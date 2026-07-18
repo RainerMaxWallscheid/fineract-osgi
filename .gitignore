@@ -35,4 +35,7 @@ gradleExp/
 .java-version
 
 .windsurf/
-docs/
+# Architecture docs under docs/arc42 and docs/gherkin are tracked.
+# Ignore only generated nested output if present:
+docs/**/build/
+docs/**/.asciidoctor/
