@@ -89,14 +89,14 @@ cargo {
 }
 
 cargoRunLocal.dependsOn ':fineract-war:war'
-// Always stop first so leftover Tomcat does not keep cargo.rmi.port / 8443 busy
-cargoStartLocal.dependsOn ':fineract-war:war', cargoStopLocal
+cargoStartLocal.dependsOn ':fineract-war:war'
 
 if (!project.hasProperty('cargoDisabled')) {
     cargoStartLocal.mustRunAfter testClasses
 }
 
-// Free ports if a previous Cargo/Tomcat died without cargoStopLocal
+// Free ports if a previous Cargo/Tomcat died without cargoStopLocal.
+// Do NOT dependsOn cargoStopLocal here: that cycles with test.finalizedBy(cargoStopLocal).
 tasks.named('cargoStartLocal').configure {
     doFirst {
         [8215, 8443].each { port ->
