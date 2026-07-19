@@ -40,6 +40,7 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **Command Hook** | T | Vor-/Nach-/Fehler-Callback um die Command-Ausführung (z. B. Username, Timestamp). |
 | **Compatibility** | A | Qualitätsziel: stabile REST-Verträge trotz interner Migration. → [07](07_quality_attributes.md) |
 | **Correlation-ID** | B/T | Request-übergreifende Trace-ID (Header z. B. `X-Correlation-ID`) für Logs und Support. → [06](06_crosscutting_concepts.md) |
+| **Clean Code** | A | Praktiken für lesbaren, testbaren, wartbaren Code (Namen, kleine Einheiten, Boy Scout, SOLID-Orientierung). → [ADR-018](decisions/ADR-018-clean-code.md) |
 | **CQRS** | A/T | *Command Query Responsibility Segregation* – Trennung von Schreib- und Lesepfaden. → [06](06_crosscutting_concepts.md), [08](08_design_decisions.md) |
 
 ---

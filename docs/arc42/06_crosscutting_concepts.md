@@ -23,6 +23,7 @@ Crosscutting Concepts sind architekturweite Lösungsansätze, die **mehrere Baus
 | 11 | Data Access & Caching | Performance, Pooling | HikariCP, optionale Caches |
 | 12 | API-Stil, DTO Composition & Compatibility | Stabile Integrationen | REST, Idempotency, OpenAPI, Gson SPI |
 | 13 | Hexagonale Architektur | Dependency Rule, austauschbare Ränder | Ports & Adapters, CQRS, OSGi, KI |
+| 14 | Clean Code | Lesbarkeit, Testbarkeit, sichere Evolution | Namen, kleine Einheiten, Boy Scout, SOLID, CI |
 
 ```mermaid
 flowchart TB
@@ -553,7 +554,37 @@ CQRS: **Commands** und **Queries** sind Application-Use-Cases mit **unterschiedl
 
 ---
 
-## 6.14 API-Stil, DTO Composition, Idempotenz & Compatibility
+## 6.14 Clean Code
+
+### Motivation
+
+Großer Legacy-Bestand und parallele Modernisierung erfordern ein gemeinsames **Code-Qualitätsleitbild** – nicht nur Architekturgrenzen ([ADR-018](decisions/ADR-018-clean-code.md)).
+
+### Leitprinzipien (Kurz)
+
+| Prinzip | Praxis |
+|---------|--------|
+| **Namen** | Fachsprache; Use-Case-klare Commands/Resources |
+| **Kleine Einheiten** | Dünne Resources/Handler; Logik in Domain |
+| **Composition** | Statt fragiler Vererbung ([ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)) |
+| **Explizite Fehler** | Validierung vor Side Effects; mappable Exceptions |
+| **Boy Scout** | Angefassten Code lokal verbessern, Scope im PR halten |
+| **Tests** | Domain unit; Adapter IT; API-Verträge absichern |
+| **Dependency Rule** | Domain ohne Transport/Vendor-APIs ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)) |
+
+SOLID dient als **Orientierung** (S/O/L/I/D), nicht als dogmatische Klassenexplosion.
+
+### Durchsetzung
+
+Spotless/Format, Checkstyle/SpotBugs (wo aktiv), CI-Tests, Code Review, arc42/Gherkin, `AGENTS.md`.
+
+### Non-Goals
+
+Kein Repo-weites Reformat in einem PR; kein Ersatz für fachliche Komplexität; kein Big-Bang-Clean-Rewrite.
+
+---
+
+## 6.15 API-Stil, DTO Composition, Idempotenz & Compatibility
 
 | Thema | Konzept |
 |-------|---------|
@@ -606,7 +637,7 @@ Shared-Typen (`DepositProductData`, `DepositAccountData`, `InteropRequestData`) 
 
 ---
 
-## 6.15 Zusammenspiel der Konzepte (Beispielfluss)
+## 6.16 Zusammenspiel der Konzepte (Beispielfluss)
 
 Loan Creation mit optionaler KI – Crosscutting-Schichten:
 
@@ -636,7 +667,7 @@ sequenceDiagram
 
 ---
 
-## 6.16 Qualitätsbezug
+## 6.17 Qualitätsbezug
 
 | Crosscutting Concept | Unterstützte Qualität ([Kap. 7](07_quality_attributes.md)) |
 |----------------------|--------------------------------------------------------------|
@@ -645,6 +676,7 @@ sequenceDiagram
 | CQRS / Commands | Skalierbarkeit Writes/Reads, Maintainability |
 | API-DTO Composition | Maintainability, Compatibility (flache JSON-Verträge) |
 | Hexagonale Architektur | Maintainability, Extensibility, Testability |
+| Clean Code | Maintainability, Reliability, Testability |
 | OSGi | Extensibility, Maintainability, Deployment-Flexibilität |
 | KI-Integration | Extensibility, Innovation ohne Core-Komplexität |
 | Observability | Operability, Performance-Diagnose |
@@ -653,7 +685,7 @@ sequenceDiagram
 
 ---
 
-## 6.17 Offene Punkte / nächste Iterationen
+## 6.18 Offene Punkte / nächste Iterationen
 
 - Einheitliches **Outbox-Pattern** für External Events (exactly-once / at-least-once klar definieren)
 - Standard-Interfaces für OSGi Extension Points (API-Bundle versioniert)
@@ -666,7 +698,7 @@ sequenceDiagram
 
 ---
 
-## 6.18 Verwandte Gherkin-Features
+## 6.19 Verwandte Gherkin-Features
 
 | Konzept | Feature |
 |---------|---------|

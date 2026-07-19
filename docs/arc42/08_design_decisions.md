@@ -40,6 +40,7 @@ Die einzelnen ADRs liegen unter [`decisions/`](decisions/) – **eine Datei pro 
 | [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md) | API-DTO Composition | accepted | Spezialisierte DTOs komponieren Shared-Felder; API bleibt flach |
 | [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md) | JPA-Ausbau Read/Write | accepted | Spring Data + EclipseLink; Hybrid Reads; Scope S1/S2 |
 | [ADR-017](decisions/ADR-017-hexagonale-architektur.md) | Hexagonale Architektur | accepted | Ports & Adapters als Leitbild; Mapping auf CQRS/OSGi/KI |
+| [ADR-018](decisions/ADR-018-clean-code.md) | Clean Code | accepted | Lesbarer, testbarer Code; Boy Scout; SOLID als Orientierung |
 
 ```mermaid
 flowchart TB
@@ -53,6 +54,9 @@ flowchart TB
     ADR003 --> ADR017[ADR-017 Hexagon]
     ADR002 --> ADR017
     ADR004 --> ADR017
+    ADR017 --> ADR018[ADR-018 Clean Code]
+    ADR015 --> ADR018
+    ADR014 --> ADR018
     ADR002 --> ADR005[ADR-005 Externe KI]
     ADR005 --> ADR006[ADR-006 Async KI]
     ADR003 --> ADR007[ADR-007 Node Modes]
@@ -104,6 +108,7 @@ flowchart TB
 | 015 DTO Composition | + | | | | ++ | + | | | ++ |
 | 016 JPA Ausbau | + | | + | + | ++ | | + | + | + |
 | 017 Hexagon | + | | | | ++ | ++ | | | + |
+| 018 Clean Code | + | | + | | ++ | | | + | + |
 
 *(++ stark positiv, + positiv, ± gemischt/Trade-off)*
 
@@ -152,6 +157,7 @@ Details: [`decisions/README.md`](decisions/README.md).
 | [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md) DTO Composition | Unit: `*DtoCompositionTest`; IT: Interop/Deposit-API-Verträge unverändert flach |
 | [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md) JPA Ausbau | Repository-/COB-ITs; N+1- und Batch-Messungen an Pilotmodulen |
 | [ADR-017](decisions/ADR-017-hexagonale-architektur.md) Hexagon | Modul-Reviews Dependency Rule; Domain-Unit-Tests mit Fake-Ports |
+| [ADR-018](decisions/ADR-018-clean-code.md) Clean Code | Review-Checkliste; Spotless/CI; Boy Scout in angefassten Diffs |
 
 ---
 
