@@ -43,7 +43,6 @@ import org.apache.fineract.integrationtests.common.charges.ChargesHelper;
 import org.apache.fineract.integrationtests.common.savings.SavingsAccountHelper;
 import org.apache.fineract.integrationtests.common.savings.SavingsProductHelper;
 import org.apache.fineract.integrationtests.common.savings.SavingsStatusChecker;
-import org.apache.fineract.interoperation.domain.InteropActionState;
 import org.apache.fineract.interoperation.domain.InteropIdentifierType;
 import org.apache.fineract.interoperation.domain.InteropTransactionRole;
 import org.apache.fineract.interoperation.util.InteropUtil;
@@ -202,7 +201,7 @@ public class InteropTest {
         String response = interopHelper.postTransactionRequest(requestCode, InteropTransactionRole.PAYER);
         JsonPath json = JsonPath.from(response);
         Assertions.assertEquals(requestCode, json.getString(InteropUtil.PARAM_REQUEST_CODE));
-        Assertions.assertEquals(InteropActionState.ACCEPTED.toString(), json.getString(InteropHelper.PARAM_ACTION_STATE));
+        Assertions.assertEquals("ACCEPTED", json.getString(InteropHelper.PARAM_ACTION_STATE));
 
         interopHelper.setResponseSpec(responseClientErrorSpec);
         interopHelper.postTransactionRequest(requestCode, InteropTransactionRole.PAYEE);
@@ -215,7 +214,7 @@ public class InteropTest {
         String response = interopHelper.postQuote(quoteCode, InteropTransactionRole.PAYER);
         JsonPath json = JsonPath.from(response);
         Assertions.assertEquals(quoteCode, json.getString(InteropUtil.PARAM_QUOTE_CODE));
-        Assertions.assertEquals(InteropActionState.ACCEPTED.toString(), json.getString(InteropHelper.PARAM_ACTION_STATE));
+        Assertions.assertEquals("ACCEPTED", json.getString(InteropHelper.PARAM_ACTION_STATE));
 
         Map<Object, Object> fee = json.getMap(InteropUtil.PARAM_FSP_FEE);
         Assertions.assertNotNull(fee);
@@ -228,7 +227,7 @@ public class InteropTest {
         response = interopHelper.postQuote(quoteCode, InteropTransactionRole.PAYEE);
         json = JsonPath.from(response);
         Assertions.assertEquals(quoteCode, json.getString(InteropUtil.PARAM_QUOTE_CODE));
-        Assertions.assertEquals(InteropActionState.ACCEPTED.toString(), json.getString(InteropHelper.PARAM_ACTION_STATE));
+        Assertions.assertEquals("ACCEPTED", json.getString(InteropHelper.PARAM_ACTION_STATE));
 
         fee = json.getMap(InteropUtil.PARAM_FSP_FEE);
         if (fee != null) {
@@ -247,7 +246,7 @@ public class InteropTest {
         String response = interopHelper.prepareTransfer(transferCode);
         JsonPath json = JsonPath.from(response);
         Assertions.assertEquals(transferCode, json.getString(InteropUtil.PARAM_TRANSFER_CODE));
-        Assertions.assertEquals(InteropActionState.ACCEPTED.toString(), json.getString(InteropHelper.PARAM_ACTION_STATE));
+        Assertions.assertEquals("ACCEPTED", json.getString(InteropHelper.PARAM_ACTION_STATE));
 
         // prepare
         savings = (String) savingsAccountHelper.getSavingsAccountDetail(savingsId, null);
@@ -268,7 +267,7 @@ public class InteropTest {
         response = interopHelper.createTransfer(transferCode, InteropTransactionRole.PAYER);
         json = JsonPath.from(response);
         Assertions.assertEquals(transferCode, json.getString(InteropUtil.PARAM_TRANSFER_CODE));
-        Assertions.assertEquals(InteropActionState.ACCEPTED.toString(), json.getString(InteropHelper.PARAM_ACTION_STATE));
+        Assertions.assertEquals("ACCEPTED", json.getString(InteropHelper.PARAM_ACTION_STATE));
 
         savings = (String) savingsAccountHelper.getSavingsAccountDetail(savingsId, null);
         LOG.debug("Response Interoperable GET Saving: {}", savings);
@@ -283,7 +282,7 @@ public class InteropTest {
         response = interopHelper.createTransfer(transferCode, InteropTransactionRole.PAYEE);
         json = JsonPath.from(response);
         Assertions.assertEquals(transferCode, json.getString(InteropUtil.PARAM_TRANSFER_CODE));
-        Assertions.assertEquals(InteropActionState.ACCEPTED.toString(), json.getString(InteropHelper.PARAM_ACTION_STATE));
+        Assertions.assertEquals("ACCEPTED", json.getString(InteropHelper.PARAM_ACTION_STATE));
 
         savings = (String) savingsAccountHelper.getSavingsAccountDetail(savingsId, null);
         LOG.debug("Response Interoperable GET Saving: {}", savings);

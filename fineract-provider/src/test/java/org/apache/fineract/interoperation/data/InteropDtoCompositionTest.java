@@ -23,7 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.gson.Gson;
 import java.math.BigDecimal;
+import org.apache.fineract.infrastructure.core.serialization.GoogleGsonSerializerHelper;
 import org.apache.fineract.interoperation.domain.InteropActionState;
 import org.apache.fineract.interoperation.domain.InteropAmountType;
 import org.apache.fineract.interoperation.domain.InteropTransactionRole;
@@ -106,5 +108,24 @@ class InteropDtoCompositionTest {
         assertTrue(InteropKycResponseData.class.getSuperclass().equals(Object.class));
         // Identifier-account stays a CommandProcessingResult for the write pipeline
         assertTrue(InteropIdentifierAccountResponseData.class.getSuperclass().getSimpleName().equals("CommandProcessingResult"));
+    }
+
+    @Test
+    void specializedResponsesSerializeFlatStateFieldForApi() {
+        final Gson gson = GoogleGsonSerializerHelper.createSimpleGson();
+
+        final String quoteJson = gson.toJson(InteropQuoteResponseData.build("tx-q", InteropActionState.ACCEPTED, "quote-z"));
+        assertTrue(quoteJson.contains("\"state\":\"ACCEPTED\""), quoteJson);
+        assertTrue(quoteJson.contains("\"quoteCode\":\"quote-z\""), quoteJson);
+        assertTrue(quoteJson.contains("\"transactionCode\":\"tx-q\""), quoteJson);
+
+        final String txnJson = gson
+                .toJson(InteropTransactionRequestResponseData.build("tx-r", InteropActionState.ACCEPTED, "req-1"));
+        assertTrue(txnJson.contains("\"state\":\"ACCEPTED\""), txnJson);
+        assertTrue(txnJson.contains("\"requestCode\":\"req-1\""), txnJson);
+
+        final String transferJson = gson.toJson(InteropTransferResponseData.build("tx-t", InteropActionState.ACCEPTED, "xfer-1"));
+        assertTrue(transferJson.contains("\"state\":\"ACCEPTED\""), transferJson);
+        assertTrue(transferJson.contains("\"transferCode\":\"xfer-1\""), transferJson);
     }
 }
