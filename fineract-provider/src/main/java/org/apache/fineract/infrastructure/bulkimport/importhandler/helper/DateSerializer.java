@@ -48,7 +48,8 @@ public class DateSerializer implements JsonSerializer<LocalDate> {
         if (StringUtils.isNotEmpty(localeCode)) {
             formatter = DateTimeFormatter.ofPattern(dateFormat, Locale.of(localeCode));
         } else {
-            formatter = DateTimeFormatter.ofPattern(dateFormat);
+            // Bulk import defaults to English month names when no locale is supplied.
+            formatter = DateTimeFormatter.ofPattern(dateFormat, Locale.ENGLISH);
         }
         return new JsonPrimitive(src.format(formatter));
     }

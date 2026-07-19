@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.fineract.infrastructure.bulkimport.constants.LoanRepaymentConstants;
@@ -255,7 +256,7 @@ public final class LoanRepaymentWorkbookPopulator extends AbstractWorkbookPopula
         CellStyle dateCellStyle = workbook.createCellStyle();
         short df = workbook.createDataFormat().getFormat(dateFormat);
         dateCellStyle.setDataFormat(df);
-        DateTimeFormatter outputFormat = new DateTimeFormatterBuilder().appendPattern(dateFormat).toFormatter();
+        DateTimeFormatter outputFormat = new DateTimeFormatterBuilder().appendPattern(dateFormat).toFormatter(Locale.ENGLISH);
         Collections.sort(allloans, new LoanComparatorByStatusActive());
         for (LoanAccountData loan : allloans) {
             row = loanRepaymentSheet.createRow(rowIndex++);

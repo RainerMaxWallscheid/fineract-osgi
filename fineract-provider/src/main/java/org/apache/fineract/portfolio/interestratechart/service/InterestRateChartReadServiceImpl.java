@@ -65,9 +65,11 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
 
     @Override
     public Collection<InterestRateChartData> retrieveAllWithSlabs(Long productId) {
-        String sql = "select " + chartExtractor.schema() + """
-             where sp.id = ? order by irc.id, CASE WHEN irc.is_primary_grouping_by_amount then ircd.amount_range_from WHEN irc.is_primary_grouping_by_amount then ircd.amount_range_to END,ircd.from_period, ircd.to_period,CASE WHEN NOT irc.is_primary_grouping_by_amount then ircd.amount_range_from WHEN NOT irc.is_primary_grouping_by_amount then ircd.amount_range_to END""";
-        return jdbcTemplate.query(con -> con.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE), ps -> ps.setLong(1, productId), chartExtractor);
+        String sql = "select " + chartExtractor.schema()
+                + " where sp.id = ? order by irc.id, CASE WHEN irc.is_primary_grouping_by_amount then ircd.amount_range_from WHEN irc.is_primary_grouping_by_amount then ircd.amount_range_to END,ircd.from_period, ircd.to_period,CASE WHEN NOT irc.is_primary_grouping_by_amount then ircd.amount_range_from WHEN NOT irc.is_primary_grouping_by_amount then ircd.amount_range_to END";
+        // TYPE_FORWARD_ONLY: PostgreSQL JDBC does not support TYPE_SCROLL_SENSITIVE well and can yield empty SQL errors.
+        return jdbcTemplate.query(con -> con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY),
+                ps -> ps.setLong(1, productId), chartExtractor);
     }
 
     @Override

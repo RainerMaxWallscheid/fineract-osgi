@@ -52,6 +52,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.apache.fineract.client.models.AdvancedQueryData;
 import org.apache.fineract.client.models.AdvancedQueryRequest;
@@ -126,9 +127,9 @@ public class DatatableAdvancedQueryTest {
     public void testDatatableAdvancedQuery() {
         String datatable = createAndVerifyDatatable(SAVINGS_TRANSACTION_APP_TABLE_NAME, null, false);
         LocalDate today = Utils.getLocalDateOfTenant();
-        String todayS = DateUtils.format(today, SAVINGS_DATE_FORMAT);
+        String todayS = DateUtils.format(today, SAVINGS_DATE_FORMAT, Locale.ENGLISH);
         LocalDate yesterday = today.minus(1, ChronoUnit.DAYS);
-        String yesterdayS = DateUtils.format(yesterday, SAVINGS_DATE_FORMAT);
+        String yesterdayS = DateUtils.format(yesterday, SAVINGS_DATE_FORMAT, Locale.ENGLISH);
         try {
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(true));
@@ -212,9 +213,9 @@ public class DatatableAdvancedQueryTest {
         String datatable = createAndVerifyDatatable(SAVINGS_TRANSACTION_APP_TABLE_NAME, null, false);
 
         LocalDate today = Utils.getLocalDateOfTenant();
-        String todayS = DateUtils.format(today, SAVINGS_DATE_FORMAT);
+        String todayS = DateUtils.format(today, SAVINGS_DATE_FORMAT, Locale.ENGLISH);
         LocalDate yesterday = today.minus(1, ChronoUnit.DAYS);
-        String yesterdayS = DateUtils.format(yesterday, SAVINGS_DATE_FORMAT);
+        String yesterdayS = DateUtils.format(yesterday, SAVINGS_DATE_FORMAT, Locale.ENGLISH);
         try {
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(true));
@@ -350,7 +351,7 @@ public class DatatableAdvancedQueryTest {
         final HashMap<String, Object> request = new HashMap<>();
         request.put(COLUMN_STRING, Utils.uniqueRandomStringGenerator(apptableId.toString() + "_", 5));
         request.put(COLUMN_TEXT, apptableId);
-        request.put(COLUMN_DATE, DateUtils.format(dateValue, SAVINGS_DATE_FORMAT));
+        request.put(COLUMN_DATE, DateUtils.format(dateValue, SAVINGS_DATE_FORMAT, Locale.ENGLISH));
         request.put(COLUMN_BOOLEAN, boolValue);
         request.put(COLUMN_INTEGER, intValue == null ? null : intValue.toString());
         request.put(COLUMN_DECIMAL, decValue == null ? null : decValue.toString());

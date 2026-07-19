@@ -162,8 +162,8 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
         Assertions.assertNotNull(transactionsResponse.getContent());
         List<GetSavingsAccountTransactionsPageItem> pageItemsList = List.copyOf(transactionsResponse.getContent());
         assertEquals(3, pageItemsList.size());
-        assertEquals(parseLocalDate(withdrawDate, DEFAULT_DATE_FORMAT), pageItemsList.get(0).getDate());
-        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT), pageItemsList.get(1).getDate());
+        assertEquals(parseLocalDate(withdrawDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), pageItemsList.get(0).getDate());
+        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), pageItemsList.get(1).getDate());
     }
 
     @Test
@@ -227,11 +227,11 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
         GetSavingsAccountTransactionsPageItem first = pageItemsList.get(0);
         assertEquals(Long.valueOf(typeD), first.getTransactionType().getId());
         assertTrue(MathUtil.isEqualTo(BigDecimal.valueOf(300), first.getAmount()));
-        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT), first.getDate());
+        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), first.getDate());
         GetSavingsAccountTransactionsPageItem second = pageItemsList.get(1);
         assertEquals(Long.valueOf(typeD), second.getTransactionType().getId());
         assertTrue(MathUtil.isEqualTo(BigDecimal.valueOf(100), second.getAmount()));
-        assertEquals(parseLocalDate(firstDepositDate, DEFAULT_DATE_FORMAT), second.getDate());
+        assertEquals(parseLocalDate(firstDepositDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), second.getDate());
     }
 
     @Test
@@ -310,11 +310,11 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
         GetSavingsAccountTransactionsPageItem first = pageItemsList.get(0);
         assertEquals(Long.valueOf(typeD), first.getTransactionType().getId());
         assertTrue(MathUtil.isEqualTo(BigDecimal.valueOf(100), first.getAmount()));
-        assertEquals(parseLocalDate(firstDepositDate, DEFAULT_DATE_FORMAT), first.getDate());
+        assertEquals(parseLocalDate(firstDepositDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), first.getDate());
         GetSavingsAccountTransactionsPageItem second = pageItemsList.get(1);
         assertEquals(Long.valueOf(typeD), second.getTransactionType().getId());
         assertTrue(MathUtil.isEqualTo(BigDecimal.valueOf(300), second.getAmount()));
-        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT), second.getDate());
+        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), second.getDate());
     }
 
     @Test
@@ -347,11 +347,11 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
         GetSavingsAccountTransactionsPageItem first = pageItemsList.get(0);
         assertEquals(Long.valueOf(typeD), first.getTransactionType().getId());
         assertTrue(MathUtil.isEqualTo(BigDecimal.valueOf(400), first.getAmount()));
-        assertEquals(parseLocalDate(thirdDepositDate, DEFAULT_DATE_FORMAT), first.getDate());
+        assertEquals(parseLocalDate(thirdDepositDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), first.getDate());
         GetSavingsAccountTransactionsPageItem second = pageItemsList.get(1);
         assertEquals(Long.valueOf(typeD), second.getTransactionType().getId());
         assertTrue(MathUtil.isEqualTo(BigDecimal.valueOf(300), second.getAmount()));
-        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT), second.getDate());
+        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), second.getDate());
     }
 
     @Test

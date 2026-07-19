@@ -24,6 +24,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.Locale;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.slf4j.Logger;
@@ -53,7 +54,9 @@ public class CreditBureauToken extends AbstractPersistableCustom<Long> {
         final String expiresIn = command.stringValueOfParameterNamed("expires_in");
         final String issued = command.stringValueOfParameterNamed(".issued");
         final String expiry = command.stringValueOfParameterNamed(".expires");
-        DateTimeFormatter dateformat = new DateTimeFormatterBuilder().appendPattern("EEE, dd MMM yyyy kk:mm:ss zzz").toFormatter();
+        // HTTP date headers always use English day/month names (e.g. "Sun, 19 Jul 2026 ...").
+        DateTimeFormatter dateformat = new DateTimeFormatterBuilder().appendPattern("EEE, dd MMM yyyy kk:mm:ss zzz")
+                .toFormatter(Locale.ENGLISH);
         LocalDate expires = LocalDate.parse(expiry, dateformat);
         return new CreditBureauToken().setUserName(userName).setAccessToken(accessToken).setTokenType(tokenType).setExpiresIn(expiresIn).setIssued(issued).setExpires(expires);
     }
