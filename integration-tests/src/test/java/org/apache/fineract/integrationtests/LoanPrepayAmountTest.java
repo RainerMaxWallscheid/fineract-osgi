@@ -55,7 +55,8 @@ public class LoanPrepayAmountTest extends FeignLoanTestBase {
             disburseLoan(loanId, BigDecimal.valueOf(400.0), "20240105");
         });
         for (int i = 7; i <= 31; i++) {
-            runAt(i + " January 2024", () -> {
+            final String businessDate = String.format("202401%02d", i);
+            runAt(businessDate, () -> {
                 GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
                 GetLoansLoanIdTransactionsTemplateResponse prepayAmountResponse = getPrepaymentAmount(loanId, null, DATETIME_PATTERN);
                 Assertions.assertEquals(BigDecimal.valueOf(prepayAmountResponse.getInterestPortion()).stripTrailingZeros(), loanDetails.getSummary().getTotalUnpaidPayableNotDueInterest().stripTrailingZeros());
