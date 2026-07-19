@@ -38,6 +38,7 @@ Die einzelnen ADRs liegen unter [`decisions/`](decisions/) – **eine Datei pro 
 | [ADR-013](decisions/ADR-013-sicherheit-am-api-rand-defense-in-depth.md) | Security am Rand | accepted | Proxy/WAF + AuthN/Z + Audit |
 | [ADR-014](decisions/ADR-014-arc42-gherkin-als-doku-strategie.md) | arc42 + Gherkin | accepted | Architektur und Verhalten dokumentieren |
 | [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md) | API-DTO Composition | accepted | Spezialisierte DTOs komponieren Shared-Felder; API bleibt flach |
+| [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md) | JPA-Ausbau Read/Write | accepted | Spring Data + EclipseLink; Hybrid Reads; Scope S1/S2 |
 
 ```mermaid
 flowchart TB
@@ -45,6 +46,9 @@ flowchart TB
     ADR001 --> ADR003[ADR-003 Spring Boot Kern]
     ADR003 --> ADR004[ADR-004 CQRS modern]
     ADR004 --> ADR015[ADR-015 DTO Composition]
+    ADR003 --> ADR016[ADR-016 JPA Ausbau]
+    ADR004 --> ADR016
+    ADR008 --> ADR016
     ADR002 --> ADR005[ADR-005 Externe KI]
     ADR005 --> ADR006[ADR-006 Async KI]
     ADR003 --> ADR007[ADR-007 Node Modes]
@@ -94,6 +98,7 @@ flowchart TB
 | 013 Security | + | ++ | | | | | | + | |
 | 014 Doku | | | | | ++ | | | + | |
 | 015 DTO Composition | + | | | | ++ | + | | | ++ |
+| 016 JPA Ausbau | + | | + | + | ++ | | + | + | + |
 
 *(++ stark positiv, + positiv, ± gemischt/Trade-off)*
 
@@ -140,6 +145,7 @@ Details: [`decisions/README.md`](decisions/README.md).
 | [ADR-013](decisions/ADR-013-sicherheit-am-api-rand-defense-in-depth.md) Security | `@adr-013` → [security_authentication](../gherkin/features/crosscutting/security_authentication.feature) |
 | [ADR-014](decisions/ADR-014-arc42-gherkin-als-doku-strategie.md) Doku | Mapping-Prozess in [gherkin/README.md](../gherkin/README.md) |
 | [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md) DTO Composition | Unit: `*DtoCompositionTest`; IT: Interop/Deposit-API-Verträge unverändert flach |
+| [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md) JPA Ausbau | Repository-/COB-ITs; N+1- und Batch-Messungen an Pilotmodulen |
 
 ---
 

@@ -497,6 +497,8 @@ Beispiele: Loan COB on/off, External Events, Correlation IDs, IP Tracking, Journ
 - JDBC/JPA über Tenant-DataSource; HikariCP-Pooling (`FINERACT_HIKARI_*`).
 - Tenants-DB nur für Routing/Metadaten; Fachdaten in Tenant-DB.
 - Optional Read-only Replica-Parameter pro Tenant.
+- **JPA-Stack**: Spring Data JPA + **EclipseLink** (Hibernate excluded); Multi-Tenant über `RoutingDataSource`, eine EMF.
+- **CQRS-Persistenz** ([ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md)): Writes/Domain → JPA; einfache Reads → Projection/Specs; schwere Reads/COB → JdbcTemplate/SQL. Ausbau in Stufen **S1** (Hygiene) und **S2** (Performance), kein Big-Bang „alles JPA“.
 
 ### Transaktionen
 

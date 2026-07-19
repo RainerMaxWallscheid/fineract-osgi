@@ -13,7 +13,7 @@ Dieses Verzeichnis enthält die arc42-Dokumentation für **fineract-osgi** – A
 | 05 | [Deployment View](05_deployment_view.md) | Compose, K8s, Modes, OSGi-Betrieb |
 | 06 | [Crosscutting Concepts](06_crosscutting_concepts.md) | Tenant, Security, CQRS, Events, Observability |
 | 07 | [Quality Attributes](07_quality_attributes.md) | NFRs, Scenarios, Trade-offs |
-| 08 | [Design Decisions](08_design_decisions.md) | ADRs 001–015 in [`decisions/`](decisions/) |
+| 08 | [Design Decisions](08_design_decisions.md) | ADRs 001–016 in [`decisions/`](decisions/) |
 | 09 | [Glossary](09_glossary.md) | Begriffe, Abkürzungen, Ports, Env |
 
 ## Ergänzende Artefakte

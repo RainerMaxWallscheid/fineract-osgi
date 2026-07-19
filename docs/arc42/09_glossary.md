@@ -56,6 +56,7 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **Docker Compose** | B | Orchestrierung lokaler Multi-Container-Setups; Referenzdateien `docker-compose*.yml`. → [05](05_deployment_view.md) |
 | **DTO** | T | *Data Transfer Object* – typisierte Nutzlast zwischen API, Command und Domain (Ziel des neuen Command-Stacks). |
 | **DTO Composition** | A | Spezialisierte API-DTOs halten Shared-Felder als Komponente oder flache Kopie statt durch Vererbung; Wire-JSON bleibt flach. → [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md) |
+| **EclipseLink** | T | JPA-Provider in fineract-osgi (statt Hibernate); Static Weaving, Spring `EclipseLinkJpaVendorAdapter`. → [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md) |
 | **Equinox** | T | Eclipse OSGi-Framework, in fineract-osgi als OSGi-Runtime vorgesehen. → [05](05_deployment_view.md), [08](08_design_decisions.md) |
 | **External Event** | T | Für Systeme außerhalb des Prozesses publiziertes Ereignis (Kafka/JMS). |
 | **Fail-Closed** | A | Bei Fehler/Timeout des Downstream (z. B. KI) wird die Operation **abgelehnt**. → [06](06_crosscutting_concepts.md) |
