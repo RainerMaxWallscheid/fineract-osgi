@@ -165,7 +165,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     private static final SavingsAccountHelper SAVINGS_ACCOUNT_HELPER = new SavingsAccountHelper(REQUEST_SPEC, RESPONSE_SPEC);
     private static final AccountTransferHelper ACCOUNT_TRANSFER_HELPER = new AccountTransferHelper(REQUEST_SPEC, RESPONSE_SPEC);
     private static final LoanProductHelper LOAN_PRODUCT_HELPER = new LoanProductHelper();
-    private static final String DATETIME_PATTERN = "dd MMMM yyyy";
+    private static final String DATETIME_PATTERN = "yyyyMMdd";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = new DateTimeFormatterBuilder().appendPattern(DATETIME_PATTERN)
             .toFormatter(Locale.ENGLISH);
     private static final BusinessDateHelper BUSINESS_DATE_HELPER = new BusinessDateHelper();
@@ -401,13 +401,13 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("252.12", String.valueOf(disbursementDetail.get("feeChargesDue")));
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20 September 2011", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20110920", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         // DISBURSE
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID, "10000",
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20110920", loanID, "10000",
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LOG.info("DISBURSE {}", loanStatusHashMap.toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
@@ -438,7 +438,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
         DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());
-        final String LOAN_DISBURSEMENT_DATE = "2 June 2014";
+        final String LOAN_DISBURSEMENT_DATE = "20140602";
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
         loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan(LOAN_DISBURSEMENT_DATE, loanID);
@@ -474,13 +474,13 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
         Integer amountPercentage = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT, "1", false));
-        addCharges(charges, amountPercentage, "1", "29 September 2011");
+        addCharges(charges, amountPercentage, "1", "20110929");
         Integer amountPlusInterestPercentage = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC, ChargesHelper
                 .getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT_AND_INTEREST, "1", false));
-        addCharges(charges, amountPlusInterestPercentage, "1", "29 September 2011");
+        addCharges(charges, amountPlusInterestPercentage, "1", "20110929");
         Integer interestPercentage = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_INTEREST, "1", false));
-        addCharges(charges, interestPercentage, "1", "29 September 2011");
+        addCharges(charges, interestPercentage, "1", "20110929");
 
         List<HashMap> collaterals = new ArrayList<>();
 
@@ -509,7 +509,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("252.12", String.valueOf(firstInstallment.get("feeChargesDue")));
 
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID,
-                LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flat), "29 September 2011", "100"));
+                LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flat), "20110929", "100"));
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         firstInstallment = loanSchedule.get(1);
@@ -560,7 +560,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("210.1", String.valueOf(firstInstallment.get("feeChargesDue")));
 
         charges.clear();
-        addCharges(charges, flat, "100", "29 September 2011");
+        addCharges(charges, flat, "100", "20110929");
         LOAN_TRANSACTION_HELPER.updateLoan(loanID, updateLoanJson(clientID, loanProductID, charges, null, collaterals));
 
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
@@ -577,12 +577,12 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("0", String.valueOf(firstInstallment.get("feeChargesDue")));
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20 September 2011", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20110920", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID,
-                LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatAccTransfer), "29 September 2011", "100"));
+                LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatAccTransfer), "20110929", "100"));
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         firstInstallment = loanSchedule.get(1);
@@ -591,13 +591,13 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
         // DISBURSE
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID, "10000",
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20110920", loanID, "10000",
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LOG.info("DISBURSE {}", loanStatusHashMap.toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID,
-                LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(amountPercentage), "29 September 2011", "1"));
+                LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(amountPercentage), "20110929", "1"));
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         firstInstallment = loanSchedule.get(1);
@@ -642,13 +642,13 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
         Integer amountPercentage = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanInstallmentJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT, "1", false));
-        addCharges(charges, amountPercentage, "1", "29 September 2011");
+        addCharges(charges, amountPercentage, "1", "20110929");
         Integer amountPlusInterestPercentage = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanInstallmentJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT_AND_INTEREST, "1", false));
-        addCharges(charges, amountPlusInterestPercentage, "1", "29 September 2011");
+        addCharges(charges, amountPlusInterestPercentage, "1", "20110929");
         Integer interestPercentage = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanInstallmentJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_INTEREST, "1", false));
-        addCharges(charges, interestPercentage, "1", "29 September 2011");
+        addCharges(charges, interestPercentage, "1", "20110929");
 
         List<HashMap> collaterals = new ArrayList<>();
 
@@ -802,7 +802,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                 "0.0");
 
         charges.clear();
-        addCharges(charges, flat, "50", "29 September 2011");
+        addCharges(charges, flat, "50", "20110929");
         LOAN_TRANSACTION_HELPER.updateLoan(loanID, updateLoanJson(clientID, loanProductID, charges, null, collaterals));
 
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
@@ -822,7 +822,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         }
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20 September 2011", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20110920", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
@@ -838,7 +838,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
         // DISBURSE
         String loanDetail = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID, "10000",
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20110920", loanID, "10000",
                 JsonPath.from(loanDetail).get("netDisbursalAmount").toString());
         LOG.info("DISBURSE {}", loanStatusHashMap.toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
@@ -1011,7 +1011,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20 September 2011", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20110920", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
@@ -1085,8 +1085,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         final Integer loanProductID = createLoanProduct(true, NONE);
 
         List<HashMap> tranches = new ArrayList<>();
-        tranches.add(createTrancheDetail("01 March 2014", "25000"));
-        tranches.add(createTrancheDetail("23 April 2014", "20000"));
+        tranches.add(createTrancheDetail("20140301", "25000"));
+        tranches.add(createTrancheDetail("20140423", "20000"));
 
         List<HashMap> collaterals = new ArrayList<>();
 
@@ -1104,19 +1104,19 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("01 March 2014", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20140301", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         // DISBURSE first Tranche
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20 March 2014", loanID,
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20140320", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LOG.info("DISBURSE {}", loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
         // DISBURSE Second Tranche
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("23 April 2014", loanID,
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20140423", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LOG.info("DISBURSE {}", loanStatusHashMap.toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
@@ -1136,8 +1136,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         final Integer savingsId = SavingsAccountHelper.openSavingsAccount(REQUEST_SPEC, RESPONSE_SPEC, clientID, MINIMUM_OPENING_BALANCE);
 
         List<HashMap> tranches = new ArrayList<>();
-        tranches.add(createTrancheDetail("01 March 2014", "25000"));
-        tranches.add(createTrancheDetail("23 April 2014", "20000"));
+        tranches.add(createTrancheDetail("20140301", "25000"));
+        tranches.add(createTrancheDetail("20140423", "20000"));
 
         List<HashMap> collaterals = new ArrayList<>();
 
@@ -1156,7 +1156,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("01 March 2014", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20140301", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
@@ -1166,7 +1166,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
         // DISBURSE first Tranche
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanToSavings("01 March 2014", loanID,
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanToSavings("20140301", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LOG.info("DISBURSE {}", loanStatusHashMap.toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
@@ -1176,7 +1176,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         assertEquals(balance, summary.get("accountBalance"), "Verifying opening Balance");
 
         // DISBURSE Second Tranche
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanToSavings("23 April 2014", loanID,
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanToSavings("20140423", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LOG.info("DISBURSE {}", loanStatusHashMap.toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
@@ -1210,7 +1210,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         addCharges(charges, flatDisbursement, "100", null);
         Integer flatSpecifiedDueDate = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "100", false));
-        addCharges(charges, flatSpecifiedDueDate, "100", "29 September 2011");
+        addCharges(charges, flatSpecifiedDueDate, "100", "20110929");
         Integer flatInstallmentFee = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanInstallmentJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "50", false));
         addCharges(charges, flatInstallmentFee, "50", null);
@@ -1256,42 +1256,42 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("50.00", String.valueOf(secondInstallment.get("feeChargesDue")));
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20 September 2011", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20110920", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         LOG.info("-------------------------------DISBURSE LOAN-------------------------------------------");
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID,
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20110920", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
         final JournalEntry[] assetAccountInitialEntry = { new JournalEntry(Float.parseFloat("100.00"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.DEBIT) };
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 September 2011", assetAccountInitialEntry);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 September 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20110920", assetAccountInitialEntry);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20110920",
                 new JournalEntry(Float.parseFloat("100.00"), JournalEntry.TransactionType.CREDIT));
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(flatDisbursement, loanCharges, "100", "0.00", "100.0", "0.0");
 
         LOG.info("-------------Make repayment 1-----------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 October 2011", Float.parseFloat("3301.49"), loanID);
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111020", Float.parseFloat("3301.49"), loanID);
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(flatDisbursement, loanCharges, "100", "0.00", "100.0", "0.0");
         validateCharge(flatSpecifiedDueDate, loanCharges, "100", "0.00", "100.0", "0.0");
         validateCharge(flatInstallmentFee, loanCharges, "50", "150.00", "50.0", "0.0");
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3301.49"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("2911.49"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20111020",
                 new JournalEntry(Float.parseFloat("150.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("240.00"), JournalEntry.TransactionType.CREDIT));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatSpecifiedDueDate), "29 October 2011", "100"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatSpecifiedDueDate), "20111029", "100"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
 
@@ -1304,11 +1304,11 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateCharge(flatInstallmentFee, loanCharges, "50", "100.00", "50.0", "50.0");
 
         LOG.info("----------Make repayment 2------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3251.49"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3251.49"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3251.49"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("2969.72"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 November 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20111120",
                 new JournalEntry(Float.parseFloat("100.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("181.77"), JournalEntry.TransactionType.CREDIT));
         loanSchedule.clear();
@@ -1317,7 +1317,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("0", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("--------------Waive interest---------------");
-        LOAN_TRANSACTION_HELPER.waiveInterest("20 December 2011", String.valueOf(61.79), loanID);
+        LOAN_TRANSACTION_HELPER.waiveInterest("20111220", String.valueOf(61.79), loanID);
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap thirdInstallment = loanSchedule.get(3);
@@ -1326,7 +1326,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         Integer flatPenaltySpecifiedDueDate = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "100", true));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "29 September 2011", "100"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "20110929", "100"));
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(flatPenaltySpecifiedDueDate, loanCharges, "100", "0.00", "100.0", "0.0");
@@ -1336,24 +1336,24 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         secondInstallment = loanSchedule.get(2);
         validateNumberForEqual("100", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3301.49"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("2811.49"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20111020",
                 new JournalEntry(Float.parseFloat("100.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("150.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("240"), JournalEntry.TransactionType.CREDIT));
 
         LOG.info("----------Make repayment 3 advance------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3301.49"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3301.49"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3301.49"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3129.11"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 November 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20111120",
                 new JournalEntry(Float.parseFloat("50.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("122.38"), JournalEntry.TransactionType.CREDIT));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "10 January 2012", "100"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "20120110", "100"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap fourthInstallment = loanSchedule.get(4);
@@ -1361,10 +1361,10 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3239.68", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Pay applied penalty ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("100"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("100"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("100"), JournalEntry.TransactionType.DEBIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 January 2012",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20120120",
                 new JournalEntry(Float.parseFloat("100.00"), JournalEntry.TransactionType.CREDIT));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
@@ -1373,11 +1373,11 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3139.68", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Make repayment 4 ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("3139.68"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("3139.68"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("3139.68"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3089.68"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 January 2012",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20120120",
                 new JournalEntry(Float.parseFloat("50.00"), JournalEntry.TransactionType.CREDIT));
     }
 
@@ -1399,11 +1399,11 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
         Integer percentageSpecifiedDueDateCharge = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT, "1", false));
-        addCharges(charges, percentageSpecifiedDueDateCharge, "1", "29 September 2011");
+        addCharges(charges, percentageSpecifiedDueDateCharge, "1", "20110929");
 
         Integer percentageInstallmentFee = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanInstallmentJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT, "1", false));
-        addCharges(charges, percentageInstallmentFee, "1", "29 September 2011");
+        addCharges(charges, percentageInstallmentFee, "1", "20110929");
 
         final Account assetAccount = ACCOUNT_HELPER.createAssetAccount();
         final Account incomeAccount = ACCOUNT_HELPER.createIncomeAccount();
@@ -1446,42 +1446,42 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("29.70", String.valueOf(secondInstallment.get("feeChargesDue")));
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20 September 2011", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20110920", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         LOG.info("-------------------------------DISBURSE LOAN-------------------------------------------");
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID,
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20110920", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
         final JournalEntry[] assetAccountInitialEntry = { new JournalEntry(Float.parseFloat("120.00"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.DEBIT) };
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 September 2011", assetAccountInitialEntry);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 September 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20110920", assetAccountInitialEntry);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20110920",
                 new JournalEntry(Float.parseFloat("120.00"), JournalEntry.TransactionType.CREDIT));
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(percentageDisbursementCharge, loanCharges, "1", "0.0", "120.00", "0.0");
 
         LOG.info("-------------Make repayment 1-----------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 October 2011", Float.parseFloat("3300.60"), loanID);
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111020", Float.parseFloat("3300.60"), loanID);
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(percentageDisbursementCharge, loanCharges, "1", "0.00", "120.00", "0.0");
         validateCharge(percentageSpecifiedDueDateCharge, loanCharges, "1", "0.00", "120.0", "0.0");
         validateCharge(percentageInstallmentFee, loanCharges, "1", "90.89", "29.11", "0.0");
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3300.60"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("2911.49"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20111020",
                 new JournalEntry(Float.parseFloat("149.11"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("240.00"), JournalEntry.TransactionType.CREDIT));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentageSpecifiedDueDateCharge), "29 October 2011", "1"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentageSpecifiedDueDateCharge), "20111029", "1"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
 
@@ -1494,11 +1494,11 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateCharge(percentageInstallmentFee, loanCharges, "1", "61.19", "29.11", "29.70");
 
         LOG.info("----------Make repayment 2------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3271.49"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3271.49"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3271.49"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("2969.72"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 November 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20111120",
                 new JournalEntry(Float.parseFloat("120.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("181.77"), JournalEntry.TransactionType.CREDIT));
         loanSchedule.clear();
@@ -1507,7 +1507,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("0", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("--------------Waive interest---------------");
-        LOAN_TRANSACTION_HELPER.waiveInterest("20 December 2011", String.valueOf(61.79), loanID);
+        LOAN_TRANSACTION_HELPER.waiveInterest("20111220", String.valueOf(61.79), loanID);
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap thirdInstallment = loanSchedule.get(3);
@@ -1516,7 +1516,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         Integer percentagePenaltySpecifiedDueDate = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT, "1", true));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentagePenaltySpecifiedDueDate), "29 September 2011", "1"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentagePenaltySpecifiedDueDate), "20110929", "1"));
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(percentagePenaltySpecifiedDueDate, loanCharges, "1", "0.00", "120.0", "0.0");
@@ -1526,24 +1526,24 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         secondInstallment = loanSchedule.get(2);
         validateNumberForEqual("120", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3300.60"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("2791.49"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20111020",
                 new JournalEntry(Float.parseFloat("120.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("149.11"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("240"), JournalEntry.TransactionType.CREDIT));
 
         LOG.info("----------Make repayment 3 advance------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3301.78"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3301.78"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3301.78"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3149.11"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 November 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20111120",
                 new JournalEntry(Float.parseFloat("30.29"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("122.38"), JournalEntry.TransactionType.CREDIT));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentagePenaltySpecifiedDueDate), "10 January 2012", "1"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentagePenaltySpecifiedDueDate), "20120110", "1"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap fourthInstallment = loanSchedule.get(4);
@@ -1551,10 +1551,10 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3240.58", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Pay applied penalty ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("120"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("120"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("120"), JournalEntry.TransactionType.DEBIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 January 2012",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20120120",
                 new JournalEntry(Float.parseFloat("120.00"), JournalEntry.TransactionType.CREDIT));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
@@ -1563,11 +1563,11 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3120.58", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Make repayment 4 ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("3120.58"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("3120.58"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("3120.58"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3089.68"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 January 2012",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20120120",
                 new JournalEntry(Float.parseFloat("30.90"), JournalEntry.TransactionType.CREDIT));
     }
 
@@ -1589,11 +1589,11 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
         Integer amountPlusInterestPercentageSpecifiedDueDateCharge = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC, ChargesHelper
                 .getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT_AND_INTEREST, "1", false));
-        addCharges(charges, amountPlusInterestPercentageSpecifiedDueDateCharge, "1", "29 September 2011");
+        addCharges(charges, amountPlusInterestPercentageSpecifiedDueDateCharge, "1", "20110929");
 
         Integer amountPlusInterestPercentageInstallmentFee = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanInstallmentJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT_AND_INTEREST, "1", false));
-        addCharges(charges, amountPlusInterestPercentageInstallmentFee, "1", "29 September 2011");
+        addCharges(charges, amountPlusInterestPercentageInstallmentFee, "1", "20110929");
 
         final Account assetAccount = ACCOUNT_HELPER.createAssetAccount();
         final Account incomeAccount = ACCOUNT_HELPER.createIncomeAccount();
@@ -1637,42 +1637,42 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("31.51", String.valueOf(secondInstallment.get("feeChargesDue")));
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20 September 2011", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20110920", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         LOG.info("-------------------------------DISBURSE LOAN-------------------------------------------");
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID,
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20110920", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
         final JournalEntry[] assetAccountInitialEntry = { new JournalEntry(Float.parseFloat("126.06"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.DEBIT) };
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 September 2011", assetAccountInitialEntry);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 September 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20110920", assetAccountInitialEntry);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20110920",
                 new JournalEntry(Float.parseFloat("126.06"), JournalEntry.TransactionType.CREDIT));
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(amountPlusInterestPercentageDisbursementCharge, loanCharges, "1", "0.0", "126.06", "0.0");
 
         LOG.info("-------------Make repayment 1-----------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 October 2011", Float.parseFloat("3309.06"), loanID);
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111020", Float.parseFloat("3309.06"), loanID);
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(amountPlusInterestPercentageDisbursementCharge, loanCharges, "1", "0.00", "126.06", "0.0");
         validateCharge(amountPlusInterestPercentageSpecifiedDueDateCharge, loanCharges, "1", "0.00", "126.06", "0.0");
         validateCharge(amountPlusInterestPercentageInstallmentFee, loanCharges, "1", "94.53", "31.51", "0.0");
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3309.06"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("2911.49"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20111020",
                 new JournalEntry(Float.parseFloat("157.57"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("240.00"), JournalEntry.TransactionType.CREDIT));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                String.valueOf(amountPlusInterestPercentageSpecifiedDueDateCharge), "29 October 2011", "1"));
+                String.valueOf(amountPlusInterestPercentageSpecifiedDueDateCharge), "20111029", "1"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
 
@@ -1686,11 +1686,11 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateCharge(amountPlusInterestPercentageInstallmentFee, loanCharges, "1", "63.02", "31.51", "31.51");
 
         LOG.info("----------Make repayment 2------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3277.55"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3277.55"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3277.55"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("2969.72"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 November 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20111120",
                 new JournalEntry(Float.parseFloat("126.06"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("181.77"), JournalEntry.TransactionType.CREDIT));
         loanSchedule.clear();
@@ -1699,7 +1699,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("0", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("--------------Waive interest---------------");
-        LOAN_TRANSACTION_HELPER.waiveInterest("20 December 2011", String.valueOf(61.79), loanID);
+        LOAN_TRANSACTION_HELPER.waiveInterest("20111220", String.valueOf(61.79), loanID);
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap thirdInstallment = loanSchedule.get(3);
@@ -1708,7 +1708,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         Integer amountPlusInterestPercentagePenaltySpecifiedDueDate = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT, "1", true));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                String.valueOf(amountPlusInterestPercentagePenaltySpecifiedDueDate), "29 September 2011", "1"));
+                String.valueOf(amountPlusInterestPercentagePenaltySpecifiedDueDate), "20110929", "1"));
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(amountPlusInterestPercentagePenaltySpecifiedDueDate, loanCharges, "1", "0.0", "120.0", "0.0");
@@ -1718,24 +1718,24 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         secondInstallment = loanSchedule.get(2);
         validateNumberForEqual("120", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3309.06"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("2791.49"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20111020",
                 new JournalEntry(Float.parseFloat("120.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("157.57"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("240"), JournalEntry.TransactionType.CREDIT));
 
         LOG.info("----------Make repayment 3 advance------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3303"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3303"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3303"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3149.11"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 November 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20111120",
                 new JournalEntry(Float.parseFloat("31.51"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("122.38"), JournalEntry.TransactionType.CREDIT));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                String.valueOf(amountPlusInterestPercentagePenaltySpecifiedDueDate), "10 January 2012", "1"));
+                String.valueOf(amountPlusInterestPercentagePenaltySpecifiedDueDate), "20120110", "1"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap fourthInstallment = loanSchedule.get(4);
@@ -1743,10 +1743,10 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3241.19", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Pay applied penalty ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("120"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("120"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("120"), JournalEntry.TransactionType.DEBIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 January 2012",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20120120",
                 new JournalEntry(Float.parseFloat("120.00"), JournalEntry.TransactionType.CREDIT));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
@@ -1755,11 +1755,11 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3121.19", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Make repayment 4 ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("3121.19"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("3121.19"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("3121.19"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3089.68"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 January 2012",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20120120",
                 new JournalEntry(Float.parseFloat("31.51"), JournalEntry.TransactionType.CREDIT));
     }
 
@@ -1824,13 +1824,13 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("50.00", String.valueOf(secondInstallment.get("feeChargesDue")));
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20 September 2011", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20110920", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         LOG.info("-------------------------------DISBURSE LOAN-------------------------------------------");
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID,
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20110920", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
@@ -1839,39 +1839,39 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                 new JournalEntry(Float.parseFloat("200.00"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.DEBIT) };
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 September 2011", assetAccountInitialEntry);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 September 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20110920", assetAccountInitialEntry);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20110920",
                 new JournalEntry(Float.parseFloat("605.94"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("100.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("200.00"), JournalEntry.TransactionType.CREDIT));
 
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatSpecifiedDueDate), "29 September 2011", "100"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatSpecifiedDueDate), "20110929", "100"));
 
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(flatDisbursement, loanCharges, "100", "0.00", "100.0", "0.0");
         validateCharge(flatSpecifiedDueDate, loanCharges, "100", "100.00", "0.0", "0.0");
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "29 September 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20110929",
                 new JournalEntry(Float.parseFloat("100.00"), JournalEntry.TransactionType.DEBIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "29 September 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20110929",
                 new JournalEntry(Float.parseFloat("100.00"), JournalEntry.TransactionType.CREDIT));
 
         LOG.info("-------------Make repayment 1-----------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 October 2011", Float.parseFloat("3301.49"), loanID);
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111020", Float.parseFloat("3301.49"), loanID);
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(flatDisbursement, loanCharges, "100", "0.00", "100.0", "0.0");
         validateCharge(flatSpecifiedDueDate, loanCharges, "100", "0.00", "100.0", "0.0");
         validateCharge(flatInstallmentFee, loanCharges, "50", "150.00", "50.0", "0.0");
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3301.49"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3301.49"), JournalEntry.TransactionType.CREDIT));
 
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatSpecifiedDueDate), "29 October 2011", "100"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatSpecifiedDueDate), "20111029", "100"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
 
@@ -1884,14 +1884,14 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(flatInstallmentFee, loanCharges, "50", "100.00", "50.0", "50.0");
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("50.0"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20 November 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20111120",
                 new JournalEntry(Float.parseFloat("50.0"), JournalEntry.TransactionType.DEBIT));
 
         LOG.info("----------Make repayment 2------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3251.49"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3251.49"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3251.49"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3251.49"), JournalEntry.TransactionType.CREDIT));
 
@@ -1901,22 +1901,22 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("0", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("--------------Waive interest---------------");
-        LOAN_TRANSACTION_HELPER.waiveInterest("20 December 2011", String.valueOf(61.79), loanID);
+        LOAN_TRANSACTION_HELPER.waiveInterest("20111220", String.valueOf(61.79), loanID);
 
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap thirdInstallment = loanSchedule.get(3);
         validateNumberForEqual("60.59", String.valueOf(thirdInstallment.get("interestOutstanding")));
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 December 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111220",
                 new JournalEntry(Float.parseFloat("61.79"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20 December 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20111220",
                 new JournalEntry(Float.parseFloat("61.79"), JournalEntry.TransactionType.DEBIT));
 
         Integer flatPenaltySpecifiedDueDate = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "100", true));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "29 September 2011", "100"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "20110929", "100"));
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(flatPenaltySpecifiedDueDate, loanCharges, "100", "0.00", "100.0", "0.0");
@@ -1927,17 +1927,17 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("100", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
         // checking the journal entry as applied penalty has been collected
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3301.49"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3301.49"), JournalEntry.TransactionType.CREDIT));
 
         LOG.info("----------Make repayment 3 advance------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3301.49"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3301.49"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3301.49"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3301.49"), JournalEntry.TransactionType.CREDIT));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "10 January 2012", "100"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "20120110", "100"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap fourthInstallment = loanSchedule.get(4);
@@ -1945,8 +1945,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3239.68", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Pay applied penalty ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("100"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("100"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("100"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("100"), JournalEntry.TransactionType.CREDIT));
         loanSchedule.clear();
@@ -1956,11 +1956,11 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3139.68", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Make over payment for repayment 4 ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("3220.60"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("3220.60"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("3220.60"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3139.68"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForLiabilityAccount(overpaymentAccount, "20 January 2012",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForLiabilityAccount(overpaymentAccount, "20120120",
                 new JournalEntry(Float.parseFloat("80.92"), JournalEntry.TransactionType.CREDIT));
         loanStatusHashMap = LOAN_TRANSACTION_HELPER.getLoanDetail(REQUEST_SPEC, RESPONSE_SPEC, loanID, "status");
         LoanStatusChecker.verifyLoanAccountIsOverPaid(loanStatusHashMap);
@@ -1984,11 +1984,11 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
         Integer percentageSpecifiedDueDateCharge = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT, "1", false));
-        addCharges(charges, percentageSpecifiedDueDateCharge, "1", "29 September 2011");
+        addCharges(charges, percentageSpecifiedDueDateCharge, "1", "20110929");
 
         Integer percentageInstallmentFee = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanInstallmentJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT, "1", false));
-        addCharges(charges, percentageInstallmentFee, "1", "29 September 2011");
+        addCharges(charges, percentageInstallmentFee, "1", "20110929");
 
         final Account assetAccount = ACCOUNT_HELPER.createAssetAccount();
         final Account incomeAccount = ACCOUNT_HELPER.createIncomeAccount();
@@ -2032,13 +2032,13 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("29.70", String.valueOf(secondInstallment.get("feeChargesDue")));
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20 September 2011", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20110920", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         LOG.info("-------------------------------DISBURSE LOAN-------------------------------------------");
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID,
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20110920", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
@@ -2048,8 +2048,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                 new JournalEntry(Float.parseFloat("120.00"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.DEBIT) };
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 September 2011", assetAccountInitialEntry);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 September 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20110920", assetAccountInitialEntry);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20110920",
                 new JournalEntry(Float.parseFloat("605.94"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("120.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("120.00"), JournalEntry.TransactionType.CREDIT),
@@ -2059,19 +2059,19 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateCharge(percentageDisbursementCharge, loanCharges, "1", "0.0", "120.00", "0.0");
 
         LOG.info("-------------Make repayment 1-----------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 October 2011", Float.parseFloat("3300.60"), loanID);
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111020", Float.parseFloat("3300.60"), loanID);
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(percentageDisbursementCharge, loanCharges, "1", "0.00", "120.00", "0.0");
         validateCharge(percentageSpecifiedDueDateCharge, loanCharges, "1", "0.00", "120.0", "0.0");
         validateCharge(percentageInstallmentFee, loanCharges, "1", "90.89", "29.11", "0.0");
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3300.60"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3300.60"), JournalEntry.TransactionType.CREDIT));
 
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentageSpecifiedDueDateCharge), "29 October 2011", "1"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentageSpecifiedDueDateCharge), "20111029", "1"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
 
@@ -2084,14 +2084,14 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(percentageInstallmentFee, loanCharges, "1", "61.19", "29.11", "29.70");
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("29.7"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20 November 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20111120",
                 new JournalEntry(Float.parseFloat("29.7"), JournalEntry.TransactionType.DEBIT));
 
         LOG.info("----------Make repayment 2------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3271.49"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3271.49"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3271.49"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3271.49"), JournalEntry.TransactionType.CREDIT));
 
@@ -2101,22 +2101,22 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("0", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("--------------Waive interest---------------");
-        LOAN_TRANSACTION_HELPER.waiveInterest("20 December 2011", String.valueOf(61.79), loanID);
+        LOAN_TRANSACTION_HELPER.waiveInterest("20111220", String.valueOf(61.79), loanID);
 
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap thirdInstallment = loanSchedule.get(3);
         validateNumberForEqual("60.59", String.valueOf(thirdInstallment.get("interestOutstanding")));
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 December 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111220",
                 new JournalEntry(Float.parseFloat("61.79"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20 December 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20111220",
                 new JournalEntry(Float.parseFloat("61.79"), JournalEntry.TransactionType.DEBIT));
 
         Integer percentagePenaltySpecifiedDueDate = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT, "1", true));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentagePenaltySpecifiedDueDate), "29 September 2011", "1"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentagePenaltySpecifiedDueDate), "20110929", "1"));
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(percentagePenaltySpecifiedDueDate, loanCharges, "1", "0.00", "120.0", "0.0");
@@ -2127,17 +2127,17 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("120", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
         // checking the journal entry as applied penalty has been collected
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3300.60"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3300.60"), JournalEntry.TransactionType.CREDIT));
 
         LOG.info("----------Make repayment 3 advance------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3301.78"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3301.78"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3301.78"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3301.78"), JournalEntry.TransactionType.CREDIT));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentagePenaltySpecifiedDueDate), "10 January 2012", "1"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentagePenaltySpecifiedDueDate), "20120110", "1"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap fourthInstallment = loanSchedule.get(4);
@@ -2145,8 +2145,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3240.58", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Pay applied penalty ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("120"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("120"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("120"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("120"), JournalEntry.TransactionType.CREDIT));
         loanSchedule.clear();
@@ -2156,11 +2156,11 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3120.58", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Make over payment for repayment 4 ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("3220.58"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("3220.58"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("3220.58"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3120.58"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForLiabilityAccount(overpaymentAccount, "20 January 2012",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForLiabilityAccount(overpaymentAccount, "20120120",
                 new JournalEntry(Float.parseFloat("100.00"), JournalEntry.TransactionType.CREDIT));
         loanStatusHashMap = LOAN_TRANSACTION_HELPER.getLoanDetail(REQUEST_SPEC, RESPONSE_SPEC, loanID, "status");
         LoanStatusChecker.verifyLoanAccountIsOverPaid(loanStatusHashMap);
@@ -2187,7 +2187,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
         Integer amountPlusInterestPercentageInstallmentFee = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanInstallmentJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT_AND_INTEREST, "1", false));
-        addCharges(charges, amountPlusInterestPercentageInstallmentFee, "1", "29 September 2011");
+        addCharges(charges, amountPlusInterestPercentageInstallmentFee, "1", "20110929");
 
         final Account assetAccount = ACCOUNT_HELPER.createAssetAccount();
         final Account incomeAccount = ACCOUNT_HELPER.createIncomeAccount();
@@ -2229,13 +2229,13 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("31.51", String.valueOf(secondInstallment.get("feeChargesDue")));
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20 September 2011", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20110920", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         LOG.info("-------------------------------DISBURSE LOAN-------------------------------------------");
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID,
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20110920", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
@@ -2244,39 +2244,39 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                 new JournalEntry(Float.parseFloat("126.04"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.DEBIT) };
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 September 2011", assetAccountInitialEntry);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 September 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20110920", assetAccountInitialEntry);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20110920",
                 new JournalEntry(Float.parseFloat("605.94"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("126.06"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("126.04"), JournalEntry.TransactionType.CREDIT));
 
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                String.valueOf(amountPlusInterestPercentageSpecifiedDueDateCharge), "29 September 2011", "1"));
+                String.valueOf(amountPlusInterestPercentageSpecifiedDueDateCharge), "20110929", "1"));
 
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(amountPlusInterestPercentageDisbursementCharge, loanCharges, "1", "0.0", "126.06", "0.0");
         validateCharge(amountPlusInterestPercentageSpecifiedDueDateCharge, loanCharges, "1", "126.06", "0.0", "0.0");
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "29 September 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20110929",
                 new JournalEntry(Float.parseFloat("126.06"), JournalEntry.TransactionType.DEBIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "29 September 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20110929",
                 new JournalEntry(Float.parseFloat("126.06"), JournalEntry.TransactionType.CREDIT));
 
         LOG.info("-------------Make repayment 1-----------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 October 2011", Float.parseFloat("3309.06"), loanID);
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111020", Float.parseFloat("3309.06"), loanID);
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(amountPlusInterestPercentageDisbursementCharge, loanCharges, "1", "0.00", "126.06", "0.0");
         validateCharge(amountPlusInterestPercentageSpecifiedDueDateCharge, loanCharges, "1", "0.00", "126.06", "0.0");
         validateCharge(amountPlusInterestPercentageInstallmentFee, loanCharges, "1", "94.53", "31.51", "0.0");
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3309.06"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3309.06"), JournalEntry.TransactionType.CREDIT));
 
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                String.valueOf(amountPlusInterestPercentageSpecifiedDueDateCharge), "29 October 2011", "1"));
+                String.valueOf(amountPlusInterestPercentageSpecifiedDueDateCharge), "20111029", "1"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
 
@@ -2290,14 +2290,14 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(amountPlusInterestPercentageInstallmentFee, loanCharges, "1", "63.02", "31.51", "31.51");
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("31.51"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20 November 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20111120",
                 new JournalEntry(Float.parseFloat("31.51"), JournalEntry.TransactionType.DEBIT));
 
         LOG.info("----------Make repayment 2------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3277.55"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3277.55"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3277.55"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3277.55"), JournalEntry.TransactionType.CREDIT));
 
@@ -2307,22 +2307,22 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("0", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("--------------Waive interest---------------");
-        LOAN_TRANSACTION_HELPER.waiveInterest("20 December 2011", String.valueOf(61.79), loanID);
+        LOAN_TRANSACTION_HELPER.waiveInterest("20111220", String.valueOf(61.79), loanID);
 
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap thirdInstallment = loanSchedule.get(3);
         validateNumberForEqual("60.59", String.valueOf(thirdInstallment.get("interestOutstanding")));
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 December 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111220",
                 new JournalEntry(Float.parseFloat("61.79"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20 December 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20111220",
                 new JournalEntry(Float.parseFloat("61.79"), JournalEntry.TransactionType.DEBIT));
 
         Integer amountPlusInterestPercentagePenaltySpecifiedDueDate = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT, "1", true));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                String.valueOf(amountPlusInterestPercentagePenaltySpecifiedDueDate), "29 September 2011", "1"));
+                String.valueOf(amountPlusInterestPercentagePenaltySpecifiedDueDate), "20110929", "1"));
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(amountPlusInterestPercentagePenaltySpecifiedDueDate, loanCharges, "1", "0.0", "120.0", "0.0");
@@ -2333,17 +2333,17 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("120", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
         // checking the journal entry as applied penalty has been collected
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3309.06"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3309.06"), JournalEntry.TransactionType.CREDIT));
 
         LOG.info("----------Make repayment 3 advance------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3303"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3303"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3303"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3303"), JournalEntry.TransactionType.CREDIT));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                String.valueOf(amountPlusInterestPercentagePenaltySpecifiedDueDate), "10 January 2012", "1"));
+                String.valueOf(amountPlusInterestPercentagePenaltySpecifiedDueDate), "20120110", "1"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap fourthInstallment = loanSchedule.get(4);
@@ -2351,8 +2351,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3241.19", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Pay applied penalty ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("120"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("120"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("120"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("120"), JournalEntry.TransactionType.CREDIT));
         loanSchedule.clear();
@@ -2362,11 +2362,11 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3121.19", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Make over payment for repayment 4 ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("3221.61"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("3221.61"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("3221.61"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3121.19"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForLiabilityAccount(overpaymentAccount, "20 January 2012",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForLiabilityAccount(overpaymentAccount, "20120120",
                 new JournalEntry(Float.parseFloat("100.42"), JournalEntry.TransactionType.CREDIT));
         loanStatusHashMap = LOAN_TRANSACTION_HELPER.getLoanDetail(REQUEST_SPEC, RESPONSE_SPEC, loanID, "status");
         LoanStatusChecker.verifyLoanAccountIsOverPaid(loanStatusHashMap);
@@ -2387,7 +2387,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         addCharges(charges, flatDisbursement, "100", null);
         Integer flatSpecifiedDueDate = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "100", false));
-        addCharges(charges, flatSpecifiedDueDate, "100", "29 September 2011");
+        addCharges(charges, flatSpecifiedDueDate, "100", "20110929");
         Integer flatInstallmentFee = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanInstallmentJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "50", false));
         addCharges(charges, flatInstallmentFee, "50", null);
@@ -2433,40 +2433,40 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("50.00", String.valueOf(secondInstallment.get("feeChargesDue")));
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20 September 2011", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20110920", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         LOG.info("-------------------------------DISBURSE LOAN-------------------------------------------");
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID,
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20110920", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
         final JournalEntry[] assetAccountInitialEntry = { new JournalEntry(Float.parseFloat("100.00"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.DEBIT) };
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 September 2011", assetAccountInitialEntry);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 September 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20110920", assetAccountInitialEntry);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20110920",
                 new JournalEntry(Float.parseFloat("100.00"), JournalEntry.TransactionType.CREDIT));
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(flatDisbursement, loanCharges, "100", "0.00", "100.0", "0.0");
 
         LOG.info("-------------Make repayment 1-----------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 October 2011", Float.parseFloat("3301.49"), loanID);
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111020", Float.parseFloat("3301.49"), loanID);
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(flatDisbursement, loanCharges, "100", "0.00", "100.0", "0.0");
         validateCharge(flatSpecifiedDueDate, loanCharges, "100", "0.00", "100.0", "0.0");
         validateCharge(flatInstallmentFee, loanCharges, "50", "150.00", "50.0", "0.0");
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3301.49"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3301.49"), JournalEntry.TransactionType.CREDIT));
 
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatSpecifiedDueDate), "29 October 2011", "100"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatSpecifiedDueDate), "20111029", "100"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
 
@@ -2480,9 +2480,9 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateCharge(flatInstallmentFee, loanCharges, "50", "100.00", "50.0", "50.0");
 
         /*
-         * JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount( assetAccount, "20 September 2011", new
+         * JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount( assetAccount, "20110920", new
          * JournalEntry(Float.parseFloat("50.0"), JournalEntry.TransactionType.CREDIT));
-         * JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount (expenseAccount, "20 September 2011", new
+         * JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount (expenseAccount, "20110920", new
          * JournalEntry(Float.parseFloat("50.0"), JournalEntry.TransactionType.DEBIT));
          */
         final String jobName = "Add Accrual Transactions";
@@ -2494,8 +2494,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         checkAccrualTransactions(loanSchedule, loanID);
 
         LOG.info("----------Make repayment 2------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3251.49"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3251.49"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3251.49"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3251.49"), JournalEntry.TransactionType.CREDIT));
 
@@ -2505,22 +2505,22 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("0", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("--------------Waive interest---------------");
-        LOAN_TRANSACTION_HELPER.waiveInterest("20 December 2011", String.valueOf(61.79), loanID);
+        LOAN_TRANSACTION_HELPER.waiveInterest("20111220", String.valueOf(61.79), loanID);
 
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap thirdInstallment = loanSchedule.get(3);
         validateNumberForEqual("60.59", String.valueOf(thirdInstallment.get("interestOutstanding")));
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 December 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111220",
                 new JournalEntry(Float.parseFloat("61.79"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20 December 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20111220",
                 new JournalEntry(Float.parseFloat("61.79"), JournalEntry.TransactionType.DEBIT));
 
         Integer flatPenaltySpecifiedDueDate = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "100", true));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "29 September 2011", "100"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "20110929", "100"));
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(flatPenaltySpecifiedDueDate, loanCharges, "100", "0.00", "100.0", "0.0");
@@ -2531,18 +2531,18 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("100", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
         // checking the journal entry as applied penalty has been collected
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3301.49"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3301.49"), JournalEntry.TransactionType.CREDIT));
 
         LOG.info("----------Make repayment 3 advance------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3301.49"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3301.49"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3301.49"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3301.49"), JournalEntry.TransactionType.CREDIT));
 
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "10 January 2012", "100"));
+                .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "20120110", "100"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap fourthInstallment = loanSchedule.get(4);
@@ -2550,8 +2550,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3239.68", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Pay applied penalty ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("100"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("100"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("100"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("100"), JournalEntry.TransactionType.CREDIT));
         loanSchedule.clear();
@@ -2561,8 +2561,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3139.68", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Make repayment 4 ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("3139.68"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("3139.68"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("3139.68"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3139.68"), JournalEntry.TransactionType.CREDIT));
         loanStatusHashMap = LOAN_TRANSACTION_HELPER.getLoanDetail(REQUEST_SPEC, RESPONSE_SPEC, loanID, "status");
@@ -2588,11 +2588,11 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
             Integer percentageSpecifiedDueDateCharge = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT, "1", false));
-            addCharges(charges, percentageSpecifiedDueDateCharge, "1", "29 September 2011");
+            addCharges(charges, percentageSpecifiedDueDateCharge, "1", "20110929");
 
             Integer percentageInstallmentFee = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                     ChargesHelper.getLoanInstallmentJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT, "1", false));
-            addCharges(charges, percentageInstallmentFee, "1", "29 September 2011");
+            addCharges(charges, percentageInstallmentFee, "1", "20110929");
 
             final Account assetAccount = ACCOUNT_HELPER.createAssetAccount();
             final Account incomeAccount = ACCOUNT_HELPER.createIncomeAccount();
@@ -2635,13 +2635,13 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             validateNumberForEqual("29.70", String.valueOf(secondInstallment.get("feeChargesDue")));
 
             LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20 September 2011", loanID);
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20110920", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
             LOG.info("-------------------------------DISBURSE LOAN-------------------------------------------");
             String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID,
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20110920", loanID,
                     JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
@@ -2651,27 +2651,27 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                     new JournalEntry(Float.parseFloat("120.00"), JournalEntry.TransactionType.DEBIT),
                     new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.CREDIT),
                     new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.DEBIT) };
-            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 September 2011", assetAccountInitialEntry);
-            JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 September 2011",
+            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20110920", assetAccountInitialEntry);
+            JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20110920",
                     new JournalEntry(Float.parseFloat("120.00"), JournalEntry.TransactionType.CREDIT));
             loanCharges.clear();
             loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
             validateCharge(percentageDisbursementCharge, loanCharges, "1", "0.0", "120.00", "0.0");
 
             LOG.info("-------------Make repayment 1-----------");
-            LOAN_TRANSACTION_HELPER.makeRepayment("20 October 2011", Float.parseFloat("3300.60"), loanID);
+            LOAN_TRANSACTION_HELPER.makeRepayment("20111020", Float.parseFloat("3300.60"), loanID);
             loanCharges.clear();
             loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
             validateCharge(percentageDisbursementCharge, loanCharges, "1", "0.00", "120.00", "0.0");
             validateCharge(percentageSpecifiedDueDateCharge, loanCharges, "1", "0.00", "120.0", "0.0");
             validateCharge(percentageInstallmentFee, loanCharges, "1", "90.89", "29.11", "0.0");
 
-            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                     new JournalEntry(Float.parseFloat("3300.60"), JournalEntry.TransactionType.DEBIT),
                     new JournalEntry(Float.parseFloat("3300.60"), JournalEntry.TransactionType.CREDIT));
 
             LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                    .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentageSpecifiedDueDateCharge), "29 October 2011", "1"));
+                    .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentageSpecifiedDueDateCharge), "20111029", "1"));
             loanSchedule.clear();
             loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
 
@@ -2685,9 +2685,9 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             validateCharge(percentageInstallmentFee, loanCharges, "1", "61.19", "29.11", "29.70");
 
             /*
-             * JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount( assetAccount, "20 September 2011", new
+             * JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount( assetAccount, "20110920", new
              * JournalEntry(Float.parseFloat("29.7"), JournalEntry.TransactionType.CREDIT));
-             * JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount (expenseAccount, "20 September 2011", new
+             * JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount (expenseAccount, "20110920", new
              * JournalEntry(Float.parseFloat("29.7"), JournalEntry.TransactionType.DEBIT));
              */
 
@@ -2700,8 +2700,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             checkAccrualTransactions(loanSchedule, loanID);
 
             LOG.info("----------Make repayment 2------------");
-            LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3271.49"), loanID);
-            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+            LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3271.49"), loanID);
+            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                     new JournalEntry(Float.parseFloat("3271.49"), JournalEntry.TransactionType.DEBIT),
                     new JournalEntry(Float.parseFloat("3271.49"), JournalEntry.TransactionType.CREDIT));
 
@@ -2711,22 +2711,22 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             validateNumberForEqual("0", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
             LOG.info("--------------Waive interest---------------");
-            LOAN_TRANSACTION_HELPER.waiveInterest("20 December 2011", String.valueOf(61.79), loanID);
+            LOAN_TRANSACTION_HELPER.waiveInterest("20111220", String.valueOf(61.79), loanID);
 
             loanSchedule.clear();
             loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
             HashMap thirdInstallment = loanSchedule.get(3);
             validateNumberForEqual("60.59", String.valueOf(thirdInstallment.get("interestOutstanding")));
 
-            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 December 2011",
+            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111220",
                     new JournalEntry(Float.parseFloat("61.79"), JournalEntry.TransactionType.CREDIT));
-            JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20 December 2011",
+            JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20111220",
                     new JournalEntry(Float.parseFloat("61.79"), JournalEntry.TransactionType.DEBIT));
 
             Integer percentagePenaltySpecifiedDueDate = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT, "1", true));
             LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                    .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentagePenaltySpecifiedDueDate), "29 September 2011", "1"));
+                    .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentagePenaltySpecifiedDueDate), "20110929", "1"));
             loanCharges.clear();
             loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
             validateCharge(percentagePenaltySpecifiedDueDate, loanCharges, "1", "0.00", "120.0", "0.0");
@@ -2737,18 +2737,18 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             validateNumberForEqual("120", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
             // checking the journal entry as applied penalty has been collected
-            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                     new JournalEntry(Float.parseFloat("3300.60"), JournalEntry.TransactionType.DEBIT),
                     new JournalEntry(Float.parseFloat("3300.60"), JournalEntry.TransactionType.CREDIT));
 
             LOG.info("----------Make repayment 3 advance------------");
-            LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3301.78"), loanID);
-            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+            LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3301.78"), loanID);
+            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                     new JournalEntry(Float.parseFloat("3301.78"), JournalEntry.TransactionType.DEBIT),
                     new JournalEntry(Float.parseFloat("3301.78"), JournalEntry.TransactionType.CREDIT));
 
             LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                    .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentagePenaltySpecifiedDueDate), "10 January 2012", "1"));
+                    .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(percentagePenaltySpecifiedDueDate), "20120110", "1"));
             loanSchedule.clear();
             loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
             HashMap fourthInstallment = loanSchedule.get(4);
@@ -2756,8 +2756,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             validateNumberForEqual("3240.58", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
             LOG.info("----------Pay applied penalty ------------");
-            LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("120"), loanID);
-            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+            LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("120"), loanID);
+            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                     new JournalEntry(Float.parseFloat("120"), JournalEntry.TransactionType.DEBIT),
                     new JournalEntry(Float.parseFloat("120"), JournalEntry.TransactionType.CREDIT));
             loanSchedule.clear();
@@ -2767,8 +2767,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             validateNumberForEqual("3120.58", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
             LOG.info("----------Make repayment 4 ------------");
-            LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("3120.58"), loanID);
-            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+            LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("3120.58"), loanID);
+            JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                     new JournalEntry(Float.parseFloat("3120.58"), JournalEntry.TransactionType.DEBIT),
                     new JournalEntry(Float.parseFloat("3120.58"), JournalEntry.TransactionType.CREDIT));
             loanStatusHashMap = LOAN_TRANSACTION_HELPER.getLoanDetail(REQUEST_SPEC, RESPONSE_SPEC, loanID, "status");
@@ -2796,11 +2796,11 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
         Integer amountPlusInterestPercentageSpecifiedDueDateCharge = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC, ChargesHelper
                 .getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT_AND_INTEREST, "1", false));
-        addCharges(charges, amountPlusInterestPercentageSpecifiedDueDateCharge, "1", "29 September 2011");
+        addCharges(charges, amountPlusInterestPercentageSpecifiedDueDateCharge, "1", "20110929");
 
         Integer amountPlusInterestPercentageInstallmentFee = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanInstallmentJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT_AND_INTEREST, "1", false));
-        addCharges(charges, amountPlusInterestPercentageInstallmentFee, "1", "29 September 2011");
+        addCharges(charges, amountPlusInterestPercentageInstallmentFee, "1", "20110929");
 
         final Account assetAccount = ACCOUNT_HELPER.createAssetAccount();
         final Account incomeAccount = ACCOUNT_HELPER.createIncomeAccount();
@@ -2844,40 +2844,40 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("31.51", String.valueOf(secondInstallment.get("feeChargesDue")));
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20 September 2011", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20110920", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         LOG.info("-------------------------------DISBURSE LOAN-------------------------------------------");
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID,
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20110920", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
         final JournalEntry[] assetAccountInitialEntry = { new JournalEntry(Float.parseFloat("126.06"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.CREDIT),
                 new JournalEntry(Float.parseFloat("12000.00"), JournalEntry.TransactionType.DEBIT) };
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 September 2011", assetAccountInitialEntry);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20 September 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20110920", assetAccountInitialEntry);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForIncomeAccount(incomeAccount, "20110920",
                 new JournalEntry(Float.parseFloat("126.06"), JournalEntry.TransactionType.CREDIT));
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(amountPlusInterestPercentageDisbursementCharge, loanCharges, "1", "0.0", "126.06", "0.0");
 
         LOG.info("-------------Make repayment 1-----------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 October 2011", Float.parseFloat("3309.06"), loanID);
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111020", Float.parseFloat("3309.06"), loanID);
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(amountPlusInterestPercentageDisbursementCharge, loanCharges, "1", "0.00", "126.06", "0.0");
         validateCharge(amountPlusInterestPercentageSpecifiedDueDateCharge, loanCharges, "1", "0.00", "126.06", "0.0");
         validateCharge(amountPlusInterestPercentageInstallmentFee, loanCharges, "1", "94.53", "31.51", "0.0");
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3309.06"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3309.06"), JournalEntry.TransactionType.CREDIT));
 
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                String.valueOf(amountPlusInterestPercentageSpecifiedDueDateCharge), "29 October 2011", "1"));
+                String.valueOf(amountPlusInterestPercentageSpecifiedDueDateCharge), "20111029", "1"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
 
@@ -2892,9 +2892,9 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateCharge(amountPlusInterestPercentageInstallmentFee, loanCharges, "1", "63.02", "31.51", "31.51");
 
         /*
-         * JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount( assetAccount, "20 September 2011", new JournalEntry(
+         * JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount( assetAccount, "20110920", new JournalEntry(
          * Float.parseFloat("31.51"), JournalEntry.TransactionType.CREDIT));
-         * JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount (expenseAccount, "20 September 2011", new
+         * JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount (expenseAccount, "20110920", new
          * JournalEntry(Float.parseFloat("31.51"), JournalEntry.TransactionType.DEBIT));
          */
 
@@ -2907,8 +2907,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         checkAccrualTransactions(loanSchedule, loanID);
 
         LOG.info("----------Make repayment 2------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3277.55"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3277.55"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3277.55"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3277.55"), JournalEntry.TransactionType.CREDIT));
 
@@ -2918,22 +2918,22 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("0", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("--------------Waive interest---------------");
-        LOAN_TRANSACTION_HELPER.waiveInterest("20 December 2011", String.valueOf(61.79), loanID);
+        LOAN_TRANSACTION_HELPER.waiveInterest("20111220", String.valueOf(61.79), loanID);
 
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap thirdInstallment = loanSchedule.get(3);
         validateNumberForEqual("60.59", String.valueOf(thirdInstallment.get("interestOutstanding")));
 
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 December 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111220",
                 new JournalEntry(Float.parseFloat("61.79"), JournalEntry.TransactionType.CREDIT));
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20 December 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForExpenseAccount(expenseAccount, "20111220",
                 new JournalEntry(Float.parseFloat("61.79"), JournalEntry.TransactionType.DEBIT));
 
         Integer amountPlusInterestPercentagePenaltySpecifiedDueDate = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_PERCENTAGE_AMOUNT, "1", true));
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                String.valueOf(amountPlusInterestPercentagePenaltySpecifiedDueDate), "29 September 2011", "1"));
+                String.valueOf(amountPlusInterestPercentagePenaltySpecifiedDueDate), "20110929", "1"));
         loanCharges.clear();
         loanCharges = LOAN_TRANSACTION_HELPER.getLoanCharges(loanID);
         validateCharge(amountPlusInterestPercentagePenaltySpecifiedDueDate, loanCharges, "1", "0.0", "120.0", "0.0");
@@ -2944,18 +2944,18 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("120", String.valueOf(secondInstallment.get("totalOutstandingForPeriod")));
 
         // checking the journal entry as applied penalty has been collected
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 October 2011",
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111020",
                 new JournalEntry(Float.parseFloat("3309.06"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3309.06"), JournalEntry.TransactionType.CREDIT));
 
         LOG.info("----------Make repayment 3 advance------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3303"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 November 2011",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3303"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20111120",
                 new JournalEntry(Float.parseFloat("3303"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3303"), JournalEntry.TransactionType.CREDIT));
 
         LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                String.valueOf(amountPlusInterestPercentagePenaltySpecifiedDueDate), "10 January 2012", "1"));
+                String.valueOf(amountPlusInterestPercentagePenaltySpecifiedDueDate), "20120110", "1"));
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         HashMap fourthInstallment = loanSchedule.get(4);
@@ -2963,8 +2963,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3241.19", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Pay applied penalty ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("120"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("120"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("120"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("120"), JournalEntry.TransactionType.CREDIT));
         loanSchedule.clear();
@@ -2974,8 +2974,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("3121.19", String.valueOf(fourthInstallment.get("totalOutstandingForPeriod")));
 
         LOG.info("----------Make repayment 4 ------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("3121.19"), loanID);
-        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20 January 2012",
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("3121.19"), loanID);
+        JOURNAL_ENTRY_HELPER.checkJournalEntryForAssetAccount(assetAccount, "20120120",
                 new JournalEntry(Float.parseFloat("3121.19"), JournalEntry.TransactionType.DEBIT),
                 new JournalEntry(Float.parseFloat("3121.19"), JournalEntry.TransactionType.CREDIT));
         loanStatusHashMap = LOAN_TRANSACTION_HELPER.getLoanDetail(REQUEST_SPEC, RESPONSE_SPEC, loanID, "status");
@@ -3060,13 +3060,13 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20 September 2011", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20110920", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         LOG.info("-------------------------------DISBURSE LOAN-------------------------------------------");
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID,
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20110920", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
@@ -3077,7 +3077,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         /***
          * Make payment for installment #1
          */
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 October 2011", Float.parseFloat("3200"), loanID);
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111020", Float.parseFloat("3200"), loanID);
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         firstInstallment = loanSchedule.get(1);
@@ -3098,7 +3098,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         /***
          * Make payment for installment #2
          */
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 November 2011", Float.parseFloat("3200"), loanID);
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111120", Float.parseFloat("3200"), loanID);
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         /***
@@ -3122,7 +3122,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         /***
          * Make payment with due amount of 3rd installment on 4th installment date
          */
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("3200"), loanID);
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("3200"), loanID);
         loanSchedule.clear();
         loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
 
@@ -3139,7 +3139,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         validateNumberForEqual("100", String.valueOf(fourthInstallment.get("interestPaid")));
         validateNumberForEqual("0.00", String.valueOf(fourthInstallment.get("interestOutstanding")));
 
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 January 2012", Float.parseFloat("3000"), loanID);
+        LOAN_TRANSACTION_HELPER.makeRepayment("20120120", Float.parseFloat("3000"), loanID);
 
         /***
          * verify loan is closed as we paid full amount
@@ -3162,9 +3162,9 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         List<HashMap> collaterals = List.of(collaterals(clientCollateralId, BigDecimal.ONE));
 
         // Apply for a loan
-        final String disbursementDate = "1 May 2023";
-        final String approvalDate = "1 April 2023";
-        final String submissionDate = "1 March 2023";
+        final String disbursementDate = "20230501";
+        final String approvalDate = "20230401";
+        final String submissionDate = "20230301";
         final String interestRate = "7";
         final Integer loanID = applyForLoanApplication(clientID, loanProductId, disbursementDate, submissionDate, interestRate, null, null,
                 "1000", collaterals);
@@ -3190,7 +3190,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         // Make the first partial repayment
         LOG.info("------------------------MAKE FIRST PARTIAL REPAYMENT-----------------------------------");
         Float firstRepaymentAmount = 500.0f; // First partial repayment
-        String firstRepaymentDate = "1 June 2023";
+        String firstRepaymentDate = "20230601";
         LOAN_TRANSACTION_HELPER.makeRepayment(firstRepaymentDate, firstRepaymentAmount, loanID);
 
         // Verify the prepayment amount after the first partial repayment
@@ -3216,7 +3216,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         // Make the second partial repayment
         LOG.info("------------------------MAKE SECOND PARTIAL REPAYMENT----------------------------------");
         Float secondRepaymentAmount = 606.18f;
-        String secondRepaymentDate = "1 July 2023";
+        String secondRepaymentDate = "20230701";
         LOAN_TRANSACTION_HELPER.makeRepayment(secondRepaymentDate, secondRepaymentAmount, loanID);
 
         // Recheck the prepayment amount
@@ -4736,7 +4736,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         JsonObject loanProductConfigurationAsFalse = new JsonObject();
         loanProductConfigurationAsFalse = createLoanProductConfigurationDetail(loanProductConfigurationAsFalse, false);
 
-        final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "01 January 2012");
+        final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "20120101");
         Integer loanProductID = LOAN_TRANSACTION_HELPER
                 .getLoanProductId(new LoanProductTestBuilder().withAmortizationTypeAsEqualInstallments().withRepaymentTypeAsMonth()
                         .withRepaymentAfterEvery("1").withRepaymentStrategy(LoanProductTestBuilder.DEFAULT_STRATEGY)
@@ -4775,10 +4775,10 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
         Integer flatAmountChargeOne = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "50", false));
-        addCharges(charges, flatAmountChargeOne, "50", "01 October 2011");
+        addCharges(charges, flatAmountChargeOne, "50", "20111001");
         Integer flatAmountChargeTwo = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                 ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "100", true));
-        addCharges(charges, flatAmountChargeTwo, "100", "15 December 2011");
+        addCharges(charges, flatAmountChargeTwo, "100", "20111215");
 
         List<HashMap> collaterals = new ArrayList<>();
         final Integer collateralId = CollateralManagementHelper.createCollateralProduct(REQUEST_SPEC, RESPONSE_SPEC);
@@ -4795,22 +4795,22 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
         LOG.info("----------------------------------- APPROVE LOAN -----------------------------------------");
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20 September 2011", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20110920", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         LOG.info("----------------------------------- DISBURSE LOAN ----------------------------------------");
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID, "10,000.00",
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20110920", loanID, "10,000.00",
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LOG.info("DISBURSE {}", loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
         LOG.info("---------------------------------- Make repayment 1 --------------------------------------");
-        LOAN_TRANSACTION_HELPER.makeRepayment("20 October 2011", Float.parseFloat("2676.24"), loanID);
+        LOAN_TRANSACTION_HELPER.makeRepayment("20111020", Float.parseFloat("2676.24"), loanID);
 
         LOG.info("---------------------------------- FORECLOSE LOAN ----------------------------------------");
-        LOAN_TRANSACTION_HELPER.forecloseLoan("08 November 2011", loanID);
+        LOAN_TRANSACTION_HELPER.forecloseLoan("20111108", loanID);
 
         // retrieving the loan status
         loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(REQUEST_SPEC, RESPONSE_SPEC, loanID);
@@ -5259,7 +5259,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         final Integer loanProductID = createLoanProductWithPeriodicAccrualAccountingNoInterest(assetAccount, incomeAccount, expenseAccount,
                 overpaymentAccount);
 
-        final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "01 January 2011");
+        final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "20110101");
 
         final Integer loanID = applyForLoanApplication(clientID, loanProductID);
 
@@ -5279,18 +5279,18 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         final Integer loanProductID = createLoanProductWithPeriodicAccrualAccountingNoInterest(assetAccount, incomeAccount, expenseAccount,
                 overpaymentAccount);
 
-        final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "01 January 2011");
+        final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "20110101");
 
         final Integer loanID = applyForLoanApplication(clientID, loanProductID);
 
         HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("02 September 2022", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20220902", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("03 September 2022", loanID, "1000");
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20220903", loanID, "1000");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
         Integer penalty = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
@@ -5314,7 +5314,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(true));
             BUSINESS_DATE_HELPER.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("01 November 2022").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20221101").dateFormat(DATETIME_PATTERN).locale("en"));
             final Account assetAccount = ACCOUNT_HELPER.createAssetAccount();
             final Account incomeAccount = ACCOUNT_HELPER.createIncomeAccount();
             final Account expenseAccount = ACCOUNT_HELPER.createExpenseAccount();
@@ -5325,18 +5325,18 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             final Integer loanProductID = createLoanProductWithPeriodicAccrualAccountingNoInterest(assetAccount, incomeAccount,
                     expenseAccount, overpaymentAccount);
 
-            final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "01 January 2011");
+            final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "20110101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID);
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(REQUEST_SPEC, RESPONSE_SPEC, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("02 September 2022", loanID);
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20220902", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("03 September 2022", loanID, "1000");
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20220903", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
             ArrayList<HashMap> loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
@@ -5400,7 +5400,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             assertEquals(1L, chargeAdjustmentTransaction.getPaymentDetailData().getPaymentType().getId());
 
             PostLoansLoanIdTransactionsResponse repaymentResult = LOAN_TRANSACTION_HELPER.makeLoanRepayment((long) loanID,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("06 September 2022").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("20220906").locale("en")
                             .transactionAmount(5.0));
 
             loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
@@ -5444,14 +5444,14 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
             String uuid = UUID.randomUUID().toString();
             LOAN_TRANSACTION_HELPER.reverseLoanTransaction((long) loanID, replayedTransaction.getId(),
-                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("08 September 2022")
+                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("20220908")
                             .transactionAmount(0.0).locale("en").reversalExternalId(uuid));
 
             // Should fail due to external id collusion
             assertThrows(CallFailedRuntimeException.class,
                     () -> LOAN_TRANSACTION_HELPER.reverseLoanTransaction((long) loanID, repaymentResult.getResourceId(),
                             new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN)
-                                    .transactionDate("08 September 2022").transactionAmount(0.0).locale("en").reversalExternalId(uuid)));
+                                    .transactionDate("20220908").transactionAmount(0.0).locale("en").reversalExternalId(uuid)));
 
             loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
             assertEquals(2, loanSchedule.size());
@@ -5485,7 +5485,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(true));
             BUSINESS_DATE_HELPER.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("01 November 2022").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20221101").dateFormat(DATETIME_PATTERN).locale("en"));
             final Account assetAccount = ACCOUNT_HELPER.createAssetAccount();
             final Account assetFeeAndPenaltyAccount = ACCOUNT_HELPER.createAssetAccount();
             final Account incomeAccount = ACCOUNT_HELPER.createIncomeAccount();
@@ -5532,11 +5532,11 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(REQUEST_SPEC, RESPONSE_SPEC, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("02 September 2022", loanID);
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20220902", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("03 September 2022", loanID, "1000");
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20220903", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
             GetLoansLoanIdResponse loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
@@ -5619,7 +5619,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
             String uuid = UUID.randomUUID().toString();
             LOAN_TRANSACTION_HELPER.reverseLoanTransaction((long) loanID, chargeAdjustmentTransactionId,
-                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("08 September 2022")
+                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("20220908")
                             .transactionAmount(0.0).locale("en").reversalExternalId(uuid));
 
             journalEntries = JOURNAL_ENTRY_HELPER.getJournalEntriesByTransactionId("L" + chargeAdjustmentTransactionId);
@@ -5679,7 +5679,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             assertEquals(1013.0, Utils.getDoubleValue(loanSummary.getTotalOutstanding()));
 
             LOAN_TRANSACTION_HELPER.makeLoanRepayment((long) loanID, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN)
-                    .transactionDate("11 September 2022").locale("en").transactionAmount(5.0));
+                    .transactionDate("20220911").locale("en").transactionAmount(5.0));
 
             externalId = UUID.randomUUID().toString();
             chargeAdjustmentResponse = LOAN_TRANSACTION_HELPER.chargeAdjustment((long) loanID, (long) feeLoanChargeId,
@@ -5794,7 +5794,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             }
 
             LOAN_TRANSACTION_HELPER.makeLoanRepayment((long) loanID, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN)
-                    .transactionDate("13 September 2022").locale("en").transactionAmount(998.0));
+                    .transactionDate("20220913").locale("en").transactionAmount(998.0));
 
             externalId = UUID.randomUUID().toString();
             chargeAdjustmentResponse = LOAN_TRANSACTION_HELPER.chargeAdjustment((long) loanID, (long) feeLoanChargeId,
@@ -5888,18 +5888,18 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         final Integer loanProductID = createLoanProductWithPeriodicAccrualAccountingNoInterest(assetAccount, incomeAccount, expenseAccount,
                 overpaymentAccount);
 
-        final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "01 January 2011");
+        final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "20110101");
 
         final Integer loanID = applyForLoanApplication(clientID, loanProductID);
 
         HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("02 September 2022", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20220902", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("03 September 2022", loanID, "1000");
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20220903", loanID, "1000");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         final Integer loanTransactionId = (Integer) ((Map) ((List) JsonPath.from(loanDetails).get("transactions")).get(0)).get("id");
@@ -5922,18 +5922,18 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         final Integer loanProductID = createLoanProductWithPeriodicAccrualAccountingNoInterest(assetAccount, incomeAccount, expenseAccount,
                 overpaymentAccount);
 
-        final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "01 January 2011");
+        final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "20110101");
 
         final Integer loanID = applyForLoanApplication(clientID, loanProductID);
 
         HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("02 September 2022", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20220902", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("03 September 2022", loanID, "1000");
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20220903", loanID, "1000");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
         ArrayList<HashMap> loanSchedule = LOAN_TRANSACTION_HELPER.getLoanRepaymentSchedule(REQUEST_SPEC, RESPONSE_SPEC, loanID);
@@ -6176,7 +6176,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(true));
             BUSINESS_DATE_HELPER.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("04 September 2022").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20220904").dateFormat(DATETIME_PATTERN).locale("en"));
             final Account assetAccount = ACCOUNT_HELPER.createAssetAccount();
             final Account incomeAccount = ACCOUNT_HELPER.createIncomeAccount();
             final Account expenseAccount = ACCOUNT_HELPER.createExpenseAccount();
@@ -6186,7 +6186,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             final Integer loanProductID = createLoanProductWithPeriodicAccrualAccountingNoInterestMultiDisbursement(assetAccount,
                     incomeAccount, expenseAccount, overpaymentAccount);
 
-            final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "01 January 2011");
+            final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "20110101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID);
 
@@ -6198,7 +6198,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
             CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class, () -> {
                 errorLoanTransactionHelper.chargeOffLoan((long) loanID,
-                        new PostLoansLoanIdTransactionsRequest().transactionDate("4 September 2022").locale("en")
+                        new PostLoansLoanIdTransactionsRequest().transactionDate("20220904").locale("en")
                                 .dateFormat(DATETIME_PATTERN).externalId(UUID.randomUUID().toString())
                                 .chargeOffReasonId((long) chargeOffReasonId));
             });
@@ -6212,17 +6212,17 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             assertEquals(403, exception.getResponse().code());
             assertTrue(exception.getMessage().contains("error.msg.loan.is.not.active"));
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("02 September 2022", loanID);
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20220902", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithTransactionAmount("02 September 2022", loanID, "1000");
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithTransactionAmount("03 September 2022", loanID, "1000");
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithTransactionAmount("20220902", loanID, "1000");
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithTransactionAmount("20220903", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
             exception = assertThrows(CallFailedRuntimeException.class, () -> {
                 LOAN_TRANSACTION_HELPER.chargeOffLoan((long) loanID,
-                        new PostLoansLoanIdTransactionsRequest().transactionDate("1 October 2022").locale("en").dateFormat(DATETIME_PATTERN)
+                        new PostLoansLoanIdTransactionsRequest().transactionDate("20221001").locale("en").dateFormat(DATETIME_PATTERN)
                                 .chargeOffReasonId((long) chargeOffReasonId));
             });
             assertEquals(403, exception.getResponse().code());
@@ -6242,16 +6242,16 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             Integer flatPenaltySpecifiedDueDate = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "3", true));
             LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                    .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "04 September 2022", "3"));
+                    .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "20220904", "3"));
             Integer chargeId = LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper
-                    .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "04 September 2022", "5"));
+                    .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "20220904", "5"));
 
             PostLoansLoanIdChargesChargeIdResponse waiveChargeResponse = LOAN_TRANSACTION_HELPER.waiveLoanCharge((long) loanID,
                     (long) chargeId, new PostLoansLoanIdChargesChargeIdRequest());
 
             String transactionExternalId = UUID.randomUUID().toString();
             LOAN_TRANSACTION_HELPER.chargeOffLoan((long) loanID,
-                    new PostLoansLoanIdTransactionsRequest().transactionDate("4 September 2022").locale("en").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdTransactionsRequest().transactionDate("20220904").locale("en").dateFormat(DATETIME_PATTERN)
                             .externalId(transactionExternalId).chargeOffReasonId((long) chargeOffReasonId));
 
             loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
@@ -6273,7 +6273,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
             exception = assertThrows(CallFailedRuntimeException.class, () -> {
                 errorLoanTransactionHelper.chargeOffLoan((long) loanID,
-                        new PostLoansLoanIdTransactionsRequest().transactionDate("4 September 2022").locale("en")
+                        new PostLoansLoanIdTransactionsRequest().transactionDate("20220904").locale("en")
                                 .dateFormat(DATETIME_PATTERN).externalId(UUID.randomUUID().toString())
                                 .chargeOffReasonId((long) chargeOffReasonId));
             });
@@ -6281,7 +6281,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             assertTrue(exception.getMessage().contains("error.msg.loan.is.already.charged.off"));
 
             HashMap chargeAddingError = errorLoanTransactionHelper.addChargesForLoanGetFullResponse(loanID, LoanTransactionHelper
-                    .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "04 September 2022", "3"));
+                    .getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(flatPenaltySpecifiedDueDate), "20220904", "3"));
 
             assertEquals("error.msg.loan.is.charged.off",
                     ((Map) ((List) chargeAddingError.get("errors")).get(0)).get("userMessageGlobalisationCode"));
@@ -6313,15 +6313,15 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             assertTrue(exception.getMessage().contains("error.msg.loan.is.not.charged.off"));
 
             BUSINESS_DATE_HELPER.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("08 September 2022").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20220908").dateFormat(DATETIME_PATTERN).locale("en"));
 
             PostLoansLoanIdTransactionsResponse loanRepaymentResponse = LOAN_TRANSACTION_HELPER.makeLoanRepayment((long) loanID,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("05 September 2022").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("20220905").locale("en")
                             .transactionAmount(5.0));
 
             exception = assertThrows(CallFailedRuntimeException.class, () -> {
                 errorLoanTransactionHelper.chargeOffLoan((long) loanID,
-                        new PostLoansLoanIdTransactionsRequest().transactionDate("04 September 2022").locale("en")
+                        new PostLoansLoanIdTransactionsRequest().transactionDate("20220904").locale("en")
                                 .dateFormat(DATETIME_PATTERN).externalId(UUID.randomUUID().toString())
                                 .chargeOffReasonId((long) chargeOffReasonId));
             });
@@ -6330,7 +6330,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             assertTrue(exception.getMessage().contains("error.msg.loan.charge.off.is.before.than.the.last.user.transaction"));
 
             LOAN_TRANSACTION_HELPER.chargeOffLoan((long) loanID,
-                    new PostLoansLoanIdTransactionsRequest().transactionDate("06 September 2022").locale("en").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdTransactionsRequest().transactionDate("20220906").locale("en").dateFormat(DATETIME_PATTERN)
                             .externalId(UUID.randomUUID().toString()).chargeOffReasonId((long) chargeOffReasonId));
 
             loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
@@ -6340,7 +6340,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             assertEquals(1998.0, Utils.getDoubleValue(chargeOffTransaction.getPrincipalPortion()));
 
             LOAN_TRANSACTION_HELPER.makeLoanRepayment((long) loanID, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN)
-                    .transactionDate("07 September 2022").locale("en").transactionAmount(5.0));
+                    .transactionDate("20220907").locale("en").transactionAmount(5.0));
 
             exception = assertThrows(CallFailedRuntimeException.class, () -> {
                 errorLoanTransactionHelper.undoChargeOffLoan((long) loanID, new PostLoansLoanIdTransactionsRequest());
@@ -6350,34 +6350,34 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
             exception = assertThrows(CallFailedRuntimeException.class, () -> {
                 errorLoanTransactionHelper.makeWriteoff((long) loanID, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN)
-                        .transactionDate("05 September 2022").locale("en"));
+                        .transactionDate("20220905").locale("en"));
             });
             assertEquals(403, exception.getResponse().code());
             assertTrue(exception.getMessage().contains("error.msg.transaction.date.cannot.be.earlier.than.charge.off.date"));
 
             exception = assertThrows(CallFailedRuntimeException.class, () -> {
                 errorLoanTransactionHelper.closeLoan((long) loanID, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN)
-                        .transactionDate("05 September 2022").locale("en"));
+                        .transactionDate("20220905").locale("en"));
             });
             assertEquals(403, exception.getResponse().code());
             assertTrue(exception.getMessage().contains("error.msg.transaction.date.cannot.be.earlier.than.charge.off.date"));
 
             exception = assertThrows(CallFailedRuntimeException.class, () -> {
                 errorLoanTransactionHelper.forecloseLoan((long) loanID, new PostLoansLoanIdTransactionsRequest()
-                        .dateFormat(DATETIME_PATTERN).transactionDate("05 September 2022").locale("en"));
+                        .dateFormat(DATETIME_PATTERN).transactionDate("20220905").locale("en"));
             });
             assertEquals(403, exception.getResponse().code());
             assertTrue(exception.getMessage().contains("error.msg.transaction.date.cannot.be.earlier.than.charge.off.date"));
 
             exception = assertThrows(CallFailedRuntimeException.class, () -> {
                 errorLoanTransactionHelper.closeRescheduledLoan((long) loanID, new PostLoansLoanIdTransactionsRequest()
-                        .dateFormat(DATETIME_PATTERN).transactionDate("05 September 2022").locale("en"));
+                        .dateFormat(DATETIME_PATTERN).transactionDate("20220905").locale("en"));
             });
             assertEquals(403, exception.getResponse().code());
             assertTrue(exception.getMessage().contains("error.msg.loan.is.charged.off"));
 
             HashMap disbursementDetailREsponse = (HashMap) errorLoanTransactionHelper.addAndDeleteDisbursementDetail(loanID, "1000",
-                    "03 September 2022", List.of(LOAN_TRANSACTION_HELPER.createTrancheDetail(null, "05 September 2022", "200")), "");
+                    "20220903", List.of(LOAN_TRANSACTION_HELPER.createTrancheDetail(null, "20220905", "200")), "");
 
             assertEquals("error.msg.loan.is.charged.off",
                     ((Map) ((List) disbursementDetailREsponse.get("errors")).get(0)).get("userMessageGlobalisationCode"));
@@ -6396,14 +6396,14 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
             exception = assertThrows(CallFailedRuntimeException.class, () -> {
                 errorLoanTransactionHelper.makeCreditBalanceRefund((long) loanID, new PostLoansLoanIdTransactionsRequest()
-                        .dateFormat(DATETIME_PATTERN).transactionDate("05 September 2022").locale("en").transactionAmount(5.0));
+                        .dateFormat(DATETIME_PATTERN).transactionDate("20220905").locale("en").transactionAmount(5.0));
             });
             assertEquals(403, exception.getResponse().code());
             assertTrue(exception.getMessage().contains("error.msg.transaction.date.cannot.be.earlier.than.charge.off.date"));
 
             exception = assertThrows(CallFailedRuntimeException.class, () -> {
                 errorLoanTransactionHelper.disburseLoan((long) loanID,
-                        new PostLoansLoanIdRequest().actualDisbursementDate("4 September 2022").transactionAmount(new BigDecimal("10"))
+                        new PostLoansLoanIdRequest().actualDisbursementDate("20220904").transactionAmount(new BigDecimal("10"))
                                 .locale("en").dateFormat(DATETIME_PATTERN));
             });
             assertEquals(403, exception.getResponse().code());
@@ -6411,24 +6411,24 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
             exception = assertThrows(CallFailedRuntimeException.class, () -> {
                 errorLoanTransactionHelper.disburseLoan((long) loanID,
-                        new PostLoansLoanIdRequest().actualDisbursementDate("7 September 2022").transactionAmount(new BigDecimal("10"))
+                        new PostLoansLoanIdRequest().actualDisbursementDate("20220907").transactionAmount(new BigDecimal("10"))
                                 .locale("en").dateFormat(DATETIME_PATTERN));
             });
             assertEquals(403, exception.getResponse().code());
             assertTrue(exception.getMessage().contains("amount.can't.be.greater.than.maximum.applied.loan.amount.calculation"));
 
             LOAN_TRANSACTION_HELPER.makeLoanRepayment((long) loanID, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN)
-                    .transactionDate("07 September 2022").locale("en").transactionAmount(5000.0));
+                    .transactionDate("20220907").locale("en").transactionAmount(5000.0));
 
             exception = assertThrows(CallFailedRuntimeException.class, () -> {
                 errorLoanTransactionHelper.makeRefundByCash((long) loanID, new PostLoansLoanIdTransactionsRequest()
-                        .dateFormat(DATETIME_PATTERN).transactionDate("05 September 2022").locale("en").transactionAmount(5.0));
+                        .dateFormat(DATETIME_PATTERN).transactionDate("20220905").locale("en").transactionAmount(5.0));
             });
             assertEquals(403, exception.getResponse().code());
             assertTrue(exception.getMessage().contains("error.msg.transaction.date.cannot.be.earlier.than.charge.off.date"));
 
             LOAN_TRANSACTION_HELPER.makeCreditBalanceRefund((long) loanID, new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("08 September 2022").locale("en").transactionAmount(3007.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20220908").locale("en").transactionAmount(3007.0));
         } finally {
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(false));
@@ -6450,18 +6450,18 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             final Integer loanProductID = createLoanProductWithPeriodicAccrualAccountingNoInterest(assetAccount, incomeAccount,
                     expenseAccount, overpaymentAccount);
 
-            final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "01 January 2011");
+            final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "20110101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID);
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(REQUEST_SPEC, RESPONSE_SPEC, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("02 September 2022", loanID);
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20220902", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("03 September 2022", loanID, "1000");
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20220903", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
             GetLoansLoanIdResponse loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
@@ -6470,8 +6470,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
             assertTrue(DateUtils.isEqual(expectedMaturityDate, actualMaturityDate));
 
-            LOAN_TRANSACTION_HELPER.makeRepayment("04 September 2022", Float.parseFloat("500"), loanID);
-            LOAN_TRANSACTION_HELPER.makeRepayment("05 September 2022", Float.parseFloat("700"), loanID);
+            LOAN_TRANSACTION_HELPER.makeRepayment("20220904", Float.parseFloat("500"), loanID);
+            LOAN_TRANSACTION_HELPER.makeRepayment("20220905", Float.parseFloat("700"), loanID);
 
             loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
 
@@ -6482,7 +6482,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             assertNull(actualMaturityDate);
 
             LOAN_TRANSACTION_HELPER.reverseLoanTransaction((long) loanID, loanDetails.getTransactions().get(1).getId(),
-                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("04 September 2022")
+                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("20220904")
                             .transactionAmount(0.0).locale("en"));
 
             loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
@@ -6513,24 +6513,24 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             final Integer loanProductID = createLoanProductWithPeriodicAccrualAccountingNoInterest(assetAccount, incomeAccount,
                     expenseAccount, overpaymentAccount);
 
-            final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "01 January 2011");
+            final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "20110101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID);
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(REQUEST_SPEC, RESPONSE_SPEC, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("02 September 2022", loanID);
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20220902", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("03 September 2022", loanID, "1000");
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20220903", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
-            LOAN_TRANSACTION_HELPER.makeRepayment("04 September 2022", Float.parseFloat("500"), loanID);
-            LOAN_TRANSACTION_HELPER.makeRepayment("05 September 2022", Float.parseFloat("10"), loanID);
-            LOAN_TRANSACTION_HELPER.makeRepayment("06 September 2022", Float.parseFloat("400"), loanID);
-            LOAN_TRANSACTION_HELPER.makeRepayment("07 September 2022", Float.parseFloat("390"), loanID);
+            LOAN_TRANSACTION_HELPER.makeRepayment("20220904", Float.parseFloat("500"), loanID);
+            LOAN_TRANSACTION_HELPER.makeRepayment("20220905", Float.parseFloat("10"), loanID);
+            LOAN_TRANSACTION_HELPER.makeRepayment("20220906", Float.parseFloat("400"), loanID);
+            LOAN_TRANSACTION_HELPER.makeRepayment("20220907", Float.parseFloat("390"), loanID);
 
             GetLoansLoanIdResponse loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
 
@@ -6554,7 +6554,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             assertEquals(LocalDate.of(2022, 9, 7), loanDetails.getTransactions().get(4).getDate());
 
             LOAN_TRANSACTION_HELPER.reverseLoanTransaction((long) loanID, loanDetails.getTransactions().get(2).getId(),
-                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("05 September 2022")
+                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("20220905")
                             .transactionAmount(0.0).locale("en"));
 
             loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
@@ -6580,7 +6580,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             assertEquals(LocalDate.of(2022, 9, 7), loanDetails.getTransactions().get(4).getDate());
 
             LOAN_TRANSACTION_HELPER.reverseLoanTransaction((long) loanID, loanDetails.getTransactions().get(1).getId(),
-                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("05 September 2022")
+                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("20220905")
                             .transactionAmount(0.0).locale("en"));
 
             loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
@@ -6605,7 +6605,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             assertEquals(390.0, Utils.getDoubleValue(loanDetails.getTransactions().get(4).getPrincipalPortion()));
             assertEquals(LocalDate.of(2022, 9, 7), loanDetails.getTransactions().get(4).getDate());
 
-            LOAN_TRANSACTION_HELPER.makeRepayment("04 September 2022", Float.parseFloat("500"), loanID);
+            LOAN_TRANSACTION_HELPER.makeRepayment("20220904", Float.parseFloat("500"), loanID);
 
             loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
 
@@ -6647,7 +6647,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(true));
             BUSINESS_DATE_HELPER.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("10 October 2022").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20221010").dateFormat(DATETIME_PATTERN).locale("en"));
 
             final Account assetAccount = ACCOUNT_HELPER.createAssetAccount();
             final Account incomeAccount = ACCOUNT_HELPER.createIncomeAccount();
@@ -6657,29 +6657,29 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             final Integer loanProductID = createLoanProductWithPeriodicAccrualAccountingNoInterest(assetAccount, incomeAccount,
                     expenseAccount, overpaymentAccount);
 
-            final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "01 January 2011");
+            final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "20110101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID);
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(REQUEST_SPEC, RESPONSE_SPEC, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("02 September 2022", loanID);
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20220902", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("03 September 2022", loanID, "1000");
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20220903", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
-            LOAN_TRANSACTION_HELPER.makeRepayment("04 September 2022", Float.parseFloat("100"), loanID);
-            LOAN_TRANSACTION_HELPER.makeRepayment("05 September 2022", Float.parseFloat("1100"), loanID);
+            LOAN_TRANSACTION_HELPER.makeRepayment("20220904", Float.parseFloat("100"), loanID);
+            LOAN_TRANSACTION_HELPER.makeRepayment("20220905", Float.parseFloat("1100"), loanID);
 
             GetLoansLoanIdResponse loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
             assertEquals(200.0, Utils.getDoubleValue(loanDetails.getTotalOverpaid()));
             assertTrue(loanDetails.getStatus().getOverpaid());
 
             LOAN_TRANSACTION_HELPER.makeCreditBalanceRefund((long) loanID, new PostLoansLoanIdTransactionsRequest().transactionAmount(200.0)
-                    .transactionDate("10 October 2022").dateFormat(DATETIME_PATTERN).locale("en").paymentTypeId(1L));
+                    .transactionDate("20221010").dateFormat(DATETIME_PATTERN).locale("en").paymentTypeId(1L));
 
             loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
             assertTrue(loanDetails.getStatus().getClosedObligationsMet());
@@ -6715,7 +6715,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
             LOAN_TRANSACTION_HELPER.reverseLoanTransaction(loanDetails.getId(), loanDetails.getTransactions().get(1).getId(),
                     new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionAmount(0.0)
-                            .transactionDate("10 October 2022").locale("en"));
+                            .transactionDate("20221010").locale("en"));
 
             loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
 
@@ -6783,7 +6783,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(true));
             BUSINESS_DATE_HELPER.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("10 October 2022").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20221010").dateFormat(DATETIME_PATTERN).locale("en"));
 
             final Account assetAccount = ACCOUNT_HELPER.createAssetAccount();
             final Account incomeAccount = ACCOUNT_HELPER.createIncomeAccount();
@@ -6793,35 +6793,35 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             final Integer loanProductID = createLoanProductWithPeriodicAccrualAccountingNoInterest(assetAccount, incomeAccount,
                     expenseAccount, overpaymentAccount);
 
-            final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "01 January 2011");
+            final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "20110101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID);
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(REQUEST_SPEC, RESPONSE_SPEC, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("02 September 2022", loanID);
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20220902", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("03 September 2022", loanID, "1000");
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20220903", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
-            LOAN_TRANSACTION_HELPER.makeRepayment("04 September 2022", Float.parseFloat("500"), loanID);
-            LOAN_TRANSACTION_HELPER.makeRepayment("05 September 2022", Float.parseFloat("700"), loanID);
+            LOAN_TRANSACTION_HELPER.makeRepayment("20220904", Float.parseFloat("500"), loanID);
+            LOAN_TRANSACTION_HELPER.makeRepayment("20220905", Float.parseFloat("700"), loanID);
 
             GetLoansLoanIdResponse loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
             assertEquals(200.0, Utils.getDoubleValue(loanDetails.getTotalOverpaid()));
             assertTrue(loanDetails.getStatus().getOverpaid());
 
             LOAN_TRANSACTION_HELPER.makeCreditBalanceRefund((long) loanID, new PostLoansLoanIdTransactionsRequest().transactionAmount(200.0)
-                    .transactionDate("06 September 2022").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .transactionDate("20220906").dateFormat(DATETIME_PATTERN).locale("en"));
 
             LOAN_TRANSACTION_HELPER.makeMerchantIssuedRefund((long) loanID, new PostLoansLoanIdTransactionsRequest().locale("en")
-                    .dateFormat(DATETIME_PATTERN).transactionDate("07 September 2022").transactionAmount(500.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20220907").transactionAmount(500.0));
 
             LOAN_TRANSACTION_HELPER.makeCreditBalanceRefund((long) loanID, new PostLoansLoanIdTransactionsRequest().transactionAmount(500.0)
-                    .transactionDate("08 September 2022").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .transactionDate("20220908").dateFormat(DATETIME_PATTERN).locale("en"));
 
             loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
             assertTrue(loanDetails.getStatus().getClosedObligationsMet());
@@ -6857,7 +6857,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
 
             LOAN_TRANSACTION_HELPER.reverseLoanTransaction(loanDetails.getId(), loanDetails.getTransactions().get(2).getId(),
                     new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionAmount(0.0)
-                            .transactionDate("07 September 2022").locale("en"));
+                            .transactionDate("20220907").locale("en"));
 
             loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
 
@@ -6915,7 +6915,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(true));
             BUSINESS_DATE_HELPER.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("10 October 2022").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20221010").dateFormat(DATETIME_PATTERN).locale("en"));
 
             final Account assetAccount = ACCOUNT_HELPER.createAssetAccount();
             final Account incomeAccount = ACCOUNT_HELPER.createIncomeAccount();
@@ -6925,7 +6925,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             final Integer loanProductID = createLoanProductWithPeriodicAccrualAccountingNoInterest(assetAccount, incomeAccount,
                     expenseAccount, overpaymentAccount);
 
-            final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "01 January 2011");
+            final Integer clientID = ClientHelper.createClient(REQUEST_SPEC, RESPONSE_SPEC, "20110101");
             List<HashMap> charges = new ArrayList<>();
             Integer installmentFee = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                     ChargesHelper.getLoanInstallmentJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "10", false));
@@ -6936,16 +6936,16 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(REQUEST_SPEC, RESPONSE_SPEC, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("02 September 2022", loanID);
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20220902", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("03 September 2022", loanID, "1000");
+            loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20220903", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
-            LOAN_TRANSACTION_HELPER.makeRepayment("04 September 2022", Float.parseFloat("5"), loanID);
+            LOAN_TRANSACTION_HELPER.makeRepayment("20220904", Float.parseFloat("5"), loanID);
 
-            PeriodicAccrualAccountingHelper.runPeriodicAccrualAccounting("04 September 2022");
+            PeriodicAccrualAccountingHelper.runPeriodicAccrualAccounting("20220904");
 
             Integer penalty = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "11", true));
@@ -6958,7 +6958,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             LOAN_TRANSACTION_HELPER.waiveLoanCharge((long) loanID, (long) penalty1LoanChargeId,
                     new PostLoansLoanIdChargesChargeIdRequest());
 
-            LOAN_TRANSACTION_HELPER.makeRepayment("08 September 2022", Float.parseFloat("1010"), loanID);
+            LOAN_TRANSACTION_HELPER.makeRepayment("20220908", Float.parseFloat("1010"), loanID);
 
             GetLoansLoanIdResponse loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails((long) loanID);
 
@@ -6997,9 +6997,9 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(true));
             BUSINESS_DATE_HELPER.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("01 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230101").dateFormat(DATETIME_PATTERN).locale("en"));
             LOG.info("-----------------------------------NEW CLIENT-----------------------------------------");
-            final PostClientsRequest newClient = createRandomClientWithDate("01 January 2023");
+            final PostClientsRequest newClient = createRandomClientWithDate("20230101");
             final PostClientsResponse clientResponse = CLIENT_HELPER.createClient(newClient);
             LOG.info("-----------------------------------NEW LOAN PRODUCT-----------------------------------------");
             PostLoanProductsRequest loanProductsRequest = createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct();
@@ -7012,48 +7012,48 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                     .chargeAppliesTo(1).locale("en").active(true));
             LOG.info("-----------------------------------SUBMIT LOAN-----------------------------------------");
             final PostLoansResponse loanApplicationResult = applyForLoanApplicationForOnePeriod30DaysLongNoInterestPeriodicAccrual(
-                    clientResponse.getResourceId(), loanProductResponse.getResourceId(), "01 January 2023",
+                    clientResponse.getResourceId(), loanProductResponse.getResourceId(), "20230101",
                     LoanApplicationTestBuilder.DUE_PENALTY_INTEREST_PRINCIPAL_FEE_IN_ADVANCE_PENALTY_INTEREST_PRINCIPAL_FEE_STRATEGY);
             LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
             PostLoansLoanIdResponse approvedLoanResult = LOAN_TRANSACTION_HELPER.approveLoan(loanApplicationResult.getResourceId(),
                     new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(1000.0)).dateFormat(DATETIME_PATTERN)
-                            .approvedOnDate("01 January 2023").locale("en"));
+                            .approvedOnDate("20230101").locale("en"));
             LOG.info("-------------------------------DISBURSE LOAN-------------------------------------------");
             String loanDisbursementUUID = UUID.randomUUID().toString();
             PostLoansLoanIdResponse disbursedLoanResult = LOAN_TRANSACTION_HELPER.disburseLoan(loanApplicationResult.getResourceId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("01 January 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230101").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(1000.00)).locale("en").externalId(loanDisbursementUUID));
             Long loanId = disbursedLoanResult.getResourceId();
             LOG.info("-------------------------------ADD CHARGES-------------------------------------------");
             PostLoansLoanIdChargesResponse penaltyLoanChargeResult = LOAN_TRANSACTION_HELPER.addChargesForLoan(loanId,
                     new PostLoansLoanIdChargesRequest().chargeId(penaltyCharge.getResourceId()).dateFormat(DATETIME_PATTERN).locale("en")
-                            .amount(10.0).dueDate("10 January 2023"));
+                            .amount(10.0).dueDate("20230110"));
             LOG.info("-------------------------------DO SOME PARTIAL REPAYMENTS-------------------------------------------");
             BUSINESS_DATE_HELPER.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("07 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230107").dateFormat(DATETIME_PATTERN).locale("en"));
             String firstRepaymentUUID = UUID.randomUUID().toString();
             PostLoansLoanIdTransactionsResponse firstRepaymentResult = LOAN_TRANSACTION_HELPER.makeLoanRepayment(loanId,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("07 January 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("20230107").locale("en")
                             .transactionAmount(9.0).externalId(firstRepaymentUUID));
             String secondRepaymentUUID = UUID.randomUUID().toString();
             PostLoansLoanIdTransactionsResponse secondRepaymentResult = LOAN_TRANSACTION_HELPER.makeLoanRepayment(loanId,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("07 January 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("20230107").locale("en")
                             .transactionAmount(8.0).externalId(secondRepaymentUUID));
             String thirdRepaymentUUID = UUID.randomUUID().toString();
             PostLoansLoanIdTransactionsResponse thirdRepaymentResult = LOAN_TRANSACTION_HELPER.makeLoanRepayment(loanId,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("07 January 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("20230107").locale("en")
                             .transactionAmount(7.0).externalId(thirdRepaymentUUID));
             LOG.info("-------------------------------CHECK LOAN TRANSACTION ORDER-------------------------------------------");
             checkLoanTransactionOrder(loanId, loanDisbursementUUID, firstRepaymentUUID, secondRepaymentUUID, thirdRepaymentUUID);
             LOG.info(
                     "-------------------------------REVERT FIRST REPAYMENT AND CHECK LOAN TRANSACTION ORDER-------------------------------------------");
             LOAN_TRANSACTION_HELPER.reverseLoanTransaction(loanId, firstRepaymentUUID, new PostLoansLoanIdTransactionsTransactionIdRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("07 January 2023").transactionAmount(0.0).locale("en"));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230107").transactionAmount(0.0).locale("en"));
             checkLoanTransactionOrder(loanId, loanDisbursementUUID, firstRepaymentUUID, secondRepaymentUUID, thirdRepaymentUUID);
             LOG.info(
                     "-------------------------------REVERT SECOND REPAYMENT AND CHECK LOAN TRANSACTION ORDER-------------------------------------------");
             LOAN_TRANSACTION_HELPER.reverseLoanTransaction(loanId, secondRepaymentUUID,
-                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("07 January 2023")
+                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("20230107")
                             .transactionAmount(0.0).locale("en"));
             checkLoanTransactionOrder(loanId, loanDisbursementUUID, firstRepaymentUUID, secondRepaymentUUID, thirdRepaymentUUID);
         } finally {
@@ -7122,7 +7122,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withCharges(charges).withExpectedDisbursementDate("03 September 2022").withSubmittedOnDate("01 September 2022")
+                .withCharges(charges).withExpectedDisbursementDate("20220903").withSubmittedOnDate("20220901")
                 .withLoanType("individual").build(clientID.toString(), loanProductID.toString(), null);
         return LOAN_TRANSACTION_HELPER.getLoanId(loanApplicationJSON);
     }
@@ -7133,7 +7133,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsDecliningBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("03 September 2022").withSubmittedOnDate("01 September 2022").withLoanType("individual")
+                .withExpectedDisbursementDate("20220903").withSubmittedOnDate("20220901").withLoanType("individual")
                 .build(clientID.toString(), loanProductID.toString(), null);
         return LOAN_TRANSACTION_HELPER.getLoanId(loanApplicationJSON);
     }
@@ -7204,8 +7204,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                 .withRepaymentFrequencyTypeAsMonths() //
                 .withInterestRatePerPeriod("2") //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("01 March 2014") //
-                .withSubmittedOnDate("01 March 2014") //
+                .withExpectedDisbursementDate("20140301") //
+                .withSubmittedOnDate("20140301") //
                 .withCollaterals(collaterals).build(clientID.toString(), loanProductID.toString(), null);
         return LOAN_TRANSACTION_HELPER.getLoanId(loanApplicationJSON);
     }
@@ -7236,8 +7236,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                 .withRepaymentFrequencyTypeAsMonths() //
                 .withInterestRatePerPeriod("2") //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("01 March 2014") //
-                .withSubmittedOnDate("01 March 2014") //
+                .withExpectedDisbursementDate("20140301") //
+                .withSubmittedOnDate("20140301") //
                 .withCollaterals(collaterals).build(clientID.toString(), loanProductID.toString(), null);
 
         return LOAN_TRANSACTION_HELPER.getLoanId(loanApplicationJSON);
@@ -7370,8 +7370,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                 .withAmortizationTypeAsEqualPrincipalPayments() //
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withPrincipalGrace(graceOnPrincipalPayment).withExpectedDisbursementDate("02 June 2014") //
-                .withSubmittedOnDate("02 June 2014") //
+                .withPrincipalGrace(graceOnPrincipalPayment).withExpectedDisbursementDate("20140602") //
+                .withSubmittedOnDate("20140602") //
                 .withCollaterals(collaterals).build(clientID.toString(), loanProductID.toString(), null);
         return LOAN_TRANSACTION_HELPER.getLoanId(loanApplicationJSON);
     }
@@ -7390,8 +7390,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                 .withAmortizationTypeAsEqualInstallments() //
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("20 September 2011") //
-                .withSubmittedOnDate("20 September 2011") //
+                .withExpectedDisbursementDate("20110920") //
+                .withSubmittedOnDate("20110920") //
                 .withCollaterals(collaterals).withCharges(charges).build(clientID.toString(), loanProductID.toString(), savingsId);
         return LOAN_TRANSACTION_HELPER.getLoanId(loanApplicationJSON);
     }
@@ -7425,8 +7425,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                 .withAmortizationTypeAsEqualInstallments() //
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("20 September 2011") //
-                .withSubmittedOnDate("20 September 2011") //
+                .withExpectedDisbursementDate("20110920") //
+                .withSubmittedOnDate("20110920") //
                 .build(clientID.toString(), loanProductID.toString(), null);
         return LOAN_TRANSACTION_HELPER.getLoanId(loanApplicationJSON, requestSpecification, responseSpecification);
     }
@@ -7445,9 +7445,9 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                 .withAmortizationTypeAsEqualInstallments() //
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("01 March 2014") //
+                .withExpectedDisbursementDate("20140301") //
                 .withCollaterals(collaterals).withTranches(tranches) //
-                .withSubmittedOnDate("01 March 2014") //
+                .withSubmittedOnDate("20140301") //
                 .withCharges(charges).build(clientID.toString(), loanProductID.toString(), savingsId);
         return LOAN_TRANSACTION_HELPER.getLoanId(loanApplicationJSON);
     }
@@ -7466,8 +7466,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                 .withAmortizationTypeAsEqualInstallments() //
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("20 September 2011") //
-                .withSubmittedOnDate("20 September 2011") //
+                .withExpectedDisbursementDate("20110920") //
+                .withSubmittedOnDate("20110920") //
                 .withCollaterals(collaterals).withCharges(charges).build(clientID.toString(), loanProductID.toString(), savingsId);
         return loanApplicationJSON;
     }
@@ -7486,8 +7486,8 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
                 .withAmortizationTypeAsEqualInstallments() //
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("20 September 2011") //
-                .withSubmittedOnDate("20 September 2011") //
+                .withExpectedDisbursementDate("20110920") //
+                .withSubmittedOnDate("20110920") //
                 .withRepaymentStrategy(repaymentStrategy) //
                 .withCollaterals(collaterals).withCharges(charges).build(clientID.toString(), loanProductID.toString(), savingsId);
         return LOAN_TRANSACTION_HELPER.getLoanId(loanApplicationJSON);

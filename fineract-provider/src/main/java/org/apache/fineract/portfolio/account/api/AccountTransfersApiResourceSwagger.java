@@ -160,11 +160,11 @@ final class AccountTransfersApiResourceSwagger {
         public Integer toAccountType;
         @Schema(example = "2")
         public Long toAccountId;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "01 August 2011")
+        @Schema(example = "20110801")
         public String transferDate;
         @Schema(example = "112.45")
         public Float transferAmount;
@@ -542,13 +542,13 @@ final class AccountTransfersApiResourceSwagger {
         public Long toAccountId;
         @Schema(example = "130")
         public Float transferAmount;
-        @Schema(example = "31 October 2014")
+        @Schema(example = "20141031")
         public String transferDate;
         @Schema(example = "Transfer refund to my savings account")
         public String transferDescription;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "1")
         public Long fromClientId;

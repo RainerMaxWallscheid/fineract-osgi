@@ -84,7 +84,7 @@ final class TellerApiResourceSwagger {
         public String locale;
         @Schema(example = "dd-MM-yyyy")
         public String dateFormat;
-        @Schema(example = "01 February 2015")
+        @Schema(example = "20150201")
         public LocalDate startDate;
 
     }
@@ -117,9 +117,9 @@ final class TellerApiResourceSwagger {
         public String description;
         @Schema(example = "ACTIVE")
         public TellerStatus status;
-        @Schema(example = "28 February 2015")
+        @Schema(example = "20150228")
         public LocalDate endDate;
-        @Schema(example = "01 February 2015")
+        @Schema(example = "20150201")
         public LocalDate startDate;
         @Schema(example = "en")
         public String locale;
@@ -141,9 +141,9 @@ final class TellerApiResourceSwagger {
 
             @Schema(example = "teller cash handling")
             public String description;
-            @Schema(example = "28 February 2015")
+            @Schema(example = "20150228")
             public LocalDate endDate;
-            @Schema(example = "01 February 2015")
+            @Schema(example = "20150201")
             public LocalDate startDate;
             @Schema(example = "en")
             public String locale;
@@ -185,7 +185,7 @@ final class TellerApiResourceSwagger {
 
         }
 
-        @Schema(example = "28 February 2015")
+        @Schema(example = "20150228")
         public LocalDate endDate;
         @Schema(example = "teller cash handling")
         public String description;
@@ -197,7 +197,7 @@ final class TellerApiResourceSwagger {
         public String locale;
         @Schema(example = "dd-MM-yyyy")
         public String dateFormat;
-        @Schema(example = "01 February 2015")
+        @Schema(example = "20150201")
         public LocalDate startDate;
 
     }
@@ -255,7 +255,7 @@ final class TellerApiResourceSwagger {
 
         }
 
-        @Schema(example = "25 February 2015")
+        @Schema(example = "20150225")
         public LocalDate endDate;
         @Schema(example = "Cashier updated.")
         public String description;
@@ -267,7 +267,7 @@ final class TellerApiResourceSwagger {
         public String locale;
         @Schema(example = "dd-MM-yyyy")
         public String dateFormat;
-        @Schema(example = "01 February 2015")
+        @Schema(example = "20150201")
         public LocalDate startDate;
 
     }
@@ -283,7 +283,7 @@ final class TellerApiResourceSwagger {
 
             private PutTellersTellerIdCashiersCashierIdResponseChanges() {}
 
-            @Schema(example = "25 February 2015")
+            @Schema(example = "20150225")
             public LocalDate endDate;
             @Schema(example = "Cashier updated.")
             public String description;

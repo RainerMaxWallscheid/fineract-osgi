@@ -39,7 +39,7 @@ public class OfficeIntegrationTest {
         Long officeId = createResponse.getResourceId();
 
         String name = Utils.uniqueRandomStringGenerator("New_Office_", 4);
-        String date = "02 July 2007";
+        String date = "20070702";
 
         officeHelper.updateOffice(officeId, name, date);
         GetOfficesResponse updatedOffice = officeHelper.retrieveOffice(officeId);
@@ -55,7 +55,7 @@ public class OfficeIntegrationTest {
         Long officeId = createResponse.getResourceId();
 
         String name = Utils.uniqueRandomStringGenerator("New_Office_", 4);
-        String date = "02 July 2007";
+        String date = "20070702";
 
         PutOfficesOfficeIdResponse updateResult = officeHelper.updateOfficeByExternalId(externalId, name, date);
         Assertions.assertEquals(officeId, updateResult.getOfficeId());
@@ -72,7 +72,7 @@ public class OfficeIntegrationTest {
         officeHelper.createOffice(externalId, LocalDate.of(2007, 7, 1));
 
         String name = Utils.uniqueRandomStringGenerator("New_Office_", 4);
-        String date = "02 July 2007";
+        String date = "20070702";
 
         officeHelper.updateOfficeByExternalId(externalId, name, date);
         GetOfficesResponse updatedOffice = officeHelper.retrieveOfficeByExternalId(externalId);

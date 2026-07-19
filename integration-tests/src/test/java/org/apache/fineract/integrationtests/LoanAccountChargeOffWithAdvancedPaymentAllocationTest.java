@@ -77,7 +77,7 @@ import org.junit.jupiter.api.Test;
 
 public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseLoanIntegrationTest {
 
-    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
     private ClientHelper clientHelper;
@@ -87,7 +87,7 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
     private LoanProductHelper loanProductHelper;
     private PaymentTypeHelper paymentTypeHelper;
     private final BusinessDateHelper businessDateHelper = new BusinessDateHelper();
-    private static final String DATETIME_PATTERN = "dd MMMM yyyy";
+    private static final String DATETIME_PATTERN = "yyyyMMdd";
     // asset
     private Account loansReceivable;
     private Account interestFeeReceivable;
@@ -149,7 +149,7 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
     // Charge-off accounting and balances
     @Test
     public void loanChargeOffWithAdvancedPaymentStrategyTest() {
-        runAt("10 September 2022", () -> {
+        runAt("20220910", () -> {
             String loanExternalIdStr = UUID.randomUUID().toString();
             final Integer loanProductID = createLoanProductWithPeriodicAccrualAccountingAndAdvancedPaymentAllocationStrategy();
             final Integer clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId().intValue();
@@ -175,7 +175,7 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
 
             // make Repayment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("9 September 2022").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220909").locale("en")
                             .transactionAmount(10.0));
 
             GetLoansLoanIdResponse loanDetails = this.loanTransactionHelper.getLoanDetails((long) loanId);
@@ -187,7 +187,7 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
             Integer chargeOffReasonId = CodeHelper.createChargeOffCodeValue(requestSpec, responseSpec, randomText, 1);
             String transactionExternalId = UUID.randomUUID().toString();
             PostLoansLoanIdTransactionsResponse chargeOffTransaction = this.loanTransactionHelper.chargeOffLoan((long) loanId,
-                    new PostLoansLoanIdTransactionsRequest().transactionDate("10 September 2022").locale("en").dateFormat("dd MMMM yyyy")
+                    new PostLoansLoanIdTransactionsRequest().transactionDate("20220910").locale("en").dateFormat("yyyyMMdd")
                             .externalId(transactionExternalId).chargeOffReasonId((long) chargeOffReasonId));
 
             loanDetails = this.loanTransactionHelper.getLoanDetails((long) loanId);
@@ -214,7 +214,7 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
     // Reverse Replay of Charge-Off
     @Test
     public void loanChargeOffReverseReplayWithAdvancedPaymentStrategyTest() {
-        runAt("9 September 2022", () -> {
+        runAt("20220909", () -> {
             String loanExternalIdStr = UUID.randomUUID().toString();
             final Integer loanProductID = createLoanProductWithPeriodicAccrualAccountingAndAdvancedPaymentAllocationStrategy();
             final Integer clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId().intValue();
@@ -240,20 +240,20 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
 
             // make Repayment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("9 September 2022").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220909").locale("en")
                             .transactionAmount(10.0));
 
             GetLoansLoanIdResponse loanDetails = this.loanTransactionHelper.getLoanDetails((long) loanId);
             assertTrue(loanDetails.getStatus().getActive());
 
             // set loan as chargeoff
-            updateBusinessDate("10 September 2022");
+            updateBusinessDate("20220910");
             String randomText = Utils.randomStringGenerator("en", 5) + Utils.randomNumberGenerator(6)
                     + Utils.randomStringGenerator("is", 5);
             Integer chargeOffReasonId = CodeHelper.createChargeOffCodeValue(requestSpec, responseSpec, randomText, 1);
             String transactionExternalId = UUID.randomUUID().toString();
             PostLoansLoanIdTransactionsResponse chargeOffTransaction = this.loanTransactionHelper.chargeOffLoan((long) loanId,
-                    new PostLoansLoanIdTransactionsRequest().transactionDate("10 September 2022").locale("en").dateFormat("dd MMMM yyyy")
+                    new PostLoansLoanIdTransactionsRequest().transactionDate("20220910").locale("en").dateFormat("yyyyMMdd")
                             .externalId(transactionExternalId).chargeOffReasonId((long) chargeOffReasonId));
 
             loanDetails = this.loanTransactionHelper.getLoanDetails((long) loanId);
@@ -266,8 +266,8 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
             Long reversedAndReplayedTransactionId = chargeOffTransaction.getResourceId();
 
             // reverse Repayment
-            updateBusinessDate("11 September 2022");
-            loanTransactionHelper.reverseRepayment(loanId, repaymentTransaction.getResourceId().intValue(), "11 September 2022");
+            updateBusinessDate("20220911");
+            loanTransactionHelper.reverseRepayment(loanId, repaymentTransaction.getResourceId().intValue(), "20220911");
 
             // verify chargeOffTransaction gets reverse replayed
 
@@ -298,7 +298,7 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
 
         // make Repayment
         final PostLoansLoanIdTransactionsResponse repaymentTransaction = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("6 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220906").locale("en")
                         .transactionAmount(100.0));
 
         GetLoansLoanIdResponse loanDetails = this.loanTransactionHelper.getLoanDetails((long) loanId);
@@ -308,8 +308,8 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
         String randomText = Utils.randomStringGenerator("en", 5) + Utils.randomNumberGenerator(6) + Utils.randomStringGenerator("is", 5);
         Integer chargeOffReasonId = CodeHelper.createChargeOffCodeValue(requestSpec, responseSpec, randomText, 1);
         String transactionExternalId = UUID.randomUUID().toString();
-        loanTransactionHelper.chargeOffLoan((long) loanId, new PostLoansLoanIdTransactionsRequest().transactionDate("7 September 2022")
-                .locale("en").dateFormat("dd MMMM yyyy").externalId(transactionExternalId).chargeOffReasonId((long) chargeOffReasonId));
+        loanTransactionHelper.chargeOffLoan((long) loanId, new PostLoansLoanIdTransactionsRequest().transactionDate("20220907")
+                .locale("en").dateFormat("yyyyMMdd").externalId(transactionExternalId).chargeOffReasonId((long) chargeOffReasonId));
 
         loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
         assertTrue(loanDetails.getStatus().getActive());
@@ -335,14 +335,14 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
     // Backdated repayment transaction, Reverse replay of charge off
     @Test
     public void postChargeOffAddBackdatedTransactionAndReverseReplayTest() {
-        runAt("3 September 2022", () -> {
+        runAt("20220903", () -> {
             String loanExternalIdStr = UUID.randomUUID().toString();
             final Integer loanProductID = createLoanProductWithPeriodicAccrualAccountingAndAdvancedPaymentAllocationStrategy();
             final Integer clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId().intValue();
             final Integer loanId = createLoanAccount(clientId, loanProductID, loanExternalIdStr);
 
             // apply charges
-            updateBusinessDate("5 September 2022");
+            updateBusinessDate("20220905");
             Integer feeCharge = ChargesHelper.createCharges(requestSpec, responseSpec,
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "10", false));
 
@@ -352,13 +352,13 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
                     LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(feeCharge), feeCharge1AddedDate, "10"));
 
             // set loan as chargeoff
-            updateBusinessDate("14 September 2022");
+            updateBusinessDate("20220914");
             String randomText = Utils.randomStringGenerator("en", 5) + Utils.randomNumberGenerator(6)
                     + Utils.randomStringGenerator("is", 5);
             Integer chargeOffReasonId = CodeHelper.createChargeOffCodeValue(requestSpec, responseSpec, randomText, 1);
             String transactionExternalId = UUID.randomUUID().toString();
             PostLoansLoanIdTransactionsResponse chargeOffTransaction = loanTransactionHelper.chargeOffLoan((long) loanId,
-                    new PostLoansLoanIdTransactionsRequest().transactionDate("14 September 2022").locale("en").dateFormat("dd MMMM yyyy")
+                    new PostLoansLoanIdTransactionsRequest().transactionDate("20220914").locale("en").dateFormat("yyyyMMdd")
                             .externalId(transactionExternalId).chargeOffReasonId((long) chargeOffReasonId));
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
@@ -380,9 +380,9 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
             verifyJournalEntry(journalEntries.get(1), 1000.0, LocalDate.of(2022, 9, 14), creditLossBadDebt, "DEBIT");
             verifyJournalEntry(journalEntries.get(0), 10.0, LocalDate.of(2022, 9, 14), feeChargeOff, "DEBIT");
 
-            // make Repayment before chargeoff date - business date is still on 14 September 2022
+            // make Repayment before chargeoff date - business date is still on 20220914
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("7 September 2022").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220907").locale("en")
                             .transactionAmount(100.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
@@ -418,9 +418,9 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
             verifyTransaction(LocalDate.of(2022, 9, 14), 910.0f, 910.0f, 0.0f, 0.0f, 0.0f, loanId, "chargeoff");
 
             // make Repayment after chargeoff date
-            updateBusinessDate("15 September 2022");
+            updateBusinessDate("20220915");
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("15 September 2022").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220915").locale("en")
                             .transactionAmount(100.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
@@ -443,7 +443,7 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
     // Repayment before charge off on charge off date, reverse replay of charge off
     @Test
     public void transactionOnChargeOffDateReverseTest() {
-        runAt("7 September 2022", () -> {
+        runAt("20220907", () -> {
             String loanExternalIdStr = UUID.randomUUID().toString();
             final Integer loanProductID = createLoanProductWithPeriodicAccrualAccountingAndAdvancedPaymentAllocationStrategy();
             final Integer clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId().intValue();
@@ -460,7 +460,7 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
 
             // make Repayment before charge-off on charge off date
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("7 September 2022").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220907").locale("en")
                             .transactionAmount(100.0));
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
@@ -485,7 +485,7 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
             Integer chargeOffReasonId = CodeHelper.createChargeOffCodeValue(requestSpec, responseSpec, randomText, 1);
             String transactionExternalId = UUID.randomUUID().toString();
             PostLoansLoanIdTransactionsResponse chargeOffTransaction = loanTransactionHelper.chargeOffLoan((long) loanId,
-                    new PostLoansLoanIdTransactionsRequest().transactionDate("7 September 2022").locale("en").dateFormat("dd MMMM yyyy")
+                    new PostLoansLoanIdTransactionsRequest().transactionDate("20220907").locale("en").dateFormat("yyyyMMdd")
                             .externalId(transactionExternalId).chargeOffReasonId((long) chargeOffReasonId));
 
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
@@ -506,7 +506,7 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
             verifyJournalEntry(journalEntries.get(0), 910.0, LocalDate.of(2022, 9, 7), creditLossBadDebt, "DEBIT");
 
             // reverse Repayment
-            loanTransactionHelper.reverseRepayment(loanId, repaymentTransaction.getResourceId().intValue(), "7 September 2022");
+            loanTransactionHelper.reverseRepayment(loanId, repaymentTransaction.getResourceId().intValue(), "20220907");
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
             assertTrue(loanDetails.getStatus().getActive());
             assertTrue(loanDetails.getChargedOff());
@@ -550,48 +550,48 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
         final PostLoanProductsResponse loanProductsResponse = loanProductHelper
                 .createLoanProduct(create4IProgressive().chargeOffBehaviour("ZERO_INTEREST"));
 
-        runAt("01 January 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "01 January 2024",
+        runAt("20240101", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20240101",
                     1000.0, 7.0, 6, null);
 
             loanIdRef.set(loanId);
 
-            disburseLoan(loanId, BigDecimal.valueOf(1000), "01 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(1000), "20240101");
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2024", 164.26, 0, 0, 5.83);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2024", 165.21, 0, 0, 4.88);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2024", 166.18, 0, 0, 3.91);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2024", 167.15, 0, 0, 2.94);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "01 June 2024", 168.12, 0, 0, 1.97);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "01 July 2024", 169.08, 0, 0, 0.99);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20240201", 164.26, 0, 0, 5.83);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20240301", 165.21, 0, 0, 4.88);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20240401", 166.18, 0, 0, 3.91);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20240501", 167.15, 0, 0, 2.94);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "20240601", 168.12, 0, 0, 1.97);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "20240701", 169.08, 0, 0, 0.99);
 
-            verifyTransactions(loanId, transaction(1000.0d, "Disbursement", "01 January 2024"));
+            verifyTransactions(loanId, transaction(1000.0d, "Disbursement", "20240101"));
             executeInlineCOB(loanId);
         });
-        runAt("10 February 2024", () -> {
+        runAt("20240210", () -> {
             Long loanId = loanIdRef.get();
 
             loanTransactionHelper.makeLoanRepayment(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN)
-                    .transactionDate("15 January 2024").locale("en").transactionAmount(170.09));
+                    .transactionDate("20240115").locale("en").transactionAmount(170.09));
 
             loanTransactionHelper.chargeOffLoan(loanId,
-                    new PostLoansLoanIdTransactionsRequest().transactionDate("31 January 2024").locale("en").dateFormat("dd MMMM yyyy"));
+                    new PostLoansLoanIdTransactionsRequest().transactionDate("20240131").locale("en").dateFormat("yyyyMMdd"));
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2024, 2, 1), 164.95, 167.46, -2.51, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.14,
                     2.63, 2.51, 170.09, 0.0);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2024", 170.09, 0, 0, 0.0);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2024", 170.09, 0, 0, 0.0);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2024", 170.09, 0, 0, 0.0);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "01 June 2024", 170.09, 0, 0, 0.0);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "01 July 2024", 154.69, 0, 0, 0.0);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20240301", 170.09, 0, 0, 0.0);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20240401", 170.09, 0, 0, 0.0);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20240501", 170.09, 0, 0, 0.0);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "20240601", 170.09, 0, 0, 0.0);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "20240701", 154.69, 0, 0, 0.0);
 
             verifyTransactions(loanId, //
-                    transaction(1000.0d, "Disbursement", "01 January 2024", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(170.09d, "Repayment", "15 January 2024", 832.54, 167.46, 2.63, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(5.14d, "Accrual", "31 January 2024", 0.0, 0.0, 5.14, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(835.05d, "Charge-off", "31 January 2024", 0.0, 832.54, 2.51, 0.0, 0.0, 0.0, 0.0, false) //
+                    transaction(1000.0d, "Disbursement", "20240101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(170.09d, "Repayment", "20240115", 832.54, 167.46, 2.63, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(5.14d, "Accrual", "20240131", 0.0, 0.0, 5.14, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(835.05d, "Charge-off", "20240131", 0.0, 832.54, 2.51, 0.0, 0.0, 0.0, 0.0, false) //
             );
         });
     }
@@ -643,13 +643,13 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
         String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("30")
                 .withLoanTermFrequencyAsDays().withNumberOfRepayments("1").withRepaymentEveryAfter("30").withRepaymentFrequencyTypeAsDays()
                 .withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance().withAmortizationTypeAsEqualPrincipalPayments()
-                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("03 September 2022")
-                .withSubmittedOnDate("01 September 2022").withLoanType("individual").withExternalId(externalId)
+                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("20220903")
+                .withSubmittedOnDate("20220901").withLoanType("individual").withExternalId(externalId)
                 .withRepaymentStrategy("advanced-payment-allocation-strategy").build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("02 September 2022", "1000", loanId, null);
-        loanTransactionHelper.disburseLoanWithTransactionAmount("03 September 2022", loanId, "1000");
+        loanTransactionHelper.approveLoan("20220902", "1000", loanId, null);
+        loanTransactionHelper.disburseLoanWithTransactionAmount("20220903", loanId, "1000");
         return loanId;
     }
 
@@ -768,7 +768,7 @@ public class LoanAccountChargeOffWithAdvancedPaymentAllocationTest extends BaseL
                 .receivableInterestAccountId(interestFeeReceivable.getAccountID().longValue())//
                 .receivableFeeAccountId(interestFeeReceivable.getAccountID().longValue())//
                 .receivablePenaltyAccountId(interestFeeReceivable.getAccountID().longValue())//
-                .dateFormat("dd MMMM yyyy")//
+                .dateFormat("yyyyMMdd")//
                 .locale("en_GB")//
                 .disallowExpectedDisbursements(true)//
                 .allowApprovedDisbursedAmountsOverApplied(true)//

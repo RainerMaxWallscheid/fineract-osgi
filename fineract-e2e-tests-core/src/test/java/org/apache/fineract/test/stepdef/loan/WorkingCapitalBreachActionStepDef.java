@@ -47,7 +47,7 @@ import org.junit.jupiter.api.Assertions;
 public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalBreachActionStepDef.class);
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
     private static final Long NON_EXISTENT_LOAN_ID = 999999999L;
     private final FineractFeignClient fineractClient;
     private final WorkingCapitalLoanRequestFactory workingCapitalLoanRequestFactory;

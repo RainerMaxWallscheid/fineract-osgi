@@ -54,11 +54,11 @@ final class FixedDepositProductsApiResourceSwagger {
                 public Double annualInterestRate;
             }
 
-            @Schema(example = "01 Jan 2014")
+            @Schema(example = "20140101")
             public String fromDate;
             @Schema(example = "en")
             public String locale;
-            @Schema(example = "dd MMMM yyyy")
+            @Schema(example = "yyyyMMdd")
             public String dateFormat;
             public Set<PostFixedDepositProductsChartSlabs> chartSlabs;
         }

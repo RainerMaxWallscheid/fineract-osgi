@@ -79,9 +79,9 @@ public class TaxesTest {
         final Long taxComponentId = createTaxComponentWithLiabilityToCredit("taxComponent");
 
         final Set<PostTaxesGroupTaxComponents> taxComponentsSet = new HashSet<>();
-        taxComponentsSet.add(new PostTaxesGroupTaxComponents().taxComponentId(taxComponentId).startDate("01 January 2023"));
+        taxComponentsSet.add(new PostTaxesGroupTaxComponents().taxComponentId(taxComponentId).startDate("20230101"));
         final PostTaxesGroupRequest taxGroupRequest = new PostTaxesGroupRequest().name(Utils.randomStringGenerator("TAX_GRP_", 4))
-                .taxComponents(taxComponentsSet).dateFormat("dd MMMM yyyy").locale("en");
+                .taxComponents(taxComponentsSet).dateFormat("yyyyMMdd").locale("en");
         final PostTaxesGroupResponse taxGroupResponse = taxGroupHelper.createTaxGroup(taxGroupRequest);
         Assertions.assertNotNull(taxGroupResponse);
         Assertions.assertNotNull(taxGroupResponse.getResourceId());
@@ -103,7 +103,7 @@ public class TaxesTest {
         final Account taxComponentGlAccount = AccountHelper.createLiabilityGlAccount(taxComponentPrefix);
 
         final PostTaxesComponentsRequest taxComponentRequest = new PostTaxesComponentsRequest()
-                .name(Utils.randomStringGenerator(taxComponentPrefix, 4)).percentage(12.0f).startDate("01 January 2023")
+                .name(Utils.randomStringGenerator(taxComponentPrefix, 4)).percentage(12.0f).startDate("20230101")
                 .creditAccountType(Integer.valueOf(taxComponentGlAccount.getAccountType().toString()))
                 .creditAccountId(taxComponentGlAccount.getAccountID().longValue()).dateFormat(Utils.DATE_FORMAT).locale(Utils.LOCALE);
 
@@ -118,7 +118,7 @@ public class TaxesTest {
         final Account taxComponentGlAccount = AccountHelper.createLiabilityGlAccount(taxComponentPrefix);
 
         final PostTaxesComponentsRequest taxComponentRequest = new PostTaxesComponentsRequest()
-                .name(Utils.randomStringGenerator(taxComponentPrefix, 4)).percentage(12.0f).startDate("01 January 2023")
+                .name(Utils.randomStringGenerator(taxComponentPrefix, 4)).percentage(12.0f).startDate("20230101")
                 .debitAccountType(Integer.valueOf(taxComponentGlAccount.getAccountType().toString()))
                 .debitAccountId(taxComponentGlAccount.getAccountID().longValue()).dateFormat(Utils.DATE_FORMAT).locale(Utils.LOCALE);
 

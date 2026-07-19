@@ -175,9 +175,9 @@ public final class WorkingCapitalLoanTransactionsApiResourceSwagger {
 
         @Schema(example = "en_GB")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "28 June 2024", description = "Transaction date")
+        @Schema(example = "20240628", description = "Transaction date")
         public String transactionDate;
         @Schema(example = "42", description = "Disbursement transaction id for discountFee; discount fee transaction id for discountFeeAdjustment")
         public Long relatedResourceId;

@@ -57,7 +57,7 @@ import org.apache.fineract.test.support.TestContextKey;
 public class WorkingCapitalDelinquencyRescheduleStepDef extends AbstractStepDef {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalDelinquencyRescheduleStepDef.class);
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
     private final FineractFeignClient fineractFeignClient;
     private final WorkingCapitalRequestFactory workingCapitalRequestFactory;
 

@@ -48,13 +48,13 @@ final class CollectionSheetApiResourceSwagger {
             public Long receiptNumber;
         }
 
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "04 May 2014")
+        @Schema(example = "20140504")
         public String transactionDate;
-        @Schema(example = "04 May 2014")
+        @Schema(example = "20140504")
         public String actualDisbursementDate;
         public List<Integer> bulkDisbursementTransactions;
         public PostCollectionSheetBulkRepaymentTransactions bulkRepaymentTransactions;
@@ -72,7 +72,7 @@ final class CollectionSheetApiResourceSwagger {
 
             @Schema(example = "en")
             public String locale;
-            @Schema(example = "dd MMMM yyyy")
+            @Schema(example = "yyyyMMdd")
             public String dateFormat;
             @Schema(example = "[15]")
             public List<Integer> loanTransactions;

@@ -87,8 +87,8 @@ public class LoanWithAdvancedPaymentAllocationIntegrationTests {
         Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(createLoanJSON(defaultAllocation, repaymentPaymentAllocation));
         Assertions.assertNotNull(loanProductId);
         GetLoanProductsProductIdResponse loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
-        final PostClientsResponse clientResponse = CLIENT_HELPER.createClient(new PostClientsRequest().activationDate("01 January 2022").active(true).dateFormat("dd MMMM yyyy").fullname("fullName").locale("en").legalFormId(1L).officeId(1L));
-        Integer loanId = createLoanAccount(LOAN_TRANSACTION_HELPER, clientResponse.getClientId().toString(), loanProductId.toString(), "02 January 2022");
+        final PostClientsResponse clientResponse = CLIENT_HELPER.createClient(new PostClientsRequest().activationDate("20220101").active(true).dateFormat("yyyyMMdd").fullname("fullName").locale("en").legalFormId(1L).officeId(1L));
+        Integer loanId = createLoanAccount(LOAN_TRANSACTION_HELPER, clientResponse.getClientId().toString(), loanProductId.toString(), "20220102");
         // then
         List<AdvancedPaymentData> allocationRules = LOAN_TRANSACTION_HELPER.getAdvancedPaymentAllocationRules(loanId);
         Assertions.assertNotNull(allocationRules);

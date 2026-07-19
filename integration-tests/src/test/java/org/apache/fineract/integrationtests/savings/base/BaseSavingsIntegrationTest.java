@@ -60,7 +60,7 @@ import org.junit.jupiter.api.Assertions;
 public class BaseSavingsIntegrationTest extends IntegrationTest {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BaseSavingsIntegrationTest.class);
-    protected static final String DATETIME_PATTERN = "dd MMMM yyyy";
+    protected static final String DATETIME_PATTERN = "yyyyMMdd";
 
     static {
         Utils.initializeRESTAssured();

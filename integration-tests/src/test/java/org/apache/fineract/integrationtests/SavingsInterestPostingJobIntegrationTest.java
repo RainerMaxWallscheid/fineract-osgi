@@ -89,7 +89,7 @@ public class SavingsInterestPostingJobIntegrationTest {
 
     @Test
     public void testSavingsBalanceCheckAfterDailyInterestPostingJob() {
-        final String startDate = "10 April 2022";
+        final String startDate = "20220410";
         final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
         Assertions.assertNotNull(clientID);
 
@@ -109,7 +109,7 @@ public class SavingsInterestPostingJobIntegrationTest {
 
     @Test
     public void testSavingsDailyInterestPostingJobWithAccountingNone() {
-        final String startDate = "10 April 2022";
+        final String startDate = "20220410";
         final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
         Assertions.assertNotNull(clientID);
         this.accountHelper = new AccountHelper(requestSpec, responseSpec);
@@ -125,7 +125,7 @@ public class SavingsInterestPostingJobIntegrationTest {
 
     @Test
     public void testDuplicateOverdraftInterestPostingJob() {
-        final String startDate = "01 July 2022";
+        final String startDate = "20220701";
         final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
         Assertions.assertNotNull(clientID);
 
@@ -153,7 +153,7 @@ public class SavingsInterestPostingJobIntegrationTest {
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(true));
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, today);
-            final String startDate = "10 April 2022";
+            final String startDate = "20220410";
             final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
             Assertions.assertNotNull(clientID);
 
@@ -182,7 +182,7 @@ public class SavingsInterestPostingJobIntegrationTest {
 
     @Test
     public void testSavingsDailyOverdraftInterestPostingJob() {
-        final String startDate = "10 April 2022";
+        final String startDate = "20220410";
         final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
         Assertions.assertNotNull(clientID);
 
@@ -204,7 +204,7 @@ public class SavingsInterestPostingJobIntegrationTest {
 
     @Test
     public void testAccountBalanceWithWithdrawalFeeAfterInterestPostingJob() {
-        final String startDate = "21 June 2022";
+        final String startDate = "20220621";
         final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
         Assertions.assertNotNull(clientID);
 
@@ -234,7 +234,7 @@ public class SavingsInterestPostingJobIntegrationTest {
                     new PutGlobalConfigurationsRequest().enabled(true));
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, businessDate);
 
-            final String startDate = "10 April 2022";
+            final String startDate = "20220410";
             final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
             Assertions.assertNotNull(clientID);
 
@@ -265,7 +265,7 @@ public class SavingsInterestPostingJobIntegrationTest {
                     new PutGlobalConfigurationsRequest().enabled(true));
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, businessDate);
 
-            final String startDate = "10 April 2022";
+            final String startDate = "20220410";
             final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
             Assertions.assertNotNull(clientID);
 

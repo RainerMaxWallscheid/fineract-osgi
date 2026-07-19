@@ -128,7 +128,7 @@ public class FeignLoanAdjustmentOriginatorEnricherTest extends FeignLoanTestBase
             // Add a fee charge to the loan
             final Long chargeId = createFlatFeeCharge(100.0, "EUR");
             ok(() -> fineractClient.loanCharges().createOrPayLoanCharge(loanId, new PostLoansLoanIdChargesRequest().chargeId(chargeId)
-                    .amount(100.0).locale("en").dateFormat("dd MMMM yyyy").dueDate(today), (String) null));
+                    .amount(100.0).locale("en").dateFormat("yyyyMMdd").dueDate(today), (String) null));
 
             externalEventHelper.deleteAllExternalEvents();
 
@@ -164,7 +164,7 @@ public class FeignLoanAdjustmentOriginatorEnricherTest extends FeignLoanTestBase
             final Long chargeId = createFlatFeeCharge(100.0, "EUR");
             final Long loanChargeId = ok(
                     () -> fineractClient.loanCharges().createOrPayLoanCharge(loanId, new PostLoansLoanIdChargesRequest().chargeId(chargeId)
-                            .amount(100.0).locale("en").dateFormat("dd MMMM yyyy").dueDate(today), (String) null))
+                            .amount(100.0).locale("en").dateFormat("yyyyMMdd").dueDate(today), (String) null))
                     .getResourceId();
 
             ok(() -> fineractClient.loanCharges().executeLoanChargeOnExistingCharge(loanId, loanChargeId,

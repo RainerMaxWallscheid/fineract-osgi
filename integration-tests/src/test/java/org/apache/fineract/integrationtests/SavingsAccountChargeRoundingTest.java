@@ -50,7 +50,7 @@ public class SavingsAccountChargeRoundingTest extends BaseSavingsIntegrationTest
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SavingsAccountChargeRoundingTest.class);
     private Long clientId;
     private ChargesHelper chargesHelper;
-    private static final String DATE = "01 January 2026";
+    private static final String DATE = "20260101";
 
     @BeforeEach
     public void setup() {

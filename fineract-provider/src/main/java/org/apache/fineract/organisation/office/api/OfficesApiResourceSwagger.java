@@ -46,7 +46,7 @@ final class OfficesApiResourceSwagger {
         public LocalDate openingDate;
         @Schema(example = ".")
         public String hierarchy;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "en")
         public String locale;
@@ -75,11 +75,11 @@ final class OfficesApiResourceSwagger {
 
         @Schema(example = "Good Friday")
         public String name;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "01 July 2007")
+        @Schema(example = "20070701")
         public LocalDate openingDate;
         @Schema(example = "2")
         public Long parentId;
@@ -111,11 +111,11 @@ final class OfficesApiResourceSwagger {
         @Schema(example = "Name is updated")
         public String name;
 
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "01 July 2007", type = "date")
+        @Schema(example = "20070701", type = "date")
         public String openingDate;
         @Schema(example = "SYS54-88")
         public String externalId;

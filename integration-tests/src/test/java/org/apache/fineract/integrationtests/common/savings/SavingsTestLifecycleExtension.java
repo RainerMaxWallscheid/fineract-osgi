@@ -52,7 +52,7 @@ public class SavingsTestLifecycleExtension implements AfterAllCallback {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SavingsTestLifecycleExtension.class);
     private SavingsAccountHelper savingsAccountHelper;
     private SchedulerJobHelper schedulerJobHelper;
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     private static final int CLEANUP_THREAD_COUNT = 10;
     private final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern(DATE_FORMAT).toFormatter(Locale.ENGLISH);
 

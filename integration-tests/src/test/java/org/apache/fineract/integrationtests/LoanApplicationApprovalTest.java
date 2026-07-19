@@ -72,8 +72,8 @@ public class LoanApplicationApprovalTest {
     public void loanApplicationApprovedAmountLessThanProposedAmount() {
         final String proposedAmount = "8000";
         final String approvalAmount = "5000";
-        final String approveDate = "20 September 2012";
-        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
+        final String approveDate = "20120920";
+        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20120101");
         final Integer loanProductID = this.loanTransactionHelper.getLoanProductId(new LoanProductTestBuilder().build(null));
         final Integer loanID = applyForLoanApplication(clientID, loanProductID, proposedAmount);
         HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(this.requestSpec, this.responseSpec, loanID);
@@ -91,8 +91,8 @@ public class LoanApplicationApprovalTest {
     public void loanApplicationApprovedAmountGreaterThanProposedAmount() {
         final String proposedAmount = "5000";
         final String approvalAmount = "9000";
-        final String approveDate = "2 April 2012";
-        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
+        final String approveDate = "20120402";
+        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20120101");
         final Integer loanProductID = this.loanTransactionHelper.getLoanProductId(new LoanProductTestBuilder().build(null));
         final Integer loanID = applyForLoanApplication(clientID, loanProductID, proposedAmount);
         HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(this.requestSpec, this.responseSpec, loanID);
@@ -113,9 +113,9 @@ public class LoanApplicationApprovalTest {
     @Test
     public void loanApplicationApprovalAndValidationForMultiDisburseLoans() {
         List<HashMap> createTranches = new ArrayList<>();
-        createTranches.add(createTrancheDetail("01 March 2014", "1000"));
-        createTranches.add(createTrancheDetail("23 March 2014", "4000"));
-        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2014");
+        createTranches.add(createTrancheDetail("20140301", "1000"));
+        createTranches.add(createTrancheDetail("20140323", "4000"));
+        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20140101");
         log.info("---------------------------------CLIENT CREATED WITH ID--------------------------------------------------- {}", clientID);
         final Integer loanProductID = this.loanTransactionHelper.getLoanProductId( //
         //
@@ -129,12 +129,12 @@ public class LoanApplicationApprovalTest {
 
     @Test
     public void loanApplicationShouldFailIfTransactionProcessingStrategyIsAdvancedPaymentAllocationButItIsNotConfiguredOnProduct() {
-        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2014");
+        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20140101");
         log.info("---------------------------------CLIENT CREATED WITH ID--------------------------------------------------- {}", clientId);
         final Integer loanProductId = this.loanTransactionHelper.getLoanProductId(new LoanProductTestBuilder().withInterestTypeAsDecliningBalance().withTranches(false).withInterestCalculationPeriodTypeAsRepaymentPeriod(true).build(null));
         log.info("----------------------------------LOAN PRODUCT CREATED WITH ID------------------------------------------- {}", loanProductId);
         loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpecForStatusCode403);
-        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("1").withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance().withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("01 March 2022").withSubmittedOnDate("01 March 2022").withLoanType("individual").withRepaymentStrategy(AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).build(clientId.toString(), loanProductId.toString(), null);
+        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("1").withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance().withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("20220301").withSubmittedOnDate("20220301").withLoanType("individual").withRepaymentStrategy(AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).build(clientId.toString(), loanProductId.toString(), null);
         List<HashMap> error = (List<HashMap>) loanTransactionHelper.createLoanAccount(loanApplicationJSON, CommonConstants.RESPONSE_ERROR);
         assertEquals("strategy.cannot.be.advanced.payment.allocation.if.not.configured", error.get(0).get(CommonConstants.RESPONSE_ERROR_MESSAGE_CODE));
     }
@@ -142,11 +142,11 @@ public class LoanApplicationApprovalTest {
     private void trancheLoansApprovedAmountLesserThanProposedAmount(Integer clientID, Integer loanProductID, List<HashMap> createTranches) {
         final String proposedAmount = "5000";
         final String approvalAmount = "2000";
-        final String approveDate = "01 March 2014";
-        final String expectedDisbursementDate = "01 March 2014";
+        final String approveDate = "20140301";
+        final String expectedDisbursementDate = "20140301";
         List<HashMap> approveTranches = new ArrayList<>();
-        approveTranches.add(createTrancheDetail("01 March 2014", "1000"));
-        approveTranches.add(createTrancheDetail("23 March 2014", "1000"));
+        approveTranches.add(createTrancheDetail("20140301", "1000"));
+        approveTranches.add(createTrancheDetail("20140323", "1000"));
         final Integer loanID = applyForLoanApplicationWithTranches(clientID, loanProductID, proposedAmount, createTranches);
         log.info("-----------------------------------LOAN CREATED WITH LOANID------------------------------------------------- {}", loanID);
         HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(this.requestSpec, this.responseSpec, loanID);
@@ -163,20 +163,20 @@ public class LoanApplicationApprovalTest {
         final String approvalAmount1 = "10000";
         final String approvalAmount3 = "400";
         final String approvalAmount4 = "200";
-        final String approveDate = "01 March 2014";
-        final String expectedDisbursementDate = "01 March 2014";
+        final String approveDate = "20140301";
+        final String expectedDisbursementDate = "20140301";
         List<HashMap> approveTranche1 = new ArrayList<>();
-        approveTranche1.add(createTrancheDetail("01 March 2014", "5000"));
-        approveTranche1.add(createTrancheDetail("23 March 2014", "5000"));
+        approveTranche1.add(createTrancheDetail("20140301", "5000"));
+        approveTranche1.add(createTrancheDetail("20140323", "5000"));
         List<HashMap> approveTranche3 = new ArrayList<>();
-        approveTranche3.add(createTrancheDetail("01 March 2014", "100"));
-        approveTranche3.add(createTrancheDetail("23 March 2014", "100"));
-        approveTranche3.add(createTrancheDetail("24 March 2014", "100"));
-        approveTranche3.add(createTrancheDetail("25 March 2014", "100"));
+        approveTranche3.add(createTrancheDetail("20140301", "100"));
+        approveTranche3.add(createTrancheDetail("20140323", "100"));
+        approveTranche3.add(createTrancheDetail("20140324", "100"));
+        approveTranche3.add(createTrancheDetail("20140325", "100"));
         List<HashMap> approveTranche4 = new ArrayList<>();
-        approveTranche4.add(createTrancheDetail("01 March 2014", "100"));
-        approveTranche4.add(createTrancheDetail("23 March 2014", "100"));
-        approveTranche4.add(createTrancheDetail("24 March 2014", "100"));
+        approveTranche4.add(createTrancheDetail("20140301", "100"));
+        approveTranche4.add(createTrancheDetail("20140323", "100"));
+        approveTranche4.add(createTrancheDetail("20140324", "100"));
         final Integer loanID = applyForLoanApplicationWithTranches(clientID, loanProductID, proposedAmount, createTranches);
         log.info("-----------------------------------LOAN CREATED WITH LOANID------------------------------------------------- {}", loanID);
         HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(this.requestSpec, this.responseSpec, loanID);
@@ -209,7 +209,7 @@ public class LoanApplicationApprovalTest {
         final Integer clientCollateralId = CollateralManagementHelper.createClientCollateral(this.requestSpec, this.responseSpec, clientID.toString(), collateralId);
         Assertions.assertNotNull(clientCollateralId);
         addCollaterals(collaterals, clientCollateralId, BigDecimal.valueOf(1));
-        final String loanApplication = new LoanApplicationTestBuilder().withPrincipal(proposedAmount).withLoanTermFrequency("5").withLoanTermFrequencyAsMonths().withNumberOfRepayments("5").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("2").withExpectedDisbursementDate("20 September 2012").withCollaterals(collaterals).withSubmittedOnDate("02 April 2012").build(clientID.toString(), loanProductID.toString(), null);
+        final String loanApplication = new LoanApplicationTestBuilder().withPrincipal(proposedAmount).withLoanTermFrequency("5").withLoanTermFrequencyAsMonths().withNumberOfRepayments("5").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("2").withExpectedDisbursementDate("20120920").withCollaterals(collaterals).withSubmittedOnDate("20120402").build(clientID.toString(), loanProductID.toString(), null);
         return this.loanTransactionHelper.getLoanId(loanApplication);
     }
 
@@ -243,7 +243,7 @@ public class LoanApplicationApprovalTest {
         //
         //
         //
-        new LoanApplicationTestBuilder().withPrincipal(principal).withLoanTermFrequency("5").withLoanTermFrequencyAsMonths().withNumberOfRepayments("5").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("2").withExpectedDisbursementDate("01 March 2014").withTranches(tranches).withInterestTypeAsDecliningBalance().withSubmittedOnDate("01 March 2014").withCollaterals(collaterals).build(clientID.toString(), loanProductID.toString(), null);
+        new LoanApplicationTestBuilder().withPrincipal(principal).withLoanTermFrequency("5").withLoanTermFrequencyAsMonths().withNumberOfRepayments("5").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("2").withExpectedDisbursementDate("20140301").withTranches(tranches).withInterestTypeAsDecliningBalance().withSubmittedOnDate("20140301").withCollaterals(collaterals).build(clientID.toString(), loanProductID.toString(), null);
         return this.loanTransactionHelper.getLoanId(loanApplicationJSON);
     }
 }

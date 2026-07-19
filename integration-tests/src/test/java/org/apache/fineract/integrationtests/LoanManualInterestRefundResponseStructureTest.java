@@ -52,20 +52,20 @@ public class LoanManualInterestRefundResponseStructureTest extends FeignLoanTest
     public void testManualInterestRefundResponseStructureWithoutExternalIds() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
         AtomicReference<Long> targetTransactionIdRef = new AtomicReference<>();
-        runAt("01 January 2024", () -> {
+        runAt("20240101", () -> {
             Long loanProductId = createLoanProduct(create4IProgressive().daysInMonthType(DaysInMonthType.ACTUAL).daysInYearType(DaysInYearType.ACTUAL).addSupportedInterestRefundTypesItem(SupportedInterestRefundTypesItem.MERCHANT_ISSUED_REFUND).recalculationRestFrequencyType(RecalculationRestFrequencyType.DAILY));
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductId, "01 January 2024", 1000.0, 9.9, 12, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductId, "20240101", 1000.0, 9.9, 12, null);
             assertNotNull(loanId);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(1000), "01 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(1000), "20240101");
         });
-        runAt("15 January 2024", () -> {
+        runAt("20240115", () -> {
             Long loanId = loanIdRef.get();
-            PostLoansLoanIdTransactionsResponse refundResponse = makeLoanMerchantIssuedRefund(loanId, "15 January 2024", 100.0);
+            PostLoansLoanIdTransactionsResponse refundResponse = makeLoanMerchantIssuedRefund(loanId, "20240115", 100.0);
             assertNotNull(refundResponse);
             assertNotNull(refundResponse.getResourceId());
             targetTransactionIdRef.set(refundResponse.getResourceId());
-            PostLoansLoanIdTransactionsResponse interestRefundResponse = createManualInterestRefund(loanId, refundResponse.getResourceId(), "15 January 2024", 5.0, null);
+            PostLoansLoanIdTransactionsResponse interestRefundResponse = createManualInterestRefund(loanId, refundResponse.getResourceId(), "20240115", 5.0, null);
             assertNotNull(interestRefundResponse, "Interest refund response should not be null");
             assertNotNull(interestRefundResponse.getResourceId(), "Interest refund resource ID should not be null");
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
@@ -82,21 +82,21 @@ public class LoanManualInterestRefundResponseStructureTest extends FeignLoanTest
     public void testManualInterestRefundResponseStructureWithExternalIds() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
         String loanExternalId = UUID.randomUUID().toString();
-        runAt("01 February 2024", () -> {
+        runAt("20240201", () -> {
             Long loanProductId = createLoanProduct(create4IProgressive().daysInMonthType(DaysInMonthType.ACTUAL).daysInYearType(DaysInYearType.ACTUAL).addSupportedInterestRefundTypesItem(SupportedInterestRefundTypesItem.MERCHANT_ISSUED_REFUND).recalculationRestFrequencyType(RecalculationRestFrequencyType.DAILY));
-            Long loanId = applyAndApproveProgressiveLoanWithExternalId(client.getClientId(), loanProductId, loanExternalId, "01 February 2024", 1000.0, 9.9, 12, null);
+            Long loanId = applyAndApproveProgressiveLoanWithExternalId(client.getClientId(), loanProductId, loanExternalId, "20240201", 1000.0, 9.9, 12, null);
             assertNotNull(loanId);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(1000), "01 February 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(1000), "20240201");
         });
-        runAt("15 February 2024", () -> {
+        runAt("20240215", () -> {
             Long loanId = loanIdRef.get();
             String repaymentExternalId = UUID.randomUUID().toString();
-            PostLoansLoanIdTransactionsResponse refundResponse = makeLoanMerchantIssuedRefundWithExternalId(loanId, repaymentExternalId, "15 February 2024", 100.0);
+            PostLoansLoanIdTransactionsResponse refundResponse = makeLoanMerchantIssuedRefundWithExternalId(loanId, repaymentExternalId, "20240215", 100.0);
             assertNotNull(refundResponse);
             assertNotNull(refundResponse.getResourceId());
             String interestRefundExternalId = UUID.randomUUID().toString();
-            PostLoansLoanIdTransactionsResponse interestRefundResponse = createManualInterestRefund(loanId, refundResponse.getResourceId(), "15 February 2024", 5.0, interestRefundExternalId);
+            PostLoansLoanIdTransactionsResponse interestRefundResponse = createManualInterestRefund(loanId, refundResponse.getResourceId(), "20240215", 5.0, interestRefundExternalId);
             assertNotNull(interestRefundResponse, "Interest refund response should not be null");
             assertNotNull(interestRefundResponse.getResourceId(), "Interest refund resource ID should not be null");
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
@@ -110,12 +110,12 @@ public class LoanManualInterestRefundResponseStructureTest extends FeignLoanTest
     }
 
     private PostLoansLoanIdTransactionsResponse makeLoanMerchantIssuedRefund(Long loanId, String transactionDate, Double amount) {
-        org.apache.fineract.client.models.PostLoansLoanIdTransactionsRequest request = new org.apache.fineract.client.models.PostLoansLoanIdTransactionsRequest().transactionDate(transactionDate).transactionAmount(amount).interestRefundCalculation(false).dateFormat("dd MMMM yyyy").locale("en");
+        org.apache.fineract.client.models.PostLoansLoanIdTransactionsRequest request = new org.apache.fineract.client.models.PostLoansLoanIdTransactionsRequest().transactionDate(transactionDate).transactionAmount(amount).interestRefundCalculation(false).dateFormat("yyyyMMdd").locale("en");
         return makeMerchantIssuedRefund(loanId, request);
     }
 
     private PostLoansLoanIdTransactionsResponse makeLoanMerchantIssuedRefundWithExternalId(Long loanId, String externalId, String transactionDate, Double amount) {
-        org.apache.fineract.client.models.PostLoansLoanIdTransactionsRequest request = new org.apache.fineract.client.models.PostLoansLoanIdTransactionsRequest().transactionDate(transactionDate).transactionAmount(amount).externalId(externalId).interestRefundCalculation(false).dateFormat("dd MMMM yyyy").locale("en");
+        org.apache.fineract.client.models.PostLoansLoanIdTransactionsRequest request = new org.apache.fineract.client.models.PostLoansLoanIdTransactionsRequest().transactionDate(transactionDate).transactionAmount(amount).externalId(externalId).interestRefundCalculation(false).dateFormat("yyyyMMdd").locale("en");
         return makeMerchantIssuedRefund(loanId, request);
     }
 

@@ -471,9 +471,9 @@ public final class WorkingCapitalLoanApiResourceSwagger {
         public BigDecimal principalAmount;
         @Schema(example = "10500.00")
         public BigDecimal totalPaymentVolume;
-        @Schema(example = "15 January 2024")
+        @Schema(example = "20240115")
         public String submittedOnDate;
-        @Schema(example = "1 February 2024")
+        @Schema(example = "20240201")
         public String expectedDisbursementDate;
         @Schema(example = "Note when submitting")
         public String submittedOnNote;
@@ -508,7 +508,7 @@ public final class WorkingCapitalLoanApiResourceSwagger {
 
         @Schema(example = "en_GB")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
 
         @Schema(description = "PostPaymentAllocationRule")
@@ -607,9 +607,9 @@ public final class WorkingCapitalLoanApiResourceSwagger {
         public BigDecimal principalAmount;
         @Schema(example = "10500.00")
         public BigDecimal totalPaymentVolume;
-        @Schema(example = "15 January 2024")
+        @Schema(example = "20240115")
         public String submittedOnDate;
-        @Schema(example = "1 February 2024")
+        @Schema(example = "20240201")
         public String expectedDisbursementDate;
         @Schema(example = "Note when modifying", description = "Max length 500 characters")
         public String submittedOnNote;
@@ -638,7 +638,7 @@ public final class WorkingCapitalLoanApiResourceSwagger {
 
         @Schema(example = "en_GB")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
     }
 
@@ -690,23 +690,23 @@ public final class WorkingCapitalLoanApiResourceSwagger {
 
         private PostWorkingCapitalLoansLoanIdRequest() {}
 
-        @Schema(example = "15 January 2024", description = "Date of approval")
+        @Schema(example = "20240115", description = "Date of approval")
         public String approvedOnDate;
         @Schema(example = "10000.00", description = "Approved principal amount (optional, defaults to proposed principal)")
         public BigDecimal approvedLoanAmount;
-        @Schema(example = "1 February 2024", description = "Expected disbursement date")
+        @Schema(example = "20240201", description = "Expected disbursement date")
         public String expectedDisbursementDate;
         @Schema(example = "0.0", description = "Discount amount (cannot exceed creation-time discount)")
         public BigDecimal discountAmount;
-        @Schema(example = "15 January 2024", description = "Date of rejection")
+        @Schema(example = "20240115", description = "Date of rejection")
         public String rejectedOnDate;
         @Schema(example = "Approval/Rejection/Disbursal Note")
         public String note;
         @Schema(example = "en_GB")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "28 June 2024", description = "Required for disburse - Actual Disbursement date")
+        @Schema(example = "20240628", description = "Required for disburse - Actual Disbursement date")
         public String actualDisbursementDate;
         @Schema(example = "1000", description = "Disbursement amount; required for disburse. Cannot exceed approved principal.")
         public BigDecimal transactionAmount;
@@ -734,7 +734,7 @@ public final class WorkingCapitalLoanApiResourceSwagger {
         @Schema(example = "en_GB")
         public String locale;
 
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
     }
 

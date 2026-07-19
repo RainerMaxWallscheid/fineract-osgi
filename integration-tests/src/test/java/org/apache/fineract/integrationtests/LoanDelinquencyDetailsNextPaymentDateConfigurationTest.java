@@ -43,7 +43,7 @@ public class LoanDelinquencyDetailsNextPaymentDateConfigurationTest extends Feig
 
     @Test
     public void testNextPaymentDateForUnpaidInstallmentsWithNPlusOneTest() {
-        runAt("01 November 2023", () -> {
+        runAt("20231101", () -> {
             try {
                 globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.NEXT_PAYMENT_DUE_DATE,
                         new PutGlobalConfigurationsRequest().stringValue("next-unpaid-due-date"));
@@ -51,53 +51,53 @@ public class LoanDelinquencyDetailsNextPaymentDateConfigurationTest extends Feig
 
                 Long loanProductId = createLoanProductWith25PctDownPaymentAndDelinquencyBucket(false, true, false, 0);
 
-                Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 November 2023", 1000.0, 3, req -> {
-                    req.submittedOnDate("01 November 2023");
+                Long loanId = applyAndApproveLoan(clientId, loanProductId, "20231101", 1000.0, 3, req -> {
+                    req.submittedOnDate("20231101");
                     req.setLoanTermFrequency(45);
                     req.setRepaymentEvery(15);
                     req.setGraceOnArrearsAgeing(0);
                 });
 
-                disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 November 2023");
+                disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20231101");
 
                 verifyRepaymentSchedule(loanId, //
-                        installment(1000.0, null, "01 November 2023"), //
-                        installment(250.0, false, "01 November 2023"), //
-                        installment(250.0, false, "16 November 2023"), //
-                        installment(250.0, false, "01 December 2023"), //
-                        installment(250.0, false, "16 December 2023") //
+                        installment(1000.0, null, "20231101"), //
+                        installment(250.0, false, "20231101"), //
+                        installment(250.0, false, "20231116"), //
+                        installment(250.0, false, "20231201"), //
+                        installment(250.0, false, "20231216") //
                 );
 
-                verifyLoanDelinquencyNextPaymentDate(loanId, "01 November 2023", false);
+                verifyLoanDelinquencyNextPaymentDate(loanId, "20231101", false);
 
-                updateBusinessDate("13 November 2023");
+                updateBusinessDate("20231113");
 
-                verifyLoanDelinquencyNextPaymentDate(loanId, "16 November 2023", false);
+                verifyLoanDelinquencyNextPaymentDate(loanId, "20231116", false);
 
-                updateBusinessDate("16 November 2023");
+                updateBusinessDate("20231116");
 
-                verifyLoanDelinquencyNextPaymentDate(loanId, "01 December 2023", false);
+                verifyLoanDelinquencyNextPaymentDate(loanId, "20231201", false);
 
-                updateBusinessDate("01 December 2023");
+                updateBusinessDate("20231201");
 
-                verifyLoanDelinquencyNextPaymentDate(loanId, "16 December 2023", false);
+                verifyLoanDelinquencyNextPaymentDate(loanId, "20231216", false);
 
-                addCharge(loanId, false, 50, "23 December 2023");
+                addCharge(loanId, false, 50, "20231223");
 
                 verifyRepaymentSchedule(loanId, //
-                        installment(1000.0, null, "01 November 2023"), //
-                        installment(250.0, false, "01 November 2023"), //
-                        installment(250.0, false, "16 November 2023"), //
-                        installment(250.0, false, "01 December 2023"), //
-                        installment(250.0, false, "16 December 2023"), //
-                        installment(0.0, 0.0, 50.0, 50.0, false, "23 December 2023") //
+                        installment(1000.0, null, "20231101"), //
+                        installment(250.0, false, "20231101"), //
+                        installment(250.0, false, "20231116"), //
+                        installment(250.0, false, "20231201"), //
+                        installment(250.0, false, "20231216"), //
+                        installment(0.0, 0.0, 50.0, 50.0, false, "20231223") //
                 );
 
-                updateBusinessDate("17 December 2023");
+                updateBusinessDate("20231217");
 
-                verifyLoanDelinquencyNextPaymentDate(loanId, "23 December 2023", false);
+                verifyLoanDelinquencyNextPaymentDate(loanId, "20231223", false);
 
-                updateBusinessDate("25 December 2023");
+                updateBusinessDate("20231225");
 
             } finally {
                 globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.NEXT_PAYMENT_DUE_DATE,
@@ -109,7 +109,7 @@ public class LoanDelinquencyDetailsNextPaymentDateConfigurationTest extends Feig
 
     @Test
     public void testNextPaymentDateFor2Paid1PartiallyPaidInstallmentsWithNPlusOneTest() {
-        runAt("01 November 2023", () -> {
+        runAt("20231101", () -> {
             try {
                 globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.NEXT_PAYMENT_DUE_DATE,
                         new PutGlobalConfigurationsRequest().stringValue("next-unpaid-due-date"));
@@ -117,77 +117,77 @@ public class LoanDelinquencyDetailsNextPaymentDateConfigurationTest extends Feig
 
                 Long loanProductId = createLoanProductWith25PctDownPaymentAndDelinquencyBucket(true, true, false, 0);
 
-                Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 November 2023", 1000.0, 3, req -> {
-                    req.submittedOnDate("01 November 2023");
+                Long loanId = applyAndApproveLoan(clientId, loanProductId, "20231101", 1000.0, 3, req -> {
+                    req.submittedOnDate("20231101");
                     req.setLoanTermFrequency(45);
                     req.setRepaymentEvery(15);
                     req.setGraceOnArrearsAgeing(0);
                 });
 
-                disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 November 2023");
+                disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20231101");
 
                 verifyRepaymentSchedule(loanId, //
-                        installment(1000.0, null, "01 November 2023"), //
-                        installment(250.0, true, "01 November 2023"), //
-                        installment(250.0, false, "16 November 2023"), //
-                        installment(250.0, false, "01 December 2023"), //
-                        installment(250.0, false, "16 December 2023") //
+                        installment(1000.0, null, "20231101"), //
+                        installment(250.0, true, "20231101"), //
+                        installment(250.0, false, "20231116"), //
+                        installment(250.0, false, "20231201"), //
+                        installment(250.0, false, "20231216") //
                 );
 
-                verifyLoanDelinquencyNextPaymentDate(loanId, "16 November 2023", false);
+                verifyLoanDelinquencyNextPaymentDate(loanId, "20231116", false);
 
-                updateBusinessDate("13 November 2023");
+                updateBusinessDate("20231113");
 
-                verifyLoanDelinquencyNextPaymentDate(loanId, "16 November 2023", false);
+                verifyLoanDelinquencyNextPaymentDate(loanId, "20231116", false);
 
-                addRepaymentForLoan(loanId, 250.0, "13 November 2023");
+                addRepaymentForLoan(loanId, 250.0, "20231113");
 
                 verifyRepaymentSchedule(loanId, //
-                        installment(1000.0, null, "01 November 2023"), //
-                        installment(250.0, true, "01 November 2023"), //
-                        installment(250.0, true, "16 November 2023"), //
-                        installment(250.0, false, "01 December 2023"), //
-                        installment(250.0, false, "16 December 2023")//
+                        installment(1000.0, null, "20231101"), //
+                        installment(250.0, true, "20231101"), //
+                        installment(250.0, true, "20231116"), //
+                        installment(250.0, false, "20231201"), //
+                        installment(250.0, false, "20231216")//
                 );
 
-                verifyLoanDelinquencyNextPaymentDate(loanId, "01 December 2023", false);
+                verifyLoanDelinquencyNextPaymentDate(loanId, "20231201", false);
 
-                updateBusinessDate("16 November 2023");
+                updateBusinessDate("20231116");
 
-                verifyLoanDelinquencyNextPaymentDate(loanId, "01 December 2023", false);
+                verifyLoanDelinquencyNextPaymentDate(loanId, "20231201", false);
 
-                addRepaymentForLoan(loanId, 100.0, "16 November 2023");
+                addRepaymentForLoan(loanId, 100.0, "20231116");
 
                 verifyRepaymentSchedule(loanId, //
-                        installment(1000.0, null, "01 November 2023"), //
-                        installment(250.0, true, "01 November 2023"), //
-                        installment(250.0, true, "16 November 2023"), //
-                        installment(250.0, 0.0, 150.0, false, "01 December 2023"), //
-                        installment(250.0, false, "16 December 2023")//
+                        installment(1000.0, null, "20231101"), //
+                        installment(250.0, true, "20231101"), //
+                        installment(250.0, true, "20231116"), //
+                        installment(250.0, 0.0, 150.0, false, "20231201"), //
+                        installment(250.0, false, "20231216")//
                 );
 
-                verifyLoanDelinquencyNextPaymentDate(loanId, "01 December 2023", false);
+                verifyLoanDelinquencyNextPaymentDate(loanId, "20231201", false);
 
-                updateBusinessDate("01 December 2023");
+                updateBusinessDate("20231201");
 
-                verifyLoanDelinquencyNextPaymentDate(loanId, "16 December 2023", false);
+                verifyLoanDelinquencyNextPaymentDate(loanId, "20231216", false);
 
-                addCharge(loanId, false, 50, "23 December 2023");
+                addCharge(loanId, false, 50, "20231223");
 
                 verifyRepaymentSchedule(loanId, //
-                        installment(1000.0, null, "01 November 2023"), //
-                        installment(250.0, true, "01 November 2023"), //
-                        installment(250.0, true, "16 November 2023"), //
-                        installment(250.0, 0.0, 150.0, false, "01 December 2023"), //
-                        installment(250.0, false, "16 December 2023"), //
-                        installment(0.0, 0.0, 50.0, 50.0, false, "23 December 2023") //
+                        installment(1000.0, null, "20231101"), //
+                        installment(250.0, true, "20231101"), //
+                        installment(250.0, true, "20231116"), //
+                        installment(250.0, 0.0, 150.0, false, "20231201"), //
+                        installment(250.0, false, "20231216"), //
+                        installment(0.0, 0.0, 50.0, 50.0, false, "20231223") //
                 );
 
-                updateBusinessDate("17 December 2023");
+                updateBusinessDate("20231217");
 
-                verifyLoanDelinquencyNextPaymentDate(loanId, "23 December 2023", false);
+                verifyLoanDelinquencyNextPaymentDate(loanId, "20231223", false);
 
-                updateBusinessDate("25 December 2023");
+                updateBusinessDate("20231225");
             } finally {
                 globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.NEXT_PAYMENT_DUE_DATE,
                         new PutGlobalConfigurationsRequest().stringValue("earliest-unpaid-date"));

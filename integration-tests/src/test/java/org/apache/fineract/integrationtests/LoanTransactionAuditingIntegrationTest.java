@@ -96,19 +96,19 @@ public class LoanTransactionAuditingIntegrationTest {
                 expenseAccount, overpaymentAccount);
 
         final Integer loanID = applyForLoanApplicationWithPaymentStrategyAndPastMonth(clientID, loanProductID, Collections.emptyList(),
-                null, "10000", LoanApplicationTestBuilder.DEFAULT_STRATEGY, "10 July 2022", "12 July 2022");
+                null, "10000", LoanApplicationTestBuilder.DEFAULT_STRATEGY, "20220710", "20220712");
         Assertions.assertNotNull(loanID);
         HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(this.requestSpec, this.responseSpec, loanID);
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = this.loanTransactionHelper.approveLoan("11 July 2022", loanID);
+        loanStatusHashMap = this.loanTransactionHelper.approveLoan("20220711", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("11 July 2022", loanID, "10000");
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20220711", loanID, "10000");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
         OffsetDateTime now = Utils.getAuditDateTimeToCompare();
-        HashMap repaymentDetails = this.loanTransactionHelper.makeRepayment("11 July 2022", 100.0f, loanID);
+        HashMap repaymentDetails = this.loanTransactionHelper.makeRepayment("20220711", 100.0f, loanID);
         Integer transactionId = (Integer) repaymentDetails.get("resourceId");
         HashMap auditFieldsResponse = LoanTransactionHelper.getLoanTransactionAuditFields(requestSpec, responseSpec, loanID, transactionId,
                 "");
@@ -132,7 +132,7 @@ public class LoanTransactionAuditingIntegrationTest {
         this.loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
 
         OffsetDateTime now2 = Utils.getAuditDateTimeToCompare();
-        this.loanTransactionHelper.reverseRepayment(loanID, transactionId, "11 July 2022");
+        this.loanTransactionHelper.reverseRepayment(loanID, transactionId, "20220711");
 
         auditFieldsResponse = LoanTransactionHelper.getLoanTransactionAuditFields(requestSpec, responseSpec, loanID, transactionId, "");
 

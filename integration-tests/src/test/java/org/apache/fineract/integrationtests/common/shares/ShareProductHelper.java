@@ -123,7 +123,7 @@ public class ShareProductHelper {
         this.marketPrices = new ArrayList<>();
         LocalDate currentDate = Utils.getLocalDateOfTenant();
         String[] prices = { "3.0", "4.0", "5.0", "6.0", "7.0" };
-        DateFormat simple = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat simple = new SimpleDateFormat("yyyyMMdd", Locale.US);
         for (int i = 0; i < prices.length; i++) {
             currentDate = currentDate.plusMonths(2);
             Map<String, String> marketPrice = new HashMap<>();

@@ -69,7 +69,7 @@ import org.junit.jupiter.api.Test;
 public class LoanChargePaymentWithAdvancedPaymentAllocationTest extends BaseLoanIntegrationTest {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanChargePaymentWithAdvancedPaymentAllocationTest.class);
-    private static final String DATETIME_PATTERN = "dd MMMM yyyy";
+    private static final String DATETIME_PATTERN = "yyyyMMdd";
     private static final String ACCOUNT_TYPE_INDIVIDUAL = "INDIVIDUAL";
     private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern(DATETIME_PATTERN).toFormatter(Locale.ENGLISH);
     private static RequestSpecification requestSpec;
@@ -153,16 +153,16 @@ public class LoanChargePaymentWithAdvancedPaymentAllocationTest extends BaseLoan
     public void feeAndPenaltyChargePaymentWithDefaultAllocationRuleTest() {
         try {
             final String jobName = "Transfer Fee For Loans From Savings";
-            final String startDate = "10 April 2022";
+            final String startDate = "20220410";
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("2023.02.15").dateFormat("yyyy.MM.dd").locale("en"));
             final Integer savingsId = createSavingsAccountDailyPosting(client.getClientId().intValue(), startDate);
             savingsAccountHelper.depositToSavingsAccount(savingsId, "10000", startDate, CommonConstants.RESPONSE_RESOURCE_ID);
-            final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), commonLoanProductId, 1000L, 45, 15, 3, BigDecimal.ZERO, "01 January 2023", "01 January 2023");
+            final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), commonLoanProductId, 1000L, 45, 15, 3, BigDecimal.ZERO, "20230101", "20230101");
             int loanId = loanResponse.getLoanId().intValue();
             loanTransactionHelper.updateLoan(loanId, updateLoanJson(client.getClientId().intValue(), commonLoanProductId, savingsId.toString()));
-            loanTransactionHelper.approveLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(1000)).dateFormat(DATETIME_PATTERN).approvedOnDate("01 January 2023").locale("en"));
-            loanTransactionHelper.disburseLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().actualDisbursementDate("01 January 2023").dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
+            loanTransactionHelper.approveLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(1000)).dateFormat(DATETIME_PATTERN).approvedOnDate("20230101").locale("en"));
+            loanTransactionHelper.disburseLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().actualDisbursementDate("20230101").dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
             final double feePortion = 50.0;
             final double penaltyPortion = 100.0;
             Integer fee = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper.getLoanSpecifiedDueDateWithAccountTransferJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, String.valueOf(feePortion), false));
@@ -251,7 +251,7 @@ public class LoanChargePaymentWithAdvancedPaymentAllocationTest extends BaseLoan
         //
         //
         //
-        new LoanApplicationTestBuilder().withPrincipal("1,000.00").withLoanTermFrequency("45").withLoanTermFrequencyAsDays().withNumberOfRepayments("3").withRepaymentEveryAfter("15").withRepaymentFrequencyTypeAsDays().withInterestRatePerPeriod("0").withRepaymentStrategy(AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).withLoanScheduleProcessingType(LoanScheduleProcessingType.HORIZONTAL.toString()).withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("01 January 2023").withSubmittedOnDate("01 January 2023").withCollaterals(collaterals).build(clientID.toString(), loanProductID.toString(), savingsId);
+        new LoanApplicationTestBuilder().withPrincipal("1,000.00").withLoanTermFrequency("45").withLoanTermFrequencyAsDays().withNumberOfRepayments("3").withRepaymentEveryAfter("15").withRepaymentFrequencyTypeAsDays().withInterestRatePerPeriod("0").withRepaymentStrategy(AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).withLoanScheduleProcessingType(LoanScheduleProcessingType.HORIZONTAL.toString()).withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("20230101").withSubmittedOnDate("20230101").withCollaterals(collaterals).build(clientID.toString(), loanProductID.toString(), savingsId);
         return loanApplicationJSON;
     }
 

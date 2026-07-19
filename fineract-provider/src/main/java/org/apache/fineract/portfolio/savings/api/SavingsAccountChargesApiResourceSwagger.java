@@ -209,9 +209,9 @@ final class SavingsAccountChargesApiResourceSwagger {
         public String locale;
         @Schema(example = "100")
         public Float amount;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "29 April 2013")
+        @Schema(example = "20130429")
         public String dueDate;
     }
 
@@ -235,13 +235,13 @@ final class SavingsAccountChargesApiResourceSwagger {
 
         private PutSavingsAccountsSavingsAccountIdChargesSavingsAccountChargeIdRequest() {}
 
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "en")
         public String locale;
         @Schema(example = "60")
         public Float amount;
-        @Schema(example = "27 March 2013")
+        @Schema(example = "20130327")
         public String dueDate;
     }
 
@@ -254,9 +254,9 @@ final class SavingsAccountChargesApiResourceSwagger {
 
             private PutSavingsChanges() {}
 
-            @Schema(example = "27 March 2013")
+            @Schema(example = "20130327")
             public String dueDate;
-            @Schema(example = "dd MMMM yyyy")
+            @Schema(example = "yyyyMMdd")
             public String dateFormat;
             @Schema(example = "en")
             public String locale;
@@ -280,13 +280,13 @@ final class SavingsAccountChargesApiResourceSwagger {
 
         private PostSavingsAccountsSavingsAccountIdChargesSavingsAccountChargeIdRequest() {}
 
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "en")
         public String locale;
         @Schema(example = "60")
         public Float amount;
-        @Schema(example = "12 September 2013")
+        @Schema(example = "20130912")
         public String dueDate;
     }
 

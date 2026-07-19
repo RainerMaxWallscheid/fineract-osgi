@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 public class InterestRecognitionFromDistbusementDateTest extends BaseLoanIntegrationTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(InterestRecognitionFromDistbusementDateTest.class);
-    private static final String DATETIME_PATTERN = "dd MMMM yyyy";
+    private static final String DATETIME_PATTERN = "yyyyMMdd";
     private static ResponseSpecification responseSpec;
     private static RequestSpecification requestSpec;
     private static LoanTransactionHelper loanTransactionHelper;
@@ -72,7 +72,7 @@ public class InterestRecognitionFromDistbusementDateTest extends BaseLoanIntegra
     // 3. Create a Loan product with Cumulative Loan Schedule and interestChargedFromDisbursementDate
     @Test
     public void uc1() {
-        final String operationDate = "1 January 2025";
+        final String operationDate = "20250101";
         runAt(operationDate, () -> {
             // Create a Loan Product Adv. Pment. Alloc. (PROGRESSIVE) withou interestChargedFromDisbursementDate
             LOG.info("Create a Loan Product Adv. Pment. Alloc. (PROGRESSIVE) not using interestChargedFromDisbursementDate flag");
@@ -107,7 +107,7 @@ public class InterestRecognitionFromDistbusementDateTest extends BaseLoanIntegra
     // 3. Create a Loan account and override the interestChargedFromDisbursementDate flag
     @Test
     public void uc2() {
-        final String operationDate = "1 January 2025";
+        final String operationDate = "20250101";
         runAt(operationDate, () -> {
             PostLoanProductsRequest product = createOnePeriod30DaysLongNoInterestPeriodicAccrualProductWithAdvancedPaymentAllocation()
                     .numberOfRepayments(6).interestRecognitionOnDisbursementDate(true);

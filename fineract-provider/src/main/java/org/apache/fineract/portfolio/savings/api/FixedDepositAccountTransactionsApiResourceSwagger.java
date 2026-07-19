@@ -41,11 +41,11 @@ final class FixedDepositAccountTransactionsApiResourceSwagger {
 
         public String locale;
 
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
 
         public String dateFormat;
 
-        @Schema(example = "01 January 2014")
+        @Schema(example = "20140101")
 
         public String transactionDate;
 
@@ -151,11 +151,11 @@ final class FixedDepositAccountTransactionsApiResourceSwagger {
 
         public String locale;
 
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
 
         public String dateFormat;
 
-        @Schema(example = "01 January 2014")
+        @Schema(example = "20140101")
 
         public String transactionDate;
 

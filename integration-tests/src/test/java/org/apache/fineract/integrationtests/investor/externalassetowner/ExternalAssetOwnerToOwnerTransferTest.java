@@ -50,7 +50,7 @@ public class ExternalAssetOwnerToOwnerTransferTest extends ExternalAssetOwnerTra
 
             // Step 1: Create client and loan
             Integer clientID = createClient();
-            Integer loanID = createLoanForClient(clientID, "02 March 2020");
+            Integer loanID = createLoanForClient(clientID, "20200302");
             addPenaltyForLoan(loanID, "10");
 
             // Step 2: Sell loan to Owner A
@@ -134,7 +134,7 @@ public class ExternalAssetOwnerToOwnerTransferTest extends ExternalAssetOwnerTra
 
             // Setup
             Integer clientID = createClient();
-            Integer loanID = createLoanForClient(clientID, "02 March 2020");
+            Integer loanID = createLoanForClient(clientID, "20200302");
             addPenaltyForLoan(loanID, "10");
 
             // Sell to Owner A and activate via COB
@@ -186,7 +186,7 @@ public class ExternalAssetOwnerToOwnerTransferTest extends ExternalAssetOwnerTra
 
             // Setup: create loan and sell to Owner A
             Integer clientID = createClient();
-            Integer loanID = createLoanForClient(clientID, "02 March 2020");
+            Integer loanID = createLoanForClient(clientID, "20200302");
             addPenaltyForLoan(loanID, "10");
 
             String ownerAExternalId = UUID.randomUUID().toString();
@@ -237,7 +237,7 @@ public class ExternalAssetOwnerToOwnerTransferTest extends ExternalAssetOwnerTra
 
             // Setup: create loan and sell to Owner A
             Integer clientID = createClient();
-            Integer loanID = createLoanForClient(clientID, "02 March 2020");
+            Integer loanID = createLoanForClient(clientID, "20200302");
             addPenaltyForLoan(loanID, "10");
 
             String ownerAExternalId = UUID.randomUUID().toString();
@@ -253,7 +253,7 @@ public class ExternalAssetOwnerToOwnerTransferTest extends ExternalAssetOwnerTra
 
             // Write off the loan — this will trigger decline when COB processes the PENDING transfer
             updateBusinessDateAndExecuteCOBJob("2020-03-04");
-            LOAN_TRANSACTION_HELPER.writeOffLoan("04 March 2020", loanID);
+            LOAN_TRANSACTION_HELPER.writeOffLoan("20200304", loanID);
 
             // Verify Owner A is still the active owner (PENDING for Owner B should be declined, not yet settled)
             ExternalTransferData activeTransfer = EXTERNAL_ASSET_OWNER_HELPER.retrieveActiveTransferByLoanId(loanID.longValue());

@@ -44,20 +44,20 @@ public class ProgressiveLoanUndoDisbursementTest extends FeignLoanTestBase {
                 .chargeCalculationType(1).chargePaymentMode(0).chargeTimeType(1).currencyCode("EUR").amount(10.0d)
                 .name(Utils.randomStringGenerator("FEE_" + Calendar.getInstance().getTimeInMillis(), 5)).locale("en"));
 
-        runAt("01 January 2025", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "01 January 2025", 430.0, 7.0, 6, l -> l.setCharges(
+        runAt("20250101", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "20250101", 430.0, 7.0, 6, l -> l.setCharges(
                     List.of(new PostLoansRequestChargeData().chargeId(disbCharge.getResourceId()).amount(new BigDecimal("10.0")))));
 
             loanIdRef.set(loanId);
 
-            disburseLoan(loanId, BigDecimal.valueOf(430), "01 January 2025");
-            verifyRepaymentSchedule(loanId, installment(430.0, 0.0, 10.0, 0, null, "01 January 2025"), //
-                    installment(70.63, 2.51, 73.14, false, "01 February 2025"), //
-                    installment(71.04, 2.1, 73.14, false, "01 March 2025"), //
-                    installment(71.46, 1.68, 73.14, false, "01 April 2025"), //
-                    installment(71.87, 1.27, 73.14, false, "01 May 2025"), //
-                    installment(72.29, 0.85, 73.14, false, "01 June 2025"), //
-                    installment(72.71, 0.42, 73.13, false, "01 July 2025"));
+            disburseLoan(loanId, BigDecimal.valueOf(430), "20250101");
+            verifyRepaymentSchedule(loanId, installment(430.0, 0.0, 10.0, 0, null, "20250101"), //
+                    installment(70.63, 2.51, 73.14, false, "20250201"), //
+                    installment(71.04, 2.1, 73.14, false, "20250301"), //
+                    installment(71.46, 1.68, 73.14, false, "20250401"), //
+                    installment(71.87, 1.27, 73.14, false, "20250501"), //
+                    installment(72.29, 0.85, 73.14, false, "20250601"), //
+                    installment(72.71, 0.42, 73.13, false, "20250701"));
             Assertions.assertDoesNotThrow(() -> undoDisbursement(loanId));
         });
     }

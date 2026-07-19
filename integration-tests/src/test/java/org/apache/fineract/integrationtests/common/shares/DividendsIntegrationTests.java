@@ -42,7 +42,7 @@ import org.junit.jupiter.api.Test;
 
 public class DividendsIntegrationTests {
 
-    private final String[] dates = { "01 Jan 2015", "01 Apr 2015", "01 Oct 2015", "01 Dec 2015", "01 Mar 2016" };
+    private final String[] dates = { "20150101", "20150401", "20151001", "20151201", "20160301" };
     private final String[] shares = { "100", "200", "300", "100", "500" };
 
     private RequestSpecification requestSpec;
@@ -59,7 +59,7 @@ public class DividendsIntegrationTests {
     @SuppressWarnings("unchecked")
     @Test
     public void testCreateDividends() {
-        DateFormat simple = new SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH);
+        DateFormat simple = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
         final Integer productId = createShareProduct();
         ArrayList<Integer> shareAccounts = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
@@ -76,25 +76,25 @@ public class DividendsIntegrationTests {
             // Approve share Account
             Map<String, Object> approveMap = new HashMap<>();
             approveMap.put("note", "Share Account Approval Note");
-            approveMap.put("dateFormat", "dd MMMM yyyy");
-            approveMap.put("approvedDate", "01 Jan 2016");
+            approveMap.put("dateFormat", "yyyyMMdd");
+            approveMap.put("approvedDate", "20160101");
             approveMap.put("locale", "en");
             String approve = new Gson().toJson(approveMap);
             ShareAccountTransactionHelper.postCommand("approve", shareAccountId, approve, requestSpec, responseSpec);
             // Activate Share Account
             Map<String, Object> activateMap = new HashMap<>();
-            activateMap.put("dateFormat", "dd MMMM yyyy");
-            activateMap.put("activatedDate", "01 Jan 2016");
+            activateMap.put("dateFormat", "yyyyMMdd");
+            activateMap.put("activatedDate", "20160101");
             activateMap.put("locale", "en");
             String activateJson = new Gson().toJson(activateMap);
             ShareAccountTransactionHelper.postCommand("activate", shareAccountId, activateJson, requestSpec, responseSpec);
         }
 
         Map<String, Object> dividendsMap = new HashMap<>();
-        dividendsMap.put("dividendPeriodStartDate", "01 Jan 2015");
-        dividendsMap.put("dividendPeriodEndDate", "01 Apr 2016");
+        dividendsMap.put("dividendPeriodStartDate", "20150101");
+        dividendsMap.put("dividendPeriodEndDate", "20160401");
         dividendsMap.put("dividendAmount", "50000");
-        dividendsMap.put("dateFormat", "dd MMMM yyyy");
+        dividendsMap.put("dateFormat", "yyyyMMdd");
         dividendsMap.put("locale", "en");
         String createDividendsJson = new Gson().toJson(dividendsMap);
         final Integer dividendId = ShareDividendsTransactionHelper.createShareProductDividends(productId, createDividendsJson, requestSpec,
@@ -110,12 +110,12 @@ public class DividendsIntegrationTests {
         Calendar cal = Calendar.getInstance();
         cal.set(startdateList.get(0), startdateList.get(1) - 1, startdateList.get(2));
         Date startDate = cal.getTime();
-        Assertions.assertEquals("01 January 2015", simple.format(startDate));
+        Assertions.assertEquals("20150101", simple.format(startDate));
         List<Integer> enddateList = (List<Integer>) dividend.get("dividendPeriodEndDate");
         cal = Calendar.getInstance();
         cal.set(enddateList.get(0), enddateList.get(1) - 1, enddateList.get(2));
         Date endDate = cal.getTime();
-        Assertions.assertEquals("01 April 2016", simple.format(endDate));
+        Assertions.assertEquals("20160401", simple.format(endDate));
 
         Map<String, Object> dividenddetails = ShareDividendsTransactionHelper.retrieveDividendDetails(productId, dividendId, requestSpec,
                 responseSpec);
@@ -152,12 +152,12 @@ public class DividendsIntegrationTests {
         cal = Calendar.getInstance();
         cal.set(startdateList.get(0), startdateList.get(1) - 1, startdateList.get(2));
         startDate = cal.getTime();
-        Assertions.assertEquals("01 January 2015", simple.format(startDate));
+        Assertions.assertEquals("20150101", simple.format(startDate));
         enddateList = (List<Integer>) dividend.get("dividendPeriodEndDate");
         cal = Calendar.getInstance();
         cal.set(enddateList.get(0), enddateList.get(1) - 1, enddateList.get(2));
         endDate = cal.getTime();
-        Assertions.assertEquals("01 April 2016", simple.format(endDate));
+        Assertions.assertEquals("20160401", simple.format(endDate));
 
         dividenddetails = ShareDividendsTransactionHelper.retrieveDividendDetails(productId, dividendId, requestSpec, responseSpec);
         Assertions.assertEquals("5", String.valueOf(dividenddetails.get("totalFilteredRecords")));
@@ -190,7 +190,7 @@ public class DividendsIntegrationTests {
     private Integer createShareAccount(final Integer clientId, final Integer productId, final Integer savingsAccountId,
             String applicationDate, String requestedShares) {
         String josn = new ShareAccountHelper().withClientId(String.valueOf(clientId)).withProductId(String.valueOf(productId))
-                .withExternalId("External1").withSavingsAccountId(String.valueOf(savingsAccountId)).withSubmittedDate("01 Jan 2016")
+                .withExternalId("External1").withSavingsAccountId(String.valueOf(savingsAccountId)).withSubmittedDate("20160101")
                 .withApplicationDate(applicationDate).withRequestedShares(requestedShares).build();
         return ShareAccountTransactionHelper.createShareAccount(josn, requestSpec, responseSpec);
     }

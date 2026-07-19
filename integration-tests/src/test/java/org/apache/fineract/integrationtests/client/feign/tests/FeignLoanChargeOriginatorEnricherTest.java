@@ -72,7 +72,7 @@ public class FeignLoanChargeOriginatorEnricherTest extends FeignIntegrationTest 
             // When: a charge is added to the loan
             ok(() -> fineractClient.loanCharges()
                     .createOrPayLoanCharge(loanId,
-                            new PostLoansLoanIdChargesRequest().chargeId(chargeId).amount(50.0).locale("en").dateFormat("dd MMMM yyyy")
+                            new PostLoansLoanIdChargesRequest().chargeId(chargeId).amount(50.0).locale("en").dateFormat("yyyyMMdd")
                                     .dueDate(org.apache.fineract.integrationtests.common.Utils.dateFormatter
                                             .format(org.apache.fineract.integrationtests.common.Utils.getLocalDateOfTenant())),
                             (String) null));
@@ -121,7 +121,7 @@ public class FeignLoanChargeOriginatorEnricherTest extends FeignIntegrationTest 
             // When: a charge is added
             ok(() -> fineractClient.loanCharges()
                     .createOrPayLoanCharge(loanId,
-                            new PostLoansLoanIdChargesRequest().chargeId(chargeId).amount(75.0).locale("en").dateFormat("dd MMMM yyyy")
+                            new PostLoansLoanIdChargesRequest().chargeId(chargeId).amount(75.0).locale("en").dateFormat("yyyyMMdd")
                                     .dueDate(org.apache.fineract.integrationtests.common.Utils.dateFormatter
                                             .format(org.apache.fineract.integrationtests.common.Utils.getLocalDateOfTenant())),
                             (String) null));
@@ -160,7 +160,7 @@ public class FeignLoanChargeOriginatorEnricherTest extends FeignIntegrationTest 
             // When: a charge is added
             ok(() -> fineractClient.loanCharges()
                     .createOrPayLoanCharge(loanId,
-                            new PostLoansLoanIdChargesRequest().chargeId(chargeId).amount(50.0).locale("en").dateFormat("dd MMMM yyyy")
+                            new PostLoansLoanIdChargesRequest().chargeId(chargeId).amount(50.0).locale("en").dateFormat("yyyyMMdd")
                                     .dueDate(org.apache.fineract.integrationtests.common.Utils.dateFormatter
                                             .format(org.apache.fineract.integrationtests.common.Utils.getLocalDateOfTenant())),
                             (String) null));

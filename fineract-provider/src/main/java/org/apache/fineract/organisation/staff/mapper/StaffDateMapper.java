@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 public class StaffDateMapper {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StaffDateMapper.class);
-    public static final String DEFAULT_DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DEFAULT_DATE_FORMAT = "yyyyMMdd";
 
     public String map(LocalDate date, String format) {
         if (date == null) {

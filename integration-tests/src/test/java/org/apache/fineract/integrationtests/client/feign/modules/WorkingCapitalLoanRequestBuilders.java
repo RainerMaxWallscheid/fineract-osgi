@@ -34,7 +34,7 @@ import org.apache.fineract.integrationtests.common.Utils;
 public final class WorkingCapitalLoanRequestBuilders {
 
     private static final String LOCALE = "en";
-    private static final String DATE_FORMAT = "dd MMMM yyyy";
+    private static final String DATE_FORMAT = "yyyyMMdd";
 
     private static final Integer CHARGE_APPLIES_TO_WORKING_CAPITAL_LOAN = 5;
     private static final Integer CHARGE_TIME_TYPE_SPECIFIED_DUE_DATE = 2;

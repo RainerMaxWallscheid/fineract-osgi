@@ -473,7 +473,7 @@ final class StandingInstructionApiResourceSwagger {
         public Integer instructionType;
         @Schema(example = "221")
         public Integer amount;
-        @Schema(example = "08 April 2014")
+        @Schema(example = "20140408")
         public String validFrom;
         @Schema(example = "1")
         public Integer recurrenceType;
@@ -483,11 +483,11 @@ final class StandingInstructionApiResourceSwagger {
         public Integer recurrenceFrequency;
         @Schema(description = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "02 April")
         public String recurrenceOnMonthDay;
-        @Schema(example = "dd MMMM")
+        @Schema(example = "MMdd")
         public String monthDayFormat;
     }
 

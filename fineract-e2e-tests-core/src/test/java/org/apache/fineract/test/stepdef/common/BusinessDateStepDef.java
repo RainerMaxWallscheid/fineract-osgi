@@ -61,7 +61,7 @@ public class BusinessDateStepDef extends AbstractStepDef {
     public void checkBusinessDate(String businessDate) {
         BusinessDateResponse businessDateResponse = ok(
                 () -> fineractClient.businessDateManagement().getBusinessDate(BusinessDateHelper.BUSINESS_DATE, Map.of()));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
         LocalDate localDate = LocalDate.parse(businessDate, formatter);
 
         assertThat(businessDateResponse.getDate()).isEqualTo(localDate);

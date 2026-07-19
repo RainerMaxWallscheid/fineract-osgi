@@ -1278,7 +1278,7 @@ public abstract class BaseLoanIntegrationTest extends IntegrationTest {
         String randomText = Utils.randomStringGenerator("en", 5) + Utils.randomNumberGenerator(6) + Utils.randomStringGenerator("is", 5);
         Integer chargeOffReasonId = CodeHelper.createChargeOffCodeValue(requestSpec, responseSpec, randomText, 1);
         String transactionExternalId = UUID.randomUUID().toString();
-        PostLoansLoanIdTransactionsResponse chargeOffTransaction = this.loanTransactionHelper.chargeOffLoan((long) loanId, new PostLoansLoanIdTransactionsRequest().transactionDate(date).locale("en").dateFormat("dd MMMM yyyy").externalId(transactionExternalId).chargeOffReasonId((long) chargeOffReasonId));
+        PostLoansLoanIdTransactionsResponse chargeOffTransaction = this.loanTransactionHelper.chargeOffLoan((long) loanId, new PostLoansLoanIdTransactionsRequest().transactionDate(date).locale("en").dateFormat("yyyyMMdd").externalId(transactionExternalId).chargeOffReasonId((long) chargeOffReasonId));
         return chargeOffTransaction.getResourceId();
     }
 

@@ -148,8 +148,8 @@ public class LoanProductRepaymentStartDateConfigurationTest {
             assertEquals(repaymentStartDateType, getLoanProductsProductResponse.getRepaymentStartDateType().getId().intValue());
             assertEquals("repaymentStartDateType.submittedOnDate", getLoanProductsProductResponse.getRepaymentStartDateType().getCode());
 
-            // create loan account with submitted date as business date (03 March 2023) and expected disbursement date
-            // as future date (07 March 2023)
+            // create loan account with submitted date as business date (20230303) and expected disbursement date
+            // as future date (20230307)
             final Integer loanId = createLoanAccountMultipleRepaymentsDisbursement(clientId, getLoanProductsProductResponse.getId(),
                     loanExternalIdStr);
 
@@ -191,13 +191,13 @@ public class LoanProductRepaymentStartDateConfigurationTest {
             assertEquals(333.34,
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(3).getTotalInstallmentAmountForPeriod()));
 
-            // first disbursement on a future date (7 March 2023)
+            // first disbursement on a future date (20230307)
 
             LocalDate disbursementDate = LocalDate.of(2023, 3, 7);
 
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, disbursementDate);
 
-            loanTransactionHelper.disburseLoanWithTransactionAmount("07 March 2023", loanId, "500");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230307", loanId, "500");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -233,13 +233,13 @@ public class LoanProductRepaymentStartDateConfigurationTest {
             assertEquals(166.66,
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(3).getTotalInstallmentAmountForPeriod()));
 
-            // second disbursement next month (7 April 2023)
+            // second disbursement next month (20230407)
 
             disbursementDate = LocalDate.of(2023, 4, 7);
 
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, disbursementDate);
 
-            loanTransactionHelper.disburseLoanWithTransactionAmount("07 April 2023", loanId, "500");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230407", loanId, "500");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -313,8 +313,8 @@ public class LoanProductRepaymentStartDateConfigurationTest {
             assertEquals(repaymentStartDateType, getLoanProductsProductResponse.getRepaymentStartDateType().getId().intValue());
             assertEquals("repaymentStartDateType.disbursementDate", getLoanProductsProductResponse.getRepaymentStartDateType().getCode());
 
-            // create loan account with submitted date as business date (03 March 2023) and expected disbursement date
-            // (07 March 2023)
+            // create loan account with submitted date as business date (20230303) and expected disbursement date
+            // (20230307)
             final Integer loanId = createLoanAccountMultipleRepaymentsDisbursement(clientId, getLoanProductsProductResponse.getId(),
                     loanExternalIdStr);
 
@@ -357,13 +357,13 @@ public class LoanProductRepaymentStartDateConfigurationTest {
             assertEquals(333.34,
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(3).getTotalInstallmentAmountForPeriod()));
 
-            // first disbursement (7 March 2023)
+            // first disbursement (20230307)
 
             LocalDate disbursementDate = LocalDate.of(2023, 3, 7);
 
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, disbursementDate);
 
-            loanTransactionHelper.disburseLoanWithTransactionAmount("07 March 2023", loanId, "500");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230307", loanId, "500");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -400,13 +400,13 @@ public class LoanProductRepaymentStartDateConfigurationTest {
             assertEquals(166.66,
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(3).getTotalInstallmentAmountForPeriod()));
 
-            // second disbursement next month (7 April 2023)
+            // second disbursement next month (20230407)
 
             disbursementDate = LocalDate.of(2023, 4, 7);
 
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, disbursementDate);
 
-            loanTransactionHelper.disburseLoanWithTransactionAmount("07 April 2023", loanId, "500");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230407", loanId, "500");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -475,11 +475,11 @@ public class LoanProductRepaymentStartDateConfigurationTest {
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("3").withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsDecliningBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("07 March 2023").withSubmittedOnDate("03 March 2023").withLoanType("individual")
+                .withExpectedDisbursementDate("20230307").withSubmittedOnDate("20230303").withLoanType("individual")
                 .withExternalId(externalId).build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("03 March 2023", "1000", loanId, null);
+        loanTransactionHelper.approveLoan("20230303", "1000", loanId, null);
         return loanId;
     }
 

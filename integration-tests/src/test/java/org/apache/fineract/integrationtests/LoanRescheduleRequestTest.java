@@ -88,7 +88,7 @@ public class LoanRescheduleRequestTest extends BaseLoanIntegrationTest {
     private final String loanPrincipalAmount = "100000.00";
     private final String numberOfRepayments = "12";
     private final String interestRatePerPeriod = "18";
-    private final String dateString = "04 September 2014";
+    private final String dateString = "20140904";
 
     @BeforeEach
     public void initialize() {
@@ -272,73 +272,73 @@ public class LoanRescheduleRequestTest extends BaseLoanIntegrationTest {
         AtomicReference<PostLoansResponse> loanResponse = new AtomicReference<>();
         // Do not allow interest rate change on not active loan
         // Do not allow interest rate change twice on the same day
-        runAt("15 February 2023", () -> {
+        runAt("20230215", () -> {
 
             loanResponse.set(applyForLoanApplication(client.getClientId(), commonLoanProductId, BigDecimal.valueOf(500.0), 45, 15, 3,
-                    BigDecimal.TEN, "01 January 2023", "01 January 2023"));
+                    BigDecimal.TEN, "20230101", "20230101"));
 
             loanTransactionHelper.approveLoan(loanResponse.get().getLoanId(),
                     new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(500)).dateFormat(DATETIME_PATTERN)
-                            .approvedOnDate("01 January 2023").locale("en"));
+                            .approvedOnDate("20230101").locale("en"));
 
             CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class,
                     () -> LoanRescheduleRequestHelper
                             .createLoanRescheduleRequest(new PostCreateRescheduleLoansRequest().loanId(loanResponse.get().getLoanId())
-                                    .dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("15 February 2023")
-                                    .newInterestRate(BigDecimal.ONE).rescheduleReasonId(1L).rescheduleFromDate("16 February 2023")));
+                                    .dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("20230215")
+                                    .newInterestRate(BigDecimal.ONE).rescheduleReasonId(1L).rescheduleFromDate("20230216")));
             assertEquals(400, exception.getStatus());
             assertTrue(exception.getMessage().contains("loan.is.not.active"));
 
             loanTransactionHelper.disburseLoan(loanResponse.get().getLoanId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("15 February 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230215").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(500.00)).locale("en"));
 
             rescheduleResponse.set(LoanRescheduleRequestHelper.createLoanRescheduleRequest(new PostCreateRescheduleLoansRequest()
-                    .loanId(loanResponse.get().getLoanId()).dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("15 February 2023")
-                    .newInterestRate(BigDecimal.ONE).rescheduleReasonId(1L).rescheduleFromDate("16 February 2023")));
+                    .loanId(loanResponse.get().getLoanId()).dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("20230215")
+                    .newInterestRate(BigDecimal.ONE).rescheduleReasonId(1L).rescheduleFromDate("20230216")));
 
             LoanRescheduleRequestHelper.createLoanRescheduleRequest(new PostCreateRescheduleLoansRequest()
-                    .loanId(loanResponse.get().getLoanId()).dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("15 February 2023")
-                    .newInterestRate(BigDecimal.ONE).rescheduleReasonId(1L).rescheduleFromDate("16 February 2023"));
+                    .loanId(loanResponse.get().getLoanId()).dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("20230215")
+                    .newInterestRate(BigDecimal.ONE).rescheduleReasonId(1L).rescheduleFromDate("20230216"));
         });
         // Do not allow approve an interest rate change if the reschedule from date is not in the future
         // Do not allow create interest rate change if a previous interest rate change got already approved for that
         // date
-        runAt("16 February 2023", () -> {
+        runAt("20230216", () -> {
             PostCreateRescheduleLoansResponse rescheduleLoansResponse = LoanRescheduleRequestHelper
                     .createLoanRescheduleRequest(new PostCreateRescheduleLoansRequest().loanId(loanResponse.get().getLoanId())
-                            .dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("17 February 2023").newInterestRate(BigDecimal.ONE)
-                            .rescheduleReasonId(1L).rescheduleFromDate("17 February 2023"));
+                            .dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("20230217").newInterestRate(BigDecimal.ONE)
+                            .rescheduleReasonId(1L).rescheduleFromDate("20230217"));
 
             LoanRescheduleRequestHelper.approveLoanRescheduleRequest(rescheduleLoansResponse.getResourceId(),
-                    new PostUpdateRescheduleLoansRequest().approvedOnDate("17 February 2024").locale("en").dateFormat(DATETIME_PATTERN));
+                    new PostUpdateRescheduleLoansRequest().approvedOnDate("20240217").locale("en").dateFormat(DATETIME_PATTERN));
 
             PostCreateRescheduleLoansResponse secondRescheduleLoansResponse = LoanRescheduleRequestHelper
                     .createLoanRescheduleRequest(new PostCreateRescheduleLoansRequest().loanId(loanResponse.get().getLoanId())
-                            .dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("17 February 2023").newInterestRate(BigDecimal.TEN)
-                            .rescheduleReasonId(1L).rescheduleFromDate("17 February 2023"));
+                            .dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("20230217").newInterestRate(BigDecimal.TEN)
+                            .rescheduleReasonId(1L).rescheduleFromDate("20230217"));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.get().getLoanId());
             assertEquals(loanDetails.getSummary().getInterestCharged().stripTrailingZeros(), BigDecimal.valueOf(1.53).stripTrailingZeros());
 
             LoanRescheduleRequestHelper.approveLoanRescheduleRequest(secondRescheduleLoansResponse.getResourceId(),
-                    new PostUpdateRescheduleLoansRequest().approvedOnDate("17 February 2024").locale("en").dateFormat(DATETIME_PATTERN));
+                    new PostUpdateRescheduleLoansRequest().approvedOnDate("20240217").locale("en").dateFormat(DATETIME_PATTERN));
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.get().getLoanId());
             assertEquals(loanDetails.getSummary().getInterestCharged().stripTrailingZeros(), BigDecimal.valueOf(4.22).stripTrailingZeros());
         });
 
         // Allow new interest rate change if the previous got rejected
-        runAt("17 February 2023", () -> {
+        runAt("20230217", () -> {
             PostCreateRescheduleLoansResponse rescheduleLoansResponse = LoanRescheduleRequestHelper
                     .createLoanRescheduleRequest(new PostCreateRescheduleLoansRequest().loanId(loanResponse.get().getLoanId())
-                            .dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("18 February 2023").newInterestRate(BigDecimal.ONE)
-                            .rescheduleReasonId(1L).rescheduleFromDate("18 February 2023"));
+                            .dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("20230218").newInterestRate(BigDecimal.ONE)
+                            .rescheduleReasonId(1L).rescheduleFromDate("20230218"));
 
             LoanRescheduleRequestHelper.rejectLoanRescheduleRequest(rescheduleLoansResponse.getResourceId(),
-                    new PostUpdateRescheduleLoansRequest().rejectedOnDate("18 February 2024").locale("en").dateFormat(DATETIME_PATTERN));
+                    new PostUpdateRescheduleLoansRequest().rejectedOnDate("20240218").locale("en").dateFormat(DATETIME_PATTERN));
 
             LoanRescheduleRequestHelper.createLoanRescheduleRequest(new PostCreateRescheduleLoansRequest()
-                    .loanId(loanResponse.get().getLoanId()).dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("18 February 2023")
-                    .newInterestRate(BigDecimal.ONE).rescheduleReasonId(1L).rescheduleFromDate("18 February 2023"));
+                    .loanId(loanResponse.get().getLoanId()).dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("20230218")
+                    .newInterestRate(BigDecimal.ONE).rescheduleReasonId(1L).rescheduleFromDate("20230218"));
 
         });
     }
@@ -350,8 +350,8 @@ public class LoanRescheduleRequestTest extends BaseLoanIntegrationTest {
         LOG.info("---------------------------------CREATING LOAN RESCHEDULE REQUEST CHANGE EMI------------------------------------------");
 
         final PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder().updateGraceOnPrincipal(null)
-                .updateGraceOnInterest(null).updateExtraTerms(null).updateEMI("5000").updateEmiChangeEndDate("4 February 2015")
-                .updateRescheduleFromDate("04 January 2015").updateRecalculateInterest(true).buildRequest(this.loanId.longValue());
+                .updateGraceOnInterest(null).updateExtraTerms(null).updateEMI("5000").updateEmiChangeEndDate("20150204")
+                .updateRescheduleFromDate("20150104").updateRecalculateInterest(true).buildRequest(this.loanId.longValue());
 
         final PostCreateRescheduleLoansResponse createResponse = LoanRescheduleRequestHelper.createLoanRescheduleRequest(createRequest);
         this.loanRescheduleRequestId = createResponse.getResourceId();
@@ -371,20 +371,20 @@ public class LoanRescheduleRequestTest extends BaseLoanIntegrationTest {
         Integer commonLoanProductId = createProgressiveLoanProduct();
 
         AtomicReference<PostLoansResponse> loanResponse = new AtomicReference<>();
-        runAt("2 February 2024", () -> {
+        runAt("20240202", () -> {
             loanResponse
-                    .set(applyForLoanWithRecalculation(client.getClientId(), commonLoanProductId, "01 January 2024", "01 January 2024"));
+                    .set(applyForLoanWithRecalculation(client.getClientId(), commonLoanProductId, "20240101", "20240101"));
 
-            approveAndDisburseLoan(loanResponse.get().getLoanId(), "01 January 2024", BigDecimal.valueOf(100));
+            approveAndDisburseLoan(loanResponse.get().getLoanId(), "20240101", BigDecimal.valueOf(100));
             makeRepayments(loanResponse.get().getLoanId().intValue());
 
             GetLoansLoanIdResponse savedLoanResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec,
                     loanResponse.get().getLoanId().intValue());
 
             PostCreateRescheduleLoansResponse rescheduleLoansResponse = rescheduleLoanWithNewInterestRate(loanResponse.get().getLoanId(),
-                    "2 February 2024", BigDecimal.ONE, "3 February 2024");
+                    "20240202", BigDecimal.ONE, "20240203");
 
-            approveLoanReschedule(rescheduleLoansResponse.getResourceId(), "2 February 2024");
+            approveLoanReschedule(rescheduleLoansResponse.getResourceId(), "20240202");
 
             GetLoansLoanIdResponse actualLoanResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec,
                     loanResponse.get().getLoanId().intValue());
@@ -399,18 +399,18 @@ public class LoanRescheduleRequestTest extends BaseLoanIntegrationTest {
         Long commonLoanProductId = createLoanProductPeriodicWithInterest();
 
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("01 March 2024", () -> {
+        runAt("20240301", () -> {
             Long loanId = applyForLoanApplicationWithInterest(client.getClientId(), commonLoanProductId, BigDecimal.valueOf(4000),
-                    "1 March 2023", "1 March 2024");
+                    "20230301", "20240301");
             loanIdRef.set(loanId);
-            loanTransactionHelper.approveLoan("1 March 2024", loanId.intValue());
+            loanTransactionHelper.approveLoan("20240301", loanId.intValue());
 
-            loanTransactionHelper.disburseLoan("1 March 2024", loanId.intValue(), "400", null);
+            loanTransactionHelper.disburseLoan("20240301", loanId.intValue(), "400", null);
 
             PostCreateRescheduleLoansResponse rescheduleLoansResponse = LoanRescheduleRequestHelper
                     .createLoanRescheduleRequest(new PostCreateRescheduleLoansRequest().loanId(loanIdRef.get()).dateFormat(DATETIME_PATTERN)
-                            .locale("en").submittedOnDate("1 March 2024").newInterestRate(BigDecimal.ONE).rescheduleReasonId(1L)
-                            .rescheduleFromDate("1 April 2024"));
+                            .locale("en").submittedOnDate("20240301").newInterestRate(BigDecimal.ONE).rescheduleReasonId(1L)
+                            .rescheduleFromDate("20240401"));
 
             GetLoanRescheduleRequestResponse getLoanRescheduleRequestResponse = Assertions.assertDoesNotThrow(
                     () -> LoanRescheduleRequestHelper.readLoanRescheduleRequest(rescheduleLoansResponse.getResourceId(), null));
@@ -424,16 +424,16 @@ public class LoanRescheduleRequestTest extends BaseLoanIntegrationTest {
         Long commonLoanProductId = createLoanProductPeriodicWithInterest();
 
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("01 March 2024", () -> {
+        runAt("20240301", () -> {
             Long loanId = applyForLoanApplicationWithInterest(client.getClientId(), commonLoanProductId, BigDecimal.valueOf(4000),
-                    "1 March 2024", "1 March 2024");
+                    "20240301", "20240301");
             loanIdRef.set(loanId);
-            loanTransactionHelper.approveLoan("1 March 2024", loanId.intValue());
-            loanTransactionHelper.disburseLoan("1 March 2024", loanId.intValue(), "4000", null);
+            loanTransactionHelper.approveLoan("20240301", loanId.intValue());
+            loanTransactionHelper.disburseLoan("20240301", loanId.intValue(), "4000", null);
 
             PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder().updateGraceOnPrincipal(null)
-                    .updateGraceOnInterest(null).updateExtraTerms("2").updateEMI("500").updateEmiChangeEndDate("01 September 2024")
-                    .updateRescheduleFromDate("01 April 2024").updateSubmittedOnDate("01 March 2024").buildRequest(loanId);
+                    .updateGraceOnInterest(null).updateExtraTerms("2").updateEMI("500").updateEmiChangeEndDate("20240901")
+                    .updateRescheduleFromDate("20240401").updateSubmittedOnDate("20240301").buildRequest(loanId);
 
             PostCreateRescheduleLoansResponse rescheduleResponse = LoanRescheduleRequestHelper.createLoanRescheduleRequest(createRequest);
             Long rescheduleRequestId = rescheduleResponse.getResourceId();
@@ -454,7 +454,7 @@ public class LoanRescheduleRequestTest extends BaseLoanIntegrationTest {
             assertEquals(expectedEMIVariationDates, emiTermVariationDates,
                     "EMI term variations should include installment dates created by extra terms");
 
-            approveLoanReschedule(rescheduleRequestId.longValue(), "01 March 2024");
+            approveLoanReschedule(rescheduleRequestId.longValue(), "20240301");
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanIdRef.get().intValue());
 
@@ -508,8 +508,8 @@ public class LoanRescheduleRequestTest extends BaseLoanIntegrationTest {
     }
 
     private void makeRepayments(int loanId) {
-        loanTransactionHelper.makeRepayment("01 February 2024", 17.01f, loanId);
-        loanTransactionHelper.makeRepayment("02 February 2024", 17.01f, loanId);
+        loanTransactionHelper.makeRepayment("20240201", 17.01f, loanId);
+        loanTransactionHelper.makeRepayment("20240202", 17.01f, loanId);
     }
 
     private PostCreateRescheduleLoansResponse rescheduleLoanWithNewInterestRate(Long loanId, String submittedOnDate,
@@ -616,7 +616,7 @@ public class LoanRescheduleRequestTest extends BaseLoanIntegrationTest {
         final PostLoansRequest loanRequest = new PostLoansRequest() //
                 .loanTermFrequency(4).locale("en_GB").loanTermFrequencyType(2).numberOfRepayments(4).repaymentFrequencyType(2)
                 .interestRatePerPeriod(BigDecimal.valueOf(2)).repaymentEvery(1).principal(principal).amortizationType(1).interestType(0)
-                .interestCalculationPeriodType(0).dateFormat("dd MMMM yyyy").transactionProcessingStrategyCode(DEFAULT_STRATEGY)
+                .interestCalculationPeriodType(0).dateFormat("yyyyMMdd").transactionProcessingStrategyCode(DEFAULT_STRATEGY)
                 .loanType("individual").submittedOnDate(submittedOnDate).expectedDisbursementDate(expectedDisburmentDate).clientId(clientId)
                 .productId(loanProductId);
         Long loanId = loanTransactionHelper.applyLoan(loanRequest).getLoanId();

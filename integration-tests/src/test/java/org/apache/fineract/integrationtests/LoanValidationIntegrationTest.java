@@ -108,8 +108,8 @@ public class LoanValidationIntegrationTest {
                 .withAmortizationTypeAsEqualInstallments() //
                 .withInterestTypeAsFlatBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("12 July 2022") //
-                .withSubmittedOnDate("10 July 2022") //
+                .withExpectedDisbursementDate("20220712") //
+                .withSubmittedOnDate("20220710") //
                 .withRepaymentStrategy(LoanApplicationTestBuilder.DEFAULT_STRATEGY) //
                 .withCharges(Collections.emptyList()) //
                 .build(clientID.toString(), loanProductID.toString(), null);

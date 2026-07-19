@@ -140,17 +140,17 @@ public class ClientLoanMultipleDisbursementsIntegrationTest {
 
         LOG.info("-----------------------------------10 Tranches--------------------------------------");
         List<HashMap> tranches = new ArrayList<>();
-        tranches.add(createTrancheDetail("01 January 2021", "1"));
-        tranches.add(createTrancheDetail("02 January 2021", "2"));
-        tranches.add(createTrancheDetail("03 January 2021", "4"));
-        tranches.add(createTrancheDetail("04 January 2021", "8"));
-        tranches.add(createTrancheDetail("05 January 2021", "16"));
-        tranches.add(createTrancheDetail("06 January 2021", "32"));
-        tranches.add(createTrancheDetail("07 January 2021", "64"));
-        tranches.add(createTrancheDetail("08 January 2021", "128"));
-        tranches.add(createTrancheDetail("09 January 2021", "256"));
-        tranches.add(createTrancheDetail("10 January 2021", "512"));
-        String submitDate = "01 January 2021";
+        tranches.add(createTrancheDetail("20210101", "1"));
+        tranches.add(createTrancheDetail("20210102", "2"));
+        tranches.add(createTrancheDetail("20210103", "4"));
+        tranches.add(createTrancheDetail("20210104", "8"));
+        tranches.add(createTrancheDetail("20210105", "16"));
+        tranches.add(createTrancheDetail("20210106", "32"));
+        tranches.add(createTrancheDetail("20210107", "64"));
+        tranches.add(createTrancheDetail("20210108", "128"));
+        tranches.add(createTrancheDetail("20210109", "256"));
+        tranches.add(createTrancheDetail("20210110", "512"));
+        String submitDate = "20210101";
 
         final Integer loanID = applyForLoanApplicationWithTranches(clientID, loanProductID, savingsId, principal, tranches, submitDate);
         Assertions.assertNotNull(loanID);
@@ -158,26 +158,26 @@ public class ClientLoanMultipleDisbursementsIntegrationTest {
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = this.loanTransactionHelper.approveLoan("01 January 2021", loanID);
+        loanStatusHashMap = this.loanTransactionHelper.approveLoan("20210101", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         LOG.info("-------------------------------DISBURSE 8 LOANS -------------------------------------------");
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("12 January 2021", loanID, "1");
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20210112", loanID, "1");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("12 January 2021", loanID, "2");
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20210112", loanID, "2");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("12 January 2021", loanID, "4");
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20210112", loanID, "4");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("13 January 2021", loanID, "8");
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20210113", loanID, "8");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("14 January 2021", loanID, "16");
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20210114", loanID, "16");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("14 January 2021", loanID, "32");
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20210114", loanID, "32");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("15 January 2021", loanID, "64");
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20210115", loanID, "64");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("15 January 2021", loanID, "128");
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20210115", loanID, "128");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
         ArrayList<HashMap> loanSchedule = this.loanTransactionHelper.getLoanRepaymentSchedule(this.requestSpec, this.responseSpec, loanID);
@@ -239,9 +239,9 @@ public class ClientLoanMultipleDisbursementsIntegrationTest {
 
         LOG.info("-----------------------------------2 Tranches--------------------------------------");
         List<HashMap> tranches = new ArrayList<>();
-        tranches.add(createTrancheDetail("01 January 2021", "1"));
-        tranches.add(createTrancheDetail("02 January 2021", "2"));
-        String submitDate = "01 January 2021";
+        tranches.add(createTrancheDetail("20210101", "1"));
+        tranches.add(createTrancheDetail("20210102", "2"));
+        String submitDate = "20210101";
 
         final Integer loanID = applyForLoanApplicationWithTranches(clientID, loanProductID, savingsId, principal, tranches, submitDate);
         Assertions.assertNotNull(loanID);
@@ -249,18 +249,18 @@ public class ClientLoanMultipleDisbursementsIntegrationTest {
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = this.loanTransactionHelper.approveLoan("01 January 2021", loanID);
+        loanStatusHashMap = this.loanTransactionHelper.approveLoan("20210101", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         LOG.info(
                 "-------------------------------DISBURSE 1, repay fully, disburse again LOANS -------------------------------------------");
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithTransactionAmount("12 January 2021", loanID, "1");
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithTransactionAmount("20210112", loanID, "1");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-        HashMap repaymentDetails = this.loanTransactionHelper.makeRepayment("13 January 2021", 1.0f, loanID);
+        HashMap repaymentDetails = this.loanTransactionHelper.makeRepayment("20210113", 1.0f, loanID);
         loanStatusHashMap = this.loanTransactionHelper.getLoanDetail(this.requestSpec, this.responseSpec, loanID, "status");
         LoanStatusChecker.verifyLoanAccountIsClosed(loanStatusHashMap);
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithTransactionAmount("14 January 2021", loanID, "2");
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithTransactionAmount("20210114", loanID, "2");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
         ArrayList<HashMap> loanSchedule = this.loanTransactionHelper.getLoanRepaymentSchedule(this.requestSpec, this.responseSpec, loanID);
@@ -329,9 +329,9 @@ public class ClientLoanMultipleDisbursementsIntegrationTest {
 
         LOG.info("-----------------------------------2 Tranches--------------------------------------");
         List<HashMap> tranches = new ArrayList<>();
-        tranches.add(createTrancheDetail("01 January 2021", "1"));
-        tranches.add(createTrancheDetail("02 January 2021", "2"));
-        String submitDate = "01 January 2021";
+        tranches.add(createTrancheDetail("20210101", "1"));
+        tranches.add(createTrancheDetail("20210102", "2"));
+        String submitDate = "20210101";
 
         final Integer loanID = applyForLoanApplicationWithTranches(clientID, loanProductID, savingsId, principal, tranches, submitDate);
         Assertions.assertNotNull(loanID);
@@ -339,18 +339,18 @@ public class ClientLoanMultipleDisbursementsIntegrationTest {
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
         LOG.info("-----------------------------------APPROVE LOAN-----------------------------------------");
-        loanStatusHashMap = this.loanTransactionHelper.approveLoan("01 January 2021", loanID);
+        loanStatusHashMap = this.loanTransactionHelper.approveLoan("20210101", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
         LOG.info(
                 "-------------------------------DISBURSE 1, repay fully, disburse again LOANS -------------------------------------------");
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithTransactionAmount("12 January 2021", loanID, "1");
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithTransactionAmount("20210112", loanID, "1");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-        HashMap repaymentDetails = this.loanTransactionHelper.makeRepayment("13 January 2021", 2.0f, loanID);
+        HashMap repaymentDetails = this.loanTransactionHelper.makeRepayment("20210113", 2.0f, loanID);
         loanStatusHashMap = this.loanTransactionHelper.getLoanDetail(this.requestSpec, this.responseSpec, loanID, "status");
         LoanStatusChecker.verifyLoanAccountIsOverPaid(loanStatusHashMap);
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithTransactionAmount("14 January 2021", loanID, "2");
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithTransactionAmount("20210114", loanID, "2");
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
         ArrayList<HashMap> loanSchedule = this.loanTransactionHelper.getLoanRepaymentSchedule(this.requestSpec, this.responseSpec, loanID);

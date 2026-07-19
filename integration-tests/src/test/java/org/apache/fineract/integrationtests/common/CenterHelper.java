@@ -36,7 +36,7 @@ public final class CenterHelper {
     private static final Logger LOG = LoggerFactory.getLogger(CenterHelper.class);
     private static final String CENTERS_URL = "/fineract-provider/api/v1/centers";
 
-    public static final String CREATED_DATE = "29 December 2014";
+    public static final String CREATED_DATE = "20141229";
     private static final String CREATE_CENTER_URL = "/fineract-provider/api/v1/centers?" + Utils.TENANT_IDENTIFIER;
 
     private CenterHelper() {
@@ -145,7 +145,7 @@ public final class CenterHelper {
         if (activationDate != null) {
             hm.put("active", true);
             hm.put("locale", "en");
-            hm.put("dateFormat", "dd MMMM yyyy");
+            hm.put("dateFormat", "yyyyMMdd");
             hm.put("activationDate", activationDate);
         }
 
@@ -348,7 +348,7 @@ public final class CenterHelper {
     @Deprecated(forRemoval = true)
     public static String activateCenterAsJSON(final String activationDate) {
         final HashMap<String, String> map = new HashMap<>();
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("locale", "en");
         if (!Strings.isNullOrEmpty(activationDate)) {
             map.put("activationDate", activationDate);

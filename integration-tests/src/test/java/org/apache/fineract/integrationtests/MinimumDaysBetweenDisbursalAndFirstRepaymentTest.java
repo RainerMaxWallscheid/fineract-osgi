@@ -65,7 +65,7 @@ public class MinimumDaysBetweenDisbursalAndFirstRepaymentTest {
     private final String loanPrincipalAmount = "100000.00";
     private final String numberOfRepayments = "12";
     private final String interestRatePerPeriod = "18";
-    private final String groupActivationDate = "01 August 2014";
+    private final String groupActivationDate = "20140801";
 
     @BeforeEach
     public void setup() {
@@ -87,8 +87,8 @@ public class MinimumDaysBetweenDisbursalAndFirstRepaymentTest {
         // create all required entities
         this.createRequiredEntities();
 
-        final String disbursalDate = "04 September 2014";
-        final String firstRepaymentDate = "11 September 2014";
+        final String disbursalDate = "20140904";
+        final String firstRepaymentDate = "20140911";
 
         List<HashMap> collaterals = new ArrayList<>();
         final Integer collateralId = CollateralManagementHelper.createCollateralProduct(this.requestSpec, this.responseSpec);
@@ -158,8 +158,8 @@ public class MinimumDaysBetweenDisbursalAndFirstRepaymentTest {
         // server
         this.loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpecForStatusCode403);
 
-        final String disbursalDate = "04 September 2014";
-        final String firstRepaymentDate = "05 September 2014";
+        final String disbursalDate = "20140904";
+        final String firstRepaymentDate = "20140905";
 
         List<HashMap> collaterals = new ArrayList<>();
         final Integer collateralId = CollateralManagementHelper.createCollateralProduct(this.requestSpec, this.responseSpec);

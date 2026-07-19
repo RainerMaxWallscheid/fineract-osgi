@@ -40,7 +40,7 @@ public class BatchLoanIntegrationTest extends BaseLoanIntegrationTest {
     public void test_InlineLoanCOB_ShouldExecute_WhenLoanIsBehind_And_RescheduleIsRequestedViaBatchApi() {
         AtomicLong createdLoanId = new AtomicLong();
 
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -59,7 +59,7 @@ public class BatchLoanIntegrationTest extends BaseLoanIntegrationTest {
             // Apply and Approve Loan
             double amount = 1250.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(repaymentEvery)//
                     .loanTermFrequency(numberOfRepayments)//
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS)//
@@ -68,27 +68,27 @@ public class BatchLoanIntegrationTest extends BaseLoanIntegrationTest {
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 January 2023"));
+                    approveLoanRequest(amount, "20230101"));
 
             Long loanId = approvedLoanResult.getLoanId();
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1250.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1250.0), "20230101");
 
             createdLoanId.set(loanId);
         });
 
-        runAt("02 January 2023", () -> {
+        runAt("20230102", () -> {
             executeInlineCOB(createdLoanId.get());
         });
 
-        runAt("05 January 2023", () -> {
+        runAt("20230105", () -> {
             runAsNonByPass(() -> {
                 long loanId = createdLoanId.get();
 
                 List<BatchResponse> responses = batchRequest() //
-                        .rescheduleLoan(1L, loanId, "01 January 2023", "01 February 2023", "01 March 2023") //
-                        .approveRescheduleLoan(2L, 1L, "01 January 2023") //
+                        .rescheduleLoan(1L, loanId, "20230101", "20230201", "20230301") //
+                        .approveRescheduleLoan(2L, 1L, "20230101") //
                         .executeEnclosingTransaction(); //
 
                 Assertions.assertEquals(HttpStatus.SC_OK, responses.get(0).getStatusCode(),
@@ -96,7 +96,7 @@ public class BatchLoanIntegrationTest extends BaseLoanIntegrationTest {
                 Assertions.assertEquals(HttpStatus.SC_OK, responses.get(1).getStatusCode(),
                         "Verify Status Code 200 for Approve Reschedule Loan request");
 
-                verifyLastClosedBusinessDate(loanId, "04 January 2023");
+                verifyLastClosedBusinessDate(loanId, "20230104");
             });
         });
     }
@@ -105,7 +105,7 @@ public class BatchLoanIntegrationTest extends BaseLoanIntegrationTest {
     public void test_InlineLoanCOB_ShouldExecute_WhenLoanIsHardLocked_And_RescheduleIsRequestedViaBatchApi() {
         AtomicLong createdLoanId = new AtomicLong();
 
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -124,7 +124,7 @@ public class BatchLoanIntegrationTest extends BaseLoanIntegrationTest {
             // Apply and Approve Loan
             double amount = 1250.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(repaymentEvery)//
                     .loanTermFrequency(numberOfRepayments)//
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS)//
@@ -133,28 +133,28 @@ public class BatchLoanIntegrationTest extends BaseLoanIntegrationTest {
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 January 2023"));
+                    approveLoanRequest(amount, "20230101"));
 
             Long loanId = approvedLoanResult.getLoanId();
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1250.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1250.0), "20230101");
 
             createdLoanId.set(loanId);
         });
 
-        runAt("02 January 2023", () -> {
+        runAt("20230102", () -> {
             executeInlineCOB(createdLoanId.get());
         });
 
-        runAt("05 January 2023", () -> {
+        runAt("20230105", () -> {
             long loanId = createdLoanId.get();
             placeHardLockOnLoan(loanId);
             runAsNonByPass(() -> {
 
                 ErrorResponse response = batchRequest() //
-                        .rescheduleLoan(1L, loanId, "01 January 2023", "01 February 2023", "01 March 2023") //
-                        .approveRescheduleLoan(2L, 1L, "01 January 2023") //
+                        .rescheduleLoan(1L, loanId, "20230101", "20230201", "20230301") //
+                        .approveRescheduleLoan(2L, 1L, "20230101") //
                         .executeEnclosingTransactionError(new ResponseSpecBuilder().expectStatusCode(409).build()); //
 
                 Assertions.assertEquals(HttpStatus.SC_CONFLICT, response.getHttpStatusCode());

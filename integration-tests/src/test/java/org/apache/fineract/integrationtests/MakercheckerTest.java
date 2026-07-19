@@ -61,8 +61,8 @@ public class MakercheckerTest {
     private AuditHelper auditHelper;
     private SavingsProductHelper savingsProductHelper;
     private SavingsAccountHelper savingsAccountHelper;
-    private static final String START_DATE_STRING = "03 June 2023";
-    private static final String TRANSACTION_DATE_STRING = "05 June 2023";
+    private static final String START_DATE_STRING = "20230603";
+    private static final String TRANSACTION_DATE_STRING = "20230605";
     private GlobalConfigurationHelper globalConfigurationHelper;
 
     @BeforeEach

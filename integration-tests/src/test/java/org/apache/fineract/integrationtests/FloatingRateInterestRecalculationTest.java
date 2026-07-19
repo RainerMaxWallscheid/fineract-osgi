@@ -67,7 +67,7 @@ public class FloatingRateInterestRecalculationTest extends BaseLoanIntegrationTe
     private LoanTransactionHelper loanTransactionHelper;
     private ClientHelper clientHelper;
     private AccountHelper accountHelper;
-    private final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+    private final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
 
     private static final BigDecimal INITIAL_INTEREST_RATE = new BigDecimal("12");
     private static final BigDecimal CHANGED_INTEREST_RATE = new BigDecimal("6");
@@ -165,11 +165,11 @@ public class FloatingRateInterestRecalculationTest extends BaseLoanIntegrationTe
     }
 
     private Long createFloatingRate() {
-        FloatingRatePeriodRequest initialPeriod = new FloatingRatePeriodRequest().fromDate("01 March 2024")
-                .interestRate(INITIAL_INTEREST_RATE).isDifferentialToBaseLendingRate(false).locale("en").dateFormat("dd MMMM yyyy");
+        FloatingRatePeriodRequest initialPeriod = new FloatingRatePeriodRequest().fromDate("20240301")
+                .interestRate(INITIAL_INTEREST_RATE).isDifferentialToBaseLendingRate(false).locale("en").dateFormat("yyyyMMdd");
 
-        FloatingRatePeriodRequest changedPeriod = new FloatingRatePeriodRequest().fromDate("01 April 2024")
-                .interestRate(CHANGED_INTEREST_RATE).isDifferentialToBaseLendingRate(false).locale("en").dateFormat("dd MMMM yyyy");
+        FloatingRatePeriodRequest changedPeriod = new FloatingRatePeriodRequest().fromDate("20240401")
+                .interestRate(CHANGED_INTEREST_RATE).isDifferentialToBaseLendingRate(false).locale("en").dateFormat("yyyyMMdd");
 
         FloatingRateRequest floatingRateRequest = new FloatingRateRequest().name(Utils.uniqueRandomStringGenerator("FLOAT_RATE_", 6))
                 .isBaseLendingRate(false).isActive(true).ratePeriods(List.of(initialPeriod, changedPeriod));

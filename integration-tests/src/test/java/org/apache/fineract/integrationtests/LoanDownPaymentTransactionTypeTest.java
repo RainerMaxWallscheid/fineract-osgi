@@ -70,7 +70,7 @@ public class LoanDownPaymentTransactionTypeTest {
     @Test
     public void loanDownPaymentTransactionTypeTest() {
 
-        DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+        DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
 
         String loanExternalIdStr = UUID.randomUUID().toString();
 
@@ -89,7 +89,7 @@ public class LoanDownPaymentTransactionTypeTest {
 
         // make down payment for loan
         final PostLoansLoanIdTransactionsResponse downPaymentTransaction_1 = loanTransactionHelper.makeLoanDownPayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("5 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220905").locale("en")
                         .transactionAmount(100.0));
         assertNotNull(downPaymentTransaction_1);
 
@@ -108,7 +108,7 @@ public class LoanDownPaymentTransactionTypeTest {
         String formattedDate = dateFormatter.format(adjustmentDate);
         PostLoansLoanIdTransactionsResponse adjustmentResult = loanTransactionHelper.reverseLoanTransaction(loanExternalIdStr,
                 loanDownPaymentTransaction.getId(), new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate(formattedDate)
-                        .locale("en").dateFormat("dd MMMM yyyy").transactionAmount(0.0));
+                        .locale("en").dateFormat("yyyyMMdd").transactionAmount(0.0));
 
         assertNotNull(adjustmentResult);
         assertEquals(loanDownPaymentTransaction.getId(), adjustmentResult.getResourceId());
@@ -119,7 +119,7 @@ public class LoanDownPaymentTransactionTypeTest {
         String downPaymentExternalIdStr = UUID.randomUUID().toString();
 
         final PostLoansLoanIdTransactionsResponse downPaymentTransaction_2 = loanTransactionHelper.makeLoanDownPayment(loanId.longValue(),
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("9 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220909").locale("en")
                         .transactionAmount(200.0).externalId(downPaymentExternalIdStr));
         assertNotNull(downPaymentTransaction_2);
         assertEquals(downPaymentExternalIdStr, downPaymentTransaction_2.getResourceExternalId());
@@ -139,7 +139,7 @@ public class LoanDownPaymentTransactionTypeTest {
         formattedDate = dateFormatter.format(adjustmentDate);
         PostLoansLoanIdTransactionsResponse adjustmentResult_1 = loanTransactionHelper.reverseLoanTransaction(loanExternalIdStr,
                 downPaymentExternalIdStr, new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate(formattedDate).locale("en")
-                        .dateFormat("dd MMMM yyyy").transactionAmount(0.0));
+                        .dateFormat("yyyyMMdd").transactionAmount(0.0));
 
         assertNotNull(adjustmentResult_1);
         assertEquals(loanDownPaymentTransaction_1.getId(), adjustmentResult_1.getResourceId());
@@ -159,12 +159,12 @@ public class LoanDownPaymentTransactionTypeTest {
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("03 September 2022").withSubmittedOnDate("01 September 2022").withLoanType("individual")
+                .withExpectedDisbursementDate("20220903").withSubmittedOnDate("20220901").withLoanType("individual")
                 .withExternalId(externalId).build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("02 September 2022", "1000", loanId, null);
-        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("03 September 2022", loanId, "1000");
+        loanTransactionHelper.approveLoan("20220902", "1000", loanId, null);
+        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20220903", loanId, "1000");
         return loanId;
     }
 

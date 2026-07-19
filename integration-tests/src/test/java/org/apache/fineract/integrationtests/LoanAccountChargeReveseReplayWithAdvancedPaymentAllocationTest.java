@@ -66,7 +66,7 @@ import org.junit.jupiter.api.Test;
 
 public class LoanAccountChargeReveseReplayWithAdvancedPaymentAllocationTest extends BaseLoanIntegrationTest {
 
-    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
     private ClientHelper clientHelper;
@@ -75,7 +75,7 @@ public class LoanAccountChargeReveseReplayWithAdvancedPaymentAllocationTest exte
     private LoanProductHelper loanProductHelper;
     private PaymentTypeHelper paymentTypeHelper;
     private final BusinessDateHelper businessDateHelper = new BusinessDateHelper();
-    private static final String DATETIME_PATTERN = "dd MMMM yyyy";
+    private static final String DATETIME_PATTERN = "yyyyMMdd";
     // asset
     private Account loansReceivable;
     private Account interestFeeReceivable;
@@ -135,16 +135,16 @@ public class LoanAccountChargeReveseReplayWithAdvancedPaymentAllocationTest exte
 
     @Test
     public void testLoanChargeReverseReplayWithAdvancedPaymentStrategy() {
-        runAt("10 September 2022", () -> {
+        runAt("20220910", () -> {
             String loanExternalIdStr = UUID.randomUUID().toString();
             final Integer loanProductID = createLoanProductWithPeriodicAccrualAccounting(true);
             final Integer clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId().intValue();
-            final Integer loanId = createLoanAccount(clientId, loanProductID, loanExternalIdStr, true, "02 September 2022",
-                    "03 September 2022");
+            final Integer loanId = createLoanAccount(clientId, loanProductID, loanExternalIdStr, true, "20220902",
+                    "20220903");
 
             // make an in advance repayment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("8 September 2022").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220908").locale("en")
                             .transactionAmount(100.0));
 
             // apply charges
@@ -179,16 +179,16 @@ public class LoanAccountChargeReveseReplayWithAdvancedPaymentAllocationTest exte
 
     @Test
     public void testLoanChargeReverseReplayWithStandardPaymentStrategy() {
-        runAt("10 September 2022", () -> {
+        runAt("20220910", () -> {
             String loanExternalIdStr = UUID.randomUUID().toString();
             final Integer loanProductID = createLoanProductWithPeriodicAccrualAccounting(false);
             final Integer clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId().intValue();
-            final Integer loanId = createLoanAccount(clientId, loanProductID, loanExternalIdStr, false, "02 September 2022",
-                    "03 September 2022");
+            final Integer loanId = createLoanAccount(clientId, loanProductID, loanExternalIdStr, false, "20220902",
+                    "20220903");
 
             // make an in advance repayment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("8 September 2022").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220908").locale("en")
                             .transactionAmount(100.0));
 
             // apply charges
@@ -223,21 +223,21 @@ public class LoanAccountChargeReveseReplayWithAdvancedPaymentAllocationTest exte
 
     @Test
     public void testRepaymentReverseReplayedOnBackdatedChargeWithAdvancedPaymentStrategy() {
-        runAt("1 September 2022", () -> {
+        runAt("20220901", () -> {
             String loanExternalIdStr = UUID.randomUUID().toString();
             final Integer loanProductID = createLoanProductWithPeriodicAccrualAccounting(true);
             final Integer clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId().intValue();
-            final Integer loanId = createLoanAccount(clientId, loanProductID, loanExternalIdStr, true, "1 September 2022",
-                    "1 September 2022");
+            final Integer loanId = createLoanAccount(clientId, loanProductID, loanExternalIdStr, true, "20220901",
+                    "20220901");
 
             // make a repayment on 3rd od Sept
-            updateBusinessDate("3 September 2022");
+            updateBusinessDate("20220903");
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("3 September 2022").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220903").locale("en")
                             .transactionAmount(100.0));
 
             // apply charges on 4th of Sept backdated to 2nd of Sept 2022
-            updateBusinessDate("4 September 2022");
+            updateBusinessDate("20220904");
             Integer feeCharge = ChargesHelper.createCharges(requestSpec, responseSpec,
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "10", false));
 
@@ -269,21 +269,21 @@ public class LoanAccountChargeReveseReplayWithAdvancedPaymentAllocationTest exte
 
     @Test
     public void testObligationMetDateIsNotMetOnExtraInstallment() {
-        runAt("1 September 2022", () -> {
+        runAt("20220901", () -> {
             String loanExternalIdStr = UUID.randomUUID().toString();
             final Integer loanProductID = createLoanProductWithPeriodicAccrualAccounting(true);
             final Integer clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId().intValue();
-            final Integer loanId = createLoanAccount(clientId, loanProductID, loanExternalIdStr, true, "1 September 2022",
-                    "1 September 2022");
+            final Integer loanId = createLoanAccount(clientId, loanProductID, loanExternalIdStr, true, "20220901",
+                    "20220901");
 
             // make a repayment on 3rd od Sept
-            updateBusinessDate("3 September 2022");
+            updateBusinessDate("20220903");
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("3 September 2022").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220903").locale("en")
                             .transactionAmount(100.0));
 
             // apply charges on 4th of Sept backdated to 2nd of Sept 2022
-            updateBusinessDate("4 September 2022");
+            updateBusinessDate("20220904");
             Integer feeCharge = ChargesHelper.createCharges(requestSpec, responseSpec,
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "10", false));
 
@@ -302,9 +302,9 @@ public class LoanAccountChargeReveseReplayWithAdvancedPaymentAllocationTest exte
                     LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), penaltyCharge1AddedDate, "20"));
 
             // make a full repayment of 10th of September
-            updateBusinessDate("10 September 2022");
+            updateBusinessDate("20220910");
             PostLoansLoanIdTransactionsResponse fullRepayment = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("10 September 2022").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220910").locale("en")
                             .transactionAmount(930.0));
 
             GetLoansLoanIdResponse loanDetails = this.loanTransactionHelper.getLoanDetails((long) loanId);
@@ -317,11 +317,11 @@ public class LoanAccountChargeReveseReplayWithAdvancedPaymentAllocationTest exte
             assertEquals(0.0, Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(1).getTotalOutstandingForPeriod()));
 
             // adding an extra charge after maturity
-            updateBusinessDate("11 October 2022");
+            updateBusinessDate("20221011");
             Integer snoozeFee = ChargesHelper.createCharges(requestSpec, responseSpec,
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "30.0", false));
             loanTransactionHelper.addChargesForLoan(loanId,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(snoozeFee), "11 October 2022", "30.0"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(snoozeFee), "20221011", "30.0"));
 
             loanDetails = this.loanTransactionHelper.getLoanDetails((long) loanId);
             assertNotNull(loanDetails.getRepaymentSchedule());
@@ -337,8 +337,8 @@ public class LoanAccountChargeReveseReplayWithAdvancedPaymentAllocationTest exte
         String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("30")
                 .withLoanTermFrequencyAsDays().withNumberOfRepayments("1").withRepaymentEveryAfter("30").withRepaymentFrequencyTypeAsDays()
                 .withInterestRatePerPeriod("0").withInterestTypeAsDecliningBalance().withAmortizationTypeAsEqualPrincipalPayments()
-                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("03 September 2022")
-                .withSubmittedOnDate("01 September 2022").withLoanType("individual").withExternalId(externalId)
+                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("20220903")
+                .withSubmittedOnDate("20220901").withLoanType("individual").withExternalId(externalId)
                 .withRepaymentStrategy(advancedPaymentStrategy ? "advanced-payment-allocation-strategy" : "mifos-standard-strategy")
                 .build(clientID.toString(), loanProductID.toString(), null);
 
@@ -460,7 +460,7 @@ public class LoanAccountChargeReveseReplayWithAdvancedPaymentAllocationTest exte
                 .receivableInterestAccountId(interestFeeReceivable.getAccountID().longValue())//
                 .receivableFeeAccountId(interestFeeReceivable.getAccountID().longValue())//
                 .receivablePenaltyAccountId(interestFeeReceivable.getAccountID().longValue())//
-                .dateFormat("dd MMMM yyyy")//
+                .dateFormat("yyyyMMdd")//
                 .locale("en_GB")//
                 .disallowExpectedDisbursements(true)//
                 .allowApprovedDisbursedAmountsOverApplied(true)//

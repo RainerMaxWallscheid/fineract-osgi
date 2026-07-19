@@ -504,7 +504,7 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
         assertNotNull(postChargesResponse);
         final Long loanChargeId = postChargesResponse.getResourceId();
 
-        payloadJSON = LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(loanChargeId.toString(), "03 September 2022",
+        payloadJSON = LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(loanChargeId.toString(), "20220903",
                 feeAmount.toString());
         PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = loanTransactionHelper.addChargeForLoan(loanId, payloadJSON,
                 responseSpec);
@@ -567,7 +567,7 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
         assertNotNull(postChargesResponse);
         final Long loanChargeId = postChargesResponse.getResourceId();
 
-        payloadJSON = LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(loanChargeId.toString(), "04 September 2022",
+        payloadJSON = LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(loanChargeId.toString(), "20220904",
                 feeAmount.toString());
         PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = loanTransactionHelper.addChargeForLoan(loanId, payloadJSON,
                 responseSpec);
@@ -669,7 +669,7 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
         assertNotNull(postChargesResponse);
         final Long loanChargeId = postChargesResponse.getResourceId();
 
-        payloadJSON = LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(loanChargeId.toString(), "03 September 2022",
+        payloadJSON = LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(loanChargeId.toString(), "20220903",
                 feeAmount.toString());
         PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = loanTransactionHelper.addChargeForLoan(loanId, payloadJSON,
                 responseSpec);
@@ -734,7 +734,7 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
         assertNotNull(postChargesResponse);
         final Long loanChargeId = postChargesResponse.getResourceId();
 
-        payloadJSON = LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(loanChargeId.toString(), "04 September 2022",
+        payloadJSON = LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(loanChargeId.toString(), "20220904",
                 feeAmount.toString());
         PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = loanTransactionHelper.addChargeForLoan(loanId, payloadJSON,
                 responseSpec);
@@ -972,7 +972,7 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
 
         // make repayment for loan
         final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("5 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220905").locale("en")
                         .transactionAmount(100.0));
 
         loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
@@ -1041,16 +1041,16 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
             assertEquals(enableAutoRepaymentForDownPayment, loanDetails.getEnableAutoRepaymentForDownPayment());
 
             // first disbursement
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 March 2023", loanId, "1000");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230303", loanId, "1000");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
             // verify down-payment transaction created
             checkDownPaymentTransaction(disbursementDate, 250.0f, 0.0f, 0.0f, 0.0f, loanId);
 
             // verify journal entries for down-payment
-            journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, "03 March 2023",
+            journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, "20230303",
                     new JournalEntry(250, JournalEntry.TransactionType.CREDIT));
-            journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, "03 March 2023",
+            journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, "20230303",
                     new JournalEntry(250, JournalEntry.TransactionType.DEBIT));
 
             // verify installment details
@@ -1072,7 +1072,7 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
 
             disbursementDate = LocalDate.of(2023, 3, 5);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, disbursementDate);
-            loanTransactionHelper.disburseLoanWithTransactionAmount("05 March 2023", loanId, "200");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230305", loanId, "200");
             checkDownPaymentTransaction(disbursementDate, 50.0f, 0.0f, 0.0f, 0.0f, loanId);
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
@@ -1101,9 +1101,9 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
             assertEquals(false, loanDetails.getRepaymentSchedule().getPeriods().get(4).getDownPaymentPeriod());
 
             // verify journal entries for down-payment
-            journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, "05 March 2023",
+            journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, "20230305",
                     new JournalEntry(50, JournalEntry.TransactionType.CREDIT));
-            journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, "05 March 2023",
+            journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, "20230305",
                     new JournalEntry(50, JournalEntry.TransactionType.DEBIT));
 
         } finally {
@@ -1169,7 +1169,7 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
             assertEquals(enableAutoRepaymentForDownPayment, loanDetails.getEnableAutoRepaymentForDownPayment());
 
             // first disbursement
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 March 2023", loanId, "1000");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230303", loanId, "1000");
 
             // verify no down-payment transaction created
             checkNoDownPaymentTransaction(loanId);
@@ -1218,7 +1218,7 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
 
     @Test
     public void downPaymentOnOverpaidProgressiveLoan() {
-        runAt("03 March 2023", () -> {
+        runAt("20230303", () -> {
             LocalDate disbursementDate = LocalDate.of(2023, 3, 3);
 
             PostClientsResponse client = clientHelper.createClient(ClientHelper.defaultClientCreationRequest());
@@ -1254,14 +1254,14 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanResponse.getResourceId(), //
-                    installment(1000.0, null, "03 March 2023"), //
-                    installment(250.0, 0.0, 0.0, true, "03 March 2023"), //
-                    installment(750.0, 0.0, 750.0, false, "02 April 2023") //
+                    installment(1000.0, null, "20230303"), //
+                    installment(250.0, 0.0, 0.0, true, "20230303"), //
+                    installment(750.0, 0.0, 750.0, false, "20230402") //
             );
             // verify transactions
             verifyTransactions(loanResponse.getResourceId(), //
-                    transaction(1000.0, "Disbursement", "03 March 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(250.0, "Down Payment", "03 March 2023", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
+                    transaction(1000.0, "Disbursement", "20230303", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(250.0, "Down Payment", "20230303", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
             );
             verifyJournalEntries(loanResponse.getResourceId(), //
                     journalEntry(1000.0, loansReceivableAccount, "DEBIT"), //
@@ -1271,20 +1271,20 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
             );
 
             loanTransactionHelper.makeLoanRepayment(loanResponse.getResourceId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat("dd MMMM yyyy").transactionDate("03 March 2023").locale("en").transactionAmount(800.0));
+                    .dateFormat("yyyyMMdd").transactionDate("20230303").locale("en").transactionAmount(800.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getResourceId());
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanResponse.getResourceId(), //
-                    installment(1000.0, null, "03 March 2023"), //
-                    installment(250.0, 0.0, 0.0, true, "03 March 2023"), //
-                    installment(750.0, 0.0, 0.0, true, "02 April 2023") //
+                    installment(1000.0, null, "20230303"), //
+                    installment(250.0, 0.0, 0.0, true, "20230303"), //
+                    installment(750.0, 0.0, 0.0, true, "20230402") //
             );
             // verify transactions
             verifyTransactions(loanResponse.getResourceId(), //
-                    transaction(1000.0, "Disbursement", "03 March 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(250.0, "Down Payment", "03 March 2023", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(800.0, "Repayment", "03 March 2023", 0.0, 750.0, 0.0, 0.0, 0.0, 0.0, 50.0) //
+                    transaction(1000.0, "Disbursement", "20230303", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(250.0, "Down Payment", "20230303", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(800.0, "Repayment", "20230303", 0.0, 750.0, 0.0, 0.0, 0.0, 0.0, 50.0) //
             );
             assertTrue(loanDetails.getStatus().getOverpaid());
             assertEquals(50.0, Utils.getDoubleValue(loanDetails.getTotalOverpaid()));
@@ -1294,50 +1294,50 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, disbursementDate);
 
             loanTransactionHelper.disburseLoan(loanResponse.getResourceId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("05 March 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230305").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(20.00)).locale("en"));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getResourceId());
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanResponse.getResourceId(), //
-                    installment(1000.0, null, "03 March 2023"), //
-                    installment(250.0, 0.0, 0.0, true, "03 March 2023"), //
-                    installment(20.0, null, "05 March 2023"), //
-                    installment(5.0, 0.0, 0.0, true, "05 March 2023"), //
-                    installment(765.0, 0.0, 0.0, true, "02 April 2023") //
+                    installment(1000.0, null, "20230303"), //
+                    installment(250.0, 0.0, 0.0, true, "20230303"), //
+                    installment(20.0, null, "20230305"), //
+                    installment(5.0, 0.0, 0.0, true, "20230305"), //
+                    installment(765.0, 0.0, 0.0, true, "20230402") //
             );
             // verify transactions
             verifyTransactions(loanResponse.getResourceId(), //
-                    transaction(1000.0, "Disbursement", "03 March 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(250.0, "Down Payment", "03 March 2023", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(800.0, "Repayment", "03 March 2023", 0.0, 750.0, 0.0, 0.0, 0.0, 0.0, 50.0), //
-                    transaction(20.0, "Disbursement", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0) //
+                    transaction(1000.0, "Disbursement", "20230303", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(250.0, "Down Payment", "20230303", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(800.0, "Repayment", "20230303", 0.0, 750.0, 0.0, 0.0, 0.0, 0.0, 50.0), //
+                    transaction(20.0, "Disbursement", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0) //
             );
             assertTrue(loanDetails.getStatus().getOverpaid());
             assertEquals(30.0, Utils.getDoubleValue(loanDetails.getTotalOverpaid()));
 
             loanTransactionHelper.disburseLoan(loanResponse.getResourceId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("05 March 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230305").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(30.00)).locale("en"));
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getResourceId());
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanResponse.getResourceId(), //
-                    installment(1000.0, null, "03 March 2023"), //
-                    installment(250.0, 0.0, 0.0, true, "03 March 2023"), //
-                    installment(20.0, null, "05 March 2023"), //
-                    installment(30.0, null, "05 March 2023"), //
-                    installment(5.0, 0.0, 0.0, true, "05 March 2023"), //
-                    installment(7.5, 0.0, 0.0, true, "05 March 2023"), //
-                    installment(787.5, 0.0, 0.0, true, "02 April 2023") //
+                    installment(1000.0, null, "20230303"), //
+                    installment(250.0, 0.0, 0.0, true, "20230303"), //
+                    installment(20.0, null, "20230305"), //
+                    installment(30.0, null, "20230305"), //
+                    installment(5.0, 0.0, 0.0, true, "20230305"), //
+                    installment(7.5, 0.0, 0.0, true, "20230305"), //
+                    installment(787.5, 0.0, 0.0, true, "20230402") //
             );
             // verify transactions
             verifyTransactions(loanResponse.getResourceId(), //
-                    transaction(1000.0, "Disbursement", "03 March 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(250.0, "Down Payment", "03 March 2023", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(800.0, "Repayment", "03 March 2023", 0.0, 750.0, 0.0, 0.0, 0.0, 0.0, 50.0), //
-                    transaction(20.0, "Disbursement", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0), //
-                    transaction(30.0, "Disbursement", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0) //
+                    transaction(1000.0, "Disbursement", "20230303", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(250.0, "Down Payment", "20230303", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(800.0, "Repayment", "20230303", 0.0, 750.0, 0.0, 0.0, 0.0, 0.0, 50.0), //
+                    transaction(20.0, "Disbursement", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0), //
+                    transaction(30.0, "Disbursement", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0) //
             );
 
             assertTrue(loanDetails.getStatus().getClosedObligationsMet());
@@ -1345,80 +1345,80 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
             assertEquals(null, Utils.getDoubleValue(loanDetails.getTotalOverpaid()));
 
             PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanResponse.getResourceId(),
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("05 March 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230305").locale("en")
                             .transactionAmount(1.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getResourceId());
             // verify transactions
             verifyTransactions(loanResponse.getResourceId(), //
-                    transaction(1000.0, "Disbursement", "03 March 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(250.0, "Down Payment", "03 March 2023", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(800.0, "Repayment", "03 March 2023", 0.0, 750.0, 0.0, 0.0, 0.0, 0.0, 50.0), //
-                    transaction(20.0, "Disbursement", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0), //
-                    transaction(30.0, "Disbursement", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0), //
-                    transaction(1.0, "Repayment", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0) //
+                    transaction(1000.0, "Disbursement", "20230303", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(250.0, "Down Payment", "20230303", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(800.0, "Repayment", "20230303", 0.0, 750.0, 0.0, 0.0, 0.0, 0.0, 50.0), //
+                    transaction(20.0, "Disbursement", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0), //
+                    transaction(30.0, "Disbursement", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0), //
+                    transaction(1.0, "Repayment", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0) //
             );
             assertTrue(loanDetails.getStatus().getOverpaid());
             assertEquals(1.0, Utils.getDoubleValue(loanDetails.getTotalOverpaid()));
 
             loanTransactionHelper.disburseLoan(loanResponse.getResourceId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("05 March 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230305").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(40.00)).locale("en"));
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getResourceId());
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanResponse.getResourceId(), //
-                    installment(1000.0, null, "03 March 2023"), //
-                    installment(250.0, 0.0, 0.0, true, "03 March 2023"), //
-                    installment(20.0, null, "05 March 2023"), //
-                    installment(30.0, null, "05 March 2023"), //
-                    installment(40.0, null, "05 March 2023"), //
-                    installment(5.0, 0.0, 0.0, true, "05 March 2023"), //
-                    installment(7.5, 0.0, 0.0, true, "05 March 2023"), //
-                    installment(10.0, 0.0, 0.0, true, "05 March 2023"), //
-                    installment(817.5, 0.0, 30.0, false, "02 April 2023") //
+                    installment(1000.0, null, "20230303"), //
+                    installment(250.0, 0.0, 0.0, true, "20230303"), //
+                    installment(20.0, null, "20230305"), //
+                    installment(30.0, null, "20230305"), //
+                    installment(40.0, null, "20230305"), //
+                    installment(5.0, 0.0, 0.0, true, "20230305"), //
+                    installment(7.5, 0.0, 0.0, true, "20230305"), //
+                    installment(10.0, 0.0, 0.0, true, "20230305"), //
+                    installment(817.5, 0.0, 30.0, false, "20230402") //
             );
             // verify transactions
             verifyTransactions(loanResponse.getResourceId(), //
-                    transaction(1000.0, "Disbursement", "03 March 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(250.0, "Down Payment", "03 March 2023", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(800.0, "Repayment", "03 March 2023", 0.0, 750.0, 0.0, 0.0, 0.0, 0.0, 50.0), //
-                    transaction(20.0, "Disbursement", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0), //
-                    transaction(30.0, "Disbursement", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0), //
-                    transaction(1.0, "Repayment", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0), //
-                    transaction(40.0, "Disbursement", "05 March 2023", 39.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0), //
-                    transaction(9.0, "Down Payment", "05 March 2023", 30.0, 9.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
+                    transaction(1000.0, "Disbursement", "20230303", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(250.0, "Down Payment", "20230303", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(800.0, "Repayment", "20230303", 0.0, 750.0, 0.0, 0.0, 0.0, 0.0, 50.0), //
+                    transaction(20.0, "Disbursement", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0), //
+                    transaction(30.0, "Disbursement", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0), //
+                    transaction(1.0, "Repayment", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0), //
+                    transaction(40.0, "Disbursement", "20230305", 39.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0), //
+                    transaction(9.0, "Down Payment", "20230305", 30.0, 9.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
             );
 
             assertTrue(loanDetails.getStatus().getActive());
             assertEquals(30.0, Utils.getDoubleValue(loanDetails.getSummary().getTotalOutstanding()));
 
             loanTransactionHelper.reverseLoanTransaction(repayment.getLoanId(), repayment.getResourceId(),
-                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("05 March 2023")
+                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("20230305")
                             .transactionAmount(0.0).locale("en"));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getResourceId());
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanResponse.getResourceId(), //
-                    installment(1000.0, null, "03 March 2023"), //
-                    installment(250.0, 0.0, 0.0, true, "03 March 2023"), //
-                    installment(20.0, null, "05 March 2023"), //
-                    installment(30.0, null, "05 March 2023"), //
-                    installment(40.0, null, "05 March 2023"), //
-                    installment(5.0, 0.0, 0.0, true, "05 March 2023"), //
-                    installment(7.5, 0.0, 0.0, true, "05 March 2023"), //
-                    installment(10.0, 0.0, 1.0, false, "05 March 2023"), //
-                    installment(817.5, 0.0, 30.0, false, "02 April 2023") //
+                    installment(1000.0, null, "20230303"), //
+                    installment(250.0, 0.0, 0.0, true, "20230303"), //
+                    installment(20.0, null, "20230305"), //
+                    installment(30.0, null, "20230305"), //
+                    installment(40.0, null, "20230305"), //
+                    installment(5.0, 0.0, 0.0, true, "20230305"), //
+                    installment(7.5, 0.0, 0.0, true, "20230305"), //
+                    installment(10.0, 0.0, 1.0, false, "20230305"), //
+                    installment(817.5, 0.0, 30.0, false, "20230402") //
             );
             // verify transactions
             verifyTransactions(loanResponse.getResourceId(), //
-                    transaction(1000.0, "Disbursement", "03 March 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(250.0, "Down Payment", "03 March 2023", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(800.0, "Repayment", "03 March 2023", 0.0, 750.0, 0.0, 0.0, 0.0, 0.0, 50.0), //
-                    transaction(20.0, "Disbursement", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0), //
-                    transaction(30.0, "Disbursement", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0), //
-                    transaction(1.0, "Repayment", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, true), //
-                    transaction(40.0, "Disbursement", "05 March 2023", 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(9.0, "Down Payment", "05 March 2023", 31.0, 9.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
+                    transaction(1000.0, "Disbursement", "20230303", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(250.0, "Down Payment", "20230303", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(800.0, "Repayment", "20230303", 0.0, 750.0, 0.0, 0.0, 0.0, 0.0, 50.0), //
+                    transaction(20.0, "Disbursement", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0), //
+                    transaction(30.0, "Disbursement", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0), //
+                    transaction(1.0, "Repayment", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, true), //
+                    transaction(40.0, "Disbursement", "20230305", 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(9.0, "Down Payment", "20230305", 31.0, 9.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
             );
 
             assertTrue(loanDetails.getStatus().getActive());
@@ -1428,7 +1428,7 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
 
     @Test
     public void downPaymentOnOverpaidCumulativeLoan() {
-        runAt("03 March 2023", () -> {
+        runAt("20230303", () -> {
             LocalDate disbursementDate = LocalDate.of(2023, 3, 3);
 
             PostClientsResponse client = clientHelper.createClient(ClientHelper.defaultClientCreationRequest());
@@ -1467,14 +1467,14 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanResponse.getResourceId(), //
-                    installment(1000.0, null, "03 March 2023"), //
-                    installment(250.0, 0.0, 0.0, true, "03 March 2023"), //
-                    installment(750.0, 0.0, 750.0, false, "02 April 2023") //
+                    installment(1000.0, null, "20230303"), //
+                    installment(250.0, 0.0, 0.0, true, "20230303"), //
+                    installment(750.0, 0.0, 750.0, false, "20230402") //
             );
             // verify transactions
             verifyTransactions(loanResponse.getResourceId(), //
-                    transaction(1000.0, "Disbursement", "03 March 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(250.0, "Down Payment", "03 March 2023", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
+                    transaction(1000.0, "Disbursement", "20230303", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(250.0, "Down Payment", "20230303", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
             );
             verifyJournalEntries(loanResponse.getResourceId(), //
                     journalEntry(1000.0, loansReceivableAccount, "DEBIT"), //
@@ -1485,21 +1485,21 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
 
             String externalId = UUID.randomUUID().toString();
             loanTransactionHelper.makeLoanRepayment(loanResponse.getResourceId(),
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("03 March 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230303").locale("en")
                             .transactionAmount(800.0).externalId(externalId));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getResourceId());
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanResponse.getResourceId(), //
-                    installment(1000.0, null, "03 March 2023"), //
-                    installment(250.0, 0.0, 0.0, true, "03 March 2023"), //
-                    installment(750.0, 0.0, 0.0, true, "02 April 2023") //
+                    installment(1000.0, null, "20230303"), //
+                    installment(250.0, 0.0, 0.0, true, "20230303"), //
+                    installment(750.0, 0.0, 0.0, true, "20230402") //
             );
             // verify transactions
             verifyTransactions(loanResponse.getResourceId(), //
-                    transaction(1000.0, "Disbursement", "03 March 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(250.0, "Down Payment", "03 March 2023", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(800.0, "Repayment", "03 March 2023", 0.0, 750.0, 0.0, 0.0, 0.0, 0.0, 50.0) //
+                    transaction(1000.0, "Disbursement", "20230303", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(250.0, "Down Payment", "20230303", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(800.0, "Repayment", "20230303", 0.0, 750.0, 0.0, 0.0, 0.0, 0.0, 50.0) //
             );
             assertTrue(loanDetails.getStatus().getOverpaid());
             assertEquals(50.0, Utils.getDoubleValue(loanDetails.getTotalOverpaid()));
@@ -1509,50 +1509,50 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, disbursementDate);
 
             loanTransactionHelper.disburseLoan(loanResponse.getResourceId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("05 March 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230305").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(20.00)).locale("en"));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getResourceId());
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanResponse.getResourceId(), //
-                    installment(1000.0, null, "03 March 2023"), //
-                    installment(250.0, 0.0, 0.0, true, "03 March 2023"), //
-                    installment(20.0, null, "05 March 2023"), //
-                    installment(5.0, 0.0, 0.0, true, "05 March 2023"), //
-                    installment(765.0, 0.0, 0.0, true, "02 April 2023") //
+                    installment(1000.0, null, "20230303"), //
+                    installment(250.0, 0.0, 0.0, true, "20230303"), //
+                    installment(20.0, null, "20230305"), //
+                    installment(5.0, 0.0, 0.0, true, "20230305"), //
+                    installment(765.0, 0.0, 0.0, true, "20230402") //
             );
             // verify transactions
             verifyTransactions(loanResponse.getResourceId(), //
-                    transaction(1000.0, "Disbursement", "03 March 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(250.0, "Down Payment", "03 March 2023", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(800.0, "Repayment", "03 March 2023", 0.0, 770.0, 0.0, 0.0, 0.0, 0.0, 30.0), //
-                    transaction(20.0, "Disbursement", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
+                    transaction(1000.0, "Disbursement", "20230303", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(250.0, "Down Payment", "20230303", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(800.0, "Repayment", "20230303", 0.0, 770.0, 0.0, 0.0, 0.0, 0.0, 30.0), //
+                    transaction(20.0, "Disbursement", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
             );
             assertTrue(loanDetails.getStatus().getOverpaid());
             assertEquals(30.0, Utils.getDoubleValue(loanDetails.getTotalOverpaid()));
 
             loanTransactionHelper.disburseLoan(loanResponse.getResourceId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("05 March 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230305").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(30.00)).locale("en"));
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getResourceId());
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanResponse.getResourceId(), //
-                    installment(1000.0, null, "03 March 2023"), //
-                    installment(250.0, 0.0, 0.0, true, "03 March 2023"), //
-                    installment(20.0, null, "05 March 2023"), //
-                    installment(30.0, null, "05 March 2023"), //
-                    installment(5.0, 0.0, 0.0, true, "05 March 2023"), //
-                    installment(7.5, 0.0, 0.0, true, "05 March 2023"), //
-                    installment(787.5, 0.0, 0.0, true, "02 April 2023") //
+                    installment(1000.0, null, "20230303"), //
+                    installment(250.0, 0.0, 0.0, true, "20230303"), //
+                    installment(20.0, null, "20230305"), //
+                    installment(30.0, null, "20230305"), //
+                    installment(5.0, 0.0, 0.0, true, "20230305"), //
+                    installment(7.5, 0.0, 0.0, true, "20230305"), //
+                    installment(787.5, 0.0, 0.0, true, "20230402") //
             );
             // verify transactions
             verifyTransactions(loanResponse.getResourceId(), //
-                    transaction(1000.0, "Disbursement", "03 March 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(250.0, "Down Payment", "03 March 2023", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(800.0, "Repayment", "03 March 2023", 0.0, 800.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(20.0, "Disbursement", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(30.0, "Disbursement", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
+                    transaction(1000.0, "Disbursement", "20230303", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(250.0, "Down Payment", "20230303", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(800.0, "Repayment", "20230303", 0.0, 800.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(20.0, "Disbursement", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(30.0, "Disbursement", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
             );
 
             assertTrue(loanDetails.getStatus().getClosedObligationsMet());
@@ -1560,61 +1560,61 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
             assertEquals(null, Utils.getDoubleValue(loanDetails.getTotalOverpaid()));
 
             loanTransactionHelper.disburseLoan(loanResponse.getResourceId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("05 March 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230305").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(40.00)).locale("en"));
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getResourceId());
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanResponse.getResourceId(), //
-                    installment(1000.0, null, "03 March 2023"), //
-                    installment(250.0, 0.0, 0.0, true, "03 March 2023"), //
-                    installment(20.0, null, "05 March 2023"), //
-                    installment(30.0, null, "05 March 2023"), //
-                    installment(40.0, null, "05 March 2023"), //
-                    installment(5.0, 0.0, 0.0, true, "05 March 2023"), //
-                    installment(7.5, 0.0, 0.0, true, "05 March 2023"), //
-                    installment(10.0, 0.0, 0.0, true, "05 March 2023"), //
-                    installment(817.5, 0.0, 30.0, false, "02 April 2023") //
+                    installment(1000.0, null, "20230303"), //
+                    installment(250.0, 0.0, 0.0, true, "20230303"), //
+                    installment(20.0, null, "20230305"), //
+                    installment(30.0, null, "20230305"), //
+                    installment(40.0, null, "20230305"), //
+                    installment(5.0, 0.0, 0.0, true, "20230305"), //
+                    installment(7.5, 0.0, 0.0, true, "20230305"), //
+                    installment(10.0, 0.0, 0.0, true, "20230305"), //
+                    installment(817.5, 0.0, 30.0, false, "20230402") //
             );
             // verify transactions
             verifyTransactions(loanResponse.getResourceId(), //
-                    transaction(1000.0, "Disbursement", "03 March 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(250.0, "Down Payment", "03 March 2023", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(800.0, "Repayment", "03 March 2023", 0.0, 800.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(20.0, "Disbursement", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(30.0, "Disbursement", "05 March 2023", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(40.0, "Disbursement", "05 March 2023", 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(10.0, "Down Payment", "05 March 2023", 30.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
+                    transaction(1000.0, "Disbursement", "20230303", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(250.0, "Down Payment", "20230303", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(800.0, "Repayment", "20230303", 0.0, 800.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(20.0, "Disbursement", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(30.0, "Disbursement", "20230305", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(40.0, "Disbursement", "20230305", 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(10.0, "Down Payment", "20230305", 30.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
             );
 
             assertTrue(loanDetails.getStatus().getActive());
             assertEquals(30.0, Utils.getDoubleValue(loanDetails.getSummary().getTotalOutstanding()));
 
             loanTransactionHelper.reverseLoanTransaction(loanResponse.getLoanId(), externalId,
-                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("05 March 2023")
+                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("20230305")
                             .transactionAmount(0.0).locale("en"));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getResourceId());
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanResponse.getResourceId(), //
-                    installment(1000.0, null, "03 March 2023"), //
-                    installment(250.0, 0.0, 0.0, true, "03 March 2023"), //
-                    installment(20.0, null, "05 March 2023"), //
-                    installment(30.0, null, "05 March 2023"), //
-                    installment(40.0, null, "05 March 2023"), //
-                    installment(5.0, 0.0, 0.0, true, "05 March 2023"), //
-                    installment(7.5, 0.0, 2.5, false, "05 March 2023"), //
-                    installment(10.0, 0.0, 10.0, false, "05 March 2023"), //
-                    installment(817.5, 0.0, 817.5, false, "02 April 2023") //
+                    installment(1000.0, null, "20230303"), //
+                    installment(250.0, 0.0, 0.0, true, "20230303"), //
+                    installment(20.0, null, "20230305"), //
+                    installment(30.0, null, "20230305"), //
+                    installment(40.0, null, "20230305"), //
+                    installment(5.0, 0.0, 0.0, true, "20230305"), //
+                    installment(7.5, 0.0, 2.5, false, "20230305"), //
+                    installment(10.0, 0.0, 10.0, false, "20230305"), //
+                    installment(817.5, 0.0, 817.5, false, "20230402") //
             );
             // verify transactions
             verifyTransactions(loanResponse.getResourceId(), //
-                    transaction(1000.0, "Disbursement", "03 March 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(250.0, "Down Payment", "03 March 2023", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(800.0, "Repayment", "03 March 2023", 0.0, 800.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
-                    transaction(20.0, "Disbursement", "05 March 2023", 770.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(30.0, "Disbursement", "05 March 2023", 800.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(40.0, "Disbursement", "05 March 2023", 840.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(10.0, "Down Payment", "05 March 2023", 830.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
+                    transaction(1000.0, "Disbursement", "20230303", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(250.0, "Down Payment", "20230303", 750.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(800.0, "Repayment", "20230303", 0.0, 800.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
+                    transaction(20.0, "Disbursement", "20230305", 770.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(30.0, "Disbursement", "20230305", 800.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(40.0, "Disbursement", "20230305", 840.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(10.0, "Down Payment", "20230305", 830.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
             );
 
             assertTrue(loanDetails.getStatus().getActive());
@@ -1646,7 +1646,7 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
         assertEquals(enableAutoRepaymentForDownPayment, getLoanProductsProductResponse.getEnableAutoRepaymentForDownPayment());
 
         final Integer loanId = createAndApproveLoanAccount(clientId, loanProductId.longValue(), loanExternalIdStr, "1", "0");
-        loanTransactionHelper.disburseLoanWithTransactionAmountAndWithoutAutoPayment("03 September 2022", loanId, "1000");
+        loanTransactionHelper.disburseLoanWithTransactionAmountAndWithoutAutoPayment("20220903", loanId, "1000");
 
         GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
         GetLoansLoanIdSummary summary = loanDetails.getSummary();
@@ -1725,12 +1725,12 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
         String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("30")
                 .withLoanTermFrequencyAsDays().withNumberOfRepayments("1").withRepaymentEveryAfter("30").withRepaymentFrequencyTypeAsDays()
                 .withInterestRatePerPeriod("0").withInterestTypeAsDecliningBalance().withAmortizationTypeAsEqualPrincipalPayments()
-                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("03 March 2023")
-                .withSubmittedOnDate("03 March 2023").withLoanType("individual").withExternalId(externalId)
+                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("20230303")
+                .withSubmittedOnDate("20230303").withLoanType("individual").withExternalId(externalId)
                 .build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("03 March 2023", "1000", loanId, null);
+        loanTransactionHelper.approveLoan("20230303", "1000", loanId, null);
         return loanId;
     }
 
@@ -1754,12 +1754,12 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("03 September 2022").withSubmittedOnDate("01 September 2022").withLoanType("individual")
+                .withExpectedDisbursementDate("20220903").withSubmittedOnDate("20220901").withLoanType("individual")
                 .withExternalId(externalId).build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("02 September 2022", "1000", loanId, null);
-        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("03 September 2022", loanId, "1000");
+        loanTransactionHelper.approveLoan("20220902", "1000", loanId, null);
+        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20220903", loanId, "1000");
         return loanId;
     }
 
@@ -1805,11 +1805,11 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments(numberOfRepayments).withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod(interestRate).withInterestTypeAsDecliningBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("03 September 2022").withSubmittedOnDate("01 September 2022").withLoanType("individual")
+                .withExpectedDisbursementDate("20220903").withSubmittedOnDate("20220901").withLoanType("individual")
                 .withExternalId(externalId).build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("02 September 2022", "1000", loanId, null);
+        loanTransactionHelper.approveLoan("20220902", "1000", loanId, null);
         return loanId;
     }
 
@@ -1817,7 +1817,7 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
             final String numberOfRepayments, final String interestRate) {
 
         Integer loanId = createAndApproveLoanAccount(clientID, loanProductID, externalId, numberOfRepayments, interestRate);
-        loanTransactionHelper.disburseLoanWithTransactionAmount("03 September 2022", loanId, "1000");
+        loanTransactionHelper.disburseLoanWithTransactionAmount("20220903", loanId, "1000");
         return loanId;
     }
 
@@ -1828,13 +1828,13 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments(numberOfRepayments).withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod(interestRate).withInterestTypeAsDecliningBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("04 September 2022").withSubmittedOnDate("01 September 2022").withLoanType("individual")
+                .withExpectedDisbursementDate("20220904").withSubmittedOnDate("20220901").withLoanType("individual")
                 .withExternalId(externalId).build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("02 September 2022", "1000", loanId, null);
-        loanTransactionHelper.disburseLoanWithTransactionAmount("03 September 2022", loanId, "700");
-        loanTransactionHelper.disburseLoanWithTransactionAmount("04 September 2022", loanId, "300");
+        loanTransactionHelper.approveLoan("20220902", "1000", loanId, null);
+        loanTransactionHelper.disburseLoanWithTransactionAmount("20220903", loanId, "700");
+        loanTransactionHelper.disburseLoanWithTransactionAmount("20220904", loanId, "300");
         return loanId;
     }
 

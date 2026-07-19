@@ -195,7 +195,7 @@ public class WorkingCapitalBatchApiStepDef extends AbstractStepDef {
     @When("Batch API adds discount fee with {string} amount on the working capital loan")
     public void batchApiAddDiscountFee(String amount) throws IOException {
         final Long transactionId = getDisburseTransactionId();
-        final PostWorkingCapitalLoanTransactionsRequest request = new PostWorkingCapitalLoanTransactionsRequest().transactionDate("01 January 2026").transactionAmount(new BigDecimal(amount)).relatedResourceId(transactionId).locale(WorkingCapitalLoanRequestFactory.DEFAULT_LOCALE).dateFormat(WorkingCapitalLoanRequestFactory.DATE_FORMAT);
+        final PostWorkingCapitalLoanTransactionsRequest request = new PostWorkingCapitalLoanTransactionsRequest().transactionDate("20260101").transactionAmount(new BigDecimal(amount)).relatedResourceId(transactionId).locale(WorkingCapitalLoanRequestFactory.DEFAULT_LOCALE).dateFormat(WorkingCapitalLoanRequestFactory.DATE_FORMAT);
         final String url = resolveLoanUrlForGet() + WCL_TRANSACTIONS_PATH + COMMAND_DISCOUNT;
         final BatchRequest batchRequest = buildBatchRequest(1L, null, url, BATCH_API_METHOD_POST, GSON.toJson(request));
         final List<BatchResponse> responses = handleBatchRequests(List.of(batchRequest), false);
@@ -467,7 +467,7 @@ public class WorkingCapitalBatchApiStepDef extends AbstractStepDef {
         final List<String> header = table.row(0);
         final List<String> expectedValues = table.row(1);
         final List<String> actualValues = new ArrayList<>();
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
         for (final String field : header) {
             switch (field) {
                 case "transactionDate" -> actualValues.add(txn.getTransactionDate() == null ? null : formatter.format(txn.getTransactionDate()));
@@ -601,14 +601,14 @@ public class WorkingCapitalBatchApiStepDef extends AbstractStepDef {
         request.relativeUrl("clients");
         request.method(BATCH_API_METHOD_POST);
         request.headers(headers);
-        request.body("{\"officeId\":1,\"firstname\":\"Test\",\"lastname\":\"Client\",\"externalId\":\"" + clientExternalId + "\",\"dateFormat\":\"dd MMMM yyyy\",\"locale\":\"en\",\"active\":false,\"submittedOnDate\":\"01 January 2026\"}");
+        request.body("{\"officeId\":1,\"firstname\":\"Test\",\"lastname\":\"Client\",\"externalId\":\"" + clientExternalId + "\",\"dateFormat\":\"yyyyMMdd\",\"locale\":\"en\",\"active\":false,\"submittedOnDate\":\"20260101\"}");
         return request;
     }
 
     private BatchRequest createWCLoanBatchRequest(Long requestId, Long reference, String loanExternalId, Map<String, String> loanData) {
         final Long productId = workingCapitalLoanProductResolver.resolve(DefaultWorkingCapitalLoanProduct.WCLP);
-        final String submittedOnDate = loanData != null ? loanData.get("submittedOnDate") : "01 January 2026";
-        final String expectedDisbursementDate = loanData != null ? loanData.get("expectedDisbursementDate") : "01 January 2026";
+        final String submittedOnDate = loanData != null ? loanData.get("submittedOnDate") : "20260101";
+        final String expectedDisbursementDate = loanData != null ? loanData.get("expectedDisbursementDate") : "20260101";
         final String principalAmount = loanData != null ? loanData.get("principalAmount") : "9000";
         final String totalPaymentVolume = loanData != null ? loanData.get("totalPaymentVolume") : "100000";
         final String periodPaymentRate = loanData != null ? loanData.get("periodPaymentRate") : "18";
@@ -628,24 +628,24 @@ public class WorkingCapitalBatchApiStepDef extends AbstractStepDef {
     }
 
     private BatchRequest createApproveWCLoanBatchRequest(Long requestId, Long reference, String relativeUrl) {
-        final PostWorkingCapitalLoansLoanIdRequest approveRequest = workingCapitalLoanRequestFactory.defaultWorkingCapitalLoanApproveRequest().approvedOnDate("01 January 2026").expectedDisbursementDate("01 January 2026").approvedLoanAmount(new BigDecimal("9000"));
+        final PostWorkingCapitalLoansLoanIdRequest approveRequest = workingCapitalLoanRequestFactory.defaultWorkingCapitalLoanApproveRequest().approvedOnDate("20260101").expectedDisbursementDate("20260101").approvedLoanAmount(new BigDecimal("9000"));
         return buildBatchRequest(requestId, reference, relativeUrl, BATCH_API_METHOD_POST, GSON.toJson(approveRequest));
     }
 
     private BatchRequest createDisburseWCLoanBatchRequest(Long requestId, Long reference, String relativeUrl) {
-        final PostWorkingCapitalLoansLoanIdRequest disburseRequest = workingCapitalLoanRequestFactory.defaultWorkingCapitalLoanDisburseRequest().actualDisbursementDate("01 January 2026").transactionAmount(new BigDecimal("9000"));
+        final PostWorkingCapitalLoansLoanIdRequest disburseRequest = workingCapitalLoanRequestFactory.defaultWorkingCapitalLoanDisburseRequest().actualDisbursementDate("20260101").transactionAmount(new BigDecimal("9000"));
         return buildBatchRequest(requestId, reference, relativeUrl, BATCH_API_METHOD_POST, GSON.toJson(disburseRequest));
     }
 
     private BatchRequest createDiscountFeeBatchRequest(Long requestId, Long reference, String relativeUrl) {
-        final PostWorkingCapitalLoanTransactionsRequest discountRequest = new PostWorkingCapitalLoanTransactionsRequest().transactionDate("01 January 2026").transactionAmount(new BigDecimal("100")).locale(WorkingCapitalLoanRequestFactory.DEFAULT_LOCALE).dateFormat(WorkingCapitalLoanRequestFactory.DATE_FORMAT);
+        final PostWorkingCapitalLoanTransactionsRequest discountRequest = new PostWorkingCapitalLoanTransactionsRequest().transactionDate("20260101").transactionAmount(new BigDecimal("100")).locale(WorkingCapitalLoanRequestFactory.DEFAULT_LOCALE).dateFormat(WorkingCapitalLoanRequestFactory.DATE_FORMAT);
         final String serialized = GSON.toJson(discountRequest);
         final String body = serialized.substring(0, serialized.lastIndexOf('}')) + ",\"relatedResourceId\":\"$.resourceId\"}";
         return buildBatchRequest(requestId, reference, relativeUrl, BATCH_API_METHOD_POST, body);
     }
 
     private BatchRequest createFailedDisburseRequest(Long requestId, Long reference) {
-        final PostWorkingCapitalLoansLoanIdRequest disburseRequest = workingCapitalLoanRequestFactory.defaultWorkingCapitalLoanDisburseRequest().actualDisbursementDate("01 January 2030").transactionAmount(new BigDecimal("999999999"));
+        final PostWorkingCapitalLoansLoanIdRequest disburseRequest = workingCapitalLoanRequestFactory.defaultWorkingCapitalLoanDisburseRequest().actualDisbursementDate("20300101").transactionAmount(new BigDecimal("999999999"));
         return buildBatchRequest(requestId, reference, "v1/working-capital-loans/$.resourceId?command=disburse", BATCH_API_METHOD_POST, GSON.toJson(disburseRequest));
     }
 

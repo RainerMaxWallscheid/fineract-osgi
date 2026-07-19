@@ -64,7 +64,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(LoanTestLifecycleExtension.class)
 public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
-    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
     // asset
     private Account loansReceivable;
     private Account interestFeeReceivable;
@@ -106,7 +106,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
     @Test
     public void postChargeOffAddBackdatedTransactionTest() {
-        runAt("14 September 2022", () -> {
+        runAt("20220914", () -> {
             String loanExternalIdStr = UUID.randomUUID().toString();
             final Long loanProductId = createLoanProductWithPeriodicAccrualAccounting();
             final Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
@@ -125,7 +125,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
             Long chargeOffReasonId = codeHelper.createChargeOffCodeValue(randomText, 1);
             String transactionExternalId = UUID.randomUUID().toString();
             PostLoansLoanIdTransactionsResponse chargeOffTransaction = chargeOffLoan(loanId,
-                    new PostLoansLoanIdTransactionsRequest().transactionDate("14 September 2022").locale(LoanTestData.LOCALE)
+                    new PostLoansLoanIdTransactionsRequest().transactionDate("20220914").locale(LoanTestData.LOCALE)
                             .dateFormat(LoanTestData.DATETIME_PATTERN).externalId(transactionExternalId)
                             .chargeOffReasonId(chargeOffReasonId));
 
@@ -163,7 +163,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
             // make Repayment before chargeoff date
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("7 September 2022")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20220907")
                             .locale(LoanTestData.LOCALE).transactionAmount(100.0));
 
             loanDetails = getLoanDetails(loanId);
@@ -196,7 +196,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
             // Goodwill Credit before chargeoff date
             final PostLoansLoanIdTransactionsResponse goodwillCredit = makeGoodwillCredit(loanId,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("10 September 2022")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20220910")
                             .locale(LoanTestData.LOCALE).transactionAmount(100.0));
 
             loanDetails = getLoanDetails(loanId);
@@ -221,11 +221,11 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
             assertEquals(goodwillExpenseAccount.getAccountID().longValue(), journalEntries.get(0).getGlAccountId().longValue());
             assertEquals("DEBIT", journalEntries.get(0).getEntryType().getValue());
 
-            updateBusinessDate("16 September 2022");
+            updateBusinessDate("20220916");
 
             // make Repayment after chargeoff date
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("15 September 2022")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20220915")
                             .locale(LoanTestData.LOCALE).transactionAmount(100.0));
 
             loanDetails = getLoanDetails(loanId);
@@ -252,7 +252,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
             // Goodwill Credit after chargeoff date
             final PostLoansLoanIdTransactionsResponse goodwillCredit_1 = makeGoodwillCredit(loanId,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("16 September 2022")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20220916")
                             .locale(LoanTestData.LOCALE).transactionAmount(100.0));
 
             loanDetails = getLoanDetails(loanId);
@@ -294,7 +294,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
         // make Repayment
         final PostLoansLoanIdTransactionsResponse repaymentTransaction = makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("7 September 2022")
+                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20220907")
                         .locale(LoanTestData.LOCALE).transactionAmount(100.0));
 
         GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
@@ -329,7 +329,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
         Long chargeOffReasonId = codeHelper.createChargeOffCodeValue(randomText, 1);
         String transactionExternalId = UUID.randomUUID().toString();
         PostLoansLoanIdTransactionsResponse chargeOffTransaction = chargeOffLoan(loanId,
-                new PostLoansLoanIdTransactionsRequest().transactionDate("14 September 2022").locale(LoanTestData.LOCALE)
+                new PostLoansLoanIdTransactionsRequest().transactionDate("20220914").locale(LoanTestData.LOCALE)
                         .dateFormat(LoanTestData.DATETIME_PATTERN).externalId(transactionExternalId).chargeOffReasonId(chargeOffReasonId));
 
         loanDetails = getLoanDetails(loanId);
@@ -355,7 +355,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
         assertEquals("DEBIT", journalEntries.get(0).getEntryType().getValue());
 
         // reverse Repayment
-        reverseRepayment(loanId, repaymentTransaction.getResourceId(), "7 September 2022");
+        reverseRepayment(loanId, repaymentTransaction.getResourceId(), "20220907");
         loanDetails = getLoanDetails(loanId);
         assertTrue(loanDetails.getStatus().getActive());
         assertTrue(loanDetails.getChargedOff());
@@ -419,7 +419,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
         // make Repayment
         final PostLoansLoanIdTransactionsResponse repaymentTransaction = makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("7 September 2022")
+                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20220907")
                         .locale(LoanTestData.LOCALE).transactionAmount(11.0).externalId(loanTransactionExternalIdStr));
 
         GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
@@ -454,7 +454,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
         Long chargeOffReasonId = codeHelper.createChargeOffCodeValue(randomText, 1);
         String transactionExternalId = UUID.randomUUID().toString();
         PostLoansLoanIdTransactionsResponse chargeOffTransaction = chargeOffLoan(loanId,
-                new PostLoansLoanIdTransactionsRequest().transactionDate("14 September 2022").locale(LoanTestData.LOCALE)
+                new PostLoansLoanIdTransactionsRequest().transactionDate("20220914").locale(LoanTestData.LOCALE)
                         .dateFormat(LoanTestData.DATETIME_PATTERN).externalId(transactionExternalId).chargeOffReasonId(chargeOffReasonId));
 
         loanDetails = getLoanDetails(loanId);
@@ -481,7 +481,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
         // make Repayment backdated for reverse replay
         final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("5 September 2022")
+                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20220905")
                         .locale(LoanTestData.LOCALE).transactionAmount(5.0));
 
         loanDetails = getLoanDetails(loanId);
@@ -563,7 +563,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
         // make Repayment on Chargeoff date before charge off
         final PostLoansLoanIdTransactionsResponse repaymentTransaction = makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("7 September 2022")
+                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20220907")
                         .locale(LoanTestData.LOCALE).transactionAmount(11.0).externalId(loanTransactionExternalIdStr));
 
         GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
@@ -596,7 +596,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
         Long chargeOffReasonId = codeHelper.createChargeOffCodeValue(randomText, 1);
         String transactionExternalId = UUID.randomUUID().toString();
         PostLoansLoanIdTransactionsResponse chargeOffTransaction = chargeOffLoan(loanId,
-                new PostLoansLoanIdTransactionsRequest().transactionDate("7 September 2022").locale(LoanTestData.LOCALE)
+                new PostLoansLoanIdTransactionsRequest().transactionDate("20220907").locale(LoanTestData.LOCALE)
                         .dateFormat(LoanTestData.DATETIME_PATTERN).externalId(transactionExternalId).chargeOffReasonId(chargeOffReasonId));
 
         loanDetails = getLoanDetails(loanId);
@@ -623,7 +623,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
         // make Repayment backdated for reverse replay
         final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("5 September 2022")
+                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20220905")
                         .locale(LoanTestData.LOCALE).transactionAmount(5.0));
 
         loanDetails = getLoanDetails(loanId);
@@ -706,7 +706,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
         Long chargeOffReasonId = codeHelper.createChargeOffCodeValue(randomText, 1);
         String transactionExternalId = UUID.randomUUID().toString();
         PostLoansLoanIdTransactionsResponse chargeOffTransaction = chargeOffLoan(loanId,
-                new PostLoansLoanIdTransactionsRequest().transactionDate("7 September 2022").locale(LoanTestData.LOCALE)
+                new PostLoansLoanIdTransactionsRequest().transactionDate("20220907").locale(LoanTestData.LOCALE)
                         .dateFormat(LoanTestData.DATETIME_PATTERN).externalId(transactionExternalId).chargeOffReasonId(chargeOffReasonId));
 
         GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
@@ -746,7 +746,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
         // make Repayment after charge-off on charge off date
         final PostLoansLoanIdTransactionsResponse repaymentTransaction = makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("7 September 2022")
+                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20220907")
                         .locale(LoanTestData.LOCALE).transactionAmount(11.0).externalId(loanTransactionExternalIdStr));
 
         loanDetails = getLoanDetails(loanId);
@@ -774,7 +774,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
         // make Repayment backdated for reverse replay
         final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("5 September 2022")
+                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20220905")
                         .locale(LoanTestData.LOCALE).transactionAmount(5.0));
 
         loanDetails = getLoanDetails(loanId);
@@ -845,7 +845,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
         // make Repayment before charge-off on charge off date
         final PostLoansLoanIdTransactionsResponse repaymentTransaction = makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("7 September 2022")
+                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20220907")
                         .locale(LoanTestData.LOCALE).transactionAmount(100.0));
 
         GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
@@ -880,7 +880,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
         Long chargeOffReasonId = codeHelper.createChargeOffCodeValue(randomText, 1);
         String transactionExternalId = UUID.randomUUID().toString();
         PostLoansLoanIdTransactionsResponse chargeOffTransaction = chargeOffLoan(loanId,
-                new PostLoansLoanIdTransactionsRequest().transactionDate("7 September 2022").locale(LoanTestData.LOCALE)
+                new PostLoansLoanIdTransactionsRequest().transactionDate("20220907").locale(LoanTestData.LOCALE)
                         .dateFormat(LoanTestData.DATETIME_PATTERN).externalId(transactionExternalId).chargeOffReasonId(chargeOffReasonId));
 
         loanDetails = getLoanDetails(loanId);
@@ -907,7 +907,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
         // make Repayment after charge-off on charge off date
         final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("7 September 2022")
+                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20220907")
                         .locale(LoanTestData.LOCALE).transactionAmount(90.0));
 
         loanDetails = getLoanDetails(loanId);
@@ -950,7 +950,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
         // make Repayment before charge-off on charge off date
         final PostLoansLoanIdTransactionsResponse repaymentTransaction = makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("7 September 2022")
+                new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20220907")
                         .locale(LoanTestData.LOCALE).transactionAmount(100.0));
 
         GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
@@ -985,7 +985,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
         Long chargeOffReasonId = codeHelper.createChargeOffCodeValue(randomText, 1);
         String transactionExternalId = UUID.randomUUID().toString();
         PostLoansLoanIdTransactionsResponse chargeOffTransaction = chargeOffLoan(loanId,
-                new PostLoansLoanIdTransactionsRequest().transactionDate("7 September 2022").locale(LoanTestData.LOCALE)
+                new PostLoansLoanIdTransactionsRequest().transactionDate("20220907").locale(LoanTestData.LOCALE)
                         .dateFormat(LoanTestData.DATETIME_PATTERN).externalId(transactionExternalId).chargeOffReasonId(chargeOffReasonId));
 
         loanDetails = getLoanDetails(loanId);
@@ -1011,7 +1011,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
         assertEquals("DEBIT", journalEntries.get(0).getEntryType().getValue());
 
         // reverse Repayment
-        reverseRepayment(loanId, repaymentTransaction.getResourceId(), "7 September 2022");
+        reverseRepayment(loanId, repaymentTransaction.getResourceId(), "20220907");
         loanDetails = getLoanDetails(loanId);
         assertTrue(loanDetails.getStatus().getActive());
         assertTrue(loanDetails.getChargedOff());
@@ -1056,8 +1056,8 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
     }
 
     private Long createLoanAccount(final Long clientId, final Long loanProductId, final String externalId) {
-        PostLoansRequest request = applyLoanRequest(clientId, loanProductId, "01 September 2022", 1000.0, 1,
-                req -> req.expectedDisbursementDate("03 September 2022").externalId(externalId).interestRatePerPeriod(BigDecimal.ZERO)
+        PostLoansRequest request = applyLoanRequest(clientId, loanProductId, "20220901", 1000.0, 1,
+                req -> req.expectedDisbursementDate("20220903").externalId(externalId).interestRatePerPeriod(BigDecimal.ZERO)
                         .interestType(LoanTestData.InterestType.DECLINING_BALANCE)
                         .amortizationType(LoanTestData.AmortizationType.EQUAL_PRINCIPAL)
                         .interestCalculationPeriodType(LoanTestData.InterestCalculationPeriodType.SAME_AS_REPAYMENT_PERIOD)
@@ -1065,8 +1065,8 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
                         .loanTermFrequencyType(LoanTestData.RepaymentFrequencyType.DAYS).dateFormat(LoanTestData.DATETIME_PATTERN)
                         .locale(LoanTestData.LOCALE));
         Long loanId = applyForLoan(request);
-        approveLoan(loanId, LoanRequestBuilders.approveLoan(1000.0, "02 September 2022", "03 September 2022"));
-        disburseLoanWithAmount(loanId, "03 September 2022", 1000.0);
+        approveLoan(loanId, LoanRequestBuilders.approveLoan(1000.0, "20220902", "20220903"));
+        disburseLoanWithAmount(loanId, "20220903", 1000.0);
         return loanId;
     }
 
@@ -1175,7 +1175,7 @@ public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
                 .receivableInterestAccountId(interestFeeReceivable.getAccountID().longValue())//
                 .receivableFeeAccountId(interestFeeReceivable.getAccountID().longValue())//
                 .receivablePenaltyAccountId(interestFeeReceivable.getAccountID().longValue())//
-                .dateFormat("dd MMMM yyyy")//
+                .dateFormat("yyyyMMdd")//
                 .locale("en_GB")//
                 .disallowExpectedDisbursements(true)//
                 .allowApprovedDisbursedAmountsOverApplied(true)//

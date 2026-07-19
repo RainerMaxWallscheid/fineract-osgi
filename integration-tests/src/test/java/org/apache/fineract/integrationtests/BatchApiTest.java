@@ -2002,7 +2002,7 @@ public class BatchApiTest extends BaseLoanIntegrationTest {
 
     @Test
     public void shouldReturnOkStatusOnModifyingSavingAccount() {
-        final String startDate = "10 April 2022";
+        final String startDate = "20220410";
         final SavingsProductHelper savingsProductHelper = new SavingsProductHelper();
         final SavingsAccountHelper savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, startDate);
@@ -2453,9 +2453,9 @@ public class BatchApiTest extends BaseLoanIntegrationTest {
         br.setRequestId(1L);
         br.setRelativeUrl(String.format("loans/" + loanId + "/transactions?command=repayment"));
         br.setMethod("POST");
-        String dateString = LocalDate.now(Utils.getZoneIdOfTenant()).format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
+        String dateString = LocalDate.now(Utils.getZoneIdOfTenant()).format(DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH));
         br.setBody(String.format(
-                "{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", " + "\"transactionDate\": \"%s\",  \"transactionAmount\": \"500\"}",
+                "{\"locale\": \"en\", \"dateFormat\": \"yyyyMMdd\", " + "\"transactionDate\": \"%s\",  \"transactionAmount\": \"500\"}",
                 dateString));
 
         final String jsonifiedRepaymentRequest = BatchHelper.toJsonString(List.of(br));
@@ -2534,9 +2534,9 @@ public class BatchApiTest extends BaseLoanIntegrationTest {
         br.setRequestId(1L);
         br.setRelativeUrl(String.format("v1/loans/" + loanId + "/transactions?command=repayment"));
         br.setMethod("POST");
-        String dateString = LocalDate.now(Utils.getZoneIdOfTenant()).format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
+        String dateString = LocalDate.now(Utils.getZoneIdOfTenant()).format(DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH));
         br.setBody(String.format(
-                "{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", " + "\"transactionDate\": \"%s\",  \"transactionAmount\": \"500\"}",
+                "{\"locale\": \"en\", \"dateFormat\": \"yyyyMMdd\", " + "\"transactionDate\": \"%s\",  \"transactionAmount\": \"500\"}",
                 dateString));
 
         final String jsonifiedRepaymentRequest = BatchHelper.toJsonString(List.of(br));

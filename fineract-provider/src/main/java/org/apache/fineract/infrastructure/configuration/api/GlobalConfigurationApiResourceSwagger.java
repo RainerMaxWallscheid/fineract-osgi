@@ -48,11 +48,11 @@ final class GlobalConfigurationApiResourceSwagger {
         public boolean enabled;
         @Schema(example = "2")
         public Long value;
-        @Schema(example = "20 September 2011")
+        @Schema(example = "20110920")
         public String dateValue;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "random text")
         public String stringValue;
@@ -71,7 +71,7 @@ final class GlobalConfigurationApiResourceSwagger {
             public boolean enabled;
             @Schema(example = "2")
             public Long value;
-            @Schema(example = "20 September 2011")
+            @Schema(example = "20110920")
             public String dateValue;
             @Schema(example = "random text")
             public String stringValue;

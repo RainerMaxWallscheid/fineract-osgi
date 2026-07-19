@@ -61,7 +61,7 @@ public class LoanTransactionReprocessForAdvancedPaymentAllocationTest extends Ba
     private static RequestSpecification REQUEST_SPEC;
     private static ClientHelper CLIENT_HELPER;
     private static AccountHelper ACCOUNT_HELPER;
-    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
 
     @BeforeAll
     public static void setupTests() {
@@ -100,7 +100,7 @@ public class LoanTransactionReprocessForAdvancedPaymentAllocationTest extends Ba
             final Integer loanId = createLoanAccount(clientId, loanProductId, loanExternalIdStr);
 
             // disburse principal amount
-            LOAN_TRANSACTION_HELPER.disburseLoanWithTransactionAmount("15 February 2023", loanId, "1000");
+            LOAN_TRANSACTION_HELPER.disburseLoanWithTransactionAmount("20230215", loanId, "1000");
 
             // add loan charge
             // apply fee
@@ -117,7 +117,7 @@ public class LoanTransactionReprocessForAdvancedPaymentAllocationTest extends Ba
 
             // make repayment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = LOAN_TRANSACTION_HELPER.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("20 February 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230220").locale("en")
                             .transactionAmount(50.0).externalId(loanTransactionExternalIdStr));
 
             // verify transaction amounts
@@ -185,12 +185,12 @@ public class LoanTransactionReprocessForAdvancedPaymentAllocationTest extends Ba
         String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("60")
                 .withLoanTermFrequencyAsDays().withNumberOfRepayments("4").withRepaymentEveryAfter("15").withRepaymentFrequencyTypeAsDays()
                 .withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance().withAmortizationTypeAsEqualPrincipalPayments()
-                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("15 February 2023")
-                .withSubmittedOnDate("15 February 2023").withLoanType("individual").withExternalId(externalId)
+                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("20230215")
+                .withSubmittedOnDate("20230215").withLoanType("individual").withExternalId(externalId)
                 .withRepaymentStrategy("advanced-payment-allocation-strategy").build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = LOAN_TRANSACTION_HELPER.getLoanId(loanApplicationJSON);
-        LOAN_TRANSACTION_HELPER.approveLoan("15 February 2023", "1000", loanId, null);
+        LOAN_TRANSACTION_HELPER.approveLoan("20230215", "1000", loanId, null);
         return loanId;
     }
 

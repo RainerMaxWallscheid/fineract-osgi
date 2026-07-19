@@ -78,9 +78,9 @@ public class ConcurrencyIntegrationTest {
         ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientID);
         final Integer loanProductID = createLoanProduct(false, NO_ACCOUNTING);
         final Integer loanID = applyForLoanApplication(clientID, loanProductID, "12,000.00");
-        this.loanTransactionHelper.approveLoan("20 September 2011", loanID);
+        this.loanTransactionHelper.approveLoan("20110920", loanID);
         String loanDetails = this.loanTransactionHelper.getLoanDetails(this.requestSpec, this.responseSpec, loanID);
-        this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID, "12,000.00",
+        this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20110920", loanID, "12,000.00",
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         ExecutorService executor = Executors.newFixedThreadPool(MYTHREADS);
         Calendar date = Calendar.getInstance();
@@ -144,8 +144,8 @@ public class ConcurrencyIntegrationTest {
                 .withAmortizationTypeAsEqualInstallments() //
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("20 September 2011") //
-                .withSubmittedOnDate("20 September 2011") //
+                .withExpectedDisbursementDate("20110920") //
+                .withSubmittedOnDate("20110920") //
                 .withCollaterals(collaterals).build(clientID.toString(), loanProductID.toString(), null);
         return this.loanTransactionHelper.getLoanId(loanApplicationJSON);
     }
@@ -168,7 +168,7 @@ public class ConcurrencyIntegrationTest {
         private final String repaymentDate;
         private final LoanTransactionHelper loanTransactionHelper;
 
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
 
         LoanRepaymentExecutor(LoanTransactionHelper loanTransactionHelper, Integer loanId, Float repaymentAmount, Calendar repaymentDate) {
             this.loanId = loanId;

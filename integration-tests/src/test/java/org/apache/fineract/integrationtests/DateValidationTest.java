@@ -86,20 +86,20 @@ public class DateValidationTest {
 
     @Test
     public void testShouldFailIfDateIsInvalid() {
-        String invalidDate = "31 June 2022";
+        String invalidDate = "20220631";
         PostClientsRequest postClientsRequest = ClientHelper.defaultClientCreationRequest();
         PostClientsResponse client = clientHelper.createClient(postClientsRequest);
         Long clientId = client.getClientId();
         final String loanProductJSON = new LoanProductTestBuilder().withPrincipal("1000").withRepaymentTypeAsMonth().withRepaymentAfterEvery("1").withNumberOfRepayments("1").withRepaymentTypeAsMonth().withinterestRatePerPeriod("0").withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualPrincipalPayment().withInterestTypeAsDecliningBalance().withAccountingRuleAsNone().withInterestCalculationPeriodTypeAsRepaymentPeriod(true).withDaysInMonth("30").withDaysInYear("365").withMoratorium("0", "0").withInArrearsTolerance("1001").withMultiDisburse().withDisallowExpectedDisbursements(true).build(null);
         final Integer loanProductID = loanTransactionHelper.getLoanProductId(loanProductJSON);
         loanTransactionHelper = new LoanTransactionHelper(requestSpec, errorResponseSpec);
-        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("1").withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance().withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate(invalidDate).withSubmittedOnDate("01 March 2022").withLoanType("individual").build(clientId.toString(), loanProductID.toString(), null);
+        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("1").withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance().withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate(invalidDate).withSubmittedOnDate("20220301").withLoanType("individual").build(clientId.toString(), loanProductID.toString(), null);
         HashMap<String, Object> response = (HashMap) loanTransactionHelper.createLoanAccount(loanApplicationJSON, "");
         List<HashMap<String, Object>> errors = (List) response.get("errors");
         assertNotNull(errors);
         HashMap<String, Object> error = errors.get(0);
         assertNotNull(error);
-        assertEquals("The parameter `expectedDisbursementDate` is invalid based on the dateFormat: `dd MMMM yyyy` and locale: `en_GB` provided:", error.get("developerMessage"));
+        assertEquals("The parameter `expectedDisbursementDate` is invalid based on the dateFormat: `yyyyMMdd` and locale: `en_GB` provided:", error.get("developerMessage"));
     }
 
     @Test
@@ -114,7 +114,7 @@ public class DateValidationTest {
         assertNotNull(errors);
         Map<String, Object> error = errors.get(0);
         assertNotNull(error);
-        assertEquals("The parameter `expiration` is invalid based on the dateFormat: `dd MMMM yyyy HH:mm:ss` and locale: `en` provided:", error.get("developerMessage"));
+        assertEquals("The parameter `expiration` is invalid based on the dateFormat: `yyyyMMdd HH:mm:ss` and locale: `en` provided:", error.get("developerMessage"));
     }
 
     @Test
@@ -123,7 +123,7 @@ public class DateValidationTest {
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
-        DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.US);
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.US);
         LocalDate todaysDate = LocalDate.now(ZoneId.systemDefault()).minusMonths(3);
         final String VALID_FROM = todaysDate.format(formatter);
         todaysDate = todaysDate.plusYears(10);
@@ -152,9 +152,9 @@ public class DateValidationTest {
         map.put(InteropUtil.PARAM_REQUEST_CODE, requestCode);
         map.put(InteropUtil.PARAM_ACCOUNT_ID, UUID.randomUUID().toString());
         map.put(InteropUtil.PARAM_TRANSACTION_ROLE, role);
-        map.put(InteropUtil.PARAM_EXPIRATION, "31 November 2022 11:11:11");
+        map.put(InteropUtil.PARAM_EXPIRATION, "20221131 11:11:11");
         map.put(InteropUtil.PARAM_LOCALE, "en");
-        map.put(InteropUtil.PARAM_DATE_FORMAT, "dd MMMM yyyy HH:mm:ss");
+        map.put(InteropUtil.PARAM_DATE_FORMAT, "yyyyMMdd HH:mm:ss");
         HashMap<String, Object> amountMap = new HashMap<>();
         amountMap.put(InteropUtil.PARAM_AMOUNT, "10");
         amountMap.put(InteropUtil.PARAM_CURRENCY, "EUR");

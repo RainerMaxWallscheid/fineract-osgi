@@ -92,9 +92,9 @@ Feature: Working Capital Near Breach Configuration
 
   @TestRailId:C76706
   Scenario: Verify deleting Working Capital Near Breach Configuration that is still assigned to WC loan account failure - UC9.2
-    When Admin sets the business date to "01 January 2027"
+    When Admin sets the business date to "20270101"
     And Admin creates a client with random data
-    And Admin creates working capital loan with with breach and near breach on "01 January 2027" date
+    And Admin creates working capital loan with with breach and near breach on "20270101" date
     Then Admin failed to delete WC Near Breach that is still assigned to WC loan product or account
 
 

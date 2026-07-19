@@ -144,7 +144,7 @@ public class SearchResourcesTest {
         final Integer savingsId = SavingsAccountHelper.openSavingsAccount(requestSpec, responseSpec, clientId.intValue(), "1000");
 
         final String shareJson = new ShareAccountHelper().withClientId(String.valueOf(clientId)).withProductId(String.valueOf(productId))
-                .withSavingsAccountId(String.valueOf(savingsId)).withSubmittedDate("01 January 2026").withApplicationDate("01 January 2026")
+                .withSavingsAccountId(String.valueOf(savingsId)).withSubmittedDate("20260101").withApplicationDate("20260101")
                 .withRequestedShares("10").build();
 
         final Integer shareAccountId = ShareAccountTransactionHelper.createShareAccount(shareJson, requestSpec, responseSpec);
@@ -154,8 +154,8 @@ public class SearchResourcesTest {
 
         final String activateJson = """
                 {
-                  "activatedDate": "01 January 2026",
-                  "dateFormat": "dd MMMM yyyy",
+                  "activatedDate": "20260101",
+                  "dateFormat": "yyyyMMdd",
                   "locale": "en"
                 }
                 """;

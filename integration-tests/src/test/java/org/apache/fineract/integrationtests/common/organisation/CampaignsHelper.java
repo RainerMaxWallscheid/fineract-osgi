@@ -38,8 +38,8 @@ public class CampaignsHelper {
     private final RequestSpecification requestSpec;
     private final ResponseSpecification responseSpec;
     private static final String SMS_CAMPAIGNS_URL = "/fineract-provider/api/v1/smscampaigns";
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
-    public static final String DATE_TIME_FORMAT = "dd MMMM yyyy HH:mm:ss";
+    public static final String DATE_FORMAT = "yyyyMMdd";
+    public static final String DATE_TIME_FORMAT = "yyyyMMdd HH:mm:ss";
     private static final String BUSINESS_RULE_OPTIONS = "businessRulesOptions";
 
     // TODO: Rewrite to use fineract-client instead!

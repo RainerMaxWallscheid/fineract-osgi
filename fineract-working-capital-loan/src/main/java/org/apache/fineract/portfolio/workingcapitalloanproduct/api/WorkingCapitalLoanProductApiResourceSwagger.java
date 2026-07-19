@@ -76,9 +76,9 @@ public final class WorkingCapitalLoanProductApiResourceSwagger {
         public String externalId;
         @Schema(example = "3")
         public Long fundId;
-        @Schema(example = "10 July 2022")
+        @Schema(example = "20220710")
         public String startDate;
-        @Schema(example = "10 July 2025")
+        @Schema(example = "20250710")
         public String closeDate;
 
         // Currency
@@ -182,7 +182,7 @@ public final class WorkingCapitalLoanProductApiResourceSwagger {
 
         @Schema(example = "en_GB")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
 
         @Schema(description = "PostPaymentAllocation")
@@ -548,9 +548,9 @@ public final class WorkingCapitalLoanProductApiResourceSwagger {
         public String externalId;
         @Schema(example = "3")
         public Long fundId;
-        @Schema(example = "10 July 2022")
+        @Schema(example = "20220710")
         public String startDate;
-        @Schema(example = "10 July 2025")
+        @Schema(example = "20250710")
         public String closeDate;
 
         // Currency
@@ -654,7 +654,7 @@ public final class WorkingCapitalLoanProductApiResourceSwagger {
 
         @Schema(example = "en_GB")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
     }
 

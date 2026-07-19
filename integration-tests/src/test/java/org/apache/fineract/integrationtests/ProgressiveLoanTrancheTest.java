@@ -41,22 +41,22 @@ public class ProgressiveLoanTrancheTest extends FeignLoanTestBase {
 
         final AtomicReference<Long> loanIdRef = new AtomicReference<>();
 
-        runAt("20 December 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "20 December 2024", 500.0, 7.0, 6,
+        runAt("20241220", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "20241220", 500.0, 7.0, 6,
                     (request) -> request.disbursementData(List.of(new PostLoansDisbursementData()
-                            .expectedDisbursementDate("20 December 2024").principal(BigDecimal.valueOf(100.0)))));
+                            .expectedDisbursementDate("20241220").principal(BigDecimal.valueOf(100.0)))));
 
             loanIdRef.set(loanId);
 
-            disburseLoan(loanId, BigDecimal.valueOf(100), "20 December 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(100), "20241220");
 
         });
-        runAt("20 January 2025", () -> {
+        runAt("20250120", () -> {
             Long loanId = loanIdRef.get();
 
             // Can't disburse without undisbursed tranche
             Assertions.assertThrows(RuntimeException.class, () -> {
-                disburseLoan(loanId, BigDecimal.valueOf(100), "20 January 2025");
+                disburseLoan(loanId, BigDecimal.valueOf(100), "20250120");
             });
 
             final GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
@@ -67,11 +67,11 @@ public class ProgressiveLoanTrancheTest extends FeignLoanTestBase {
                         .expectedDisbursementDate(dateTimeFormatter.format(disbursementDetail.getExpectedDisbursementDate())));
             }
             disbursementDetails
-                    .add(new DisbursementDetail().expectedDisbursementDate("20 January 2025").principal(BigDecimal.valueOf(100.0)));
+                    .add(new DisbursementDetail().expectedDisbursementDate("20250120").principal(BigDecimal.valueOf(100.0)));
 
             addAndDeleteDisbursementDetail(loanId, disbursementDetails);
 
-            disburseLoan(loanId, BigDecimal.valueOf(100), "20 January 2025");
+            disburseLoan(loanId, BigDecimal.valueOf(100), "20250120");
         });
     }
 }

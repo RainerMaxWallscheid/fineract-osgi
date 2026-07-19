@@ -105,7 +105,7 @@ public class WorkingCapitalLoanBreachActionTest {
 
     @Test
     public void testPauseCreatesBreachActionWithNoEffectiveEndDate() {
-        BusinessDateHelper.runAt("01 July 2026", () -> {
+        BusinessDateHelper.runAt("20260701", () -> {
             final Long loanId = createActiveLoan(LocalDate.of(2026, Month.JULY, 1));
 
             breachActionHelper.pause(loanId, "2026-07-01", "2026-07-10");
@@ -125,13 +125,13 @@ public class WorkingCapitalLoanBreachActionTest {
     @Test
     public void testResumeCreatesResumeActionAndSetsEffectiveEndDateOnPause() {
         final Long[] loanIdHolder = new Long[1];
-        BusinessDateHelper.runAt("01 July 2026", () -> {
+        BusinessDateHelper.runAt("20260701", () -> {
             loanIdHolder[0] = createActiveLoan(LocalDate.of(2026, Month.JULY, 1));
 
             breachActionHelper.pause(loanIdHolder[0], "2026-07-01", "2026-07-10");
         });
 
-        BusinessDateHelper.runAt("05 July 2026", () -> {
+        BusinessDateHelper.runAt("20260705", () -> {
             breachActionHelper.resume(loanIdHolder[0], "2026-07-05");
 
             final List<WorkingCapitalLoanBreachActionData> actions = breachActionHelper.retrieveBreachActions(loanIdHolder[0]);
@@ -154,7 +154,7 @@ public class WorkingCapitalLoanBreachActionTest {
 
     @Test
     public void testPauseWithoutResumeHasNullEffectiveEndDate() {
-        BusinessDateHelper.runAt("01 July 2026", () -> {
+        BusinessDateHelper.runAt("20260701", () -> {
             final Long loanId = createActiveLoan(LocalDate.of(2026, Month.JULY, 1));
 
             breachActionHelper.pause(loanId, "2026-07-01", "2026-07-15");
@@ -168,13 +168,13 @@ public class WorkingCapitalLoanBreachActionTest {
     @Test
     public void testResumeOutsidePauseWindowDoesNotSetEffectiveEndDate() {
         final Long[] loanIdHolder = new Long[1];
-        BusinessDateHelper.runAt("01 July 2026", () -> {
+        BusinessDateHelper.runAt("20260701", () -> {
             loanIdHolder[0] = createActiveLoan(LocalDate.of(2026, Month.JULY, 1));
 
             breachActionHelper.pause(loanIdHolder[0], "2026-07-01", "2026-07-10");
         });
 
-        BusinessDateHelper.runAt("20 July 2026", () -> {
+        BusinessDateHelper.runAt("20260720", () -> {
             CallFailedRuntimeException ex = breachActionHelper.resumeExpectingFailure(loanIdHolder[0], "2026-07-20");
             assertEquals(400, ex.getStatus());
             assertNotNull(ex.getDeveloperMessage());
@@ -192,14 +192,14 @@ public class WorkingCapitalLoanBreachActionTest {
     @Test
     public void testMultiplePausesEachGetCorrectEffectiveEndDate() {
         final Long[] loanIdHolder = new Long[1];
-        BusinessDateHelper.runAt("01 July 2026", () -> {
+        BusinessDateHelper.runAt("20260701", () -> {
             loanIdHolder[0] = createActiveLoan(LocalDate.of(2026, Month.JULY, 1));
 
             breachActionHelper.pause(loanIdHolder[0], "2026-07-01", "2026-07-10");
             breachActionHelper.pause(loanIdHolder[0], "2026-07-15", "2026-07-25");
         });
 
-        BusinessDateHelper.runAt("05 July 2026", () -> {
+        BusinessDateHelper.runAt("20260705", () -> {
             breachActionHelper.resume(loanIdHolder[0], "2026-07-05");
 
             final List<WorkingCapitalLoanBreachActionData> actions = breachActionHelper.retrieveBreachActions(loanIdHolder[0]);

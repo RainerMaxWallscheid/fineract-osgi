@@ -134,11 +134,11 @@ public class CobPartitioningTest extends BaseLoanIntegrationTest {
             Collections.sort(loanIds);
             final CountDownLatch closeLatch = new CountDownLatch(N - 5);
             // Warm up (EclipseLink sometimes fails if JPQL cache is not warm up but concurrent queries are executed)
-            LOAN_TRANSACTION_HELPER.forecloseLoan("02 March 2020", loanIds.get(2));
+            LOAN_TRANSACTION_HELPER.forecloseLoan("20200302", loanIds.get(2));
             for (int i = 3; i < N - 2; i++) {
                 final int idx = i;
                 futures.add(executorService.submit(() -> {
-                    LOAN_TRANSACTION_HELPER.forecloseLoan("02 March 2020", loanIds.get(idx));
+                    LOAN_TRANSACTION_HELPER.forecloseLoan("20200302", loanIds.get(idx));
                     closeLatch.countDown();
                 }));
             }
@@ -209,14 +209,14 @@ public class CobPartitioningTest extends BaseLoanIntegrationTest {
     @NonNull
     private Integer createLoanForClient(Integer clientID, Integer loanProductID) {
         HashMap loanStatusHashMap;
-        Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), "1 March 2020");
+        Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), "20200301");
         Assertions.assertNotNull(loanID);
         loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("01 March 2020", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20200301", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID, JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20200302", loanID, JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
         return loanID;
     }

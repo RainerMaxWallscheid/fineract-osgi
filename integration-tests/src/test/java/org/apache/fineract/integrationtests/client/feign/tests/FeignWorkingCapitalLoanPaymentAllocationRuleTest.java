@@ -120,16 +120,16 @@ public class FeignWorkingCapitalLoanPaymentAllocationRuleTest extends FeignInteg
         final Long[] loanIdHolder = new Long[1];
         final Long[] feeLoanChargeIdHolder = new Long[1];
         businessDateHelper.runAt("2026-02-01", () -> {
-            Long client = clientHelper.createClient("01 February 2026");
-            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 February 2026");
-            feeLoanChargeIdHolder[0] = addFeeCharge(loanIdHolder[0], 100, "01 February 2026");
+            Long client = clientHelper.createClient("20260201");
+            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260201");
+            feeLoanChargeIdHolder[0] = addFeeCharge(loanIdHolder[0], 100, "20260201");
         });
         businessDateHelper.runAt("2026-02-10", () -> {
             // REPAYMENT follows the product's DEFAULT order (fee before principal): a 60 repayment is fully
             // absorbed by the 100 fee, leaving principal untouched.
 
             wcLoanHelper.makeRepayment(loanIdHolder[0],
-                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(60), "10 February 2026"));
+                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(60), "20260210"));
 
             GetWorkingCapitalLoanTransactionIdResponse repayment = findTransaction(wcLoanHelper.getTransactions(loanIdHolder[0]),
                     "loanTransactionType.repayment", LocalDate.of(2026, Month.FEBRUARY, 10), BigDecimal.valueOf(60));
@@ -146,7 +146,7 @@ public class FeignWorkingCapitalLoanPaymentAllocationRuleTest extends FeignInteg
             // amount is instead fully absorbed by principal, leaving the remaining 40 fee outstanding untouched.
 
             wcLoanHelper.makeGoodwillCredit(loanIdHolder[0],
-                    WorkingCapitalLoanRequestBuilders.goodwillCredit(BigDecimal.valueOf(60), "15 February 2026"));
+                    WorkingCapitalLoanRequestBuilders.goodwillCredit(BigDecimal.valueOf(60), "20260215"));
 
             GetWorkingCapitalLoanTransactionIdResponse goodwillCredit = findTransaction(wcLoanHelper.getTransactions(loanIdHolder[0]),
                     "loanTransactionType.goodwillCredit", LocalDate.of(2026, Month.FEBRUARY, 15), BigDecimal.valueOf(60));
@@ -169,10 +169,10 @@ public class FeignWorkingCapitalLoanPaymentAllocationRuleTest extends FeignInteg
         final Long[] loanIdHolder = new Long[1];
         final Long[] feeLoanChargeIdHolder = new Long[1];
         businessDateHelper.runAt("2026-03-01", () -> {
-            Long client = clientHelper.createClient("01 March 2026");
-            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 March 2026",
+            Long client = clientHelper.createClient("20260301");
+            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260301",
                     createProductWithChargeAdjustmentOverride());
-            feeLoanChargeIdHolder[0] = addFeeCharge(loanIdHolder[0], 100, "01 March 2026");
+            feeLoanChargeIdHolder[0] = addFeeCharge(loanIdHolder[0], 100, "20260301");
         });
         businessDateHelper.runAt("2026-03-05", () -> {
             wcLoanHelper.adjustCharge(loanIdHolder[0], feeLoanChargeIdHolder[0],
@@ -200,10 +200,10 @@ public class FeignWorkingCapitalLoanPaymentAllocationRuleTest extends FeignInteg
         final Long[] feeLoanChargeIdHolder = new Long[1];
         final Long[] adjustmentTransactionIdHolder = new Long[1];
         businessDateHelper.runAt("2026-04-01", () -> {
-            Long client = clientHelper.createClient("01 April 2026");
-            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 April 2026",
+            Long client = clientHelper.createClient("20260401");
+            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260401",
                     createProductWithChargeAdjustmentOverride());
-            feeLoanChargeIdHolder[0] = addFeeCharge(loanIdHolder[0], 100, "01 April 2026");
+            feeLoanChargeIdHolder[0] = addFeeCharge(loanIdHolder[0], 100, "20260401");
         });
         businessDateHelper.runAt("2026-04-05", () -> {
             adjustmentTransactionIdHolder[0] = wcLoanHelper.adjustCharge(loanIdHolder[0], feeLoanChargeIdHolder[0],
@@ -235,10 +235,10 @@ public class FeignWorkingCapitalLoanPaymentAllocationRuleTest extends FeignInteg
         final Long[] feeLoanChargeIdHolder = new Long[1];
         final Long[] adjustmentTransactionIdHolder = new Long[1];
         businessDateHelper.runAt("2026-05-01", () -> {
-            Long client = clientHelper.createClient("01 May 2026");
-            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(40), "01 May 2026",
+            Long client = clientHelper.createClient("20260501");
+            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(40), "20260501",
                     createProductWithChargeAdjustmentOverride());
-            feeLoanChargeIdHolder[0] = addFeeCharge(loanIdHolder[0], 40, "01 May 2026");
+            feeLoanChargeIdHolder[0] = addFeeCharge(loanIdHolder[0], 40, "20260501");
 
             GetWorkingCapitalLoansLoanIdResponse loanDetails = wcLoanHelper.getLoanDetails(loanIdHolder[0]);
             assertNotNull(loanDetails.getStatus());
@@ -289,10 +289,10 @@ public class FeignWorkingCapitalLoanPaymentAllocationRuleTest extends FeignInteg
                 "WCL PayAlloc Breach " + Utils.uniqueRandomStringGenerator("", 8), 30, "DAYS", "PERCENTAGE", BigDecimal.TEN));
 
         businessDateHelper.runAt("2026-06-01", () -> {
-            Long client = clientHelper.createClient("01 June 2026");
-            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(5000), "01 June 2026",
+            Long client = clientHelper.createClient("20260601");
+            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(5000), "20260601",
                     createProductWithChargeAdjustmentOverrideAndBreach(breachId));
-            feeLoanChargeIdHolder[0] = addFeeCharge(loanIdHolder[0], 500, "01 June 2026");
+            feeLoanChargeIdHolder[0] = addFeeCharge(loanIdHolder[0], 500, "20260601");
         });
         businessDateHelper.runAt("2026-06-06", () -> {
             FeignCalls.ok(() -> FineractFeignClientHelper.getFineractFeignClient().inlineJob().executeInlineJob("WC_LOAN_COB",

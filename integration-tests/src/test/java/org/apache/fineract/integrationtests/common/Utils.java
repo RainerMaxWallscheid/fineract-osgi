@@ -85,13 +85,10 @@ public final class Utils {
     public static final String TENANT_IDENTIFIER = TENANT_PARAM_NAME + '=' + DEFAULT_TENANT;
     private static final String LOGIN_URL = "/fineract-provider/api/v1/authentication?" + TENANT_IDENTIFIER;
     public static final String TENANT_TIME_ZONE = "Asia/Kolkata";
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
-    public static final String DATE_TIME_FORMAT = "dd MMMM yyyy HH:mm";
+    public static final String DATE_FORMAT = "yyyyMMdd";
+    public static final String DATE_TIME_FORMAT = "yyyyMMdd HH:mm";
     public static final String LOCALE = "en";
-    /**
-     * Formats dates for API requests that send {@code dateFormat=dd MMMM yyyy} and {@code locale=en}. Must use English
-     * month names regardless of the JVM default locale (e.g. de_DE would otherwise produce "Juli" instead of "July").
-     */
+    /** Formats dates for API requests that send {@code dateFormat=yyyyMMdd} and {@code locale=en}. */
     public static final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern(DATE_FORMAT)
             .toFormatter(Locale.ENGLISH);
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
@@ -426,7 +423,7 @@ public final class Utils {
     }
 
     public static String convertDateToURLFormat(final String dateToBeConvert) throws ParseException {
-        final SimpleDateFormat oldFormat = new SimpleDateFormat("dd MMMMMM yyyy", Locale.US);
+        final SimpleDateFormat oldFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         final SimpleDateFormat newFormat = new SimpleDateFormat("yyyy-MM-dd");
         String reformattedStr = "";
 
@@ -498,7 +495,7 @@ public final class Utils {
     }
 
     public static String convertDateToURLFormat(final Calendar dateToBeConvert) {
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMMMM yyyy", Locale.ENGLISH);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
         return dateFormat.format(dateToBeConvert.getTime());
     }

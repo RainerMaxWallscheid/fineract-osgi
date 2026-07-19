@@ -80,7 +80,7 @@ public class ExternalAssetOwnerTransferUndisbursedLoanTest extends BaseLoanInteg
         externalAssetOwnerHelper.setProperFinancialActivity(financialActivityAccountHelper, transferAccount);
 
         try {
-            runAt("01 January 2024", () -> {
+            runAt("20240101", () -> {
                 PostClientsResponse client = ClientHelper.createClient(ClientHelper.defaultClientCreationRequest());
                 Long clientId = client.getClientId();
 
@@ -91,10 +91,10 @@ public class ExternalAssetOwnerTransferUndisbursedLoanTest extends BaseLoanInteg
                 PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(loanProductRequest);
 
                 PostLoansResponse loanResponse = loanTransactionHelper
-                        .applyLoan(applyLoanRequest(clientId, loanProduct.getResourceId(), "01 January 2024", 10000.0, 4));
+                        .applyLoan(applyLoanRequest(clientId, loanProduct.getResourceId(), "20240101", 10000.0, 4));
                 Long loanId = loanResponse.getLoanId();
 
-                loanTransactionHelper.approveLoan(loanId, approveLoanRequest(10000.0, "01 January 2024"));
+                loanTransactionHelper.approveLoan(loanId, approveLoanRequest(10000.0, "20240101"));
 
                 GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
                 assertNotNull(loanDetails);
@@ -104,7 +104,7 @@ public class ExternalAssetOwnerTransferUndisbursedLoanTest extends BaseLoanInteg
                 String ownerExternalId = UUID.randomUUID().toString();
 
                 PostInitiateTransferResponse transferResponse = externalAssetOwnerHelper.initiateTransferByLoanId(loanId, "sale",
-                        new ExternalAssetOwnerRequest().settlementDate("01 January 2024").dateFormat("dd MMMM yyyy").locale("en")
+                        new ExternalAssetOwnerRequest().settlementDate("20240101").dateFormat("yyyyMMdd").locale("en")
                                 .transferExternalId(transferExternalId).ownerExternalId(ownerExternalId).purchasePriceRatio("1.0"));
 
                 assertNotNull(transferResponse);
@@ -140,7 +140,7 @@ public class ExternalAssetOwnerTransferUndisbursedLoanTest extends BaseLoanInteg
         externalAssetOwnerHelper.setProperFinancialActivity(financialActivityAccountHelper, transferAccount);
 
         try {
-            runAt("01 March 2024", () -> {
+            runAt("20240301", () -> {
                 PostClientsResponse client = ClientHelper.createClient(ClientHelper.defaultClientCreationRequest());
                 Long clientId = client.getClientId();
 
@@ -151,16 +151,16 @@ public class ExternalAssetOwnerTransferUndisbursedLoanTest extends BaseLoanInteg
                 PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(loanProductRequest);
 
                 PostLoansResponse loanResponse = loanTransactionHelper
-                        .applyLoan(applyLoanRequest(clientId, loanProduct.getResourceId(), "01 December 2023", 15000.0, 4));
+                        .applyLoan(applyLoanRequest(clientId, loanProduct.getResourceId(), "20231201", 15000.0, 4));
                 Long loanId = loanResponse.getLoanId();
 
-                loanTransactionHelper.approveLoan(loanId, approveLoanRequest(15000.0, "01 December 2023"));
+                loanTransactionHelper.approveLoan(loanId, approveLoanRequest(15000.0, "20231201"));
 
                 String transferExternalId = UUID.randomUUID().toString();
                 String ownerExternalId = UUID.randomUUID().toString();
 
                 PostInitiateTransferResponse transferResponse = externalAssetOwnerHelper.initiateTransferByLoanId(loanId, "sale",
-                        new ExternalAssetOwnerRequest().settlementDate("01 March 2024").dateFormat("dd MMMM yyyy").locale("en")
+                        new ExternalAssetOwnerRequest().settlementDate("20240301").dateFormat("yyyyMMdd").locale("en")
                                 .transferExternalId(transferExternalId).ownerExternalId(ownerExternalId).purchasePriceRatio("1.0"));
 
                 assertNotNull(transferResponse);
@@ -196,7 +196,7 @@ public class ExternalAssetOwnerTransferUndisbursedLoanTest extends BaseLoanInteg
         externalAssetOwnerHelper.setProperFinancialActivity(financialActivityAccountHelper, transferAccount);
 
         try {
-            runAt("01 January 2024", () -> {
+            runAt("20240101", () -> {
                 PostClientsResponse client1 = ClientHelper.createClient(ClientHelper.defaultClientCreationRequest());
                 PostClientsResponse client2 = ClientHelper.createClient(ClientHelper.defaultClientCreationRequest());
 
@@ -207,20 +207,20 @@ public class ExternalAssetOwnerTransferUndisbursedLoanTest extends BaseLoanInteg
                 PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(loanProductRequest);
 
                 PostLoansResponse loan1Response = loanTransactionHelper
-                        .applyLoan(applyLoanRequest(client1.getClientId(), loanProduct.getResourceId(), "01 January 2024", 20000.0, 4));
+                        .applyLoan(applyLoanRequest(client1.getClientId(), loanProduct.getResourceId(), "20240101", 20000.0, 4));
                 loan1Id = loan1Response.getLoanId();
 
                 PostLoansResponse loan2Response = loanTransactionHelper
-                        .applyLoan(applyLoanRequest(client2.getClientId(), loanProduct.getResourceId(), "01 January 2024", 20000.0, 4));
+                        .applyLoan(applyLoanRequest(client2.getClientId(), loanProduct.getResourceId(), "20240101", 20000.0, 4));
                 loan2Id = loan2Response.getLoanId();
 
-                loanTransactionHelper.approveLoan(loan1Id, approveLoanRequest(20000.0, "01 January 2024"));
-                loanTransactionHelper.approveLoan(loan2Id, approveLoanRequest(20000.0, "01 January 2024"));
+                loanTransactionHelper.approveLoan(loan1Id, approveLoanRequest(20000.0, "20240101"));
+                loanTransactionHelper.approveLoan(loan2Id, approveLoanRequest(20000.0, "20240101"));
 
-                disburseLoan(loan1Id, BigDecimal.valueOf(20000.0), "01 January 2024");
+                disburseLoan(loan1Id, BigDecimal.valueOf(20000.0), "20240101");
             });
 
-            runAt("31 January 2024", () -> {
+            runAt("20240131", () -> {
                 executeInlineCOB(loan1Id);
                 executeInlineCOB(loan2Id);
 
@@ -229,11 +229,11 @@ public class ExternalAssetOwnerTransferUndisbursedLoanTest extends BaseLoanInteg
                 String ownerExternalId = UUID.randomUUID().toString();
 
                 PostInitiateTransferResponse transfer1Response = externalAssetOwnerHelper.initiateTransferByLoanId(loan1Id, "sale",
-                        new ExternalAssetOwnerRequest().settlementDate("31 January 2024").dateFormat("dd MMMM yyyy").locale("en")
+                        new ExternalAssetOwnerRequest().settlementDate("20240131").dateFormat("yyyyMMdd").locale("en")
                                 .transferExternalId(transfer1ExternalId).ownerExternalId(ownerExternalId).purchasePriceRatio("1.0"));
 
                 PostInitiateTransferResponse transfer2Response = externalAssetOwnerHelper.initiateTransferByLoanId(loan2Id, "sale",
-                        new ExternalAssetOwnerRequest().settlementDate("31 January 2024").dateFormat("dd MMMM yyyy").locale("en")
+                        new ExternalAssetOwnerRequest().settlementDate("20240131").dateFormat("yyyyMMdd").locale("en")
                                 .transferExternalId(transfer2ExternalId).ownerExternalId(ownerExternalId).purchasePriceRatio("1.0"));
 
                 GetLoansLoanIdResponse disbursedLoan = loanTransactionHelper.getLoanDetails(loan1Id);

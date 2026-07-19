@@ -133,7 +133,7 @@ public class CreditBureauTest {
         jsonResponse.put("userName", "testUser");
         jsonResponse.put(".issued", "sample");
         jsonResponse.put(".expires", ZonedDateTime.now(ZoneId.systemDefault()).plusSeconds(3600)
-                .format(new DateTimeFormatterBuilder().appendPattern("EEE, dd MMM yyyy kk:mm:ss zzz").toFormatter(Locale.ENGLISH)));
+                .format(new DateTimeFormatterBuilder().appendPattern("EEE, yyyyMMdd kk:mm:ss zzz").toFormatter(Locale.ENGLISH)));
         wm.stubFor(WireMock.post("/token/").willReturn(WireMock.jsonResponse(MAPPER.writeValueAsString(jsonResponse), 200)));
         wm.stubFor(WireMock.post("/search/NRC213")
                 .willReturn(WireMock.jsonResponse("{\"ResponseMessage\":\"OK\",\"Data\":[{\"UniqueID\":\"123456\"}]}", 200)));
@@ -171,7 +171,7 @@ public class CreditBureauTest {
         jsonResponse.put("userName", "testUser");
         jsonResponse.put(".issued", "sample");
         jsonResponse.put(".expires", ZonedDateTime.now(ZoneId.systemDefault()).plusSeconds(3600)
-                .format(new DateTimeFormatterBuilder().appendPattern("EEE, dd MMM yyyy kk:mm:ss zzz").toFormatter(Locale.ENGLISH)));
+                .format(new DateTimeFormatterBuilder().appendPattern("EEE, yyyyMMdd kk:mm:ss zzz").toFormatter(Locale.ENGLISH)));
         wm.stubFor(WireMock.post("/token/").willReturn(WireMock.jsonResponse(MAPPER.writeValueAsString(jsonResponse), 200)));
         wm.stubFor(WireMock.post("/search/NRC213")
                 .willReturn(WireMock.jsonResponse("{\"ResponseMessage\":\"OK\",\"Data\":[{\"UniqueID\":\"123456\"}]}", 200)));

@@ -32,7 +32,7 @@ import org.apache.fineract.client.models.LoanAccountLockResponseDTO;
 
 public final class ErrorMessageHelper {
 
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
     public static final String DATA_INTEGRITY_ISSUE_ENTITY_LINKED_CODE = "error.msg.data.integrity.issue.entity.linked";
 
     private ErrorMessageHelper() {}

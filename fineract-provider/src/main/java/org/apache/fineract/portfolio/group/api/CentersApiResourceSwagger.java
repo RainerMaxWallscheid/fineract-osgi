@@ -206,11 +206,11 @@ final class CentersApiResourceSwagger {
 
         @Schema(example = "32")
         public Long closureReasonId;
-        @Schema(example = "05 May 2014")
+        @Schema(example = "20140505")
         public String closureDate;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
     }
 

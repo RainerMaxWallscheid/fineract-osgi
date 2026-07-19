@@ -142,8 +142,8 @@ public class FeignTrialBalanceSummaryReportTest extends FeignIntegrationTest {
     @Order(2)
     public void testExternalAssetOwnerEntriesAppearInReport() {
         runWithBusinessDate("2020-03-02", () -> {
-            Long clientId = createClient("01 March 2020");
-            Long loanId = createAndDisburseLoan(clientId, "01 March 2020", "02 March 2020", null, null);
+            Long clientId = createClient("20200301");
+            Long loanId = createAndDisburseLoan(clientId, "20200301", "20200302", null, null);
             String ownerExternalId = UUID.randomUUID().toString();
             PostInitiateTransferResponse saleResponse = ok(() -> fineractClient().externalAssetOwners().transferRequestWithLoanId(loanId, new ExternalAssetOwnerRequest().settlementDate("2020-03-02").dateFormat("yyyy-MM-dd").locale(LoanTestData.LOCALE).transferExternalId(UUID.randomUUID().toString()).ownerExternalId(ownerExternalId).purchasePriceRatio("1.0"), "sale"));
             assertNotNull(saleResponse);
@@ -160,11 +160,11 @@ public class FeignTrialBalanceSummaryReportTest extends FeignIntegrationTest {
     @Order(3)
     public void testBalanceFormulaIsConsistent() {
         runWithBusinessDate("2020-06-01", () -> {
-            Long clientId = createClient("01 June 2020");
+            Long clientId = createClient("20200601");
             Long chargeId = createFlatFeeCharge(500.0);
-            Long loanId = createAndDisburseLoan(clientId, "01 June 2020", "01 June 2020", chargeId, null);
+            Long loanId = createAndDisburseLoan(clientId, "20200601", "20200601", chargeId, null);
             String productName = loanHelper.getLoanDetails(loanId).getLoanProductName();
-            transactionHelper.addRepayment(loanId, new PostLoansLoanIdTransactionsRequest().transactionDate("01 June 2020").transactionAmount(1500.0).locale(LoanTestData.LOCALE).dateFormat(LoanTestData.DATETIME_PATTERN));
+            transactionHelper.addRepayment(loanId, new PostLoansLoanIdTransactionsRequest().transactionDate("20200601").transactionAmount(1500.0).locale(LoanTestData.LOCALE).dateFormat(LoanTestData.DATETIME_PATTERN));
             RunReportsResponse report = runReport("2020-06-01");
             assertNotNull(report.getData());
             int productIdx = findColumnIndex(report, "product");
@@ -212,9 +212,9 @@ public class FeignTrialBalanceSummaryReportTest extends FeignIntegrationTest {
     @Order(5)
     public void testOriginatorExternalIdsEntriesAppearInReport() {
         runWithBusinessDate("2020-03-02", () -> {
-            Long clientId = createClient("01 March 2020");
+            Long clientId = createClient("20200301");
             String originatorExternalId = UUID.randomUUID().toString();
-            Long loanId = createAndDisburseLoan(clientId, "01 March 2020", "02 March 2020", null, originatorExternalId);
+            Long loanId = createAndDisburseLoan(clientId, "20200301", "20200302", null, originatorExternalId);
             advanceBusinessDateAndRunCob("2020-03-03");
             RunReportsResponse report = runReport("2020-03-02");
             assertNotNull(report.getData());

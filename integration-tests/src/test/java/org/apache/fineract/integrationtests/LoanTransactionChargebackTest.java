@@ -473,10 +473,10 @@ public class LoanTransactionChargebackTest extends BaseLoanIntegrationTest {
     public class ProgressiveInterestBearingLoanWithInterestRecalculationTest {
         Long applyApproveDisburseLoan(Long loanProductId) {
             AtomicReference<Long> loanIdRef = new AtomicReference<>();
-            runAt("1 January 2024", () -> {
-                Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "1 January 2024", 100.0, 7.0, 6, null);
+            runAt("20240101", () -> {
+                Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "20240101", 100.0, 7.0, 6, null);
                 loanIdRef.set(loanId);
-                disburseLoan(loanId, BigDecimal.valueOf(100.0), "01 January 2024");
+                disburseLoan(loanId, BigDecimal.valueOf(100.0), "20240101");
             });
             return loanIdRef.get();
         }
@@ -498,32 +498,32 @@ public class LoanTransactionChargebackTest extends BaseLoanIntegrationTest {
             @Test
             public void testS1FullChargebackBeforeMaturityDate() {
                 final Long loanId = applyApproveDisburseLoan(loanProductWithoutChargebackAllocation.getResourceId());
-                runAt("1 February 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 February 2024", 17.01);
+                runAt("20240201", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240201", 17.01);
                 });
-                runAt("1 March 2024", () -> {
-                    Long repaymentId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 March 2024", 17.01).getResourceId();
+                runAt("20240301", () -> {
+                    Long repaymentId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240301", 17.01).getResourceId();
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(16.9, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(16.62, 0.39, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(16.9, 0.1, "20240701") //
                     ); //
                     addChargebackForLoan(loanId, repaymentId, 17.01);
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(33.53, 0.49, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(17.0, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(33.53, 0.49, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(17.0, 0.1, "20240701") //
                     ); //
-                    Long prepayId = verifyPrepayAmountByRepayment(loanId, "1 March 2024");
-                    loanTransactionHelper.reverseLoanTransaction(loanId, prepayId, "1 March 2024");
+                    Long prepayId = verifyPrepayAmountByRepayment(loanId, "20240301");
+                    loanTransactionHelper.reverseLoanTransaction(loanId, prepayId, "20240301");
                     GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
                     verifyLoanStatus(loanDetails, LoanStatus.ACTIVE);
                 });
@@ -533,43 +533,43 @@ public class LoanTransactionChargebackTest extends BaseLoanIntegrationTest {
             public void testS2AndS3PartialChargebackThenFullChargebackBeforeMaturityDate() {
                 final Long loanId = applyApproveDisburseLoan(loanProductWithoutChargebackAllocation.getResourceId());
                 AtomicReference<Long> repaymentFebruaryRef = new AtomicReference<>();
-                runAt("1 February 2024", () -> {
-                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 February 2024", 17.01);
+                runAt("20240201", () -> {
+                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240201", 17.01);
                     repaymentFebruaryRef.set(repayment.getResourceId());
                 });
-                runAt("1 March 2024", () -> {
-                    Long repaymentId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 March 2024", 17.01).getResourceId();
+                runAt("20240301", () -> {
+                    Long repaymentId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240301", 17.01).getResourceId();
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(16.9, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(16.62, 0.39, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(16.9, 0.1, "20240701") //
                     ); //
                     addChargebackForLoan(loanId, repaymentFebruaryRef.get(), 15.0);
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(31.53, 0.48, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(16.99, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(31.53, 0.48, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(16.99, 0.1, "20240701") //
                     ); //
                     addChargebackForLoan(loanId, repaymentId, 17.01);
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(48.44, 0.58, "01 April 2024"),  //
-                    unpaidInstallment(16.71, 0.3, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(17.1, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(48.44, 0.58, "20240401"),  //
+                    unpaidInstallment(16.71, 0.3, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(17.1, 0.1, "20240701") //
                     ); //
-                    Long prepayId = verifyPrepayAmountByRepayment(loanId, "1 March 2024");
-                    loanTransactionHelper.reverseLoanTransaction(loanId, prepayId, "1 March 2024");
+                    Long prepayId = verifyPrepayAmountByRepayment(loanId, "20240301");
+                    loanTransactionHelper.reverseLoanTransaction(loanId, prepayId, "20240301");
                 });
             }
 
@@ -577,146 +577,146 @@ public class LoanTransactionChargebackTest extends BaseLoanIntegrationTest {
             public void testS4FullChargebackMiddleOfRepaymentPeriodBeforeMaturityDate() {
                 final Long loanId = applyApproveDisburseLoan(loanProductWithoutChargebackAllocation.getResourceId());
                 AtomicReference<Long> repaymentMarchId = new AtomicReference<>();
-                runAt("1 February 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 February 2024", 17.01);
+                runAt("20240201", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240201", 17.01);
                 });
-                runAt("1 March 2024", () -> {
-                    repaymentMarchId.set(loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 March 2024", 17.01).getResourceId());
+                runAt("20240301", () -> {
+                    repaymentMarchId.set(loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240301", 17.01).getResourceId());
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(16.9, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(16.62, 0.39, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(16.9, 0.1, "20240701") //
                     ); //
                 });
-                runAt("15 March 2024", () -> {
+                runAt("20240315", () -> {
                     addChargebackForLoan(loanId, repaymentMarchId.get(), 17.01);
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(33.57, 0.45, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(16.96, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(33.57, 0.45, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(16.96, 0.1, "20240701") //
                     ); //
-                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "15 March 2024");
-                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "15 March 2024");
+                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "20240315");
+                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "20240315");
                 });
             }
 
             @Test
             public void testS7ChargebacksOnMaturityDate() {
                 final Long loanId = applyApproveDisburseLoan(loanProductWithoutChargebackAllocation.getResourceId());
-                runAt("1 February 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 February 2024", 17.01);
+                runAt("20240201", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240201", 17.01);
                 });
-                runAt("1 March 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 March 2024", 17.01);
+                runAt("20240301", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240301", 17.01);
                 });
-                runAt("1 April 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 April 2024", 17.01);
+                runAt("20240401", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240401", 17.01);
                 });
-                runAt("1 May 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 May 2024", 17.01);
+                runAt("20240501", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240501", 17.01);
                 });
                 AtomicReference<Long> repaymentJuneRef = new AtomicReference<>();
-                runAt("1 June 2024", () -> {
-                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 June 2024", 17.01);
+                runAt("20240601", () -> {
+                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240601", 17.01);
                     repaymentJuneRef.set(repayment.getResourceId());
                 });
                 AtomicReference<Long> repaymentJulyRef = new AtomicReference<>();
-                runAt("1 July 2024", () -> {
-                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 July 2024", 17.0);
+                runAt("20240701", () -> {
+                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240701", 17.0);
                     repaymentJulyRef.set(repayment.getResourceId());
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    fullyRepaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    fullyRepaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    fullyRepaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    fullyRepaidInstallment(16.9, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    fullyRepaidInstallment(16.62, 0.39, "20240401"),  //
+                    fullyRepaidInstallment(16.72, 0.29, "20240501"),  //
+                    fullyRepaidInstallment(16.81, 0.2, "20240601"),  //
+                    fullyRepaidInstallment(16.9, 0.1, "20240701") //
                     ); //
                     addChargebackForLoan(loanId, repaymentJulyRef.get(), 17.0);
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    fullyRepaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    fullyRepaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    fullyRepaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    installment(33.9, 0.1, 17.0, false, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    fullyRepaidInstallment(16.62, 0.39, "20240401"),  //
+                    fullyRepaidInstallment(16.72, 0.29, "20240501"),  //
+                    fullyRepaidInstallment(16.81, 0.2, "20240601"),  //
+                    installment(33.9, 0.1, 17.0, false, "20240701") //
                     ); //
-                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "01 July 2024");
-                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "01 July 2024");
+                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "20240701");
+                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "20240701");
                 });
             }
 
             @Test
             public void testS5AndS6ChargebacksAfterMaturityDateVerifyNPlus1ThPeriod() {
                 final Long loanId = applyApproveDisburseLoan(loanProductWithoutChargebackAllocation.getResourceId());
-                runAt("1 February 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 February 2024", 17.01);
+                runAt("20240201", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240201", 17.01);
                 });
-                runAt("1 March 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 March 2024", 17.01);
+                runAt("20240301", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240301", 17.01);
                 });
-                runAt("1 April 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 April 2024", 17.01);
+                runAt("20240401", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240401", 17.01);
                 });
-                runAt("1 May 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 May 2024", 17.01);
+                runAt("20240501", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240501", 17.01);
                 });
                 AtomicReference<Long> repaymentJuneRef = new AtomicReference<>();
-                runAt("1 June 2024", () -> {
-                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 June 2024", 17.01);
+                runAt("20240601", () -> {
+                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240601", 17.01);
                     repaymentJuneRef.set(repayment.getResourceId());
                 });
                 AtomicReference<Long> repaymentJulyRef = new AtomicReference<>();
-                runAt("1 July 2024", () -> {
-                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 July 2024", 17.0);
+                runAt("20240701", () -> {
+                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240701", 17.0);
                     repaymentJulyRef.set(repayment.getResourceId());
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    fullyRepaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    fullyRepaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    fullyRepaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    fullyRepaidInstallment(16.9, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    fullyRepaidInstallment(16.62, 0.39, "20240401"),  //
+                    fullyRepaidInstallment(16.72, 0.29, "20240501"),  //
+                    fullyRepaidInstallment(16.81, 0.2, "20240601"),  //
+                    fullyRepaidInstallment(16.9, 0.1, "20240701") //
                     ); //
                 });
-                runAt("15 July 2024", () -> {
+                runAt("20240715", () -> {
                     addChargebackForLoan(loanId, repaymentJuneRef.get(), 17.01);
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    fullyRepaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    fullyRepaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    fullyRepaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    fullyRepaidInstallment(16.9, 0.1, "01 July 2024"),  //
-                    unpaidInstallment(17.01, 0.0, "15 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    fullyRepaidInstallment(16.62, 0.39, "20240401"),  //
+                    fullyRepaidInstallment(16.72, 0.29, "20240501"),  //
+                    fullyRepaidInstallment(16.81, 0.2, "20240601"),  //
+                    fullyRepaidInstallment(16.9, 0.1, "20240701"),  //
+                    unpaidInstallment(17.01, 0.0, "20240715") //
                     ); //
                 });
-                runAt("30 July 2024", () -> {
+                runAt("20240730", () -> {
                     addChargebackForLoan(loanId, repaymentJulyRef.get(), 17.0);
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    fullyRepaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    fullyRepaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    fullyRepaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    fullyRepaidInstallment(16.9, 0.1, "01 July 2024"),  //
-                    unpaidInstallment(34.01, 0.0, "30 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    fullyRepaidInstallment(16.62, 0.39, "20240401"),  //
+                    fullyRepaidInstallment(16.72, 0.29, "20240501"),  //
+                    fullyRepaidInstallment(16.81, 0.2, "20240601"),  //
+                    fullyRepaidInstallment(16.9, 0.1, "20240701"),  //
+                    unpaidInstallment(34.01, 0.0, "20240730") //
                     ); //
-                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "30 July 2024");
-                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "30 July 2024");
+                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "20240730");
+                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "20240730");
                 });
             }
         }
@@ -729,34 +729,34 @@ public class LoanTransactionChargebackTest extends BaseLoanIntegrationTest {
             @Test
             public void testS1FullChargebackBeforeMaturityDate() {
                 final Long loanId = applyApproveDisburseLoan(loanProductWithChargebackAllocationPrincipalInterestFeesPenalties.getResourceId());
-                runAt("1 February 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 February 2024", 17.01);
+                runAt("20240201", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240201", 17.01);
                 });
-                runAt("1 March 2024", () -> {
-                    Long repaymentId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 March 2024", 17.01).getResourceId();
+                runAt("20240301", () -> {
+                    Long repaymentId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240301", 17.01).getResourceId();
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(16.9, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(16.62, 0.39, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(16.9, 0.1, "20240701") //
                     ); //
-                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "01 January 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 February 2024", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 March 2024", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
+                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "20240101", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240201", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240301", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
                     addChargebackForLoan(loanId, repaymentId, 17.01);
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(33.04, 0.98, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(17.0, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(33.04, 0.98, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(17.0, 0.1, "20240701") //
                     ); //
-                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "01 January 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 February 2024", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 March 2024", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Chargeback", "01 March 2024", 83.57, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
-                    Long prepayId = verifyPrepayAmountByRepayment(loanId, "1 March 2024");
-                    loanTransactionHelper.reverseLoanTransaction(loanId, prepayId, "1 March 2024");
+                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "20240101", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240201", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240301", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Chargeback", "20240301", 83.57, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
+                    Long prepayId = verifyPrepayAmountByRepayment(loanId, "20240301");
+                    loanTransactionHelper.reverseLoanTransaction(loanId, prepayId, "20240301");
                     GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
                     verifyLoanStatus(loanDetails, LoanStatus.ACTIVE);
                 });
@@ -766,47 +766,47 @@ public class LoanTransactionChargebackTest extends BaseLoanIntegrationTest {
             public void testS2AndS3PartialChargebackThenFullChargebackBeforeMaturityDate() {
                 final Long loanId = applyApproveDisburseLoan(loanProductWithChargebackAllocationPrincipalInterestFeesPenalties.getResourceId());
                 AtomicReference<Long> repaymentFebruaryRef = new AtomicReference<>();
-                runAt("1 February 2024", () -> {
-                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 February 2024", 17.01);
+                runAt("20240201", () -> {
+                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240201", 17.01);
                     repaymentFebruaryRef.set(repayment.getResourceId());
                 });
-                runAt("1 March 2024", () -> {
-                    runAt("1 March 2024", () -> {
-                        Long repaymentMarchId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 March 2024", 17.01).getResourceId();
+                runAt("20240301", () -> {
+                    runAt("20240301", () -> {
+                        Long repaymentMarchId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240301", 17.01).getResourceId();
                         verifyRepaymentSchedule(loanId,  //
-                        installment(100.0, null, "01 January 2024"),  //
-                        fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                        fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                        unpaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                        unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                        unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                        unpaidInstallment(16.9, 0.1, "01 July 2024") //
+                        installment(100.0, null, "20240101"),  //
+                        fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                        fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                        unpaidInstallment(16.62, 0.39, "20240401"),  //
+                        unpaidInstallment(16.72, 0.29, "20240501"),  //
+                        unpaidInstallment(16.81, 0.2, "20240601"),  //
+                        unpaidInstallment(16.9, 0.1, "20240701") //
                         ); //
-                        verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "01 January 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 February 2024", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 March 2024", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
+                        verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "20240101", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240201", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240301", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
                         addChargebackForLoan(loanId, repaymentFebruaryRef.get(), 15.0);
-                        verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "01 January 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 February 2024", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 March 2024", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(15.0, "Chargeback", "01 March 2024", 82.05, 15.0, 0.0, 0.0, 0.0, 0.0, 0.0, false));
+                        verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "20240101", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240201", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240301", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(15.0, "Chargeback", "20240301", 82.05, 15.0, 0.0, 0.0, 0.0, 0.0, 0.0, false));
                         verifyRepaymentSchedule(loanId,  //
-                        installment(100.0, null, "01 January 2024"),  //
-                        fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                        fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                        unpaidInstallment(31.53, 0.48, "01 April 2024"),  //
-                        unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                        unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                        unpaidInstallment(16.99, 0.1, "01 July 2024") //
+                        installment(100.0, null, "20240101"),  //
+                        fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                        fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                        unpaidInstallment(31.53, 0.48, "20240401"),  //
+                        unpaidInstallment(16.72, 0.29, "20240501"),  //
+                        unpaidInstallment(16.81, 0.2, "20240601"),  //
+                        unpaidInstallment(16.99, 0.1, "20240701") //
                         ); //
                         addChargebackForLoan(loanId, repaymentMarchId, 17.01);
-                        verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "01 January 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 February 2024", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 March 2024", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(15.0, "Chargeback", "01 March 2024", 82.05, 15.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Chargeback", "01 March 2024", 98.57, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
+                        verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "20240101", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240201", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240301", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(15.0, "Chargeback", "20240301", 82.05, 15.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Chargeback", "20240301", 98.57, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
                         verifyRepaymentSchedule(loanId,  //
-                        installment(100.0, null, "01 January 2024"),  //
-                        fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                        fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                        unpaidInstallment(47.96, 1.06, "01 April 2024"),  //
-                        unpaidInstallment(16.71, 0.3, "01 May 2024"),  //
-                        unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                        unpaidInstallment(17.09, 0.1, "01 July 2024") //
+                        installment(100.0, null, "20240101"),  //
+                        fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                        fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                        unpaidInstallment(47.96, 1.06, "20240401"),  //
+                        unpaidInstallment(16.71, 0.3, "20240501"),  //
+                        unpaidInstallment(16.81, 0.2, "20240601"),  //
+                        unpaidInstallment(17.09, 0.1, "20240701") //
                         ); //
-                        Long prepayId = verifyPrepayAmountByRepayment(loanId, "1 March 2024");
-                        loanTransactionHelper.reverseLoanTransaction(loanId, prepayId, "1 March 2024");
+                        Long prepayId = verifyPrepayAmountByRepayment(loanId, "20240301");
+                        loanTransactionHelper.reverseLoanTransaction(loanId, prepayId, "20240301");
                     });
                 });
             }
@@ -815,100 +815,100 @@ public class LoanTransactionChargebackTest extends BaseLoanIntegrationTest {
             public void testS4FullChargebackMiddleOfRepaymentPeriodBeforeMaturityDate() {
                 final Long loanId = applyApproveDisburseLoan(loanProductWithChargebackAllocationPrincipalInterestFeesPenalties.getResourceId());
                 AtomicReference<Long> repaymentMarchId = new AtomicReference<>();
-                runAt("1 February 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 February 2024", 17.01);
+                runAt("20240201", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240201", 17.01);
                 });
-                runAt("1 March 2024", () -> {
-                    repaymentMarchId.set(loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 March 2024", 17.01).getResourceId());
+                runAt("20240301", () -> {
+                    repaymentMarchId.set(loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240301", 17.01).getResourceId());
                 });
-                runAt("15 March 2024", () -> {
+                runAt("20240315", () -> {
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(16.9, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(16.62, 0.39, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(16.9, 0.1, "20240701") //
                     );
-                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "01 January 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 February 2024", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 March 2024", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
+                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "20240101", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240201", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240301", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
                     addChargebackForLoan(loanId, repaymentMarchId.get(), 17.01);
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(33.09, 0.93, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(16.95, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(33.09, 0.93, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(16.95, 0.1, "20240701") //
                     ); //
-                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "01 January 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 February 2024", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 March 2024", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Chargeback", "15 March 2024", 83.57, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
-                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "15 March 2024");
-                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "15 March 2024");
+                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "20240101", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240201", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240301", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Chargeback", "20240315", 83.57, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
+                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "20240315");
+                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "20240315");
                 });
             }
 
             @Test
             public void testS5AndS6ChargebacksAfterMaturityDateVerifyNPlus1ThPeriod() {
                 final Long loanId = applyApproveDisburseLoan(loanProductWithChargebackAllocationPrincipalInterestFeesPenalties.getResourceId());
-                runAt("1 February 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 February 2024", 17.01);
+                runAt("20240201", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240201", 17.01);
                 });
-                runAt("1 March 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 March 2024", 17.01);
+                runAt("20240301", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240301", 17.01);
                 });
-                runAt("1 April 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 April 2024", 17.01);
+                runAt("20240401", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240401", 17.01);
                 });
-                runAt("1 May 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 May 2024", 17.01);
+                runAt("20240501", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240501", 17.01);
                 });
                 AtomicReference<Long> repaymentJuneRef = new AtomicReference<>();
-                runAt("1 June 2024", () -> {
-                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 June 2024", 17.01);
+                runAt("20240601", () -> {
+                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240601", 17.01);
                     repaymentJuneRef.set(repayment.getResourceId());
                 });
                 AtomicReference<Long> repaymentJulyRef = new AtomicReference<>();
-                runAt("1 July 2024", () -> {
-                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 July 2024", 17.0);
+                runAt("20240701", () -> {
+                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240701", 17.0);
                     repaymentJulyRef.set(repayment.getResourceId());
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    fullyRepaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    fullyRepaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    fullyRepaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    fullyRepaidInstallment(16.9, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    fullyRepaidInstallment(16.62, 0.39, "20240401"),  //
+                    fullyRepaidInstallment(16.72, 0.29, "20240501"),  //
+                    fullyRepaidInstallment(16.81, 0.2, "20240601"),  //
+                    fullyRepaidInstallment(16.9, 0.1, "20240701") //
                     ); //
                 });
-                runAt("15 July 2024", () -> {
+                runAt("20240715", () -> {
                     addChargebackForLoan(loanId, repaymentJuneRef.get(), 17.01);
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    fullyRepaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    fullyRepaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    fullyRepaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    fullyRepaidInstallment(16.9, 0.1, "01 July 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "15 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    fullyRepaidInstallment(16.62, 0.39, "20240401"),  //
+                    fullyRepaidInstallment(16.72, 0.29, "20240501"),  //
+                    fullyRepaidInstallment(16.81, 0.2, "20240601"),  //
+                    fullyRepaidInstallment(16.9, 0.1, "20240701"),  //
+                    unpaidInstallment(16.81, 0.2, "20240715") //
                     ); //
                 });
-                runAt("30 July 2024", () -> {
+                runAt("20240730", () -> {
                     addChargebackForLoan(loanId, repaymentJulyRef.get(), 17.0);
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    fullyRepaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    fullyRepaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    fullyRepaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    fullyRepaidInstallment(16.9, 0.1, "01 July 2024"),  //
-                    unpaidInstallment(33.71, 0.3, "30 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    fullyRepaidInstallment(16.62, 0.39, "20240401"),  //
+                    fullyRepaidInstallment(16.72, 0.29, "20240501"),  //
+                    fullyRepaidInstallment(16.81, 0.2, "20240601"),  //
+                    fullyRepaidInstallment(16.9, 0.1, "20240701"),  //
+                    unpaidInstallment(33.71, 0.3, "20240730") //
                     ); //
-                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "30 July 2024");
-                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "30 July 2024");
+                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "20240730");
+                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "20240730");
                 });
             }
         }
@@ -921,34 +921,34 @@ public class LoanTransactionChargebackTest extends BaseLoanIntegrationTest {
             @Test
             public void testS1FullChargebackBeforeMaturityDate() {
                 final Long loanId = applyApproveDisburseLoan(loanProductWithChargebackAllocationInterestFeesPenaltiesPrincipal.getResourceId());
-                runAt("1 February 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 February 2024", 17.01);
+                runAt("20240201", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240201", 17.01);
                 });
-                runAt("1 March 2024", () -> {
-                    Long repaymentId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 March 2024", 17.01).getResourceId();
+                runAt("20240301", () -> {
+                    Long repaymentId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240301", 17.01).getResourceId();
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(16.9, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(16.62, 0.39, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(16.9, 0.1, "20240701") //
                     ); //
-                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "01 January 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 February 2024", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 March 2024", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
+                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "20240101", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240201", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240301", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
                     addChargebackForLoan(loanId, repaymentId, 17.01);
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(33.04, 0.98, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(17.0, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(33.04, 0.98, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(17.0, 0.1, "20240701") //
                     ); //
-                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "01 January 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 February 2024", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 March 2024", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Chargeback", "01 March 2024", 83.57, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
-                    Long prepayId = verifyPrepayAmountByRepayment(loanId, "1 March 2024");
-                    loanTransactionHelper.reverseLoanTransaction(loanId, prepayId, "1 March 2024");
+                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "20240101", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240201", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240301", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Chargeback", "20240301", 83.57, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
+                    Long prepayId = verifyPrepayAmountByRepayment(loanId, "20240301");
+                    loanTransactionHelper.reverseLoanTransaction(loanId, prepayId, "20240301");
                     GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
                     verifyLoanStatus(loanDetails, LoanStatus.ACTIVE);
                 });
@@ -958,46 +958,46 @@ public class LoanTransactionChargebackTest extends BaseLoanIntegrationTest {
             public void testS2AndS3PartialChargebackThenFullChargebackBeforeMaturityDate() {
                 final Long loanId = applyApproveDisburseLoan(loanProductWithChargebackAllocationInterestFeesPenaltiesPrincipal.getResourceId());
                 AtomicReference<Long> repaymentFebruaryRef = new AtomicReference<>();
-                runAt("1 February 2024", () -> {
-                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 February 2024", 17.01);
+                runAt("20240201", () -> {
+                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240201", 17.01);
                     repaymentFebruaryRef.set(repayment.getResourceId());
                 });
-                runAt("1 March 2024", () -> {
-                    Long repaymentMarchId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 March 2024", 17.01).getResourceId();
+                runAt("20240301", () -> {
+                    Long repaymentMarchId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240301", 17.01).getResourceId();
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(16.9, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(16.62, 0.39, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(16.9, 0.1, "20240701") //
                     ); //
-                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "01 January 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 February 2024", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 March 2024", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
+                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "20240101", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240201", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240301", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
                     addChargebackForLoan(loanId, repaymentFebruaryRef.get(), 15.0);
-                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "01 January 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 February 2024", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 March 2024", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(15.0, "Chargeback", "01 March 2024", 81.47, 14.42, 0.58, 0.0, 0.0, 0.0, 0.0, false));
+                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "20240101", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240201", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240301", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(15.0, "Chargeback", "20240301", 81.47, 14.42, 0.58, 0.0, 0.0, 0.0, 0.0, false));
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(30.95, 1.06, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(16.99, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(30.95, 1.06, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(16.99, 0.1, "20240701") //
                     ); //
                     addChargebackForLoan(loanId, repaymentMarchId, 17.01);
-                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "01 January 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 February 2024", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 March 2024", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(15.0, "Chargeback", "01 March 2024", 81.47, 14.42, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Chargeback", "01 March 2024", 97.99, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
+                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "20240101", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240201", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240301", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(15.0, "Chargeback", "20240301", 81.47, 14.42, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Chargeback", "20240301", 97.99, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(47.38, 1.64, "01 April 2024"),  //
-                    unpaidInstallment(16.71, 0.3, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(17.09, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(47.38, 1.64, "20240401"),  //
+                    unpaidInstallment(16.71, 0.3, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(17.09, 0.1, "20240701") //
                     ); //
-                    Long prepayId = verifyPrepayAmountByRepayment(loanId, "1 March 2024");
-                    loanTransactionHelper.reverseLoanTransaction(loanId, prepayId, "1 March 2024");
+                    Long prepayId = verifyPrepayAmountByRepayment(loanId, "20240301");
+                    loanTransactionHelper.reverseLoanTransaction(loanId, prepayId, "20240301");
                 });
             }
 
@@ -1005,152 +1005,152 @@ public class LoanTransactionChargebackTest extends BaseLoanIntegrationTest {
             public void testS4FullChargebackMiddleOfRepaymentPeriodBeforeMaturityDate() {
                 final Long loanId = applyApproveDisburseLoan(loanProductWithChargebackAllocationInterestFeesPenaltiesPrincipal.getResourceId());
                 AtomicReference<Long> repaymentMarchId = new AtomicReference<>();
-                runAt("1 February 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 February 2024", 17.01);
+                runAt("20240201", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240201", 17.01);
                 });
-                runAt("1 March 2024", () -> {
-                    repaymentMarchId.set(loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 March 2024", 17.01).getResourceId());
+                runAt("20240301", () -> {
+                    repaymentMarchId.set(loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240301", 17.01).getResourceId());
                 });
-                runAt("15 March 2024", () -> {
+                runAt("20240315", () -> {
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(16.9, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(16.62, 0.39, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(16.9, 0.1, "20240701") //
                     );
-                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "01 January 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 February 2024", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 March 2024", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
+                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "20240101", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240201", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240301", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
                     addChargebackForLoan(loanId, repaymentMarchId.get(), 17.01);
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    unpaidInstallment(33.09, 0.93, "01 April 2024"),  //
-                    unpaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    unpaidInstallment(16.95, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    unpaidInstallment(33.09, 0.93, "20240401"),  //
+                    unpaidInstallment(16.72, 0.29, "20240501"),  //
+                    unpaidInstallment(16.81, 0.2, "20240601"),  //
+                    unpaidInstallment(16.95, 0.1, "20240701") //
                     ); //
-                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "01 January 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 February 2024", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "01 March 2024", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Chargeback", "15 March 2024", 83.57, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
-                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "15 March 2024");
-                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "15 March 2024");
+                    verifyTransactions(loanId, new TransactionExt(100.0, "Disbursement", "20240101", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240201", 83.57, 16.43, 0.58, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Repayment", "20240301", 67.05, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false), new TransactionExt(17.01, "Chargeback", "20240315", 83.57, 16.52, 0.49, 0.0, 0.0, 0.0, 0.0, false));
+                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "20240315");
+                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "20240315");
                 });
             }
 
             @Test
             public void testS5AndS6ChargebacksAfterMaturityDateVerifyNPlus1ThPeriod() {
                 final Long loanId = applyApproveDisburseLoan(loanProductWithChargebackAllocationInterestFeesPenaltiesPrincipal.getResourceId());
-                runAt("1 February 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 February 2024", 17.01);
+                runAt("20240201", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240201", 17.01);
                 });
-                runAt("1 March 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 March 2024", 17.01);
+                runAt("20240301", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240301", 17.01);
                 });
-                runAt("1 April 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 April 2024", 17.01);
+                runAt("20240401", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240401", 17.01);
                 });
-                runAt("1 May 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 May 2024", 17.01);
+                runAt("20240501", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240501", 17.01);
                 });
                 AtomicReference<Long> repaymentJuneRef = new AtomicReference<>();
-                runAt("1 June 2024", () -> {
-                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 June 2024", 17.01);
+                runAt("20240601", () -> {
+                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240601", 17.01);
                     repaymentJuneRef.set(repayment.getResourceId());
                 });
                 AtomicReference<Long> repaymentJulyRef = new AtomicReference<>();
-                runAt("1 July 2024", () -> {
-                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 July 2024", 17.0);
+                runAt("20240701", () -> {
+                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240701", 17.0);
                     repaymentJulyRef.set(repayment.getResourceId());
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    fullyRepaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    fullyRepaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    fullyRepaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    fullyRepaidInstallment(16.9, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    fullyRepaidInstallment(16.62, 0.39, "20240401"),  //
+                    fullyRepaidInstallment(16.72, 0.29, "20240501"),  //
+                    fullyRepaidInstallment(16.81, 0.2, "20240601"),  //
+                    fullyRepaidInstallment(16.9, 0.1, "20240701") //
                     ); //
                 });
-                runAt("15 July 2024", () -> {
+                runAt("20240715", () -> {
                     addChargebackForLoan(loanId, repaymentJuneRef.get(), 17.01);
                     // TODO verify TRANSACTIONS!!!!
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    fullyRepaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    fullyRepaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    fullyRepaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    fullyRepaidInstallment(16.9, 0.1, "01 July 2024"),  //
-                    unpaidInstallment(16.81, 0.2, "15 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    fullyRepaidInstallment(16.62, 0.39, "20240401"),  //
+                    fullyRepaidInstallment(16.72, 0.29, "20240501"),  //
+                    fullyRepaidInstallment(16.81, 0.2, "20240601"),  //
+                    fullyRepaidInstallment(16.9, 0.1, "20240701"),  //
+                    unpaidInstallment(16.81, 0.2, "20240715") //
                     ); //
                 });
-                runAt("30 July 2024", () -> {
+                runAt("20240730", () -> {
                     addChargebackForLoan(loanId, repaymentJulyRef.get(), 17.0);
                     // TODO verify TRANSACTIONS!!!!
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    fullyRepaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    fullyRepaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    fullyRepaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    fullyRepaidInstallment(16.9, 0.1, "01 July 2024"),  //
-                    unpaidInstallment(33.71, 0.3, "30 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    fullyRepaidInstallment(16.62, 0.39, "20240401"),  //
+                    fullyRepaidInstallment(16.72, 0.29, "20240501"),  //
+                    fullyRepaidInstallment(16.81, 0.2, "20240601"),  //
+                    fullyRepaidInstallment(16.9, 0.1, "20240701"),  //
+                    unpaidInstallment(33.71, 0.3, "20240730") //
                     ); //
-                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "30 July 2024");
-                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "30 July 2024");
+                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "20240730");
+                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "20240730");
                 });
             }
 
             @Test
             public void testS7ChargebacksOnMaturityDate() {
                 final Long loanId = applyApproveDisburseLoan(loanProductWithChargebackAllocationInterestFeesPenaltiesPrincipal.getResourceId());
-                runAt("1 February 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 February 2024", 17.01);
+                runAt("20240201", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240201", 17.01);
                 });
-                runAt("1 March 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 March 2024", 17.01);
+                runAt("20240301", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240301", 17.01);
                 });
-                runAt("1 April 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 April 2024", 17.01);
+                runAt("20240401", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240401", 17.01);
                 });
-                runAt("1 May 2024", () -> {
-                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 May 2024", 17.01);
+                runAt("20240501", () -> {
+                    loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240501", 17.01);
                 });
                 AtomicReference<Long> repaymentJuneRef = new AtomicReference<>();
-                runAt("1 June 2024", () -> {
-                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 June 2024", 17.01);
+                runAt("20240601", () -> {
+                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240601", 17.01);
                     repaymentJuneRef.set(repayment.getResourceId());
                 });
                 AtomicReference<Long> repaymentJulyRef = new AtomicReference<>();
-                runAt("1 July 2024", () -> {
-                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 July 2024", 17.0);
+                runAt("20240701", () -> {
+                    PostLoansLoanIdTransactionsResponse repayment = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20240701", 17.0);
                     repaymentJulyRef.set(repayment.getResourceId());
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    fullyRepaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    fullyRepaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    fullyRepaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    fullyRepaidInstallment(16.9, 0.1, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    fullyRepaidInstallment(16.62, 0.39, "20240401"),  //
+                    fullyRepaidInstallment(16.72, 0.29, "20240501"),  //
+                    fullyRepaidInstallment(16.81, 0.2, "20240601"),  //
+                    fullyRepaidInstallment(16.9, 0.1, "20240701") //
                     ); //
                     addChargebackForLoan(loanId, repaymentJulyRef.get(), 17.0);
                     verifyRepaymentSchedule(loanId,  //
-                    installment(100.0, null, "01 January 2024"),  //
-                    fullyRepaidInstallment(16.43, 0.58, "01 February 2024"),  //
-                    fullyRepaidInstallment(16.52, 0.49, "01 March 2024"),  //
-                    fullyRepaidInstallment(16.62, 0.39, "01 April 2024"),  //
-                    fullyRepaidInstallment(16.72, 0.29, "01 May 2024"),  //
-                    fullyRepaidInstallment(16.81, 0.2, "01 June 2024"),  //
-                    installment(33.8, 0.2, 17.0, false, "01 July 2024") //
+                    installment(100.0, null, "20240101"),  //
+                    fullyRepaidInstallment(16.43, 0.58, "20240201"),  //
+                    fullyRepaidInstallment(16.52, 0.49, "20240301"),  //
+                    fullyRepaidInstallment(16.62, 0.39, "20240401"),  //
+                    fullyRepaidInstallment(16.72, 0.29, "20240501"),  //
+                    fullyRepaidInstallment(16.81, 0.2, "20240601"),  //
+                    installment(33.8, 0.2, 17.0, false, "20240701") //
                     ); //
-                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "01 July 2024");
-                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "01 July 2024");
+                    Long repaymentId = verifyPrepayAmountByRepayment(loanId, "20240701");
+                    loanTransactionHelper.reverseLoanTransaction(loanId, repaymentId, "20240701");
                 });
-                runAt("2 July 2024", () -> {
+                runAt("20240702", () -> {
                     executeInlineCOB(loanId);
                 });
             }
@@ -1162,7 +1162,7 @@ public class LoanTransactionChargebackTest extends BaseLoanIntegrationTest {
         final Long delinquencyBucketId = DelinquencyBucketsHelper.createDefaultBucket();
         final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketId);
         // Client and Loan account creation
-        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
+        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20120101");
         final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucketId, withJournalEntries, loanProductTestBuilder);
         assertNotNull(getLoanProductsProductResponse);
         log.info("Loan Product Bucket Name: {}", getLoanProductsProductResponse.getDelinquencyBucket().getName());

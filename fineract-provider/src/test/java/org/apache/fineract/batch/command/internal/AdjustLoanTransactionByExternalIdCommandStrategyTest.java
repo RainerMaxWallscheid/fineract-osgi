@@ -54,8 +54,8 @@ public class AdjustLoanTransactionByExternalIdCommandStrategyTest {
         final String transactionExternalId = UUID.randomUUID().toString();
         final BatchRequest request = getBatchRequest(loanExternalId, transactionExternalId, null);
         final String responseBody = "{\"officeId\":1,\"clientId\":107,\"loanId\":71,\"resourceId\":193,\"changes\""
-                + ":{\"transactionDate\":\"03 October 2022\",\"transactionAmount\":\"500\",\"locale\":\"en\",\"dateFormat\":"
-                + "\"dd MMMM yyyy\",\"paymentTypeId\":\"\"}}";
+                + ":{\"transactionDate\":\"20221003\",\"transactionAmount\":\"500\",\"locale\":\"en\",\"dateFormat\":"
+                + "\"yyyyMMdd\",\"paymentTypeId\":\"\"}}";
 
         given(testContext.loanTransactionsApiResource.adjustLoanTransaction(eq(loanExternalId), eq(transactionExternalId),
                 eq(request.getBody()), eq(null))).willReturn(responseBody);
@@ -84,8 +84,8 @@ public class AdjustLoanTransactionByExternalIdCommandStrategyTest {
         final String transactionExternalId = UUID.randomUUID().toString();
         final BatchRequest request = getBatchRequest(loanExternalId, transactionExternalId, "chargeback");
         final String responseBody = "{\"officeId\":1,\"clientId\":107,\"loanId\":71,\"resourceId\":193,\"changes\""
-                + ":{\"transactionDate\":\"03 October 2022\",\"transactionAmount\":\"500\",\"locale\":\"en\",\"dateFormat\":"
-                + "\"dd MMMM yyyy\",\"paymentTypeId\":\"\"}}";
+                + ":{\"transactionDate\":\"20221003\",\"transactionAmount\":\"500\",\"locale\":\"en\",\"dateFormat\":"
+                + "\"yyyyMMdd\",\"paymentTypeId\":\"\"}}";
 
         given(testContext.loanTransactionsApiResource.adjustLoanTransaction(eq(loanExternalId), eq(transactionExternalId),
                 eq(request.getBody()), eq("chargeback"))).willReturn(responseBody);
@@ -125,7 +125,7 @@ public class AdjustLoanTransactionByExternalIdCommandStrategyTest {
         }
         br.setMethod(HttpMethod.POST);
         br.setReference(Long.valueOf(RandomStringUtils.randomNumeric(5)));
-        br.setBody("{\"locale\":\"en\",\"dateFormat\":\"dd MMMM yyyy\",\"transactionDate\":\"03 October 2022\",\"transactionAmount\":500}");
+        br.setBody("{\"locale\":\"en\",\"dateFormat\":\"yyyyMMdd\",\"transactionDate\":\"20221003\",\"transactionAmount\":500}");
 
         return br;
     }

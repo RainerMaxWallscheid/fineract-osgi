@@ -107,7 +107,7 @@ public class GLAccountIntegrationTest extends BaseLoanIntegrationTest {
 
     @Test
     public void testDeleteGLAccountWhileThereIsJournalEntry() {
-        runAt("01 January 2024", () -> {
+        runAt("20240101", () -> {
             String uniqueString = Utils.uniqueRandomStringGenerator("UNIQUE_FEE_INCOME" + Calendar.getInstance().getTimeInMillis(), 5);
             final PostGLAccountsResponse newAccount = createGLAccount(uniqueString);
             uniqueString = Utils.uniqueRandomStringGenerator("UNIQUE_FEE_INCOME" + Calendar.getInstance().getTimeInMillis(), 5);

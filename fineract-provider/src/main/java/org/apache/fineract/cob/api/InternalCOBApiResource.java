@@ -57,7 +57,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class InternalCOBApiResource implements InitializingBean {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InternalCOBApiResource.class);
-    private static final String DATETIME_PATTERN = "dd MMMM yyyy";
+    private static final String DATETIME_PATTERN = "yyyyMMdd";
     private final RetrieveLoanIdService retrieveIdService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final ToApiJsonSerializer<List> toApiJsonSerializerForList;

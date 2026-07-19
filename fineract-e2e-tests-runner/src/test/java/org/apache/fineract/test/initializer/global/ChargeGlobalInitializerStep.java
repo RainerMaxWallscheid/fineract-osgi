@@ -44,7 +44,7 @@ public class ChargeGlobalInitializerStep implements FineractGlobalInitializerSte
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ChargeGlobalInitializerStep.class);
     public static final String CURRENCY_CODE = CurrencyOptions.EUR.value;
-    public static final String MONTH_DAY_FORMAT = "dd MMM";
+    public static final String MONTH_DAY_FORMAT = "MMdd";
     public static final String LOCALE_EN = "en";
     public static final Integer CHARGE_PAYMENT_MODE = ChargePaymentMode.REGULAR.value;
     public static final Enum<ChargeProductAppliesTo> CHARGE_APPLIES_TO_LOAN = ChargeProductAppliesTo.LOAN;

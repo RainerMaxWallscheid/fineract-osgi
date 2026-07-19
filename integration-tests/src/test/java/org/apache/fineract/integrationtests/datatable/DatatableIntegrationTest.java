@@ -79,8 +79,8 @@ public class DatatableIntegrationTest extends IntegrationTest {
     private static final String LP_REPAYMENTS = "5";
     private static final String LP_REPAYMENT_PERIOD = "2";
     private static final String LP_INTEREST_RATE = "1";
-    private static final String EXPECTED_DISBURSAL_DATE = "14 March 2011";
-    private static final String LOAN_APPLICATION_SUBMISSION_DATE = "13 March 2011";
+    private static final String EXPECTED_DISBURSAL_DATE = "20110314";
+    private static final String LOAN_APPLICATION_SUBMISSION_DATE = "20110313";
     private static final String LOAN_TERM_FREQUENCY = "10";
     private static final String INDIVIDUAL_LOAN = "individual";
     public static final String ACCOUNT_TYPE_INDIVIDUAL = "INDIVIDUAL";

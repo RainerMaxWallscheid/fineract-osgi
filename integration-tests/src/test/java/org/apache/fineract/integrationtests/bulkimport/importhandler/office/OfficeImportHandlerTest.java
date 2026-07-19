@@ -64,15 +64,15 @@ public class OfficeImportHandlerTest {
 
     @Test
     public void testOfficeImport() throws IOException, InterruptedException, NoSuchFieldException, ParseException {
-        Workbook workbook = getOfficeWorkBook("dd MMMM yyyy");
+        Workbook workbook = getOfficeWorkBook("yyyyMMdd");
         // insert dummy data into excel
         Sheet sheet = workbook.getSheet(TemplatePopulateImportConstants.OFFICE_SHEET_NAME);
         Row firstOfficeRow = sheet.getRow(1);
         firstOfficeRow.createCell(OfficeConstants.OFFICE_NAME_COL).setCellValue(Utils.uniqueRandomStringGenerator("Test_Off_", 6));
         firstOfficeRow.createCell(OfficeConstants.PARENT_OFFICE_NAME_COL).setCellValue(firstOfficeRow.getCell(OfficeConstants.LOOKUP_OFFICE_COL).getStringCellValue());
         firstOfficeRow.createCell(OfficeConstants.PARENT_OFFICE_ID_COL).setCellValue(firstOfficeRow.getCell(OfficeConstants.LOOKUP_OFFICE_ID_COL).getNumericCellValue());
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        Date date = simpleDateFormat.parse("14 May 2001");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        Date date = simpleDateFormat.parse("20010514");
         firstOfficeRow.createCell(OfficeConstants.OPENED_ON_COL).setCellValue(date);
         Path directory = Path.of("").toAbsolutePath().resolve("src").resolve("integrationTest").resolve("resources").resolve("bulkimport").resolve("importhandler").resolve("office");
         if (!directory.toFile().exists()) {
@@ -105,7 +105,7 @@ public class OfficeImportHandlerTest {
 
     private String importOfficeTemplate(File file) {
         requestSpec.header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA);
-        return Utils.performServerTemplatePost(requestSpec, responseSpec, OFFICE_URL + "/uploadtemplate" + "?" + Utils.TENANT_IDENTIFIER, null, file, "en", "dd MMMM yyyy");
+        return Utils.performServerTemplatePost(requestSpec, responseSpec, OFFICE_URL + "/uploadtemplate" + "?" + Utils.TENANT_IDENTIFIER, null, file, "en", "yyyyMMdd");
     }
 
     private byte[] downloadOutputTemplate(final String importDocumentId) {

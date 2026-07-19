@@ -60,7 +60,7 @@ public class LoanAccountsContainsCurrencyFieldTest extends BaseLoanIntegrationTe
 
     @Test
     public void testGetClientLoanAccountsUsingExternalIdContainsCurrency() {
-        String formattedDate = "01 September 2022";
+        String formattedDate = "20220901";
         // given
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, true);
         // when
@@ -87,7 +87,7 @@ public class LoanAccountsContainsCurrencyFieldTest extends BaseLoanIntegrationTe
     }
 
     private Integer createLoanAccount(final LoanTransactionHelper loanTransactionHelper, final String clientId, final String loanProductId, final String operationDate) {
-        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal(principalAmount).withLoanTermFrequency("1").withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance().withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("03 September 2022").withSubmittedOnDate("01 September 2022").withLoanType("individual").build(clientId, loanProductId, null);
+        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal(principalAmount).withLoanTermFrequency("1").withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance().withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("20220903").withSubmittedOnDate("20220901").withLoanType("individual").build(clientId, loanProductId, null);
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
         loanTransactionHelper.approveLoan(operationDate, principalAmount, loanId, null);
         return loanId;

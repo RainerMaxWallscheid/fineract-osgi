@@ -90,7 +90,7 @@ public class ExternalAssetOwnerTransferCancelTest extends BaseLoanIntegrationTes
     private static LoanTransactionHelper LOAN_TRANSACTION_HELPER;
     private static SchedulerJobHelper SCHEDULER_JOB_HELPER;
     private static LocalDate TODAYS_DATE;
-    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
 
     @BeforeAll
     public static void setupInvestorBusinessStep() {
@@ -193,7 +193,7 @@ public class ExternalAssetOwnerTransferCancelTest extends BaseLoanIntegrationTes
     private void addPenaltyForLoan(Integer loanID, String amount) {
         // Add Charge Penalty
         Integer penalty = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC, ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, amount, true));
-        Integer penalty1LoanChargeId = this.LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "02 March 2020", amount));
+        Integer penalty1LoanChargeId = this.LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "20200302", amount));
         assertNotNull(penalty1LoanChargeId);
     }
 
@@ -225,14 +225,14 @@ public class ExternalAssetOwnerTransferCancelTest extends BaseLoanIntegrationTes
         Integer loanProductID = createLoanProduct(overdueFeeChargeId.toString());
         Assertions.assertNotNull(loanProductID);
         HashMap loanStatusHashMap;
-        Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), "1 March 2020");
+        Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), "20200301");
         Assertions.assertNotNull(loanID);
         loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("01 March 2020", loanID);
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("20200301", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID, JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("20200302", loanID, JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
         return loanID;
     }

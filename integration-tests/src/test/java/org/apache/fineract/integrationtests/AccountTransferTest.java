@@ -84,9 +84,9 @@ public class AccountTransferTest {
 
     public static final Integer INVALID_LOAN_ID = 123123123;
 
-    public static final String LOAN_APPROVAL_DATE = "10 January 2013";
-    public static final String LOAN_APPROVAL_DATE_PLUS_ONE = "11 January 2013";
-    public static final String LOAN_DISBURSAL_DATE = "10 January 2013";
+    public static final String LOAN_APPROVAL_DATE = "20130110";
+    public static final String LOAN_APPROVAL_DATE_PLUS_ONE = "20130111";
+    public static final String LOAN_DISBURSAL_DATE = "20130110";
 
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
@@ -164,7 +164,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(toOfficeId);
 
         // Creating Savings Account to which fund to be Transferred
-        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(toOfficeId));
         Assertions.assertNotNull(toClientID);
 
@@ -191,7 +191,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(fromOfficeId);
 
         // Creating Savings Account from which the Fund has to be Transferred
-        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(fromOfficeId));
         Assertions.assertNotNull(fromClientID);
 
@@ -263,7 +263,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(toOfficeId);
 
         // Creating Loan Account to which fund to be Transferred
-        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(toOfficeId));
         Assertions.assertNotNull(toClientID);
 
@@ -291,7 +291,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(fromOfficeId);
 
         // Creating Savings Account from which the Fund has to be Transferred
-        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(fromOfficeId));
         Assertions.assertNotNull(fromClientID);
 
@@ -361,7 +361,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(toOfficeId);
 
         // Creating Loan Account to which fund to be Transferred
-        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(toOfficeId));
         Assertions.assertNotNull(toClientID);
 
@@ -386,7 +386,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(fromOfficeId);
 
         // Creating Savings Account from which the Fund has to be Transferred
-        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(fromOfficeId));
         Assertions.assertNotNull(fromClientID);
 
@@ -485,7 +485,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(toOfficeId);
 
         // Creating Loan Account to which fund to be Transferred
-        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(toOfficeId));
         Assertions.assertNotNull(toClientID);
 
@@ -510,7 +510,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(fromOfficeId);
 
         // Creating Savings Account from which the Fund has to be Transferred
-        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(fromOfficeId));
         Assertions.assertNotNull(fromClientID);
 
@@ -577,7 +577,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(toOfficeId);
 
         // Creating Loan Account to which fund to be Transferred
-        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(toOfficeId));
         Assertions.assertNotNull(toClientID);
 
@@ -602,7 +602,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(fromOfficeId);
 
         // Creating Savings Account from which the Fund has to be Transferred
-        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(fromOfficeId));
         Assertions.assertNotNull(fromClientID);
 
@@ -670,7 +670,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(toOfficeId);
 
         // Creating Loan Account to which fund to be Transferred
-        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(toOfficeId));
         Assertions.assertNotNull(toClientID);
 
@@ -695,7 +695,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(fromOfficeId);
 
         // Creating Savings Account from which the Fund has to be Transferred
-        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(fromOfficeId));
         Assertions.assertNotNull(fromClientID);
 
@@ -763,7 +763,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(toOfficeId);
 
         // Creating Loan Account to which fund to be Transferred
-        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(toOfficeId));
         Assertions.assertNotNull(toClientID);
 
@@ -788,7 +788,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(fromOfficeId);
 
         // Creating Savings Account from which the Fund has to be Transferred
-        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(fromOfficeId));
         Assertions.assertNotNull(fromClientID);
 
@@ -849,7 +849,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(toOfficeId);
 
         // Creating Savings Account to which fund to be Transferred
-        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer toClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(toOfficeId));
         Assertions.assertNotNull(toClientID);
 
@@ -876,7 +876,7 @@ public class AccountTransferTest {
         Assertions.assertNotNull(fromOfficeId);
 
         // Creating Savings Account from which the Fund has to be Transferred
-        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2011",
+        final Integer fromClientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20110101",
                 String.valueOf(fromOfficeId));
         Assertions.assertNotNull(fromClientID);
 
@@ -957,8 +957,8 @@ public class AccountTransferTest {
                 .withAmortizationTypeAsEqualInstallments() //
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("10 January 2013") //
-                .withSubmittedOnDate("10 January 2013") //
+                .withExpectedDisbursementDate("20130110") //
+                .withSubmittedOnDate("20130110") //
                 .withCollaterals(collaterals).build(clientID.toString(), loanProductID.toString(), null);
         return this.loanTransactionHelper.getLoanId(loanApplicationJSON);
     }

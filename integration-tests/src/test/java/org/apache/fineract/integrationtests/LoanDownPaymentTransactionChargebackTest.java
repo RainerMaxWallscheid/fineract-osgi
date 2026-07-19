@@ -40,33 +40,33 @@ public class LoanDownPaymentTransactionChargebackTest extends BaseLoanIntegratio
 
     @Test
     public void loanDownPaymentTransactionChargebackTest() {
-        runAt("03 March 2023", () -> {
+        runAt("20230303", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             // Create Loan Product
             Long loanProductId = createLoanProductWithMultiDisbursalAndRepaymentsWithEnableDownPayment(false);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 March 2023", 1500.0, 3, req -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230301", 1500.0, 3, req -> {
                 req.setRepaymentEvery(15);
                 req.setLoanTermFrequency(45);
             });
 
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 March 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230301");
 
             // verify repayment schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, false, "01 March 2023"), //
-                    installment(250.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "15 April 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, false, "20230301"), //
+                    installment(250.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230415")//
             );
 
             // make down payment
             final PostLoansLoanIdTransactionsResponse downPaymentTransaction_1 = loanTransactionHelper.makeLoanDownPayment(loanId,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("01 March 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230301").locale("en")
                             .transactionAmount(250.0));
             assertNotNull(downPaymentTransaction_1);
 
@@ -79,11 +79,11 @@ public class LoanDownPaymentTransactionChargebackTest extends BaseLoanIntegratio
 
             // verify repayment schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, true, "01 March 2023"), //
-                    installment(300.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "15 April 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, true, "20230301"), //
+                    installment(300.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230415")//
             );
 
             // verify journal entries for chargeback transaction
@@ -96,14 +96,14 @@ public class LoanDownPaymentTransactionChargebackTest extends BaseLoanIntegratio
 
     @Test
     public void loanDownPaymentTransactionChargebackForAdvancedPaymentAllocationTest() {
-        runAt("03 March 2023", () -> {
+        runAt("20230303", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             // Create Loan Product
             Long loanProductId = createLoanProductWithMultiDisbursalAndRepaymentsWithEnableDownPayment(true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 March 2023", 1500.0, 3, req -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230301", 1500.0, 3, req -> {
                 req.setRepaymentEvery(15);
                 req.setLoanTermFrequency(45);
                 req.setTransactionProcessingStrategyCode("advanced-payment-allocation-strategy");
@@ -112,20 +112,20 @@ public class LoanDownPaymentTransactionChargebackTest extends BaseLoanIntegratio
             });
 
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 March 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230301");
 
             // verify repayment schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, false, "01 March 2023"), //
-                    installment(250.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "15 April 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, false, "20230301"), //
+                    installment(250.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230415")//
             );
 
             // make down payment
             final PostLoansLoanIdTransactionsResponse downPaymentTransaction_1 = loanTransactionHelper.makeLoanDownPayment(loanId,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("01 March 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230301").locale("en")
                             .transactionAmount(250.0));
             assertNotNull(downPaymentTransaction_1);
 
@@ -138,11 +138,11 @@ public class LoanDownPaymentTransactionChargebackTest extends BaseLoanIntegratio
 
             // verify repayment schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, true, "01 March 2023"), //
-                    installment(300.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "15 April 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, true, "20230301"), //
+                    installment(300.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230415")//
             );
 
             // verify journal entries for chargeback transaction

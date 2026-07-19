@@ -42,19 +42,19 @@ public class LoanContractTerminationTest extends FeignLoanTestBase {
 
         final Long loanProductId = createLoanProduct(create4IProgressive());
 
-        runAt("1 January 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "1 January 2024", 500.0, 7.0, 6, null);
+        runAt("20240101", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "20240101", 500.0, 7.0, 6, null);
             loanIdRef.set(loanId);
 
-            disburseLoan(loanId, BigDecimal.valueOf(100), "1 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(100), "20240101");
         });
 
-        runAt("2 February 2024", () -> {
+        runAt("20240202", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
         });
 
-        runAt("3 February 2024", () -> {
+        runAt("20240203", () -> {
             Long loanId = loanIdRef.get();
 
             moveLoanState(loanId,
@@ -62,10 +62,10 @@ public class LoanContractTerminationTest extends FeignLoanTestBase {
                     "contractTermination");
 
             verifyTransactions(loanId, //
-                    transaction(100.0, "Disbursement", "01 January 2024"), //
-                    transaction(0.58, "Accrual", "01 February 2024"), //
-                    transaction(100.62, "Contract Termination", "03 February 2024"), //
-                    transaction(0.04, "Accrual", "03 February 2024") //
+                    transaction(100.0, "Disbursement", "20240101"), //
+                    transaction(0.58, "Accrual", "20240201"), //
+                    transaction(100.62, "Contract Termination", "20240203"), //
+                    transaction(0.04, "Accrual", "20240203") //
             );
         });
     }
@@ -78,8 +78,8 @@ public class LoanContractTerminationTest extends FeignLoanTestBase {
 
         final Long loanProductId = createLoanProduct(create4IProgressive());
 
-        runAt("1 January 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "1 January 2024", 500.0, 7.0, 3, null);
+        runAt("20240101", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "20240101", 500.0, 7.0, 3, null);
             loanIdRef.set(loanId);
 
             CallFailedRuntimeException callFailedRuntimeException = Assertions.assertThrows(CallFailedRuntimeException.class,
@@ -102,10 +102,10 @@ public class LoanContractTerminationTest extends FeignLoanTestBase {
                 createOnePeriod30DaysPeriodicAccrualProduct(12.4).transactionProcessingStrategyCode(LoanProductTestBuilder.DEFAULT_STRATEGY)
                         .loanScheduleType(LoanScheduleType.CUMULATIVE.toString()));
 
-        runAt("1 January 2024", () -> {
-            final Long loanId = applyAndApproveLoan(clientId, loanProductId, "1 January 2024", 100.0, 6);
+        runAt("20240101", () -> {
+            final Long loanId = applyAndApproveLoan(clientId, loanProductId, "20240101", 100.0, 6);
 
-            disburseLoan(loanId, BigDecimal.valueOf(100), "1 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(100), "20240101");
 
             CallFailedRuntimeException callFailedRuntimeException = Assertions.assertThrows(CallFailedRuntimeException.class,
                     () -> moveLoanState(loanId,
@@ -121,21 +121,21 @@ public class LoanContractTerminationTest extends FeignLoanTestBase {
     public void testLoanContractTerminationSameDisbursementDate() {
         final Long clientId = createClient();
 
-        runAt("1 January 2024", () -> {
+        runAt("20240101", () -> {
 
             Long loanProductId = createLoanProduct(create4IProgressive().interestRecognitionOnDisbursementDate(false));
-            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "1 January 2024", 500.0, 7.0, 6,
+            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "20240101", 500.0, 7.0, 6,
                     (request) -> request.interestRecognitionOnDisbursementDate(false));
 
-            disburseLoan(loanId, BigDecimal.valueOf(100), "1 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(100), "20240101");
 
             moveLoanState(loanId,
                     new PostLoansLoanIdRequest().note("Contract Termination Test").externalId(Utils.randomStringGenerator("", 20)),
                     "contractTermination");
 
             verifyTransactions(loanId, //
-                    transaction(100.0, "Disbursement", "01 January 2024"), //
-                    transaction(100.0, "Contract Termination", "01 January 2024"));
+                    transaction(100.0, "Disbursement", "20240101"), //
+                    transaction(100.0, "Contract Termination", "20240101"));
 
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             assertEquals(BigDecimal.ZERO.stripTrailingZeros(), loanDetails.getSummary().getInterestCharged().stripTrailingZeros());

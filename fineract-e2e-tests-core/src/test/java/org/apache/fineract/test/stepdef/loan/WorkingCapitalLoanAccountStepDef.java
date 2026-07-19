@@ -110,7 +110,7 @@ import org.junit.jupiter.api.Assertions;
 public class WorkingCapitalLoanAccountStepDef extends AbstractStepDef {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanAccountStepDef.class);
-    private static final String DATE_FORMAT = "dd MMMM yyyy";
+    private static final String DATE_FORMAT = "yyyyMMdd";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
     private static final Long NON_EXISTENT_LOAN_ID = 999999999L;

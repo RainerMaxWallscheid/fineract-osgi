@@ -74,7 +74,7 @@ public class DisbursalAndRepaymentScheduleTest {
     private final String numberOfRepayments = "12";
     private final String interestRatePerPeriod = "18";
 
-    private final SimpleDateFormat dateFormatterStandard = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+    private final SimpleDateFormat dateFormatterStandard = new SimpleDateFormat("yyyyMMdd", Locale.US);
 
     @BeforeEach
     public void setup() {

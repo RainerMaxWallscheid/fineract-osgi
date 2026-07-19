@@ -33,44 +33,44 @@ public class LoanRepaymentScheduleForChargesAfterMaturityTest extends FeignLoanT
 
     @Test
     public void loanNPlusOneInstallmentIsRetainedAfterLoanRescheduleTest() {
-        runAt("03 March 2023", () -> {
+        runAt("20230303", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             Long loanProductId = createLoanProductWithMultiDisbursalAndRepayments();
 
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 March 2023", 1500.0, 4, req -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230301", 1500.0, 4, req -> {
                 req.setRepaymentEvery(15);
                 req.setLoanTermFrequency(60);
             });
 
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 March 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230301");
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "15 April 2023"), //
-                    installment(250.0, false, "30 April 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230415"), //
+                    installment(250.0, false, "20230430")//
             );
 
-            addCharge(loanId, false, 50, "23 May 2023");
+            addCharge(loanId, false, 50, "20230523");
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "15 April 2023"), //
-                    installment(250.0, false, "30 April 2023"), //
-                    installment(0.0, 0.0, 50.0, 50.0, false, "23 May 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230415"), //
+                    installment(250.0, false, "20230430"), //
+                    installment(0.0, 0.0, 50.0, 50.0, false, "20230523")//
             );
 
-            createAndApproveReschedule(loanId, "03 March 2023", "15 April 2023", "30 April 2023");
+            createAndApproveReschedule(loanId, "20230303", "20230415", "20230430");
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "30 April 2023"), //
-                    installment(250.0, false, "15 May 2023"), //
-                    installment(0.0, 0.0, 50.0, 50.0, false, "23 May 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230430"), //
+                    installment(250.0, false, "20230515"), //
+                    installment(0.0, 0.0, 50.0, 50.0, false, "20230523")//
             );
 
         });
@@ -78,43 +78,43 @@ public class LoanRepaymentScheduleForChargesAfterMaturityTest extends FeignLoanT
 
     @Test
     public void loanNPlusOneInstallmentIsAdjustedAfterRescheduleIfDateFallBeforeMaturityDateTest() {
-        runAt("03 March 2023", () -> {
+        runAt("20230303", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             Long loanProductId = createLoanProductWithMultiDisbursalAndRepayments();
 
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 March 2023", 1500.0, 4, req -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230301", 1500.0, 4, req -> {
                 req.setRepaymentEvery(15);
                 req.setLoanTermFrequency(60);
             });
 
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 March 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230301");
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "15 April 2023"), //
-                    installment(250.0, false, "30 April 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230415"), //
+                    installment(250.0, false, "20230430")//
             );
 
-            addCharge(loanId, false, 50, "13 May 2023");
+            addCharge(loanId, false, 50, "20230513");
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "15 April 2023"), //
-                    installment(250.0, false, "30 April 2023"), //
-                    installment(0.0, 0.0, 50.0, 50.0, false, "13 May 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230415"), //
+                    installment(250.0, false, "20230430"), //
+                    installment(0.0, 0.0, 50.0, 50.0, false, "20230513")//
             );
 
-            createAndApproveReschedule(loanId, "03 March 2023", "15 April 2023", "30 April 2023");
+            createAndApproveReschedule(loanId, "20230303", "20230415", "20230430");
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "30 April 2023"), //
-                    installment(250.0, 0.0, 50.0, 300.0, false, "15 May 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230430"), //
+                    installment(250.0, 0.0, 50.0, 300.0, false, "20230515")//
             );
 
         });
@@ -122,11 +122,11 @@ public class LoanRepaymentScheduleForChargesAfterMaturityTest extends FeignLoanT
 
     @Test
     public void loanNPlusOneInstallmentIsRetainedAfterLoanRescheduleForAdvancedPaymentAllocationTest() {
-        runAt("03 March 2023", () -> {
+        runAt("20230303", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             Long loanProductId = createLoanProductWithMultiDisbursalAndRepaymentsWithAdvancedPaymentAllocationStrategy();
 
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 March 2023", 1500.0, 4, req -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230301", 1500.0, 4, req -> {
                 req.setRepaymentEvery(15);
                 req.setLoanTermFrequency(60);
                 req.setTransactionProcessingStrategyCode("advanced-payment-allocation-strategy");
@@ -134,35 +134,35 @@ public class LoanRepaymentScheduleForChargesAfterMaturityTest extends FeignLoanT
                 req.setLoanScheduleProcessingType(LoanScheduleProcessingType.HORIZONTAL.toString());
             });
 
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 March 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230301");
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "15 April 2023"), //
-                    installment(250.0, false, "30 April 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230415"), //
+                    installment(250.0, false, "20230430")//
             );
 
-            addCharge(loanId, false, 50, "23 May 2023");
+            addCharge(loanId, false, 50, "20230523");
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "15 April 2023"), //
-                    installment(250.0, false, "30 April 2023"), //
-                    installment(0.0, 0.0, 50.0, 50.0, false, "23 May 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230415"), //
+                    installment(250.0, false, "20230430"), //
+                    installment(0.0, 0.0, 50.0, 50.0, false, "20230523")//
             );
 
-            createAndApproveReschedule(loanId, "03 March 2023", "15 April 2023", "30 April 2023");
+            createAndApproveReschedule(loanId, "20230303", "20230415", "20230430");
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "30 April 2023"), //
-                    installment(250.0, false, "15 May 2023"), //
-                    installment(0.0, 0.0, 50.0, 50.0, false, "23 May 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230430"), //
+                    installment(250.0, false, "20230515"), //
+                    installment(0.0, 0.0, 50.0, 50.0, false, "20230523")//
             );
 
         });
@@ -170,44 +170,44 @@ public class LoanRepaymentScheduleForChargesAfterMaturityTest extends FeignLoanT
 
     @Test
     public void loanNPlusOneInstallmentIsAdjustedAfterRescheduleIfDateFallBeforeMaturityDateForAdvancedPaymentAllocationTest() {
-        runAt("03 March 2023", () -> {
+        runAt("20230303", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             Long loanProductId = createLoanProductWithMultiDisbursalAndRepaymentsWithAdvancedPaymentAllocationStrategy();
 
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 March 2023", 1500.0, 4, req -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230301", 1500.0, 4, req -> {
                 req.setRepaymentEvery(15);
                 req.setLoanTermFrequency(60);
                 req.setTransactionProcessingStrategyCode("advanced-payment-allocation-strategy");
             });
 
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 March 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230301");
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "15 April 2023"), //
-                    installment(250.0, false, "30 April 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230415"), //
+                    installment(250.0, false, "20230430")//
             );
 
-            addCharge(loanId, false, 50, "13 May 2023");
+            addCharge(loanId, false, 50, "20230513");
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "15 April 2023"), //
-                    installment(250.0, false, "30 April 2023"), //
-                    installment(0.0, 0.0, 50.0, 50.0, false, "13 May 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230415"), //
+                    installment(250.0, false, "20230430"), //
+                    installment(0.0, 0.0, 50.0, 50.0, false, "20230513")//
             );
 
-            createAndApproveReschedule(loanId, "03 March 2023", "15 April 2023", "30 April 2023");
+            createAndApproveReschedule(loanId, "20230303", "20230415", "20230430");
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "30 April 2023"), //
-                    installment(250.0, 0.0, 50.0, 300.0, false, "15 May 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230430"), //
+                    installment(250.0, 0.0, 50.0, 300.0, false, "20230515")//
             );
 
         });
@@ -215,28 +215,28 @@ public class LoanRepaymentScheduleForChargesAfterMaturityTest extends FeignLoanT
 
     @Test
     public void incorrectValueAfterCharge() {
-        runAt("20 December 2024", () -> {
+        runAt("20241220", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             PostLoanProductsRequest product = createOnePeriod30DaysLongNoInterestPeriodicAccrualProductWithAdvancedPaymentAllocation()
                     .minPrincipal(100.0);
             Long loanProductId = createLoanProduct(product);
 
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20 December 2024", 800.0, 4, req -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20241220", 800.0, 4, req -> {
                 req.setRepaymentEvery(30);
                 req.setLoanTermFrequency(120);
                 req.setTransactionProcessingStrategyCode("advanced-payment-allocation-strategy");
             });
 
-            disburseLoan(loanId, BigDecimal.valueOf(800.00), "20 December 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(800.00), "20241220");
 
-            addCharge(loanId, false, 123456789012.12, "23 December 2024");
+            addCharge(loanId, false, 123456789012.12, "20241223");
 
             verifyRepaymentSchedule(loanId, //
-                    installment(800.0, null, "20 December 2024"), //
-                    installment(200.0, 0.0, 123456789212.12, false, "19 January 2025"), //
-                    installment(200.0, 0.0, 200.0, false, "18 February 2025"), //
-                    installment(200.0, 0.0, 200.0, false, "20 March 2025"), //
-                    installment(200.0, 0.0, 200.0, false, "19 April 2025")//
+                    installment(800.0, null, "20241220"), //
+                    installment(200.0, 0.0, 123456789212.12, false, "20250119"), //
+                    installment(200.0, 0.0, 200.0, false, "20250218"), //
+                    installment(200.0, 0.0, 200.0, false, "20250320"), //
+                    installment(200.0, 0.0, 200.0, false, "20250419")//
             );
         });
     }

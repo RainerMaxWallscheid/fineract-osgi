@@ -59,7 +59,7 @@ public class LoanWaiveChargeTest extends FeignLoanTestBase {
         double amount = 1000.0;
         AtomicLong appliedLoanId = new AtomicLong();
 
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -75,7 +75,7 @@ public class LoanWaiveChargeTest extends FeignLoanTestBase {
 
             // Apply and Approve Loan
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, 1);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, 1);
             if (advancedPaymentStrategy) {
                 applicationRequest = applicationRequest
                         .transactionProcessingStrategyCode(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY);
@@ -83,18 +83,18 @@ public class LoanWaiveChargeTest extends FeignLoanTestBase {
 
             Long loanId = applyForLoan(applicationRequest);
 
-            approveLoan(loanId, approveLoanRequest(amount, "01 January 2023"));
+            approveLoan(loanId, approveLoanRequest(amount, "20230101"));
             appliedLoanId.set(loanId);
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(amount), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(amount), "20230101");
 
             // verify schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(1000.0, 0.0, 0.0, 1000.0, false, "31 January 2023"));
+                    installment(1000.0, null, "20230101"), //
+                    installment(1000.0, 0.0, 0.0, 1000.0, false, "20230131"));
         });
-        runAt("02 February 2023", () -> {
+        runAt("20230202", () -> {
             Long loanId = appliedLoanId.get();
 
             // create charge
@@ -103,24 +103,24 @@ public class LoanWaiveChargeTest extends FeignLoanTestBase {
             Long chargeId = chargeResult.getResourceId();
 
             // add charge after maturity
-            PostLoansLoanIdChargesResponse loanChargeResult = addLoanCharge(loanId, chargeId, "01 February 2023", chargeAmount);
+            PostLoansLoanIdChargesResponse loanChargeResult = addLoanCharge(loanId, chargeId, "20230201", chargeAmount);
             Long loanChargeId = loanChargeResult.getResourceId();
 
             // verify N+1 installment in schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(1000.0, 0.0, 0.0, 1000.0, false, "31 January 2023"), //
-                    installment(0.0, 0.0, 100.0, 100.0, false, "01 February 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(1000.0, 0.0, 0.0, 1000.0, false, "20230131"), //
+                    installment(0.0, 0.0, 100.0, 100.0, false, "20230201") //
             );
 
             // waive charge
             waiveLoanCharge(loanId, loanChargeId, 2);
         });
-        runAt("03 February 2023", () -> {
+        runAt("20230203", () -> {
             Long loanId = appliedLoanId.get();
 
             // repay loan
-            addRepaymentForLoan(loanId, amount, "03 February 2023");
+            addRepaymentForLoan(loanId, amount, "20230203");
 
             // verify maturity
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
@@ -128,9 +128,9 @@ public class LoanWaiveChargeTest extends FeignLoanTestBase {
 
             // verify N+1 installment completion
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(1000.0, 0.0, 0.0, 0.0, true, "31 January 2023"), //
-                    installment(0.0, 0.0, 100.0, 0.0, true, "01 February 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(1000.0, 0.0, 0.0, 0.0, true, "20230131"), //
+                    installment(0.0, 0.0, 100.0, 0.0, true, "20230201") //
             );
 
             // verify obligationsMetOnDate for N+1 installment
@@ -148,7 +148,7 @@ public class LoanWaiveChargeTest extends FeignLoanTestBase {
         AtomicLong appliedLoanId = new AtomicLong();
         String LoanCoBJobName = "Loan COB";
 
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -164,7 +164,7 @@ public class LoanWaiveChargeTest extends FeignLoanTestBase {
 
             // Apply and Approve Loan
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, 1);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, 1);
             if (advancedPaymentStrategy) {
                 applicationRequest = applicationRequest
                         .transactionProcessingStrategyCode(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY);
@@ -172,19 +172,19 @@ public class LoanWaiveChargeTest extends FeignLoanTestBase {
 
             Long loanId = applyForLoan(applicationRequest);
 
-            approveLoan(loanId, approveLoanRequest(amount, "01 January 2023"));
+            approveLoan(loanId, approveLoanRequest(amount, "20230101"));
             appliedLoanId.set(loanId);
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(amount), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(amount), "20230101");
 
             // verify schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(1000.0, 0.0, 0.0, 1000.0, false, "31 January 2023"));
+                    installment(1000.0, null, "20230101"), //
+                    installment(1000.0, 0.0, 0.0, 1000.0, false, "20230131"));
         });
 
-        runAt("10 January 2023", () -> {
+        runAt("20230110", () -> {
             Long loanId = appliedLoanId.get();
 
             // create charge
@@ -192,20 +192,20 @@ public class LoanWaiveChargeTest extends FeignLoanTestBase {
             PostChargesResponse chargeResult = createCharge(chargeAmount);
             Long chargeId = chargeResult.getResourceId();
 
-            PostLoansLoanIdChargesResponse loanChargeResult = addLoanCharge(loanId, chargeId, "09 January 2023", chargeAmount);
+            PostLoansLoanIdChargesResponse loanChargeResult = addLoanCharge(loanId, chargeId, "20230109", chargeAmount);
             loanChargeResult.getResourceId();
             schedulerHelper.executeAndAwaitJob(LoanCoBJobName);
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(1000.0, 0.0, 10.0, 1010.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(1000.0, 0.0, 10.0, 1010.0, false, "20230131") //
 
             );
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(10.0, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 10.0, 0.0, 0.0, 0.0));
+                    transaction(1000.0, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(10.0, "Accrual", "20230109", 0.0, 0.0, 0.0, 10.0, 0.0, 0.0, 0.0));
         });
-        runAt("11 January 2023", () -> {
+        runAt("20230111", () -> {
             Long loanId = appliedLoanId.get();
 
             // create charge
@@ -213,26 +213,26 @@ public class LoanWaiveChargeTest extends FeignLoanTestBase {
             PostChargesResponse chargeResult = createCharge(chargeAmount);
             Long chargeId = chargeResult.getResourceId();
 
-            PostLoansLoanIdChargesResponse loanChargeResult = addLoanCharge(loanId, chargeId, "10 January 2023", chargeAmount);
+            PostLoansLoanIdChargesResponse loanChargeResult = addLoanCharge(loanId, chargeId, "20230110", chargeAmount);
             Long loanChargeId = loanChargeResult.getResourceId();
             schedulerHelper.executeAndAwaitJob(LoanCoBJobName);
             // waive charge
             waiveLoanCharge(loanId, loanChargeId, 1);
 
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(10.0, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 10.0, 0.0, 0.0, 0.0), //
-                    transaction(9.0, "Accrual", "10 January 2023", 0.0, 0.0, 0.0, 9.0, 0.0, 0.0, 0.0), //
-                    transaction(9.0, "Waive loan charges", "10 January 2023", 1000.0, 0.0, 0.0, 9.0, 0.0, 0.0, 0.0) //
+                    transaction(1000.0, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(10.0, "Accrual", "20230109", 0.0, 0.0, 0.0, 10.0, 0.0, 0.0, 0.0), //
+                    transaction(9.0, "Accrual", "20230110", 0.0, 0.0, 0.0, 9.0, 0.0, 0.0, 0.0), //
+                    transaction(9.0, "Waive loan charges", "20230110", 1000.0, 0.0, 0.0, 9.0, 0.0, 0.0, 0.0) //
             );
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(1000.0, 0.0, 19.0, 1010.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(1000.0, 0.0, 19.0, 1010.0, false, "20230131") //
             );
         });
 
-        runAt("12 January 2023", () -> {
+        runAt("20230112", () -> {
             Long loanId = appliedLoanId.get();
 
             // create charge
@@ -240,23 +240,23 @@ public class LoanWaiveChargeTest extends FeignLoanTestBase {
             PostChargesResponse chargeResult = createCharge(chargeAmount);
             Long chargeId = chargeResult.getResourceId();
 
-            PostLoansLoanIdChargesResponse loanChargeResult = addLoanCharge(loanId, chargeId, "11 January 2023", chargeAmount);
+            PostLoansLoanIdChargesResponse loanChargeResult = addLoanCharge(loanId, chargeId, "20230111", chargeAmount);
             loanChargeResult.getResourceId();
 
-            addRepayment(loanId, LoanRequestBuilders.repayLoan(1018.0, "12 January 2023"));
+            addRepayment(loanId, LoanRequestBuilders.repayLoan(1018.0, "20230112"));
 
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(10.0, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 10.0, 0.0, 0.0, 0.0), //
-                    transaction(9.0, "Accrual", "10 January 2023", 0.0, 0.0, 0.0, 9.0, 0.0, 0.0, 0.0), //
-                    transaction(9.0, "Waive loan charges", "10 January 2023", 1000.0, 0.0, 0.0, 9.0, 0.0, 0.0, 0.0), //
-                    transaction(1018.0, "Repayment", "12 January 2023", 0.0, 1000.0, 0.0, 18.0, 0.0, 0.0, 0.0), //
-                    transaction(8.0, "Accrual", "12 January 2023", 0.0, 0.0, 0.0, 8.0, 0.0, 0.0, 0.0) //
+                    transaction(1000.0, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(10.0, "Accrual", "20230109", 0.0, 0.0, 0.0, 10.0, 0.0, 0.0, 0.0), //
+                    transaction(9.0, "Accrual", "20230110", 0.0, 0.0, 0.0, 9.0, 0.0, 0.0, 0.0), //
+                    transaction(9.0, "Waive loan charges", "20230110", 1000.0, 0.0, 0.0, 9.0, 0.0, 0.0, 0.0), //
+                    transaction(1018.0, "Repayment", "20230112", 0.0, 1000.0, 0.0, 18.0, 0.0, 0.0, 0.0), //
+                    transaction(8.0, "Accrual", "20230112", 0.0, 0.0, 0.0, 8.0, 0.0, 0.0, 0.0) //
             );
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(1000.0, 0.0, 27.0, 0.0, true, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(1000.0, 0.0, 27.0, 0.0, true, "20230131") //
             );
         });
 
@@ -267,7 +267,7 @@ public class LoanWaiveChargeTest extends FeignLoanTestBase {
         double amount = 1000.0;
         AtomicLong appliedLoanId = new AtomicLong();
 
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -276,19 +276,19 @@ public class LoanWaiveChargeTest extends FeignLoanTestBase {
             Long loanProductId = createLoanProduct(product);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "01 January 2023", amount, 9.9, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "20230101", amount, 9.9, 4, null);
             appliedLoanId.set(loanId);
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(amount), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(amount), "20230101");
         });
-        runAt("23 January 2023", () -> {
+        runAt("20230123", () -> {
             // create charge
             double chargeAmount = 5.0;
             PostChargesResponse chargeResult = createCharge(chargeAmount, "EUR");
             Long chargeId = chargeResult.getResourceId();
 
-            PostLoansLoanIdChargesResponse loanChargeResult = addLoanCharge(appliedLoanId.get(), chargeId, "23 January 2023", chargeAmount);
+            PostLoansLoanIdChargesResponse loanChargeResult = addLoanCharge(appliedLoanId.get(), chargeId, "20230123", chargeAmount);
             long loanChargeId = loanChargeResult.getResourceId();
 
             // waive charge
@@ -299,9 +299,9 @@ public class LoanWaiveChargeTest extends FeignLoanTestBase {
                     .flatMap(t -> t.getLoanChargePaidByList().stream()).filter(t -> Objects.equals(loanChargeId, t.getChargeId()))
                     .findAny();
 
-            reverseLoanTransaction(appliedLoanId.get(), chargeData.get().getTransactionId(), "23 January 2023");
+            reverseLoanTransaction(appliedLoanId.get(), chargeData.get().getTransactionId(), "20230123");
             CallFailedRuntimeException callFailedRuntimeException = assertThrows(CallFailedRuntimeException.class,
-                    () -> chargeOffLoan(appliedLoanId.get(), "05 January 2023"));
+                    () -> chargeOffLoan(appliedLoanId.get(), "20230105"));
             assertTrue(callFailedRuntimeException.getMessage().contains("error.msg.loan.monetary.transactions.after.charge.off"));
         });
     }

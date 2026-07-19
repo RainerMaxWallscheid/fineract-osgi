@@ -418,7 +418,7 @@ class SavingsAccountWritePlatformServiceJpaRepositoryImplTest {
         JsonCommand command = mock(JsonCommand.class);
         when(command.json()).thenReturn("{}");
         when(command.extractLocale()).thenReturn(java.util.Locale.ENGLISH);
-        when(command.dateFormat()).thenReturn("dd MMMM yyyy");
+        when(command.dateFormat()).thenReturn("yyyyMMdd");
         when(command.bigDecimalValueOfParameterNamed("amount")).thenReturn(BigDecimal.TEN);
         when(command.localDateValueOfParameterNamed("dueAsOfDate")).thenReturn(transactionDate);
         when(command.stringValueOfParameterNamed("note")).thenReturn(null);

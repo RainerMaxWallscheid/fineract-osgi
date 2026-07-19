@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
 public class LoanOriginationValidationTest extends BaseLoanIntegrationTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AdvancedPaymentAllocationLoanRepaymentScheduleTest.class);
-    private static final String DATETIME_PATTERN = "dd MMMM yyyy";
+    private static final String DATETIME_PATTERN = "yyyyMMdd";
     private static ResponseSpecification responseSpec;
     private static RequestSpecification requestSpec;
     private static BusinessDateHelper businessDateHelper;
@@ -93,7 +93,7 @@ public class LoanOriginationValidationTest extends BaseLoanIntegrationTest {
     // missed required attribute
     @Test
     public void uc1() {
-        String operationDate = "15 August 2024";
+        String operationDate = "20240815";
         runAt(operationDate, () -> {
 
             LOG.info("------------------------------CREATING NEW LOAN PRODUCT ---------------------------------------");
@@ -129,7 +129,7 @@ public class LoanOriginationValidationTest extends BaseLoanIntegrationTest {
     // due missed required attribute
     @Test
     public void uc2() {
-        String operationDate = "15 August 2024";
+        String operationDate = "20240815";
         runAt(operationDate, () -> {
 
             LOG.info("------------------------------CREATING NEW LOAN PRODUCT ---------------------------------------");
@@ -167,7 +167,7 @@ public class LoanOriginationValidationTest extends BaseLoanIntegrationTest {
     // 2. Submit Loan application without required parameters
     @Test
     public void uc3() {
-        String operationDate = "15 August 2024";
+        String operationDate = "20240815";
         runAt(operationDate, () -> {
 
             LOG.info("------------------------------CREATING NEW LOAN PRODUCT ---------------------------------------");

@@ -376,7 +376,7 @@ public class LoanWritePlatformServiceJpaRepositoryImplTest {
         command = mock(JsonCommand.class);
         when(command.localDateValueOfParameterNamed("actualDisbursementDate")).thenReturn(disbursementDate);
         when(command.extractLocale()).thenReturn(Locale.ENGLISH);
-        when(command.dateFormat()).thenReturn("dd MMMM yyyy");
+        when(command.dateFormat()).thenReturn("yyyyMMdd");
 
         // Setup service mocks
         when(loanAssembler.assembleFrom(LOAN_ID)).thenReturn(loan);
@@ -460,7 +460,7 @@ public class LoanWritePlatformServiceJpaRepositoryImplTest {
         command = mock(JsonCommand.class);
         when(command.localDateValueOfParameterNamed("actualDisbursementDate")).thenReturn(disbursementDate);
         when(command.extractLocale()).thenReturn(Locale.ENGLISH);
-        when(command.dateFormat()).thenReturn("dd MMMM yyyy");
+        when(command.dateFormat()).thenReturn("yyyyMMdd");
 
         // Setup service mocks
         when(loanAssembler.assembleFrom(LOAN_ID)).thenReturn(loan);
@@ -541,7 +541,7 @@ public class LoanWritePlatformServiceJpaRepositoryImplTest {
         command = mock(JsonCommand.class);
         when(command.localDateValueOfParameterNamed("actualDisbursementDate")).thenReturn(disbursementDate);
         when(command.extractLocale()).thenReturn(Locale.ENGLISH);
-        when(command.dateFormat()).thenReturn("dd MMMM yyyy");
+        when(command.dateFormat()).thenReturn("yyyyMMdd");
 
         // Setup service mocks
         when(loanAssembler.assembleFrom(LOAN_ID)).thenReturn(loan);

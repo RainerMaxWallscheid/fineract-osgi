@@ -97,7 +97,7 @@ public class LoanAuditingIntegrationTest {
         OffsetDateTime now = Utils.getAuditDateTimeToCompare();
 
         final Integer loanID = this.loanTransactionHelper.applyForLoanApplicationWithPaymentStrategyAndPastMonth(clientID, loanProductID,
-                Collections.emptyList(), null, "10000", LoanApplicationTestBuilder.DEFAULT_STRATEGY, "10 July 2022", "11 July 2022");
+                Collections.emptyList(), null, "10000", LoanApplicationTestBuilder.DEFAULT_STRATEGY, "20220710", "20220711");
         Assertions.assertNotNull(loanID);
         HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(this.requestSpec, this.responseSpec, loanID);
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
@@ -123,7 +123,7 @@ public class LoanAuditingIntegrationTest {
         this.loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
 
         OffsetDateTime now2 = Utils.getAuditDateTimeToCompare();
-        loanStatusHashMap = this.loanTransactionHelper.approveLoan("11 July 2022", loanID);
+        loanStatusHashMap = this.loanTransactionHelper.approveLoan("20220711", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         auditFieldsResponse = LoanTransactionHelper.getLoanAuditFields(requestSpec, responseSpec, loanID, "");
 

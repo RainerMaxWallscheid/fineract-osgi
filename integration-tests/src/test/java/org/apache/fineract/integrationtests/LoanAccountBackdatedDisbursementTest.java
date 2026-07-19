@@ -102,8 +102,8 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
                     .compareTo(disbursedAmountPercentageForDownPayment));
             assertEquals(enableAutoRepaymentForDownPayment, getLoanProductsProductResponse.getEnableAutoRepaymentForDownPayment());
 
-            // create loan account with submitted date as business date (03 March 2023) and expected disbursement date
-            // as future date (07 March 2023)
+            // create loan account with submitted date as business date (20230303) and expected disbursement date
+            // as future date (20230307)
             final Integer loanId = createLoanAccountMultipleRepaymentsDisbursement(clientId, getLoanProductsProductResponse.getId(),
                     loanExternalIdStr);
 
@@ -144,13 +144,13 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
             assertEquals(LocalDate.of(2023, 6, 7), loanDetails.getRepaymentSchedule().getPeriods().get(4).getDueDate());
             assertEquals(250.0,
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(4).getTotalInstallmentAmountForPeriod()));
-            // first disbursement on a future date (7 March 2023)
+            // first disbursement on a future date (20230307)
 
             businessDate = LocalDate.of(2023, 3, 7);
 
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, businessDate);
 
-            loanTransactionHelper.disburseLoanWithTransactionAmount("07 March 2023", loanId, "500");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230307", loanId, "500");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -191,7 +191,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
 
             // make repayment on 7 March to pay down payment installment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("7 March 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230307").locale("en")
                             .transactionAmount(125.00));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
@@ -242,7 +242,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
 
             // second disbursement backdated 5 March
 
-            loanTransactionHelper.disburseLoanWithTransactionAmount("05 March 2023", loanId, "500");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230305", loanId, "500");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -273,7 +273,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(3).getTotalInstallmentAmountForPeriod()));
             assertEquals(false, loanDetails.getRepaymentSchedule().getPeriods().get(3).getComplete());
 
-            // third installment [5 March 2023 - 5 April 2023]
+            // third installment [20230305 - 20230405]
             assertEquals(3, loanDetails.getRepaymentSchedule().getPeriods().get(4).getPeriod());
             assertEquals(LocalDate.of(2023, 3, 5), loanDetails.getRepaymentSchedule().getPeriods().get(4).getFromDate());
             assertEquals(LocalDate.of(2023, 4, 5), loanDetails.getRepaymentSchedule().getPeriods().get(4).getDueDate());
@@ -281,7 +281,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(4).getTotalInstallmentAmountForPeriod()));
             assertEquals(false, loanDetails.getRepaymentSchedule().getPeriods().get(4).getComplete());
 
-            // fourth installment [5 April 2023 - 5 May 2023]
+            // fourth installment [20230405 - 20230505]
             assertEquals(4, loanDetails.getRepaymentSchedule().getPeriods().get(5).getPeriod());
             assertEquals(LocalDate.of(2023, 4, 5), loanDetails.getRepaymentSchedule().getPeriods().get(5).getFromDate());
             assertEquals(LocalDate.of(2023, 5, 5), loanDetails.getRepaymentSchedule().getPeriods().get(5).getDueDate());
@@ -289,7 +289,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(5).getTotalInstallmentAmountForPeriod()));
             assertEquals(false, loanDetails.getRepaymentSchedule().getPeriods().get(5).getComplete());
 
-            // fifth installment [5 May 2023 - 5 June 2023]
+            // fifth installment [20230505 - 20230605]
             assertEquals(5, loanDetails.getRepaymentSchedule().getPeriods().get(6).getPeriod());
             assertEquals(LocalDate.of(2023, 5, 5), loanDetails.getRepaymentSchedule().getPeriods().get(6).getFromDate());
             assertEquals(LocalDate.of(2023, 6, 5), loanDetails.getRepaymentSchedule().getPeriods().get(6).getDueDate());
@@ -340,8 +340,8 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
                     .compareTo(disbursedAmountPercentageForDownPayment));
             assertEquals(enableAutoRepaymentForDownPayment, getLoanProductsProductResponse.getEnableAutoRepaymentForDownPayment());
 
-            // create loan account with submitted date as business date (03 March 2023) and expected disbursement date
-            // as future date (07 March 2023)
+            // create loan account with submitted date as business date (20230303) and expected disbursement date
+            // as future date (20230307)
             final Integer loanId = createLoanAccountMultipleRepaymentsDisbursement(clientId, getLoanProductsProductResponse.getId(),
                     loanExternalIdStr);
 
@@ -386,13 +386,13 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
             assertEquals(250.0,
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(4).getTotalInstallmentAmountForPeriod()));
 
-            // first disbursement on a future date (7 March 2023)
+            // first disbursement on a future date (20230307)
 
             businessDate = LocalDate.of(2023, 3, 7);
 
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, businessDate);
 
-            loanTransactionHelper.disburseLoanWithTransactionAmount("07 March 2023", loanId, "500");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230307", loanId, "500");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -410,21 +410,21 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
             assertEquals(125.00,
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(1).getTotalInstallmentAmountForPeriod()));
 
-            // second installment [3 March 2023 - 3 April 2023]
+            // second installment [20230303 - 20230403]
             assertEquals(2, loanDetails.getRepaymentSchedule().getPeriods().get(2).getPeriod());
             assertEquals(LocalDate.of(2023, 3, 3), loanDetails.getRepaymentSchedule().getPeriods().get(2).getFromDate());
             assertEquals(LocalDate.of(2023, 4, 3), loanDetails.getRepaymentSchedule().getPeriods().get(2).getDueDate());
             assertEquals(125.00,
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(2).getTotalInstallmentAmountForPeriod()));
 
-            // third installment [3 April 2023 - 3 May 2023]
+            // third installment [20230403 - 20230503]
             assertEquals(3, loanDetails.getRepaymentSchedule().getPeriods().get(3).getPeriod());
             assertEquals(LocalDate.of(2023, 4, 3), loanDetails.getRepaymentSchedule().getPeriods().get(3).getFromDate());
             assertEquals(LocalDate.of(2023, 5, 3), loanDetails.getRepaymentSchedule().getPeriods().get(3).getDueDate());
             assertEquals(125.00,
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(3).getTotalInstallmentAmountForPeriod()));
 
-            // fourth installment [3 May 2023 - 3 June 2023]
+            // fourth installment [20230503 - 20230603]
             assertEquals(4, loanDetails.getRepaymentSchedule().getPeriods().get(4).getPeriod());
             assertEquals(LocalDate.of(2023, 5, 3), loanDetails.getRepaymentSchedule().getPeriods().get(4).getFromDate());
             assertEquals(LocalDate.of(2023, 6, 3), loanDetails.getRepaymentSchedule().getPeriods().get(4).getDueDate());
@@ -433,7 +433,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
 
             // make repayment on 7 March to pay downpayment insatllment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("7 March 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230307").locale("en")
                             .transactionAmount(125.00));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
@@ -451,21 +451,21 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
             assertEquals(125.00, Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(1).getTotalPaidForPeriod()));
             assertEquals(true, loanDetails.getRepaymentSchedule().getPeriods().get(1).getComplete());
 
-            // second installment [3 March 2023 - 3 April 2023]
+            // second installment [20230303 - 20230403]
             assertEquals(2, loanDetails.getRepaymentSchedule().getPeriods().get(2).getPeriod());
             assertEquals(LocalDate.of(2023, 3, 3), loanDetails.getRepaymentSchedule().getPeriods().get(2).getFromDate());
             assertEquals(LocalDate.of(2023, 4, 3), loanDetails.getRepaymentSchedule().getPeriods().get(2).getDueDate());
             assertEquals(125.00,
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(2).getTotalInstallmentAmountForPeriod()));
 
-            // third installment [3 April 2023 - 3 May 2023]
+            // third installment [20230403 - 20230503]
             assertEquals(3, loanDetails.getRepaymentSchedule().getPeriods().get(3).getPeriod());
             assertEquals(LocalDate.of(2023, 4, 3), loanDetails.getRepaymentSchedule().getPeriods().get(3).getFromDate());
             assertEquals(LocalDate.of(2023, 5, 3), loanDetails.getRepaymentSchedule().getPeriods().get(3).getDueDate());
             assertEquals(125.00,
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(3).getTotalInstallmentAmountForPeriod()));
 
-            // fourth installment [3 May 2023 - 3 June 2023]
+            // fourth installment [20230503 - 20230603]
             assertEquals(4, loanDetails.getRepaymentSchedule().getPeriods().get(4).getPeriod());
             assertEquals(LocalDate.of(2023, 5, 3), loanDetails.getRepaymentSchedule().getPeriods().get(4).getFromDate());
             assertEquals(LocalDate.of(2023, 6, 3), loanDetails.getRepaymentSchedule().getPeriods().get(4).getDueDate());
@@ -477,7 +477,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, businessDate);
 
             // second disbursement backdated 5 March
-            loanTransactionHelper.disburseLoanWithTransactionAmount("05 March 2023", loanId, "500");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230305", loanId, "500");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -504,7 +504,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(3).getTotalInstallmentAmountForPeriod()));
             assertEquals(false, loanDetails.getRepaymentSchedule().getPeriods().get(3).getComplete());
 
-            // third installment [3 March 2023 - 3 April 2023]
+            // third installment [20230303 - 20230403]
             assertEquals(3, loanDetails.getRepaymentSchedule().getPeriods().get(4).getPeriod());
             assertEquals(LocalDate.of(2023, 3, 3), loanDetails.getRepaymentSchedule().getPeriods().get(4).getFromDate());
             assertEquals(LocalDate.of(2023, 4, 3), loanDetails.getRepaymentSchedule().getPeriods().get(4).getDueDate());
@@ -512,7 +512,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(4).getTotalInstallmentAmountForPeriod()));
             assertEquals(false, loanDetails.getRepaymentSchedule().getPeriods().get(4).getComplete());
 
-            // fourth installment [3 April 2023 - 3 May 2023]
+            // fourth installment [20230403 - 20230503]
             assertEquals(4, loanDetails.getRepaymentSchedule().getPeriods().get(5).getPeriod());
             assertEquals(LocalDate.of(2023, 4, 3), loanDetails.getRepaymentSchedule().getPeriods().get(5).getFromDate());
             assertEquals(LocalDate.of(2023, 5, 3), loanDetails.getRepaymentSchedule().getPeriods().get(5).getDueDate());
@@ -520,7 +520,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(5).getTotalInstallmentAmountForPeriod()));
             assertEquals(false, loanDetails.getRepaymentSchedule().getPeriods().get(5).getComplete());
 
-            // fifth installment [3 May 2023 - 3 June 2023]
+            // fifth installment [20230503 - 20230603]
             assertEquals(5, loanDetails.getRepaymentSchedule().getPeriods().get(6).getPeriod());
             assertEquals(LocalDate.of(2023, 5, 3), loanDetails.getRepaymentSchedule().getPeriods().get(6).getFromDate());
             assertEquals(LocalDate.of(2023, 6, 3), loanDetails.getRepaymentSchedule().getPeriods().get(6).getDueDate());
@@ -571,8 +571,8 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
                     .compareTo(disbursedAmountPercentageForDownPayment));
             assertEquals(enableAutoRepaymentForDownPayment, getLoanProductsProductResponse.getEnableAutoRepaymentForDownPayment());
 
-            // create loan account with submitted date as business date (03 March 2023) and expected disbursement date
-            // as future date (07 March 2023)
+            // create loan account with submitted date as business date (20230303) and expected disbursement date
+            // as future date (20230307)
             final Integer loanId = createLoanAccountMultipleRepaymentsDisbursement(clientId, getLoanProductsProductResponse.getId(),
                     loanExternalIdStr);
 
@@ -617,13 +617,13 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
             assertEquals(250.0,
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(4).getTotalInstallmentAmountForPeriod()));
 
-            // first disbursement on a future date (7 March 2023)
+            // first disbursement on a future date (20230307)
 
             businessDate = LocalDate.of(2023, 3, 7);
 
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, businessDate);
 
-            loanTransactionHelper.disburseLoanWithTransactionAmount("07 March 2023", loanId, "500");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230307", loanId, "500");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -664,7 +664,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
 
             // make repayment on 7 March to pay downpayment insatllment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("7 March 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230307").locale("en")
                             .transactionAmount(125.00));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
@@ -715,7 +715,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
 
             // make 2nd repayment on 7 April to pay installment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_2 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("7 April 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230407").locale("en")
                             .transactionAmount(125.00));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
@@ -760,7 +760,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
 
             // make backdate disbursement for 5 march with business date 7 April
 
-            loanTransactionHelper.disburseLoanWithTransactionAmount("05 March 2023", loanId, "500");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230305", loanId, "500");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -791,7 +791,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
             assertEquals(125.00, Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(3).getTotalPaidForPeriod()));
             assertEquals(true, loanDetails.getRepaymentSchedule().getPeriods().get(3).getComplete());
 
-            // third installment [5 March 2023 - 5 April 2023]
+            // third installment [20230305 - 20230405]
             assertEquals(3, loanDetails.getRepaymentSchedule().getPeriods().get(4).getPeriod());
             assertEquals(LocalDate.of(2023, 3, 5), loanDetails.getRepaymentSchedule().getPeriods().get(4).getFromDate());
             assertEquals(LocalDate.of(2023, 4, 5), loanDetails.getRepaymentSchedule().getPeriods().get(4).getDueDate());
@@ -799,7 +799,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(4).getTotalInstallmentAmountForPeriod()));
             assertEquals(false, loanDetails.getRepaymentSchedule().getPeriods().get(4).getComplete());
 
-            // fourth installment [5 April 2023 - 5 May 2023]
+            // fourth installment [20230405 - 20230505]
             assertEquals(4, loanDetails.getRepaymentSchedule().getPeriods().get(5).getPeriod());
             assertEquals(LocalDate.of(2023, 4, 5), loanDetails.getRepaymentSchedule().getPeriods().get(5).getFromDate());
             assertEquals(LocalDate.of(2023, 5, 5), loanDetails.getRepaymentSchedule().getPeriods().get(5).getDueDate());
@@ -807,7 +807,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(5).getTotalInstallmentAmountForPeriod()));
             assertEquals(false, loanDetails.getRepaymentSchedule().getPeriods().get(5).getComplete());
 
-            // fifth installment [5 May 2023 - 5 June 2023]
+            // fifth installment [20230505 - 20230605]
             assertEquals(5, loanDetails.getRepaymentSchedule().getPeriods().get(6).getPeriod());
             assertEquals(LocalDate.of(2023, 5, 5), loanDetails.getRepaymentSchedule().getPeriods().get(6).getFromDate());
             assertEquals(LocalDate.of(2023, 6, 5), loanDetails.getRepaymentSchedule().getPeriods().get(6).getDueDate());
@@ -860,8 +860,8 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
                     .compareTo(disbursedAmountPercentageForDownPayment));
             assertEquals(enableAutoRepaymentForDownPayment, getLoanProductsProductResponse.getEnableAutoRepaymentForDownPayment());
 
-            // create loan account with submitted date as business date (03 March 2023) and expected disbursement date
-            // as future date (07 March 2023)
+            // create loan account with submitted date as business date (20230303) and expected disbursement date
+            // as future date (20230307)
             final Integer loanId = createLoanAccountMultipleRepaymentsDisbursement(clientId, getLoanProductsProductResponse.getId(),
                     loanExternalIdStr);
 
@@ -900,10 +900,10 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
             assertEquals(LocalDate.of(2023, 6, 7), loanDetails.getRepaymentSchedule().getPeriods().get(4).getDueDate());
             assertEquals(250.0,
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(4).getTotalInstallmentAmountForPeriod()));
-            // first disbursement on a future date (7 March 2023)
+            // first disbursement on a future date (20230307)
             businessDate = LocalDate.of(2023, 3, 7);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, businessDate);
-            loanTransactionHelper.disburseLoanWithTransactionAmount("07 March 2023", loanId, "500");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230307", loanId, "500");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -921,7 +921,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
 
             // second disbursement backdated for 2 nd March 2023 before loan submission date
             List<HashMap<String, Object>> loanErrorData = (List<HashMap<String, Object>>) validationErrorHelper
-                    .disburseLoanWithTransactionAmountWithError("02 March 2023", loanId, "500", CommonConstants.RESPONSE_ERROR);
+                    .disburseLoanWithTransactionAmountWithError("20230302", loanId, "500", CommonConstants.RESPONSE_ERROR);
             assertNotNull(loanErrorData);
             assertEquals("Loan can't be disbursed before 2023-03-03", loanErrorData.get(0).get("defaultUserMessage"));
             assertEquals("error.msg.loan.actualdisbursementdate.before.submittedDate",
@@ -966,8 +966,8 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
             assertEquals("repaymentStartDateType.disbursementDate", getLoanProductsProductResponse.getRepaymentStartDateType().getCode());
             assertEquals(enableDownPayment, getLoanProductsProductResponse.getEnableDownPayment());
 
-            // create loan account with submitted date as business date (03 March 2023) and expected disbursement date
-            // as future date (07 March 2023)
+            // create loan account with submitted date as business date (20230303) and expected disbursement date
+            // as future date (20230307)
             final Integer loanId = createLoanAccountMultipleRepaymentsDisbursement(clientId, getLoanProductsProductResponse.getId(),
                     loanExternalIdStr);
 
@@ -1002,13 +1002,13 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
             assertEquals(LocalDate.of(2023, 6, 7), loanDetails.getRepaymentSchedule().getPeriods().get(3).getDueDate());
             assertEquals(333.34,
                     Utils.getDoubleValue(loanDetails.getRepaymentSchedule().getPeriods().get(3).getTotalInstallmentAmountForPeriod()));
-            // first disbursement on a future date (7 March 2023)
+            // first disbursement on a future date (20230307)
 
             businessDate = LocalDate.of(2023, 3, 7);
 
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, businessDate);
 
-            loanTransactionHelper.disburseLoanWithTransactionAmount("07 March 2023", loanId, "500");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230307", loanId, "500");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -1045,7 +1045,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
 
             // make repayment on 7 March to pay installment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("7 March 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230307").locale("en")
                             .transactionAmount(166.67));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
@@ -1088,7 +1088,7 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
 
             // second disbursement backdated 5 March
 
-            loanTransactionHelper.disburseLoanWithTransactionAmount("05 March 2023", loanId, "500");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230305", loanId, "500");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -1143,11 +1143,11 @@ public class LoanAccountBackdatedDisbursementTest extends BaseLoanIntegrationTes
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("3").withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsDecliningBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("07 March 2023").withSubmittedOnDate("03 March 2023").withLoanType("individual")
+                .withExpectedDisbursementDate("20230307").withSubmittedOnDate("20230303").withLoanType("individual")
                 .withExternalId(externalId).build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("03 March 2023", "1000", loanId, null);
+        loanTransactionHelper.approveLoan("20230303", "1000", loanId, null);
         return loanId;
     }
 

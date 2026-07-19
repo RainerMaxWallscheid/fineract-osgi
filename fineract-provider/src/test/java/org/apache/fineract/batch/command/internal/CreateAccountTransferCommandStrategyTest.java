@@ -83,7 +83,7 @@ public class CreateAccountTransferCommandStrategyTest {
         br.setMethod(HttpMethod.POST);
         br.setBody("{\"fromOfficeId\":1,\"fromClientId\":2,\"fromAccountType\":2,\"fromAccountId\":3,"
                 + "\"toOfficeId\":1,\"toClientId\":4,\"toAccountType\":2,\"toAccountId\":5,"
-                + "\"transferAmount\":100,\"transferDate\":\"01 March 2026\"," + "\"locale\":\"en\",\"dateFormat\":\"dd MMMM yyyy\"}");
+                + "\"transferAmount\":100,\"transferDate\":\"20260301\"," + "\"locale\":\"en\",\"dateFormat\":\"yyyyMMdd\"}");
         return br;
     }
 

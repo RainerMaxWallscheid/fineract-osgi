@@ -75,15 +75,15 @@ final class HolidaysApiResourceSwagger {
         public String name;
         @Schema(example = "Good Friday")
         public String description;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "25 October 2013")
+        @Schema(example = "20131025")
         public LocalDate fromDate;
-        @Schema(example = "25 October 2013")
+        @Schema(example = "20131025")
         public LocalDate toDate;
-        @Schema(example = "26 October 2013")
+        @Schema(example = "20131026")
         public LocalDate repaymentsRescheduledTo;
         @Schema(example = "2")
         public Integer reschedulingType;

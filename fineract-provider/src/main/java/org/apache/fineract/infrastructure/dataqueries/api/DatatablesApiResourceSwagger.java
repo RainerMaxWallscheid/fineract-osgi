@@ -201,11 +201,11 @@ final class DatatablesApiResourceSwagger {
         public Long Gender_cd;
         @Schema(example = "8.5")
         public Double HighestRatePaid;
-        @Schema(example = "01 October 2012")
+        @Schema(example = "20121001")
         public String NextVisit;
         @Schema(example = "5")
         public Long YearsinBusiness;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "en")
         public String locale;

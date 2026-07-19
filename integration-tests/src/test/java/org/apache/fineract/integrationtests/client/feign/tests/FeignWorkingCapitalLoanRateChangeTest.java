@@ -130,8 +130,8 @@ public class FeignWorkingCapitalLoanRateChangeTest extends FeignIntegrationTest 
     @Test
     void testMultipleRateChangesOnDifferentBusinessDates() {
         businessDateHelper.runAt("2026-01-01", () -> {
-            Long clientForTest = clientHelper.createClient("01 January 2026");
-            Long loanId = createAndDisburseLoanOnDate(clientForTest, BigDecimal.valueOf(50000), BigDecimal.valueOf(18), "01 January 2026");
+            Long clientForTest = clientHelper.createClient("20260101");
+            Long loanId = createAndDisburseLoanOnDate(clientForTest, BigDecimal.valueOf(50000), BigDecimal.valueOf(18), "20260101");
 
             // First rate change: 18 → 15 on Jan 1
             wcLoanHelper.updateRate(loanId, WorkingCapitalLoanRequestBuilders.updateRate(BigDecimal.valueOf(15)));
@@ -161,8 +161,8 @@ public class FeignWorkingCapitalLoanRateChangeTest extends FeignIntegrationTest 
         // then advance past term. The rate change should succeed — the segment starts
         // at the base term end with the remaining principal as balance.
         businessDateHelper.runAt("2026-01-01", () -> {
-            Long clientForTest = clientHelper.createClient("01 January 2026");
-            Long loanId = createAndDisburseLoanOnDate(clientForTest, BigDecimal.valueOf(100), BigDecimal.valueOf(18), "01 January 2026");
+            Long clientForTest = clientHelper.createClient("20260101");
+            Long loanId = createAndDisburseLoanOnDate(clientForTest, BigDecimal.valueOf(100), BigDecimal.valueOf(18), "20260101");
 
             // Advance past the loan term — rate change at day 5 is past the schedule end
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-06");

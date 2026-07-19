@@ -58,10 +58,10 @@ import org.junit.jupiter.api.Test;
 public class RepaymentReverseExternalIdTest extends BaseLoanIntegrationTest {
 
     private static final String loanAmount = "1000";
-    private static final String startDate = "20 December 2024";
-    private static final String firstRepaymentDate = "23 December 2024";
-    private static final String secondRepaymentDate = "26 December 2024";
-    private static final String reverseDate = "27 December 2024";
+    private static final String startDate = "20241220";
+    private static final String firstRepaymentDate = "20241223";
+    private static final String secondRepaymentDate = "20241226";
+    private static final String reverseDate = "20241227";
     private static final Double firstRepaymentAmount = 1000.0;
     private static final Double secondRepaymentAmount = 10.0;
 
@@ -101,12 +101,12 @@ public class RepaymentReverseExternalIdTest extends BaseLoanIntegrationTest {
 
             // First repayment to cover part of the loan
             final PostLoansLoanIdTransactionsResponse repaymentTransaction1 = loanTransactionHelper.makeLoanRepayment(loanExternalId,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate(firstRepaymentDate).locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate(firstRepaymentDate).locale("en")
                             .transactionAmount(firstRepaymentAmount));
 
             // Second repayment to create overpayment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction2 = loanTransactionHelper.makeLoanRepayment(loanExternalId,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate(secondRepaymentDate).locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate(secondRepaymentDate).locale("en")
                             .transactionAmount(secondRepaymentAmount)); // This creates an overpayment as total is now
             // 1010
 
@@ -237,7 +237,7 @@ public class RepaymentReverseExternalIdTest extends BaseLoanIntegrationTest {
                 .chargeOffFraudExpenseAccountId(chargeOffFraudExpenseAccount.getAccountID().longValue())//
                 .incomeFromChargeOffPenaltyAccountId(penaltyChargeOffAccount.getAccountID().longValue())//
 
-                .dateFormat("dd MMMM yyyy")//
+                .dateFormat("yyyyMMdd")//
                 .locale("en")//
                 .disallowExpectedDisbursements(false)//
                 .allowApprovedDisbursedAmountsOverApplied(false)//
@@ -266,7 +266,7 @@ public class RepaymentReverseExternalIdTest extends BaseLoanIntegrationTest {
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
         loanTransactionHelper.approveLoan(startDate, loanAmount, loanId, null);
         loanTransactionHelper.disburseLoan(Long.valueOf(loanId), new PostLoansLoanIdRequest().actualDisbursementDate(startDate)
-                .transactionAmount(new BigDecimal(loanAmount)).locale("en").dateFormat("dd MMMM yyyy"));
+                .transactionAmount(new BigDecimal(loanAmount)).locale("en").dateFormat("yyyyMMdd"));
         return loanId;
     }
 }

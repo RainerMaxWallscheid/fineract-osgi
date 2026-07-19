@@ -43,23 +43,23 @@ public class AdvancedPaymentAllocationWaiveLoanCharges extends FeignLoanTestBase
 
     @Test
     public void testAddFeeAndWaiveAdvancedPaymentAllocationNoBackdated() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = createClient();
             // Create Loan Product
             Long loanProductId = createLoanProductWithAdvancedAllocation();
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1000.0, 1, req -> req.transactionProcessingStrategyCode(ADVANCED_PAYMENT_ALLOCATION_STRATEGY).loanScheduleProcessingType(LoanScheduleProcessingType.HORIZONTAL.toString()));
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1000.0, 1, req -> req.transactionProcessingStrategyCode(ADVANCED_PAYMENT_ALLOCATION_STRATEGY).loanScheduleProcessingType(LoanScheduleProcessingType.HORIZONTAL.toString()));
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20230101");
             // Add Penalty
-            Long loanChargeId = addCharge(loanId, false, 50, "01 January 2023");
+            Long loanChargeId = addCharge(loanId, false, 50, "20230101");
             // When Waive Created Penalty
             waiveLoanCharge(loanId, loanChargeId, new PostLoansLoanIdChargesChargeIdRequest());
             // Then verify
             verifyTransactions(loanId,  //
-            transaction(1000, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(50, "Waive loan charges", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 50.0, 0.0) //
+            transaction(1000, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(50, "Waive loan charges", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 50.0, 0.0) //
             );
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             GetLoansLoanIdTransactions waiveTransaction = loanDetails.getTransactions().get(1);
@@ -72,23 +72,23 @@ public class AdvancedPaymentAllocationWaiveLoanCharges extends FeignLoanTestBase
 
     @Test
     public void testAddPenaltyAndWaiveAdvancedPaymentAllocationNoBackDated() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = createClient();
             // Create Loan Product
             Long loanProductId = createLoanProductWithAdvancedAllocation();
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1000.0, 1, req -> req.transactionProcessingStrategyCode(ADVANCED_PAYMENT_ALLOCATION_STRATEGY).loanScheduleProcessingType(LoanScheduleProcessingType.HORIZONTAL.toString()));
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1000.0, 1, req -> req.transactionProcessingStrategyCode(ADVANCED_PAYMENT_ALLOCATION_STRATEGY).loanScheduleProcessingType(LoanScheduleProcessingType.HORIZONTAL.toString()));
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20230101");
             // Add Penalty
-            Long loanChargeId = addCharge(loanId, true, 50, "01 January 2023");
+            Long loanChargeId = addCharge(loanId, true, 50, "20230101");
             // When Waive Created Penalty
             waiveLoanCharge(loanId, loanChargeId, new PostLoansLoanIdChargesChargeIdRequest());
             // Then verify
             verifyTransactions(loanId,  //
-            transaction(1000, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(50, "Waive loan charges", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 50.0, 0.0) //
+            transaction(1000, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(50, "Waive loan charges", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 50.0, 0.0) //
             );
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             GetLoansLoanIdTransactions waiveTransaction = loanDetails.getTransactions().get(1);
@@ -101,25 +101,25 @@ public class AdvancedPaymentAllocationWaiveLoanCharges extends FeignLoanTestBase
 
     @Test
     public void testAddPenaltyAndWaiveAdvancedPaymentAllocationAndBackdatedRepayment() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = createClient();
             // Create Loan Product
             Long loanProductId = createLoanProductWithAdvancedAllocation();
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1000.0, 1, req -> req.transactionProcessingStrategyCode(ADVANCED_PAYMENT_ALLOCATION_STRATEGY).loanScheduleProcessingType(LoanScheduleProcessingType.HORIZONTAL.toString())); // Disburse
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1000.0, 1, req -> req.transactionProcessingStrategyCode(ADVANCED_PAYMENT_ALLOCATION_STRATEGY).loanScheduleProcessingType(LoanScheduleProcessingType.HORIZONTAL.toString())); // Disburse
             // Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20230101");
             // set business date to
-            updateBusinessDate("05 January 2023");
+            updateBusinessDate("20230105");
             // Add Penalty
-            Long loanChargeId = addCharge(loanId, true, 50, "05 January 2023");
+            Long loanChargeId = addCharge(loanId, true, 50, "20230105");
             // When Waive Created Penalty
             waiveLoanCharge(loanId, loanChargeId, new PostLoansLoanIdChargesChargeIdRequest());
             // Then verify
             verifyTransactions(loanId,  //
-            transaction(1000, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(50, "Waive loan charges", "05 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 50.0, 0.0) //
+            transaction(1000, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(50, "Waive loan charges", "20230105", 1000.0, 0.0, 0.0, 0.0, 0.0, 50.0, 0.0) //
             );
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             GetLoansLoanIdTransactions waiveTransaction = loanDetails.getTransactions().get(1);
@@ -127,11 +127,11 @@ public class AdvancedPaymentAllocationWaiveLoanCharges extends FeignLoanTestBase
             Assertions.assertEquals(1, waiveTransaction.getLoanChargePaidByList().size());
             Assertions.assertEquals(loanChargeId, waiveTransaction.getLoanChargePaidByList().get(0).getChargeId());
             Assertions.assertEquals(50.0, Utils.getDoubleValue(waiveTransaction.getLoanChargePaidByList().get(0).getAmount()));
-            addRepaymentForLoan(loanId, 200.0, "03 January 2023");
+            addRepaymentForLoan(loanId, 200.0, "20230103");
             verifyTransactions(loanId,  //
-            transaction(1000, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(200, "Repayment", "03 January 2023", 800.0, 200.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(50, "Waive loan charges", "05 January 2023", 800.0, 0.0, 0.0, 0.0, 0.0, 50.0, 0.0) //
+            transaction(1000, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(200, "Repayment", "20230103", 800.0, 200.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(50, "Waive loan charges", "20230105", 800.0, 0.0, 0.0, 0.0, 0.0, 50.0, 0.0) //
             );
         });
     }

@@ -139,9 +139,9 @@ public class GroupTest {
 
         final Integer loanId = this.applyForLoanApplication(clientID, loanProductId, this.principal);
 
-        this.loanTransactionHelper.approveLoan("20 September 2014", loanId);
+        this.loanTransactionHelper.approveLoan("20140920", loanId);
         String loanDetails = this.loanTransactionHelper.getLoanDetails(this.requestSpec, this.responseSpec, loanId);
-        this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20 September 2014", loanId,
+        this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20140920", loanId,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
 
         final HashMap assignStaffAndInheritStaffForClientAccounts = (HashMap) GroupHelper.assignStaffInheritStaffForClientAccounts(
@@ -188,8 +188,8 @@ public class GroupTest {
                 .withAmortizationTypeAsEqualInstallments() //
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("20 September 2014") //
-                .withSubmittedOnDate("20 September 2014") //
+                .withExpectedDisbursementDate("20140920") //
+                .withSubmittedOnDate("20140920") //
                 .withCollaterals(collaterals).build(clientID.toString(), loanProductID.toString(), null);
         return this.loanTransactionHelper.getLoanId(loanApplicationJSON);
     }

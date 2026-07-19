@@ -98,7 +98,7 @@ public class LoanChargeTypeInstallmentFeeErrorHandlingWithAdvancedPaymentAllocat
             final Integer loanId = createLoanAccount(clientId, loanProductId, loanExternalIdStr);
 
             // disburse principal amount
-            LOAN_TRANSACTION_HELPER.disburseLoanWithTransactionAmount("15 February 2023", loanId, "1000");
+            LOAN_TRANSACTION_HELPER.disburseLoanWithTransactionAmount("20230215", loanId, "1000");
 
             // add loan charge
             // apply Installment fee
@@ -142,12 +142,12 @@ public class LoanChargeTypeInstallmentFeeErrorHandlingWithAdvancedPaymentAllocat
         String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("60")
                 .withLoanTermFrequencyAsDays().withNumberOfRepayments("4").withRepaymentEveryAfter("15").withRepaymentFrequencyTypeAsDays()
                 .withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance().withAmortizationTypeAsEqualPrincipalPayments()
-                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("15 February 2023")
-                .withSubmittedOnDate("15 February 2023").withLoanType("individual").withExternalId(externalId)
+                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("20230215")
+                .withSubmittedOnDate("20230215").withLoanType("individual").withExternalId(externalId)
                 .withRepaymentStrategy("advanced-payment-allocation-strategy").build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = LOAN_TRANSACTION_HELPER.getLoanId(loanApplicationJSON);
-        LOAN_TRANSACTION_HELPER.approveLoan("15 February 2023", "1000", loanId, null);
+        LOAN_TRANSACTION_HELPER.approveLoan("20230215", "1000", loanId, null);
         return loanId;
     }
 }

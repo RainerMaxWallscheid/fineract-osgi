@@ -52,7 +52,7 @@ public class LoanTransactionDataTest {
         Long loanId = 10L;
         String transactionType = "REPAYMENT";
         Integer rowIndex = 1;
-        String dateFormat = "dd MMMM yyyy";
+        String dateFormat = "yyyyMMdd";
         String locale = "en";
         Long paymentTypeId = 1L;
         String accountNumber = "AC123456";
@@ -184,7 +184,7 @@ public class LoanTransactionDataTest {
         Long repaymentTypeId = 1L;
         Integer rowIndex = 1;
         String locale = "en";
-        String dateFormat = "dd MMMM yyyy";
+        String dateFormat = "yyyyMMdd";
 
         // When
         LoanTransactionData data = LoanTransactionData.importInstance(repaymentAmount, lastRepaymentDate, repaymentTypeId, rowIndex, locale,
@@ -218,7 +218,7 @@ public class LoanTransactionDataTest {
         String transactionType = "REPAYMENT";
         Integer rowIndex = 2;
         String locale = "en";
-        String dateFormat = "dd MMMM yyyy";
+        String dateFormat = "yyyyMMdd";
 
         // When
         LoanTransactionData data = LoanTransactionData.importInstance(repaymentAmount, repaymentDate, repaymentTypeId, accountNumber,

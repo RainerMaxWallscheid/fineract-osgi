@@ -35,7 +35,7 @@ import retrofit2.Response;
 
 public class ShareAccountCreationValidationTest extends IntegrationTest {
 
-    private static final String DATE_FORMAT = "dd MMMM yyyy";
+    private static final String DATE_FORMAT = "yyyyMMdd";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
 
     @Test

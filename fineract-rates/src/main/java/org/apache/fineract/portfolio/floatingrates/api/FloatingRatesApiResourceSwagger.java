@@ -37,13 +37,13 @@ final class FloatingRatesApiResourceSwagger {
 
             private PostFloatingRatesRatePeriods() {}
 
-            @Schema(example = "19 November 2015")
+            @Schema(example = "20151119")
             public String fromDate;
             @Schema(example = "10")
             public Double interestRate;
             @Schema(example = "en")
             public String locale;
-            @Schema(example = "dd MMMM yyyy")
+            @Schema(example = "yyyyMMdd")
             public String dateFormat;
         }
 

@@ -52,15 +52,15 @@ final class BatchApiResourceSwagger {
             public String lastname;
             @Schema(example = "\"ex_externalId1\"")
             public String externalId;
-            @Schema(example = "\"dd MMMM yyyy\"")
+            @Schema(example = "\"yyyyMMdd\"")
             public String dateFormat;
             @Schema(example = "\"en\"")
             public String locale;
             @Schema(example = "true")
             public boolean active;
-            @Schema(example = "\"04 March 2009\"")
+            @Schema(example = "\"20090304\"")
             public String activationDate;
-            @Schema(example = "\"04 March 2009\"")
+            @Schema(example = "\"20090304\"")
             public String submittedOnDate;
 
         }

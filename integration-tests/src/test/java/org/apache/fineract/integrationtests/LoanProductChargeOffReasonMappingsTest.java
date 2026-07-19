@@ -48,7 +48,7 @@ public class LoanProductChargeOffReasonMappingsTest extends BaseLoanIntegrationT
 
     @Test
     public void testCreateAndUpdateLoanProductWithValidChargeOffReason() {
-        runAt("15 January 2023", () -> {
+        runAt("20230115", () -> {
             Integer chargeOffReasons = createChargeOffReason();
             Long localLoanProductId = loanTransactionHelper
                     .createLoanProduct(loanProductsRequest(Long.valueOf(chargeOffReasons), expenseAccount.getAccountID().longValue()))
@@ -78,7 +78,7 @@ public class LoanProductChargeOffReasonMappingsTest extends BaseLoanIntegrationT
 
     @Test
     public void testCreateLoanProductWithInvalidGLAccount() {
-        runAt("15 January 2023", () -> {
+        runAt("20230115", () -> {
             try {
                 Integer chargeOffReasons = createChargeOffReason();
                 loanTransactionHelper.createLoanProduct(loanProductsRequest(Long.valueOf(chargeOffReasons), -1L));
@@ -90,7 +90,7 @@ public class LoanProductChargeOffReasonMappingsTest extends BaseLoanIntegrationT
 
     @Test
     public void testCreateLoanProductWithInvalidChargeOffReason() {
-        runAt("15 January 2023", () -> {
+        runAt("20230115", () -> {
             try {
                 loanTransactionHelper.createLoanProduct(loanProductsRequest(-1L, expenseAccount.getAccountID().longValue()));
             } catch (CallFailedRuntimeException e) {
@@ -207,7 +207,7 @@ public class LoanProductChargeOffReasonMappingsTest extends BaseLoanIntegrationT
                 .chargeOffFraudExpenseAccountId(chargeOffFraudExpenseAccount.getAccountID().longValue())//
                 .incomeFromChargeOffPenaltyAccountId(penaltyChargeOffAccount.getAccountID().longValue())//
 
-                .dateFormat("dd MMMM yyyy")//
+                .dateFormat("yyyyMMdd")//
                 .locale("en")//
                 .disallowExpectedDisbursements(false)//
                 .allowApprovedDisbursedAmountsOverApplied(false)//

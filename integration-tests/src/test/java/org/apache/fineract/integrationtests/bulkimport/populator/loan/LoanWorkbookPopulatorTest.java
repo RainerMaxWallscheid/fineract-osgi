@@ -98,7 +98,7 @@ public class LoanWorkbookPopulatorTest {
         Long outcome_payment_creation = paymentTypesResponse.getResourceId();
         Assertions.assertNotNull(outcome_payment_creation, "Could not create payment type");
 
-        Workbook workbook = loanTransactionHelper.getLoanWorkbook("dd MMMM yyyy");
+        Workbook workbook = loanTransactionHelper.getLoanWorkbook("yyyyMMdd");
 
         Sheet officeSheet = workbook.getSheet(TemplatePopulateImportConstants.OFFICE_SHEET_NAME);
         Row firstOfficeRow = officeSheet.getRow(1);

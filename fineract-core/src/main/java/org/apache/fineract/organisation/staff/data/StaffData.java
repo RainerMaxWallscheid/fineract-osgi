@@ -45,7 +45,7 @@ public final class StaffData implements Serializable {
 
     @java.lang.SuppressWarnings("all")
         private static String $default$dateFormat() {
-        return "dd MMMM yyyy";
+        return "yyyyMMdd";
     }
 
 

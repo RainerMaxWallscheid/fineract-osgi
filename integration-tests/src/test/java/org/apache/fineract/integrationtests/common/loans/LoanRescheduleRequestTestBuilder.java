@@ -26,7 +26,7 @@ import org.apache.fineract.client.models.PostUpdateRescheduleLoansRequest;
 
 public class LoanRescheduleRequestTestBuilder {
 
-    private String rescheduleFromDate = "04 December 2014";
+    private String rescheduleFromDate = "20141204";
     private String graceOnPrincipal = "2";
     private String graceOnInterest = "2";
     private String extraTerms = "2";
@@ -35,14 +35,14 @@ public class LoanRescheduleRequestTestBuilder {
     private String adjustedDueDate = null;
     private String rescheduleReasonId = "1";
     private String rescheduleReasonComment = null;
-    private String submittedOnDate = "04 September 2014";
+    private String submittedOnDate = "20140904";
     private String emi = null;
     private String emiEndDate = null;
 
     public String build(final String loanId) {
         final HashMap<String, Object> map = new HashMap<>();
 
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("locale", "en_GB");
         map.put("loanId", loanId);
         map.put("submittedOnDate", submittedOnDate);
@@ -163,7 +163,7 @@ public class LoanRescheduleRequestTestBuilder {
     public String getRejectLoanRescheduleRequestJSON() {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("rejectedOnDate", submittedOnDate);
         return new Gson().toJson(map);
     }
@@ -171,13 +171,13 @@ public class LoanRescheduleRequestTestBuilder {
     public String getApproveLoanRescheduleRequestJSON() {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("approvedOnDate", submittedOnDate);
         return new Gson().toJson(map);
     }
 
     public PostCreateRescheduleLoansRequest buildRequest(final Long loanId) {
-        PostCreateRescheduleLoansRequest request = new PostCreateRescheduleLoansRequest().dateFormat("dd MMMM yyyy").locale("en_GB")
+        PostCreateRescheduleLoansRequest request = new PostCreateRescheduleLoansRequest().dateFormat("yyyyMMdd").locale("en_GB")
                 .loanId(loanId).submittedOnDate(submittedOnDate).rescheduleFromDate(rescheduleFromDate)
                 .rescheduleReasonId(Long.valueOf(rescheduleReasonId));
 
@@ -209,10 +209,10 @@ public class LoanRescheduleRequestTestBuilder {
     }
 
     public PostUpdateRescheduleLoansRequest getRejectRequest() {
-        return new PostUpdateRescheduleLoansRequest().locale("en").dateFormat("dd MMMM yyyy").rejectedOnDate(submittedOnDate);
+        return new PostUpdateRescheduleLoansRequest().locale("en").dateFormat("yyyyMMdd").rejectedOnDate(submittedOnDate);
     }
 
     public PostUpdateRescheduleLoansRequest getApproveRequest() {
-        return new PostUpdateRescheduleLoansRequest().locale("en").dateFormat("dd MMMM yyyy").approvedOnDate(submittedOnDate);
+        return new PostUpdateRescheduleLoansRequest().locale("en").dateFormat("yyyyMMdd").approvedOnDate(submittedOnDate);
     }
 }

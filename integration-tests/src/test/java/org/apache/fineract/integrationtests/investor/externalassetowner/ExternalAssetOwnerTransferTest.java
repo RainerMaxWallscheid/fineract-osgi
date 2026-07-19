@@ -85,7 +85,7 @@ public class ExternalAssetOwnerTransferTest extends BaseLoanIntegrationTest {
     protected static SchedulerJobHelper SCHEDULER_JOB_HELPER;
     protected static LocalDate TODAYS_DATE;
     public String ownerExternalId;
-    protected DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+    protected DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
 
     @BeforeAll
     public static void setupInvestorBusinessStep() {
@@ -141,7 +141,7 @@ public class ExternalAssetOwnerTransferTest extends BaseLoanIntegrationTest {
     protected void addPenaltyForLoan(Integer loanID, String amount) {
         // Add Charge Penalty
         Integer penalty = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC, ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, amount, true));
-        Integer penalty1LoanChargeId = LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "02 March 2020", amount));
+        Integer penalty1LoanChargeId = LOAN_TRANSACTION_HELPER.addChargesForLoan(loanID, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "20200302", amount));
         assertNotNull(penalty1LoanChargeId);
     }
 

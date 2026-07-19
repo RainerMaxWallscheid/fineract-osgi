@@ -78,9 +78,9 @@ public class FeignWorkingCapitalLoanReprocessingCorrectnessTest extends FeignInt
     @DisplayName("Reprocessing after a backdated repayment preserves a prior charge adjustment (no double-settlement of the fee)")
     void backdatedRepayment_preservesChargeAdjustment() {
         businessDateHelper.runAt("2026-01-01", () -> {
-            Long client = clientHelper.createClient("01 January 2026");
-            Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 January 2026");
-            Long feeLoanChargeId = addCharge(loanId, false, 100, "01 January 2026");
+            Long client = clientHelper.createClient("20260101");
+            Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260101");
+            Long feeLoanChargeId = addCharge(loanId, false, 100, "20260101");
 
             // A 40 charge adjustment partially settles the 100 fee: amountPaid 40, outstanding 60.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-05");
@@ -88,13 +88,13 @@ public class FeignWorkingCapitalLoanReprocessingCorrectnessTest extends FeignInt
 
             // R1 on day 10: settles the remaining 60 of the fee, then the leftover would be nothing (60 == remaining).
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-20");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(60), "10 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(60), "20260110"));
 
             // Backdated R2 on day 8 (before R1) triggers reprocessing. The prior 40 adjustment must survive: the fee's
             // remaining outstanding is only 60, so the replayed repayments together settle only the 60 remainder while
             // the rest goes to principal.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-25");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(50), "08 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(50), "20260108"));
 
             // Balance: fee fully paid (40 adjustment + 60 repayment), 50 to principal.
             GetBalance balance = balanceOf(loanId);

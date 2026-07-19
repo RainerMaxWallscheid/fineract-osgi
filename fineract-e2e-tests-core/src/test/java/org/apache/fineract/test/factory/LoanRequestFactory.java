@@ -58,7 +58,7 @@ public class LoanRequestFactory {
     private LoanProductResolver loanProductResolver;
     @Autowired
     private PaymentTypeResolver paymentTypeResolver;
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     public static final String DEFAULT_LOCALE = "en";
     public static final DefaultLoanProduct DEFAULT_LOAN_PRODUCT = DefaultLoanProduct.valueOf("LP1");
     public static final DefaultLoanProduct DEFAULT_PROGRESSIVE_LOAN_PRODUCT = DefaultLoanProduct.valueOf("LP2_ADV_CUSTOM_PMT_ALLOC_PROGRESSIVE_LOAN_SCHEDULE_HORIZONTAL");
@@ -178,7 +178,7 @@ public class LoanRequestFactory {
         //
         //
         //
-        new PutLoansLoanIdRequest().productId(loanProductResolver.resolve(DEFAULT_LOAN_PRODUCT)).submittedOnDate(newSubmittedOnDate).expectedDisbursementDate(dateDisburseStr).linkAccountId(null).createStandingInstructionAtDisbursement(null).loanTermFrequency(DEFAULT_LOAN_TERM_FREQUENCY).loanTermFrequencyType(DEFAULT_LOAN_TERM_FREQUENCY_TYPE).numberOfRepayments(DEFAULT_NUMBER_OF_REPAYMENTS).repaymentEvery(DEFAULT_REPAYMENT_FREQUENCY).repaymentFrequencyType(DEFAULT_REPAYMENT_FREQUENCY_TYPE).repaymentFrequencyNthDayType(null).repaymentFrequencyDayOfWeekType(null).repaymentsStartingFromDate(null).interestChargedFromDate(null).interestRatePerPeriod(DEFAULT_INTEREST_RATE_PER_PERIOD).interestType(DEFAULT_INTEREST_TYPE).interestCalculationPeriodType(DEFAULT_INTEREST_CALCULATION_PERIOD_TYPE_SAME_AS_REPAYMENT_PERIOD).amortizationType(DEFAULT_AMORTIZATION_TYPE).isEqualAmortization(false).transactionProcessingStrategyCode(DEFAULT_TRANSACTION_PROCESSING_STRATEGY_CODE).graceOnArrearsAgeing(3).loanIdToClose(null).isTopup(null).maxOutstandingLoanBalance(10000L).charges(new ArrayList<>()).collateral(new ArrayList<>()).disbursementData(new ArrayList<>()).clientId(clientId).dateFormat("dd MMMM yyyy").locale("en").loanType("individual").principal(DEFAULT_PRINCIPAL.longValue());//
+        new PutLoansLoanIdRequest().productId(loanProductResolver.resolve(DEFAULT_LOAN_PRODUCT)).submittedOnDate(newSubmittedOnDate).expectedDisbursementDate(dateDisburseStr).linkAccountId(null).createStandingInstructionAtDisbursement(null).loanTermFrequency(DEFAULT_LOAN_TERM_FREQUENCY).loanTermFrequencyType(DEFAULT_LOAN_TERM_FREQUENCY_TYPE).numberOfRepayments(DEFAULT_NUMBER_OF_REPAYMENTS).repaymentEvery(DEFAULT_REPAYMENT_FREQUENCY).repaymentFrequencyType(DEFAULT_REPAYMENT_FREQUENCY_TYPE).repaymentFrequencyNthDayType(null).repaymentFrequencyDayOfWeekType(null).repaymentsStartingFromDate(null).interestChargedFromDate(null).interestRatePerPeriod(DEFAULT_INTEREST_RATE_PER_PERIOD).interestType(DEFAULT_INTEREST_TYPE).interestCalculationPeriodType(DEFAULT_INTEREST_CALCULATION_PERIOD_TYPE_SAME_AS_REPAYMENT_PERIOD).amortizationType(DEFAULT_AMORTIZATION_TYPE).isEqualAmortization(false).transactionProcessingStrategyCode(DEFAULT_TRANSACTION_PROCESSING_STRATEGY_CODE).graceOnArrearsAgeing(3).loanIdToClose(null).isTopup(null).maxOutstandingLoanBalance(10000L).charges(new ArrayList<>()).collateral(new ArrayList<>()).disbursementData(new ArrayList<>()).clientId(clientId).dateFormat("yyyyMMdd").locale("en").loanType("individual").principal(DEFAULT_PRINCIPAL.longValue());//
     }
 
     public PutLoansLoanIdRequest enableFraudFlag() {

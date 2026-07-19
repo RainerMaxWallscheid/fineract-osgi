@@ -63,13 +63,13 @@ public class FixedLengthLoanProductIntegrationTest extends FeignLoanTestBase {
 
     @Test
     public void testLoanApplicationWithFixedLengthInheritedFromLoanProduct() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             Long clientId = createClient();
 
             Long loanProductId = createLoanProduct(fixedLengthLoanProduct(4));
             Assertions.assertNotNull(loanProductId);
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", 1000.0, 4);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", 1000.0, 4);
             applicationRequest = applicationRequest
                     .transactionProcessingStrategyCode(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY);
 
@@ -82,13 +82,13 @@ public class FixedLengthLoanProductIntegrationTest extends FeignLoanTestBase {
 
     @Test
     public void testLoanApplicationWithFixedLengthOverriddenByLoanApplication() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             Long clientId = createClient();
 
             Long loanProductId = createLoanProduct(fixedLengthLoanProduct(4));
             Assertions.assertNotNull(loanProductId);
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", 1000.0, 4);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", 1000.0, 4);
             applicationRequest = applicationRequest.fixedLength(5).repaymentEvery(1).repaymentFrequencyType(2).loanTermFrequencyType(2)
                     .loanTermFrequency(4).transactionProcessingStrategyCode(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY);
 

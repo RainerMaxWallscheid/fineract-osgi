@@ -37,7 +37,7 @@ public class LoanChargeOffAccountingEntriesForReverseReplayedTransactionsTest ex
 
     @Test
     public void testJournalEntriesForChargeOffLoanWithMultipleReverseReplay() {
-        runAt("24 May 2024", () -> {
+        runAt("20240524", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
             Long delinquencyBucketId = DelinquencyBucketsHelper.createBucket(List.of(//
@@ -60,56 +60,56 @@ public class LoanChargeOffAccountingEntriesForReverseReplayedTransactionsTest ex
 
             Long loanProductId = createLoanProduct(loanProductsRequest);
 
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "24 May 2024", 1000.0, 3);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20240524", 1000.0, 3);
 
-            disburseLoan(loanId, BigDecimal.valueOf(200), "24 May 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(200), "20240524");
 
             verifyTransactions(loanId, //
-                    transaction(50.0, "Down Payment", "24 May 2024"), //
-                    transaction(200.0, "Disbursement", "24 May 2024") //
+                    transaction(50.0, "Down Payment", "20240524"), //
+                    transaction(200.0, "Disbursement", "20240524") //
             );
 
-            updateBusinessDate("25 May 2024");
+            updateBusinessDate("20240525");
 
-            Long downPaymentTransactionId = getTransactionId(loanId, "Down Payment", "24 May 2024");
+            Long downPaymentTransactionId = getTransactionId(loanId, "Down Payment", "20240524");
             reverseLoanTransaction(loanId, downPaymentTransactionId,
                     new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(LoanTestData.DATETIME_PATTERN)
-                            .transactionDate("25 May 2024").transactionAmount(0.0).locale(LoanTestData.LOCALE));
+                            .transactionDate("20240525").transactionAmount(0.0).locale(LoanTestData.LOCALE));
 
             verifyTransactions(loanId, //
-                    transaction(200.0, "Disbursement", "24 May 2024", 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(50.0, "Down Payment", "24 May 2024", 150.0, 50.0, 0.0, 0.0, 0.0, 0.0, 0.0, true) //
+                    transaction(200.0, "Disbursement", "20240524", 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(50.0, "Down Payment", "20240524", 150.0, 50.0, 0.0, 0.0, 0.0, 0.0, 0.0, true) //
             );
 
-            updateBusinessDate("26 May 2024");
-            Long chargeOffTransactionId = chargeOffLoan(loanId, "26 May 2024");
+            updateBusinessDate("20240526");
+            Long chargeOffTransactionId = chargeOffLoan(loanId, "20240526");
 
             verifyTransactions(loanId, //
-                    transaction(200.0, "Disbursement", "24 May 2024", 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(50.0, "Down Payment", "24 May 2024", 150.0, 50.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
-                    transaction(200.0, "Charge-off", "26 May 2024", 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, false) //
+                    transaction(200.0, "Disbursement", "20240524", 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(50.0, "Down Payment", "20240524", 150.0, 50.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
+                    transaction(200.0, "Charge-off", "20240526", 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, false) //
             );
 
-            Long repaymentTransactionId = addRepaymentForLoan(loanId, 10.0, "25 May 2024");
+            Long repaymentTransactionId = addRepaymentForLoan(loanId, 10.0, "20240525");
 
             verifyTransactions(loanId, //
-                    transaction(200.0, "Disbursement", "24 May 2024", 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(50.0, "Down Payment", "24 May 2024", 150.0, 50.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
-                    transaction(10.0, "Repayment", "25 May 2024", 190.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(190.0, "Charge-off", "26 May 2024", 0.0, 190.0, 0.0, 0.0, 0.0, 0.0, 0.0, false));
+                    transaction(200.0, "Disbursement", "20240524", 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(50.0, "Down Payment", "20240524", 150.0, 50.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
+                    transaction(10.0, "Repayment", "20240525", 190.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(190.0, "Charge-off", "20240526", 0.0, 190.0, 0.0, 0.0, 0.0, 0.0, 0.0, false));
 
             String merchantIssuedRefundExternalId = UUID.randomUUID().toString();
             Long merchantIssuedRefundId = makeMerchantIssuedRefund(loanId,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("26 May 2024")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20240526")
                             .locale(LoanTestData.LOCALE).transactionAmount(200.0).externalId(merchantIssuedRefundExternalId))
                     .getResourceId();
 
             verifyTransactions(loanId, //
-                    transaction(200.0, "Disbursement", "24 May 2024", 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(50.0, "Down Payment", "24 May 2024", 150.0, 50.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
-                    transaction(10.0, "Repayment", "25 May 2024", 190.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(190.0, "Charge-off", "26 May 2024", 0.0, 190.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(200.0, "Merchant Issued Refund", "26 May 2024", 0.0, 190.0, 0.0, 0.0, 0.0, 0.0, 10.0, false));
+                    transaction(200.0, "Disbursement", "20240524", 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(50.0, "Down Payment", "20240524", 150.0, 50.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
+                    transaction(10.0, "Repayment", "20240525", 190.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(190.0, "Charge-off", "20240526", 0.0, 190.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(200.0, "Merchant Issued Refund", "20240526", 0.0, 190.0, 0.0, 0.0, 0.0, 0.0, 10.0, false));
 
             verifyLoanStatus(loanId, LoanStatus.OVERPAID);
 
@@ -132,32 +132,32 @@ public class LoanChargeOffAccountingEntriesForReverseReplayedTransactionsTest ex
 
             );
 
-            updateBusinessDate("27 May 2024");
+            updateBusinessDate("20240527");
 
-            makeCreditBalanceRefund(loanId, new PostLoansLoanIdTransactionsRequest().transactionDate("27 May 2024")
+            makeCreditBalanceRefund(loanId, new PostLoansLoanIdTransactionsRequest().transactionDate("20240527")
                     .dateFormat(LoanTestData.DATETIME_PATTERN).transactionAmount(10.0).locale(LoanTestData.LOCALE));
 
             verifyLoanStatus(loanId, LoanStatus.CLOSED_OBLIGATIONS_MET);
 
             verifyTransactions(loanId, //
-                    transaction(200.0, "Disbursement", "24 May 2024", 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(50.0, "Down Payment", "24 May 2024", 150.0, 50.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
-                    transaction(10.0, "Repayment", "25 May 2024", 190.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(190.0, "Charge-off", "26 May 2024", 0.0, 190.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(200.0, "Merchant Issued Refund", "26 May 2024", 0.0, 190.0, 0.0, 0.0, 0.0, 0.0, 10.0, false), //
-                    transaction(10.0, "Credit Balance Refund", "27 May 2024", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 10.0, false));
+                    transaction(200.0, "Disbursement", "20240524", 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(50.0, "Down Payment", "20240524", 150.0, 50.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
+                    transaction(10.0, "Repayment", "20240525", 190.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(190.0, "Charge-off", "20240526", 0.0, 190.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(200.0, "Merchant Issued Refund", "20240526", 0.0, 190.0, 0.0, 0.0, 0.0, 0.0, 10.0, false), //
+                    transaction(10.0, "Credit Balance Refund", "20240527", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 10.0, false));
 
             reverseLoanTransaction(loanId, repaymentTransactionId,
                     new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(LoanTestData.DATETIME_PATTERN)
-                            .transactionDate("27 May 2024").transactionAmount(0.0).locale(LoanTestData.LOCALE));
+                            .transactionDate("20240527").transactionAmount(0.0).locale(LoanTestData.LOCALE));
 
             verifyTransactions(loanId, //
-                    transaction(200.0, "Disbursement", "24 May 2024", 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(50.0, "Down Payment", "24 May 2024", 150.0, 50.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
-                    transaction(10.0, "Repayment", "25 May 2024", 190.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
-                    transaction(200.0, "Charge-off", "26 May 2024", 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(200.0, "Merchant Issued Refund", "26 May 2024", 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(10.0, "Credit Balance Refund", "27 May 2024", 10.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, false));
+                    transaction(200.0, "Disbursement", "20240524", 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(50.0, "Down Payment", "20240524", 150.0, 50.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
+                    transaction(10.0, "Repayment", "20240525", 190.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
+                    transaction(200.0, "Charge-off", "20240526", 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(200.0, "Merchant Issued Refund", "20240526", 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(10.0, "Credit Balance Refund", "20240527", 10.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, false));
 
             verifyTRJournalEntries(repaymentTransactionId, //
                     credit(accounts.getLoansReceivableAccount(), 10), //

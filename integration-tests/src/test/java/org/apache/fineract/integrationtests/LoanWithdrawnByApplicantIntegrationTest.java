@@ -31,11 +31,11 @@ public class LoanWithdrawnByApplicantIntegrationTest extends FeignLoanTestBase {
         Long clientId = createClient();
         Long loanProductId = createLoanProduct(createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct());
 
-        Long loanId = applyForLoan(applyLoanRequest(clientId, loanProductId, "04 April 2012", 5000.0, 5));
+        Long loanId = applyForLoan(applyLoanRequest(clientId, loanProductId, "20120404", 5000.0, 5));
 
         verifyLoanStatus(loanId, LoanStatus.SUBMITTED_AND_PENDING_APPROVAL);
 
-        withdrawLoan(loanId, new PostLoansLoanIdRequest().withdrawnOnDate("05 April 2012").dateFormat(Utils.DATE_FORMAT).locale("en"));
+        withdrawLoan(loanId, new PostLoansLoanIdRequest().withdrawnOnDate("20120405").dateFormat(Utils.DATE_FORMAT).locale("en"));
 
         verifyLoanStatus(loanId, LoanStatus.WITHDRAWN_BY_CLIENT);
     }

@@ -165,8 +165,8 @@ public final class StaffHelper {
         HashMap<String, Object> map = new HashMap<>();
 
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
-        map.put("joiningDate", "20 September 2011");
+        map.put("dateFormat", "yyyyMMdd");
+        map.put("joiningDate", "20110920");
 
         return map;
     }

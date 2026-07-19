@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 public class BusinessDateHelper {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BusinessDateHelper.class);
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     public static final String DEFAULT_LOCALE = "en";
     public static final String BUSINESS_DATE = "BUSINESS_DATE";
     public static final String COB = "COB_DATE";

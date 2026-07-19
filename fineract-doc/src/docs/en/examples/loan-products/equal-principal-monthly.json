@@ -18,7 +18,7 @@
   "interestCalculationPeriodType": 1,
   "daysInYearType": 1,
   "daysInMonthType": 1,
-  "dateFormat": "dd MMMM yyyy",
+  "dateFormat": "yyyyMMdd",
   "transactionProcessingStrategyCode": "mifos-standard-strategy",
   "accountingRule": 1,
   "inArrearsTolerance": 0,

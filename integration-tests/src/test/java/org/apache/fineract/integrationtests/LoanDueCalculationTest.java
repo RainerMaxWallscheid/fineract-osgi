@@ -49,7 +49,7 @@ public class LoanDueCalculationTest extends FeignLoanTestBase {
     @ParameterizedTest
     @MethodSource("processingStrategy")
     public void dueDateBasedOnFirstRepaymentDate(String repaymentProcessor) {
-        runAt("2 February 2024", () -> {
+        runAt("20240202", () -> {
             final Long clientId = createClient();
             PostLoanProductsRequest loanProductsRequest = create4Period1MonthLongWithoutInterestProduct(repaymentProcessor);
             Long loanProductId = createLoanProduct(loanProductsRequest);
@@ -60,29 +60,29 @@ public class LoanDueCalculationTest extends FeignLoanTestBase {
                         .repaymentsStartingFromDate(LocalDate.of(2024, 2, 29));
             });
             Long loanId = applyForLoan(loanRequest);
-            verifyRepaymentSchedule(loanId, installment(1000.0, null, "31 January 2024"), //
-                    installment(250.0, false, "29 February 2024"), //
-                    installment(250.0, false, "29 March 2024"), //
-                    installment(250.0, false, "29 April 2024"), //
-                    installment(250.0, false, "29 May 2024")) //
+            verifyRepaymentSchedule(loanId, installment(1000.0, null, "20240131"), //
+                    installment(250.0, false, "20240229"), //
+                    installment(250.0, false, "20240329"), //
+                    installment(250.0, false, "20240429"), //
+                    installment(250.0, false, "20240529")) //
             ;
 
-            approveLoan(loanId, approveLoanRequest(1000.0, "31 January 2024"));
+            approveLoan(loanId, approveLoanRequest(1000.0, "20240131"));
 
-            verifyRepaymentSchedule(loanId, installment(1000.0, null, "31 January 2024"), //
-                    installment(250.0, false, "29 February 2024"), //
-                    installment(250.0, false, "29 March 2024"), //
-                    installment(250.0, false, "29 April 2024"), //
-                    installment(250.0, false, "29 May 2024")) //
+            verifyRepaymentSchedule(loanId, installment(1000.0, null, "20240131"), //
+                    installment(250.0, false, "20240229"), //
+                    installment(250.0, false, "20240329"), //
+                    installment(250.0, false, "20240429"), //
+                    installment(250.0, false, "20240529")) //
             ;
 
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "31 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20240131");
 
-            verifyRepaymentSchedule(loanId, installment(1000.0, null, "31 January 2024"), //
-                    installment(250.0, false, "29 February 2024"), //
-                    installment(250.0, false, "29 March 2024"), //
-                    installment(250.0, false, "29 April 2024"), //
-                    installment(250.0, false, "29 May 2024")) //
+            verifyRepaymentSchedule(loanId, installment(1000.0, null, "20240131"), //
+                    installment(250.0, false, "20240229"), //
+                    installment(250.0, false, "20240329"), //
+                    installment(250.0, false, "20240429"), //
+                    installment(250.0, false, "20240529")) //
             ;
 
         });
@@ -96,7 +96,7 @@ public class LoanDueCalculationTest extends FeignLoanTestBase {
     @ParameterizedTest
     @MethodSource("processingStrategy")
     public void dueDateBasedOnExpectedDisbursementDate(String repaymentProcessor) {
-        runAt("31 March 2024", () -> {
+        runAt("20240331", () -> {
             final Long clientId = createClient();
             PostLoanProductsRequest loanProductsRequest = create4Period1MonthLongWithoutInterestProduct(repaymentProcessor)
                     .repaymentStartDateType(RepaymentStartDateType.DISBURSEMENT_DATE.getValue());
@@ -107,29 +107,29 @@ public class LoanDueCalculationTest extends FeignLoanTestBase {
                         .loanTermFrequency(4).loanTermFrequencyType(2).dateFormat(LoanTestData.ISO_DATE_PATTERN);
             });
             Long loanId = applyForLoan(loanRequest);
-            verifyRepaymentSchedule(loanId, installment(1000.0, null, "30 January 2024"), //
-                    installment(250.0, false, "29 February 2024"), //
-                    installment(250.0, false, "30 March 2024"), //
-                    installment(250.0, false, "30 April 2024"), //
-                    installment(250.0, false, "30 May 2024")) //
+            verifyRepaymentSchedule(loanId, installment(1000.0, null, "20240130"), //
+                    installment(250.0, false, "20240229"), //
+                    installment(250.0, false, "20240330"), //
+                    installment(250.0, false, "20240430"), //
+                    installment(250.0, false, "20240530")) //
             ;
 
-            approveLoan(loanId, approveLoanRequest(1000.0, "30 January 2024"));
+            approveLoan(loanId, approveLoanRequest(1000.0, "20240130"));
 
-            verifyRepaymentSchedule(loanId, installment(1000.0, null, "30 January 2024"), //
-                    installment(250.0, false, "29 February 2024"), //
-                    installment(250.0, false, "30 March 2024"), //
-                    installment(250.0, false, "30 April 2024"), //
-                    installment(250.0, false, "30 May 2024")) //
+            verifyRepaymentSchedule(loanId, installment(1000.0, null, "20240130"), //
+                    installment(250.0, false, "20240229"), //
+                    installment(250.0, false, "20240330"), //
+                    installment(250.0, false, "20240430"), //
+                    installment(250.0, false, "20240530")) //
             ;
 
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "31 March 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20240331");
 
-            verifyRepaymentSchedule(loanId, installment(1000.0, null, "31 March 2024"), //
-                    installment(250.0, false, "30 April 2024"), //
-                    installment(250.0, false, "31 May 2024"), //
-                    installment(250.0, false, "30 June 2024"), //
-                    installment(250.0, false, "31 July 2024")) //
+            verifyRepaymentSchedule(loanId, installment(1000.0, null, "20240331"), //
+                    installment(250.0, false, "20240430"), //
+                    installment(250.0, false, "20240531"), //
+                    installment(250.0, false, "20240630"), //
+                    installment(250.0, false, "20240731")) //
             ;
         });
     }
@@ -142,7 +142,7 @@ public class LoanDueCalculationTest extends FeignLoanTestBase {
     @ParameterizedTest
     @MethodSource("processingStrategy")
     public void dueDateBasedOnSubmittedOnDate(String repaymentProcessor) {
-        runAt("03 February 2024", () -> {
+        runAt("20240203", () -> {
             final Long clientId = createClient();
             PostLoanProductsRequest loanProductsRequest = create4Period1MonthLongWithoutInterestProduct(repaymentProcessor)
                     .repaymentStartDateType(RepaymentStartDateType.SUBMITTED_ON_DATE.getValue());
@@ -155,31 +155,31 @@ public class LoanDueCalculationTest extends FeignLoanTestBase {
             });
             Long loanId = applyForLoan(loanRequest);
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 February 2024"), //
-                    installment(250.0, false, "29 February 2024"), //
-                    installment(250.0, false, "31 March 2024"), //
-                    installment(250.0, false, "30 April 2024"), //
-                    installment(250.0, false, "31 May 2024")) //
+                    installment(1000.0, null, "20240201"), //
+                    installment(250.0, false, "20240229"), //
+                    installment(250.0, false, "20240331"), //
+                    installment(250.0, false, "20240430"), //
+                    installment(250.0, false, "20240531")) //
             ;
 
-            approveLoan(loanId, approveLoanRequest(1000.0, "31 January 2024"));
+            approveLoan(loanId, approveLoanRequest(1000.0, "20240131"));
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 February 2024"), //
-                    installment(250.0, false, "29 February 2024"), //
-                    installment(250.0, false, "31 March 2024"), //
-                    installment(250.0, false, "30 April 2024"), //
-                    installment(250.0, false, "31 May 2024")) //
+                    installment(1000.0, null, "20240201"), //
+                    installment(250.0, false, "20240229"), //
+                    installment(250.0, false, "20240331"), //
+                    installment(250.0, false, "20240430"), //
+                    installment(250.0, false, "20240531")) //
             ;
 
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "03 February 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20240203");
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "03 February 2024"), //
-                    installment(250.0, false, "29 February 2024"), //
-                    installment(250.0, false, "31 March 2024"), //
-                    installment(250.0, false, "30 April 2024"), //
-                    installment(250.0, false, "31 May 2024")) //
+                    installment(1000.0, null, "20240203"), //
+                    installment(250.0, false, "20240229"), //
+                    installment(250.0, false, "20240331"), //
+                    installment(250.0, false, "20240430"), //
+                    installment(250.0, false, "20240531")) //
             ;
         });
     }
@@ -191,7 +191,7 @@ public class LoanDueCalculationTest extends FeignLoanTestBase {
     @ParameterizedTest
     @MethodSource("processingStrategy")
     public void dueDateBasedOnSubmittedOnDateButThereShallBeMinimumDaysBetweenDisbursementAndFirstRepayment(String repaymentProcessor) {
-        runAt("31 January 2024", () -> {
+        runAt("20240131", () -> {
             final Long clientId = createClient();
             PostLoanProductsRequest loanProductsRequest = create4Period1MonthLongWithoutInterestProduct(repaymentProcessor)
                     .repaymentStartDateType(RepaymentStartDateType.SUBMITTED_ON_DATE.getValue())
@@ -204,29 +204,29 @@ public class LoanDueCalculationTest extends FeignLoanTestBase {
                         .dateFormat(LoanTestData.ISO_DATE_PATTERN);
             });
             Long loanId = applyForLoan(loanRequest);
-            verifyRepaymentSchedule(loanId, installment(1000.0, null, "26 February 2024"), //
-                    installment(250.0, false, "07 March 2024"), //
-                    installment(250.0, false, "07 April 2024"), //
-                    installment(250.0, false, "07 May 2024"), //
-                    installment(250.0, false, "07 June 2024")) //
+            verifyRepaymentSchedule(loanId, installment(1000.0, null, "20240226"), //
+                    installment(250.0, false, "20240307"), //
+                    installment(250.0, false, "20240407"), //
+                    installment(250.0, false, "20240507"), //
+                    installment(250.0, false, "20240607")) //
             ;
 
-            approveLoan(loanId, approveLoanRequest(1000.0, "31 January 2024"));
+            approveLoan(loanId, approveLoanRequest(1000.0, "20240131"));
 
-            verifyRepaymentSchedule(loanId, installment(1000.0, null, "26 February 2024"), //
-                    installment(250.0, false, "07 March 2024"), //
-                    installment(250.0, false, "07 April 2024"), //
-                    installment(250.0, false, "07 May 2024"), //
-                    installment(250.0, false, "07 June 2024")) //
+            verifyRepaymentSchedule(loanId, installment(1000.0, null, "20240226"), //
+                    installment(250.0, false, "20240307"), //
+                    installment(250.0, false, "20240407"), //
+                    installment(250.0, false, "20240507"), //
+                    installment(250.0, false, "20240607")) //
             ;
 
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "31 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20240131");
 
-            verifyRepaymentSchedule(loanId, installment(1000.0, null, "31 January 2024"), //
-                    installment(250.0, false, "07 March 2024"), //
-                    installment(250.0, false, "07 April 2024"), //
-                    installment(250.0, false, "07 May 2024"), //
-                    installment(250.0, false, "07 June 2024")) //
+            verifyRepaymentSchedule(loanId, installment(1000.0, null, "20240131"), //
+                    installment(250.0, false, "20240307"), //
+                    installment(250.0, false, "20240407"), //
+                    installment(250.0, false, "20240507"), //
+                    installment(250.0, false, "20240607")) //
             ;
         });
     }
@@ -239,7 +239,7 @@ public class LoanDueCalculationTest extends FeignLoanTestBase {
     @MethodSource("processingStrategy")
     public void dueDateBasedOnExpectedDisbursalDateButThereShallBeMinimumDaysBetweenDisbursementAndFirstRepayment(
             String repaymentProcessor) {
-        runAt("31 January 2024", () -> {
+        runAt("20240131", () -> {
             final Long clientId = createClient();
             PostLoanProductsRequest loanProductsRequest = create4Period1MonthLongWithoutInterestProduct(repaymentProcessor)
                     .repaymentStartDateType(RepaymentStartDateType.DISBURSEMENT_DATE.getValue())
@@ -252,29 +252,29 @@ public class LoanDueCalculationTest extends FeignLoanTestBase {
                         .dateFormat(LoanTestData.ISO_DATE_PATTERN);
             });
             Long loanId = applyForLoan(loanRequest);
-            verifyRepaymentSchedule(loanId, installment(1000.0, null, "31 January 2024"), //
-                    installment(250.0, false, "07 March 2024"), //
-                    installment(250.0, false, "07 April 2024"), //
-                    installment(250.0, false, "07 May 2024"), //
-                    installment(250.0, false, "07 June 2024")) //
+            verifyRepaymentSchedule(loanId, installment(1000.0, null, "20240131"), //
+                    installment(250.0, false, "20240307"), //
+                    installment(250.0, false, "20240407"), //
+                    installment(250.0, false, "20240507"), //
+                    installment(250.0, false, "20240607")) //
             ;
 
-            approveLoan(loanId, approveLoanRequest(1000.0, "31 January 2024"));
+            approveLoan(loanId, approveLoanRequest(1000.0, "20240131"));
 
-            verifyRepaymentSchedule(loanId, installment(1000.0, null, "31 January 2024"), //
-                    installment(250.0, false, "07 March 2024"), //
-                    installment(250.0, false, "07 April 2024"), //
-                    installment(250.0, false, "07 May 2024"), //
-                    installment(250.0, false, "07 June 2024")) //
+            verifyRepaymentSchedule(loanId, installment(1000.0, null, "20240131"), //
+                    installment(250.0, false, "20240307"), //
+                    installment(250.0, false, "20240407"), //
+                    installment(250.0, false, "20240507"), //
+                    installment(250.0, false, "20240607")) //
             ;
 
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "31 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20240131");
 
-            verifyRepaymentSchedule(loanId, installment(1000.0, null, "31 January 2024"), //
-                    installment(250.0, false, "07 March 2024"), //
-                    installment(250.0, false, "07 April 2024"), //
-                    installment(250.0, false, "07 May 2024"), //
-                    installment(250.0, false, "07 June 2024")) //
+            verifyRepaymentSchedule(loanId, installment(1000.0, null, "20240131"), //
+                    installment(250.0, false, "20240307"), //
+                    installment(250.0, false, "20240407"), //
+                    installment(250.0, false, "20240507"), //
+                    installment(250.0, false, "20240607")) //
             ;
         });
     }
@@ -288,7 +288,7 @@ public class LoanDueCalculationTest extends FeignLoanTestBase {
     @ParameterizedTest
     @MethodSource("processingStrategy")
     public void dueDateBasedOnSubmittedOnDateButChangingExpectedDisbursementAtApproval(String repaymentProcessor) {
-        runAt("03 February 2024", () -> {
+        runAt("20240203", () -> {
             final Long clientId = createClient();
             PostLoanProductsRequest loanProductsRequest = create4Period1MonthLongWithoutInterestProduct(repaymentProcessor)
                     .repaymentStartDateType(RepaymentStartDateType.SUBMITTED_ON_DATE.getValue());
@@ -301,31 +301,31 @@ public class LoanDueCalculationTest extends FeignLoanTestBase {
             });
             Long loanId = applyForLoan(loanRequest);
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 February 2024"), //
-                    installment(250.0, false, "29 February 2024"), //
-                    installment(250.0, false, "31 March 2024"), //
-                    installment(250.0, false, "30 April 2024"), //
-                    installment(250.0, false, "31 May 2024")) //
+                    installment(1000.0, null, "20240201"), //
+                    installment(250.0, false, "20240229"), //
+                    installment(250.0, false, "20240331"), //
+                    installment(250.0, false, "20240430"), //
+                    installment(250.0, false, "20240531")) //
             ;
 
-            approveLoan(loanId, approveLoanRequest(1000.0, "31 January 2024", "02 February 2024"));
+            approveLoan(loanId, approveLoanRequest(1000.0, "20240131", "20240202"));
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "02 February 2024"), //
-                    installment(250.0, false, "29 February 2024"), //
-                    installment(250.0, false, "31 March 2024"), //
-                    installment(250.0, false, "30 April 2024"), //
-                    installment(250.0, false, "31 May 2024")) //
+                    installment(1000.0, null, "20240202"), //
+                    installment(250.0, false, "20240229"), //
+                    installment(250.0, false, "20240331"), //
+                    installment(250.0, false, "20240430"), //
+                    installment(250.0, false, "20240531")) //
             ;
 
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "03 February 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20240203");
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "03 February 2024"), //
-                    installment(250.0, false, "29 February 2024"), //
-                    installment(250.0, false, "31 March 2024"), //
-                    installment(250.0, false, "30 April 2024"), //
-                    installment(250.0, false, "31 May 2024")) //
+                    installment(1000.0, null, "20240203"), //
+                    installment(250.0, false, "20240229"), //
+                    installment(250.0, false, "20240331"), //
+                    installment(250.0, false, "20240430"), //
+                    installment(250.0, false, "20240531")) //
             ;
         });
     }

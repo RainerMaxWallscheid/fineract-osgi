@@ -54,8 +54,8 @@ public class CreditBureauToken extends AbstractPersistableCustom<Long> {
         final String expiresIn = command.stringValueOfParameterNamed("expires_in");
         final String issued = command.stringValueOfParameterNamed(".issued");
         final String expiry = command.stringValueOfParameterNamed(".expires");
-        // HTTP date headers always use English day/month names (e.g. "Sun, 19 Jul 2026 ...").
-        DateTimeFormatter dateformat = new DateTimeFormatterBuilder().appendPattern("EEE, dd MMM yyyy kk:mm:ss zzz")
+        // HTTP date headers always use English day/month names (e.g. "Sun, 20260719 ...").
+        DateTimeFormatter dateformat = new DateTimeFormatterBuilder().appendPattern("EEE, yyyyMMdd kk:mm:ss zzz")
                 .toFormatter(Locale.ENGLISH);
         LocalDate expires = LocalDate.parse(expiry, dateformat);
         return new CreditBureauToken().setUserName(userName).setAccessToken(accessToken).setTokenType(tokenType).setExpiresIn(expiresIn).setIssued(issued).setExpires(expires);

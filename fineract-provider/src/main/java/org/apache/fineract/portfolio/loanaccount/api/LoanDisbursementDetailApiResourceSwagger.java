@@ -31,7 +31,7 @@ public final class LoanDisbursementDetailApiResourceSwagger {
 
         private PostAddAndDeleteDisbursementDetailRequest() {}
 
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "de_DE")
         public String locale;
@@ -48,7 +48,7 @@ public final class LoanDisbursementDetailApiResourceSwagger {
 
         @Schema(example = "1")
         public Long id;
-        @Schema(example = "1 January 2024")
+        @Schema(example = "20240101")
         public String expectedDisbursementDate;
         @Schema(example = "100")
         public BigDecimal principal;

@@ -54,7 +54,7 @@ import org.junit.jupiter.api.Assertions;
 public class WorkingCapitalLoanCobStepDef extends AbstractStepDef {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanCobStepDef.class);
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
     private final WorkingCapitalLoanTestHelper wcLoanHelper;
     private final FineractFeignClient fineractClient;
 

@@ -73,7 +73,7 @@ public class FlexibleSavingsInterestPostingIntegrationTest {
     @Test
     public void testSavingsInterestPostingAtPeriodEnd() {
         // client activation, savings activation and 1st transaction date
-        final String startDate = "01 December 2013";
+        final String startDate = "20131201";
         final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
         Assertions.assertNotNull(clientID);
 

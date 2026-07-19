@@ -86,7 +86,7 @@ public class LoanUndoChargeOffReverseExternalIdTest {
 
         // make Repayment
         final PostLoansLoanIdTransactionsResponse repaymentTransaction = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("6 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220906").locale("en")
                         .transactionAmount(100.0));
 
         GetLoansLoanIdResponse loanDetails = this.loanTransactionHelper.getLoanDetails((long) loanId);
@@ -96,8 +96,8 @@ public class LoanUndoChargeOffReverseExternalIdTest {
         String randomText = Utils.randomStringGenerator("en", 5) + Utils.randomNumberGenerator(6) + Utils.randomStringGenerator("is", 5);
         Integer chargeOffReasonId = CodeHelper.createChargeOffCodeValue(requestSpec, responseSpec, randomText, 1);
         String transactionExternalId = UUID.randomUUID().toString();
-        loanTransactionHelper.chargeOffLoan((long) loanId, new PostLoansLoanIdTransactionsRequest().transactionDate("7 September 2022")
-                .locale("en").dateFormat("dd MMMM yyyy").externalId(transactionExternalId).chargeOffReasonId((long) chargeOffReasonId));
+        loanTransactionHelper.chargeOffLoan((long) loanId, new PostLoansLoanIdTransactionsRequest().transactionDate("20220907")
+                .locale("en").dateFormat("yyyyMMdd").externalId(transactionExternalId).chargeOffReasonId((long) chargeOffReasonId));
 
         loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
         assertTrue(loanDetails.getStatus().getActive());
@@ -137,18 +137,18 @@ public class LoanUndoChargeOffReverseExternalIdTest {
 
         // make Repayment
         final PostLoansLoanIdTransactionsResponse repaymentTransaction = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("28 March 2025").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20250328").locale("en")
                         .transactionAmount(100.0));
 
         GetLoansLoanIdResponse loanDetails = this.loanTransactionHelper.getLoanDetails((long) loanId);
         assertTrue(loanDetails.getStatus().getActive());
 
-        // Perform first charge-off with date "29 March 2025"
+        // Perform first charge-off with date "20250329"
         String randomText1 = Utils.randomStringGenerator("en", 5) + Utils.randomNumberGenerator(6) + Utils.randomStringGenerator("is", 5);
         Integer chargeOffReasonId1 = CodeHelper.createChargeOffCodeValue(requestSpec, responseSpec, randomText1, 1);
         String transactionExternalId1 = UUID.randomUUID().toString();
-        loanTransactionHelper.chargeOffLoan((long) loanId, new PostLoansLoanIdTransactionsRequest().transactionDate("29 March 2025")
-                .locale("en").dateFormat("dd MMMM yyyy").externalId(transactionExternalId1).chargeOffReasonId((long) chargeOffReasonId1));
+        loanTransactionHelper.chargeOffLoan((long) loanId, new PostLoansLoanIdTransactionsRequest().transactionDate("20250329")
+                .locale("en").dateFormat("yyyyMMdd").externalId(transactionExternalId1).chargeOffReasonId((long) chargeOffReasonId1));
 
         loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
         assertTrue(loanDetails.getStatus().getActive());
@@ -164,12 +164,12 @@ public class LoanUndoChargeOffReverseExternalIdTest {
         assertTrue(loanDetails.getStatus().getActive());
         assertFalse(loanDetails.getChargedOff());
 
-        // Perform a new charge-off with an earlier date ("28 March 2025") than the first charge-off
+        // Perform a new charge-off with an earlier date ("20250328") than the first charge-off
         String randomText2 = Utils.randomStringGenerator("en", 5) + Utils.randomNumberGenerator(6) + Utils.randomStringGenerator("is", 5);
         Integer chargeOffReasonId2 = CodeHelper.createChargeOffCodeValue(requestSpec, responseSpec, randomText2, 1);
         String transactionExternalId2 = UUID.randomUUID().toString();
-        loanTransactionHelper.chargeOffLoan((long) loanId, new PostLoansLoanIdTransactionsRequest().transactionDate("28 March 2025")
-                .locale("en").dateFormat("dd MMMM yyyy").externalId(transactionExternalId2).chargeOffReasonId((long) chargeOffReasonId2));
+        loanTransactionHelper.chargeOffLoan((long) loanId, new PostLoansLoanIdTransactionsRequest().transactionDate("20250328")
+                .locale("en").dateFormat("yyyyMMdd").externalId(transactionExternalId2).chargeOffReasonId((long) chargeOffReasonId2));
 
         loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
         // After the new charge-off, the loan should be charged off
@@ -188,12 +188,12 @@ public class LoanUndoChargeOffReverseExternalIdTest {
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("03 September 2022").withSubmittedOnDate("01 September 2022").withLoanType("individual")
+                .withExpectedDisbursementDate("20220903").withSubmittedOnDate("20220901").withLoanType("individual")
                 .withExternalId(externalId).build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("02 September 2022", "1000", loanId, null);
-        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("03 September 2022", loanId, "1000");
+        loanTransactionHelper.approveLoan("20220902", "1000", loanId, null);
+        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20220903", loanId, "1000");
         return loanId;
     }
 

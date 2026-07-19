@@ -60,7 +60,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class LoanChargeStepDef extends AbstractStepDef {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanChargeStepDef.class);
-    public static final String DEFAULT_DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DEFAULT_DATE_FORMAT = "yyyyMMdd";
     public static final String DATE_FORMAT_EVENTS = "yyyy-MM-dd";
     public static final Double DEFAULT_CHARGE_FEE_FLAT = 10.0;
     @Autowired

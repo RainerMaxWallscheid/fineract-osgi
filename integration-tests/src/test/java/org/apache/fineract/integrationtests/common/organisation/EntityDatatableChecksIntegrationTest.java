@@ -75,7 +75,7 @@ public class EntityDatatableChecksIntegrationTest {
     public static final String MINIMUM_OPENING_BALANCE = "1000.0";
     public static final String ACCOUNT_TYPE_INDIVIDUAL = "INDIVIDUAL";
 
-    public static final String DATE_TIME_FORMAT = "dd MMMM yyyy HH:mm";
+    public static final String DATE_TIME_FORMAT = "yyyyMMdd HH:mm";
 
     @BeforeEach
     public void setup() {
@@ -281,7 +281,7 @@ public class EntityDatatableChecksIntegrationTest {
 
         // creating savings with datatables
         final Integer savingsId = this.savingsAccountHelper.applyForSavingsApplicationWithDatatables(clientID, savingsProductID,
-                ACCOUNT_TYPE_INDIVIDUAL, "01 December 2016", registeredTableName);
+                ACCOUNT_TYPE_INDIVIDUAL, "20161201", registeredTableName);
         Assertions.assertNotNull(savingsId);
 
         // deleting entity datatable check
@@ -327,7 +327,7 @@ public class EntityDatatableChecksIntegrationTest {
 
         // creating savings with datatables with error
         ArrayList<HashMap<Object, Object>> groupErrorData = (ArrayList<HashMap<Object, Object>>) validationErrorHelper
-                .applyForSavingsApplicationWithFailure(clientID, savingsProductID, ACCOUNT_TYPE_INDIVIDUAL, "01 December 2016",
+                .applyForSavingsApplicationWithFailure(clientID, savingsProductID, ACCOUNT_TYPE_INDIVIDUAL, "20161201",
                         CommonConstants.RESPONSE_ERROR);
         assertEquals("error.msg.entry.required.in.datatable.[" + registeredTableName + "]",
                 groupErrorData.get(0).get(CommonConstants.RESPONSE_ERROR_MESSAGE_CODE));
@@ -494,8 +494,8 @@ public class EntityDatatableChecksIntegrationTest {
                 .withAmortizationTypeAsEqualPrincipalPayments() //
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withPrincipalGrace(graceOnPrincipalPayment).withExpectedDisbursementDate("02 June 2014") //
-                .withSubmittedOnDate("02 June 2014") //
+                .withPrincipalGrace(graceOnPrincipalPayment).withExpectedDisbursementDate("20140602") //
+                .withSubmittedOnDate("20140602") //
                 .withDatatables(getTestDatatableAsJson(registeredTableName)) //
                 .withCollaterals(collaterals).build(clientID.toString(), loanProductID.toString(), null);
         return this.loanTransactionHelper.getLoanId(loanApplicationJSON);
@@ -522,8 +522,8 @@ public class EntityDatatableChecksIntegrationTest {
                 .withAmortizationTypeAsEqualPrincipalPayments() //
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withPrincipalGrace(graceOnPrincipalPayment).withExpectedDisbursementDate("02 June 2014") //
-                .withSubmittedOnDate("02 June 2014") //
+                .withPrincipalGrace(graceOnPrincipalPayment).withExpectedDisbursementDate("20140602") //
+                .withSubmittedOnDate("20140602") //
                 .withCollaterals(collaterals).build(clientID.toString(), loanProductID.toString(), null);
         return this.validationErrorHelper.getLoanError(loanApplicationJSON, responseAttribute);
     }
@@ -546,9 +546,9 @@ public class EntityDatatableChecksIntegrationTest {
         dataMap.put("locale", "en");
         dataMap.put("Spouse Name", Utils.randomStringGenerator("Spouse_name", 4));
         dataMap.put("Number of Dependents", 5);
-        dataMap.put("Time of Visit", "01 December 2016 04:03");
+        dataMap.put("Time of Visit", "20161201 04:03");
         dataMap.put("dateFormat", DATE_TIME_FORMAT);
-        dataMap.put("Date of Approval", "02 December 2016 00:00");
+        dataMap.put("Date of Approval", "20161202 00:00");
         datatableMap.put("registeredTableName", registeredTableName);
         datatableMap.put("data", dataMap);
         datatablesListMap.add(datatableMap);
@@ -617,7 +617,7 @@ public class EntityDatatableChecksIntegrationTest {
         String datatablesJsonString = new Gson().toJson(datatablesMap);
         LOG.info("map : {}", datatablesJsonString);
 
-        PostClientsResponse postClientsResponse = ClientHelper.createClientAsPersonWithDatatable(requestSpec, responseSpec, "04 March 2011",
+        PostClientsResponse postClientsResponse = ClientHelper.createClientAsPersonWithDatatable(requestSpec, responseSpec, "20110304",
                 "1", datatablesMap);
         assertNotNull(postClientsResponse);
         assertNotNull(postClientsResponse.getResourceId());

@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
 public class LoanAccrualTransactionOnDisbursementByAccountingTypeTest extends FeignLoanTestBase {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanAccrualTransactionOnDisbursementByAccountingTypeTest.class);
-    private static final String DISBURSEMENT_DATE = "01 January 2024";
+    private static final String DISBURSEMENT_DATE = "20240101";
     private static final Double LOAN_AMOUNT = 1000.0;
     private static final double INTEREST_RATE_PER_PERIOD = 12.0; // 12% annual
     // Customizer to set non-zero interest rate on the loan application

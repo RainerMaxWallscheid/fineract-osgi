@@ -65,7 +65,7 @@ public class LoanInterestPauseApiTest extends BaseLoanIntegrationTest {
     private final String loanPrincipalAmount = "10000.00";
     private final String numberOfRepayments = "12";
     private final String interestRatePerPeriod = "18";
-    private final String dateString = "01 January 2023";
+    private final String dateString = "20230101";
 
     @BeforeEach
     public void initialize() {
@@ -495,57 +495,57 @@ public class LoanInterestPauseApiTest extends BaseLoanIntegrationTest {
 
     @Test
     public void testInterestPauseOnZeroInterestRate() {
-        runAt("1 September 2019", () -> {
+        runAt("20190901", () -> {
             Long loanProductId = loanProductHelper.createLoanProduct(create4IProgressive()).getResourceId();
-            loan = applyAndApproveProgressiveLoan(clientId, loanProductId, "1 September 2019", 1200.0, 0.0, 4, null);
-            disburseLoan(loan, BigDecimal.valueOf(1200.0), "1 September 2019");
+            loan = applyAndApproveProgressiveLoan(clientId, loanProductId, "20190901", 1200.0, 0.0, 4, null);
+            disburseLoan(loan, BigDecimal.valueOf(1200.0), "20190901");
         });
-        runAt("1 October 2019", () -> {
-            loanTransactionHelper.makeLoanRepayment(loan, "Repayment", "1 October 2019", 300.0);
+        runAt("20191001", () -> {
+            loanTransactionHelper.makeLoanRepayment(loan, "Repayment", "20191001", 300.0);
         });
-        runAt("1 November 2019", () -> {
-            loanTransactionHelper.makeLoanRepayment(loan, "Repayment", "1 November 2019", 300.0);
+        runAt("20191101", () -> {
+            loanTransactionHelper.makeLoanRepayment(loan, "Repayment", "20191101", 300.0);
         });
-        runAt("1 December 2019", () -> {
-            loanTransactionHelper.makeLoanRepayment(loan, "Repayment", "1 December 2019", 300.0);
+        runAt("20191201", () -> {
+            loanTransactionHelper.makeLoanRepayment(loan, "Repayment", "20191201", 300.0);
             verifyTransactions(loan,  //
-            transaction(1200.0, "Disbursement", "01 September 2019", 1200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0),  //
-            transaction(300.0, "Repayment", "01 October 2019", 900.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(300.0, "Repayment", "01 November 2019", 600.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(300.0, "Repayment", "01 December 2019", 300.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
+            transaction(1200.0, "Disbursement", "20190901", 1200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0),  //
+            transaction(300.0, "Repayment", "20191001", 900.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(300.0, "Repayment", "20191101", 600.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(300.0, "Repayment", "20191201", 300.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
             );
-            Response<CommandProcessingResult> response = loanTransactionHelper.createInterestPause(loan, "1 October 2019", "15 December 2019");
+            Response<CommandProcessingResult> response = loanTransactionHelper.createInterestPause(loan, "20191001", "20191215");
             Assertions.assertEquals(403, response.code());
             verifyTransactions(loan,  //
-            transaction(1200.0, "Disbursement", "01 September 2019", 1200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0),  //
-            transaction(300.0, "Repayment", "01 October 2019", 900.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(300.0, "Repayment", "01 November 2019", 600.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(300.0, "Repayment", "01 December 2019", 300.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
+            transaction(1200.0, "Disbursement", "20190901", 1200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0),  //
+            transaction(300.0, "Repayment", "20191001", 900.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(300.0, "Repayment", "20191101", 600.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(300.0, "Repayment", "20191201", 300.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
             );
         });
     }
 
     @Test
     public void testInterestPauseOnZeroInterestRateRightAfterDisbursement() {
-        runAt("1 September 2019", () -> {
+        runAt("20190901", () -> {
             Long loanProductId = loanProductHelper.createLoanProduct(create4IProgressive()).getResourceId();
-            loan = applyAndApproveProgressiveLoan(clientId, loanProductId, "1 September 2019", 1200.0, 0.0, 4, null);
-            disburseLoan(loan, BigDecimal.valueOf(1200.0), "1 September 2019");
+            loan = applyAndApproveProgressiveLoan(clientId, loanProductId, "20190901", 1200.0, 0.0, 4, null);
+            disburseLoan(loan, BigDecimal.valueOf(1200.0), "20190901");
             verifyRepaymentSchedule(loan,  //
-            installment(1200.0, null, "01 September 2019"),  //
-            installment(300.0, 0.0, 300.0, false, "01 October 2019"),  //
-            installment(300.0, 0.0, 300.0, false, "01 November 2019"),  //
-            installment(300.0, 0.0, 300.0, false, "01 December 2019"),  //
-            installment(300.0, 0.0, 300.0, false, "01 January 2020") //
+            installment(1200.0, null, "20190901"),  //
+            installment(300.0, 0.0, 300.0, false, "20191001"),  //
+            installment(300.0, 0.0, 300.0, false, "20191101"),  //
+            installment(300.0, 0.0, 300.0, false, "20191201"),  //
+            installment(300.0, 0.0, 300.0, false, "20200101") //
             );
-            Response<CommandProcessingResult> response = loanTransactionHelper.createInterestPause(loan, "1 October 2019", "15 December 2019");
+            Response<CommandProcessingResult> response = loanTransactionHelper.createInterestPause(loan, "20191001", "20191215");
             Assertions.assertEquals(403, response.code());
             verifyRepaymentSchedule(loan,  //
-            installment(1200.0, null, "01 September 2019"),  //
-            installment(300.0, 0.0, 300.0, false, "01 October 2019"),  //
-            installment(300.0, 0.0, 300.0, false, "01 November 2019"),  //
-            installment(300.0, 0.0, 300.0, false, "01 December 2019"),  //
-            installment(300.0, 0.0, 300.0, false, "01 January 2020") //
+            installment(1200.0, null, "20190901"),  //
+            installment(300.0, 0.0, 300.0, false, "20191001"),  //
+            installment(300.0, 0.0, 300.0, false, "20191101"),  //
+            installment(300.0, 0.0, 300.0, false, "20191201"),  //
+            installment(300.0, 0.0, 300.0, false, "20200101") //
             );
         });
     }
@@ -605,7 +605,7 @@ public class LoanInterestPauseApiTest extends BaseLoanIntegrationTest {
      */
     private void disburseLoan() {
         if (loanId != null) {
-            LOAN_TRANSACTION_HELPER.disburseLoan(externalId, new PostLoansLoanIdRequest().actualDisbursementDate(dateString).transactionAmount(new BigDecimal(loanPrincipalAmount)).locale("en").dateFormat("dd MMMM yyyy"));
+            LOAN_TRANSACTION_HELPER.disburseLoan(externalId, new PostLoansLoanIdRequest().actualDisbursementDate(dateString).transactionAmount(new BigDecimal(loanPrincipalAmount)).locale("en").dateFormat("yyyyMMdd"));
             log.info("Successfully disbursed loan (ID: {} )", loanId);
         }
     }

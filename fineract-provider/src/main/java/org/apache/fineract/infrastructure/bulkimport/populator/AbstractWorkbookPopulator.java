@@ -73,12 +73,14 @@ public abstract class AbstractWorkbookPopulator implements WorkbookPopulator {
     protected void writeDate(int colIndex, Row row, String value, CellStyle dateCellStyle, String dateFormat) {
         try {
             DateTimeFormatter formatinDB;
-            if (value.matches("\\d{4}-\\d{1,2}-\\d{1,2}")) {
+            if (value.matches("\\d{8}")) {
+                formatinDB = DateTimeFormatter.ofPattern("yyyyMMdd");
+            } else if (value.matches("\\d{4}-\\d{1,2}-\\d{1,2}")) {
                 formatinDB = new DateTimeFormatterBuilder().appendPattern("yyyy-M-d").toFormatter();
             } else if (value.matches("\\d{1,2}/\\d{1,2}/\\d{4}")) {
                 formatinDB = new DateTimeFormatterBuilder().appendPattern("d/M/yyyy").toFormatter();
             } else if (value.matches("\\d{1,2} \\w{3,12} \\d{4}")) {
-                // Month names must stay English: bulk import templates use locale=en / dd MMMM yyyy.
+                // Legacy text-month input (English month names).
                 formatinDB = new DateTimeFormatterBuilder().appendPattern("d MMMM yyyy").toFormatter(Locale.ENGLISH);
             } else {
                 throw new IllegalArgumentException("Unrecognised format of date value: " + value);
@@ -120,7 +122,7 @@ public abstract class AbstractWorkbookPopulator implements WorkbookPopulator {
         short df = workbook.createDataFormat().getFormat(dateFormat);
         dateCellStyle.setDataFormat(df);
         int rowIndex = 0;
-        // Templates are generated for locale=en with text month patterns (dd MMMM yyyy).
+        // Templates are generated for locale=en with text month patterns (yyyyMMdd).
         DateTimeFormatter outputFormat = new DateTimeFormatterBuilder().appendPattern(dateFormat).toFormatter(Locale.ENGLISH);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat, Locale.ENGLISH);
         try {

@@ -79,16 +79,16 @@ public class FeignWorkingCapitalLoanChargeAllocationTest extends FeignIntegratio
     @DisplayName("A single repayment splits across penalty, fee and principal in the product's configured allocation order")
     void testRepaymentSplitsAcrossPenaltyFeeAndPrincipalInConfiguredOrder() {
         businessDateHelper.runAt("2026-01-01", () -> {
-            Long client = clientHelper.createClient("01 January 2026");
-            Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 January 2026");
+            Long client = clientHelper.createClient("20260101");
+            Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260101");
 
             // Charges due on the disbursement date (business date is 01 Jan, so the due date is not in the past).
-            Long penaltyLoanChargeId = addCharge(loanId, true, 50, "01 January 2026");
-            Long feeLoanChargeId = addCharge(loanId, false, 100, "01 January 2026");
+            Long penaltyLoanChargeId = addCharge(loanId, true, 50, "20260101");
+            Long feeLoanChargeId = addCharge(loanId, false, 100, "20260101");
 
             // A single 200 repayment must consume penalty (50) then fee (100) then principal (50) in that order.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-10");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(200), "10 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(200), "20260110"));
 
             // Balance buckets reflect the split.
             GetBalance balance = balanceOf(loanId);
@@ -120,13 +120,13 @@ public class FeignWorkingCapitalLoanChargeAllocationTest extends FeignIntegratio
     @DisplayName("A backdated repayment triggers reprocessing that redistributes the later repayment's charge allocation onto principal")
     void testBackdatedRepaymentReprocessingRedistributesChargeAllocation() {
         businessDateHelper.runAt("2026-01-01", () -> {
-            Long client = clientHelper.createClient("01 January 2026");
-            Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 January 2026");
-            Long feeLoanChargeId = addCharge(loanId, false, 100, "01 January 2026");
+            Long client = clientHelper.createClient("20260101");
+            Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260101");
+            Long feeLoanChargeId = addCharge(loanId, false, 100, "20260101");
 
             // R1 on day 20: the fee (due 01 Jan) is the only thing to settle, so the 100 goes entirely to the fee.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-20");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(100), "20 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(100), "20260120"));
 
             GetWorkingCapitalLoanTransactionIdResponse r1BeforeReprocessing = findTransaction(wcLoanHelper.getTransactions(loanId),
                     LocalDate.of(2026, 1, 20), BigDecimal.valueOf(100));
@@ -138,7 +138,7 @@ public class FeignWorkingCapitalLoanChargeAllocationTest extends FeignIntegratio
             // Backdated R2 on day 10 (before R1) settles the fee first when replayed in chronological order, so
             // reprocessing must redistribute R1 from fee to principal.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-25");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(100), "10 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(100), "20260110"));
 
             List<GetWorkingCapitalLoanTransactionIdResponse> transactions = wcLoanHelper.getTransactions(loanId);
             // R2 (earlier) now settles the fee.
@@ -169,9 +169,9 @@ public class FeignWorkingCapitalLoanChargeAllocationTest extends FeignIntegratio
     @DisplayName("A charge adjustment partially settles the charge and refreshes the fee balance bucket without touching principal")
     void testChargeAdjustmentPartiallySettlesChargeAndRefreshesBalanceBucket() {
         businessDateHelper.runAt("2026-01-01", () -> {
-            Long client = clientHelper.createClient("01 January 2026");
-            Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 January 2026");
-            Long feeLoanChargeId = addCharge(loanId, false, 100, "01 January 2026");
+            Long client = clientHelper.createClient("20260101");
+            Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260101");
+            Long feeLoanChargeId = addCharge(loanId, false, 100, "20260101");
 
             // A 40 charge adjustment partially settles the 100 fee charge and bumps the fee bucket by 40.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-05");
@@ -195,9 +195,9 @@ public class FeignWorkingCapitalLoanChargeAllocationTest extends FeignIntegratio
         final Long[] adjustmentTransactionIdHolder = new Long[1];
         final Long[] feeLoanChargeIdHolder = new Long[1];
         businessDateHelper.runAt("2026-01-01", () -> {
-            Long client = clientHelper.createClient("01 January 2026");
-            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 January 2026");
-            feeLoanChargeIdHolder[0] = addCharge(loanIdHolder[0], false, 100, "01 January 2026");
+            Long client = clientHelper.createClient("20260101");
+            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260101");
+            feeLoanChargeIdHolder[0] = addCharge(loanIdHolder[0], false, 100, "20260101");
 
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-05");
             adjustmentTransactionIdHolder[0] = wcLoanHelper.adjustCharge(loanIdHolder[0], feeLoanChargeIdHolder[0],
@@ -231,9 +231,9 @@ public class FeignWorkingCapitalLoanChargeAllocationTest extends FeignIntegratio
         final Long[] adjustmentTransactionIdHolder = new Long[1];
         final Long[] feeLoanChargeIdHolder = new Long[1];
         businessDateHelper.runAt("2026-01-01", () -> {
-            Long client = clientHelper.createClient("01 January 2026");
-            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 January 2026");
-            feeLoanChargeIdHolder[0] = addCharge(loanIdHolder[0], false, 100, "01 January 2026");
+            Long client = clientHelper.createClient("20260101");
+            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260101");
+            feeLoanChargeIdHolder[0] = addCharge(loanIdHolder[0], false, 100, "20260101");
         });
         businessDateHelper.runAt("2026-01-05", () -> {
             adjustmentTransactionIdHolder[0] = wcLoanHelper.adjustCharge(loanIdHolder[0], feeLoanChargeIdHolder[0],
@@ -256,15 +256,15 @@ public class FeignWorkingCapitalLoanChargeAllocationTest extends FeignIntegratio
         final Long[] adjustmentTransactionIdHolder = new Long[1];
         final Long[] feeLoanChargeIdHolder = new Long[1];
         businessDateHelper.runAt("2026-01-01", () -> {
-            Long client = clientHelper.createClient("01 January 2026");
-            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 January 2026");
+            Long client = clientHelper.createClient("20260101");
+            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260101");
             // Due well after the repayment below, so it's an "in advance" charge and doesn't compete with
             // principal in the repayment that closes the loan.
-            feeLoanChargeIdHolder[0] = addCharge(loanIdHolder[0], false, 100, "31 January 2026");
+            feeLoanChargeIdHolder[0] = addCharge(loanIdHolder[0], false, 100, "20260131");
         });
         businessDateHelper.runAt("2026-01-02", () -> {
             wcLoanHelper.makeRepayment(loanIdHolder[0],
-                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(9000), "02 January 2026"));
+                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(9000), "20260102"));
             GetWorkingCapitalLoansLoanIdResponse loanDetails = wcLoanHelper.getLoanDetails(loanIdHolder[0]);
             assertNotNull(loanDetails.getStatus());
             assertEquals("loanStatusType.closed.obligations.met", loanDetails.getStatus().getCode(),
@@ -297,9 +297,9 @@ public class FeignWorkingCapitalLoanChargeAllocationTest extends FeignIntegratio
         final Long[] loanIdHolder = new Long[1];
         final Long[] feeLoanChargeIdHolder = new Long[1];
         businessDateHelper.runAt("2026-01-01", () -> {
-            Long client = clientHelper.createClient("01 January 2026");
-            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 January 2026");
-            feeLoanChargeIdHolder[0] = addCharge(loanIdHolder[0], false, 100, "01 January 2026");
+            Long client = clientHelper.createClient("20260101");
+            loanIdHolder[0] = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260101");
+            feeLoanChargeIdHolder[0] = addCharge(loanIdHolder[0], false, 100, "20260101");
         });
         businessDateHelper.runAt("2026-01-20", () -> {
             wcLoanHelper.adjustCharge(loanIdHolder[0], feeLoanChargeIdHolder[0],
@@ -307,7 +307,7 @@ public class FeignWorkingCapitalLoanChargeAllocationTest extends FeignIntegratio
         });
         businessDateHelper.runAt("2026-01-25", () -> {
             wcLoanHelper.makeRepayment(loanIdHolder[0],
-                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(100), "10 January 2026"));
+                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(100), "20260110"));
 
             GetBalance balance = balanceOf(loanIdHolder[0]);
             assertEqualBigDecimal(BigDecimal.valueOf(100), balance.getFeePaid(), "Fee is fully settled by the earlier-dated repayment");

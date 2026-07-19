@@ -92,9 +92,9 @@ public class SavingsAccountTransactionTest {
     private static final int DEADLOCK_BATCH_ITERATIONS = 5;
     private static final int DEADLOCK_BATCH_THREAD_COUNT = DEADLOCK_BATCH_ITERATIONS * 2;
     private static final int EXECUTOR_TIMEOUT_SECONDS = 30;
-    final String startDateString = "03 June 2023";
-    final String depositDateString = "05 June 2023";
-    final String withdrawDateString = "10 June 2023";
+    final String startDateString = "20230603";
+    final String depositDateString = "20230605";
+    final String withdrawDateString = "20230610";
 
     private String authenticationKey;
     private ResponseSpecification responseSpec;

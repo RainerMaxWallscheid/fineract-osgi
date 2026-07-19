@@ -78,7 +78,7 @@ public class SavingsAccrualIntegrationTest {
 
     @Test
     public void testAccrualsAreGeneratedForTenDayPeriod() {
-        runAt("12 August 2021", () -> {
+        runAt("20210812", () -> {
             // --- ARRANGE ---
 
             final Account assetAccount = this.accountHelper.createAssetAccount();
@@ -97,11 +97,11 @@ public class SavingsAccrualIntegrationTest {
                     this.responseSpec);
             Assertions.assertNotNull(savingsProductId, "Error creating savings product.");
 
-            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2020");
+            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20200101");
             Assertions.assertNotNull(clientId, "Error creating client.");
 
             final LocalDate startDate = LocalDate.of(2021, 8, 12).minusDays(daysToTest);
-            final String startDateString = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US).format(startDate);
+            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
 
             final Integer savingsAccountId = this.savingsAccountHelper.applyForSavingsApplicationOnDate(clientId, savingsProductId,
                     SavingsAccountHelper.ACCOUNT_TYPE_INDIVIDUAL, startDateString);
@@ -154,7 +154,7 @@ public class SavingsAccrualIntegrationTest {
 
     @Test
     public void testAccrualsAreReversedAndRecalculatedAfterBackdatedTransaction() {
-        runAt("12 August 2021", () -> {
+        runAt("20210812", () -> {
             // --- ARRANGE ---
             final Account assetAccount = this.accountHelper.createAssetAccount();
             final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
@@ -173,12 +173,12 @@ public class SavingsAccrualIntegrationTest {
                     this.responseSpec);
             Assertions.assertNotNull(savingsProductId);
 
-            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2020");
+            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20200101");
             Assertions.assertNotNull(clientId);
 
             final LocalDate today = LocalDate.of(2021, 8, 12);
             final LocalDate startDate = today.minusDays(daysToTest);
-            final String startDateString = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US).format(startDate);
+            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
 
             final Integer savingsAccountId = this.savingsAccountHelper.applyForSavingsApplicationOnDate(clientId, savingsProductId,
                     SavingsAccountHelper.ACCOUNT_TYPE_INDIVIDUAL, startDateString);
@@ -193,7 +193,7 @@ public class SavingsAccrualIntegrationTest {
             schedulerJobHelper.executeAndAwaitJob("Add Accrual Transactions For Savings");
 
             final LocalDate backdatedTransactionDate = startDate.plusDays(daysUntilTransaction);
-            final String backdatedTransactionDateString = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US)
+            final String backdatedTransactionDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US)
                     .format(backdatedTransactionDate);
             this.savingsAccountHelper.withdrawalFromSavingsAccount(savingsAccountId, "1000", backdatedTransactionDateString,
                     CommonConstants.RESPONSE_RESOURCE_ID);

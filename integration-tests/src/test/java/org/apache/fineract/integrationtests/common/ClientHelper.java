@@ -89,7 +89,7 @@ public class ClientHelper {
     public static final String CREATED_DATE = Utils.getLocalDateOfTenant().minusDays(5).format(Utils.dateFormatter);
     public static final String CREATED_DATE_PLUS_ONE = Utils.getLocalDateOfTenant().minusDays(4).format(Utils.dateFormatter);
     public static final String CREATED_DATE_PLUS_TWO = Utils.getLocalDateOfTenant().minusDays(3).format(Utils.dateFormatter);
-    public static final String DEFAULT_DATE = "04 March 2011";
+    public static final String DEFAULT_DATE = "20110304";
     private static final Gson GSON = new JSON().getGson();
     private final RequestSpecification requestSpec;
     private final ResponseSpecification responseSpec;
@@ -252,7 +252,7 @@ public class ClientHelper {
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
     public static Integer createClientPending(final RequestSpecification requestSpec, final ResponseSpecification responseSpec) {
-        return createClientPending(requestSpec, responseSpec, "04 March 2014");
+        return createClientPending(requestSpec, responseSpec, "20140304");
     }
 
     // TODO: Rewrite to use fineract-client instead!
@@ -278,7 +278,7 @@ public class ClientHelper {
     @Deprecated(forRemoval = true)
     public Object createClientPendingWithError(final String jsonAttributeToGetBack) {
         log.info("---------------------------------CREATING A CLIENT IN PENDING WITH ERROR---------------------------------------------");
-        return Utils.performServerPost(this.requestSpec, this.responseSpec, CREATE_CLIENT_URL, getTestClientAsJSONPending("04 March 2014", "1"), jsonAttributeToGetBack);
+        return Utils.performServerPost(this.requestSpec, this.responseSpec, CREATE_CLIENT_URL, getTestClientAsJSONPending("20140304", "1"), jsonAttributeToGetBack);
     }
 
     // TODO: Rewrite to use fineract-client instead!
@@ -439,7 +439,7 @@ public class ClientHelper {
     public static String getTestPendingClientWithDatatableAsJson(final String registeredTableName) {
         HashMap<String, Object> map = setInitialClientValues("1", LEGALFORM_ID_PERSON);
         map.put("active", "false");
-        map.put("submittedOnDate", "04 March 2014");
+        map.put("submittedOnDate", "20140304");
         String requestJson = getTestDatatableAsJson(map, registeredTableName);
         log.info("map : {}", requestJson);
         return requestJson;
@@ -456,9 +456,9 @@ public class ClientHelper {
         dataMap.put("locale", "en");
         dataMap.put("Spouse Name", Utils.randomStringGenerator("Spouse_name", 4));
         dataMap.put("Number of Dependents", 5);
-        dataMap.put("Time of Visit", "01 December 2016 04:03");
+        dataMap.put("Time of Visit", "20161201 04:03");
         dataMap.put("dateFormat", Utils.DATE_TIME_FORMAT);
-        dataMap.put("Date of Approval", "02 December 2016 00:00");
+        dataMap.put("Date of Approval", "20161202 00:00");
         datatableMap.put("registeredTableName", registeredTableName);
         datatableMap.put("data", dataMap);
         datatablesListMap.add(datatableMap);
@@ -1057,7 +1057,7 @@ public class ClientHelper {
     @Deprecated(forRemoval = true)
     public String importClientEntityTemplate(File file) {
         String locale = "en";
-        String dateFormat = "dd MMMM yyyy";
+        String dateFormat = "yyyyMMdd";
         String legalFormType = GlobalEntityType.CLIENTS_ENTITY.toString();
         requestSpec.header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA);
         return Utils.performServerTemplatePost(requestSpec, responseSpec, CLIENT_URL + "/uploadtemplate" + "?" + Utils.TENANT_IDENTIFIER, legalFormType, file, locale, dateFormat);

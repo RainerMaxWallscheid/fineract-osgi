@@ -176,11 +176,11 @@ final class RescheduleLoansApiResourceSwagger {
     @Schema(description = "PostCreateRescheduleLoansRequest")
     public static final class PostCreateRescheduleLoansRequest {
 
-        @Schema(example = "20 September 2011")
+        @Schema(example = "20110920")
         public String adjustedDueDate;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "1")
         public Integer extraTerms;
@@ -192,9 +192,9 @@ final class RescheduleLoansApiResourceSwagger {
         public Long loanId;
         @Schema(example = "1.1")
         public BigDecimal newInterestRate;
-        @Schema(example = "20 September 2011")
+        @Schema(example = "20110920")
         public String rescheduleFromDate;
-        @Schema(example = "20 September 2011")
+        @Schema(example = "20110920")
         public String endDate;
         @Schema(example = "100.0")
         public BigDecimal emi;
@@ -202,20 +202,20 @@ final class RescheduleLoansApiResourceSwagger {
         public String rescheduleReasonComment;
         @Schema(example = "1")
         public Long rescheduleReasonId;
-        @Schema(example = "20 September 2011")
+        @Schema(example = "20110920")
         public String submittedOnDate;
     }
 
     @Schema(description = "PostUpdateRescheduleLoansRequest")
     public static final class PostUpdateRescheduleLoansRequest {
 
-        @Schema(example = "20 September 2011")
+        @Schema(example = "20110920")
         public String approvedOnDate;
-        @Schema(example = "20 September 2011")
+        @Schema(example = "20110920")
         public String rejectedOnDate;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
     }
 

@@ -64,29 +64,29 @@ public class DelinquencyActionIntegrationTests extends BaseLoanIntegrationTest {
 
     @Test
     public void testCreateAndReadPauseDelinquencyAction() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             // Create Loan Product
             Long loanProductId = createLoanProductWith25PctDownPayment(true, true);
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0, 2);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0, 2);
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20230101");
             // Create Delinquency Pause for the Loan
-            PostLoansDelinquencyActionResponse response = loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "10 January 2023", "15 January 2023");
+            PostLoansDelinquencyActionResponse response = loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20230110", "20230115");
             List<GetDelinquencyActionsResponse> loanDelinquencyActions = loanTransactionHelper.getLoanDelinquencyActions(loanId);
             Assertions.assertNotNull(loanDelinquencyActions);
             Assertions.assertEquals(1, loanDelinquencyActions.size());
             Assertions.assertEquals("PAUSE", loanDelinquencyActions.get(0).getAction());
-            Assertions.assertEquals(LocalDate.parse("10 January 2023", dateTimeFormatter), loanDelinquencyActions.get(0).getStartDate());
-            Assertions.assertEquals(LocalDate.parse("15 January 2023", dateTimeFormatter), loanDelinquencyActions.get(0).getEndDate());
+            Assertions.assertEquals(LocalDate.parse("20230110", dateTimeFormatter), loanDelinquencyActions.get(0).getStartDate());
+            Assertions.assertEquals(LocalDate.parse("20230115", dateTimeFormatter), loanDelinquencyActions.get(0).getEndDate());
         });
     }
 
     @Test
     public void testCreateAndReadPauseDelinquencyActionUsingExternalId() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             // Create Loan Product
@@ -94,199 +94,199 @@ public class DelinquencyActionIntegrationTests extends BaseLoanIntegrationTest {
             // Create external ID
             String externalId = UUID.randomUUID().toString();
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0, 2, req -> req.externalId(externalId));
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0, 2, req -> req.externalId(externalId));
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20230101");
             // Create Delinquency Pause for the Loan
-            PostLoansDelinquencyActionResponse response = loanTransactionHelper.createLoanDelinquencyAction(externalId, PAUSE, "10 January 2023", "15 January 2023");
+            PostLoansDelinquencyActionResponse response = loanTransactionHelper.createLoanDelinquencyAction(externalId, PAUSE, "20230110", "20230115");
             List<GetDelinquencyActionsResponse> loanDelinquencyActions = loanTransactionHelper.getLoanDelinquencyActions(externalId);
             Assertions.assertNotNull(loanDelinquencyActions);
             Assertions.assertEquals(1, loanDelinquencyActions.size());
             Assertions.assertEquals("PAUSE", loanDelinquencyActions.get(0).getAction());
-            Assertions.assertEquals(LocalDate.parse("10 January 2023", dateTimeFormatter), loanDelinquencyActions.get(0).getStartDate());
-            Assertions.assertEquals(LocalDate.parse("15 January 2023", dateTimeFormatter), loanDelinquencyActions.get(0).getEndDate());
+            Assertions.assertEquals(LocalDate.parse("20230110", dateTimeFormatter), loanDelinquencyActions.get(0).getStartDate());
+            Assertions.assertEquals(LocalDate.parse("20230115", dateTimeFormatter), loanDelinquencyActions.get(0).getEndDate());
         });
     }
 
     @Test
     public void testCreatePauseAndResumeDelinquencyAction() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             // Create Loan Product
             Long loanProductId = createLoanProductWith25PctDownPayment(true, true);
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0, 2);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0, 2);
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20230101");
             // Create Delinquency Pause for the Loan
-            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "10 January 2023", "15 January 2023");
+            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20230110", "20230115");
             // Update business date
-            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("14 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("20230114").dateFormat(DATETIME_PATTERN).locale("en"));
             // Create 2nd Delinquency Resume for the Loan
-            loanTransactionHelper.createLoanDelinquencyAction(loanId, RESUME, "14 January 2023");
+            loanTransactionHelper.createLoanDelinquencyAction(loanId, RESUME, "20230114");
             List<GetDelinquencyActionsResponse> loanDelinquencyActions = loanTransactionHelper.getLoanDelinquencyActions(loanId);
             Assertions.assertNotNull(loanDelinquencyActions);
             Assertions.assertEquals(2, loanDelinquencyActions.size());
             Assertions.assertEquals("PAUSE", loanDelinquencyActions.get(0).getAction());
-            Assertions.assertEquals(LocalDate.parse("10 January 2023", dateTimeFormatter), loanDelinquencyActions.get(0).getStartDate());
-            Assertions.assertEquals(LocalDate.parse("15 January 2023", dateTimeFormatter), loanDelinquencyActions.get(0).getEndDate());
+            Assertions.assertEquals(LocalDate.parse("20230110", dateTimeFormatter), loanDelinquencyActions.get(0).getStartDate());
+            Assertions.assertEquals(LocalDate.parse("20230115", dateTimeFormatter), loanDelinquencyActions.get(0).getEndDate());
             Assertions.assertEquals("RESUME", loanDelinquencyActions.get(1).getAction());
-            Assertions.assertEquals(LocalDate.parse("14 January 2023", dateTimeFormatter), loanDelinquencyActions.get(1).getStartDate());
+            Assertions.assertEquals(LocalDate.parse("20230114", dateTimeFormatter), loanDelinquencyActions.get(1).getStartDate());
         });
     }
 
     @Test
     public void testCreatePauseAndResumeDelinquencyActionWithStatusFlag() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             // Create Loan Product
             Long loanProductId = createLoanProductWith25PctDownPayment(true, true);
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0, 2);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0, 2);
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20230101");
             // Create Delinquency Pause for the Loan
-            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "10 January 2023", "15 January 2023");
+            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20230110", "20230115");
             // Update business date
-            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("14 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("20230114").dateFormat(DATETIME_PATTERN).locale("en"));
             // Validate Loan Delinquency Pause Period on Loan
-            validateLoanDelinquencyPausePeriods(loanId, pausePeriods("10 January 2023", "15 January 2023", true));
+            validateLoanDelinquencyPausePeriods(loanId, pausePeriods("20230110", "20230115", true));
             // Create a Resume for the Loan for the current business date, it is still expected to be in pause
-            loanTransactionHelper.createLoanDelinquencyAction(loanId, RESUME, "14 January 2023");
+            loanTransactionHelper.createLoanDelinquencyAction(loanId, RESUME, "20230114");
             // Validate Loan Delinquency Pause Period on Loan
-            validateLoanDelinquencyPausePeriods(loanId, pausePeriods("10 January 2023", "14 January 2023", true));
-            // Update business date to 15 January 2023
-            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("15 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+            validateLoanDelinquencyPausePeriods(loanId, pausePeriods("20230110", "20230114", true));
+            // Update business date to 20230115
+            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("20230115").dateFormat(DATETIME_PATTERN).locale("en"));
             // Validate Loan Delinquency Pause Period on Loan
-            validateLoanDelinquencyPausePeriods(loanId, pausePeriods("10 January 2023", "14 January 2023", false));
+            validateLoanDelinquencyPausePeriods(loanId, pausePeriods("20230110", "20230114", false));
             // Create a new pause action for the future
-            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20 January 2023", "25 January 2023");
+            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20230120", "20230125");
             // Validate Loan Delinquency Pause Period on Loan
             validateLoanDelinquencyPausePeriods(loanId,  //
-            pausePeriods("10 January 2023", "14 January 2023", false),  //
-            pausePeriods("20 January 2023", "25 January 2023", false) //
+            pausePeriods("20230110", "20230114", false),  //
+            pausePeriods("20230120", "20230125", false) //
             );
         });
     }
 
     @Test
     public void testValidationErrorIsThrownWhenCreatingPauseActionWithBackdatedStartDateBeforeDisbursement() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             // Create Loan Product
             Long loanProductId = createLoanProductWith25PctDownPayment(true, true);
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0, 2);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0, 2);
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20230101");
             // Create Delinquency Pause for the Loan before disbursement date
-            CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class, () -> loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "05 December 2022", "15 January 2023"));
+            CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class, () -> loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20221205", "20230115"));
             assertTrue(exception.getMessage().contains("Start date of pause period must be after first disbursal date"));
         });
     }
 
     @Test
     public void testCreateAndVerifyBackdatedPauseDelinquencyAction() {
-        runAt("30 January 2023", () -> {
+        runAt("20230130", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             // Create Loan Product
             Long loanProductId = createLoanProductWith25PctDownPayment(true, true);
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "25 December 2022", 1500.0, 3, req -> req.submittedOnDate("25 December 2022"));
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20221225", 1500.0, 3, req -> req.submittedOnDate("20221225"));
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "25 December 2022");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20221225");
             // Create Delinquency Pause for the Loan in the past
-            PostLoansDelinquencyActionResponse response = loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "28 January 2023", "15 February 2023");
+            PostLoansDelinquencyActionResponse response = loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20230128", "20230215");
             List<GetDelinquencyActionsResponse> loanDelinquencyActions = loanTransactionHelper.getLoanDelinquencyActions(loanId);
             Assertions.assertNotNull(loanDelinquencyActions);
             Assertions.assertEquals(1, loanDelinquencyActions.size());
             Assertions.assertEquals("PAUSE", loanDelinquencyActions.get(0).getAction());
-            Assertions.assertEquals(LocalDate.parse("28 January 2023", dateTimeFormatter), loanDelinquencyActions.get(0).getStartDate());
-            Assertions.assertEquals(LocalDate.parse("15 February 2023", dateTimeFormatter), loanDelinquencyActions.get(0).getEndDate());
+            Assertions.assertEquals(LocalDate.parse("20230128", dateTimeFormatter), loanDelinquencyActions.get(0).getStartDate());
+            Assertions.assertEquals(LocalDate.parse("20230215", dateTimeFormatter), loanDelinquencyActions.get(0).getEndDate());
             // Validate Active Delinquency Pause Period on Loan
-            validateLoanDelinquencyPausePeriods(loanId, pausePeriods("28 January 2023", "15 February 2023", true));
+            validateLoanDelinquencyPausePeriods(loanId, pausePeriods("20230128", "20230215", true));
         });
     }
 
     @Test
     public void testVerifyLoanDelinquencyRecalculationForBackdatedPauseDelinquencyAction() {
-        runAt("30 January 2023", () -> {
+        runAt("20230130", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             // Create Loan Product
             Long loanProductId = createLoanProductWith25PctDownPaymentAndDelinquencyBucket(true, true, true, 3);
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "25 December 2022", 1500.0, 3, req -> req.submittedOnDate("25 December 2022"));
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20221225", 1500.0, 3, req -> req.submittedOnDate("20221225"));
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "25 December 2022");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20221225");
             // Loan delinquency data before backdated pause
             verifyLoanDelinquencyData(loanId, 6, new InstallmentDelinquencyData(4, 10, BigDecimal.valueOf(250.0)));
             // Create Delinquency Pause for the Loan in the past
-            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "27 January 2023", "15 February 2023");
+            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20230127", "20230215");
             List<GetDelinquencyActionsResponse> loanDelinquencyActions = loanTransactionHelper.getLoanDelinquencyActions(loanId);
             Assertions.assertNotNull(loanDelinquencyActions);
             Assertions.assertEquals(1, loanDelinquencyActions.size());
             Assertions.assertEquals("PAUSE", loanDelinquencyActions.getFirst().getAction());
-            Assertions.assertEquals(LocalDate.parse("27 January 2023", dateTimeFormatter), loanDelinquencyActions.getFirst().getStartDate());
-            Assertions.assertEquals(LocalDate.parse("15 February 2023", dateTimeFormatter), loanDelinquencyActions.getFirst().getEndDate());
+            Assertions.assertEquals(LocalDate.parse("20230127", dateTimeFormatter), loanDelinquencyActions.getFirst().getStartDate());
+            Assertions.assertEquals(LocalDate.parse("20230215", dateTimeFormatter), loanDelinquencyActions.getFirst().getEndDate());
             // Loan delinquency data calculation after backdated pause
             verifyLoanDelinquencyData(loanId, 3, new InstallmentDelinquencyData(1, 3, BigDecimal.valueOf(250.0)));
             // Validate Active Delinquency Pause Period on Loan
-            validateLoanDelinquencyPausePeriods(loanId, pausePeriods("27 January 2023", "15 February 2023", true));
+            validateLoanDelinquencyPausePeriods(loanId, pausePeriods("20230127", "20230215", true));
         });
     }
 
     @Test
     public void testValidationErrorIsThrownWhenCreatingActionThatOverlaps() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             // Create Loan Product
             Long loanProductId = createLoanProductWith25PctDownPayment(true, true);
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0, 2);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0, 2);
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20230101");
             // Create Delinquency Pause for the Loan
-            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "01 January 2023", "15 January 2023");
+            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20230101", "20230115");
             // Create overlapping Delinquency Pause for the Loan
-            CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class, () -> loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "01 January 2023", "15 January 2023"));
+            CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class, () -> loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20230101", "20230115"));
             assertTrue(exception.getMessage().contains("Delinquency pause period cannot overlap with another pause period"));
         });
     }
 
     @Test
     public void testLoanAndInstallmentDelinquencyCalculationForCOBAfterPausePeriodEndTest() {
-        runAt("01 November 2023", () -> {
+        runAt("20231101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             // Create Loan Product
             Long loanProductId = createLoanProductWith25PctDownPaymentAndDelinquencyBucket(true, true, true, 0);
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 November 2023", 1000.0, 3, req -> {
-                req.submittedOnDate("01 November 2023");
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20231101", 1000.0, 3, req -> {
+                req.submittedOnDate("20231101");
                 req.setLoanTermFrequency(45);
                 req.setRepaymentEvery(15);
                 req.setGraceOnArrearsAgeing(0);
             });
             // Partial Loan amount Disbursement
-            disburseLoan(loanId, BigDecimal.valueOf(100.0), "01 November 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(100.0), "20231101");
             // Update business date
-            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("05 November 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("20231105").dateFormat(DATETIME_PATTERN).locale("en"));
             // Create Delinquency Pause for the Loan
-            PostLoansDelinquencyActionResponse response = loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "16 November 2023", "25 November 2023");
+            PostLoansDelinquencyActionResponse response = loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20231116", "20231125");
             // run cob for business date 26 November
             final InlineLoanCOBHelper inlineLoanCOBHelper = new InlineLoanCOBHelper(requestSpec, responseSpec);
-            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("26 November 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("20231126").dateFormat(DATETIME_PATTERN).locale("en"));
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId.longValue()));
             // Loan delinquency data
             verifyLoanDelinquencyData(loanId, 1, new InstallmentDelinquencyData(1, 3, BigDecimal.valueOf(25.0)));
             // Validate Delinquency Pause Period on Loan
-            validateLoanDelinquencyPausePeriods(loanId, pausePeriods("16 November 2023", "25 November 2023", false));
+            validateLoanDelinquencyPausePeriods(loanId, pausePeriods("20231116", "20231125", false));
         });
     }
 
@@ -388,19 +388,19 @@ public class DelinquencyActionIntegrationTests extends BaseLoanIntegrationTest {
     @Test
     public void testDelinquentDaysAndDateAfterPastDelinquencyPause() {
         final Long[] loanIdHolder = new Long[1];
-        runAt("01 January 2022", () -> {
+        runAt("20220101", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             Long loanProductId = createLoanProductWith25PctDownPaymentAndDelinquencyBucket(true, true, false, 0);
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2022", 1000.0, 2, req -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20220101", 1000.0, 2, req -> {
                 req.setLoanTermFrequency(30);
                 req.setRepaymentEvery(15);
                 req.setGraceOnArrearsAgeing(0);
             });
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 January 2022");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20220101");
             loanIdHolder[0] = loanId;
-            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20 January 2022", "30 January 2022");
+            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20220120", "20220130");
         });
-        runAt("02 February 2022", () -> {
+        runAt("20220202", () -> {
             final InlineLoanCOBHelper inlineLoanCOBHelper = new InlineLoanCOBHelper(requestSpec, responseSpec);
             Long loanId = loanIdHolder[0];
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
@@ -414,12 +414,12 @@ public class DelinquencyActionIntegrationTests extends BaseLoanIntegrationTest {
             assertEquals(7, delinquentDays, "Delinquent days should be 7 (17 past due days - 10 paused days = 7)");
             LocalDate delinquentDate = loanDetails.getDelinquent().getDelinquentDate();
             assertNotNull(delinquentDate, "Delinquent date should not be null");
-            assertEquals(LocalDate.parse("16 January 2022", dateTimeFormatter), delinquentDate, "Delinquent date should be 16 Jan 2022 (first installment due date, NOT adjusted for pause)");
+            assertEquals(LocalDate.parse("20220116", dateTimeFormatter), delinquentDate, "Delinquent date should be 20220116 (first installment due date, NOT adjusted for pause)");
             List<GetLoansLoanIdDelinquencyPausePeriod> pausePeriods = loanDetails.getDelinquent().getDelinquencyPausePeriods();
             assertNotNull(pausePeriods);
             assertEquals(1, pausePeriods.size());
-            assertEquals(LocalDate.parse("20 January 2022", dateTimeFormatter), pausePeriods.get(0).getPausePeriodStart());
-            assertEquals(LocalDate.parse("30 January 2022", dateTimeFormatter), pausePeriods.get(0).getPausePeriodEnd());
+            assertEquals(LocalDate.parse("20220120", dateTimeFormatter), pausePeriods.get(0).getPausePeriodStart());
+            assertEquals(LocalDate.parse("20220130", dateTimeFormatter), pausePeriods.get(0).getPausePeriodEnd());
             assertEquals(FALSE, pausePeriods.get(0).getActive());
         });
     }
@@ -427,20 +427,20 @@ public class DelinquencyActionIntegrationTests extends BaseLoanIntegrationTest {
     @Test
     public void testInstallmentLevelDelinquencyWithMultipleOverdueInstallments() {
         final Long[] loanIdHolder = new Long[1];
-        runAt("01 January 2022", () -> {
+        runAt("20220101", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             Long loanProductId = createLoanProductWith25PctDownPaymentAndDelinquencyBucket(true, true, true, 0);
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2022", 1000.0, 3, req -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20220101", 1000.0, 3, req -> {
                 req.setLoanTermFrequency(45);
                 req.setRepaymentEvery(15);
                 req.setGraceOnArrearsAgeing(0);
             });
-            disburseLoan(loanId, BigDecimal.valueOf(100.0), "01 January 2022");
+            disburseLoan(loanId, BigDecimal.valueOf(100.0), "20220101");
             loanIdHolder[0] = loanId;
-            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("05 January 2022").dateFormat(DATETIME_PATTERN).locale("en"));
-            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20 January 2022", "30 January 2022");
+            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("20220105").dateFormat(DATETIME_PATTERN).locale("en"));
+            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20220120", "20220130");
         });
-        runAt("02 March 2022", () -> {
+        runAt("20220302", () -> {
             final InlineLoanCOBHelper inlineLoanCOBHelper = new InlineLoanCOBHelper(requestSpec, responseSpec);
             Long loanId = loanIdHolder[0];
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
@@ -451,30 +451,30 @@ public class DelinquencyActionIntegrationTests extends BaseLoanIntegrationTest {
             Integer loanLevelDelinquentDays = loanDetails.getDelinquent().getDelinquentDays();
             assertEquals(35, loanLevelDelinquentDays, "Loan level delinquent days should be 35 (45 past due days - 10 paused days = 35)");
             LocalDate loanLevelDelinquentDate = loanDetails.getDelinquent().getDelinquentDate();
-            assertEquals(LocalDate.parse("16 January 2022", dateTimeFormatter), loanLevelDelinquentDate, "Loan level delinquent date should be 16 Jan 2022 (first installment due date)");
-            Map<String, BigDecimal> expectedTotals = calculateExpectedBucketTotals(loanDetails, LocalDate.parse("02 March 2022", dateTimeFormatter));
+            assertEquals(LocalDate.parse("20220116", dateTimeFormatter), loanLevelDelinquentDate, "Loan level delinquent date should be 20220116 (first installment due date)");
+            Map<String, BigDecimal> expectedTotals = calculateExpectedBucketTotals(loanDetails, LocalDate.parse("20220302", dateTimeFormatter));
             assertTrue(expectedTotals.containsKey("11-60"), "Expected 11-60 bucket to contain delinquent installments");
-            assertInstallmentDelinquencyBuckets(loanDetails, LocalDate.parse("02 March 2022", dateTimeFormatter), expectedTotals);
+            assertInstallmentDelinquencyBuckets(loanDetails, LocalDate.parse("20220302", dateTimeFormatter), expectedTotals);
         });
     }
 
     @Test
     public void testInstallmentDelinquencyWithSinglePauseAffectingMultipleInstallments() {
         final Long[] loanIdHolder = new Long[1];
-        runAt("10 January 2022", () -> {
+        runAt("20220110", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             Long loanProductId = createLoanProductWith25PctDownPaymentAndDelinquencyBucket(true, true, true, 0);
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "10 January 2022", 1000.0, 3, req -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20220110", 1000.0, 3, req -> {
                 req.setLoanTermFrequency(30);
                 req.setRepaymentEvery(10);
                 req.setGraceOnArrearsAgeing(0);
             });
-            disburseLoan(loanId, BigDecimal.valueOf(100.0), "10 January 2022");
+            disburseLoan(loanId, BigDecimal.valueOf(100.0), "20220110");
             loanIdHolder[0] = loanId;
-            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("14 January 2022").dateFormat(DATETIME_PATTERN).locale("en"));
-            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "15 January 2022", "25 January 2022");
+            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("20220114").dateFormat(DATETIME_PATTERN).locale("en"));
+            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20220115", "20220125");
         });
-        runAt("05 February 2022", () -> {
+        runAt("20220205", () -> {
             final InlineLoanCOBHelper inlineLoanCOBHelper = new InlineLoanCOBHelper(requestSpec, responseSpec);
             Long loanId = loanIdHolder[0];
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
@@ -498,32 +498,32 @@ public class DelinquencyActionIntegrationTests extends BaseLoanIntegrationTest {
     @Test
     public void testInstallmentDelinquencyWithMultiplePausesAffectingSameInstallment() {
         final Long[] loanIdHolder = new Long[1];
-        runAt("01 January 2022", () -> {
+        runAt("20220101", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             Long loanProductId = createLoanProductWith25PctDownPaymentAndDelinquencyBucket(true, true, true, 0);
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2022", 1000.0, 1, req -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20220101", 1000.0, 1, req -> {
                 req.setLoanTermFrequency(30);
                 req.setRepaymentEvery(30);
                 req.setGraceOnArrearsAgeing(0);
             });
-            disburseLoan(loanId, BigDecimal.valueOf(100.0), "01 January 2022");
+            disburseLoan(loanId, BigDecimal.valueOf(100.0), "20220101");
             loanIdHolder[0] = loanId;
         });
-        runAt("04 February 2022", () -> {
+        runAt("20220204", () -> {
             Long loanId = loanIdHolder[0];
-            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "04 February 2022", "09 February 2022");
+            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20220204", "20220209");
         });
-        runAt("15 February 2022", () -> {
+        runAt("20220215", () -> {
             Long loanId = loanIdHolder[0];
-            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "15 February 2022", "20 February 2022");
+            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20220215", "20220220");
         });
-        runAt("01 March 2022", () -> {
+        runAt("20220301", () -> {
             final InlineLoanCOBHelper inlineLoanCOBHelper = new InlineLoanCOBHelper(requestSpec, responseSpec);
             Long loanId = loanIdHolder[0];
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             assertNotNull(loanDetails.getDelinquent(), "Loan delinquent data should not be null");
-            LocalDate businessDate = LocalDate.parse("01 March 2022", dateTimeFormatter);
+            LocalDate businessDate = LocalDate.parse("20220301", dateTimeFormatter);
             LocalDate installmentDueDate = loanDetails.getDelinquent().getDelinquentDate();
             Integer loanLevelPastDueDays = loanDetails.getDelinquent().getPastDueDays();
             long expectedPastDueDays = ChronoUnit.DAYS.between(installmentDueDate, businessDate);
@@ -549,88 +549,88 @@ public class DelinquencyActionIntegrationTests extends BaseLoanIntegrationTest {
     @Test
     public void testInstallmentDelinquencyWithPauseBetweenSequentialInstallments() {
         final Long[] loanIdHolder = new Long[1];
-        runAt("01 January 2022", () -> {
+        runAt("20220101", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             Long loanProductId = createLoanProductWith25PctDownPaymentAndDelinquencyBucket(true, true, true, 0);
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2022", 1000.0, 2, req -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20220101", 1000.0, 2, req -> {
                 req.setLoanTermFrequency(20);
                 req.setRepaymentEvery(10);
                 req.setGraceOnArrearsAgeing(0);
             });
-            disburseLoan(loanId, BigDecimal.valueOf(100.0), "01 January 2022");
+            disburseLoan(loanId, BigDecimal.valueOf(100.0), "20220101");
             loanIdHolder[0] = loanId;
-            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("02 January 2022").dateFormat(DATETIME_PATTERN).locale("en"));
-            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "03 January 2022", "10 January 2022");
+            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("20220102").dateFormat(DATETIME_PATTERN).locale("en"));
+            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20220103", "20220110");
         });
-        runAt("12 January 2022", () -> {
+        runAt("20220112", () -> {
             final InlineLoanCOBHelper inlineLoanCOBHelper = new InlineLoanCOBHelper(requestSpec, responseSpec);
             Long loanId = loanIdHolder[0];
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             assertNotNull(loanDetails.getDelinquent(), "Loan delinquent data should not be null");
-            Map<String, BigDecimal> expectedTotals = calculateExpectedBucketTotals(loanDetails, LocalDate.parse("12 January 2022", dateTimeFormatter));
-            assertInstallmentDelinquencyBuckets(loanDetails, LocalDate.parse("12 January 2022", dateTimeFormatter), expectedTotals);
+            Map<String, BigDecimal> expectedTotals = calculateExpectedBucketTotals(loanDetails, LocalDate.parse("20220112", dateTimeFormatter));
+            assertInstallmentDelinquencyBuckets(loanDetails, LocalDate.parse("20220112", dateTimeFormatter), expectedTotals);
         });
     }
 
     @Test
     public void testInstallmentDelinquencyWithFourInstallmentsAndPausePeriod() {
         final Long[] loanIdHolder = new Long[1];
-        runAt("01 January 2022", () -> {
+        runAt("20220101", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             Long loanProductId = createLoanProductWith25PctDownPaymentAndDelinquencyBucket(true, true, true, 0);
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2022", 1000.0, 4, req -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20220101", 1000.0, 4, req -> {
                 req.setLoanTermFrequency(60);
                 req.setRepaymentEvery(15);
                 req.setGraceOnArrearsAgeing(0);
             });
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 January 2022");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20220101");
             loanIdHolder[0] = loanId;
-            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("01 January 2022").dateFormat(DATETIME_PATTERN).locale("en"));
-            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "02 January 2022", "20 January 2022");
+            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("20220101").dateFormat(DATETIME_PATTERN).locale("en"));
+            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20220102", "20220120");
         });
-        runAt("01 March 2022", () -> {
+        runAt("20220301", () -> {
             final InlineLoanCOBHelper inlineLoanCOBHelper = new InlineLoanCOBHelper(requestSpec, responseSpec);
             Long loanId = loanIdHolder[0];
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             assertNotNull(loanDetails.getDelinquent(), "Loan delinquent data should not be null");
-            Map<String, BigDecimal> expectedTotals = calculateExpectedBucketTotals(loanDetails, LocalDate.parse("01 March 2022", dateTimeFormatter));
-            assertInstallmentDelinquencyBuckets(loanDetails, LocalDate.parse("01 March 2022", dateTimeFormatter), expectedTotals);
+            Map<String, BigDecimal> expectedTotals = calculateExpectedBucketTotals(loanDetails, LocalDate.parse("20220301", dateTimeFormatter));
+            assertInstallmentDelinquencyBuckets(loanDetails, LocalDate.parse("20220301", dateTimeFormatter), expectedTotals);
         });
     }
 
     @Test
     public void testPauseUsesBusinessDateNotCOBDate() {
         final Long[] loanIdHolder = new Long[1];
-        runAt("01 January 2025", () -> {
+        runAt("20250101", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             Long loanProductId = createLoanProductWithDelinquencyBucketNoDownPayment(true, true, 3);
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2025", 1000.0, 4, req -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20250101", 1000.0, 4, req -> {
                 req.setLoanTermFrequency(40);
                 req.setRepaymentEvery(10);
                 req.setGraceOnArrearsAgeing(3);
             });
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 January 2025");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20250101");
             loanIdHolder[0] = loanId;
         });
-        runAt("07 January 2025", () -> {
+        runAt("20250107", () -> {
             final InlineLoanCOBHelper inlineLoanCOBHelper = new InlineLoanCOBHelper(requestSpec, responseSpec);
             Long loanId = loanIdHolder[0];
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
-            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "09 January 2025", "20 January 2025");
+            loanTransactionHelper.createLoanDelinquencyAction(loanId, PAUSE, "20250109", "20250120");
         });
-        runAt("15 January 2025", () -> {
-            final InlineLoanCOBHelper inlineLoanCOBHelper = new InlineLoanCOBHelper(requestSpec, responseSpec);
-            Long loanId = loanIdHolder[0];
-            inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
-        });
-        runAt("25 January 2025", () -> {
+        runAt("20250115", () -> {
             final InlineLoanCOBHelper inlineLoanCOBHelper = new InlineLoanCOBHelper(requestSpec, responseSpec);
             Long loanId = loanIdHolder[0];
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
         });
-        runAt("10 February 2025", () -> {
+        runAt("20250125", () -> {
+            final InlineLoanCOBHelper inlineLoanCOBHelper = new InlineLoanCOBHelper(requestSpec, responseSpec);
+            Long loanId = loanIdHolder[0];
+            inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
+        });
+        runAt("20250210", () -> {
             final InlineLoanCOBHelper inlineLoanCOBHelper = new InlineLoanCOBHelper(requestSpec, responseSpec);
             Long loanId = loanIdHolder[0];
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
@@ -641,9 +641,9 @@ public class DelinquencyActionIntegrationTests extends BaseLoanIntegrationTest {
             Integer loanLevelDelinquentDays = loanDetails.getDelinquent().getDelinquentDays();
             assertEquals(18, loanLevelDelinquentDays, "Loan level delinquent days should be 18 (29 overdue days from Jan 12 to Feb 10, minus 8 paused days from Jan 12 to Jan 20, minus 3 grace)");
             LocalDate loanLevelDelinquentDate = loanDetails.getDelinquent().getDelinquentDate();
-            assertEquals(LocalDate.parse("14 January 2025", dateTimeFormatter), loanLevelDelinquentDate, "Loan level delinquent date should be Jan 14, 2025 (first installment due Jan 11 + 3 days grace)");
-            Map<String, BigDecimal> expectedTotals = calculateExpectedBucketTotals(loanDetails, LocalDate.parse("10 February 2025", dateTimeFormatter));
-            assertInstallmentDelinquencyBuckets(loanDetails, LocalDate.parse("10 February 2025", dateTimeFormatter), expectedTotals);
+            assertEquals(LocalDate.parse("20250114", dateTimeFormatter), loanLevelDelinquentDate, "Loan level delinquent date should be Jan 14, 2025 (first installment due Jan 11 + 3 days grace)");
+            Map<String, BigDecimal> expectedTotals = calculateExpectedBucketTotals(loanDetails, LocalDate.parse("20250210", dateTimeFormatter));
+            assertInstallmentDelinquencyBuckets(loanDetails, LocalDate.parse("20250210", dateTimeFormatter), expectedTotals);
         });
     }
 

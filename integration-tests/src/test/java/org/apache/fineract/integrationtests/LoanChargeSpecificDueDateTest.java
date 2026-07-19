@@ -83,7 +83,7 @@ public class LoanChargeSpecificDueDateTest extends BaseLoanIntegrationTest {
     public void testApplyLoanSpecificDueDateFeeWithDisbursementDate() {
         final LocalDate todaysDate = Utils.getLocalDateOfTenant();
         // Client and Loan account creation
-        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
+        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20120101");
         final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProductWithPeriodicAccrual(loanTransactionHelper, null);
         assertNotNull(getLoanProductsProductResponse);
         // Older date to have more than one overdue installment
@@ -136,7 +136,7 @@ public class LoanChargeSpecificDueDateTest extends BaseLoanIntegrationTest {
     public void testApplyLoanSpecificDueDatePenaltyWithDisbursementDate() {
         final LocalDate todaysDate = Utils.getLocalDateOfTenant();
         // Client and Loan account creation
-        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
+        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20120101");
         final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProductWithPeriodicAccrual(loanTransactionHelper, null);
         assertNotNull(getLoanProductsProductResponse);
         // Older date to have more than one overdue installment
@@ -193,7 +193,7 @@ public class LoanChargeSpecificDueDateTest extends BaseLoanIntegrationTest {
         final LocalDate todaysDate = Utils.getLocalDateOfTenant();
         BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, todaysDate);
         // Client and Loan account creation
-        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
+        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20120101");
         final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, null);
         assertNotNull(getLoanProductsProductResponse);
         // Older date to have more than one overdue installment
@@ -246,7 +246,7 @@ public class LoanChargeSpecificDueDateTest extends BaseLoanIntegrationTest {
         final LocalDate todaysDate = Utils.getLocalDateOfTenant();
         BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, todaysDate);
         // Client and Loan account creation
-        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
+        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20120101");
         final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, null);
         assertNotNull(getLoanProductsProductResponse);
         // Older date to have more than one overdue installment
@@ -300,7 +300,7 @@ public class LoanChargeSpecificDueDateTest extends BaseLoanIntegrationTest {
     public void testApplyAndWaiveLoanSpecificDueDatePenaltyWithDisbursementDate() {
         final LocalDate todaysDate = Utils.getLocalDateOfTenant();
         // Client and Loan account creation
-        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
+        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20120101");
         final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, null);
         assertNotNull(getLoanProductsProductResponse);
         // Older date to have more than one overdue installment
@@ -349,7 +349,7 @@ public class LoanChargeSpecificDueDateTest extends BaseLoanIntegrationTest {
             final LocalDate todaysDate = Utils.getLocalDateOfTenant();
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, todaysDate);
             // Client and Loan account creation
-            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
+            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20120101");
             final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProductWithPeriodicAccrual(loanTransactionHelper, null);
             assertNotNull(getLoanProductsProductResponse);
             LocalDate transactionDate = LocalDate.of(Utils.getLocalDateOfTenant().getYear(), 1, 1);
@@ -454,7 +454,7 @@ public class LoanChargeSpecificDueDateTest extends BaseLoanIntegrationTest {
             final LocalDate todaysDate = Utils.getLocalDateOfTenant();
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, todaysDate);
             // Client and Loan account creation
-            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
+            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20120101");
             final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProductWithPeriodicAccrual(loanTransactionHelper, null);
             assertNotNull(getLoanProductsProductResponse);
             LocalDate transactionDate = LocalDate.of(Utils.getLocalDateOfTenant().getYear(), 1, 1);
@@ -513,7 +513,7 @@ public class LoanChargeSpecificDueDateTest extends BaseLoanIntegrationTest {
     public void testApplyLoanSpecificDueDatePenaltyWithDisbursementDateWithMultipleDisbursement() {
         final LocalDate todaysDate = Utils.getLocalDateOfTenant();
         // Client and Loan account creation
-        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
+        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20120101");
         final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProductWithPeriodicAccrual(loanTransactionHelper, null);
         assertNotNull(getLoanProductsProductResponse);
         // Older date to have more than one overdue installment
@@ -539,7 +539,7 @@ public class LoanChargeSpecificDueDateTest extends BaseLoanIntegrationTest {
         // Get loan details expecting to have a delinquency classification
         getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
         validateLoanAccount(getLoansLoanIdResponse, Double.valueOf(principalAmount), Double.valueOf("10.00"), true);
-        loanTransactionHelper.disburseLoan((long) loanId, new PostLoansLoanIdRequest().actualDisbursementDate(operationDate).transactionAmount(new BigDecimal("1000")).locale("en").dateFormat("dd MMMM yyyy"));
+        loanTransactionHelper.disburseLoan((long) loanId, new PostLoansLoanIdRequest().actualDisbursementDate(operationDate).transactionAmount(new BigDecimal("1000")).locale("en").dateFormat("yyyyMMdd"));
         // Get loan details expecting to have a delinquency classification
         getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
         validateLoanAccount(getLoansLoanIdResponse, Double.parseDouble(principalAmount) * 2, Double.valueOf("10.00"), true);
@@ -555,7 +555,7 @@ public class LoanChargeSpecificDueDateTest extends BaseLoanIntegrationTest {
     public void testApplyLoanSpecificDueDatePenaltyAccrualWithDisbursementDateWithMultipleDisbursement() {
         final LocalDate todaysDate = Utils.getLocalDateOfTenant();
         // Client and Loan account creation
-        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
+        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20120101");
         final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProductWithPeriodicAccrual(loanTransactionHelper, null);
         assertNotNull(getLoanProductsProductResponse);
         // Older date to have more than one overdue installment
@@ -583,7 +583,7 @@ public class LoanChargeSpecificDueDateTest extends BaseLoanIntegrationTest {
         validateLoanAccount(getLoansLoanIdResponse, Double.valueOf(principalAmount), Double.valueOf("10.00"), true);
         transactionDate = transactionDate.plusDays(1);
         operationDate = Utils.dateFormatter.format(transactionDate);
-        loanTransactionHelper.disburseLoan((long) loanId, new PostLoansLoanIdRequest().actualDisbursementDate(operationDate).transactionAmount(new BigDecimal("1000")).locale("en").dateFormat("dd MMMM yyyy"));
+        loanTransactionHelper.disburseLoan((long) loanId, new PostLoansLoanIdRequest().actualDisbursementDate(operationDate).transactionAmount(new BigDecimal("1000")).locale("en").dateFormat("yyyyMMdd"));
         // Get loan details expecting to have a delinquency classification
         getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
         validateLoanAccount(getLoansLoanIdResponse, Double.parseDouble(principalAmount) * 2, Double.valueOf("10.00"), true);

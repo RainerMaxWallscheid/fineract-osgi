@@ -84,7 +84,7 @@ public class BatchApiStepDef extends AbstractStepDef {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BatchApiStepDef.class);
     private static final com.fasterxml.jackson.databind.ObjectMapper OBJECT_MAPPER = org.apache.fineract.client.feign.ObjectMapperFactory.getShared();
-    private static final String DATE_FORMAT = "dd MMMM yyyy";
+    private static final String DATE_FORMAT = "yyyyMMdd";
     private static final String DEFAULT_LOCALE = "en";
     private static final Long BATCH_API_SAMPLE_REQUEST_ID_1 = 1L;
     private static final Long BATCH_API_SAMPLE_REQUEST_ID_2 = 2L;
@@ -1101,7 +1101,7 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest.method(BATCH_API_METHOD_POST);
         batchRequest.reference(referenceId);
         batchRequest.headers(setHeaders(idempotencyKey));
-        String interestPauseRequest = String.format("{\"dateFormat\":\"dd MMMM yyyy\",\"locale\":\"en\",\"startDate\":\"%s\",\"endDate\":\"%s\"}", startDate, endDate);
+        String interestPauseRequest = String.format("{\"dateFormat\":\"yyyyMMdd\",\"locale\":\"en\",\"startDate\":\"%s\",\"endDate\":\"%s\"}", startDate, endDate);
         batchRequest.body(interestPauseRequest);
         return batchRequest;
     }
@@ -1113,7 +1113,7 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest.method(BATCH_API_METHOD_POST);
         batchRequest.reference(referenceId);
         batchRequest.headers(setHeaders(idempotencyKey));
-        String interestPauseRequest = String.format("{\"dateFormat\":\"dd MMMM yyyy\",\"locale\":\"en\",\"startDate\":\"%s\",\"endDate\":\"%s\"}", startDate, endDate);
+        String interestPauseRequest = String.format("{\"dateFormat\":\"yyyyMMdd\",\"locale\":\"en\",\"startDate\":\"%s\",\"endDate\":\"%s\"}", startDate, endDate);
         batchRequest.body(interestPauseRequest);
         return batchRequest;
     }

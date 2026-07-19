@@ -80,12 +80,12 @@ public class FeignWorkingCapitalLoanTransactionReprocessingTest extends FeignInt
     @Test
     void testBackdatedRepayment_balanceReflectsBothPayments() {
         businessDateHelper.runAt("2026-01-01", () -> {
-            Long clientForTest = clientHelper.createClient("01 January 2026");
-            Long loanId = createAndDisburseLoanOnDate(clientForTest, BigDecimal.valueOf(9000), "01 January 2026");
+            Long clientForTest = clientHelper.createClient("20260101");
+            Long loanId = createAndDisburseLoanOnDate(clientForTest, BigDecimal.valueOf(9000), "20260101");
 
             // First repayment on day 10
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-10");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "10 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "20260110"));
 
             GetWorkingCapitalLoansLoanIdResponse afterFirstRepayment = wcLoanHelper.getLoanDetails(loanId);
             assertNotNull(afterFirstRepayment.getBalance(), "Balance should exist after repayment");
@@ -96,7 +96,7 @@ public class FeignWorkingCapitalLoanTransactionReprocessingTest extends FeignInt
 
             // Backdated repayment on day 5 (before existing repayment on day 10)
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-15");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(2000), "05 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(2000), "20260105"));
 
             // Both repayments should be reflected — balance math is order-independent
             GetWorkingCapitalLoansLoanIdResponse afterBackdated = wcLoanHelper.getLoanDetails(loanId);
@@ -116,12 +116,12 @@ public class FeignWorkingCapitalLoanTransactionReprocessingTest extends FeignInt
     @Test
     void testBackdatedRepayment_excessBecomesOverpayment() {
         businessDateHelper.runAt("2026-01-01", () -> {
-            Long clientForTest = clientHelper.createClient("01 January 2026");
-            Long loanId = createAndDisburseLoanOnDate(clientForTest, BigDecimal.valueOf(9000), "01 January 2026");
+            Long clientForTest = clientHelper.createClient("20260101");
+            Long loanId = createAndDisburseLoanOnDate(clientForTest, BigDecimal.valueOf(9000), "20260101");
 
             // Partial repayment on day 10 (loan stays ACTIVE with 2000 outstanding)
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-10");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(7000), "10 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(7000), "20260110"));
 
             GetWorkingCapitalLoansLoanIdResponse afterRepayment = wcLoanHelper.getLoanDetails(loanId);
             assertNotNull(afterRepayment.getBalance(), "Balance should exist after repayment");
@@ -130,7 +130,7 @@ public class FeignWorkingCapitalLoanTransactionReprocessingTest extends FeignInt
 
             // Backdated repayment on day 5 — total repaid (5000 + 7000 = 12000) exceeds principal (9000)
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-15");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(5000), "05 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(5000), "20260105"));
 
             // Totals are order-independent: 9000 principal repaid, 3000 overpayment
             GetWorkingCapitalLoansLoanIdResponse afterBackdated = wcLoanHelper.getLoanDetails(loanId);
@@ -154,12 +154,12 @@ public class FeignWorkingCapitalLoanTransactionReprocessingTest extends FeignInt
     @Test
     void testMultipleBackdatedRepaymentsAccumulateCorrectly() {
         businessDateHelper.runAt("2026-01-01", () -> {
-            Long clientForTest = clientHelper.createClient("01 January 2026");
-            Long loanId = createAndDisburseLoanOnDate(clientForTest, BigDecimal.valueOf(9000), "01 January 2026");
+            Long clientForTest = clientHelper.createClient("20260101");
+            Long loanId = createAndDisburseLoanOnDate(clientForTest, BigDecimal.valueOf(9000), "20260101");
 
             // First repayment on day 15
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-15");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "15 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "20260115"));
 
             GetWorkingCapitalLoansLoanIdResponse afterFirst = wcLoanHelper.getLoanDetails(loanId);
             assertNotNull(afterFirst.getBalance());
@@ -168,7 +168,7 @@ public class FeignWorkingCapitalLoanTransactionReprocessingTest extends FeignInt
 
             // Backdated repayment on day 5
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-20");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(1000), "05 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(1000), "20260105"));
 
             GetWorkingCapitalLoansLoanIdResponse afterSecond = wcLoanHelper.getLoanDetails(loanId);
             assertNotNull(afterSecond.getBalance());
@@ -178,7 +178,7 @@ public class FeignWorkingCapitalLoanTransactionReprocessingTest extends FeignInt
                     "Principal paid should be 4000 (1000 + 3000)");
 
             // Another backdated repayment on day 10 (between existing ones)
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(2000), "10 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(2000), "20260110"));
 
             GetWorkingCapitalLoansLoanIdResponse afterThird = wcLoanHelper.getLoanDetails(loanId);
             assertNotNull(afterThird.getBalance());
@@ -192,18 +192,18 @@ public class FeignWorkingCapitalLoanTransactionReprocessingTest extends FeignInt
     @Test
     void testUndoRepayment_onOverpaidChargeFreeLoan_reallocatesRemainingRepayment() {
         businessDateHelper.runAt("2026-01-01", () -> {
-            Long clientForTest = clientHelper.createClient("01 January 2026");
-            Long loanId = createAndDisburseLoanOnDate(clientForTest, BigDecimal.valueOf(9000), "01 January 2026");
+            Long clientForTest = clientHelper.createClient("20260101");
+            Long loanId = createAndDisburseLoanOnDate(clientForTest, BigDecimal.valueOf(9000), "20260101");
 
             // Repayment on day 5 (3000) leaves 6000 outstanding.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-05");
             final Long day5TxnId = wcLoanHelper.makeRepayment(loanId,
-                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "05 January 2026"));
+                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "20260105"));
 
             // Repayment on day 10 (6500) overpays: total repaid 9500 on a 9000 loan, so the day-10 repayment stores
             // 6000 principal + 500 overpayment.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-10");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(6500), "10 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(6500), "20260110"));
 
             GetWorkingCapitalLoansLoanIdResponse afterOverpay = wcLoanHelper.getLoanDetails(loanId);
             assertEqualBigDecimal(BigDecimal.valueOf(9000), afterOverpay.getBalance().getPrincipalPaid(),
@@ -239,15 +239,15 @@ public class FeignWorkingCapitalLoanTransactionReprocessingTest extends FeignInt
     @Test
     void testNonBackdatedRepaymentDoesNotTriggerReprocessing() {
         businessDateHelper.runAt("2026-01-01", () -> {
-            Long clientForTest = clientHelper.createClient("01 January 2026");
-            Long loanId = createAndDisburseLoanOnDate(clientForTest, BigDecimal.valueOf(9000), "01 January 2026");
+            Long clientForTest = clientHelper.createClient("20260101");
+            Long loanId = createAndDisburseLoanOnDate(clientForTest, BigDecimal.valueOf(9000), "20260101");
 
             // Sequential repayments (not backdated — each on or after the business date)
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-05");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(2000), "05 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(2000), "20260105"));
 
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-10");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "10 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "20260110"));
 
             // Verify balance is the simple sum — no reprocessing side effects
             GetWorkingCapitalLoansLoanIdResponse loan = wcLoanHelper.getLoanDetails(loanId);

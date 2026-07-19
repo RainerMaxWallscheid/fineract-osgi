@@ -32,7 +32,7 @@ import org.apache.fineract.test.support.TestContextKey;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class AnnualSummaryStepDef extends AbstractStepDef {
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
     private static final String OFFICE_ID_CONFIG = "office-id";
     private final JdbcTemplate testJdbcTemplate;
     private final FineractFeignClient fineractClient;

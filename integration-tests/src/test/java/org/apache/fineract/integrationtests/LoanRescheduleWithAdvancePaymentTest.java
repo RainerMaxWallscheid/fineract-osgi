@@ -206,8 +206,8 @@ public class LoanRescheduleWithAdvancePaymentTest extends BaseLoanIntegrationTes
     }
 
     private void createLoanEntityWithEntitiesForTestResceduleWithLatePayment() {
-        String firstRepaymentDate = "14 June 2021";
-        String submittedDate = "10 May 2021";
+        String firstRepaymentDate = "20210614";
+        String submittedDate = "20210510";
 
         LOG.info("---------------------------------NEW LOAN APPLICATION------------------------------------------");
 
@@ -229,17 +229,17 @@ public class LoanRescheduleWithAdvancePaymentTest extends BaseLoanIntegrationTes
 
     private void createApproveLoanRescheduleRequestAfterLatePayment() {
         LOG.info("-------------Make repayment 1-----------");
-        this.loanTransactionHelper.makeRepayment("14 June 2021", Float.parseFloat("1331.58"), loanId);
+        this.loanTransactionHelper.makeRepayment("20210614", Float.parseFloat("1331.58"), loanId);
 
         LOG.info("-------------Make repayment 2-----------");
-        this.loanTransactionHelper.makeRepayment("15 July 2021", Float.parseFloat("1331.58"), loanId);
+        this.loanTransactionHelper.makeRepayment("20210715", Float.parseFloat("1331.58"), loanId);
 
         LOG.info(
                 "---------------------------------CREATING LOAN RESCHEDULE REQUEST FOR LOAN WITH RECALCULATION------------------------------------");
 
         final PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder().updateGraceOnPrincipal(null)
-                .updateGraceOnInterest(null).updateExtraTerms(null).updateRescheduleFromDate("16 August 2021")
-                .updateAdjustedDueDate("31 August 2021").updateRecalculateInterest(false).updateSubmittedOnDate("16 August 2022")
+                .updateGraceOnInterest(null).updateExtraTerms(null).updateRescheduleFromDate("20210816")
+                .updateAdjustedDueDate("20210831").updateRecalculateInterest(false).updateSubmittedOnDate("20220816")
                 .buildRequest(this.loanId.longValue());
         LOG.info("Reschedule request : {}", createRequest);
         final PostCreateRescheduleLoansResponse createResponse = LoanRescheduleRequestHelper.createLoanRescheduleRequest(createRequest);
@@ -249,7 +249,7 @@ public class LoanRescheduleWithAdvancePaymentTest extends BaseLoanIntegrationTes
         LOG.info("Successfully created loan reschedule request (ID: {} )", this.loanRescheduleRequestId);
 
         final PostUpdateRescheduleLoansRequest approveRequest = new LoanRescheduleRequestTestBuilder()
-                .updateSubmittedOnDate("16 August 2022").getApproveRequest();
+                .updateSubmittedOnDate("20220816").getApproveRequest();
         LoanRescheduleRequestHelper.approveLoanRescheduleRequest(this.loanRescheduleRequestId, approveRequest);
 
         final GetLoanRescheduleRequestResponse response = LoanRescheduleRequestHelper.readLoanRescheduleRequest(loanRescheduleRequestId,
@@ -323,8 +323,8 @@ public class LoanRescheduleWithAdvancePaymentTest extends BaseLoanIntegrationTes
     }
 
     private void createLoanEntityForTestMultipleAdvancePaymentWithReschedule() {
-        String firstRepaymentDate = "03 January 2022";
-        String submittedDate = "29 November 2021";
+        String firstRepaymentDate = "20220103";
+        String submittedDate = "20211129";
 
         LOG.info("---------------------------------NEW LOAN APPLICATION------------------------------------------");
 
@@ -347,10 +347,10 @@ public class LoanRescheduleWithAdvancePaymentTest extends BaseLoanIntegrationTes
     private void doMultipleAdvancePaymentsAndVerifySchedule() {
 
         LOG.info("-------------Make Advance repayment 1-----------");
-        this.loanTransactionHelper.makeRepayment("02 December 2021", Float.parseFloat("1"), this.loanId);
+        this.loanTransactionHelper.makeRepayment("20211202", Float.parseFloat("1"), this.loanId);
 
         LOG.info("-------------Make Advance repayment 2-----------");
-        this.loanTransactionHelper.makeRepayment("03 December 2021", Float.parseFloat("1"), this.loanId);
+        this.loanTransactionHelper.makeRepayment("20211203", Float.parseFloat("1"), this.loanId);
 
         final Map repaymentSchedule = (Map) this.loanTransactionHelper.getLoanDetailExcludeFutureSchedule(requestSpec, generalResponseSpec,
                 this.loanId, "repaymentSchedule");

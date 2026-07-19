@@ -54,7 +54,7 @@ public class WorkingCapitalLoanDelinquencyActionEffectiveEndDateTest {
 
     @Test
     public void testPauseCreatesDelinquencyActionWithNoEffectiveEndDate() {
-        BusinessDateHelper.runAt("01 July 2026", () -> {
+        BusinessDateHelper.runAt("20260701", () -> {
             final Long loanId = createActiveLoan(LocalDate.of(2026, Month.JULY, 1));
 
             WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, "pause", LocalDate.of(2026, Month.JULY, 1),
@@ -75,14 +75,14 @@ public class WorkingCapitalLoanDelinquencyActionEffectiveEndDateTest {
     @Test
     public void testResumeCreatesResumeActionAndSetsEffectiveEndDateOnPause() {
         final Long[] loanIdHolder = new Long[1];
-        BusinessDateHelper.runAt("01 July 2026", () -> {
+        BusinessDateHelper.runAt("20260701", () -> {
             loanIdHolder[0] = createActiveLoan(LocalDate.of(2026, Month.JULY, 1));
 
             WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanIdHolder[0], "pause", LocalDate.of(2026, Month.JULY, 1),
                     LocalDate.of(2026, Month.JULY, 10));
         });
 
-        BusinessDateHelper.runAt("05 July 2026", () -> {
+        BusinessDateHelper.runAt("20260705", () -> {
             WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanIdHolder[0], "resume", LocalDate.of(2026, Month.JULY, 5),
                     null);
 
@@ -108,14 +108,14 @@ public class WorkingCapitalLoanDelinquencyActionEffectiveEndDateTest {
     @Test
     public void testEffectiveEndDateMatchesEarliestResumeWithinPauseWindow() {
         final Long[] loanIdHolder = new Long[1];
-        BusinessDateHelper.runAt("01 July 2026", () -> {
+        BusinessDateHelper.runAt("20260701", () -> {
             loanIdHolder[0] = createActiveLoan(LocalDate.of(2026, Month.JULY, 1));
 
             WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanIdHolder[0], "pause", LocalDate.of(2026, Month.JULY, 1),
                     LocalDate.of(2026, Month.JULY, 20));
         });
 
-        BusinessDateHelper.runAt("05 July 2026", () -> {
+        BusinessDateHelper.runAt("20260705", () -> {
             WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanIdHolder[0], "resume", LocalDate.of(2026, Month.JULY, 5),
                     null);
 
@@ -132,7 +132,7 @@ public class WorkingCapitalLoanDelinquencyActionEffectiveEndDateTest {
     @Test
     public void testMultiplePausesEachGetCorrectEffectiveEndDate() {
         final Long[] loanIdHolder = new Long[1];
-        BusinessDateHelper.runAt("01 July 2026", () -> {
+        BusinessDateHelper.runAt("20260701", () -> {
             loanIdHolder[0] = createActiveLoan(LocalDate.of(2026, Month.JULY, 1));
 
             WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanIdHolder[0], "pause", LocalDate.of(2026, Month.JULY, 1),
@@ -141,7 +141,7 @@ public class WorkingCapitalLoanDelinquencyActionEffectiveEndDateTest {
                     LocalDate.of(2026, Month.JULY, 25));
         });
 
-        BusinessDateHelper.runAt("05 July 2026", () -> {
+        BusinessDateHelper.runAt("20260705", () -> {
             WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanIdHolder[0], "resume", LocalDate.of(2026, Month.JULY, 5),
                     null);
 

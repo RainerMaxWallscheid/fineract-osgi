@@ -46,7 +46,7 @@ public class SavingsAccountsExternalIdTest extends IntegrationTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(SavingsAccountsExternalIdTest.class);
     public static final String EXTERNAL_ID = UUID.randomUUID().toString();
-    private final String dateFormat = "dd MMMM yyyy";
+    private final String dateFormat = "yyyyMMdd";
     private final String locale = "en";
     private final String formattedDate = Utils.getLocalDateOfTenant().format(DateTimeFormatter.ofPattern(dateFormat, Locale.ENGLISH));
 

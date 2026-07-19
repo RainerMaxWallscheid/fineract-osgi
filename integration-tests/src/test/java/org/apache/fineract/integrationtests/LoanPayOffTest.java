@@ -35,26 +35,26 @@ public class LoanPayOffTest extends FeignLoanTestBase {
     private Long loanId;
 
     // create client, progressive loan product, loan with disburse limit 1000 for the client,
-    // and disburse 250 on 01 June 2024
+    // and disburse 250 on 20240601
     @BeforeEach
     public void beforeEach() {
-        runAt("01 June 2024", () -> {
+        runAt("20240601", () -> {
             clientId = createClient();
             final Long loanProductId = createLoanProduct(create4IProgressive());
-            loanId = applyForLoan(applyLP2ProgressiveLoanRequest(clientId, loanProductId, "01 June 2024", 1000.0, 10.0, 4, null));
-            approveLoan(loanId, LoanRequestBuilders.approveLoan(1000.0, "01 June 2024"));
-            disburseLoan(loanId, BigDecimal.valueOf(250.0), "01 June 2024");
+            loanId = applyForLoan(applyLP2ProgressiveLoanRequest(clientId, loanProductId, "20240601", 1000.0, 10.0, 4, null));
+            approveLoan(loanId, LoanRequestBuilders.approveLoan(1000.0, "20240601"));
+            disburseLoan(loanId, BigDecimal.valueOf(250.0), "20240601");
         });
     }
 
     @Test
     public void testPayOffOnDisbursementDate() {
-        runAt("01 June 2024", () -> {
+        runAt("20240601", () -> {
             GetLoansLoanIdTransactionsTemplateResponse prepayAmount = getPrepaymentAmount(loanId, null, DATETIME_PATTERN);
 
             Assertions.assertEquals(250.0, prepayAmount.getAmount());
 
-            addRepaymentForLoan(loanId, 250.0, "01 June 2024");
+            addRepaymentForLoan(loanId, 250.0, "20240601");
 
             final GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             Assertions.assertNotNull(loanDetails.getStatus());

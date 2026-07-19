@@ -143,7 +143,7 @@ public class LoanApplicationTestBuilder {
     }
 
     private String build(final HashMap<String, Object> map, final String loanProductId, final String savingsID) {
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("locale", "en_GB");
         map.put("productId", loanProductId);
         map.put("principal", this.principal);

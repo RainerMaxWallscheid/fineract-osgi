@@ -58,28 +58,28 @@ public class UserLoanPermissionTest extends BaseLoanIntegrationTest {
                     .incomeFromBuyDownAccountId(feeIncomeAccount.getAccountID().longValue())
                     .deferredIncomeLiabilityAccountId(deferredIncomeLiabilityAccount.getAccountID().longValue())).getResourceId();
         }
-        runAt("1 January 2025", () -> {
+        runAt("20250101", () -> {
 
             PostLoansResponse postLoansResponse = loanTransactionHelper
-                    .applyLoan(applyLP2ProgressiveLoanRequest(clientId, loanProductId, "1 January 2025", 10000.0, 12.0, 4, null));
+                    .applyLoan(applyLP2ProgressiveLoanRequest(clientId, loanProductId, "20250101", 10000.0, 12.0, 4, null));
 
-            loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(), approveLoanRequest(2000.0, "1 January 2025"));
+            loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(), approveLoanRequest(2000.0, "20250101"));
 
             loanId = postLoansResponse.getResourceId();
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "1 January 2025");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20250101");
         });
     }
 
     @Test
     public void testCapitalizedIncomeAndCapitalizedIncomeAdjustmentPermissions() {
-        runAt("1 January 2025", () -> {
+        runAt("20250101", () -> {
             Long capitalizedIncomeId = makeLoanTransactionWithPermissionVerification(loanId, new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).locale("en").transactionAmount(50.0).transactionDate("01 January 2025"),
+                    .dateFormat(DATETIME_PATTERN).locale("en").transactionAmount(50.0).transactionDate("20250101"),
                     "capitalizedIncome", "CAPITALIZEDINCOME_LOAN").getResourceId();
 
             adjustLoanTransactionWithPermissionVerification(
                     loanId, capitalizedIncomeId, new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN)
-                            .locale("en").transactionAmount(50.0).transactionDate("1 January 2025"),
+                            .locale("en").transactionAmount(50.0).transactionDate("20250101"),
                     "capitalizedIncomeAdjustment", "CAPITALIZEDINCOMEADJUSTMENT_LOAN");
 
         });
@@ -88,26 +88,26 @@ public class UserLoanPermissionTest extends BaseLoanIntegrationTest {
 
     @Test
     public void testBuyDownFeeAndBuyDownFeeAdjustmentPermissions() {
-        runAt("1 January 2025", () -> {
+        runAt("20250101", () -> {
             final Long buyDownFeeTransactionId = makeLoanTransactionWithPermissionVerification(loanId,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("01 January 2025").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("20250101").locale("en")
                             .transactionAmount(100.0d),
                     "buyDownFee", "BUYDOWNFEE_LOAN").getResourceId();
 
             adjustLoanTransactionWithPermissionVerification(
                     loanId, buyDownFeeTransactionId, new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN)
-                            .transactionDate("01 January 2025").locale("en").transactionAmount(100.0d),
+                            .transactionDate("20250101").locale("en").transactionAmount(100.0d),
                     "buyDownFeeAdjustment", "BUYDOWNFEEADJUSTMENT_LOAN");
         });
     }
 
     @Test
     public void testManualInterestRefundPermission() {
-        runAt("1 February 2025", () -> {
+        runAt("20250201", () -> {
             final Long merchantIssuedRefundId = loanTransactionHelper
                     .makeMerchantIssuedRefund(loanId,
                             new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).locale("en")
-                                    .transactionDate("01 February 2025").transactionAmount(100.0D).interestRefundCalculation(false))
+                                    .transactionDate("20250201").transactionAmount(100.0D).interestRefundCalculation(false))
                     .getResourceId();
 
             performPermissionTestForRequest("MANUAL_INTEREST_REFUND_TRANSACTION_LOAN",
@@ -120,10 +120,10 @@ public class UserLoanPermissionTest extends BaseLoanIntegrationTest {
 
     @Test
     public void testUpdateApprovedAmountPermission() {
-        runAt("1 January 2025", () -> {
+        runAt("20250101", () -> {
             // disbursement should be rejected upon validation error
             Response<PostLoansLoanIdResponse> response = Calls.executeU(
-                    fineractClient().loans.handleCommandsLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("1 January 2025")
+                    fineractClient().loans.handleCommandsLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("20250101")
                             .dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(2000.0)).locale("en"), "disburse"));
 
             Assertions.assertEquals(403, response.code());
@@ -134,7 +134,7 @@ public class UserLoanPermissionTest extends BaseLoanIntegrationTest {
                             new PutLoansApprovedAmountRequest().amount(BigDecimal.valueOf(4000.0d)).locale("en")));
 
             // disbursement should be performed without error
-            Calls.ok(fineractClient().loans.handleCommandsLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("1 January 2025")
+            Calls.ok(fineractClient().loans.handleCommandsLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("20250101")
                     .dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(2000.0)).locale("en"), "disburse"));
         });
     }
@@ -142,7 +142,7 @@ public class UserLoanPermissionTest extends BaseLoanIntegrationTest {
     @Test
     public void testContractTerminationAndUndoContractTerminationPermission() {
 
-        runAt("2 January 2025", () -> {
+        runAt("20250102", () -> {
             performPermissionTestForRequest("CONTRACT_TERMINATION_LOAN", fineractClient -> fineractClient.loans.handleCommandsLoan(loanId,
                     new PostLoansLoanIdRequest().note(""), "contractTermination"));
 

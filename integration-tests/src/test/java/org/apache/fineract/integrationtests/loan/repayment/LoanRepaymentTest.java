@@ -39,7 +39,7 @@ public class LoanRepaymentTest extends FeignLoanTestBase {
     @Test
     public void test_LoanRepaymentWorks_WhenDisbursementChargeIsAvailable_AndAccrualAccounting_AndDailyRecalculateInterest_AndDailyInterestCalculationPeriod() {
 
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = createClient();
 
@@ -79,7 +79,7 @@ public class LoanRepaymentTest extends FeignLoanTestBase {
             // Apply and Approve Loan
             double amount = 1000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(repaymentEvery)//
                     .loanTermFrequency(numberOfRepayments)//
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS)//
@@ -93,15 +93,15 @@ public class LoanRepaymentTest extends FeignLoanTestBase {
 
             Long loanId = applyForLoan(applicationRequest);
 
-            approveLoan(loanId, LoanRequestBuilders.approveLoan(amount, "01 January 2023"));
+            approveLoan(loanId, LoanRequestBuilders.approveLoan(amount, "20230101"));
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(25.0, "Repayment (at time of disbursement)", "01 January 2023") //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(25.0, "Repayment (at time of disbursement)", "20230101") //
             );
 
             // verify journal entries
@@ -113,13 +113,13 @@ public class LoanRepaymentTest extends FeignLoanTestBase {
             );
 
             // repay 500
-            addRepaymentForLoan(loanId, 500.0, "01 January 2023");
+            addRepaymentForLoan(loanId, 500.0, "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(25.0, "Repayment (at time of disbursement)", "01 January 2023"), //
-                    transaction(500.0, "Repayment", "01 January 2023") //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(25.0, "Repayment (at time of disbursement)", "20230101"), //
+                    transaction(500.0, "Repayment", "20230101") //
             );
 
             // verify journal entries
@@ -137,7 +137,7 @@ public class LoanRepaymentTest extends FeignLoanTestBase {
     @Test
     public void test_LoanRepaymentWorks_WhenOnlyOneInstallment_AndAccrualAccounting_AndMonthlyRecalculateInterest_AndMonthlyInterestCalculationPeriod_AllowPartial() {
 
-        runAt("31 January 2023", () -> {
+        runAt("20230131", () -> {
             // Create Client
             Long clientId = createClient();
 
@@ -171,7 +171,7 @@ public class LoanRepaymentTest extends FeignLoanTestBase {
             // Apply and Approve Loan
             double amount = 1000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(repaymentEvery)//
                     .loanTermFrequency(numberOfRepayments)//
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS)//
@@ -182,23 +182,23 @@ public class LoanRepaymentTest extends FeignLoanTestBase {
 
             Long loanId = applyForLoan(applicationRequest);
 
-            approveLoan(loanId, LoanRequestBuilders.approveLoan(amount, "01 January 2023"));
+            approveLoan(loanId, LoanRequestBuilders.approveLoan(amount, "20230101"));
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023")//
+                    transaction(1000.0, "Disbursement", "20230101")//
             );
 
-            verifyPrepayAmountByRepayment(loanId, "15 January 2023");
+            verifyPrepayAmountByRepayment(loanId, "20230115");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(1045.16, "Repayment", "15 January 2023"), //
-                    transaction(45.16, "Accrual", "15 January 2023") //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(1045.16, "Repayment", "20230115"), //
+                    transaction(45.16, "Accrual", "20230115") //
             );
 
             // verify journal entries
@@ -219,7 +219,7 @@ public class LoanRepaymentTest extends FeignLoanTestBase {
     @Test
     public void test_LoanRepaymentWorks_WhenOnlyOneInstallment_AndAccrualAccounting_AndDailyRecalculateInterest_AndMonthlyInterestCalculationPeriod_NotAllowPartial() {
 
-        runAt("31 January 2023", () -> {
+        runAt("20230131", () -> {
             // Create Client
             Long clientId = createClient();
 
@@ -253,7 +253,7 @@ public class LoanRepaymentTest extends FeignLoanTestBase {
             // Apply and Approve Loan
             double amount = 1000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(repaymentEvery)//
                     .loanTermFrequency(numberOfRepayments)//
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS)//
@@ -264,23 +264,23 @@ public class LoanRepaymentTest extends FeignLoanTestBase {
 
             Long loanId = applyForLoan(applicationRequest);
 
-            approveLoan(loanId, LoanRequestBuilders.approveLoan(amount, "01 January 2023"));
+            approveLoan(loanId, LoanRequestBuilders.approveLoan(amount, "20230101"));
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023")//
+                    transaction(1000.0, "Disbursement", "20230101")//
             );
 
-            verifyPrepayAmountByRepayment(loanId, "15 January 2023");
+            verifyPrepayAmountByRepayment(loanId, "20230115");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(1100.0, "Repayment", "15 January 2023"), //
-                    transaction(100.0, "Accrual", "15 January 2023") //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(1100.0, "Repayment", "20230115"), //
+                    transaction(100.0, "Accrual", "20230115") //
             );
 
             // verify journal entries

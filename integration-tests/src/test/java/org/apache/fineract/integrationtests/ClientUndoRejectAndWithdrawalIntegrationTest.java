@@ -39,7 +39,7 @@ import org.junit.jupiter.api.Test;
 public class ClientUndoRejectAndWithdrawalIntegrationTest {
 
     private static final String CREATE_CLIENT_URL = "/fineract-provider/api/v1/clients?" + Utils.TENANT_IDENTIFIER;
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     private final String submittedOnDate = "submittedOnDate";
     private final String officeId = "officeId";
     private ResponseSpecification responseSpec;

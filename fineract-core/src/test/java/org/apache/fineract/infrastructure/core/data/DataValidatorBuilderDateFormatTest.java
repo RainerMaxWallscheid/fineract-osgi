@@ -32,7 +32,7 @@ class DataValidatorBuilderDateFormatTest {
     private static final String PARAMETER = "dateFormat";
 
     @ParameterizedTest
-    @ValueSource(strings = { "dd MMMM yyyy", "yyyy-MM-dd", "dd/MM/yyyy", "MM/dd/yyyy", "dd-MM-yyyy HH:mm:ss" })
+    @ValueSource(strings = { "yyyyMMdd", "yyyy-MM-dd", "dd/MM/yyyy", "MM/dd/yyyy", "dd-MM-yyyy HH:mm:ss" })
     void validDateTimeFormatPatternShouldAcceptValidPatterns(final String pattern) {
         final List<ApiParameterError> errors = new ArrayList<>();
         new DataValidatorBuilder(errors).resource(RESOURCE).parameter(PARAMETER).value(pattern).validDateTimeFormatPattern();
@@ -40,7 +40,7 @@ class DataValidatorBuilderDateFormatTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "02 February 2026", "not-a-pattern", "P!@#$", "{{invalid}}" })
+    @ValueSource(strings = { "20260202", "not-a-pattern", "P!@#$", "{{invalid}}" })
     void validDateTimeFormatPatternShouldRejectInvalidPatterns(final String pattern) {
         final List<ApiParameterError> errors = new ArrayList<>();
         new DataValidatorBuilder(errors).resource(RESOURCE).parameter(PARAMETER).value(pattern).validDateTimeFormatPattern();

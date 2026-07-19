@@ -3,11 +3,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2722
   Scenario: Verify that all fields and values are correct in case of a SALES request by loan id and user-generated transferExternalId
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, user-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -26,11 +26,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2723
   Scenario: Verify that all fields and values are correct in case of a SALES request by loan id system-generated transferExternalId
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -49,11 +49,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2724
   Scenario: Verify that all fields and values are correct in case of a SALES request by loan external id user-generated transferExternalId
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan external ID with unique ownerExternalId, user-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -72,11 +72,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2725
   Scenario: Verify that all fields and values are correct in case of a SALES request by loan external id system-generated transferExternalId
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan external ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -95,11 +95,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2727
   Scenario: Verify that Asset externalization details are correct after CoB in case of a SALES request by loan id
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -108,7 +108,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 2 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
@@ -117,11 +117,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2729
   Scenario: Verify that Asset externalization details has the correct data in case of a BUYBACK request placed before the settlementDate with a same settlementDate as the sales one
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -130,7 +130,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "10 May 2023"
+    When Admin sets the business date to "20230510"
     When Admin runs inline COB job for Loan
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -140,7 +140,7 @@ Feature: Asset Externalization - Part1
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
       | 2023-05-21     | 1                  | BUYBACK | 2023-05-10    | 9999-12-31  | BUYBACK          |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 4 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status    | effectiveFrom | effectiveTo | Transaction type |
@@ -151,11 +151,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2730
   Scenario: Verify that Asset externalization details has the correct data in case of a BUYBACK request placed on a business date before the settlementDate of sales request and with a settlementDate for buyback after the sales got active
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -164,7 +164,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "10 May 2023"
+    When Admin sets the business date to "20230510"
     When Admin runs inline COB job for Loan
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -173,14 +173,14 @@ Feature: Asset Externalization - Part1
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-10    | 9999-12-31  | BUYBACK          |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 3 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-10    | 9999-12-31  | BUYBACK          |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 3 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
@@ -190,11 +190,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2731
   Scenario: Verify that Asset externalization details has the correct data in case of a BUYBACK request placed after the settlementDate
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -203,7 +203,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -211,7 +211,7 @@ Feature: Asset Externalization - Part1
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "25 May 2023"
+    When Admin sets the business date to "20230525"
     When Admin runs inline COB job for Loan
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -221,7 +221,7 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-25    | 9999-12-31  | BUYBACK          |
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -233,11 +233,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2732
   Scenario: Verify that BUYBACK request on a loan with PENDING ownership where BUYBACK settlement date is earlier than SALE settlement date results an error
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -246,7 +246,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "10 May 2023"
+    When Admin sets the business date to "20230510"
     When Admin runs inline COB job for Loan
     Then BUYBACK transaction results a 403 error and proper error message when its settlementDate is earlier than the original settlementDate
       | Transaction type | settlementDate |
@@ -254,13 +254,13 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2733
   Scenario: Verify that SALES request on a fully paid loan results an error
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
-    When Admin sets the business date to "10 May 2023"
-    And Customer makes "AUTOPAY" repayment on "10 May 2023" with 1000 EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
+    When Admin sets the business date to "20230510"
+    And Customer makes "AUTOPAY" repayment on "20230510" with 1000 EUR transaction amount
     Then Loan status will be "CLOSED_OBLIGATIONS_MET"
     Then Asset externalization transaction with the following data results a 403 error and "LOAN_CLOSED_OBLIGATIONS_MET_INVALID" error message
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -268,13 +268,13 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2734
   Scenario: Verify that SALES request on an overpaid loan results an error
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
-    When Admin sets the business date to "10 May 2023"
-    And Customer makes "AUTOPAY" repayment on "10 May 2023" with 1200 EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
+    When Admin sets the business date to "20230510"
+    And Customer makes "AUTOPAY" repayment on "20230510" with 1200 EUR transaction amount
     Then Loan status will be "OVERPAID"
     Then Asset externalization transaction with the following data results a 403 error and "LOAN_OVERPAID_INVALID" error message
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -282,11 +282,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2735
   Scenario: Verify that SALES request on a loan with ACTIVE ownership succeeds (owner-to-owner transfer)
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -295,7 +295,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -303,7 +303,7 @@ Feature: Asset Externalization - Part1
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "25 May 2023"
+    When Admin sets the business date to "20230525"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | sale             | 2023-05-30     | 1                  |
@@ -311,11 +311,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2736
   Scenario: Verify that BUYBACK request on a fully paid loan can be done successfully
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -324,7 +324,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -332,8 +332,8 @@ Feature: Asset Externalization - Part1
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "25 May 2023"
-    And Customer makes "AUTOPAY" repayment on "25 May 2023" with 1000 EUR transaction amount and check external owner
+    When Admin sets the business date to "20230525"
+    And Customer makes "AUTOPAY" repayment on "20230525" with 1000 EUR transaction amount and check external owner
     Then Loan status will be "CLOSED_OBLIGATIONS_MET"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -346,11 +346,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2737
   Scenario: Verify that BUYBACK request on an overpaid loan can be done successfully
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -359,7 +359,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -367,8 +367,8 @@ Feature: Asset Externalization - Part1
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "25 May 2023"
-    And Customer makes "AUTOPAY" repayment on "25 May 2023" with 1200 EUR transaction amount and check external owner
+    When Admin sets the business date to "20230525"
+    And Customer makes "AUTOPAY" repayment on "20230525" with 1200 EUR transaction amount and check external owner
     Then Loan status will be "OVERPAID"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -381,11 +381,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2738
   Scenario: Verify that BUYBACK request on a loan with INACTIVE ownership results an error
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     Then Asset externalization transaction with the following data results a 403 error and "ASSET_NOT_OWNED_CANNOT_BE_BOUGHT" error message
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -393,9 +393,9 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2739
   Scenario: Verify that SALES request can NOT be placed on a loan which is not APPROVED yet
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
+    When Admin creates a new default Loan with date: "20230501"
     Then Loan status will be "SUBMITTED_AND_PENDING_APPROVAL"
     Then Asset externalization transaction with the following data results a 403 error and "LOAN_SUBMITTED_AND_PENDING_APPROVAL_INVALID" error message
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -403,10 +403,10 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2740
   Scenario: Verify that SALES request can NOT be placed on a loan which is not DISBURSED yet
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
     Then Loan status will be "APPROVED"
     Then Asset externalization transaction with the following data results a 403 error and "LOAN_APPROVED_INVALID" error message
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -414,11 +414,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2741
   Scenario: Verify that SALES request on a loan with PENDING ownership results an error
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -427,7 +427,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "10 May 2023"
+    When Admin sets the business date to "20230510"
     When Admin runs inline COB job for Loan
     Then Asset externalization transaction with the following data results a 403 error and "ALREADY_PENDING" error message
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -435,11 +435,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2742
   Scenario: Verify that SALES with settlement date earlier than actual business date results an error
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     Then Asset externalization transaction with the following data results a 403 error and "SETTLEMENT_DATE_IN_THE_PAST" error message
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -447,11 +447,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2743
   Scenario: Verify that SALES with null owner external id results an error
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     Then Asset externalization SALES transaction with ownerExternalId = null and the following data results a 400 error and "INVALID_REQUEST" error message
       | settlementDate | purchasePriceRatio |
@@ -459,11 +459,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2744
   Scenario: Verify that SALES with null purchase price ratio results an error
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     Then Asset externalization transaction with the following data results a 400 error and "INVALID_REQUEST" error message
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -471,11 +471,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2745
   Scenario: Verify that SALES with null settlement date results an error
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     Then Asset externalization transaction with the following data results a 400 error and "INVALID_REQUEST" error message
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -483,11 +483,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2746
   Scenario: Verify that BUYBACK request on a loan with PENDING BUYBACK ownership result an error
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -496,7 +496,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -504,7 +504,7 @@ Feature: Asset Externalization - Part1
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "25 May 2023"
+    When Admin sets the business date to "20230525"
     When Admin runs inline COB job for Loan
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -514,7 +514,7 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-25    | 9999-12-31  | BUYBACK          |
-    When Admin sets the business date to "28 May 2023"
+    When Admin sets the business date to "20230528"
     When Admin runs inline COB job for Loan
     Then Asset externalization transaction with the following data results a 403 error and "BUYBACK_ALREADY_IN_PROGRESS_CANNOT_BE_BOUGHT" error message
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -522,11 +522,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2747
   Scenario: Verify that BUYBACK with settlement date earlier than actual business date results an error
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -535,7 +535,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -543,7 +543,7 @@ Feature: Asset Externalization - Part1
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "25 May 2023"
+    When Admin sets the business date to "20230525"
     When Admin runs inline COB job for Loan
     Then Asset externalization transaction with the following data results a 403 error and "SETTLEMENT_DATE_IN_THE_PAST" error message
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -551,11 +551,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2748
   Scenario: Verify that BUYBACK with ownerExternalId=NULL can be placed, and results a 200OK response
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -564,7 +564,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -572,7 +572,7 @@ Feature: Asset Externalization - Part1
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "25 May 2023"
+    When Admin sets the business date to "20230525"
     When Admin runs inline COB job for Loan
     When Admin makes asset externalization BUYBACK request with ownerExternalId = null and settlement date "2023-05-30" by Loan ID with system-generated transferExternalId
     Then Fetching Asset externalization details by loan id gives numberOfElements: 3 with correct ownerExternalId and the following data:
@@ -583,11 +583,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2749
   Scenario: Verify that BUYBACK with purchasePriceRatio=NULL can be placed, and results a 200OK response
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -596,7 +596,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -604,7 +604,7 @@ Feature: Asset Externalization - Part1
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "25 May 2023"
+    When Admin sets the business date to "20230525"
     When Admin runs inline COB job for Loan
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -617,11 +617,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2750
   Scenario: Verify that SALES with null settlement date results an error
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -630,7 +630,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -638,7 +638,7 @@ Feature: Asset Externalization - Part1
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "25 May 2023"
+    When Admin sets the business date to "20230525"
     When Admin runs inline COB job for Loan
     Then Asset externalization transaction with the following data results a 400 error and "INVALID_REQUEST" error message
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -646,11 +646,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2751 @AssetExternalizationJournalEntry
   Scenario: Verify that Asset externalization SALES and BUYBACK has the correct Journal entries: no other transactions
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -659,7 +659,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -684,7 +684,7 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-22    | 9999-12-31  | BUYBACK          |
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -706,11 +706,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2752 @AssetExternalizationJournalEntry
   Scenario: Verify that Asset externalization SALES and BUYBACK has the correct Journal entries: fee applied before sale, and penalty applied before buyback
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -719,10 +719,10 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin adds "LOAN_SNOOZE_FEE" due date charge with "10 May 2023" due date and 10 EUR transaction amount
-    When Admin sets the business date to "10 May 2023"
+    When Admin adds "LOAN_SNOOZE_FEE" due date charge with "20230510" due date and 10 EUR transaction amount
+    When Admin sets the business date to "20230510"
     When Admin runs inline COB job for Loan
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -750,10 +750,10 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-22    | 9999-12-31  | BUYBACK          |
-    When Admin adds "LOAN_NSF_FEE" due date charge with "25 May 2023" due date and 20 EUR transaction amount
-    When Admin sets the business date to "26 May 2023"
+    When Admin adds "LOAN_NSF_FEE" due date charge with "20230525" due date and 20 EUR transaction amount
+    When Admin sets the business date to "20230526"
     When Admin runs inline COB job for Loan
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -781,11 +781,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2753 @AssetExternalizationJournalEntry
   Scenario: Verify that Asset externalization SALES and BUYBACK has the correct Journal entries: Repyment while status is ACTIVE
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -794,7 +794,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -811,7 +811,7 @@ Feature: Asset Externalization - Part1
     Then The asset external owner has the following OWNER Journal entries:
       | glAccountType | glAccountCode | glAccountName    | entryType | amount  |
       | ASSET         | 112601        | Loans Receivable | DEBIT     | 1000.00 |
-    When Customer makes "REPAYMENT" transaction with "AUTOPAY" payment type on "22 May 2023" with 200 EUR transaction amount and system-generated Idempotency key and check external owner
+    When Customer makes "REPAYMENT" transaction with "AUTOPAY" payment type on "20230522" with 200 EUR transaction amount and system-generated Idempotency key and check external owner
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | buyback          | 2023-05-30     |                    |
@@ -820,7 +820,7 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-22    | 9999-12-31  | BUYBACK          |
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -844,11 +844,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2754 @AssetExternalizationJournalEntry
   Scenario: Verify that Asset externalization SALES and BUYBACK has the correct Journal entries: GOODWILL_CREDIT transaction while status is ACTIVE
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -857,7 +857,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -874,7 +874,7 @@ Feature: Asset Externalization - Part1
     Then The asset external owner has the following OWNER Journal entries:
       | glAccountType | glAccountCode | glAccountName    | entryType | amount  |
       | ASSET         | 112601        | Loans Receivable | DEBIT     | 1000.00 |
-    When Customer makes "GOODWILL_CREDIT" transaction with "AUTOPAY" payment type on "22 May 2023" with 200 EUR transaction amount and system-generated Idempotency key and check external owner
+    When Customer makes "GOODWILL_CREDIT" transaction with "AUTOPAY" payment type on "20230522" with 200 EUR transaction amount and system-generated Idempotency key and check external owner
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | buyback          | 2023-05-30     |                    |
@@ -883,7 +883,7 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-22    | 9999-12-31  | BUYBACK          |
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -907,11 +907,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2755 @AssetExternalizationJournalEntry
   Scenario: Verify that Asset externalization SALES and BUYBACK has the correct Journal entries: MERCHANT_ISSUED_REFUND transaction while status is ACTIVE
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -920,7 +920,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -937,7 +937,7 @@ Feature: Asset Externalization - Part1
     Then The asset external owner has the following OWNER Journal entries:
       | glAccountType | glAccountCode | glAccountName    | entryType | amount  |
       | ASSET         | 112601        | Loans Receivable | DEBIT     | 1000.00 |
-    When Customer makes "MERCHANT_ISSUED_REFUND" transaction with "AUTOPAY" payment type on "22 May 2023" with 200 EUR transaction amount and system-generated Idempotency key and check external owner
+    When Customer makes "MERCHANT_ISSUED_REFUND" transaction with "AUTOPAY" payment type on "20230522" with 200 EUR transaction amount and system-generated Idempotency key and check external owner
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | buyback          | 2023-05-30     |                    |
@@ -946,7 +946,7 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-22    | 9999-12-31  | BUYBACK          |
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -970,11 +970,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2756 @AssetExternalizationJournalEntry
   Scenario: Verify that Asset externalization SALES and BUYBACK has the correct Journal entries: PAYOUT_REFUND transaction while status is ACTIVE
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -983,7 +983,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -1000,7 +1000,7 @@ Feature: Asset Externalization - Part1
     Then The asset external owner has the following OWNER Journal entries:
       | glAccountType | glAccountCode | glAccountName    | entryType | amount  |
       | ASSET         | 112601        | Loans Receivable | DEBIT     | 1000.00 |
-    When Customer makes "PAYOUT_REFUND" transaction with "AUTOPAY" payment type on "22 May 2023" with 200 EUR transaction amount and system-generated Idempotency key and check external owner
+    When Customer makes "PAYOUT_REFUND" transaction with "AUTOPAY" payment type on "20230522" with 200 EUR transaction amount and system-generated Idempotency key and check external owner
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | buyback          | 2023-05-30     |                    |
@@ -1009,7 +1009,7 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-22    | 9999-12-31  | BUYBACK          |
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -1033,11 +1033,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2757 @AssetExternalizationJournalEntry
   Scenario: Verify that Asset externalization SALES and BUYBACK has the correct Journal entries: REPAYMENT_ADJUSTMENT_REFUND chargeback transaction while status is ACTIVE
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1046,7 +1046,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -1063,7 +1063,7 @@ Feature: Asset Externalization - Part1
     Then The asset external owner has the following OWNER Journal entries:
       | glAccountType | glAccountCode | glAccountName    | entryType | amount  |
       | ASSET         | 112601        | Loans Receivable | DEBIT     | 1000.00 |
-    When Customer makes "REPAYMENT" transaction with "AUTOPAY" payment type on "22 May 2023" with 1000 EUR transaction amount and system-generated Idempotency key and check external owner
+    When Customer makes "REPAYMENT" transaction with "AUTOPAY" payment type on "20230522" with 1000 EUR transaction amount and system-generated Idempotency key and check external owner
     Then Loan status will be "CLOSED_OBLIGATIONS_MET"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1073,9 +1073,9 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-22    | 9999-12-31  | BUYBACK          |
-    When Admin sets the business date to "25 May 2023"
+    When Admin sets the business date to "20230525"
     When Admin makes "REPAYMENT_ADJUSTMENT_REFUND" chargeback with 800 EUR transaction amount
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -1101,11 +1101,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2758 @AssetExternalizationJournalEntry
   Scenario: Verify that Asset externalization SALES and BUYBACK has the correct Journal entries: CHARGE ADJUSTMENT transaction while status is ACTIVE
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1114,7 +1114,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -1131,7 +1131,7 @@ Feature: Asset Externalization - Part1
     Then The asset external owner has the following OWNER Journal entries:
       | glAccountType | glAccountCode | glAccountName    | entryType | amount  |
       | ASSET         | 112601        | Loans Receivable | DEBIT     | 1000.00 |
-    When Admin adds "LOAN_SNOOZE_FEE" due date charge with "24 May 2023" due date and 300 EUR transaction amount
+    When Admin adds "LOAN_SNOOZE_FEE" due date charge with "20230524" due date and 300 EUR transaction amount
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | buyback          | 2023-05-30     |                    |
@@ -1140,10 +1140,10 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-22    | 9999-12-31  | BUYBACK          |
-    When Admin sets the business date to "25 May 2023"
+    When Admin sets the business date to "20230525"
     When Admin runs inline COB job for Loan
-    When Admin makes a charge adjustment for the last "LOAN_SNOOZE_FEE" type charge which is due on "24 May 2023" with 100 EUR transaction amount and externalId ""
-    When Admin sets the business date to "31 May 2023"
+    When Admin makes a charge adjustment for the last "LOAN_SNOOZE_FEE" type charge which is due on "20230524" with 100 EUR transaction amount and externalId ""
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -1172,11 +1172,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2759
   Scenario: Verify that LoanOwnershipTransferBusinessEvent and LoanAccountSnapshotBusinessEvent is created with correct data
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1186,7 +1186,7 @@ Feature: Asset Externalization - Part1
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
     Then Asset externalization details has the generated transferExternalId
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 2 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
@@ -1194,11 +1194,11 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
-    When Admin sets the business date to "25 May 2023"
+    When Admin sets the business date to "20230525"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | buyback          | 2023-05-30     |                    |
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 3 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
@@ -1210,15 +1210,15 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2760
   Scenario: Verify that LoanOwnershipTransferBusinessEvent and LoanAccountSnapshotBusinessEvent is created with correct data for partial repayment, fee, penalty
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
-    When Customer makes "REPAYMENT" transaction with "AUTOPAY" payment type on "1 May 2023" with 500 EUR transaction amount and system-generated Idempotency key
-    When Admin adds "LOAN_NSF_FEE" due date charge with "1 May 2023" due date and 15 EUR transaction amount
-    When Admin adds "LOAN_SNOOZE_FEE" due date charge with "1 May 2023" due date and 20 EUR transaction amount
+    When Customer makes "REPAYMENT" transaction with "AUTOPAY" payment type on "20230501" with 500 EUR transaction amount and system-generated Idempotency key
+    When Admin adds "LOAN_NSF_FEE" due date charge with "20230501" due date and 15 EUR transaction amount
+    When Admin adds "LOAN_SNOOZE_FEE" due date charge with "20230501" due date and 20 EUR transaction amount
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | sale             | 2023-05-21     | 1                  |
@@ -1227,7 +1227,7 @@ Feature: Asset Externalization - Part1
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
     Then Asset externalization details has the generated transferExternalId
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 2 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
@@ -1235,11 +1235,11 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
-    When Admin sets the business date to "25 May 2023"
+    When Admin sets the business date to "20230525"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | buyback          | 2023-05-30     |                    |
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 3 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
@@ -1251,11 +1251,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2771
   Scenario: Verify that SALE and BUYBACK can be cancelled in right order
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request for type "SALE" by Loan ID with unique ownerExternalId, user-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1264,7 +1264,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId, ignore transactionExternalId and contain the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  |
-    When Admin sets the business date to "10 May 2023"
+    When Admin sets the business date to "20230510"
     When Admin makes asset externalization request for type "BUYBACK" by Loan ID with unique ownerExternalId, user-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | buyback          | 2023-05-21     |                    |
@@ -1290,11 +1290,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2772
   Scenario: Verify that SALE can be cancelled
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, user-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1303,22 +1303,22 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId, ignore transactionExternalId and contain the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  |
-    When Admin sets the business date to "10 May 2023"
+    When Admin sets the business date to "20230510"
     When Admin send "cancel" command on "SALE" transaction
     Then Fetching Asset externalization details by loan id gives numberOfElements: 2 with correct ownerExternalId, ignore transactionExternalId and contain the following data:
       | settlementDate | purchasePriceRatio | status    | effectiveFrom | effectiveTo |
       | 2023-05-21     | 1                  | PENDING   | 2023-05-01    | 2023-05-10  |
       | 2023-05-21     | 1                  | CANCELLED | 2023-05-01    | 2023-05-10  |
 
-   Then LoanOwnershipTransferBusinessEvent is not created on "21 May 2023"
+   Then LoanOwnershipTransferBusinessEvent is not created on "20230521"
 
   @TestRailId:C2773
   Scenario: Verify that active SALE can not be cancelled
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, user-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1327,7 +1327,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 2 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
@@ -1339,11 +1339,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2774
   Scenario: Verify that Asset cannot be cancelled after SALE and BUYBACK is completed
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1352,7 +1352,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "10 May 2023"
+    When Admin sets the business date to "20230510"
     When Admin runs inline COB job for Loan
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1361,14 +1361,14 @@ Feature: Asset Externalization - Part1
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-10    | 9999-12-31  | BUYBACK          |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 3 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-10    | 9999-12-31  | BUYBACK          |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 3 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
@@ -1379,11 +1379,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2775
   Scenario: Verify that SALE and BUYBACK can be cancelled in right order with double cancel test
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request for type "SALE" by Loan ID with unique ownerExternalId, user-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1406,7 +1406,7 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | PENDING   | 2023-05-01    | 2023-05-01  |
       | 2023-05-21     | 1                  | CANCELLED | 2023-05-01    | 2023-05-01  |
       | 2023-05-21     | 1                  | PENDING   | 2023-05-01    | 9999-12-31  |
-    When Admin sets the business date to "10 May 2023"
+    When Admin sets the business date to "20230510"
     When Admin makes asset externalization request for type "BUYBACK" by Loan ID with unique ownerExternalId, user-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | buyback          | 2023-05-21     |                    |
@@ -1438,11 +1438,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2785
   Scenario: Verify that when a loan with PENDING SALES is fully paid asset transfer status will be DECLINED
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1451,8 +1451,8 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "15 May 2023"
-    And Customer makes "AUTOPAY" repayment on "15 May 2023" with 1000 EUR transaction amount
+    When Admin sets the business date to "20230515"
+    And Customer makes "AUTOPAY" repayment on "20230515" with 1000 EUR transaction amount
     Then Loan status will be "CLOSED_OBLIGATIONS_MET"
     Then Fetching Asset externalization details by loan id gives numberOfElements: 2 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status   | effectiveFrom | effectiveTo | Transaction type |
@@ -1462,11 +1462,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2786
   Scenario: Verify that when a loan with PENDING SALES is overpaid asset transfer status will be DECLINED
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1475,8 +1475,8 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "15 May 2023"
-    And Customer makes "AUTOPAY" repayment on "15 May 2023" with 1200 EUR transaction amount
+    When Admin sets the business date to "20230515"
+    And Customer makes "AUTOPAY" repayment on "20230515" with 1200 EUR transaction amount
     Then Loan status will be "OVERPAID"
     Then Fetching Asset externalization details by loan id gives numberOfElements: 2 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status   | effectiveFrom | effectiveTo | Transaction type |
@@ -1486,11 +1486,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2787
   Scenario: Verify that when a loan with PENDING BUYBACK is fully paid BUYBACK transaction can be done successfully
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1499,7 +1499,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 2 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
@@ -1514,10 +1514,10 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-22    | 9999-12-31  | BUYBACK          |
-    When Admin sets the business date to "25 May 2023"
-    And Customer makes "AUTOPAY" repayment on "25 May 2023" with 1000 EUR transaction amount
+    When Admin sets the business date to "20230525"
+    And Customer makes "AUTOPAY" repayment on "20230525" with 1000 EUR transaction amount
     Then Loan status will be "CLOSED_OBLIGATIONS_MET"
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 3 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
@@ -1528,11 +1528,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2788
   Scenario: Verify that when a loan with PENDING BUYBACK is overpaid BUYBACK transaction can be done successfully
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1541,7 +1541,7 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 2 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
@@ -1555,10 +1555,10 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-22    | 9999-12-31  | BUYBACK          |
-    When Admin sets the business date to "25 May 2023"
-    And Customer makes "AUTOPAY" repayment on "25 May 2023" with 1200 EUR transaction amount
+    When Admin sets the business date to "20230525"
+    And Customer makes "AUTOPAY" repayment on "20230525" with 1200 EUR transaction amount
     Then Loan status will be "OVERPAID"
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 3 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
@@ -1568,11 +1568,11 @@ Feature: Asset Externalization - Part1
 
   @TestRailId:C2811
   Scenario: Verify that transaction and transaction adjustment events has the proper external owner
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 May 2023"
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20230501"
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, user-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1581,25 +1581,25 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    And Customer makes "AUTOPAY" repayment on "1 May 2023" with 10 EUR transaction amount
-    When Admin sets the business date to "22 May 2023"
+    And Customer makes "AUTOPAY" repayment on "20230501" with 10 EUR transaction amount
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 2 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
-    And Customer makes "AUTOPAY" repayment on "22 May 2023" with 10 EUR transaction amount and check external owner
-    When Customer adjust "1"th repayment on "22 May 2023" with amount "9" and check external owner
+    And Customer makes "AUTOPAY" repayment on "20230522" with 10 EUR transaction amount and check external owner
+    When Customer adjust "1"th repayment on "20230522" with amount "9" and check external owner
 
   @TestRailId:C3193
   Scenario: Verify that Asset externalization SALES and BUYBACK has the correct Journal entries: no other transactions - interest bearing loan
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
     When Admin creates a fully customized loan with the following data:
       | LoanProduct                                     | submitted on date | with Principal | ANNUAL interest rate % | interest type     | interest calculation period | amortization type  | loanTermFrequency | loanTermFrequencyType | repaymentEvery | repaymentFrequencyType | numberOfRepayments | graceOnPrincipalPayment | graceOnInterestPayment | interest free period | Payment strategy            |
-      | LP2_ADV_PYMNT_INTEREST_DAILY_EMI_ACTUAL_ACTUAL | 01 May 2023       | 1000           | 12                     | DECLINING_BALANCE | DAILY                       | EQUAL_INSTALLMENTS | 6                 | MONTHS                | 1              | MONTHS                 | 6                  | 0                       | 0                      | 0                    | ADVANCED_PAYMENT_ALLOCATION |
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+      | LP2_ADV_PYMNT_INTEREST_DAILY_EMI_ACTUAL_ACTUAL | 20230501       | 1000           | 12                     | DECLINING_BALANCE | DAILY                       | EQUAL_INSTALLMENTS | 6                 | MONTHS                | 1              | MONTHS                 | 6                  | 0                       | 0                      | 0                    | ADVANCED_PAYMENT_ALLOCATION |
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1608,10 +1608,10 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |
-    When Admin adds "LOAN_SNOOZE_FEE" due date charge with "10 May 2023" due date and 10 EUR transaction amount
-    When Admin sets the business date to "10 May 2023"
+    When Admin adds "LOAN_SNOOZE_FEE" due date charge with "20230510" due date and 10 EUR transaction amount
+    When Admin sets the business date to "20230510"
     When Admin runs inline COB job for Loan
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -1639,10 +1639,10 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-22    | 9999-12-31  | BUYBACK          |
-    When Admin adds "LOAN_NSF_FEE" due date charge with "25 May 2023" due date and 20 EUR transaction amount
-    When Admin sets the business date to "26 May 2023"
+    When Admin adds "LOAN_NSF_FEE" due date charge with "20230525" due date and 20 EUR transaction amount
+    When Admin sets the business date to "20230526"
     When Admin runs inline COB job for Loan
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -1689,13 +1689,13 @@ Feature: Asset Externalization - Part1
   @TestRailId:C3690 @AssetExternalizationJournalEntry
   Scenario: Verify that Asset externalization SALES and BUYBACK has the correct Journal entries with PAYABLE_OUTSTANDING_INTEREST strategy
     When Global config "outstanding-interest-calculation-strategy-for-external-asset-transfer" value set to "PAYABLE_OUTSTANDING_INTEREST"
-    When Admin sets the business date to "1 May 2023"
+    When Admin sets the business date to "20230501"
     When Admin creates a client with random data
     When Admin creates a fully customized loan with the following data:
       | LoanProduct                                     | submitted on date | with Principal | ANNUAL interest rate % | interest type     | interest calculation period | amortization type  | loanTermFrequency | loanTermFrequencyType | repaymentEvery | repaymentFrequencyType | numberOfRepayments | graceOnPrincipalPayment | graceOnInterestPayment | interest free period | Payment strategy            |
-      | LP2_ADV_PYMNT_INTEREST_DAILY_EMI_ACTUAL_ACTUAL | 01 May 2023       | 1000           | 12                     | DECLINING_BALANCE | DAILY                       | EQUAL_INSTALLMENTS | 6                 | MONTHS                | 1              | MONTHS                 | 6                  | 0                       | 0                      | 0                    | ADVANCED_PAYMENT_ALLOCATION |
-    And Admin successfully approves the loan on "1 May 2023" with "1000" amount and expected disbursement date on "1 May 2023"
-    When Admin successfully disburse the loan on "1 May 2023" with "1000" EUR transaction amount
+      | LP2_ADV_PYMNT_INTEREST_DAILY_EMI_ACTUAL_ACTUAL | 20230501       | 1000           | 12                     | DECLINING_BALANCE | DAILY                       | EQUAL_INSTALLMENTS | 6                 | MONTHS                | 1              | MONTHS                 | 6                  | 0                       | 0                      | 0                    | ADVANCED_PAYMENT_ALLOCATION |
+    And Admin successfully approves the loan on "20230501" with "1000" amount and expected disbursement date on "20230501"
+    When Admin successfully disburse the loan on "20230501" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1704,10 +1704,10 @@ Feature: Asset Externalization - Part1
     Then Fetching Asset externalization details by loan id gives numberOfElements: 1 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type | totalOutstanding | totalPrincipalOutstanding | totalInterestOutstanding | totalFeeChargesOutstanding | totalPenaltyChargesOutstanding |
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 9999-12-31  | SALE             |                  |                           |                          |                            |                                |
-    When Admin adds "LOAN_SNOOZE_FEE" due date charge with "10 May 2023" due date and 10 EUR transaction amount
-    When Admin sets the business date to "10 May 2023"
+    When Admin adds "LOAN_SNOOZE_FEE" due date charge with "20230510" due date and 10 EUR transaction amount
+    When Admin sets the business date to "20230510"
     When Admin runs inline COB job for Loan
-    When Admin sets the business date to "22 May 2023"
+    When Admin sets the business date to "20230522"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -1735,10 +1735,10 @@ Feature: Asset Externalization - Part1
       | 2023-05-21     | 1                  | PENDING | 2023-05-01    | 2023-05-21  | SALE             |                  |                           |                          |                            |                                |
       | 2023-05-21     | 1                  | ACTIVE  | 2023-05-22    | 9999-12-31  | SALE             | 1016.58          | 1000.00                   | 6.58                     | 10.00                      | 0.00                           |
       | 2023-05-30     | 1                  | BUYBACK | 2023-05-22    | 9999-12-31  | BUYBACK          |                  |                           |                          |                            |                                |
-    When Admin adds "LOAN_NSF_FEE" due date charge with "25 May 2023" due date and 20 EUR transaction amount
-    When Admin sets the business date to "26 May 2023"
+    When Admin adds "LOAN_NSF_FEE" due date charge with "20230525" due date and 20 EUR transaction amount
+    When Admin sets the business date to "20230526"
     When Admin runs inline COB job for Loan
-    When Admin sets the business date to "31 May 2023"
+    When Admin sets the business date to "20230531"
     When Admin runs inline COB job for Loan
     Then LoanOwnershipTransferBusinessEvent is created
     Then LoanAccountSnapshotBusinessEvent is created
@@ -1787,11 +1787,11 @@ Feature: Asset Externalization - Part1
   Scenario: Verify manual journal entry with External Asset Owner value if asset-externalization is enabled for existing loan - UC1
     Given Global configuration "asset-externalization-of-non-active-loans" is enabled
 
-    When Admin sets the business date to "1 June 2025"
+    When Admin sets the business date to "20250601"
     When Admin creates a client with random data
-    When Admin creates a new default Loan with date: "1 June 2025"
-    And Admin successfully approves the loan on "1 June 2025" with "1000" amount and expected disbursement date on "1 June 2025"
-    When Admin successfully disburse the loan on "1 June 2025" with "1000" EUR transaction amount
+    When Admin creates a new default Loan with date: "20250601"
+    And Admin successfully approves the loan on "20250601" with "1000" amount and expected disbursement date on "20250601"
+    When Admin successfully disburse the loan on "20250601" with "1000" EUR transaction amount
     Then Loan status will be "ACTIVE"
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
@@ -1801,33 +1801,33 @@ Feature: Asset Externalization - Part1
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
       | 2025-06-01     | 1                  | PENDING | 2025-06-01    | 9999-12-31  | SALE             |
 
-    When Admin sets the business date to "26 June 2025"
-    Then Admin creates manual Journal entry with "131" amount and "26 June 2025" date and unique External Asset Owner
+    When Admin sets the business date to "20250626"
+    Then Admin creates manual Journal entry with "131" amount and "20250626" date and unique External Asset Owner
     Then Verify manual Journal entry with External Asset Owner "true" and with the following Journal entries:
       | Type      | Account code | Account name              | Debit | Credit | Manual Entry |
       | ASSET     | 112601       | Loans Receivable          | 131.0 |        | true         |
       | LIABILITY | 145023       | Suspense/Clearing account |       | 131.0  | true         |
     Given Global configuration "asset-externalization-of-non-active-loans" is enabled
 
-    When Loan Pay-off is made on "26 June 2025"
+    When Loan Pay-off is made on "20250626"
     Then Loan's all installments have obligations met
 
   @TestRailId:C85341
   Scenario: Verify remaining capitalized income is fully recognized on loan sale to external owner
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a fully customized loan with the following data:
       | LoanProduct                                                                      | submitted on date | with Principal | ANNUAL interest rate % | interest type     | interest calculation period | amortization type  | loanTermFrequency | loanTermFrequencyType | repaymentEvery | repaymentFrequencyType | numberOfRepayments | graceOnPrincipalPayment | graceOnInterestPayment | interest free period | Payment strategy            |
-      | LP2_ADV_PYMNT_INTEREST_DAILY_EMI_360_30_INTEREST_RECALC_DAILY_CAPITALIZED_INCOME | 01 January 2026   | 200            | 0                      | DECLINING_BALANCE | DAILY                       | EQUAL_INSTALLMENTS | 3                 | MONTHS                | 1              | MONTHS                 | 3                  | 0                       | 0                      | 0                    | ADVANCED_PAYMENT_ALLOCATION |
-    And Admin successfully approves the loan on "01 January 2026" with "200" amount and expected disbursement date on "01 January 2026"
-    And Admin successfully disburse the loan on "01 January 2026" with "100" EUR transaction amount
-    And Admin adds capitalized income with "AUTOPAY" payment type to the loan on "01 January 2026" with "50" EUR transaction amount
+      | LP2_ADV_PYMNT_INTEREST_DAILY_EMI_360_30_INTEREST_RECALC_DAILY_CAPITALIZED_INCOME | 20260101   | 200            | 0                      | DECLINING_BALANCE | DAILY                       | EQUAL_INSTALLMENTS | 3                 | MONTHS                | 1              | MONTHS                 | 3                  | 0                       | 0                      | 0                    | ADVANCED_PAYMENT_ALLOCATION |
+    And Admin successfully approves the loan on "20260101" with "200" amount and expected disbursement date on "20260101"
+    And Admin successfully disburse the loan on "20260101" with "100" EUR transaction amount
+    And Admin adds capitalized income with "AUTOPAY" payment type to the loan on "20260101" with "50" EUR transaction amount
     Then Loan status will be "ACTIVE"
     And Loan Transactions tab has the following data:
       | Transaction date | Transaction Type   | Amount | Principal | Interest | Fees | Penalties | Loan Balance | Reverted |
-      | 01 January 2026  | Disbursement       | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
-      | 01 January 2026  | Capitalized Income | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | false    |
-    And Loan Transactions tab has a "CAPITALIZED_INCOME" transaction with date "01 January 2026" which has the following Journal entries:
+      | 20260101  | Disbursement       | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
+      | 20260101  | Capitalized Income | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | false    |
+    And Loan Transactions tab has a "CAPITALIZED_INCOME" transaction with date "20260101" which has the following Journal entries:
       | Type      | Account code | Account name                | Debit | Credit |
       | ASSET     | 112601       | Loans Receivable            | 50.0  |        |
       | LIABILITY | 145024       | Deferred Capitalized Income |       | 50.0   |
@@ -1838,7 +1838,7 @@ Feature: Asset Externalization - Part1
       | Transaction type | settlementDate | purchasePriceRatio |
       | sale             | 2026-01-02     | 1                  |
     Then Asset externalization response has the correct Loan ID, transferExternalId
-    When Admin sets the business date to "03 January 2026"
+    When Admin sets the business date to "20260103"
     And Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 2 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
@@ -1846,11 +1846,11 @@ Feature: Asset Externalization - Part1
       | 2026-01-02     | 1                  | ACTIVE  | 2026-01-03    | 9999-12-31  | SALE             |
     And Loan Transactions tab has the following data:
       | Transaction date | Transaction Type                | Amount | Principal | Interest | Fees | Penalties | Loan Balance | Reverted |
-      | 01 January 2026  | Disbursement                    | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
-      | 01 January 2026  | Capitalized Income              | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | false    |
-      | 02 January 2026  | Capitalized Income Amortization | 1.11   | 0.0       | 1.11     | 0.0  | 0.0       | 0.0          | false    |
-      | 02 January 2026  | Capitalized Income Amortization | 48.89  | 0.0       | 48.89    | 0.0  | 0.0       | 0.0          | false    |
-    And Loan Transactions tab has 2 a "CAPITALIZED_INCOME_AMORTIZATION" transactions with date "02 January 2026" which has the following Journal entries:
+      | 20260101  | Disbursement                    | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
+      | 20260101  | Capitalized Income              | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | false    |
+      | 20260102  | Capitalized Income Amortization | 1.11   | 0.0       | 1.11     | 0.0  | 0.0       | 0.0          | false    |
+      | 20260102  | Capitalized Income Amortization | 48.89  | 0.0       | 48.89    | 0.0  | 0.0       | 0.0          | false    |
+    And Loan Transactions tab has 2 a "CAPITALIZED_INCOME_AMORTIZATION" transactions with date "20260102" which has the following Journal entries:
       | Type      | Account code | Account name                | Debit | Credit |
       | INCOME    | 404000       | Interest Income             |       | 1.11   |
       | LIABILITY | 145024       | Deferred Capitalized Income | 1.11  |        |
@@ -1862,55 +1862,55 @@ Feature: Asset Externalization - Part1
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | buyback          | 2026-01-03     |                    |
-    When Admin sets the business date to "04 January 2026"
+    When Admin sets the business date to "20260104"
     And Admin runs inline COB job for Loan
     Then Deferred Capitalized Income contains the following data:
       | Amount | Amortized Amount | Unrecognized Amount | Adjusted Amount | Charged Off Amount |
       | 50.0   | 50.0             | 0.0                 | 0.0             | 0.0                |
     And Loan Transactions tab has the following data:
       | Transaction date | Transaction Type                | Amount | Principal | Interest | Fees | Penalties | Loan Balance | Reverted |
-      | 01 January 2026  | Disbursement                    | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
-      | 01 January 2026  | Capitalized Income              | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | false    |
-      | 02 January 2026  | Capitalized Income Amortization | 1.11   | 0.0       | 1.11     | 0.0  | 0.0       | 0.0          | false    |
-      | 02 January 2026  | Capitalized Income Amortization | 48.89  | 0.0       | 48.89    | 0.0  | 0.0       | 0.0          | false    |
-    When Loan Pay-off is made on "04 January 2026"
+      | 20260101  | Disbursement                    | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
+      | 20260101  | Capitalized Income              | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | false    |
+      | 20260102  | Capitalized Income Amortization | 1.11   | 0.0       | 1.11     | 0.0  | 0.0       | 0.0          | false    |
+      | 20260102  | Capitalized Income Amortization | 48.89  | 0.0       | 48.89    | 0.0  | 0.0       | 0.0          | false    |
+    When Loan Pay-off is made on "20260104"
     Then Loan's all installments have obligations met
 
   @TestRailId:C85342
   Scenario: Verify remaining buy down fee is fully recognized on loan sale to external owner
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a fully customized loan with the following data:
       | LoanProduct                                              | submitted on date | with Principal | ANNUAL interest rate % | interest type     | interest calculation period | amortization type  | loanTermFrequency | loanTermFrequencyType | repaymentEvery | repaymentFrequencyType | numberOfRepayments | graceOnPrincipalPayment | graceOnInterestPayment | interest free period | Payment strategy            |
-      | LP2_PROGRESSIVE_ADVANCED_PAYMENT_ALLOCATION_BUYDOWN_FEES | 01 January 2026   | 100            | 7                      | DECLINING_BALANCE | DAILY                       | EQUAL_INSTALLMENTS | 3                 | MONTHS                | 1              | MONTHS                 | 3                  | 0                       | 0                      | 0                    | ADVANCED_PAYMENT_ALLOCATION |
-    And Admin successfully approves the loan on "01 January 2026" with "100" amount and expected disbursement date on "01 January 2026"
-    And Admin successfully disburse the loan on "01 January 2026" with "100" EUR transaction amount
-    And Admin adds buy down fee with "AUTOPAY" payment type to the loan on "01 January 2026" with "50" EUR transaction amount
+      | LP2_PROGRESSIVE_ADVANCED_PAYMENT_ALLOCATION_BUYDOWN_FEES | 20260101   | 100            | 7                      | DECLINING_BALANCE | DAILY                       | EQUAL_INSTALLMENTS | 3                 | MONTHS                | 1              | MONTHS                 | 3                  | 0                       | 0                      | 0                    | ADVANCED_PAYMENT_ALLOCATION |
+    And Admin successfully approves the loan on "20260101" with "100" amount and expected disbursement date on "20260101"
+    And Admin successfully disburse the loan on "20260101" with "100" EUR transaction amount
+    And Admin adds buy down fee with "AUTOPAY" payment type to the loan on "20260101" with "50" EUR transaction amount
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | sale             | 2026-01-02     | 1                  |
     Then Asset externalization response has the correct Loan ID, transferExternalId
-    When Admin sets the business date to "02 January 2026"
-    And Admin adds buy down fee with "AUTOPAY" payment type to the loan on "02 January 2026" with "20" EUR transaction amount
+    When Admin sets the business date to "20260102"
+    And Admin adds buy down fee with "AUTOPAY" payment type to the loan on "20260102" with "20" EUR transaction amount
     Then Loan status will be "ACTIVE"
     And Loan Transactions tab has the following data:
       | Transaction date | Transaction Type | Amount | Principal | Interest | Fees | Penalties | Loan Balance | Reverted |
-      | 01 January 2026  | Disbursement     | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
-      | 01 January 2026  | Buy Down Fee     | 50.0   | 0.0       | 50.0     | 0.0  | 0.0       | 0.0          | false    |
-      | 02 January 2026  | Buy Down Fee     | 20.0   | 0.0       | 20.0     | 0.0  | 0.0       | 0.0          | false    |
-    And Loan Transactions tab has a "BUY_DOWN_FEE" transaction with date "01 January 2026" which has the following Journal entries:
+      | 20260101  | Disbursement     | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
+      | 20260101  | Buy Down Fee     | 50.0   | 0.0       | 50.0     | 0.0  | 0.0       | 0.0          | false    |
+      | 20260102  | Buy Down Fee     | 20.0   | 0.0       | 20.0     | 0.0  | 0.0       | 0.0          | false    |
+    And Loan Transactions tab has a "BUY_DOWN_FEE" transaction with date "20260101" which has the following Journal entries:
       | Type      | Account code | Account name                | Debit | Credit |
       | EXPENSE   | 450280       | Buy Down Expense            | 50.0  |        |
       | LIABILITY | 145024       | Deferred Capitalized Income |       | 50.0   |
-    And Loan Transactions tab has a "BUY_DOWN_FEE" transaction with date "02 January 2026" which has the following Journal entries:
+    And Loan Transactions tab has a "BUY_DOWN_FEE" transaction with date "20260102" which has the following Journal entries:
       | Type      | Account code | Account name                | Debit | Credit |
       | EXPENSE   | 450280       | Buy Down Expense            | 20.0  |        |
       | LIABILITY | 145024       | Deferred Capitalized Income |       | 20.0   |
     And Buy down fee contains the following data:
       | Date            | Fee Amount | Amortized Amount | Not Yet Amortized Amount | Adjusted Amount | Charged Off Amount |
-      | 01 January 2026 | 50.0       | 0.0              | 50.0                     | 0.0             | 0.0                |
-      | 02 January 2026 | 20.0       | 0.0              | 20.0                     | 0.0             | 0.0                |
-    When Admin sets the business date to "03 January 2026"
+      | 20260101 | 50.0       | 0.0              | 50.0                     | 0.0             | 0.0                |
+      | 20260102 | 20.0       | 0.0              | 20.0                     | 0.0             | 0.0                |
+    When Admin sets the business date to "20260103"
     And Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 2 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
@@ -1918,12 +1918,12 @@ Feature: Asset Externalization - Part1
       | 2026-01-02     | 1                  | ACTIVE  | 2026-01-03    | 9999-12-31  | SALE             |
     And Loan Transactions tab has the following data without accruals:
       | Transaction date | Transaction Type          | Amount | Principal | Interest | Fees | Penalties | Loan Balance | Reverted |
-      | 01 January 2026  | Disbursement              | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
-      | 01 January 2026  | Buy Down Fee              | 50.0   | 0.0       | 50.0     | 0.0  | 0.0       | 0.0          | false    |
-      | 02 January 2026  | Buy Down Fee              | 20.0   | 0.0       | 20.0     | 0.0  | 0.0       | 0.0          | false    |
-      | 02 January 2026  | Buy Down Fee Amortization | 1.33   | 0.0       | 1.33     | 0.0  | 0.0       | 0.0          | false    |
-      | 02 January 2026  | Buy Down Fee Amortization | 68.67  | 0.0       | 68.67    | 0.0  | 0.0       | 0.0          | false    |
-    And Loan Transactions tab has 2 a "BUY_DOWN_FEE_AMORTIZATION" transactions with date "02 January 2026" which has the following Journal entries:
+      | 20260101  | Disbursement              | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
+      | 20260101  | Buy Down Fee              | 50.0   | 0.0       | 50.0     | 0.0  | 0.0       | 0.0          | false    |
+      | 20260102  | Buy Down Fee              | 20.0   | 0.0       | 20.0     | 0.0  | 0.0       | 0.0          | false    |
+      | 20260102  | Buy Down Fee Amortization | 1.33   | 0.0       | 1.33     | 0.0  | 0.0       | 0.0          | false    |
+      | 20260102  | Buy Down Fee Amortization | 68.67  | 0.0       | 68.67    | 0.0  | 0.0       | 0.0          | false    |
+    And Loan Transactions tab has 2 a "BUY_DOWN_FEE_AMORTIZATION" transactions with date "20260102" which has the following Journal entries:
       | Type      | Account code | Account name                | Debit | Credit |
       | INCOME    | 450281       | Income From Buy Down        |       | 1.33   |
       | LIABILITY | 145024       | Deferred Capitalized Income | 1.33  |        |
@@ -1931,69 +1931,69 @@ Feature: Asset Externalization - Part1
       | LIABILITY | 145024       | Deferred Capitalized Income | 68.67 |        |
     And Buy down fee contains the following data:
       | Date            | Fee Amount | Amortized Amount | Not Yet Amortized Amount | Adjusted Amount | Charged Off Amount |
-      | 01 January 2026 | 50.0       | 50.0             | 0.0                      | 0.0             | 0.0                |
-      | 02 January 2026 | 20.0       | 20.0             | 0.0                      | 0.0             | 0.0                |
-    When Loan Pay-off is made on "03 January 2026" with transfer external owner
+      | 20260101 | 50.0       | 50.0             | 0.0                      | 0.0             | 0.0                |
+      | 20260102 | 20.0       | 20.0             | 0.0                      | 0.0             | 0.0                |
+    When Loan Pay-off is made on "20260103" with transfer external owner
     Then Loan's all installments have obligations met
 
   @TestRailId:C85343
   Scenario: Verify daily COB after loan sale does not create capitalized income amortization adjustment when deferred income is fully recognized
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a fully customized loan with the following data:
       | LoanProduct                                                                      | submitted on date | with Principal | ANNUAL interest rate % | interest type     | interest calculation period | amortization type  | loanTermFrequency | loanTermFrequencyType | repaymentEvery | repaymentFrequencyType | numberOfRepayments | graceOnPrincipalPayment | graceOnInterestPayment | interest free period | Payment strategy            |
-      | LP2_ADV_PYMNT_INTEREST_DAILY_EMI_360_30_INTEREST_RECALC_DAILY_CAPITALIZED_INCOME | 01 January 2026   | 200            | 0                      | DECLINING_BALANCE | DAILY                       | EQUAL_INSTALLMENTS | 3                 | MONTHS                | 1              | MONTHS                 | 3                  | 0                       | 0                      | 0                    | ADVANCED_PAYMENT_ALLOCATION |
-    And Admin successfully approves the loan on "01 January 2026" with "200" amount and expected disbursement date on "01 January 2026"
-    And Admin successfully disburse the loan on "01 January 2026" with "100" EUR transaction amount
-    And Admin adds capitalized income with "AUTOPAY" payment type to the loan on "01 January 2026" with "50" EUR transaction amount
+      | LP2_ADV_PYMNT_INTEREST_DAILY_EMI_360_30_INTEREST_RECALC_DAILY_CAPITALIZED_INCOME | 20260101   | 200            | 0                      | DECLINING_BALANCE | DAILY                       | EQUAL_INSTALLMENTS | 3                 | MONTHS                | 1              | MONTHS                 | 3                  | 0                       | 0                      | 0                    | ADVANCED_PAYMENT_ALLOCATION |
+    And Admin successfully approves the loan on "20260101" with "200" amount and expected disbursement date on "20260101"
+    And Admin successfully disburse the loan on "20260101" with "100" EUR transaction amount
+    And Admin adds capitalized income with "AUTOPAY" payment type to the loan on "20260101" with "50" EUR transaction amount
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | sale             | 2026-01-02     | 1                  |
-    When Admin sets the business date to "03 January 2026"
+    When Admin sets the business date to "20260103"
     And Admin runs inline COB job for Loan
     And Deferred Capitalized Income contains the following data:
       | Amount | Amortized Amount | Unrecognized Amount | Adjusted Amount | Charged Off Amount |
       | 50.0   | 50.0             | 0.0                 | 0.0             | 0.0                |
     And Loan Transactions tab has the following data:
       | Transaction date | Transaction Type                | Amount | Principal | Interest | Fees | Penalties | Loan Balance | Reverted |
-      | 01 January 2026  | Disbursement                    | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
-      | 01 January 2026  | Capitalized Income              | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | false    |
-      | 02 January 2026  | Capitalized Income Amortization | 1.11   | 0.0       | 1.11     | 0.0  | 0.0       | 0.0          | false    |
-      | 02 January 2026  | Capitalized Income Amortization | 48.89  | 0.0       | 48.89    | 0.0  | 0.0       | 0.0          | false    |
-    When Admin sets the business date to "04 January 2026"
+      | 20260101  | Disbursement                    | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
+      | 20260101  | Capitalized Income              | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | false    |
+      | 20260102  | Capitalized Income Amortization | 1.11   | 0.0       | 1.11     | 0.0  | 0.0       | 0.0          | false    |
+      | 20260102  | Capitalized Income Amortization | 48.89  | 0.0       | 48.89    | 0.0  | 0.0       | 0.0          | false    |
+    When Admin sets the business date to "20260104"
     And Admin runs inline COB job for Loan
     Then Deferred Capitalized Income contains the following data:
       | Amount | Amortized Amount | Unrecognized Amount | Adjusted Amount | Charged Off Amount |
       | 50.0   | 50.0             | 0.0                 | 0.0             | 0.0                |
     And Loan Transactions tab has the following data:
       | Transaction date | Transaction Type                | Amount | Principal | Interest | Fees | Penalties | Loan Balance | Reverted |
-      | 01 January 2026  | Disbursement                    | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
-      | 01 January 2026  | Capitalized Income              | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | false    |
-      | 02 January 2026  | Capitalized Income Amortization | 1.11   | 0.0       | 1.11     | 0.0  | 0.0       | 0.0          | false    |
-      | 02 January 2026  | Capitalized Income Amortization | 48.89  | 0.0       | 48.89    | 0.0  | 0.0       | 0.0          | false    |
-    When Loan Pay-off is made on "04 January 2026" with transfer external owner
+      | 20260101  | Disbursement                    | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
+      | 20260101  | Capitalized Income              | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | false    |
+      | 20260102  | Capitalized Income Amortization | 1.11   | 0.0       | 1.11     | 0.0  | 0.0       | 0.0          | false    |
+      | 20260102  | Capitalized Income Amortization | 48.89  | 0.0       | 48.89    | 0.0  | 0.0       | 0.0          | false    |
+    When Loan Pay-off is made on "20260104" with transfer external owner
     Then Loan's all installments have obligations met
 
   @TestRailId:C85344
   Scenario: Verify daily COB continues amortizing second capitalized income after first is fully recognized on loan sale
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a fully customized loan with the following data:
       | LoanProduct                                                                      | submitted on date | with Principal | ANNUAL interest rate % | interest type     | interest calculation period | amortization type  | loanTermFrequency | loanTermFrequencyType | repaymentEvery | repaymentFrequencyType | numberOfRepayments | graceOnPrincipalPayment | graceOnInterestPayment | interest free period | Payment strategy            |
-      | LP2_ADV_PYMNT_INTEREST_DAILY_EMI_360_30_INTEREST_RECALC_DAILY_CAPITALIZED_INCOME | 01 January 2026   | 200            | 0                      | DECLINING_BALANCE | DAILY                       | EQUAL_INSTALLMENTS | 3                 | MONTHS                | 1              | MONTHS                 | 3                  | 0                       | 0                      | 0                    | ADVANCED_PAYMENT_ALLOCATION |
-    And Admin successfully approves the loan on "01 January 2026" with "200" amount and expected disbursement date on "01 January 2026"
-    And Admin successfully disburse the loan on "01 January 2026" with "100" EUR transaction amount
-    And Admin adds capitalized income with "AUTOPAY" payment type to the loan on "01 January 2026" with "50" EUR transaction amount
+      | LP2_ADV_PYMNT_INTEREST_DAILY_EMI_360_30_INTEREST_RECALC_DAILY_CAPITALIZED_INCOME | 20260101   | 200            | 0                      | DECLINING_BALANCE | DAILY                       | EQUAL_INSTALLMENTS | 3                 | MONTHS                | 1              | MONTHS                 | 3                  | 0                       | 0                      | 0                    | ADVANCED_PAYMENT_ALLOCATION |
+    And Admin successfully approves the loan on "20260101" with "200" amount and expected disbursement date on "20260101"
+    And Admin successfully disburse the loan on "20260101" with "100" EUR transaction amount
+    And Admin adds capitalized income with "AUTOPAY" payment type to the loan on "20260101" with "50" EUR transaction amount
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | sale             | 2026-01-02     | 1                  |
-    When Admin sets the business date to "03 January 2026"
+    When Admin sets the business date to "20260103"
     And Admin runs inline COB job for Loan
     And Deferred Capitalized Income contains the following data:
       | Amount | Amortized Amount | Unrecognized Amount | Adjusted Amount | Charged Off Amount |
       | 50.0   | 50.0             | 0.0                 | 0.0             | 0.0                |
-    And Admin adds capitalized income with "AUTOPAY" payment type to the loan on "03 January 2026" with "30" EUR transaction amount
-    When Admin sets the business date to "04 January 2026"
+    And Admin adds capitalized income with "AUTOPAY" payment type to the loan on "20260103" with "30" EUR transaction amount
+    When Admin sets the business date to "20260104"
     And Admin runs inline COB job for Loan
     Then Deferred Capitalized Income contains the following data:
       | Amount | Amortized Amount | Unrecognized Amount | Adjusted Amount | Charged Off Amount |
@@ -2001,41 +2001,41 @@ Feature: Asset Externalization - Part1
       | 30.0   | 0.33             | 29.67               | 0.0             | 0.0                |
     And Loan Transactions tab has the following data:
       | Transaction date | Transaction Type                | Amount | Principal | Interest | Fees | Penalties | Loan Balance | Reverted |
-      | 01 January 2026  | Disbursement                    | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
-      | 01 January 2026  | Capitalized Income              | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | false    |
-      | 02 January 2026  | Capitalized Income Amortization | 1.11   | 0.0       | 1.11     | 0.0  | 0.0       | 0.0          | false    |
-      | 02 January 2026  | Capitalized Income Amortization | 48.89  | 0.0       | 48.89    | 0.0  | 0.0       | 0.0          | false    |
-      | 03 January 2026  | Capitalized Income              | 30.0   | 30.0      | 0.0      | 0.0  | 0.0       | 180.0        | false    |
-      | 03 January 2026  | Capitalized Income Amortization | 0.34   | 0.0       | 0.34     | 0.0  | 0.0       | 0.0          | false    |
-    When Loan Pay-off is made on "04 January 2026" with transfer external owner
+      | 20260101  | Disbursement                    | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
+      | 20260101  | Capitalized Income              | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | false    |
+      | 20260102  | Capitalized Income Amortization | 1.11   | 0.0       | 1.11     | 0.0  | 0.0       | 0.0          | false    |
+      | 20260102  | Capitalized Income Amortization | 48.89  | 0.0       | 48.89    | 0.0  | 0.0       | 0.0          | false    |
+      | 20260103  | Capitalized Income              | 30.0   | 30.0      | 0.0      | 0.0  | 0.0       | 180.0        | false    |
+      | 20260103  | Capitalized Income Amortization | 0.34   | 0.0       | 0.34     | 0.0  | 0.0       | 0.0          | false    |
+    When Loan Pay-off is made on "20260104" with transfer external owner
     Then Loan's all installments have obligations met
 
   @TestRailId:C85345
   Scenario: Verify loan sale with reversed capitalized income and active second entry fully recognizes remaining deferred income without erroneous amortization adjustment
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a fully customized loan with the following data:
       | LoanProduct                                                                      | submitted on date | with Principal | ANNUAL interest rate % | interest type     | interest calculation period | amortization type  | loanTermFrequency | loanTermFrequencyType | repaymentEvery | repaymentFrequencyType | numberOfRepayments | graceOnPrincipalPayment | graceOnInterestPayment | interest free period | Payment strategy            |
-      | LP2_ADV_PYMNT_INTEREST_DAILY_EMI_360_30_INTEREST_RECALC_DAILY_CAPITALIZED_INCOME | 01 January 2026   | 200            | 0                      | DECLINING_BALANCE | DAILY                       | EQUAL_INSTALLMENTS | 3                 | MONTHS                | 1              | MONTHS                 | 3                  | 0                       | 0                      | 0                    | ADVANCED_PAYMENT_ALLOCATION |
-    And Admin successfully approves the loan on "01 January 2026" with "200" amount and expected disbursement date on "01 January 2026"
-    And Admin successfully disburse the loan on "01 January 2026" with "100" EUR transaction amount
-    And Admin adds capitalized income with "AUTOPAY" payment type to the loan on "01 January 2026" with "50" EUR transaction amount
-    When Admin sets the business date to "02 January 2026"
-    And Admin adds capitalized income with "AUTOPAY" payment type to the loan on "02 January 2026" with "30" EUR transaction amount
-    When Admin sets the business date to "03 January 2026"
+      | LP2_ADV_PYMNT_INTEREST_DAILY_EMI_360_30_INTEREST_RECALC_DAILY_CAPITALIZED_INCOME | 20260101   | 200            | 0                      | DECLINING_BALANCE | DAILY                       | EQUAL_INSTALLMENTS | 3                 | MONTHS                | 1              | MONTHS                 | 3                  | 0                       | 0                      | 0                    | ADVANCED_PAYMENT_ALLOCATION |
+    And Admin successfully approves the loan on "20260101" with "200" amount and expected disbursement date on "20260101"
+    And Admin successfully disburse the loan on "20260101" with "100" EUR transaction amount
+    And Admin adds capitalized income with "AUTOPAY" payment type to the loan on "20260101" with "50" EUR transaction amount
+    When Admin sets the business date to "20260102"
+    And Admin adds capitalized income with "AUTOPAY" payment type to the loan on "20260102" with "30" EUR transaction amount
+    When Admin sets the business date to "20260103"
     And Admin runs inline COB job for Loan
     And Loan Transactions tab has the following data:
       | Transaction date | Transaction Type                | Amount | Principal | Interest | Fees | Penalties | Loan Balance | Reverted |
-      | 01 January 2026  | Disbursement                    | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
-      | 01 January 2026  | Capitalized Income              | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | false    |
-      | 02 January 2026  | Capitalized Income              | 30.0   | 30.0      | 0.0      | 0.0  | 0.0       | 180.0        | false    |
-      | 02 January 2026  | Capitalized Income Amortization | 1.45   | 0.0       | 1.45     | 0.0  | 0.0       | 0.0          | false    |
+      | 20260101  | Disbursement                    | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
+      | 20260101  | Capitalized Income              | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | false    |
+      | 20260102  | Capitalized Income              | 30.0   | 30.0      | 0.0      | 0.0  | 0.0       | 180.0        | false    |
+      | 20260102  | Capitalized Income Amortization | 1.45   | 0.0       | 1.45     | 0.0  | 0.0       | 0.0          | false    |
     When Admin makes asset externalization request by Loan ID with unique ownerExternalId, system-generated transferExternalId and the following data:
       | Transaction type | settlementDate | purchasePriceRatio |
       | sale             | 2026-01-03     | 1                  |
     Then Asset externalization response has the correct Loan ID, transferExternalId
-    And Customer undo "1"th "Capitalized Income" transaction made on "01 January 2026"
-    When Admin sets the business date to "04 January 2026"
+    And Customer undo "1"th "Capitalized Income" transaction made on "20260101"
+    When Admin sets the business date to "20260104"
     And Admin runs inline COB job for Loan
     Then Fetching Asset externalization details by loan id gives numberOfElements: 2 with correct ownerExternalId and the following data:
       | settlementDate | purchasePriceRatio | status  | effectiveFrom | effectiveTo | Transaction type |
@@ -2046,15 +2046,15 @@ Feature: Asset Externalization - Part1
       | 30.0   | 30.0             | 0.0                 | 0.0             | 0.0                |
     And Loan Transactions tab has the following data:
       | Transaction date | Transaction Type                           | Amount | Principal | Interest | Fees | Penalties | Loan Balance | Reverted |
-      | 01 January 2026  | Disbursement                               | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
-      | 01 January 2026  | Capitalized Income                         | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | true     |
-      | 02 January 2026  | Capitalized Income                         | 30.0   | 30.0      | 0.0      | 0.0  | 0.0       | 130.0        | false    |
-      | 02 January 2026  | Capitalized Income Amortization            | 1.45   | 0.0       | 1.45     | 0.0  | 0.0       | 0.0          | false    |
-      | 03 January 2026  | Capitalized Income Amortization Adjustment | 0.78   | 0.0       | 0.78     | 0.0  | 0.0       | 0.0          | false    |
-      | 03 January 2026  | Capitalized Income Amortization            | 29.33  | 0.0       | 29.33    | 0.0  | 0.0       | 0.0          | false    |
-    And Loan Transactions tab has 1 a "CAPITALIZED_INCOME_AMORTIZATION" transactions with date "03 January 2026" which has the following Journal entries:
+      | 20260101  | Disbursement                               | 100.0  | 0.0       | 0.0      | 0.0  | 0.0       | 100.0        | false    |
+      | 20260101  | Capitalized Income                         | 50.0   | 50.0      | 0.0      | 0.0  | 0.0       | 150.0        | true     |
+      | 20260102  | Capitalized Income                         | 30.0   | 30.0      | 0.0      | 0.0  | 0.0       | 130.0        | false    |
+      | 20260102  | Capitalized Income Amortization            | 1.45   | 0.0       | 1.45     | 0.0  | 0.0       | 0.0          | false    |
+      | 20260103  | Capitalized Income Amortization Adjustment | 0.78   | 0.0       | 0.78     | 0.0  | 0.0       | 0.0          | false    |
+      | 20260103  | Capitalized Income Amortization            | 29.33  | 0.0       | 29.33    | 0.0  | 0.0       | 0.0          | false    |
+    And Loan Transactions tab has 1 a "CAPITALIZED_INCOME_AMORTIZATION" transactions with date "20260103" which has the following Journal entries:
       | Type      | Account code | Account name                | Debit | Credit |
       | INCOME    | 404000       | Interest Income             |       | 29.33  |
       | LIABILITY | 145024       | Deferred Capitalized Income | 29.33 |        |
-    When Loan Pay-off is made on "04 January 2026" with transfer external owner
+    When Loan Pay-off is made on "20260104" with transfer external owner
     Then Loan's all installments have obligations met

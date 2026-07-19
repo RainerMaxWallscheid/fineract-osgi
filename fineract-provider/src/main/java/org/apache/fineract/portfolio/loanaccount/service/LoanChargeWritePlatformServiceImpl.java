@@ -1017,7 +1017,7 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
         if (this.fromApiJsonHelper.parameterExists("dateFormat", jsonObject)) {
             dateFormat = this.fromApiJsonHelper.extractStringNamed("dateFormat", jsonObject);
         } else {
-            dateFormat = "dd MMMM yyyy";
+            dateFormat = "yyyyMMdd";
             jsonObject.addProperty("dateFormat", dateFormat);
         }
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat);

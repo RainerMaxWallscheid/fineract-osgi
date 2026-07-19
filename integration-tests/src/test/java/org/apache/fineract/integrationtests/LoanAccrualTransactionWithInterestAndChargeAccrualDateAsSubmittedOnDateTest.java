@@ -38,7 +38,7 @@ public class LoanAccrualTransactionWithInterestAndChargeAccrualDateAsSubmittedOn
 
     @Test
     public void accrualTransactionForInterestBearingLoan_WithoutCharges_SubmittedOnDateAsChargeAccrualDateWorksTest() {
-        runAt("15 April 2024", () -> {
+        runAt("20240415", () -> {
 
             try {
                 // Configure Charge accrual date as submitted on date
@@ -53,55 +53,55 @@ public class LoanAccrualTransactionWithInterestAndChargeAccrualDateAsSubmittedOn
                 PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProductsRequest);
 
                 // Apply and Approve Loan
-                Long loanId = applyAndApproveLoanApplication(clientId, loanProductResponse.getResourceId(), "15 April 2024", 1000.0, 4);
+                Long loanId = applyAndApproveLoanApplication(clientId, loanProductResponse.getResourceId(), "20240415", 1000.0, 4);
 
                 // Disburse Loan
-                disburseLoan(loanId, BigDecimal.valueOf(500), "15 April 2024");
+                disburseLoan(loanId, BigDecimal.valueOf(500), "20240415");
 
                 // Verify Repayment Schedule and Due Dates
                 verifyRepaymentSchedule(loanId, //
-                        installment(500.0, null, "15 April 2024"), //
-                        installment(114.41, 29.59, 0.0, 0.0, 144.0, false, "30 April 2024"), //
-                        installment(121.18, 22.82, 0.0, 0.0, 144.0, false, "15 May 2024"), //
-                        installment(128.35, 15.65, 0.0, 0.0, 144.0, false, "30 May 2024"), //
-                        installment(136.06, 8.05, 0.0, 0.0, 144.11, false, "14 June 2024") //
+                        installment(500.0, null, "20240415"), //
+                        installment(114.41, 29.59, 0.0, 0.0, 144.0, false, "20240430"), //
+                        installment(121.18, 22.82, 0.0, 0.0, 144.0, false, "20240515"), //
+                        installment(128.35, 15.65, 0.0, 0.0, 144.0, false, "20240530"), //
+                        installment(136.06, 8.05, 0.0, 0.0, 144.11, false, "20240614") //
                 );
 
                 verifyTransactions(loanId, //
-                        transaction(500.0, "Disbursement", "15 April 2024", 500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
+                        transaction(500.0, "Disbursement", "20240415", 500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
                 );
 
                 // update business date
-                updateBusinessDate("25 April 2024");
+                updateBusinessDate("20240425");
 
                 // run cob
                 schedulerJobHelper.executeAndAwaitJob("Loan COB");
 
                 verifyTransactions(loanId, //
-                        transaction(500.0, "Disbursement", "15 April 2024", 500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                        transaction(17.75, "Accrual", "24 April 2024", 0.0, 0.0, 17.75, 0.0, 0.0, 0.0, 0.0) //
+                        transaction(500.0, "Disbursement", "20240415", 500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                        transaction(17.75, "Accrual", "20240424", 0.0, 0.0, 17.75, 0.0, 0.0, 0.0, 0.0) //
                 );
 
                 // update business date
-                updateBusinessDate("26 April 2024");
+                updateBusinessDate("20240426");
 
                 // disburse amount
-                disburseLoan(loanId, BigDecimal.valueOf(500), "26 April 2024");
+                disburseLoan(loanId, BigDecimal.valueOf(500), "20240426");
 
                 // Verify Repayment Schedule and Due Dates
                 verifyRepaymentSchedule(loanId, //
-                        installment(500.0, null, "15 April 2024"), //
-                        installment(500.0, null, "26 April 2024"), //
-                        installment(250.52, 37.48, 0.0, 0.0, 288.0, false, "30 April 2024"), //
-                        installment(243.65, 44.35, 0.0, 0.0, 288.0, false, "15 May 2024"), //
-                        installment(258.07, 29.93, 0.0, 0.0, 288.0, false, "30 May 2024"), //
-                        installment(247.76, 14.66, 0.0, 0.0, 262.42, false, "14 June 2024") //
+                        installment(500.0, null, "20240415"), //
+                        installment(500.0, null, "20240426"), //
+                        installment(250.52, 37.48, 0.0, 0.0, 288.0, false, "20240430"), //
+                        installment(243.65, 44.35, 0.0, 0.0, 288.0, false, "20240515"), //
+                        installment(258.07, 29.93, 0.0, 0.0, 288.0, false, "20240530"), //
+                        installment(247.76, 14.66, 0.0, 0.0, 262.42, false, "20240614") //
                 );
 
                 verifyTransactions(loanId, //
-                        transaction(500.0, "Disbursement", "15 April 2024", 500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                        transaction(22.49, "Accrual", "24 April 2024", 0.0, 0.0, 22.49, 0.0, 0.0, 0.0, 0.0), //
-                        transaction(500.0, "Disbursement", "26 April 2024", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+                        transaction(500.0, "Disbursement", "20240415", 500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                        transaction(22.49, "Accrual", "20240424", 0.0, 0.0, 22.49, 0.0, 0.0, 0.0, 0.0), //
+                        transaction(500.0, "Disbursement", "20240426", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 
             } finally {
                 globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.CHARGE_ACCRUAL_DATE,
@@ -114,7 +114,7 @@ public class LoanAccrualTransactionWithInterestAndChargeAccrualDateAsSubmittedOn
 
     @Test
     public void accrualTransactionForInterestBearingLoan_WithCharges_SubmittedOnDateAsChargeAccrualDateWorksTest() {
-        runAt("15 April 2024", () -> {
+        runAt("20240415", () -> {
 
             try {
                 // Configure Charge accrual date as submitted on date
@@ -129,79 +129,79 @@ public class LoanAccrualTransactionWithInterestAndChargeAccrualDateAsSubmittedOn
                 PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProductsRequest);
 
                 // Apply and Approve Loan
-                Long loanId = applyAndApproveLoanApplication(clientId, loanProductResponse.getResourceId(), "15 April 2024", 1000.0, 4);
+                Long loanId = applyAndApproveLoanApplication(clientId, loanProductResponse.getResourceId(), "20240415", 1000.0, 4);
 
                 // Disburse Loan
-                disburseLoan(loanId, BigDecimal.valueOf(500), "15 April 2024");
+                disburseLoan(loanId, BigDecimal.valueOf(500), "20240415");
 
                 // Verify Repayment Schedule and Due Dates
                 verifyRepaymentSchedule(loanId, //
-                        installment(500.0, null, "15 April 2024"), //
-                        installment(114.41, 29.59, 0.0, 0.0, 144.0, false, "30 April 2024"), //
-                        installment(121.18, 22.82, 0.0, 0.0, 144.0, false, "15 May 2024"), //
-                        installment(128.35, 15.65, 0.0, 0.0, 144.0, false, "30 May 2024"), //
-                        installment(136.06, 8.05, 0.0, 0.0, 144.11, false, "14 June 2024") //
+                        installment(500.0, null, "20240415"), //
+                        installment(114.41, 29.59, 0.0, 0.0, 144.0, false, "20240430"), //
+                        installment(121.18, 22.82, 0.0, 0.0, 144.0, false, "20240515"), //
+                        installment(128.35, 15.65, 0.0, 0.0, 144.0, false, "20240530"), //
+                        installment(136.06, 8.05, 0.0, 0.0, 144.11, false, "20240614") //
                 );
 
                 verifyTransactions(loanId, //
-                        transaction(500.0, "Disbursement", "15 April 2024", 500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
+                        transaction(500.0, "Disbursement", "20240415", 500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0) //
                 );
 
                 // update business date
-                updateBusinessDate("24 April 2024");
+                updateBusinessDate("20240424");
 
                 // add charge
-                addCharge(loanId, false, 10.0, "29 April 2024");
+                addCharge(loanId, false, 10.0, "20240429");
 
                 // Verify Repayment Schedule and Due Dates
                 verifyRepaymentSchedule(loanId, //
-                        installment(500.0, null, "15 April 2024"), //
-                        installment(114.41, 29.59, 10.0, 0.0, 154.0, false, "30 April 2024"), //
-                        installment(121.18, 22.82, 0.0, 0.0, 144.0, false, "15 May 2024"), //
-                        installment(128.35, 15.65, 0.0, 0.0, 144.0, false, "30 May 2024"), //
-                        installment(136.06, 8.05, 0.0, 0.0, 144.11, false, "14 June 2024") //
+                        installment(500.0, null, "20240415"), //
+                        installment(114.41, 29.59, 10.0, 0.0, 154.0, false, "20240430"), //
+                        installment(121.18, 22.82, 0.0, 0.0, 144.0, false, "20240515"), //
+                        installment(128.35, 15.65, 0.0, 0.0, 144.0, false, "20240530"), //
+                        installment(136.06, 8.05, 0.0, 0.0, 144.11, false, "20240614") //
                 );
 
                 // update business date
-                updateBusinessDate("25 April 2024");
+                updateBusinessDate("20240425");
 
                 // run cob
                 schedulerJobHelper.executeAndAwaitJob("Loan COB");
 
                 verifyTransactions(loanId, //
-                        transaction(500.0, "Disbursement", "15 April 2024", 500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                        transaction(27.75, "Accrual", "24 April 2024", 0.0, 0.0, 17.75, 10.0, 0.0, 0.0, 0.0) //
+                        transaction(500.0, "Disbursement", "20240415", 500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                        transaction(27.75, "Accrual", "20240424", 0.0, 0.0, 17.75, 10.0, 0.0, 0.0, 0.0) //
                 );
 
                 // update business date
-                updateBusinessDate("26 April 2024");
+                updateBusinessDate("20240426");
 
                 // disburse amount
-                disburseLoan(loanId, BigDecimal.valueOf(500), "26 April 2024");
+                disburseLoan(loanId, BigDecimal.valueOf(500), "20240426");
 
                 // Verify Repayment Schedule and Due Dates
                 verifyRepaymentSchedule(loanId, //
-                        installment(500.0, null, "15 April 2024"), //
-                        installment(500.0, null, "26 April 2024"), //
-                        installment(250.52, 37.48, 10.0, 0.0, 298.0, false, "30 April 2024"), //
-                        installment(243.65, 44.35, 0.0, 0.0, 288.0, false, "15 May 2024"), //
-                        installment(258.07, 29.93, 0.0, 0.0, 288.0, false, "30 May 2024"), //
-                        installment(247.76, 14.66, 0.0, 0.0, 262.42, false, "14 June 2024") //
+                        installment(500.0, null, "20240415"), //
+                        installment(500.0, null, "20240426"), //
+                        installment(250.52, 37.48, 10.0, 0.0, 298.0, false, "20240430"), //
+                        installment(243.65, 44.35, 0.0, 0.0, 288.0, false, "20240515"), //
+                        installment(258.07, 29.93, 0.0, 0.0, 288.0, false, "20240530"), //
+                        installment(247.76, 14.66, 0.0, 0.0, 262.42, false, "20240614") //
                 );
 
                 verifyTransactions(loanId, //
-                        transaction(500.0, "Disbursement", "15 April 2024", 500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                        transaction(32.49, "Accrual", "24 April 2024", 0.0, 0.0, 22.49, 10.0, 0.0, 0.0, 0.0), //
-                        transaction(500.0, "Disbursement", "26 April 2024", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+                        transaction(500.0, "Disbursement", "20240415", 500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                        transaction(32.49, "Accrual", "20240424", 0.0, 0.0, 22.49, 10.0, 0.0, 0.0, 0.0), //
+                        transaction(500.0, "Disbursement", "20240426", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 
                 // run cob
                 schedulerJobHelper.executeAndAwaitJob("Loan COB");
 
                 verifyTransactions(loanId, //
-                        transaction(500.0, "Disbursement", "15 April 2024", 500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                        transaction(32.49, "Accrual", "24 April 2024", 0.0, 0.0, 22.49, 10.0, 0.0, 0.0, 0.0), //
-                        transaction(2.50, "Accrual", "25 April 2024", 0.0, 0.0, 2.50, 0.0, 0.0, 0.0, 0.0), //
-                        transaction(500.0, "Disbursement", "26 April 2024", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+                        transaction(500.0, "Disbursement", "20240415", 500.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                        transaction(32.49, "Accrual", "20240424", 0.0, 0.0, 22.49, 10.0, 0.0, 0.0, 0.0), //
+                        transaction(2.50, "Accrual", "20240425", 0.0, 0.0, 2.50, 0.0, 0.0, 0.0, 0.0), //
+                        transaction(500.0, "Disbursement", "20240426", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 
             } finally {
                 globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.CHARGE_ACCRUAL_DATE,

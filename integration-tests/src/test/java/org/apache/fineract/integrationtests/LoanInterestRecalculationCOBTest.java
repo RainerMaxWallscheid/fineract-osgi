@@ -89,45 +89,45 @@ public class LoanInterestRecalculationCOBTest extends BaseLoanIntegrationTest {
     @Test
     public void testInterestRecalculationInCaseOfTinyAmountOfRepaymentsEveryRepaymentPeriodForProgressiveLoanSameAsRepaymentPeriod() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2023", () -> {
+        runAt("20230101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct( //
             create4IProgressive().recalculationRestFrequencyType(RecalculationRestFrequencyType.SAME_AS_REPAYMENT_PERIOD) //
             );//
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2023", 10000.0, 86.42, 6, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20230101", 10000.0, 86.42, 6, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(8000), "1 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(8000), "20230101");
         });
-        runAt("1 February 2023", () -> {
+        runAt("20230201", () -> {
             Long loanId = loanIdRef.get();
-            loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "1 February 2023", 0.01);
+            loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20230201", 0.01);
         });
-        runAt("1 March 2023", () -> {
+        runAt("20230301", () -> {
             Long loanId = loanIdRef.get();
-            loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "1 March 2023", 0.01);
+            loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20230301", 0.01);
         });
-        runAt("1 April 2023", () -> {
+        runAt("20230401", () -> {
             Long loanId = loanIdRef.get();
-            loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "1 April 2023", 0.01);
+            loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20230401", 0.01);
         });
-        runAt("1 May 2023", () -> {
+        runAt("20230501", () -> {
             Long loanId = loanIdRef.get();
-            loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "1 May 2023", 0.01);
+            loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20230501", 0.01);
         });
-        runAt("1 June 2023", () -> {
+        runAt("20230601", () -> {
             Long loanId = loanIdRef.get();
-            loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "1 June 2023", 0.01);
+            loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20230601", 0.01);
         });
-        runAt("17 June 2023", () -> {
+        runAt("20230617", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             verifyRepaymentSchedule(loanId,  //
-            installment(8000.0, null, "01 January 2023"),  //
-            installment(1112.7, 576.13, 1688.78, false, "01 February 2023"),  //
-            installment(1112.7, 576.13, 1688.83, false, "01 March 2023"),  //
-            installment(1112.7, 576.13, 1688.83, false, "01 April 2023"),  //
-            installment(1112.7, 576.13, 1688.83, false, "01 May 2023"),  //
-            installment(1112.7, 576.13, 1688.83, false, "01 June 2023"),  //
-            installment(2436.5, 389.15, 2825.65, false, "01 July 2023") //
+            installment(8000.0, null, "20230101"),  //
+            installment(1112.7, 576.13, 1688.78, false, "20230201"),  //
+            installment(1112.7, 576.13, 1688.83, false, "20230301"),  //
+            installment(1112.7, 576.13, 1688.83, false, "20230401"),  //
+            installment(1112.7, 576.13, 1688.83, false, "20230501"),  //
+            installment(1112.7, 576.13, 1688.83, false, "20230601"),  //
+            installment(2436.5, 389.15, 2825.65, false, "20230701") //
             );
         });
     }
@@ -135,50 +135,50 @@ public class LoanInterestRecalculationCOBTest extends BaseLoanIntegrationTest {
     @Test
     public void verifyLoanInstallmentRecalculatedIfThereIsOverdueInstallmentOn4IProgressiveLoanCOBStepDaily() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2023", () -> {
+        runAt("20230101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().recalculationRestFrequencyType(RecalculationRestFrequencyType.DAILY) //
             );
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2023", 8000.0, 10.0, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20230101", 8000.0, 10.0, 4, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(8000), "1 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(8000), "20230101");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.63, 0.0, 0.0, 50.21);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2024.97, 0.0, 0.0, 16.87);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.63, 0.0, 0.0, 50.21);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2024.97, 0.0, 0.0, 16.87);
         });
-        runAt("1 February 2023", () -> {
+        runAt("20230201", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.63, 0.0, 0.0, 50.21);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2024.97, 0.0, 0.0, 16.87);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.63, 0.0, 0.0, 50.21);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2024.97, 0.0, 0.0, 16.87);
         });
-        runAt("2 February 2023", () -> {
+        runAt("20230202", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.05, 0.0, 0.0, 50.79);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2025.55, 0.0, 0.0, 16.88);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.05, 0.0, 0.0, 50.79);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2025.55, 0.0, 0.0, 16.88);
         });
-        runAt("1 March 2023", () -> {
+        runAt("20230301", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.09, 0.0, 0.0, 33.75);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2041.57, 0.0, 0.0, 17.01);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.09, 0.0, 0.0, 33.75);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2041.57, 0.0, 0.0, 17.01);
         });
-        payoffOnDateAndVerifyStatus("1 March 2023", loanIdRef.get());
+        payoffOnDateAndVerifyStatus("20230301", loanIdRef.get());
     }
 
     private void payoffOnDateAndVerifyStatus(final String date, final Long loanId) {
@@ -204,334 +204,334 @@ public class LoanInterestRecalculationCOBTest extends BaseLoanIntegrationTest {
     @Test
     public void verifyLoanInstallmentRecalculatedIfThereIsOverdueInstallmentOn4IProgressiveLoanCOBStepLatePayPayOnDuePayLatePayOnDateDaily() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2023", () -> {
+        runAt("20230101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().recalculationRestFrequencyType(RecalculationRestFrequencyType.DAILY) //
             );
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2023", 8000.0, 10.0, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20230101", 8000.0, 10.0, 4, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(8000), "1 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(8000), "20230101");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.63, 0.0, 0.0, 50.21);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2024.97, 0.0, 0.0, 16.87);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.63, 0.0, 0.0, 50.21);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2024.97, 0.0, 0.0, 16.87);
         });
-        runAt("20 February 2023", () -> {
+        runAt("20230220", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1980.46, 0.0, 0.0, 61.38);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.14, 0.0, 0.0, 33.7);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2036.23, 0.0, 0.0, 16.97);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1980.46, 0.0, 0.0, 61.38);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.14, 0.0, 0.0, 33.7);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2036.23, 0.0, 0.0, 16.97);
         });
-        runAt("1 March 2023", () -> {
+        runAt("20230301", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.09, 0.0, 0.0, 33.75);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2041.57, 0.0, 0.0, 17.01);
-            loanTransactionHelper.makeLoanRepayment("20 February 2023", 2041.84F, loanId.intValue());
-            loanTransactionHelper.makeLoanRepayment("01 March 2023", 2041.84F, loanId.intValue());
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.09, 0.0, 0.0, 33.75);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2041.57, 0.0, 0.0, 17.01);
+            loanTransactionHelper.makeLoanRepayment("20230220", 2041.84F, loanId.intValue());
+            loanTransactionHelper.makeLoanRepayment("20230301", 2041.84F, loanId.intValue());
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67, 2041.84);
-            validateFullyPaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1980.46, 0.0, 0.0, 61.38);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.14, 0.0, 0.0, 33.7);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2036.23, 0.0, 0.0, 16.97);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67, 2041.84);
+            validateFullyPaidRepaymentPeriod(loanDetails, 2, "20230301", 1980.46, 0.0, 0.0, 61.38);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.14, 0.0, 0.0, 33.7);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2036.23, 0.0, 0.0, 16.97);
         });
-        runAt("10 April 2023", () -> {
+        runAt("20230410", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67, 2041.84);
-            validateFullyPaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1980.46, 0.0, 0.0, 61.38);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.14, 0.0, 0.0, 33.7);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2036.23, 0.0, 0.0, 21.99);
-            loanTransactionHelper.makeLoanRepayment("10 April 2023", 2041.84F, loanId.intValue());
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67, 2041.84);
+            validateFullyPaidRepaymentPeriod(loanDetails, 2, "20230301", 1980.46, 0.0, 0.0, 61.38);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.14, 0.0, 0.0, 33.7);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2036.23, 0.0, 0.0, 21.99);
+            loanTransactionHelper.makeLoanRepayment("20230410", 2041.84F, loanId.intValue());
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67, 2041.84);
-            validateFullyPaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1980.46, 0.0, 0.0, 61.38);
-            validateFullyPaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.14, 0.0, 0.0, 33.7, 2041.84);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2036.23, 0.0, 0.0, 21.99);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67, 2041.84);
+            validateFullyPaidRepaymentPeriod(loanDetails, 2, "20230301", 1980.46, 0.0, 0.0, 61.38);
+            validateFullyPaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.14, 0.0, 0.0, 33.7, 2041.84);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2036.23, 0.0, 0.0, 21.99);
         });
-        payoffOnDateAndVerifyStatus("10 April 2023", loanIdRef.get());
+        payoffOnDateAndVerifyStatus("20230410", loanIdRef.get());
     }
 
     @Test
     public void verifyLoanInstallmentRecalculatedIfThereIsOverdueInstallmentOn4IProgressiveLoanCOBStepLatePartialRepaymentDailyInterestCalculation() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2023", () -> {
+        runAt("20230101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().recalculationRestFrequencyType(RecalculationRestFrequencyType.DAILY) //
             );
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2023", 8000.0, 10.0, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20230101", 8000.0, 10.0, 4, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(8000), "1 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(8000), "20230101");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.63, 0.0, 0.0, 50.21);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2024.97, 0.0, 0.0, 16.87);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.63, 0.0, 0.0, 50.21);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2024.97, 0.0, 0.0, 16.87);
         });
-        runAt("1 February 2023", () -> {
+        runAt("20230201", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
-            loanTransactionHelper.makeLoanRepayment("01 February 2023", 2041.84F, loanId.intValue());
+            loanTransactionHelper.makeLoanRepayment("20230201", 2041.84F, loanId.intValue());
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.63, 0.0, 0.0, 50.21);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2024.97, 0.0, 0.0, 16.87);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.63, 0.0, 0.0, 50.21);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2024.97, 0.0, 0.0, 16.87);
         });
-        runAt("10 March 2023", () -> {
+        runAt("20230310", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.63, 0.0, 0.0, 50.21);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2003.41, 0.0, 0.0, 38.43);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2029.79, 0.0, 0.0, 16.91);
-            loanTransactionHelper.makeLoanRepayment("10 March 2023", 500.0F, loanId.intValue());
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.63, 0.0, 0.0, 50.21);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2003.41, 0.0, 0.0, 38.43);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2029.79, 0.0, 0.0, 16.91);
+            loanTransactionHelper.makeLoanRepayment("20230310", 500.0F, loanId.intValue());
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
             validateRepaymentPeriod(loanDetails, 2, LocalDate.of(2023, 3, 1), 1991.63, 500.0, 1491.63, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 50.21, 0, 50.21, 0, 500.0);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2003.41, 0.0, 0.0, 38.43);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2029.79, 0.0, 0.0, 16.91);
-            loanTransactionHelper.makeLoanRepayment("10 March 2023", 541.84F, loanId.intValue());
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2003.41, 0.0, 0.0, 38.43);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2029.79, 0.0, 0.0, 16.91);
+            loanTransactionHelper.makeLoanRepayment("20230310", 541.84F, loanId.intValue());
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
             validateRepaymentPeriod(loanDetails, 2, LocalDate.of(2023, 3, 1), 1991.63, 1041.84, 949.79, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 50.21, 0, 50.21, 0, 1041.84);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2003.41, 0.0, 0.0, 38.43);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2029.79, 0.0, 0.0, 16.91);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2003.41, 0.0, 0.0, 38.43);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2029.79, 0.0, 0.0, 16.91);
         });
-        runAt("20 March 2023", () -> {
+        runAt("20230320", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
             validateRepaymentPeriod(loanDetails, 2, LocalDate.of(2023, 3, 1), 1991.63, 1041.84, 949.79, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 50.21, 0, 50.21, 0, 1041.84);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2000.86, 0.0, 0.0, 40.98);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2032.34, 0.0, 0.0, 16.94);
-            loanTransactionHelper.makeLoanRepayment("20 March 2023", 1000.0F, loanId.intValue());
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2000.86, 0.0, 0.0, 40.98);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2032.34, 0.0, 0.0, 16.94);
+            loanTransactionHelper.makeLoanRepayment("20230320", 1000.0F, loanId.intValue());
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyPaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.63, 0.0, 0.0, 50.21, 2041.84);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2000.86, 0.0, 0.0, 40.98);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2032.34, 0.0, 0.0, 16.94);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyPaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.63, 0.0, 0.0, 50.21, 2041.84);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2000.86, 0.0, 0.0, 40.98);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2032.34, 0.0, 0.0, 16.94);
         });
-        payoffOnDateAndVerifyStatus("1 April 2023", loanIdRef.get());
+        payoffOnDateAndVerifyStatus("20230401", loanIdRef.get());
     }
 
     @Test
     public void verifyLoanInstallmentRecalculatedIfThereIsOverdueInstallmentOn4IProgressiveLoanCOBStep() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2023", () -> {
+        runAt("20230101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().recalculationRestFrequencyType(RecalculationRestFrequencyType.SAME_AS_REPAYMENT_PERIOD));
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2023", 8000.0, 10.0, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20230101", 8000.0, 10.0, 4, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(8000), "1 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(8000), "20230101");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.63, 0.0, 0.0, 50.21);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2024.97, 0.0, 0.0, 16.87);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.63, 0.0, 0.0, 50.21);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2024.97, 0.0, 0.0, 16.87);
         });
-        runAt("1 February 2023", () -> {
+        runAt("20230201", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.63, 0.0, 0.0, 50.21);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2024.97, 0.0, 0.0, 16.87);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.63, 0.0, 0.0, 50.21);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2024.97, 0.0, 0.0, 16.87);
         });
-        runAt("2 February 2023", () -> {
+        runAt("20230202", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.05, 0.0, 0.0, 50.79);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2025.55, 0.0, 0.0, 16.88);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.05, 0.0, 0.0, 50.79);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2025.55, 0.0, 0.0, 16.88);
         });
-        runAt("2 March 2023", () -> {
+        runAt("20230302", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2007.03, 0.0, 0.0, 34.81);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2042.63, 0.0, 0.0, 17.02);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2007.03, 0.0, 0.0, 34.81);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2042.63, 0.0, 0.0, 17.02);
         });
-        payoffOnDateAndVerifyStatus("2 March 2023", loanIdRef.get());
+        payoffOnDateAndVerifyStatus("20230302", loanIdRef.get());
     }
 
     @Test
     public void verifyLoanInstallmentRecalculatedIfThereIsOverdueInstallmentOn4IProgressiveLoanCOBStepLatePaidPaidOnTimeLatePaidPayoffOnTime() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2023", () -> {
+        runAt("20230101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().recalculationRestFrequencyType(RecalculationRestFrequencyType.SAME_AS_REPAYMENT_PERIOD));
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2023", 8000.0, 10.0, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20230101", 8000.0, 10.0, 4, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(8000), "1 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(8000), "20230101");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.63, 0.0, 0.0, 50.21);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2024.97, 0.0, 0.0, 16.87);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.63, 0.0, 0.0, 50.21);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2024.97, 0.0, 0.0, 16.87);
         });
-        runAt("2 February 2023", () -> {
+        runAt("20230202", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.05, 0.0, 0.0, 50.79);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2025.55, 0.0, 0.0, 16.88);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.05, 0.0, 0.0, 50.79);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2025.55, 0.0, 0.0, 16.88);
         });
-        runAt("15 February 2023", () -> {
+        runAt("20230215", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1983.4, 0.0, 0.0, 58.44);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.16, 0.0, 0.0, 33.68);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2033.27, 0.0, 0.0, 16.94);
-            loanTransactionHelper.makeLoanRepayment("15 February 2023", 500.0F, loanId.intValue());
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1983.4, 0.0, 0.0, 58.44);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.16, 0.0, 0.0, 33.68);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2033.27, 0.0, 0.0, 16.94);
+            loanTransactionHelper.makeLoanRepayment("20230215", 500.0F, loanId.intValue());
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2023, 2, 1), 1975.17, 500, 1475.17, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 66.67, 0, 66.67, 0, 500);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1983.4, 0.0, 0.0, 58.44);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.16, 0.0, 0.0, 33.68);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2033.27, 0.0, 0.0, 16.94);
-            loanTransactionHelper.makeLoanRepayment("15 February 2023", 500.0F, loanId.intValue());
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1983.4, 0.0, 0.0, 58.44);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.16, 0.0, 0.0, 33.68);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2033.27, 0.0, 0.0, 16.94);
+            loanTransactionHelper.makeLoanRepayment("20230215", 500.0F, loanId.intValue());
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2023, 2, 1), 1975.17, 1000, 975.17, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 66.67, 0, 66.67, 0, 1000);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1983.4, 0.0, 0.0, 58.44);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.16, 0.0, 0.0, 33.68);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2033.27, 0.0, 0.0, 16.94);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1983.4, 0.0, 0.0, 58.44);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.16, 0.0, 0.0, 33.68);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2033.27, 0.0, 0.0, 16.94);
         });
-        runAt("20 February 2023", () -> {
+        runAt("20230220", () -> {
             Long loanId = loanIdRef.get();
-            loanTransactionHelper.makeLoanRepayment("20 February 2023", 1041.84F, loanId.intValue());
+            loanTransactionHelper.makeLoanRepayment("20230220", 1041.84F, loanId.intValue());
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67, 2041.84);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1981.95, 0.0, 0.0, 59.89);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.15, 0.0, 0.0, 33.69);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2034.73, 0.0, 0.0, 16.96);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67, 2041.84);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1981.95, 0.0, 0.0, 59.89);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.15, 0.0, 0.0, 33.69);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2034.73, 0.0, 0.0, 16.96);
         });
-        runAt("1 March 2023", () -> {
+        runAt("20230301", () -> {
             Long loanId = loanIdRef.get();
-            loanTransactionHelper.makeLoanRepayment("01 March 2023", 2041.84F, loanId.intValue());
+            loanTransactionHelper.makeLoanRepayment("20230301", 2041.84F, loanId.intValue());
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67, 2041.84);
-            validateFullyPaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1981.95, 0.0, 0.0, 59.89);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.15, 0.0, 0.0, 33.69);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2034.73, 0.0, 0.0, 16.96);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67, 2041.84);
+            validateFullyPaidRepaymentPeriod(loanDetails, 2, "20230301", 1981.95, 0.0, 0.0, 59.89);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.15, 0.0, 0.0, 33.69);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2034.73, 0.0, 0.0, 16.96);
         });
-        runAt("2 April 2023", () -> {
+        runAt("20230402", () -> {
             Long loanId = loanIdRef.get();
-            inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
-            GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            logLoanDetails(loanDetails);
-            validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2023, 2, 1), 1975.17, 1975.17, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 66.67, 66.67, 0, 0, 2041.84);
-            validateFullyPaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1981.95, 0.0, 0.0, 59.89);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.15, 0.0, 0.0, 33.69);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2034.73, 0.0, 0.0, 17.51);
-        });
-        runAt("1 May 2023", () -> {
-            Long loanId = loanIdRef.get();
-            loanTransactionHelper.makeLoanRepayment("15 April 2023", 2041.84F, loanId.intValue());
-            loanTransactionHelper.makeLoanRepayment("01 May 2023", 2075.32F, loanId.intValue());
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2023, 2, 1), 1975.17, 1975.17, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 66.67, 66.67, 0, 0, 2041.84);
-            validateFullyPaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1981.95, 0.0, 0.0, 59.89);
+            validateFullyPaidRepaymentPeriod(loanDetails, 2, "20230301", 1981.95, 0.0, 0.0, 59.89);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.15, 0.0, 0.0, 33.69);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2034.73, 0.0, 0.0, 17.51);
+        });
+        runAt("20230501", () -> {
+            Long loanId = loanIdRef.get();
+            loanTransactionHelper.makeLoanRepayment("20230415", 2041.84F, loanId.intValue());
+            loanTransactionHelper.makeLoanRepayment("20230501", 2075.32F, loanId.intValue());
+            inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
+            GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
+            logLoanDetails(loanDetails);
+            validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2023, 2, 1), 1975.17, 1975.17, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 66.67, 66.67, 0, 0, 2041.84);
+            validateFullyPaidRepaymentPeriod(loanDetails, 2, "20230301", 1981.95, 0.0, 0.0, 59.89);
             validateRepaymentPeriod(loanDetails, 3, LocalDate.of(2023, 4, 1), 2008.15, 2008.15, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 33.69, 33.69, 0, 0, 2041.84);
-            validateFullyPaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2034.73, 0.0, 0.0, 24.77);
+            validateFullyPaidRepaymentPeriod(loanDetails, 4, "20230501", 2034.73, 0.0, 0.0, 24.77);
         });
     }
 
     @Test
     public void verifyEarlyLateRepaymentOnProgressiveLoanNextInstallmentAllocationRepayLessThenEmi() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2024", () -> {
+        runAt("20240101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct( //
             create4IProgressive().recalculationRestFrequencyType(RecalculationRestFrequencyType.DAILY) //
             );
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2024", 100.0, 7.0, 6, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20240101", 100.0, 7.0, 6, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(100), "1 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(100), "20240101");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2024", 16.43, 0.0, 0.0, 0.58);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2024", 16.52, 0.0, 0.0, 0.49);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2024", 16.62, 0.0, 0.0, 0.39);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2024", 16.72, 0.0, 0.0, 0.29);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "01 June 2024", 16.81, 0.0, 0.0, 0.2);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "01 July 2024", 16.9, 0.0, 0.0, 0.1);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20240201", 16.43, 0.0, 0.0, 0.58);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20240301", 16.52, 0.0, 0.0, 0.49);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20240401", 16.62, 0.0, 0.0, 0.39);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20240501", 16.72, 0.0, 0.0, 0.29);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "20240601", 16.81, 0.0, 0.0, 0.2);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "20240701", 16.9, 0.0, 0.0, 0.1);
         });
-        runAt("15 February 2024", () -> {
+        runAt("20240215", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
-            loanTransactionHelper.makeLoanRepayment("15 February 2024", 15.0F, loanId.intValue());
+            loanTransactionHelper.makeLoanRepayment("20240215", 15.0F, loanId.intValue());
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2024, 2, 1), 16.43, 15.0, 1.43, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.58, 0, 0.58, 0.0, 15.0);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2024", 16.48, 0.0, 0.0, 0.53);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2024", 16.62, 0.0, 0.0, 0.39);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2024", 16.72, 0.0, 0.0, 0.29);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "01 June 2024", 16.81, 0.0, 0.0, 0.2);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "01 July 2024", 16.94, 0.0, 0.0, 0.1);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20240301", 16.48, 0.0, 0.0, 0.53);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20240401", 16.62, 0.0, 0.0, 0.39);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20240501", 16.72, 0.0, 0.0, 0.29);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "20240601", 16.81, 0.0, 0.0, 0.2);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "20240701", 16.94, 0.0, 0.0, 0.1);
         });
     }
 
     @Test
     public void verifyChargeCreationAfterMaturityDateOnInterestBearingProgressiveLoan() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2024", () -> {
+        runAt("20240101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct( //
             //
             create4IProgressive().recalculationRestFrequencyType(RecalculationRestFrequencyType.DAILY).currencyCode("USD"));
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2024", 100.0, 7.0, 6, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20240101", 100.0, 7.0, 6, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(100), "1 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(100), "20240101");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2024", 16.43, 0.0, 0.0, 0.58);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2024", 16.52, 0.0, 0.0, 0.49);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2024", 16.62, 0.0, 0.0, 0.39);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2024", 16.72, 0.0, 0.0, 0.29);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "01 June 2024", 16.81, 0.0, 0.0, 0.2);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "01 July 2024", 16.9, 0.0, 0.0, 0.1);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20240201", 16.43, 0.0, 0.0, 0.58);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20240301", 16.52, 0.0, 0.0, 0.49);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20240401", 16.62, 0.0, 0.0, 0.39);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20240501", 16.72, 0.0, 0.0, 0.29);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "20240601", 16.81, 0.0, 0.0, 0.2);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "20240701", 16.9, 0.0, 0.0, 0.1);
         });
-        runAt("10 July 2024", () -> {
+        runAt("20240710", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             // create charge
@@ -540,37 +540,37 @@ public class LoanInterestRecalculationCOBTest extends BaseLoanIntegrationTest {
             Long chargeId = chargeResult.getResourceId();
             Assertions.assertNotNull(chargeId);
             // add charge after maturity
-            PostLoansLoanIdChargesResponse loanChargeResult = addLoanCharge(loanId, chargeId, "15 July 2024", 10.0);
+            PostLoansLoanIdChargesResponse loanChargeResult = addLoanCharge(loanId, chargeId, "20240715", 10.0);
             Assertions.assertNotNull(loanChargeResult.getResourceId());
             // verify N+1 installment in schedule
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2024", 16.43, 0.0, 0.0, 0.58);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2024", 16.43, 0.0, 0.0, 0.58);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2024", 16.43, 0.0, 0.0, 0.58);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2024", 16.43, 0.0, 0.0, 0.58);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "01 June 2024", 16.43, 0.0, 0.0, 0.58);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "01 July 2024", 17.85, 0.0, 0.0, 0.58);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 7, "15 July 2024", 0.0, 10.0, 0.0, 0.0);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20240201", 16.43, 0.0, 0.0, 0.58);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20240301", 16.43, 0.0, 0.0, 0.58);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20240401", 16.43, 0.0, 0.0, 0.58);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20240501", 16.43, 0.0, 0.0, 0.58);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "20240601", 16.43, 0.0, 0.0, 0.58);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "20240701", 17.85, 0.0, 0.0, 0.58);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 7, "20240715", 0.0, 10.0, 0.0, 0.0);
             Assertions.assertNotNull(loanDetails.getStatus());
             Assertions.assertEquals(300, loanDetails.getStatus().getId());
         });
-        runAt("15 July 2024", () -> {
+        runAt("20240715", () -> {
             Long loanId = loanIdRef.get();
-            loanTransactionHelper.makeLoanRepayment("15 July 2024", 113.48F, loanId.intValue());
+            loanTransactionHelper.makeLoanRepayment("20240715", 113.48F, loanId.intValue());
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyPaidRepaymentPeriod(loanDetails, 2, "01 March 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyPaidRepaymentPeriod(loanDetails, 3, "01 April 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyPaidRepaymentPeriod(loanDetails, 4, "01 May 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyPaidRepaymentPeriod(loanDetails, 5, "01 June 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyPaidRepaymentPeriod(loanDetails, 6, "01 July 2024", 17.85, 0.0, 0.0, 0.58, 18.43);
-            validateFullyPaidRepaymentPeriod(loanDetails, 7, "15 July 2024", 0.0, 10.0, 0.0, 0.0);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20240201", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 2, "20240301", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 3, "20240401", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 4, "20240501", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 5, "20240601", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 6, "20240701", 17.85, 0.0, 0.0, 0.58, 18.43);
+            validateFullyPaidRepaymentPeriod(loanDetails, 7, "20240715", 0.0, 10.0, 0.0, 0.0);
             Assertions.assertNotNull(loanDetails.getStatus());
             Assertions.assertEquals(600, loanDetails.getStatus().getId());
         });
-        runAt("16 July 2024", () -> {
+        runAt("20240716", () -> {
             Long loanId = loanIdRef.get();
             // create charge
             PostChargesResponse chargeResult = createCharge(10.0);
@@ -578,33 +578,33 @@ public class LoanInterestRecalculationCOBTest extends BaseLoanIntegrationTest {
             Long chargeId = chargeResult.getResourceId();
             Assertions.assertNotNull(chargeId);
             // add charge after maturity
-            PostLoansLoanIdChargesResponse loanChargeResult = addLoanCharge(loanId, chargeId, "20 July 2024", 15.0);
+            PostLoansLoanIdChargesResponse loanChargeResult = addLoanCharge(loanId, chargeId, "20240720", 15.0);
             Assertions.assertNotNull(loanChargeResult.getResourceId());
             // verify N+1 installment in schedule
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyPaidRepaymentPeriod(loanDetails, 2, "01 March 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyPaidRepaymentPeriod(loanDetails, 3, "01 April 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyPaidRepaymentPeriod(loanDetails, 4, "01 May 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyPaidRepaymentPeriod(loanDetails, 5, "01 June 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyPaidRepaymentPeriod(loanDetails, 6, "01 July 2024", 17.85, 0.0, 0.0, 0.58, 18.43);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20240201", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 2, "20240301", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 3, "20240401", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 4, "20240501", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 5, "20240601", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 6, "20240701", 17.85, 0.0, 0.0, 0.58, 18.43);
             validateRepaymentPeriod(loanDetails, 7, LocalDate.of(2024, 7, 20), 0.0, 0.0, 0.0, 25.0, 10.0, 15.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
             Assertions.assertNotNull(loanDetails.getStatus());
             Assertions.assertEquals(300, loanDetails.getStatus().getId());
         });
-        runAt("20 July 2024", () -> {
+        runAt("20240720", () -> {
             Long loanId = loanIdRef.get();
-            loanTransactionHelper.makeLoanRepayment("20 July 2024", 15.0F, loanId.intValue());
+            loanTransactionHelper.makeLoanRepayment("20240720", 15.0F, loanId.intValue());
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyPaidRepaymentPeriod(loanDetails, 2, "01 March 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyPaidRepaymentPeriod(loanDetails, 3, "01 April 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyPaidRepaymentPeriod(loanDetails, 4, "01 May 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyPaidRepaymentPeriod(loanDetails, 5, "01 June 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyPaidRepaymentPeriod(loanDetails, 6, "01 July 2024", 17.85, 0.0, 0.0, 0.58, 18.43);
-            validateFullyPaidRepaymentPeriod(loanDetails, 7, "20 July 2024", 0.0, 25.0, 0.0, 0.0);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20240201", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 2, "20240301", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 3, "20240401", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 4, "20240501", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 5, "20240601", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 6, "20240701", 17.85, 0.0, 0.0, 0.58, 18.43);
+            validateFullyPaidRepaymentPeriod(loanDetails, 7, "20240720", 0.0, 25.0, 0.0, 0.0);
             Assertions.assertNotNull(loanDetails.getStatus());
             Assertions.assertEquals(600, loanDetails.getStatus().getId());
         });
@@ -613,140 +613,140 @@ public class LoanInterestRecalculationCOBTest extends BaseLoanIntegrationTest {
     @Test
     public void verifyEarlyLateRepaymentOnProgressiveLoanNextInstallmentAllocationRepayEmi() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2024", () -> {
+        runAt("20240101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct( //
             create4IProgressive().recalculationRestFrequencyType(RecalculationRestFrequencyType.DAILY) //
             );
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2024", 100.0, 7.0, 6, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20240101", 100.0, 7.0, 6, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(100), "1 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(100), "20240101");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2024", 16.43, 0.0, 0.0, 0.58);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2024", 16.52, 0.0, 0.0, 0.49);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2024", 16.62, 0.0, 0.0, 0.39);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2024", 16.72, 0.0, 0.0, 0.29);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "01 June 2024", 16.81, 0.0, 0.0, 0.2);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "01 July 2024", 16.9, 0.0, 0.0, 0.1);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20240201", 16.43, 0.0, 0.0, 0.58);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20240301", 16.52, 0.0, 0.0, 0.49);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20240401", 16.62, 0.0, 0.0, 0.39);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20240501", 16.72, 0.0, 0.0, 0.29);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "20240601", 16.81, 0.0, 0.0, 0.2);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "20240701", 16.9, 0.0, 0.0, 0.1);
         });
-        runAt("15 February 2024", () -> {
+        runAt("20240215", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
-            loanTransactionHelper.makeLoanRepayment("15 February 2024", 17.01F, loanId.intValue());
+            loanTransactionHelper.makeLoanRepayment("20240215", 17.01F, loanId.intValue());
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2024", 16.43, 0.0, 0.0, 0.58, 17.01);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2024", 16.48, 0.0, 0.0, 0.53);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2024", 16.62, 0.0, 0.0, 0.39);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2024", 16.72, 0.0, 0.0, 0.29);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "01 June 2024", 16.81, 0.0, 0.0, 0.2);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "01 July 2024", 16.94, 0.0, 0.0, 0.1);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20240201", 16.43, 0.0, 0.0, 0.58, 17.01);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20240301", 16.48, 0.0, 0.0, 0.53);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20240401", 16.62, 0.0, 0.0, 0.39);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20240501", 16.72, 0.0, 0.0, 0.29);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "20240601", 16.81, 0.0, 0.0, 0.2);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "20240701", 16.94, 0.0, 0.0, 0.1);
         });
     }
 
     @Test
     public void verifyLoanInstallmentRecalculatedIfThereIsOverdueInstallmentOn4IProgressiveLoanCOBStepOnePaid() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2023", () -> {
+        runAt("20230101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().recalculationRestFrequencyType(RecalculationRestFrequencyType.SAME_AS_REPAYMENT_PERIOD));
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2023", 8000.0, 10.0, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20230101", 8000.0, 10.0, 4, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(8000), "1 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(8000), "20230101");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.63, 0.0, 0.0, 50.21);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2024.97, 0.0, 0.0, 16.87);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.63, 0.0, 0.0, 50.21);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2024.97, 0.0, 0.0, 16.87);
         });
-        runAt("1 February 2023", () -> {
+        runAt("20230201", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
-            loanTransactionHelper.makeLoanRepayment("01 February 2023", 2041.84F, loanId.intValue());
+            loanTransactionHelper.makeLoanRepayment("20230201", 2041.84F, loanId.intValue());
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.63, 0.0, 0.0, 50.21);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2024.97, 0.0, 0.0, 16.87);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.63, 0.0, 0.0, 50.21);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2024.97, 0.0, 0.0, 16.87);
         });
-        runAt("1 March 2023", () -> {
-            Long loanId = loanIdRef.get();
-            inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
-            GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.63, 0.0, 0.0, 50.21);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2024.97, 0.0, 0.0, 16.87);
-        });
-        runAt("2 March 2023", () -> {
+        runAt("20230301", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.63, 0.0, 0.0, 50.21);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2007.69, 0.0, 0.0, 34.15);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2025.51, 0.0, 0.0, 16.88);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.63, 0.0, 0.0, 50.21);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2024.97, 0.0, 0.0, 16.87);
         });
-        payoffOnDateAndVerifyStatus("2 March 2023", loanIdRef.get());
+        runAt("20230302", () -> {
+            Long loanId = loanIdRef.get();
+            inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
+            GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
+            logLoanDetails(loanDetails);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.63, 0.0, 0.0, 50.21);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2007.69, 0.0, 0.0, 34.15);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2025.51, 0.0, 0.0, 16.88);
+        });
+        payoffOnDateAndVerifyStatus("20230302", loanIdRef.get());
     }
 
     @Test
     public void verifyLoanInstallmentRecalculatedIfThereIsOverdueInstallmentOnCumulativeLoanCOBStep() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2023", () -> {
+        runAt("20230101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(//
             createOnePeriod30DaysPeriodicAccrualProduct(10.0).isInterestRecalculationEnabled(true).maxPrincipal(10000.0).minNumberOfRepayments(1).rescheduleStrategyMethod(1).recalculationRestFrequencyType(MONTHS).recalculationRestFrequencyInterval(1).recalculationCompoundingFrequencyType(MONTHS).recalculationCompoundingFrequencyInterval(30).interestRecalculationCompoundingMethod(1));
-            Long loanId = applyAndApproveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2023", 8000.0, 2, postLoansRequest -> //
+            Long loanId = applyAndApproveLoan(client.getClientId(), loanProduct.getResourceId(), "20230101", 8000.0, 2, postLoansRequest -> //
             //
             //
             //
             //
             postLoansRequest.loanTermFrequency(2).loanTermFrequencyType(MONTHS).interestRatePerPeriod(BigDecimal.valueOf(10.0)).interestCalculationPeriodType(DAYS).repaymentEvery(1).repaymentFrequencyType(MONTHS).principal(BigDecimal.valueOf(8000.0)).maxOutstandingLoanBalance(BigDecimal.valueOf(100000.0)));
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(8000), "1 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(8000), "20230101");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2023, 2, 1), 3783.06, 0.0, 3783.06, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 817.94, 0.0, 817.94, 0.0, 0.0);
             validateRepaymentPeriod(loanDetails, 2, LocalDate.of(2023, 3, 1), 4216.94, 0.0, 4216.94, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 385.53, 0.0, 385.53, 0.0, 0.0);
         });
-        runAt("2 February 2023", () -> {
+        runAt("20230202", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2023, 2, 1), 3783.06, 0.0, 3783.06, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 817.94, 0.0, 817.94, 0.0, 0.0);
             validateRepaymentPeriod(loanDetails, 2, LocalDate.of(2023, 3, 1), 4216.94, 0.0, 4216.94, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 403.23, 0.0, 403.23, 0.0, 0.0);
         });
-        payoffOnDateAndVerifyStatus("1 March 2023", loanIdRef.get());
+        payoffOnDateAndVerifyStatus("20230301", loanIdRef.get());
     }
 
     @Test
     public void verifyLoanInstallmentRecalculatedIfThereIsOverdueInstallmentOnProgressiveLoanJob() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2023", () -> {
+        runAt("20230101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().recalculationRestFrequencyType(RecalculationRestFrequencyType.SAME_AS_REPAYMENT_PERIOD));
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2023", 8000.0, 10.0, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20230101", 8000.0, 10.0, 4, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(8000), "1 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(8000), "20230101");
         });
-        runAt("2 February 2023", () -> {
+        runAt("20230202", () -> {
             Long loanId = loanIdRef.get();
             executeInterestRecalculationJobs();
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.05, 0.0, 0.0, 50.79);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2025.55, 0.0, 0.0, 16.88);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.05, 0.0, 0.0, 50.79);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2025.55, 0.0, 0.0, 16.88);
         });
-        payoffOnDateAndVerifyStatus("2 February 2023", loanIdRef.get());
+        payoffOnDateAndVerifyStatus("20230202", loanIdRef.get());
     }
 
     @Test
     public void verifyLoanInstallmentRecalculatedIfThereIsOverdueInstallmentOnCumulativeLoanJob() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2023", () -> {
+        runAt("20230101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(//
             //
             //
@@ -756,57 +756,57 @@ public class LoanInterestRecalculationCOBTest extends BaseLoanIntegrationTest {
             //
             //
             createOnePeriod30DaysPeriodicAccrualProduct(10.0).isInterestRecalculationEnabled(true).maxPrincipal(10000.0).minNumberOfRepayments(1).rescheduleStrategyMethod(1).recalculationRestFrequencyType(MONTHS).recalculationRestFrequencyInterval(1).recalculationCompoundingFrequencyType(MONTHS).recalculationCompoundingFrequencyInterval(30).interestRecalculationCompoundingMethod(1)); //
-            Long loanId = applyAndApproveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2023", 8000.0, 2, postLoansRequest -> //
+            Long loanId = applyAndApproveLoan(client.getClientId(), loanProduct.getResourceId(), "20230101", 8000.0, 2, postLoansRequest -> //
             //
             //
             //
             //
             postLoansRequest.loanTermFrequency(2).loanTermFrequencyType(MONTHS).interestRatePerPeriod(BigDecimal.valueOf(10.0)).interestCalculationPeriodType(DAYS).repaymentEvery(1).repaymentFrequencyType(MONTHS).principal(BigDecimal.valueOf(8000.0)).maxOutstandingLoanBalance(BigDecimal.valueOf(100000.0)));
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(8000), "1 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(8000), "20230101");
         });
-        runAt("2 February 2023", () -> {
+        runAt("20230202", () -> {
             Long loanId = loanIdRef.get();
             executeInterestRecalculationJobs();
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2023, 2, 1), 3783.06, 0.0, 3783.06, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 817.94, 0.0, 817.94, 0.0, 0.0);
             validateRepaymentPeriod(loanDetails, 2, LocalDate.of(2023, 3, 1), 4216.94, 0.0, 4216.94, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 403.23, 0.0, 403.23, 0.0, 0.0);
         });
-        payoffOnDateAndVerifyStatus("1 March 2023", loanIdRef.get());
+        payoffOnDateAndVerifyStatus("20230301", loanIdRef.get());
     }
 
     @Test
     public void verifyLoanInstallmentRecalculatedIfThereIsOverdueInstallmentOn4IProgressiveLoanMultiOverdueSingleRepayment() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2023", () -> {
+        runAt("20230101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive());
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2023", 8000.0, 10.0, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20230101", 8000.0, 10.0, 4, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(8000), "1 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(8000), "20230101");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1991.63, 0.0, 0.0, 50.21);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.23, 0.0, 0.0, 33.61);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2024.97, 0.0, 0.0, 16.87);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1991.63, 0.0, 0.0, 50.21);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.23, 0.0, 0.0, 33.61);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2024.97, 0.0, 0.0, 16.87);
         });
-        runAt("1 March 2023", () -> {
+        runAt("20230301", () -> {
             Long loanId = loanIdRef.get();
-            loanTransactionHelper.makeLoanRepayment("01 March 2023", 4083.68F, loanId.intValue());
+            loanTransactionHelper.makeLoanRepayment("20230301", 4083.68F, loanId.intValue());
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1975.17, 0.0, 0.0, 66.67, 2041.84);
-            validateFullyPaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1975.17, 0.0, 0.0, 66.67);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2008.09, 0.0, 0.0, 33.75);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2041.57, 0.0, 0.0, 17.01);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20230201", 1975.17, 0.0, 0.0, 66.67, 2041.84);
+            validateFullyPaidRepaymentPeriod(loanDetails, 2, "20230301", 1975.17, 0.0, 0.0, 66.67);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2008.09, 0.0, 0.0, 33.75);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2041.57, 0.0, 0.0, 17.01);
         });
-        payoffOnDateAndVerifyStatus("1 April 2023", loanIdRef.get());
+        payoffOnDateAndVerifyStatus("20230401", loanIdRef.get());
     }
 
     @Test
     public void verifyLoanInstallmentRecalculatedIfThereIsOverdueInstallmentOnCumulativeLoanJobSameAsRepaymentPeriod() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2023", () -> {
+        runAt("20230101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(//
             //
             //
@@ -819,38 +819,38 @@ public class LoanInterestRecalculationCOBTest extends BaseLoanIntegrationTest {
             //
             //
             createOnePeriod30DaysPeriodicAccrualProduct(10.0).isInterestRecalculationEnabled(true).maxPrincipal(10000.0).minNumberOfRepayments(1).maxNumberOfRepayments(10).rescheduleStrategyMethod(1).daysInYearType(360).daysInMonthType(30).recalculationRestFrequencyType(SAME_AS_REPAYMENT_PERIOD).recalculationRestFrequencyInterval(1).recalculationCompoundingFrequencyType(1).recalculationCompoundingFrequencyInterval(1).interestRecalculationCompoundingMethod(0)); //
-            Long loanId = applyAndApproveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2023", 8000.0, 2, postLoansRequest -> //
+            Long loanId = applyAndApproveLoan(client.getClientId(), loanProduct.getResourceId(), "20230101", 8000.0, 2, postLoansRequest -> //
             //
             //
             //
             //
             postLoansRequest.loanTermFrequency(4).loanTermFrequencyType(MONTHS).numberOfRepayments(4).interestRatePerPeriod(BigDecimal.valueOf(10.0)).interestCalculationPeriodType(DAYS).repaymentEvery(1).repaymentFrequencyType(MONTHS).principal(BigDecimal.valueOf(8000.0)).maxOutstandingLoanBalance(BigDecimal.valueOf(100000.0)));
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(8000), "1 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(8000), "20230101");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1724.0, 0.0, 0.0, 800.0);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1896.4, 0.0, 0.0, 627.6);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2086.04, 0.0, 0.0, 437.96);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2293.56, 0.0, 0.0, 229.36);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1724.0, 0.0, 0.0, 800.0);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1896.4, 0.0, 0.0, 627.6);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2086.04, 0.0, 0.0, 437.96);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2293.56, 0.0, 0.0, 229.36);
         });
-        runAt("8 February 2023", () -> {
+        runAt("20230208", () -> {
             Long loanId = loanIdRef.get();
             executeInterestRecalculationJobs();
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1724.0, 0.0, 0.0, 800.0);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1724.0, 0.0, 0.0, 800.0);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2068.8, 0.0, 0.0, 455.2);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2483.2, 0.0, 0.0, 248.32);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1724.0, 0.0, 0.0, 800.0);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1724.0, 0.0, 0.0, 800.0);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2068.8, 0.0, 0.0, 455.2);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2483.2, 0.0, 0.0, 248.32);
         });
-        payoffOnDateAndVerifyStatus("1 May 2023", loanIdRef.get());
+        payoffOnDateAndVerifyStatus("20230501", loanIdRef.get());
     }
 
     @Test
     public void verifyLoanInstallmentRecalculatedIfThereIsOverdueInstallmentOnCumulativeLoanCOBSameAsRepaymentPeriod() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2023", () -> {
+        runAt("20230101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(//
             //
             //
@@ -863,82 +863,82 @@ public class LoanInterestRecalculationCOBTest extends BaseLoanIntegrationTest {
             //
             //
             createOnePeriod30DaysPeriodicAccrualProduct(10.0).isInterestRecalculationEnabled(true).maxPrincipal(10000.0).minNumberOfRepayments(1).maxNumberOfRepayments(10).rescheduleStrategyMethod(1).daysInYearType(360).daysInMonthType(30).recalculationRestFrequencyType(SAME_AS_REPAYMENT_PERIOD).recalculationRestFrequencyInterval(1).recalculationCompoundingFrequencyType(1).recalculationCompoundingFrequencyInterval(1).interestRecalculationCompoundingMethod(0)); //
-            Long loanId = applyAndApproveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2023", 8000.0, 2, postLoansRequest -> //
+            Long loanId = applyAndApproveLoan(client.getClientId(), loanProduct.getResourceId(), "20230101", 8000.0, 2, postLoansRequest -> //
             //
             //
             //
             //
             postLoansRequest.loanTermFrequency(4).loanTermFrequencyType(MONTHS).numberOfRepayments(4).interestRatePerPeriod(BigDecimal.valueOf(10.0)).interestCalculationPeriodType(DAYS).repaymentEvery(1).repaymentFrequencyType(MONTHS).principal(BigDecimal.valueOf(8000.0)).maxOutstandingLoanBalance(BigDecimal.valueOf(100000.0)));
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(8000), "1 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(8000), "20230101");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1724.0, 0.0, 0.0, 800.0);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1896.4, 0.0, 0.0, 627.6);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2086.04, 0.0, 0.0, 437.96);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2293.56, 0.0, 0.0, 229.36);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1724.0, 0.0, 0.0, 800.0);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1896.4, 0.0, 0.0, 627.6);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2086.04, 0.0, 0.0, 437.96);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2293.56, 0.0, 0.0, 229.36);
         });
-        runAt("8 February 2023", () -> {
+        runAt("20230208", () -> {
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2023", 1724.0, 0.0, 0.0, 800.0);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2023", 1724.0, 0.0, 0.0, 800.0);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2023", 2068.8, 0.0, 0.0, 455.2);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2023", 2483.2, 0.0, 0.0, 248.32);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20230201", 1724.0, 0.0, 0.0, 800.0);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20230301", 1724.0, 0.0, 0.0, 800.0);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20230401", 2068.8, 0.0, 0.0, 455.2);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20230501", 2483.2, 0.0, 0.0, 248.32);
         });
-        payoffOnDateAndVerifyStatus("1 May 2023", loanIdRef.get());
+        payoffOnDateAndVerifyStatus("20230501", loanIdRef.get());
     }
 
     @Test
     public void verifyEarlyLateRepaymentOnProgressiveLoanThePastDueHasNoEffect() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 January 2024", () -> {
+        runAt("20240101", () -> {
             PostLoanProductsResponse loanProduct =  //
             loanProductHelper.createLoanProduct( //
             //
             create4IProgressive().recalculationRestFrequencyType(RecalculationRestFrequencyType.DAILY).disallowInterestCalculationOnPastDue(true) //
             );
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2024", 100.0, 7.0, 6, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20240101", 100.0, 7.0, 6, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(100), "1 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(100), "20240101");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "01 February 2024", 16.43, 0.0, 0.0, 0.58);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2024", 16.52, 0.0, 0.0, 0.49);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2024", 16.62, 0.0, 0.0, 0.39);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2024", 16.72, 0.0, 0.0, 0.29);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "01 June 2024", 16.81, 0.0, 0.0, 0.2);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "01 July 2024", 16.9, 0.0, 0.0, 0.1);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20240201", 16.43, 0.0, 0.0, 0.58);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20240301", 16.52, 0.0, 0.0, 0.49);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20240401", 16.62, 0.0, 0.0, 0.39);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20240501", 16.72, 0.0, 0.0, 0.29);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "20240601", 16.81, 0.0, 0.0, 0.2);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "20240701", 16.9, 0.0, 0.0, 0.1);
         });
-        runAt("15 February 2024", () -> {
+        runAt("20240215", () -> {
             // we have past due and should not count extra interest
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
-            loanTransactionHelper.makeLoanRepayment("15 February 2024", 15.0F, loanId.intValue());
+            loanTransactionHelper.makeLoanRepayment("20240215", 15.0F, loanId.intValue());
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2024, 2, 1), 16.43, 15.0, 1.43, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.58, 0, 0.58, 0.0, 15.0);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "01 March 2024", 16.52, 0.0, 0.0, 0.49);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2024", 16.62, 0.0, 0.0, 0.39);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2024", 16.72, 0.0, 0.0, 0.29);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "01 June 2024", 16.81, 0.0, 0.0, 0.2);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "01 July 2024", 16.9, 0.0, 0.0, 0.1);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20240301", 16.52, 0.0, 0.0, 0.49);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20240401", 16.62, 0.0, 0.0, 0.39);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20240501", 16.72, 0.0, 0.0, 0.29);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "20240601", 16.81, 0.0, 0.0, 0.2);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "20240701", 16.9, 0.0, 0.0, 0.1);
         });
-        runAt("15 February 2024", () -> {
+        runAt("20240215", () -> {
             // we turn from past due into early repayment and should have less interest
             Long loanId = loanIdRef.get();
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
-            loanTransactionHelper.makeLoanRepayment("15 February 2024", 19.02F, loanId.intValue());
+            loanTransactionHelper.makeLoanRepayment("20240215", 19.02F, loanId.intValue());
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             logLoanDetails(loanDetails);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2024, 2, 1), 16.43, 16.43, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.58, 0.58, 0.0, 0.0, 17.01);
             validateRepaymentPeriod(loanDetails, 2, LocalDate.of(2024, 3, 1), 16.77, 16.77, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.24, 0.24, 0.0, 17.01, 0.0);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "01 April 2024", 16.42, 0.0, 0.0, 0.59);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "01 May 2024", 16.72, 0.0, 0.0, 0.29);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "01 June 2024", 16.81, 0.0, 0.0, 0.2);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "01 July 2024", 16.85, 0.0, 0.0, 0.1);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20240401", 16.42, 0.0, 0.0, 0.59);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20240501", 16.72, 0.0, 0.0, 0.29);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "20240601", 16.81, 0.0, 0.0, 0.2);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "20240701", 16.85, 0.0, 0.0, 0.1);
         });
     }
 }

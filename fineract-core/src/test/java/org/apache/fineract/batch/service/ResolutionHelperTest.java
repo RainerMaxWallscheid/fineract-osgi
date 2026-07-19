@@ -111,7 +111,7 @@ public class ResolutionHelperTest {
         // Test resolving a JSON primitive with array date format
         BatchRequest batchRequest = new BatchRequest();
         batchRequest
-                .setBody("{\"dateFormat\":\"dd MMMM yyyy\",\"startDate\":\"$[ARRAYDATE].dates[0]\",\"endDate\":\"$[ARRAYDATE].dates[1]\"}");
+                .setBody("{\"dateFormat\":\"yyyyMMdd\",\"startDate\":\"$[ARRAYDATE].dates[0]\",\"endDate\":\"$[ARRAYDATE].dates[1]\"}");
         batchRequest.setRelativeUrl("/resource/endpoint");
 
         BatchResponse parentResponse = new BatchResponse();
@@ -127,9 +127,9 @@ public class ResolutionHelperTest {
 
         // Check for possible date formats
         String body = resolvedRequest.getBody();
-        assertTrue(body.contains("\"startDate\":\"15 May 2023\"") || body.contains("\"startDate\":\"15 May, 2023\"")
+        assertTrue(body.contains("\"startDate\":\"20230515\"") || body.contains("\"startDate\":\"15 May, 2023\"")
                 || body.contains("\"startDate\":\"15 May. 2023\"") || body.contains("\"startDate\":\"May 15, 2023\""));
-        assertTrue(body.contains("\"endDate\":\"15 June 2023\"") || body.contains("\"endDate\":\"15 June, 2023\"")
+        assertTrue(body.contains("\"endDate\":\"20230615\"") || body.contains("\"endDate\":\"15 June, 2023\"")
                 || body.contains("\"endDate\":\"15 Jun. 2023\"") || body.contains("\"endDate\":\"June 15, 2023\""));
     }
 

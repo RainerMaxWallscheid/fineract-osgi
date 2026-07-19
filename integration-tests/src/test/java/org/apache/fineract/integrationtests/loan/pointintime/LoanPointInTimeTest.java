@@ -44,7 +44,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
     public void test_LoanPointInTimeDataWorks_ForPrincipalOutstandingCalculation() {
         AtomicReference<Long> aLoanId = new AtomicReference<>();
 
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -85,7 +85,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             // Apply and Approve Loan
             double amount = 5000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(repaymentEvery)//
                     .loanTermFrequency(numberOfRepayments)//
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS)//
@@ -100,87 +100,87 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 January 2023"));
+                    approveLoanRequest(amount, "20230101"));
 
             aLoanId.getAndSet(approvedLoanResult.getLoanId());
             Long loanId = aLoanId.get();
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(125.0, "Repayment (at time of disbursement)", "01 January 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(125.0, "Repayment (at time of disbursement)", "20230101") //
             );
         });
 
-        runAt("01 February 2023", () -> {
+        runAt("20230201", () -> {
             Long loanId = aLoanId.get();
 
             // repay 500
-            addRepaymentForLoan(loanId, 500.0, "01 February 2023");
+            addRepaymentForLoan(loanId, 500.0, "20230201");
 
             // check point in time data
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "01 February 2023");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20230201");
             verifyOutstanding(pointInTimeData, outstanding(4500.0, 0.0, 0.0, 0.0, 4500.0));
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(125.0, "Repayment (at time of disbursement)", "01 January 2023"), //
-                    transaction(500.0, "Repayment", "01 February 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(125.0, "Repayment (at time of disbursement)", "20230101"), //
+                    transaction(500.0, "Repayment", "20230201") //
             );
         });
 
-        runAt("09 February 2023", () -> {
+        runAt("20230209", () -> {
             Long loanId = aLoanId.get();
 
             // repay 500
-            addRepaymentForLoan(loanId, 500.0, "09 February 2023");
+            addRepaymentForLoan(loanId, 500.0, "20230209");
 
             // check point in time data
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "01 February 2023");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20230201");
             verifyOutstanding(pointInTimeData, outstanding(4500.0, 0.0, 0.0, 0.0, 4500.0));
 
-            pointInTimeData = getPointInTimeData(loanId, "07 February 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230207");
             verifyOutstanding(pointInTimeData, outstanding(4500.0, 0.0, 0.0, 0.0, 4500.0));
 
-            pointInTimeData = getPointInTimeData(loanId, "09 February 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230209");
             verifyOutstanding(pointInTimeData, outstanding(4000.0, 0.0, 0.0, 0.0, 4000.0));
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(125.0, "Repayment (at time of disbursement)", "01 January 2023"), //
-                    transaction(500.0, "Repayment", "01 February 2023"), //
-                    transaction(500.0, "Repayment", "09 February 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(125.0, "Repayment (at time of disbursement)", "20230101"), //
+                    transaction(500.0, "Repayment", "20230201"), //
+                    transaction(500.0, "Repayment", "20230209") //
             );
         });
 
-        runAt("01 March 2023", () -> {
+        runAt("20230301", () -> {
             Long loanId = aLoanId.get();
 
             // repay 500
-            addRepaymentForLoan(loanId, 500.0, "01 March 2023");
+            addRepaymentForLoan(loanId, 500.0, "20230301");
 
             // check point in time data
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "01 February 2023");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20230201");
             verifyOutstanding(pointInTimeData, outstanding(4500.0, 0.0, 0.0, 0.0, 4500.0));
 
-            pointInTimeData = getPointInTimeData(loanId, "10 February 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230210");
             verifyOutstanding(pointInTimeData, outstanding(4000.0, 0.0, 0.0, 0.0, 4000.0));
 
-            pointInTimeData = getPointInTimeData(loanId, "01 March 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230301");
             verifyOutstanding(pointInTimeData, outstanding(3500.0, 0.0, 0.0, 0.0, 3500.0));
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(125.0, "Repayment (at time of disbursement)", "01 January 2023"), //
-                    transaction(500.0, "Repayment", "01 February 2023"), //
-                    transaction(500.0, "Repayment", "09 February 2023"), //
-                    transaction(500.0, "Repayment", "01 March 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(125.0, "Repayment (at time of disbursement)", "20230101"), //
+                    transaction(500.0, "Repayment", "20230201"), //
+                    transaction(500.0, "Repayment", "20230209"), //
+                    transaction(500.0, "Repayment", "20230301") //
             );
         });
     }
@@ -189,7 +189,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
     public void test_LoanPointInTimeDataWorks_ForAllOutstandingCalculation_WhenLoanIsCumulative_AndInterestIsEnabled() {
         AtomicReference<Long> aLoanId = new AtomicReference<>();
 
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -224,7 +224,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             // Apply and Approve Loan
             double amount = 5000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(repaymentEvery)//
                     .interestRatePerPeriod(BigDecimal.valueOf(10.0))//
                     .loanTermFrequency(numberOfRepayments)//
@@ -236,116 +236,116 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 January 2023"));
+                    approveLoanRequest(amount, "20230101"));
 
             aLoanId.getAndSet(approvedLoanResult.getLoanId());
             Long loanId = aLoanId.get();
 
             Long chargeId = createCharge(100.0).getResourceId();
-            addLoanCharge(loanId, chargeId, "02 February 2023", 100.0);
+            addLoanCharge(loanId, chargeId, "20230202", 100.0);
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023") //
+                    transaction(5000.0, "Disbursement", "20230101") //
             );
         });
 
-        runAt("01 February 2023", () -> {
+        runAt("20230201", () -> {
             Long loanId = aLoanId.get();
 
             // repay 500
-            addRepaymentForLoan(loanId, 250.0, "01 February 2023");
+            addRepaymentForLoan(loanId, 250.0, "20230201");
 
             // check point in time data
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "01 February 2023");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20230201");
             verifyOutstanding(pointInTimeData, outstanding(5000.0, 767.70, 0.0, 0.0, 5767.70));
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(250.0, "Repayment", "01 February 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(250.0, "Repayment", "20230201") //
             );
         });
 
-        runAt("09 February 2023", () -> {
+        runAt("20230209", () -> {
             Long loanId = aLoanId.get();
 
             // repay 500
-            addRepaymentForLoan(loanId, 500.0, "09 February 2023");
+            addRepaymentForLoan(loanId, 500.0, "20230209");
 
             // check point in time data
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "01 February 2023");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20230201");
             verifyOutstanding(pointInTimeData, outstanding(5000.0, 767.70, 0.0, 0.0, 5767.70));
 
-            pointInTimeData = getPointInTimeData(loanId, "07 February 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230207");
             verifyOutstanding(pointInTimeData, outstanding(5000.0, 800.22, 100.0, 0.0, 5900.22));
 
-            pointInTimeData = getPointInTimeData(loanId, "09 February 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230209");
             verifyOutstanding(pointInTimeData, outstanding(4759.59, 551.47, 100.0, 0.0, 5411.06));
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(250.0, "Repayment", "01 February 2023"), //
-                    transaction(500.0, "Repayment", "09 February 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(250.0, "Repayment", "20230201"), //
+                    transaction(500.0, "Repayment", "20230209") //
             );
         });
 
-        runAt("01 March 2023", () -> {
+        runAt("20230301", () -> {
             Long loanId = aLoanId.get();
 
             // repay 500
-            addRepaymentForLoan(loanId, 500.0, "01 March 2023");
+            addRepaymentForLoan(loanId, 500.0, "20230301");
 
             // check point in time data
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "01 February 2023");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20230201");
             verifyOutstanding(pointInTimeData, outstanding(5000.0, 767.70, 0.0, 0.0, 5767.70));
 
-            pointInTimeData = getPointInTimeData(loanId, "10 February 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230210");
             verifyOutstanding(pointInTimeData, outstanding(4759.59, 556.02, 100.0, 0.0, 5415.61));
 
-            pointInTimeData = getPointInTimeData(loanId, "01 March 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230301");
             verifyOutstanding(pointInTimeData, outstanding(4259.59, 642.46, 100.0, 0.0, 5002.05));
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(250.0, "Repayment", "01 February 2023"), //
-                    transaction(500.0, "Repayment", "09 February 2023"), //
-                    transaction(500.0, "Repayment", "01 March 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(250.0, "Repayment", "20230201"), //
+                    transaction(500.0, "Repayment", "20230209"), //
+                    transaction(500.0, "Repayment", "20230301") //
             );
         });
 
-        runAt("05 March 2023", () -> {
+        runAt("20230305", () -> {
             Long loanId = aLoanId.get();
 
             // repay full loan
-            addRepaymentForLoan(loanId, 5032.52, "05 March 2023");
+            addRepaymentForLoan(loanId, 5032.52, "20230305");
 
             // check point in time data
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "01 February 2023");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20230201");
             verifyOutstanding(pointInTimeData, outstanding(5000.0, 767.70, 0.0, 0.0, 5767.70));
 
-            pointInTimeData = getPointInTimeData(loanId, "10 February 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230210");
             verifyOutstanding(pointInTimeData, outstanding(4759.59, 556.02, 100.0, 0.0, 5415.61));
 
-            pointInTimeData = getPointInTimeData(loanId, "01 March 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230301");
             verifyOutstanding(pointInTimeData, outstanding(4259.59, 642.46, 100.0, 0.0, 5002.05));
 
-            pointInTimeData = getPointInTimeData(loanId, "05 March 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230305");
             verifyOutstanding(pointInTimeData, outstanding(0.0, 0.0, 0.0, 0.0, 0.0));
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(250.0, "Repayment", "01 February 2023"), //
-                    transaction(500.0, "Repayment", "09 February 2023"), //
-                    transaction(500.0, "Repayment", "01 March 2023"), //
-                    transaction(5032.52, "Repayment", "05 March 2023"), //
-                    transaction(1110.08, "Accrual", "05 March 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(250.0, "Repayment", "20230201"), //
+                    transaction(500.0, "Repayment", "20230209"), //
+                    transaction(500.0, "Repayment", "20230301"), //
+                    transaction(5032.52, "Repayment", "20230305"), //
+                    transaction(1110.08, "Accrual", "20230305") //
             );
         });
     }
@@ -354,7 +354,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
     public void test_LoanPointInTimeDataWorks_ForAllOutstandingCalculation_WhenLoanIsProgressive_AndInterestIsEnabled() {
         AtomicReference<Long> aLoanId = new AtomicReference<>();
 
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -388,7 +388,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             // Apply and Approve Loan
             double amount = 5000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(repaymentEvery)//
                     .transactionProcessingStrategyCode(ADVANCED_PAYMENT_ALLOCATION_STRATEGY).interestRatePerPeriod(BigDecimal.valueOf(10.0))//
                     .loanTermFrequency(numberOfRepayments)//
@@ -400,116 +400,116 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 January 2023"));
+                    approveLoanRequest(amount, "20230101"));
 
             aLoanId.getAndSet(approvedLoanResult.getLoanId());
             Long loanId = aLoanId.get();
 
             Long chargeId = createCharge(100.0).getResourceId();
-            addLoanCharge(loanId, chargeId, "02 February 2023", 100.0);
+            addLoanCharge(loanId, chargeId, "20230202", 100.0);
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023") //
+                    transaction(5000.0, "Disbursement", "20230101") //
             );
         });
 
-        runAt("01 February 2023", () -> {
+        runAt("20230201", () -> {
             Long loanId = aLoanId.get();
 
             // repay 500
-            addRepaymentForLoan(loanId, 250.0, "01 February 2023");
+            addRepaymentForLoan(loanId, 250.0, "20230201");
 
             // check point in time data
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "01 February 2023");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20230201");
             verifyOutstanding(pointInTimeData, outstanding(4750.0, 83.56, 0.0, 0.0, 4833.56));
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(250.0, "Repayment", "01 February 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(250.0, "Repayment", "20230201") //
             );
         });
 
-        runAt("09 February 2023", () -> {
+        runAt("20230209", () -> {
             Long loanId = aLoanId.get();
 
             // repay 500
-            addRepaymentForLoan(loanId, 500.0, "09 February 2023");
+            addRepaymentForLoan(loanId, 500.0, "20230209");
 
             // check point in time data
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "01 February 2023");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20230201");
             verifyOutstanding(pointInTimeData, outstanding(4750.0, 83.56, 0.0, 0.0, 4833.56));
 
-            pointInTimeData = getPointInTimeData(loanId, "07 February 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230207");
             verifyOutstanding(pointInTimeData, outstanding(4750.0, 86.10, 100.0, 0.0, 4936.10));
 
-            pointInTimeData = getPointInTimeData(loanId, "09 February 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230209");
             verifyOutstanding(pointInTimeData, outstanding(4250.0, 86.93, 100.0, 0.0, 4436.93));
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(250.0, "Repayment", "01 February 2023"), //
-                    transaction(500.0, "Repayment", "09 February 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(250.0, "Repayment", "20230201"), //
+                    transaction(500.0, "Repayment", "20230209") //
             );
         });
 
-        runAt("01 March 2023", () -> {
+        runAt("20230301", () -> {
             Long loanId = aLoanId.get();
 
             // repay 500
-            addRepaymentForLoan(loanId, 500.0, "01 March 2023");
+            addRepaymentForLoan(loanId, 500.0, "20230301");
 
             // check point in time data
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "01 February 2023");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20230201");
             verifyOutstanding(pointInTimeData, outstanding(4750.0, 83.56, 0.0, 0.0, 4833.56));
 
-            pointInTimeData = getPointInTimeData(loanId, "10 February 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230210");
             verifyOutstanding(pointInTimeData, outstanding(4250.0, 87.20, 100.0, 0.0, 4437.20));
 
-            pointInTimeData = getPointInTimeData(loanId, "01 March 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230301");
             verifyOutstanding(pointInTimeData, outstanding(3750.0, 92.36, 100.0, 0.0, 3942.36));
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(250.0, "Repayment", "01 February 2023"), //
-                    transaction(500.0, "Repayment", "09 February 2023"), //
-                    transaction(500.0, "Repayment", "01 March 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(250.0, "Repayment", "20230201"), //
+                    transaction(500.0, "Repayment", "20230209"), //
+                    transaction(500.0, "Repayment", "20230301") //
             );
         });
 
-        runAt("05 March 2023", () -> {
+        runAt("20230305", () -> {
             Long loanId = aLoanId.get();
 
             // repay full loan
-            addRepaymentForLoan(loanId, 3942.36, "05 March 2023");
+            addRepaymentForLoan(loanId, 3942.36, "20230305");
 
             // check point in time data
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "01 February 2023");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20230201");
             verifyOutstanding(pointInTimeData, outstanding(4750.0, 83.56, 0.0, 0.0, 4833.56));
 
-            pointInTimeData = getPointInTimeData(loanId, "10 February 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230210");
             verifyOutstanding(pointInTimeData, outstanding(4250.0, 87.20, 100.0, 0.0, 4437.20));
 
-            pointInTimeData = getPointInTimeData(loanId, "01 March 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230301");
             verifyOutstanding(pointInTimeData, outstanding(3750.0, 92.36, 100.0, 0.0, 3942.36));
 
-            pointInTimeData = getPointInTimeData(loanId, "05 March 2023");
+            pointInTimeData = getPointInTimeData(loanId, "20230305");
             verifyOutstanding(pointInTimeData, outstanding(0.0, 0.0, 0.0, 0.0, 0.0));
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(250.0, "Repayment", "01 February 2023"), //
-                    transaction(500.0, "Repayment", "09 February 2023"), //
-                    transaction(500.0, "Repayment", "01 March 2023"), //
-                    transaction(3942.36, "Repayment", "05 March 2023"), //
-                    transaction(182.31, "Accrual", "05 March 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(250.0, "Repayment", "20230201"), //
+                    transaction(500.0, "Repayment", "20230209"), //
+                    transaction(500.0, "Repayment", "20230301"), //
+                    transaction(3942.36, "Repayment", "20230305"), //
+                    transaction(182.31, "Accrual", "20230305") //
             );
         });
     }
@@ -519,7 +519,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
         AtomicReference<Long> aLoanId = new AtomicReference<>();
         AtomicReference<Long> aLoanId2 = new AtomicReference<>();
 
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -560,7 +560,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             // Apply and Approve Loan
             double amount = 5000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(repaymentEvery)//
                     .loanTermFrequency(numberOfRepayments)//
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS)//
@@ -576,10 +576,10 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             PostLoansResponse postLoansResponse2 = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 January 2023"));
+                    approveLoanRequest(amount, "20230101"));
 
             PostLoansLoanIdResponse approvedLoanResult2 = loanTransactionHelper.approveLoan(postLoansResponse2.getResourceId(),
-                    approveLoanRequest(amount, "01 January 2023"));
+                    approveLoanRequest(amount, "20230101"));
 
             aLoanId.getAndSet(approvedLoanResult.getLoanId());
             aLoanId2.getAndSet(approvedLoanResult2.getLoanId());
@@ -587,75 +587,75 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             Long loanId2 = aLoanId2.get();
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "01 January 2023");
-            disburseLoan(loanId2, BigDecimal.valueOf(5000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "20230101");
+            disburseLoan(loanId2, BigDecimal.valueOf(5000.0), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(125.0, "Repayment (at time of disbursement)", "01 January 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(125.0, "Repayment (at time of disbursement)", "20230101") //
             );
             verifyTransactions(loanId2, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(125.0, "Repayment (at time of disbursement)", "01 January 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(125.0, "Repayment (at time of disbursement)", "20230101") //
             );
         });
 
-        runAt("01 February 2023", () -> {
+        runAt("20230201", () -> {
             Long loanId = aLoanId.get();
             Long loanId2 = aLoanId2.get();
 
             // repay 500
-            addRepaymentForLoan(loanId, 500.0, "01 February 2023");
-            addRepaymentForLoan(loanId2, 500.0, "01 February 2023");
+            addRepaymentForLoan(loanId, 500.0, "20230201");
+            addRepaymentForLoan(loanId2, 500.0, "20230201");
 
             // check point in time data
-            List<LoanPointInTimeData> pointInTimeData = getPointInTimeData(List.of(loanId, loanId2), "01 February 2023");
+            List<LoanPointInTimeData> pointInTimeData = getPointInTimeData(List.of(loanId, loanId2), "20230201");
             verifyOutstanding(pointInTimeData.get(0), outstanding(4500.0, 0.0, 0.0, 0.0, 4500.0));
             verifyOutstanding(pointInTimeData.get(1), outstanding(4500.0, 0.0, 0.0, 0.0, 4500.0));
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(125.0, "Repayment (at time of disbursement)", "01 January 2023"), //
-                    transaction(500.0, "Repayment", "01 February 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(125.0, "Repayment (at time of disbursement)", "20230101"), //
+                    transaction(500.0, "Repayment", "20230201") //
             );
             verifyTransactions(loanId2, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(125.0, "Repayment (at time of disbursement)", "01 January 2023"), //
-                    transaction(500.0, "Repayment", "01 February 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(125.0, "Repayment (at time of disbursement)", "20230101"), //
+                    transaction(500.0, "Repayment", "20230201") //
             );
         });
 
-        runAt("01 March 2023", () -> {
+        runAt("20230301", () -> {
             Long loanId = aLoanId.get();
             Long loanId2 = aLoanId2.get();
 
             // repay 500
-            addRepaymentForLoan(loanId, 500.0, "01 March 2023");
-            addRepaymentForLoan(loanId2, 500.0, "01 March 2023");
+            addRepaymentForLoan(loanId, 500.0, "20230301");
+            addRepaymentForLoan(loanId2, 500.0, "20230301");
 
             // check point in time data
-            List<LoanPointInTimeData> pointInTimeData = getPointInTimeData(List.of(loanId, loanId2), "01 February 2023");
+            List<LoanPointInTimeData> pointInTimeData = getPointInTimeData(List.of(loanId, loanId2), "20230201");
             verifyOutstanding(pointInTimeData.get(0), outstanding(4500.0, 0.0, 0.0, 0.0, 4500.0));
             verifyOutstanding(pointInTimeData.get(1), outstanding(4500.0, 0.0, 0.0, 0.0, 4500.0));
 
-            pointInTimeData = getPointInTimeData(List.of(loanId, loanId2), "01 March 2023");
+            pointInTimeData = getPointInTimeData(List.of(loanId, loanId2), "20230301");
             verifyOutstanding(pointInTimeData.get(0), outstanding(4000.0, 0.0, 0.0, 0.0, 4000.0));
             verifyOutstanding(pointInTimeData.get(1), outstanding(4000.0, 0.0, 0.0, 0.0, 4000.0));
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(125.0, "Repayment (at time of disbursement)", "01 January 2023"), //
-                    transaction(500.0, "Repayment", "01 February 2023"), //
-                    transaction(500.0, "Repayment", "01 March 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(125.0, "Repayment (at time of disbursement)", "20230101"), //
+                    transaction(500.0, "Repayment", "20230201"), //
+                    transaction(500.0, "Repayment", "20230301") //
             );
             verifyTransactions(loanId2, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(125.0, "Repayment (at time of disbursement)", "01 January 2023"), //
-                    transaction(500.0, "Repayment", "01 February 2023"), //
-                    transaction(500.0, "Repayment", "01 March 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(125.0, "Repayment (at time of disbursement)", "20230101"), //
+                    transaction(500.0, "Repayment", "20230201"), //
+                    transaction(500.0, "Repayment", "20230301") //
             );
         });
     }
@@ -664,7 +664,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
     public void test_LoanPointInTimeDataWorks_ForArrearsDataCalculation() {
         AtomicReference<Long> aLoanId = new AtomicReference<>();
 
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -704,7 +704,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             // Apply and Approve Loan
             double amount = 5000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(repaymentEvery)//
                     .loanTermFrequency(numberOfRepayments)//
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS)//
@@ -719,40 +719,40 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 January 2023"));
+                    approveLoanRequest(amount, "20230101"));
 
             aLoanId.getAndSet(approvedLoanResult.getLoanId());
             Long loanId = aLoanId.get();
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(125.0, "Repayment (at time of disbursement)", "01 January 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(125.0, "Repayment (at time of disbursement)", "20230101") //
             );
         });
 
-        runAt("05 February 2023", () -> {
+        runAt("20230205", () -> {
             Long loanId = aLoanId.get();
 
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "10 February 2023");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20230210");
             verifyOutstanding(pointInTimeData, outstanding(5000.0, 0.0, 0.0, 0.0, 5000.0));
             verifyArrears(pointInTimeData, true, "2023-02-01");
 
             // repay 500
-            addRepaymentForLoan(loanId, 2500.0, "01 February 2023");
+            addRepaymentForLoan(loanId, 2500.0, "20230201");
 
-            LoanPointInTimeData pointInTimeDataAfterRepay = getPointInTimeData(loanId, "10 February 2023");
+            LoanPointInTimeData pointInTimeDataAfterRepay = getPointInTimeData(loanId, "20230210");
             verifyOutstanding(pointInTimeDataAfterRepay, outstanding(2500.0, 0.0, 0.0, 0.0, 2500.0));
             verifyArrears(pointInTimeDataAfterRepay, false, null);
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(125.0, "Repayment (at time of disbursement)", "01 January 2023"), //
-                    transaction(2500.0, "Repayment", "01 February 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(125.0, "Repayment (at time of disbursement)", "20230101"), //
+                    transaction(2500.0, "Repayment", "20230201") //
             );
         });
     }
@@ -761,7 +761,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
     public void test_LoanPointInTimeDataWorks_ForArrearsDataCalculation_ForFutureDate_WithInterest() {
         AtomicReference<Long> aLoanId = new AtomicReference<>();
 
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -802,7 +802,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             // Apply and Approve Loan
             double amount = 5000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(repaymentEvery)//
                     .interestRatePerPeriod(BigDecimal.valueOf(interestRatePerPeriod)).loanTermFrequency(numberOfRepayments)//
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS)//
@@ -817,40 +817,40 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 January 2023"));
+                    approveLoanRequest(amount, "20230101"));
 
             aLoanId.getAndSet(approvedLoanResult.getLoanId());
             Long loanId = aLoanId.get();
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(125.0, "Repayment (at time of disbursement)", "01 January 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(125.0, "Repayment (at time of disbursement)", "20230101") //
             );
         });
 
-        runAt("05 March 2023", () -> {
+        runAt("20230305", () -> {
             Long loanId = aLoanId.get();
 
             // repay
-            addRepaymentForLoan(loanId, 5897.89, "05 March 2023");
+            addRepaymentForLoan(loanId, 5897.89, "20230305");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023"), //
-                    transaction(125.0, "Repayment (at time of disbursement)", "01 January 2023"), //
-                    transaction(5897.89, "Repayment", "05 March 2023"), //
-                    transaction(897.89, "Accrual", "05 March 2023") //
+                    transaction(5000.0, "Disbursement", "20230101"), //
+                    transaction(125.0, "Repayment (at time of disbursement)", "20230101"), //
+                    transaction(5897.89, "Repayment", "20230305"), //
+                    transaction(897.89, "Accrual", "20230305") //
             );
         });
 
-        runAt("05 June 2023", () -> {
+        runAt("20230605", () -> {
             Long loanId = aLoanId.get();
 
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "05 June 2023");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20230605");
 
             verifyOutstanding(pointInTimeData, outstanding(0.0, 0.0, 0.0, 0.0, 0.0));
             verifyArrears(pointInTimeData, false, null);
@@ -867,7 +867,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
         AtomicReference<Long> aLoanId = new AtomicReference<>();
         double installmentFeeAmount = 100.0;
 
-        runAt("01 October 2025", () -> {
+        runAt("20251001", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
             int numberOfRepayments = 6;
@@ -892,7 +892,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
 
             double amount = 6000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 October 2025", amount, numberOfRepayments)
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20251001", amount, numberOfRepayments)
                     .repaymentEvery(repaymentEvery).loanTermFrequency(numberOfRepayments)
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS).loanTermFrequencyType(RepaymentFrequencyType.MONTHS)
                     .interestType(InterestType.DECLINING_BALANCE).interestCalculationPeriodType(InterestCalculationPeriodType.DAILY)
@@ -902,42 +902,42 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 October 2025"));
+                    approveLoanRequest(amount, "20251001"));
 
             aLoanId.getAndSet(approvedLoanResult.getLoanId());
             Long loanId = aLoanId.get();
 
-            disburseLoan(loanId, BigDecimal.valueOf(amount), "01 October 2025");
+            disburseLoan(loanId, BigDecimal.valueOf(amount), "20251001");
 
-            verifyTransactions(loanId, transaction(6000.0, "Disbursement", "01 October 2025"));
+            verifyTransactions(loanId, transaction(6000.0, "Disbursement", "20251001"));
         });
 
-        runAt("01 November 2025", () -> {
+        runAt("20251101", () -> {
             Long loanId = aLoanId.get();
 
-            addRepaymentForLoan(loanId, 1100.0, "01 November 2025");
+            addRepaymentForLoan(loanId, 1100.0, "20251101");
 
-            verifyTransactions(loanId, transaction(6000.0, "Disbursement", "01 October 2025"),
-                    transaction(1100.0, "Repayment", "01 November 2025"));
+            verifyTransactions(loanId, transaction(6000.0, "Disbursement", "20251001"),
+                    transaction(1100.0, "Repayment", "20251101"));
         });
 
-        runAt("01 December 2025", () -> {
+        runAt("20251201", () -> {
             Long loanId = aLoanId.get();
 
-            addRepaymentForLoan(loanId, 1100.0, "01 December 2025");
+            addRepaymentForLoan(loanId, 1100.0, "20251201");
 
-            verifyTransactions(loanId, transaction(6000.0, "Disbursement", "01 October 2025"),
-                    transaction(1100.0, "Repayment", "01 November 2025"), transaction(1100.0, "Repayment", "01 December 2025"));
+            verifyTransactions(loanId, transaction(6000.0, "Disbursement", "20251001"),
+                    transaction(1100.0, "Repayment", "20251101"), transaction(1100.0, "Repayment", "20251201"));
         });
 
-        runAt("01 January 2026", () -> {
+        runAt("20260101", () -> {
             Long loanId = aLoanId.get();
 
-            addRepaymentForLoan(loanId, 1100.0, "01 January 2026");
+            addRepaymentForLoan(loanId, 1100.0, "20260101");
 
-            verifyTransactions(loanId, transaction(6000.0, "Disbursement", "01 October 2025"),
-                    transaction(1100.0, "Repayment", "01 November 2025"), transaction(1100.0, "Repayment", "01 December 2025"),
-                    transaction(1100.0, "Repayment", "01 January 2026"));
+            verifyTransactions(loanId, transaction(6000.0, "Disbursement", "20251001"),
+                    transaction(1100.0, "Repayment", "20251101"), transaction(1100.0, "Repayment", "20251201"),
+                    transaction(1100.0, "Repayment", "20260101"));
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             BigDecimal regularApiFeeChargesPaid = loanDetails.getSummary().getFeeChargesPaid();
@@ -947,10 +947,10 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             assertThat(regularApiFeeChargesPaid).isEqualByComparingTo(BigDecimal.valueOf(300.0));
         });
 
-        runAt("08 January 2026", () -> {
+        runAt("20260108", () -> {
             Long loanId = aLoanId.get();
 
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "08 January 2026");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20260108");
 
             assertThat(pointInTimeData.getFee().getFeeChargesCharged())
                     .as("Point-in-time feeChargesCharged should only include fees for installments due by the requested date")
@@ -973,7 +973,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
         AtomicReference<Long> aLoanId = new AtomicReference<>();
         double installmentFeeAmount = 25.0;
 
-        runAt("01 October 2023", () -> {
+        runAt("20231001", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
             int numberOfRepayments = 2;
@@ -994,7 +994,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
 
             double amount = 2000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 October 2023", amount, numberOfRepayments)
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20231001", amount, numberOfRepayments)
                     .repaymentEvery(repaymentEvery).loanTermFrequency(numberOfRepayments)
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS).loanTermFrequencyType(RepaymentFrequencyType.MONTHS)
                     .interestType(InterestType.FLAT).interestCalculationPeriodType(InterestCalculationPeriodType.SAME_AS_REPAYMENT_PERIOD)
@@ -1004,31 +1004,31 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 October 2023"));
+                    approveLoanRequest(amount, "20231001"));
 
             aLoanId.getAndSet(approvedLoanResult.getLoanId());
             Long loanId = aLoanId.get();
 
-            disburseLoan(loanId, BigDecimal.valueOf(amount), "01 October 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(amount), "20231001");
 
-            verifyTransactions(loanId, transaction(2000.0, "Disbursement", "01 October 2023"));
+            verifyTransactions(loanId, transaction(2000.0, "Disbursement", "20231001"));
         });
 
-        runAt("01 November 2023", () -> {
+        runAt("20231101", () -> {
             Long loanId = aLoanId.get();
 
             // First repayment: 1000 principal + 25 fee = 1025
-            addRepaymentForLoan(loanId, 1025.0, "01 November 2023");
+            addRepaymentForLoan(loanId, 1025.0, "20231101");
 
-            verifyTransactions(loanId, transaction(2000.0, "Disbursement", "01 October 2023"),
-                    transaction(1025.0, "Repayment", "01 November 2023"));
+            verifyTransactions(loanId, transaction(2000.0, "Disbursement", "20231001"),
+                    transaction(1025.0, "Repayment", "20231101"));
         });
 
-        runAt("01 December 2023", () -> {
+        runAt("20231201", () -> {
             Long loanId = aLoanId.get();
 
             // Second repayment: 1000 principal + 25 fee = 1025 (loan should close)
-            addRepaymentForLoan(loanId, 1025.0, "01 December 2023");
+            addRepaymentForLoan(loanId, 1025.0, "20231201");
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
 
@@ -1044,16 +1044,16 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             assertThat(feeChargesPaid).as("Total fee charges paid should be 50").isEqualByComparingTo(BigDecimal.valueOf(50.0));
 
             // With periodic accrual accounting, an accrual transaction is created for the installment fees
-            verifyTransactions(loanId, transaction(2000.0, "Disbursement", "01 October 2023"),
-                    transaction(1025.0, "Repayment", "01 November 2023"), transaction(50.0, "Accrual", "01 December 2023"),
-                    transaction(1025.0, "Repayment", "01 December 2023"));
+            verifyTransactions(loanId, transaction(2000.0, "Disbursement", "20231001"),
+                    transaction(1025.0, "Repayment", "20231101"), transaction(50.0, "Accrual", "20231201"),
+                    transaction(1025.0, "Repayment", "20231201"));
         });
 
-        runAt("15 December 2023", () -> {
+        runAt("20231215", () -> {
             Long loanId = aLoanId.get();
 
             // Query point-in-time data for a date AFTER the loan was closed
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "15 December 2023");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20231215");
 
             // For a closed loan, all installment fees should be included (50 total)
             assertThat(pointInTimeData.getFee().getFeeChargesCharged())
@@ -1076,7 +1076,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
         AtomicReference<Long> aLoanId = new AtomicReference<>();
         double installmentFeeAmount = 100.0;
 
-        runAt("01 October 2025", () -> {
+        runAt("20251001", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
             int numberOfRepayments = 6;
@@ -1101,7 +1101,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
 
             double amount = 6000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 October 2025", amount, numberOfRepayments)
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20251001", amount, numberOfRepayments)
                     .repaymentEvery(repaymentEvery).loanTermFrequency(numberOfRepayments)
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS).loanTermFrequencyType(RepaymentFrequencyType.MONTHS)
                     .interestType(InterestType.DECLINING_BALANCE).interestCalculationPeriodType(InterestCalculationPeriodType.DAILY)
@@ -1111,27 +1111,27 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 October 2025"));
+                    approveLoanRequest(amount, "20251001"));
 
             aLoanId.getAndSet(approvedLoanResult.getLoanId());
             Long loanId = aLoanId.get();
 
-            disburseLoan(loanId, BigDecimal.valueOf(amount), "01 October 2025");
+            disburseLoan(loanId, BigDecimal.valueOf(amount), "20251001");
         });
 
-        runAt("01 November 2025", () -> {
+        runAt("20251101", () -> {
             Long loanId = aLoanId.get();
-            addRepaymentForLoan(loanId, 1100.0, "01 November 2025");
+            addRepaymentForLoan(loanId, 1100.0, "20251101");
         });
 
-        runAt("01 December 2025", () -> {
+        runAt("20251201", () -> {
             Long loanId = aLoanId.get();
-            addRepaymentForLoan(loanId, 1100.0, "01 December 2025");
+            addRepaymentForLoan(loanId, 1100.0, "20251201");
         });
 
-        runAt("01 January 2026", () -> {
+        runAt("20260101", () -> {
             Long loanId = aLoanId.get();
-            addRepaymentForLoan(loanId, 1100.0, "01 January 2026");
+            addRepaymentForLoan(loanId, 1100.0, "20260101");
 
             // Verify regular API values (full schedule)
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
@@ -1140,10 +1140,10 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
                     .isEqualByComparingTo(BigDecimal.valueOf(600.0));
         });
 
-        runAt("08 January 2026", () -> {
+        runAt("20260108", () -> {
             Long loanId = aLoanId.get();
 
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "08 January 2026");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20260108");
 
             // Fee charges should only include fees for installments due by the requested date (3 installments * 100 =
             // 300)
@@ -1175,7 +1175,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
         double installmentFeeAmount = 50.0;
         double interestRatePerPeriod = 12.0;
 
-        runAt("01 October 2025", () -> {
+        runAt("20251001", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
             int numberOfRepayments = 4;
@@ -1196,7 +1196,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
 
             double amount = 4000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 October 2025", amount, numberOfRepayments)
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20251001", amount, numberOfRepayments)
                     .repaymentEvery(repaymentEvery).loanTermFrequency(numberOfRepayments)
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS).loanTermFrequencyType(RepaymentFrequencyType.MONTHS)
                     .interestType(InterestType.FLAT).interestCalculationPeriodType(InterestCalculationPeriodType.SAME_AS_REPAYMENT_PERIOD)
@@ -1206,25 +1206,25 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 October 2025"));
+                    approveLoanRequest(amount, "20251001"));
 
             aLoanId.getAndSet(approvedLoanResult.getLoanId());
             Long loanId = aLoanId.get();
 
-            disburseLoan(loanId, BigDecimal.valueOf(amount), "01 October 2025");
+            disburseLoan(loanId, BigDecimal.valueOf(amount), "20251001");
         });
 
-        runAt("01 November 2025", () -> {
+        runAt("20251101", () -> {
             Long loanId = aLoanId.get();
-            addRepaymentForLoan(loanId, 1170.0, "01 November 2025");
+            addRepaymentForLoan(loanId, 1170.0, "20251101");
         });
 
-        runAt("01 December 2025", () -> {
+        runAt("20251201", () -> {
             Long loanId = aLoanId.get();
-            addRepaymentForLoan(loanId, 1170.0, "01 December 2025");
+            addRepaymentForLoan(loanId, 1170.0, "20251201");
         });
 
-        runAt("08 December 2025", () -> {
+        runAt("20251208", () -> {
             Long loanId = aLoanId.get();
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
@@ -1232,7 +1232,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             BigDecimal regularApiInterestPaid = loanDetails.getSummary().getInterestPaid();
             BigDecimal regularApiInterestOutstanding = loanDetails.getSummary().getInterestOutstanding();
 
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "08 December 2025");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20251208");
 
             assertThat(pointInTimeData.getInterest().getInterestCharged())
                     .as("Point-in-time interestCharged should remain unchanged from regular API")
@@ -1257,7 +1257,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
         double installmentFeeAmount = 50.0;
         double installmentPenaltyAmount = 25.0;
 
-        runAt("01 October 2025", () -> {
+        runAt("20251001", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
             int numberOfRepayments = 4;
@@ -1280,7 +1280,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
 
             double amount = 4000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 October 2025", amount, numberOfRepayments)
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20251001", amount, numberOfRepayments)
                     .repaymentEvery(repaymentEvery).loanTermFrequency(numberOfRepayments)
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS).loanTermFrequencyType(RepaymentFrequencyType.MONTHS)
                     .interestType(InterestType.FLAT).interestCalculationPeriodType(InterestCalculationPeriodType.SAME_AS_REPAYMENT_PERIOD)
@@ -1293,25 +1293,25 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 October 2025"));
+                    approveLoanRequest(amount, "20251001"));
 
             aLoanId.getAndSet(approvedLoanResult.getLoanId());
             Long loanId = aLoanId.get();
 
-            disburseLoan(loanId, BigDecimal.valueOf(amount), "01 October 2025");
+            disburseLoan(loanId, BigDecimal.valueOf(amount), "20251001");
         });
 
-        runAt("01 November 2025", () -> {
+        runAt("20251101", () -> {
             Long loanId = aLoanId.get();
-            addRepaymentForLoan(loanId, 1075.0, "01 November 2025");
+            addRepaymentForLoan(loanId, 1075.0, "20251101");
         });
 
-        runAt("01 December 2025", () -> {
+        runAt("20251201", () -> {
             Long loanId = aLoanId.get();
-            addRepaymentForLoan(loanId, 1075.0, "01 December 2025");
+            addRepaymentForLoan(loanId, 1075.0, "20251201");
         });
 
-        runAt("08 December 2025", () -> {
+        runAt("20251208", () -> {
             Long loanId = aLoanId.get();
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
@@ -1319,7 +1319,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             BigDecimal regularApiPenaltyPaid = loanDetails.getSummary().getPenaltyChargesPaid();
             BigDecimal regularApiPenaltyOutstanding = loanDetails.getSummary().getPenaltyChargesOutstanding();
 
-            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "08 December 2025");
+            LoanPointInTimeData pointInTimeData = getPointInTimeData(loanId, "20251208");
 
             assertThat(pointInTimeData.getPenalty().getPenaltyChargesCharged())
                     .as("Point-in-time penaltyChargesCharged should remain unchanged from regular API")
@@ -1344,7 +1344,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
         AtomicReference<Long> aLoanId = new AtomicReference<>();
         double installmentFeeAmount = 100.0;
 
-        runAt("01 October 2025", () -> {
+        runAt("20251001", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
             int numberOfRepayments = 3;
@@ -1365,7 +1365,7 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
 
             double amount = 3000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 October 2025", amount, numberOfRepayments)
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20251001", amount, numberOfRepayments)
                     .repaymentEvery(repaymentEvery).loanTermFrequency(numberOfRepayments)
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS).loanTermFrequencyType(RepaymentFrequencyType.MONTHS)
                     .interestType(InterestType.FLAT).interestCalculationPeriodType(InterestCalculationPeriodType.SAME_AS_REPAYMENT_PERIOD)
@@ -1375,38 +1375,38 @@ public class LoanPointInTimeTest extends BaseLoanIntegrationTest {
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 October 2025"));
+                    approveLoanRequest(amount, "20251001"));
 
             aLoanId.getAndSet(approvedLoanResult.getLoanId());
             Long loanId = aLoanId.get();
 
-            disburseLoan(loanId, BigDecimal.valueOf(amount), "01 October 2025");
+            disburseLoan(loanId, BigDecimal.valueOf(amount), "20251001");
         });
 
-        runAt("01 November 2025", () -> {
+        runAt("20251101", () -> {
             Long loanId = aLoanId.get();
-            addRepaymentForLoan(loanId, 1100.0, "01 November 2025");
+            addRepaymentForLoan(loanId, 1100.0, "20251101");
         });
 
-        runAt("01 December 2025", () -> {
+        runAt("20251201", () -> {
             Long loanId = aLoanId.get();
-            addRepaymentForLoan(loanId, 1100.0, "01 December 2025");
+            addRepaymentForLoan(loanId, 1100.0, "20251201");
         });
 
-        runAt("01 January 2026", () -> {
+        runAt("20260101", () -> {
             Long loanId = aLoanId.get();
-            addRepaymentForLoan(loanId, 1100.0, "01 January 2026");
+            addRepaymentForLoan(loanId, 1100.0, "20260101");
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
 
             assertThat(loanDetails.getStatus().getCode()).isEqualTo("loanStatusType.closed.obligations.met");
         });
 
-        runAt("15 January 2026", () -> {
+        runAt("20260115", () -> {
             Long loanId = aLoanId.get();
 
             GetLoansLoanIdResponse regularApi = loanTransactionHelper.getLoanDetails(loanId);
-            LoanPointInTimeData pointInTimeApi = getPointInTimeData(loanId, "15 January 2026");
+            LoanPointInTimeData pointInTimeApi = getPointInTimeData(loanId, "20260115");
 
             assertThat(pointInTimeApi.getFee().getFeeChargesCharged())
                     .as("Closed loan: point-in-time feeChargesCharged should match regular API")

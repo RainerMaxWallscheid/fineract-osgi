@@ -46,7 +46,7 @@ public class CustomSnapshotEventIntegrationTest extends BaseLoanIntegrationTest 
 
     @Test
     public void testSnapshotEventGenerationWhenLoanInstallmentIsNotPayed() {
-        runAt("31 January 2023", () -> {
+        runAt("20230131", () -> {
             // Enable Business Step
             enableCOBBusinessStep("APPLY_CHARGE_TO_OVERDUE_LOANS", "LOAN_DELINQUENCY_CLASSIFICATION", "CHECK_LOAN_REPAYMENT_DUE", "CHECK_LOAN_REPAYMENT_OVERDUE", "UPDATE_LOAN_ARREARS_AGING", "ADD_PERIODIC_ACCRUAL_ENTRIES", "EXTERNAL_ASSET_OWNER_TRANSFER", "CHECK_DUE_INSTALLMENTS");
             enableLoanAccountCustomSnapshotBusinessEvent();
@@ -56,21 +56,21 @@ public class CustomSnapshotEventIntegrationTest extends BaseLoanIntegrationTest 
             PostLoanProductsRequest loanProductsRequest = create1InstallmentAmountInMultiplesOf4Period1MonthLongWithInterestAndAmortizationProduct(InterestType.FLAT, AmortizationType.EQUAL_INSTALLMENTS);
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProductsRequest);
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductResponse.getResourceId(), "01 January 2023", 1250.0, 4);
+            Long loanId = applyAndApproveLoan(clientId, loanProductResponse.getResourceId(), "20230101", 1250.0, 4);
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1250), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1250), "20230101");
             // Verify Repayment Schedule and Due Dates
             verifyRepaymentSchedule(loanId,  //
-            installment(1250.0, null, "01 January 2023"),  //
-            installment(312.0, false, "31 January 2023"),  //
-            installment(312.0, false, "02 March 2023"),  //
-            installment(312.0, false, "01 April 2023"),  //
-            installment(314.0, false, "01 May 2023") //
+            installment(1250.0, null, "20230101"),  //
+            installment(312.0, false, "20230131"),  //
+            installment(312.0, false, "20230302"),  //
+            installment(312.0, false, "20230401"),  //
+            installment(314.0, false, "20230501") //
             );
             // delete all external events
             deleteAllExternalEvents();
             // run cob
-            updateBusinessDateAndExecuteCOBJob("01 February 2023");
+            updateBusinessDateAndExecuteCOBJob("20230201");
             // verify external events
             List<ExternalEventResponse> allExternalEvents = ExternalEventHelper.getAllExternalEvents(requestSpec, responseSpec);
             Assertions.assertEquals(1, allExternalEvents.size());
@@ -98,7 +98,7 @@ public class CustomSnapshotEventIntegrationTest extends BaseLoanIntegrationTest 
 
     @Test
     public void testNoSnapshotEventGenerationWhenLoanInstallmentIsPayed() {
-        runAt("31 January 2023", () -> {
+        runAt("20230131", () -> {
             // Enable Business Step
             enableCOBBusinessStep("APPLY_CHARGE_TO_OVERDUE_LOANS", "LOAN_DELINQUENCY_CLASSIFICATION", "CHECK_LOAN_REPAYMENT_DUE", "CHECK_LOAN_REPAYMENT_OVERDUE", "UPDATE_LOAN_ARREARS_AGING", "ADD_PERIODIC_ACCRUAL_ENTRIES", "EXTERNAL_ASSET_OWNER_TRANSFER", "CHECK_DUE_INSTALLMENTS");
             enableLoanAccountCustomSnapshotBusinessEvent();
@@ -108,30 +108,30 @@ public class CustomSnapshotEventIntegrationTest extends BaseLoanIntegrationTest 
             PostLoanProductsRequest loanProductsRequest = create1InstallmentAmountInMultiplesOf4Period1MonthLongWithInterestAndAmortizationProduct(InterestType.FLAT, AmortizationType.EQUAL_INSTALLMENTS);
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProductsRequest);
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductResponse.getResourceId(), "01 January 2023", 1250.0, 4);
+            Long loanId = applyAndApproveLoan(clientId, loanProductResponse.getResourceId(), "20230101", 1250.0, 4);
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1250), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1250), "20230101");
             // Verify Repayment Schedule and Due Dates
             verifyRepaymentSchedule(loanId,  //
-            installment(1250.0, null, "01 January 2023"),  //
-            installment(312.0, false, "31 January 2023"),  //
-            installment(312.0, false, "02 March 2023"),  //
-            installment(312.0, false, "01 April 2023"),  //
-            installment(314.0, false, "01 May 2023") //
+            installment(1250.0, null, "20230101"),  //
+            installment(312.0, false, "20230131"),  //
+            installment(312.0, false, "20230302"),  //
+            installment(312.0, false, "20230401"),  //
+            installment(314.0, false, "20230501") //
             );
-            addRepaymentForLoan(loanId, 313.0, "31 January 2023");
+            addRepaymentForLoan(loanId, 313.0, "20230131");
             // Verify Repayment Schedule and Due Dates
             verifyRepaymentSchedule(loanId,  //
-            installment(1250.0, null, "01 January 2023"),  //
-            installment(312.0, true, "31 January 2023"),  //
-            installment(312.0, false, "02 March 2023"),  //
-            installment(312.0, false, "01 April 2023"),  //
-            installment(314.0, false, "01 May 2023") //
+            installment(1250.0, null, "20230101"),  //
+            installment(312.0, true, "20230131"),  //
+            installment(312.0, false, "20230302"),  //
+            installment(312.0, false, "20230401"),  //
+            installment(314.0, false, "20230501") //
             );
             // delete all external events
             deleteAllExternalEvents();
             // run cob
-            updateBusinessDateAndExecuteCOBJob("01 February 2023");
+            updateBusinessDateAndExecuteCOBJob("20230201");
             // verify external events
             List<ExternalEventResponse> allExternalEvents = ExternalEventHelper.getAllExternalEvents(requestSpec, responseSpec);
             Assertions.assertEquals(0, allExternalEvents.size());
@@ -140,7 +140,7 @@ public class CustomSnapshotEventIntegrationTest extends BaseLoanIntegrationTest 
 
     @Test
     public void testNoSnapshotEventGenerationWhenWhenCustomSnapshotEventCOBTaskIsNotActive() {
-        runAt("31 January 2023", () -> {
+        runAt("20230131", () -> {
             // Enable Business Step
             enableCOBBusinessStep("APPLY_CHARGE_TO_OVERDUE_LOANS", "LOAN_DELINQUENCY_CLASSIFICATION", "CHECK_LOAN_REPAYMENT_DUE", "CHECK_LOAN_REPAYMENT_OVERDUE", "UPDATE_LOAN_ARREARS_AGING", "ADD_PERIODIC_ACCRUAL_ENTRIES", "EXTERNAL_ASSET_OWNER_TRANSFER");
             enableLoanAccountCustomSnapshotBusinessEvent();
@@ -150,21 +150,21 @@ public class CustomSnapshotEventIntegrationTest extends BaseLoanIntegrationTest 
             PostLoanProductsRequest loanProductsRequest = create1InstallmentAmountInMultiplesOf4Period1MonthLongWithInterestAndAmortizationProduct(InterestType.FLAT, AmortizationType.EQUAL_INSTALLMENTS);
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProductsRequest);
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductResponse.getResourceId(), "01 January 2023", 1250.0, 4);
+            Long loanId = applyAndApproveLoan(clientId, loanProductResponse.getResourceId(), "20230101", 1250.0, 4);
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1250), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1250), "20230101");
             // Verify Repayment Schedule and Due Dates
             verifyRepaymentSchedule(loanId,  //
-            installment(1250.0, null, "01 January 2023"),  //
-            installment(312.0, false, "31 January 2023"),  //
-            installment(312.0, false, "02 March 2023"),  //
-            installment(312.0, false, "01 April 2023"),  //
-            installment(314.0, false, "01 May 2023") //
+            installment(1250.0, null, "20230101"),  //
+            installment(312.0, false, "20230131"),  //
+            installment(312.0, false, "20230302"),  //
+            installment(312.0, false, "20230401"),  //
+            installment(314.0, false, "20230501") //
             );
             // delete all external events
             deleteAllExternalEvents();
             // run cob
-            updateBusinessDateAndExecuteCOBJob("01 February 2023");
+            updateBusinessDateAndExecuteCOBJob("20230201");
             // verify external events
             List<ExternalEventResponse> allExternalEvents = ExternalEventHelper.getAllExternalEvents(requestSpec, responseSpec);
             Assertions.assertEquals(0, allExternalEvents.size());
@@ -173,7 +173,7 @@ public class CustomSnapshotEventIntegrationTest extends BaseLoanIntegrationTest 
 
     @Test
     public void testNoSnapshotEventGenerationWhenCOBDateIsNotMatchingWithInstallmentDueDate() {
-        runAt("30 January 2023", () -> {
+        runAt("20230130", () -> {
             // Enable Business Step
             enableCOBBusinessStep("APPLY_CHARGE_TO_OVERDUE_LOANS", "LOAN_DELINQUENCY_CLASSIFICATION", "CHECK_LOAN_REPAYMENT_OVERDUE", "UPDATE_LOAN_ARREARS_AGING", "ADD_PERIODIC_ACCRUAL_ENTRIES", "EXTERNAL_ASSET_OWNER_TRANSFER", "CHECK_DUE_INSTALLMENTS");
             enableLoanAccountCustomSnapshotBusinessEvent();
@@ -183,21 +183,21 @@ public class CustomSnapshotEventIntegrationTest extends BaseLoanIntegrationTest 
             PostLoanProductsRequest loanProductsRequest = create1InstallmentAmountInMultiplesOf4Period1MonthLongWithInterestAndAmortizationProduct(InterestType.FLAT, AmortizationType.EQUAL_INSTALLMENTS);
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProductsRequest);
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductResponse.getResourceId(), "01 January 2023", 1250.0, 4);
+            Long loanId = applyAndApproveLoan(clientId, loanProductResponse.getResourceId(), "20230101", 1250.0, 4);
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1250), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1250), "20230101");
             // Verify Repayment Schedule and Due Dates
             verifyRepaymentSchedule(loanId,  //
-            installment(1250.0, null, "01 January 2023"),  //
-            installment(312.0, false, "31 January 2023"),  //
-            installment(312.0, false, "02 March 2023"),  //
-            installment(312.0, false, "01 April 2023"),  //
-            installment(314.0, false, "01 May 2023") //
+            installment(1250.0, null, "20230101"),  //
+            installment(312.0, false, "20230131"),  //
+            installment(312.0, false, "20230302"),  //
+            installment(312.0, false, "20230401"),  //
+            installment(314.0, false, "20230501") //
             );
             // delete all external events
             deleteAllExternalEvents();
             // run cob
-            updateBusinessDateAndExecuteCOBJob("31 January 2023");
+            updateBusinessDateAndExecuteCOBJob("20230131");
             // verify external events
             List<ExternalEventResponse> allExternalEvents = ExternalEventHelper.getAllExternalEvents(requestSpec, responseSpec);
             Assertions.assertEquals(0, allExternalEvents.size());
@@ -206,7 +206,7 @@ public class CustomSnapshotEventIntegrationTest extends BaseLoanIntegrationTest 
 
     @Test
     public void testNoSnapshotEventGenerationWhenCustomSnapshotEventIsDisabled() {
-        runAt("31 January 2023", () -> {
+        runAt("20230131", () -> {
             // disable custom snapshot event
             disableLoanAccountCustomSnapshotBusinessEvent();
             // Enable Business Step
@@ -217,21 +217,21 @@ public class CustomSnapshotEventIntegrationTest extends BaseLoanIntegrationTest 
             PostLoanProductsRequest loanProductsRequest = create1InstallmentAmountInMultiplesOf4Period1MonthLongWithInterestAndAmortizationProduct(InterestType.FLAT, AmortizationType.EQUAL_INSTALLMENTS);
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProductsRequest);
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductResponse.getResourceId(), "01 January 2023", 1250.0, 4);
+            Long loanId = applyAndApproveLoan(clientId, loanProductResponse.getResourceId(), "20230101", 1250.0, 4);
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1250), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1250), "20230101");
             // Verify Repayment Schedule and Due Dates
             verifyRepaymentSchedule(loanId,  //
-            installment(1250.0, null, "01 January 2023"),  //
-            installment(312.0, false, "31 January 2023"),  //
-            installment(312.0, false, "02 March 2023"),  //
-            installment(312.0, false, "01 April 2023"),  //
-            installment(314.0, false, "01 May 2023") //
+            installment(1250.0, null, "20230101"),  //
+            installment(312.0, false, "20230131"),  //
+            installment(312.0, false, "20230302"),  //
+            installment(312.0, false, "20230401"),  //
+            installment(314.0, false, "20230501") //
             );
             // delete all external events
             deleteAllExternalEvents();
             // run cob
-            updateBusinessDateAndExecuteCOBJob("01 February 2023");
+            updateBusinessDateAndExecuteCOBJob("20230201");
             // verify external events
             List<ExternalEventResponse> allExternalEvents = ExternalEventHelper.getAllExternalEvents(requestSpec, responseSpec);
             Assertions.assertEquals(0, allExternalEvents.size());

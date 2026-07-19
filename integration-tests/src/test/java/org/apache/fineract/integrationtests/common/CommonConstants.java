@@ -21,7 +21,7 @@ package org.apache.fineract.integrationtests.common;
 public interface CommonConstants {
 
     String LOCALE = "en";
-    String DATE_FORMAT = "dd MMMM yyyy";
+    String DATE_FORMAT = "yyyyMMdd";
     String RESPONSE_RESOURCE_ID = "resourceId";
     String RESPONSE_CHANGES = "changes";
     String RESPONSE_STATUS = "status";

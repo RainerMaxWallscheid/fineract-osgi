@@ -102,7 +102,7 @@ public class LoanChargebackOnPaymentTypeRepaymentTransactionsTest {
 
         // make Repayment
         final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("5 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220905").locale("en")
                         .transactionAmount(500.0));
 
         // verify transaction relation and outstanding balance
@@ -131,7 +131,7 @@ public class LoanChargebackOnPaymentTypeRepaymentTransactionsTest {
 
         // Goodwill Credit
         final PostLoansLoanIdTransactionsResponse goodwillCredit_1 = loanTransactionHelper.makeGoodwillCredit((long) loanId,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("6 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220906").locale("en")
                         .transactionAmount(200.0));
 
         // verify transaction relation and outstanding balance
@@ -155,7 +155,7 @@ public class LoanChargebackOnPaymentTypeRepaymentTransactionsTest {
         // Payout Refund
 
         final PostLoansLoanIdTransactionsResponse payoutRefund_1 = loanTransactionHelper.makePayoutRefund((long) loanId,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("7 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220907").locale("en")
                         .transactionAmount(300.0));
 
         // verify transaction relation and outstanding balance
@@ -185,7 +185,7 @@ public class LoanChargebackOnPaymentTypeRepaymentTransactionsTest {
         // Merchant Issued Refund
 
         final PostLoansLoanIdTransactionsResponse merchantIssuedRefund_1 = loanTransactionHelper.makeMerchantIssuedRefund((long) loanId,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("8 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220908").locale("en")
                         .transactionAmount(100.0));
 
         // verify transaction relation and outstanding balance
@@ -237,11 +237,11 @@ public class LoanChargebackOnPaymentTypeRepaymentTransactionsTest {
 
         // Merchant Refund
         final PostLoansLoanIdTransactionsResponse merchantIssuedRefund_2 = loanTransactionHelper.makeMerchantIssuedRefund((long) loanId,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("8 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220908").locale("en")
                         .transactionAmount(50.0));
 
         // reverse Merchant Refund
-        loanTransactionHelper.reverseRepayment(loanId, merchantIssuedRefund_2.getResourceId().intValue(), "8 September 2022");
+        loanTransactionHelper.reverseRepayment(loanId, merchantIssuedRefund_2.getResourceId().intValue(), "20220908");
 
         // apply Chargeback should give 503 error
         final Long chargebackTransactionId = loanTransactionHelper.applyChargebackTransaction(loanId,
@@ -263,13 +263,13 @@ public class LoanChargebackOnPaymentTypeRepaymentTransactionsTest {
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("03 September 2022").withSubmittedOnDate("01 September 2022").withLoanType("individual")
+                .withExpectedDisbursementDate("20220903").withSubmittedOnDate("20220901").withLoanType("individual")
                 .withExternalId(externalId).withRepaymentStrategy(repaymentStrategy)
                 .build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("02 September 2022", "1000", loanId, null);
-        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("03 September 2022", loanId, "1000");
+        loanTransactionHelper.approveLoan("20220902", "1000", loanId, null);
+        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20220903", loanId, "1000");
         return loanId;
     }
 

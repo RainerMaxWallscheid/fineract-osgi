@@ -75,13 +75,13 @@ public class JournalEntryReversalOrderingIntegrationTest extends BaseLoanIntegra
 
         final Integer loanProductID = createLoanProductWithAccounting(assetAccount, incomeAccount, expenseAccount, overpaymentAccount);
         final Integer clientID = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId().intValue();
-        final Integer loanID = applyForLoanApplication(clientID, loanProductID, "10 January 2023", "10000");
+        final Integer loanID = applyForLoanApplication(clientID, loanProductID, "20230110", "10000");
 
-        loanTransactionHelper.approveLoan("10 January 2023", loanID);
-        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("10 January 2023", loanID, "10000");
+        loanTransactionHelper.approveLoan("20230110", loanID);
+        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20230110", loanID, "10000");
 
         // When: Make a repayment transaction
-        final PostLoansLoanIdTransactionsResponse repaymentResponse = loanTransactionHelper.makeLoanRepayment("11 January 2023", 1000.0f,
+        final PostLoansLoanIdTransactionsResponse repaymentResponse = loanTransactionHelper.makeLoanRepayment("20230111", 1000.0f,
                 loanID);
         assertNotNull(repaymentResponse);
         final Long repaymentTransactionId = repaymentResponse.getResourceId();
@@ -94,7 +94,7 @@ public class JournalEntryReversalOrderingIntegrationTest extends BaseLoanIntegra
 
         // When: Reverse the repayment transaction
         PostLoansLoanIdTransactionsResponse reversalResponse = loanTransactionHelper.reverseLoanTransaction(loanID.longValue(),
-                repaymentTransactionId, "12 January 2023");
+                repaymentTransactionId, "20230112");
         assertNotNull(reversalResponse);
 
         // Then: Verify journal entries after reversal maintain consistent ordering

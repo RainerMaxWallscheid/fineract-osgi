@@ -130,7 +130,7 @@ public class WorkingCapitalLoanDelinquencyRangeScheduleIntegrationTest {
         final BigDecimal minPaymentPercent = new BigDecimal("3");
         // Expected: (9000 + 1000) * 3% = 300
         final BigDecimal expectedMinPayment = new BigDecimal("300.000000");
-        final String businessDate = "01 January 2026";
+        final String businessDate = "20260101";
         BusinessDateHelper.runAt(businessDate, () -> {
             // given - Create delinquency bucket with 30-day frequency, 3% minimum payment
             final List<Long> rangeIds = createDelinquencyRanges();

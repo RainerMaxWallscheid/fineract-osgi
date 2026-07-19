@@ -59,7 +59,7 @@ import org.junit.jupiter.api.Test;
 
 public class LoanMultipleDisbursementRepaymentScheduleTest extends BaseLoanIntegrationTest {
 
-    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
     private LoanTransactionHelper loanTransactionHelper;
@@ -138,7 +138,7 @@ public class LoanMultipleDisbursementRepaymentScheduleTest extends BaseLoanInteg
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, currentDate);
 
             final PostLoansLoanIdTransactionsResponse merchantIssuedRefund_1 = loanTransactionHelper.makeMerchantIssuedRefund((long) loanId,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("21 July 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230721").locale("en")
                             .transactionAmount(167.4));
 
             assertNotNull(merchantIssuedRefund_1);
@@ -151,7 +151,7 @@ public class LoanMultipleDisbursementRepaymentScheduleTest extends BaseLoanInteg
 
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, currentDate);
 
-            loanTransactionHelper.disburseLoanWithTransactionAmount("24 July 2023", loanId, "18");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230724", loanId, "18");
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
             assertTrue(loanDetails.getStatus().getActive());
@@ -220,13 +220,13 @@ public class LoanMultipleDisbursementRepaymentScheduleTest extends BaseLoanInteg
         String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("30")
                 .withLoanTermFrequencyAsDays().withNumberOfRepayments("1").withRepaymentEveryAfter("30").withRepaymentFrequencyTypeAsDays()
                 .withInterestRatePerPeriod("0").withInterestTypeAsDecliningBalance().withAmortizationTypeAsEqualPrincipalPayments()
-                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("07 July 2023")
-                .withSubmittedOnDate("07 July 2023").withLoanType("individual").withExternalId(externalId)
+                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("20230707")
+                .withSubmittedOnDate("20230707").withLoanType("individual").withExternalId(externalId)
                 .build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("07 July 2023", "1000", loanId, null);
-        loanTransactionHelper.disburseLoanWithTransactionAmount("07 July 2023", loanId, "370.55");
+        loanTransactionHelper.approveLoan("20230707", "1000", loanId, null);
+        loanTransactionHelper.disburseLoanWithTransactionAmount("20230707", loanId, "370.55");
         return loanId;
     }
 

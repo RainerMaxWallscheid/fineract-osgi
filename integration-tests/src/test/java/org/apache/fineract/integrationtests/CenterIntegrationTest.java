@@ -189,10 +189,10 @@ public class CenterIntegrationTest {
             map.put("officeId", "" + officeId);
             map.put("name", Utils.uniqueRandomStringGenerator("Group_Name_", 5));
             map.put("externalId", UUID.randomUUID().toString());
-            map.put("dateFormat", "dd MMMM yyyy");
+            map.put("dateFormat", "yyyyMMdd");
             map.put("locale", "en");
             map.put("active", "true");
-            map.put("activationDate", "04 March 2011");
+            map.put("activationDate", "20110304");
 
             groupMembers[i] = Utils.performServerPost(requestSpec, responseSpec,
                     "/fineract-provider/api/v1/groups?" + Utils.TENANT_IDENTIFIER, new Gson().toJson(map), "groupId");

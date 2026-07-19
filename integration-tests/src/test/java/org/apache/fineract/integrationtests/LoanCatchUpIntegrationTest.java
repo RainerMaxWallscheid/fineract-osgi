@@ -97,18 +97,18 @@ public class LoanCatchUpIntegrationTest extends BaseLoanIntegrationTest {
             final Integer loanProductID = createLoanProduct(overdueFeeChargeId.toString());
             Assertions.assertNotNull(loanProductID);
             HashMap loanStatusHashMap;
-            final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 March 2020");
+            final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "20200301");
 
             Assertions.assertNotNull(loanID);
 
             loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.approveLoan("01 March 2020", loanID);
+            loanStatusHashMap = loanTransactionHelper.approveLoan("20200301", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
 
             String loanDetails = loanTransactionHelper.getLoanDetails(requestSpec, responseSpec, loanID);
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID,
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20200302", loanID,
                     JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 

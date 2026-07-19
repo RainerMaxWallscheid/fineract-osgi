@@ -65,7 +65,7 @@ import org.apache.fineract.test.support.TestContextKey;
 public class LoanRepaymentStepDef extends AbstractStepDef {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanRepaymentStepDef.class);
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     public static final String DEFAULT_LOCALE = "en";
     public static final String DEFAULT_ACCOUNT_NB = "1234567890";
     public static final String DEFAULT_CHECK_NB = "1234567890";

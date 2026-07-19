@@ -315,15 +315,15 @@ final class ClientsApiResourceSwagger {
         public LocalDate dateOfBirth;
         @Schema(example = "1")
         public Long groupId;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "en")
         public String locale;
         @Schema(example = "true")
         public Boolean active;
-        @Schema(example = "04 March 2009")
+        @Schema(example = "20090304")
         public String activationDate;
-        @Schema(example = "04 March 2009")
+        @Schema(example = "20090304")
         public String submittedOnDate;
         @Schema(example = "+353851239876")
         public String mobileNo;
@@ -409,27 +409,27 @@ final class ClientsApiResourceSwagger {
 
         private PostClientsClientIdRequest() {}
 
-        @Schema(example = "03 August 2021")
+        @Schema(example = "20210803")
         public String activationDate;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "03 August 2021")
+        @Schema(example = "20210803")
         public String closureDate;
         @Schema(example = "1")
         public Long closureReasonId;
-        @Schema(example = "03 August 2021")
+        @Schema(example = "20210803")
         public String reactivationDate;
-        @Schema(example = "03 August 2021")
+        @Schema(example = "20210803")
         public String rejectionDate;
         @Schema(example = "1")
         public Long rejectionReasonId;
-        @Schema(example = "03 August 2021")
+        @Schema(example = "20210803")
         public String withdrawalDate;
         @Schema(example = "1")
         public Long withdrawalReasonId;
-        @Schema(example = "03 August 2021")
+        @Schema(example = "20210803")
         public String reopenedDate;
     }
 

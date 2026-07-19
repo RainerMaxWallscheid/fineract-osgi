@@ -227,9 +227,9 @@ final class SavingsAccountsApiResourceSwagger {
         public Long productId;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "01 March 2011")
+        @Schema(example = "20110301")
         public String submittedOnDate;
         @Schema(example = "123")
         public String externalId;
@@ -334,21 +334,21 @@ final class SavingsAccountsApiResourceSwagger {
 
         private PostSavingsAccountsAccountIdRequest() {}
 
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "05 September 2014")
+        @Schema(example = "20140905")
         public String approvedOnDate;
-        @Schema(example = "05 September 2014")
+        @Schema(example = "20140905")
         public String activatedOnDate;
-        @Schema(example = "05 September 2014")
+        @Schema(example = "20140905")
         public String closedOnDate;
         @Schema(example = "false")
         public Boolean withdrawBalance;
-        @Schema(example = "05 September 2014")
+        @Schema(example = "20140905")
         public String rejectedOnDate;
-        @Schema(example = "05 September 2014")
+        @Schema(example = "20140905")
         public String withdrawnOnDate;
     }
 

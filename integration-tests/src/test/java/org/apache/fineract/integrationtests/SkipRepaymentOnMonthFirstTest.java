@@ -93,7 +93,7 @@ public class SkipRepaymentOnMonthFirstTest {
         final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Integer groupID = GroupHelper.createGroup(this.requestSpec, this.responseSpec, true);
         groupID = GroupHelper.associateClient(this.requestSpec, this.responseSpec, groupID.toString(), clientID.toString());
-        final String startDate = "15 September 2011";
+        final String startDate = "20110915";
         final String frequency = "3"; // Monthly
         final String interval = "1"; // Every One Moth
         Long calendarID = CalendarHelper.createMeetingForGroup(groupID.longValue(), startDate, frequency, interval, null).getResourceId();
@@ -143,9 +143,9 @@ public class SkipRepaymentOnMonthFirstTest {
                 .withAmortizationTypeAsEqualInstallments() //
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("01 October 2011") //
+                .withExpectedDisbursementDate("20111001") //
                 .withCalendarID(calendarID.toString()) //
-                .withSubmittedOnDate("01 October 2011") //
+                .withSubmittedOnDate("20111001") //
                 .withCollaterals(collaterals).withLoanType("jlg")
                 .build(clientID.toString(), groupID.toString(), loanProductID.toString(), null);
         LOG.info(loanApplicationJSON);

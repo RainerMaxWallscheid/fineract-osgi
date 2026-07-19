@@ -33,8 +33,8 @@ import org.junit.jupiter.api.Test;
 
 public class MultiActivityAccrualsTest extends FeignLoanTestBase {
 
-    private static final String disbursementDate = "9 August 2024";
-    private static final String repaymentDate = "9 December 2024";
+    private static final String disbursementDate = "20240809";
+    private static final String repaymentDate = "20241209";
     private static final Double fullRepaymentAmount = 700.0;
     private static final Integer expectedNumberOfAccruals = 1;
     private static final Integer expectedNumberOfActivityAccruals = 4;
@@ -71,13 +71,13 @@ public class MultiActivityAccrualsTest extends FeignLoanTestBase {
             assertEquals(expectedNumberOfActivityAccruals, accrualActivityTransactional.size());
 
             verifyTransactions(loanId, //
-                    transaction(600.0, "Disbursement", "09 August 2024", 600.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                    transaction(19.98, "Accrual", "09 December 2024", 0, 0, 19.98, 0, 0, 0.0, 0.0),
-                    transaction(4.99, "Accrual Activity", "09 September 2024", 0, 0, 4.99, 0, 0, 0.0, 0.0),
-                    transaction(5.0, "Accrual Activity", "09 October 2024", 0, 0, 5.0, 0, 0, 0.0, 0.0),
-                    transaction(4.99, "Accrual Activity", "09 November 2024", 0, 0, 4.99, 0, 0, 0.0, 0.0),
-                    transaction(5.0, "Accrual Activity", "09 December 2024", 0, 0, 5.0, 0, 0, 0.0, 0.0),
-                    transaction(700.00, "Repayment", "09 December 2024", 0, 600.00, 19.98, 0, 0, 0.0, 80.02));
+                    transaction(600.0, "Disbursement", "20240809", 600.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                    transaction(19.98, "Accrual", "20241209", 0, 0, 19.98, 0, 0, 0.0, 0.0),
+                    transaction(4.99, "Accrual Activity", "20240909", 0, 0, 4.99, 0, 0, 0.0, 0.0),
+                    transaction(5.0, "Accrual Activity", "20241009", 0, 0, 5.0, 0, 0, 0.0, 0.0),
+                    transaction(4.99, "Accrual Activity", "20241109", 0, 0, 4.99, 0, 0, 0.0, 0.0),
+                    transaction(5.0, "Accrual Activity", "20241209", 0, 0, 5.0, 0, 0, 0.0, 0.0),
+                    transaction(700.00, "Repayment", "20241209", 0, 600.00, 19.98, 0, 0, 0.0, 80.02));
         });
     }
 }

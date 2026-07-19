@@ -36,21 +36,21 @@ public class LoanProductWithChargeOffBehaviourTest extends FeignLoanTestBase {
 
     // create client, progressive loan product with charge-off behaviour REGULAR (default), loan with disburse limit
     // 1000 for the client,
-    // and disburse 250 on 01 June 2024
+    // and disburse 250 on 20240601
     @BeforeEach
     public void beforeEach() {
-        runAt("01 June 2024", () -> {
+        runAt("20240601", () -> {
             clientId = createClient();
             loanProductId = createLoanProduct(create4IProgressive());
-            loanId = applyForLoan(applyLP2ProgressiveLoanRequest(clientId, loanProductId, "01 June 2024", 1000.0, 10.0, 4, null));
-            approveLoan(loanId, LoanRequestBuilders.approveLoan(1000.0, "01 June 2024"));
-            disburseLoan(loanId, BigDecimal.valueOf(250.0), "01 June 2024");
+            loanId = applyForLoan(applyLP2ProgressiveLoanRequest(clientId, loanProductId, "20240601", 1000.0, 10.0, 4, null));
+            approveLoan(loanId, LoanRequestBuilders.approveLoan(1000.0, "20240601"));
+            disburseLoan(loanId, BigDecimal.valueOf(250.0), "20240601");
         });
     }
 
     @Test
     public void testSavedToLoanNotChangingWithProduct() {
-        runAt("01 June 2024", () -> {
+        runAt("20240601", () -> {
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             Assertions.assertEquals("REGULAR", loanDetails.getChargeOffBehaviour().getId());
 

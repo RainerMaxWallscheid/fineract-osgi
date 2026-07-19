@@ -46,7 +46,7 @@ public class SavingsApplicationTestBuilder {
     public String build(final String clientOrGroupId, final String savingsProductId, final String accountType) {
 
         final HashMap<String, Object> map = new HashMap<>();
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         if (accountType.equals("GROUP")) {
             map.put("groupId", clientOrGroupId);
         } else {

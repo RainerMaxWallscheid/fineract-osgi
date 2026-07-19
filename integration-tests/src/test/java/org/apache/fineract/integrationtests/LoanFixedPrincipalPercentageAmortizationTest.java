@@ -153,8 +153,8 @@ public class LoanFixedPrincipalPercentageAmortizationTest {
                                                                // second last EMI
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeAsDays() //
-                .withExpectedDisbursementDate("20 September 2011") //
-                .withSubmittedOnDate("20 September 2011") //
+                .withExpectedDisbursementDate("20110920") //
+                .withSubmittedOnDate("20110920") //
                 .withCollaterals(collaterals).withCharges(charges).build(clientID.toString(), loanProductID.toString(), savingsId);
         return this.loanTransactionHelper.getLoanId(loanApplicationJSON);
     }
@@ -195,8 +195,8 @@ public class LoanFixedPrincipalPercentageAmortizationTest {
                                                                // second last EMI
                 .withPrincipalGrace("6").withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeAsDays() //
-                .withExpectedDisbursementDate("20 September 2011") //
-                .withSubmittedOnDate("20 September 2011") //
+                .withExpectedDisbursementDate("20110920") //
+                .withSubmittedOnDate("20110920") //
                 .withCollaterals(collaterals).withCharges(charges).build(clientID.toString(), loanProductID.toString(), savingsId);
         return this.loanTransactionHelper.getLoanId(loanApplicationJSON);
     }
@@ -308,8 +308,8 @@ public class LoanFixedPrincipalPercentageAmortizationTest {
                                                                // second last EMI
                 .withInterestTypeAsFlatBalance() //
                 .withInterestCalculationPeriodTypeAsDays() //
-                .withExpectedDisbursementDate("20 September 2011") //
-                .withSubmittedOnDate("20 September 2011") //
+                .withExpectedDisbursementDate("20110920") //
+                .withSubmittedOnDate("20110920") //
                 .withCharges(charges).build(clientID.toString(), loanProductID.toString(), savingsId);
         return this.loanTransactionHelper.getLoanId(loanApplicationJSON);
     }

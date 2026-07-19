@@ -44,7 +44,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class SavingsAccountBalanceCheckAfterReversalTest {
 
     public static final String ACCOUNT_TYPE_INDIVIDUAL = "INDIVIDUAL";
-    public static final String START_DATE = "10 April 2022";
+    public static final String START_DATE = "20220410";
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
     private SavingsProductHelper savingsProductHelper;

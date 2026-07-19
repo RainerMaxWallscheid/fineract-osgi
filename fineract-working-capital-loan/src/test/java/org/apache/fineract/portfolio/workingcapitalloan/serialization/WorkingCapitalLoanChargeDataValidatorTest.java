@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
 
 class WorkingCapitalLoanChargeDataValidatorTest {
 
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
 
     private WorkingCapitalLoanChargeDataValidator validator;
     private LocalDate businessDate;
@@ -82,7 +82,7 @@ class WorkingCapitalLoanChargeDataValidatorTest {
     private JsonObject baseRequest() {
         final JsonObject json = new JsonObject();
         json.addProperty("locale", "en");
-        json.addProperty("dateFormat", "dd MMMM yyyy");
+        json.addProperty("dateFormat", "yyyyMMdd");
         json.addProperty("amount", "40");
         return json;
     }

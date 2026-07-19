@@ -233,7 +233,7 @@ public abstract class FeignLoanTestBase extends FeignIntegrationTest implements 
 
     protected PostLoansLoanIdChargesResponse addLoanCharge(Long loanId, Long chargeId, String date, Double amount) {
         return addLoanCharge(loanId, new PostLoansLoanIdChargesRequest().chargeId(chargeId).amount(amount).dueDate(date)
-                .dateFormat("dd MMMM yyyy").locale("en"));
+                .dateFormat("yyyyMMdd").locale("en"));
     }
 
     protected List<GetLoansLoanIdChargesChargeIdResponse> getLoanCharges(Long loanId) {

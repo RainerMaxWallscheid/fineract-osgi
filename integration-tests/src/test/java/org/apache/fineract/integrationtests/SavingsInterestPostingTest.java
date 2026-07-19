@@ -96,7 +96,7 @@ public class SavingsInterestPostingTest {
 
     @Test
     public void testPostInterestWithOverdraftProduct() {
-        runAt("12 March 2025", () -> {
+        runAt("20250312", () -> {
             final String amount = "10000";
 
             final Account assetAccount = accountHelper.createAssetAccount();
@@ -111,9 +111,9 @@ public class SavingsInterestPostingTest {
                     interestPayableAccount.getAccountID().toString(), savingsControlAccount.getAccountID().toString(),
                     interestReceivableAccount.getAccountID().toString(), assetAccount, incomeAccount, expenseAccount, liabilityAccount);
 
-            final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2025");
+            final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "20250101");
             final LocalDate startDate = LocalDate.of(2025, 2, 1);
-            final String startDateString = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US).format(startDate);
+            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
 
             final Integer accountId = createTrackedSavingsAccount(clientId, productId, startDateString);
             savingsAccountHelper.approveSavingsOnDate(accountId, startDateString);
@@ -142,7 +142,7 @@ public class SavingsInterestPostingTest {
 
     @Test
     public void testOverdraftInterestWithOverdraftProduct() {
-        runAt("12 March 2025", () -> {
+        runAt("20250312", () -> {
             final String amount = "10000";
 
             final Account assetAccount = accountHelper.createAssetAccount();
@@ -157,9 +157,9 @@ public class SavingsInterestPostingTest {
                     interestPayableAccount.getAccountID().toString(), savingsControlAccount.getAccountID().toString(),
                     interestReceivableAccount.getAccountID().toString(), assetAccount, incomeAccount, expenseAccount, liabilityAccount);
 
-            final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2025");
+            final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "20250101");
             final LocalDate startDate = LocalDate.of(2025, 2, 1);
-            final String startDateString = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US).format(startDate);
+            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
 
             final Integer accountId = createTrackedSavingsAccount(clientId, productId, startDateString);
             savingsAccountHelper.approveSavingsOnDate(accountId, startDateString);
@@ -191,7 +191,7 @@ public class SavingsInterestPostingTest {
 
     @Test
     public void testOverdraftAndInterestPosting_WithOverdraftProduct_WhitBalanceLessZero() {
-        runAt("12 March 2025", () -> {
+        runAt("20250312", () -> {
             final String amountDeposit = "10000";
             final String amountWithdrawal = "20000";
 
@@ -207,9 +207,9 @@ public class SavingsInterestPostingTest {
                     interestPayableAccount.getAccountID().toString(), savingsControlAccount.getAccountID().toString(),
                     interestReceivableAccount.getAccountID().toString(), assetAccount, incomeAccount, expenseAccount, liabilityAccount);
 
-            final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2025");
+            final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "20250101");
             final LocalDate startDate = LocalDate.of(2025, 2, 1);
-            final String startStr = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US).format(startDate);
+            final String startStr = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
 
             final Integer accountId = createTrackedSavingsAccount(clientId, productId, startStr);
             savingsAccountHelper.approveSavingsOnDate(accountId, startStr);
@@ -217,7 +217,7 @@ public class SavingsInterestPostingTest {
             savingsAccountHelper.depositToSavingsAccount(accountId, amountDeposit, startStr, CommonConstants.RESPONSE_RESOURCE_ID);
 
             final LocalDate withdrawalDate = LocalDate.of(2025, 2, 16);
-            final String withdrawalStr = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US).format(withdrawalDate);
+            final String withdrawalStr = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(withdrawalDate);
             savingsAccountHelper.withdrawalFromSavingsAccount(accountId, amountWithdrawal, withdrawalStr,
                     CommonConstants.RESPONSE_RESOURCE_ID);
 
@@ -256,7 +256,7 @@ public class SavingsInterestPostingTest {
 
     @Test
     public void testOverdraftAndInterestPosting_WithOverdraftProduct_WhitBalanceGreaterZero() {
-        runAt("12 March 2025", () -> {
+        runAt("20250312", () -> {
             final String amountDeposit = "20000";
             final String amountWithdrawal = "10000";
 
@@ -272,9 +272,9 @@ public class SavingsInterestPostingTest {
                     interestPayableAccount.getAccountID().toString(), savingsControlAccount.getAccountID().toString(),
                     interestReceivableAccount.getAccountID().toString(), assetAccount, incomeAccount, expenseAccount, liabilityAccount);
 
-            final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2025");
+            final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "20250101");
             final LocalDate startDate = LocalDate.of(2025, 2, 1);
-            final String startStr = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US).format(startDate);
+            final String startStr = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
 
             final Integer accountId = createTrackedSavingsAccount(clientId, productId, startStr);
             savingsAccountHelper.approveSavingsOnDate(accountId, startStr);
@@ -282,7 +282,7 @@ public class SavingsInterestPostingTest {
             savingsAccountHelper.withdrawalFromSavingsAccount(accountId, amountWithdrawal, startStr, CommonConstants.RESPONSE_RESOURCE_ID);
 
             final LocalDate depositDate = LocalDate.of(2025, 2, 16);
-            final String depositStr = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US).format(depositDate);
+            final String depositStr = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(depositDate);
             savingsAccountHelper.depositToSavingsAccount(accountId, amountDeposit, depositStr, CommonConstants.RESPONSE_RESOURCE_ID);
 
             LocalDate marchDate = LocalDate.of(2025, 3, 2);
@@ -320,7 +320,7 @@ public class SavingsInterestPostingTest {
 
     @Test
     public void testPostInterestNotZero() {
-        runAt("12 March 2025", () -> {
+        runAt("20250312", () -> {
             final String amountDeposit = "1000";
             final String amountWithdrawal = "1000";
 
@@ -336,9 +336,9 @@ public class SavingsInterestPostingTest {
                     interestPayableAccount.getAccountID().toString(), savingsControlAccount.getAccountID().toString(),
                     interestReceivableAccount.getAccountID().toString(), assetAccount, incomeAccount, expenseAccount, liabilityAccount);
 
-            final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2025");
+            final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "20250101");
             final LocalDate startDate = LocalDate.of(2025, 1, 1);
-            final String startStr = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US).format(startDate);
+            final String startStr = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
 
             final Integer accountId = createTrackedSavingsAccount(clientId, productId, startStr);
             savingsAccountHelper.approveSavingsOnDate(accountId, startStr);
@@ -356,7 +356,7 @@ public class SavingsInterestPostingTest {
             Assertions.assertEquals(expectedFebruary, BigDecimal.valueOf(((Double) txsFebruary.get(0).get("amount"))));
 
             final LocalDate withdrawalDate = LocalDate.of(2025, 2, 1);
-            final String withdrawal = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US).format(withdrawalDate);
+            final String withdrawal = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(withdrawalDate);
 
             BigDecimal runningBalance = new BigDecimal(txsFebruary.get(0).get("runningBalance").toString());
             String withdrawalRunning = runningBalance.setScale(2, RoundingMode.HALF_UP).toString();
@@ -398,7 +398,7 @@ public class SavingsInterestPostingTest {
 
     @Test
     public void testPostInterestForDuplicatePrevention() {
-        runAt("18 March 2025", () -> {
+        runAt("20250318", () -> {
             final String amount = "10000";
 
             final Account assetAccount = accountHelper.createAssetAccount();
@@ -415,10 +415,10 @@ public class SavingsInterestPostingTest {
 
             final LocalDate startDate = LocalDate.of(2025, 2, 1);
 
-            final String startDateString = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US).format(startDate);
+            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
             List<Integer> accountIdList = new CopyOnWriteArrayList<>();
             ParallelExecutionHelper.runInParallel(IntStream.range(0, 200).boxed().toList(), (i) -> {
-                final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2025");
+                final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "20250101");
                 final Integer accountId = createTrackedSavingsAccount(clientId, productId, startDateString);
 
                 savingsAccountHelper.approveSavingsOnDate(accountId, startDateString);
@@ -443,10 +443,10 @@ public class SavingsInterestPostingTest {
         final Integer[] savingsAccountId = new Integer[1];
         final int[] interestTxAfterFirstManualPost = new int[1];
         final int[] interestTxAfterManualAsOnPost = new int[1];
-        final String accountOpeningDate = "01 January 2025";
-        final String firstManualPostingDate = "02 February 2025";
-        final String manualAsOnPostingDate = "15 March 2025";
-        final String schedulerPostingDate = "02 April 2025";
+        final String accountOpeningDate = "20250101";
+        final String firstManualPostingDate = "20250202";
+        final String manualAsOnPostingDate = "20250315";
+        final String schedulerPostingDate = "20250402";
         final String depositAmount = "10000";
 
         runAt(accountOpeningDate, () -> {
@@ -616,8 +616,8 @@ public class SavingsInterestPostingTest {
 
             if (v instanceof String) {
                 String s = (String) v;
-                DateTimeFormatter[] fmts = new DateTimeFormatter[] { DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US),
-                        DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US), DateTimeFormatter.ofPattern("yyyy-MM-dd") };
+                DateTimeFormatter[] fmts = new DateTimeFormatter[] { DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US),
+                        DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US), DateTimeFormatter.ofPattern("yyyy-MM-dd") };
                 for (DateTimeFormatter f : fmts) {
                     try {
                         return LocalDate.parse(s, f);

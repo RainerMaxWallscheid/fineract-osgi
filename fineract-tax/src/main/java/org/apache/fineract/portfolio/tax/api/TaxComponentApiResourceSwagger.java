@@ -95,9 +95,9 @@ final class TaxComponentApiResourceSwagger {
         public Long creditAccountId;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "11 April 2016")
+        @Schema(example = "20160411")
         public String startDate;
     }
 
@@ -121,9 +121,9 @@ final class TaxComponentApiResourceSwagger {
         public Float percentage;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "15 April 2016")
+        @Schema(example = "20160415")
         public String startDate;
     }
 

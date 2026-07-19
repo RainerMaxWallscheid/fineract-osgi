@@ -111,7 +111,7 @@ public class VariableInstallmentsIntegrationTest {
         HashMap modifiedReschdule = transactionHelper.validateVariations(toDeletedata, loanID);
         ArrayList newperiods = (ArrayList) modifiedReschdule.get("periods");
         ArrayList toVerifyData = VariableInstallmentsDecliningBalanceHelper.constructVerifyData(
-                new String[] { "20 November 2011", "20 December 2011", "20 January 2012" },
+                new String[] { "20111120", "20111220", "20120120" },
                 new String[] { "34675.47", "34675.47", "36756.26" });
         assertAfterSubmit(newperiods, toVerifyData);
         transactionHelper.submitVariations(toDeletedata, loanID);
@@ -148,9 +148,9 @@ public class VariableInstallmentsIntegrationTest {
 
     @Test
     public void testAddInstallmentsWithDecliningBalanceEqualInstallments() {
-        // 31 October 2011 - 5000
-        // Result: 20 October 2011 - 21,215.84, 31 October 2011 - 5000, 20
-        // November 2011 26,477.31, 20 December 2011 26,477.31, 20 January 2012
+        // 20111031 - 5000
+        // Result: 20111020 - 21,215.84, 20111031 - 5000, 20
+        // November 2011 26,477.31, 20111220 26,477.31, 20120120
         // 25,947.7
         VariableIntallmentsTransactionHelper transactionHelper = new VariableIntallmentsTransactionHelper(requestSpec, responseSpec);
         final String loanProductJson = VariableInstallmentsDecliningBalanceHelper.createLoanProductWithVaribleConfig(false, NONE);
@@ -179,7 +179,7 @@ public class VariableInstallmentsIntegrationTest {
         HashMap modifiedReschdule = transactionHelper.validateVariations(addVariationsjsondata, loanID);
         ArrayList newperiods = (ArrayList) modifiedReschdule.get("periods");
         ArrayList toVerifyData = VariableInstallmentsDecliningBalanceHelper.constructVerifyData(
-                new String[] { "20 October 2011", "31 October 2011", "20 November 2011", "20 December 2011", "20 January 2012" },
+                new String[] { "20111020", "20111031", "20111120", "20111220", "20120120" },
                 new String[] { "21215.84", "5000.0", "26477.31", "26477.31", "25947.7" });
         assertAfterSubmit(newperiods, toVerifyData);
         transactionHelper.submitVariations(addVariationsjsondata, loanID);
@@ -193,9 +193,9 @@ public class VariableInstallmentsIntegrationTest {
 
     @Test
     public void testModifyInstallmentWithDecliningBalanceEqualInstallments() {
-        // 20 October 2011 - 30000 modify
-        // Result 20 October 2011 - 30000.0, 20 November 2011 - 24,966.34, 20
-        // December 2011 - 24,966.34, 20 January 2012 - 24,966.33
+        // 20111020 - 30000 modify
+        // Result 20111020 - 30000.0, 20111120 - 24,966.34, 20
+        // December 2011 - 24,966.34, 20120120 - 24,966.33
         VariableIntallmentsTransactionHelper transactionHelper = new VariableIntallmentsTransactionHelper(requestSpec, responseSpec);
         final String loanProductJson = VariableInstallmentsDecliningBalanceHelper.createLoanProductWithVaribleConfig(false, NONE);
         Integer loanProductID = this.loanTransactionHelper.getLoanProductId(loanProductJson);
@@ -227,7 +227,7 @@ public class VariableInstallmentsIntegrationTest {
         HashMap modifiedReschdule = transactionHelper.validateVariations(addVariationsjsondata, loanID);
         ArrayList newperiods = (ArrayList) modifiedReschdule.get("periods");
         ArrayList toVerifyData = VariableInstallmentsDecliningBalanceHelper.constructVerifyData(
-                new String[] { "20 October 2011", "20 November 2011", "20 December 2011", "20 January 2012" },
+                new String[] { "20111020", "20111120", "20111220", "20120120" },
                 new String[] { "30000.0", "24966.34", "24966.34", "24966.33" });
         assertAfterSubmit(newperiods, toVerifyData);
         transactionHelper.submitVariations(addVariationsjsondata, loanID);
@@ -242,10 +242,10 @@ public class VariableInstallmentsIntegrationTest {
 
     @Test
     public void testAllVariationsDecliningBalancewithEqualInstallments() {
-        // Request: Delete 20 December 2011 26,262.38, Modify 20 November 2011
-        // from 26,262.38 to 30000, Add 25 December 2011 5000
-        // Result: 20 October 2011 - 26262.38, 20 November 2011 - 30000, 25
-        // December 2011 - 5000, 20 January 2012 - 44077
+        // Request: Delete 20111220 26,262.38, Modify 20111120
+        // from 26,262.38 to 30000, Add 20111225 5000
+        // Result: 20111020 - 26262.38, 20111120 - 30000, 25
+        // December 2011 - 5000, 20120120 - 44077
         VariableIntallmentsTransactionHelper transactionHelper = new VariableIntallmentsTransactionHelper(requestSpec, responseSpec);
         final String loanProductJson = VariableInstallmentsDecliningBalanceHelper.createLoanProductWithVaribleConfig(false, NONE);
         Integer loanProductID = this.loanTransactionHelper.getLoanProductId(loanProductJson);
@@ -277,7 +277,7 @@ public class VariableInstallmentsIntegrationTest {
         HashMap modifiedReschdule = transactionHelper.validateVariations(addVariationsjsondata, loanID);
         ArrayList newperiods = (ArrayList) modifiedReschdule.get("periods");
         ArrayList toVerifyData = VariableInstallmentsDecliningBalanceHelper.constructVerifyData(
-                new String[] { "20 October 2011", "20 November 2011", "25 December 2011", "20 January 2012" },
+                new String[] { "20111020", "20111120", "20111225", "20120120" },
                 new String[] { "26262.38", "30000.0", "5000.0", "44077.0" });
         assertAfterSubmit(newperiods, toVerifyData);
         transactionHelper.submitVariations(addVariationsjsondata, loanID);
@@ -291,10 +291,10 @@ public class VariableInstallmentsIntegrationTest {
 
     @Test
     public void testAllVariationsDecliningBalancewithEqualPrincipal() {
-        // Request: Delete 20 December 2011 26,262.38, Modify 20 November 2011
-        // from 26,262.38 to 30000, Add 25 December 2011 5000
-        // Result: 20 October 2011 - 27000.0, 20 November 2011 - 31500.0, 25
-        // December 2011 - 6045.16, 20 January 2012 - 40670.97
+        // Request: Delete 20111220 26,262.38, Modify 20111120
+        // from 26,262.38 to 30000, Add 20111225 5000
+        // Result: 20111020 - 27000.0, 20111120 - 31500.0, 25
+        // December 2011 - 6045.16, 20120120 - 40670.97
         VariableIntallmentsTransactionHelper transactionHelper = new VariableIntallmentsTransactionHelper(requestSpec, responseSpec);
         final String loanProductJson = VariableInstallmentsDecliningBalanceHelper
                 .createLoanProductWithVaribleConfigwithEqualPrincipal(false, NONE);
@@ -327,7 +327,7 @@ public class VariableInstallmentsIntegrationTest {
         HashMap modifiedReschdule = transactionHelper.validateVariations(addVariationsjsondata, loanID);
         ArrayList newperiods = (ArrayList) modifiedReschdule.get("periods");
         ArrayList toVerifyData = VariableInstallmentsDecliningBalanceHelper.constructVerifyData(
-                new String[] { "20 October 2011", "20 November 2011", "25 December 2011", "20 January 2012" },
+                new String[] { "20111020", "20111120", "20111225", "20120120" },
                 new String[] { "27000.0", "31500.0", "6045.16", "40670.97" });
         assertAfterSubmit(newperiods, toVerifyData);
         transactionHelper.submitVariations(addVariationsjsondata, loanID);
@@ -341,10 +341,10 @@ public class VariableInstallmentsIntegrationTest {
 
     @Test
     public void testModifyDatesWithDecliningBalanceEqualInstallments() {
-        // Modify 20 December 2011:25000 -> 04 January 2012:20000
-        // Modify 20 January 2012 -> 08 February 2012
-        // Result 20 October 2011 -26262.38, 20 November 2011 - 26262.38, 04
-        // January 2012 -20000, 08 February 2012 - 33242.97
+        // Modify 20111220:25000 -> 20120104:20000
+        // Modify 20120120 -> 20120208
+        // Result 20111020 -26262.38, 20111120 - 26262.38, 04
+        // January 2012 -20000, 20120208 - 33242.97
         VariableIntallmentsTransactionHelper transactionHelper = new VariableIntallmentsTransactionHelper(requestSpec, responseSpec);
         final String loanProductJson = VariableInstallmentsDecliningBalanceHelper.createLoanProductWithVaribleConfig(false, NONE);
         Integer loanProductID = this.loanTransactionHelper.getLoanProductId(loanProductJson);
@@ -371,13 +371,13 @@ public class VariableInstallmentsIntegrationTest {
         //
         //
         String addVariationsjsondata = VariableInstallmentsDecliningBalanceHelper.createModifiyDateVariations(
-                new String[] { "20 December 2011", "20 January 2012" }, new String[] { "04 January 2012", "08 February 2012" },
+                new String[] { "20111220", "20120120" }, new String[] { "20120104", "20120208" },
                 new String[] { "20000" }); // 0th position will have
                                            // disbursement
         HashMap modifiedReschdule = transactionHelper.validateVariations(addVariationsjsondata, loanID);
         ArrayList newperiods = (ArrayList) modifiedReschdule.get("periods");
         ArrayList toVerifyData = VariableInstallmentsDecliningBalanceHelper.constructVerifyData(
-                new String[] { "20 October 2011", "20 November 2011", "04 January 2012", "08 February 2012" },
+                new String[] { "20111020", "20111120", "20120104", "20120208" },
                 new String[] { "26262.38", "26262.38", "20000.0", "33242.97" });
         assertAfterSubmit(newperiods, toVerifyData);
         transactionHelper.submitVariations(addVariationsjsondata, loanID);
@@ -419,7 +419,7 @@ public class VariableInstallmentsIntegrationTest {
         HashMap modifiedReschdule = transactionHelper.validateVariations(toDeletedata, loanID);
         ArrayList newperiods = (ArrayList) modifiedReschdule.get("periods");
         ArrayList toVerifyData = VariableInstallmentsFlatHelper.constructVerifyData(
-                new String[] { "20 November 2011", "20 December 2011", "20 January 2012" },
+                new String[] { "20111120", "20111220", "20120120" },
                 new String[] { "36000.0", "36000.0", "36000.0" });
         assertAfterSubmit(newperiods, toVerifyData);
         transactionHelper.submitVariations(toDeletedata, loanID);
@@ -433,9 +433,9 @@ public class VariableInstallmentsIntegrationTest {
 
     @Test
     public void testAddInstallmentsWithInterestTypeFlat() {
-        // 31 October 2011 - 5000
-        // Result: 20 October 2011 - 21600.0, 31 October 2011 - 6600.0, 20
-        // November 2011 26600.0, 20 December 2011 26600.0, 20 January 2012
+        // 20111031 - 5000
+        // Result: 20111020 - 21600.0, 20111031 - 6600.0, 20
+        // November 2011 26600.0, 20111220 26600.0, 20120120
         // 26600.0
         VariableIntallmentsTransactionHelper transactionHelper = new VariableIntallmentsTransactionHelper(requestSpec, responseSpec);
         final String loanProductJson = VariableInstallmentsFlatHelper.createLoanProductWithVaribleConfig(false, NONE);
@@ -463,7 +463,7 @@ public class VariableInstallmentsIntegrationTest {
         HashMap modifiedReschdule = transactionHelper.validateVariations(addVariationsjsondata, loanID);
         ArrayList newperiods = (ArrayList) modifiedReschdule.get("periods");
         ArrayList toVerifyData = VariableInstallmentsFlatHelper.constructVerifyData(
-                new String[] { "20 October 2011", "31 October 2011", "20 November 2011", "20 December 2011", "20 January 2012" },
+                new String[] { "20111020", "20111031", "20111120", "20111220", "20120120" },
                 new String[] { "21600.0", "6600.0", "26600.0", "26600.0", "26600.0" });
         assertAfterSubmit(newperiods, toVerifyData);
         transactionHelper.submitVariations(addVariationsjsondata, loanID);
@@ -477,9 +477,9 @@ public class VariableInstallmentsIntegrationTest {
 
     @Test
     public void testModifyInstallmentsWithInterestTypeisFlat() {
-        // 20 October 2011 - 30000 modify
-        // Result 20 October 2011 - 32000.0, 20 November 2011 - 25333.33, 20
-        // December 2011 - 25333.33, 20 January 2012 - 25333.34
+        // 20111020 - 30000 modify
+        // Result 20111020 - 32000.0, 20111120 - 25333.33, 20
+        // December 2011 - 25333.33, 20120120 - 25333.34
         VariableIntallmentsTransactionHelper transactionHelper = new VariableIntallmentsTransactionHelper(requestSpec, responseSpec);
         final String loanProductJson = VariableInstallmentsFlatHelper.createLoanProductWithVaribleConfig(false, NONE);
         Integer loanProductID = this.loanTransactionHelper.getLoanProductId(loanProductJson);
@@ -509,7 +509,7 @@ public class VariableInstallmentsIntegrationTest {
         HashMap modifiedReschdule = transactionHelper.validateVariations(addVariationsjsondata, loanID);
         ArrayList newperiods = (ArrayList) modifiedReschdule.get("periods");
         ArrayList toVerifyData = VariableInstallmentsFlatHelper.constructVerifyData(
-                new String[] { "20 October 2011", "20 November 2011", "20 December 2011", "20 January 2012" },
+                new String[] { "20111020", "20111120", "20111220", "20120120" },
                 new String[] { "32000.0", "25333.33", "25333.33", "25333.34" });
         assertAfterSubmit(newperiods, toVerifyData);
         transactionHelper.submitVariations(addVariationsjsondata, loanID);
@@ -523,10 +523,10 @@ public class VariableInstallmentsIntegrationTest {
 
     @Test
     public void testAllVariationsWithInterestTypeFlat() {
-        // Request: Delete 20 December 2011 25000.0, Modify 20 November 2011
-        // from 25,000 to 30000, Add 25 December 2011 5000
-        // Result: 20 October 2011 - 27000.0, 20 November 2011 - 32000.0, 25
-        // December 2011 - 7000.0, 20 January 2012 - 42000.0
+        // Request: Delete 20111220 25000.0, Modify 20111120
+        // from 25,000 to 30000, Add 20111225 5000
+        // Result: 20111020 - 27000.0, 20111120 - 32000.0, 25
+        // December 2011 - 7000.0, 20120120 - 42000.0
         VariableIntallmentsTransactionHelper transactionHelper = new VariableIntallmentsTransactionHelper(requestSpec, responseSpec);
         final String loanProductJson = VariableInstallmentsFlatHelper.createLoanProductWithVaribleConfig(false, NONE);
         Integer loanProductID = this.loanTransactionHelper.getLoanProductId(loanProductJson);
@@ -558,7 +558,7 @@ public class VariableInstallmentsIntegrationTest {
         HashMap modifiedReschdule = transactionHelper.validateVariations(addVariationsjsondata, loanID);
         ArrayList newperiods = (ArrayList) modifiedReschdule.get("periods");
         ArrayList toVerifyData = VariableInstallmentsFlatHelper.constructVerifyData(
-                new String[] { "20 October 2011", "20 November 2011", "25 December 2011", "20 January 2012" },
+                new String[] { "20111020", "20111120", "20111225", "20120120" },
                 new String[] { "27000.0", "32000.0", "7000.0", "42000.0" });
         assertAfterSubmit(newperiods, toVerifyData);
         transactionHelper.submitVariations(addVariationsjsondata, loanID);
@@ -572,10 +572,10 @@ public class VariableInstallmentsIntegrationTest {
 
     @Test
     public void testModifyDatesWithInterestTypeFlat() {
-        // Modify 20 December 2011:25000 -> 04 January 2012:20000
-        // Modify 20 January 2012 -> 08 February 2012
-        // Result 20 October 2011 -27306.45, 20 November 2011 - 27306.45, 04
-        // January 2012 -22306.45, 08 February 2012 - 32306.46
+        // Modify 20111220:25000 -> 20120104:20000
+        // Modify 20120120 -> 20120208
+        // Result 20111020 -27306.45, 20111120 - 27306.45, 04
+        // January 2012 -22306.45, 20120208 - 32306.46
         VariableIntallmentsTransactionHelper transactionHelper = new VariableIntallmentsTransactionHelper(requestSpec, responseSpec);
         final String loanProductJson = VariableInstallmentsFlatHelper.createLoanProductWithVaribleConfig(false, NONE);
         Integer loanProductID = this.loanTransactionHelper.getLoanProductId(loanProductJson);
@@ -602,13 +602,13 @@ public class VariableInstallmentsIntegrationTest {
         //
         //
         String addVariationsjsondata = VariableInstallmentsFlatHelper.createModifiyDateVariations(
-                new String[] { "20 December 2011", "20 January 2012" }, new String[] { "04 January 2012", "08 February 2012" },
+                new String[] { "20111220", "20120120" }, new String[] { "20120104", "20120208" },
                 new String[] { "20000" }); // 0th position will have
                                            // disbursement
         HashMap modifiedReschdule = transactionHelper.validateVariations(addVariationsjsondata, loanID);
         ArrayList newperiods = (ArrayList) modifiedReschdule.get("periods");
         ArrayList toVerifyData = VariableInstallmentsFlatHelper.constructVerifyData(
-                new String[] { "20 October 2011", "20 November 2011", "04 January 2012", "08 February 2012" },
+                new String[] { "20111020", "20111120", "20120104", "20120208" },
                 new String[] { "27306.45", "27306.45", "22306.45", "32306.46" });
         assertAfterSubmit(newperiods, toVerifyData);
         transactionHelper.submitVariations(addVariationsjsondata, loanID);

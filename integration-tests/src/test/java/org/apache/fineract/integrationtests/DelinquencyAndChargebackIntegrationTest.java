@@ -86,7 +86,7 @@ public class DelinquencyAndChargebackIntegrationTest extends BaseLoanIntegration
     public void testLoanClassificationStepAsPartOfCOB(LoanProductTestBuilder loanProductTestBuilder) {
         try {
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
-            final LocalDate todaysDate = Utils.getDateAsLocalDate("01 April 2012");
+            final LocalDate todaysDate = Utils.getDateAsLocalDate("20120401");
             LocalDate businessDate = todaysDate.minusMonths(3);
             log.info("Current Business date {}", businessDate);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, businessDate);
@@ -95,7 +95,7 @@ public class DelinquencyAndChargebackIntegrationTest extends BaseLoanIntegration
             final Long delinquencyBucketId = DelinquencyBucketsHelper.createDefaultBucket();
             final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketId);
             // Client and Loan account creation
-            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
+            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20120101");
             final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucket.getId(), loanProductTestBuilder);
             assertNotNull(getLoanProductsProductResponse);
             // Older date to have more than one overdue installment
@@ -188,7 +188,7 @@ public class DelinquencyAndChargebackIntegrationTest extends BaseLoanIntegration
             final Long delinquencyBucketId = DelinquencyBucketsHelper.createDefaultBucket();
             final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketId);
             // Client and Loan account creation
-            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
+            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20120101");
             final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucket.getId(), loanProductTestBuilder);
             assertNotNull(getLoanProductsProductResponse);
             // Older date to have more than one overdue installment

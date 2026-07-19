@@ -71,8 +71,8 @@ public class LoanDisbursementDetailsIntegrationTest {
     private LoanTransactionHelper loanTransactionHelper;
     private Integer loanId;
     private Integer disbursementId;
-    final String approveDate = "01 March 2014";
-    final String expectedDisbursementDate = "01 March 2014";
+    final String approveDate = "20140301";
+    final String expectedDisbursementDate = "20140301";
     final String proposedAmount = "5000";
     final String approvalAmount = "5000";
 
@@ -92,9 +92,9 @@ public class LoanDisbursementDetailsIntegrationTest {
         String installmentAmount = "800";
         String withoutInstallmentAmount = "";
         String proposedAmount = "10000";
-        createTranches.add(this.loanTransactionHelper.createTrancheDetail(id, "01 June 2015", "5000"));
-        createTranches.add(this.loanTransactionHelper.createTrancheDetail(id, "01 September 2015", "5000"));
-        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2014");
+        createTranches.add(this.loanTransactionHelper.createTrancheDetail(id, "20150601", "5000"));
+        createTranches.add(this.loanTransactionHelper.createTrancheDetail(id, "20150901", "5000"));
+        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20140101");
         log.info("---------------------------------CLIENT CREATED WITH ID---------------------------------------------------{}", clientID);
         final Integer loanProductID = this.loanTransactionHelper.getLoanProductId(new LoanProductTestBuilder().withInterestTypeAsDecliningBalance().withMoratorium("", "").withAmortizationTypeAsEqualInstallments().withTranches(true).withInterestCalculationPeriodTypeAsRepaymentPeriod(true).build(null));
         log.info("----------------------------------LOAN PRODUCT CREATED WITH ID------------------------------------------- {}", loanProductID);
@@ -107,7 +107,7 @@ public class LoanDisbursementDetailsIntegrationTest {
         HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(this.requestSpec, this.responseSpec, loanIDWithEmi);
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
         log.info("-----------------------------------APPROVE LOAN-----------------------------------------------------------");
-        loanStatusHashMap = this.loanTransactionHelper.approveLoanWithApproveAmount("01 June 2015", "01 June 2015", "10000", loanIDWithEmi, createTranches);
+        loanStatusHashMap = this.loanTransactionHelper.approveLoanWithApproveAmount("20150601", "20150601", "10000", loanIDWithEmi, createTranches);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
         log.info("-----------------------------------MULTI DISBURSAL LOAN WITH EMI APPROVED SUCCESSFULLY---------------------------------------");
@@ -121,7 +121,7 @@ public class LoanDisbursementDetailsIntegrationTest {
         HashMap loanStatusMap = LoanStatusChecker.getStatusOfLoan(this.requestSpec, this.responseSpec, loanIDWithoutEmi);
         LoanStatusChecker.verifyLoanIsPending(loanStatusMap);
         log.info("-----------------------------------APPROVE LOAN-----------------------------------------------------------");
-        loanStatusHashMap = this.loanTransactionHelper.approveLoanWithApproveAmount("01 June 2015", "01 June 2015", "10000", loanIDWithoutEmi, createTranches);
+        loanStatusHashMap = this.loanTransactionHelper.approveLoanWithApproveAmount("20150601", "20150601", "10000", loanIDWithoutEmi, createTranches);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
         log.info("-----------------------------------MULTI DISBURSAL LOAN WITHOUT EMI APPROVED SUCCESSFULLY---------------------------------------");
@@ -202,13 +202,13 @@ public class LoanDisbursementDetailsIntegrationTest {
         //
         //
         //
-        new LoanApplicationTestBuilder().withPrincipal(proposedAmount).withLoanTermFrequency("12").withLoanTermFrequencyAsMonths().withNumberOfRepayments("12").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("1").withExpectedDisbursementDate("01 June 2015").withTranches(tranches).withFixedEmiAmount(installmentAmount).withInterestTypeAsDecliningBalance().withSubmittedOnDate("01 June 2015").withAmortizationTypeAsEqualInstallments().withCollaterals(collaterals).build(clientId.toString(), loanProductId.toString(), null);
+        new LoanApplicationTestBuilder().withPrincipal(proposedAmount).withLoanTermFrequency("12").withLoanTermFrequencyAsMonths().withNumberOfRepayments("12").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("1").withExpectedDisbursementDate("20150601").withTranches(tranches).withFixedEmiAmount(installmentAmount).withInterestTypeAsDecliningBalance().withSubmittedOnDate("20150601").withAmortizationTypeAsEqualInstallments().withCollaterals(collaterals).build(clientId.toString(), loanProductId.toString(), null);
         return this.loanTransactionHelper.getLoanId(loanApplicationJSON);
     }
 
     @Test
     public void validateEqualInstallmentsForMultiTrancheLoan() {
-        final String operationDate = "01 January 2014";
+        final String operationDate = "20140101";
         final String principal = "1000";
         final String disbursedPrincipal = "900";
         final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, operationDate);
@@ -240,7 +240,7 @@ public class LoanDisbursementDetailsIntegrationTest {
 
     @Test
     public void disburseLoanWithExceededOverAppliedAmountFails() {
-        final String operationDate = "01 January 2014";
+        final String operationDate = "20140101";
         final String principal = "1000";
         final String firstDisbursedPrincipal = "900";
         final String secondDisbursedPrincipal = "1101";
@@ -269,7 +269,7 @@ public class LoanDisbursementDetailsIntegrationTest {
 
     @Test
     public void disburseLoanWithExceededOverAppliedAmountSucceed() {
-        final String operationDate = "01 January 2014";
+        final String operationDate = "20140101";
         final String principal = "1000";
         final String firstDisbursedPrincipal = "900";
         final String secondDisbursedPrincipal = "1100";
@@ -302,8 +302,8 @@ public class LoanDisbursementDetailsIntegrationTest {
     public void createApproveAndValidateMultiDisburseLoan() throws ParseException {
         List<HashMap> createTranches = new ArrayList<>();
         String id = null;
-        createTranches.add(this.loanTransactionHelper.createTrancheDetail(id, "01 March 2014", "1000"));
-        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2014");
+        createTranches.add(this.loanTransactionHelper.createTrancheDetail(id, "20140301", "1000"));
+        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20140101");
         log.info("---------------------------------CLIENT CREATED WITH ID--------------------------------------------------- {}", clientID);
         final Integer loanProductID = this.loanTransactionHelper.getLoanProductId(new LoanProductTestBuilder().withInterestTypeAsDecliningBalance().withTranches(true).withInterestCalculationPeriodTypeAsRepaymentPeriod(true).build(null));
         log.info("----------------------------------LOAN PRODUCT CREATED WITH ID------------------------------------------- {}", loanProductID);
@@ -400,8 +400,8 @@ public class LoanDisbursementDetailsIntegrationTest {
         String date = formatExpectedDisbursementDate(expectedDisbursementDate.toString());
         String id = null;
         addTranches.add(this.loanTransactionHelper.createTrancheDetail(disbursementDetails.get(0).get("id").toString(), date, disbursementDetails.get(0).get("principal").toString()));
-        addTranches.add(this.loanTransactionHelper.createTrancheDetail(id, "03 March 2014", "2000"));
-        addTranches.add(this.loanTransactionHelper.createTrancheDetail(id, "04 March 2014", "500"));
+        addTranches.add(this.loanTransactionHelper.createTrancheDetail(id, "20140303", "2000"));
+        addTranches.add(this.loanTransactionHelper.createTrancheDetail(id, "20140304", "500"));
         /* Add disbursement detail */
         this.loanTransactionHelper.addAndDeleteDisbursementDetail(this.loanId, this.approvalAmount, this.expectedDisbursementDate, addTranches, "");
     }
@@ -420,7 +420,7 @@ public class LoanDisbursementDetailsIntegrationTest {
     }
 
     private void editDateAndPrincipalOfExistingTranche() throws ParseException {
-        String updatedExpectedDisbursementDate = "01 March 2014";
+        String updatedExpectedDisbursementDate = "20140301";
         String updatedPrincipal = "900";
         /* Update */
         this.loanTransactionHelper.editDisbursementDetail(this.loanId, this.disbursementId, this.approvalAmount, this.expectedDisbursementDate, updatedExpectedDisbursementDate, updatedPrincipal, "");
@@ -434,7 +434,7 @@ public class LoanDisbursementDetailsIntegrationTest {
 
     private String formatExpectedDisbursementDate(String expectedDisbursementDate) throws ParseException {
         SimpleDateFormat source = new SimpleDateFormat("[yyyy, MM, dd]");
-        SimpleDateFormat target = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        SimpleDateFormat target = new SimpleDateFormat("yyyyMMdd", Locale.US);
         String date = target.format(source.parse(expectedDisbursementDate));
         return date;
     }
@@ -452,7 +452,7 @@ public class LoanDisbursementDetailsIntegrationTest {
         //
         //
         //
-        new LoanApplicationTestBuilder().withPrincipal(principal).withLoanTermFrequency("5").withLoanTermFrequencyAsMonths().withNumberOfRepayments("5").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("2").withExpectedDisbursementDate("01 March 2014").withTranches(tranches).withInterestTypeAsDecliningBalance().withSubmittedOnDate("01 March 2014").withCollaterals(collaterals).build(clientId.toString(), loanProductId.toString(), null);
+        new LoanApplicationTestBuilder().withPrincipal(principal).withLoanTermFrequency("5").withLoanTermFrequencyAsMonths().withNumberOfRepayments("5").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("2").withExpectedDisbursementDate("20140301").withTranches(tranches).withInterestTypeAsDecliningBalance().withSubmittedOnDate("20140301").withCollaterals(collaterals).build(clientId.toString(), loanProductId.toString(), null);
     }
 
     private Integer applyForLoanApplicationWithTranches(final Integer clientId, final Integer loanProductId, String principal, List<HashMap> tranches) {
@@ -463,7 +463,7 @@ public class LoanDisbursementDetailsIntegrationTest {
         final Integer clientCollateralId = CollateralManagementHelper.createClientCollateral(this.requestSpec, this.responseSpec, clientId.toString(), collateralId);
         Assertions.assertNotNull(clientCollateralId);
         addCollaterals(collaterals, clientCollateralId, BigDecimal.valueOf(1));
-        final String loanApplicationJSON = buildLoanApplicationJSON(clientId, loanProductId, principal, tranches, "01 March 2014", collaterals);
+        final String loanApplicationJSON = buildLoanApplicationJSON(clientId, loanProductId, principal, tranches, "20140301", collaterals);
         return this.loanTransactionHelper.getLoanId(loanApplicationJSON);
     }
 
@@ -602,9 +602,9 @@ public class LoanDisbursementDetailsIntegrationTest {
         final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         log.info("------------------CLIENT CREATED WITH ID----------- {}", clientId);
         List<HashMap> createTranches = new ArrayList<>();
-        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "01 March 2014", "5000"));
-        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "01 April 2014", "5000"));
-        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("10000").withLoanTermFrequency("12").withLoanTermFrequencyAsMonths().withNumberOfRepayments("12").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("1").withExpectedDisbursementDate("01 March 2014").withTranches(createTranches).withSubmittedOnDate("01 March 2014").withRepaymentStrategy(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).build(clientId.toString(), loanProductId.toString(), null);
+        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "20140301", "5000"));
+        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "20140401", "5000"));
+        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("10000").withLoanTermFrequency("12").withLoanTermFrequencyAsMonths().withNumberOfRepayments("12").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("1").withExpectedDisbursementDate("20140301").withTranches(createTranches).withSubmittedOnDate("20140301").withRepaymentStrategy(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).build(clientId.toString(), loanProductId.toString(), null);
         final Integer loanId = this.loanTransactionHelper.getLoanId(loanApplicationJSON);
         log.info("------------------LOAN CREATED WITH ID----------- {}", loanId);
         GetLoansLoanIdResponse loanDetails = this.loanTransactionHelper.getLoanDetails((long) loanId);
@@ -622,9 +622,9 @@ public class LoanDisbursementDetailsIntegrationTest {
         final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         log.info("------------------CLIENT CREATED WITH ID----------- {}", clientId);
         List<HashMap> createTranches = new ArrayList<>();
-        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "01 March 2014", "5000"));
-        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "01 April 2014", "5000"));
-        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("10000").withLoanTermFrequency("12").withLoanTermFrequencyAsMonths().withNumberOfRepayments("12").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("1").withExpectedDisbursementDate("01 March 2014").withTranches(createTranches).withSubmittedOnDate("01 March 2014").withRepaymentStrategy(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).withAllowFullTermForTranche(false).build(clientId.toString(), loanProductId.toString(), null);
+        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "20140301", "5000"));
+        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "20140401", "5000"));
+        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("10000").withLoanTermFrequency("12").withLoanTermFrequencyAsMonths().withNumberOfRepayments("12").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("1").withExpectedDisbursementDate("20140301").withTranches(createTranches).withSubmittedOnDate("20140301").withRepaymentStrategy(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).withAllowFullTermForTranche(false).build(clientId.toString(), loanProductId.toString(), null);
         final Integer loanId = this.loanTransactionHelper.getLoanId(loanApplicationJSON);
         log.info("------------------LOAN CREATED WITH ID----------- {}", loanId);
         GetLoansLoanIdResponse loanDetails = this.loanTransactionHelper.getLoanDetails((long) loanId);
@@ -639,19 +639,19 @@ public class LoanDisbursementDetailsIntegrationTest {
         final String loanProductJSON = new LoanProductTestBuilder().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().withMoratorium("", "").withInterestCalculationPeriodTypeAsRepaymentPeriod(true).withinterestRatePerPeriod("9.4822").withInterestRateFrequencyTypeAsYear().withMultiDisburse().withLoanScheduleType(LoanScheduleType.PROGRESSIVE).addAdvancedPaymentAllocation(defaultAllocation).withAllowFullTermForTranche(true).withDaysInYear("360").withMinPrincipal("100").build(null);
         final Integer loanProductId = this.loanTransactionHelper.getLoanProductId(loanProductJSON);
         log.info("------------------LOAN PRODUCT CREATED WITH ID----------- {}", loanProductId);
-        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2024");
+        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20240101");
         log.info("------------------CLIENT CREATED WITH ID----------- {}", clientId);
         List<HashMap> createTranches = new ArrayList<>();
-        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "01 January 2024", "100"));
-        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "01 February 2024", "100"));
-        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("200").withLoanTermFrequency("6").withLoanTermFrequencyAsMonths().withNumberOfRepayments("6").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("9.4822").withExpectedDisbursementDate("01 January 2024").withTranches(createTranches).withSubmittedOnDate("01 January 2024").withRepaymentStrategy(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).build(clientId.toString(), loanProductId.toString(), null);
+        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "20240101", "100"));
+        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "20240201", "100"));
+        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("200").withLoanTermFrequency("6").withLoanTermFrequencyAsMonths().withNumberOfRepayments("6").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("9.4822").withExpectedDisbursementDate("20240101").withTranches(createTranches).withSubmittedOnDate("20240101").withRepaymentStrategy(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).build(clientId.toString(), loanProductId.toString(), null);
         final Integer loanId = this.loanTransactionHelper.getLoanId(loanApplicationJSON);
         log.info("------------------LOAN CREATED WITH ID----------- {}", loanId);
-        this.loanTransactionHelper.approveLoanWithApproveAmount("01 January 2024", "01 January 2024", "200", loanId, createTranches);
+        this.loanTransactionHelper.approveLoanWithApproveAmount("20240101", "20240101", "200", loanId, createTranches);
         log.info("-------------------LOAN APPROVED-------");
-        loanTransactionHelper.disburseLoanWithTransactionAmount("01 January 2024", loanId, "100");
+        loanTransactionHelper.disburseLoanWithTransactionAmount("20240101", loanId, "100");
         log.info("-------------------FIRST TRANCHE DISBURSED-------");
-        loanTransactionHelper.disburseLoanWithTransactionAmount("01 February 2024", loanId, "100");
+        loanTransactionHelper.disburseLoanWithTransactionAmount("20240201", loanId, "100");
         log.info("-------------------SECOND TRANCHE DISBURSED-------");
         GetLoansLoanIdResponse loanDetails = this.loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
         assertNotNull(loanDetails);
@@ -668,7 +668,7 @@ public class LoanDisbursementDetailsIntegrationTest {
         log.info("-------------------S1 TEST: SCHEDULE VALIDATION-------");
         log.info("Schedule structure validated: 2 disbursement + 7 repayment periods");
         // Close the loan to allow LoanTestLifecycleExtension cleanup to succeed
-        closeFullTermTrancheLoan(loanId, "01 August 2024");
+        closeFullTermTrancheLoan(loanId, "20240801");
     }
 
     @Test
@@ -677,19 +677,19 @@ public class LoanDisbursementDetailsIntegrationTest {
         final String loanProductJSON = new LoanProductTestBuilder().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().withMoratorium("", "").withInterestCalculationPeriodTypeAsRepaymentPeriod(true).withinterestRatePerPeriod("9.4822").withInterestRateFrequencyTypeAsYear().withMultiDisburse().withLoanScheduleType(LoanScheduleType.PROGRESSIVE).addAdvancedPaymentAllocation(defaultAllocation).withAllowFullTermForTranche(true).withDaysInYear("360").withMinPrincipal("100").build(null);
         final Integer loanProductId = this.loanTransactionHelper.getLoanProductId(loanProductJSON);
         log.info("------------------LOAN PRODUCT CREATED WITH ID----------- {}", loanProductId);
-        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2024");
+        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20240101");
         log.info("------------------CLIENT CREATED WITH ID----------- {}", clientId);
         List<HashMap> createTranches = new ArrayList<>();
-        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "01 January 2024", "100"));
-        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "15 February 2024", "100"));
-        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("200").withLoanTermFrequency("6").withLoanTermFrequencyAsMonths().withNumberOfRepayments("6").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("9.4822").withExpectedDisbursementDate("01 January 2024").withTranches(createTranches).withSubmittedOnDate("01 January 2024").withRepaymentStrategy(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).build(clientId.toString(), loanProductId.toString(), null);
+        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "20240101", "100"));
+        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "20240215", "100"));
+        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("200").withLoanTermFrequency("6").withLoanTermFrequencyAsMonths().withNumberOfRepayments("6").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("9.4822").withExpectedDisbursementDate("20240101").withTranches(createTranches).withSubmittedOnDate("20240101").withRepaymentStrategy(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).build(clientId.toString(), loanProductId.toString(), null);
         final Integer loanId = this.loanTransactionHelper.getLoanId(loanApplicationJSON);
         log.info("------------------LOAN CREATED WITH ID----------- {}", loanId);
-        this.loanTransactionHelper.approveLoanWithApproveAmount("01 January 2024", "01 January 2024", "200", loanId, createTranches);
+        this.loanTransactionHelper.approveLoanWithApproveAmount("20240101", "20240101", "200", loanId, createTranches);
         log.info("-------------------LOAN APPROVED-------");
-        loanTransactionHelper.disburseLoanWithTransactionAmount("01 January 2024", loanId, "100");
+        loanTransactionHelper.disburseLoanWithTransactionAmount("20240101", loanId, "100");
         log.info("-------------------FIRST TRANCHE DISBURSED-------");
-        loanTransactionHelper.disburseLoanWithTransactionAmount("15 February 2024", loanId, "100");
+        loanTransactionHelper.disburseLoanWithTransactionAmount("20240215", loanId, "100");
         log.info("-------------------SECOND TRANCHE DISBURSED (MID-PERIOD)-------");
         GetLoansLoanIdResponse loanDetails = this.loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
         assertNotNull(loanDetails);
@@ -706,7 +706,7 @@ public class LoanDisbursementDetailsIntegrationTest {
         log.info("-------------------S2 TEST: SCHEDULE VALIDATION-------");
         log.info("Schedule structure validated: 2 disbursement + 7 repayment periods (mid-period disbursement)");
         // Close the loan to allow LoanTestLifecycleExtension cleanup to succeed
-        closeFullTermTrancheLoan(loanId, "01 August 2024");
+        closeFullTermTrancheLoan(loanId, "20240801");
     }
 
     @Test
@@ -715,19 +715,19 @@ public class LoanDisbursementDetailsIntegrationTest {
         final String loanProductJSON = new LoanProductTestBuilder().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().withMoratorium("", "").withInterestCalculationPeriodTypeAsRepaymentPeriod(true).withinterestRatePerPeriod("9.4822").withInterestRateFrequencyTypeAsYear().withMultiDisburse().withLoanScheduleType(LoanScheduleType.PROGRESSIVE).addAdvancedPaymentAllocation(defaultAllocation).withAllowFullTermForTranche(true).withDaysInYear("360").withMinPrincipal("100").build(null);
         final Integer loanProductId = this.loanTransactionHelper.getLoanProductId(loanProductJSON);
         log.info("------------------LOAN PRODUCT CREATED WITH ID----------- {}", loanProductId);
-        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2024");
+        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20240101");
         log.info("------------------CLIENT CREATED WITH ID----------- {}", clientId);
         List<HashMap> createTranches = new ArrayList<>();
-        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "01 January 2024", "100"));
-        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "15 January 2024", "100"));
-        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("200").withLoanTermFrequency("6").withLoanTermFrequencyAsMonths().withNumberOfRepayments("6").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("9.4822").withExpectedDisbursementDate("01 January 2024").withTranches(createTranches).withSubmittedOnDate("01 January 2024").withRepaymentStrategy(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).build(clientId.toString(), loanProductId.toString(), null);
+        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "20240101", "100"));
+        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "20240115", "100"));
+        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("200").withLoanTermFrequency("6").withLoanTermFrequencyAsMonths().withNumberOfRepayments("6").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("9.4822").withExpectedDisbursementDate("20240101").withTranches(createTranches).withSubmittedOnDate("20240101").withRepaymentStrategy(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).build(clientId.toString(), loanProductId.toString(), null);
         final Integer loanId = this.loanTransactionHelper.getLoanId(loanApplicationJSON);
         log.info("------------------LOAN CREATED WITH ID----------- {}", loanId);
-        this.loanTransactionHelper.approveLoanWithApproveAmount("01 January 2024", "01 January 2024", "200", loanId, createTranches);
+        this.loanTransactionHelper.approveLoanWithApproveAmount("20240101", "20240101", "200", loanId, createTranches);
         log.info("-------------------LOAN APPROVED-------");
-        loanTransactionHelper.disburseLoanWithTransactionAmount("01 January 2024", loanId, "100");
+        loanTransactionHelper.disburseLoanWithTransactionAmount("20240101", loanId, "100");
         log.info("-------------------FIRST TRANCHE DISBURSED-------");
-        loanTransactionHelper.disburseLoanWithTransactionAmount("15 January 2024", loanId, "100");
+        loanTransactionHelper.disburseLoanWithTransactionAmount("20240115", loanId, "100");
         log.info("-------------------SECOND TRANCHE DISBURSED (BEFORE FIRST REPAYMENT)-------");
         GetLoansLoanIdResponse loanDetails = this.loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
         assertNotNull(loanDetails);
@@ -745,7 +745,7 @@ public class LoanDisbursementDetailsIntegrationTest {
         log.info("Schedule structure validated: 2 disbursement + 6 repayment periods (no term extension)");
         log.info("Both disbursements before first repayment date result in same maturity date");
         // Close the loan to allow LoanTestLifecycleExtension cleanup to succeed
-        closeFullTermTrancheLoan(loanId, "01 July 2024");
+        closeFullTermTrancheLoan(loanId, "20240701");
     }
 
     @Test
@@ -754,19 +754,19 @@ public class LoanDisbursementDetailsIntegrationTest {
         final String loanProductWithoutFlag = new LoanProductTestBuilder().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().withMoratorium("", "").withInterestCalculationPeriodTypeAsRepaymentPeriod(true).withinterestRatePerPeriod("9.4822").withInterestRateFrequencyTypeAsYear().withMultiDisburse().withLoanScheduleType(LoanScheduleType.PROGRESSIVE).addAdvancedPaymentAllocation(defaultAllocation).withAllowFullTermForTranche(false).withDaysInYear("360").withMinPrincipal("100").build(null);
         final Integer loanProductId = this.loanTransactionHelper.getLoanProductId(loanProductWithoutFlag);
         log.info("------------------LOAN PRODUCT CREATED WITH allowFullTermForTranche=false ID----------- {}", loanProductId);
-        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2024");
+        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20240101");
         log.info("------------------CLIENT CREATED WITH ID----------- {}", clientId);
         List<HashMap> createTranches = new ArrayList<>();
-        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "01 January 2024", "100"));
-        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "01 February 2024", "100"));
-        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("200").withLoanTermFrequency("6").withLoanTermFrequencyAsMonths().withNumberOfRepayments("6").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("9.4822").withExpectedDisbursementDate("01 January 2024").withTranches(createTranches).withSubmittedOnDate("01 January 2024").withRepaymentStrategy(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).build(clientId.toString(), loanProductId.toString(), null);
+        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "20240101", "100"));
+        createTranches.add(this.loanTransactionHelper.createTrancheDetail(null, "20240201", "100"));
+        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("200").withLoanTermFrequency("6").withLoanTermFrequencyAsMonths().withNumberOfRepayments("6").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("9.4822").withExpectedDisbursementDate("20240101").withTranches(createTranches).withSubmittedOnDate("20240101").withRepaymentStrategy(LoanProductTestBuilder.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).build(clientId.toString(), loanProductId.toString(), null);
         final Integer loanId = this.loanTransactionHelper.getLoanId(loanApplicationJSON);
         log.info("------------------LOAN CREATED WITH ID----------- {}", loanId);
-        this.loanTransactionHelper.approveLoanWithApproveAmount("01 January 2024", "01 January 2024", "200", loanId, createTranches);
+        this.loanTransactionHelper.approveLoanWithApproveAmount("20240101", "20240101", "200", loanId, createTranches);
         log.info("-------------------LOAN APPROVED-------");
-        loanTransactionHelper.disburseLoanWithTransactionAmount("01 January 2024", loanId, "100");
+        loanTransactionHelper.disburseLoanWithTransactionAmount("20240101", loanId, "100");
         log.info("-------------------FIRST TRANCHE DISBURSED-------");
-        loanTransactionHelper.disburseLoanWithTransactionAmount("01 February 2024", loanId, "100");
+        loanTransactionHelper.disburseLoanWithTransactionAmount("20240201", loanId, "100");
         log.info("-------------------SECOND TRANCHE DISBURSED-------");
         GetLoansLoanIdResponse loanDetails = this.loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
         assertNotNull(loanDetails);

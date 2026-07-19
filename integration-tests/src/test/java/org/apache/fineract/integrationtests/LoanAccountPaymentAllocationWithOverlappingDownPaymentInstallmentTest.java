@@ -62,7 +62,7 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
     private RequestSpecification requestSpec;
     private LoanTransactionHelper loanTransactionHelper;
     private ClientHelper clientHelper;
-    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
 
     @BeforeEach
     public void setup() {
@@ -152,7 +152,7 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
             assertEquals(enableAutoRepaymentForDownPayment, loanDetails.getEnableAutoRepaymentForDownPayment());
 
             // first disbursement
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 March 2023", loanId, "500");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230303", loanId, "500");
 
             // verify down-payment transaction created
             checkDownPaymentTransaction(disbursementDate, 125.0f, 0.0f, 0.0f, 0.0f, loanId);
@@ -181,7 +181,7 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
 
             disbursementDate = LocalDate.of(2023, 4, 3);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, disbursementDate);
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 April 2023", loanId, "1000");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230403", loanId, "1000");
 
             checkDownPaymentTransaction(disbursementDate, 250.0f, 0.0f, 0.0f, 0.0f, loanId);
 
@@ -213,7 +213,7 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
             // make repayment for fully paying and verify that regular installment gets fully paid on 3rd april
 
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("3 April 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230403").locale("en")
                             .transactionAmount(577.65));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
@@ -325,11 +325,11 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
             assertEquals(enableAutoRepaymentForDownPayment, loanDetails.getEnableAutoRepaymentForDownPayment());
 
             // first disbursement
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 March 2023", loanId, "500");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230303", loanId, "500");
 
             // make repayment on 3rd March
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("3 March 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230303").locale("en")
                             .transactionAmount(125.0));
 
             // verify loan schedule
@@ -356,11 +356,11 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
 
             disbursementDate = LocalDate.of(2023, 4, 3);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, disbursementDate);
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 April 2023", loanId, "1000");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230403", loanId, "1000");
 
             // make repayment on 3rd April
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("3 April 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230403").locale("en")
                             .transactionAmount(250.0));
 
             // verify loan schedule
@@ -391,7 +391,7 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
             // make repayment for fully paying and verify that regular installment gets fully paid on 3rd april
 
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_2 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("3 April 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230403").locale("en")
                             .transactionAmount(577.65));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
@@ -476,11 +476,11 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
             assertEquals(enableAutoRepaymentForDownPayment, loanDetails.getEnableAutoRepaymentForDownPayment());
 
             // first disbursement
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 March 2023", loanId, "200");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230303", loanId, "200");
 
             // make repayment on 3rd March
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("3 March 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230303").locale("en")
                             .transactionAmount(50.0));
 
             // verify loan schedule
@@ -507,11 +507,11 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
 
             disbursementDate = LocalDate.of(2023, 4, 3);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, disbursementDate);
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 April 2023", loanId, "200");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230403", loanId, "200");
 
             // make repayment on 3rd April
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("3 April 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230403").locale("en")
                             .transactionAmount(50.0));
 
             // verify loan schedule
@@ -541,11 +541,11 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
 
             // same day third disbursement with overlapping installment i.e same due date as regular repayment due date
             // 3-April
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 April 2023", loanId, "200");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230403", loanId, "200");
 
             // make repayment on 3rd April
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_2 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("3 April 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230403").locale("en")
                             .transactionAmount(50.0));
 
             // verify loan schedule
@@ -580,7 +580,7 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
 
             // make repayment for fully paying and verify that regular installment gets fully paid on 3rd april
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_3 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("3 April 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230403").locale("en")
                             .transactionAmount(225.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
@@ -674,11 +674,11 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
             assertEquals(enableAutoRepaymentForDownPayment, loanDetails.getEnableAutoRepaymentForDownPayment());
 
             // first disbursement
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 March 2023", loanId, "200");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230303", loanId, "200");
 
             // make repayment on 3rd March
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("3 March 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230303").locale("en")
                             .transactionAmount(50.0));
 
             // verify loan schedule
@@ -705,11 +705,11 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
 
             disbursementDate = LocalDate.of(2023, 4, 3);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, disbursementDate);
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 April 2023", loanId, "200");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230403", loanId, "200");
 
             // make repayment on 3rd April
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("3 April 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230403").locale("en")
                             .transactionAmount(50.0));
 
             // verify loan schedule
@@ -739,11 +739,11 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
 
             // same day third disbursement with overlapping installment i.e same due date as regular repayment due date
             // 3-April
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 April 2023", loanId, "200");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230403", loanId, "200");
 
             // make repayment on 3rd April
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_2 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("3 April 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230403").locale("en")
                             .transactionAmount(50.0));
 
             // verify loan schedule
@@ -778,7 +778,7 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
 
             // make repayment for fully paying and verify that regular installment gets fully paid on 3rd april
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_3 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("3 April 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230403").locale("en")
                             .transactionAmount(225.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
@@ -845,12 +845,12 @@ public class LoanAccountPaymentAllocationWithOverlappingDownPaymentInstallmentTe
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("2").withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsDecliningBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("03 March 2023").withSubmittedOnDate("03 March 2023").withLoanType("individual")
+                .withExpectedDisbursementDate("20230303").withSubmittedOnDate("20230303").withLoanType("individual")
                 .withExternalId(externalId).withRepaymentStrategy(repaymentStartegy)
                 .build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("03 March 2023", "1000", loanId, null);
+        loanTransactionHelper.approveLoan("20230303", "1000", loanId, null);
         return loanId;
     }
 

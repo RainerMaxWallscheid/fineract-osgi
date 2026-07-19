@@ -78,7 +78,7 @@ public class LoanProductsRequestFactory {
     public static final String NAME_PREFIX_INTEREST_DECLINING = "LP1InterestDeclining-";
     public static final String NAME_PREFIX_INTEREST_DECLINING_RECALCULATION = "LP1InterestDecliningRecalculation-";
     public static final String NAME_PREFIX_INTEREST_RECALCULATION = "LP2InterestRecalculation-";
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     public static final String LOCALE_EN = "en";
     public static final String DESCRIPTION = "30 days repayment";
     public static final String DESCRIPTION_LP2 = "4 installments repayment";

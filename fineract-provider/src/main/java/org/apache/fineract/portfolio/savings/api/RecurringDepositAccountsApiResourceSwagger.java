@@ -282,9 +282,9 @@ final class RecurringDepositAccountsApiResourceSwagger {
         public Long productId;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "02 June 2014")
+        @Schema(example = "20140602")
         public String submittedOnDate;
         @Schema(example = "20")
         public Integer depositPeriod;

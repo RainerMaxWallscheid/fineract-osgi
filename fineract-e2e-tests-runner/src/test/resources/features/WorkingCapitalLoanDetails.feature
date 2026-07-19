@@ -4,15 +4,15 @@ Feature: Working Capital Loan Details
 
   @TestRailId:C85423
   Scenario: Loan details GET returns the general fields aligned with the Term loan API
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a working capital loan with the following data:
       | LoanProduct | submittedOnDate | expectedDisbursementDate | principalAmount | totalPaymentVolume | periodPaymentRate | discount |
-      | WCLP        | 01 January 2026 | 01 January 2026          | 100.0           | 100.0              | 1.0               | 0.0      |
+      | WCLP        | 20260101 | 20260101          | 100.0           | 100.0              | 1.0               | 0.0      |
     Then Working capital loan creation was successful
-    When Admin successfully approves the working capital loan on "01 January 2026" with "100" amount and expected disbursement date on "01 January 2026"
+    When Admin successfully approves the working capital loan on "20260101" with "100" amount and expected disbursement date on "20260101"
     Then Working capital loan approval was successful
-    When Admin successfully disburse the Working Capital loan on "01 January 2026" with "100" EUR transaction amount
+    When Admin successfully disburse the Working Capital loan on "20260101" with "100" EUR transaction amount
     Then Verify Working Capital loan disbursement was successful
     Then Working capital loan details has the following field values:
       | id                                             | present                      |
@@ -164,11 +164,11 @@ Feature: Working Capital Loan Details
 
   @TestRailId:C85424
   Scenario: Loan details GET returns the fund when the loan is created with one
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a working capital loan with fund and the following data:
       | LoanProduct | submittedOnDate | expectedDisbursementDate | principalAmount | totalPaymentVolume | periodPaymentRate | discount |
-      | WCLP        | 01 January 2026 | 01 January 2026          | 100.0           | 100.0              | 1.0               | 0.0      |
+      | WCLP        | 20260101 | 20260101          | 100.0           | 100.0              | 1.0               | 0.0      |
     Then Working capital loan creation was successful
     Then Working capital loan details has the following field values:
       | fundId   | 1        |
@@ -176,11 +176,11 @@ Feature: Working Capital Loan Details
 
   @TestRailId:C85425
   Scenario: Loan details GET returns the charges added to the loan
-    Given Admin sets the business date to "01 January 2026"
+    Given Admin sets the business date to "20260101"
     And Admin creates a client with random data and creates-approves-disburses a working capital loan with the following data:
       | LoanProduct | submittedOnDate | expectedDisbursementDate | principalAmount | totalPaymentVolume | periodPaymentRate | discount |
-      | WCLP        | 01 January 2026 | 01 January 2026          | 100.0           | 100.0              | 1.0               | 0.0      |
-    And Admin adds "WORKING_CAPITAL_SPECIFIED_DUE_DATE_FEE" specified due date charge to working capital loan with "12 January 2026" due date and 35.0 transaction amount
+      | WCLP        | 20260101 | 20260101          | 100.0           | 100.0              | 1.0               | 0.0      |
+    And Admin adds "WORKING_CAPITAL_SPECIFIED_DUE_DATE_FEE" specified due date charge to working capital loan with "20260112" due date and 35.0 transaction amount
     Then Working capital loan details has the following field values:
       | charges.size                          | 1                        |
       | charges.0.id                          | present                  |
@@ -201,12 +201,12 @@ Feature: Working Capital Loan Details
 
   @TestRailId:C85444
   Scenario: Loan details GET returns the originator attached to loan
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a new loan originator with external ID and name "WC Inline Originator"
     And Admin creates a working capital loan with originator attached inline and the following data:
       | LoanProduct | submittedOnDate | expectedDisbursementDate | principalAmount | totalPaymentVolume | periodPaymentRate | discount |
-      | WCLP        | 01 January 2026 | 01 January 2026          | 100.0           | 100.0              | 1.0               | 0.0      |
+      | WCLP        | 20260101 | 20260101          | 100.0           | 100.0              | 1.0               | 0.0      |
     Then Working capital loan creation was successful
     Then Working capital loan details has the originator attached
     Then Working capital loan details has the following field values:
@@ -218,11 +218,11 @@ Feature: Working Capital Loan Details
 
   @TestRailId:C85445
   Scenario: Loan details GET returns the breach and near breach values
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a working capital loan with the following data:
       | LoanProduct | submittedOnDate | expectedDisbursementDate | principalAmount | totalPaymentVolume | periodPaymentRate | discount |
-      | WCLP        | 01 January 2026 | 01 January 2026          | 100.0           | 100.0              | 1.0               | 0.0      |
+      | WCLP        | 20260101 | 20260101          | 100.0           | 100.0              | 1.0               | 0.0      |
     Then Working capital loan creation was successful
     And Working capital loan account has the correct data:
       | product.name | submittedOnDate | expectedDisbursementDate | status                         | proposedPrincipal | approvedPrincipal | totalPaymentVolume | periodPaymentRate | discountProposed |

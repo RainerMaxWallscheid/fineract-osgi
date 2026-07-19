@@ -366,7 +366,7 @@ public class ChargesTest {
         final ChargesHelper chargesHelper = new ChargesHelper();
 
         final PostTaxesComponentsRequest taxComponentRequest = new PostTaxesComponentsRequest()
-                .name(Utils.randomStringGenerator("TAX_COM_", 4)).percentage(12.0f).startDate("01 January 2023").dateFormat("dd MMMM yyyy")
+                .name(Utils.randomStringGenerator("TAX_COM_", 4)).percentage(12.0f).startDate("20230101").dateFormat("yyyyMMdd")
                 .locale("en");
 
         final PostTaxesComponentsResponse taxComponentRespose = TaxComponentHelper.createTaxComponent(taxComponentRequest);
@@ -374,9 +374,9 @@ public class ChargesTest {
 
         final Set<PostTaxesGroupTaxComponents> taxComponentsSet = new HashSet<>();
         taxComponentsSet
-                .add(new PostTaxesGroupTaxComponents().taxComponentId(taxComponentRespose.getResourceId()).startDate("01 January 2023"));
+                .add(new PostTaxesGroupTaxComponents().taxComponentId(taxComponentRespose.getResourceId()).startDate("20230101"));
         final PostTaxesGroupRequest taxGroupRequest = new PostTaxesGroupRequest().name(Utils.randomStringGenerator("TAX_GRP_", 4))
-                .taxComponents(taxComponentsSet).dateFormat("dd MMMM yyyy").locale("en");
+                .taxComponents(taxComponentsSet).dateFormat("yyyyMMdd").locale("en");
         final PostTaxesGroupResponse taxGroupResponse = TaxGroupHelper.createTaxGroup(taxGroupRequest);
         Assertions.assertNotNull(taxGroupResponse);
 

@@ -91,7 +91,7 @@ public class LoanReschedulingWithinCenterTest extends BaseLoanIntegrationTest {
         String externalId = UUID.randomUUID().toString();
         int staffId = StaffHelper.createStaff(requestSpec, responseSpec);
         int[] groupMembers = generateGroupMembers(1, officeId);
-        final String centerActivationDate = "01 July 2007";
+        final String centerActivationDate = "20070701";
         Integer centerId = CenterHelper.createCenter(name, officeId, externalId, staffId, groupMembers, centerActivationDate, requestSpec,
                 responseSpec);
         CenterDomain center = CenterHelper.retrieveByID(centerId, requestSpec, responseSpec);
@@ -106,13 +106,13 @@ public class LoanReschedulingWithinCenterTest extends BaseLoanIntegrationTest {
 
         associateClientsToGroup(groupId, clientId);
 
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
         Calendar today = Calendar.getInstance(Utils.getTimeZoneOfTenant());
         today.add(Calendar.DAY_OF_MONTH, -14);
         // CREATE A LOAN PRODUCT
         final String disbursalDate = dateFormat.format(today.getTime());
-        final String recalculationRestFrequencyDate = "01 January 2012";
+        final String recalculationRestFrequencyDate = "20120101";
         final boolean isMultiTrancheLoan = false;
 
         List<HashMap> collaterals = new ArrayList<>();
@@ -190,14 +190,14 @@ public class LoanReschedulingWithinCenterTest extends BaseLoanIntegrationTest {
 
     private Integer createClient(Integer officeId) {
         // CREATE CLIENT
-        final String clientActivationDate = "01 July 2014";
+        final String clientActivationDate = "20140701";
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, clientActivationDate, officeId.toString());
         ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientId);
         return clientId;
     }
 
     private Long createCalendarMeeting(Integer centerId) {
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
         Calendar today = Calendar.getInstance(Utils.getTimeZoneOfTenant());
         final String startDate = dateFormat.format(today.getTime());
@@ -224,7 +224,7 @@ public class LoanReschedulingWithinCenterTest extends BaseLoanIntegrationTest {
         String externalId = UUID.randomUUID().toString();
         int staffId = StaffHelper.createStaff(requestSpec, responseSpec);
         int[] groupMembers = generateGroupMembers(1, officeId);
-        final String centerActivationDate = "01 July 2007";
+        final String centerActivationDate = "20070701";
         Integer centerId = CenterHelper.createCenter(name, officeId, externalId, staffId, groupMembers, centerActivationDate, requestSpec,
                 responseSpec);
         CenterDomain center = CenterHelper.retrieveByID(centerId, requestSpec, responseSpec);
@@ -240,7 +240,7 @@ public class LoanReschedulingWithinCenterTest extends BaseLoanIntegrationTest {
         associateClientsToGroup(groupId, clientId);
 
         // CREATE A LOAN PRODUCT
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
         Calendar today = Calendar.getInstance(Utils.getTimeZoneOfTenant());
         today.add(Calendar.DAY_OF_MONTH, -14);
@@ -249,7 +249,7 @@ public class LoanReschedulingWithinCenterTest extends BaseLoanIntegrationTest {
         final String expectedDisbursementDate = dateFormat.format(today.getTime());
         final String disbursementDate = dateFormat.format(today.getTime());
         final String approvalAmount = "10000";
-        final String recalculationRestFrequencyDate = "01 January 2012";
+        final String recalculationRestFrequencyDate = "20120101";
         final boolean isMultiTrancheLoan = true;
 
         // CREATE LOAN MULTIDISBURSAL PRODUCT WITH INTEREST RECALCULATION
@@ -423,10 +423,10 @@ public class LoanReschedulingWithinCenterTest extends BaseLoanIntegrationTest {
             map.put("officeId", "" + officeId);
             map.put("name", Utils.uniqueRandomStringGenerator("Group_Name_", 5));
             map.put("externalId", UUID.randomUUID().toString());
-            map.put("dateFormat", "dd MMMM yyyy");
+            map.put("dateFormat", "yyyyMMdd");
             map.put("locale", "en");
             map.put("active", "true");
-            map.put("activationDate", "04 March 2011");
+            map.put("activationDate", "20110304");
 
             groupMembers[i] = Utils.performServerPost(requestSpec, responseSpec,
                     "/fineract-provider/api/v1/groups?" + Utils.TENANT_IDENTIFIER, new Gson().toJson(map), "groupId");

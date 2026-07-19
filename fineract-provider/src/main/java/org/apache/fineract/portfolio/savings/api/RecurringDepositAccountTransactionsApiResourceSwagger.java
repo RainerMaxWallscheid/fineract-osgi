@@ -207,9 +207,9 @@ final class RecurringDepositAccountTransactionsApiResourceSwagger {
 
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "27 May 2013")
+        @Schema(example = "20130527")
         public String transactionDate;
         @Schema(example = "500")
         public Double transactionAmount;

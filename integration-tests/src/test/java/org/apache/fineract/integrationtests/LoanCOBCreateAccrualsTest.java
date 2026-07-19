@@ -68,59 +68,59 @@ public class LoanCOBCreateAccrualsTest extends BaseLoanIntegrationTest {
     public void chargeAmountLessThanOverpaidAmount() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
         setup();
-        runAt("20 October 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20 October 2024", 100.0, 0.0, 1, null);
+        runAt("20241020", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20241020", 100.0, 0.0, 1, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(100), "20 October 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(100), "20241020");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0);
-            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20 October 2024"));
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0);
+            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20241020"));
         });
-        runAt("21 October 2024", () -> {
+        runAt("20241021", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanIdRef.get());
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0);
-            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20 October 2024"));
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0);
+            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20241020"));
         });
-        runAt("22 October 2024", () -> {
+        runAt("20241022", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0);
-            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20 October 2024"));
-            loanTransactionHelper.makeLoanRepayment("22 October 2024", 102.0F, loanId.intValue());
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0);
+            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20241020"));
+            loanTransactionHelper.makeLoanRepayment("20241022", 102.0F, loanId.intValue());
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0, 0, 100);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0, 0, 100);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(102.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 0, 0, 2.0, false));
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(102.0, "Repayment", "20241022", 0, 100.0, 0, 0, 0, 0, 2.0, false));
         });
-        runAt("23 October 2024", () -> {
+        runAt("20241023", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0, 0, 100);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0, 0, 100);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(102.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 0, 0, 2.0, false));
-            addCharge(loanId, true, 1.5, "23 October 2024");
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(102.0, "Repayment", "20241022", 0, 100.0, 0, 0, 0, 0, 2.0, false));
+            addCharge(loanId, true, 1.5, "20241023");
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2024, 11, 20), 100.0, 100.0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 101.5, 0);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(1.5, "Accrual", "23 October 2024", 0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.0, false),  //
-            transaction(102.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 1.5, 0, 0.5, false));
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(1.5, "Accrual", "20241023", 0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.0, false),  //
+            transaction(102.0, "Repayment", "20241022", 0, 100.0, 0, 0, 1.5, 0, 0.5, false));
         });
-        runAt("24 October 2024", () -> {
+        runAt("20241024", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2024, 11, 20), 100.0, 100.0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 101.5, 0);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(1.5, "Accrual", "23 October 2024", 0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.0, false),  //
-            transaction(102.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 1.5, 0, 0.5, false));
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(1.5, "Accrual", "20241023", 0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.0, false),  //
+            transaction(102.0, "Repayment", "20241022", 0, 100.0, 0, 0, 1.5, 0, 0.5, false));
         });
     }
 
@@ -136,59 +136,59 @@ public class LoanCOBCreateAccrualsTest extends BaseLoanIntegrationTest {
     public void chargeAmountEqualsToOverpaidAmount() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
         setup();
-        runAt("20 October 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20 October 2024", 100.0, 0.0, 1, null);
+        runAt("20241020", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20241020", 100.0, 0.0, 1, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(100), "20 October 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(100), "20241020");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0);
-            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20 October 2024"));
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0);
+            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20241020"));
         });
-        runAt("21 October 2024", () -> {
+        runAt("20241021", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanIdRef.get());
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0);
-            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20 October 2024"));
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0);
+            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20241020"));
         });
-        runAt("22 October 2024", () -> {
+        runAt("20241022", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0);
-            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20 October 2024"));
-            loanTransactionHelper.makeLoanRepayment("22 October 2024", 102.0F, loanId.intValue());
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0);
+            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20241020"));
+            loanTransactionHelper.makeLoanRepayment("20241022", 102.0F, loanId.intValue());
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0, 0, 100);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0, 0, 100);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(102.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 0, 0, 2.0, false));
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(102.0, "Repayment", "20241022", 0, 100.0, 0, 0, 0, 0, 2.0, false));
         });
-        runAt("23 October 2024", () -> {
+        runAt("20241023", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0, 0, 100);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0, 0, 100);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(102.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 0, 0, 2.0, false));
-            addCharge(loanId, true, 2.0, "23 October 2024");
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(102.0, "Repayment", "20241022", 0, 100.0, 0, 0, 0, 0, 2.0, false));
+            addCharge(loanId, true, 2.0, "20241023");
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2024, 11, 20), 100.0, 100.0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 102, 0);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(2.0, "Accrual", "23 October 2024", 0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, false),  //
-            transaction(102.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 2, 0, 0, false));
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(2.0, "Accrual", "20241023", 0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, false),  //
+            transaction(102.0, "Repayment", "20241022", 0, 100.0, 0, 0, 2, 0, 0, false));
         });
-        runAt("24 October 2024", () -> {
+        runAt("20241024", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2024, 11, 20), 100.0, 100.0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 102, 0);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(2.0, "Accrual", "23 October 2024", 0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, false),  //
-            transaction(102.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 2, 0, 0, false));
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(2.0, "Accrual", "20241023", 0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, false),  //
+            transaction(102.0, "Repayment", "20241022", 0, 100.0, 0, 0, 2, 0, 0, false));
         });
     }
 
@@ -204,58 +204,58 @@ public class LoanCOBCreateAccrualsTest extends BaseLoanIntegrationTest {
     public void chargeAmountIsGreaterThanOverpaidAmount() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
         setup();
-        runAt("20 October 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20 October 2024", 100.0, 0.0, 1, null);
+        runAt("20241020", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20241020", 100.0, 0.0, 1, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(100), "20 October 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(100), "20241020");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0);
-            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20 October 2024"));
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0);
+            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20241020"));
         });
-        runAt("21 October 2024", () -> {
+        runAt("20241021", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanIdRef.get());
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0);
-            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20 October 2024"));
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0);
+            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20241020"));
         });
-        runAt("22 October 2024", () -> {
+        runAt("20241022", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0);
-            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20 October 2024"));
-            loanTransactionHelper.makeLoanRepayment("22 October 2024", 102.0F, loanId.intValue());
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0);
+            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20241020"));
+            loanTransactionHelper.makeLoanRepayment("20241022", 102.0F, loanId.intValue());
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0, 0, 100);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0, 0, 100);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(102.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 0, 0, 2.0, false));
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(102.0, "Repayment", "20241022", 0, 100.0, 0, 0, 0, 0, 2.0, false));
         });
-        runAt("23 October 2024", () -> {
+        runAt("20241023", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0, 0, 100);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0, 0, 100);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(102.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 0, 0, 2.0, false));
-            addCharge(loanId, true, 5.0, "23 October 2024");
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(102.0, "Repayment", "20241022", 0, 100.0, 0, 0, 0, 0, 2.0, false));
+            addCharge(loanId, true, 5.0, "20241023");
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2024, 11, 20), 100.0, 100.0, 0, 0, 0, 0, 5, 2, 3, 0, 0, 0, 102, 0);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(102.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 2, 0, 0, false));
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(102.0, "Repayment", "20241022", 0, 100.0, 0, 0, 2, 0, 0, false));
         });
-        runAt("24 October 2024", () -> {
+        runAt("20241024", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2024, 11, 20), 100.0, 100.0, 0, 0, 0, 0, 5, 2, 3, 0, 0, 0, 102, 0);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(5.0, "Accrual", "23 October 2024", 0, 0.0, 0.0, 0.0, 5.0, 0.0, 0.0, false),  //
-            transaction(102.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 2, 0, 0, false));
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(5.0, "Accrual", "20241023", 0, 0.0, 0.0, 0.0, 5.0, 0.0, 0.0, false),  //
+            transaction(102.0, "Repayment", "20241022", 0, 100.0, 0, 0, 2, 0, 0, false));
         });
     }
 
@@ -271,58 +271,58 @@ public class LoanCOBCreateAccrualsTest extends BaseLoanIntegrationTest {
     public void chargeForObligationMetLoan() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
         setup();
-        runAt("20 October 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20 October 2024", 100.0, 0.0, 1, null);
+        runAt("20241020", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20241020", 100.0, 0.0, 1, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(100), "20 October 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(100), "20241020");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0);
-            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20 October 2024"));
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0);
+            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20241020"));
         });
-        runAt("21 October 2024", () -> {
+        runAt("20241021", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanIdRef.get());
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0);
-            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20 October 2024"));
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0);
+            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20241020"));
         });
-        runAt("22 October 2024", () -> {
+        runAt("20241022", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0);
-            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20 October 2024"));
-            loanTransactionHelper.makeLoanRepayment("22 October 2024", 100.0F, loanId.intValue());
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0);
+            verifyTransactions(loanId, transaction(100.0, "Disbursement", "20241020"));
+            loanTransactionHelper.makeLoanRepayment("20241022", 100.0F, loanId.intValue());
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0, 0, 100);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0, 0, 100);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(100.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 0, 0, 0.0, false));
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(100.0, "Repayment", "20241022", 0, 100.0, 0, 0, 0, 0, 0.0, false));
         });
-        runAt("23 October 2024", () -> {
+        runAt("20241023", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20 November 2024", 100, 0, 0, 0, 0, 100);
+            validateFullyPaidRepaymentPeriod(loanDetails, 1, "20241120", 100, 0, 0, 0, 0, 100);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(100.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 0, 0, 0.0, false));
-            addCharge(loanId, true, 5.0, "23 October 2024");
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(100.0, "Repayment", "20241022", 0, 100.0, 0, 0, 0, 0, 0.0, false));
+            addCharge(loanId, true, 5.0, "20241023");
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2024, 11, 20), 100.0, 100.0, 0, 0, 0, 0, 5, 0, 5, 0, 0, 0, 100, 0);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(100.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 0, 0, 0, false));
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(100.0, "Repayment", "20241022", 0, 100.0, 0, 0, 0, 0, 0, false));
         });
-        runAt("24 October 2024", () -> {
+        runAt("20241024", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2024, 11, 20), 100.0, 100.0, 0, 0, 0, 0, 5, 0, 5, 0, 0, 0, 100, 0);
             verifyTransactions(loanId,  //
-            transaction(100.0, "Disbursement", "20 October 2024", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(5.0, "Accrual", "23 October 2024", 0, 0.0, 0.0, 0.0, 5.0, 0.0, 0.0, false),  //
-            transaction(100.0, "Repayment", "22 October 2024", 0, 100.0, 0, 0, 0, 0, 0, false));
+            transaction(100.0, "Disbursement", "20241020", 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(5.0, "Accrual", "20241023", 0, 0.0, 0.0, 0.0, 5.0, 0.0, 0.0, false),  //
+            transaction(100.0, "Repayment", "20241022", 0, 100.0, 0, 0, 0, 0, 0, false));
         });
     }
 
@@ -331,38 +331,38 @@ public class LoanCOBCreateAccrualsTest extends BaseLoanIntegrationTest {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
         setup();
         final PostLoanProductsResponse loanProductsResponse = loanProductHelper.createLoanProduct(create4IProgressive());
-        runAt("20 December 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20 December 2024", 430.0, 26.0, 6, null);
+        runAt("20241220", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20241220", 430.0, 26.0, 6, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(430), "20 December 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(430), "20241220");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20 January 2025", 67.88, 0, 0, 9.32);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20 February 2025", 69.35, 0, 0, 7.85);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20 March 2025", 70.86, 0, 0, 6.34);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20 April 2025", 72.39, 0, 0, 4.81);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "20 May 2025", 73.96, 0, 0, 3.24);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "20 June 2025", 75.56, 0, 0, 1.64);
-            verifyTransactions(loanId, transaction(430.0, "Disbursement", "20 December 2024"));
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20250120", 67.88, 0, 0, 9.32);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20250220", 69.35, 0, 0, 7.85);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20250320", 70.86, 0, 0, 6.34);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20250420", 72.39, 0, 0, 4.81);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "20250520", 73.96, 0, 0, 3.24);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "20250620", 75.56, 0, 0, 1.64);
+            verifyTransactions(loanId, transaction(430.0, "Disbursement", "20241220"));
             executeInlineCOB(loanId);
         });
-        runAt("30 December 2024", () -> {
+        runAt("20241230", () -> {
             executeInlineCOB(loanIdRef.get());
             Long loanId = loanIdRef.get();
-            loanTransactionHelper.makeLoanRepayment(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("30 December 2024").locale("en").transactionAmount(200.0));
+            loanTransactionHelper.makeLoanRepayment(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("20241230").locale("en").transactionAmount(200.0));
             // Accruals around installment due dates are as expected
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             // Accruals around installment due dates are as expected
             validateTransactionsExist(loanDetails,  //
-            transaction(0.3, "Accrual", "21 December 2024", 0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0) //
+            transaction(0.3, "Accrual", "20241221", 0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0) //
             );
         });
-        runAt("01 January 2025", () -> {
+        runAt("20250101", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             // Accruals around installment due dates are as expected
             validateTransactionsExist(loanDetails,  //
-            transaction(0.16, "Accrual", "31 December 2024", 0.0, 0.0, 0.16, 0.0, 0.0, 0.0, 0.0) //
+            transaction(0.16, "Accrual", "20241231", 0.0, 0.0, 0.16, 0.0, 0.0, 0.0, 0.0) //
             );
         });
     }
@@ -372,25 +372,25 @@ public class LoanCOBCreateAccrualsTest extends BaseLoanIntegrationTest {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
         setup();
         final PostLoanProductsResponse loanProductsResponse = loanProductHelper.createLoanProduct(create4IProgressive().interestRecognitionOnDisbursementDate(true));
-        runAt("20 December 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20 December 2024", 430.0, 26.0, 1, null);
+        runAt("20241220", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20241220", 430.0, 26.0, 1, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(430), "20 December 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(430), "20241220");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20 January 2025", 430.0, 0, 0, 9.32);
-            verifyTransactions(loanId, transaction(430.0, "Disbursement", "20 December 2024"));
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20250120", 430.0, 0, 0, 9.32);
+            verifyTransactions(loanId, transaction(430.0, "Disbursement", "20241220"));
             executeInlineCOB(loanId);
         });
         // disbursement date is included
-        runAt("21 December 2024", () -> {
+        runAt("20241221", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             verifyTransactions(loanId,  //
-            transaction(430.0, "Disbursement", "20 December 2024", 430.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
-            transaction(0.3, "Accrual", "20 December 2024", 0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, false));
+            transaction(430.0, "Disbursement", "20241220", 430.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false),  //
+            transaction(0.3, "Accrual", "20241220", 0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, false));
         });
         // last installment due date is excluded
-        runAt("21 January 2025", () -> {
+        runAt("20250121", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
@@ -403,25 +403,25 @@ public class LoanCOBCreateAccrualsTest extends BaseLoanIntegrationTest {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
         setup();
         final PostLoanProductsResponse loanProductsResponse = loanProductHelper.createLoanProduct(create4IProgressive().interestRecognitionOnDisbursementDate(false));
-        runAt("20 December 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20 December 2024", 430.0, 26.0, 6, null);
+        runAt("20241220", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20241220", 430.0, 26.0, 6, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(430), "20 December 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(430), "20241220");
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20 January 2025", 67.88, 0, 0, 9.32);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20 February 2025", 69.35, 0, 0, 7.85);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20 March 2025", 70.86, 0, 0, 6.34);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20 April 2025", 72.39, 0, 0, 4.81);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "20 May 2025", 73.96, 0, 0, 3.24);
-            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "20 June 2025", 75.56, 0, 0, 1.64);
-            verifyTransactions(loanId, transaction(430.0, "Disbursement", "20 December 2024"));
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 1, "20250120", 67.88, 0, 0, 9.32);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 2, "20250220", 69.35, 0, 0, 7.85);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 3, "20250320", 70.86, 0, 0, 6.34);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 4, "20250420", 72.39, 0, 0, 4.81);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 5, "20250520", 73.96, 0, 0, 3.24);
+            validateFullyUnpaidRepaymentPeriod(loanDetails, 6, "20250620", 75.56, 0, 0, 1.64);
+            verifyTransactions(loanId, transaction(430.0, "Disbursement", "20241220"));
             executeInlineCOB(loanId);
         });
-        runAt("21 December 2024", () -> {
+        runAt("20241221", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             verifyTransactions(loanId,  //
-            transaction(430.0, "Disbursement", "20 December 2024", 430.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false));
+            transaction(430.0, "Disbursement", "20241220", 430.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false));
         });
     }
 
@@ -431,42 +431,42 @@ public class LoanCOBCreateAccrualsTest extends BaseLoanIntegrationTest {
         AtomicReference<Long> repaymentIdRef = new AtomicReference<>();
         setup();
         final PostLoanProductsResponse loanProductsResponse = loanProductHelper.createLoanProduct(create4IProgressive().isInterestRecalculationEnabled(false).creditAllocation(chargebackCreditAllocationOrders(List.of("PRINCIPAL", "PENALTY", "FEE", "INTEREST"))).currencyCode("USD"));
-        runAt("20 December 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20 December 2024", 430.0, 26.0, 6, null);
+        runAt("20241220", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20241220", 430.0, 26.0, 6, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(430), "20 December 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(430), "20241220");
             executeInlineCOB(loanId);
         });
-        runAt("20 January 2025", () -> {
+        runAt("20250120", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
-            addCharge(loanId, true, 5.0, "20 January 2025");
-            Long repaymentId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20 January 2025", 82.2).getResourceId();
+            addCharge(loanId, true, 5.0, "20250120");
+            Long repaymentId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20250120", 82.2).getResourceId();
             repaymentIdRef.set(repaymentId);
         });
-        runAt("2 February 2025", () -> {
+        runAt("20250202", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             addChargebackForLoan(loanId, repaymentIdRef.get(), 82.2);
         });
-        runAt("20 February 2025", () -> {
+        runAt("20250220", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateTransactionsExist(loanDetails,  //
-            transaction(0.26, "Accrual", "01 February 2025", 0.0, 0.0, 0.26, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(0.25, "Accrual", "02 February 2025", 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(0.25, "Accrual", "03 February 2025", 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0)); //
+            transaction(0.26, "Accrual", "20250201", 0.0, 0.0, 0.26, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(0.25, "Accrual", "20250202", 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(0.25, "Accrual", "20250203", 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0)); //
         });
-        runAt("23 February 2025", () -> {
+        runAt("20250223", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateTransactionsExist(loanDetails,  //
-            transaction(0.25, "Accrual", "19 February 2025", 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(0.26, "Accrual", "20 February 2025", 0.0, 0.0, 0.26, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(0.23, "Accrual", "21 February 2025", 0.0, 0.0, 0.23, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(0.22, "Accrual", "22 February 2025", 0.0, 0.0, 0.22, 0.0, 0.0, 0.0, 0.0)); //
+            transaction(0.25, "Accrual", "20250219", 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(0.26, "Accrual", "20250220", 0.0, 0.0, 0.26, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(0.23, "Accrual", "20250221", 0.0, 0.0, 0.23, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(0.22, "Accrual", "20250222", 0.0, 0.0, 0.22, 0.0, 0.0, 0.0, 0.0)); //
         });
     }
 
@@ -476,43 +476,43 @@ public class LoanCOBCreateAccrualsTest extends BaseLoanIntegrationTest {
         AtomicReference<Long> repaymentIdRef = new AtomicReference<>();
         setup();
         final PostLoanProductsResponse loanProductsResponse = loanProductHelper.createLoanProduct(create4IProgressive().isInterestRecalculationEnabled(true).creditAllocation(chargebackCreditAllocationOrders(List.of("PRINCIPAL", "PENALTY", "FEE", "INTEREST"))).currencyCode("USD"));
-        runAt("20 December 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20 December 2024", 430.0, 26.0, 6, null);
+        runAt("20241220", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20241220", 430.0, 26.0, 6, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(430), "20 December 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(430), "20241220");
             executeInlineCOB(loanId);
         });
-        runAt("20 January 2025", () -> {
+        runAt("20250120", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
-            addCharge(loanId, true, 5.0, "20 January 2025");
-            Long repaymentId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20 January 2025", 82.2).getResourceId();
+            addCharge(loanId, true, 5.0, "20250120");
+            Long repaymentId = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20250120", 82.2).getResourceId();
             repaymentIdRef.set(repaymentId);
         });
-        runAt("2 February 2025", () -> {
+        runAt("20250202", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             addChargebackForLoan(loanId, repaymentIdRef.get(), 82.2);
         });
-        runAt("20 February 2025", () -> {
+        runAt("20250220", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateTransactionsExist(loanDetails,  //
-            transaction(0.26, "Accrual", "01 February 2025", 0.0, 0.0, 0.26, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(0.25, "Accrual", "02 February 2025", 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(0.3, "Accrual", "03 February 2025", 0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(0.3, "Accrual", "04 February 2025", 0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0)); //
+            transaction(0.26, "Accrual", "20250201", 0.0, 0.0, 0.26, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(0.25, "Accrual", "20250202", 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(0.3, "Accrual", "20250203", 0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(0.3, "Accrual", "20250204", 0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0)); //
         });
-        runAt("23 February 2025", () -> {
+        runAt("20250223", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateTransactionsExist(loanDetails,  //
-            transaction(0.3, "Accrual", "19 February 2025", 0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(0.3, "Accrual", "20 February 2025", 0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(0.33, "Accrual", "21 February 2025", 0.0, 0.0, 0.33, 0.0, 0.0, 0.0, 0.0),  //
-            transaction(0.34, "Accrual", "22 February 2025", 0.0, 0.0, 0.34, 0.0, 0.0, 0.0, 0.0)); //
+            transaction(0.3, "Accrual", "20250219", 0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(0.3, "Accrual", "20250220", 0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(0.33, "Accrual", "20250221", 0.0, 0.0, 0.33, 0.0, 0.0, 0.0, 0.0),  //
+            transaction(0.34, "Accrual", "20250222", 0.0, 0.0, 0.34, 0.0, 0.0, 0.0, 0.0)); //
         });
     }
 
@@ -521,27 +521,27 @@ public class LoanCOBCreateAccrualsTest extends BaseLoanIntegrationTest {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
         setup();
         final PostLoanProductsResponse loanProductsResponse = loanProductHelper.createLoanProduct(create4IProgressive().enableAccrualActivityPosting(true));
-        runAt("1 April 2025", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "1 March 2025", 430.0, 26.0, 6, null);
+        runAt("20250401", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20250301", 430.0, 26.0, 6, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(430), "1 March 2025");
+            disburseLoan(loanId, BigDecimal.valueOf(430), "20250301");
             executeInlineCOB(loanId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateTransactionsExist(loanDetails,  //
-            transaction(9.02, "Accrual", "31 March 2025", 0.0, 0.0, 9.02, 0.0, 0.0, 0.0, 0.0));
+            transaction(9.02, "Accrual", "20250331", 0.0, 0.0, 9.02, 0.0, 0.0, 0.0, 0.0));
             assertEquals(LocalDate.of(2025, 3, 31), loanDetails.getLastClosedBusinessDate());
             undoDisbursement(loanId.intValue());
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             assertNull(loanDetails.getLastClosedBusinessDate());
-            disburseLoan(loanIdRef.get(), BigDecimal.valueOf(430), "2 March 2025");
+            disburseLoan(loanIdRef.get(), BigDecimal.valueOf(430), "20250302");
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             assertNull(loanDetails.getLastClosedBusinessDate());
         });
-        runAt("2 April 2025", () -> {
+        runAt("20250402", () -> {
             executeInlineCOB(loanIdRef.get());
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanIdRef.get());
             validateTransactionsExist(loanDetails,  //
-            transaction(9.02, "Accrual", "01 April 2025", 0.0, 0.0, 9.02, 0.0, 0.0, 0.0, 0.0));
+            transaction(9.02, "Accrual", "20250401", 0.0, 0.0, 9.02, 0.0, 0.0, 0.0, 0.0));
             assertEquals(LocalDate.of(2025, 4, 1), loanDetails.getLastClosedBusinessDate());
         });
     }
@@ -576,13 +576,13 @@ public class LoanCOBCreateAccrualsTest extends BaseLoanIntegrationTest {
     public void shouldSkipInterestRecalculationWhenNoOverdueInstallments() {
         setup();
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("01 April 2025", () -> {
+        runAt("20250401", () -> {
             // Create and disburse a loan with a single installment due in the future
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "01 April 2025", 100.0, 0.0, 1, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20250401", 100.0, 0.0, 1, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(100), "01 April 2025");
+            disburseLoan(loanId, BigDecimal.valueOf(100), "20250401");
         });
-        runAt("02 April 2025", () -> {
+        runAt("20250402", () -> {
             Long loanId = loanIdRef.get();
             // No overdue installments: installment due in the future
             executeInlineCOB(loanId);

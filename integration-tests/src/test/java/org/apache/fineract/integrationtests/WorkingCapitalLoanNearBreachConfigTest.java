@@ -203,14 +203,14 @@ public class WorkingCapitalLoanNearBreachConfigTest {
     public void testCobEvaluatesNearBreachWithUpdatedConfig() {
         final Long nearBreachId = createNearBreachTemplate(BigDecimal.valueOf(50), 7, "DAYS");
         final Long[] loanIdHolder = new Long[1];
-        BusinessDateHelper.runAt("01 January 2026", () -> {
+        BusinessDateHelper.runAt("20260101", () -> {
             loanIdHolder[0] = createActiveLoanWithNearBreach(nearBreachId, null, LocalDate.of(2026, 1, 1));
             nearBreachActionsHelper.createNearBreachActionById(loanIdHolder[0],
                     WorkingCapitalLoanRequestBuilders.createNearBreachRescheduleAction(BigDecimal.valueOf(1), 14, "DAYS"));
         });
         final Long loanId = loanIdHolder[0];
 
-        BusinessDateHelper.runAt("09 January 2026", () -> {
+        BusinessDateHelper.runAt("20260109", () -> {
             FeignCalls.ok(() -> FineractFeignClientHelper.getFineractFeignClient().inlineJob().executeInlineJob("WC_LOAN_COB",
                     new InlineJobRequest().addLoanIdsItem(loanId)));
 
@@ -221,7 +221,7 @@ public class WorkingCapitalLoanNearBreachConfigTest {
                     "Near breach should not be flagged on day 7 after config changed to 14-day frequency");
         });
 
-        BusinessDateHelper.runAt("16 January 2026", () -> {
+        BusinessDateHelper.runAt("20260116", () -> {
             FeignCalls.ok(() -> FineractFeignClientHelper.getFineractFeignClient().inlineJob().executeInlineJob("WC_LOAN_COB",
                     new InlineJobRequest().addLoanIdsItem(loanId)));
 

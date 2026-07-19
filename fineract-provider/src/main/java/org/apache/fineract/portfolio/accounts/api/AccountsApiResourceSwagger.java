@@ -366,7 +366,7 @@ final class AccountsApiResourceSwagger {
 
                 @Schema(example = "1")
                 public Long id;
-                @Schema(example = "01 May 2013")
+                @Schema(example = "20130501")
                 public String purchasedDate;
                 @Schema(example = "10")
                 public Integer numberOfShares;
@@ -428,7 +428,7 @@ final class AccountsApiResourceSwagger {
         public Integer requestedShares;
         @Schema(example = "1")
         public String externalId;
-        @Schema(example = "01 May 2016")
+        @Schema(example = "20160501")
         public String submittedDate;
         @Schema(example = "1")
         public Integer minimumActivePeriod;
@@ -438,13 +438,13 @@ final class AccountsApiResourceSwagger {
         public Integer lockinPeriodFrequency;
         @Schema(example = "0")
         public Integer lockinPeriodFrequencyType;
-        @Schema(example = "01 May 2016")
+        @Schema(example = "20160501")
         public String applicationDate;
         @Schema(example = "true")
         public Boolean allowDividendCalculationForInactiveClients;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         public Set<PostAccountsCharges> charges;
         @Schema(example = "13")
@@ -492,9 +492,9 @@ final class AccountsApiResourceSwagger {
 
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "01 April 2016")
+        @Schema(example = "20160401")
         public String applicationDate;
         @Schema(example = "20")
         public Integer requestedShares;
@@ -509,9 +509,9 @@ final class AccountsApiResourceSwagger {
 
             private PutAccountsChanges() {}
 
-            @Schema(example = "dd MMMM yyyy")
+            @Schema(example = "yyyyMMdd")
             public String dateFormat;
-            @Schema(example = "01 April 2016")
+            @Schema(example = "20160401")
             public String applicationDate;
             @Schema(example = "20")
             public Integer requestedShares;

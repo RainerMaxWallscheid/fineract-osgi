@@ -101,16 +101,16 @@ public class SavingsAccountHelper {
     private static final String HOLD_AMOUNT_SAVINGS_COMMAND = "holdAmount";
     private static final String RELEASE_AMOUNT_SAVINGS_COMMAND = "releaseAmount";
 
-    public static final String CREATED_DATE = "08 January 2013";
-    public static final String CREATED_DATE_PLUS_ONE = "09 January 2013";
-    public static final String CREATED_DATE_MINUS_ONE = "07 January 2013";
-    public static final String TRANSACTION_DATE = "01 March 2013";
-    public static final String TRANSACTION_DATE_PLUS_ONE = "02 March 2013";
-    public static final String LAST_TRANSACTION_DATE = "01 March 2013";
+    public static final String CREATED_DATE = "20130108";
+    public static final String CREATED_DATE_PLUS_ONE = "20130109";
+    public static final String CREATED_DATE_MINUS_ONE = "20130107";
+    public static final String TRANSACTION_DATE = "20130301";
+    public static final String TRANSACTION_DATE_PLUS_ONE = "20130302";
+    public static final String LAST_TRANSACTION_DATE = "20130301";
     public static final String ACCOUNT_TYPE_INDIVIDUAL = "INDIVIDUAL";
     public static final Long PAYMENT_TYPE_ID = 1L;
 
-    public static final String DATE_TIME_FORMAT = "dd MMMM yyyy HH:mm";
+    public static final String DATE_TIME_FORMAT = "yyyyMMdd HH:mm";
     private static final Boolean IS_BLOCK = false;
 
     // TODO: Rewrite to use fineract-client instead!
@@ -1192,10 +1192,10 @@ public class SavingsAccountHelper {
         map.put("amount", amount);
         map.put("feeOnMonthDay", "15 January");
         map.put("locale", CommonConstants.LOCALE);
-        map.put("monthDayFormat", "dd MMMM");
-        map.put("dateFormat", "dd MMMM yyy");
+        map.put("monthDayFormat", "MMdd");
+        map.put("dateFormat", "yyyyMMdd");
         if (addDueDate) {
-            map.put("dueDate", "10 January 2013");
+            map.put("dueDate", "20130110");
         }
         String json = new Gson().toJson(map);
         return json;
@@ -1210,7 +1210,7 @@ public class SavingsAccountHelper {
         map.put("chargeId", chargeId);
         map.put("amount", amount);
         map.put("locale", CommonConstants.LOCALE);
-        map.put("dateFormat", "dd MMMM yyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("dueDate", addDueDate);
         String json = new Gson().toJson(map);
         return json;
@@ -1227,8 +1227,8 @@ public class SavingsAccountHelper {
         map.put("amount", amount);
         map.put("feeOnMonthDay", feeOnMonthDay);
         map.put("locale", CommonConstants.LOCALE);
-        map.put("monthDayFormat", "dd MMMM");
-        map.put("dateFormat", "dd MMMM yyy");
+        map.put("monthDayFormat", "MMdd");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("dueDate", addDueDate);
         String json = new Gson().toJson(map);
         return json;
@@ -1329,9 +1329,9 @@ public class SavingsAccountHelper {
         dataMap.put("locale", "en");
         dataMap.put("Spouse Name", Utils.randomStringGenerator("Spouse_name", 4));
         dataMap.put("Number of Dependents", 5);
-        dataMap.put("Time of Visit", "01 December 2016 04:03");
+        dataMap.put("Time of Visit", "20161201 04:03");
         dataMap.put("dateFormat", DATE_TIME_FORMAT);
-        dataMap.put("Date of Approval", "02 December 2016 00:00");
+        dataMap.put("Date of Approval", "20161202 00:00");
         datatableMap.put("registeredTableName", registeredTableName);
         datatableMap.put("data", dataMap);
         datatablesListMap.add(datatableMap);
@@ -1357,7 +1357,7 @@ public class SavingsAccountHelper {
     @Deprecated(forRemoval = true)
     public String importSavingsTemplate(File file) {
         String locale = "en";
-        String dateFormat = "dd MMMM yyyy";
+        String dateFormat = "yyyyMMdd";
         String legalFormType = null;
         requestSpec.header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA);
         return Utils.performServerTemplatePost(requestSpec, responseSpec,

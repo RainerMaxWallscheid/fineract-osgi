@@ -81,7 +81,7 @@ public class SavingsWorkbookPopulateTest {
         assertNotNull(outcome_sp_creaction, "Could not create Savings product");
 
         SavingsAccountHelper savingsAccountHelper = new SavingsAccountHelper(requestSpec, responseSpec);
-        Workbook workbook = savingsAccountHelper.getSavingsWorkbook("dd MMMM yyyy");
+        Workbook workbook = savingsAccountHelper.getSavingsWorkbook("yyyyMMdd");
 
         Sheet officeSheet = workbook.getSheet(TemplatePopulateImportConstants.OFFICE_SHEET_NAME);
         Row firstOfficeRow = officeSheet.getRow(1);

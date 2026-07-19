@@ -60,7 +60,7 @@ public class LoanTransactionSummaryTest {
     private RequestSpecification requestSpec;
     private ClientHelper clientHelper;
     private LoanTransactionHelper loanTransactionHelper;
-    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
 
     @BeforeEach
     public void setup() {
@@ -87,28 +87,28 @@ public class LoanTransactionSummaryTest {
         final Integer loanId = createLoanAccount(clientId, getLoanProductsProductResponse.getId(), loanExternalIdStr);
         log.info("Loan Id {}", loanId);
         // make Repayments
-        final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("5 September 2022").locale("en").transactionAmount(100.0));
-        final PostLoansLoanIdTransactionsResponse repaymentTransaction_2 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("6 September 2022").locale("en").transactionAmount(100.0));
-        final PostLoansLoanIdTransactionsResponse repaymentTransaction_3 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("7 September 2022").locale("en").transactionAmount(50.0));
+        final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220905").locale("en").transactionAmount(100.0));
+        final PostLoansLoanIdTransactionsResponse repaymentTransaction_2 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220906").locale("en").transactionAmount(100.0));
+        final PostLoansLoanIdTransactionsResponse repaymentTransaction_3 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220907").locale("en").transactionAmount(50.0));
         // reverse Repayment
-        loanTransactionHelper.reverseRepayment(loanId, repaymentTransaction_3.getResourceId().intValue(), "7 September 2022");
+        loanTransactionHelper.reverseRepayment(loanId, repaymentTransaction_3.getResourceId().intValue(), "20220907");
         // Merchant Refund
-        final PostLoansLoanIdTransactionsResponse merchantIssuedRefund_1 = loanTransactionHelper.makeMerchantIssuedRefund((long) loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("8 September 2022").locale("en").transactionAmount(100.0));
-        final PostLoansLoanIdTransactionsResponse merchantIssuedRefund_2 = loanTransactionHelper.makeMerchantIssuedRefund((long) loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("8 September 2022").locale("en").transactionAmount(50.0));
+        final PostLoansLoanIdTransactionsResponse merchantIssuedRefund_1 = loanTransactionHelper.makeMerchantIssuedRefund((long) loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220908").locale("en").transactionAmount(100.0));
+        final PostLoansLoanIdTransactionsResponse merchantIssuedRefund_2 = loanTransactionHelper.makeMerchantIssuedRefund((long) loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220908").locale("en").transactionAmount(50.0));
         // reverse Merchant Refund
-        loanTransactionHelper.reverseRepayment(loanId, merchantIssuedRefund_2.getResourceId().intValue(), "8 September 2022");
+        loanTransactionHelper.reverseRepayment(loanId, merchantIssuedRefund_2.getResourceId().intValue(), "20220908");
         // Payout Refund
-        final PostLoansLoanIdTransactionsResponse payoutRefund_1 = loanTransactionHelper.makePayoutRefund((long) loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("9 September 2022").locale("en").transactionAmount(100.0));
-        final PostLoansLoanIdTransactionsResponse payoutRefund_2 = loanTransactionHelper.makePayoutRefund((long) loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("9 September 2022").locale("en").transactionAmount(50.0));
+        final PostLoansLoanIdTransactionsResponse payoutRefund_1 = loanTransactionHelper.makePayoutRefund((long) loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220909").locale("en").transactionAmount(100.0));
+        final PostLoansLoanIdTransactionsResponse payoutRefund_2 = loanTransactionHelper.makePayoutRefund((long) loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220909").locale("en").transactionAmount(50.0));
         // reverse Payout Refund
-        loanTransactionHelper.reverseRepayment(loanId, payoutRefund_2.getResourceId().intValue(), "9 September 2022");
+        loanTransactionHelper.reverseRepayment(loanId, payoutRefund_2.getResourceId().intValue(), "20220909");
         // Goodwill Credit
-        final PostLoansLoanIdTransactionsResponse goodwillCredit_1 = loanTransactionHelper.makeGoodwillCredit((long) loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("10 September 2022").locale("en").transactionAmount(100.0));
-        final PostLoansLoanIdTransactionsResponse goodwillCredit_2 = loanTransactionHelper.makeGoodwillCredit((long) loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("10 September 2022").locale("en").transactionAmount(50.0));
+        final PostLoansLoanIdTransactionsResponse goodwillCredit_1 = loanTransactionHelper.makeGoodwillCredit((long) loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220910").locale("en").transactionAmount(100.0));
+        final PostLoansLoanIdTransactionsResponse goodwillCredit_2 = loanTransactionHelper.makeGoodwillCredit((long) loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220910").locale("en").transactionAmount(50.0));
         // reverse Goodwill Credit
-        loanTransactionHelper.reverseRepayment(loanId, goodwillCredit_2.getResourceId().intValue(), "10 September 2022");
+        loanTransactionHelper.reverseRepayment(loanId, goodwillCredit_2.getResourceId().intValue(), "20220910");
         // Chargeback
-        final PostLoansLoanIdTransactionsResponse repaymentTransaction_4 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("11 September 2022").locale("en").transactionAmount(150.0));
+        final PostLoansLoanIdTransactionsResponse repaymentTransaction_4 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220911").locale("en").transactionAmount(150.0));
         loanTransactionHelper.chargebackLoanTransaction(loanExternalIdStr, repaymentTransaction_4.getResourceId(), new PostLoansLoanIdTransactionsTransactionIdRequest().locale("en").transactionAmount(50.0).paymentTypeId(1L));
         // Charge Adjustment
         // Add Charge
@@ -157,9 +157,9 @@ public class LoanTransactionSummaryTest {
         assertNotNull(getLoanProductsProductResponse);
         final Integer loanId = createLoanAccount(clientId, getLoanProductsProductResponse.getId(), loanExternalIdStr);
         // Merchant Refund
-        final PostLoansLoanIdTransactionsResponse merchantIssuedRefund = loanTransactionHelper.makeMerchantIssuedRefund((long) loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("8 September 2022").locale("en").transactionAmount(20.0));
-        final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("7 September 2022").locale("en").transactionAmount(100.0));
-        final PostLoansLoanIdTransactionsResponse repaymentTransaction_2 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("6 September 2022").locale("en").transactionAmount(50.0));
+        final PostLoansLoanIdTransactionsResponse merchantIssuedRefund = loanTransactionHelper.makeMerchantIssuedRefund((long) loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220908").locale("en").transactionAmount(20.0));
+        final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220907").locale("en").transactionAmount(100.0));
+        final PostLoansLoanIdTransactionsResponse repaymentTransaction_2 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220906").locale("en").transactionAmount(50.0));
         // Retrieve Loan with loanId
         GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
         assertEquals(20.0, Utils.getDoubleValue(loanDetails.getDelinquent().getLastPaymentAmount()));
@@ -175,10 +175,10 @@ public class LoanTransactionSummaryTest {
     }
 
     private Integer createLoanAccount(final Integer clientID, final Long loanProductID, final String externalId) {
-        String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("1").withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance().withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("03 September 2022").withSubmittedOnDate("01 September 2022").withLoanType("individual").withExternalId(externalId).build(clientID.toString(), loanProductID.toString(), null);
+        String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("1").withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance().withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("20220903").withSubmittedOnDate("20220901").withLoanType("individual").withExternalId(externalId).build(clientID.toString(), loanProductID.toString(), null);
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("02 September 2022", "1000", loanId, null);
-        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("03 September 2022", loanId, "1000");
+        loanTransactionHelper.approveLoan("20220902", "1000", loanId, null);
+        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20220903", loanId, "1000");
         return loanId;
     }
 }

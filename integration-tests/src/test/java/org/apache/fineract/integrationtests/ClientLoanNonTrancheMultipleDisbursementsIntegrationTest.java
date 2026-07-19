@@ -147,7 +147,7 @@ public class ClientLoanNonTrancheMultipleDisbursementsIntegrationTest {
          * Apply for loan application and verify loan status
          */
         final String savingsId = null;
-        String submitDate = "01 January 2021";
+        String submitDate = "20210101";
         Integer repaymentsNo = 3;
         final Integer loanID = applyForLoanApplication(clientID, loanProductID, savingsId, APPLIED_FOR_PRINCIPAL, submitDate,
                 repaymentsNo.toString());
@@ -197,7 +197,7 @@ public class ClientLoanNonTrancheMultipleDisbursementsIntegrationTest {
 
         LOG.info("------------------------------- 3rd DISBURSE non-tranch multi-disbursal loan       ----------");
         final Float thirdDisbursalAmount = 500.00f;
-        String thirdDisbursalDate = "03 February 2021";
+        String thirdDisbursalDate = "20210203";
         loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount(thirdDisbursalDate, loanID,
                 thirdDisbursalAmount.toString(), netDisbursedAmt);
 
@@ -231,7 +231,7 @@ public class ClientLoanNonTrancheMultipleDisbursementsIntegrationTest {
          * Apply for loan application and verify loan status
          */
         final String savingsId = null;
-        String submitDate = "01 January 2022";
+        String submitDate = "20220101";
         Integer repaymentsNo = 3;
         final Integer loanID = applyForLoanApplication(clientID, loanProductID, savingsId, APPLIED_FOR_PRINCIPAL, submitDate,
                 repaymentsNo.toString());

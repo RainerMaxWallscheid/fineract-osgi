@@ -49,7 +49,7 @@ import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 
 public class LoanReAmortizationStepDef extends AbstractStepDef {
-    private static final String DATE_FORMAT = "dd MMMM yyyy";
+    private static final String DATE_FORMAT = "yyyyMMdd";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
     private final FineractFeignClient fineractClient;
     private final EventAssertion eventAssertion;

@@ -119,8 +119,8 @@ public class FixedDepositAccountHelper {
         map.put("clientId", clientId);
         map.put("interestCalculationDaysInYearType", this.interestCalculationDaysInYearType);
         map.put("locale", LOCALE);
-        map.put("dateFormat", "dd MMMM yyyy");
-        map.put("monthDayFormat", "dd MMM");
+        map.put("dateFormat", "yyyyMMdd");
+        map.put("monthDayFormat", "MMdd");
         map.put("interestCalculationType", this.interestCalculationType);
         map.put("interestCompoundingPeriodType", this.interestCompoundingPeriodType);
         map.put("interestPostingPeriodType", this.interestPostingPeriodType);
@@ -659,7 +659,7 @@ public class FixedDepositAccountHelper {
             final String transactionDate, final Double transactionAmount) {
         LOG.info("--------------------------------- ADJUST FIXED DEPOSIT TRANSACTION --------------------------------");
         final PostFixedDepositAccountsFixedDepositAccountIdTransactionsRequest request = new PostFixedDepositAccountsFixedDepositAccountIdTransactionsRequest()
-                .dateFormat("dd MMMM yyyy").locale("en").transactionDate(transactionDate).transactionAmount(transactionAmount);
+                .dateFormat("yyyyMMdd").locale("en").transactionDate(transactionDate).transactionAmount(transactionAmount);
         return Calls
                 .ok(FineractClientHelper.getFineractClient().fixedDepositAccountTransactions.handleCommandsFixedDepositAccountTransaction(
                         fixedDepositAccountId.longValue(), transactionId.longValue(), request, "modify"))

@@ -196,13 +196,13 @@ final class SavingsAccountTransactionsApiResourceSwagger {
 
         private PostSavingsAccountTransactionsRequest() {}
 
-        @Schema(example = "27 March 2022")
+        @Schema(example = "20220327")
         public String transactionDate;
         @Schema(example = "1000")
         public BigDecimal transactionAmount;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "5dd80a7c-ccba-4446-b378-01eb6f53e871")
         public String externalId;

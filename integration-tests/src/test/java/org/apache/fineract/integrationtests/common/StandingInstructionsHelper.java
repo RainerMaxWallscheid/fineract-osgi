@@ -48,7 +48,7 @@ public class StandingInstructionsHelper {
     private static final String STATUS_DISABLED = "2";
     private static final String TRANSFER_TYPE_ACCOUNT_TRANSFER = "1";
     private static final String TRANSFER_TYPE_LOAN_REPAYMENT = "2";
-    private static final String ACCOUNT_TRANSFER_DATE = "01 March 2013";
+    private static final String ACCOUNT_TRANSFER_DATE = "20130301";
     private String transferDate = "";
     private String officeId = OFFICE_ID;
     private RequestSpecification requestSpec;
@@ -70,8 +70,8 @@ public class StandingInstructionsHelper {
     public String build(final String clientId, final String fromAccountId, final String toAccountId, final String fromAccountType, final String toAccountType, final String validFrom, final String validTo, final String monthDay) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("name", Utils.uniqueRandomStringGenerator("STANDING_INSTRUCTION_", 5));
-        map.put("dateFormat", "dd MMMM yyyy");
-        map.put("monthDayFormat", "dd MMMM");
+        map.put("dateFormat", "yyyyMMdd");
+        map.put("monthDayFormat", "MMdd");
         map.put("locale", LOCALE);
         map.put("fromClientId", clientId);
         map.put("fromAccountId", fromAccountId);

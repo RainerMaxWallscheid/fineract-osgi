@@ -66,8 +66,8 @@ public class ShareAccountChargeRoundingTest extends BaseSavingsIntegrationTest {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ShareAccountChargeRoundingTest.class);
     private Long clientId;
     private ChargesHelper chargesHelper;
-    private static final String DATE = "01 January 2026";
-    private static final String LATER_DATE = "01 June 2026";
+    private static final String DATE = "20260101";
+    private static final String LATER_DATE = "20260601";
 
     @BeforeEach
     public void setup() {
@@ -444,7 +444,7 @@ public class ShareAccountChargeRoundingTest extends BaseSavingsIntegrationTest {
 
     private void activateShareAccount(Long shareAccountId, String activationDate) {
         Map<String, Object> activateMap = new HashMap<>();
-        activateMap.put("dateFormat", "dd MMMM yyyy");
+        activateMap.put("dateFormat", "yyyyMMdd");
         activateMap.put("activatedDate", activationDate);
         activateMap.put("locale", "en");
         String activateJson = new Gson().toJson(activateMap);
@@ -454,7 +454,7 @@ public class ShareAccountChargeRoundingTest extends BaseSavingsIntegrationTest {
     private void redeemShares(Long shareAccountId, long shares, String requestedDate) {
         Map<String, Object> redeemMap = new HashMap<>();
         redeemMap.put("requestedDate", requestedDate);
-        redeemMap.put("dateFormat", "dd MMMM yyyy");
+        redeemMap.put("dateFormat", "yyyyMMdd");
         redeemMap.put("locale", "en");
         redeemMap.put("requestedShares", String.valueOf(shares));
         String redeemJson = new Gson().toJson(redeemMap);

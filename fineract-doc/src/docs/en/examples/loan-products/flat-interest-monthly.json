@@ -4,7 +4,7 @@
   "description": "Starter template for a monthly loan with flat interest and equal installments.",
   "currencyCode": "USD",
   "digitsAfterDecimal": 2,
-  "dateFormat": "dd MMMM yyyy",
+  "dateFormat": "yyyyMMdd",
   "inMultiplesOf": 1,
   "principal": 5000,
   "minPrincipal": 500,

@@ -41,7 +41,7 @@ public class FeignLoanAccrualOnClosedLoanTest extends FeignLoanTestBase {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FeignLoanAccrualOnClosedLoanTest.class);
     private static final DateTimeFormatter ISO_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final String DATETIME_PATTERN = LoanTestData.DATETIME_PATTERN;
-    private static final String LOAN_START_DATE = "01 January 2026";
+    private static final String LOAN_START_DATE = "20260101";
     private static final double PRINCIPAL = 100000.0;
     private static final double ANNUAL_INTEREST_RATE = 12.0;
 
@@ -84,13 +84,13 @@ public class FeignLoanAccrualOnClosedLoanTest extends FeignLoanTestBase {
         Long loanId = loanIdHolder[0];
         runAt("2026-01-15", () -> {
             executeInlineCOB(loanId);
-            GetLoansLoanIdTransactionsTemplateResponse prepayTemplate = getPrepaymentAmount(loanId, "15 January 2026", DATETIME_PATTERN);
+            GetLoansLoanIdTransactionsTemplateResponse prepayTemplate = getPrepaymentAmount(loanId, "20260115", DATETIME_PATTERN);
             assertNotNull(prepayTemplate);
             double prepayAmount = prepayTemplate.getAmount();
             log.info("Prepay template amount: {}", prepayAmount);
             log.info("Prepay template interest portion: {}", prepayTemplate.getInterestPortion());
             log.info("Prepay template principal portion: {}", prepayTemplate.getPrincipalPortion());
-            addRepayment(loanId, repayment(prepayAmount, "15 January 2026"));
+            addRepayment(loanId, repayment(prepayAmount, "20260115"));
             GetLoansLoanIdResponse loanAfterPrepay = getLoanDetails(loanId);
             log.info("Loan status after prepay: {}", loanAfterPrepay.getStatus().getCode());
             verifyLoanStatus(loanAfterPrepay, GetLoansLoanIdStatus::getClosedObligationsMet);
@@ -127,12 +127,12 @@ public class FeignLoanAccrualOnClosedLoanTest extends FeignLoanTestBase {
             double totalInterestPaid = sumInterestPortion(getNonReversedTransactions(loanBeforePrepay, "loanTransactionType.repayment"));
             double unpaidAccruedInterest = totalAccruedInterest - totalInterestPaid;
             log.info("Before prepay - totalAccrued: {}, totalPaid: {}, unpaidAccrued: {}", totalAccruedInterest, totalInterestPaid, unpaidAccruedInterest);
-            GetLoansLoanIdTransactionsTemplateResponse prepayTemplate = getPrepaymentAmount(loanId, "15 January 2026", DATETIME_PATTERN);
+            GetLoansLoanIdTransactionsTemplateResponse prepayTemplate = getPrepaymentAmount(loanId, "20260115", DATETIME_PATTERN);
             double prepayAmount = prepayTemplate.getAmount();
             double templateInterest = prepayTemplate.getInterestPortion() != null ? prepayTemplate.getInterestPortion() : 0.0;
             log.info("Prepay template - amount: {}, interest: {}, principal: {}", prepayAmount, templateInterest, prepayTemplate.getPrincipalPortion());
             assertTrue(templateInterest >= unpaidAccruedInterest, "Prepay template interest (" + templateInterest + ") should cover all unpaid accrued interest (" + unpaidAccruedInterest + "). Shortfall: " + (unpaidAccruedInterest - templateInterest));
-            addRepayment(loanId, repayment(prepayAmount, "15 January 2026"));
+            addRepayment(loanId, repayment(prepayAmount, "20260115"));
             GetLoansLoanIdResponse loanAfterPrepay = getLoanDetails(loanId);
             verifyLoanStatus(loanAfterPrepay, GetLoansLoanIdStatus::getClosedObligationsMet);
         });
@@ -161,13 +161,13 @@ public class FeignLoanAccrualOnClosedLoanTest extends FeignLoanTestBase {
             double totalInterestPaid = sumInterestPortion(getNonReversedTransactions(loanBeforePrepay, "loanTransactionType.repayment"));
             double unpaidAccruedInterest = totalAccruedInterest - totalInterestPaid;
             log.info("Before prepay - totalAccrued: {}, totalPaid: {}, unpaidAccrued: {}", totalAccruedInterest, totalInterestPaid, unpaidAccruedInterest);
-            GetLoansLoanIdTransactionsTemplateResponse prepayTemplate = getPrepaymentAmount(loanId, "15 February 2026", DATETIME_PATTERN);
+            GetLoansLoanIdTransactionsTemplateResponse prepayTemplate = getPrepaymentAmount(loanId, "20260215", DATETIME_PATTERN);
             assertNotNull(prepayTemplate);
             double prepayAmount = prepayTemplate.getAmount();
             double templateInterest = prepayTemplate.getInterestPortion() != null ? prepayTemplate.getInterestPortion() : 0.0;
             log.info("Prepay template - amount: {}, interest: {}, principal: {}", prepayAmount, templateInterest, prepayTemplate.getPrincipalPortion());
             assertTrue(templateInterest >= unpaidAccruedInterest, "Prepay template interest (" + templateInterest + ") should cover all unpaid accrued interest (" + unpaidAccruedInterest + ") including post-maturity period. Shortfall: " + (unpaidAccruedInterest - templateInterest));
-            addRepayment(loanId, repayment(prepayAmount, "15 February 2026"));
+            addRepayment(loanId, repayment(prepayAmount, "20260215"));
             GetLoansLoanIdResponse loanAfterPrepay = getLoanDetails(loanId);
             log.info("Loan status after prepay: {}", loanAfterPrepay.getStatus().getCode());
             verifyLoanStatus(loanAfterPrepay, GetLoansLoanIdStatus::getClosedObligationsMet);
@@ -208,10 +208,10 @@ public class FeignLoanAccrualOnClosedLoanTest extends FeignLoanTestBase {
             for (GetLoansLoanIdRepaymentPeriod p : periodsBeforePrepay) {
                 log.info("  Period {}: fromDate={}, dueDate={}, interestDue={}", p.getPeriod(), p.getFromDate(), p.getDueDate(), p.getInterestDue());
             }
-            GetLoansLoanIdTransactionsTemplateResponse prepayTemplate = getPrepaymentAmount(loanId, "15 February 2026", DATETIME_PATTERN);
+            GetLoansLoanIdTransactionsTemplateResponse prepayTemplate = getPrepaymentAmount(loanId, "20260215", DATETIME_PATTERN);
             double prepayAmount = prepayTemplate.getAmount();
             log.info("Prepay amount: {}", prepayAmount);
-            addRepayment(loanId, repayment(prepayAmount, "15 February 2026"));
+            addRepayment(loanId, repayment(prepayAmount, "20260215"));
             GetLoansLoanIdResponse loanAfterPrepay = getLoanDetails(loanId);
             verifyLoanStatus(loanAfterPrepay, GetLoansLoanIdStatus::getClosedObligationsMet);
             List<GetLoansLoanIdRepaymentPeriod> periodsAfterPrepay = loanAfterPrepay.getRepaymentSchedule().getPeriods().stream().filter(p -> p.getPeriod() != null).toList();
@@ -242,11 +242,11 @@ public class FeignLoanAccrualOnClosedLoanTest extends FeignLoanTestBase {
             var installment = loanDetails.getRepaymentSchedule().getPeriods().stream().filter(p -> p.getPeriod() != null && p.getPeriod() == 1).findFirst().orElseThrow();
             double installmentTotalDue = Utils.getDoubleValue(installment.getTotalDueForPeriod());
             log.info("Installment total due: {}", installmentTotalDue);
-            GetLoansLoanIdTransactionsTemplateResponse prepayTemplate = getPrepaymentAmount(loanId, "15 February 2026", DATETIME_PATTERN);
+            GetLoansLoanIdTransactionsTemplateResponse prepayTemplate = getPrepaymentAmount(loanId, "20260215", DATETIME_PATTERN);
             double prepayAmount = prepayTemplate.getAmount();
             log.info("Prepay amount on Feb 15: {}", prepayAmount);
             assertTrue(prepayAmount > installmentTotalDue, "Prepay amount should include post-maturity interest beyond installment total due. " + "Prepay amount: " + prepayAmount + ", Installment total due: " + installmentTotalDue);
-            addRepayment(loanId, repayment(prepayAmount, "15 February 2026"));
+            addRepayment(loanId, repayment(prepayAmount, "20260215"));
             GetLoansLoanIdResponse loanAfterPrepay = getLoanDetails(loanId);
             verifyLoanStatus(loanAfterPrepay, GetLoansLoanIdStatus::getClosedObligationsMet);
         });
@@ -263,7 +263,7 @@ public class FeignLoanAccrualOnClosedLoanTest extends FeignLoanTestBase {
             log.info("Loan status before prepay (no installments paid): {}", loanBeforePrepay.getStatus().getCode());
             double totalAccruedInterest = sumInterestPortion(getNonReversedTransactions(loanBeforePrepay, "loanTransactionType.accrual"));
             log.info("Total accrued interest (all on full principal, no payments): {}", totalAccruedInterest);
-            GetLoansLoanIdTransactionsTemplateResponse prepayTemplate = getPrepaymentAmount(loanId, "15 February 2026", DATETIME_PATTERN);
+            GetLoansLoanIdTransactionsTemplateResponse prepayTemplate = getPrepaymentAmount(loanId, "20260215", DATETIME_PATTERN);
             assertNotNull(prepayTemplate);
             double prepayAmount = prepayTemplate.getAmount();
             double templateInterest = prepayTemplate.getInterestPortion() != null ? prepayTemplate.getInterestPortion() : 0.0;
@@ -271,7 +271,7 @@ public class FeignLoanAccrualOnClosedLoanTest extends FeignLoanTestBase {
             log.info("Prepay template - amount: {}, interest: {}, principal: {}", prepayAmount, templateInterest, templatePrincipal);
             // Prepay template must include full principal + all interest (including post-maturity)
             assertTrue(templateInterest >= totalAccruedInterest, "Prepay template interest (" + templateInterest + ") should cover all accrued interest (" + totalAccruedInterest + ") including post-maturity period on full 100k principal. Shortfall: " + (totalAccruedInterest - templateInterest));
-            addRepayment(loanId, repayment(prepayAmount, "15 February 2026"));
+            addRepayment(loanId, repayment(prepayAmount, "20260215"));
             GetLoansLoanIdResponse loanAfterPrepay = getLoanDetails(loanId);
             log.info("Loan status after prepay: {}", loanAfterPrepay.getStatus().getCode());
             verifyLoanStatus(loanAfterPrepay, GetLoansLoanIdStatus::getClosedObligationsMet);
@@ -297,10 +297,10 @@ public class FeignLoanAccrualOnClosedLoanTest extends FeignLoanTestBase {
         Long loanId = loanIdHolder[0];
         runAt("2026-02-15", () -> {
             executeInlineCOB(loanId);
-            GetLoansLoanIdTransactionsTemplateResponse prepayTemplate = getPrepaymentAmount(loanId, "15 February 2026", DATETIME_PATTERN);
+            GetLoansLoanIdTransactionsTemplateResponse prepayTemplate = getPrepaymentAmount(loanId, "20260215", DATETIME_PATTERN);
             double prepayAmount = prepayTemplate.getAmount();
             log.info("Prepay amount: {}", prepayAmount);
-            addRepayment(loanId, repayment(prepayAmount, "15 February 2026"));
+            addRepayment(loanId, repayment(prepayAmount, "20260215"));
             GetLoansLoanIdResponse loanAfterPrepay = getLoanDetails(loanId);
             verifyLoanStatus(loanAfterPrepay, GetLoansLoanIdStatus::getClosedObligationsMet);
         });

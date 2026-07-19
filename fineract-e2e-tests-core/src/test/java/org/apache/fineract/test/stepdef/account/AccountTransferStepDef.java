@@ -34,7 +34,7 @@ import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 
 public class AccountTransferStepDef extends AbstractStepDef {
-    private static final String DATE_FORMAT = "dd MMMM yyyy";
+    private static final String DATE_FORMAT = "yyyyMMdd";
     private static final String DEFAULT_LOCALE = "en";
     private static final String SAVINGS_ACCOUNT_TYPE = "2";
     private static final String LOAN_ACCOUNT_TYPE = "1";

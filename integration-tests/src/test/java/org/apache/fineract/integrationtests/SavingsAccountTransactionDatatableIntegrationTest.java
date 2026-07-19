@@ -59,8 +59,8 @@ public class SavingsAccountTransactionDatatableIntegrationTest {
 
     private static final String SAVINGS_TRANSACTION_APP_TABLE_NAME = EntityTables.SAVINGS_TRANSACTION.getName();
     public static final String ACCOUNT_TYPE_INDIVIDUAL = "INDIVIDUAL";
-    final String startDate = "01 Jun 2023";
-    final String firstDepositDate = "05 Jun 2023";
+    final String startDate = "20230601";
+    final String firstDepositDate = "20230605";
     private RequestSpecification requestSpec;
     private ResponseSpecification responseSpec;
     private DatatableHelper datatableHelper;

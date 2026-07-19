@@ -72,7 +72,7 @@ public class LoanOriginationStepDef extends AbstractStepDef {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanOriginationStepDef.class);
     private static final long NON_EXISTENT_ID = Long.MAX_VALUE;
-    private static final String DATE_FORMAT = "dd MMMM yyyy";
+    private static final String DATE_FORMAT = "yyyyMMdd";
     private static final String DEFAULT_LOCALE = "en";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
     private static final String ADJUSTED_TRANSACTION_ID = "adjustedTransactionId";

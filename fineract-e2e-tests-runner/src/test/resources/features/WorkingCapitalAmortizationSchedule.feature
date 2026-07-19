@@ -4,11 +4,11 @@ Feature: WorkingCapitalAmortizationSchedule
 
   @TestRailId:C72349
   Scenario: Generate and retrieve a projected amortization schedule with 200 payments
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a working capital loan with the following data:
       | LoanProduct | submittedOnDate | expectedDisbursementDate | principalAmount | totalPaymentVolume | periodPaymentRate | discount |
-      | WCLP        | 01 January 2026 | 01 January 2026          | 100             | 100          | 1                 | 0        |
+      | WCLP        | 20260101 | 20260101          | 100             | 100          | 1                 | 0        |
     When Admin generates a projected amortization schedule with discountFeeAmount 1000.0, netDisbursementAmount 9000.0, totalPaymentVolume 100000.0, periodPaymentRate 18, npvDayCount 360, expectedDisbursementDate "2019-01-01"
     And Admin retrieves the projected amortization schedule
     Then The retrieved amortization schedule has the following summary fields:
@@ -220,13 +220,13 @@ Feature: WorkingCapitalAmortizationSchedule
 
   @TestRailId:C78826
   Scenario: Generate and retrieve a projected amortization schedule with 200 payments  with update period payment rate in a middle of loan lifecycle - UC2
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a working capital loan with the following data:
       | LoanProduct | submittedOnDate | expectedDisbursementDate | principalAmount | totalPaymentVolume | periodPaymentRate | discount |
-      | WCLP        | 01 January 2026 | 01 January 2026          | 100             | 100          | 18                | 0        |
-    Then Admin successfully approves the working capital loan on "01 January 2026" with "100" amount and expected disbursement date on "01 January 2026"
-    Then Admin successfully disburse the Working Capital loan on "01 January 2026" with "100" EUR transaction amount
+      | WCLP        | 20260101 | 20260101          | 100             | 100          | 18                | 0        |
+    Then Admin successfully approves the working capital loan on "20260101" with "100" amount and expected disbursement date on "20260101"
+    Then Admin successfully disburse the Working Capital loan on "20260101" with "100" EUR transaction amount
     Then Working Capital loan status will be "ACTIVE"
 
     When Admin generates a projected amortization schedule with discountFeeAmount 1000.0, netDisbursementAmount 9000.0, totalPaymentVolume 100000.0, periodPaymentRate 18, npvDayCount 360, expectedDisbursementDate "2019-01-01"
@@ -438,7 +438,7 @@ Feature: WorkingCapitalAmortizationSchedule
       | 199       | 2019-07-19 | 50.00                 | 49.95           | 0.11                       |                     |                          | 0.06                       |               |                          |
       | 200       | 2019-07-20 | 50.00                 | 0.00            | 0.05                       |                     |                          | 0.01                       |               |                          |
 
-    When Admin sets the business date to "25 January 2026"
+    When Admin sets the business date to "20260125"
     And Admin runs inline COB job for Working Capital Loan by loanId
     And Admin update Working Capital period payment rate with "17" value
     And Admin retrieves the projected amortization schedule

@@ -61,7 +61,7 @@ public class CampaignsTest {
     private static final String CLOSE_COMMAND = "close";
     private static final String REACTIVATE_COMMAND = "reactivate";
 
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
 
     private final ClientAndServer client;
 

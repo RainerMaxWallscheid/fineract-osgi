@@ -75,13 +75,13 @@ public class LoanRepaymentRescheduleAtDisbursementTest {
     public void testLoanRepaymentRescheduleAtDisbursement() {
 
         final String approvalAmount = "10000";
-        final String approveDate = "01 March 2015";
-        final String expectedDisbursementDate = "01 March 2015";
-        final String disbursementDate = "01 March 2015";
-        final String adjustRepaymentDate = "16 March 2015";
+        final String approveDate = "20150301";
+        final String expectedDisbursementDate = "20150301";
+        final String disbursementDate = "20150301";
+        final String adjustRepaymentDate = "20150316";
 
         // CREATE CLIENT
-        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2014");
+        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20140101");
         LOG.info("---------------------------------CLIENT CREATED WITH ID--------------------------------------------------- {}", clientID);
 
         // CREATE LOAN MULTIDISBURSAL PRODUCT WITH INTEREST RECALCULATION
@@ -93,13 +93,13 @@ public class LoanRepaymentRescheduleAtDisbursementTest {
 
         // CREATE TRANCHES
         List<HashMap> createTranches = new ArrayList<>();
-        createTranches.add(this.loanApplicationApprovalTest.createTrancheDetail("01 March 2015", "5000"));
-        createTranches.add(this.loanApplicationApprovalTest.createTrancheDetail("01 May 2015", "5000"));
+        createTranches.add(this.loanApplicationApprovalTest.createTrancheDetail("20150301", "5000"));
+        createTranches.add(this.loanApplicationApprovalTest.createTrancheDetail("20150501", "5000"));
 
         // APPROVE TRANCHES
         List<HashMap> approveTranches = new ArrayList<>();
-        approveTranches.add(this.loanApplicationApprovalTest.createTrancheDetail("01 March 2015", "5000"));
-        approveTranches.add(this.loanApplicationApprovalTest.createTrancheDetail("01 May 2015", "5000"));
+        approveTranches.add(this.loanApplicationApprovalTest.createTrancheDetail("20150301", "5000"));
+        approveTranches.add(this.loanApplicationApprovalTest.createTrancheDetail("20150501", "5000"));
 
         List<HashMap> collaterals = new ArrayList<>();
         final Integer collateralId = CollateralManagementHelper.createCollateralProduct(this.requestSpec, this.responseSpec);

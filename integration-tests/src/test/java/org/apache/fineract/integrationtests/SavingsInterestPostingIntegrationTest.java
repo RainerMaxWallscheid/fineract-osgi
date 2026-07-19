@@ -85,7 +85,7 @@ public class SavingsInterestPostingIntegrationTest {
                     new PutGlobalConfigurationsRequest().enabled(true));
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, today);
             // client activation, savings activation and 1st transaction date
-            final String startDate = "01 November 2021";
+            final String startDate = "20211101";
             final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
             Assertions.assertNotNull(clientID);
 

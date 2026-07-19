@@ -71,7 +71,7 @@ public class LoanRescheduleOnDecliningBalanceLoanTest extends BaseLoanIntegratio
     private final String loanPrincipalAmount = "100000.00";
     private final String numberOfRepayments = "12";
     private final String interestRatePerPeriod = "18";
-    private final String dateString = "4 September 2014";
+    private final String dateString = "20140904";
 
     @BeforeEach
     public void initialize() {
@@ -324,11 +324,11 @@ public class LoanRescheduleOnDecliningBalanceLoanTest extends BaseLoanIntegratio
     private void createLoanRescheduleRequestWhichFailsAsLoanIdChargedOff() {
 
         final PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder().updateGraceOnPrincipal(null)
-                .updateGraceOnInterest(null).updateExtraTerms(null).updateRescheduleFromDate("04 January 2015")
-                .updateAdjustedDueDate("04 October 2015").updateRecalculateInterest(true).buildRequest(this.loanId.longValue());
+                .updateGraceOnInterest(null).updateExtraTerms(null).updateRescheduleFromDate("20150104")
+                .updateAdjustedDueDate("20151004").updateRecalculateInterest(true).buildRequest(this.loanId.longValue());
 
         this.loanTransactionHelper.chargeOffLoan((long) this.loanId,
-                new PostLoansLoanIdTransactionsRequest().transactionDate("04 January 2015").locale("en").dateFormat("dd MMMM yyyy"));
+                new PostLoansLoanIdTransactionsRequest().transactionDate("20150104").locale("en").dateFormat("yyyyMMdd"));
 
         CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class,
                 () -> LoanRescheduleRequestHelper.createLoanRescheduleRequest(createRequest));
@@ -336,7 +336,7 @@ public class LoanRescheduleOnDecliningBalanceLoanTest extends BaseLoanIntegratio
 
         this.loanTransactionHelper.undoChargeOffLoan((long) this.loanId, new PostLoansLoanIdTransactionsRequest());
         this.loanTransactionHelper.closeRescheduledLoan((long) this.loanId,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("04 January 2015").locale("en"));
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20150104").locale("en"));
     }
 
     /**
@@ -347,8 +347,8 @@ public class LoanRescheduleOnDecliningBalanceLoanTest extends BaseLoanIntegratio
                 "---------------------------------CREATING LOAN RESCHEDULE REQUEST FOR INTEREST APPROPRIATTION-------------------------------------");
 
         final PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder().updateGraceOnPrincipal(null)
-                .updateGraceOnInterest(null).updateExtraTerms(null).updateRescheduleFromDate("04 January 2015")
-                .updateAdjustedDueDate("04 October 2015").updateRecalculateInterest(true).buildRequest(this.loanId.longValue());
+                .updateGraceOnInterest(null).updateExtraTerms(null).updateRescheduleFromDate("20150104")
+                .updateAdjustedDueDate("20151004").updateRecalculateInterest(true).buildRequest(this.loanId.longValue());
 
         final PostCreateRescheduleLoansResponse createResponse = LoanRescheduleRequestHelper.createLoanRescheduleRequest(createRequest);
         this.loanRescheduleRequestId = createResponse.getResourceId();
@@ -397,8 +397,8 @@ public class LoanRescheduleOnDecliningBalanceLoanTest extends BaseLoanIntegratio
                 "---------------------------------CREATING LOAN RESCHEDULE REQUEST FOR LOAN WITH RECALCULATION------------------------------------");
 
         final PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder().updateGraceOnPrincipal(null)
-                .updateGraceOnInterest(null).updateExtraTerms(null).updateRescheduleFromDate("04 January 2015")
-                .updateAdjustedDueDate("04 October 2015").updateRecalculateInterest(true).buildRequest(this.loanId.longValue());
+                .updateGraceOnInterest(null).updateExtraTerms(null).updateRescheduleFromDate("20150104")
+                .updateAdjustedDueDate("20151004").updateRecalculateInterest(true).buildRequest(this.loanId.longValue());
 
         final PostCreateRescheduleLoansResponse createResponse = LoanRescheduleRequestHelper.createLoanRescheduleRequest(createRequest);
         this.loanRescheduleRequestId = createResponse.getResourceId();
@@ -446,8 +446,8 @@ public class LoanRescheduleOnDecliningBalanceLoanTest extends BaseLoanIntegratio
                 "---------------------------------CREATING LOAN RESCHEDULE REQUEST FOR INTEREST APPROPRIATTION-------------------------------------");
 
         final PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder().updateGraceOnPrincipal(null)
-                .updateGraceOnInterest(null).updateExtraTerms(null).updateRescheduleFromDate("04 January 2015")
-                .updateAdjustedDueDate("04 July 2015").updateEMI("5000").updateEmiChangeEndDate("4 September 2015")
+                .updateGraceOnInterest(null).updateExtraTerms(null).updateRescheduleFromDate("20150104")
+                .updateAdjustedDueDate("20150704").updateEMI("5000").updateEmiChangeEndDate("20150904")
                 .updateRecalculateInterest(true).buildRequest(this.loanId.longValue());
 
         final PostCreateRescheduleLoansResponse createResponse = LoanRescheduleRequestHelper.createLoanRescheduleRequest(createRequest);
@@ -504,8 +504,8 @@ public class LoanRescheduleOnDecliningBalanceLoanTest extends BaseLoanIntegratio
                 "---------------------------------CREATING LOAN RESCHEDULE REQUEST FOR INTEREST APPROPRIATTION-------------------------------------");
 
         final PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder().updateGraceOnPrincipal(null)
-                .updateGraceOnInterest(null).updateExtraTerms(null).updateRescheduleFromDate("04 December 2015")
-                .updateAdjustedDueDate("04 June 2016").updateRecalculateInterest(true).buildRequest(this.loanId.longValue());
+                .updateGraceOnInterest(null).updateExtraTerms(null).updateRescheduleFromDate("20151204")
+                .updateAdjustedDueDate("20160604").updateRecalculateInterest(true).buildRequest(this.loanId.longValue());
 
         final PostCreateRescheduleLoansResponse createResponse = LoanRescheduleRequestHelper.createLoanRescheduleRequest(createRequest);
         this.loanRescheduleRequestId = createResponse.getResourceId();
@@ -576,7 +576,7 @@ public class LoanRescheduleOnDecliningBalanceLoanTest extends BaseLoanIntegratio
      * submit a new loan application, approve and disburse the loan
      **/
     private void createLoanEntityWithScheduleGapWithInterestGreaterThanEMIAndPrincipalCompoundingOff() {
-        String firstRepaymentDate = "01 January 2015";
+        String firstRepaymentDate = "20150101";
 
         LOG.info("---------------------------------NEW LOAN APPLICATION------------------------------------------");
 
@@ -604,8 +604,8 @@ public class LoanRescheduleOnDecliningBalanceLoanTest extends BaseLoanIntegratio
                 "---------------------------------CREATING LOAN RESCHEDULE REQUEST FOR LOAN WITH RECALCULATION------------------------------------");
 
         final PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder().updateGraceOnPrincipal(null)
-                .updateGraceOnInterest(null).updateExtraTerms(null).updateRescheduleFromDate("01 March 2015")
-                .updateAdjustedDueDate("01 July 2015").updateRecalculateInterest(true).buildRequest(this.loanId.longValue());
+                .updateGraceOnInterest(null).updateExtraTerms(null).updateRescheduleFromDate("20150301")
+                .updateAdjustedDueDate("20150701").updateRecalculateInterest(true).buildRequest(this.loanId.longValue());
 
         final PostCreateRescheduleLoansResponse createResponse = LoanRescheduleRequestHelper.createLoanRescheduleRequest(createRequest);
         this.loanRescheduleRequestId = createResponse.getResourceId();

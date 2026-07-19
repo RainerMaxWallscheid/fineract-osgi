@@ -236,7 +236,7 @@ public class FixedDepositTest extends IntegrationTest {
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
@@ -272,8 +272,8 @@ public class FixedDepositTest extends IntegrationTest {
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -373,8 +373,8 @@ public class FixedDepositTest extends IntegrationTest {
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
         final Account liabilityAccountForTax = this.accountHelper.createLiabilityAccount();
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -480,7 +480,7 @@ public class FixedDepositTest extends IntegrationTest {
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
         final Account liabilityAccountForTax = this.accountHelper.createLiabilityAccount();
-        DateTimeFormatter monthDayFormat = new DateTimeFormatterBuilder().appendPattern("dd MMM").toFormatter(Locale.ENGLISH);
+        DateTimeFormatter monthDayFormat = new DateTimeFormatterBuilder().appendPattern("MMdd").toFormatter(Locale.ENGLISH);
         DateTimeFormatter currentDateFormat = new DateTimeFormatterBuilder().appendPattern("dd").toFormatter();
         LocalDate todaysDate = Utils.getLocalDateOfTenant();
         todaysDate = todaysDate.minusMonths(20);
@@ -668,11 +668,11 @@ public class FixedDepositTest extends IntegrationTest {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        final String VALID_FROM = "01 March 2014";
-        final String VALID_TO = "01 March 2016";
-        final String SUBMITTED_ON_DATE = "01 March 2015";
-        final String APPROVED_ON_DATE = "01 March 2015";
-        final String ACTIVATION_DATE = "01 March 2015";
+        final String VALID_FROM = "20140301";
+        final String VALID_TO = "20160301";
+        final String SUBMITTED_ON_DATE = "20150301";
+        final String APPROVED_ON_DATE = "20150301";
+        final String ACTIVATION_DATE = "20150301";
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
         /**
@@ -719,8 +719,8 @@ public class FixedDepositTest extends IntegrationTest {
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -842,8 +842,8 @@ public class FixedDepositTest extends IntegrationTest {
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -909,8 +909,8 @@ public class FixedDepositTest extends IntegrationTest {
     public void testFixedDepositAccountUpdation() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
@@ -939,8 +939,8 @@ public class FixedDepositTest extends IntegrationTest {
     public void testFixedDepositAccountUndoApproval() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
@@ -971,8 +971,8 @@ public class FixedDepositTest extends IntegrationTest {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
@@ -1002,8 +1002,8 @@ public class FixedDepositTest extends IntegrationTest {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
@@ -1032,8 +1032,8 @@ public class FixedDepositTest extends IntegrationTest {
     public void testFixedDepositAccountIsDeleted() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
@@ -1060,8 +1060,8 @@ public class FixedDepositTest extends IntegrationTest {
     public void testMaturityAmountForMonthlyCompoundingAndMonthlyPosting_With_360_Days() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -1175,8 +1175,8 @@ public class FixedDepositTest extends IntegrationTest {
     public void testMaturityAmountForMonthlyCompoundingAndMonthlyPosting_With_365_Days() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -1226,7 +1226,7 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateTimeFormatter dateFormat = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+        DateTimeFormatter dateFormat = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
         LocalDate todaysDate = Utils.getLocalDateOfTenant();
         todaysDate = todaysDate.minusMonths(3);
         final String VALID_FROM = dateFormat.format(todaysDate);
@@ -1289,7 +1289,7 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateTimeFormatter dateFormat = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+        DateTimeFormatter dateFormat = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
         LocalDate todaysDate = Utils.getLocalDateOfTenant().minusDays(32);
         todaysDate = todaysDate.minusMonths(3);
         final String VALID_FROM = dateFormat.format(todaysDate);
@@ -1352,7 +1352,7 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateTimeFormatter dateFormat = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+        DateTimeFormatter dateFormat = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
         LocalDate todaysDate = Utils.getLocalDateOfTenant().minusDays(32);
         todaysDate = todaysDate.minusMonths(3);
         final String VALID_FROM = dateFormat.format(todaysDate);
@@ -1414,8 +1414,8 @@ public class FixedDepositTest extends IntegrationTest {
     public void testMaturityAmountForDailyCompoundingAndMonthlyPosting_With_365_Days() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -1464,8 +1464,8 @@ public class FixedDepositTest extends IntegrationTest {
     public void testMaturityAmountForDailyCompoundingAndMonthlyPosting_With_360_Days() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -1517,8 +1517,8 @@ public class FixedDepositTest extends IntegrationTest {
     public void testMaturityAmountForDailyCompoundingAndAnnuallyPosting_With_365_Days() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
@@ -1574,8 +1574,8 @@ public class FixedDepositTest extends IntegrationTest {
     public void testMaturityAmountDailyCompoundingAndAnnuallyPostingWith_360_Days() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
@@ -1633,8 +1633,8 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
@@ -1690,8 +1690,8 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
@@ -1747,8 +1747,8 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
@@ -1804,8 +1804,8 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
@@ -1872,8 +1872,8 @@ public class FixedDepositTest extends IntegrationTest {
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -1936,8 +1936,8 @@ public class FixedDepositTest extends IntegrationTest {
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        new SimpleDateFormat("dd MMM", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        new SimpleDateFormat("MMdd", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -1993,8 +1993,8 @@ public class FixedDepositTest extends IntegrationTest {
             final Account expenseAccount = this.accountHelper.createExpenseAccount();
             this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
             this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-            DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-            DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+            DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
             DateFormat currentDateFormat = new SimpleDateFormat("dd");
             Calendar todaysDate = Calendar.getInstance();
             int currentYear = todaysDate.get(Calendar.YEAR);
@@ -2048,8 +2048,8 @@ public class FixedDepositTest extends IntegrationTest {
             final Account expenseAccount = this.accountHelper.createExpenseAccount();
             this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
             this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-            DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-            DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+            DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
             DateFormat currentDateFormat = new SimpleDateFormat("dd");
             Calendar todaysDate = Calendar.getInstance();
             int currentYear = todaysDate.get(Calendar.YEAR);
@@ -2250,9 +2250,9 @@ public class FixedDepositTest extends IntegrationTest {
     }
 
     private Integer createTaxGroup(final String percentage, final Account liabilityAccountForTax) {
-        final PostTaxesComponentsRequest componentRequest = new PostTaxesComponentsRequest().name(Utils.randomStringGenerator("Tax_component_Name_", 5)).percentage(Float.parseFloat(percentage)).startDate("01 January 2013").dateFormat("dd MMMM yyyy").locale("en").creditAccountType(2).creditAccountId(liabilityAccountForTax.getAccountID().longValue());
+        final PostTaxesComponentsRequest componentRequest = new PostTaxesComponentsRequest().name(Utils.randomStringGenerator("Tax_component_Name_", 5)).percentage(Float.parseFloat(percentage)).startDate("20130101").dateFormat("yyyyMMdd").locale("en").creditAccountType(2).creditAccountId(liabilityAccountForTax.getAccountID().longValue());
         final var componentResponse = TaxComponentHelper.createTaxComponent(componentRequest);
-        final PostTaxesGroupRequest groupRequest = new PostTaxesGroupRequest().name(Utils.randomStringGenerator("Tax_group_Name_", 5)).dateFormat("dd MMMM yyyy").locale("en").taxComponents(Set.of(new PostTaxesGroupTaxComponents().taxComponentId(componentResponse.getResourceId()).startDate("01 January 2013")));
+        final PostTaxesGroupRequest groupRequest = new PostTaxesGroupRequest().name(Utils.randomStringGenerator("Tax_group_Name_", 5)).dateFormat("yyyyMMdd").locale("en").taxComponents(Set.of(new PostTaxesGroupTaxComponents().taxComponentId(componentResponse.getResourceId()).startDate("20130101")));
         return TaxGroupHelper.createTaxGroup(groupRequest).getResourceId().intValue();
     }
 
@@ -2269,7 +2269,7 @@ public class FixedDepositTest extends IntegrationTest {
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
@@ -2355,7 +2355,7 @@ public class FixedDepositTest extends IntegrationTest {
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());

@@ -41,23 +41,23 @@ public class FeignLoanRescheduleAfterReAgeTest extends FeignLoanTestBase {
     @Test
     void testRescheduleAfterReAgeWithDownpayment() {
         runAt("2026-04-21", () -> {
-            Long clientId = createClient("21 April 2026");
+            Long clientId = createClient("20260421");
             Long productId = createLoanProduct(createProgressiveNoInterestWithDownpayment());
 
-            Long loanId = createApproveAndDisburseProgressiveLoan(clientId, productId, "21 April 2026", 540.0, 2);
+            Long loanId = createApproveAndDisburseProgressiveLoan(clientId, productId, "20260421", 540.0, 2);
 
             GetLoansLoanIdResponse loan = getLoanDetails(loanId);
             verifyLoanStatus(loan, GetLoansLoanIdStatus::getActive);
             assertEquals(360.0, Utils.getDoubleValue(loan.getSummary().getTotalOutstanding()));
 
-            createAndApproveReschedule(loanId, "21 April 2026", "21 May 2026", "21 June 2026");
+            createAndApproveReschedule(loanId, "20260421", "20260521", "20260621");
 
-            reAge(loanId, reAge("23 May 2026", LoanTestData.RepaymentFrequencyType.MONTHS_STRING, 1, 15));
+            reAge(loanId, reAge("20260523", LoanTestData.RepaymentFrequencyType.MONTHS_STRING, 1, 15));
 
             loan = getLoanDetails(loanId);
             assertEquals(360.0, Utils.getDoubleValue(loan.getSummary().getTotalOutstanding()));
 
-            createAndApproveReschedule(loanId, "21 April 2026", "23 May 2026", "23 July 2026");
+            createAndApproveReschedule(loanId, "20260421", "20260523", "20260723");
 
             loan = getLoanDetails(loanId);
             verifyLoanStatus(loan, GetLoansLoanIdStatus::getActive);
@@ -90,23 +90,23 @@ public class FeignLoanRescheduleAfterReAgeTest extends FeignLoanTestBase {
     @Test
     void testRescheduleAfterReAgeWithoutDownpayment() {
         runAt("2026-04-20", () -> {
-            Long clientId = createClient("20 April 2026");
+            Long clientId = createClient("20260420");
             Long productId = createLoanProduct(createProgressiveNoInterestNoDownpayment());
 
-            Long loanId = createApproveAndDisburseProgressiveLoan(clientId, productId, "20 April 2026", 600.0, 1);
+            Long loanId = createApproveAndDisburseProgressiveLoan(clientId, productId, "20260420", 600.0, 1);
 
             GetLoansLoanIdResponse loan = getLoanDetails(loanId);
             verifyLoanStatus(loan, GetLoansLoanIdStatus::getActive);
             assertEquals(600.0, Utils.getDoubleValue(loan.getSummary().getTotalOutstanding()));
 
-            createAndApproveReschedule(loanId, "20 April 2026", "20 May 2026", "18 August 2026");
+            createAndApproveReschedule(loanId, "20260420", "20260520", "20260818");
 
-            reAge(loanId, reAge("04 June 2026", LoanTestData.RepaymentFrequencyType.DAYS_STRING, 30, 20));
+            reAge(loanId, reAge("20260604", LoanTestData.RepaymentFrequencyType.DAYS_STRING, 30, 20));
 
             loan = getLoanDetails(loanId);
             assertEquals(600.0, Utils.getDoubleValue(loan.getSummary().getTotalOutstanding()));
 
-            createAndApproveReschedule(loanId, "20 April 2026", "04 July 2026", "02 October 2026");
+            createAndApproveReschedule(loanId, "20260420", "20260704", "20261002");
 
             loan = getLoanDetails(loanId);
             verifyLoanStatus(loan, GetLoansLoanIdStatus::getActive);

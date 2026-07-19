@@ -76,8 +76,8 @@ public class ApplyWorkingCapitalLoanCommandStrategyTest {
         br.setRequestId(Long.valueOf(RandomStringUtils.randomNumeric(5)));
         br.setRelativeUrl("working-capital-loans");
         br.setMethod(HttpMethod.POST);
-        br.setBody("{\"clientId\":1,\"productId\":1,\"principal\":1000,\"locale\":\"en\",\"dateFormat\":\"dd MMMM yyyy\","
-                + "\"expectedDisbursementDate\":\"01 January 2026\"}");
+        br.setBody("{\"clientId\":1,\"productId\":1,\"principal\":1000,\"locale\":\"en\",\"dateFormat\":\"yyyyMMdd\","
+                + "\"expectedDisbursementDate\":\"20260101\"}");
         return br;
     }
 

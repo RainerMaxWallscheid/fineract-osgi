@@ -91,7 +91,7 @@ public class FeignLoanHelper {
                 .isInterestRecalculationEnabled(false)//
                 .accountingRule(1)//
                 .locale("en")//
-                .dateFormat("dd MMMM yyyy");
+                .dateFormat("yyyyMMdd");
         return createLoanProduct(request);
     }
 
@@ -177,7 +177,7 @@ public class FeignLoanHelper {
 
     public PostLoansLoanIdResponse disburseLoanWithAmount(Long loanId, String date, double amount) {
         return disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate(date).transactionAmount(BigDecimal.valueOf(amount))
-                .dateFormat("dd MMMM yyyy").locale("en"));
+                .dateFormat("yyyyMMdd").locale("en"));
     }
 
     public GetLoansLoanIdResponse getLoanDetailsWithAssociations(Long loanId, String associations) {
@@ -217,7 +217,7 @@ public class FeignLoanHelper {
                 .interestCalculationPeriodType(1)//
                 .transactionProcessingStrategyCode("mifos-standard-strategy")//
                 .locale("en")//
-                .dateFormat("dd MMMM yyyy");
+                .dateFormat("yyyyMMdd");
 
         Long loanId = applyForLoan(applyRequest);
 
@@ -225,7 +225,7 @@ public class FeignLoanHelper {
                 .approvedLoanAmount(BigDecimal.valueOf(principal))//
                 .approvedOnDate(submittedOnDate)//
                 .locale("en")//
-                .dateFormat("dd MMMM yyyy");
+                .dateFormat("yyyyMMdd");
 
         approveLoan(loanId, approveRequest);
         return loanId;
@@ -250,7 +250,7 @@ public class FeignLoanHelper {
                 .interestCalculationPeriodType(1)//
                 .transactionProcessingStrategyCode("mifos-standard-strategy")//
                 .locale("en")//
-                .dateFormat("dd MMMM yyyy");
+                .dateFormat("yyyyMMdd");
         return applyForLoan(applyRequest);
     }
 
@@ -332,7 +332,7 @@ public class FeignLoanHelper {
                 .amount(amount)//
                 .dueDate(dueDate)//
                 .locale("en")//
-                .dateFormat("dd MMMM yyyy");
+                .dateFormat("yyyyMMdd");
         return addLoanCharge(loanId, request).getResourceId();
     }
 
@@ -341,7 +341,7 @@ public class FeignLoanHelper {
                 .chargeId(chargeId)//
                 .amount(amount)//
                 .locale("en")//
-                .dateFormat("dd MMMM yyyy");
+                .dateFormat("yyyyMMdd");
         return addLoanCharge(loanId, request).getResourceId();
     }
 
@@ -351,7 +351,7 @@ public class FeignLoanHelper {
 
     public CommandProcessingResult addAndDeleteDisbursementDetail(Long loanId, List<DisbursementDetail> disbursementDetails) {
         return addAndDeleteDisbursementDetail(loanId, new PostAddAndDeleteDisbursementDetailRequest().locale("en")//
-                .dateFormat("dd MMMM yyyy")//
+                .dateFormat("yyyyMMdd")//
                 .disbursementData(disbursementDetails));
     }
 
@@ -406,6 +406,6 @@ public class FeignLoanHelper {
                 .interestCalculationPeriodType(1)//
                 .transactionProcessingStrategyCode("mifos-standard-strategy")//
                 .locale("en")//
-                .dateFormat("dd MMMM yyyy");
+                .dateFormat("yyyyMMdd");
     }
 }

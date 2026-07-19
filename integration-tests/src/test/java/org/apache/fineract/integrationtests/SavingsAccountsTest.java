@@ -44,7 +44,7 @@ import retrofit2.Response;
 public class SavingsAccountsTest extends IntegrationTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(SavingsAccountsTest.class);
-    private final String dateFormat = "dd MMMM yyyy";
+    private final String dateFormat = "yyyyMMdd";
     private final String locale = "en";
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(dateFormat, Locale.ENGLISH);
     private final String formattedDate = dateFormatter.format(Utils.getLocalDateOfTenant());

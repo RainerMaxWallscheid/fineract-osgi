@@ -68,11 +68,11 @@ public class LoanDisbursalDateValidationTest {
     public void loanApplicationValidateDisbursalDate() {
 
         final String proposedAmount = "5000";
-        final String approveDate = "01 March 2014";
-        final String disbursalDate = "02 March 2014";
+        final String approveDate = "20140301";
+        final String disbursalDate = "20140302";
 
         // CREATE CLIENT
-        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2014");
+        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20140101");
         LOG.info("---------------------------------CLIENT CREATED WITH ID--------------------------------------------------- {}", clientID);
 
         // CREATE LOAN PRODUCT
@@ -117,8 +117,8 @@ public class LoanDisbursalDateValidationTest {
         addCollaterals(collaterals, clientCollateralId, BigDecimal.valueOf(1));
         final String loanApplication = new LoanApplicationTestBuilder().withPrincipal(proposedAmount).withLoanTermFrequency("5")
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("5").withRepaymentEveryAfter("1")
-                .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("2").withExpectedDisbursementDate("01 March 2014")
-                .withCollaterals(collaterals).withSubmittedOnDate("26 February 2014")
+                .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("2").withExpectedDisbursementDate("20140301")
+                .withCollaterals(collaterals).withSubmittedOnDate("20140226")
                 .build(clientID.toString(), loanProductID.toString(), null);
         return this.loanTransactionHelper.getLoanId(loanApplication);
     }

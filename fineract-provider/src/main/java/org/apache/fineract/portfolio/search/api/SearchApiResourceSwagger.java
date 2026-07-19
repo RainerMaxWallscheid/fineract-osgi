@@ -64,7 +64,7 @@ final class SearchApiResourceSwagger {
 
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "approvalDate")
         public String loanDateOption;

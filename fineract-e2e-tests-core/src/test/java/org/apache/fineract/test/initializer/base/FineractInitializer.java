@@ -28,7 +28,7 @@ import org.springframework.beans.factory.InitializingBean;
 public class FineractInitializer implements InitializingBean {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FineractInitializer.class);
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     private final List<FineractGlobalInitializerStep> globalInitializerSteps;
     private final List<FineractSuiteInitializerStep> suiteInitializerSteps;
     private final List<FineractScenarioInitializerStep> scenarioInitializerSteps;

@@ -187,7 +187,7 @@ public class FeignWorkingCapitalLoanHelper {
             return;
         }
         final PostWorkingCapitalLoansLoanIdRequest emptyRequest = new PostWorkingCapitalLoansLoanIdRequest().locale("en")
-                .dateFormat("dd MMMM yyyy");
+                .dateFormat("yyyyMMdd");
         tryQuietly(() -> undoDisbursal(loanId, emptyRequest));
         tryQuietly(() -> undoApproval(loanId, emptyRequest));
         tryQuietly(() -> delete(loanId));

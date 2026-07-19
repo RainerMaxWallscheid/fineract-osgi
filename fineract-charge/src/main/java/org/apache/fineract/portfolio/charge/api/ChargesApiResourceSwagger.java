@@ -149,7 +149,7 @@ final class ChargesApiResourceSwagger {
         public Integer chargePaymentMode;
         @Schema(example = "true")
         public boolean active;
-        @Schema(example = "dd MMMM")
+        @Schema(example = "MMdd")
         public String monthDayFormat;
         @Schema(example = "false")
         public boolean penalty;
@@ -203,7 +203,7 @@ final class ChargesApiResourceSwagger {
         public boolean active;
         @Schema(example = "false")
         public boolean penalty;
-        @Schema(example = "dd MMMM")
+        @Schema(example = "MMdd")
         public String monthDayFormat;
         @Schema(example = "01 March")
         public String feeOnMonthDay;

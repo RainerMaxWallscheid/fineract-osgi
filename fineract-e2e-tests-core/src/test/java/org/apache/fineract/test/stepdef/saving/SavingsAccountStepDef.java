@@ -58,7 +58,7 @@ public class SavingsAccountStepDef extends AbstractStepDef {
     @Autowired
     private FineractFeignClient fineractClient;
 
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
     private static final String EUR = "EUR";
 

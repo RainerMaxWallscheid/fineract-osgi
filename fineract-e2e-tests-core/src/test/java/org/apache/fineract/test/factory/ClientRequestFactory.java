@@ -27,7 +27,7 @@ public class ClientRequestFactory {
 
     private static final Long HEAD_OFFICE_ID = 1L;
     private static final Long LEGAL_FORM_ID_PERSON = 1L;
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     public static final String DEFAULT_LOCALE = "en";
 
     public PostClientsRequest defaultClientCreationRequest() {
@@ -40,7 +40,7 @@ public class ClientRequestFactory {
                 .dateFormat(DATE_FORMAT)//
                 .locale(DEFAULT_LOCALE)//
                 .active(true)//
-                .activationDate("04 March 2011");//
+                .activationDate("20110304");//
     }
 
     private String randomClientId(final String prefix, final int lenOfRandomSuffix) {

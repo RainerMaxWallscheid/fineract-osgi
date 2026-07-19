@@ -36,13 +36,13 @@ final class ProvisioningEntriesApiResourceSwagger {
 
         }
 
-        @Schema(example = "16 October 2015")
+        @Schema(example = "20151016")
         public String date;
 
         @Schema(example = "en")
         public String locale;
 
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
 
         @Schema(example = "true")

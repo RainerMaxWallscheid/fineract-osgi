@@ -46,7 +46,7 @@ public class LoanInstallmentMultiplesOfTest extends FeignLoanTestBase {
     @ParameterizedTest
     @MethodSource("interestTypes")
     public void test_LoanRepaymentScheduleIsEquallyDistributed_WhenNoInterest_ButInterestTypeIs(int interestType) {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             int amortizationType = AmortizationType.EQUAL_INSTALLMENTS;
 
             // Create Client
@@ -61,7 +61,7 @@ public class LoanInstallmentMultiplesOfTest extends FeignLoanTestBase {
             // Apply and Approve Loan
             double amount = 1250.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, 4)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, 4)//
                     .repaymentEvery(1)//
                     .loanTermFrequency(4)//
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS)//
@@ -71,34 +71,34 @@ public class LoanInstallmentMultiplesOfTest extends FeignLoanTestBase {
 
             Long loanId = applyForLoan(applicationRequest);
 
-            approveLoan(loanId, LoanRequestBuilders.approveLoan(amount, "01 January 2023"));
+            approveLoan(loanId, LoanRequestBuilders.approveLoan(amount, "20230101"));
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1250.0, null, "01 January 2023"), //
-                    installment(312.0, false, "01 February 2023"), //
-                    installment(312.0, false, "01 March 2023"), //
-                    installment(312.0, false, "01 April 2023"), //
-                    installment(314.0, false, "01 May 2023") //
+                    installment(1250.0, null, "20230101"), //
+                    installment(312.0, false, "20230201"), //
+                    installment(312.0, false, "20230301"), //
+                    installment(312.0, false, "20230401"), //
+                    installment(314.0, false, "20230501") //
             );
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1250.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1250.0), "20230101");
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1250, null, "01 January 2023"), //
-                    installment(312.0, false, "01 February 2023"), //
-                    installment(312.0, false, "01 March 2023"), //
-                    installment(312.0, false, "01 April 2023"), //
-                    installment(314.0, false, "01 May 2023") //
+                    installment(1250, null, "20230101"), //
+                    installment(312.0, false, "20230201"), //
+                    installment(312.0, false, "20230301"), //
+                    installment(312.0, false, "20230401"), //
+                    installment(314.0, false, "20230501") //
             );
         });
     }
 
     @Test
     public void test_LoanRepaymentScheduleIsEquallyDistributed_WhenInterestIsPresent_AndInterestTypeIsFlat() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             int amortizationType = AmortizationType.EQUAL_INSTALLMENTS;
             int interestType = InterestType.FLAT;
 
@@ -119,7 +119,7 @@ public class LoanInstallmentMultiplesOfTest extends FeignLoanTestBase {
             double amount = 1250.0;
             int numberOfRepayments = 3;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(1)//
                     .loanTermFrequency(numberOfRepayments)//
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS)//
@@ -131,32 +131,32 @@ public class LoanInstallmentMultiplesOfTest extends FeignLoanTestBase {
 
             Long loanId = applyForLoan(applicationRequest);
 
-            approveLoan(loanId, LoanRequestBuilders.approveLoan(amount, "01 January 2023"));
+            approveLoan(loanId, LoanRequestBuilders.approveLoan(amount, "20230101"));
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1250.0, null, "01 January 2023"), //
-                    installment(416.5, 12.5, 429.0, false, "01 February 2023"), //
-                    installment(416.5, 12.5, 429.0, false, "01 March 2023"), //
-                    installment(417.0, 12.5, 429.5, false, "01 April 2023") //
+                    installment(1250.0, null, "20230101"), //
+                    installment(416.5, 12.5, 429.0, false, "20230201"), //
+                    installment(416.5, 12.5, 429.0, false, "20230301"), //
+                    installment(417.0, 12.5, 429.5, false, "20230401") //
             );
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1250.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1250.0), "20230101");
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1250, null, "01 January 2023"), //
-                    installment(416.5, 12.5, 429.0, false, "01 February 2023"), //
-                    installment(416.5, 12.5, 429.0, false, "01 March 2023"), //
-                    installment(417.0, 12.5, 429.5, false, "01 April 2023") //
+                    installment(1250, null, "20230101"), //
+                    installment(416.5, 12.5, 429.0, false, "20230201"), //
+                    installment(416.5, 12.5, 429.0, false, "20230301"), //
+                    installment(417.0, 12.5, 429.5, false, "20230401") //
             );
         });
     }
 
     @Test
     public void test_LoanRepaymentScheduleIsEquallyDistributed_WhenInterestIsPresent_AndInterestTypeIsFlat_AndMultiplesOfIs20() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             int amortizationType = AmortizationType.EQUAL_INSTALLMENTS;
             int interestType = InterestType.FLAT;
 
@@ -178,7 +178,7 @@ public class LoanInstallmentMultiplesOfTest extends FeignLoanTestBase {
             double amount = 1250.0;
             int numberOfRepayments = 3;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(1)//
                     .loanTermFrequency(numberOfRepayments)//
                     .repaymentFrequencyType(RepaymentFrequencyType.MONTHS)//
@@ -190,25 +190,25 @@ public class LoanInstallmentMultiplesOfTest extends FeignLoanTestBase {
 
             Long loanId = applyForLoan(applicationRequest);
 
-            approveLoan(loanId, LoanRequestBuilders.approveLoan(amount, "01 January 2023"));
+            approveLoan(loanId, LoanRequestBuilders.approveLoan(amount, "20230101"));
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1250.0, null, "01 January 2023"), //
-                    installment(427.5, 12.5, 440.0, false, "01 February 2023"), //
-                    installment(427.5, 12.5, 440.0, false, "01 March 2023"), //
-                    installment(395.0, 12.5, 407.5, false, "01 April 2023") //
+                    installment(1250.0, null, "20230101"), //
+                    installment(427.5, 12.5, 440.0, false, "20230201"), //
+                    installment(427.5, 12.5, 440.0, false, "20230301"), //
+                    installment(395.0, 12.5, 407.5, false, "20230401") //
             );
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1250.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1250.0), "20230101");
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1250.0, null, "01 January 2023"), //
-                    installment(427.5, 12.5, 440.0, false, "01 February 2023"), //
-                    installment(427.5, 12.5, 440.0, false, "01 March 2023"), //
-                    installment(395.0, 12.5, 407.5, false, "01 April 2023") //
+                    installment(1250.0, null, "20230101"), //
+                    installment(427.5, 12.5, 440.0, false, "20230201"), //
+                    installment(427.5, 12.5, 440.0, false, "20230301"), //
+                    installment(395.0, 12.5, 407.5, false, "20230401") //
             );
         });
     }

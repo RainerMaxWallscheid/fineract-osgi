@@ -52,8 +52,8 @@ public class LoanChargeRoundingTest extends BaseLoanIntegrationTest {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanChargeRoundingTest.class);
     private Long clientId;
-    private static final String DATE = "01 January 2026";
-    private static final String LATER_DATE = "01 June 2026";
+    private static final String DATE = "20260101";
+    private static final String LATER_DATE = "20260601";
 
     @BeforeEach
     public void setup() {
@@ -298,7 +298,7 @@ public class LoanChargeRoundingTest extends BaseLoanIntegrationTest {
     public void shouldApplyRoundingRules_forPercentageOfTrancheDisbursementCharge() {
         runAt(DATE, () -> {
             Long productId = createMultiDisbursementLoanProduct(0, 1);
-            List<PostLoansDisbursementData> disbursements = List.of(new PostLoansDisbursementData().expectedDisbursementDate("01 January 2026").principal(new BigDecimal("615")), new PostLoansDisbursementData().expectedDisbursementDate("01 February 2026").principal(new BigDecimal("385")));
+            List<PostLoansDisbursementData> disbursements = List.of(new PostLoansDisbursementData().expectedDisbursementDate("20260101").principal(new BigDecimal("615")), new PostLoansDisbursementData().expectedDisbursementDate("20260201").principal(new BigDecimal("385")));
             Long loanId = applyAndApproveMultiTrancheLoan(productId, disbursements);
             PostChargesResponse chargeResponse = createPercentageOfTrancheDisbursementCharge(0.5);
             assertNotNull(chargeResponse.getResourceId());
@@ -319,7 +319,7 @@ public class LoanChargeRoundingTest extends BaseLoanIntegrationTest {
     public void shouldFailToAddPercentageOfTrancheDisbursementCharge_whenAnyTrancheRoundsToZero() {
         runAt(DATE, () -> {
             Long productId = createMultiDisbursementLoanProduct(0, 1);
-            List<PostLoansDisbursementData> disbursements = List.of(new PostLoansDisbursementData().expectedDisbursementDate("01 January 2026").principal(new BigDecimal("615")), new PostLoansDisbursementData().expectedDisbursementDate("01 February 2026").principal(new BigDecimal("385")));
+            List<PostLoansDisbursementData> disbursements = List.of(new PostLoansDisbursementData().expectedDisbursementDate("20260101").principal(new BigDecimal("615")), new PostLoansDisbursementData().expectedDisbursementDate("20260201").principal(new BigDecimal("385")));
             Long loanId = applyAndApproveMultiTrancheLoan(productId, disbursements);
             PostChargesResponse chargeResponse = createPercentageOfTrancheDisbursementCharge(0.09);
             assertNotNull(chargeResponse.getResourceId());
@@ -337,7 +337,7 @@ public class LoanChargeRoundingTest extends BaseLoanIntegrationTest {
     public void shouldFailToAddAnyCharges_whenAllRoundedChargesBecomeZero_forPercentageOfTrancheDisbursementCharge() {
         runAt(DATE, () -> {
             Long productId = createMultiDisbursementLoanProduct(0, 1);
-            List<PostLoansDisbursementData> disbursements = List.of(new PostLoansDisbursementData().expectedDisbursementDate("01 January 2026").principal(new BigDecimal("615")), new PostLoansDisbursementData().expectedDisbursementDate("01 February 2026").principal(new BigDecimal("385")));
+            List<PostLoansDisbursementData> disbursements = List.of(new PostLoansDisbursementData().expectedDisbursementDate("20260101").principal(new BigDecimal("615")), new PostLoansDisbursementData().expectedDisbursementDate("20260201").principal(new BigDecimal("385")));
             Long loanId = applyAndApproveMultiTrancheLoan(productId, disbursements);
             PostChargesResponse chargeResponse = createPercentageOfTrancheDisbursementCharge(0.04);
             assertNotNull(chargeResponse.getResourceId());
@@ -358,7 +358,7 @@ public class LoanChargeRoundingTest extends BaseLoanIntegrationTest {
     public void shouldApplyRoundingRules_forPercentageOfDisbursementCharge() {
         runAt(DATE, () -> {
             Long productId = createMultiDisbursementLoanProduct(0, 1);
-            List<PostLoansDisbursementData> disbursements = List.of(new PostLoansDisbursementData().expectedDisbursementDate("01 January 2026").principal(new BigDecimal("615")), new PostLoansDisbursementData().expectedDisbursementDate("01 February 2026").principal(new BigDecimal("385")));
+            List<PostLoansDisbursementData> disbursements = List.of(new PostLoansDisbursementData().expectedDisbursementDate("20260101").principal(new BigDecimal("615")), new PostLoansDisbursementData().expectedDisbursementDate("20260201").principal(new BigDecimal("385")));
             Long loanId = applyAndApproveMultiTrancheLoan(productId, disbursements);
             PostChargesResponse chargeResponse = createPercentageOfDisbursementCharge(0.5);
             assertNotNull(chargeResponse.getResourceId());
@@ -376,7 +376,7 @@ public class LoanChargeRoundingTest extends BaseLoanIntegrationTest {
     public void shouldRoundUpPercentageOfDisbursementCharge_whenValueIsAboveHalf() {
         runAt(DATE, () -> {
             Long productId = createMultiDisbursementLoanProduct(0, 1);
-            List<PostLoansDisbursementData> disbursements = List.of(new PostLoansDisbursementData().expectedDisbursementDate("01 January 2026").principal(new BigDecimal("615")), new PostLoansDisbursementData().expectedDisbursementDate("01 February 2026").principal(new BigDecimal("385")));
+            List<PostLoansDisbursementData> disbursements = List.of(new PostLoansDisbursementData().expectedDisbursementDate("20260101").principal(new BigDecimal("615")), new PostLoansDisbursementData().expectedDisbursementDate("20260201").principal(new BigDecimal("385")));
             Long loanId = applyAndApproveMultiTrancheLoan(productId, disbursements);
             PostChargesResponse chargeResponse = createPercentageOfDisbursementCharge(0.09);
             assertNotNull(chargeResponse.getResourceId());
@@ -395,7 +395,7 @@ public class LoanChargeRoundingTest extends BaseLoanIntegrationTest {
     public void shouldFailToAddPercentageOfDisbursementCharge_whenRoundedToZero() {
         runAt(DATE, () -> {
             Long productId = createMultiDisbursementLoanProduct(0, 1);
-            List<PostLoansDisbursementData> disbursements = List.of(new PostLoansDisbursementData().expectedDisbursementDate("01 January 2026").principal(new BigDecimal("615")), new PostLoansDisbursementData().expectedDisbursementDate("01 February 2026").principal(new BigDecimal("385")));
+            List<PostLoansDisbursementData> disbursements = List.of(new PostLoansDisbursementData().expectedDisbursementDate("20260101").principal(new BigDecimal("615")), new PostLoansDisbursementData().expectedDisbursementDate("20260201").principal(new BigDecimal("385")));
             Long loanId = applyAndApproveMultiTrancheLoan(productId, disbursements);
             PostChargesResponse chargeResponse = createPercentageOfDisbursementCharge(0.04);
             assertNotNull(chargeResponse.getResourceId());
@@ -419,7 +419,7 @@ public class LoanChargeRoundingTest extends BaseLoanIntegrationTest {
     }
 
     private PostLoanProductsRequest baseLoanProductRequest() {
-        return new PostLoanProductsRequest().name("LP-" + UUID.randomUUID()).shortName(randomShortName()).currencyCode("USD").locale("en").dateFormat("dd MMMM yyyy").principal(10000.0).numberOfRepayments(1).repaymentEvery(1).repaymentFrequencyType(1L).interestRatePerPeriod(1.0).interestRateFrequencyType(1).amortizationType(1).interestType(0).interestCalculationPeriodType(1).transactionProcessingStrategyCode("mifos-standard-strategy").accountingRule(1).isInterestRecalculationEnabled(false).daysInYearType(1).daysInMonthType(1);
+        return new PostLoanProductsRequest().name("LP-" + UUID.randomUUID()).shortName(randomShortName()).currencyCode("USD").locale("en").dateFormat("yyyyMMdd").principal(10000.0).numberOfRepayments(1).repaymentEvery(1).repaymentFrequencyType(1L).interestRatePerPeriod(1.0).interestRateFrequencyType(1).amortizationType(1).interestType(0).interestCalculationPeriodType(1).transactionProcessingStrategyCode("mifos-standard-strategy").accountingRule(1).isInterestRecalculationEnabled(false).daysInYearType(1).daysInMonthType(1);
     }
 
     private String randomShortName() {
@@ -485,7 +485,7 @@ public class LoanChargeRoundingTest extends BaseLoanIntegrationTest {
     }
 
     protected PostLoansLoanIdChargesRequest buildLoanChargeRequest(Long chargeId, String dueDate, Double amount) {
-        return new PostLoansLoanIdChargesRequest().chargeId(chargeId).amount(amount).dueDate(dueDate).dateFormat("dd MMMM yyyy").locale("en");
+        return new PostLoansLoanIdChargesRequest().chargeId(chargeId).amount(amount).dueDate(dueDate).dateFormat("yyyyMMdd").locale("en");
     }
 
     @Override

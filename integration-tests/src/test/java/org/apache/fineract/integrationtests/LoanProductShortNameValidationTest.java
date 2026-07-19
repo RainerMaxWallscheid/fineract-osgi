@@ -49,7 +49,7 @@ public class LoanProductShortNameValidationTest {
         return new PostLoanProductsRequest().name(uniqueRandomStringGenerator("LoanProduct_", 4)).shortName(shortName).principal(10000.0)
                 .numberOfRepayments(5).repaymentEvery(1).repaymentFrequencyType(2L).interestRatePerPeriod(2.0).interestRateFrequencyType(2)
                 .amortizationType(1).interestType(0).transactionProcessingStrategyCode("mifos-standard-strategy").currencyCode("USD")
-                .digitsAfterDecimal(2).inMultiplesOf(0).locale("en").dateFormat("dd MMMM yyyy").interestCalculationPeriodType(1)
+                .digitsAfterDecimal(2).inMultiplesOf(0).locale("en").dateFormat("yyyyMMdd").interestCalculationPeriodType(1)
                 .daysInYearType(1).daysInMonthType(1).isInterestRecalculationEnabled(false).accountingRule(1);
     }
 }

@@ -83,7 +83,7 @@ public final class ChargesHelper {
     private static final String AMOUNT = "100";
     private static final String CURRENCY_CODE = "USD";
     public static final String FEE_ON_MONTH_DAY = "04 March";
-    private static final String MONTH_DAY_FORMAT = "dd MMM";
+    private static final String MONTH_DAY_FORMAT = "MMdd";
 
     private static final Gson GSON = new JSON().getGson();
 

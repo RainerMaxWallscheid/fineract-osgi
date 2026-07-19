@@ -69,7 +69,7 @@ public final class CalendarHelper {
 
     private static CalendarRequest buildCalendarRequest(final String frequency, final String interval, final String repeatsOnDay,
             final String startDate) {
-        return new CalendarRequest().dateFormat("dd MMMM yyyy").locale("en").frequency(frequency).interval(interval).repeating("true")
+        return new CalendarRequest().dateFormat("yyyyMMdd").locale("en").frequency(frequency).interval(interval).repeating("true")
                 .repeatsOnDay(repeatsOnDay).title(Utils.randomStringGenerator("groups_CollectionMeeting", 4)).typeId("1")
                 .startDate(startDate);
     }
@@ -77,13 +77,13 @@ public final class CalendarHelper {
     private static String buildCalendarJson(final String frequency, final String interval, final String repeatsOnDay,
             final String startDate) {
         return String.format(
-                "{\"dateFormat\":\"dd MMMM yyyy\",\"locale\":\"en\",\"frequency\":\"%s\",\"interval\":\"%s\","
+                "{\"dateFormat\":\"yyyyMMdd\",\"locale\":\"en\",\"frequency\":\"%s\",\"interval\":\"%s\","
                         + "\"repeating\":\"true\",\"repeatsOnDay\":\"%s\",\"title\":\"%s\",\"typeId\":\"1\",\"startDate\":\"%s\"}",
                 frequency, interval, repeatsOnDay, Utils.randomStringGenerator("groups_CollectionMeeting", 4), startDate);
     }
 
     private static String buildRescheduleMeetingJson(final String oldDate, final String startDate) {
-        return String.format("{\"dateFormat\":\"dd MMMM yyyy\",\"locale\":\"en\",\"newMeetingDate\":\"%s\","
+        return String.format("{\"dateFormat\":\"yyyyMMdd\",\"locale\":\"en\",\"newMeetingDate\":\"%s\","
                 + "\"presentMeetingDate\":\"%s\",\"reschedulebasedOnMeetingDates\":\"true\"}", startDate, oldDate);
     }
 }

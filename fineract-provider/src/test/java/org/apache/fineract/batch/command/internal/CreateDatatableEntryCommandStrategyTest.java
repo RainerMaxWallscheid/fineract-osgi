@@ -81,7 +81,7 @@ public class CreateDatatableEntryCommandStrategyTest {
         br.setRequestId(Long.valueOf(RandomStringUtils.randomNumeric(5)));
         br.setRelativeUrl(relativeUrl);
         br.setMethod(HttpMethod.POST);
-        br.setBody("{\"locale\":\"en\",\"dateFormat\":\"dd MMMM yyyy\",\"enabled\":true,\"amount\":500.10}");
+        br.setBody("{\"locale\":\"en\",\"dateFormat\":\"yyyyMMdd\",\"enabled\":true,\"amount\":500.10}");
 
         return br;
     }

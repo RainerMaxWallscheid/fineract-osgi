@@ -57,7 +57,7 @@ public class LoanAccountCreditRefundPayoutWithChargebackTest {
     private RequestSpecification requestSpec;
     private ClientHelper clientHelper;
     private LoanTransactionHelper loanTransactionHelper;
-    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
 
     @BeforeEach
     public void setup() {
@@ -91,7 +91,7 @@ public class LoanAccountCreditRefundPayoutWithChargebackTest {
 
         // make Repayment with full amount, Loan balance becomes zero, Loan closes
         final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("5 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220905").locale("en")
                         .transactionAmount(1000.0));
 
         // Chargeback full repayment amount to add to principal balance
@@ -105,28 +105,28 @@ public class LoanAccountCreditRefundPayoutWithChargebackTest {
 
         // Verify Goodwill Credit can be created with full amount
         final PostLoansLoanIdTransactionsResponse goodwillCredit_1 = loanTransactionHelper.makeGoodwillCredit((long) loanId,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("8 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220908").locale("en")
                         .transactionAmount(1000.0));
         assertNotNull(goodwillCredit_1);
         assertEquals(goodwillCredit_1.getLoanId(), (long) loanId);
 
         // Verify Goodwill Credit can be created after balance is zero again
         final PostLoansLoanIdTransactionsResponse goodwillCredit_2 = loanTransactionHelper.makeGoodwillCredit((long) loanId,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("9 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220909").locale("en")
                         .transactionAmount(10.0));
         assertNotNull(goodwillCredit_2);
         assertEquals(goodwillCredit_2.getLoanId(), (long) loanId);
 
         // Verify Payout refund can be created after balance is zero again
         final PostLoansLoanIdTransactionsResponse payoutRefund_1 = loanTransactionHelper.makePayoutRefund((long) loanId,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("9 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220909").locale("en")
                         .transactionAmount(10.0));
         assertNotNull(payoutRefund_1);
         assertEquals(payoutRefund_1.getLoanId(), (long) loanId);
 
         // Verify Merchant refund can be created after balance is zero again
         final PostLoansLoanIdTransactionsResponse merchantIssuedRefund_1 = loanTransactionHelper.makeMerchantIssuedRefund((long) loanId,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("10 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220910").locale("en")
                         .transactionAmount(10.0));
         assertNotNull(merchantIssuedRefund_1);
         assertEquals(merchantIssuedRefund_1.getLoanId(), (long) loanId);
@@ -146,12 +146,12 @@ public class LoanAccountCreditRefundPayoutWithChargebackTest {
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("03 September 2022").withSubmittedOnDate("01 September 2022").withLoanType("individual")
+                .withExpectedDisbursementDate("20220903").withSubmittedOnDate("20220901").withLoanType("individual")
                 .withExternalId(externalId).build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("02 September 2022", "1000", loanId, null);
-        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("03 September 2022", loanId, "1000");
+        loanTransactionHelper.approveLoan("20220902", "1000", loanId, null);
+        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20220903", loanId, "1000");
         return loanId;
     }
 }

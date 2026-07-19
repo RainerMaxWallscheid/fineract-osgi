@@ -85,7 +85,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
     @Test
     @DisplayName("Should create charge-specific journal entries when multiple charges with different amounts are applied to a loan")
     public void testMultipleChargesCreateChargeSpecificJournalEntries() {
-        runAt("15 January 2023", () -> {
+        runAt("20230115", () -> {
             PostLoanProductsRequest loanProduct = createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProduct);
             Long loanProductId = loanProductResponse.getResourceId();
@@ -101,24 +101,24 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
 
             // Create client and loan
             Long clientId = ClientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "15 January 2023", 10000.0, 4);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230115", 10000.0, 4);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(applicationRequest);
             Long loanId = loanResponse.getLoanId();
 
             // Approve and disburse loan
-            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(10000.0, "15 January 2023"));
-            disburseLoan(loanId, BigDecimal.valueOf(10000), "15 January 2023");
+            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(10000.0, "20230115"));
+            disburseLoan(loanId, BigDecimal.valueOf(10000), "20230115");
 
             // Add multiple charges
-            PostLoansLoanIdChargesResponse loanCharge1 = addLoanCharge(loanId, charge1.getResourceId(), "15 January 2023", 100.0);
-            PostLoansLoanIdChargesResponse loanCharge2 = addLoanCharge(loanId, charge2.getResourceId(), "15 January 2023", 200.0);
-            PostLoansLoanIdChargesResponse loanCharge3 = addLoanCharge(loanId, charge3.getResourceId(), "15 January 2023", 150.0);
+            PostLoansLoanIdChargesResponse loanCharge1 = addLoanCharge(loanId, charge1.getResourceId(), "20230115", 100.0);
+            PostLoansLoanIdChargesResponse loanCharge2 = addLoanCharge(loanId, charge2.getResourceId(), "20230115", 200.0);
+            PostLoansLoanIdChargesResponse loanCharge3 = addLoanCharge(loanId, charge3.getResourceId(), "20230115", 150.0);
             assertNotNull(loanCharge1);
             assertNotNull(loanCharge2);
             assertNotNull(loanCharge3);
 
             // Make repayment to trigger charge payment and journal entry creation
-            GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 600.0, "15 January 2023");
+            GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 600.0, "20230115");
             assertNotNull(journalEntries);
             assertNotNull(journalEntries.getPageItems());
             assertTrue(journalEntries.getPageItems().size() > 0, "Should have journal entries after repayment with charges");
@@ -151,7 +151,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
     @Test
     @DisplayName("Should aggregate charges by GL account type to optimize journal entry creation and reduce duplicate entries")
     public void testChargeAggregationByGLAccount() {
-        runAt("15 January 2023", () -> {
+        runAt("20230115", () -> {
             PostLoanProductsRequest loanProduct = createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProduct);
             Long loanProductId = loanProductResponse.getResourceId();
@@ -162,17 +162,17 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
             PostChargesResponse charge3 = createCharge(50.0);
 
             Long clientId = clientHelper.createClient(clientHelper.defaultClientCreationRequest()).getClientId();
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "15 January 2023", 5000.0, 2);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230115", 5000.0, 2);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(applicationRequest);
             Long loanId = loanResponse.getLoanId();
 
-            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(5000.0, "15 January 2023"));
-            disburseLoan(loanId, BigDecimal.valueOf(5000), "15 January 2023");
+            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(5000.0, "20230115"));
+            disburseLoan(loanId, BigDecimal.valueOf(5000), "20230115");
 
             // Add charges simultaneously to test aggregation
-            addLoanCharge(loanId, charge1.getResourceId(), "25 January 2023", 75.0);
-            addLoanCharge(loanId, charge2.getResourceId(), "25 January 2023", 125.0);
-            addLoanCharge(loanId, charge3.getResourceId(), "25 January 2023", 50.0);
+            addLoanCharge(loanId, charge1.getResourceId(), "20230125", 75.0);
+            addLoanCharge(loanId, charge2.getResourceId(), "20230125", 125.0);
+            addLoanCharge(loanId, charge3.getResourceId(), "20230125", 50.0);
 
             JournalEntryHelper journalHelper = new JournalEntryHelper(requestSpec, responseSpec);
             GetJournalEntriesTransactionIdResponse journalEntries = journalHelper.getJournalEntriesForLoan(loanId);
@@ -192,7 +192,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
     @Test
     @DisplayName("Should maintain backward compatibility by falling back to product-level default GL accounts when charge-specific accounts are not configured")
     public void testBackwardCompatibilityWithExistingConfigurations() {
-        runAt("10 January 2023", () -> {
+        runAt("20230110", () -> {
             PostLoanProductsRequest loanProduct = createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProduct);
             Long loanProductId = loanProductResponse.getResourceId();
@@ -200,15 +200,15 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
             PostChargesResponse charge = createCharge(300.0);
 
             Long clientId = ClientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "10 January 2023", 8000.0, 3);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230110", 8000.0, 3);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(applicationRequest);
             Long loanId = loanResponse.getLoanId();
 
-            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(8000.0, "10 January 2023"));
-            disburseLoan(loanId, BigDecimal.valueOf(8000), "10 January 2023");
+            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(8000.0, "20230110"));
+            disburseLoan(loanId, BigDecimal.valueOf(8000), "20230110");
 
             // Add charge - should use product-level default GL accounts
-            addLoanCharge(loanId, charge.getResourceId(), "15 January 2023", 300.0);
+            addLoanCharge(loanId, charge.getResourceId(), "20230115", 300.0);
 
             JournalEntryHelper journalHelper = new JournalEntryHelper(requestSpec, responseSpec);
             GetJournalEntriesTransactionIdResponse journalEntries = journalHelper.getJournalEntriesForLoan(loanId);
@@ -223,7 +223,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
     @Test
     @DisplayName("Should maintain accounting equation integrity ensuring total debits equal total credits for all charge transactions")
     public void testAccountingIntegrityValidation() {
-        runAt("20 January 2023", () -> {
+        runAt("20230120", () -> {
             PostLoanProductsRequest loanProduct = createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProduct);
             Long loanProductId = loanProductResponse.getResourceId();
@@ -231,14 +231,14 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
             PostChargesResponse charge = createCharge(500.0);
 
             Long clientId = ClientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20 January 2023", 12000.0, 4);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230120", 12000.0, 4);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(applicationRequest);
             Long loanId = loanResponse.getLoanId();
 
-            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(12000.0, "20 January 2023"));
-            disburseLoan(loanId, BigDecimal.valueOf(12000), "20 January 2023");
+            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(12000.0, "20230120"));
+            disburseLoan(loanId, BigDecimal.valueOf(12000), "20230120");
 
-            addLoanCharge(loanId, charge.getResourceId(), "25 January 2023", 500.0);
+            addLoanCharge(loanId, charge.getResourceId(), "20230125", 500.0);
 
             JournalEntryHelper journalHelper = new JournalEntryHelper(requestSpec, responseSpec);
             GetJournalEntriesTransactionIdResponse journalEntries = journalHelper.getJournalEntriesForLoan(loanId);
@@ -254,7 +254,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
     @Test
     @DisplayName("Should validate that each charge type uses its configured specific GL account for debit entries rather than a single generic receivable account")
     public void testChargeSpecificGLAccountValidation() {
-        runAt("01 February 2023", () -> {
+        runAt("20230201", () -> {
             PostLoanProductsRequest loanProduct = createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProduct);
             Long loanProductId = loanProductResponse.getResourceId();
@@ -269,27 +269,27 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
             assertNotNull(documentationFeeCharge, "Documentation fee charge should be created");
 
             Long clientId = clientHelper.createClient(clientHelper.defaultClientCreationRequest()).getClientId();
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 February 2023", 15000.0, 4);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230201", 15000.0, 4);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(applicationRequest);
             Long loanId = loanResponse.getLoanId();
             assertNotNull(loanId, "Loan should be created successfully");
 
-            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(15000.0, "01 February 2023"));
-            disburseLoan(loanId, BigDecimal.valueOf(15000), "01 February 2023");
+            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(15000.0, "20230201"));
+            disburseLoan(loanId, BigDecimal.valueOf(15000), "20230201");
 
             // Add charges with different amounts
-            PostLoansLoanIdChargesResponse charge1Response = addLoanCharge(loanId, processingFeeCharge.getResourceId(), "01 February 2023",
+            PostLoansLoanIdChargesResponse charge1Response = addLoanCharge(loanId, processingFeeCharge.getResourceId(), "20230201",
                     250.0);
-            PostLoansLoanIdChargesResponse charge2Response = addLoanCharge(loanId, penaltyCharge.getResourceId(), "01 February 2023",
+            PostLoansLoanIdChargesResponse charge2Response = addLoanCharge(loanId, penaltyCharge.getResourceId(), "20230201",
                     175.0);
             PostLoansLoanIdChargesResponse charge3Response = addLoanCharge(loanId, documentationFeeCharge.getResourceId(),
-                    "01 February 2023", 325.0);
+                    "20230201", 325.0);
             assertNotNull(charge1Response, "First charge should be added successfully");
             assertNotNull(charge2Response, "Second charge should be added successfully");
             assertNotNull(charge3Response, "Third charge should be added successfully");
 
             // Make partial repayment to trigger charge processing
-            GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 1000.0, "01 February 2023");
+            GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 1000.0, "20230201");
             assertNotNull(journalEntries, "Journal entries should exist");
             assertNotNull(journalEntries.getPageItems(), "Journal entry items should exist");
             assertTrue(journalEntries.getPageItems().size() > 0, "Should have journal entries after charge payment");
@@ -320,7 +320,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
     @Test
     @DisplayName("Should handle proportional distribution calculations accurately when multiple charges have different debit and credit account combinations")
     public void testProportionalDistributionLogic() {
-        runAt("10 February 2023", () -> {
+        runAt("20230210", () -> {
             PostLoanProductsRequest loanProduct = createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProduct);
             Long loanProductId = loanProductResponse.getResourceId();
@@ -331,20 +331,20 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
             PostChargesResponse charge3 = createCharge(300.0); // 30% of 1000
 
             Long clientId = clientHelper.createClient(clientHelper.defaultClientCreationRequest()).getClientId();
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "10 February 2023", 20000.0, 6);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230210", 20000.0, 6);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(applicationRequest);
             Long loanId = loanResponse.getLoanId();
 
-            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(20000.0, "10 February 2023"));
-            disburseLoan(loanId, BigDecimal.valueOf(20000), "10 February 2023");
+            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(20000.0, "20230210"));
+            disburseLoan(loanId, BigDecimal.valueOf(20000), "20230210");
 
             // Add charges to create proportional distribution scenario
-            addLoanCharge(loanId, charge1.getResourceId(), "10 February 2023", 400.0);
-            addLoanCharge(loanId, charge2.getResourceId(), "10 February 2023", 300.0);
-            addLoanCharge(loanId, charge3.getResourceId(), "10 February 2023", 300.0);
+            addLoanCharge(loanId, charge1.getResourceId(), "20230210", 400.0);
+            addLoanCharge(loanId, charge2.getResourceId(), "20230210", 300.0);
+            addLoanCharge(loanId, charge3.getResourceId(), "20230210", 300.0);
 
             // Make repayment to trigger proportional charge payment
-            GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 1200.0, "10 February 2023");
+            GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 1200.0, "20230210");
             assertNotNull(journalEntries, "Journal entries should exist for proportional distribution test");
 
             // Check that proportional amounts are correctly calculated
@@ -370,7 +370,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
     @Test
     @DisplayName("Should handle accounting imbalance errors gracefully when GL account configurations cause debit-credit mismatches")
     public void testAccountingImbalanceErrorHandling() {
-        runAt("15 February 2023", () -> {
+        runAt("20230215", () -> {
             PostLoanProductsRequest loanProduct = createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProduct);
             Long loanProductId = loanProductResponse.getResourceId();
@@ -378,20 +378,20 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
             PostChargesResponse charge = createCharge(500.0);
 
             Long clientId = clientHelper.createClient(clientHelper.defaultClientCreationRequest()).getClientId();
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "15 February 2023", 10000.0, 3);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230215", 10000.0, 3);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(applicationRequest);
             Long loanId = loanResponse.getLoanId();
 
-            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(10000.0, "15 February 2023"));
-            disburseLoan(loanId, BigDecimal.valueOf(10000), "15 February 2023");
+            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(10000.0, "20230215"));
+            disburseLoan(loanId, BigDecimal.valueOf(10000), "20230215");
 
-            addLoanCharge(loanId, charge.getResourceId(), "15 February 2023", 500.0);
+            addLoanCharge(loanId, charge.getResourceId(), "20230215", 500.0);
 
             // Try the operation - it should either succeed or fail with accounting-related exception
             try {
                 // Execute normal operations - should succeed if no GL account mapping issues
                 GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 700.0,
-                        "15 February 2023");
+                        "20230215");
                 assertNotNull(journalEntries, "Journal entries should exist for successful operation");
 
                 validateAccountingBalance(journalEntries, "Error handling test");
@@ -408,7 +408,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
     @Test
     @DisplayName("Should handle missing GL account mappings gracefully by using fallback mechanisms or providing clear error messages")
     public void testMissingGLAccountMappingHandling() {
-        runAt("20 February 2023", () -> {
+        runAt("20230220", () -> {
             PostLoanProductsRequest loanProduct = createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProduct);
             Long loanProductId = loanProductResponse.getResourceId();
@@ -416,20 +416,20 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
             PostChargesResponse charge = createCharge(300.0);
 
             Long clientId = clientHelper.createClient(clientHelper.defaultClientCreationRequest()).getClientId();
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20 February 2023", 8000.0, 2);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230220", 8000.0, 2);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(applicationRequest);
             Long loanId = loanResponse.getLoanId();
 
-            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(8000.0, "20 February 2023"));
-            disburseLoan(loanId, BigDecimal.valueOf(8000), "20 February 2023");
+            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(8000.0, "20230220"));
+            disburseLoan(loanId, BigDecimal.valueOf(8000), "20230220");
 
-            addLoanCharge(loanId, charge.getResourceId(), "25 February 2023", 300.0);
+            addLoanCharge(loanId, charge.getResourceId(), "20230225", 300.0);
 
             // Try the operation - it should either succeed with fallback or fail gracefully
             try {
                 // Should either succeed with fallback accounts or fail gracefully
                 GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 500.0,
-                        "25 February 2023");
+                        "20230225");
                 assertNotNull(journalEntries, "Fallback mechanism should create journal entries");
                 assertFalse(journalEntries.getPageItems().isEmpty(),
                         "Should have fallback journal entries when specific mapping unavailable");
@@ -445,7 +445,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
     @Test
     @DisplayName("Should handle zero or minimal amount charges correctly without causing precision errors or system instability")
     public void testZeroAmountChargeHandling() {
-        runAt("25 February 2023", () -> {
+        runAt("20230225", () -> {
             PostLoanProductsRequest loanProduct = createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProduct);
             Long loanProductId = loanProductResponse.getResourceId();
@@ -455,20 +455,20 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
             PostChargesResponse smallCharge = createCharge(0.01); // Minimum valid amount instead of zero
 
             Long clientId = ClientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "25 February 2023", 5000.0, 2);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230225", 5000.0, 2);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(applicationRequest);
             Long loanId = loanResponse.getLoanId();
 
-            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(5000.0, "25 February 2023"));
-            disburseLoan(loanId, BigDecimal.valueOf(5000), "25 February 2023");
+            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(5000.0, "20230225"));
+            disburseLoan(loanId, BigDecimal.valueOf(5000), "20230225");
 
-            addLoanCharge(loanId, regularCharge.getResourceId(), "25 February 2023", 200.0);
-            addLoanCharge(loanId, smallCharge.getResourceId(), "25 February 2023", 0.01);
+            addLoanCharge(loanId, regularCharge.getResourceId(), "20230225", 200.0);
+            addLoanCharge(loanId, smallCharge.getResourceId(), "20230225", 0.01);
 
             // Try the operation - it should either handle small amounts or fail with validation error
             try {
                 GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 300.0,
-                        "25 February 2023");
+                        "20230225");
                 assertNotNull(journalEntries, "Should handle small amount charges gracefully");
                 validateAccountingBalance(journalEntries, "Small amount charges test");
             } catch (CallFailedRuntimeException e) {
@@ -483,7 +483,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
     @Test
     @DisplayName("Should process mixed charge types applied simultaneously correctly using appropriate GL accounts for each charge category")
     public void testMixedChargeTypesAndTimingScenarios() {
-        runAt("05 March 2023", () -> {
+        runAt("20230305", () -> {
             PostLoanProductsRequest loanProduct = createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProduct);
             Long loanProductId = loanProductResponse.getResourceId();
@@ -494,23 +494,23 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
             PostChargesResponse penaltyCharge = createCharge(100.0);
 
             Long clientId = ClientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "05 March 2023", 18000.0, 5);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230305", 18000.0, 5);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(applicationRequest);
             Long loanId = loanResponse.getLoanId();
 
-            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(18000.0, "05 March 2023"));
-            disburseLoan(loanId, BigDecimal.valueOf(18000), "05 March 2023");
+            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(18000.0, "20230305"));
+            disburseLoan(loanId, BigDecimal.valueOf(18000), "20230305");
 
             // Add charges on same date as disbursement
-            PostLoansLoanIdChargesResponse charge1 = addLoanCharge(loanId, flatFeeCharge.getResourceId(), "05 March 2023", 150.0);
-            PostLoansLoanIdChargesResponse charge2 = addLoanCharge(loanId, percentageCharge.getResourceId(), "05 March 2023", 200.0);
-            PostLoansLoanIdChargesResponse charge3 = addLoanCharge(loanId, penaltyCharge.getResourceId(), "05 March 2023", 100.0);
+            PostLoansLoanIdChargesResponse charge1 = addLoanCharge(loanId, flatFeeCharge.getResourceId(), "20230305", 150.0);
+            PostLoansLoanIdChargesResponse charge2 = addLoanCharge(loanId, percentageCharge.getResourceId(), "20230305", 200.0);
+            PostLoansLoanIdChargesResponse charge3 = addLoanCharge(loanId, penaltyCharge.getResourceId(), "20230305", 100.0);
             assertNotNull(charge1, "Flat fee charge should be added");
             assertNotNull(charge2, "Percentage charge should be added");
             assertNotNull(charge3, "Penalty charge should be added");
 
             // Make repayment to trigger all charge processing
-            GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 600.0, "05 March 2023");
+            GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 600.0, "20230305");
             assertNotNull(journalEntries, "Should have journal entries for mixed charge types");
 
             // Validate that different charge amounts are processed
@@ -534,7 +534,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
     @Test
     @DisplayName("Should validate that chargeId parameter is properly passed to getLinkedGLAccountForLoanCharges method to enable charge-specific account resolution (AC-1)")
     public void testChargeIdParameterValidationInGLAccountMapping() {
-        runAt("10 March 2023", () -> {
+        runAt("20230310", () -> {
             PostLoanProductsRequest loanProduct = createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProduct);
             Long loanProductId = loanProductResponse.getResourceId();
@@ -547,22 +547,22 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
             assertNotNull(secondaryCharge, "Secondary charge should be created");
 
             Long clientId = ClientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "10 March 2023", 15000.0, 4);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230310", 15000.0, 4);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(applicationRequest);
             Long loanId = loanResponse.getLoanId();
             assertNotNull(loanId, "Loan should be created successfully");
 
-            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(15000.0, "10 March 2023"));
-            disburseLoan(loanId, BigDecimal.valueOf(15000), "10 March 2023");
+            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(15000.0, "20230310"));
+            disburseLoan(loanId, BigDecimal.valueOf(15000), "20230310");
 
             // Add charges - this tests that chargeId parameter is properly passed to getLinkedGLAccountForLoanCharges()
-            PostLoansLoanIdChargesResponse loanCharge1 = addLoanCharge(loanId, primaryCharge.getResourceId(), "10 March 2023", 250.0);
-            PostLoansLoanIdChargesResponse loanCharge2 = addLoanCharge(loanId, secondaryCharge.getResourceId(), "10 March 2023", 350.0);
+            PostLoansLoanIdChargesResponse loanCharge1 = addLoanCharge(loanId, primaryCharge.getResourceId(), "20230310", 250.0);
+            PostLoansLoanIdChargesResponse loanCharge2 = addLoanCharge(loanId, secondaryCharge.getResourceId(), "20230310", 350.0);
             assertNotNull(loanCharge1, "Primary loan charge should be added successfully");
             assertNotNull(loanCharge2, "Secondary loan charge should be added successfully");
 
             // Make repayment to trigger journal entry creation and validate charge ID usage
-            GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 1000.0, "10 March 2023");
+            GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 1000.0, "20230310");
             assertNotNull(journalEntries, "Journal entries should exist for charge ID validation test");
             assertNotNull(journalEntries.getPageItems(), "Journal entry items should exist");
 
@@ -596,7 +596,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
     @Test
     @DisplayName("Should use advanced accounting rules to override default FEE INCOME GL accounts when specific charge configurations require alternative accounts")
     public void testAdvancedAccountingRulesOverrideForChargeSpecificGLAccounts() {
-        runAt("15 March 2023", () -> {
+        runAt("20230315", () -> {
             // Create loan product with accrual accounting
             PostLoanProductsRequest loanProduct = createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProduct);
@@ -611,20 +611,20 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
             Account advancedFeeIncomeAccount = accountHelper.createIncomeAccount("advancedFeeIncome");
 
             Long clientId = ClientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "15 March 2023", 20000.0, 6);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230315", 20000.0, 6);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(applicationRequest);
             Long loanId = loanResponse.getLoanId();
             assertNotNull(loanId, "Loan should be created successfully");
 
-            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(20000.0, "15 March 2023"));
-            disburseLoan(loanId, BigDecimal.valueOf(20000), "15 March 2023");
+            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(20000.0, "20230315"));
+            disburseLoan(loanId, BigDecimal.valueOf(20000), "20230315");
 
             // Add charge - this should use default FEE INCOME GL account unless advanced rules override it
-            PostLoansLoanIdChargesResponse loanCharge = addLoanCharge(loanId, feeCharge.getResourceId(), "15 March 2023", 400.0);
+            PostLoansLoanIdChargesResponse loanCharge = addLoanCharge(loanId, feeCharge.getResourceId(), "20230315", 400.0);
             assertNotNull(loanCharge, "Fee charge should be added successfully");
 
             // Make repayment to trigger charge processing
-            GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 500.0, "15 March 2023");
+            GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 500.0, "20230315");
             assertNotNull(journalEntries, "Journal entries should exist for advanced accounting rules test");
             assertNotNull(journalEntries.getPageItems(), "Journal entry items should exist");
 
@@ -673,7 +673,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
     @Test
     @DisplayName("Should create proper accrual adjustment entries using correct GL accounts when charges are removed and COB processing is executed")
     public void testChargeRemovalAndCOBAccrualAdjustmentProcessing() {
-        runAt("20 March 2023", () -> {
+        runAt("20230320", () -> {
             // Create loan product with accrual accounting to test accrual adjustments
             PostLoanProductsRequest loanProduct = createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProduct);
@@ -687,17 +687,17 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
             assertNotNull(penaltyCharge, "Penalty charge should be created");
 
             Long clientId = ClientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20 March 2023", 25000.0, 6);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230320", 25000.0, 6);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(applicationRequest);
             Long loanId = loanResponse.getLoanId();
             assertNotNull(loanId, "Loan should be created successfully");
 
-            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(25000.0, "20 March 2023"));
-            disburseLoan(loanId, BigDecimal.valueOf(25000), "20 March 2023");
+            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(25000.0, "20230320"));
+            disburseLoan(loanId, BigDecimal.valueOf(25000), "20230320");
 
             // Add charges that will be accrued and then removed
-            PostLoansLoanIdChargesResponse loanFeeCharge = addLoanCharge(loanId, feeCharge.getResourceId(), "25 March 2023", 300.0);
-            PostLoansLoanIdChargesResponse loanPenaltyCharge = addLoanCharge(loanId, penaltyCharge.getResourceId(), "25 March 2023", 200.0);
+            PostLoansLoanIdChargesResponse loanFeeCharge = addLoanCharge(loanId, feeCharge.getResourceId(), "20230325", 300.0);
+            PostLoansLoanIdChargesResponse loanPenaltyCharge = addLoanCharge(loanId, penaltyCharge.getResourceId(), "20230325", 200.0);
             assertNotNull(loanFeeCharge, "Fee charge should be added successfully");
             assertNotNull(loanPenaltyCharge, "Penalty charge should be added successfully");
 
@@ -756,7 +756,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
     @Test
     @DisplayName("Should support multiple debit accounts for accrual adjustments using charge ID resolution to determine appropriate GL accounts (AC-2)")
     public void testMultipleDebitAccountsForAccrualAdjustmentWithChargeIdResolution() {
-        runAt("25 March 2023", () -> {
+        runAt("20230325", () -> {
             // Create loan product with accrual accounting for accrual adjustment testing
             PostLoanProductsRequest loanProduct = createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProduct);
@@ -775,18 +775,18 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
             // These would be configured in a real scenario with advanced accounting rules
 
             Long clientId = ClientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "25 March 2023", 30000.0, 8);
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230325", 30000.0, 8);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(applicationRequest);
             Long loanId = loanResponse.getLoanId();
             assertNotNull(loanId, "Loan should be created successfully");
 
-            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(30000.0, "25 March 2023"));
-            disburseLoan(loanId, BigDecimal.valueOf(30000), "25 March 2023");
+            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(30000.0, "20230325"));
+            disburseLoan(loanId, BigDecimal.valueOf(30000), "20230325");
 
             // Add multiple charges that should use different debit GL accounts
-            PostLoansLoanIdChargesResponse loanCharge1 = addLoanCharge(loanId, processingFeeCharge.getResourceId(), "25 March 2023", 500.0);
-            PostLoansLoanIdChargesResponse loanCharge2 = addLoanCharge(loanId, serviceFeeCharge.getResourceId(), "25 March 2023", 300.0);
-            PostLoansLoanIdChargesResponse loanCharge3 = addLoanCharge(loanId, lateFeeCharge.getResourceId(), "25 March 2023", 150.0);
+            PostLoansLoanIdChargesResponse loanCharge1 = addLoanCharge(loanId, processingFeeCharge.getResourceId(), "20230325", 500.0);
+            PostLoansLoanIdChargesResponse loanCharge2 = addLoanCharge(loanId, serviceFeeCharge.getResourceId(), "20230325", 300.0);
+            PostLoansLoanIdChargesResponse loanCharge3 = addLoanCharge(loanId, lateFeeCharge.getResourceId(), "20230325", 150.0);
             assertNotNull(loanCharge1, "Processing fee charge should be added successfully");
             assertNotNull(loanCharge2, "Service fee charge should be added successfully");
             assertNotNull(loanCharge3, "Late fee charge should be added successfully");
@@ -795,7 +795,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
 
             // Make partial payment to trigger complex accrual adjustment scenarios
-            GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 1200.0, "25 March 2023");
+            GetJournalEntriesTransactionIdResponse journalEntries = makeRepaymentAndGetJournalEntries(loanId, 1200.0, "20230325");
             assertNotNull(journalEntries, "Journal entries should exist for multiple debit accounts test");
             assertNotNull(journalEntries.getPageItems(), "Journal entry items should exist");
 
@@ -824,7 +824,7 @@ public class LoanChargesMultipleDebitAccountsTest extends BaseLoanIntegrationTes
             });
 
             // Test accrual adjustment scenario - create adjustment by executing COB again
-            updateBusinessDate("26 March 2023");
+            updateBusinessDate("20230326");
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanId));
 
             // Get updated journal entries to check accrual adjustments

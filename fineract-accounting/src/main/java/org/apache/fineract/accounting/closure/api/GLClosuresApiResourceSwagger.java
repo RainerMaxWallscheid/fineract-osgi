@@ -73,13 +73,13 @@ final class GLClosuresApiResourceSwagger {
 
         @Schema(example = "1")
         public Long officeId;
-        @Schema(example = "06 December 2012")
+        @Schema(example = "20121206")
         public LocalDate closingDate;
         @Schema(example = "The accountants are heading for a Caribbean vacation")
         public String comments;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
     }
 

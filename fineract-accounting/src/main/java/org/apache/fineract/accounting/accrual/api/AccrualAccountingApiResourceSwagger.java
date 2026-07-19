@@ -38,9 +38,9 @@ final class AccrualAccountingApiResourceSwagger {
 
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "04 June 2014", description = "which specifies periodic accruals should happen till the given Date")
+        @Schema(example = "20140604", description = "which specifies periodic accruals should happen till the given Date")
         public String tillDate;
     }
 

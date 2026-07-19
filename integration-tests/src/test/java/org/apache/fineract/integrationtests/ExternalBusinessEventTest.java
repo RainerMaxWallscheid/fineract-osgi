@@ -69,7 +69,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExternalBusinessEventTest.class);
-    private static final String DATETIME_PATTERN = "dd MMMM yyyy";
+    private static final String DATETIME_PATTERN = "yyyyMMdd";
     private static PostClientsResponse client;
     private static LoanTransactionHelper loanTransactionHelper;
     private static Long loanProductId;
@@ -97,36 +97,36 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
     @Test
     public void testExternalBusinessEventLoanBalanceChangedBusinessEventOnMultiDisbursedInterestBearingLoanForRepaymentAndOverpaymentAndReverseRepaymentAndFullRepayment() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("1 March 2023", () -> {
+        runAt("20230301", () -> {
             enableLoanBalanceChangedBusinessEvent();
-            Long loanId = applyForLoanApplicationWithInterest(client.getClientId(), loanProductId, BigDecimal.valueOf(1000), "1 March 2023", "1 March 2023");
+            Long loanId = applyForLoanApplicationWithInterest(client.getClientId(), loanProductId, BigDecimal.valueOf(1000), "20230301", "20230301");
             loanIdRef.set(loanId);
-            loanTransactionHelper.approveLoan("1 March 2023", loanId.intValue());
+            loanTransactionHelper.approveLoan("20230301", loanId.intValue());
             deleteAllExternalEvents();
-            loanTransactionHelper.disburseLoan("1 March 2023", loanId.intValue(), "400", null);
+            loanTransactionHelper.disburseLoan("20230301", loanId.intValue(), "400", null);
         });
-        runAt("15 March 2023", () -> {
+        runAt("20230315", () -> {
             deleteAllExternalEvents();
-            loanTransactionHelper.makeLoanRepayment("15 March 2023", 125.0F, loanIdRef.get().intValue());
-            verifyBusinessEvents(new LoanBusinessEvent("LoanBalanceChangedBusinessEvent", "15 March 2023", 300, 400.0, 289.13));
+            loanTransactionHelper.makeLoanRepayment("20230315", 125.0F, loanIdRef.get().intValue());
+            verifyBusinessEvents(new LoanBusinessEvent("LoanBalanceChangedBusinessEvent", "20230315", 300, 400.0, 289.13));
         });
-        runAt("1 April 2023", () -> {
-            loanTransactionHelper.disburseLoan("1 April 2023", loanIdRef.get().intValue(), "600", null);
+        runAt("20230401", () -> {
+            loanTransactionHelper.disburseLoan("20230401", loanIdRef.get().intValue(), "600", null);
         });
-        runAt("15 April 2023", () -> {
+        runAt("20230415", () -> {
             deleteAllExternalEvents();
-            loanTransactionHelper.makeLoanRepayment("15 April 2023", 125.0F, loanIdRef.get().intValue());
-            verifyBusinessEvents(new LoanBusinessEvent("LoanBalanceChangedBusinessEvent", "15 April 2023", 300, 1000.0, 758.15));
+            loanTransactionHelper.makeLoanRepayment("20230415", 125.0F, loanIdRef.get().intValue());
+            verifyBusinessEvents(new LoanBusinessEvent("LoanBalanceChangedBusinessEvent", "20230415", 300, 1000.0, 758.15));
             deleteAllExternalEvents();
-            Long transactionId = loanTransactionHelper.makeLoanRepayment("15 April 2023", 1000.0F, loanIdRef.get().intValue()).getResourceId();
+            Long transactionId = loanTransactionHelper.makeLoanRepayment("20230415", 1000.0F, loanIdRef.get().intValue()).getResourceId();
             Assertions.assertNotNull(transactionId);
-            verifyBusinessEvents(new LoanBusinessEvent("LoanBalanceChangedBusinessEvent", "15 April 2023", 700, 1000.0, 0.0));
+            verifyBusinessEvents(new LoanBusinessEvent("LoanBalanceChangedBusinessEvent", "20230415", 700, 1000.0, 0.0));
             deleteAllExternalEvents();
-            loanTransactionHelper.reverseRepayment(loanIdRef.get().intValue(), transactionId.intValue(), "15 April 2023");
-            verifyBusinessEvents(new LoanBusinessEvent("LoanBalanceChangedBusinessEvent", "15 April 2023", 300, 1000.0, 758.15));
+            loanTransactionHelper.reverseRepayment(loanIdRef.get().intValue(), transactionId.intValue(), "20230415");
+            verifyBusinessEvents(new LoanBusinessEvent("LoanBalanceChangedBusinessEvent", "20230415", 300, 1000.0, 758.15));
             deleteAllExternalEvents();
-            loanTransactionHelper.makeLoanRepayment("15 April 2023", 830.22F, loanIdRef.get().intValue());
-            verifyBusinessEvents(new LoanBusinessEvent("LoanBalanceChangedBusinessEvent", "15 April 2023", 700, 1000.0, 0.0));
+            loanTransactionHelper.makeLoanRepayment("20230415", 830.22F, loanIdRef.get().intValue());
+            verifyBusinessEvents(new LoanBusinessEvent("LoanBalanceChangedBusinessEvent", "20230415", 700, 1000.0, 0.0));
             disableLoanBalanceChangedBusinessEvent();
         });
     }
@@ -138,14 +138,14 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
      */
     @Test
     public void verifyLoanChargeAdjustmentPostBusinessEvent01() {
-        runAt("1 January 2021", () -> {
+        runAt("20210101", () -> {
             externalEventHelper.enableBusinessEvent("LoanChargeAdjustmentPostBusinessEvent");
             externalEventHelper.enableBusinessEvent("LoanTransactionMakeRepaymentPostBusinessEvent");
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().currencyCode("USD"));
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2021", 600.0, 9.99, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20210101", 600.0, 9.99, 4, null);
             Assertions.assertNotNull(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(600), "1 January 2021");
-            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "01 February 2021", 111.0);
+            disburseLoan(loanId, BigDecimal.valueOf(600), "20210101");
+            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "20210201", 111.0);
             Long chargeId = postLoansLoanIdChargesResponse.getResourceId();
             deleteAllExternalEvents();
             // resourceId is chargeId
@@ -172,14 +172,14 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
      */
     @Test
     public void verifyLoanChargeAdjustmentPostBusinessEvent02() {
-        runAt("1 January 2021", () -> {
+        runAt("20210101", () -> {
             externalEventHelper.enableBusinessEvent("LoanChargeAdjustmentPostBusinessEvent");
             externalEventHelper.enableBusinessEvent("LoanTransactionMakeRepaymentPostBusinessEvent");
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().currencyCode("USD"));
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2021", 600.0, 9.99, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20210101", 600.0, 9.99, 4, null);
             Assertions.assertNotNull(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(600), "1 January 2021");
-            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "01 February 2021", 111.0);
+            disburseLoan(loanId, BigDecimal.valueOf(600), "20210101");
+            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "20210201", 111.0);
             Long chargeId = postLoansLoanIdChargesResponse.getResourceId();
             // check first part
             deleteAllExternalEvents();
@@ -227,18 +227,18 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
      */
     @Test
     public void verifyLoanChargeAdjustmentPostBusinessEvent03() {
-        runAt("1 January 2021", () -> {
+        runAt("20210101", () -> {
             externalEventHelper.enableBusinessEvent("LoanChargeAdjustmentPostBusinessEvent");
             externalEventHelper.enableBusinessEvent("LoanTransactionMakeRepaymentPostBusinessEvent");
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().currencyCode("USD"));
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2021", 600.0, 9.99, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20210101", 600.0, 9.99, 4, null);
             Assertions.assertNotNull(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(600), "1 January 2021");
-            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "01 February 2021", 111.0);
+            disburseLoan(loanId, BigDecimal.valueOf(600), "20210101");
+            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "20210201", 111.0);
             Long chargeId = postLoansLoanIdChargesResponse.getResourceId();
             // check repayment
             deleteAllExternalEvents();
-            Long transactionId = loanTransactionHelper.makeLoanRepayment("01 January 2021", 300.0F, loanId.intValue()).getResourceId();
+            Long transactionId = loanTransactionHelper.makeLoanRepayment("20210101", 300.0F, loanId.intValue()).getResourceId();
             List<ExternalEventResponse> allExternalEvents = ExternalEventHelper.getAllExternalEvents(requestSpec, responseSpec);
             List<ExternalEventResponse> list = allExternalEvents.stream().filter(x -> "LoanTransactionMakeRepaymentPostBusinessEvent".equals(x.getType())).toList();
             Assertions.assertEquals(1, list.size());
@@ -287,14 +287,14 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
      */
     @Test
     public void verifyLoanChargeAdjustmentPostBusinessEvent04() {
-        runAt("1 January 2021", () -> {
+        runAt("20210101", () -> {
             externalEventHelper.enableBusinessEvent("LoanChargeAdjustmentPostBusinessEvent");
             externalEventHelper.enableBusinessEvent("LoanTransactionMakeRepaymentPostBusinessEvent");
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().isInterestRecalculationEnabled(false).currencyCode("USD"));
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2021", 600.0, 9.99, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20210101", 600.0, 9.99, 4, null);
             Assertions.assertNotNull(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(600), "1 January 2021");
-            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "01 February 2021", 111.0);
+            disburseLoan(loanId, BigDecimal.valueOf(600), "20210101");
+            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "20210201", 111.0);
             Long chargeId = postLoansLoanIdChargesResponse.getResourceId();
             deleteAllExternalEvents();
             // resourceId is chargeId
@@ -321,14 +321,14 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
      */
     @Test
     public void verifyLoanChargeAdjustmentPostBusinessEvent05() {
-        runAt("1 January 2021", () -> {
+        runAt("20210101", () -> {
             externalEventHelper.enableBusinessEvent("LoanChargeAdjustmentPostBusinessEvent");
             externalEventHelper.enableBusinessEvent("LoanTransactionMakeRepaymentPostBusinessEvent");
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().isInterestRecalculationEnabled(false).currencyCode("USD"));
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2021", 600.0, 9.99, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20210101", 600.0, 9.99, 4, null);
             Assertions.assertNotNull(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(600), "1 January 2021");
-            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "01 February 2021", 111.0);
+            disburseLoan(loanId, BigDecimal.valueOf(600), "20210101");
+            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "20210201", 111.0);
             Long chargeId = postLoansLoanIdChargesResponse.getResourceId();
             // check first part
             deleteAllExternalEvents();
@@ -375,18 +375,18 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
      */
     @Test
     public void verifyLoanChargeAdjustmentPostBusinessEvent06() {
-        runAt("1 January 2021", () -> {
+        runAt("20210101", () -> {
             externalEventHelper.enableBusinessEvent("LoanChargeAdjustmentPostBusinessEvent");
             externalEventHelper.enableBusinessEvent("LoanTransactionMakeRepaymentPostBusinessEvent");
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().isInterestRecalculationEnabled(false).currencyCode("USD"));
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2021", 600.0, 9.99, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20210101", 600.0, 9.99, 4, null);
             Assertions.assertNotNull(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(600), "1 January 2021");
-            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "01 February 2021", 111.0);
+            disburseLoan(loanId, BigDecimal.valueOf(600), "20210101");
+            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "20210201", 111.0);
             Long chargeId = postLoansLoanIdChargesResponse.getResourceId();
             // check repayment
             deleteAllExternalEvents();
-            Long transactionId = loanTransactionHelper.makeLoanRepayment("01 January 2021", 300.0F, loanId.intValue()).getResourceId();
+            Long transactionId = loanTransactionHelper.makeLoanRepayment("20210101", 300.0F, loanId.intValue()).getResourceId();
             List<ExternalEventResponse> allExternalEvents = ExternalEventHelper.getAllExternalEvents(requestSpec, responseSpec);
             List<ExternalEventResponse> list = allExternalEvents.stream().filter(x -> "LoanTransactionMakeRepaymentPostBusinessEvent".equals(x.getType())).toList();
             Assertions.assertEquals(1, list.size());
@@ -434,14 +434,14 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
      */
     @Test
     public void verifyLoanChargeAdjustmentPostBusinessEvent07() {
-        runAt("1 January 2021", () -> {
+        runAt("20210101", () -> {
             externalEventHelper.enableBusinessEvent("LoanChargeAdjustmentPostBusinessEvent");
             externalEventHelper.enableBusinessEvent("LoanTransactionMakeRepaymentPostBusinessEvent");
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().isInterestRecalculationEnabled(false).currencyCode("USD"));
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2021", 600.0, 0.0, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20210101", 600.0, 0.0, 4, null);
             Assertions.assertNotNull(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(600), "1 January 2021");
-            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "01 February 2021", 111.0);
+            disburseLoan(loanId, BigDecimal.valueOf(600), "20210101");
+            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "20210201", 111.0);
             Long chargeId = postLoansLoanIdChargesResponse.getResourceId();
             deleteAllExternalEvents();
             // resourceId is chargeId
@@ -467,14 +467,14 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
      */
     @Test
     public void verifyLoanChargeAdjustmentPostBusinessEvent08() {
-        runAt("1 January 2021", () -> {
+        runAt("20210101", () -> {
             externalEventHelper.enableBusinessEvent("LoanChargeAdjustmentPostBusinessEvent");
             externalEventHelper.enableBusinessEvent("LoanTransactionMakeRepaymentPostBusinessEvent");
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().isInterestRecalculationEnabled(false).currencyCode("USD"));
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2021", 600.0, 0.0, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20210101", 600.0, 0.0, 4, null);
             Assertions.assertNotNull(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(600), "1 January 2021");
-            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "01 February 2021", 111.0);
+            disburseLoan(loanId, BigDecimal.valueOf(600), "20210101");
+            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "20210201", 111.0);
             Long chargeId = postLoansLoanIdChargesResponse.getResourceId();
             // check first part
             deleteAllExternalEvents();
@@ -520,18 +520,18 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
      */
     @Test
     public void verifyLoanChargeAdjustmentPostBusinessEvent09() {
-        runAt("1 January 2021", () -> {
+        runAt("20210101", () -> {
             externalEventHelper.enableBusinessEvent("LoanChargeAdjustmentPostBusinessEvent");
             externalEventHelper.enableBusinessEvent("LoanTransactionMakeRepaymentPostBusinessEvent");
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct(create4IProgressive().isInterestRecalculationEnabled(false).currencyCode("USD"));
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2021", 600.0, 0.0, 4, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20210101", 600.0, 0.0, 4, null);
             Assertions.assertNotNull(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(600), "1 January 2021");
-            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "01 February 2021", 111.0);
+            disburseLoan(loanId, BigDecimal.valueOf(600), "20210101");
+            PostLoansLoanIdChargesResponse postLoansLoanIdChargesResponse = addLoanCharge(loanId, chargeId, "20210201", 111.0);
             Long chargeId = postLoansLoanIdChargesResponse.getResourceId();
             // check repayment
             deleteAllExternalEvents();
-            Long transactionId = loanTransactionHelper.makeLoanRepayment("01 January 2021", 300.0F, loanId.intValue()).getResourceId();
+            Long transactionId = loanTransactionHelper.makeLoanRepayment("20210101", 300.0F, loanId.intValue()).getResourceId();
             List<ExternalEventResponse> allExternalEvents = ExternalEventHelper.getAllExternalEvents(requestSpec, responseSpec);
             List<ExternalEventResponse> list = allExternalEvents.stream().filter(x -> "LoanTransactionMakeRepaymentPostBusinessEvent".equals(x.getType())).toList();
             Assertions.assertEquals(1, list.size());
@@ -576,8 +576,8 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
     /**
      * Using Interest bearing Progressive Loan, Accrual Activity Posting, InterestRecalculation, 25% yearly interest 6
      * repayment 450 USD principal.
-     * <li>apply, approve and disburse backdated on 17 August 2024</li>
-     * <li>repay 600 on 17 January 2025</li>
+     * <li>apply, approve and disburse backdated on 20240817</li>
+     * <li>repay 600 on 20250117</li>
      * <li>verify Accrual and Accrual Activity transaction creation</li>
      * <li>verify that the loan become overpaid</li>
      * <li>reverse repayment on same day</li>
@@ -586,7 +586,7 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
      */
     @Test
     public void testInterestBearingProgressiveInterestRecalculationReopenDueReverseRepayment() {
-        runAt("17 January 2025", () -> {
+        runAt("20250117", () -> {
             externalEventHelper.enableBusinessEvent("LoanAdjustTransactionBusinessEvent");
             final PostLoanProductsResponse loanProductsResponse = loanProductHelper.createLoanProduct( //
             //
@@ -594,29 +594,29 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
             //
             //
             create4IProgressive().description("Interest bearing Progressive Loan USD, Accrual Activity Posting, NO InterestRecalculation").enableAccrualActivityPosting(true).daysInMonthType(DaysInMonthType.ACTUAL).daysInYearType(DaysInYearType.ACTUAL).isInterestRecalculationEnabled(false));//
-            PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applyLP2ProgressiveLoanRequest(client.getClientId(), loanProductsResponse.getResourceId(), "17 August 2024", 450.0, 25.0, 6, null));
+            PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applyLP2ProgressiveLoanRequest(client.getClientId(), loanProductsResponse.getResourceId(), "20240817", 450.0, 25.0, 6, null));
             Long loanId = postLoansResponse.getLoanId();
             Assertions.assertNotNull(loanId);
-            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(450.0, "17 August 2024"));
-            disburseLoan(loanId, BigDecimal.valueOf(450.0), "17 August 2024");
+            loanTransactionHelper.approveLoan(loanId, approveLoanRequest(450.0, "20240817"));
+            disburseLoan(loanId, BigDecimal.valueOf(450.0), "20240817");
             verifyTransactions(loanId,  //
-            transaction(450.0, "Disbursement", "17 August 2024") //
+            transaction(450.0, "Disbursement", "20240817") //
             );
-            Long repaymentId = loanTransactionHelper.makeLoanRepayment("17 January 2025", 600.0F, loanId.intValue()).getResourceId();
+            Long repaymentId = loanTransactionHelper.makeLoanRepayment("20250117", 600.0F, loanId.intValue()).getResourceId();
             Assertions.assertNotNull(repaymentId);
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             verifyLoanStatus(loanDetails, GetLoansLoanIdStatus::getOverpaid);
             verifyTransactions(loanId,  //
-            transaction(450.0, "Disbursement", "17 August 2024"),  //
-            transaction(600.0, "Repayment", "17 January 2025"),  //
-            transaction(33.52, "Accrual", "17 January 2025"),  //
-            transaction(9.53, "Accrual Activity", "17 September 2024"),  //
-            transaction(7.77, "Accrual Activity", "17 October 2024"),  //
-            transaction(6.48, "Accrual Activity", "17 November 2024"),  //
-            transaction(4.75, "Accrual Activity", "17 December 2024"),  //
-            transaction(4.99, "Accrual Activity", "17 January 2025")); //
+            transaction(450.0, "Disbursement", "20240817"),  //
+            transaction(600.0, "Repayment", "20250117"),  //
+            transaction(33.52, "Accrual", "20250117"),  //
+            transaction(9.53, "Accrual Activity", "20240917"),  //
+            transaction(7.77, "Accrual Activity", "20241017"),  //
+            transaction(6.48, "Accrual Activity", "20241117"),  //
+            transaction(4.75, "Accrual Activity", "20241217"),  //
+            transaction(4.99, "Accrual Activity", "20250117")); //
             deleteAllExternalEvents();
-            loanTransactionHelper.reverseRepayment(loanId.intValue(), repaymentId.intValue(), "17 January 2025");
+            loanTransactionHelper.reverseRepayment(loanId.intValue(), repaymentId.intValue(), "20250117");
             List<ExternalEventResponse> allExternalEvents = ExternalEventHelper.getAllExternalEvents(requestSpec, responseSpec);
             // Verify that there were no reverse-replay event
             List<ExternalEventResponse> list =  //
@@ -636,13 +636,13 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
             Assertions.assertTrue((Boolean) ((Map) list.get(1).getPayLoad().get("transactionToAdjust")).get("reversed"));
             loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             verifyLoanStatus(loanDetails, GetLoansLoanIdStatus::getActive);
-            verifyTransactions(loanId, transaction(450.0, "Disbursement", "17 August 2024"),  //
-            transaction(33.52, "Accrual", "17 January 2025"),  //
-            reversedTransaction(600.0, "Repayment", "17 January 2025"),  //
-            transaction(9.53, "Accrual Activity", "17 September 2024"),  //
-            transaction(7.77, "Accrual Activity", "17 October 2024"),  //
-            transaction(6.48, "Accrual Activity", "17 November 2024"),  //
-            transaction(4.75, "Accrual Activity", "17 December 2024")); //
+            verifyTransactions(loanId, transaction(450.0, "Disbursement", "20240817"),  //
+            transaction(33.52, "Accrual", "20250117"),  //
+            reversedTransaction(600.0, "Repayment", "20250117"),  //
+            transaction(9.53, "Accrual Activity", "20240917"),  //
+            transaction(7.77, "Accrual Activity", "20241017"),  //
+            transaction(6.48, "Accrual Activity", "20241117"),  //
+            transaction(4.75, "Accrual Activity", "20241217")); //
         });
     }
 
@@ -650,24 +650,24 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
     public void verifyInterestRefundPostBusinessEventCreatedForMerchantIssuedRefundWithInterestRefund() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
         enableLoanInterestRefundPstBusinessEvent(true);
-        runAt("1 January 2021", () -> {
+        runAt("20210101", () -> {
             PostLoanProductsResponse loanProduct = loanProductHelper.createLoanProduct( //
             //
             //
             create4IProgressive().daysInMonthType(DaysInMonthType.ACTUAL).daysInYearType(DaysInYearType.ACTUAL).supportedInterestRefundTypes(new ArrayList<>()).addSupportedInterestRefundTypesItem("MERCHANT_ISSUED_REFUND").recalculationRestFrequencyType(RecalculationRestFrequencyType.DAILY) //
             );
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "1 January 2021", 1000.0, 9.99, 12, null);
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProduct.getResourceId(), "20210101", 1000.0, 9.99, 12, null);
             Assertions.assertNotNull(loanId);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(1000), "1 January 2021");
+            disburseLoan(loanId, BigDecimal.valueOf(1000), "20210101");
         });
-        runAt("22 January 2021", () -> {
+        runAt("20210122", () -> {
             Long loanId = loanIdRef.get();
             deleteAllExternalEvents();
-            PostLoansLoanIdTransactionsResponse postLoansLoanIdTransactionsResponse = loanTransactionHelper.makeLoanRepayment("MerchantIssuedRefund", "22 January 2021", 1000.0F, loanId.intValue());
+            PostLoansLoanIdTransactionsResponse postLoansLoanIdTransactionsResponse = loanTransactionHelper.makeLoanRepayment("MerchantIssuedRefund", "20210122", 1000.0F, loanId.intValue());
             Assertions.assertNotNull(postLoansLoanIdTransactionsResponse);
             Assertions.assertNotNull(postLoansLoanIdTransactionsResponse.getResourceId());
-            verifyBusinessEvents(new LoanTransactionBusinessEvent("LoanTransactionInterestRefundPostBusinessEvent", "22 January 2021", 5.75, 0.0, 5.75, 0.0, 0.0, 0.0));
+            verifyBusinessEvents(new LoanTransactionBusinessEvent("LoanTransactionInterestRefundPostBusinessEvent", "20210122", 5.75, 0.0, 5.75, 0.0, 0.0, 0.0));
         });
         enableLoanInterestRefundPstBusinessEvent(false);
     }
@@ -675,16 +675,16 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
     @Test
     public void testExternalBusinessEventLoanRescheduledDueAdjustScheduleBusinessEventInterestChange() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
-        runAt("01 March 2024", () -> {
+        runAt("20240301", () -> {
             enableLoanRescheduledDueAdjustScheduleBusinessEvent();
-            Long loanId = applyForLoanApplicationWithInterest(client.getClientId(), loanProductId, BigDecimal.valueOf(4000), "1 March 2023", "1 March 2024");
+            Long loanId = applyForLoanApplicationWithInterest(client.getClientId(), loanProductId, BigDecimal.valueOf(4000), "20230301", "20240301");
             loanIdRef.set(loanId);
-            loanTransactionHelper.approveLoan("1 March 2024", loanId.intValue());
-            loanTransactionHelper.disburseLoan("1 March 2024", loanId.intValue(), "400", null);
-            PostCreateRescheduleLoansResponse rescheduleLoansResponse = LoanRescheduleRequestHelper.createLoanRescheduleRequest(new PostCreateRescheduleLoansRequest().loanId(loanIdRef.get()).dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("1 March 2024").newInterestRate(BigDecimal.ONE).rescheduleReasonId(1L).rescheduleFromDate("1 April 2024"));
+            loanTransactionHelper.approveLoan("20240301", loanId.intValue());
+            loanTransactionHelper.disburseLoan("20240301", loanId.intValue(), "400", null);
+            PostCreateRescheduleLoansResponse rescheduleLoansResponse = LoanRescheduleRequestHelper.createLoanRescheduleRequest(new PostCreateRescheduleLoansRequest().loanId(loanIdRef.get()).dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate("20240301").newInterestRate(BigDecimal.ONE).rescheduleReasonId(1L).rescheduleFromDate("20240401"));
             deleteAllExternalEvents();
-            LoanRescheduleRequestHelper.approveLoanRescheduleRequest(rescheduleLoansResponse.getResourceId(), new PostUpdateRescheduleLoansRequest().approvedOnDate("1 March 2024").locale("en").dateFormat(DATETIME_PATTERN));
-            verifyBusinessEvents(new LoanBusinessEvent("LoanRescheduledDueAdjustScheduleBusinessEvent", "01 March 2024", 300, 400.0, 400.0, List.of("interestRateForInstallment")));
+            LoanRescheduleRequestHelper.approveLoanRescheduleRequest(rescheduleLoansResponse.getResourceId(), new PostUpdateRescheduleLoansRequest().approvedOnDate("20240301").locale("en").dateFormat(DATETIME_PATTERN));
+            verifyBusinessEvents(new LoanBusinessEvent("LoanRescheduledDueAdjustScheduleBusinessEvent", "20240301", 300, 400.0, 400.0, List.of("interestRateForInstallment")));
         });
     }
 
@@ -694,49 +694,49 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
         final AtomicReference<Long> loanIdRef = new AtomicReference<>();
         final AtomicReference<Long> repaymentTransactionIdRef = new AtomicReference<>();
         final PostLoanProductsResponse loanProductsResponse = loanProductHelper.createLoanProduct(create4IProgressive());
-        runAt("01 January 2025", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "01 January 2025", 1000.0, 7.0, 6, null);
+        runAt("20250101", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20250101", 1000.0, 7.0, 6, null);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(1000), "01 January 2025");
+            disburseLoan(loanId, BigDecimal.valueOf(1000), "20250101");
         });
-        runAt("01 February 2025", () -> {
+        runAt("20250201", () -> {
             final Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
-            final PostLoansLoanIdTransactionsResponse postLoansLoanIdTransactionsResponse = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "01 February 2025", 260.0);
+            final PostLoansLoanIdTransactionsResponse postLoansLoanIdTransactionsResponse = loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20250201", 260.0);
             repaymentTransactionIdRef.set(postLoansLoanIdTransactionsResponse.getResourceId());
         });
-        runAt("04 February 2025", () -> {
+        runAt("20250204", () -> {
             final Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
-            chargeOffLoan(loanId, "04 February 2025");
+            chargeOffLoan(loanId, "20250204");
         });
-        runAt("05 February 2025", () -> {
+        runAt("20250205", () -> {
             final Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             configureLoanAdjustTransactionBusinessEvent(true);
             configureLoanAccrualTransactionCreatedBusinessEvent(true);
             deleteAllExternalEvents();
-            loanTransactionHelper.reverseLoanTransaction(loanId, repaymentTransactionIdRef.get(), "01 February 2025");
+            loanTransactionHelper.reverseLoanTransaction(loanId, repaymentTransactionIdRef.get(), "20250201");
             List<ExternalEventResponse> allExternalEvents = ExternalEventHelper.getAllExternalEvents(requestSpec, responseSpec);
             // Verify no BulkEvent was created
             Assertions.assertEquals(0, allExternalEvents.stream().filter(e -> e.getType().equals("BulkBusinessEvent")).count());
             verifyBusinessEvents(//
-            new LoanAdjustTransactionBusinessEvent("LoanAdjustTransactionBusinessEvent", "05 February 2025", "loanTransactionType.chargeOff", "2025-02-04"),  //
-            new LoanAdjustTransactionBusinessEvent("LoanAdjustTransactionBusinessEvent", "05 February 2025", "loanTransactionType.repayment", "2025-02-01"),  //
-            new LoanTransactionBusinessEvent("LoanAccrualTransactionCreatedBusinessEvent", "05 February 2025", 0.15, 0.0, 0.0, 0.15, 0.0, 0.0)//
+            new LoanAdjustTransactionBusinessEvent("LoanAdjustTransactionBusinessEvent", "20250205", "loanTransactionType.chargeOff", "2025-02-04"),  //
+            new LoanAdjustTransactionBusinessEvent("LoanAdjustTransactionBusinessEvent", "20250205", "loanTransactionType.repayment", "2025-02-01"),  //
+            new LoanTransactionBusinessEvent("LoanAccrualTransactionCreatedBusinessEvent", "20250205", 0.15, 0.0, 0.0, 0.15, 0.0, 0.0)//
             );
         });
     }
 
     @Test
     public void verifyLoanApplicationModifiedBusinessEvent01() {
-        runAt("1 March 2024", () -> {
+        runAt("20240301", () -> {
             externalEventHelper.enableBusinessEvent("LoanApplicationModifiedBusinessEvent");
-            PostLoansRequest loanRequest = applyForLoanApplication(client.getClientId(), loanProductId, BigDecimal.valueOf(4000), "1 March 2023", "1 March 2024");
+            PostLoansRequest loanRequest = applyForLoanApplication(client.getClientId(), loanProductId, BigDecimal.valueOf(4000), "20230301", "20240301");
             PostLoansResponse applicationResponse = loanTransactionHelper.applyLoan(loanRequest);
             Long loanId = applicationResponse.getResourceId();
             Assertions.assertNotNull(loanId);
-            PutLoansLoanIdRequest modification = new PutLoansLoanIdRequest().clientId(client.getClientId()).productId(loanProductId).transactionProcessingStrategyCode(DEFAULT_STRATEGY).interestRatePerPeriod(BigDecimal.valueOf(2)).repaymentEvery(1).principal(550L).amortizationType(1).interestType(0).interestCalculationPeriodType(0).expectedDisbursementDate("1 March 2024").repaymentFrequencyType(2).numberOfRepayments(4).loanTermFrequency(4).loanTermFrequencyType(2).loanType("individual").dateFormat("dd MMMM yyyy").locale("en_GB");
+            PutLoansLoanIdRequest modification = new PutLoansLoanIdRequest().clientId(client.getClientId()).productId(loanProductId).transactionProcessingStrategyCode(DEFAULT_STRATEGY).interestRatePerPeriod(BigDecimal.valueOf(2)).repaymentEvery(1).principal(550L).amortizationType(1).interestType(0).interestCalculationPeriodType(0).expectedDisbursementDate("20240301").repaymentFrequencyType(2).numberOfRepayments(4).loanTermFrequency(4).loanTermFrequencyType(2).loanType("individual").dateFormat("yyyyMMdd").locale("en_GB");
             loanTransactionHelper.modifyApplicationForLoan(loanId, "modify", modification);
             List<ExternalEventResponse> modifiedEvents = ExternalEventHelper.getAllExternalEvents(requestSpec, responseSpec).stream().filter(e -> "LoanApplicationModifiedBusinessEvent".equals(e.getType())).toList();
             Assertions.assertEquals(1, modifiedEvents.size());
@@ -747,13 +747,13 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
 
     @Test
     public void verifyLoanWithdrawnByApplicantBusinessEvent01() {
-        runAt("01 March 2024", () -> {
+        runAt("20240301", () -> {
             externalEventHelper.enableBusinessEvent("LoanWithdrawnByApplicantBusinessEvent");
-            PostLoansRequest loanRequest = applyForLoanApplication(client.getClientId(), loanProductId, BigDecimal.valueOf(4000), "1 March 2023", "01 March 2024");
+            PostLoansRequest loanRequest = applyForLoanApplication(client.getClientId(), loanProductId, BigDecimal.valueOf(4000), "20230301", "20240301");
             PostLoansResponse applicationResponse = loanTransactionHelper.applyLoan(loanRequest);
             Long loanId = applicationResponse.getLoanId();
             Assertions.assertNotNull(loanId);
-            loanTransactionHelper.withdrawLoanApplicationByClient("01 March 2024", loanId.intValue());
+            loanTransactionHelper.withdrawLoanApplicationByClient("20240301", loanId.intValue());
             List<ExternalEventResponse> events = ExternalEventHelper.getAllExternalEvents(requestSpec, responseSpec).stream().filter(e -> "LoanWithdrawnByApplicantBusinessEvent".equals(e.getType())).toList();
             Assertions.assertEquals(1, events.size());
         });
@@ -789,48 +789,48 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
         public void testInterestPaymentWaiverNotReverseReplayOnCreationAndHasGeneratedExternalId() {
             externalEventHelper.enableBusinessEvent("LoanAdjustTransactionBusinessEvent");
             AtomicReference<Long> loanIdRef = new AtomicReference<>();
-            runAt("15 January 2025", () -> {
+            runAt("20250115", () -> {
                 PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(create4IProgressive().isInterestRecalculationEnabled(true).recalculationRestFrequencyType(RecalculationRestFrequencyType.DAILY).recalculationRestFrequencyInterval(1));
-                Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductResponse.getResourceId(), "15 January 2025", 430.0, 9.9, 4, null);
+                Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductResponse.getResourceId(), "20250115", 430.0, 9.9, 4, null);
                 loanIdRef.set(loanId);
-                loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("15 January 2025").dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(430.0)).locale("en"));
-                verifyTransactions(loanId, transaction(430.0, "Disbursement", "15 January 2025") //
+                loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("20250115").dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(430.0)).locale("en"));
+                verifyTransactions(loanId, transaction(430.0, "Disbursement", "20250115") //
                 );
                 verifyRepaymentSchedule(loanId,  //
-                installment(430.0, null, "15 January 2025"),  //
-                unpaidInstallment(106.18, 3.55, "15 February 2025"),  //
-                unpaidInstallment(107.06, 2.67, "15 March 2025"),  //
-                unpaidInstallment(107.94, 1.79, "15 April 2025"),  //
-                unpaidInstallment(108.82, 0.9, "15 May 2025") //
+                installment(430.0, null, "20250115"),  //
+                unpaidInstallment(106.18, 3.55, "20250215"),  //
+                unpaidInstallment(107.06, 2.67, "20250315"),  //
+                unpaidInstallment(107.94, 1.79, "20250415"),  //
+                unpaidInstallment(108.82, 0.9, "20250515") //
                 );
             });
-            runAt("16 January 2025", () -> {
+            runAt("20250116", () -> {
                 Long loanId = loanIdRef.get();
                 executeInlineCOB(loanId);
-                verifyTransactions(loanId, transaction(430.0, "Disbursement", "15 January 2025") //
+                verifyTransactions(loanId, transaction(430.0, "Disbursement", "20250115") //
                 );
             });
-            runAt("17 January 2025", () -> {
+            runAt("20250117", () -> {
                 Long loanId = loanIdRef.get();
                 executeInlineCOB(loanId);
-                verifyTransactions(loanId, transaction(430.0, "Disbursement", "15 January 2025"),  //
-                transaction(0.11, "Accrual", "16 January 2025"));
+                verifyTransactions(loanId, transaction(430.0, "Disbursement", "20250115"),  //
+                transaction(0.11, "Accrual", "20250116"));
                 deleteAllExternalEvents();
-                PostLoansLoanIdTransactionsResponse interestPaymentWaiverResponse = loanTransactionHelper.makeLoanRepayment(loanId, "InterestPaymentWaiver", "17 January 2025", 10.0);
+                PostLoansLoanIdTransactionsResponse interestPaymentWaiverResponse = loanTransactionHelper.makeLoanRepayment(loanId, "InterestPaymentWaiver", "20250117", 10.0);
                 List<ExternalEventResponse> allExternalEvents = ExternalEventHelper.getAllExternalEvents(requestSpec, responseSpec);
                 List<ExternalEventResponse> adjustments = allExternalEvents.stream().filter(e -> "LoanAdjustTransactionBusinessEvent".equals(e.getType())).toList();
                 Assertions.assertEquals(0, adjustments.size());
                 Assertions.assertNotNull(interestPaymentWaiverResponse);
                 Assertions.assertNotNull(interestPaymentWaiverResponse.getResourceExternalId());
-                verifyTransactions(loanId, transaction(430.0, "Disbursement", "15 January 2025"),  //
-                transaction(10.0, "Interest Payment Waiver", "17 January 2025"),  //
-                transaction(0.11, "Accrual", "16 January 2025"));
+                verifyTransactions(loanId, transaction(430.0, "Disbursement", "20250115"),  //
+                transaction(10.0, "Interest Payment Waiver", "20250117"),  //
+                transaction(0.11, "Accrual", "20250116"));
                 verifyRepaymentSchedule(loanId,  //
-                installment(430.0, null, "15 January 2025"),  //
-                installment(106.26, 3.47, 99.73, false, "15 February 2025"),  //
-                unpaidInstallment(107.06, 2.67, "15 March 2025"),  //
-                unpaidInstallment(107.94, 1.79, "15 April 2025"),  //
-                unpaidInstallment(108.74, 0.9, "15 May 2025") //
+                installment(430.0, null, "20250115"),  //
+                installment(106.26, 3.47, 99.73, false, "20250215"),  //
+                unpaidInstallment(107.06, 2.67, "20250315"),  //
+                unpaidInstallment(107.94, 1.79, "20250415"),  //
+                unpaidInstallment(108.74, 0.9, "20250515") //
                 );
             });
         }
@@ -889,7 +889,7 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
 
     private static Long applyForLoanApplicationWithInterest(final Long clientId, final Long loanProductId, BigDecimal principal, String submittedOnDate, String expectedDisburmentDate) {
         final PostLoansRequest loanRequest =  //
-        new PostLoansRequest().loanTermFrequency(4).locale("en_GB").loanTermFrequencyType(2).numberOfRepayments(4).repaymentFrequencyType(2).interestRatePerPeriod(BigDecimal.valueOf(2)).repaymentEvery(1).principal(principal).amortizationType(1).interestType(0).interestCalculationPeriodType(0).dateFormat("dd MMMM yyyy").transactionProcessingStrategyCode(DEFAULT_STRATEGY).loanType("individual").submittedOnDate(submittedOnDate).expectedDisbursementDate(expectedDisburmentDate).clientId(clientId).productId(loanProductId);
+        new PostLoansRequest().loanTermFrequency(4).locale("en_GB").loanTermFrequencyType(2).numberOfRepayments(4).repaymentFrequencyType(2).interestRatePerPeriod(BigDecimal.valueOf(2)).repaymentEvery(1).principal(principal).amortizationType(1).interestType(0).interestCalculationPeriodType(0).dateFormat("yyyyMMdd").transactionProcessingStrategyCode(DEFAULT_STRATEGY).loanType("individual").submittedOnDate(submittedOnDate).expectedDisbursementDate(expectedDisburmentDate).clientId(clientId).productId(loanProductId);
         Long loanId = loanTransactionHelper.applyLoan(loanRequest).getLoanId();
         log.info("Test MultiDisbursed Loan with Interest. clientId: {} loanId: {}", client.getClientId(), loanId);
         return loanId;
@@ -897,7 +897,7 @@ public class ExternalBusinessEventTest extends BaseLoanIntegrationTest {
 
     private static PostLoansRequest applyForLoanApplication(final Long clientId, final Long loanProductId, BigDecimal principal, String submittedOnDate, String expectedDisburmentDate) {
         final PostLoansRequest loanRequest =  //
-        new PostLoansRequest().loanTermFrequency(4).locale("en_GB").loanTermFrequencyType(2).numberOfRepayments(4).repaymentFrequencyType(2).interestRatePerPeriod(BigDecimal.valueOf(2)).repaymentEvery(1).principal(principal).amortizationType(1).interestType(0).interestCalculationPeriodType(0).dateFormat("dd MMMM yyyy").transactionProcessingStrategyCode(DEFAULT_STRATEGY).loanType("individual").submittedOnDate(submittedOnDate).expectedDisbursementDate(expectedDisburmentDate).clientId(clientId).productId(loanProductId);
+        new PostLoansRequest().loanTermFrequency(4).locale("en_GB").loanTermFrequencyType(2).numberOfRepayments(4).repaymentFrequencyType(2).interestRatePerPeriod(BigDecimal.valueOf(2)).repaymentEvery(1).principal(principal).amortizationType(1).interestType(0).interestCalculationPeriodType(0).dateFormat("yyyyMMdd").transactionProcessingStrategyCode(DEFAULT_STRATEGY).loanType("individual").submittedOnDate(submittedOnDate).expectedDisbursementDate(expectedDisburmentDate).clientId(clientId).productId(loanProductId);
         return loanRequest;
     }
 

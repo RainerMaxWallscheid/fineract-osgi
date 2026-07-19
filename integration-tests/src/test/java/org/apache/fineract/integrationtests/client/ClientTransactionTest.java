@@ -67,7 +67,7 @@ public class ClientTransactionTest {
         final Integer chargeId = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper.getChargeSpecifiedDueDateJSON());
         Assertions.assertNotNull(chargeId);
         final Integer clientChargeId1 = ClientHelper.addChargesForClient(requestSpec, responseSpec, clientId.intValue(),
-                ClientHelper.getSpecifiedDueDateChargesClientAsJSON(chargeId.toString(), "29 October 2011"));
+                ClientHelper.getSpecifiedDueDateChargesClientAsJSON(chargeId.toString(), "20111029"));
         Assertions.assertNotNull(clientChargeId1);
         String transactionExternalId = UUID.randomUUID().toString();
         final String clientChargePaidTransactionId1 = ClientHelper.payChargesForClients(requestSpec, responseSpec, clientId.intValue(),
@@ -75,7 +75,7 @@ public class ClientTransactionTest {
         assertNotNull(clientChargePaidTransactionId1);
 
         final Integer clientChargeId2 = ClientHelper.addChargesForClient(requestSpec, responseSpec, clientId.intValue(),
-                ClientHelper.getSpecifiedDueDateChargesClientAsJSON(chargeId.toString(), "29 October 2011"));
+                ClientHelper.getSpecifiedDueDateChargesClientAsJSON(chargeId.toString(), "20111029"));
         Assertions.assertNotNull(clientChargeId2);
         final String clientChargePaidTransactionExternalId = ClientHelper.payChargesForClientsTransactionExternalId(requestSpec,
                 responseSpec, clientId.intValue(), clientChargeId2,

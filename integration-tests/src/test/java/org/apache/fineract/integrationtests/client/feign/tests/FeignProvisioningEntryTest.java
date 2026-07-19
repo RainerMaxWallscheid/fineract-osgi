@@ -72,7 +72,7 @@ public class FeignProvisioningEntryTest extends FeignLoanTestBase {
 
         // Create the provisioning entry
         String today = Utils.dateFormatter.format(Utils.getLocalDateOfTenant());
-        ProvisionEntryRequest request = new ProvisionEntryRequest().date(today).dateFormat("dd MMMM yyyy").locale("en")
+        ProvisionEntryRequest request = new ProvisionEntryRequest().date(today).dateFormat("yyyyMMdd").locale("en")
                 .createjournalentries(false);
         PostProvisioningEntriesResponse created = ok(() -> fineractClient().provisioningEntries().createProvisioningEntries(request));
         assertNotNull(created);

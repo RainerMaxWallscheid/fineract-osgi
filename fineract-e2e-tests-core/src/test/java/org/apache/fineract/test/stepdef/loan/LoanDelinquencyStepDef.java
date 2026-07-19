@@ -61,7 +61,7 @@ import org.apache.fineract.test.support.TestContextKey;
 public class LoanDelinquencyStepDef extends AbstractStepDef {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanDelinquencyStepDef.class);
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     public static final String DEFAULT_LOCALE = "en";
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
     private final FineractFeignClient fineractClient;

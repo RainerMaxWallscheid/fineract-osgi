@@ -181,7 +181,7 @@ public class LoanProductTestBuilder {
         map.put("externalId", this.externalId);
         map.put("currencyCode", this.currencyCode);
         map.put("locale", LOCALE);
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("digitsAfterDecimal", digitsAfterDecimal);
         map.put("inMultiplesOf", inMultiplesOf);
         map.put("principal", this.principal);

@@ -43,8 +43,8 @@ public class LoanApplicationScheduleMonthlyTest {
     private static final Logger LOG = LoggerFactory.getLogger(LoanApplicationScheduleMonthlyTest.class);
     public static final Integer TOTAL_REPAYMENTS = 14;
     public static final String NUMBER_OF_REPAYMENTS = String.valueOf(TOTAL_REPAYMENTS);
-    public static final String DISBURSEMENT_DATE = "30 December 2022";
-    public static final String CLIENT_ACTIVATION_DATE = "13 October 2022";
+    public static final String DISBURSEMENT_DATE = "20221230";
+    public static final String CLIENT_ACTIVATION_DATE = "20221013";
     public static final String DUE_DATE = "dueDate";
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
@@ -64,7 +64,7 @@ public class LoanApplicationScheduleMonthlyTest {
     public void validateSeedDate31() {
         final Integer clientId = createClient(CLIENT_ACTIVATION_DATE);
 
-        String firstRepaymentDate = "31 January 2023";
+        String firstRepaymentDate = "20230131";
         Integer loanProductId = createLoanProductEntity();
 
         Integer loanId = applyForLoanApplication(clientId, loanProductId, firstRepaymentDate);
@@ -125,7 +125,7 @@ public class LoanApplicationScheduleMonthlyTest {
     public void validateSeedDate30() {
         final Integer clientId = createClient(CLIENT_ACTIVATION_DATE);
 
-        String firstRepaymentDate = "30 January 2023";
+        String firstRepaymentDate = "20230130";
         Integer loanProductId = createLoanProductEntity();
 
         Integer loanId = applyForLoanApplication(clientId, loanProductId, firstRepaymentDate);
@@ -181,7 +181,7 @@ public class LoanApplicationScheduleMonthlyTest {
     public void validateSeedDate28() {
         final Integer clientId = createClient(CLIENT_ACTIVATION_DATE);
 
-        String firstRepaymentDate = "28 January 2023";
+        String firstRepaymentDate = "20230128";
         Integer loanProductId = createLoanProductEntity();
 
         Integer loanId = applyForLoanApplication(clientId, loanProductId, firstRepaymentDate);
@@ -237,7 +237,7 @@ public class LoanApplicationScheduleMonthlyTest {
     public void validateSeedDate25() {
         final Integer clientId = createClient(CLIENT_ACTIVATION_DATE);
 
-        String firstRepaymentDate = "25 January 2023";
+        String firstRepaymentDate = "20230125";
         Integer loanProductId = createLoanProductEntity();
 
         Integer loanId = applyForLoanApplication(clientId, loanProductId, firstRepaymentDate);

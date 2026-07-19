@@ -123,8 +123,8 @@ public class RecurringDepositAccountHelper {
         map.put("clientId", clientId);
         map.put("interestCalculationDaysInYearType", this.interestCalculationDaysInYearType);
         map.put("locale", LOCALE);
-        map.put("dateFormat", "dd MMMM yyyy");
-        map.put("monthDayFormat", "dd MMM");
+        map.put("dateFormat", "yyyyMMdd");
+        map.put("monthDayFormat", "MMdd");
         map.put("interestCalculationType", this.interestCalculationType);
         map.put("interestCompoundingPeriodType", this.interestCompoundingPeriodType);
         map.put("interestPostingPeriodType", this.interestPostingPeriodType);
@@ -245,7 +245,7 @@ public class RecurringDepositAccountHelper {
     public HashMap updateRecurringDepositAccount(final String clientID, final String productID, final String accountID,
             final String validFrom, final String validTo, final String penalInterestType, final String submittedOnDate) {
 
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         todaysDate.add(Calendar.DATE, -1);

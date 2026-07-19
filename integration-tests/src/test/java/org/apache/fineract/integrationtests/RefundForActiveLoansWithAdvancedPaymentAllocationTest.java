@@ -56,7 +56,7 @@ import org.junit.jupiter.api.Test;
 public class RefundForActiveLoansWithAdvancedPaymentAllocationTest extends BaseLoanIntegrationTest {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RefundForActiveLoansWithAdvancedPaymentAllocationTest.class);
-    private static final String DATETIME_PATTERN = "dd MMMM yyyy";
+    private static final String DATETIME_PATTERN = "yyyyMMdd";
     private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern(DATETIME_PATTERN).toFormatter(Locale.ENGLISH);
     private static RequestSpecification requestSpec;
     private static ResponseSpecification responseSpec;
@@ -89,10 +89,10 @@ public class RefundForActiveLoansWithAdvancedPaymentAllocationTest extends BaseL
             final Account expenseAccount = accountHelper.createExpenseAccount();
             final Account overpaymentAccount = accountHelper.createLiabilityAccount();
             Integer loanProductId = createLoanProduct("1000", "30", "4", LoanScheduleProcessingType.VERTICAL, assetAccount, incomeAccount, expenseAccount, overpaymentAccount);
-            final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), loanProductId, 1000L, 90, 30, 3, BigDecimal.ZERO, "01 January 2023", "01 January 2023");
+            final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), loanProductId, 1000L, 90, 30, 3, BigDecimal.ZERO, "20230101", "20230101");
             int loanId = loanResponse.getLoanId().intValue();
-            loanTransactionHelper.approveLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(1000)).dateFormat(DATETIME_PATTERN).approvedOnDate("01 January 2023").locale("en"));
-            loanTransactionHelper.disburseLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().actualDisbursementDate("01 January 2023").dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
+            loanTransactionHelper.approveLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(1000)).dateFormat(DATETIME_PATTERN).approvedOnDate("20230101").locale("en"));
+            loanTransactionHelper.disburseLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().actualDisbursementDate("20230101").dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
             final double feePortion = 50.0;
             final double penaltyPortion = 100.0;
             Integer fee = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, String.valueOf(feePortion), false));
@@ -132,7 +132,7 @@ public class RefundForActiveLoansWithAdvancedPaymentAllocationTest extends BaseL
             assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 4, 1), thirdRepaymentInstallment.getDueDate());
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("2023.03.01").dateFormat("yyyy.MM.dd").locale("en"));
-            loanTransactionHelper.makeRepayment("01 March 2023", 810.0F, loanId);
+            loanTransactionHelper.makeRepayment("20230301", 810.0F, loanId);
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
             firstRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(2);
             secondRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(3);
@@ -161,7 +161,7 @@ public class RefundForActiveLoansWithAdvancedPaymentAllocationTest extends BaseL
             assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
             assertEquals(240.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 4, 1), thirdRepaymentInstallment.getDueDate());
-            loanTransactionHelper.makeRefundByCash("01 March 2023", 15.0F, loanId);
+            loanTransactionHelper.makeRefundByCash("20230301", 15.0F, loanId);
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
             firstRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(2);
             secondRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(3);
@@ -192,7 +192,7 @@ public class RefundForActiveLoansWithAdvancedPaymentAllocationTest extends BaseL
             assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
             assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 4, 1), thirdRepaymentInstallment.getDueDate());
-            loanTransactionHelper.makeRefundByCash("01 March 2023", 265.0F, loanId);
+            loanTransactionHelper.makeRefundByCash("20230301", 265.0F, loanId);
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
             firstRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(2);
             secondRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(3);
@@ -238,10 +238,10 @@ public class RefundForActiveLoansWithAdvancedPaymentAllocationTest extends BaseL
             final Account expenseAccount = accountHelper.createExpenseAccount();
             final Account overpaymentAccount = accountHelper.createLiabilityAccount();
             Integer loanProductId = createLoanProduct("1000", "30", "4", LoanScheduleProcessingType.HORIZONTAL, assetAccount, incomeAccount, expenseAccount, overpaymentAccount);
-            final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), loanProductId, 1000L, 90, 30, 3, BigDecimal.ZERO, "01 January 2023", "01 January 2023");
+            final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), loanProductId, 1000L, 90, 30, 3, BigDecimal.ZERO, "20230101", "20230101");
             int loanId = loanResponse.getLoanId().intValue();
-            loanTransactionHelper.approveLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(1000)).dateFormat(DATETIME_PATTERN).approvedOnDate("01 January 2023").locale("en"));
-            loanTransactionHelper.disburseLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().actualDisbursementDate("01 January 2023").dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
+            loanTransactionHelper.approveLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(1000)).dateFormat(DATETIME_PATTERN).approvedOnDate("20230101").locale("en"));
+            loanTransactionHelper.disburseLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().actualDisbursementDate("20230101").dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
             final double feePortion = 50.0;
             final double penaltyPortion = 100.0;
             Integer fee = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, String.valueOf(feePortion), false));
@@ -281,7 +281,7 @@ public class RefundForActiveLoansWithAdvancedPaymentAllocationTest extends BaseL
             assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 4, 1), thirdRepaymentInstallment.getDueDate());
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("2023.03.01").dateFormat("yyyy.MM.dd").locale("en"));
-            loanTransactionHelper.makeRepayment("28 January 2023", 810.0F, loanId);
+            loanTransactionHelper.makeRepayment("20230128", 810.0F, loanId);
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
             firstRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(2);
             secondRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(3);
@@ -310,7 +310,7 @@ public class RefundForActiveLoansWithAdvancedPaymentAllocationTest extends BaseL
             assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
             assertEquals(90.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 4, 1), thirdRepaymentInstallment.getDueDate());
-            loanTransactionHelper.makeRefundByCash("28 January 2023", 15.0F, loanId);
+            loanTransactionHelper.makeRefundByCash("20230128", 15.0F, loanId);
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
             firstRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(2);
             secondRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(3);
@@ -342,7 +342,7 @@ public class RefundForActiveLoansWithAdvancedPaymentAllocationTest extends BaseL
             assertEquals(105.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 4, 1), thirdRepaymentInstallment.getDueDate());
             // fully unpaying the second installment
-            loanTransactionHelper.makeRefundByCash("28 January 2023", 395.0F, loanId);
+            loanTransactionHelper.makeRefundByCash("20230128", 395.0F, loanId);
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
             firstRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(2);
             secondRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(3);

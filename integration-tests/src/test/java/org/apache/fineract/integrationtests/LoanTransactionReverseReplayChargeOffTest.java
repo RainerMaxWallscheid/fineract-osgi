@@ -41,7 +41,7 @@ public class LoanTransactionReverseReplayChargeOffTest extends FeignLoanTestBase
 
     @Test
     public void loanTransactionReverseReplayWithChargeOff() {
-        runAt("4 October 2022", () -> {
+        runAt("20221004", () -> {
             final Account assetAccount = accountHelper.createAssetAccount("asset");
             final Account chargeOffFraudExpenseAccount = accountHelper.createExpenseAccount("fraudExpense");
             final Account chargeOffExpenseAccount = accountHelper.createExpenseAccount("chargeOffExpense");
@@ -56,14 +56,14 @@ public class LoanTransactionReverseReplayChargeOffTest extends FeignLoanTestBase
                     .loanPortfolioAccountId(assetAccount.getAccountID().longValue());
             Long loanProductId = createLoanProduct(loanProductsRequest);
 
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "2 September 2022", 1000.0, 1,
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20220902", 1000.0, 1,
                     postLoansRequest -> postLoansRequest.externalId(loanExternalIdStr));
 
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "2 September 2022");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20220902");
 
             String loanTransactionExternalIdStr = UUID.randomUUID().toString();
             PostLoansLoanIdTransactionsResponse repaymentTransaction = makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("03 October 2022")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20221003")
                             .locale(LoanTestData.LOCALE).transactionAmount(10.0).externalId(loanTransactionExternalIdStr));
 
             changeLoanFraudState(loanId, true);
@@ -72,14 +72,14 @@ public class LoanTransactionReverseReplayChargeOffTest extends FeignLoanTestBase
                     Utils.randomStringGenerator("en", 5) + Utils.randomNumberGenerator(6) + Utils.randomStringGenerator("is", 5), 1);
             String transactionExternalId = UUID.randomUUID().toString();
             PostLoansLoanIdTransactionsResponse chargeOffTransaction = chargeOffLoan(loanId,
-                    new PostLoansLoanIdTransactionsRequest().transactionDate("4 October 2022").locale(LoanTestData.LOCALE)
+                    new PostLoansLoanIdTransactionsRequest().transactionDate("20221004").locale(LoanTestData.LOCALE)
                             .dateFormat(LoanTestData.DATETIME_PATTERN).externalId(transactionExternalId)
                             .chargeOffReasonId(chargeOffReasonId));
 
-            updateBusinessDate("6 October 2022");
+            updateBusinessDate("20221006");
 
             reverseLoanTransaction(loanExternalIdStr, repaymentTransaction.getResourceId(),
-                    new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate("6 October 2022").locale(LoanTestData.LOCALE)
+                    new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate("20221006").locale(LoanTestData.LOCALE)
                             .dateFormat(LoanTestData.DATETIME_PATTERN).transactionAmount(0.0));
 
             GetJournalEntriesTransactionIdResponse journalEntriesForChargeOffTransaction = getJournalEntries(

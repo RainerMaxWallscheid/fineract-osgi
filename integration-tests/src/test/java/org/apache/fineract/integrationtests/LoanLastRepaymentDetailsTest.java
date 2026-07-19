@@ -55,7 +55,7 @@ public class LoanLastRepaymentDetailsTest {
     private RequestSpecification requestSpec;
     private ClientHelper clientHelper;
     private LoanTransactionHelper loanTransactionHelper;
-    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
 
     @BeforeEach
     public void setup() {
@@ -89,7 +89,7 @@ public class LoanLastRepaymentDetailsTest {
 
         // make Repayments
         final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("5 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220905").locale("en")
                         .transactionAmount(500.0));
 
         GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
@@ -105,7 +105,7 @@ public class LoanLastRepaymentDetailsTest {
         assertEquals(loanDetails.getDelinquent().getLastRepaymentDate(), lastRepaymentDate_1);
 
         final PostLoansLoanIdTransactionsResponse repaymentTransaction_2 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("6 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220906").locale("en")
                         .transactionAmount(500.0));
 
         // verify loan is closed and last repayment details
@@ -143,7 +143,7 @@ public class LoanLastRepaymentDetailsTest {
 
         // make Repayments
         final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("5 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220905").locale("en")
                         .transactionAmount(500.0));
 
         GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
@@ -159,7 +159,7 @@ public class LoanLastRepaymentDetailsTest {
         assertEquals(loanDetails.getDelinquent().getLastRepaymentDate(), lastRepaymentDate_1);
 
         final PostLoansLoanIdTransactionsResponse repaymentTransaction_2 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("6 September 2022").locale("en")
+                new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20220906").locale("en")
                         .transactionAmount(600.0));
 
         // verify loan is overpaid and last repayment details
@@ -189,12 +189,12 @@ public class LoanLastRepaymentDetailsTest {
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("03 September 2022").withSubmittedOnDate("01 September 2022").withLoanType("individual")
+                .withExpectedDisbursementDate("20220903").withSubmittedOnDate("20220901").withLoanType("individual")
                 .withExternalId(externalId).build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("02 September 2022", "1000", loanId, null);
-        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("03 September 2022", loanId, "1000");
+        loanTransactionHelper.approveLoan("20220902", "1000", loanId, null);
+        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20220903", loanId, "1000");
         return loanId;
     }
 }

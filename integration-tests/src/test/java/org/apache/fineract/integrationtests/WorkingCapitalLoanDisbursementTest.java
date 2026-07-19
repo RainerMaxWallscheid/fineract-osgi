@@ -79,7 +79,7 @@ public class WorkingCapitalLoanDisbursementTest {
 
     private static final PostWorkingCapitalLoansLoanIdRequest CLEANUP_EMPTY_COMMAND_REQUEST = WorkingCapitalLoanApplicationTestBuilder
             .buildUndoApproveRequest();
-    private static final DateTimeFormatter BUSINESS_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter BUSINESS_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
     private static final String WC_DISBURSAL_TXN_EVENT = "WorkingCapitalLoanDisbursalTransactionBusinessEvent";
     private static final String WC_UNDO_DISBURSAL_TXN_EVENT = "WorkingCapitalLoanUndoDisbursalTransactionBusinessEvent";
 

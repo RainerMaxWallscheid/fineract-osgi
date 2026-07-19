@@ -90,7 +90,7 @@ public class StateTransitionWorkingCapitalLoanByExternalIdCommandStrategyTest {
         br.setRelativeUrl("v1/working-capital-loans/external-id/" + loanExternalId + "?command=" + command);
         br.setMethod(HttpMethod.POST);
         br.setReference(Long.valueOf(RandomStringUtils.randomNumeric(5)));
-        br.setBody("{\"approvedOnDate\":\"01 January 2026\",\"locale\":\"en\",\"dateFormat\":\"dd MMMM yyyy\"}");
+        br.setBody("{\"approvedOnDate\":\"20260101\",\"locale\":\"en\",\"dateFormat\":\"yyyyMMdd\"}");
         return br;
     }
 

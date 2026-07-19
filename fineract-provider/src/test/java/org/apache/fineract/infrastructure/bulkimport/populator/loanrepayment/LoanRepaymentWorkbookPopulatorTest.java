@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
 class LoanRepaymentWorkbookPopulatorTest {
 
     private static final LoanStatusEnumData ACTIVE_STATUS = new LoanStatusEnumData(300L, "loanStatusType.active", "Active");
-    private static final String DATE_FORMAT = "dd MMMM yyyy";
+    private static final String DATE_FORMAT = "yyyyMMdd";
 
     private LoanAccountData loanWithAccountNo(String accountNo) {
         return new LoanAccountData().setAccountNo(accountNo).setStatus(ACTIVE_STATUS).setClientName("John Doe").setClientId(1L)

@@ -176,7 +176,7 @@ import org.junit.jupiter.api.Assertions;
 public class LoanStepDef extends AbstractStepDef {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanStepDef.class);
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     public static final String DATE_FORMAT_EVENTS = "yyyy-MM-dd";
     public static final String DEFAULT_LOCALE = "en";
     public static final String LOAN_STATE_SUBMITTED_AND_PENDING = "Submitted and pending approval";
@@ -186,7 +186,7 @@ public class LoanStepDef extends AbstractStepDef {
     public static final String LOAN_STATE_ACTIVE = "Active";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
     private static final DateTimeFormatter FORMATTER_EVENTS = DateTimeFormatter.ofPattern(DATE_FORMAT_EVENTS, Locale.ENGLISH);
-    private static final String TRANSACTION_DATE_FORMAT = "dd MMMM yyyy";
+    private static final String TRANSACTION_DATE_FORMAT = "yyyyMMdd";
     private final BusinessDateHelper businessDateHelper;
     private final FineractFeignClient fineractClient;
     private final EventAssertion eventAssertion;
@@ -431,7 +431,7 @@ public class LoanStepDef extends AbstractStepDef {
         assert transactions != null;
         final GetLoansLoanIdTransactions moneyTransaction = transactions.stream().filter(t -> t.getType() != null && transactionType.equals(TransactionType.REPAYMENT) && t.getDate() != null && transactionDate.equals(FORMATTER.format(t.getDate()))).findFirst().orElseThrow(() -> new IllegalStateException("No repayment transaction found"));
         final Long paymentTypeValue = paymentTypeResolver.resolve(DefaultPaymentType.AUTOPAY);
-        final PostLoansLoanIdTransactionsTransactionIdRequest interestRefundRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("dd MMMM yyyy").locale("en").transactionAmount(amount).paymentTypeId(paymentTypeValue).externalId("EXT-INT-REF-" + UUID.randomUUID()).note("");
+        final PostLoansLoanIdTransactionsTransactionIdRequest interestRefundRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("yyyyMMdd").locale("en").transactionAmount(amount).paymentTypeId(paymentTypeValue).externalId("EXT-INT-REF-" + UUID.randomUUID()).note("");
         final CallFailedRuntimeException exception = fail(() -> fineractClient.loanTransactions().adjustLoanTransaction(loanId, moneyTransaction.getId(), interestRefundRequest, Map.of("command", "interest-refund")));
         assertThat(exception.getStatus()).isEqualTo(403);
     }
@@ -447,7 +447,7 @@ public class LoanStepDef extends AbstractStepDef {
         assert transactions != null;
         final GetLoansLoanIdTransactions refundTransaction = transactions.stream().filter(t -> t.getType() != null && (transactionType.equals(TransactionType.PAYOUT_REFUND) ? "Payout Refund" : "Merchant Issued Refund").equals(t.getType().getValue()) && t.getDate() != null && transactionDate.equals(FORMATTER.format(t.getDate()))).findFirst().orElseThrow(() -> new IllegalStateException("No refund transaction found for loan " + loanId));
         final Long paymentTypeValue = paymentTypeResolver.resolve(DefaultPaymentType.AUTOPAY);
-        final PostLoansLoanIdTransactionsTransactionIdRequest interestRefundRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("dd MMMM yyyy").locale("en").transactionAmount(amount).paymentTypeId(paymentTypeValue).externalId("EXT-INT-REF-" + UUID.randomUUID()).note("");
+        final PostLoansLoanIdTransactionsTransactionIdRequest interestRefundRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("yyyyMMdd").locale("en").transactionAmount(amount).paymentTypeId(paymentTypeValue).externalId("EXT-INT-REF-" + UUID.randomUUID()).note("");
         final CallFailedRuntimeException exception = fail(() -> fineractClient.loanTransactions().adjustLoanTransaction(loanId, refundTransaction.getId(), interestRefundRequest, Map.of("command", "interest-refund")));
         assertThat(exception.getStatus()).isEqualTo(403);
         assertThat(exception.getDeveloperMessage()).contains(ErrorMessageHelper.addManualInterestRefundIfAlreadyExistsFailure());
@@ -464,7 +464,7 @@ public class LoanStepDef extends AbstractStepDef {
         assert transactions != null;
         final GetLoansLoanIdTransactions refundTransaction = transactions.stream().filter(t -> t.getType() != null && (transactionType.equals(TransactionType.PAYOUT_REFUND) ? "Payout Refund" : "Merchant Issued Refund").equals(t.getType().getValue()) && t.getDate() != null && transactionDate.equals(FORMATTER.format(t.getDate()))).findFirst().orElseThrow(() -> new IllegalStateException("No refund transaction found for loan " + loanId));
         final Long paymentTypeValue = paymentTypeResolver.resolve(DefaultPaymentType.AUTOPAY);
-        final PostLoansLoanIdTransactionsTransactionIdRequest interestRefundRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("dd MMMM yyyy").locale("en").transactionAmount(amount).paymentTypeId(paymentTypeValue).externalId("EXT-INT-REF-" + UUID.randomUUID()).note("");
+        final PostLoansLoanIdTransactionsTransactionIdRequest interestRefundRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("yyyyMMdd").locale("en").transactionAmount(amount).paymentTypeId(paymentTypeValue).externalId("EXT-INT-REF-" + UUID.randomUUID()).note("");
         final CallFailedRuntimeException exception = fail(() -> fineractClient.loanTransactions().adjustLoanTransaction(loanId, refundTransaction.getId(), interestRefundRequest, Map.of("command", "interest-refund")));
         assertThat(exception.getStatus()).isEqualTo(403);
         assertThat(exception.getDeveloperMessage()).contains(ErrorMessageHelper.addManualInterestRefundIfReversedFailure());
@@ -1339,7 +1339,7 @@ public class LoanStepDef extends AbstractStepDef {
         // add new entry with expected disbursement detail
         DisbursementDetail disbursementDetailsEntryNew = new DisbursementDetail().principal(BigDecimal.valueOf(disbursementAmount)).expectedDisbursementDate(expectedDisbursementDate);
         disbursementData.add(disbursementDetailsEntryNew);
-        DateTimeFormatter parsingFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ENGLISH);
+        DateTimeFormatter parsingFormatter = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
         disbursementData.forEach(detail -> detail.expectedDisbursementDate(FORMATTER.format(LocalDate.parse(detail.getExpectedDisbursementDate(), parsingFormatter))));
         disbursementData.sort(Comparator.comparing(detail -> LocalDate.parse(detail.getExpectedDisbursementDate(), parsingFormatter)));
         PostAddAndDeleteDisbursementDetailRequest disbursementDetailRequest = loanRequestFactory.defaultLoanDisbursementDetailRequest(disbursementData);
@@ -3942,7 +3942,7 @@ public class LoanStepDef extends AbstractStepDef {
         final long loanId = loanResponse.getLoanId();
         final DefaultPaymentType paymentType = DefaultPaymentType.valueOf(transactionPaymentType);
         final Long paymentTypeValue = paymentTypeResolver.resolve(paymentType);
-        final PostLoansLoanIdTransactionsTransactionIdRequest capitalizedIncomeRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate(transactionDate).dateFormat("dd MMMM yyyy").locale("en").transactionAmount(Double.valueOf(amount)).paymentTypeId(paymentTypeValue).externalId("EXT-CAP-INC-ADJ-" + UUID.randomUUID());
+        final PostLoansLoanIdTransactionsTransactionIdRequest capitalizedIncomeRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate(transactionDate).dateFormat("yyyyMMdd").locale("en").transactionAmount(Double.valueOf(amount)).paymentTypeId(paymentTypeValue).externalId("EXT-CAP-INC-ADJ-" + UUID.randomUUID());
         return ok(() -> fineractClient.loanTransactions().adjustLoanTransaction(loanId, transactionId, capitalizedIncomeRequest, Map.of("command", "capitalizedIncomeAdjustment")));
     }
 
@@ -4088,7 +4088,7 @@ public class LoanStepDef extends AbstractStepDef {
         final GetLoansLoanIdTransactions capitalizedIncomeTransaction = transactions.stream().filter(t -> "Capitalized Income".equals(t.getType().getValue())).findFirst().orElseThrow(() -> new IllegalStateException("No Capitalized Income transaction found for loan " + loanId));
         final DefaultPaymentType paymentType = DefaultPaymentType.valueOf(transactionPaymentType);
         final Long paymentTypeValue = paymentTypeResolver.resolve(paymentType);
-        final PostLoansLoanIdTransactionsTransactionIdRequest capitalizedIncomeRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate(transactionDate).dateFormat("dd MMMM yyyy").locale("en").transactionAmount(Double.valueOf(amount)).paymentTypeId(paymentTypeValue).externalId("EXT-CAP-INC-ADJ-" + UUID.randomUUID());
+        final PostLoansLoanIdTransactionsTransactionIdRequest capitalizedIncomeRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate(transactionDate).dateFormat("yyyyMMdd").locale("en").transactionAmount(Double.valueOf(amount)).paymentTypeId(paymentTypeValue).externalId("EXT-CAP-INC-ADJ-" + UUID.randomUUID());
         // This step expects the call to fail with validation error
         CallFailedRuntimeException exception = fail(() -> fineractClient.loanTransactions().adjustLoanTransaction(loanId, capitalizedIncomeTransaction.getId(), capitalizedIncomeRequest, Map.of("command", "capitalizedIncomeAdjustment")));
         assertThat(exception.getStatus()).isEqualTo(400);
@@ -4199,7 +4199,7 @@ public class LoanStepDef extends AbstractStepDef {
         final GetLoansLoanIdTransactions capitalizedIncomeTransaction = transactions.stream().filter(t -> "Capitalized Income".equals(t.getType().getValue())).findFirst().orElseThrow(() -> new IllegalStateException("No Capitalized Income transaction found for loan " + loanId));
         final DefaultPaymentType paymentType = DefaultPaymentType.valueOf(transactionPaymentType);
         final Long paymentTypeValue = paymentTypeResolver.resolve(paymentType);
-        final PostLoansLoanIdTransactionsTransactionIdRequest capitalizedIncomeRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate(transactionDate).dateFormat("dd MMMM yyyy").locale("en").transactionAmount(Double.valueOf(amount)).paymentTypeId(paymentTypeValue).externalId("EXT-CAP-INC-ADJ-" + UUID.randomUUID());
+        final PostLoansLoanIdTransactionsTransactionIdRequest capitalizedIncomeRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate(transactionDate).dateFormat("yyyyMMdd").locale("en").transactionAmount(Double.valueOf(amount)).paymentTypeId(paymentTypeValue).externalId("EXT-CAP-INC-ADJ-" + UUID.randomUUID());
         CallFailedRuntimeException exception = fail(() -> fineractClient.loanTransactions().adjustLoanTransaction(loanId, capitalizedIncomeTransaction.getId(), capitalizedIncomeRequest, Map.of("command", "capitalizedIncomeAdjustment")));
         assertThat(exception.getStatus()).isEqualTo(400);
         assertThat(exception.getDeveloperMessage()).contains(ErrorMessageHelper.addCapitalizedIncomeFutureDateFailure());
@@ -4230,7 +4230,7 @@ public class LoanStepDef extends AbstractStepDef {
         final long loanId = loanResponse.getLoanId();
         final DefaultPaymentType paymentType = DefaultPaymentType.valueOf(transactionPaymentType);
         final Long paymentTypeValue = paymentTypeResolver.resolve(paymentType);
-        final PostLoansLoanIdTransactionsTransactionIdRequest buyDownFeeRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate(transactionDate).dateFormat("dd MMMM yyyy").locale("en").transactionAmount(Double.valueOf(amount)).paymentTypeId(paymentTypeValue).externalId("EXT-BUY-DOWN-FEE-ADJ-" + UUID.randomUUID());
+        final PostLoansLoanIdTransactionsTransactionIdRequest buyDownFeeRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate(transactionDate).dateFormat("yyyyMMdd").locale("en").transactionAmount(Double.valueOf(amount)).paymentTypeId(paymentTypeValue).externalId("EXT-BUY-DOWN-FEE-ADJ-" + UUID.randomUUID());
         // Use adjustLoanTransaction with the transaction ID and command
         final PostLoansLoanIdTransactionsResponse buyDownFeeResponse = ok(() -> fineractClient.loanTransactions().adjustLoanTransaction(loanId, transactionId, buyDownFeeRequest, Map.of("command", "buyDownFeeAdjustment")));
         return buyDownFeeResponse;
@@ -4420,7 +4420,7 @@ public class LoanStepDef extends AbstractStepDef {
         final long loanId = loanResponse.getLoanId();
         final DefaultPaymentType paymentType = DefaultPaymentType.AUTOPAY;
         final Long paymentTypeValue = paymentTypeResolver.resolve(paymentType);
-        final PostLoansLoanIdTransactionsTransactionIdRequest interestRefundRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("dd MMMM yyyy").locale("en").transactionAmount(amount).paymentTypeId(paymentTypeValue).externalId("EXT-INT-REF-" + UUID.randomUUID()).note("");
+        final PostLoansLoanIdTransactionsTransactionIdRequest interestRefundRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("yyyyMMdd").locale("en").transactionAmount(amount).paymentTypeId(paymentTypeValue).externalId("EXT-INT-REF-" + UUID.randomUUID()).note("");
         return ok(() -> fineractClient.loanTransactions().adjustLoanTransaction(loanId, transactionId, interestRefundRequest, Map.of("command", "interest-refund")));
     }
 
@@ -4430,7 +4430,7 @@ public class LoanStepDef extends AbstractStepDef {
         final long loanId = loanResponse.getLoanId();
         final DefaultPaymentType paymentType = DefaultPaymentType.AUTOPAY;
         final Long paymentTypeValue = paymentTypeResolver.resolve(paymentType);
-        final PostLoansLoanIdTransactionsTransactionIdRequest interestRefundRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("dd MMMM yyyy").locale("en").transactionAmount(amount).paymentTypeId(paymentTypeValue).externalId("EXT-INT-REF-" + UUID.randomUUID()).note("");
+        final PostLoansLoanIdTransactionsTransactionIdRequest interestRefundRequest = new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("yyyyMMdd").locale("en").transactionAmount(amount).paymentTypeId(paymentTypeValue).externalId("EXT-INT-REF-" + UUID.randomUUID()).note("");
         if (transactionDate != null) {
             interestRefundRequest.transactionDate(transactionDate);
         }

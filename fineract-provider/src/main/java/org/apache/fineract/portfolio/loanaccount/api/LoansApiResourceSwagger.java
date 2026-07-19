@@ -422,7 +422,7 @@ final class LoansApiResourceSwagger {
             public BigDecimal chargeAmount;
             @Schema(example = "22000.000000")
             public BigDecimal waivedChargeAmount;
-            @Schema(example = "dd MMMM yyyy")
+            @Schema(example = "yyyyMMdd")
             public String dateFormat;
             @Schema(example = "de_DE")
             public String locale;
@@ -888,7 +888,7 @@ final class LoansApiResourceSwagger {
             public List<GetLoansLoanIdCodeValueData> writeOffReasonOptions;
             @Schema(example = "4")
             public Integer numberOfRepayments;
-            @Schema(example = "dd MMMM yyyy")
+            @Schema(example = "yyyyMMdd")
             public String dateFormat;
             @Schema(example = "de_DE")
             public String locale;
@@ -1313,7 +1313,7 @@ final class LoansApiResourceSwagger {
 
             private PostLoansDisbursementData() {}
 
-            @Schema(example = "1 November 2023")
+            @Schema(example = "20231101")
             public String expectedDisbursementDate;
             @Schema(example = "1000.00")
             public BigDecimal principal;
@@ -1333,7 +1333,7 @@ final class LoansApiResourceSwagger {
 
         @Schema(example = "1")
         public Long clientId;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "en_GB")
         public String locale;
@@ -1365,7 +1365,7 @@ final class LoansApiResourceSwagger {
         public Integer interestType;
         @Schema(example = "1")
         public Integer interestCalculationPeriodType;
-        @Schema(example = "20 September 2011")
+        @Schema(example = "20110920")
         public String expectedDisbursementDate;
         @Schema(example = "mifos-standard-strategy")
         public String transactionProcessingStrategyCode;
@@ -1375,7 +1375,7 @@ final class LoansApiResourceSwagger {
         public String daysInYearCustomStrategy;
         @Schema(example = "individual")
         public String loanType;
-        @Schema(example = "20 September 2011")
+        @Schema(example = "20110920")
         public String submittedOnDate;
         @Schema(example = "786444UUUYYH7")
         public String externalId;
@@ -1555,7 +1555,7 @@ final class LoansApiResourceSwagger {
 
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema
         public String submittedOnDate;
@@ -1587,7 +1587,7 @@ final class LoansApiResourceSwagger {
         public Integer amortizationType;
         @Schema(example = "5.5")
         public BigDecimal fixedPrincipalPercentagePerInstallment;
-        @Schema(example = "04 March 2014")
+        @Schema(example = "20140304")
         public String expectedDisbursementDate;
         @Schema(example = "mifos-standard-strategy")
         public String transactionProcessingStrategyCode;
@@ -1641,7 +1641,7 @@ final class LoansApiResourceSwagger {
 
             private PutLoansLoanIdChargeData() {}
 
-            @Schema(example = "dd MMMM yyyy")
+            @Schema(example = "yyyyMMdd")
             public String dateFormat;
             @Schema(example = "en")
             public String locale;
@@ -1675,7 +1675,7 @@ final class LoansApiResourceSwagger {
 
             private PutLoansLoanIdDisbursementData() {}
 
-            @Schema(example = "dd MMMM yyyy")
+            @Schema(example = "yyyyMMdd")
             public String dateFormat;
             @Schema(example = "en")
             public String locale;
@@ -1756,14 +1756,14 @@ final class LoansApiResourceSwagger {
 
         @Schema(example = "2")
         public Long toLoanOfficerId;
-        @Schema(example = "02 September 2014")
+        @Schema(example = "20140902")
         public String assignmentDate;
 
-        @Schema(example = "02 September 2014")
+        @Schema(example = "20140902")
         public String unassignedDate;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "")
         public Long fromLoanOfficerId;
@@ -1773,25 +1773,25 @@ final class LoansApiResourceSwagger {
         public BigDecimal transactionAmount;
         @Schema(example = "Description of disbursement details.")
         public String note;
-        @Schema(example = "28 June 2022")
+        @Schema(example = "20220628")
         public String actualDisbursementDate;
         @Schema(example = "3")
         public Integer paymentTypeId;
-        @Schema(example = "28 June 2022")
+        @Schema(example = "20220628")
         public String approvedOnDate;
         @Schema(example = "1000")
         public BigDecimal approvedLoanAmount;
-        @Schema(example = "28 June 2022")
+        @Schema(example = "20220628")
         public String expectedDisbursementDate;
-        @Schema(example = "28 June 2022")
+        @Schema(example = "20220628")
         public String rejectedOnDate;
-        @Schema(example = "28 June 2022")
+        @Schema(example = "20220628")
         public String withdrawnOnDate;
         @Schema(description = "List of PostLoansLoanIdDisbursementData")
         public List<PostLoansLoanIdDisbursementData> disbursementData;
         @Schema(example = "500.00")
         public BigDecimal fixedEmiAmount;
-        @Schema(example = "28 July 2022")
+        @Schema(example = "20220728")
         public String adjustRepaymentDate;
     }
 
@@ -1834,9 +1834,9 @@ final class LoansApiResourceSwagger {
 
             @Schema(example = "en")
             public String locale;
-            @Schema(example = "dd MMMM yyyy")
+            @Schema(example = "yyyyMMdd")
             public String dateFormat;
-            @Schema(example = "28 June 2022")
+            @Schema(example = "20220628")
             public String approvedOnDate;
             @Schema(example = "Loan approval note")
             public String note;

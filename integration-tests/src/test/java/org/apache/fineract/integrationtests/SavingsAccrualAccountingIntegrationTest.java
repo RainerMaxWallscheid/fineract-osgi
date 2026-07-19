@@ -77,7 +77,7 @@ public class SavingsAccrualAccountingIntegrationTest {
 
     @Test
     public void testPositiveAccrualPostsCorrectJournalEntries() {
-        runAt("12 August 2021", () -> {
+        runAt("20210812", () -> {
             // --- ARRANGE ---
             LOG.info("------------------------- INITIATING POSITIVE ACCRUAL ACCOUNTING TEST -------------------------");
             final int daysToSubtract = 10;
@@ -103,9 +103,9 @@ public class SavingsAccrualAccountingIntegrationTest {
                     this.responseSpec);
             Assertions.assertNotNull(savingsProductId, "Failed to create savings product.");
 
-            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2020");
+            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20200101");
             final LocalDate startDate = LocalDate.of(2021, 8, 12).minusDays(daysToSubtract);
-            final String startDateString = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US).format(startDate);
+            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
             final Integer savingsAccountId = this.savingsAccountHelper.applyForSavingsApplicationOnDate(clientId, savingsProductId,
                     SavingsAccountHelper.ACCOUNT_TYPE_INDIVIDUAL, startDateString);
             this.savingsAccountHelper.approveSavingsOnDate(savingsAccountId, startDateString);
@@ -153,7 +153,7 @@ public class SavingsAccrualAccountingIntegrationTest {
 
     @Test
     public void testNegativeAccrualPostsCorrectJournalEntries() {
-        runAt("12 August 2021", () -> {
+        runAt("20210812", () -> {
             // --- ARRANGE ---
             LOG.info("------------------------- INITIATING NEGATIVE ACCRUAL (OVERDRAFT) ACCOUNTING TEST -------------------------");
             final int daysToSubtract = 10;
@@ -187,9 +187,9 @@ public class SavingsAccrualAccountingIntegrationTest {
                     this.responseSpec);
             Assertions.assertNotNull(savingsProductId, "Savings product with overdraft creation failed.");
 
-            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2020");
+            final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20200101");
             final LocalDate startDate = LocalDate.of(2021, 8, 12).minusDays(daysToSubtract);
-            final String startDateString = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US).format(startDate);
+            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
             final Integer savingsAccountId = this.savingsAccountHelper.applyForSavingsApplicationOnDate(clientId, savingsProductId,
                     SavingsAccountHelper.ACCOUNT_TYPE_INDIVIDUAL, startDateString);
             this.savingsAccountHelper.approveSavingsOnDate(savingsAccountId, startDateString);

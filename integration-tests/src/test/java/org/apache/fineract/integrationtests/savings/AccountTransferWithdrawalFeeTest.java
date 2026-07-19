@@ -42,7 +42,7 @@ import org.junit.jupiter.api.Test;
 public class AccountTransferWithdrawalFeeTest extends BaseSavingsIntegrationTest {
 
     private static final String ACCOUNT_TRANSFER_AMOUNT = "15000.0";
-    private static final String TRANSFER_DATE = "01 March 2013";
+    private static final String TRANSFER_DATE = "20130301";
 
     @Test
     public void testFromSavingsToSavingsAccountTransferWithWithdrawalFee() {
@@ -63,13 +63,13 @@ public class AccountTransferWithdrawalFeeTest extends BaseSavingsIntegrationTest
 
         // Create FROM savings account and enable withdrawalFeeForTransfers on it
         final PostSavingsAccountsResponse fromSavingsResponse = applySavingsAccount(
-                applySavingsRequest(fromClientId, productId, "01 January 2013"));
+                applySavingsRequest(fromClientId, productId, "20130101"));
         final Long fromSavingsId = fromSavingsResponse.getSavingsId();
         enableWithdrawalFeeForTransfers(fromSavingsId);
 
-        approveSavingsAccount(fromSavingsId, "01 January 2013");
-        activateSavingsAccount(fromSavingsId, "01 January 2013");
-        deposit(fromSavingsId, "01 January 2013", BigDecimal.valueOf(30000));
+        approveSavingsAccount(fromSavingsId, "20130101");
+        activateSavingsAccount(fromSavingsId, "20130101");
+        deposit(fromSavingsId, "20130101", BigDecimal.valueOf(30000));
 
         // Add withdrawal fee charge to FROM savings account
         final PostSavingsAccountsSavingsAccountIdChargesResponse chargeResponse = ok(fineractClient().savingsAccountCharges
@@ -79,11 +79,11 @@ public class AccountTransferWithdrawalFeeTest extends BaseSavingsIntegrationTest
 
         // Create TO savings account
         final PostSavingsAccountsResponse toSavingsResponse = applySavingsAccount(
-                applySavingsRequest(toClientId, productId, "01 January 2013"));
+                applySavingsRequest(toClientId, productId, "20130101"));
         final Long toSavingsId = toSavingsResponse.getSavingsId();
 
-        approveSavingsAccount(toSavingsId, "01 January 2013");
-        activateSavingsAccount(toSavingsId, "01 January 2013");
+        approveSavingsAccount(toSavingsId, "20130101");
+        activateSavingsAccount(toSavingsId, "20130101");
 
         // Perform transfer - without null-checks in SavingsAccount.payWithdrawalFee(),
         // this would trigger NPE because paymentDetail is null during account transfers
@@ -132,13 +132,13 @@ public class AccountTransferWithdrawalFeeTest extends BaseSavingsIntegrationTest
 
         // Create FROM savings account with withdrawal fee enabled for transfers
         final PostSavingsAccountsResponse fromSavingsResponse = applySavingsAccount(
-                applySavingsRequest(fromClientId, productId, "01 January 2013"));
+                applySavingsRequest(fromClientId, productId, "20130101"));
         final Long fromSavingsId = fromSavingsResponse.getSavingsId();
         enableWithdrawalFeeForTransfers(fromSavingsId);
 
-        approveSavingsAccount(fromSavingsId, "01 January 2013");
-        activateSavingsAccount(fromSavingsId, "01 January 2013");
-        deposit(fromSavingsId, "01 January 2013", BigDecimal.valueOf(30000));
+        approveSavingsAccount(fromSavingsId, "20130101");
+        activateSavingsAccount(fromSavingsId, "20130101");
+        deposit(fromSavingsId, "20130101", BigDecimal.valueOf(30000));
 
         // Add payment-type withdrawal fee charge to FROM savings account
         final PostSavingsAccountsSavingsAccountIdChargesResponse chargeResponse = ok(fineractClient().savingsAccountCharges
@@ -148,11 +148,11 @@ public class AccountTransferWithdrawalFeeTest extends BaseSavingsIntegrationTest
 
         // Create TO savings account
         final PostSavingsAccountsResponse toSavingsResponse = applySavingsAccount(
-                applySavingsRequest(toClientId, productId, "01 January 2013"));
+                applySavingsRequest(toClientId, productId, "20130101"));
         final Long toSavingsId = toSavingsResponse.getSavingsId();
 
-        approveSavingsAccount(toSavingsId, "01 January 2013");
-        activateSavingsAccount(toSavingsId, "01 January 2013");
+        approveSavingsAccount(toSavingsId, "20130101");
+        activateSavingsAccount(toSavingsId, "20130101");
 
         // Perform transfer - without null-checks in SavingsAccount.payWithdrawalFee(),
         // this throws NPE because paymentDetail is null and code tries to call

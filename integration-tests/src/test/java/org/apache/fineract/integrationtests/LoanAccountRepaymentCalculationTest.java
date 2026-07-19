@@ -127,7 +127,7 @@ public class LoanAccountRepaymentCalculationTest extends BaseLoanIntegrationTest
                     LocalDate.of(2023, 6, 3), false);
 
             // disbursement
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 March 2023", loanId, "1250");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230303", loanId, "1250");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -222,7 +222,7 @@ public class LoanAccountRepaymentCalculationTest extends BaseLoanIntegrationTest
                     LocalDate.of(2023, 6, 3), false);
 
             // disbursement
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 March 2023", loanId, "1250");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230303", loanId, "1250");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -306,7 +306,7 @@ public class LoanAccountRepaymentCalculationTest extends BaseLoanIntegrationTest
                     LocalDate.of(2023, 6, 3), false);
 
             // disbursement
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 March 2023", loanId, "1250");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230303", loanId, "1250");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -386,7 +386,7 @@ public class LoanAccountRepaymentCalculationTest extends BaseLoanIntegrationTest
                     LocalDate.of(2023, 6, 3), false);
 
             // disbursement
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 March 2023", loanId, "1250");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230303", loanId, "1250");
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanId.longValue());
 
@@ -427,12 +427,12 @@ public class LoanAccountRepaymentCalculationTest extends BaseLoanIntegrationTest
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("3").withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsDecliningBalance()
                 .withAmortizationTypeAsEqualInstallments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("03 March 2023").withSubmittedOnDate("03 March 2023").withLoanType("individual")
+                .withExpectedDisbursementDate("20230303").withSubmittedOnDate("20230303").withLoanType("individual")
                 .withExternalId(externalId).withRepaymentStrategy(repaymentStartegy)
                 .build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("03 March 2023", "1250", loanId, null);
+        loanTransactionHelper.approveLoan("20230303", "1250", loanId, null);
         return loanId;
     }
 

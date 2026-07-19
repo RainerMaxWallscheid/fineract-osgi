@@ -33,10 +33,10 @@ public class ClientLoanAccountLockIntegrationTest extends FeignLoanTestBase {
         Long clientId = createClient();
         Long loanProductId = createLoanProduct(createOnePeriod30DaysLongNoInterestPeriodicAccrualProduct());
 
-        Long loanId = applyAndApproveLoan(clientId, loanProductId, "20 September 2011", 12000.0, 4);
+        Long loanId = applyAndApproveLoan(clientId, loanProductId, "20110920", 12000.0, 4);
         verifyLoanStatus(loanId, LoanStatus.APPROVED);
 
-        disburseLoan(loanId, "20 September 2011", 12000.0);
+        disburseLoan(loanId, "20110920", 12000.0);
         verifyLoanStatus(loanId, LoanStatus.ACTIVE);
 
         executeVoid(() -> FineractFeignClientHelper.getFineractFeignClient().loanAccountLock().placeLockOnLoanAccount(loanId,

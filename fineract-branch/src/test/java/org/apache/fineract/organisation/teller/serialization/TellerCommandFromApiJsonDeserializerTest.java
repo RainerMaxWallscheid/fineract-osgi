@@ -43,7 +43,7 @@ class TellerCommandFromApiJsonDeserializerTest {
 
     @Test
     public void testCashTxnValidJsonPassesValidation() throws JsonProcessingException {
-        String json = cashTxnJson(BigDecimal.valueOf(1000), "10 September 2022", "Test note", "USD");
+        String json = cashTxnJson(BigDecimal.valueOf(1000), "20220910", "Test note", "USD");
         assertDoesNotThrow(() -> underTest.validateForCashTxnForCashier(json));
     }
 
@@ -58,7 +58,7 @@ class TellerCommandFromApiJsonDeserializerTest {
     @Test
     public void testCashTxnMissingTxnAmountThrowsValidationException() {
         assertPlatformValidationException("The parameter `txnAmount` is mandatory.", "validation.msg.teller.txnAmount.cannot.be.blank",
-                () -> underTest.validateForCashTxnForCashier(cashTxnJson(null, "10 September 2022", "Test note", "USD")));
+                () -> underTest.validateForCashTxnForCashier(cashTxnJson(null, "20220910", "Test note", "USD")));
     }
 
     @Test
@@ -71,21 +71,21 @@ class TellerCommandFromApiJsonDeserializerTest {
     public void testCashTxnTxnNoteExceedingMaxLengthThrowsValidationException() {
         assertPlatformValidationException("The parameter `txnNote` exceeds max length of 200.",
                 "validation.msg.teller.txnNote.exceeds.max.length", () -> underTest
-                        .validateForCashTxnForCashier(cashTxnJson(BigDecimal.valueOf(1000), "10 September 2022", "A".repeat(201), "USD")));
+                        .validateForCashTxnForCashier(cashTxnJson(BigDecimal.valueOf(1000), "20220910", "A".repeat(201), "USD")));
     }
 
     @Test
     public void testCashTxnCurrencyCodeExceedingMaxLengthThrowsValidationException() {
         assertPlatformValidationException("The parameter `currencyCode` exceeds max length of 3.",
                 "validation.msg.teller.currencyCode.exceeds.max.length", () -> underTest
-                        .validateForCashTxnForCashier(cashTxnJson(BigDecimal.valueOf(1000), "10 September 2022", "Test note", "ABCD")));
+                        .validateForCashTxnForCashier(cashTxnJson(BigDecimal.valueOf(1000), "20220910", "Test note", "ABCD")));
     }
 
     @NonNull
     private String cashTxnJson(@Nullable BigDecimal txnAmount, @Nullable String txnDate, @Nullable String txnNote,
             @Nullable String currencyCode) throws JsonProcessingException {
         Map<String, Object> map = new HashMap<>();
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("locale", "en");
         Optional.ofNullable(txnAmount).ifPresent(a -> map.put("txnAmount", a));
         Optional.ofNullable(txnDate).ifPresent(d -> map.put("txnDate", d));

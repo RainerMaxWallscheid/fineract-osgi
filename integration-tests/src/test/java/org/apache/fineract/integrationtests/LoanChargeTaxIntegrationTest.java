@@ -57,10 +57,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class LoanChargeTaxIntegrationTest extends BaseLoanIntegrationTest {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanChargeTaxIntegrationTest.class);
-    private static final String DATE_FORMAT = "dd MMMM yyyy";
-    private static final String LOAN_DATE = "01 January 2023";
-    private static final String DUE_DATE = "15 January 2023";
-    private static final String TAX_START_DATE = "01 January 2013";
+    private static final String DATE_FORMAT = "yyyyMMdd";
+    private static final String LOAN_DATE = "20230101";
+    private static final String DUE_DATE = "20230115";
+    private static final String TAX_START_DATE = "20130101";
 
     // -----------------------------------------------------------------------
     // 1. TaxGroup setup helpers

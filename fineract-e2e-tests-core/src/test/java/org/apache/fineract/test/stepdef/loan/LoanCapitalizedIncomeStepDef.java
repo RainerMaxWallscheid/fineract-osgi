@@ -42,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class LoanCapitalizedIncomeStepDef extends AbstractStepDef {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanCapitalizedIncomeStepDef.class);
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
     @Autowired
     FineractFeignClient fineractClient;

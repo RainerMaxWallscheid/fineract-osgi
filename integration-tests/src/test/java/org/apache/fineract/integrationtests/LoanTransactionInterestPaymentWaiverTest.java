@@ -88,7 +88,7 @@ import org.slf4j.LoggerFactory;
 public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegrationTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AdvancedPaymentAllocationLoanRepaymentScheduleTest.class);
-    private static final String DATETIME_PATTERN = "dd MMMM yyyy";
+    private static final String DATETIME_PATTERN = "yyyyMMdd";
     private static ResponseSpecification responseSpec;
     private static RequestSpecification requestSpec;
     private static BusinessDateHelper businessDateHelper;
@@ -124,10 +124,10 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
 
     @Test
     public void testInterestPaymentWaiverTransactionForProgressiveLoan() {
-        runAt("15 January 2023", () -> {
+        runAt("20230115", () -> {
             Integer numberOfRepayments = 4;
             double amount = 1000.0;
-            String loanDisbursementDate = "1 January 2023";
+            String loanDisbursementDate = "20230101";
 
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -140,53 +140,53 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
                     loanProductResponse.getResourceId(), numberOfRepayments, loanDisbursementDate, amount, null);
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 February 2023"), //
-                    installment(250.0, false, "01 March 2023"), //
-                    installment(250.0, false, "01 April 2023"), //
-                    installment(250.0, false, "01 May 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230201"), //
+                    installment(250.0, false, "20230301"), //
+                    installment(250.0, false, "20230401"), //
+                    installment(250.0, false, "20230501") //
             );
 
-            loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("1 January 2023")
+            loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("20230101")
                     .dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
 
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+                    transaction(1000.0, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 
-            Long repayment1TransactionId = addInterestPaymentWaiverForLoan(loanId, 250.0, "2 January 2023");
+            Long repayment1TransactionId = addInterestPaymentWaiverForLoan(loanId, 250.0, "20230102");
 
             assertNotNull(repayment1TransactionId);
 
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                    transaction(250.0, "Interest Payment Waiver", "02 January 2023", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0));
+                    transaction(1000.0, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                    transaction(250.0, "Interest Payment Waiver", "20230102", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0));
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, 0, 0, 0, 0.0, true, "01 February 2023", 750.0), //
-                    installment(250.0, false, "01 March 2023"), //
-                    installment(250.0, false, "01 April 2023"), //
-                    installment(250.0, false, "01 May 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, 0, 0, 0, 0.0, true, "20230201", 750.0), //
+                    installment(250.0, false, "20230301"), //
+                    installment(250.0, false, "20230401"), //
+                    installment(250.0, false, "20230501") //
             );
 
-            Long repayment2TransactionId = addInterestPaymentWaiverForLoan(loanId, 250.0, "3 January 2023");
+            Long repayment2TransactionId = addInterestPaymentWaiverForLoan(loanId, 250.0, "20230103");
 
             assertNotNull(repayment2TransactionId);
 
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                    transaction(250.0, "Interest Payment Waiver", "02 January 2023", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0),
-                    transaction(250.0, "Interest Payment Waiver", "03 January 2023", 500.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+                    transaction(1000.0, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                    transaction(250.0, "Interest Payment Waiver", "20230102", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0),
+                    transaction(250.0, "Interest Payment Waiver", "20230103", 500.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 
         });
     }
 
     @Test
     public void testInterestPaymentWaiverTransactionValidationErrorTests() {
-        runAt("15 January 2023", () -> {
+        runAt("20230115", () -> {
             Integer numberOfRepayments = 4;
             double amount = 1000.0;
-            String loanDisbursementDate = "1 January 2023";
+            String loanDisbursementDate = "20230101";
 
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -199,30 +199,30 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
                     loanProductResponse.getResourceId(), numberOfRepayments, loanDisbursementDate, amount, null);
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 February 2023"), //
-                    installment(250.0, false, "01 March 2023"), //
-                    installment(250.0, false, "01 April 2023"), //
-                    installment(250.0, false, "01 May 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230201"), //
+                    installment(250.0, false, "20230301"), //
+                    installment(250.0, false, "20230401"), //
+                    installment(250.0, false, "20230501") //
             );
 
             // loan should be active
-            assertThrows(Exception.class, () -> addInterestPaymentWaiverForLoan(loanId, 250.0, "2 January 2023"));
+            assertThrows(Exception.class, () -> addInterestPaymentWaiverForLoan(loanId, 250.0, "20230102"));
 
-            loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("1 January 2023")
+            loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("20230101")
                     .dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
 
             // transaction cant be made before disbursement
-            assertThrows(Exception.class, () -> addInterestPaymentWaiverForLoan(loanId, 250.0, "30 December 2022"));
+            assertThrows(Exception.class, () -> addInterestPaymentWaiverForLoan(loanId, 250.0, "20221230"));
         });
     }
 
     @Test
     public void testInterestPaymentWaiverTransactionForProgressiveLoanWithExternalTransactionId() {
-        runAt("15 January 2023", () -> {
+        runAt("20230115", () -> {
             Integer numberOfRepayments = 4;
             double amount = 1000.0;
-            String loanDisbursementDate = "1 January 2023";
+            String loanDisbursementDate = "20230101";
 
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -236,24 +236,24 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
                     loanProductResponse.getResourceId(), numberOfRepayments, loanDisbursementDate, amount, loanExternalIdStr);
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 February 2023"), //
-                    installment(250.0, false, "01 March 2023"), //
-                    installment(250.0, false, "01 April 2023"), //
-                    installment(250.0, false, "01 May 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230201"), //
+                    installment(250.0, false, "20230301"), //
+                    installment(250.0, false, "20230401"), //
+                    installment(250.0, false, "20230501") //
             );
 
-            loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("1 January 2023")
+            loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("20230101")
                     .dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
 
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+                    transaction(1000.0, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 
             // Check whether the provided external id was retrieved
             String transactionExternalIdStr = UUID.randomUUID().toString();
             final PostLoansLoanIdTransactionsResponse interestPaymentWaiverResultWithExternalId = loanTransactionHelper
-                    .makeGoodwillCredit(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy")
-                            .transactionDate("03 January 2023").locale("en").transactionAmount(5.0).externalId(transactionExternalIdStr));
+                    .makeGoodwillCredit(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd")
+                            .transactionDate("20230103").locale("en").transactionAmount(5.0).externalId(transactionExternalIdStr));
             assertEquals(transactionExternalIdStr, interestPaymentWaiverResultWithExternalId.getResourceExternalId());
 
             GetLoansLoanIdTransactionsTransactionIdResponse response = loanTransactionHelper.getLoanTransactionDetails(loanId,
@@ -269,10 +269,10 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
 
     @Test
     public void testInterestPaymentWaiverTransactionReversePaymentForProgressiveLoan() {
-        runAt("15 January 2023", () -> {
+        runAt("20230115", () -> {
             Integer numberOfRepayments = 4;
             double amount = 1000.0;
-            String loanDisbursementDate = "1 January 2023";
+            String loanDisbursementDate = "20230101";
 
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -285,47 +285,47 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
                     loanProductResponse.getResourceId(), numberOfRepayments, loanDisbursementDate, amount, null);
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 February 2023"), //
-                    installment(250.0, false, "01 March 2023"), //
-                    installment(250.0, false, "01 April 2023"), //
-                    installment(250.0, false, "01 May 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230201"), //
+                    installment(250.0, false, "20230301"), //
+                    installment(250.0, false, "20230401"), //
+                    installment(250.0, false, "20230501") //
             );
 
-            loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("1 January 2023")
+            loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("20230101")
                     .dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
 
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+                    transaction(1000.0, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 
-            Long repayment1TransactionId = addInterestPaymentWaiverForLoan(loanId, 250.0, "2 January 2023");
+            Long repayment1TransactionId = addInterestPaymentWaiverForLoan(loanId, 250.0, "20230102");
 
             assertNotNull(repayment1TransactionId);
 
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                    transaction(250.0, "Interest Payment Waiver", "02 January 2023", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0));
+                    transaction(1000.0, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                    transaction(250.0, "Interest Payment Waiver", "20230102", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0));
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, 0, 0, 0, 0.0, true, "01 February 2023", 750.0), //
-                    installment(250.0, false, "01 March 2023"), //
-                    installment(250.0, false, "01 April 2023"), //
-                    installment(250.0, false, "01 May 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, 0, 0, 0, 0.0, true, "20230201", 750.0), //
+                    installment(250.0, false, "20230301"), //
+                    installment(250.0, false, "20230401"), //
+                    installment(250.0, false, "20230501") //
             );
 
-            loanTransactionHelper.reverseRepayment(Math.toIntExact(loanId), Math.toIntExact(repayment1TransactionId), "2 January 2023");
+            loanTransactionHelper.reverseRepayment(Math.toIntExact(loanId), Math.toIntExact(repayment1TransactionId), "20230102");
 
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                    transaction(250.0, "Interest Payment Waiver", "02 January 2023", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0, true));
+                    transaction(1000.0, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                    transaction(250.0, "Interest Payment Waiver", "20230102", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0, true));
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, 0, 0, 0, 250.0, false, "01 February 2023", 750.0), //
-                    installment(250.0, false, "01 March 2023"), //
-                    installment(250.0, false, "01 April 2023"), //
-                    installment(250.0, false, "01 May 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, 0, 0, 0, 250.0, false, "20230201", 750.0), //
+                    installment(250.0, false, "20230301"), //
+                    installment(250.0, false, "20230401"), //
+                    installment(250.0, false, "20230501") //
             );
 
         });
@@ -333,10 +333,10 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
 
     @Test
     public void testInterestPaymentWaiverTransactionChargeBackForProgressiveLoan() {
-        runAt("15 January 2023", () -> {
+        runAt("20230115", () -> {
             Integer numberOfRepayments = 4;
             double amount = 1000.0;
-            String loanDisbursementDate = "1 January 2023";
+            String loanDisbursementDate = "20230101";
 
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -349,48 +349,48 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
                     loanProductResponse.getResourceId(), numberOfRepayments, loanDisbursementDate, amount, null);
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 February 2023"), //
-                    installment(250.0, false, "01 March 2023"), //
-                    installment(250.0, false, "01 April 2023"), //
-                    installment(250.0, false, "01 May 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230201"), //
+                    installment(250.0, false, "20230301"), //
+                    installment(250.0, false, "20230401"), //
+                    installment(250.0, false, "20230501") //
             );
 
-            loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("1 January 2023")
+            loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("20230101")
                     .dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
 
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+                    transaction(1000.0, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 
-            Long repayment1TransactionId = addInterestPaymentWaiverForLoan(loanId, 250.0, "2 January 2023");
+            Long repayment1TransactionId = addInterestPaymentWaiverForLoan(loanId, 250.0, "20230102");
 
             assertNotNull(repayment1TransactionId);
 
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                    transaction(250.0, "Interest Payment Waiver", "02 January 2023", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0));
+                    transaction(1000.0, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                    transaction(250.0, "Interest Payment Waiver", "20230102", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0));
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, 0, 0, 0, 0.0, true, "01 February 2023", 750.0), //
-                    installment(250.0, false, "01 March 2023"), //
-                    installment(250.0, false, "01 April 2023"), //
-                    installment(250.0, false, "01 May 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, 0, 0, 0, 0.0, true, "20230201", 750.0), //
+                    installment(250.0, false, "20230301"), //
+                    installment(250.0, false, "20230401"), //
+                    installment(250.0, false, "20230501") //
             );
 
             addChargebackForLoan(loanId, repayment1TransactionId, 250.0);
 
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                    transaction(250.0, "Interest Payment Waiver", "02 January 2023", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0),
-                    transaction(250.0, "Chargeback", "15 January 2023", 1000.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+                    transaction(1000.0, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                    transaction(250.0, "Interest Payment Waiver", "20230102", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0),
+                    transaction(250.0, "Chargeback", "20230115", 1000.0, 250.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(500.0, 0, 0, 0, 250.0, false, "01 February 2023", 750.0), //
-                    installment(250.0, false, "01 March 2023"), //
-                    installment(250.0, false, "01 April 2023"), //
-                    installment(250.0, false, "01 May 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(500.0, 0, 0, 0, 250.0, false, "20230201", 750.0), //
+                    installment(250.0, false, "20230301"), //
+                    installment(250.0, false, "20230401"), //
+                    installment(250.0, false, "20230501") //
             );
 
         });
@@ -437,17 +437,17 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
     // 3. Overpay 2nd installment
     @Test
     public void testInterestPaymentWaiverUC3() {
-        runAt("15 February 2023", () -> {
+        runAt("20230215", () -> {
 
             final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), commonLoanProductId,
-                    BigDecimal.valueOf(500.0), 45, 15, 3, BigDecimal.ZERO, "01 January 2023", "01 January 2023");
+                    BigDecimal.valueOf(500.0), 45, 15, 3, BigDecimal.ZERO, "20230101", "20230101");
 
             loanTransactionHelper.approveLoan(loanResponse.getLoanId(),
                     new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(500)).dateFormat(DATETIME_PATTERN)
-                            .approvedOnDate("01 January 2023").locale("en"));
+                            .approvedOnDate("20230101").locale("en"));
 
             loanTransactionHelper.disburseLoan(loanResponse.getLoanId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("01 January 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230101").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(500.00)).locale("en"));
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
@@ -460,7 +460,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeInterestPaymentWaiver(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("16 January 2023").locale("en").transactionAmount(150.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230116").locale("en").transactionAmount(150.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 225.0, 275.0, 225.0, 275.0, null);
@@ -472,7 +472,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeLoanRepayment(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("31 January 2023").locale("en").transactionAmount(125.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230131").locale("en").transactionAmount(125.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 100.0, 400.0, 100.0, 400.0, null);
@@ -484,7 +484,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeLoanRepayment(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("15 February 2023").locale("en").transactionAmount(125.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230215").locale("en").transactionAmount(125.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 0.0, 500.0, 0.0, 500.0, 25.0);
@@ -505,17 +505,17 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
     // 4. Pay rest on time
     @Test
     public void testInterestPaymentWaiverUC12() {
-        runAt("15 February 2023", () -> {
+        runAt("20230215", () -> {
 
             final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), commonLoanProductId,
-                    BigDecimal.valueOf(500.0), 45, 15, 3, BigDecimal.ZERO, "01 January 2023", "01 January 2023");
+                    BigDecimal.valueOf(500.0), 45, 15, 3, BigDecimal.ZERO, "20230101", "20230101");
 
             loanTransactionHelper.approveLoan(loanResponse.getLoanId(),
                     new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(500)).dateFormat(DATETIME_PATTERN)
-                            .approvedOnDate("01 January 2023").locale("en"));
+                            .approvedOnDate("20230101").locale("en"));
 
             loanTransactionHelper.disburseLoan(loanResponse.getLoanId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("01 January 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230101").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(500.00)).locale("en"));
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
@@ -528,7 +528,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeInterestPaymentWaiver(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("08 January 2023").locale("en").transactionAmount(200.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230108").locale("en").transactionAmount(200.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 175.0, 325.0, 175.0, 325.0, null);
@@ -540,7 +540,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeLoanRepayment(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("16 January 2023").locale("en").transactionAmount(125.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230116").locale("en").transactionAmount(125.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 50.0, 450.0, 50.0, 450.0, null);
@@ -552,7 +552,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeLoanRepayment(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("31 January 2023").locale("en").transactionAmount(50.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230131").locale("en").transactionAmount(50.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 0.0, 500.0, 0.0, 500.0, null);
@@ -573,17 +573,17 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
     // 4. Pay rest on time
     @Test
     public void testInterestPaymentWaiverUC13() {
-        runAt("15 February 2023", () -> {
+        runAt("20230215", () -> {
 
             final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), commonLoanProductId,
-                    BigDecimal.valueOf(500.0), 45, 15, 3, BigDecimal.ZERO, "01 January 2023", "01 January 2023");
+                    BigDecimal.valueOf(500.0), 45, 15, 3, BigDecimal.ZERO, "20230101", "20230101");
 
             loanTransactionHelper.approveLoan(loanResponse.getLoanId(),
                     new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(500)).dateFormat(DATETIME_PATTERN)
-                            .approvedOnDate("01 January 2023").locale("en"));
+                            .approvedOnDate("20230101").locale("en"));
 
             loanTransactionHelper.disburseLoan(loanResponse.getLoanId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("01 January 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230101").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(500.00)).locale("en"));
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
@@ -596,7 +596,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeInterestPaymentWaiver(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("08 January 2023").locale("en").transactionAmount(200.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230108").locale("en").transactionAmount(200.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 175.0, 325.0, 175.0, 325.0, null);
@@ -608,7 +608,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeLoanRepayment(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("16 January 2023").locale("en").transactionAmount(125.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230116").locale("en").transactionAmount(125.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 50.0, 450.0, 50.0, 450.0, null);
@@ -620,7 +620,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeLoanRepayment(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("31 January 2023").locale("en").transactionAmount(50.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230131").locale("en").transactionAmount(50.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 0.0, 500.0, 0.0, 500.0, null);
@@ -642,22 +642,22 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
     // 5. Pay rest on time
     @Test
     public void testInterestPaymentWaiverUC15() {
-        runAt("15 February 2023", () -> {
+        runAt("20230215", () -> {
 
             final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), commonLoanProductId,
-                    BigDecimal.valueOf(500.0), 45, 15, 3, BigDecimal.ZERO, "01 January 2023", "01 January 2023");
+                    BigDecimal.valueOf(500.0), 45, 15, 3, BigDecimal.ZERO, "20230101", "20230101");
 
             loanTransactionHelper.approveLoan(loanResponse.getLoanId(),
                     new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(500)).dateFormat(DATETIME_PATTERN)
-                            .approvedOnDate("01 January 2023").locale("en"));
+                            .approvedOnDate("20230101").locale("en"));
 
             loanTransactionHelper.disburseLoan(loanResponse.getLoanId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("01 January 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230101").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(500.00)).locale("en"));
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             loanTransactionHelper.reverseLoanTransaction(loanResponse.getLoanId(), loanDetails.getTransactions().get(1).getId(),
-                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("01 January 2023")
+                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("20230101")
                             .transactionAmount(0.0).locale("en"));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
@@ -669,7 +669,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeInterestPaymentWaiver(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("15 January 2023").locale("en").transactionAmount(200.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230115").locale("en").transactionAmount(200.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 300.0, 200.0, 300.0, 200.0, null);
@@ -681,7 +681,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeLoanRepayment(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("16 January 2023").locale("en").transactionAmount(125.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230116").locale("en").transactionAmount(125.0));
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 175.0, 325.0, 175.0, 325.0, null);
             validateRepaymentPeriod(loanDetails, 1, 125.0, 125.0, 0.0, 0.0, 125.0);
@@ -692,7 +692,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeLoanRepayment(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("31 January 2023").locale("en").transactionAmount(125.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230131").locale("en").transactionAmount(125.0));
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 50.0, 450.0, 50.0, 450.0, null);
             validateRepaymentPeriod(loanDetails, 1, 125.0, 125.0, 0.0, 0.0, 125.0);
@@ -703,7 +703,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeLoanRepayment(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("15 February 2023").locale("en").transactionAmount(50.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230215").locale("en").transactionAmount(50.0));
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 0.0, 500.0, 0.0, 500.0, null);
             validateRepaymentPeriod(loanDetails, 1, 125.0, 125.0, 0.0, 0.0, 125.0);
@@ -724,17 +724,17 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
     // 5. CBR
     @Test
     public void testInterestPaymentWaiverUC17c() {
-        runAt("15 February 2023", () -> {
+        runAt("20230215", () -> {
 
             final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), commonLoanProductId,
-                    BigDecimal.valueOf(500.0), 45, 15, 3, BigDecimal.ZERO, "01 January 2023", "01 January 2023");
+                    BigDecimal.valueOf(500.0), 45, 15, 3, BigDecimal.ZERO, "20230101", "20230101");
 
             loanTransactionHelper.approveLoan(loanResponse.getLoanId(),
                     new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(500)).dateFormat(DATETIME_PATTERN)
-                            .approvedOnDate("01 January 2023").locale("en"));
+                            .approvedOnDate("20230101").locale("en"));
 
             loanTransactionHelper.disburseLoan(loanResponse.getLoanId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("01 January 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230101").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(500.00)).locale("en"));
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
@@ -747,7 +747,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeInterestPaymentWaiver(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("08 January 2023").locale("en").transactionAmount(500.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230108").locale("en").transactionAmount(500.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 0.0, 500.0, 0.0, 500.0, 125.0);
@@ -759,7 +759,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getOverpaid());
 
             loanTransactionHelper.makeCreditBalanceRefund(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("09 January 2023").locale("en").transactionAmount(125.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230109").locale("en").transactionAmount(125.0));
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 0.0, 500.0, 0.0, 500.0, null);
             validateRepaymentPeriod(loanDetails, 1, 125.0, 125.0, 0.0, 0.0, 0.0);
@@ -852,7 +852,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
     // 7. Do Interest Payment Waiver (in advance payment)
     @Test
     public void testInterestPaymentWaiverUC112() {
-        runAt("01 September 2023", () -> {
+        runAt("20230901", () -> {
 
             final Account assetAccount = accountHelper.createAssetAccount();
             final Account incomeAccount = accountHelper.createIncomeAccount();
@@ -861,14 +861,14 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             Integer localLoanProductId = createLoanProduct("1000", "15", "3", true, "25", false, LoanScheduleType.PROGRESSIVE,
                     LoanScheduleProcessingType.HORIZONTAL, assetAccount, incomeAccount, expenseAccount, overpaymentAccount);
             final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), localLoanProductId,
-                    BigDecimal.valueOf(1000.0), 45, 15, 3, BigDecimal.ZERO, "01 September 2023", "01 September 2023");
+                    BigDecimal.valueOf(1000.0), 45, 15, 3, BigDecimal.ZERO, "20230901", "20230901");
 
             loanTransactionHelper.approveLoan(loanResponse.getLoanId(),
                     new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(1000)).dateFormat(DATETIME_PATTERN)
-                            .approvedOnDate("01 September 2023").locale("en"));
+                            .approvedOnDate("20230901").locale("en"));
 
             loanTransactionHelper.disburseLoan(loanResponse.getLoanId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("01 September 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230901").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
@@ -883,7 +883,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             Integer penalty = ChargesHelper.createCharges(requestSpec, responseSpec,
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "20", true));
             loanTransactionHelper.addChargesForLoan(loanResponse.getLoanId().intValue(),
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "17 October 2023", "20"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "20231017", "20"));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 1020.0, 0.0, 1000.0, 0.0, null);
@@ -896,7 +896,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeLoanRepayment(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("01 September 2023").locale("en").transactionAmount(250.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230901").locale("en").transactionAmount(250.0));
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 770.0, 250.0, 750.0, 250.0, null);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2023, 9, 1), 250.0, 250.0, 0.0, 0.0, 0.0);
@@ -911,7 +911,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
                     .date("2023.09.16").dateFormat("yyyy.MM.dd").locale("en"));
 
             loanTransactionHelper.makeLoanRepayment(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("16 September 2023").locale("en").transactionAmount(250.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230916").locale("en").transactionAmount(250.0));
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 520.0, 500.0, 500.0, 500.0, null);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2023, 9, 1), 250.0, 250.0, 0.0, 0.0, 0.0);
@@ -923,12 +923,12 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.addChargesForLoan(loanResponse.getLoanId().intValue(),
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "17 September 2023", "20"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "20230917", "20"));
             loanTransactionHelper.addChargesForLoan(loanResponse.getLoanId().intValue(),
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "16 October 2023", "20"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "20231016", "20"));
 
             loanTransactionHelper.makeInterestPaymentWaiver(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("16 September 2023").locale("en").transactionAmount(50.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230916").locale("en").transactionAmount(50.0));
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 510.0, 550.0, 490.0, 510.0, null);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2023, 9, 1), 250.0, 250.0, 0.0, 0.0, 0.0);
@@ -958,7 +958,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
     // 7. Do Interest Payment Waiver (in advance payment)
     @Test
     public void testInterestPaymentWaiverUC113() {
-        runAt("01 September 2023", () -> {
+        runAt("20230901", () -> {
 
             final Account assetAccount = accountHelper.createAssetAccount();
             final Account incomeAccount = accountHelper.createIncomeAccount();
@@ -967,15 +967,15 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             Integer localLoanProductId = createLoanProduct("1000", "15", "3", true, "25", false, LoanScheduleType.PROGRESSIVE,
                     LoanScheduleProcessingType.VERTICAL, assetAccount, incomeAccount, expenseAccount, overpaymentAccount);
             final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), localLoanProductId,
-                    BigDecimal.valueOf(1000.0), 45, 15, 3, BigDecimal.ZERO, "01 September 2023", "01 September 2023",
+                    BigDecimal.valueOf(1000.0), 45, 15, 3, BigDecimal.ZERO, "20230901", "20230901",
                     LoanScheduleProcessingType.VERTICAL);
 
             loanTransactionHelper.approveLoan(loanResponse.getLoanId(),
                     new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(1000)).dateFormat(DATETIME_PATTERN)
-                            .approvedOnDate("01 September 2023").locale("en"));
+                            .approvedOnDate("20230901").locale("en"));
 
             loanTransactionHelper.disburseLoan(loanResponse.getLoanId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("01 September 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230901").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
@@ -990,7 +990,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             Integer penalty = ChargesHelper.createCharges(requestSpec, responseSpec,
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "20", true));
             loanTransactionHelper.addChargesForLoan(loanResponse.getLoanId().intValue(),
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "17 October 2023", "20"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "20231017", "20"));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 1020.0, 0.0, 1000.0, 0.0, null);
@@ -1003,7 +1003,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.makeLoanRepayment(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("01 September 2023").locale("en").transactionAmount(250.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230901").locale("en").transactionAmount(250.0));
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 770.0, 250.0, 750.0, 250.0, null);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2023, 9, 1), 250.0, 250.0, 0.0, 0.0, 0.0);
@@ -1018,7 +1018,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
                     .date("2023.09.16").dateFormat("yyyy.MM.dd").locale("en"));
 
             loanTransactionHelper.makeLoanRepayment(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("16 September 2023").locale("en").transactionAmount(250.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230916").locale("en").transactionAmount(250.0));
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 520.0, 500.0, 500.0, 500.0, null);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2023, 9, 1), 250.0, 250.0, 0.0, 0.0, 0.0);
@@ -1030,12 +1030,12 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertTrue(loanDetails.getStatus().getActive());
 
             loanTransactionHelper.addChargesForLoan(loanResponse.getLoanId().intValue(),
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "17 September 2023", "20"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "20230917", "20"));
             loanTransactionHelper.addChargesForLoan(loanResponse.getLoanId().intValue(),
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "16 October 2023", "20"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "20231016", "20"));
 
             loanTransactionHelper.makeInterestPaymentWaiver(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("16 September 2023").locale("en").transactionAmount(50.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20230916").locale("en").transactionAmount(50.0));
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 510.0, 550.0, 500.0, 500.0, null);
             validateRepaymentPeriod(loanDetails, 1, LocalDate.of(2023, 9, 1), 250.0, 250.0, 0.0, 0.0, 0.0);
@@ -1064,13 +1064,13 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
     // reverse 4 - 1 installment Payment Waiver transactions
     @Test
     public void testAccounting() {
-        runAt("15 May 2023", () -> {
+        runAt("20230515", () -> {
 
-            final String disbursementDay = "01 January 2023";
-            final String repaymentPeriod1DueDate = "01 February 2023";
-            final String repaymentPeriod2DueDate = "01 March 2023";
-            final String repaymentPeriod3DueDate = "01 April 2023";
-            final String repaymentPeriod4DueDate = "01 May 2023";
+            final String disbursementDay = "20230101";
+            final String repaymentPeriod1DueDate = "20230201";
+            final String repaymentPeriod2DueDate = "20230301";
+            final String repaymentPeriod3DueDate = "20230401";
+            final String repaymentPeriod4DueDate = "20230501";
 
             Long localLoanProductId = createLoanProductAccountingAccuralPeriodicWithInterest();
             final Long loanId = applyForLoanApplicationWithInterest(client.getClientId(), localLoanProductId, BigDecimal.valueOf(40000),
@@ -1349,13 +1349,13 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
     // reverse 4 - 1 Interest Payment Waiver transactions
     @Test
     public void testInterestPaymentWaiverTransactionAccountingAccuralForInterestPenaltyFeeOverpaymentChargeOFFLoan() {
-        runAt("2 January 2023", () -> {
+        runAt("20230102", () -> {
 
-            final String disbursementDay = "01 January 2023";
-            final String repaymentPeriod1DueDate = "01 February 2023";
-            final String repaymentPeriod2DueDate = "01 March 2023";
-            final String repaymentPeriod3DueDate = "01 April 2023";
-            final String repaymentPeriod4DueDate = "01 May 2023";
+            final String disbursementDay = "20230101";
+            final String repaymentPeriod1DueDate = "20230201";
+            final String repaymentPeriod2DueDate = "20230301";
+            final String repaymentPeriod3DueDate = "20230401";
+            final String repaymentPeriod4DueDate = "20230501";
 
             Long localLoanProductId = createLoanProductAccountingAccuralPeriodicWithInterest();
             final Long loanId = applyForLoanApplicationWithInterest(client.getClientId(), localLoanProductId, BigDecimal.valueOf(40000),
@@ -1378,10 +1378,10 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             Integer chargeOffReasonId = CodeHelper.createChargeOffCodeValue(requestSpec, responseSpec, randomText, 1);
             String transactionExternalId = UUID.randomUUID().toString();
             PostLoansLoanIdTransactionsResponse chargeOffTransaction = loanTransactionHelper.chargeOffLoan(loanId,
-                    new PostLoansLoanIdTransactionsRequest().transactionDate("2 January 2023").locale("en").dateFormat("dd MMMM yyyy")
+                    new PostLoansLoanIdTransactionsRequest().transactionDate("20230102").locale("en").dateFormat("yyyyMMdd")
                             .externalId(transactionExternalId).chargeOffReasonId((long) chargeOffReasonId));
 
-            updateBusinessDate("15 May 2023");
+            updateBusinessDate("20230515");
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
             validateLoanSummaryBalances(loanDetails, 1260.0, 0.0, 1000.0, 0.0, null);
@@ -1576,10 +1576,10 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
 
     @Test
     public void testInterestPaymentWaiverAdjustTransaction() {
-        runAt("15 January 2023", () -> {
+        runAt("20230115", () -> {
             Integer numberOfRepayments = 4;
             double amount = 1000.0;
-            String loanDisbursementDate = "1 January 2023";
+            String loanDisbursementDate = "20230101";
 
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -1592,30 +1592,30 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
                     loanProductResponse.getResourceId(), numberOfRepayments, loanDisbursementDate, amount, null);
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 February 2023"), //
-                    installment(250.0, false, "01 March 2023"), //
-                    installment(250.0, false, "01 April 2023"), //
-                    installment(250.0, false, "01 May 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230201"), //
+                    installment(250.0, false, "20230301"), //
+                    installment(250.0, false, "20230401"), //
+                    installment(250.0, false, "20230501") //
             );
 
-            loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("1 January 2023")
+            loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate("20230101")
                     .dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
 
             // loan should be active
-            Long transactionId = addInterestPaymentWaiverForLoan(loanId, 250.0, "2 January 2023");
+            Long transactionId = addInterestPaymentWaiverForLoan(loanId, 250.0, "20230102");
 
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                    transaction(250.0, "Interest Payment Waiver", "02 January 2023", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0));
+                    transaction(1000.0, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                    transaction(250.0, "Interest Payment Waiver", "20230102", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0));
 
             loanTransactionHelper.adjustLoanTransaction(loanId, transactionId, new PostLoansLoanIdTransactionsTransactionIdRequest()
-                    .transactionAmount(200.0).dateFormat(DATETIME_PATTERN).transactionDate("3 January 2023").locale("en"));
+                    .transactionAmount(200.0).dateFormat(DATETIME_PATTERN).transactionDate("20230103").locale("en"));
 
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-                    transaction(250.0, "Interest Payment Waiver", "02 January 2023", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0, true),
-                    transaction(200.0, "Interest Payment Waiver", "03 January 2023", 800.0, 200.0, 0.0, 0.0, 0, 0.0, 0.0));
+                    transaction(1000.0, "Disbursement", "20230101", 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                    transaction(250.0, "Interest Payment Waiver", "20230102", 750.0, 250.0, 0.0, 0.0, 0, 0.0, 0.0, true),
+                    transaction(200.0, "Interest Payment Waiver", "20230103", 800.0, 200.0, 0.0, 0.0, 0, 0.0, 0.0));
         });
     }
 
@@ -1624,7 +1624,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
         Long[] loanIdContainer = new Long[1];
         String[] loanExternalIdContainer = new String[1];
 
-        runAt("01 January 2025", () -> {
+        runAt("20250101", () -> {
             PostLoanProductsRequest loanProductRequest = create4IProgressiveWithChargeOffBehaviour();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProductRequest);
             Long loanProductId = loanProductResponse.getResourceId();
@@ -1635,15 +1635,15 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertNotNull(clientId);
 
             String loanExternalId = UUID.randomUUID().toString();
-            Long createdLoanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2022", 1500.0, 3,
+            Long createdLoanId = applyAndApproveLoan(clientId, loanProductId, "20220101", 1500.0, 3,
                     req -> req.numberOfRepayments(3).loanTermFrequency(3).loanTermFrequencyType(RepaymentFrequencyType.MONTHS)
                             .repaymentEvery(1).repaymentFrequencyType(RepaymentFrequencyType.MONTHS)
                             .interestRatePerPeriod(BigDecimal.valueOf(9.99))
                             .interestCalculationPeriodType(InterestCalculationPeriodType.DAILY).externalId(loanExternalId)
                             .transactionProcessingStrategyCode(ADVANCED_PAYMENT_ALLOCATION_STRATEGY));
-            disburseLoan(createdLoanId, BigDecimal.valueOf(1500.0), "01 January 2022");
+            disburseLoan(createdLoanId, BigDecimal.valueOf(1500.0), "20220101");
 
-            Long chargeOffTransactionId = chargeOffLoan(createdLoanId, "15 June 2022");
+            Long chargeOffTransactionId = chargeOffLoan(createdLoanId, "20220615");
             assertNotNull(chargeOffTransactionId);
 
             loanIdContainer[0] = createdLoanId;
@@ -1653,7 +1653,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
         Long loanId = loanIdContainer[0];
         String loanExternalId = loanExternalIdContainer[0];
 
-        runAt("01 January 2025", () -> {
+        runAt("20250101", () -> {
             String transactionExternalId = UUID.randomUUID().toString();
             LocalDate waiverDate = LocalDate.of(2022, 9, 24);
             BigDecimal waiverAmount = new BigDecimal("46.56");
@@ -1722,7 +1722,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
      */
     @Test
     public void testInterestPaymentWaiverBackbookBatchExternalId() {
-        runAt("01 January 2025", () -> {
+        runAt("20250101", () -> {
             PostLoanProductsRequest loanProductRequest = create4IProgressiveWithChargeOffBehaviour();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProductRequest);
             Long loanProductId = loanProductResponse.getResourceId();
@@ -1733,20 +1733,20 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertNotNull(clientId);
 
             String loanExternalId = UUID.randomUUID().toString();
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "18 January 2022", 431.98, 3,
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20220118", 431.98, 3,
                     req -> req.numberOfRepayments(3).loanTermFrequency(3).loanTermFrequencyType(RepaymentFrequencyType.MONTHS)
                             .repaymentEvery(1).repaymentFrequencyType(RepaymentFrequencyType.MONTHS)
                             .interestRatePerPeriod(BigDecimal.valueOf(9.99))
                             .interestCalculationPeriodType(InterestCalculationPeriodType.DAILY).externalId(loanExternalId)
                             .transactionProcessingStrategyCode(ADVANCED_PAYMENT_ALLOCATION_STRATEGY));
 
-            disburseLoan(loanId, BigDecimal.valueOf(431.98), "18 January 2022");
+            disburseLoan(loanId, BigDecimal.valueOf(431.98), "20220118");
 
-            loanTransactionHelper.makeLoanRepayment("28 February 2022", 19.83f, loanId.intValue());
-            PostLoansLoanIdTransactionsResponse txn2 = loanTransactionHelper.makeLoanRepayment("18 March 2022", 19.83f, loanId.intValue());
-            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn2.getResourceId().intValue(), "18 March 2022");
+            loanTransactionHelper.makeLoanRepayment("20220228", 19.83f, loanId.intValue());
+            PostLoansLoanIdTransactionsResponse txn2 = loanTransactionHelper.makeLoanRepayment("20220318", 19.83f, loanId.intValue());
+            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn2.getResourceId().intValue(), "20220318");
 
-            Long chargeOffTxnId = chargeOffLoan(loanId, "16 September 2022");
+            Long chargeOffTxnId = chargeOffLoan(loanId, "20220916");
             assertNotNull(chargeOffTxnId);
 
             String transactionExternalId = UUID.randomUUID().toString();
@@ -1807,7 +1807,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
         Long[] loanIdContainer = new Long[1];
         String[] loanExternalIdContainer = new String[1];
 
-        runAt("18 January 2022", () -> {
+        runAt("20220118", () -> {
             PostLoanProductsRequest loanProductRequest = create4IProgressiveWithChargeOffBehaviour();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProductRequest);
             Long loanProductId = loanProductResponse.getResourceId();
@@ -1819,13 +1819,13 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
 
             String loanExternalId = UUID.randomUUID().toString();
 
-            Long createdLoanId = applyAndApproveLoan(clientId, loanProductId, "18 January 2022", 431.98, 3,
+            Long createdLoanId = applyAndApproveLoan(clientId, loanProductId, "20220118", 431.98, 3,
                     req -> req.numberOfRepayments(3).loanTermFrequency(3).loanTermFrequencyType(RepaymentFrequencyType.MONTHS)
                             .repaymentEvery(1).repaymentFrequencyType(RepaymentFrequencyType.MONTHS)
                             .interestRatePerPeriod(BigDecimal.valueOf(9.99))
                             .interestCalculationPeriodType(InterestCalculationPeriodType.DAILY).externalId(loanExternalId)
                             .transactionProcessingStrategyCode(ADVANCED_PAYMENT_ALLOCATION_STRATEGY));
-            disburseLoan(createdLoanId, BigDecimal.valueOf(431.98), "18 January 2022");
+            disburseLoan(createdLoanId, BigDecimal.valueOf(431.98), "20220118");
             loanIdContainer[0] = createdLoanId;
             loanExternalIdContainer[0] = loanExternalId;
         });
@@ -1833,31 +1833,31 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
         Long loanId = loanIdContainer[0];
         String loanExternalId = loanExternalIdContainer[0];
 
-        runAt("28 February 2022", () -> {
-            loanTransactionHelper.makeLoanRepayment("28 February 2022", 19.83f, loanId.intValue());
+        runAt("20220228", () -> {
+            loanTransactionHelper.makeLoanRepayment("20220228", 19.83f, loanId.intValue());
         });
 
-        runAt("18 March 2022", () -> {
-            PostLoansLoanIdTransactionsResponse txn = loanTransactionHelper.makeLoanRepayment("18 March 2022", 19.83f, loanId.intValue());
-            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn.getResourceId().intValue(), "18 March 2022");
+        runAt("20220318", () -> {
+            PostLoansLoanIdTransactionsResponse txn = loanTransactionHelper.makeLoanRepayment("20220318", 19.83f, loanId.intValue());
+            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn.getResourceId().intValue(), "20220318");
         });
 
-        runAt("31 March 2022", () -> {
-            PostLoansLoanIdTransactionsResponse txn = loanTransactionHelper.makeLoanRepayment("31 March 2022", 19.83f, loanId.intValue());
-            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn.getResourceId().intValue(), "31 March 2022");
+        runAt("20220331", () -> {
+            PostLoansLoanIdTransactionsResponse txn = loanTransactionHelper.makeLoanRepayment("20220331", 19.83f, loanId.intValue());
+            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn.getResourceId().intValue(), "20220331");
         });
 
-        runAt("18 April 2022", () -> {
-            PostLoansLoanIdTransactionsResponse txn = loanTransactionHelper.makeLoanRepayment("18 April 2022", 39.66f, loanId.intValue());
-            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn.getResourceId().intValue(), "18 April 2022");
+        runAt("20220418", () -> {
+            PostLoansLoanIdTransactionsResponse txn = loanTransactionHelper.makeLoanRepayment("20220418", 39.66f, loanId.intValue());
+            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn.getResourceId().intValue(), "20220418");
         });
 
-        runAt("16 September 2022", () -> {
-            Long chargeOffTransactionId = chargeOffLoan(loanId, "16 September 2022");
+        runAt("20220916", () -> {
+            Long chargeOffTransactionId = chargeOffLoan(loanId, "20220916");
             assertNotNull(chargeOffTransactionId);
         });
 
-        runAt("24 September 2022", () -> {
+        runAt("20220924", () -> {
             String transactionExternalId = UUID.randomUUID().toString();
             LocalDate waiverDate = LocalDate.of(2022, 9, 24);
             BigDecimal waiverAmount = new BigDecimal("46.56");
@@ -1913,7 +1913,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
 
     @Test
     public void testInterestPaymentWaiverProductionScenarioBatchExternalId() {
-        runAt("01 January 2025", () -> {
+        runAt("20250101", () -> {
             PostLoanProductsRequest loanProductRequest = create4IProgressiveWithChargeOffBehaviour();
             PostLoanProductsResponse loanProductResponse = loanProductHelper.createLoanProduct(loanProductRequest);
             Long loanProductId = loanProductResponse.getResourceId();
@@ -1924,39 +1924,39 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
             assertNotNull(clientId);
 
             String loanExternalId = UUID.randomUUID().toString();
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "18 January 2022", 431.98, 3,
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20220118", 431.98, 3,
                     req -> req.numberOfRepayments(3).loanTermFrequency(3).loanTermFrequencyType(RepaymentFrequencyType.MONTHS)
                             .repaymentEvery(1).repaymentFrequencyType(RepaymentFrequencyType.MONTHS)
                             .interestRatePerPeriod(BigDecimal.valueOf(9.99))
                             .interestCalculationPeriodType(InterestCalculationPeriodType.DAILY).externalId(loanExternalId)
                             .transactionProcessingStrategyCode(ADVANCED_PAYMENT_ALLOCATION_STRATEGY));
 
-            disburseLoan(loanId, BigDecimal.valueOf(431.98), "18 January 2022");
+            disburseLoan(loanId, BigDecimal.valueOf(431.98), "20220118");
 
-            loanTransactionHelper.makeLoanRepayment("28 February 2022", 19.83f, loanId.intValue());
+            loanTransactionHelper.makeLoanRepayment("20220228", 19.83f, loanId.intValue());
 
-            PostLoansLoanIdTransactionsResponse txn2 = loanTransactionHelper.makeLoanRepayment("18 March 2022", 19.83f, loanId.intValue());
-            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn2.getResourceId().intValue(), "18 March 2022");
+            PostLoansLoanIdTransactionsResponse txn2 = loanTransactionHelper.makeLoanRepayment("20220318", 19.83f, loanId.intValue());
+            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn2.getResourceId().intValue(), "20220318");
 
-            PostLoansLoanIdTransactionsResponse txn3 = loanTransactionHelper.makeLoanRepayment("31 March 2022", 19.83f, loanId.intValue());
-            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn3.getResourceId().intValue(), "31 March 2022");
+            PostLoansLoanIdTransactionsResponse txn3 = loanTransactionHelper.makeLoanRepayment("20220331", 19.83f, loanId.intValue());
+            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn3.getResourceId().intValue(), "20220331");
 
-            PostLoansLoanIdTransactionsResponse txn4 = loanTransactionHelper.makeLoanRepayment("18 April 2022", 39.66f, loanId.intValue());
-            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn4.getResourceId().intValue(), "18 April 2022");
+            PostLoansLoanIdTransactionsResponse txn4 = loanTransactionHelper.makeLoanRepayment("20220418", 39.66f, loanId.intValue());
+            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn4.getResourceId().intValue(), "20220418");
 
-            PostLoansLoanIdTransactionsResponse txn5 = loanTransactionHelper.makeLoanRepayment("18 May 2022", 59.49f, loanId.intValue());
-            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn5.getResourceId().intValue(), "18 May 2022");
+            PostLoansLoanIdTransactionsResponse txn5 = loanTransactionHelper.makeLoanRepayment("20220518", 59.49f, loanId.intValue());
+            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn5.getResourceId().intValue(), "20220518");
 
-            PostLoansLoanIdTransactionsResponse txn6 = loanTransactionHelper.makeLoanRepayment("18 June 2022", 64.83f, loanId.intValue());
-            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn6.getResourceId().intValue(), "18 June 2022");
+            PostLoansLoanIdTransactionsResponse txn6 = loanTransactionHelper.makeLoanRepayment("20220618", 64.83f, loanId.intValue());
+            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn6.getResourceId().intValue(), "20220618");
 
-            PostLoansLoanIdTransactionsResponse txn7 = loanTransactionHelper.makeLoanRepayment("18 July 2022", 65.32f, loanId.intValue());
-            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn7.getResourceId().intValue(), "18 July 2022");
+            PostLoansLoanIdTransactionsResponse txn7 = loanTransactionHelper.makeLoanRepayment("20220718", 65.32f, loanId.intValue());
+            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn7.getResourceId().intValue(), "20220718");
 
-            PostLoansLoanIdTransactionsResponse txn8 = loanTransactionHelper.makeLoanRepayment("18 August 2022", 65.83f, loanId.intValue());
-            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn8.getResourceId().intValue(), "18 August 2022");
+            PostLoansLoanIdTransactionsResponse txn8 = loanTransactionHelper.makeLoanRepayment("20220818", 65.83f, loanId.intValue());
+            loanTransactionHelper.reverseRepayment(loanId.intValue(), txn8.getResourceId().intValue(), "20220818");
 
-            Long chargeOffTxnId = chargeOffLoan(loanId, "16 September 2022");
+            Long chargeOffTxnId = chargeOffLoan(loanId, "20220916");
             assertNotNull(chargeOffTxnId);
 
             String transactionExternalId = UUID.randomUUID().toString();
@@ -2071,7 +2071,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
                 .recalculationRestFrequencyInterval(0).isInterestRecalculationEnabled(false).interestRateFrequencyType(2).locale("en_GB")
                 .numberOfRepayments(4).repaymentFrequencyType(2L).interestRatePerPeriod(2.0).repaymentEvery(1).minPrincipal(100.0)
                 .principal(1000.0).maxPrincipal(10000000.0).amortizationType(1).interestType(1).interestCalculationPeriodType(1)
-                .dateFormat("dd MMMM yyyy").transactionProcessingStrategyCode(DEFAULT_STRATEGY).accountingRule(3)
+                .dateFormat("yyyyMMdd").transactionProcessingStrategyCode(DEFAULT_STRATEGY).accountingRule(3)
                 .fundSourceAccountId(fundSource.getAccountID().longValue())//
                 .loanPortfolioAccountId(loansReceivableAccount.getAccountID().longValue())//
                 .transfersInSuspenseAccountId(suspenseAccount.getAccountID().longValue())//
@@ -2102,7 +2102,7 @@ public class LoanTransactionInterestPaymentWaiverTest extends BaseLoanIntegratio
         final PostLoansRequest loanRequest = new PostLoansRequest() //
                 .loanTermFrequency(4).locale("en_GB").loanTermFrequencyType(2).numberOfRepayments(4).repaymentFrequencyType(2)
                 .interestRatePerPeriod(BigDecimal.valueOf(2)).repaymentEvery(1).principal(principal).amortizationType(1).interestType(1)
-                .interestCalculationPeriodType(1).dateFormat("dd MMMM yyyy").transactionProcessingStrategyCode(DEFAULT_STRATEGY)
+                .interestCalculationPeriodType(1).dateFormat("yyyyMMdd").transactionProcessingStrategyCode(DEFAULT_STRATEGY)
                 .loanType("individual").expectedDisbursementDate(applicationDisbursementDate).submittedOnDate(applicationDisbursementDate)
                 .clientId(clientID).productId(loanProductID);
         return loanTransactionHelper.applyLoan(loanRequest).getLoanId();

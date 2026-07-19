@@ -103,11 +103,11 @@ final class LoanChargesApiResourceSwagger {
         public Double amountOrPercentage;
         @Schema(example = "false")
         public Boolean penalty;
-        @Schema(example = "27 March 2013")
+        @Schema(example = "20130327")
         public LocalDate submittedOnDate;
         @Schema(example = "95174ff9-1a75-4d72-a413-6f9b1cb988b7")
         public String externalId;
-        @Schema(example = "26 March 2013")
+        @Schema(example = "20130326")
         public LocalDate dueDate;
     }
 
@@ -182,9 +182,9 @@ final class LoanChargesApiResourceSwagger {
         public String locale;
         @Schema(example = "100.00")
         public Double amount;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "29 April 2013")
+        @Schema(example = "20130429")
         public String dueDate;
         @Schema(example = "786444UUUYYH7")
         public String externalId;
@@ -212,13 +212,13 @@ final class LoanChargesApiResourceSwagger {
 
         private PutLoansLoanIdChargesChargeIdRequest() {}
 
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "en")
         public String locale;
         @Schema(example = "60.00")
         public Double amount;
-        @Schema(example = "27 March 2013")
+        @Schema(example = "20130327")
         public String dueDate;
     }
 
@@ -245,15 +245,15 @@ final class LoanChargesApiResourceSwagger {
 
         private PostLoansLoanIdChargesChargeIdRequest() {}
 
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "19 September 2013")
+        @Schema(example = "20130919")
         public String transactionDate;
         @Schema(example = "1")
         public Long chargeId;
-        @Schema(example = "19 September 2013")
+        @Schema(example = "20130919")
         public String dueDate;
         @Schema(example = "1")
         public Long installmentNumber;
@@ -304,11 +304,11 @@ final class LoanChargesApiResourceSwagger {
 
             @Schema(example = "en")
             public String locale;
-            @Schema(example = "19 September 2013")
+            @Schema(example = "20130919")
             public LocalDate transactionDate;
             @Schema(example = "1")
             public Long chargeId;
-            @Schema(example = "19 September 2013")
+            @Schema(example = "20130919")
             public LocalDate dueDate;
             @Schema(example = "1")
             public Long installmentNumber;
@@ -327,7 +327,7 @@ final class LoanChargesApiResourceSwagger {
             public Double penaltyChargesPortion;
             @Schema(example = "100.00")
             public Double outstandingLoanBalance;
-            @Schema(example = "19 September 2013")
+            @Schema(example = "20130919")
             public Double date;
             @Schema(example = "1")
             public Long id;

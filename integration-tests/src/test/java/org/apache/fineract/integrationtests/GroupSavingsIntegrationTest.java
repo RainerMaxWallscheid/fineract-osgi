@@ -182,7 +182,7 @@ public class GroupSavingsIntegrationTest {
         savingsStatusHashMap = this.savingsAccountHelper.activateSavings(savingsId);
         SavingsStatusChecker.verifySavingsIsActive(savingsStatusHashMap);
 
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         Calendar todaysDate = Calendar.getInstance();
         final String CLOSEDON_DATE = dateFormat.format(todaysDate.getTime());
         String withdrawBalance = "false";
@@ -235,8 +235,8 @@ public class GroupSavingsIntegrationTest {
         // Prepare the client array with two entries:
         // one for the parent client (isParent = true) and one for the child client (isParent = false)
         List<Map<String, Object>> clientArray = new ArrayList<>();
-        clientArray.add(clientArray(parentClientID, groupID, savingsProductID, "08 January 2013", true));
-        clientArray.add(clientArray(childClientID, groupID, savingsProductID, "08 January 2013", false));
+        clientArray.add(clientArray(parentClientID, groupID, savingsProductID, "20130108", true));
+        clientArray.add(clientArray(childClientID, groupID, savingsProductID, "20130108", false));
 
         // Apply for a GSIM savings account with both clients under the same application
         final Integer gsimID = this.savingsAccountHelper.applyForGsimApplication(clientArray);
@@ -323,7 +323,7 @@ public class GroupSavingsIntegrationTest {
         Assertions.assertNotNull(savingsProductID);
 
         List<Map<String, Object>> clientArray = new ArrayList<>();
-        clientArray.add(clientArray(clientID, groupID, savingsProductID, "08 January 2013", true));
+        clientArray.add(clientArray(clientID, groupID, savingsProductID, "20130108", true));
 
         final Integer gsimID = this.savingsAccountHelper.applyForGsimApplication(clientArray);
 
@@ -375,7 +375,7 @@ public class GroupSavingsIntegrationTest {
         Assertions.assertNotNull(savingsProductID);
 
         List<Map<String, Object>> clientArray = new ArrayList<>();
-        clientArray.add(clientArray(clientID, groupID, savingsProductID, "08 January 2013", true));
+        clientArray.add(clientArray(clientID, groupID, savingsProductID, "20130108", true));
         LOG.info("client Array : {} ", clientArray);
 
         final Integer savingsId = this.savingsAccountHelper.applyForSavingsApplication(groupID, savingsProductID, ACCOUNT_TYPE_GROUP);
@@ -393,7 +393,7 @@ public class GroupSavingsIntegrationTest {
 
         List<Map<String, Object>> savingsArray = new ArrayList<>();
         final Integer transactionAmount = 2500;
-        savingsArray.add(savingsArray(paymentTypeId, savingsId, transactionAmount, "10 March 2013"));
+        savingsArray.add(savingsArray(paymentTypeId, savingsId, transactionAmount, "20130310"));
 
         HashMap savingsStatusHashMap = SavingsStatusChecker.getStatusOfSavings(this.requestSpec, this.responseSpec, savingsId);
         SavingsStatusChecker.verifySavingsIsPending(savingsStatusHashMap);
@@ -434,7 +434,7 @@ public class GroupSavingsIntegrationTest {
         Assertions.assertNotNull(savingsProductID);
 
         List<Map<String, Object>> clientArray = new ArrayList<>();
-        clientArray.add(clientArray(clientID, groupID, savingsProductID, "08 January 2013", true));
+        clientArray.add(clientArray(clientID, groupID, savingsProductID, "20130108", true));
 
         final Integer gsimID = this.savingsAccountHelper.applyForGsimApplication(clientArray);
 
@@ -444,7 +444,7 @@ public class GroupSavingsIntegrationTest {
         savingsStatusHashMap = this.savingsAccountHelper.activateGsimSavings(gsimID);
         SavingsStatusChecker.verifySavingsIsActive(savingsStatusHashMap);
 
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         Calendar todaysDate = Calendar.getInstance();
         final String CLOSEDON_DATE = dateFormat.format(todaysDate.getTime());
         String withdrawBalance = "false";
@@ -483,7 +483,7 @@ public class GroupSavingsIntegrationTest {
         Assertions.assertNotNull(savingsProductID);
 
         List<Map<String, Object>> clientArray = new ArrayList<>();
-        clientArray.add(clientArray(clientID, groupID, savingsProductID, "08 January 2013", true));
+        clientArray.add(clientArray(clientID, groupID, savingsProductID, "20130108", true));
 
         final Integer gsimID = this.savingsAccountHelper.applyForGsimApplication(clientArray);
 
@@ -517,7 +517,7 @@ public class GroupSavingsIntegrationTest {
         Assertions.assertNotNull(savingsProductID);
 
         List<Map<String, Object>> clientArray = new ArrayList<>();
-        clientArray.add(clientArray(clientID, groupID, savingsProductID, "08 January 2013", true));
+        clientArray.add(clientArray(clientID, groupID, savingsProductID, "20130108", true));
         final Integer gsimID = this.savingsAccountHelper.applyForGsimApplication(clientArray);
 
         final List<String> retrievedGsimId = GroupHelper.verifyRetrieveGsimAccounts(this.requestSpec, this.responseSpec, groupID);

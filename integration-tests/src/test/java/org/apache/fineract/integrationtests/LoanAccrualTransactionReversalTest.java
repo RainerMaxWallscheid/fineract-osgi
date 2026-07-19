@@ -61,8 +61,8 @@ public class LoanAccrualTransactionReversalTest extends FeignLoanTestBase {
 
         Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
         final Long loanId = createLoanAccount(clientId, getLoanProductsProductResponse.getId(), loanExternalIdStr);
-        disburseLoanWithAmount(loanId, "03 September 2022", 100.0);
-        disburseLoanWithAmount(loanId, "04 September 2022", 300.0);
+        disburseLoanWithAmount(loanId, "20220903", 100.0);
+        disburseLoanWithAmount(loanId, "20220904", 300.0);
 
         LocalDate targetDate = LocalDate.of(2022, 9, 4);
         final String penaltyCharge1AddedDate = dateTimeFormatter.format(targetDate);
@@ -73,7 +73,7 @@ public class LoanAccrualTransactionReversalTest extends FeignLoanTestBase {
 
         checkAccrualTransaction(targetDate, 0.0f, 0.0f, 10.0f, loanId);
 
-        disburseLoanWithAmount(loanId, "05 September 2022", 600.0);
+        disburseLoanWithAmount(loanId, "20220905", 600.0);
 
         checkAccrualTransaction(targetDate, 0.0f, 0.0f, 10.0f, loanId);
 
@@ -107,7 +107,7 @@ public class LoanAccrualTransactionReversalTest extends FeignLoanTestBase {
             runPeriodicAccrualAccounting(accrualRunTillDate);
             checkAccrualTransaction(currentDate, 0.82f, 0.0f, 0.0f, loanId);
             makeLoanRepayment(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN)
-                    .transactionDate("5 February 2022").locale(LoanTestData.LOCALE).transactionAmount(106.57));
+                    .transactionDate("20220205").locale(LoanTestData.LOCALE).transactionAmount(106.57));
             checkAccrualTransaction(currentDate, 0.71f, 0.0f, 0.0f, loanId);
         } finally {
             updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
@@ -124,14 +124,14 @@ public class LoanAccrualTransactionReversalTest extends FeignLoanTestBase {
                 .amortizationType(LoanTestData.AmortizationType.EQUAL_INSTALLMENTS)
                 .interestCalculationPeriodType(LoanTestData.InterestCalculationPeriodType.DAILY)
                 .interestRatePerPeriod(BigDecimal.valueOf(12)).interestType(LoanTestData.InterestType.DECLINING_BALANCE)
-                .graceOnPrincipalPayment(2).graceOnInterestPayment(2).expectedDisbursementDate("05 January 2022")
-                .submittedOnDate("05 January 2022").dateFormat(LoanTestData.DATETIME_PATTERN).locale(LoanTestData.LOCALE)
+                .graceOnPrincipalPayment(2).graceOnInterestPayment(2).expectedDisbursementDate("20220105")
+                .submittedOnDate("20220105").dateFormat(LoanTestData.DATETIME_PATTERN).locale(LoanTestData.LOCALE)
                 .loanType("individual").externalId(externalId)
                 .transactionProcessingStrategyCode("due-penalty-interest-principal-fee-in-advance-penalty-interest-principal-fee-strategy");
 
         Long loanId = applyForLoan(request);
-        approveLoan(loanId, LoanRequestBuilders.approveLoan(1000.0, "05 January 2022"));
-        disburseLoan(loanId, "05 January 2022", 1000.0);
+        approveLoan(loanId, LoanRequestBuilders.approveLoan(1000.0, "20220105"));
+        disburseLoan(loanId, "20220105", 1000.0);
         return loanId;
     }
 
@@ -148,8 +148,8 @@ public class LoanAccrualTransactionReversalTest extends FeignLoanTestBase {
 
     private Long createLoanAccount(final Long clientId, final Long loanProductId, final String externalId) {
 
-        PostLoansRequest request = applyLoanRequest(clientId, loanProductId, "01 September 2022", 1000.0, 1,
-                req -> req.expectedDisbursementDate("03 September 2022").externalId(externalId).interestRatePerPeriod(BigDecimal.ZERO)
+        PostLoansRequest request = applyLoanRequest(clientId, loanProductId, "20220901", 1000.0, 1,
+                req -> req.expectedDisbursementDate("20220903").externalId(externalId).interestRatePerPeriod(BigDecimal.ZERO)
                         .interestType(LoanTestData.InterestType.DECLINING_BALANCE)
                         .amortizationType(LoanTestData.AmortizationType.EQUAL_PRINCIPAL)
                         .interestCalculationPeriodType(LoanTestData.InterestCalculationPeriodType.SAME_AS_REPAYMENT_PERIOD)
@@ -158,7 +158,7 @@ public class LoanAccrualTransactionReversalTest extends FeignLoanTestBase {
                         .locale(LoanTestData.LOCALE));
 
         Long loanId = applyForLoan(request);
-        approveLoan(loanId, LoanRequestBuilders.approveLoan(1000.0, "02 September 2022", "03 September 2022"));
+        approveLoan(loanId, LoanRequestBuilders.approveLoan(1000.0, "20220902", "20220903"));
         return loanId;
     }
 

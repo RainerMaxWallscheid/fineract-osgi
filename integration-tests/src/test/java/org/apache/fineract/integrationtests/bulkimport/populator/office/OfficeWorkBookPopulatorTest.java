@@ -54,7 +54,7 @@ public class OfficeWorkBookPopulatorTest {
 
     @Test
     public void testOfficeWorkbookPopulate() throws IOException {
-        Workbook workbook = getOfficeWorkBook("dd MMMM yyyy");
+        Workbook workbook = getOfficeWorkBook("yyyyMMdd");
         Sheet sheet = workbook.getSheet(TemplatePopulateImportConstants.OFFICE_SHEET_NAME);
         Row firstRow = sheet.getRow(1);
         Assertions.assertNotNull("No parent offices found", firstRow.getCell(OfficeConstants.LOOKUP_OFFICE_COL).getStringCellValue());

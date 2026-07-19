@@ -326,9 +326,9 @@ final class LoanTransactionsApiResourceSwagger {
 
         @Schema(example = "en_GB")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "28 June 2022")
+        @Schema(example = "20220628")
         public String transactionDate;
         @Schema(example = "50000.00")
         public Double transactionAmount;
@@ -352,7 +352,7 @@ final class LoanTransactionsApiResourceSwagger {
         public String bankNumber;
         @Schema(example = "3")
         public Long loanChargeId;
-        @Schema(example = "28 June 2022")
+        @Schema(example = "20220628")
         public String dueDate;
         @Schema(example = "1")
         public Long chargeOffReasonId;
@@ -407,9 +407,9 @@ final class LoanTransactionsApiResourceSwagger {
 
             @Schema(example = "en_GB")
             public String locale;
-            @Schema(example = "dd MMMM yyyy")
+            @Schema(example = "yyyyMMdd")
             public String dateFormat;
-            @Schema(example = "28 June 2022")
+            @Schema(example = "20220628")
             public String transactionDate;
             @Schema(example = "50,000.00")
             public String transactionAmount;
@@ -431,9 +431,9 @@ final class LoanTransactionsApiResourceSwagger {
 
         @Schema(example = "en_GB")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "28 June 2022")
+        @Schema(example = "20220628")
         public String transactionDate;
         @Schema(example = "50,000.00")
         public Double transactionAmount;
@@ -470,7 +470,7 @@ final class LoanTransactionsApiResourceSwagger {
             public Long id;
             @Schema(example = "95174ff9-1a75-4d72-a413-6f9b1cb988b7")
             public String externalId;
-            @Schema(example = "28 June 2022")
+            @Schema(example = "20220628")
             public LocalDate date;
 
         }

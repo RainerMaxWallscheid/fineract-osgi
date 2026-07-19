@@ -40,8 +40,8 @@ public class GroupHelper {
     private static final Logger LOG = LoggerFactory.getLogger(GroupHelper.class);
 
     private static final String CREATE_GROUP_URL = "/fineract-provider/api/v1/groups?" + Utils.TENANT_IDENTIFIER;
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
-    public static final String DATE_TIME_FORMAT = "dd MMMM yyyy HH:mm";
+    public static final String DATE_FORMAT = "yyyyMMdd";
+    public static final String DATE_TIME_FORMAT = "yyyyMMdd HH:mm";
 
     // TODO: Rewrite to use fineract-client instead!
     // Example: org.apache.fineract.integrationtests.common.loans.LoanTransactionHelper.disburseLoan(java.lang.Long,
@@ -59,7 +59,7 @@ public class GroupHelper {
     public static Integer createGroup(final RequestSpecification requestSpec, final ResponseSpecification responseSpec,
             @SuppressWarnings("unused") final boolean active) {
         LOG.info("---------------------------------CREATING A GROUP---------------------------------------------");
-        return createGroup(requestSpec, responseSpec, "04 March 2011");
+        return createGroup(requestSpec, responseSpec, "20110304");
     }
 
     // TODO: Rewrite to use fineract-client instead!
@@ -193,15 +193,15 @@ public class GroupHelper {
         map.put("officeId", "1");
         map.put("name", randomNameGenerator("Group_Name_", 5));
         map.put("externalId", UUID.randomUUID().toString());
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("locale", "en");
         if (active) {
             map.put("active", "true");
             map.put("activationDate", activationDate);
         } else {
             map.put("active", "false");
-            map.put("submittedOnDate", "04 March 2011");
-            LOG.info("defaulting to inactive group: 04 March 2011");
+            map.put("submittedOnDate", "20110304");
+            LOG.info("defaulting to inactive group: 20110304");
         }
         LOG.debug("map : {} ", map);
         return new Gson().toJson(map);
@@ -226,13 +226,13 @@ public class GroupHelper {
     @Deprecated(forRemoval = true)
     public static String activateGroupAsJSON(final String activationDate) {
         final HashMap<String, String> map = new HashMap<>();
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("locale", "en");
         if (!Strings.isNullOrEmpty(activationDate)) {
             map.put("activationDate", activationDate);
         } else {
-            map.put("activationDate", "04 March 2011");
-            LOG.info("defaulting to fixed date: 04 March 2011");
+            map.put("activationDate", "20110304");
+            LOG.info("defaulting to fixed date: 20110304");
         }
         LOG.debug("map : {}", map);
         return new Gson().toJson(map);
@@ -431,10 +431,10 @@ public class GroupHelper {
         map.put("officeId", "1");
         map.put("name", randomNameGenerator("Group_Name_", 5));
         map.put("externalId", UUID.randomUUID().toString());
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("locale", "en");
         map.put("active", "false");
-        map.put("submittedOnDate", "04 March 2011");
+        map.put("submittedOnDate", "20110304");
         String requestJson = getTestDatatableAsJson(map, registeredTableName);
         LOG.debug("map : {} ", requestJson);
         return requestJson;
@@ -451,9 +451,9 @@ public class GroupHelper {
         dataMap.put("locale", "en");
         dataMap.put("Spouse Name", Utils.randomStringGenerator("Spouse_name", 4));
         dataMap.put("Number of Dependents", 5);
-        dataMap.put("Time of Visit", "01 December 2016 04:03");
+        dataMap.put("Time of Visit", "20161201 04:03");
         dataMap.put("dateFormat", DATE_TIME_FORMAT);
-        dataMap.put("Date of Approval", "02 December 2016 00:00");
+        dataMap.put("Date of Approval", "20161202 00:00");
         datatableMap.put("registeredTableName", registeredTableName);
         datatableMap.put("data", dataMap);
         datatablesListMap.add(datatableMap);

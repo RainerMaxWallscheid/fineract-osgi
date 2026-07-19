@@ -90,7 +90,7 @@ public class ShareAccountHelper {
         if (this.productId != null) {
             map.put("productId", this.productId);
         }
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         if (this.savingsAccountId != null) {
             map.put("savingsAccountId", this.savingsAccountId);
         }

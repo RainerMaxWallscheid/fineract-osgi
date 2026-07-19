@@ -82,10 +82,10 @@ public class WorkingCapitalLoanStartDatesTest {
     @Test
     public void testStartDatesArePopulatedWhenLoanBreachesAndBecomesDelinquent() {
         AtomicLong loanIdRef = new AtomicLong();
-        BusinessDateHelper.runAt("01 January 2026", () -> {
+        BusinessDateHelper.runAt("20260101", () -> {
             loanIdRef.set(createDisbursedLoan());
         });
-        BusinessDateHelper.runAt("21 January 2026", () -> {
+        BusinessDateHelper.runAt("20260121", () -> {
             final Long loanId = loanIdRef.get();
             ok(() -> FineractFeignClientHelper.getFineractFeignClient().inlineJob().executeInlineJob("WC_LOAN_COB", new InlineJobRequest().addLoanIdsItem(loanId)));
             // then - both start dates are populated on the retrieveOne response
@@ -104,10 +104,10 @@ public class WorkingCapitalLoanStartDatesTest {
         AtomicLong loanIdRef = new AtomicLong();
         // given - a WC loan submitted on 2025-12-20 but disbursed on 2026-01-01, with delinquencyStartType =
         // LOAN_CREATION
-        BusinessDateHelper.runAt("01 January 2026", () -> {
+        BusinessDateHelper.runAt("20260101", () -> {
             loanIdRef.set(createDisbursedLoan(SUBMITTED_ON_DATE, "LOAN_CREATION"));
         });
-        BusinessDateHelper.runAt("21 January 2026", () -> {
+        BusinessDateHelper.runAt("20260121", () -> {
             final Long loanId = loanIdRef.get();
             ok(() -> FineractFeignClientHelper.getFineractFeignClient().inlineJob().executeInlineJob("WC_LOAN_COB", new InlineJobRequest().addLoanIdsItem(loanId)));
             final WorkingCapitalLoanHelper loanHelper = new WorkingCapitalLoanHelper();
@@ -120,7 +120,7 @@ public class WorkingCapitalLoanStartDatesTest {
 
     @Test
     public void testStartDatesAreNullForHealthyLoan() {
-        BusinessDateHelper.runAt("01 January 2026", () -> {
+        BusinessDateHelper.runAt("20260101", () -> {
             // given - a disbursed WC loan with breach + delinquency configuration
             final Long loanId = createDisbursedLoan();
             // when - run the WC COB on the disbursement date, before any period has expired

@@ -70,7 +70,7 @@ class ClientDataValidatorTest {
 
     @Test
     void validateForCreate_withInvalidDateFormat_throwsPlatformApiDataValidationException() {
-        String json = validMinimalCreateJson("02 February 2026");
+        String json = validMinimalCreateJson("20260202");
 
         PlatformApiDataValidationException ex = assertThrows(PlatformApiDataValidationException.class,
                 () -> validator.validateForCreate(json));
@@ -87,7 +87,7 @@ class ClientDataValidatorTest {
 
     @Test
     void validateForCreate_withValidDateFormat_doesNotThrow() {
-        String json = validMinimalCreateJson("dd MMMM yyyy");
+        String json = validMinimalCreateJson("yyyyMMdd");
 
         assertDoesNotThrow(() -> validator.validateForCreate(json));
     }
@@ -115,7 +115,7 @@ class ClientDataValidatorTest {
 
     @Test
     void validateForUpdate_withInvalidDateFormat_throwsPlatformApiDataValidationException() {
-        String json = validMinimalUpdateJson("02 February 2026");
+        String json = validMinimalUpdateJson("20260202");
 
         PlatformApiDataValidationException ex = assertThrows(PlatformApiDataValidationException.class,
                 () -> validator.validateForUpdate(json));
@@ -140,7 +140,7 @@ class ClientDataValidatorTest {
                   "active": false,
                   "legalFormId": 1,
                   "locale": "en",
-                  "dateFormat": "dd MMMM yyyy",
+                  "dateFormat": "yyyyMMdd",
                   "mobileNo": "phone123"
                 }
                 """;
@@ -161,7 +161,7 @@ class ClientDataValidatorTest {
                   "active": false,
                   "legalFormId": 1,
                   "locale": "en",
-                  "dateFormat": "dd MMMM yyyy",
+                  "dateFormat": "yyyyMMdd",
                   "mobileNo": "+919876543210"
                 }
                 """;

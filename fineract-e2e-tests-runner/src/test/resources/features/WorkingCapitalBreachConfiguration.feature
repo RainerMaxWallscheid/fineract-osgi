@@ -90,7 +90,7 @@ Feature: Working Capital Breach Configuration
 
   @TestRailId:C78843
   Scenario: Verify deleting Working Capital Breach Configuration that is still assigned to WC loan account failure - UC9.2
-    When Admin sets the business date to "01 January 2027"
+    When Admin sets the business date to "20270101"
     And Admin creates a client with random data
-    And Admin creates working capital loan with with breach on "01 January 2027" date
+    And Admin creates working capital loan with with breach on "20270101" date
     Then Admin failed to delete WC Breach that is assigned to a Working Capital Loan Account

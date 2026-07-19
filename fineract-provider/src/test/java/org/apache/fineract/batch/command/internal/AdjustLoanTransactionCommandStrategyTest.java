@@ -52,8 +52,8 @@ public class AdjustLoanTransactionCommandStrategyTest {
         final Long transactionId = Long.valueOf(RandomStringUtils.randomNumeric(4));
         final BatchRequest request = getBatchRequest(loanId, transactionId, null);
         final String responseBody = "{\"officeId\":1,\"clientId\":107,\"loanId\":71,\"resourceId\":193,\"changes\""
-                + ":{\"transactionDate\":\"03 October 2022\",\"transactionAmount\":\"500\",\"locale\":\"en\",\"dateFormat\":"
-                + "\"dd MMMM yyyy\",\"paymentTypeId\":\"\"}}";
+                + ":{\"transactionDate\":\"20221003\",\"transactionAmount\":\"500\",\"locale\":\"en\",\"dateFormat\":"
+                + "\"yyyyMMdd\",\"paymentTypeId\":\"\"}}";
 
         given(testContext.loanTransactionsApiResource.adjustLoanTransaction(eq(loanId), eq(transactionId), eq(request.getBody()), eq(null)))
                 .willReturn(responseBody);
@@ -82,8 +82,8 @@ public class AdjustLoanTransactionCommandStrategyTest {
         final Long transactionId = Long.valueOf(RandomStringUtils.randomNumeric(4));
         final BatchRequest request = getBatchRequest(loanId, transactionId, "chargeback");
         final String responseBody = "{\"officeId\":1,\"clientId\":107,\"loanId\":71,\"resourceId\":193,\"changes\""
-                + ":{\"transactionDate\":\"03 October 2022\",\"transactionAmount\":\"500\",\"locale\":\"en\",\"dateFormat\":"
-                + "\"dd MMMM yyyy\",\"paymentTypeId\":\"\"}}";
+                + ":{\"transactionDate\":\"20221003\",\"transactionAmount\":\"500\",\"locale\":\"en\",\"dateFormat\":"
+                + "\"yyyyMMdd\",\"paymentTypeId\":\"\"}}";
 
         given(testContext.loanTransactionsApiResource.adjustLoanTransaction(eq(loanId), eq(transactionId), eq(request.getBody()),
                 eq("chargeback"))).willReturn(responseBody);
@@ -123,7 +123,7 @@ public class AdjustLoanTransactionCommandStrategyTest {
         }
         br.setMethod(HttpMethod.POST);
         br.setReference(Long.valueOf(RandomStringUtils.randomNumeric(5)));
-        br.setBody("{\"locale\":\"en\",\"dateFormat\":\"dd MMMM yyyy\",\"transactionDate\":\"03 October 2022\",\"transactionAmount\":500}");
+        br.setBody("{\"locale\":\"en\",\"dateFormat\":\"yyyyMMdd\",\"transactionDate\":\"20221003\",\"transactionAmount\":500}");
 
         return br;
     }

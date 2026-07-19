@@ -39,7 +39,7 @@ public class InterestRateChartWriteServiceImpl implements InterestRateChartWrite
     @Override
     @Transactional
     public InterestRateChartCreateResponse createInterestRateChart(InterestRateChartCreateRequest request) {
-        final String dateFormat = request.getDateFormat() != null ? request.getDateFormat() : "dd MMMM yyyy";
+        final String dateFormat = request.getDateFormat() != null ? request.getDateFormat() : "yyyyMMdd";
         final Locale locale = request.getLocale() != null ? Locale.forLanguageTag(request.getLocale()) : Locale.getDefault();
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat, locale);
         final LocalDate fromDate = request.getFromDate() != null ? LocalDate.parse(request.getFromDate(), formatter) : null;

@@ -43,12 +43,12 @@ public class LoanInterestRateFrequencyTest extends FeignLoanTestBase {
 
     @Test
     public void testProgressiveInterestRateTypeWholeTerm() {
-        runAt("15 April 2024", () -> {
+        runAt("20240415", () -> {
             Long clientId = createClient();
             PostLoanProductsRequest loanProductsRequest = createLoanProductWithInterestCalculation();
             Long loanProductId = createLoanProduct(loanProductsRequest);
-            Long loanId = applyAndApproveLoanApplication(clientId, loanProductId, "15 April 2024", 1000.0, 6);
-            disburseLoan(loanId, BigDecimal.valueOf(1000), "15 April 2024");
+            Long loanId = applyAndApproveLoanApplication(clientId, loanProductId, "20240415", 1000.0, 6);
+            disburseLoan(loanId, BigDecimal.valueOf(1000), "20240415");
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             Assertions.assertEquals(loanDetails.getInterestRateFrequencyType().getCode(), "interestRateFrequency.periodFrequencyType.whole_term");
             Assertions.assertEquals(loanDetails.getAnnualInterestRate(), new BigDecimal("20.000000"));

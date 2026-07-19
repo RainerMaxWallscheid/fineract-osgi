@@ -40,7 +40,7 @@ public class LoanProductOverAppliedAmountTest extends FeignLoanTestBase {
 
     @Test
     public void testCreateMultiDisburseLoanProductWithOverAppliedAmountAndExpectedTranches() {
-        runAt("01 January 2024", () -> {
+        runAt("20240101", () -> {
             // Create Loan Product with multi-disburse, expected tranches, and over-applied amount
             final PostLoanProductsRequest loanProductRequest = create4IProgressive().multiDisburseLoan(true).maxTrancheCount(5)
                     .outstandingLoanBalance(10000.0).disallowExpectedDisbursements(false) // Expected tranches enabled
@@ -64,7 +64,7 @@ public class LoanProductOverAppliedAmountTest extends FeignLoanTestBase {
 
     @Test
     public void testModifyMultiDisburseLoanProductWithOverAppliedAmountAndExpectedTranches() {
-        runAt("01 January 2024", () -> {
+        runAt("20240101", () -> {
             // Create initial loan product without over-applied amount
             final PostLoanProductsRequest initialLoanProductRequest = create4IProgressive().multiDisburseLoan(true).maxTrancheCount(5)
                     .outstandingLoanBalance(10000.0).disallowExpectedDisbursements(false).allowApprovedDisbursedAmountsOverApplied(false)
@@ -92,7 +92,7 @@ public class LoanProductOverAppliedAmountTest extends FeignLoanTestBase {
 
     @Test
     public void testAvailableDisbursementAmountNotNegativeWhenDisbursedAmountExceedsApprovedAmount() {
-        runAt("01 January 2024", () -> {
+        runAt("20240101", () -> {
             // Create Loan Product with over-applied amount enabled
             final PostLoanProductsRequest loanProductRequest = create4IProgressive().multiDisburseLoan(true).maxTrancheCount(5)
                     .outstandingLoanBalance(10000.0).disallowExpectedDisbursements(false) // Expected tranches enabled
@@ -105,12 +105,12 @@ public class LoanProductOverAppliedAmountTest extends FeignLoanTestBase {
             assertNotNull(clientId);
 
             // Create and approve loan with amount 1000
-            final Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "1 January 2024", 1000.0, 7.0, 6,
-                    request -> request.disbursementData(List.of(new PostLoansDisbursementData().expectedDisbursementDate("1 January 2024")
+            final Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "20240101", 1000.0, 7.0, 6,
+                    request -> request.disbursementData(List.of(new PostLoansDisbursementData().expectedDisbursementDate("20240101")
                             .principal(BigDecimal.valueOf(1000.0)))));
 
             // Disburse loan with amount 1500 (exceeds approved amount, but allowed due to over-applied setting)
-            disburseLoan(loanId, BigDecimal.valueOf(1500.0), "01 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(1500.0), "20240101");
 
             // Verify loan is active
             verifyLoanStatus(loanId, LoanStatus.ACTIVE);

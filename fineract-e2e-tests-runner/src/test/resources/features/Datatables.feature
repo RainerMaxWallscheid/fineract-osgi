@@ -55,11 +55,11 @@ Feature: Datatables
 
   @TestRailId:C85156
   Scenario: Datatable entry create with null value persists column via client JSON body
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a fully customized loan with the following data:
       | LoanProduct  | submitted on date | with Principal | ANNUAL interest rate % | interest type     | interest calculation period | amortization type  | loanTermFrequency | loanTermFrequencyType | repaymentEvery | repaymentFrequencyType | numberOfRepayments | graceOnPrincipalPayment | graceOnInterestPayment | interest free period | Payment strategy                            |
-      | LP1_DUE_DATE | 01 January 2026   | 1000           | 0                      | DECLINING_BALANCE | SAME_AS_REPAYMENT_PERIOD    | EQUAL_INSTALLMENTS | 1                 | MONTHS                | 1              | MONTHS                 | 1                  | 0                       | 0                      | 0                    | PENALTIES_FEES_INTEREST_PRINCIPAL_ORDER |
+      | LP1_DUE_DATE | 20260101   | 1000           | 0                      | DECLINING_BALANCE | SAME_AS_REPAYMENT_PERIOD    | EQUAL_INSTALLMENTS | 1                 | MONTHS                | 1              | MONTHS                 | 1                  | 0                       | 0                      | 0                    | PENALTIES_FEES_INTEREST_PRINCIPAL_ORDER |
     And A datatable for "Loan" is created with the following extra columns:
       | Name   | Type   | Length | Unique | Indexed |
       | amount | number | 10     | false  | false   |
@@ -68,11 +68,11 @@ Feature: Datatables
 
   @TestRailId:C85157
   Scenario: Datatable entry update with null value clears column via client JSON body
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a fully customized loan with the following data:
       | LoanProduct  | submitted on date | with Principal | ANNUAL interest rate % | interest type     | interest calculation period | amortization type  | loanTermFrequency | loanTermFrequencyType | repaymentEvery | repaymentFrequencyType | numberOfRepayments | graceOnPrincipalPayment | graceOnInterestPayment | interest free period | Payment strategy                            |
-      | LP1_DUE_DATE | 01 January 2026   | 1000           | 0                      | DECLINING_BALANCE | SAME_AS_REPAYMENT_PERIOD    | EQUAL_INSTALLMENTS | 1                 | MONTHS                | 1              | MONTHS                 | 1                  | 0                       | 0                      | 0                    | PENALTIES_FEES_INTEREST_PRINCIPAL_ORDER |
+      | LP1_DUE_DATE | 20260101   | 1000           | 0                      | DECLINING_BALANCE | SAME_AS_REPAYMENT_PERIOD    | EQUAL_INSTALLMENTS | 1                 | MONTHS                | 1              | MONTHS                 | 1                  | 0                       | 0                      | 0                    | PENALTIES_FEES_INTEREST_PRINCIPAL_ORDER |
     And A datatable for "Loan" is created with the following extra columns:
       | Name   | Type   | Length | Unique | Indexed |
       | amount | number | 10     | false  | false   |

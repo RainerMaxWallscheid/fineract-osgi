@@ -35,7 +35,7 @@ public class AccountTransferHelper {
     private static final String LOCALE = "en_GB";
     private static final String OFFICE_ID = "1";
     private static final String TRANSFER_DESCRIPTION = "Transfer";
-    public static final String ACCOUNT_TRANSFER_DATE = "01 March 2013";
+    public static final String ACCOUNT_TRANSFER_DATE = "20130301";
     public static final String ACCOUNT_TRANSFER_INVALID_DATE = "01 05 2013";
 
     private String transferDate = "";
@@ -62,7 +62,7 @@ public class AccountTransferHelper {
             final String fromAccountType, final String toAccountType, final String transferAmount) {
 
         final HashMap<String, String> map = new HashMap<>();
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("locale", LOCALE);
         map.put("fromClientId", fromClientId);
         map.put("fromAccountId", fromAccountId);

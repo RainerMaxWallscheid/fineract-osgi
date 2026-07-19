@@ -28,21 +28,21 @@ public class ProgressiveLoanMoratoriumIntegrationTest extends FeignLoanTestBase 
     public void testProgressivePrincipalMoratoriumSchedule() {
         Long clientId = createClient();
 
-        runAt("1 January 2024", () -> {
+        runAt("20240101", () -> {
             Long loanProductId = createLoanProduct(create4IProgressive().principal(100.0).minPrincipal(100.0).maxPrincipal(100.0)
                     .numberOfRepayments(6).interestRatePerPeriod(7.0));
 
-            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "1 January 2024", 100.0, 7.0, 6,
+            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "20240101", 100.0, 7.0, 6,
                     request -> request.graceOnPrincipalPayment(2));
 
-            disburseLoan(loanId, BigDecimal.valueOf(100.0), "1 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(100.0), "20240101");
 
-            verifyRepaymentSchedule(loanId, installment(100.0, null, "01 January 2024"),
-                    installment(0.0, 0.58, 0.58, false, "01 February 2024"), installment(0.0, 0.58, 0.58, false, "01 March 2024"), //
-                    installment(24.79, 0.58, 25.37, false, "01 April 2024"), //
-                    installment(24.93, 0.44, 25.37, false, "01 May 2024"), //
-                    installment(25.08, 0.29, 25.37, false, "01 June 2024"), //
-                    installment(25.20, 0.15, 25.35, false, "01 July 2024"));
+            verifyRepaymentSchedule(loanId, installment(100.0, null, "20240101"),
+                    installment(0.0, 0.58, 0.58, false, "20240201"), installment(0.0, 0.58, 0.58, false, "20240301"), //
+                    installment(24.79, 0.58, 25.37, false, "20240401"), //
+                    installment(24.93, 0.44, 25.37, false, "20240501"), //
+                    installment(25.08, 0.29, 25.37, false, "20240601"), //
+                    installment(25.20, 0.15, 25.35, false, "20240701"));
         });
     }
 
@@ -50,21 +50,21 @@ public class ProgressiveLoanMoratoriumIntegrationTest extends FeignLoanTestBase 
     public void testProgressiveInterestMoratoriumSchedule() {
         Long clientId = createClient();
 
-        runAt("1 January 2024", () -> {
+        runAt("20240101", () -> {
             Long loanProductId = createLoanProduct(create4IProgressive().principal(100.0).minPrincipal(100.0).maxPrincipal(100.0)
                     .numberOfRepayments(6).interestRatePerPeriod(7.0));
 
-            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "1 January 2024", 100.0, 7.0, 6,
+            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "20240101", 100.0, 7.0, 6,
                     request -> request.graceOnInterestPayment(2));
 
-            disburseLoan(loanId, BigDecimal.valueOf(100.0), "1 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(100.0), "20240101");
 
-            verifyRepaymentSchedule(loanId, installment(100.0, null, "01 January 2024"),
-                    installment(17.01, 0.0, 17.01, false, "01 February 2024"), installment(17.01, 0.0, 17.01, false, "01 March 2024"), //
-                    installment(15.57, 1.44, 17.01, false, "01 April 2024"), //
-                    installment(16.72, 0.29, 17.01, false, "01 May 2024"), //
-                    installment(16.81, 0.20, 17.01, false, "01 June 2024"), //
-                    installment(16.88, 0.10, 16.98, false, "01 July 2024"));
+            verifyRepaymentSchedule(loanId, installment(100.0, null, "20240101"),
+                    installment(17.01, 0.0, 17.01, false, "20240201"), installment(17.01, 0.0, 17.01, false, "20240301"), //
+                    installment(15.57, 1.44, 17.01, false, "20240401"), //
+                    installment(16.72, 0.29, 17.01, false, "20240501"), //
+                    installment(16.81, 0.20, 17.01, false, "20240601"), //
+                    installment(16.88, 0.10, 16.98, false, "20240701"));
         });
     }
 }

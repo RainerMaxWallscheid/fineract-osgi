@@ -117,7 +117,7 @@ public class FeignTransactionHelper {
 
     public PostLoansLoanIdTransactionsResponse makeLoanRepayment(Long loanId, String command, String date, Double amount) {
         return ok(() -> fineractClient.loanTransactions().handleCommandsLoanTransaction(loanId, new PostLoansLoanIdTransactionsRequest()
-                .transactionAmount(amount).transactionDate(date).dateFormat("dd MMMM yyyy").locale("en"), Map.of("command", command)));
+                .transactionAmount(amount).transactionDate(date).dateFormat("yyyyMMdd").locale("en"), Map.of("command", command)));
     }
 
     public PostLoansLoanIdTransactionsResponse makeLoanRepayment(Long loanId, PostLoansLoanIdTransactionsRequest request) {
@@ -166,7 +166,7 @@ public class FeignTransactionHelper {
 
     public PostLoansLoanIdTransactionsResponse reverseLoanTransaction(Long loanId, Long transactionId, String transactionDate) {
         return reverseLoanTransaction(loanId, transactionId, new PostLoansLoanIdTransactionsTransactionIdRequest()
-                .dateFormat("dd MMMM yyyy").transactionDate(transactionDate).transactionAmount(0.0).locale("en"));
+                .dateFormat("yyyyMMdd").transactionDate(transactionDate).transactionAmount(0.0).locale("en"));
     }
 
     public PostLoansLoanIdTransactionsResponse makeCreditBalanceRefund(Long loanId, PostLoansLoanIdTransactionsRequest request) {
@@ -181,7 +181,7 @@ public class FeignTransactionHelper {
     public PostLoansLoanIdTransactionsResponse createManualInterestRefund(Long loanId, Long targetTransactionId, String transactionDate,
             Double amount, String externalId) {
         PostLoansLoanIdTransactionsTransactionIdRequest request = new PostLoansLoanIdTransactionsTransactionIdRequest()
-                .transactionAmount(amount).dateFormat("dd MMMM yyyy").locale("en");
+                .transactionAmount(amount).dateFormat("yyyyMMdd").locale("en");
         if (externalId != null) {
             request.externalId(externalId);
         }

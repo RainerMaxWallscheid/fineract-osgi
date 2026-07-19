@@ -42,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class InlineCOBStepDef extends AbstractStepDef {
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
 
     @Autowired
     private FineractFeignClient fineractClient;

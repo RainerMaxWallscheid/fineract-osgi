@@ -45,7 +45,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class AuthenticationIntegrationTest {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthenticationIntegrationTest.class);
-    private static final String LOAN_DATE = "11 July 2022";
+    private static final String LOAN_DATE = "20220711";
     private static final String APPROVE_COMMAND = "approve";
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
@@ -64,7 +64,7 @@ public class AuthenticationIntegrationTest {
         UserHelper.createUser(this.requestSpec, this.responseSpec, 1, staffId, username, "A1b2c3d4e5f$", "resourceId");
         Integer clientID = ClientHelper.createClient(requestSpec, responseSpec);
         Integer loanProductID = setupLoanProduct(accountHelper);
-        this.loanID = loanTransactionHelper.applyForLoanApplicationWithPaymentStrategyAndPastMonth(clientID, loanProductID, Collections.emptyList(), null, "10000", LoanApplicationTestBuilder.DEFAULT_STRATEGY, "10 July 2022", LOAN_DATE);
+        this.loanID = loanTransactionHelper.applyForLoanApplicationWithPaymentStrategyAndPastMonth(clientID, loanProductID, Collections.emptyList(), null, "10000", LoanApplicationTestBuilder.DEFAULT_STRATEGY, "20220710", LOAN_DATE);
     }
 
     @Test

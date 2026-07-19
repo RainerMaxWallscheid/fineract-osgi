@@ -78,8 +78,8 @@ public class VariableInstallmentsFlatHelper {
                 .withAmortizationTypeAsEqualPrincipalPayments() //
                 .withInterestTypeAsFlatBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("20 September 2011") //
-                .withSubmittedOnDate("20 September 2011") //
+                .withExpectedDisbursementDate("20110920") //
+                .withSubmittedOnDate("20110920") //
                 .withCollaterals(collaterals).withCharges(charges).build(clientID.toString(), loanProductID.toString(), savingsId);
         return loanApplicationJSON;
     }
@@ -91,7 +91,7 @@ public class VariableInstallmentsFlatHelper {
     public static String createDeleteVariations(ArrayList<Map> deletedInstallments) {
         Map<String, Object> toReturn = new HashMap<>();
         toReturn.put("locale", "en");
-        toReturn.put("dateFormat", "dd MMMM yyyy");
+        toReturn.put("dateFormat", "yyyyMMdd");
         Map exceptions = new HashMap<>();
         exceptions.put("deletedinstallments", createDeletedMap(deletedInstallments));
         toReturn.put("exceptions", exceptions);
@@ -121,7 +121,7 @@ public class VariableInstallmentsFlatHelper {
     public static String createAddVariations() {
         Map<String, Object> toReturn = new HashMap<>();
         toReturn.put("locale", "en");
-        toReturn.put("dateFormat", "dd MMMM yyyy");
+        toReturn.put("dateFormat", "yyyyMMdd");
         Map exceptions = new HashMap<>();
         exceptions.put("newinstallments", createNewInstallments());
         toReturn.put("exceptions", exceptions);
@@ -136,7 +136,7 @@ public class VariableInstallmentsFlatHelper {
     private static ArrayList createNewInstallments() {
         ArrayList toReturn = new ArrayList<>();
         Map tosend = new HashMap();
-        tosend.put("dueDate", "31 October 2011");
+        tosend.put("dueDate", "20111031");
         tosend.put("principal", "5000");
         toReturn.add(tosend);
         return toReturn;
@@ -149,7 +149,7 @@ public class VariableInstallmentsFlatHelper {
     public static String createModifiyVariations(Map firstSchedule) {
         Map<String, Object> toReturn = new HashMap<>();
         toReturn.put("locale", "en");
-        toReturn.put("dateFormat", "dd MMMM yyyy");
+        toReturn.put("dateFormat", "yyyyMMdd");
         Map exceptions = new HashMap<>();
         exceptions.put("modifiedinstallments", createModifyMap(firstSchedule));
         toReturn.put("exceptions", exceptions);
@@ -177,7 +177,7 @@ public class VariableInstallmentsFlatHelper {
     public static String createModifiyDateVariations(String[] date, String[] newdate, String[] principal) {
         Map<String, Object> toReturn = new HashMap<>();
         toReturn.put("locale", "en");
-        toReturn.put("dateFormat", "dd MMMM yyyy");
+        toReturn.put("dateFormat", "yyyyMMdd");
         Map exceptions = new HashMap<>();
         exceptions.put("modifiedinstallments", createDateModifyMap(date, newdate, principal));
         toReturn.put("exceptions", exceptions);
@@ -224,11 +224,11 @@ public class VariableInstallmentsFlatHelper {
     public static String createAllVariations() {
         Map<String, Object> toReturn = new HashMap<>();
         toReturn.put("locale", "en");
-        toReturn.put("dateFormat", "dd MMMM yyyy");
+        toReturn.put("dateFormat", "yyyyMMdd");
         Map exceptions = new HashMap<>();
-        exceptions.put("modifiedinstallments", createModifyMap("20 November 2011"));
-        exceptions.put("newinstallments", createNewInstallments("25 December 2011"));
-        exceptions.put("deletedinstallments", createDeletedMap("20 December 2011"));
+        exceptions.put("modifiedinstallments", createModifyMap("20111120"));
+        exceptions.put("newinstallments", createNewInstallments("20111225"));
+        exceptions.put("deletedinstallments", createDeletedMap("20111220"));
         toReturn.put("exceptions", exceptions);
         String json = new Gson().toJson(toReturn);
         return json;
@@ -269,7 +269,7 @@ public class VariableInstallmentsFlatHelper {
         cal.set(Calendar.MONTH, (int) list.get(1) - 1);
         cal.set(Calendar.DAY_OF_MONTH, (int) list.get(2));
         Date date = cal.getTime();
-        DateFormat requiredFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat requiredFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         return requiredFormat.format(date);
     }
 

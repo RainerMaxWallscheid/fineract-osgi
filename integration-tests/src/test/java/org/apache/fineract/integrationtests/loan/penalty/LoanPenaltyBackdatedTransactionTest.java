@@ -55,7 +55,7 @@ public class LoanPenaltyBackdatedTransactionTest extends BaseLoanIntegrationTest
     public void test_PenaltyRecalculationWorksForBackdatedTx_WhenCumulative_1() {
         AtomicReference<Long> aLoanId = new AtomicReference<>();
 
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -94,7 +94,7 @@ public class LoanPenaltyBackdatedTransactionTest extends BaseLoanIntegrationTest
             // Apply and Approve Loan
             double amount = 5000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(repaymentEvery)//
                     .loanTermFrequency(numberOfRepayments * repaymentEvery)//
                     .repaymentFrequencyType(RepaymentFrequencyType.DAYS)//
@@ -105,21 +105,21 @@ public class LoanPenaltyBackdatedTransactionTest extends BaseLoanIntegrationTest
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 January 2023"));
+                    approveLoanRequest(amount, "20230101"));
 
             aLoanId.getAndSet(approvedLoanResult.getLoanId());
             Long loanId = aLoanId.get();
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023") //
+                    transaction(5000.0, "Disbursement", "20230101") //
             );
         });
 
-        runAt("09 January 2023", () -> {
+        runAt("20230109", () -> {
             Long loanId = aLoanId.get();
             // run accrual posting
             schedulerJobHelper.executeAndAwaitJob("Apply penalty to overdue loans");
@@ -127,24 +127,24 @@ public class LoanPenaltyBackdatedTransactionTest extends BaseLoanIntegrationTest
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(16.67, "Accrual", "05 January 2023", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
-                    transaction(50.01, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0) //
+                    transaction(5000.0, "Disbursement", "20230101", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(16.67, "Accrual", "20230105", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
+                    transaction(50.01, "Accrual", "20230109", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0) //
             );
 
             // repay 1k
-            addRepaymentForLoan(loanId, 1000.0, "07 January 2023");
+            addRepaymentForLoan(loanId, 1000.0, "20230107");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(16.67, "Accrual", "05 January 2023", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
-                    transaction(1000.0, "Repayment", "07 January 2023", 4016.67, 983.33, 0.0, 0.0, 16.67, 0.0, 0.0), //
-                    transaction(50.01, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0) //
+                    transaction(5000.0, "Disbursement", "20230101", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(16.67, "Accrual", "20230105", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
+                    transaction(1000.0, "Repayment", "20230107", 4016.67, 983.33, 0.0, 0.0, 16.67, 0.0, 0.0), //
+                    transaction(50.01, "Accrual", "20230109", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0) //
             );
 
             // reverse accruals
-            deactivateOverdueLoanCharges(loanId, "07 January 2023");
+            deactivateOverdueLoanCharges(loanId, "20230107");
 
             // run accrual posting
             schedulerJobHelper.executeAndAwaitJob("Apply penalty to overdue loans");
@@ -152,11 +152,11 @@ public class LoanPenaltyBackdatedTransactionTest extends BaseLoanIntegrationTest
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(16.67, "Accrual", "05 January 2023", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
-                    transaction(1000.0, "Repayment", "07 January 2023", 4016.67, 983.33, 0.0, 0.0, 16.67, 0.0, 0.0), //
-                    transaction(50.01, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0, true), //
-                    transaction(30.33, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 0.0, 30.33, 0.0, 0.0) //
+                    transaction(5000.0, "Disbursement", "20230101", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(16.67, "Accrual", "20230105", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
+                    transaction(1000.0, "Repayment", "20230107", 4016.67, 983.33, 0.0, 0.0, 16.67, 0.0, 0.0), //
+                    transaction(50.01, "Accrual", "20230109", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0, true), //
+                    transaction(30.33, "Accrual", "20230109", 0.0, 0.0, 0.0, 0.0, 30.33, 0.0, 0.0) //
             );
         });
     }
@@ -165,7 +165,7 @@ public class LoanPenaltyBackdatedTransactionTest extends BaseLoanIntegrationTest
     public void test_PenaltyRecalculationWorksForBackdatedTx_WhenCumulative_2() {
         AtomicReference<Long> aLoanId = new AtomicReference<>();
 
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -204,7 +204,7 @@ public class LoanPenaltyBackdatedTransactionTest extends BaseLoanIntegrationTest
             // Apply and Approve Loan
             double amount = 5000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(repaymentEvery)//
                     .loanTermFrequency(numberOfRepayments * repaymentEvery)//
                     .repaymentFrequencyType(RepaymentFrequencyType.DAYS)//
@@ -215,21 +215,21 @@ public class LoanPenaltyBackdatedTransactionTest extends BaseLoanIntegrationTest
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 January 2023"));
+                    approveLoanRequest(amount, "20230101"));
 
             aLoanId.getAndSet(approvedLoanResult.getLoanId());
             Long loanId = aLoanId.get();
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023") //
+                    transaction(5000.0, "Disbursement", "20230101") //
             );
         });
 
-        runAt("09 January 2023", () -> {
+        runAt("20230109", () -> {
             Long loanId = aLoanId.get();
 
             // run accrual posting
@@ -238,24 +238,24 @@ public class LoanPenaltyBackdatedTransactionTest extends BaseLoanIntegrationTest
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(16.67, "Accrual", "05 January 2023", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
-                    transaction(50.01, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0) //
+                    transaction(5000.0, "Disbursement", "20230101", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(16.67, "Accrual", "20230105", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
+                    transaction(50.01, "Accrual", "20230109", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0) //
             );
 
             // repay 1k
-            addRepaymentForLoan(loanId, 1000.0, "07 January 2023");
+            addRepaymentForLoan(loanId, 1000.0, "20230107");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(16.67, "Accrual", "05 January 2023", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
-                    transaction(1000.0, "Repayment", "07 January 2023", 4016.67, 983.33, 0.0, 0.0, 16.67, 0.0, 0.0), //
-                    transaction(50.01, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0) //
+                    transaction(5000.0, "Disbursement", "20230101", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(16.67, "Accrual", "20230105", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
+                    transaction(1000.0, "Repayment", "20230107", 4016.67, 983.33, 0.0, 0.0, 16.67, 0.0, 0.0), //
+                    transaction(50.01, "Accrual", "20230109", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0) //
             );
 
             // reverse accruals
-            deactivateOverdueLoanCharges(loanId, "05 January 2023");
+            deactivateOverdueLoanCharges(loanId, "20230105");
 
             // run accrual posting
             schedulerJobHelper.executeAndAwaitJob("Apply penalty to overdue loans");
@@ -263,12 +263,12 @@ public class LoanPenaltyBackdatedTransactionTest extends BaseLoanIntegrationTest
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(16.67, "Accrual", "05 January 2023", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0, true), //
-                    transaction(6.83, "Accrual", "05 January 2023", 0.0, 0.0, 0.0, 0.0, 6.83, 0.0, 0.0), //
-                    transaction(1000.0, "Repayment", "07 January 2023", 4006.83, 993.17, 0.0, 0.0, 6.83, 0.0, 0.0), //
-                    transaction(50.01, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0, true), //
-                    transaction(20.49, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 0.0, 20.49, 0.0, 0.0) //
+                    transaction(5000.0, "Disbursement", "20230101", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(16.67, "Accrual", "20230105", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0, true), //
+                    transaction(6.83, "Accrual", "20230105", 0.0, 0.0, 0.0, 0.0, 6.83, 0.0, 0.0), //
+                    transaction(1000.0, "Repayment", "20230107", 4006.83, 993.17, 0.0, 0.0, 6.83, 0.0, 0.0), //
+                    transaction(50.01, "Accrual", "20230109", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0, true), //
+                    transaction(20.49, "Accrual", "20230109", 0.0, 0.0, 0.0, 0.0, 20.49, 0.0, 0.0) //
             );
         });
     }
@@ -277,7 +277,7 @@ public class LoanPenaltyBackdatedTransactionTest extends BaseLoanIntegrationTest
     public void test_PenaltyRecalculationWorksForBackdatedTx_WhenCumulative_3() {
         AtomicReference<Long> aLoanId = new AtomicReference<>();
 
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -316,7 +316,7 @@ public class LoanPenaltyBackdatedTransactionTest extends BaseLoanIntegrationTest
             // Apply and Approve Loan
             double amount = 5000.0;
 
-            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "01 January 2023", amount, numberOfRepayments)//
+            PostLoansRequest applicationRequest = applyLoanRequest(clientId, loanProductId, "20230101", amount, numberOfRepayments)//
                     .repaymentEvery(repaymentEvery)//
                     .loanTermFrequency(numberOfRepayments * repaymentEvery)//
                     .repaymentFrequencyType(RepaymentFrequencyType.DAYS)//
@@ -327,21 +327,21 @@ public class LoanPenaltyBackdatedTransactionTest extends BaseLoanIntegrationTest
             PostLoansResponse postLoansResponse = loanTransactionHelper.applyLoan(applicationRequest);
 
             PostLoansLoanIdResponse approvedLoanResult = loanTransactionHelper.approveLoan(postLoansResponse.getResourceId(),
-                    approveLoanRequest(amount, "01 January 2023"));
+                    approveLoanRequest(amount, "20230101"));
 
             aLoanId.getAndSet(approvedLoanResult.getLoanId());
             Long loanId = aLoanId.get();
 
             // disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(5000.0), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023") //
+                    transaction(5000.0, "Disbursement", "20230101") //
             );
         });
 
-        runAt("09 January 2023", () -> {
+        runAt("20230109", () -> {
             Long loanId = aLoanId.get();
 
             // run accrual posting
@@ -350,24 +350,24 @@ public class LoanPenaltyBackdatedTransactionTest extends BaseLoanIntegrationTest
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(16.67, "Accrual", "05 January 2023", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
-                    transaction(50.01, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0) //
+                    transaction(5000.0, "Disbursement", "20230101", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(16.67, "Accrual", "20230105", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
+                    transaction(50.01, "Accrual", "20230109", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0) //
             );
 
             // repay 1k
-            addRepaymentForLoan(loanId, 1000.0, "07 January 2023");
+            addRepaymentForLoan(loanId, 1000.0, "20230107");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(16.67, "Accrual", "05 January 2023", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
-                    transaction(1000.0, "Repayment", "07 January 2023", 4016.67, 983.33, 0.0, 0.0, 16.67, 0.0, 0.0), //
-                    transaction(50.01, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0) //
+                    transaction(5000.0, "Disbursement", "20230101", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(16.67, "Accrual", "20230105", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
+                    transaction(1000.0, "Repayment", "20230107", 4016.67, 983.33, 0.0, 0.0, 16.67, 0.0, 0.0), //
+                    transaction(50.01, "Accrual", "20230109", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0) //
             );
 
             // reverse accruals
-            deactivateOverdueLoanCharges(loanId, "07 January 2023");
+            deactivateOverdueLoanCharges(loanId, "20230107");
 
             // run accrual posting
             schedulerJobHelper.executeAndAwaitJob("Apply penalty to overdue loans");
@@ -375,28 +375,28 @@ public class LoanPenaltyBackdatedTransactionTest extends BaseLoanIntegrationTest
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(16.67, "Accrual", "05 January 2023", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
-                    transaction(1000.0, "Repayment", "07 January 2023", 4016.67, 983.33, 0.0, 0.0, 16.67, 0.0, 0.0), //
-                    transaction(50.01, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0, true), //
-                    transaction(30.33, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 0.0, 30.33, 0.0, 0.0) //
+                    transaction(5000.0, "Disbursement", "20230101", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(16.67, "Accrual", "20230105", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
+                    transaction(1000.0, "Repayment", "20230107", 4016.67, 983.33, 0.0, 0.0, 16.67, 0.0, 0.0), //
+                    transaction(50.01, "Accrual", "20230109", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0, true), //
+                    transaction(30.33, "Accrual", "20230109", 0.0, 0.0, 0.0, 0.0, 30.33, 0.0, 0.0) //
             );
         });
 
-        runAt("10 January 2023", () -> {
+        runAt("20230110", () -> {
             Long loanId = aLoanId.get();
 
             // repay 1k
-            addRepaymentForLoan(loanId, 1000.0, "10 January 2023");
+            addRepaymentForLoan(loanId, 1000.0, "20230110");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(5000.0, "Disbursement", "01 January 2023", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
-                    transaction(16.67, "Accrual", "05 January 2023", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
-                    transaction(1000.0, "Repayment", "07 January 2023", 4016.67, 983.33, 0.0, 0.0, 16.67, 0.0, 0.0), //
-                    transaction(50.01, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0, true), //
-                    transaction(30.33, "Accrual", "09 January 2023", 0.0, 0.0, 0.0, 0.0, 30.33, 0.0, 0.0), //
-                    transaction(1000.0, "Repayment", "10 January 2023", 3047.0, 969.67, 0.0, 0.0, 30.33, 0.0, 0.0) //
+                    transaction(5000.0, "Disbursement", "20230101", 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), //
+                    transaction(16.67, "Accrual", "20230105", 0.0, 0.0, 0.0, 0.0, 16.67, 0.0, 0.0), //
+                    transaction(1000.0, "Repayment", "20230107", 4016.67, 983.33, 0.0, 0.0, 16.67, 0.0, 0.0), //
+                    transaction(50.01, "Accrual", "20230109", 0.0, 0.0, 0.0, 0.0, 50.01, 0.0, 0.0, true), //
+                    transaction(30.33, "Accrual", "20230109", 0.0, 0.0, 0.0, 0.0, 30.33, 0.0, 0.0), //
+                    transaction(1000.0, "Repayment", "20230110", 3047.0, 969.67, 0.0, 0.0, 30.33, 0.0, 0.0) //
             );
         });
     }

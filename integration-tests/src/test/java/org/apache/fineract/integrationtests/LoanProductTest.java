@@ -65,8 +65,8 @@ public class LoanProductTest extends BaseLoanIntegrationTest {
             Assertions.assertEquals(LoanCapitalizedIncomeStrategy.EQUAL_AMORTIZATION.getCode(), loanProductsProductIdResponse.getCapitalizedIncomeStrategy().getCode());
             Assertions.assertNotNull(loanProductsProductIdResponse.getCapitalizedIncomeType());
             Assertions.assertEquals(LoanCapitalizedIncomeType.FEE.getCode(), loanProductsProductIdResponse.getCapitalizedIncomeType().getCode());
-            runAt("20 December 2024", () -> {
-                Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20 December 2024", 430.0, 7.0, 6, null);
+            runAt("20241220", () -> {
+                Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20241220", 430.0, 7.0, 6, null);
                 final GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
                 Assertions.assertEquals(Boolean.TRUE, loanDetails.getEnableIncomeCapitalization());
                 Assertions.assertNotNull(loanDetails.getCapitalizedIncomeCalculationType());
@@ -75,7 +75,7 @@ public class LoanProductTest extends BaseLoanIntegrationTest {
                 Assertions.assertEquals(LoanCapitalizedIncomeStrategy.EQUAL_AMORTIZATION.getCode(), loanDetails.getCapitalizedIncomeStrategy().getCode());
                 Assertions.assertNotNull(loanDetails.getCapitalizedIncomeType());
                 Assertions.assertEquals(LoanCapitalizedIncomeType.FEE.getCode(), loanDetails.getCapitalizedIncomeType().getCode());
-                Assertions.assertDoesNotThrow(() -> disburseLoan(loanId, BigDecimal.valueOf(430), "20 December 2024"));
+                Assertions.assertDoesNotThrow(() -> disburseLoan(loanId, BigDecimal.valueOf(430), "20241220"));
             });
         }
 
@@ -91,8 +91,8 @@ public class LoanProductTest extends BaseLoanIntegrationTest {
             Assertions.assertEquals(LoanCapitalizedIncomeStrategy.EQUAL_AMORTIZATION.getCode(), loanProductsProductIdResponse.getCapitalizedIncomeStrategy().getCode());
             Assertions.assertNotNull(loanProductsProductIdResponse.getCapitalizedIncomeType());
             Assertions.assertEquals(LoanCapitalizedIncomeType.FEE.getCode(), loanProductsProductIdResponse.getCapitalizedIncomeType().getCode());
-            runAt("20 December 2024", () -> {
-                Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20 December 2024", 430.0, 7.0, 6, null);
+            runAt("20241220", () -> {
+                Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20241220", 430.0, 7.0, 6, null);
                 final GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
                 Assertions.assertEquals(Boolean.FALSE, loanDetails.getEnableIncomeCapitalization());
                 Assertions.assertNotNull(loanDetails.getCapitalizedIncomeCalculationType());
@@ -101,7 +101,7 @@ public class LoanProductTest extends BaseLoanIntegrationTest {
                 Assertions.assertEquals(LoanCapitalizedIncomeStrategy.EQUAL_AMORTIZATION.getCode(), loanDetails.getCapitalizedIncomeStrategy().getCode());
                 Assertions.assertNotNull(loanDetails.getCapitalizedIncomeType());
                 Assertions.assertEquals(LoanCapitalizedIncomeType.FEE.getCode(), loanDetails.getCapitalizedIncomeType().getCode());
-                Assertions.assertDoesNotThrow(() -> disburseLoan(loanId, BigDecimal.valueOf(430), "20 December 2024"));
+                Assertions.assertDoesNotThrow(() -> disburseLoan(loanId, BigDecimal.valueOf(430), "20241220"));
             });
         }
 
@@ -182,8 +182,8 @@ public class LoanProductTest extends BaseLoanIntegrationTest {
             Assertions.assertEquals(LoanBuyDownFeeStrategy.EQUAL_AMORTIZATION.getCode(), loanProductsProductIdResponse.getBuyDownFeeStrategy().getCode());
             Assertions.assertNotNull(loanProductsProductIdResponse.getBuyDownFeeIncomeType());
             Assertions.assertEquals(LoanBuyDownFeeIncomeType.FEE.getCode(), loanProductsProductIdResponse.getBuyDownFeeIncomeType().getCode());
-            runAt("20 December 2024", () -> {
-                Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20 December 2024", 430.0, 7.0, 6, null);
+            runAt("20241220", () -> {
+                Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20241220", 430.0, 7.0, 6, null);
                 final GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
                 Assertions.assertEquals(Boolean.TRUE, loanDetails.getEnableBuyDownFee());
                 Assertions.assertNotNull(loanDetails.getBuyDownFeeCalculationType());
@@ -192,7 +192,7 @@ public class LoanProductTest extends BaseLoanIntegrationTest {
                 Assertions.assertEquals(LoanBuyDownFeeStrategy.EQUAL_AMORTIZATION.getCode(), loanDetails.getBuyDownFeeStrategy().getCode());
                 Assertions.assertNotNull(loanDetails.getBuyDownFeeIncomeType());
                 Assertions.assertEquals(LoanBuyDownFeeIncomeType.FEE.getCode(), loanDetails.getBuyDownFeeIncomeType().getCode());
-                Assertions.assertDoesNotThrow(() -> disburseLoan(loanId, BigDecimal.valueOf(430), "20 December 2024"));
+                Assertions.assertDoesNotThrow(() -> disburseLoan(loanId, BigDecimal.valueOf(430), "20241220"));
             });
         }
 
@@ -208,8 +208,8 @@ public class LoanProductTest extends BaseLoanIntegrationTest {
             Assertions.assertEquals(LoanBuyDownFeeStrategy.EQUAL_AMORTIZATION.getCode(), loanProductsProductIdResponse.getBuyDownFeeStrategy().getCode());
             Assertions.assertNotNull(loanProductsProductIdResponse.getBuyDownFeeIncomeType());
             Assertions.assertEquals(LoanBuyDownFeeIncomeType.FEE.getCode(), loanProductsProductIdResponse.getBuyDownFeeIncomeType().getCode());
-            runAt("20 December 2024", () -> {
-                Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20 December 2024", 430.0, 7.0, 6, null);
+            runAt("20241220", () -> {
+                Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20241220", 430.0, 7.0, 6, null);
                 final GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
                 Assertions.assertEquals(Boolean.FALSE, loanDetails.getEnableBuyDownFee());
                 Assertions.assertNotNull(loanDetails.getBuyDownFeeCalculationType());
@@ -218,7 +218,7 @@ public class LoanProductTest extends BaseLoanIntegrationTest {
                 Assertions.assertEquals(LoanBuyDownFeeStrategy.EQUAL_AMORTIZATION.getCode(), loanDetails.getBuyDownFeeStrategy().getCode());
                 Assertions.assertNotNull(loanDetails.getBuyDownFeeIncomeType());
                 Assertions.assertEquals(LoanBuyDownFeeIncomeType.FEE.getCode(), loanDetails.getBuyDownFeeIncomeType().getCode());
-                Assertions.assertDoesNotThrow(() -> disburseLoan(loanId, BigDecimal.valueOf(430), "20 December 2024"));
+                Assertions.assertDoesNotThrow(() -> disburseLoan(loanId, BigDecimal.valueOf(430), "20241220"));
             });
         }
 

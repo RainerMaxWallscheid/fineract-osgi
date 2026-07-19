@@ -113,8 +113,8 @@ import retrofit2.Response;
 public class LoanTransactionHelper {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanTransactionHelper.class);
-    public static final String DATE_FORMAT = "d MMMM yyyy";
-    public static final String DATE_TIME_FORMAT = "dd MMMM yyyy HH:mm";
+    public static final String DATE_FORMAT = "yyyyMMdd";
+    public static final String DATE_TIME_FORMAT = "yyyyMMdd HH:mm";
     private static final String LOAN_PRODUCTS_URL = "/fineract-provider/api/v1/loanproducts";
     private static final String CREATE_LOAN_PRODUCT_URL = "/fineract-provider/api/v1/loanproducts?" + Utils.TENANT_IDENTIFIER;
     private static final String APPLY_LOAN_URL = "/fineract-provider/api/v1/loans?" + Utils.TENANT_IDENTIFIER;
@@ -404,12 +404,12 @@ public class LoanTransactionHelper {
     }
 
     public PostLoansDelinquencyActionResponse createLoanDelinquencyAction(final Long loanid, DelinquencyAction action, String startDate, String endDate) {
-        PostLoansDelinquencyActionRequest postLoansDelinquencyAction = new PostLoansDelinquencyActionRequest().action(action.name()).startDate(startDate).endDate(endDate).locale("en").dateFormat("dd MMMM yyyy");
+        PostLoansDelinquencyActionRequest postLoansDelinquencyAction = new PostLoansDelinquencyActionRequest().action(action.name()).startDate(startDate).endDate(endDate).locale("en").dateFormat("yyyyMMdd");
         return Calls.ok(FineractClientHelper.getFineractClient().loans.createDelinquencyActionLoan(loanid, postLoansDelinquencyAction));
     }
 
     public PostLoansDelinquencyActionResponse createLoanDelinquencyAction(String externalId, DelinquencyAction action, String startDate, String endDate) {
-        PostLoansDelinquencyActionRequest postLoansDelinquencyAction = new PostLoansDelinquencyActionRequest().action(action.name()).startDate(startDate).endDate(endDate).locale("en").dateFormat("dd MMMM yyyy");
+        PostLoansDelinquencyActionRequest postLoansDelinquencyAction = new PostLoansDelinquencyActionRequest().action(action.name()).startDate(startDate).endDate(endDate).locale("en").dateFormat("yyyyMMdd");
         return Calls.ok(FineractClientHelper.getFineractClient().loans.createDelinquencyActionLoanByExternalId(externalId, postLoansDelinquencyAction));
     }
 
@@ -599,7 +599,7 @@ public class LoanTransactionHelper {
     private String getDisburseLoanWithPostDatedChecksAsJSON(final String actualDisbursementDate, final String transactionAmount, final List<HashMap> postDatedChecks) {
         final HashMap<String, Object> map = new HashMap<String, Object>();
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("actualDisbursementDate", actualDisbursementDate);
         map.put("note", "DISBURSE NOTE");
         if (transactionAmount != null) {
@@ -824,7 +824,7 @@ public class LoanTransactionHelper {
 
     public PostLoansLoanIdTransactionsResponse makeLoanRepayment(final Long loanId, final String command, final String date, final Double amountToBePaid) {
         log.info("Make loan transaction. Command - {} with amount {} in {} for Loan {}", command, amountToBePaid, date, loanId);
-        return Calls.ok(FineractClientHelper.getFineractClient().loanTransactions.handleCommandsLoanTransaction(loanId, new PostLoansLoanIdTransactionsRequest().transactionAmount(amountToBePaid).transactionDate(date).dateFormat("dd MMMM yyyy").locale("en"), command));
+        return Calls.ok(FineractClientHelper.getFineractClient().loanTransactions.handleCommandsLoanTransaction(loanId, new PostLoansLoanIdTransactionsRequest().transactionAmount(amountToBePaid).transactionDate(date).dateFormat("yyyyMMdd").locale("en"), command));
     }
 
     // TODO: Rewrite to use fineract-client instead!
@@ -853,11 +853,11 @@ public class LoanTransactionHelper {
     }
 
     public PostLoansLoanIdTransactionsResponse addCapitalizedIncome(final Long loanId, final String transactionDate, final double amount) {
-        return addCapitalizedIncome(loanId, new PostLoansLoanIdTransactionsRequest().transactionAmount(amount).transactionDate(transactionDate).dateFormat("dd MMMM yyyy").locale("en"));
+        return addCapitalizedIncome(loanId, new PostLoansLoanIdTransactionsRequest().transactionAmount(amount).transactionDate(transactionDate).dateFormat("yyyyMMdd").locale("en"));
     }
 
     public PostLoansLoanIdTransactionsResponse addCapitalizedIncome(final Long loanId, final String transactionDate, final double amount, final Long classificationId) {
-        return addCapitalizedIncome(loanId, new PostLoansLoanIdTransactionsRequest().transactionAmount(amount).transactionDate(transactionDate).dateFormat("dd MMMM yyyy").locale("en").classificationId(classificationId));
+        return addCapitalizedIncome(loanId, new PostLoansLoanIdTransactionsRequest().transactionAmount(amount).transactionDate(transactionDate).dateFormat("yyyyMMdd").locale("en").classificationId(classificationId));
     }
 
     public Response<CommandProcessingResult> createInterestPause(Long loanId, String startDate, String endDate) {
@@ -882,7 +882,7 @@ public class LoanTransactionHelper {
     }
 
     public PostLoansLoanIdTransactionsResponse capitalizedIncomeAdjustment(final Long loanId, final Long capitalizedIncomeTransactionId, final String transactionDate, final double amount) {
-        return capitalizedIncomeAdjustment(loanId, capitalizedIncomeTransactionId, new PostLoansLoanIdTransactionsTransactionIdRequest().transactionAmount(amount).transactionDate(transactionDate).dateFormat("dd MMMM yyyy").locale("en"));
+        return capitalizedIncomeAdjustment(loanId, capitalizedIncomeTransactionId, new PostLoansLoanIdTransactionsTransactionIdRequest().transactionAmount(amount).transactionDate(transactionDate).dateFormat("yyyyMMdd").locale("en"));
     }
 
     public PostLoansLoanIdTransactionsResponse buyDownFeeAdjustment(final Long loanId, final Long buyDownFeeTransactionId, final PostLoansLoanIdTransactionsTransactionIdRequest request) {
@@ -902,7 +902,7 @@ public class LoanTransactionHelper {
     }
 
     public PostLoansLoanIdTransactionsResponse buyDownFeeAdjustment(final Long loanId, final Long buyDownFeeTransactionId, final String transactionDate, final double amount) {
-        return buyDownFeeAdjustment(loanId, buyDownFeeTransactionId, new PostLoansLoanIdTransactionsTransactionIdRequest().transactionAmount(amount).transactionDate(transactionDate).dateFormat("dd MMMM yyyy").locale("en"));
+        return buyDownFeeAdjustment(loanId, buyDownFeeTransactionId, new PostLoansLoanIdTransactionsTransactionIdRequest().transactionAmount(amount).transactionDate(transactionDate).dateFormat("yyyyMMdd").locale("en"));
     }
 
     // TODO: Rewrite to use fineract-client instead!
@@ -1490,7 +1490,7 @@ public class LoanTransactionHelper {
      * Helper method to create manual interest refund transaction
      */
     public PostLoansLoanIdTransactionsResponse createManualInterestRefund(Long loanId, Long targetTransactionId, String transactionDate, Double amount, String externalId) {
-        PostLoansLoanIdTransactionsTransactionIdRequest request = new PostLoansLoanIdTransactionsTransactionIdRequest().transactionAmount(amount).dateFormat("dd MMMM yyyy").locale("en");
+        PostLoansLoanIdTransactionsTransactionIdRequest request = new PostLoansLoanIdTransactionsTransactionIdRequest().transactionAmount(amount).dateFormat("yyyyMMdd").locale("en");
         if (externalId != null) {
             request.externalId(externalId);
         }
@@ -1535,7 +1535,7 @@ public class LoanTransactionHelper {
     private String getDisburseLoanAsJSON(final String actualDisbursementDate, final String transactionAmount, final String netDisbursalAmount, final String externalId) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("actualDisbursementDate", actualDisbursementDate);
         if (netDisbursalAmount != null) {
             map.put("netDisbursalAmount", netDisbursalAmount);
@@ -1558,7 +1558,7 @@ public class LoanTransactionHelper {
     private String getDisburseLoanWithRepaymentRescheduleAsJSON(final String actualDisbursementDate, final String transactionAmount, final String adjustRepaymentDate) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("actualDisbursementDate", actualDisbursementDate);
         map.put("adjustRepaymentDate", adjustRepaymentDate);
         map.put("note", "DISBURSE NOTE");
@@ -1584,7 +1584,7 @@ public class LoanTransactionHelper {
     private String getApproveLoanAsJSON(final String approvalDate, final String expectedDisbursementDate, final String approvalAmount, List<HashMap> tranches) {
         final HashMap<String, Object> map = new HashMap<>();
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         if (approvalAmount != null) {
             map.put("approvedLoanAmount", approvalAmount);
         }
@@ -1607,7 +1607,7 @@ public class LoanTransactionHelper {
         final HashMap<String, String> map = new HashMap<>();
         map.put("actualDisbursementDate", date);
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         return new Gson().toJson(map);
     }
 
@@ -1619,7 +1619,7 @@ public class LoanTransactionHelper {
         final HashMap<String, String> map = new HashMap<>();
         map.put("rejectedOnDate", date);
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         return new Gson().toJson(map);
     }
 
@@ -1630,7 +1630,7 @@ public class LoanTransactionHelper {
     private String getLoanChargeRefundBodyAsJSON(final Integer loanChargeId, final Integer installmentNumber, final Float transactionAmount, final String externalId) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("loanChargeId", loanChargeId.toString());
         map.put("transactionAmount", transactionAmount.toString());
         map.put("note", "Loancharge Refund Made!!!");
@@ -1650,7 +1650,7 @@ public class LoanTransactionHelper {
     private String getCreditBalanceRefundBodyAsJSON(final String transactionDate, final Float transactionAmount, final String externalId) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("transactionDate", transactionDate);
         map.put("transactionAmount", transactionAmount.toString());
         map.put("note", "Credit Balance Refund Made!!!");
@@ -1667,7 +1667,7 @@ public class LoanTransactionHelper {
     private String getRepaymentBodyAsJSON(final String transactionDate, final Float transactionAmount) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("transactionDate", transactionDate);
         map.put("transactionAmount", transactionAmount.toString());
         map.put("note", "Repayment Made!!!");
@@ -1695,7 +1695,7 @@ public class LoanTransactionHelper {
         final HashMap<String, String> map = new HashMap<>();
         map.put("transactionDate", date);
         map.put("transactionAmount", amount);
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("locale", "en");
         return new Gson().toJson(map);
     }
@@ -1708,7 +1708,7 @@ public class LoanTransactionHelper {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en");
         map.put("paymentTypeId", paymentTypeId.toString());
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("transactionDate", transactionDate);
         map.put("transactionAmount", transactionAmount.toString());
         map.put("note", "Repayment Made!!!");
@@ -1722,7 +1722,7 @@ public class LoanTransactionHelper {
     private String getForeclosureBodyAsJSON(final String transactionDate, final Integer loanId) {
         final HashMap<String, Object> map = new HashMap<>();
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("transactionDate", transactionDate);
         map.put("note", "Foreclosure Made!!!");
         String json = new Gson().toJson(map);
@@ -1736,7 +1736,7 @@ public class LoanTransactionHelper {
     @Deprecated(forRemoval = true)
     private String getWriteOffBodyAsJSON(final String transactionDate) {
         final HashMap<String, String> map = new HashMap<>();
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("locale", "en");
         map.put("note", " LOAN WRITE OFF!!!");
         map.put("transactionDate", transactionDate);
@@ -1750,7 +1750,7 @@ public class LoanTransactionHelper {
     private String getWaiveBodyAsJSON(final String transactionDate, final String amountToBeWaived) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("transactionDate", transactionDate);
         map.put("transactionAmount", amountToBeWaived);
         map.put("note", " Interest Waived!!!");
@@ -1764,7 +1764,7 @@ public class LoanTransactionHelper {
     private String getWithdrawLoanApplicationBodyAsJSON(final String withdrawDate) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("withdrawnOnDate", withdrawDate);
         map.put("note", " Loan Withdrawn By Client!!!");
         return new Gson().toJson(map);
@@ -1775,7 +1775,7 @@ public class LoanTransactionHelper {
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
     public static String getSpecifiedDueDateChargesForLoanAsJSON(final String chargeId) {
-        return getSpecifiedDueDateChargesForLoanAsJSON(chargeId, "12 January 2013", "100", null);
+        return getSpecifiedDueDateChargesForLoanAsJSON(chargeId, "20130112", "100", null);
     }
 
     // TODO: Rewrite to use fineract-client instead!
@@ -1793,7 +1793,7 @@ public class LoanTransactionHelper {
     public static String getSpecifiedDueDateChargesForLoanAsJSON(final String chargeId, final String dueDate, final String amount, final String externalId) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en_GB");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("amount", amount);
         map.put("dueDate", dueDate);
         map.put("chargeId", chargeId);
@@ -1812,7 +1812,7 @@ public class LoanTransactionHelper {
     public static String getSpecifiedInstallmentChargesForLoanAsJSON(final String chargeId, final String amount) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en_GB");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("amount", amount);
         map.put("chargeId", chargeId);
         String json = new Gson().toJson(map);
@@ -1835,7 +1835,7 @@ public class LoanTransactionHelper {
     public static String getDisbursementChargesForLoanAsJSON(final String chargeId, String amount) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en_GB");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("amount", amount);
         map.put("chargeId", chargeId);
         String json = new Gson().toJson(map);
@@ -1858,7 +1858,7 @@ public class LoanTransactionHelper {
     public static String getInstallmentChargesForLoanAsJSON(final String chargeId, final Object amount, final Locale locale) {
         final HashMap<String, Object> map = new HashMap<>();
         map.put("locale", locale.getLanguage());
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("amount", amount);
         map.put("chargeId", chargeId);
         String json = new Gson().toJson(map);
@@ -1873,7 +1873,7 @@ public class LoanTransactionHelper {
     public static String getUpdateChargesForLoanAsJSON(String amount) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en_GB");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("amount", amount);
         String json = new Gson().toJson(map);
         log.info("{}", json);
@@ -1895,7 +1895,7 @@ public class LoanTransactionHelper {
     public static String getPayChargeJSON(final String date, final String installmentNumber, final String externalId) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en_GB");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("transactionDate", date);
         if (installmentNumber != null) {
             map.put("installmentNumber", installmentNumber);
@@ -1927,7 +1927,7 @@ public class LoanTransactionHelper {
     @Deprecated(forRemoval = true)
     public String getLoanCalculationBodyAsJSON(final String productID) {
         final HashMap<String, String> map = new HashMap<>();
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("locale", "en_GB");
         map.put("productId", productID);
         map.put("principal", "4,500.00");
@@ -1941,7 +1941,7 @@ public class LoanTransactionHelper {
         map.put("amortizationType", "1");
         map.put("interestType", "0");
         map.put("interestCalculationPeriodType", "1");
-        map.put("expectedDisbursementDate", "20 September 2011");
+        map.put("expectedDisbursementDate", "20110920");
         map.put("transactionProcessingStrategyCode", "mifos-standard-strategy");
         return new Gson().toJson(map);
     }
@@ -2140,7 +2140,7 @@ public class LoanTransactionHelper {
     private String getAdjustTransactionJSON(final String date, final String transactionAmount) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en_GB");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("transactionDate", date);
         map.put("transactionAmount", transactionAmount);
         String json = new Gson().toJson(map);
@@ -2250,7 +2250,7 @@ public class LoanTransactionHelper {
     private String getRefundByCashBodyAsJSON(final String transactionDate, final Float transactionAmount) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("transactionDate", transactionDate);
         map.put("transactionAmount", transactionAmount.toString());
         map.put("note", "Refund Made!!!");
@@ -2269,7 +2269,7 @@ public class LoanTransactionHelper {
         map.put("toClientId", toClientId.toString());
         map.put("toAccountType", "2");
         map.put("toAccountId", toAccountId.toString());
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("transferDate", transactionDate);
         map.put("transferAmount", transactionAmount.toString());
         map.put("transferDescription", "Refund Made!!!");
@@ -2324,7 +2324,7 @@ public class LoanTransactionHelper {
     }
 
     public CommandProcessingResult addAndDeleteDisbursementDetail(final Long loanId, final List<DisbursementDetail> disbursementDetails) {
-        return addAndDeleteDisbursementDetail(loanId, new PostAddAndDeleteDisbursementDetailRequest().locale("en").dateFormat("dd MMMM yyyy").disbursementData(disbursementDetails));
+        return addAndDeleteDisbursementDetail(loanId, new PostAddAndDeleteDisbursementDetailRequest().locale("en").dateFormat("yyyyMMdd").disbursementData(disbursementDetails));
     }
 
     // TODO: Rewrite to use fineract-client instead!
@@ -2350,7 +2350,7 @@ public class LoanTransactionHelper {
     public static String getEditDisbursementsAsJSON(final String approvalAmount, final String expectedDisbursementDate, final String updatedExpectedDisbursementDate, final String updatedPrincipal) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("approvedLoanAmount", approvalAmount);
         map.put("expectedDisbursementDate", expectedDisbursementDate);
         map.put("updatedExpectedDisbursementDate", updatedExpectedDisbursementDate);
@@ -2367,7 +2367,7 @@ public class LoanTransactionHelper {
     public static String getAddAndDeleteDisbursementsAsJSON(final String approvalAmount, final String expectedDisbursementDate, final List<HashMap> disbursementData) {
         final HashMap map = new HashMap<>();
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("approvedLoanAmount", approvalAmount);
         map.put("expectedDisbursementDate", expectedDisbursementDate);
         map.put("disbursementData", disbursementData);
@@ -2387,9 +2387,9 @@ public class LoanTransactionHelper {
         dataMap.put("locale", "en");
         dataMap.put("Spouse Name", Utils.randomStringGenerator("Spouse_name", 4));
         dataMap.put("Number of Dependents", 5);
-        dataMap.put("Time of Visit", "01 December 2016 04:03");
+        dataMap.put("Time of Visit", "20161201 04:03");
         dataMap.put("dateFormat", DATE_TIME_FORMAT);
-        dataMap.put("Date of Approval", "02 December 2016 00:00");
+        dataMap.put("Date of Approval", "20161202 00:00");
         datatableMap.put("registeredTableName", registeredTableName);
         datatableMap.put("data", dataMap);
         datatablesListMap.add(datatableMap);
@@ -2414,7 +2414,7 @@ public class LoanTransactionHelper {
     @Deprecated(forRemoval = true)
     public String importLoanTemplate(File file) {
         String locale = "en";
-        String dateFormat = "dd MMMM yyyy";
+        String dateFormat = "yyyyMMdd";
         String legalFormType = null;
         requestSpec.header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA);
         return Utils.performServerTemplatePost(requestSpec, responseSpec, LOAN_ACCOUNT_URL + "/uploadtemplate" + "?" + Utils.TENANT_IDENTIFIER, legalFormType, file, locale, dateFormat);
@@ -2679,7 +2679,7 @@ public class LoanTransactionHelper {
      * @param loanId
      *            loan Id
      * @param date
-     *            formatted to "d MMMM yyyy"
+     *            formatted to "yyyyMMdd"
      * @param amount
      *            amount to disburse
      * @return Post Loans Loan Id Response
@@ -2814,7 +2814,7 @@ public class LoanTransactionHelper {
     }
 
     public PostLoansLoanIdTransactionsResponse makeLoanBuyDownFee(Long loanId, String date, double amount) {
-        return makeLoanBuyDownFee(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate(date).locale("en").transactionAmount(amount));
+        return makeLoanBuyDownFee(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate(date).locale("en").transactionAmount(amount));
     }
 
     public List<AdvancedPaymentData> getAdvancedPaymentAllocationRules(final Integer loanId) {

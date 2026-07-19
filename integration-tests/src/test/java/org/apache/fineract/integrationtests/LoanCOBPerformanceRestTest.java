@@ -230,9 +230,9 @@ public class LoanCOBPerformanceRestTest extends BaseLoanIntegrationTest {
         metrics.put("loanCount", loanCount);
 
         // Create loans
-        runAt("1 January 2023", () -> {
+        runAt("20230101", () -> {
             long startTime = System.nanoTime();
-            loanIds.set(createLoans(loanCount, "1 January 2023", null, null, null));
+            loanIds.set(createLoans(loanCount, "20230101", null, null, null));
             long endTime = System.nanoTime();
             long duration = TimeUnit.NANOSECONDS.toMillis(endTime - startTime);
             metrics.put("loanCreationTimeMs", duration);
@@ -240,7 +240,7 @@ public class LoanCOBPerformanceRestTest extends BaseLoanIntegrationTest {
         });
 
         // First COB run - January to February
-        runAt("1 February 2023", () -> {
+        runAt("20230201", () -> {
             LOG.info("Running first COB for {} loans...", loanCount);
             long startTime = System.nanoTime();
             inlineLoanCOBHelper.executeInlineCOB(loanIds.get());
@@ -251,7 +251,7 @@ public class LoanCOBPerformanceRestTest extends BaseLoanIntegrationTest {
         });
 
         // Second COB run - February to March
-        runAt("1 March 2023", () -> {
+        runAt("20230301", () -> {
             LOG.info("Running second COB for {} loans...", loanCount);
             long startTime = System.nanoTime();
             inlineLoanCOBHelper.executeInlineCOB(loanIds.get());

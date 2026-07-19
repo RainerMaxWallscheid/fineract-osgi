@@ -55,20 +55,20 @@ public class LoanTransactionTest extends BaseLoanIntegrationTest {
         final AtomicReference<Long> loanIdRef = new AtomicReference<>();
         final PostLoanProductsResponse loanProductsResponse = loanProductHelper.createLoanProduct(create4IProgressive());
         final String loanExternalIdStr = UUID.randomUUID().toString();
-        runAt("20 December 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20 December 2024", 430.0, 7.0, 6, request -> request.externalId(loanExternalIdStr));
+        runAt("20241220", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20241220", 430.0, 7.0, 6, request -> request.externalId(loanExternalIdStr));
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(430), "20 December 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(430), "20241220");
         });
-        runAt("20 February 2025", () -> {
+        runAt("20250220", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
-            loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20 February 2025", 82.2);
+            loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20250220", 82.2);
         });
-        runAt("23 February 2025", () -> {
+        runAt("20250223", () -> {
             Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
-            loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "23 February 2025", 82.2);
+            loanTransactionHelper.makeLoanRepayment(loanId, "Repayment", "20250223", 82.2);
             final GetLoansLoanIdTransactionsResponse allLoanTransactionsPage = loanTransactionHelper.getLoanTransactions(loanId);
             Assertions.assertEquals(7L, allLoanTransactionsPage.getTotalElements());
             final GetLoansLoanIdTransactionsResponse nonAccrualLoanTransactionsPage = loanTransactionHelper.getLoanTransactions(loanId, List.of(TransactionType.ACCRUAL));
@@ -87,9 +87,9 @@ public class LoanTransactionTest extends BaseLoanIntegrationTest {
         final PostCodeValueDataResponse classificationCode = codeHelper.createCodeValue(code.getId(), new PostCodeValuesDataRequest().name(Utils.uniqueRandomStringGenerator("CLASS_", 6)).isActive(true).position(10));
         final PostLoanProductsResponse loanProductsResponse = loanProductHelper.createLoanProduct(create4IProgressive().enableIncomeCapitalization(true).capitalizedIncomeCalculationType(PostLoanProductsRequest.CapitalizedIncomeCalculationTypeEnum.FLAT).capitalizedIncomeStrategy(PostLoanProductsRequest.CapitalizedIncomeStrategyEnum.EQUAL_AMORTIZATION).deferredIncomeLiabilityAccountId(deferredIncomeLiabilityAccount.getAccountID().longValue()).incomeFromCapitalizationAccountId(feeIncomeAccount.getAccountID().longValue()).capitalizedIncomeType(PostLoanProductsRequest.CapitalizedIncomeTypeEnum.FEE));
         final String loanExternalIdStr = UUID.randomUUID().toString();
-        runAt("20 December 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20 December 2024", 430.0, 7.0, 6, request -> request.externalId(loanExternalIdStr));
-            disburseLoan(loanId, BigDecimal.valueOf(230), "20 December 2024");
+        runAt("20241220", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20241220", 430.0, 7.0, 6, request -> request.externalId(loanExternalIdStr));
+            disburseLoan(loanId, BigDecimal.valueOf(230), "20241220");
             final GetLoansLoanIdTransactionsTemplateResponse transactionTemplate = loanTransactionHelper.retrieveTransactionTemplate(loanId, capitalizedIncomeCommand, null, null, null);
             assertNotNull(transactionTemplate);
             assertEquals("loanTransactionType." + capitalizedIncomeCommand, transactionTemplate.getType().getCode());
@@ -104,9 +104,9 @@ public class LoanTransactionTest extends BaseLoanIntegrationTest {
         final PostClientsResponse client = clientHelper.createClient(ClientHelper.defaultClientCreationRequest());
         final PostLoanProductsResponse loanProductsResponse = loanProductHelper.createLoanProduct(create4IProgressive().enableIncomeCapitalization(true).capitalizedIncomeCalculationType(PostLoanProductsRequest.CapitalizedIncomeCalculationTypeEnum.FLAT).capitalizedIncomeStrategy(PostLoanProductsRequest.CapitalizedIncomeStrategyEnum.EQUAL_AMORTIZATION).deferredIncomeLiabilityAccountId(deferredIncomeLiabilityAccount.getAccountID().longValue()).incomeFromCapitalizationAccountId(feeIncomeAccount.getAccountID().longValue()).capitalizedIncomeType(PostLoanProductsRequest.CapitalizedIncomeTypeEnum.FEE).overAppliedCalculationType(null).overAppliedNumber(null).allowApprovedDisbursedAmountsOverApplied(false));
         final String loanExternalIdStr = UUID.randomUUID().toString();
-        runAt("20 December 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20 December 2024", 430.0, 7.0, 6, request -> request.externalId(loanExternalIdStr));
-            disburseLoan(loanId, BigDecimal.valueOf(230), "20 December 2024");
+        runAt("20241220", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20241220", 430.0, 7.0, 6, request -> request.externalId(loanExternalIdStr));
+            disburseLoan(loanId, BigDecimal.valueOf(230), "20241220");
             final GetLoansLoanIdTransactionsTemplateResponse transactionTemplate = loanTransactionHelper.retrieveTransactionTemplate(loanId, capitalizedIncomeCommand, null, null, null);
             assertNotNull(transactionTemplate);
             assertEquals("loanTransactionType." + capitalizedIncomeCommand, transactionTemplate.getType().getCode());
@@ -120,10 +120,10 @@ public class LoanTransactionTest extends BaseLoanIntegrationTest {
         final PostClientsResponse client = clientHelper.createClient(ClientHelper.defaultClientCreationRequest());
         final PostLoanProductsResponse loanProductsResponse = loanProductHelper.createLoanProduct(create4IProgressive().enableIncomeCapitalization(true).capitalizedIncomeCalculationType(PostLoanProductsRequest.CapitalizedIncomeCalculationTypeEnum.FLAT).capitalizedIncomeStrategy(PostLoanProductsRequest.CapitalizedIncomeStrategyEnum.EQUAL_AMORTIZATION).deferredIncomeLiabilityAccountId(deferredIncomeLiabilityAccount.getAccountID().longValue()).incomeFromCapitalizationAccountId(feeIncomeAccount.getAccountID().longValue()).capitalizedIncomeType(PostLoanProductsRequest.CapitalizedIncomeTypeEnum.FEE));
         final String loanExternalIdStr = UUID.randomUUID().toString();
-        runAt("20 December 2024", () -> {
-            final Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20 December 2024", 430.0, 7.0, 6, request -> request.externalId(loanExternalIdStr));
-            disburseLoan(loanId, BigDecimal.valueOf(230), "20 December 2024");
-            PostLoansLoanIdTransactionsResponse loanTransactionResponse = loanTransactionHelper.executeLoanTransaction(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("20 December 2024").locale("en").transactionAmount(150.0), capitalizedIncomeCommand);
+        runAt("20241220", () -> {
+            final Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20241220", 430.0, 7.0, 6, request -> request.externalId(loanExternalIdStr));
+            disburseLoan(loanId, BigDecimal.valueOf(230), "20241220");
+            PostLoansLoanIdTransactionsResponse loanTransactionResponse = loanTransactionHelper.executeLoanTransaction(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("20241220").locale("en").transactionAmount(150.0), capitalizedIncomeCommand);
             assertNotNull(loanTransactionResponse);
             final Long transactionId = loanTransactionResponse.getResourceId();
             assertNotNull(transactionId);
@@ -147,10 +147,10 @@ public class LoanTransactionTest extends BaseLoanIntegrationTest {
         //
         create4IProgressive().enableBuyDownFee(true).buyDownFeeStrategy(PostLoanProductsRequest.BuyDownFeeStrategyEnum.EQUAL_AMORTIZATION).buyDownFeeCalculationType(PostLoanProductsRequest.BuyDownFeeCalculationTypeEnum.FLAT).buyDownFeeIncomeType(PostLoanProductsRequest.BuyDownFeeIncomeTypeEnum.INTEREST).merchantBuyDownFee(true).deferredIncomeLiabilityAccountId(deferredIncomeLiabilityAccount.getAccountID().longValue()).incomeFromCapitalizationAccountId(feeIncomeAccount.getAccountID().longValue()).capitalizedIncomeType(PostLoanProductsRequest.CapitalizedIncomeTypeEnum.FEE).buyDownExpenseAccountId(buyDownExpenseAccount.getAccountID().longValue()).incomeFromBuyDownAccountId(feeIncomeAccount.getAccountID().longValue()));
         final String loanExternalIdStr = UUID.randomUUID().toString();
-        runAt("20 December 2024", () -> {
-            final Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20 December 2024", 430.0, 7.0, 6, request -> request.externalId(loanExternalIdStr));
-            disburseLoan(loanId, BigDecimal.valueOf(230), "20 December 2024");
-            PostLoansLoanIdTransactionsResponse loanTransactionResponse = loanTransactionHelper.executeLoanTransaction(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("20 December 2024").locale("en").transactionAmount(150.0), buyDownFeeCommand);
+        runAt("20241220", () -> {
+            final Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20241220", 430.0, 7.0, 6, request -> request.externalId(loanExternalIdStr));
+            disburseLoan(loanId, BigDecimal.valueOf(230), "20241220");
+            PostLoansLoanIdTransactionsResponse loanTransactionResponse = loanTransactionHelper.executeLoanTransaction(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("20241220").locale("en").transactionAmount(150.0), buyDownFeeCommand);
             assertNotNull(loanTransactionResponse);
             final Long transactionId = loanTransactionResponse.getResourceId();
             assertNotNull(transactionId);
@@ -169,9 +169,9 @@ public class LoanTransactionTest extends BaseLoanIntegrationTest {
         final PostCodeValueDataResponse classificationCode = codeHelper.createCodeValue(code.getId(), new PostCodeValuesDataRequest().name(Utils.uniqueRandomStringGenerator("CLASS_", 6)).isActive(true).position(10));
         final PostLoanProductsResponse loanProductsResponse = loanProductHelper.createLoanProduct(create4IProgressive().enableIncomeCapitalization(true).capitalizedIncomeCalculationType(PostLoanProductsRequest.CapitalizedIncomeCalculationTypeEnum.FLAT).capitalizedIncomeStrategy(PostLoanProductsRequest.CapitalizedIncomeStrategyEnum.EQUAL_AMORTIZATION).deferredIncomeLiabilityAccountId(deferredIncomeLiabilityAccount.getAccountID().longValue()).incomeFromCapitalizationAccountId(feeIncomeAccount.getAccountID().longValue()).capitalizedIncomeType(PostLoanProductsRequest.CapitalizedIncomeTypeEnum.FEE));
         final String loanExternalIdStr = UUID.randomUUID().toString();
-        runAt("20 December 2024", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20 December 2024", 430.0, 7.0, 6, request -> request.externalId(loanExternalIdStr));
-            disburseLoan(loanId, BigDecimal.valueOf(230), "20 December 2024");
+        runAt("20241220", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(client.getClientId(), loanProductsResponse.getResourceId(), "20241220", 430.0, 7.0, 6, request -> request.externalId(loanExternalIdStr));
+            disburseLoan(loanId, BigDecimal.valueOf(230), "20241220");
             final GetLoansLoanIdTransactionsTemplateResponse transactionTemplate = loanTransactionHelper.retrieveTransactionTemplate(loanId, buyDownFeeCommand, null, null, null);
             assertNotNull(transactionTemplate);
             assertEquals("loanTransactionType." + buyDownFeeCommand, transactionTemplate.getType().getCode());

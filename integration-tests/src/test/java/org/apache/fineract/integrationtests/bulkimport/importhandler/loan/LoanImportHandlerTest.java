@@ -72,7 +72,7 @@ public class LoanImportHandlerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(LoanImportHandlerTest.class);
     private static final String CREATE_CLIENT_URL = "/fineract-provider/api/v1/clients?" + Utils.TENANT_IDENTIFIER;
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
 
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
@@ -112,7 +112,7 @@ public class LoanImportHandlerTest {
         clientMap.put("legalFormId", 1);
         clientMap.put("locale", "en");
         clientMap.put("active", "true");
-        clientMap.put("activationDate", "04 March 2011");
+        clientMap.put("activationDate", "20110304");
 
         Integer outcome_client_creation = Utils.performServerPost(requestSpec, responseSpec, CREATE_CLIENT_URL,
                 new Gson().toJson(clientMap), "clientId");
@@ -187,7 +187,7 @@ public class LoanImportHandlerTest {
         firstLoanRow.createCell(LoanConstants.LOAN_OFFICER_NAME_COL).setCellValue((String) staffMap.get("displayName"));
 
         final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US);
-        final LocalDate localDate = LocalDate.parse("17 May 2017", dateFormat);
+        final LocalDate localDate = LocalDate.parse("20170517", dateFormat);
 
         firstLoanRow.createCell(LoanConstants.SUBMITTED_ON_DATE_COL).setCellValue(localDate);
         firstLoanRow.createCell(LoanConstants.APPROVED_DATE_COL).setCellValue(localDate);

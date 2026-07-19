@@ -119,7 +119,7 @@ public class RecurringDepositProductHelper {
         HashMap<String, Object> chartsMap = new HashMap<>();
         chartsMap.put("fromDate", validFrom);
         chartsMap.put("endDate", validTo);
-        chartsMap.put("dateFormat", "dd MMMM yyyy");
+        chartsMap.put("dateFormat", "yyyyMMdd");
         chartsMap.put("locale", LOCALE);
         chartsMap.put("chartSlabs", chartSlabs);
         chartsMap.put("isPrimaryGroupingByAmount", this.isPrimaryGroupingByAmount);

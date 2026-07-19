@@ -128,7 +128,7 @@ public class JournalEntryHelper {
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
     private String createURLForGettingAccountEntries(final Account account, final String date, final Integer officeId) {
-        String url = new String("/fineract-provider/api/v1/journalentries?glAccountId=" + account.getAccountID() + "&type=" + account.getAccountType() + "&fromDate=" + date + "&toDate=" + date + "&tenantIdentifier=default" + "&orderBy=id&sortOrder=desc&locale=en&dateFormat=dd MMMM yyyy");
+        String url = new String("/fineract-provider/api/v1/journalentries?glAccountId=" + account.getAccountID() + "&type=" + account.getAccountType() + "&fromDate=" + date + "&toDate=" + date + "&tenantIdentifier=default" + "&orderBy=id&sortOrder=desc&locale=en&dateFormat=yyyyMMdd");
         if (officeId != null) {
             url = url + "&officeId=" + officeId;
         }
@@ -150,7 +150,7 @@ public class JournalEntryHelper {
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
     private String createURLForGettingAccountEntriesByTransactionId(final String transactionId) {
-        return new String("/fineract-provider/api/v1/journalentries?transactionId=" + transactionId + "&tenantIdentifier=default" + "&orderBy=id&sortOrder=desc&locale=en&dateFormat=dd MMMM yyyy");
+        return new String("/fineract-provider/api/v1/journalentries?transactionId=" + transactionId + "&tenantIdentifier=default" + "&orderBy=id&sortOrder=desc&locale=en&dateFormat=yyyyMMdd");
     }
 
     // TODO: Rewrite to use fineract-client instead!
@@ -171,7 +171,7 @@ public class JournalEntryHelper {
     @Deprecated(forRemoval = true)
     public GetJournalEntriesTransactionIdResponse getJournalEntriesForLoan(final Long loanId) {
         log.info("Getting GL Journal entries for loan id {}", loanId);
-        final String url = "/fineract-provider/api/v1/journalentries?loanId=" + loanId + "&tenantIdentifier=default" + "&orderBy=id&sortOrder=desc&locale=en&dateFormat=dd MMMM yyyy";
+        final String url = "/fineract-provider/api/v1/journalentries?loanId=" + loanId + "&tenantIdentifier=default" + "&orderBy=id&sortOrder=desc&locale=en&dateFormat=yyyyMMdd";
         final String response = Utils.performServerGet(this.requestSpec, this.responseSpec, url, null);
         log.info("response {}", response);
         return GSON.fromJson(response, GetJournalEntriesTransactionIdResponse.class);

@@ -26,7 +26,7 @@ public class GuarantorsRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private String locale;
-    private String dateFormat; // "dd MMMM yyyy"
+    private String dateFormat; // "yyyyMMdd"
     /**
      * Fields for capturing relationship of Guarantor with customer *
      */

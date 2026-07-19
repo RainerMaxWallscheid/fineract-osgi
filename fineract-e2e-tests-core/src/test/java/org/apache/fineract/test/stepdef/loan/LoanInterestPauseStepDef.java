@@ -43,7 +43,7 @@ import org.apache.fineract.test.support.TestContextKey;
 import org.junit.jupiter.api.Assertions;
 
 public class LoanInterestPauseStepDef extends AbstractStepDef {
-    private static final String DATE_FORMAT = "dd MMMM yyyy";
+    private static final String DATE_FORMAT = "yyyyMMdd";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
     private static final int INTEREST_PAUSE_TERM_TYPE_ID = 11;
     private final EventAssertion eventAssertion;

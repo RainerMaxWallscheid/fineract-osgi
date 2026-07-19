@@ -77,7 +77,7 @@ public class FeignOfficeHelper {
         PutOfficesOfficeIdRequest request = new PutOfficesOfficeIdRequest()//
                 .name(name)//
                 .openingDate(openingDate)//
-                .dateFormat("dd MMMM yyyy")//
+                .dateFormat("yyyyMMdd")//
                 .locale("en");
         return ok(() -> fineractClient.offices().updateOffice(officeId, request));
     }
@@ -86,7 +86,7 @@ public class FeignOfficeHelper {
         PutOfficesOfficeIdRequest request = new PutOfficesOfficeIdRequest()//
                 .name(name)//
                 .openingDate(openingDate)//
-                .dateFormat("dd MMMM yyyy")//
+                .dateFormat("yyyyMMdd")//
                 .locale("en");
         return ok(() -> fineractClient.offices().updateOfficeByExternalId(externalId, request));
     }

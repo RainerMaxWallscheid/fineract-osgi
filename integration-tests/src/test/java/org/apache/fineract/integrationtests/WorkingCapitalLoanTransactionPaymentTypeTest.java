@@ -272,6 +272,6 @@ public class WorkingCapitalLoanTransactionPaymentTypeTest {
     }
 
     private String fmt(final LocalDate date) {
-        return date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
+        return date.format(DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH));
     }
 }

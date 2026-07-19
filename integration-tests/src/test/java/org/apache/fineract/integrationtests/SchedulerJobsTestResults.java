@@ -106,11 +106,11 @@ public class SchedulerJobsTestResults extends IntegrationTest {
 
     private static final String FROM_ACCOUNT_TYPE_SAVINGS = "2";
     private static final String TO_ACCOUNT_TYPE_SAVINGS = "2";
-    private static final String DATE_OF_JOINING = "01 January 2011";
-    private static final String TRANSACTION_DATE = "01 March 2013";
-    public static final String LOAN_APPROVAL_DATE = "01 March 2013";
-    public static final String LOAN_APPROVAL_DATE_PLUS_ONE = "02 March 2013";
-    public static final String LOAN_DISBURSAL_DATE = "01 March 2013";
+    private static final String DATE_OF_JOINING = "20110101";
+    private static final String TRANSACTION_DATE = "20130301";
+    public static final String LOAN_APPROVAL_DATE = "20130301";
+    public static final String LOAN_APPROVAL_DATE_PLUS_ONE = "20130302";
+    public static final String LOAN_DISBURSAL_DATE = "20130301";
     private static final String ACCOUNT_TYPE_INDIVIDUAL = "INDIVIDUAL";
     private static final String MINIMUM_OPENING_BALANCE = "1000";
     private static final Float SP_BALANCE = Float.valueOf(MINIMUM_OPENING_BALANCE);
@@ -124,7 +124,7 @@ public class SchedulerJobsTestResults extends IntegrationTest {
     private JournalEntryHelper journalEntryHelper;
     private ClientHelper clientHelper;
     private TimeZone systemTimeZone;
-    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
     private BusinessDateHelper businessDateHelper;
     private static BusinessStepHelper businessStepHelper;
     private GlobalConfigurationHelper globalConfigurationHelper;
@@ -168,7 +168,7 @@ public class SchedulerJobsTestResults extends IntegrationTest {
                     new PutGlobalConfigurationsRequest().enabled(true));
 
             LocalDate submittedDate = LocalDate.of(2022, 9, 28);
-            String submittedDateString = "28 September 2022";
+            String submittedDateString = "20220928";
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, submittedDate);
             this.savingsAccountHelper = new SavingsAccountHelper(requestSpec, responseSpec);
 
@@ -190,7 +190,7 @@ public class SchedulerJobsTestResults extends IntegrationTest {
                     ChargesHelper.getSavingsAnnualFeeJSON());
             Assertions.assertNotNull(annualFeeChargeId);
 
-            this.savingsAccountHelper.addChargesForSavingsWithDueDateAndFeeOnMonthDay(savingsId, annualFeeChargeId, "10 January 2023", 100,
+            this.savingsAccountHelper.addChargesForSavingsWithDueDateAndFeeOnMonthDay(savingsId, annualFeeChargeId, "20230110", 100,
                     "15 January");
             ArrayList<HashMap> chargesPendingState = this.savingsAccountHelper.getSavingsCharges(savingsId);
             Assertions.assertEquals(1, chargesPendingState.size());
@@ -215,7 +215,7 @@ public class SchedulerJobsTestResults extends IntegrationTest {
 
             assertThat(nextDueDateForAnnualFee).isEqualTo(expectedDueDate);
         } finally {
-            savingsAccountHelper.closeSavingsAccountOnDate(savingsId, "true", "11 November 2022");
+            savingsAccountHelper.closeSavingsAccountOnDate(savingsId, "true", "20221111");
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(false));
         }
@@ -284,7 +284,7 @@ public class SchedulerJobsTestResults extends IntegrationTest {
         final Integer loanProductID = createLoanProduct(null);
         Assertions.assertNotNull(loanProductID);
 
-        final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), savingsId.toString(), "1 March 2013");
+        final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), savingsId.toString(), "20130301");
         Assertions.assertNotNull(loanID);
 
         HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
@@ -298,7 +298,7 @@ public class SchedulerJobsTestResults extends IntegrationTest {
         Assertions.assertNotNull(specifiedDueDateChargeId);
 
         this.loanTransactionHelper.addChargesForLoan(loanID,
-                LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(specifiedDueDateChargeId.toString(), "12 March 2013", "100"));
+                LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(specifiedDueDateChargeId.toString(), "20130312", "100"));
         ArrayList<HashMap> chargesPendingState = this.loanTransactionHelper.getLoanCharges(loanID);
         Assertions.assertEquals(1, chargesPendingState.size());
 
@@ -335,7 +335,7 @@ public class SchedulerJobsTestResults extends IntegrationTest {
         final Integer loanProductID = createLoanProduct(null);
         Assertions.assertNotNull(loanProductID);
 
-        final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "01 March 2013");
+        final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "20130301");
         Assertions.assertNotNull(loanID);
 
         HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
@@ -435,17 +435,17 @@ public class SchedulerJobsTestResults extends IntegrationTest {
         final Integer loanProductID = createLoanProduct(null);
         Assertions.assertNotNull(loanProductID);
 
-        final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "04 January 2024");
+        final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "20240104");
         Assertions.assertNotNull(loanID);
 
         HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-        loanStatusHashMap = this.loanTransactionHelper.approveLoan("04 January 2024", loanID);
+        loanStatusHashMap = this.loanTransactionHelper.approveLoan("20240104", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
 
         String loanDetails = this.loanTransactionHelper.getLoanDetails(requestSpec, responseSpec, loanID);
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("04 January 2024", loanID,
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20240104", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
@@ -646,7 +646,7 @@ public class SchedulerJobsTestResults extends IntegrationTest {
         final Integer loanProductID = createLoanProduct(null);
         Assertions.assertNotNull(loanProductID);
 
-        final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 March 2013");
+        final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "20130301");
         Assertions.assertNotNull(loanID);
 
         HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
@@ -676,8 +676,8 @@ public class SchedulerJobsTestResults extends IntegrationTest {
         savingsAccountHelper = new SavingsAccountHelper(requestSpec, responseSpec);
         StandingInstructionsHelper standingInstructionsHelper = new StandingInstructionsHelper(requestSpec, responseSpec);
 
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US);
-        final DateTimeFormatter monthDayFormat = DateTimeFormatter.ofPattern("dd MMMM", Locale.US);
+        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
+        final DateTimeFormatter monthDayFormat = DateTimeFormatter.ofPattern("MMdd", Locale.US);
 
         // Create the LocalDate with the Zone used by default
         final LocalDate localDate = LocalDate.now(this.systemTimeZone.toZoneId());
@@ -776,17 +776,17 @@ public class SchedulerJobsTestResults extends IntegrationTest {
         final Integer loanProductID = createLoanProduct(overdueFeeChargeId.toString());
         Assertions.assertNotNull(loanProductID);
 
-        final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 March 2020");
+        final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "20200301");
         Assertions.assertNotNull(loanID);
 
         HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-        loanStatusHashMap = this.loanTransactionHelper.approveLoan("01 March 2020", loanID);
+        loanStatusHashMap = this.loanTransactionHelper.approveLoan("20200301", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
 
         String loanDetails = this.loanTransactionHelper.getLoanDetails(requestSpec, responseSpec, loanID);
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID,
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20200302", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
@@ -822,22 +822,22 @@ public class SchedulerJobsTestResults extends IntegrationTest {
         final Integer loanProductID = createLoanProductNoInterest(overdueFeeChargeId.toString());
         Assertions.assertNotNull(loanProductID);
 
-        final Integer loanID = applyForLoanApplicationNoInterest(clientID.toString(), loanProductID.toString(), null, "01 March 2020");
+        final Integer loanID = applyForLoanApplicationNoInterest(clientID.toString(), loanProductID.toString(), null, "20200301");
         Assertions.assertNotNull(loanID);
 
         HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-        loanStatusHashMap = this.loanTransactionHelper.approveLoan("01 March 2020", loanID);
+        loanStatusHashMap = this.loanTransactionHelper.approveLoan("20200301", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
 
         String loanDetails = this.loanTransactionHelper.getLoanDetails(requestSpec, responseSpec, loanID);
-        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID,
+        loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20200302", loanID,
                 JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
         this.loanTransactionHelper.chargeOffLoan((long) loanID,
-                new PostLoansLoanIdTransactionsRequest().transactionDate("03 March 2020").locale("en").dateFormat("dd MMMM yyyy"));
+                new PostLoansLoanIdTransactionsRequest().transactionDate("20200303").locale("en").dateFormat("yyyyMMdd"));
 
         String JobName = "Apply penalty to overdue loans";
         this.schedulerJobHelper.executeAndAwaitJob(JobName);
@@ -874,24 +874,24 @@ public class SchedulerJobsTestResults extends IntegrationTest {
             List<Integer> loanIDs = new ArrayList<>();
             HashMap loanStatusHashMap;
             for (int i = 0; i < 3; i++) {
-                final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 March 2020");
+                final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "20200301");
 
                 Assertions.assertNotNull(loanID);
 
                 loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
                 LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-                loanStatusHashMap = this.loanTransactionHelper.approveLoan("01 March 2020", loanID);
+                loanStatusHashMap = this.loanTransactionHelper.approveLoan("20200301", loanID);
                 LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
 
                 String loanDetails = this.loanTransactionHelper.getLoanDetails(requestSpec, responseSpec, loanID);
-                loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID,
+                loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20200302", loanID,
                         JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
                 LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
                 loanIDs.add(loanID);
 
                 this.loanTransactionHelper.addChargesForLoan(loanID,
-                        LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "02 March 2020", "10", null));
+                        LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "20200302", "10", null));
             }
 
             BusinessDateHelper.updateBusinessDate(BusinessDateType.COB_DATE, LocalDate.of(2020, 9, 2));
@@ -939,23 +939,23 @@ public class SchedulerJobsTestResults extends IntegrationTest {
             final Integer loanProductID = createLoanProductWithPeriodicAccrual(null);
             Assertions.assertNotNull(loanProductID);
 
-            final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 June 2020");
+            final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "20200601");
 
             Assertions.assertNotNull(loanID);
 
             HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = this.loanTransactionHelper.approveLoan("01 June 2020", loanID);
+            loanStatusHashMap = this.loanTransactionHelper.approveLoan("20200601", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
 
             String loanDetails = this.loanTransactionHelper.getLoanDetails(requestSpec, responseSpec, loanID);
-            loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 June 2020", loanID,
+            loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20200602", loanID,
                     JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
             this.loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "02 June 2020", "10", null));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "20200602", "10", null));
 
             String jobName = "Loan COB";
             this.schedulerJobHelper.executeAndAwaitJob(jobName);
@@ -1006,18 +1006,18 @@ public class SchedulerJobsTestResults extends IntegrationTest {
             Assertions.assertNotNull(loanProductID);
             HashMap loanStatusHashMap;
 
-            final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 July 2020");
+            final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "20200701");
 
             Assertions.assertNotNull(loanID);
 
             loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.approveLoan("01 July 2020", loanID);
+            loanStatusHashMap = loanTransactionHelper.approveLoan("20200701", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
 
             String loanDetails = loanTransactionHelper.getLoanDetails(requestSpec, responseSpec, loanID);
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 July 2020", loanID,
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20200702", loanID,
                     JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.COB_DATE, LocalDate.of(2020, 7, 2));
@@ -1066,18 +1066,18 @@ public class SchedulerJobsTestResults extends IntegrationTest {
             Assertions.assertNotNull(loanProductID);
             HashMap loanStatusHashMap;
 
-            final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 March 2019");
+            final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "20190301");
 
             Assertions.assertNotNull(loanID);
 
             loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = this.loanTransactionHelper.approveLoan("01 March 2019", loanID);
+            loanStatusHashMap = this.loanTransactionHelper.approveLoan("20190301", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
 
             String loanDetails = this.loanTransactionHelper.getLoanDetails(requestSpec, responseSpec, loanID);
-            loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2019", loanID,
+            loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20190302", loanID,
                     JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.COB_DATE, LocalDate.of(2019, 4, 1));
@@ -1126,18 +1126,18 @@ public class SchedulerJobsTestResults extends IntegrationTest {
             Assertions.assertNotNull(loanProductID);
             HashMap loanStatusHashMap;
             // Test penalty where there is 1 day grace period
-            final Integer loanID2 = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 April 2020");
+            final Integer loanID2 = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "20200401");
 
             Assertions.assertNotNull(loanID2);
 
             loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID2);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = this.loanTransactionHelper.approveLoan("01 April 2020", loanID2);
+            loanStatusHashMap = this.loanTransactionHelper.approveLoan("20200401", loanID2);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
 
             String loanDetails2 = this.loanTransactionHelper.getLoanDetails(requestSpec, responseSpec, loanID2);
-            loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 April 2020", loanID2,
+            loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20200402", loanID2,
                     JsonPath.from(loanDetails2).get("netDisbursalAmount").toString());
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
@@ -1181,7 +1181,7 @@ public class SchedulerJobsTestResults extends IntegrationTest {
         final Integer loanProductID = createLoanProduct(overdueFeeChargeId.toString());
         Assertions.assertNotNull(loanProductID);
 
-        final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 March 2013");
+        final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "20130301");
         Assertions.assertNotNull(loanID);
 
         HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
@@ -1233,7 +1233,7 @@ public class SchedulerJobsTestResults extends IntegrationTest {
         final Integer loanProductID = createLoanProduct(null);
         Assertions.assertNotNull(loanProductID);
 
-        final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 March 2013");
+        final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "20130301");
         Assertions.assertNotNull(loanID);
 
         HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
@@ -1260,7 +1260,7 @@ public class SchedulerJobsTestResults extends IntegrationTest {
         this.savingsAccountHelper = new SavingsAccountHelper(requestSpec, responseSpec);
         FixedDepositAccountHelper fixedDepositAccountHelper = new FixedDepositAccountHelper(requestSpec, responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
@@ -1361,10 +1361,10 @@ public class SchedulerJobsTestResults extends IntegrationTest {
 
             final PostClientsResponse client = clientHelper.createClient(ClientHelper.defaultClientCreationRequest());
 
-            Integer loanId = applyForLoanApplication(client.getClientId().toString(), loanProductID.toString(), null, "02 September 2022");
+            Integer loanId = applyForLoanApplication(client.getClientId().toString(), loanProductID.toString(), null, "20220902");
 
-            this.loanTransactionHelper.approveLoan("02 September 2022", loanId);
-            this.loanTransactionHelper.disburseLoan("03 September 2022", loanId, "1000", null);
+            this.loanTransactionHelper.approveLoan("20220902", loanId);
+            this.loanTransactionHelper.disburseLoan("20220903", loanId, "1000", null);
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
                     .date("2022.09.05").dateFormat("yyyy.MM.dd").locale("en"));

@@ -66,14 +66,14 @@ import org.springframework.data.domain.Sort;
 public class SavingsAccountTransactionsSearchIntegrationTest {
 
     public static final String ACCOUNT_TYPE_INDIVIDUAL = "INDIVIDUAL";
-    public static final String DEFAULT_DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DEFAULT_DATE_FORMAT = "yyyyMMdd";
     public static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
-    final String startDate = "01 May 2023";
-    final String firstDepositDate = "05 May 2023";
-    final String secondDepositDate = "09 May 2023";
-    final String thirdDepositDate = "12 May 2023";
-    final String fourthDepositDate = "01 Jun 2023";
-    final String withdrawDate = "10 May 2023";
+    final String startDate = "20230501";
+    final String firstDepositDate = "20230505";
+    final String secondDepositDate = "20230509";
+    final String thirdDepositDate = "20230512";
+    final String fourthDepositDate = "20230601";
+    final String withdrawDate = "20230510";
 
     private ResponseSpecification responseSpec;
     private ResponseSpecification responseSpecForValidationError;
@@ -370,7 +370,7 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
         TransactionSearchRequest searchParameters = new TransactionSearchRequest().fromAmount(BigDecimal.valueOf(100))
                 .toAmount(BigDecimal.valueOf(500));
         Map<String, Object> queryParams = buildTransactionsSearchQuery(searchParameters, null, null);
-        queryParams.put("fromDate", "05 May 2023"); // wrong date format
+        queryParams.put("fromDate", "20230505"); // wrong date format
         this.savingsAccountHelperValidationError.searchSavingsTransactions(savingsId, queryParams);
     }
 

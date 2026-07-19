@@ -77,7 +77,7 @@ class LoanReAgingValidatorTest {
     @InjectMocks
     private LoanReAgingValidator underTest;
 
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     private final LocalDate actualDate = LocalDate.now(Clock.systemUTC());
     private final LocalDate maturityDate = actualDate.plusDays(30);
     private final LocalDate businessDate = maturityDate.plusDays(1);

@@ -43,7 +43,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 public class LoanTestLifecycleExtension implements AfterEachCallback, BeforeEachCallback {
 
     private LoanTransactionHelper loanTransactionHelper;
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     private final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern(DATE_FORMAT).toFormatter(Locale.ENGLISH);
 
     @Override

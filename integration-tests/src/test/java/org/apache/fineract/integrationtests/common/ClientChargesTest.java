@@ -63,7 +63,7 @@ public class ClientChargesTest {
         Assertions.assertNotNull(chargeId);
 
         // creates client with activation date
-        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 October 2011");
+        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20111001");
         Assertions.assertNotNull(clientId);
 
         /**
@@ -76,14 +76,14 @@ public class ClientChargesTest {
         Assertions.assertNotNull(loanChargeId);
         ResponseSpecification responseLoanChargeFailure = new ResponseSpecBuilder().expectStatusCode(403).build();
         final Integer clientLoanChargeId = ClientHelper.addChargesForClient(this.requestSpec, responseLoanChargeFailure, clientId,
-                ClientHelper.getSpecifiedDueDateChargesClientAsJSON(loanChargeId.toString(), "29 October 2011"));
+                ClientHelper.getSpecifiedDueDateChargesClientAsJSON(loanChargeId.toString(), "20111029"));
         Assertions.assertNull(clientLoanChargeId);
 
         /**
          * associates a clientCharge to a client and pay client charge for 10 USD--success scenario
          **/
         final Integer clientChargeId = ClientHelper.addChargesForClient(this.requestSpec, this.responseSpec, clientId,
-                ClientHelper.getSpecifiedDueDateChargesClientAsJSON(chargeId.toString(), "29 October 2011"));
+                ClientHelper.getSpecifiedDueDateChargesClientAsJSON(chargeId.toString(), "20111029"));
         Assertions.assertNotNull(clientChargeId);
         final String clientChargePaidTransactionId = ClientHelper.payChargesForClients(this.requestSpec, this.responseSpec, clientId,
                 clientChargeId, ClientHelper.getPayChargeJSON("25 AUGUST 2015", "10"));
@@ -103,7 +103,7 @@ public class ClientChargesTest {
          * Now pay client charge for 20 USD and ensure the outstanding amount is updated properly
          */
         ResponseSpecification responseSpecFailure = new ResponseSpecBuilder().expectStatusCode(400).build();
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
         Calendar today = Calendar.getInstance(Utils.getTimeZoneOfTenant());
         today.add(Calendar.DAY_OF_MONTH, 2);
@@ -129,7 +129,7 @@ public class ClientChargesTest {
          */
 
         final String responseId_activationDate_failure = ClientHelper.payChargesForClients(this.requestSpec, responseSpecFailure, clientId,
-                clientChargeId, ClientHelper.getPayChargeJSON("30 September 2011", "20"));
+                clientChargeId, ClientHelper.getPayChargeJSON("20110930", "20"));
         Assertions.assertNull(responseId_activationDate_failure);
         /**
          * pay client charge more than outstanding amount amount and ensured its a failure test case

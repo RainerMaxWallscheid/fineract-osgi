@@ -305,7 +305,7 @@ public final class CalendarUtils {
         final Date endDate = recur.getUntil();
         if (endDate != null) {
             final LocalDate date = LocalDate.ofInstant(endDate.toInstant(), DateUtils.getDateTimeZoneOfTenant());
-            final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd MMMM yy");
+            final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd");
             final String formattedDate = date.format(fmt);
             humanReadable += ", until " + formattedDate;
         }

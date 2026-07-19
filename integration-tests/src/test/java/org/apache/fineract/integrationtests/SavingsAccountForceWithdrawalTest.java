@@ -74,12 +74,12 @@ public class SavingsAccountForceWithdrawalTest {
         this.savingsAccountHelper.approveSavings(savingsId);
         this.savingsAccountHelper.activateSavings(savingsId);
 
-        this.savingsAccountHelper.depositToSavingsAccount(savingsId, "100", "04 March 2013", null);
+        this.savingsAccountHelper.depositToSavingsAccount(savingsId, "100", "20130304", null);
 
         PostSavingsAccountTransactionsRequest request = new PostSavingsAccountTransactionsRequest() //
                 .locale("en") //
-                .dateFormat("dd MMMM yyyy") //
-                .transactionDate("05 March 2013") //
+                .dateFormat("yyyyMMdd") //
+                .transactionDate("20130305") //
                 .transactionAmount(java.math.BigDecimal.valueOf(200.0)) //
                 .paymentTypeId(1);
 

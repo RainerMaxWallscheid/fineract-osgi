@@ -40,12 +40,12 @@ public class SearchExternalAssetOwnerTransferTest extends ExternalAssetOwnerTran
     @Test
     public void saleActiveLoanToExternalAssetOwnerWithSearching() {
         final String baseDate = "2020-02-29";
-        LocalDate baseLocalDate = Utils.getDateAsLocalDate("29 February 2020");
+        LocalDate baseLocalDate = Utils.getDateAsLocalDate("20200229");
         try {
             globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, true);
             setInitialBusinessDate(LocalDate.of(2020, 2, 29));
             Integer clientID = createClient();
-            Integer loanID = createLoanForClient(clientID, "29 February 2020");
+            Integer loanID = createLoanForClient(clientID, "20200229");
             addPenaltyForLoan(loanID, "10");
             PostInitiateTransferResponse saleTransferResponse = createSaleTransfer(loanID, baseDate);
             validateResponse(saleTransferResponse, loanID);
@@ -99,12 +99,12 @@ public class SearchExternalAssetOwnerTransferTest extends ExternalAssetOwnerTran
     public void initialSearchExternalAssetOwnerTransferUsingEffectiveDateTest() {
         saleActiveLoanToExternalAssetOwnerWithSearching();
         final String attribute = "effective";
-        LocalDate fromDate = Utils.getDateAsLocalDate("01 March 2023");
+        LocalDate fromDate = Utils.getDateAsLocalDate("20230301");
         LocalDate toDate = fromDate.plusMonths(3);
         PagedRequestExternalAssetOwnerSearchRequest searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(null, attribute, fromDate, toDate, 0, null);
         PageExternalTransferData response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
         validateResponse(response, 0);
-        fromDate = Utils.getDateAsLocalDate("01 January 2020");
+        fromDate = Utils.getDateAsLocalDate("20200101");
         toDate = fromDate.plusMonths(6);
         searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(null, attribute, fromDate, toDate, 0, null);
         response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
@@ -115,12 +115,12 @@ public class SearchExternalAssetOwnerTransferTest extends ExternalAssetOwnerTran
     @Test
     public void initialSearchExternalAssetOwnerTransferUsingSubmittedDateTest() {
         final String attribute = "settlement";
-        LocalDate fromDate = Utils.getDateAsLocalDate("01 March 2023");
+        LocalDate fromDate = Utils.getDateAsLocalDate("20230301");
         LocalDate toDate = fromDate.plusMonths(3);
         PagedRequestExternalAssetOwnerSearchRequest searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(null, attribute, fromDate, toDate, 0, null);
         PageExternalTransferData response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
         validateResponse(response, 0);
-        fromDate = Utils.getDateAsLocalDate("01 February 2020");
+        fromDate = Utils.getDateAsLocalDate("20200201");
         toDate = fromDate.plusMonths(3);
         searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(null, attribute, fromDate, toDate, 0, null);
         response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
@@ -132,12 +132,12 @@ public class SearchExternalAssetOwnerTransferTest extends ExternalAssetOwnerTran
     public void initialSearchExternalAssetOwnerTransferUsingTextAndDatesTest() {
         final String textToSearch = UUID.randomUUID().toString();
         final String attribute = "settlement";
-        LocalDate fromDate = Utils.getDateAsLocalDate("01 March 2023");
+        LocalDate fromDate = Utils.getDateAsLocalDate("20230301");
         LocalDate toDate = fromDate.plusMonths(3);
         PagedRequestExternalAssetOwnerSearchRequest searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(textToSearch, attribute, fromDate, toDate, 0, null);
         PageExternalTransferData response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
         validateResponse(response, 0);
-        fromDate = Utils.getDateAsLocalDate("01 February 2020");
+        fromDate = Utils.getDateAsLocalDate("20200201");
         toDate = fromDate.plusMonths(3);
         searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(textToSearch, attribute, fromDate, toDate, 0, null);
         response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);

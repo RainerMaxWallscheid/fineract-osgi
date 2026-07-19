@@ -57,7 +57,7 @@ import retrofit2.Response;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public abstract class IntegrationTest {
 
-    protected static final String DATETIME_PATTERN = "dd MMMM yyyy";
+    protected static final String DATETIME_PATTERN = "yyyyMMdd";
     protected static final String LOCALE = "en";
     protected GlobalConfigurationHelper globalConfigurationHelper = new GlobalConfigurationHelper();
     protected BusinessDateHelper businessDateHelper = new BusinessDateHelper();

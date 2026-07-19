@@ -32,139 +32,139 @@ public class ProgressiveLoanCreditBalanceRefundTest extends FeignLoanTestBase {
     public void testAccrualCreationAfterCBRThenReverseRepayment() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
         AtomicReference<Long> reverseRepaymentIdRef = new AtomicReference<>();
-        runAt("13 February 2021", () -> {
-            loanIdRef.set(applyAndApproveProgressiveLoan(clientId, loanProductId, "13 February 2021", 300.0, 37.56, 12, null));
+        runAt("20210213", () -> {
+            loanIdRef.set(applyAndApproveProgressiveLoan(clientId, loanProductId, "20210213", 300.0, 37.56, 12, null));
 
-            disburseLoan(loanIdRef.get(), BigDecimal.valueOf(300.0), "13 February 2021");
+            disburseLoan(loanIdRef.get(), BigDecimal.valueOf(300.0), "20210213");
 
             verifyRepaymentSchedule(loanIdRef.get(), //
-                    installment(300.0, null, "13 February 2021"), //
-                    installment(20.98, 9.39, 30.37, false, "13 March 2021"), //
-                    installment(21.64, 8.73, 30.37, false, "13 April 2021"), //
-                    installment(22.31, 8.06, 30.37, false, "13 May 2021"), //
-                    installment(23.01, 7.36, 30.37, false, "13 June 2021"), //
-                    installment(23.73, 6.64, 30.37, false, "13 July 2021"), //
-                    installment(24.48, 5.89, 30.37, false, "13 August 2021"), //
-                    installment(25.24, 5.13, 30.37, false, "13 September 2021"), //
-                    installment(26.03, 4.34, 30.37, false, "13 October 2021"), //
-                    installment(26.85, 3.52, 30.37, false, "13 November 2021"), //
-                    installment(27.69, 2.68, 30.37, false, "13 December 2021"), //
-                    installment(28.55, 1.82, 30.37, false, "13 January 2022"), //
-                    installment(29.49, 0.92, 30.41, false, "13 February 2022") //
+                    installment(300.0, null, "20210213"), //
+                    installment(20.98, 9.39, 30.37, false, "20210313"), //
+                    installment(21.64, 8.73, 30.37, false, "20210413"), //
+                    installment(22.31, 8.06, 30.37, false, "20210513"), //
+                    installment(23.01, 7.36, 30.37, false, "20210613"), //
+                    installment(23.73, 6.64, 30.37, false, "20210713"), //
+                    installment(24.48, 5.89, 30.37, false, "20210813"), //
+                    installment(25.24, 5.13, 30.37, false, "20210913"), //
+                    installment(26.03, 4.34, 30.37, false, "20211013"), //
+                    installment(26.85, 3.52, 30.37, false, "20211113"), //
+                    installment(27.69, 2.68, 30.37, false, "20211213"), //
+                    installment(28.55, 1.82, 30.37, false, "20220113"), //
+                    installment(29.49, 0.92, 30.41, false, "20220213") //
             );
 
-            makeLoanRepayment(loanIdRef.get(), "Repayment", "13 February 2021", 60.0);
-            Long repaymentId = makeLoanRepayment(loanIdRef.get(), "Repayment", "13 February 2021", 40.0).getResourceId();
+            makeLoanRepayment(loanIdRef.get(), "Repayment", "20210213", 60.0);
+            Long repaymentId = makeLoanRepayment(loanIdRef.get(), "Repayment", "20210213", 40.0).getResourceId();
             reverseRepaymentIdRef.set(repaymentId);
-            makeLoanRepayment(loanIdRef.get(), "MerchantIssuedRefund", "13 February 2021", 300.0);
+            makeLoanRepayment(loanIdRef.get(), "MerchantIssuedRefund", "20210213", 300.0);
 
             verifyRepaymentSchedule(loanIdRef.get(), //
-                    installment(300.0, null, "13 February 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 March 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 April 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 May 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 June 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 July 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 August 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 September 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 October 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 November 2021"), //
-                    installment(26.67, 0.0, 0.0, true, "13 December 2021"), //
-                    installment(0.0, 0.0, 0.0, true, "13 January 2022"), //
-                    installment(0.0, 0.0, 0.0, true, "13 February 2022") //
+                    installment(300.0, null, "20210213"), //
+                    installment(30.37, 0.0, 0.0, true, "20210313"), //
+                    installment(30.37, 0.0, 0.0, true, "20210413"), //
+                    installment(30.37, 0.0, 0.0, true, "20210513"), //
+                    installment(30.37, 0.0, 0.0, true, "20210613"), //
+                    installment(30.37, 0.0, 0.0, true, "20210713"), //
+                    installment(30.37, 0.0, 0.0, true, "20210813"), //
+                    installment(30.37, 0.0, 0.0, true, "20210913"), //
+                    installment(30.37, 0.0, 0.0, true, "20211013"), //
+                    installment(30.37, 0.0, 0.0, true, "20211113"), //
+                    installment(26.67, 0.0, 0.0, true, "20211213"), //
+                    installment(0.0, 0.0, 0.0, true, "20220113"), //
+                    installment(0.0, 0.0, 0.0, true, "20220213") //
             );
             verifyTransactions(loanIdRef.get(), //
-                    transaction(300.0, "Disbursement", "13 February 2021", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(60.0, "Repayment", "13 February 2021", 240.0, 60.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(40.0, "Repayment", "13 February 2021", 200.0, 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(300.0, "Merchant Issued Refund", "13 February 2021", 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 100.0, false) //
+                    transaction(300.0, "Disbursement", "20210213", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(60.0, "Repayment", "20210213", 240.0, 60.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(40.0, "Repayment", "20210213", 200.0, 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(300.0, "Merchant Issued Refund", "20210213", 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 100.0, false) //
             );
         });
 
-        runAt("19 February 2021", () -> {
+        runAt("20210219", () -> {
             final Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
-            makeLoanRepayment(loanId, "CreditBalanceRefund", "19 February 2021", 100.0);
+            makeLoanRepayment(loanId, "CreditBalanceRefund", "20210219", 100.0);
             // 0 overpaid
             verifyRepaymentSchedule(loanId, //
-                    installment(300.0, null, "13 February 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 March 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 April 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 May 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 June 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 July 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 August 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 September 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 October 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 November 2021"), //
-                    installment(26.67, 0.0, 0.0, true, "13 December 2021"), //
-                    installment(0.0, 0.0, 0.0, true, "13 January 2022"), //
-                    installment(0.0, 0.0, 0.0, true, "13 February 2022") //
+                    installment(300.0, null, "20210213"), //
+                    installment(30.37, 0.0, 0.0, true, "20210313"), //
+                    installment(30.37, 0.0, 0.0, true, "20210413"), //
+                    installment(30.37, 0.0, 0.0, true, "20210513"), //
+                    installment(30.37, 0.0, 0.0, true, "20210613"), //
+                    installment(30.37, 0.0, 0.0, true, "20210713"), //
+                    installment(30.37, 0.0, 0.0, true, "20210813"), //
+                    installment(30.37, 0.0, 0.0, true, "20210913"), //
+                    installment(30.37, 0.0, 0.0, true, "20211013"), //
+                    installment(30.37, 0.0, 0.0, true, "20211113"), //
+                    installment(26.67, 0.0, 0.0, true, "20211213"), //
+                    installment(0.0, 0.0, 0.0, true, "20220113"), //
+                    installment(0.0, 0.0, 0.0, true, "20220213") //
             );
             verifyTransactions(loanId, //
-                    transaction(300.0, "Disbursement", "13 February 2021", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(60.0, "Repayment", "13 February 2021", 240.0, 60.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(40.0, "Repayment", "13 February 2021", 200.0, 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(300.0, "Merchant Issued Refund", "13 February 2021", 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 100.0, false), //
-                    transaction(100.0, "Credit Balance Refund", "19 February 2021", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, false) //
+                    transaction(300.0, "Disbursement", "20210213", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(60.0, "Repayment", "20210213", 240.0, 60.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(40.0, "Repayment", "20210213", 200.0, 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(300.0, "Merchant Issued Refund", "20210213", 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 100.0, false), //
+                    transaction(100.0, "Credit Balance Refund", "20210219", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, false) //
             );
         });
-        runAt("23 February 2021", () -> {
+        runAt("20210223", () -> {
             final Long loanId = loanIdRef.get();
             final Long reverseRepaymentId = reverseRepaymentIdRef.get();
             executeInlineCOB(loanId);
-            reverseLoanTransaction(loanId, reverseRepaymentId, "23 February 2021");
+            reverseLoanTransaction(loanId, reverseRepaymentId, "20210223");
             // 40 outstanding
             verifyRepaymentSchedule(loanId, //
-                    installment(300.0, null, "13 February 2021"), //
-                    installment(130.37, 0.98, 40.98, false, "13 March 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 April 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 May 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 June 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 July 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 August 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 September 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 October 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 November 2021"), //
-                    installment(26.67, 0.0, 0.0, true, "13 December 2021"), //
-                    installment(0.0, 0.0, 0.0, true, "13 January 2022"), //
-                    installment(0.0, 0.0, 0.0, true, "13 February 2022") //
+                    installment(300.0, null, "20210213"), //
+                    installment(130.37, 0.98, 40.98, false, "20210313"), //
+                    installment(30.37, 0.0, 0.0, true, "20210413"), //
+                    installment(30.37, 0.0, 0.0, true, "20210513"), //
+                    installment(30.37, 0.0, 0.0, true, "20210613"), //
+                    installment(30.37, 0.0, 0.0, true, "20210713"), //
+                    installment(30.37, 0.0, 0.0, true, "20210813"), //
+                    installment(30.37, 0.0, 0.0, true, "20210913"), //
+                    installment(30.37, 0.0, 0.0, true, "20211013"), //
+                    installment(30.37, 0.0, 0.0, true, "20211113"), //
+                    installment(26.67, 0.0, 0.0, true, "20211213"), //
+                    installment(0.0, 0.0, 0.0, true, "20220113"), //
+                    installment(0.0, 0.0, 0.0, true, "20220213") //
             );
 
             verifyTransactions(loanId, //
-                    transaction(300.0, "Disbursement", "13 February 2021", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(60.0, "Repayment", "13 February 2021", 240.0, 60.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(40.0, "Repayment", "13 February 2021", 200.0, 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
-                    transaction(300.0, "Merchant Issued Refund", "13 February 2021", 0.0, 240.0, 0.0, 0.0, 0.0, 0.0, 60.0, false), //
-                    transaction(100.0, "Credit Balance Refund", "19 February 2021", 40.0, 40.0, 0.0, 0.0, 0.0, 0.0, 60.0, false) //
+                    transaction(300.0, "Disbursement", "20210213", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(60.0, "Repayment", "20210213", 240.0, 60.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(40.0, "Repayment", "20210213", 200.0, 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
+                    transaction(300.0, "Merchant Issued Refund", "20210213", 0.0, 240.0, 0.0, 0.0, 0.0, 0.0, 60.0, false), //
+                    transaction(100.0, "Credit Balance Refund", "20210219", 40.0, 40.0, 0.0, 0.0, 0.0, 0.0, 60.0, false) //
             );
         });
-        runAt("24 February 2021", () -> {
+        runAt("20210224", () -> {
             final Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             verifyTransactions(loanId, //
-                    transaction(300.0, "Disbursement", "13 February 2021", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(60.0, "Repayment", "13 February 2021", 240.0, 60.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(40.0, "Repayment", "13 February 2021", 200.0, 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
-                    transaction(300.0, "Merchant Issued Refund", "13 February 2021", 0.0, 240.0, 0.0, 0.0, 0.0, 0.0, 60.0, false), //
-                    transaction(100.0, "Credit Balance Refund", "19 February 2021", 40.0, 40.0, 0.0, 0.0, 0.0, 0.0, 60.0, false), //
-                    transaction(0.18, "Accrual", "23 February 2021", 0.0, 0.0, 0.18, 0.0, 0.0, 0.0, 0.0, false) //
+                    transaction(300.0, "Disbursement", "20210213", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(60.0, "Repayment", "20210213", 240.0, 60.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(40.0, "Repayment", "20210213", 200.0, 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
+                    transaction(300.0, "Merchant Issued Refund", "20210213", 0.0, 240.0, 0.0, 0.0, 0.0, 0.0, 60.0, false), //
+                    transaction(100.0, "Credit Balance Refund", "20210219", 40.0, 40.0, 0.0, 0.0, 0.0, 0.0, 60.0, false), //
+                    transaction(0.18, "Accrual", "20210223", 0.0, 0.0, 0.18, 0.0, 0.0, 0.0, 0.0, false) //
             );
         });
-        runAt("28 February 2021", () -> {
+        runAt("20210228", () -> {
             final Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             verifyTransactions(loanId, //
-                    transaction(300.0, "Disbursement", "13 February 2021", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(60.0, "Repayment", "13 February 2021", 240.0, 60.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(40.0, "Repayment", "13 February 2021", 200.0, 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
-                    transaction(300.0, "Merchant Issued Refund", "13 February 2021", 0.0, 240.0, 0.0, 0.0, 0.0, 0.0, 60.0, false), //
-                    transaction(100.0, "Credit Balance Refund", "19 February 2021", 40.0, 40.0, 0.0, 0.0, 0.0, 0.0, 60.0, false), //
-                    transaction(0.18, "Accrual", "23 February 2021", 0.0, 0.0, 0.18, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(0.04, "Accrual", "24 February 2021", 0.0, 0.0, 0.04, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(0.05, "Accrual", "25 February 2021", 0.0, 0.0, 0.05, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(0.04, "Accrual", "26 February 2021", 0.0, 0.0, 0.04, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(0.05, "Accrual", "27 February 2021", 0.0, 0.0, 0.05, 0.0, 0.0, 0.0, 0.0, false) //
+                    transaction(300.0, "Disbursement", "20210213", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(60.0, "Repayment", "20210213", 240.0, 60.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(40.0, "Repayment", "20210213", 200.0, 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
+                    transaction(300.0, "Merchant Issued Refund", "20210213", 0.0, 240.0, 0.0, 0.0, 0.0, 0.0, 60.0, false), //
+                    transaction(100.0, "Credit Balance Refund", "20210219", 40.0, 40.0, 0.0, 0.0, 0.0, 0.0, 60.0, false), //
+                    transaction(0.18, "Accrual", "20210223", 0.0, 0.0, 0.18, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(0.04, "Accrual", "20210224", 0.0, 0.0, 0.04, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(0.05, "Accrual", "20210225", 0.0, 0.0, 0.05, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(0.04, "Accrual", "20210226", 0.0, 0.0, 0.04, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(0.05, "Accrual", "20210227", 0.0, 0.0, 0.05, 0.0, 0.0, 0.0, 0.0, false) //
             );
         });
     }
@@ -173,150 +173,150 @@ public class ProgressiveLoanCreditBalanceRefundTest extends FeignLoanTestBase {
     public void testAccrualCreationAfterCBRThenReverseRepaymentThenRepayment() {
         AtomicReference<Long> loanIdRef = new AtomicReference<>();
         AtomicReference<Long> reverseRepaymentIdRef = new AtomicReference<>();
-        runAt("13 February 2021", () -> {
-            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "13 February 2021", 300.0, 37.56, 12, null);
+        runAt("20210213", () -> {
+            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "20210213", 300.0, 37.56, 12, null);
             loanIdRef.set(loanId);
 
-            disburseLoan(loanId, BigDecimal.valueOf(300.0), "13 February 2021");
+            disburseLoan(loanId, BigDecimal.valueOf(300.0), "20210213");
 
             verifyRepaymentSchedule(loanId, //
-                    installment(300.0, null, "13 February 2021"), //
-                    installment(20.98, 9.39, 30.37, false, "13 March 2021"), //
-                    installment(21.64, 8.73, 30.37, false, "13 April 2021"), //
-                    installment(22.31, 8.06, 30.37, false, "13 May 2021"), //
-                    installment(23.01, 7.36, 30.37, false, "13 June 2021"), //
-                    installment(23.73, 6.64, 30.37, false, "13 July 2021"), //
-                    installment(24.48, 5.89, 30.37, false, "13 August 2021"), //
-                    installment(25.24, 5.13, 30.37, false, "13 September 2021"), //
-                    installment(26.03, 4.34, 30.37, false, "13 October 2021"), //
-                    installment(26.85, 3.52, 30.37, false, "13 November 2021"), //
-                    installment(27.69, 2.68, 30.37, false, "13 December 2021"), //
-                    installment(28.55, 1.82, 30.37, false, "13 January 2022"), //
-                    installment(29.49, 0.92, 30.41, false, "13 February 2022") //
+                    installment(300.0, null, "20210213"), //
+                    installment(20.98, 9.39, 30.37, false, "20210313"), //
+                    installment(21.64, 8.73, 30.37, false, "20210413"), //
+                    installment(22.31, 8.06, 30.37, false, "20210513"), //
+                    installment(23.01, 7.36, 30.37, false, "20210613"), //
+                    installment(23.73, 6.64, 30.37, false, "20210713"), //
+                    installment(24.48, 5.89, 30.37, false, "20210813"), //
+                    installment(25.24, 5.13, 30.37, false, "20210913"), //
+                    installment(26.03, 4.34, 30.37, false, "20211013"), //
+                    installment(26.85, 3.52, 30.37, false, "20211113"), //
+                    installment(27.69, 2.68, 30.37, false, "20211213"), //
+                    installment(28.55, 1.82, 30.37, false, "20220113"), //
+                    installment(29.49, 0.92, 30.41, false, "20220213") //
             );
-            Long resourceId = makeLoanRepayment(loanId, "Repayment", "13 February 2021", 100.0).getResourceId();
+            Long resourceId = makeLoanRepayment(loanId, "Repayment", "20210213", 100.0).getResourceId();
             reverseRepaymentIdRef.set(resourceId);
 
-            makeLoanRepayment(loanId, "MerchantIssuedRefund", "13 February 2021", 300.0);
+            makeLoanRepayment(loanId, "MerchantIssuedRefund", "20210213", 300.0);
 
             verifyRepaymentSchedule(loanId, //
-                    installment(300.0, null, "13 February 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 March 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 April 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 May 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 June 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 July 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 August 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 September 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 October 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 November 2021"), //
-                    installment(26.67, 0.0, 0.0, true, "13 December 2021"), //
-                    installment(0.0, 0.0, 0.0, true, "13 January 2022"), //
-                    installment(0.0, 0.0, 0.0, true, "13 February 2022") //
+                    installment(300.0, null, "20210213"), //
+                    installment(30.37, 0.0, 0.0, true, "20210313"), //
+                    installment(30.37, 0.0, 0.0, true, "20210413"), //
+                    installment(30.37, 0.0, 0.0, true, "20210513"), //
+                    installment(30.37, 0.0, 0.0, true, "20210613"), //
+                    installment(30.37, 0.0, 0.0, true, "20210713"), //
+                    installment(30.37, 0.0, 0.0, true, "20210813"), //
+                    installment(30.37, 0.0, 0.0, true, "20210913"), //
+                    installment(30.37, 0.0, 0.0, true, "20211013"), //
+                    installment(30.37, 0.0, 0.0, true, "20211113"), //
+                    installment(26.67, 0.0, 0.0, true, "20211213"), //
+                    installment(0.0, 0.0, 0.0, true, "20220113"), //
+                    installment(0.0, 0.0, 0.0, true, "20220213") //
             );
             verifyTransactions(loanId, //
-                    transaction(300.0, "Disbursement", "13 February 2021", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(100.0, "Repayment", "13 February 2021", 200.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(300.0, "Merchant Issued Refund", "13 February 2021", 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 100.0, false) //
+                    transaction(300.0, "Disbursement", "20210213", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(100.0, "Repayment", "20210213", 200.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(300.0, "Merchant Issued Refund", "20210213", 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 100.0, false) //
             );
 
         });
-        runAt("19 February 2021", () -> {
+        runAt("20210219", () -> {
             final Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
-            makeLoanRepayment(loanId, "CreditBalanceRefund", "19 February 2021", 100.0);
+            makeLoanRepayment(loanId, "CreditBalanceRefund", "20210219", 100.0);
             verifyRepaymentSchedule(loanId, //
-                    installment(300.0, null, "13 February 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 March 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 April 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 May 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 June 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 July 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 August 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 September 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 October 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 November 2021"), //
-                    installment(26.67, 0.0, 0.0, true, "13 December 2021"), //
-                    installment(0.0, 0.0, 0.0, true, "13 January 2022"), //
-                    installment(0.0, 0.0, 0.0, true, "13 February 2022") //
+                    installment(300.0, null, "20210213"), //
+                    installment(30.37, 0.0, 0.0, true, "20210313"), //
+                    installment(30.37, 0.0, 0.0, true, "20210413"), //
+                    installment(30.37, 0.0, 0.0, true, "20210513"), //
+                    installment(30.37, 0.0, 0.0, true, "20210613"), //
+                    installment(30.37, 0.0, 0.0, true, "20210713"), //
+                    installment(30.37, 0.0, 0.0, true, "20210813"), //
+                    installment(30.37, 0.0, 0.0, true, "20210913"), //
+                    installment(30.37, 0.0, 0.0, true, "20211013"), //
+                    installment(30.37, 0.0, 0.0, true, "20211113"), //
+                    installment(26.67, 0.0, 0.0, true, "20211213"), //
+                    installment(0.0, 0.0, 0.0, true, "20220113"), //
+                    installment(0.0, 0.0, 0.0, true, "20220213") //
             );
             verifyTransactions(loanId, //
-                    transaction(300.0, "Disbursement", "13 February 2021", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(100.0, "Repayment", "13 February 2021", 200.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(300.0, "Merchant Issued Refund", "13 February 2021", 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 100.0, false), //
-                    transaction(100.0, "Credit Balance Refund", "19 February 2021", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, false) //
+                    transaction(300.0, "Disbursement", "20210213", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(100.0, "Repayment", "20210213", 200.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(300.0, "Merchant Issued Refund", "20210213", 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 100.0, false), //
+                    transaction(100.0, "Credit Balance Refund", "20210219", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, false) //
             );
         });
-        runAt("23 February 2021", () -> {
+        runAt("20210223", () -> {
             final Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
 
             final Long reverseRepaymentId = reverseRepaymentIdRef.get();
-            reverseLoanTransaction(loanId, reverseRepaymentId, "23 February 2021");
+            reverseLoanTransaction(loanId, reverseRepaymentId, "20210223");
             verifyRepaymentSchedule(loanId, //
-                    installment(300.0, null, "13 February 2021"), //
-                    installment(130.37, 2.46, 102.46, false, "13 March 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 April 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 May 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 June 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 July 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 August 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 September 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 October 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 November 2021"), //
-                    installment(26.67, 0.0, 0.0, true, "13 December 2021"), //
-                    installment(0.0, 0.0, 0.0, true, "13 January 2022"), //
-                    installment(0.0, 0.0, 0.0, true, "13 February 2022") //
+                    installment(300.0, null, "20210213"), //
+                    installment(130.37, 2.46, 102.46, false, "20210313"), //
+                    installment(30.37, 0.0, 0.0, true, "20210413"), //
+                    installment(30.37, 0.0, 0.0, true, "20210513"), //
+                    installment(30.37, 0.0, 0.0, true, "20210613"), //
+                    installment(30.37, 0.0, 0.0, true, "20210713"), //
+                    installment(30.37, 0.0, 0.0, true, "20210813"), //
+                    installment(30.37, 0.0, 0.0, true, "20210913"), //
+                    installment(30.37, 0.0, 0.0, true, "20211013"), //
+                    installment(30.37, 0.0, 0.0, true, "20211113"), //
+                    installment(26.67, 0.0, 0.0, true, "20211213"), //
+                    installment(0.0, 0.0, 0.0, true, "20220113"), //
+                    installment(0.0, 0.0, 0.0, true, "20220213") //
             );
             verifyTransactions(loanId, //
-                    transaction(300.0, "Disbursement", "13 February 2021", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(100.0, "Repayment", "13 February 2021", 200.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
-                    transaction(300.0, "Merchant Issued Refund", "13 February 2021", 0.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(100.0, "Credit Balance Refund", "19 February 2021", 100.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, false) //
+                    transaction(300.0, "Disbursement", "20210213", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(100.0, "Repayment", "20210213", 200.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
+                    transaction(300.0, "Merchant Issued Refund", "20210213", 0.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(100.0, "Credit Balance Refund", "20210219", 100.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, false) //
             );
         });
-        runAt("24 February 2021", () -> {
+        runAt("20210224", () -> {
             final Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
             verifyTransactions(loanId, //
-                    transaction(300.0, "Disbursement", "13 February 2021", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(100.0, "Repayment", "13 February 2021", 200.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
-                    transaction(300.0, "Merchant Issued Refund", "13 February 2021", 0.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(100.0, "Credit Balance Refund", "19 February 2021", 100.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(0.45, "Accrual", "23 February 2021", 0.0, 0.0, 0.45, 0.0, 0.0, 0.0, 0.0, false) //
+                    transaction(300.0, "Disbursement", "20210213", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(100.0, "Repayment", "20210213", 200.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
+                    transaction(300.0, "Merchant Issued Refund", "20210213", 0.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(100.0, "Credit Balance Refund", "20210219", 100.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(0.45, "Accrual", "20210223", 0.0, 0.0, 0.45, 0.0, 0.0, 0.0, 0.0, false) //
             );
         });
-        runAt("28 February 2021", () -> {
+        runAt("20210228", () -> {
             final Long loanId = loanIdRef.get();
             executeInlineCOB(loanId);
-            makeLoanRepayment(loanId, "Repayment", "28 February 2021", 101.01);
+            makeLoanRepayment(loanId, "Repayment", "20210228", 101.01);
             verifyRepaymentSchedule(loanId, //
-                    installment(300.0, null, "13 February 2021"), //
-                    installment(130.37, 1.01, 0.0, true, "13 March 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 April 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 May 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 June 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 July 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 August 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 September 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 October 2021"), //
-                    installment(30.37, 0.0, 0.0, true, "13 November 2021"), //
-                    installment(26.67, 0.0, 0.0, true, "13 December 2021"), //
-                    installment(0.0, 0.0, 0.0, true, "13 January 2022"), //
-                    installment(0.0, 0.0, 0.0, true, "13 February 2022") //
+                    installment(300.0, null, "20210213"), //
+                    installment(130.37, 1.01, 0.0, true, "20210313"), //
+                    installment(30.37, 0.0, 0.0, true, "20210413"), //
+                    installment(30.37, 0.0, 0.0, true, "20210513"), //
+                    installment(30.37, 0.0, 0.0, true, "20210613"), //
+                    installment(30.37, 0.0, 0.0, true, "20210713"), //
+                    installment(30.37, 0.0, 0.0, true, "20210813"), //
+                    installment(30.37, 0.0, 0.0, true, "20210913"), //
+                    installment(30.37, 0.0, 0.0, true, "20211013"), //
+                    installment(30.37, 0.0, 0.0, true, "20211113"), //
+                    installment(26.67, 0.0, 0.0, true, "20211213"), //
+                    installment(0.0, 0.0, 0.0, true, "20220113"), //
+                    installment(0.0, 0.0, 0.0, true, "20220213") //
             );
             verifyTransactions(loanId, //
-                    transaction(300.0, "Disbursement", "13 February 2021", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(100.0, "Repayment", "13 February 2021", 200.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
-                    transaction(300.0, "Merchant Issued Refund", "13 February 2021", 0.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(100.0, "Credit Balance Refund", "19 February 2021", 100.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(0.45, "Accrual", "23 February 2021", 0.0, 0.0, 0.45, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(0.11, "Accrual", "24 February 2021", 0.0, 0.0, 0.11, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(0.11, "Accrual", "25 February 2021", 0.0, 0.0, 0.11, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(0.11, "Accrual", "26 February 2021", 0.0, 0.0, 0.11, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(0.11, "Accrual", "27 February 2021", 0.0, 0.0, 0.11, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(101.01, "Repayment", "28 February 2021", 0.0, 100.0, 1.01, 0.0, 0.0, 0.0, 0.0, false), //
-                    transaction(0.12, "Accrual", "28 February 2021", 0.0, 0.0, 0.12, 0.0, 0.0, 0.0, 0.0, false) //
+                    transaction(300.0, "Disbursement", "20210213", 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(100.0, "Repayment", "20210213", 200.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, true), //
+                    transaction(300.0, "Merchant Issued Refund", "20210213", 0.0, 300.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(100.0, "Credit Balance Refund", "20210219", 100.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(0.45, "Accrual", "20210223", 0.0, 0.0, 0.45, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(0.11, "Accrual", "20210224", 0.0, 0.0, 0.11, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(0.11, "Accrual", "20210225", 0.0, 0.0, 0.11, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(0.11, "Accrual", "20210226", 0.0, 0.0, 0.11, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(0.11, "Accrual", "20210227", 0.0, 0.0, 0.11, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(101.01, "Repayment", "20210228", 0.0, 100.0, 1.01, 0.0, 0.0, 0.0, 0.0, false), //
+                    transaction(0.12, "Accrual", "20210228", 0.0, 0.0, 0.12, 0.0, 0.0, 0.0, 0.0, false) //
             );
         });
     }

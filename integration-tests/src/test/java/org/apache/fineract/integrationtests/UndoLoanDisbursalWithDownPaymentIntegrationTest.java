@@ -36,7 +36,7 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
     @Test
     public void testUndoDisbursalForLoanWithSingleDisbursalAutoDownPaymentEnabledAndNoManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -44,22 +44,22 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(true, false);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1000.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1000.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -72,9 +72,9 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             // undoDisbursal
@@ -97,16 +97,16 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
                     journalEntry(1000.0, fundSource, "DEBIT")); //
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
         });
     }
 
     @Test
     public void testUndoDisbursalForLoanWithSingleDisbursalAutoDownPaymentEnabledAndHasManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -114,22 +114,22 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(true, false);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1000.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1000.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // Verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -141,13 +141,13 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             );
 
             // make a repayment
-            addRepaymentForLoan(loanId, 100.0, "01 January 2023");
+            addRepaymentForLoan(loanId, 100.0, "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(100.0, "Repayment", "01 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(100.0, "Repayment", "20230101") //
             );
 
             // undoDisbursal
@@ -180,16 +180,16 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             );
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
         });
     }
 
     @Test
     public void testUndoDisbursalForLoanWithSingleDisbursalAutoDownPaymentDisabledAndNoManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -197,25 +197,25 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(false, false);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1000.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1000.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // Manual down-payment
-            addRepaymentForLoan(loanId, 250.0, "01 January 2023");
+            addRepaymentForLoan(loanId, 250.0, "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Repayment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Repayment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -249,16 +249,16 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // verify repayment entries are reverted
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
         });
     }
 
     @Test
     public void testUndoDisbursalForLoanWithSingleDisbursalAutoDownPaymentDisabledAndHasManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -266,29 +266,29 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(false, false);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1000.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1000.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // Manual down-payment
-            addRepaymentForLoan(loanId, 250.0, "01 January 2023");
+            addRepaymentForLoan(loanId, 250.0, "20230101");
 
             // An extra Manual Repayment after the down-payment
-            addRepaymentForLoan(loanId, 100.0, "01 January 2023");
+            addRepaymentForLoan(loanId, 100.0, "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(250.0, "Repayment", "01 January 2023"), //
-                    transaction(100.0, "Repayment", "01 January 2023") //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(250.0, "Repayment", "20230101"), //
+                    transaction(100.0, "Repayment", "20230101") //
             );
 
             // verify journal entries
@@ -303,9 +303,9 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             // undoDisbursal
@@ -339,16 +339,16 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
         });
     }
 
     @Test
     public void testUndoLastDisbursalForLoanWithSingleDisbursalAutoDownPaymentEnabledAndNoManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -356,22 +356,22 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(true, false);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1000.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1000.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -384,9 +384,9 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             verifyUndoLastDisbursalShallFail(loanId, "error.msg.loan.product.does.not.support.multiple.disbursals.cannot.undo.last");
@@ -396,7 +396,7 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
     @Test
     public void testUndoLastDisbursalForLoanWithMultiDisbursalAutoDownPaymentEnabledAndNoManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -404,22 +404,22 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(true, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1000.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1000.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -432,9 +432,9 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             verifyUndoLastDisbursalShallFail(loanId, "error.msg.tranches.should.be.disbursed.more.than.one.to.undo.last.disbursal");
@@ -443,7 +443,7 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
     @Test
     public void testUndoDisbursalForLoanWithMultiDisbursalAutoDownPaymentEnabledAndNoManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -451,22 +451,22 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(true, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1000.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1000.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -479,9 +479,9 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             // undoDisbursal
@@ -506,16 +506,16 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
         });
     }
 
     @Test
     public void testUndoDisbursalForLoanWithMultiDisbursalAutoDownPaymentEnabledAndHasManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -523,22 +523,22 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(true, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1000.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1000.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // Verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -550,13 +550,13 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             );
 
             // make a repayment
-            addRepaymentForLoan(loanId, 100.0, "01 January 2023");
+            addRepaymentForLoan(loanId, 100.0, "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(100.0, "Repayment", "01 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(100.0, "Repayment", "20230101") //
             );
 
             // undoDisbursal
@@ -590,16 +590,16 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
         });
     }
 
     @Test
     public void testUndoDisbursalForLoanWithMultiDisbursalAutoDownPaymentDisabledAndNoManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -607,25 +607,25 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(false, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1000.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1000.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // Manual down-payment
-            addRepaymentForLoan(loanId, 250.0, "01 January 2023");
+            addRepaymentForLoan(loanId, 250.0, "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Repayment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023")//
+                    transaction(250.0, "Repayment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101")//
             );
 
             // verify journal entries
@@ -659,16 +659,16 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
         });
     }
 
     @Test
     public void testUndoDisbursalForLoanWithMultiDisbursalAutoDownPaymentDisabledAndHasManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -676,28 +676,28 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(false, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1000.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1000.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023"));//
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131"));//
 
             // Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // Manual down-payment
-            addRepaymentForLoan(loanId, 250.0, "01 January 2023");
+            addRepaymentForLoan(loanId, 250.0, "20230101");
 
             // An extra Manual Repayment after the down-payment
-            addRepaymentForLoan(loanId, 100.0, "01 January 2023");
+            addRepaymentForLoan(loanId, 100.0, "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(250.0, "Repayment", "01 January 2023"), //
-                    transaction(100.0, "Repayment", "01 January 2023") //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(250.0, "Repayment", "20230101"), //
+                    transaction(100.0, "Repayment", "20230101") //
             );
 
             // verify journal entries
@@ -712,9 +712,9 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             // undoDisbursal
@@ -747,15 +747,15 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             );
 
             // Verify Repayment Schedule
-            verifyRepaymentSchedule(loanId, installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, false, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023"));//
+            verifyRepaymentSchedule(loanId, installment(1000.0, null, "20230101"), //
+                    installment(250.0, false, "20230101"), //
+                    installment(750.0, false, "20230131"));//
         });
     }
 
     @Test
     public void testUndoLastDisbursalForLoanWithMultiDisbursalWith2DisburseAutoDownPaymentEnabledAndNoManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -763,22 +763,22 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(true, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1500.0, null, "01 January 2023"), //
-                    installment(375.0, false, "01 January 2023"), //
-                    installment(1125.0, false, "31 January 2023") //
+                    installment(1500.0, null, "20230101"), //
+                    installment(375.0, false, "20230101"), //
+                    installment(1125.0, false, "20230131") //
             );
 
             // 1st Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -789,23 +789,23 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             );
 
             // Verify Repayment Schedule
-            verifyRepaymentSchedule(loanId, installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+            verifyRepaymentSchedule(loanId, installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("15 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230115").dateFormat(DATETIME_PATTERN).locale("en"));
 
             // 2nd Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(400.0), "15 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(400.0), "20230115");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(100.0, "Down Payment", "15 January 2023"), //
-                    transaction(400.0, "Disbursement", "15 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(100.0, "Down Payment", "20230115"), //
+                    transaction(400.0, "Disbursement", "20230115") //
             );
 
             // verify journal entries
@@ -822,11 +822,11 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(400.0, null, "15 January 2023"), //
-                    installment(100.0, true, "15 January 2023"), //
-                    installment(1050.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(400.0, null, "20230115"), //
+                    installment(100.0, true, "20230115"), //
+                    installment(1050.0, false, "20230131") //
             );
 
             // undoLastDisbursal
@@ -834,8 +834,8 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -860,16 +860,16 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             );
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
         });
     }
 
     @Test
     public void testUndoLastDisbursalForLoanWithMultiDisbursalWith2DisburseAutoDownPaymentEnabledAndNoManualTransactionsWithExtraRepayment() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -877,22 +877,22 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(true, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1500.0, null, "01 January 2023"), //
-                    installment(375.0, false, "01 January 2023"), //
-                    installment(1125.0, false, "31 January 2023") //
+                    installment(1500.0, null, "20230101"), //
+                    installment(375.0, false, "20230101"), //
+                    installment(1125.0, false, "20230131") //
             );
 
             // 1st Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -903,35 +903,35 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             );
 
             // Verify Repayment Schedule
-            verifyRepaymentSchedule(loanId, installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+            verifyRepaymentSchedule(loanId, installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("10 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230110").dateFormat(DATETIME_PATTERN).locale("en"));
 
-            addRepaymentForLoan(loanId, 300.0, "10 January 2023");
+            addRepaymentForLoan(loanId, 300.0, "20230110");
 
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(300.0, "Repayment", "10 January 2023") //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(300.0, "Repayment", "20230110") //
             );
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("15 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230115").dateFormat(DATETIME_PATTERN).locale("en"));
 
             // 2nd Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(400.0), "15 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(400.0), "20230115");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(300.0, "Repayment", "10 January 2023"), //
-                    transaction(400.0, "Disbursement", "15 January 2023"), //
-                    transaction(100.0, "Down Payment", "15 January 2023") //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(300.0, "Repayment", "20230110"), //
+                    transaction(400.0, "Disbursement", "20230115"), //
+                    transaction(100.0, "Down Payment", "20230115") //
             );
 
             // verify journal entries
@@ -950,11 +950,11 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(400.0, null, "15 January 2023"), //
-                    installment(100.0, true, "15 January 2023"), //
-                    installment(1050.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(400.0, null, "20230115"), //
+                    installment(100.0, true, "20230115"), //
+                    installment(1050.0, false, "20230131") //
             );
 
             // undoLastDisbursal
@@ -962,9 +962,9 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(300.0, "Repayment", "10 January 2023") //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(300.0, "Repayment", "20230110") //
             );
 
             // verify journal entries
@@ -993,16 +993,16 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             );
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
         });
     }
 
     @Test
     public void testUndoLastDisbursalForLoanWithMultiDisbursalWith2DisburseAutoDownPaymentDisabledAndNoManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -1010,25 +1010,25 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(false, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1500.0, null, "01 January 2023"), //
-                    installment(375.0, false, "01 January 2023"), //
-                    installment(1125.0, false, "31 January 2023") //
+                    installment(1500.0, null, "20230101"), //
+                    installment(375.0, false, "20230101"), //
+                    installment(1125.0, false, "20230131") //
             );
 
             // 1st Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // Manual down-payment
-            addRepaymentForLoan(loanId, 250.0, "01 January 2023");
+            addRepaymentForLoan(loanId, 250.0, "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Repayment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Repayment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -1041,26 +1041,26 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("15 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230115").dateFormat(DATETIME_PATTERN).locale("en"));
 
             // 2nd Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(400.0), "15 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(400.0), "20230115");
 
             // Manual down-payment
-            addRepaymentForLoan(loanId, 100.0, "15 January 2023");
+            addRepaymentForLoan(loanId, 100.0, "20230115");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Repayment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(100.0, "Repayment", "15 January 2023"), //
-                    transaction(400.0, "Disbursement", "15 January 2023") //
+                    transaction(250.0, "Repayment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(100.0, "Repayment", "20230115"), //
+                    transaction(400.0, "Disbursement", "20230115") //
             );
 
             // verify journal entries
@@ -1077,11 +1077,11 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(400.0, null, "15 January 2023"), //
-                    installment(100.0, true, "15 January 2023"), //
-                    installment(1050.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(400.0, null, "20230115"), //
+                    installment(100.0, true, "20230115"), //
+                    installment(1050.0, false, "20230131") //
             );
 
             // undoLastDisbursal
@@ -1089,8 +1089,8 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Repayment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Repayment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -1115,16 +1115,16 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             );
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
         });
     }
 
     @Test
     public void testUndoLastDisbursalForLoanWithMultiDisbursalWith2DisburseAutoDownPaymentEnabledAndHasManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -1132,22 +1132,22 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(true, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1500.0, null, "01 January 2023"), //
-                    installment(375.0, false, "01 January 2023"), //
-                    installment(1125.0, false, "31 January 2023") //
+                    installment(1500.0, null, "20230101"), //
+                    installment(375.0, false, "20230101"), //
+                    installment(1125.0, false, "20230131") //
             );
 
             // 1st Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -1160,23 +1160,23 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("15 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230115").dateFormat(DATETIME_PATTERN).locale("en"));
 
             // 2nd Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(400.0), "15 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(400.0), "20230115");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(100.0, "Down Payment", "15 January 2023"), //
-                    transaction(400.0, "Disbursement", "15 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(100.0, "Down Payment", "20230115"), //
+                    transaction(400.0, "Disbursement", "20230115") //
             );
 
             // verify journal entries
@@ -1193,18 +1193,18 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(400.0, null, "15 January 2023"), //
-                    installment(100.0, true, "15 January 2023"), //
-                    installment(1050.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(400.0, null, "20230115"), //
+                    installment(100.0, true, "20230115"), //
+                    installment(1050.0, false, "20230131") //
             );
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("20 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230120").dateFormat(DATETIME_PATTERN).locale("en"));
 
             // make an additional repayment after the 2nd disbursal
-            addRepaymentForLoan(loanId, 50.0, "20 January 2023");
+            addRepaymentForLoan(loanId, 50.0, "20230120");
 
             // undo last disbursal shall fail
             verifyUndoLastDisbursalShallFail(loanId, "error.msg.cannot.undo.last.disbursal.after.repayments or waivers");
@@ -1213,7 +1213,7 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
     @Test
     public void testUndoLastDisbursalForLoanWithMultiDisbursalWith2DisburseAutoDownPaymentDisabledAndHasManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -1221,25 +1221,25 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(false, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1500.0, null, "01 January 2023"), //
-                    installment(375.0, false, "01 January 2023"), //
-                    installment(1125.0, false, "31 January 2023") //
+                    installment(1500.0, null, "20230101"), //
+                    installment(375.0, false, "20230101"), //
+                    installment(1125.0, false, "20230131") //
             );
 
             // 1st Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // Manual down-payment
-            addRepaymentForLoan(loanId, 250.0, "01 January 2023");
+            addRepaymentForLoan(loanId, 250.0, "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Repayment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Repayment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -1252,26 +1252,26 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("15 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230115").dateFormat(DATETIME_PATTERN).locale("en"));
 
             // 2nd Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(400.0), "15 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(400.0), "20230115");
 
             // Manual down-payment
-            addRepaymentForLoan(loanId, 100.0, "15 January 2023");
+            addRepaymentForLoan(loanId, 100.0, "20230115");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Repayment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(100.0, "Repayment", "15 January 2023"), //
-                    transaction(400.0, "Disbursement", "15 January 2023") //
+                    transaction(250.0, "Repayment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(100.0, "Repayment", "20230115"), //
+                    transaction(400.0, "Disbursement", "20230115") //
             );
 
             // verify journal entries
@@ -1288,18 +1288,18 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(400.0, null, "15 January 2023"), //
-                    installment(100.0, true, "15 January 2023"), //
-                    installment(1050.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(400.0, null, "20230115"), //
+                    installment(100.0, true, "20230115"), //
+                    installment(1050.0, false, "20230131") //
             );
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("20 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230120").dateFormat(DATETIME_PATTERN).locale("en"));
 
             // make an additional repayment after the 2nd disbursal
-            addRepaymentForLoan(loanId, 50.0, "20 January 2023");
+            addRepaymentForLoan(loanId, 50.0, "20230120");
 
             // undo last disbursal shall fail
             verifyUndoLastDisbursalShallFail(loanId, "error.msg.cannot.undo.last.disbursal.after.repayments or waivers");
@@ -1308,7 +1308,7 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
     @Test
     public void testUndoDisbursalForLoanWithMultiDisbursalWith2DisburseAutoDownPaymentEnabledAndNoManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -1316,22 +1316,22 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(true, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1500.0, null, "01 January 2023"), //
-                    installment(375.0, false, "01 January 2023"), //
-                    installment(1125.0, false, "31 January 2023") //
+                    installment(1500.0, null, "20230101"), //
+                    installment(375.0, false, "20230101"), //
+                    installment(1125.0, false, "20230131") //
             );
 
             // 1st Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -1344,23 +1344,23 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("15 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230115").dateFormat(DATETIME_PATTERN).locale("en"));
 
             // 2nd Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(400.0), "15 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(400.0), "20230115");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(100.0, "Down Payment", "15 January 2023"), //
-                    transaction(400.0, "Disbursement", "15 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(100.0, "Down Payment", "20230115"), //
+                    transaction(400.0, "Disbursement", "20230115") //
             );
 
             // verify journal entries
@@ -1377,11 +1377,11 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(400.0, null, "15 January 2023"), //
-                    installment(100.0, true, "15 January 2023"), //
-                    installment(1050.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(400.0, null, "20230115"), //
+                    installment(100.0, true, "20230115"), //
+                    installment(1050.0, false, "20230131") //
             );
 
             // undoDisbursal
@@ -1389,9 +1389,9 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1500.0, null, "01 January 2023"), //
-                    installment(375.0, false, "01 January 2023"), //
-                    installment(1125.0, false, "31 January 2023") //
+                    installment(1500.0, null, "20230101"), //
+                    installment(375.0, false, "20230101"), //
+                    installment(1125.0, false, "20230131") //
             );
 
             verifyNoTransactions(loanId);
@@ -1427,7 +1427,7 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
     @Test
     public void testUndoDisbursalForLoanWithMultiDisbursalWith2DisburseAutoDownPaymentDisabledAndNoManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -1435,25 +1435,25 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(false, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1500.0, null, "01 January 2023"), //
-                    installment(375.0, false, "01 January 2023"), //
-                    installment(1125.0, false, "31 January 2023") //
+                    installment(1500.0, null, "20230101"), //
+                    installment(375.0, false, "20230101"), //
+                    installment(1125.0, false, "20230131") //
             );
 
             // 1st Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // Manual down-payment
-            addRepaymentForLoan(loanId, 250.0, "01 January 2023");
+            addRepaymentForLoan(loanId, 250.0, "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Repayment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Repayment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -1466,26 +1466,26 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("15 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230115").dateFormat(DATETIME_PATTERN).locale("en"));
 
             // 2nd Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(400.0), "15 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(400.0), "20230115");
 
             // Manual down-payment
-            addRepaymentForLoan(loanId, 100.0, "15 January 2023");
+            addRepaymentForLoan(loanId, 100.0, "20230115");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Repayment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(100.0, "Repayment", "15 January 2023"), //
-                    transaction(400.0, "Disbursement", "15 January 2023") //
+                    transaction(250.0, "Repayment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(100.0, "Repayment", "20230115"), //
+                    transaction(400.0, "Disbursement", "20230115") //
             );
 
             // verify journal entries
@@ -1502,11 +1502,11 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(400.0, null, "15 January 2023"), //
-                    installment(100.0, true, "15 January 2023"), //
-                    installment(1050.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(400.0, null, "20230115"), //
+                    installment(100.0, true, "20230115"), //
+                    installment(1050.0, false, "20230131") //
             );
 
             // undoDisbursal
@@ -1514,9 +1514,9 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1500.0, null, "01 January 2023"), //
-                    installment(375.0, false, "01 January 2023"), //
-                    installment(1125.0, false, "31 January 2023") //
+                    installment(1500.0, null, "20230101"), //
+                    installment(375.0, false, "20230101"), //
+                    installment(1125.0, false, "20230131") //
             );
 
             verifyNoTransactions(loanId);
@@ -1552,7 +1552,7 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
     @Test
     public void testUndoDisbursalForLoanWithMultiDisbursalWith2DisburseAutoDownPaymentEnabledAndHasManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -1560,22 +1560,22 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(true, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1500.0, null, "01 January 2023"), //
-                    installment(375.0, false, "01 January 2023"), //
-                    installment(1125.0, false, "31 January 2023") //
+                    installment(1500.0, null, "20230101"), //
+                    installment(375.0, false, "20230101"), //
+                    installment(1125.0, false, "20230131") //
             );
 
             // 1st Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -1588,23 +1588,23 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("15 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230115").dateFormat(DATETIME_PATTERN).locale("en"));
 
             // 2nd Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(400.0), "15 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(400.0), "20230115");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(100.0, "Down Payment", "15 January 2023"), //
-                    transaction(400.0, "Disbursement", "15 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(100.0, "Down Payment", "20230115"), //
+                    transaction(400.0, "Disbursement", "20230115") //
             );
 
             // verify journal entries
@@ -1621,27 +1621,27 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(400.0, null, "15 January 2023"), //
-                    installment(100.0, true, "15 January 2023"), //
-                    installment(1050.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(400.0, null, "20230115"), //
+                    installment(100.0, true, "20230115"), //
+                    installment(1050.0, false, "20230131") //
             );
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("20 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230120").dateFormat(DATETIME_PATTERN).locale("en"));
 
             // make an additional repayment after the 2nd disbursal
-            addRepaymentForLoan(loanId, 50.0, "20 January 2023");
+            addRepaymentForLoan(loanId, 50.0, "20230120");
 
             // undoDisbursal
             loanTransactionHelper.undoDisbursal(loanId.intValue());
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1500.0, null, "01 January 2023"), //
-                    installment(375.0, false, "01 January 2023"), //
-                    installment(1125.0, false, "31 January 2023") //
+                    installment(1500.0, null, "20230101"), //
+                    installment(375.0, false, "20230101"), //
+                    installment(1125.0, false, "20230131") //
             );
 
             verifyNoTransactions(loanId);
@@ -1685,7 +1685,7 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
     @Test
     public void testUndoDisbursalForLoanWithMultiDisbursalWith2DisburseAutoDownPaymentDisabledAndHasManualTransactions() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -1693,25 +1693,25 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
             Long loanProductId = createLoanProductWith25PctDownPayment(false, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1500.0, null, "01 January 2023"), //
-                    installment(375.0, false, "01 January 2023"), //
-                    installment(1125.0, false, "31 January 2023") //
+                    installment(1500.0, null, "20230101"), //
+                    installment(375.0, false, "20230101"), //
+                    installment(1125.0, false, "20230131") //
             );
 
             // 1st Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // Manual down-payment
-            addRepaymentForLoan(loanId, 250.0, "01 January 2023");
+            addRepaymentForLoan(loanId, 250.0, "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Repayment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Repayment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -1724,26 +1724,26 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(750.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(750.0, false, "20230131") //
             );
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("15 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230115").dateFormat(DATETIME_PATTERN).locale("en"));
 
             // 2nd Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(400.0), "15 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(400.0), "20230115");
 
             // Manual down-payment
-            addRepaymentForLoan(loanId, 100.0, "15 January 2023");
+            addRepaymentForLoan(loanId, 100.0, "20230115");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Repayment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023"), //
-                    transaction(100.0, "Repayment", "15 January 2023"), //
-                    transaction(400.0, "Disbursement", "15 January 2023") //
+                    transaction(250.0, "Repayment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101"), //
+                    transaction(100.0, "Repayment", "20230115"), //
+                    transaction(400.0, "Disbursement", "20230115") //
             );
 
             // verify journal entries
@@ -1759,27 +1759,27 @@ public class UndoLoanDisbursalWithDownPaymentIntegrationTest extends BaseLoanInt
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(400.0, null, "15 January 2023"), //
-                    installment(100.0, true, "15 January 2023"), //
-                    installment(1050.0, false, "31 January 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(400.0, null, "20230115"), //
+                    installment(100.0, true, "20230115"), //
+                    installment(1050.0, false, "20230131") //
             );
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("20 January 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230120").dateFormat(DATETIME_PATTERN).locale("en"));
 
             // make an additional repayment after the 2nd disbursal
-            addRepaymentForLoan(loanId, 50.0, "20 January 2023");
+            addRepaymentForLoan(loanId, 50.0, "20230120");
 
             // undoDisbursal
             loanTransactionHelper.undoDisbursal(loanId.intValue());
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1500.0, null, "01 January 2023"), //
-                    installment(375.0, false, "01 January 2023"), //
-                    installment(1125.0, false, "31 January 2023") //
+                    installment(1500.0, null, "20230101"), //
+                    installment(375.0, false, "20230101"), //
+                    installment(1125.0, false, "20230131") //
             );
 
             verifyNoTransactions(loanId);

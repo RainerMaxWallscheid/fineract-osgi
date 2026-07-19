@@ -65,7 +65,7 @@ import org.junit.jupiter.api.Assertions;
 public class WorkingCapitalChargeStepDef extends AbstractStepDef {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalChargeStepDef.class);
-    private static final String DATE_FORMAT = "dd MMMM yyyy";
+    private static final String DATE_FORMAT = "yyyyMMdd";
     private static final String DATE_FORMAT_API = "dd-MM-yyyy";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
     private static final DateTimeFormatter FORMATTER_API = DateTimeFormatter.ofPattern(DATE_FORMAT_API, Locale.ENGLISH);

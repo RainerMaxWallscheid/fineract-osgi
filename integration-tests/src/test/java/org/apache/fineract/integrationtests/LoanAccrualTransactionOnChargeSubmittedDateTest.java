@@ -69,7 +69,7 @@ public class LoanAccrualTransactionOnChargeSubmittedDateTest extends BaseLoanInt
     private RequestSpecification requestSpec;
     private LoanTransactionHelper loanTransactionHelper;
     private ClientHelper clientHelper;
-    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
     private AccountHelper accountHelper;
     private InlineLoanCOBHelper inlineLoanCOBHelper;
 
@@ -154,7 +154,7 @@ public class LoanAccrualTransactionOnChargeSubmittedDateTest extends BaseLoanInt
 
             // make repayment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("4 March 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230304").locale("en")
                             .transactionAmount(100.0));
 
             // Add Charge
@@ -253,7 +253,7 @@ public class LoanAccrualTransactionOnChargeSubmittedDateTest extends BaseLoanInt
 
             // make repayment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("4 March 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230304").locale("en")
                             .transactionAmount(100.0));
 
             // Add Charge
@@ -353,7 +353,7 @@ public class LoanAccrualTransactionOnChargeSubmittedDateTest extends BaseLoanInt
 
             // make repayment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("4 March 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230304").locale("en")
                             .transactionAmount(100.0));
 
             // Add Charge
@@ -452,7 +452,7 @@ public class LoanAccrualTransactionOnChargeSubmittedDateTest extends BaseLoanInt
 
             // make repayment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("4 March 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230304").locale("en")
                             .transactionAmount(100.0));
 
             // Add Charge
@@ -585,7 +585,7 @@ public class LoanAccrualTransactionOnChargeSubmittedDateTest extends BaseLoanInt
             final Integer loanId = createLoanAccountMultipleRepaymentsDisbursement(clientId, getLoanProductsProductResponse.getId(),
                     loanExternalIdStr);
 
-            loanTransactionHelper.disburseLoanWithTransactionAmount("03 March 2023", loanId, "1000");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230303", loanId, "1000");
 
             // Add Charge Penalty
             Integer penalty = ChargesHelper.createCharges(requestSpec, responseSpec,
@@ -613,7 +613,7 @@ public class LoanAccrualTransactionOnChargeSubmittedDateTest extends BaseLoanInt
 
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, futureDate);
 
-            loanTransactionHelper.disburseLoanWithTransactionAmount("04 March 2023", loanId, "300");
+            loanTransactionHelper.disburseLoanWithTransactionAmount("20230304", loanId, "300");
 
             // verify accrual transaction exists with same date,amount and is not reversed by regeneration of repayment
             // schedule
@@ -678,14 +678,14 @@ public class LoanAccrualTransactionOnChargeSubmittedDateTest extends BaseLoanInt
 
             // adjust loan schedule
             final PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder()
-                    .updateRescheduleFromDate("18 June 2023").updateAdjustedDueDate("18 July 2023").updateSubmittedOnDate("19 May 2023")
+                    .updateRescheduleFromDate("20230618").updateAdjustedDueDate("20230718").updateSubmittedOnDate("20230519")
                     .updateGraceOnPrincipal(null).updateGraceOnInterest(null).updateExtraTerms(null).buildRequest(loanId.longValue());
             final PostCreateRescheduleLoansResponse loanRescheduleRequestResponse = LoanRescheduleRequestHelper
                     .createLoanRescheduleRequest(createRequest);
             final Long loanRescheduleRequestId = loanRescheduleRequestResponse.getResourceId();
             LoanRescheduleRequestHelper.approveLoanRescheduleRequest(loanRescheduleRequestId,
-                    new LoanRescheduleRequestTestBuilder().updateRescheduleFromDate("18 June 2023").updateAdjustedDueDate("18 July 2023")
-                            .updateSubmittedOnDate("19 May 2023").updateGraceOnPrincipal(null).updateGraceOnInterest(null)
+                    new LoanRescheduleRequestTestBuilder().updateRescheduleFromDate("20230618").updateAdjustedDueDate("20230718")
+                            .updateSubmittedOnDate("20230519").updateGraceOnPrincipal(null).updateGraceOnInterest(null)
                             .updateExtraTerms(null).getApproveRequest());
 
             // run cob
@@ -703,7 +703,7 @@ public class LoanAccrualTransactionOnChargeSubmittedDateTest extends BaseLoanInt
 
             // make repayment
             final PostLoansLoanIdTransactionsResponse repaymentTransaction_1 = loanTransactionHelper.makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate("18 July 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate("20230718").locale("en")
                             .transactionAmount(1010.0));
 
             // update business date
@@ -711,7 +711,7 @@ public class LoanAccrualTransactionOnChargeSubmittedDateTest extends BaseLoanInt
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, currentDate);
 
             // reverse repayment
-            loanTransactionHelper.reverseRepayment(loanId, repaymentTransaction_1.getResourceId().intValue(), "19 July 2023");
+            loanTransactionHelper.reverseRepayment(loanId, repaymentTransaction_1.getResourceId().intValue(), "20230719");
 
             // Add Charge Penalty
             Integer penalty = ChargesHelper.createCharges(requestSpec, responseSpec,
@@ -808,12 +808,12 @@ public class LoanAccrualTransactionOnChargeSubmittedDateTest extends BaseLoanInt
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("03 March 2023").withSubmittedOnDate("03 March 2023").withLoanType("individual")
+                .withExpectedDisbursementDate("20230303").withSubmittedOnDate("20230303").withLoanType("individual")
                 .withExternalId(externalId).build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("03 March 2023", "1000", loanId, null);
-        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("03 March 2023", loanId, "1000");
+        loanTransactionHelper.approveLoan("20230303", "1000", loanId, null);
+        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20230303", loanId, "1000");
         return loanId;
     }
 
@@ -847,12 +847,12 @@ public class LoanAccrualTransactionOnChargeSubmittedDateTest extends BaseLoanInt
         String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("30")
                 .withLoanTermFrequencyAsDays().withNumberOfRepayments("10").withRepaymentEveryAfter("3").withRepaymentFrequencyTypeAsDays()
                 .withInterestRatePerPeriod("0").withInterestTypeAsDecliningBalance().withAmortizationTypeAsEqualPrincipalPayments()
-                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("03 March 2023")
-                .withSubmittedOnDate("03 March 2023").withLoanType("individual").withExternalId(externalId)
+                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("20230303")
+                .withSubmittedOnDate("20230303").withLoanType("individual").withExternalId(externalId)
                 .build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("03 March 2023", "1000", loanId, null);
+        loanTransactionHelper.approveLoan("20230303", "1000", loanId, null);
         return loanId;
     }
 
@@ -861,13 +861,13 @@ public class LoanAccrualTransactionOnChargeSubmittedDateTest extends BaseLoanInt
         String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("30")
                 .withLoanTermFrequencyAsDays().withNumberOfRepayments("10").withRepaymentEveryAfter("3").withRepaymentFrequencyTypeAsDays()
                 .withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance().withAmortizationTypeAsEqualPrincipalPayments()
-                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("03 March 2023")
-                .withSubmittedOnDate("03 March 2023").withLoanType("individual").withExternalId(externalId)
+                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("20230303")
+                .withSubmittedOnDate("20230303").withLoanType("individual").withExternalId(externalId)
                 .build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("03 March 2023", "1000", loanId, null);
-        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("03 March 2023", loanId, "1000");
+        loanTransactionHelper.approveLoan("20230303", "1000", loanId, null);
+        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20230303", loanId, "1000");
         return loanId;
     }
 
@@ -876,13 +876,13 @@ public class LoanAccrualTransactionOnChargeSubmittedDateTest extends BaseLoanInt
         String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("30")
                 .withLoanTermFrequencyAsDays().withNumberOfRepayments("1").withRepaymentEveryAfter("30").withRepaymentFrequencyTypeAsDays()
                 .withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance().withAmortizationTypeAsEqualPrincipalPayments()
-                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("19 May 2023")
-                .withSubmittedOnDate("19 May 2023").withLoanType("individual").withExternalId(externalId)
+                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("20230519")
+                .withSubmittedOnDate("20230519").withLoanType("individual").withExternalId(externalId)
                 .build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("19 May 2023", "1000", loanId, null);
-        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("19 May 2023", loanId, "1000");
+        loanTransactionHelper.approveLoan("20230519", "1000", loanId, null);
+        loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20230519", loanId, "1000");
         return loanId;
     }
 

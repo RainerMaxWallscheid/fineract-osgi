@@ -105,8 +105,8 @@ public class CashierTransactionsHelper {
         HashMap<String, Object> map = new HashMap<>();
 
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
-        map.put("startDate", "20 September 2011");
+        map.put("dateFormat", "yyyyMMdd");
+        map.put("startDate", "20110920");
 
         return map;
     }
@@ -147,9 +147,9 @@ public class CashierTransactionsHelper {
         HashMap<String, Object> map = new HashMap<>();
 
         map.put("locale", "en");
-        map.put("dateFormat", "dd MMMM yyyy");
-        map.put("startDate", "01 January 2023");
-        map.put("endDate", "31 December 2023");
+        map.put("dateFormat", "yyyyMMdd");
+        map.put("startDate", "20230101");
+        map.put("endDate", "20231231");
         map.put("isFullDay", true);
 
         return map;

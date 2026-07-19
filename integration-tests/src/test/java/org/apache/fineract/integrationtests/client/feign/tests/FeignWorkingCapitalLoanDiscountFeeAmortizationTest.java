@@ -127,18 +127,18 @@ public class FeignWorkingCapitalLoanDiscountFeeAmortizationTest extends FeignInt
     @Order(1)
     void testDiscountFeeAmortizationCreatedAfterRepaymentAndCOB() {
         businessDateHelper.runAt("2026-01-01", () -> {
-            final Long testClientId = clientHelper.createClient("01 January 2026");
+            final Long testClientId = clientHelper.createClient("20260101");
             final Long productId = createAccrualWithDeferredRevenueAmortizationProductWithDiscount();
             final BigDecimal principal = BigDecimal.valueOf(9000);
             final BigDecimal discount = BigDecimal.valueOf(1000);
 
-            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "01 January 2026");
+            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "20260101");
             wcLoanHelper.approve(loanId,
-                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("01 January 2026", principal, "01 January 2026", discount));
-            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("01 January 2026", principal, discount));
+                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("20260101", principal, "20260101", discount));
+            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("20260101", principal, discount));
 
             // Make a repayment
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "01 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "20260101"));
 
             // Run WC COB — this triggers the discount fee amortization business step
             wcLoanHelper.executeInlineWCCOB(loanId);
@@ -172,15 +172,15 @@ public class FeignWorkingCapitalLoanDiscountFeeAmortizationTest extends FeignInt
     @Order(2)
     void testNoAmortizationWithoutRepayment() {
         businessDateHelper.runAt("2026-02-01", () -> {
-            final Long testClientId = clientHelper.createClient("01 February 2026");
+            final Long testClientId = clientHelper.createClient("20260201");
             final Long productId = createAccrualWithDeferredRevenueAmortizationProductWithDiscount();
             final BigDecimal principal = BigDecimal.valueOf(9000);
             final BigDecimal discount = BigDecimal.valueOf(1000);
 
-            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "01 February 2026");
+            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "20260201");
             wcLoanHelper.approve(loanId,
-                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("01 February 2026", principal, "01 February 2026", discount));
-            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("01 February 2026", principal, discount));
+                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("20260201", principal, "20260201", discount));
+            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("20260201", principal, discount));
 
             // Run COB without making any repayment
             wcLoanHelper.executeInlineWCCOB(loanId);
@@ -200,16 +200,16 @@ public class FeignWorkingCapitalLoanDiscountFeeAmortizationTest extends FeignInt
     @Order(3)
     void testNoAmortizationWithoutDiscountFee() {
         businessDateHelper.runAt("2026-03-01", () -> {
-            final Long testClientId = clientHelper.createClient("01 March 2026");
+            final Long testClientId = clientHelper.createClient("20260301");
             final Long productId = createAccrualWithDeferredRevenueAmortizationProductWithoutDiscount();
             final BigDecimal principal = BigDecimal.valueOf(9000);
 
-            final Long loanId = submitLoan(testClientId, productId, principal, "01 March 2026");
-            wcLoanHelper.approve(loanId, WorkingCapitalLoanRequestBuilders.approve("01 March 2026", principal, "01 March 2026"));
-            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburse("01 March 2026", principal));
+            final Long loanId = submitLoan(testClientId, productId, principal, "20260301");
+            wcLoanHelper.approve(loanId, WorkingCapitalLoanRequestBuilders.approve("20260301", principal, "20260301"));
+            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburse("20260301", principal));
 
             // Make a repayment
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "01 March 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "20260301"));
 
             // Run COB
             wcLoanHelper.executeInlineWCCOB(loanId);
@@ -229,18 +229,18 @@ public class FeignWorkingCapitalLoanDiscountFeeAmortizationTest extends FeignInt
     @Order(4)
     void testCOBIdempotencyNoNewPayment() {
         businessDateHelper.runAt("2026-04-01", () -> {
-            final Long testClientId = clientHelper.createClient("01 April 2026");
+            final Long testClientId = clientHelper.createClient("20260401");
             final Long productId = createAccrualWithDeferredRevenueAmortizationProductWithDiscount();
             final BigDecimal principal = BigDecimal.valueOf(9000);
             final BigDecimal discount = BigDecimal.valueOf(1000);
 
-            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "01 April 2026");
+            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "20260401");
             wcLoanHelper.approve(loanId,
-                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("01 April 2026", principal, "01 April 2026", discount));
-            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("01 April 2026", principal, discount));
+                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("20260401", principal, "20260401", discount));
+            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("20260401", principal, discount));
 
             // Make a repayment and run COB
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "01 April 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "20260401"));
             wcLoanHelper.executeInlineWCCOB(loanId);
 
             final List<GetWorkingCapitalLoanTransactionIdResponse> firstRunTxns = filterByType(wcLoanHelper.getTransactions(loanId),
@@ -267,18 +267,18 @@ public class FeignWorkingCapitalLoanDiscountFeeAmortizationTest extends FeignInt
     @Order(5)
     void testIncrementalAmortizationAcrossMultipleRepayments() {
         businessDateHelper.runAt("2026-05-01", () -> {
-            final Long testClientId = clientHelper.createClient("01 May 2026");
+            final Long testClientId = clientHelper.createClient("20260501");
             final Long productId = createAccrualWithDeferredRevenueAmortizationProductWithDiscount();
             final BigDecimal principal = BigDecimal.valueOf(9000);
             final BigDecimal discount = BigDecimal.valueOf(1000);
 
-            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "01 May 2026");
+            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "20260501");
             wcLoanHelper.approve(loanId,
-                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("01 May 2026", principal, "01 May 2026", discount));
-            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("01 May 2026", principal, discount));
+                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("20260501", principal, "20260501", discount));
+            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("20260501", principal, discount));
 
             // First repayment + COB → first partial amortization
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(50), "01 May 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(50), "20260501"));
             wcLoanHelper.executeInlineWCCOB(loanId);
 
             final List<GetWorkingCapitalLoanTransactionIdResponse> firstRun = filterByType(wcLoanHelper.getTransactions(loanId),
@@ -290,7 +290,7 @@ public class FeignWorkingCapitalLoanDiscountFeeAmortizationTest extends FeignInt
 
             // Second repayment + COB → second incremental amortization
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-05-02");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(50), "02 May 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(50), "20260502"));
             wcLoanHelper.executeInlineWCCOB(loanId);
 
             final List<GetWorkingCapitalLoanTransactionIdResponse> secondRun = filterByType(wcLoanHelper.getTransactions(loanId),
@@ -313,18 +313,18 @@ public class FeignWorkingCapitalLoanDiscountFeeAmortizationTest extends FeignInt
     @Order(6)
     void testAmortizationUsesCOBDateAsTransactionDate() {
         businessDateHelper.runAt("2026-06-14", () -> {
-            final Long testClientId = clientHelper.createClient("14 June 2026");
+            final Long testClientId = clientHelper.createClient("20260614");
             final Long productId = createAccrualWithDeferredRevenueAmortizationProductWithDiscount();
             final BigDecimal principal = BigDecimal.valueOf(9000);
             final BigDecimal discount = BigDecimal.valueOf(1000);
 
-            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "14 June 2026");
+            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "20260614");
             wcLoanHelper.approve(loanId,
-                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("14 June 2026", principal, "14 June 2026", discount));
-            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("14 June 2026", principal, discount));
+                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("20260614", principal, "20260614", discount));
+            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("20260614", principal, discount));
 
             // Repay on June 14
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "14 June 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "20260614"));
 
             // Advance business date to June 16 → COB_DATE becomes June 15
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-06-16");
@@ -423,18 +423,18 @@ public class FeignWorkingCapitalLoanDiscountFeeAmortizationTest extends FeignInt
     @Order(7)
     void testAmortizationCreatedInlineOnLoanClose() {
         businessDateHelper.runAt("2026-07-01", () -> {
-            final Long testClientId = clientHelper.createClient("01 July 2026");
+            final Long testClientId = clientHelper.createClient("20260701");
             final Long productId = createAccrualWithDeferredRevenueAmortizationProductWithDiscount();
             final BigDecimal principal = BigDecimal.valueOf(9000);
             final BigDecimal discount = BigDecimal.valueOf(1000);
 
-            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "01 July 2026");
+            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "20260701");
             wcLoanHelper.approve(loanId,
-                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("01 July 2026", principal, "01 July 2026", discount));
-            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("01 July 2026", principal, discount));
+                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("20260701", principal, "20260701", discount));
+            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("20260701", principal, discount));
 
             // Make a repayment that fully pays off the loan (principal + discount = 10000)
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(10000), "01 July 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(10000), "20260701"));
 
             // Do NOT run COB — amortization should be created inline during the repayment
             final GetWorkingCapitalLoansLoanIdResponse loan = wcLoanHelper.getLoanDetails(loanId);
@@ -462,18 +462,18 @@ public class FeignWorkingCapitalLoanDiscountFeeAmortizationTest extends FeignInt
     @Order(8)
     void testAmortizationCreatedInlineOnLoanOverpay() {
         businessDateHelper.runAt("2026-08-01", () -> {
-            final Long testClientId = clientHelper.createClient("01 August 2026");
+            final Long testClientId = clientHelper.createClient("20260801");
             final Long productId = createAccrualWithDeferredRevenueAmortizationProductWithDiscount();
             final BigDecimal principal = BigDecimal.valueOf(9000);
             final BigDecimal discount = BigDecimal.valueOf(1000);
 
-            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "01 August 2026");
+            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "20260801");
             wcLoanHelper.approve(loanId,
-                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("01 August 2026", principal, "01 August 2026", discount));
-            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("01 August 2026", principal, discount));
+                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("20260801", principal, "20260801", discount));
+            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("20260801", principal, discount));
 
             // Make an overpayment (more than principal + discount)
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(11000), "01 August 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(11000), "20260801"));
 
             // Do NOT run COB — amortization should be created inline
             final GetWorkingCapitalLoansLoanIdResponse loan = wcLoanHelper.getLoanDetails(loanId);
@@ -494,19 +494,19 @@ public class FeignWorkingCapitalLoanDiscountFeeAmortizationTest extends FeignInt
     @Order(9)
     void testBackdatedRepaymentKeepsAmortizationConsistent() {
         businessDateHelper.runAt("2026-09-01", () -> {
-            final Long testClientId = clientHelper.createClient("01 September 2026");
+            final Long testClientId = clientHelper.createClient("20260901");
             final Long productId = createAccrualWithDeferredRevenueAmortizationProductWithDiscount();
             final BigDecimal principal = BigDecimal.valueOf(9000);
             final BigDecimal discount = BigDecimal.valueOf(1000);
 
-            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "01 September 2026");
+            final Long loanId = submitLoanWithDiscount(testClientId, productId, principal, discount, "20260901");
             wcLoanHelper.approve(loanId,
-                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("01 September 2026", principal, "01 September 2026", discount));
-            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("01 September 2026", principal, discount));
+                    WorkingCapitalLoanRequestBuilders.approveWithDiscount("20260901", principal, "20260901", discount));
+            wcLoanHelper.disburse(loanId, WorkingCapitalLoanRequestBuilders.disburseWithDiscount("20260901", principal, discount));
 
             // Repayment on Sep 5, then COB → first partial amortization
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-09-05");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "05 September 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "20260905"));
             wcLoanHelper.executeInlineWCCOB(loanId);
 
             final List<GetWorkingCapitalLoanTransactionIdResponse> afterFirst = filterByType(wcLoanHelper.getTransactions(loanId),
@@ -517,7 +517,7 @@ public class FeignWorkingCapitalLoanDiscountFeeAmortizationTest extends FeignInt
 
             // Backdated repayment on Sep 2, then COB: net amortization must stay non-decreasing and bounded by the
             // discount.
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(2000), "02 September 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(2000), "20260902"));
             wcLoanHelper.executeInlineWCCOB(loanId);
 
             final BigDecimal netAfterBackdated = netAmortization(loanId);
@@ -529,7 +529,7 @@ public class FeignWorkingCapitalLoanDiscountFeeAmortizationTest extends FeignInt
 
             // Overpay (cumulative 11000 > principal + discount = 10000) → inline full recognition.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-09-10");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(6000), "10 September 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(6000), "20260910"));
 
             final GetWorkingCapitalLoansLoanIdResponse loan = wcLoanHelper.getLoanDetails(loanId);
             assertEquals("loanStatusType.overpaid", loan.getStatus().getCode(), "Loan should be overpaid after the final repayment");

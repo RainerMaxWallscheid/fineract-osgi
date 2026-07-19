@@ -128,9 +128,9 @@ final class ClientChargesApiResourceSwagger {
         public Integer amount;
         @Schema(example = "226")
         public Long chargeId;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "01 September 2015")
+        @Schema(example = "20150901")
         public String dueDate;
         @Schema(example = "en")
         public String locale;
@@ -158,9 +158,9 @@ final class ClientChargesApiResourceSwagger {
         public Integer amount;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "01 September 2015")
+        @Schema(example = "20150901")
         public String transactionDate;
         @Schema(example = "3e7791ce-aa10-11ec-b909-0242ac120002")
         public String externalId;

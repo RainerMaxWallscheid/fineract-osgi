@@ -59,7 +59,7 @@ public class LoanAccountDisbursementToSavingsWithAutoDownPaymentTest extends Bas
 
     @Test
     public void loanDisbursementToSavingsWithAutoDownPaymentAndStandingInstructionsTest() {
-        runAt("01 March 2023", () -> {
+        runAt("20230301", () -> {
             enableLoanBalanceChangedBusinessEvent();
             ExternalEventHelper.deleteAllExternalEvents(requestSpec, createResponseSpecification(Matchers.is(204)));
 
@@ -75,7 +75,7 @@ public class LoanAccountDisbursementToSavingsWithAutoDownPaymentTest extends Bas
             SavingsAccountHelper savingsAccountHelper = new SavingsAccountHelper(requestSpec, responseSpec);
 
             // Create approve and activate savings account
-            Integer savingsAccountId = createApproveActivateSavingsAccountDailyPosting(clientId.intValue(), "01 March 2023",
+            Integer savingsAccountId = createApproveActivateSavingsAccountDailyPosting(clientId.intValue(), "20230301",
                     savingsAccountHelper);
 
             // create Financial Activity Mapping for Liability Transfer
@@ -87,18 +87,18 @@ public class LoanAccountDisbursementToSavingsWithAutoDownPaymentTest extends Bas
 
             // disburse to savings
             PostLoansLoanIdResponse responseLoanDisburseToSavings = loanTransactionHelper.disburseToSavingsLoan(loanExternalIdStr,
-                    new PostLoansLoanIdRequest().actualDisbursementDate("01 March 2023").transactionAmount(new BigDecimal("1000"))
-                            .locale("en").dateFormat("dd MMMM yyyy"));
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230301").transactionAmount(new BigDecimal("1000"))
+                            .locale("en").dateFormat("yyyyMMdd"));
 
             assertEquals(loanExternalIdStr, responseLoanDisburseToSavings.getResourceExternalId());
 
             // verify repayment schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 March 2023"), //
-                    installment(250.0, true, "01 March 2023"), //
-                    installment(250.0, false, "16 March 2023"), //
-                    installment(250.0, false, "31 March 2023"), //
-                    installment(250.0, false, "15 April 2023")//
+                    installment(1000.0, null, "20230301"), //
+                    installment(250.0, true, "20230301"), //
+                    installment(250.0, false, "20230316"), //
+                    installment(250.0, false, "20230331"), //
+                    installment(250.0, false, "20230415")//
             );
 
             // verify Disbursement Transaction is account transfer
@@ -158,12 +158,12 @@ public class LoanAccountDisbursementToSavingsWithAutoDownPaymentTest extends Bas
         String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("1000").withLoanTermFrequency("45")
                 .withLoanTermFrequencyAsDays().withNumberOfRepayments("3").withRepaymentEveryAfter("15").withRepaymentFrequencyTypeAsDays()
                 .withInterestRatePerPeriod("0").withInterestTypeAsDecliningBalance().withAmortizationTypeAsEqualPrincipalPayments()
-                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("01 March 2023")
-                .withSubmittedOnDate("01 March 2023").withLoanType("individual").withExternalId(externalId)
+                .withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("20230301")
+                .withSubmittedOnDate("20230301").withLoanType("individual").withExternalId(externalId)
                 .withCreateStandingInstructionAtDisbursement().build(clientID.toString(), loanProductID.toString(), savingsId.toString());
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("01 March 2023", "1000", loanId, null);
+        loanTransactionHelper.approveLoan("20230301", "1000", loanId, null);
         return loanId.longValue();
     }
 

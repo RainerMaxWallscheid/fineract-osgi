@@ -23,7 +23,7 @@ import org.apache.fineract.client.models.PostLoansLoanIdChargesRequest;
 
 public final class LoanChargeRequestFactory {
 
-    public static final String DEFAULT_DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DEFAULT_DATE_FORMAT = "yyyyMMdd";
     public static final String DEFAULT_LOCALE = "en";
     public static final Long DEFAULT_CHARGE_ID = 1L;
     public static final double DEFAULT_CHARGE_AMOUNT = 1;

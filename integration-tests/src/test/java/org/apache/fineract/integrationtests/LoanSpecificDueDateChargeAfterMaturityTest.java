@@ -74,17 +74,17 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings({ "unchecked" })
 public class LoanSpecificDueDateChargeAfterMaturityTest extends BaseLoanIntegrationTest {
 
-    private static final String DATETIME_PATTERN = "dd MMMM yyyy";
+    private static final String DATETIME_PATTERN = "yyyyMMdd";
     private static final String ACCOUNT_TYPE_INDIVIDUAL = "INDIVIDUAL";
     private static final String MINIMUM_OPENING_BALANCE = "1000.0";
     private static final String DEPOSIT_AMOUNT = "7000";
     private static final Logger LOG = LoggerFactory.getLogger(LoanSpecificDueDateChargeAfterMaturityTest.class);
-    private static final String DATE_OF_JOINING = "01 January 2011";
+    private static final String DATE_OF_JOINING = "20110101";
     private static final Float LP_PRINCIPAL = 10000.0f;
     private static final String LP_REPAYMENTS = "1";
     private static final String LP_REPAYMENT_PERIOD = "1";
-    private static final String EXPECTED_DISBURSAL_DATE = "04 March 2011";
-    private static final String LOAN_APPLICATION_SUBMISSION_DATE = "03 March 2011";
+    private static final String EXPECTED_DISBURSAL_DATE = "20110304";
+    private static final String LOAN_APPLICATION_SUBMISSION_DATE = "20110303";
     private static final String LOAN_TERM_FREQUENCY = "1";
     private static final String INDIVIDUAL_LOAN = "individual";
     private static final BusinessDateHelper BUSINESS_DATE_HELPER = new BusinessDateHelper();
@@ -435,7 +435,7 @@ public class LoanSpecificDueDateChargeAfterMaturityTest extends BaseLoanIntegrat
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(true));
             BUSINESS_DATE_HELPER.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("01 September 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20230901").dateFormat(DATETIME_PATTERN).locale("en"));
 
             PostChargesResponse penaltyCharge = CHARGES_HELPER.createCharges(new ChargeRequest().penalty(true).amount(10.0)
                     .chargeCalculationType(ChargeCalculationType.FLAT.getValue())
@@ -444,14 +444,14 @@ public class LoanSpecificDueDateChargeAfterMaturityTest extends BaseLoanIntegrat
                     .chargeAppliesTo(1).locale("en").active(true));
 
             final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), commonLoanProductId, 1000L, 30, 30, 1,
-                    BigDecimal.ZERO, "01 September 2023", "01 September 2023");
+                    BigDecimal.ZERO, "20230901", "20230901");
 
             loanTransactionHelper.approveLoan(loanResponse.getLoanId(),
                     new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(1000)).dateFormat(DATETIME_PATTERN)
-                            .approvedOnDate("01 September 2023").locale("en"));
+                            .approvedOnDate("20230901").locale("en"));
 
             loanTransactionHelper.disburseLoan(loanResponse.getLoanId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("01 September 2023").dateFormat(DATETIME_PATTERN)
+                    new PostLoansLoanIdRequest().actualDisbursementDate("20230901").dateFormat(DATETIME_PATTERN)
                             .transactionAmount(BigDecimal.valueOf(1000)).locale("en"));
 
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
@@ -461,10 +461,10 @@ public class LoanSpecificDueDateChargeAfterMaturityTest extends BaseLoanIntegrat
             assertTrue(loanDetails.getStatus().getActive());
 
             BUSINESS_DATE_HELPER.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("01 October 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20231001").dateFormat(DATETIME_PATTERN).locale("en"));
 
             PostLoansLoanIdTransactionsResponse repaymentTransaction = loanTransactionHelper.makeLoanRepayment(loanResponse.getLoanId(),
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("01 October 2023").locale("en")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("20231001").locale("en")
                             .transactionAmount(1000.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
@@ -474,10 +474,10 @@ public class LoanSpecificDueDateChargeAfterMaturityTest extends BaseLoanIntegrat
             assertTrue(loanDetails.getStatus().getClosedObligationsMet());
 
             BUSINESS_DATE_HELPER.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("04 October 2023").dateFormat(DATETIME_PATTERN).locale("en"));
+                    .date("20231004").dateFormat(DATETIME_PATTERN).locale("en"));
 
             loanTransactionHelper.makeMerchantIssuedRefund(loanResponse.getLoanId(), new PostLoansLoanIdTransactionsRequest()
-                    .dateFormat(DATETIME_PATTERN).transactionDate("04 October 2023").locale("en").transactionAmount(1000.0));
+                    .dateFormat(DATETIME_PATTERN).transactionDate("20231004").locale("en").transactionAmount(1000.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 0.0, 1000.0, 0.0, 1000.0, 1000.0);
@@ -486,7 +486,7 @@ public class LoanSpecificDueDateChargeAfterMaturityTest extends BaseLoanIntegrat
             assertTrue(loanDetails.getStatus().getOverpaid());
 
             loanTransactionHelper.reverseLoanTransaction(loanResponse.getLoanId(), repaymentTransaction.getResourceId(),
-                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("04 October 2023")
+                    new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat(DATETIME_PATTERN).transactionDate("20231004")
                             .transactionAmount(0.0).locale("en"));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
@@ -497,7 +497,7 @@ public class LoanSpecificDueDateChargeAfterMaturityTest extends BaseLoanIntegrat
 
             PostLoansLoanIdChargesResponse penaltyLoanChargeResult = loanTransactionHelper.addChargesForLoan(loanResponse.getLoanId(),
                     new PostLoansLoanIdChargesRequest().chargeId(penaltyCharge.getResourceId()).dateFormat(DATETIME_PATTERN).locale("en")
-                            .amount(10.0).dueDate("04 October 2023"));
+                            .amount(10.0).dueDate("20231004"));
 
             loanDetails = loanTransactionHelper.getLoanDetails(loanResponse.getLoanId());
             validateLoanSummaryBalances(loanDetails, 10.0, 1000.0, 0.0, 1000.0, null);

@@ -632,7 +632,7 @@ public final class ClientDataValidator {
             return;
         }
         if (!DateFormatValidator.isValidPattern(dateFormat)) {
-            final String message = "Invalid dateFormat: `" + dateFormat + "`. Use a valid Java date/time pattern (e.g. dd MMMM yyyy).";
+            final String message = "Invalid dateFormat: `" + dateFormat + "`. Use a valid Java date/time pattern (e.g. yyyyMMdd).";
             dataValidationErrors.add(ApiParameterError.parameterError("validation.msg.invalid.dateFormat.format", message,
                     ClientApiConstants.dateFormatParamName));
         }

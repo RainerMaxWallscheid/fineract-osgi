@@ -96,12 +96,12 @@ public class ProvisioningIntegrationTest {
             final Integer loanID = applyForLoanApplication(clientID, loanProductID, null, null, "1,00,000.00", collaterals);
             HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(this.requestSpec, this.responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
-            loanStatusHashMap = this.loanTransactionHelper.approveLoan("20 September 2011", loanID);
+            loanStatusHashMap = this.loanTransactionHelper.approveLoan("20110920", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
             LOG.info("-------------------------------DISBURSE LOAN-------------------------------------------");
             String loanDetails = this.loanTransactionHelper.getLoanDetails(this.requestSpec, this.responseSpec, loanID);
-            loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20 September 2011", loanID,
+            loanStatusHashMap = this.loanTransactionHelper.disburseLoanWithNetDisbursalAmount("20110920", loanID,
                     JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
             Assertions.assertNotNull(loanID);
@@ -244,8 +244,8 @@ public class ProvisioningIntegrationTest {
                 .withAmortizationTypeAsEqualInstallments() //
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("20 September 2011") //
-                .withSubmittedOnDate("20 September 2011") //
+                .withExpectedDisbursementDate("20110920") //
+                .withSubmittedOnDate("20110920") //
                 .withCollaterals(collaterals).withCharges(charges).build(clientID.toString(), loanProductID.toString(), savingsId);
         return this.loanTransactionHelper.getLoanId(loanApplicationJSON);
     }

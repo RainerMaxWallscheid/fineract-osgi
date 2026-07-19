@@ -70,9 +70,9 @@ public final class LoanProductsApiResourceSwagger {
         public String shortName;
         @Schema(example = "non-interest bearing product")
         public String description;
-        @Schema(example = "10 July 2022")
+        @Schema(example = "20220710")
         public String startDate;
-        @Schema(example = "10 July 2022")
+        @Schema(example = "20220710")
         public String closeDate;
         @Schema(example = "3")
         public Long fundId;
@@ -323,7 +323,7 @@ public final class LoanProductsApiResourceSwagger {
         public List<LoanProductChargeData> charges;
         @Schema(example = "en_GB")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
 
         public AllowAttributeOverrides allowAttributeOverrides;
@@ -1571,9 +1571,9 @@ public final class LoanProductsApiResourceSwagger {
         public String shortName;
         @Schema(example = "non-interest bearing product")
         public String description;
-        @Schema(example = "10 July 2022")
+        @Schema(example = "20220710")
         public String startDate;
-        @Schema(example = "10 July 2022")
+        @Schema(example = "20220710")
         public String closeDate;
         @Schema(example = "3")
         public Long fundId;
@@ -1812,7 +1812,7 @@ public final class LoanProductsApiResourceSwagger {
         public List<LoanProductChargeData> charges;
         @Schema(example = "en_GB")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
 
         @Schema(example = "HORIZONTAL")

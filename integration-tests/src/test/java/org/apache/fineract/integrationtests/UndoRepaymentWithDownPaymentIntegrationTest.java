@@ -71,7 +71,7 @@ import org.junit.jupiter.api.Test;
 
 public class UndoRepaymentWithDownPaymentIntegrationTest extends BaseLoanIntegrationTest {
 
-    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
     private ClientHelper clientHelper;
@@ -170,12 +170,12 @@ public class UndoRepaymentWithDownPaymentIntegrationTest extends BaseLoanIntegra
         assertEquals(enableAutoRepaymentForDownPayment, loanDetails.getEnableAutoRepaymentForDownPayment());
 
         PostLoansLoanIdTransactionsResponse postLoansLoanIdTransactionsResponse = loanTransactionHelper
-                .makeLoanRepayment("05 September 2022", 500.0f, loanId);
+                .makeLoanRepayment("20220905", 500.0f, loanId);
         Long repaymentTransactionId = postLoansLoanIdTransactionsResponse.getResourceId();
 
         BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, LocalDate.of(2022, 9, 25));
         PostLoansLoanIdTransactionsResponse secondPostLoansLoanIdTransactionsResponse = loanTransactionHelper
-                .makeLoanRepayment("25 September 2022", 250.0f, loanId);
+                .makeLoanRepayment("20220925", 250.0f, loanId);
         Long secondRepaymentId = secondPostLoansLoanIdTransactionsResponse.getResourceId();
 
         BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, LocalDate.of(2022, 9, 28));
@@ -183,10 +183,10 @@ public class UndoRepaymentWithDownPaymentIntegrationTest extends BaseLoanIntegra
                 new PostLoansLoanIdTransactionsTransactionIdRequest().locale("en").transactionAmount(100.0).paymentTypeId(1L));
 
         BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, LocalDate.of(2022, 9, 30));
-        loanTransactionHelper.makeLoanRepayment("30 September 2022", 100.0f, loanId);
+        loanTransactionHelper.makeLoanRepayment("20220930", 100.0f, loanId);
 
         PostLoansLoanIdTransactionsResponse postLoansLoanIdTransactionsResponse1 = loanTransactionHelper.reverseLoanTransaction(loanId,
-                repaymentTransactionId, "05 September 2022", responseSpec);
+                repaymentTransactionId, "20220905", responseSpec);
 
         assertNotNull(postLoansLoanIdTransactionsResponse1);
 
@@ -311,7 +311,7 @@ public class UndoRepaymentWithDownPaymentIntegrationTest extends BaseLoanIntegra
                 .receivableInterestAccountId(interestFeeReceivable.getAccountID().longValue())//
                 .receivableFeeAccountId(interestFeeReceivable.getAccountID().longValue())//
                 .receivablePenaltyAccountId(interestFeeReceivable.getAccountID().longValue())//
-                .dateFormat("dd MMMM yyyy")//
+                .dateFormat("yyyyMMdd")//
                 .locale("en_GB")//
                 .disallowExpectedDisbursements(true)//
                 .allowApprovedDisbursedAmountsOverApplied(true)//
@@ -342,13 +342,13 @@ public class UndoRepaymentWithDownPaymentIntegrationTest extends BaseLoanIntegra
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments(numberOfRepayments).withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod(interestRate).withInterestTypeAsFlatBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("03 September 2022").withSubmittedOnDate("01 September 2022").withLoanType("individual")
+                .withExpectedDisbursementDate("20220903").withSubmittedOnDate("20220901").withLoanType("individual")
                 .withRepaymentStrategy(ADVANCED_PAYMENT_ALLOCATION_STRATEGY).withExternalId(externalId)
                 .build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
-        loanTransactionHelper.approveLoan("02 September 2022", "1000", loanId, null);
-        loanTransactionHelper.disburseLoanWithTransactionAmount("03 September 2022", loanId, "1000");
+        loanTransactionHelper.approveLoan("20220902", "1000", loanId, null);
+        loanTransactionHelper.disburseLoanWithTransactionAmount("20220903", loanId, "1000");
         return loanId;
     }
 

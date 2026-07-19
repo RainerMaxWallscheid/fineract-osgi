@@ -55,7 +55,7 @@ public class RepaymentWithPostDatedChecksTest {
 
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
-    private final SimpleDateFormat dateFormatterStandard = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+    private final SimpleDateFormat dateFormatterStandard = new SimpleDateFormat("yyyyMMdd", Locale.US);
     private LoanTransactionHelper loanTransactionHelper;
     private PaymentTypeHelper paymentTypeHelper;
 
@@ -106,7 +106,7 @@ public class RepaymentWithPostDatedChecksTest {
         List<HashMap> postDatedChecks = new ArrayList<>();
         Gson gson = new Gson();
 
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
 
         // Get the first installment date
@@ -165,8 +165,8 @@ public class RepaymentWithPostDatedChecksTest {
         addCollaterals(collaterals, clientCollateralId, BigDecimal.valueOf(1));
         final String loanApplication = new LoanApplicationTestBuilder().withPrincipal(proposedAmount).withLoanTermFrequency("5")
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("5").withRepaymentEveryAfter("1")
-                .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("2").withExpectedDisbursementDate("04 April 2012")
-                .withCollaterals(collaterals).withSubmittedOnDate("02 April 2012")
+                .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("2").withExpectedDisbursementDate("20120404")
+                .withCollaterals(collaterals).withSubmittedOnDate("20120402")
                 .build(clientID.toString(), loanProductID.toString(), null);
         return this.loanTransactionHelper.getLoanId(loanApplication);
     }

@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
 public class LoanDelinquencyForNonActiveAccountsTest extends FeignLoanTestBase {
     @Test
     public void testDelinquencyCalculationsForRejectedLoanAccount() {
-        runAt("06 May 2024", () -> {
+        runAt("20240506", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             Long delinquencyBucketId = DelinquencyBucketsHelper.createBucket(List.of(//
             Pair.of(1, 10),  //
@@ -48,19 +48,19 @@ public class LoanDelinquencyForNonActiveAccountsTest extends FeignLoanTestBase {
             loanProductsRequest.setEnableInstallmentLevelDelinquency(true);
             loanProductsRequest.setDelinquencyBucketId(delinquencyBucketId.longValue());
             Long loanProductId = createLoanProduct(loanProductsRequest);
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "06 May 2024", 1000.0, 4);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20240506", 1000.0, 4);
             verifyDelinquency(loanId, 0, "0.0", null, null);
-            updateBusinessDate("17 June 2024");
+            updateBusinessDate("20240617");
             undoLoanApproval(loanId);
             verifyDelinquency(loanId, 0, "0.0", null, null);
-            rejectLoan(loanId, "17 June 2024");
+            rejectLoan(loanId, "20240617");
             verifyDelinquency(loanId, 0, "0.0", null, null);
         });
     }
 
     @Test
     public void testDelinquencyCalculationsForRejectedLoanAccountCOBTest() {
-        runAt("06 May 2024", () -> {
+        runAt("20240506", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             Long delinquencyBucketId = DelinquencyBucketsHelper.createBucket(List.of(//
             Pair.of(1, 10),  //
@@ -72,14 +72,14 @@ public class LoanDelinquencyForNonActiveAccountsTest extends FeignLoanTestBase {
             loanProductsRequest.setEnableInstallmentLevelDelinquency(true);
             loanProductsRequest.setDelinquencyBucketId(delinquencyBucketId.longValue());
             Long loanProductId = createLoanProduct(loanProductsRequest);
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "06 May 2024", 1000.0, 4);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20240506", 1000.0, 4);
             verifyDelinquency(loanId, 0, "0.0", null, null);
-            updateBusinessDate("17 June 2024");
+            updateBusinessDate("20240617");
             undoLoanApproval(loanId);
             verifyDelinquency(loanId, 0, "0.0", null, null);
-            rejectLoan(loanId, "17 June 2024");
+            rejectLoan(loanId, "20240617");
             verifyDelinquency(loanId, 0, "0.0", null, null);
-            updateBusinessDate("18 June 2024");
+            updateBusinessDate("20240618");
             schedulerHelper.executeAndAwaitJob("Loan COB");
             verifyDelinquency(loanId, 0, "0.0", null, null);
         });
@@ -87,7 +87,7 @@ public class LoanDelinquencyForNonActiveAccountsTest extends FeignLoanTestBase {
 
     @Test
     public void testDelinquencyCalculationsForClosedLoanAccount() {
-        runAt("06 May 2024", () -> {
+        runAt("20240506", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             Long delinquencyBucketId = DelinquencyBucketsHelper.createBucket(List.of(//
             Pair.of(1, 10),  //
@@ -99,20 +99,20 @@ public class LoanDelinquencyForNonActiveAccountsTest extends FeignLoanTestBase {
             loanProductsRequest.setEnableInstallmentLevelDelinquency(true);
             loanProductsRequest.setDelinquencyBucketId(delinquencyBucketId.longValue());
             Long loanProductId = createLoanProduct(loanProductsRequest);
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "06 May 2024", 1000.0, 4);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20240506", 1000.0, 4);
             verifyDelinquency(loanId, 0, "0.0", null, null);
-            updateBusinessDate("17 June 2024");
-            disburseLoan(loanId, BigDecimal.valueOf(1000), "06 May 2024");
+            updateBusinessDate("20240617");
+            disburseLoan(loanId, BigDecimal.valueOf(1000), "20240506");
             verifyDelinquency(loanId, 12, "250.0", null, null,  //
             delinquency(11, 30, "250.0"));
-            addRepaymentForLoan(loanId, 1000.0, "17 June 2024");
-            verifyDelinquency(loanId, 0, "0.0", "17 June 2024", "1000.0");
+            addRepaymentForLoan(loanId, 1000.0, "20240617");
+            verifyDelinquency(loanId, 0, "0.0", "20240617", "1000.0");
         });
     }
 
     @Test
     public void testDelinquencyCalculationsForOverPaidLoanAccount() {
-        runAt("06 May 2024", () -> {
+        runAt("20240506", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             Long delinquencyBucketId = DelinquencyBucketsHelper.createBucket(List.of(//
             Pair.of(1, 10),  //
@@ -124,14 +124,14 @@ public class LoanDelinquencyForNonActiveAccountsTest extends FeignLoanTestBase {
             loanProductsRequest.setEnableInstallmentLevelDelinquency(true);
             loanProductsRequest.setDelinquencyBucketId(delinquencyBucketId.longValue());
             Long loanProductId = createLoanProduct(loanProductsRequest);
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "06 May 2024", 1000.0, 4);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20240506", 1000.0, 4);
             verifyDelinquency(loanId, 0, "0.0", null, null);
-            updateBusinessDate("17 June 2024");
-            disburseLoan(loanId, BigDecimal.valueOf(1000), "06 May 2024");
+            updateBusinessDate("20240617");
+            disburseLoan(loanId, BigDecimal.valueOf(1000), "20240506");
             verifyDelinquency(loanId, 12, "250.0", null, null,  //
             delinquency(11, 30, "250.0"));
-            addRepaymentForLoan(loanId, 1200.0, "17 June 2024");
-            verifyDelinquency(loanId, 0, "0.0", "17 June 2024", "1200.0");
+            addRepaymentForLoan(loanId, 1200.0, "20240617");
+            verifyDelinquency(loanId, 0, "0.0", "20240617", "1200.0");
         });
     }
 

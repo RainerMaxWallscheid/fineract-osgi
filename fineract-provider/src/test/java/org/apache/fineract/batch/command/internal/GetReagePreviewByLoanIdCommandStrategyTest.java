@@ -58,7 +58,7 @@ public class GetReagePreviewByLoanIdCommandStrategyTest {
      * @return Arguments.
      */
     private static Stream<Arguments> provideQueryParameters() {
-        return Stream.of(Arguments.of(1L, 1, "MONTHS", "2024-01-15", 12, "dd MMMM yyyy", "en"),
+        return Stream.of(Arguments.of(1L, 1, "MONTHS", "2024-01-15", 12, "yyyyMMdd", "en"),
                 Arguments.of(2L, 2, "WEEKS", "2024-02-01", 24, "yyyy-MM-dd", "en_US"),
                 Arguments.of(3L, 3, "DAYS", "2024-03-10", 6, "dd/MM/yyyy", "en_GB"));
     }
@@ -214,7 +214,7 @@ public class GetReagePreviewByLoanIdCommandStrategyTest {
         queryParams.add("freqType=MONTHS"); // should be frequencyType
         queryParams.add("start=2024-01-15"); // should be startDate
         queryParams.add("installments=12"); // should be numberOfInstallments
-        queryParams.add("format=dd MMMM yyyy"); // should be dateFormat
+        queryParams.add("format=yyyyMMdd"); // should be dateFormat
         queryParams.add("lang=en"); // should be locale
 
         relativeUrl = relativeUrl + "?" + String.join("&", queryParams);

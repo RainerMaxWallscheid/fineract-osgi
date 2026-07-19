@@ -48,7 +48,7 @@ public class LoanTransactionReverseReplayTest extends FeignLoanTestBase {
         try {
             updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(true));
-            updateBusinessDate("04 October 2022");
+            updateBusinessDate("20221004");
 
             String loanExternalIdStr = UUID.randomUUID().toString();
 
@@ -58,23 +58,23 @@ public class LoanTransactionReverseReplayTest extends FeignLoanTestBase {
             final Long loanId = createLoanAccount(clientId, loanProductId, loanExternalIdStr);
 
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("03 October 2022")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20221003")
                             .locale(LoanTestData.LOCALE).transactionAmount(1000.0));
 
             makeMerchantIssuedRefund(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN)
-                    .transactionDate("04 October 2022").locale(LoanTestData.LOCALE).transactionAmount(500.0));
+                    .transactionDate("20221004").locale(LoanTestData.LOCALE).transactionAmount(500.0));
 
             executeInlineCOB(loanId);
 
-            updateBusinessDate("05 October 2022");
+            updateBusinessDate("20221005");
 
             makeCreditBalanceRefund(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN)
-                    .transactionDate("05 October 2022").locale(LoanTestData.LOCALE).transactionAmount(500.0));
+                    .transactionDate("20221005").locale(LoanTestData.LOCALE).transactionAmount(500.0));
 
-            updateBusinessDate("06 October 2022");
+            updateBusinessDate("20221006");
 
             reverseLoanTransaction(loanExternalIdStr, repaymentTransaction.getResourceId(),
-                    new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate("06 October 2022").locale(LoanTestData.LOCALE)
+                    new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate("20221006").locale(LoanTestData.LOCALE)
                             .dateFormat(LoanTestData.DATETIME_PATTERN).transactionAmount(0.0));
 
             LocalDate targetDate = LocalDate.of(2022, 10, 6);
@@ -92,7 +92,7 @@ public class LoanTransactionReverseReplayTest extends FeignLoanTestBase {
         try {
             updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(true));
-            updateBusinessDate("04 October 2022");
+            updateBusinessDate("20221004");
 
             String loanExternalIdStr = UUID.randomUUID().toString();
 
@@ -103,7 +103,7 @@ public class LoanTransactionReverseReplayTest extends FeignLoanTestBase {
 
             String loanTransactionExternalIdStr = UUID.randomUUID().toString();
             makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("03 October 2022")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20221003")
                             .locale(LoanTestData.LOCALE).transactionAmount(1000.0).externalId(loanTransactionExternalIdStr));
 
             LocalDate targetDate = LocalDate.of(2022, 10, 10);
@@ -116,17 +116,17 @@ public class LoanTransactionReverseReplayTest extends FeignLoanTestBase {
             assertEquals(LocalDate.of(2022, 10, 10),
                     loansLoanIdResponse.getRepaymentSchedule().getPeriods().get(lastPeriodIndex).getDueDate());
 
-            updateBusinessDate("06 October 2022");
+            updateBusinessDate("20221006");
 
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("06 October 2022")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20221006")
                             .locale(LoanTestData.LOCALE).transactionAmount(500.0));
 
             makeCreditBalanceRefund(loanExternalIdStr, new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN)
-                    .transactionDate("06 October 2022").locale(LoanTestData.LOCALE).transactionAmount(490.0));
+                    .transactionDate("20221006").locale(LoanTestData.LOCALE).transactionAmount(490.0));
 
             reverseLoanTransaction(loanExternalIdStr, repaymentTransaction.getResourceId(),
-                    new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate("06 October 2022").locale(LoanTestData.LOCALE)
+                    new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate("20221006").locale(LoanTestData.LOCALE)
                             .dateFormat(LoanTestData.DATETIME_PATTERN).transactionAmount(0.0));
 
             loansLoanIdResponse = getLoanDetails(loanExternalIdStr);
@@ -134,7 +134,7 @@ public class LoanTransactionReverseReplayTest extends FeignLoanTestBase {
             assertEquals(LocalDate.of(2022, 10, 10),
                     loansLoanIdResponse.getRepaymentSchedule().getPeriods().get(lastPeriodIndex).getDueDate());
 
-            updateBusinessDate("11 October 2022");
+            updateBusinessDate("20221011");
             chargebackLoanTransaction(loanExternalIdStr, loanTransactionExternalIdStr, new PostLoansLoanIdTransactionsTransactionIdRequest()
                     .locale(LoanTestData.LOCALE).transactionAmount(100.0).paymentTypeId(1L));
 
@@ -153,7 +153,7 @@ public class LoanTransactionReverseReplayTest extends FeignLoanTestBase {
         try {
             updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(true));
-            updateBusinessDate("04 October 2022");
+            updateBusinessDate("20221004");
 
             final Account assetAccount = accountHelper.createAssetAccount("asset");
             final Account assetFeeAndPenaltyAccount = accountHelper.createAssetAccount("feePenaltyAsset");
@@ -173,20 +173,20 @@ public class LoanTransactionReverseReplayTest extends FeignLoanTestBase {
                     Utils.randomStringGenerator("en", 5) + Utils.randomNumberGenerator(6) + Utils.randomStringGenerator("is", 5), 1);
             String transactionExternalId = UUID.randomUUID().toString();
             PostLoansLoanIdTransactionsResponse chargeOffResponse = chargeOffLoan(loanId,
-                    new PostLoansLoanIdTransactionsRequest().transactionDate("03 October 2022").locale(LoanTestData.LOCALE)
+                    new PostLoansLoanIdTransactionsRequest().transactionDate("20221003").locale(LoanTestData.LOCALE)
                             .dateFormat(LoanTestData.DATETIME_PATTERN).externalId(transactionExternalId)
                             .chargeOffReasonId(chargeOffReasonId));
 
             final PostLoansLoanIdTransactionsResponse repaymentTransaction = makeLoanRepayment(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("03 October 2022")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20221003")
                             .locale(LoanTestData.LOCALE).transactionAmount(1500.0));
 
             executeInlineCOB(loanId);
 
-            updateBusinessDate("05 October 2022");
+            updateBusinessDate("20221005");
 
             PostLoansLoanIdTransactionsResponse cbrTransactionResponse = makeCreditBalanceRefund(loanExternalIdStr,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("05 October 2022")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(LoanTestData.DATETIME_PATTERN).transactionDate("20221005")
                             .locale(LoanTestData.LOCALE).transactionAmount(500.0));
 
             GetLoansLoanIdResponse loansLoanIdResponse = getLoanDetails(loanExternalIdStr);
@@ -205,10 +205,10 @@ public class LoanTransactionReverseReplayTest extends FeignLoanTestBase {
             assertEquals(1, cbrExpenseJournalEntries.size());
             assertEquals(1, cbrAssetJournalEntries.size());
 
-            updateBusinessDate("06 October 2022");
+            updateBusinessDate("20221006");
 
             reverseLoanTransaction(loanExternalIdStr, repaymentTransaction.getResourceId(),
-                    new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate("06 October 2022").locale(LoanTestData.LOCALE)
+                    new PostLoansLoanIdTransactionsTransactionIdRequest().transactionDate("20221006").locale(LoanTestData.LOCALE)
                             .dateFormat(LoanTestData.DATETIME_PATTERN).transactionAmount(0.0));
 
             journalEntriesForCBR = getJournalEntries("L" + cbrTransactionResponse.getResourceId().toString());
@@ -293,13 +293,13 @@ public class LoanTransactionReverseReplayTest extends FeignLoanTestBase {
     }
 
     private Long createLoanAccount(final Long clientId, final Long loanProductId, final String externalId) {
-        Long loanId = applyForLoan(applyLoanRequest(clientId, loanProductId, "01 September 2022", 1000.0, 1,
-                r -> r.externalId(externalId).expectedDisbursementDate("03 September 2022").repaymentEvery(1)
+        Long loanId = applyForLoan(applyLoanRequest(clientId, loanProductId, "20220901", 1000.0, 1,
+                r -> r.externalId(externalId).expectedDisbursementDate("20220903").repaymentEvery(1)
                         .repaymentFrequencyType(LoanTestData.RepaymentFrequencyType.MONTHS).loanTermFrequency(1)
                         .loanTermFrequencyType(LoanTestData.RepaymentFrequencyType.MONTHS)
                         .amortizationType(LoanTestData.AmortizationType.EQUAL_PRINCIPAL).interestType(LoanTestData.InterestType.FLAT)));
-        approveLoan(loanId, approveLoanRequest(1000.0, "02 September 2022", "03 September 2022"));
-        disburseLoan(loanId, "03 September 2022", 1000.0);
+        approveLoan(loanId, approveLoanRequest(1000.0, "20220902", "20220903"));
+        disburseLoan(loanId, "20220903", 1000.0);
         return loanId;
     }
 

@@ -26,7 +26,7 @@
   "daysInYearType": 1,
   "daysInMonthType": 1,
 
-  "dateFormat": "dd MMMM yyyy",
+  "dateFormat": "yyyyMMdd",
   "locale": "en",
 
   "transactionProcessingStrategyCode": "mifos-standard-strategy",

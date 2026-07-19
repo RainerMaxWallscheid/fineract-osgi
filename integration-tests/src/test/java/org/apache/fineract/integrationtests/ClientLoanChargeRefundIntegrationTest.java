@@ -380,7 +380,7 @@ public class ClientLoanChargeRefundIntegrationTest {
         final Integer loanChargeId = disburseAddChargeAndRepay(repaymentAmount, ACTIVE, ACCRUAL_PERIODIC, false);
         final Integer repayment1Id = createdRepaymentTypeResourceId;
 
-        final String repayment2Date = "20 January 2022";
+        final String repayment2Date = "20220120";
         final Float repayment2Amount = oneInstallment; // installment 3
         makeRepaymentType(MAKE_REPAYMENT_COMMAND, repayment2Date, repayment2Amount);
         Integer repayment2Id = createdRepaymentTypeResourceId;
@@ -414,7 +414,7 @@ public class ClientLoanChargeRefundIntegrationTest {
         final Integer chargeRefundTxnId = (Integer) this.loanTransactionHelper.loanChargeRefund(loanChargeId, installmentNumber,
                 oneThirdChargeRefundAmount, externalId, this.disbursedLoanID, "resourceId");
 
-        final String repayment2Date = "20 January 2022";
+        final String repayment2Date = "20220120";
         final Float repayment2Amount = oneInstallment; // installment 3
         ArrayList<HashMap> errors = (ArrayList<HashMap>) this.loanTransactionHelperValidationError.makeRepaymentTypePayment(
                 MAKE_REPAYMENT_COMMAND, repayment2Date, repayment2Amount, this.disbursedLoanID, CommonConstants.RESPONSE_ERROR);
@@ -480,7 +480,7 @@ public class ClientLoanChargeRefundIntegrationTest {
     private static String getLoanChargeAsJSON(final String chargeId, final String dueDate, final String amount, final String externalId) {
         final HashMap<String, String> map = new HashMap<>();
         map.put("locale", "en_GB");
-        map.put("dateFormat", "dd MMMM yyyy");
+        map.put("dateFormat", "yyyyMMdd");
         map.put("amount", amount);
         map.put("dueDate", dueDate);
         map.put("chargeId", chargeId);
@@ -534,7 +534,7 @@ public class ClientLoanChargeRefundIntegrationTest {
 
     private Integer disburseAddChargeAndRepay(final Float repaymentAmount, final String expectedPostRepaymentStatus,
             final String accountingType, final boolean penalty) {
-        final String loanDate = "01 January 2022";
+        final String loanDate = "20220101";
         final String loanAmount = "12,000.00";
         disburseLoanOfAccountingRule(accountingType, loanAmount, loanDate, penalty);
 
@@ -543,12 +543,12 @@ public class ClientLoanChargeRefundIntegrationTest {
 
         final String externalId = null;
         final float amount = 1.0f;
-        final String chargeDueDate = "15 February 2022"; // will be added to the 2nd installment (March)
+        final String chargeDueDate = "20220215"; // will be added to the 2nd installment (March)
         final Integer loanChargeId = this.loanTransactionHelper.addChargesForLoan(this.disbursedLoanID,
                 getLoanChargeAsJSON(String.valueOf(charge), chargeDueDate, String.valueOf(amount), externalId));
         Assertions.assertNotNull(loanChargeId);
 
-        final String repaymentDate = "10 January 2022";
+        final String repaymentDate = "20220110";
         HashMap loanStatusHashMap = makeRepaymentType(MAKE_REPAYMENT_COMMAND, repaymentDate, repaymentAmount);
         assertTrue((Boolean) loanStatusHashMap.get(expectedPostRepaymentStatus));
         return loanChargeId;
@@ -596,7 +596,7 @@ public class ClientLoanChargeRefundIntegrationTest {
     }
 
     private String getTodaysDate() {
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());
         return dateFormat.format(todaysDate.getTime());

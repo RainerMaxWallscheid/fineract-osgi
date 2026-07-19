@@ -90,7 +90,7 @@ public class CreateWorkingCapitalTransactionByLoanExternalIdCommandStrategyTest 
         br.setRelativeUrl("v1/working-capital-loans/external-id/" + loanExternalId + "/transactions?command=" + command);
         br.setMethod(HttpMethod.POST);
         br.setReference(Long.valueOf(RandomStringUtils.randomNumeric(5)));
-        br.setBody("{\"transactionDate\":\"01 January 2026\",\"transactionAmount\":500,\"locale\":\"en\",\"dateFormat\":\"dd MMMM yyyy\"}");
+        br.setBody("{\"transactionDate\":\"20260101\",\"transactionAmount\":500,\"locale\":\"en\",\"dateFormat\":\"yyyyMMdd\"}");
         return br;
     }
 

@@ -43,7 +43,7 @@ public class LoanRescheduleTestWithDownpayment extends BaseLoanIntegrationTest {
 
     @Test
     public void testRescheduleWithDownPayment() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -51,23 +51,23 @@ public class LoanRescheduleTestWithDownpayment extends BaseLoanIntegrationTest {
             Long loanProductId = createLoanProductWith25PctDownPayment(true, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 1500.0, 2);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 1500.0, 2);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1500.0, null, "01 January 2023"), //
-                    installment(375.0, false, "01 January 2023"), //
-                    installment(562.0, false, "31 January 2023"), //
-                    installment(563.0, false, "02 March 2023") //
+                    installment(1500.0, null, "20230101"), //
+                    installment(375.0, false, "20230101"), //
+                    installment(562.0, false, "20230131"), //
+                    installment(563.0, false, "20230302") //
             );
 
             // 1st Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(250.0, "Down Payment", "01 January 2023"), //
-                    transaction(1000.0, "Disbursement", "01 January 2023") //
+                    transaction(250.0, "Down Payment", "20230101"), //
+                    transaction(1000.0, "Disbursement", "20230101") //
             );
 
             // verify journal entries
@@ -79,35 +79,35 @@ public class LoanRescheduleTestWithDownpayment extends BaseLoanIntegrationTest {
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(375.0, false, "31 January 2023"), //
-                    installment(375.0, false, "02 March 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(375.0, false, "20230131"), //
+                    installment(375.0, false, "20230302") //
             );
 
             PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder().updateGraceOnInterest(null)
                     .updateGraceOnPrincipal(null).updateExtraTerms(null).updateNewInterestRate(null)
-                    .updateRescheduleFromDate("31 January 2023").updateAdjustedDueDate("15 February 2023")
-                    .updateSubmittedOnDate("01 January 2023").updateRescheduleReasonId("1").buildRequest(loanId);
+                    .updateRescheduleFromDate("20230131").updateAdjustedDueDate("20230215")
+                    .updateSubmittedOnDate("20230101").updateRescheduleReasonId("1").buildRequest(loanId);
             PostCreateRescheduleLoansResponse loanRescheduleRequest = LoanRescheduleRequestHelper
                     .createLoanRescheduleRequest(createRequest);
             PostUpdateRescheduleLoansRequest approveRequest = new LoanRescheduleRequestTestBuilder()
-                    .updateSubmittedOnDate("01 January 2023").getApproveRequest();
+                    .updateSubmittedOnDate("20230101").getApproveRequest();
             PostUpdateRescheduleLoansResponse approveLoanRescheduleRequest = LoanRescheduleRequestHelper
                     .approveLoanRescheduleRequest(loanRescheduleRequest.getResourceId(), approveRequest);
 
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "01 January 2023"), //
-                    installment(250.0, true, "01 January 2023"), //
-                    installment(375.0, false, "15 February 2023"), //
-                    installment(375.0, false, "17 March 2023") //
+                    installment(1000.0, null, "20230101"), //
+                    installment(250.0, true, "20230101"), //
+                    installment(375.0, false, "20230215"), //
+                    installment(375.0, false, "20230317") //
             );
         });
     }
 
     @Test
     public void testRescheduleAddExtraInstallmentsWithDownPayment() {
-        runAt("01 November 2023", () -> {
+        runAt("20231101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -115,62 +115,62 @@ public class LoanRescheduleTestWithDownpayment extends BaseLoanIntegrationTest {
             Long loanProductId = createLoanProductWith33PctDownPayment(true, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "02 October 2023", 1000.0, 3);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20231002", 1000.0, 3);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "02 October 2023"), //
-                    installment(330.0, false, "02 October 2023"), //
-                    installment(223.33, false, "01 November 2023"), //
-                    installment(223.33, false, "01 December 2023"), //
-                    installment(223.34, false, "31 December 2023") //
+                    installment(1000.0, null, "20231002"), //
+                    installment(330.0, false, "20231002"), //
+                    installment(223.33, false, "20231101"), //
+                    installment(223.33, false, "20231201"), //
+                    installment(223.34, false, "20231231") //
             );
 
             // 1st Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "02 October 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20231002");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(330.0, "Down Payment", "02 October 2023"), //
-                    transaction(1000.0, "Disbursement", "02 October 2023") //
+                    transaction(330.0, "Down Payment", "20231002"), //
+                    transaction(1000.0, "Disbursement", "20231002") //
             );
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "02 October 2023"), //
-                    installment(330.0, true, "02 October 2023"), //
-                    installment(223.33, false, "01 November 2023"), //
-                    installment(223.33, false, "01 December 2023"), //
-                    installment(223.34, false, "31 December 2023") //
+                    installment(1000.0, null, "20231002"), //
+                    installment(330.0, true, "20231002"), //
+                    installment(223.33, false, "20231101"), //
+                    installment(223.33, false, "20231201"), //
+                    installment(223.34, false, "20231231") //
             );
 
             PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder().updateGraceOnInterest(null)
                     .updateGraceOnPrincipal(null).updateExtraTerms("2").updateNewInterestRate(null)
-                    .updateRescheduleFromDate("01 November 2023").updateAdjustedDueDate(null).updateSubmittedOnDate("01 November 2023")
+                    .updateRescheduleFromDate("20231101").updateAdjustedDueDate(null).updateSubmittedOnDate("20231101")
                     .updateRescheduleReasonId("1").buildRequest(loanId);
             PostCreateRescheduleLoansResponse loanRescheduleRequest = LoanRescheduleRequestHelper
                     .createLoanRescheduleRequest(createRequest);
             PostUpdateRescheduleLoansRequest approveRequest = new LoanRescheduleRequestTestBuilder()
-                    .updateSubmittedOnDate("01 November 2023").getApproveRequest();
+                    .updateSubmittedOnDate("20231101").getApproveRequest();
             PostUpdateRescheduleLoansResponse approveLoanRescheduleRequest = LoanRescheduleRequestHelper
                     .approveLoanRescheduleRequest(loanRescheduleRequest.getResourceId(), approveRequest);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "02 October 2023"), //
-                    installment(330.0, true, "02 October 2023"), //
-                    installment(134.0, false, "01 November 2023"), //
-                    installment(134.0, false, "01 December 2023"), //
-                    installment(134.0, false, "31 December 2023"), //
-                    installment(134.0, false, "30 January 2024"), //
-                    installment(134.0, false, "29 February 2024") //
+                    installment(1000.0, null, "20231002"), //
+                    installment(330.0, true, "20231002"), //
+                    installment(134.0, false, "20231101"), //
+                    installment(134.0, false, "20231201"), //
+                    installment(134.0, false, "20231231"), //
+                    installment(134.0, false, "20240130"), //
+                    installment(134.0, false, "20240229") //
             );
         });
     }
 
     @Test
     public void testRescheduleAddExtraInstallmentsMultipleDisbursementWithDownPayment() {
-        runAt("31 December 2023", () -> {
+        runAt("20231231", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -178,86 +178,86 @@ public class LoanRescheduleTestWithDownpayment extends BaseLoanIntegrationTest {
             Long loanProductId = createLoanProductWith33PctDownPayment(true, true);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "02 October 2023", 1000.0, 3);
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20231002", 1000.0, 3);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "02 October 2023"), //
-                    installment(330.0, false, "02 October 2023"), //
-                    installment(223.33, false, "01 November 2023"), //
-                    installment(223.33, false, "01 December 2023"), //
-                    installment(223.34, false, "31 December 2023") //
+                    installment(1000.0, null, "20231002"), //
+                    installment(330.0, false, "20231002"), //
+                    installment(223.33, false, "20231101"), //
+                    installment(223.33, false, "20231201"), //
+                    installment(223.34, false, "20231231") //
             );
 
             // 1st Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "02 October 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.00), "20231002");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(330.0, "Down Payment", "02 October 2023"), //
-                    transaction(1000.0, "Disbursement", "02 October 2023") //
+                    transaction(330.0, "Down Payment", "20231002"), //
+                    transaction(1000.0, "Disbursement", "20231002") //
             );
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "02 October 2023"), //
-                    installment(330.0, true, "02 October 2023"), //
-                    installment(223.33, false, "01 November 2023"), //
-                    installment(223.33, false, "01 December 2023"), //
-                    installment(223.34, false, "31 December 2023") //
+                    installment(1000.0, null, "20231002"), //
+                    installment(330.0, true, "20231002"), //
+                    installment(223.33, false, "20231101"), //
+                    installment(223.33, false, "20231201"), //
+                    installment(223.34, false, "20231231") //
             );
 
             // 2nd Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(200.00), "02 December 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(200.00), "20231202");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(330.0, "Down Payment", "02 October 2023"), //
-                    transaction(1000.0, "Disbursement", "02 October 2023"), //
-                    transaction(200.0, "Disbursement", "02 December 2023"), //
-                    transaction(66.0, "Down Payment", "02 December 2023") //
+                    transaction(330.0, "Down Payment", "20231002"), //
+                    transaction(1000.0, "Disbursement", "20231002"), //
+                    transaction(200.0, "Disbursement", "20231202"), //
+                    transaction(66.0, "Down Payment", "20231202") //
             );
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "02 October 2023"), //
-                    installment(330.0, true, "02 October 2023"), //
-                    installment(268.0, false, "01 November 2023"), //
-                    installment(268.0, false, "01 December 2023"), //
-                    installment(200.0, null, "02 December 2023"), //
-                    installment(66.0, false, "02 December 2023"), //
-                    installment(268.0, false, "31 December 2023") //
+                    installment(1000.0, null, "20231002"), //
+                    installment(330.0, true, "20231002"), //
+                    installment(268.0, false, "20231101"), //
+                    installment(268.0, false, "20231201"), //
+                    installment(200.0, null, "20231202"), //
+                    installment(66.0, false, "20231202"), //
+                    installment(268.0, false, "20231231") //
             );
 
             PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder().updateGraceOnInterest(null)
                     .updateGraceOnPrincipal(null).updateExtraTerms("2").updateNewInterestRate(null)
-                    .updateRescheduleFromDate("31 December 2023").updateAdjustedDueDate(null).updateSubmittedOnDate("31 December 2023")
+                    .updateRescheduleFromDate("20231231").updateAdjustedDueDate(null).updateSubmittedOnDate("20231231")
                     .updateRescheduleReasonId("1").buildRequest(loanId);
             PostCreateRescheduleLoansResponse loanRescheduleRequest = LoanRescheduleRequestHelper
                     .createLoanRescheduleRequest(createRequest);
             PostUpdateRescheduleLoansRequest approveRequest = new LoanRescheduleRequestTestBuilder()
-                    .updateSubmittedOnDate("31 December 2023").getApproveRequest();
+                    .updateSubmittedOnDate("20231231").getApproveRequest();
             PostUpdateRescheduleLoansResponse approveLoanRescheduleRequest = LoanRescheduleRequestHelper
                     .approveLoanRescheduleRequest(loanRescheduleRequest.getResourceId(), approveRequest);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(1000.0, null, "02 October 2023"), //
-                    installment(330.0, true, "02 October 2023"), //
-                    installment(268, false, "01 November 2023"), //
-                    installment(268, false, "01 December 2023"), //
-                    installment(200.0, null, "02 December 2023"), //
-                    installment(66.0, false, "02 December 2023"), //
-                    installment(89.33, false, "31 December 2023"), //
-                    installment(89.33, false, "30 January 2024"), //
-                    installment(89.34, false, "29 February 2024") //
+                    installment(1000.0, null, "20231002"), //
+                    installment(330.0, true, "20231002"), //
+                    installment(268, false, "20231101"), //
+                    installment(268, false, "20231201"), //
+                    installment(200.0, null, "20231202"), //
+                    installment(66.0, false, "20231202"), //
+                    installment(89.33, false, "20231231"), //
+                    installment(89.33, false, "20240130"), //
+                    installment(89.34, false, "20240229") //
             );
         });
     }
 
     @Test
     public void testRescheduleAddExtraInstallmentsDisbursementWithDownPaymentWithInterest() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -265,7 +265,7 @@ public class LoanRescheduleTestWithDownpayment extends BaseLoanIntegrationTest {
             Long loanProductId = createLoanProductWith20PctDownPaymentWithDecliningBalanceInterest(true, true, 5.0);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 15000.0, 6, postLoansRequest -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 15000.0, 6, postLoansRequest -> {
                 postLoansRequest.interestRatePerPeriod(BigDecimal.valueOf(5));
                 postLoansRequest.interestRatePerPeriod(BigDecimal.valueOf(5));
                 postLoansRequest.repaymentEvery(1);
@@ -276,67 +276,67 @@ public class LoanRescheduleTestWithDownpayment extends BaseLoanIntegrationTest {
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(15000.0, null, "01 January 2023"), //
-                    installment(3000.00, false, "01 January 2023"), //
-                    installment(1764.21, false, "01 February 2023"), //
-                    installment(1852.42, false, "01 March 2023"), //
-                    installment(1945.04, false, "01 April 2023"), //
-                    installment(2042.29, false, "01 May 2023"), //
-                    installment(2144.41, false, "01 June 2023"), //
-                    installment(2251.63, false, "01 July 2023") //
+                    installment(15000.0, null, "20230101"), //
+                    installment(3000.00, false, "20230101"), //
+                    installment(1764.21, false, "20230201"), //
+                    installment(1852.42, false, "20230301"), //
+                    installment(1945.04, false, "20230401"), //
+                    installment(2042.29, false, "20230501"), //
+                    installment(2144.41, false, "20230601"), //
+                    installment(2251.63, false, "20230701") //
             );
 
             // 1st Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(12000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(12000.00), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(2400.0, "Down Payment", "01 January 2023"), //
-                    transaction(12000.0, "Disbursement", "01 January 2023") //
+                    transaction(2400.0, "Down Payment", "20230101"), //
+                    transaction(12000.0, "Disbursement", "20230101") //
             );
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(12000.0, null, "01 January 2023"), //
-                    installment(2400.00, true, "01 January 2023"), //
-                    installment(1411.37, false, "01 February 2023"), //
-                    installment(1481.94, false, "01 March 2023"), //
-                    installment(1556.04, false, "01 April 2023"), //
-                    installment(1633.84, false, "01 May 2023"), //
-                    installment(1715.53, false, "01 June 2023"), //
-                    installment(1801.28, false, "01 July 2023") //
+                    installment(12000.0, null, "20230101"), //
+                    installment(2400.00, true, "20230101"), //
+                    installment(1411.37, false, "20230201"), //
+                    installment(1481.94, false, "20230301"), //
+                    installment(1556.04, false, "20230401"), //
+                    installment(1633.84, false, "20230501"), //
+                    installment(1715.53, false, "20230601"), //
+                    installment(1801.28, false, "20230701") //
             );
 
-            updateBusinessDate("01 June 2023");
+            updateBusinessDate("20230601");
             PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder().updateGraceOnInterest(null)
-                    .updateGraceOnPrincipal(null).updateExtraTerms("2").updateNewInterestRate(null).updateRescheduleFromDate("01 June 2023")
-                    .updateAdjustedDueDate(null).updateSubmittedOnDate("01 June 2023").updateRescheduleReasonId("1").buildRequest(loanId);
+                    .updateGraceOnPrincipal(null).updateExtraTerms("2").updateNewInterestRate(null).updateRescheduleFromDate("20230601")
+                    .updateAdjustedDueDate(null).updateSubmittedOnDate("20230601").updateRescheduleReasonId("1").buildRequest(loanId);
             PostCreateRescheduleLoansResponse loanRescheduleRequest = LoanRescheduleRequestHelper
                     .createLoanRescheduleRequest(createRequest);
-            PostUpdateRescheduleLoansRequest approveRequest = new LoanRescheduleRequestTestBuilder().updateSubmittedOnDate("01 June 2023")
+            PostUpdateRescheduleLoansRequest approveRequest = new LoanRescheduleRequestTestBuilder().updateSubmittedOnDate("20230601")
                     .getApproveRequest();
             PostUpdateRescheduleLoansResponse approveLoanRescheduleRequest = LoanRescheduleRequestHelper
                     .approveLoanRescheduleRequest(loanRescheduleRequest.getResourceId(), approveRequest);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(12000.0, null, "01 January 2023"), //
-                    installment(2400.00, true, "01 January 2023"), //
-                    installment(1411.37, false, "01 February 2023"), //
-                    installment(1481.94, false, "01 March 2023"), //
-                    installment(1556.04, false, "01 April 2023"), //
-                    installment(1633.84, false, "01 May 2023"), //
-                    installment(815.94, false, "01 June 2023"), //
-                    installment(856.74, false, "01 July 2023"), //
-                    installment(899.57, false, "01 August 2023"), //
-                    installment(944.56, false, "01 September 2023") //
+                    installment(12000.0, null, "20230101"), //
+                    installment(2400.00, true, "20230101"), //
+                    installment(1411.37, false, "20230201"), //
+                    installment(1481.94, false, "20230301"), //
+                    installment(1556.04, false, "20230401"), //
+                    installment(1633.84, false, "20230501"), //
+                    installment(815.94, false, "20230601"), //
+                    installment(856.74, false, "20230701"), //
+                    installment(899.57, false, "20230801"), //
+                    installment(944.56, false, "20230901") //
             );
         });
     }
 
     @Test
     public void testRescheduleAddExtraInstallmentsMultipleDisbursementWithDownPaymentWithInterest() {
-        runAt("01 January 2023", () -> {
+        runAt("20230101", () -> {
             // Create Client
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
 
@@ -344,7 +344,7 @@ public class LoanRescheduleTestWithDownpayment extends BaseLoanIntegrationTest {
             Long loanProductId = createLoanProductWith20PctDownPaymentWithDecliningBalanceInterest(true, true, 5.0);
 
             // Apply and Approve Loan
-            Long loanId = applyAndApproveLoan(clientId, loanProductId, "01 January 2023", 15000.0, 6, postLoansRequest -> {
+            Long loanId = applyAndApproveLoan(clientId, loanProductId, "20230101", 15000.0, 6, postLoansRequest -> {
                 postLoansRequest.interestRatePerPeriod(BigDecimal.valueOf(5));
                 postLoansRequest.interestRatePerPeriod(BigDecimal.valueOf(5));
                 postLoansRequest.repaymentEvery(1);
@@ -355,88 +355,88 @@ public class LoanRescheduleTestWithDownpayment extends BaseLoanIntegrationTest {
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(15000.0, null, "01 January 2023"), //
-                    installment(3000.00, false, "01 January 2023"), //
-                    installment(1764.21, false, "01 February 2023"), //
-                    installment(1852.42, false, "01 March 2023"), //
-                    installment(1945.04, false, "01 April 2023"), //
-                    installment(2042.29, false, "01 May 2023"), //
-                    installment(2144.41, false, "01 June 2023"), //
-                    installment(2251.63, false, "01 July 2023") //
+                    installment(15000.0, null, "20230101"), //
+                    installment(3000.00, false, "20230101"), //
+                    installment(1764.21, false, "20230201"), //
+                    installment(1852.42, false, "20230301"), //
+                    installment(1945.04, false, "20230401"), //
+                    installment(2042.29, false, "20230501"), //
+                    installment(2144.41, false, "20230601"), //
+                    installment(2251.63, false, "20230701") //
             );
 
             // 1st Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(12000.00), "01 January 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(12000.00), "20230101");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(2400.0, "Down Payment", "01 January 2023"), //
-                    transaction(12000.0, "Disbursement", "01 January 2023") //
+                    transaction(2400.0, "Down Payment", "20230101"), //
+                    transaction(12000.0, "Disbursement", "20230101") //
             );
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(12000.0, null, "01 January 2023"), //
-                    installment(2400.00, true, "01 January 2023"), //
-                    installment(1411.37, false, "01 February 2023"), //
-                    installment(1481.94, false, "01 March 2023"), //
-                    installment(1556.04, false, "01 April 2023"), //
-                    installment(1633.84, false, "01 May 2023"), //
-                    installment(1715.53, false, "01 June 2023"), //
-                    installment(1801.28, false, "01 July 2023") //
+                    installment(12000.0, null, "20230101"), //
+                    installment(2400.00, true, "20230101"), //
+                    installment(1411.37, false, "20230201"), //
+                    installment(1481.94, false, "20230301"), //
+                    installment(1556.04, false, "20230401"), //
+                    installment(1633.84, false, "20230501"), //
+                    installment(1715.53, false, "20230601"), //
+                    installment(1801.28, false, "20230701") //
             );
 
-            updateBusinessDate("02 May 2023");
+            updateBusinessDate("20230502");
             // 2nd Disburse Loan
-            disburseLoan(loanId, BigDecimal.valueOf(3000.00), "02 May 2023");
+            disburseLoan(loanId, BigDecimal.valueOf(3000.00), "20230502");
 
             // verify transactions
             verifyTransactions(loanId, //
-                    transaction(2400.0, "Down Payment", "01 January 2023"), //
-                    transaction(12000.0, "Disbursement", "01 January 2023"), //
-                    transaction(3000.00, "Disbursement", "02 May 2023"), //
-                    transaction(600.0, "Down Payment", "02 May 2023") //
+                    transaction(2400.0, "Down Payment", "20230101"), //
+                    transaction(12000.0, "Disbursement", "20230101"), //
+                    transaction(3000.00, "Disbursement", "20230502"), //
+                    transaction(600.0, "Down Payment", "20230502") //
             );
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(12000.0, null, "01 January 2023"), //
-                    installment(2400.00, true, "01 January 2023"), //
-                    installment(1884.21, false, "01 February 2023"), //
-                    installment(1978.42, false, "01 March 2023"), //
-                    installment(2077.34, false, "01 April 2023"), //
-                    installment(2181.21, false, "01 May 2023"), //
-                    installment(3000.0, null, "02 May 2023"), //
-                    installment(600.0, false, "02 May 2023"), //
-                    installment(2174.14, false, "01 June 2023"), //
-                    installment(1704.68, false, "01 July 2023") //
+                    installment(12000.0, null, "20230101"), //
+                    installment(2400.00, true, "20230101"), //
+                    installment(1884.21, false, "20230201"), //
+                    installment(1978.42, false, "20230301"), //
+                    installment(2077.34, false, "20230401"), //
+                    installment(2181.21, false, "20230501"), //
+                    installment(3000.0, null, "20230502"), //
+                    installment(600.0, false, "20230502"), //
+                    installment(2174.14, false, "20230601"), //
+                    installment(1704.68, false, "20230701") //
             );
 
-            updateBusinessDate("01 June 2023");
+            updateBusinessDate("20230601");
             PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder().updateGraceOnInterest(null)
-                    .updateGraceOnPrincipal(null).updateExtraTerms("2").updateNewInterestRate(null).updateRescheduleFromDate("01 June 2023")
-                    .updateAdjustedDueDate(null).updateSubmittedOnDate("01 June 2023").updateRescheduleReasonId("1").buildRequest(loanId);
+                    .updateGraceOnPrincipal(null).updateExtraTerms("2").updateNewInterestRate(null).updateRescheduleFromDate("20230601")
+                    .updateAdjustedDueDate(null).updateSubmittedOnDate("20230601").updateRescheduleReasonId("1").buildRequest(loanId);
             PostCreateRescheduleLoansResponse loanRescheduleRequest = LoanRescheduleRequestHelper
                     .createLoanRescheduleRequest(createRequest);
-            PostUpdateRescheduleLoansRequest approveRequest = new LoanRescheduleRequestTestBuilder().updateSubmittedOnDate("01 June 2023")
+            PostUpdateRescheduleLoansRequest approveRequest = new LoanRescheduleRequestTestBuilder().updateSubmittedOnDate("20230601")
                     .getApproveRequest();
             PostUpdateRescheduleLoansResponse approveLoanRescheduleRequest = LoanRescheduleRequestHelper
                     .approveLoanRescheduleRequest(loanRescheduleRequest.getResourceId(), approveRequest);
 
             // Verify Repayment Schedule
             verifyRepaymentSchedule(loanId, //
-                    installment(12000.0, null, "01 January 2023"), //
-                    installment(2400.00, true, "01 January 2023"), //
-                    installment(1884.21, false, "01 February 2023"), //
-                    installment(1978.42, false, "01 March 2023"), //
-                    installment(2077.34, false, "01 April 2023"), //
-                    installment(2181.21, false, "01 May 2023"), //
-                    installment(3000.0, null, "02 May 2023"), //
-                    installment(600.0, false, "02 May 2023"), //
-                    installment(903.80, false, "01 June 2023"), //
-                    installment(945.12, false, "01 July 2023"), //
-                    installment(992.37, false, "01 August 2023"), //
-                    installment(1037.53, false, "01 September 2023")//
+                    installment(12000.0, null, "20230101"), //
+                    installment(2400.00, true, "20230101"), //
+                    installment(1884.21, false, "20230201"), //
+                    installment(1978.42, false, "20230301"), //
+                    installment(2077.34, false, "20230401"), //
+                    installment(2181.21, false, "20230501"), //
+                    installment(3000.0, null, "20230502"), //
+                    installment(600.0, false, "20230502"), //
+                    installment(903.80, false, "20230601"), //
+                    installment(945.12, false, "20230701"), //
+                    installment(992.37, false, "20230801"), //
+                    installment(1037.53, false, "20230901")//
             );
         });
     }

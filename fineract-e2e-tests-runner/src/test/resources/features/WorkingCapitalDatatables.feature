@@ -72,11 +72,11 @@ Feature: WorkingCapitalDatatables
   # Entry CRUD - WC Loan
   @TestRailId:C76724
   Scenario: Single-row datatable entry for WC Loan supports create, read, update, delete
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a working capital loan with the following data:
       | LoanProduct | submittedOnDate | expectedDisbursementDate | principalAmount | totalPaymentVolume | periodPaymentRate | discount |
-      | WCLP        | 01 January 2026 | 01 January 2026          | 9000            | 100000       | 18                | 0        |
+      | WCLP        | 20260101 | 20260101          | 9000            | 100000       | 18                | 0        |
     And A datatable for "WC_Loan" is created with the following extra columns:
       | Name    | Type   | Length | Unique | Indexed |
       | test_nr | number | 10     | false  | false   |
@@ -89,11 +89,11 @@ Feature: WorkingCapitalDatatables
 
   @TestRailId:C76725
   Scenario: Multi-row datatable entries for WC Loan support create, read, update, delete
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a working capital loan with the following data:
       | LoanProduct | submittedOnDate | expectedDisbursementDate | principalAmount | totalPaymentVolume | periodPaymentRate | discount |
-      | WCLP        | 01 January 2026 | 01 January 2026          | 9000            | 100000       | 18                | 0        |
+      | WCLP        | 20260101 | 20260101          | 9000            | 100000       | 18                | 0        |
     And A multirow datatable for "WC_Loan" is created
     And A multirow datatable entry is created for "WC_Loan" with value "10" in column "col"
     Then Fetching multirow datatable entries for "WC_Loan" returns value "10" in column "col"
@@ -105,11 +105,11 @@ Feature: WorkingCapitalDatatables
   # Single-row strategy - only one entry per parent row
   @TestRailId:C76726
   Scenario: Single-row datatable for WC Loan rejects a second entry for the same loan
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a working capital loan with the following data:
       | LoanProduct | submittedOnDate | expectedDisbursementDate | principalAmount | totalPaymentVolume | periodPaymentRate | discount |
-      | WCLP        | 01 January 2026 | 01 January 2026          | 9000            | 100000       | 18                | 0        |
+      | WCLP        | 20260101 | 20260101          | 9000            | 100000       | 18                | 0        |
     And A datatable for "WC_Loan" is created with the following extra columns:
       | Name    | Type   | Length | Unique | Indexed |
       | test_nr | number | 10     | false  | false   |
@@ -267,11 +267,11 @@ Feature: WorkingCapitalDatatables
 
   @TestRailId:C76741
   Scenario: Fetching a specific multi-row datatable entry by id returns that row for WC Loan
-    When Admin sets the business date to "01 January 2026"
+    When Admin sets the business date to "20260101"
     And Admin creates a client with random data
     And Admin creates a working capital loan with the following data:
       | LoanProduct | submittedOnDate | expectedDisbursementDate | principalAmount | totalPaymentVolume | periodPaymentRate | discount |
-      | WCLP        | 01 January 2026 | 01 January 2026          | 9000            | 100000       | 18                | 0        |
+      | WCLP        | 20260101 | 20260101          | 9000            | 100000       | 18                | 0        |
     And A multirow datatable for "WC_Loan" is created
     And A multirow datatable entry is created for "WC_Loan" with value "55" in column "col"
     Then Fetching the multirow datatable entry by id for "WC_Loan" returns value "55" in column "col"

@@ -38,7 +38,7 @@ import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 
 public class ReportingStepDef extends AbstractStepDef {
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
     private static final String TRIAL_BALANCE_REPORT = "Trial Balance Summary Report with Asset Owner";
     private final FineractFeignClient fineractClient;
 

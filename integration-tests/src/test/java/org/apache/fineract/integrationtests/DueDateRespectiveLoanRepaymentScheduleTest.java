@@ -103,30 +103,30 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "50", true));
             final Integer loanProductID = createLoanProductWithNoAccountingNoInterest("1000", "30", "1", "0",
                     LoanProductTestBuilder.DUE_PENALTY_FEE_INTEREST_PRINCIPAL_IN_ADVANCE_PRINCIPAL_PENALTY_FEE_INTEREST_STRATEGY);
-            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2023");
+            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "20230101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID, "1000", "30", "30", "1", "0",
                     LoanApplicationTestBuilder.DUE_PENALTY_FEE_INTEREST_PRINCIPAL_IN_ADVANCE_PRINCIPAL_PENALTY_FEE_INTEREST_STRATEGY,
-                    "01 January 2023", "01 January 2023");
+                    "20230101", "20230101");
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.approveLoan("01 January 2023", loanID);
+            loanStatusHashMap = loanTransactionHelper.approveLoan("20230101", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("01 January 2023", loanID, "1000");
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("20230101", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
-            Integer firstRepaymentId = (Integer) loanTransactionHelper.makeRepayment("10 January 2023", Float.parseFloat("500.00"), loanID)
+            Integer firstRepaymentId = (Integer) loanTransactionHelper.makeRepayment("20230110", Float.parseFloat("500.00"), loanID)
                     .get("resourceId");
             Integer firstChargeId = loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "20 January 2023", "50"));
-            Integer secondRepaymentId = (Integer) loanTransactionHelper.makeRepayment("17 January 2023", Float.parseFloat("450.00"), loanID)
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "20230120", "50"));
+            Integer secondRepaymentId = (Integer) loanTransactionHelper.makeRepayment("20230117", Float.parseFloat("450.00"), loanID)
                     .get("resourceId");
 
-            Integer thirdRepaymentId = (Integer) loanTransactionHelper.makeRepayment("21 January 2023", Float.parseFloat("50.00"), loanID)
+            Integer thirdRepaymentId = (Integer) loanTransactionHelper.makeRepayment("20230121", Float.parseFloat("50.00"), loanID)
                     .get("resourceId");
 
             GetLoansLoanIdResponse response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -215,33 +215,33 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "50", false));
             final Integer loanProductID = createLoanProductWithNoAccountingNoInterest("1000", "30", "1", "0",
                     LoanProductTestBuilder.DUE_PENALTY_FEE_INTEREST_PRINCIPAL_IN_ADVANCE_PRINCIPAL_PENALTY_FEE_INTEREST_STRATEGY);
-            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2023");
+            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "20230101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID, "1000", "30", "30", "1", "0",
                     LoanApplicationTestBuilder.DUE_PENALTY_FEE_INTEREST_PRINCIPAL_IN_ADVANCE_PRINCIPAL_PENALTY_FEE_INTEREST_STRATEGY,
-                    "01 January 2023", "01 January 2023");
+                    "20230101", "20230101");
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.approveLoan("01 January 2023", loanID);
+            loanStatusHashMap = loanTransactionHelper.approveLoan("20230101", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("01 January 2023", loanID, "1000");
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("20230101", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
-            Integer firstRepaymentId = (Integer) loanTransactionHelper.makeRepayment("10 January 2023", Float.parseFloat("500.00"), loanID)
+            Integer firstRepaymentId = (Integer) loanTransactionHelper.makeRepayment("20230110", Float.parseFloat("500.00"), loanID)
                     .get("resourceId");
             Integer firstChargeId = loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "20 January 2023", "50"));
-            Integer secondRepaymentId = (Integer) loanTransactionHelper.makeRepayment("17 January 2023", Float.parseFloat("100.00"), loanID)
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "20230120", "50"));
+            Integer secondRepaymentId = (Integer) loanTransactionHelper.makeRepayment("20230117", Float.parseFloat("100.00"), loanID)
                     .get("resourceId");
 
             Integer secondChargeId = loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "23 January 2023", "10"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "20230123", "10"));
 
-            Integer thirdRepaymentId = (Integer) loanTransactionHelper.makeRepayment("20 January 2023", Float.parseFloat("100.00"), loanID)
+            Integer thirdRepaymentId = (Integer) loanTransactionHelper.makeRepayment("20230120", Float.parseFloat("100.00"), loanID)
                     .get("resourceId");
 
             GetLoansLoanIdResponse response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -321,27 +321,27 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "50", false));
             final Integer loanProductID = createLoanProductWithNoAccountingNoInterest("1000", "30", "1", "0",
                     LoanProductTestBuilder.DUE_PENALTY_FEE_INTEREST_PRINCIPAL_IN_ADVANCE_PRINCIPAL_PENALTY_FEE_INTEREST_STRATEGY);
-            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2023");
+            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "20230101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID, "1000", "30", "30", "1", "0",
                     LoanApplicationTestBuilder.DUE_PENALTY_FEE_INTEREST_PRINCIPAL_IN_ADVANCE_PRINCIPAL_PENALTY_FEE_INTEREST_STRATEGY,
-                    "01 January 2023", "01 January 2023");
+                    "20230101", "20230101");
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.approveLoan("01 January 2023", loanID);
+            loanStatusHashMap = loanTransactionHelper.approveLoan("20230101", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("01 January 2023", loanID, "1000");
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("20230101", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
-            Integer firstRepaymentId = (Integer) loanTransactionHelper.makeRepayment("10 January 2023", Float.parseFloat("500.00"), loanID)
+            Integer firstRepaymentId = (Integer) loanTransactionHelper.makeRepayment("20230110", Float.parseFloat("500.00"), loanID)
                     .get("resourceId");
             Integer firstChargeId = loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "20 January 2023", "50"));
-            Integer secondRepaymentId = (Integer) loanTransactionHelper.makeRepayment("17 January 2023", Float.parseFloat("550.00"), loanID)
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "20230120", "50"));
+            Integer secondRepaymentId = (Integer) loanTransactionHelper.makeRepayment("20230117", Float.parseFloat("550.00"), loanID)
                     .get("resourceId");
 
             GetLoansLoanIdResponse response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -408,26 +408,26 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "50", false));
             final Integer loanProductID = createLoanProductWithNoAccountingNoInterest("1000", "30", "3", "0",
                     LoanProductTestBuilder.DUE_PENALTY_FEE_INTEREST_PRINCIPAL_IN_ADVANCE_PRINCIPAL_PENALTY_FEE_INTEREST_STRATEGY);
-            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2023");
+            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "20230101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID, "1000", "90", "30", "3", "0",
                     LoanApplicationTestBuilder.DUE_PENALTY_FEE_INTEREST_PRINCIPAL_IN_ADVANCE_PRINCIPAL_PENALTY_FEE_INTEREST_STRATEGY,
-                    "01 January 2023", "01 January 2023");
+                    "20230101", "20230101");
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.approveLoan("01 January 2023", loanID);
+            loanStatusHashMap = loanTransactionHelper.approveLoan("20230101", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("01 January 2023", loanID, "1000");
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("20230101", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
             Integer firstChargeId = loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "20 January 2023", "50"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "20230120", "50"));
 
-            Integer firstRepaymentId = (Integer) loanTransactionHelper.makeRepayment("10 January 2023", Float.parseFloat("500.00"), loanID)
+            Integer firstRepaymentId = (Integer) loanTransactionHelper.makeRepayment("20230110", Float.parseFloat("500.00"), loanID)
                     .get("resourceId");
 
             GetLoansLoanIdResponse response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -493,26 +493,26 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "50", false));
             final Integer loanProductID = createLoanProductWithNoAccountingNoInterest("1000", "30", "3", "0",
                     LoanProductTestBuilder.DUE_PENALTY_FEE_INTEREST_PRINCIPAL_IN_ADVANCE_PRINCIPAL_PENALTY_FEE_INTEREST_STRATEGY);
-            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2023");
+            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "20230101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID, "1000", "90", "30", "3", "0",
                     LoanApplicationTestBuilder.DUE_PENALTY_FEE_INTEREST_PRINCIPAL_IN_ADVANCE_PRINCIPAL_PENALTY_FEE_INTEREST_STRATEGY,
-                    "01 January 2023", "01 January 2023");
+                    "20230101", "20230101");
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.approveLoan("01 January 2023", loanID);
+            loanStatusHashMap = loanTransactionHelper.approveLoan("20230101", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("01 January 2023", loanID, "1000");
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("20230101", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
             Integer firstChargeId = loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "20 January 2023", "50"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "20230120", "50"));
 
-            Integer firstRepaymentId = (Integer) loanTransactionHelper.makeRepayment("10 January 2023", Float.parseFloat("500.00"), loanID)
+            Integer firstRepaymentId = (Integer) loanTransactionHelper.makeRepayment("20230110", Float.parseFloat("500.00"), loanID)
                     .get("resourceId");
 
             GetLoansLoanIdResponse response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -552,7 +552,7 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
             assertEquals(firstChargeId, response.getTransactions().get(1).getLoanChargePaidByList().get(0).getChargeId().intValue());
             assertEquals(1, response.getTransactions().get(1).getLoanChargePaidByList().size());
 
-            Integer secondRepaymentId = (Integer) loanTransactionHelper.makeRepayment("17 January 2023", Float.parseFloat("650.00"), loanID)
+            Integer secondRepaymentId = (Integer) loanTransactionHelper.makeRepayment("20230117", Float.parseFloat("650.00"), loanID)
                     .get("resourceId");
 
             response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -639,25 +639,25 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "20", false));
             final Integer loanProductID = createLoanProductWithNoAccountingNoInterest("1000", "30", "1", "0",
                     LoanProductTestBuilder.DUE_PENALTY_INTEREST_PRINCIPAL_FEE_IN_ADVANCE_PENALTY_INTEREST_PRINCIPAL_FEE_STRATEGY);
-            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2023");
+            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "20230101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID, "1000", "30", "30", "1", "0",
                     LoanApplicationTestBuilder.DUE_PENALTY_INTEREST_PRINCIPAL_FEE_IN_ADVANCE_PENALTY_INTEREST_PRINCIPAL_FEE_STRATEGY,
-                    "01 January 2023", "01 January 2023");
+                    "20230101", "20230101");
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.approveLoan("01 January 2023", loanID);
+            loanStatusHashMap = loanTransactionHelper.approveLoan("20230101", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("01 January 2023", loanID, "1000");
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("20230101", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
             Integer firstChargeId = loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "25 January 2023", "20"));
-            Integer firstRepaymentId = (Integer) loanTransactionHelper.makeRepayment("01 March 2023", Float.parseFloat("1010.00"), loanID)
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "20230125", "20"));
+            Integer firstRepaymentId = (Integer) loanTransactionHelper.makeRepayment("20230301", Float.parseFloat("1010.00"), loanID)
                     .get("resourceId");
 
             GetLoansLoanIdResponse response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -714,23 +714,23 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "15", true));
             final Integer loanProductID = createLoanProductWithNoAccountingNoInterest("1000", "30", "1", "0",
                     LoanProductTestBuilder.DUE_PENALTY_INTEREST_PRINCIPAL_FEE_IN_ADVANCE_PENALTY_INTEREST_PRINCIPAL_FEE_STRATEGY);
-            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2023");
+            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "20230101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID, "1000", "30", "30", "1", "0",
                     LoanApplicationTestBuilder.DUE_PENALTY_INTEREST_PRINCIPAL_FEE_IN_ADVANCE_PENALTY_INTEREST_PRINCIPAL_FEE_STRATEGY,
-                    "01 January 2023", "01 January 2023");
+                    "20230101", "20230101");
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.approveLoan("01 January 2023", loanID);
+            loanStatusHashMap = loanTransactionHelper.approveLoan("20230101", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("01 January 2023", loanID, "1000");
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("20230101", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
-            Integer firstRepaymentId = (Integer) loanTransactionHelper.makeRepayment("25 January 2023", Float.parseFloat("1000.00"), loanID)
+            Integer firstRepaymentId = (Integer) loanTransactionHelper.makeRepayment("20230125", Float.parseFloat("1000.00"), loanID)
                     .get("resourceId");
 
             GetLoansLoanIdResponse response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -758,8 +758,8 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
             assertEquals(0, response.getTransactions().get(1).getLoanChargePaidByList().size());
 
             PostLoansLoanIdTransactionsResponse reverseRepayment = loanTransactionHelper.reverseLoanTransaction((long) loanID,
-                    (long) firstRepaymentId, new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("dd MMMM yyyy")
-                            .transactionDate("28 January 2023").transactionAmount(0.0).locale("en"));
+                    (long) firstRepaymentId, new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("yyyyMMdd")
+                            .transactionDate("20230128").transactionAmount(0.0).locale("en"));
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
                     .date("2023.01.31").dateFormat("yyyy.MM.dd").locale("en"));
@@ -790,8 +790,8 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
             assertEquals(0, response.getTransactions().get(1).getLoanChargePaidByList().size());
 
             Integer firstChargeId = loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "28 January 2023", "15"));
-            Integer secondRepayment = (Integer) loanTransactionHelper.makeRepayment("31 January 2023", Float.parseFloat("1010.00"), loanID)
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "20230128", "15"));
+            Integer secondRepayment = (Integer) loanTransactionHelper.makeRepayment("20230131", Float.parseFloat("1010.00"), loanID)
                     .get("resourceId");
 
             response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -851,38 +851,38 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "15", true));
             final Integer loanProductID = createLoanProductWithNoAccountingNoInterest("1000", "30", "1", "0",
                     LoanProductTestBuilder.DUE_PENALTY_INTEREST_PRINCIPAL_FEE_IN_ADVANCE_PENALTY_INTEREST_PRINCIPAL_FEE_STRATEGY);
-            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2023");
+            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "20230101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID, "1000", "30", "30", "1", "0",
                     LoanApplicationTestBuilder.DUE_PENALTY_INTEREST_PRINCIPAL_FEE_IN_ADVANCE_PENALTY_INTEREST_PRINCIPAL_FEE_STRATEGY,
-                    "01 January 2023", "01 January 2023");
+                    "20230101", "20230101");
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.approveLoan("01 January 2023", loanID);
+            loanStatusHashMap = loanTransactionHelper.approveLoan("20230101", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("01 January 2023", loanID, "1000");
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("20230101", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
             final PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder()
-                    .updateRescheduleFromDate("31 January 2023").updateAdjustedDueDate("01 March 2023")
-                    .updateSubmittedOnDate("25 January 2023").updateGraceOnPrincipal(null).updateGraceOnInterest(null)
+                    .updateRescheduleFromDate("20230131").updateAdjustedDueDate("20230301")
+                    .updateSubmittedOnDate("20230125").updateGraceOnPrincipal(null).updateGraceOnInterest(null)
                     .updateExtraTerms(null).buildRequest(loanID.longValue());
             final PostCreateRescheduleLoansResponse loanRescheduleRequestResponse = LoanRescheduleRequestHelper
                     .createLoanRescheduleRequest(createRequest);
             final Long loanRescheduleRequestId = loanRescheduleRequestResponse.getResourceId();
             LoanRescheduleRequestHelper.approveLoanRescheduleRequest(loanRescheduleRequestId,
-                    new LoanRescheduleRequestTestBuilder().updateRescheduleFromDate("31 January 2023")
-                            .updateAdjustedDueDate("01 March 2023").updateSubmittedOnDate("25 January 2023").updateGraceOnPrincipal(null)
+                    new LoanRescheduleRequestTestBuilder().updateRescheduleFromDate("20230131")
+                            .updateAdjustedDueDate("20230301").updateSubmittedOnDate("20230125").updateGraceOnPrincipal(null)
                             .updateGraceOnInterest(null).updateExtraTerms(null).getApproveRequest());
 
             Integer firstChargeId = loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "01 March 2023", "20"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "20230301", "20"));
             Integer firstRepaymentId = (Integer) loanTransactionHelper
-                    .makeRepayment("10 February 2023", Float.parseFloat("1010.00"), loanID).get("resourceId");
+                    .makeRepayment("20230210", Float.parseFloat("1010.00"), loanID).get("resourceId");
 
             GetLoansLoanIdResponse response = loanTransactionHelper.getLoanDetails((long) loanID);
             assertEquals(10.0, Utils.getDoubleValue(response.getSummary().getTotalOutstanding()));
@@ -910,11 +910,11 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
             assertEquals(1, response.getTransactions().get(1).getLoanChargePaidByList().size());
 
             PostLoansLoanIdTransactionsResponse reverseRepayment = loanTransactionHelper.reverseLoanTransaction((long) loanID,
-                    (long) firstRepaymentId, new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("dd MMMM yyyy")
-                            .transactionDate("15 February 2023").transactionAmount(0.0).locale("en"));
+                    (long) firstRepaymentId, new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("yyyyMMdd")
+                            .transactionDate("20230215").transactionAmount(0.0).locale("en"));
 
             Integer secondChargeId = loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "15 February 2023", "15"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "20230215", "15"));
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
                     .date("2023.03.01").dateFormat("yyyy.MM.dd").locale("en"));
@@ -948,7 +948,7 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
             assertEquals(firstChargeId, response.getTransactions().get(1).getLoanChargePaidByList().get(0).getChargeId().intValue());
             assertEquals(1, response.getTransactions().get(1).getLoanChargePaidByList().size());
 
-            Integer secondRepayment = (Integer) loanTransactionHelper.makeRepayment("01 March 2023", Float.parseFloat("15.00"), loanID)
+            Integer secondRepayment = (Integer) loanTransactionHelper.makeRepayment("20230301", Float.parseFloat("15.00"), loanID)
                     .get("resourceId");
 
             response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -979,7 +979,7 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
             assertEquals(secondChargeId, response.getTransactions().get(2).getLoanChargePaidByList().get(0).getChargeId().intValue());
             assertEquals(1, response.getTransactions().get(2).getLoanChargePaidByList().size());
 
-            Integer thirdRepayment = (Integer) loanTransactionHelper.makeRepayment("01 March 2023", Float.parseFloat("1000.00"), loanID)
+            Integer thirdRepayment = (Integer) loanTransactionHelper.makeRepayment("20230301", Float.parseFloat("1000.00"), loanID)
                     .get("resourceId");
 
             response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -1009,7 +1009,7 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
             assertEquals(0.0, Utils.getDoubleValue(response.getTransactions().get(3).getOutstandingLoanBalance()));
             assertEquals(0, response.getTransactions().get(3).getLoanChargePaidByList().size());
 
-            Integer forthRepayment = (Integer) loanTransactionHelper.makeRepayment("01 March 2023", Float.parseFloat("10.00"), loanID)
+            Integer forthRepayment = (Integer) loanTransactionHelper.makeRepayment("20230301", Float.parseFloat("10.00"), loanID)
                     .get("resourceId");
 
             response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -1075,38 +1075,38 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "15", true));
             final Integer loanProductID = createLoanProductWithNoAccountingNoInterest("1000", "30", "1", "0",
                     LoanProductTestBuilder.DUE_PENALTY_INTEREST_PRINCIPAL_FEE_IN_ADVANCE_PENALTY_INTEREST_PRINCIPAL_FEE_STRATEGY);
-            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2023");
+            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "20230101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID, "1000", "30", "30", "1", "0",
                     LoanApplicationTestBuilder.DUE_PENALTY_INTEREST_PRINCIPAL_FEE_IN_ADVANCE_PENALTY_INTEREST_PRINCIPAL_FEE_STRATEGY,
-                    "01 January 2023", "01 January 2023");
+                    "20230101", "20230101");
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.approveLoan("01 January 2023", loanID);
+            loanStatusHashMap = loanTransactionHelper.approveLoan("20230101", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("01 January 2023", loanID, "1000");
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("20230101", loanID, "1000");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
             final PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder()
-                    .updateRescheduleFromDate("31 January 2023").updateAdjustedDueDate("01 March 2023")
-                    .updateSubmittedOnDate("25 January 2023").updateGraceOnPrincipal(null).updateGraceOnInterest(null)
+                    .updateRescheduleFromDate("20230131").updateAdjustedDueDate("20230301")
+                    .updateSubmittedOnDate("20230125").updateGraceOnPrincipal(null).updateGraceOnInterest(null)
                     .updateExtraTerms(null).buildRequest(loanID.longValue());
             final PostCreateRescheduleLoansResponse loanRescheduleRequestResponse = LoanRescheduleRequestHelper
                     .createLoanRescheduleRequest(createRequest);
             final Long loanRescheduleRequestId = loanRescheduleRequestResponse.getResourceId();
             LoanRescheduleRequestHelper.approveLoanRescheduleRequest(loanRescheduleRequestId,
-                    new LoanRescheduleRequestTestBuilder().updateRescheduleFromDate("31 January 2023")
-                            .updateAdjustedDueDate("01 March 2023").updateSubmittedOnDate("25 January 2023").updateGraceOnPrincipal(null)
+                    new LoanRescheduleRequestTestBuilder().updateRescheduleFromDate("20230131")
+                            .updateAdjustedDueDate("20230301").updateSubmittedOnDate("20230125").updateGraceOnPrincipal(null)
                             .updateGraceOnInterest(null).updateExtraTerms(null).getApproveRequest());
 
             Integer firstChargeId = loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "01 March 2023", "20"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "20230301", "20"));
             Integer firstRepaymentId = (Integer) loanTransactionHelper
-                    .makeRepayment("10 February 2023", Float.parseFloat("1010.00"), loanID).get("resourceId");
+                    .makeRepayment("20230210", Float.parseFloat("1010.00"), loanID).get("resourceId");
 
             GetLoansLoanIdResponse response = loanTransactionHelper.getLoanDetails((long) loanID);
             assertEquals(10.0, Utils.getDoubleValue(response.getSummary().getTotalOutstanding()));
@@ -1134,11 +1134,11 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
             assertEquals(1, response.getTransactions().get(1).getLoanChargePaidByList().size());
 
             PostLoansLoanIdTransactionsResponse reverseRepayment = loanTransactionHelper.reverseLoanTransaction((long) loanID,
-                    (long) firstRepaymentId, new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("dd MMMM yyyy")
-                            .transactionDate("15 February 2023").transactionAmount(0.0).locale("en"));
+                    (long) firstRepaymentId, new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("yyyyMMdd")
+                            .transactionDate("20230215").transactionAmount(0.0).locale("en"));
 
             Integer secondChargeId = loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "15 February 2023", "15"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "20230215", "15"));
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
                     .date("2023.03.01").dateFormat("yyyy.MM.dd").locale("en"));
@@ -1172,7 +1172,7 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
             assertEquals(firstChargeId, response.getTransactions().get(1).getLoanChargePaidByList().get(0).getChargeId().intValue());
             assertEquals(1, response.getTransactions().get(1).getLoanChargePaidByList().size());
 
-            Integer secondRepayment = (Integer) loanTransactionHelper.makeRepayment("01 March 2023", Float.parseFloat("1030.00"), loanID)
+            Integer secondRepayment = (Integer) loanTransactionHelper.makeRepayment("20230301", Float.parseFloat("1030.00"), loanID)
                     .get("resourceId");
 
             response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -1213,16 +1213,16 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
                     .date("2023.03.07").dateFormat("yyyy.MM.dd").locale("en"));
 
             PostLoansLoanIdTransactionsResponse secondReverseRepayment = loanTransactionHelper.reverseLoanTransaction((long) loanID,
-                    (long) secondRepayment, new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("dd MMMM yyyy")
-                            .transactionDate("07 March 2023").transactionAmount(0.0).locale("en"));
+                    (long) secondRepayment, new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("yyyyMMdd")
+                            .transactionDate("20230307").transactionAmount(0.0).locale("en"));
 
             Integer thirdChargeId = loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "07 March 2023", "15"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), "20230307", "15"));
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
                     .date("2023.03.08").dateFormat("yyyy.MM.dd").locale("en"));
 
-            Integer thirdRepayment = (Integer) loanTransactionHelper.makeRepayment("08 March 2023", Float.parseFloat("15.00"), loanID)
+            Integer thirdRepayment = (Integer) loanTransactionHelper.makeRepayment("20230308", Float.parseFloat("15.00"), loanID)
                     .get("resourceId");
 
             response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -1263,7 +1263,7 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
             assertEquals(secondChargeId, response.getTransactions().get(3).getLoanChargePaidByList().get(0).getChargeId().intValue());
             assertEquals(1, response.getTransactions().get(3).getLoanChargePaidByList().size());
 
-            Integer forthRepayment = (Integer) loanTransactionHelper.makeRepayment("08 March 2023", Float.parseFloat("1015.00"), loanID)
+            Integer forthRepayment = (Integer) loanTransactionHelper.makeRepayment("20230308", Float.parseFloat("1015.00"), loanID)
                     .get("resourceId");
 
             response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -1304,7 +1304,7 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
             assertEquals(firstChargeId, response.getTransactions().get(4).getLoanChargePaidByList().get(0).getChargeId().intValue());
             assertEquals(1, response.getTransactions().get(4).getLoanChargePaidByList().size());
 
-            Integer fifthRepayment = (Integer) loanTransactionHelper.makeRepayment("08 March 2023", Float.parseFloat("10.00"), loanID)
+            Integer fifthRepayment = (Integer) loanTransactionHelper.makeRepayment("20230308", Float.parseFloat("10.00"), loanID)
                     .get("resourceId");
 
             response = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -1381,37 +1381,37 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "3.65", false));
             final Integer loanProductID = createLoanProductWithNoAccountingNoInterest("1000", "30", "1", "0",
                     LoanProductTestBuilder.DUE_PENALTY_INTEREST_PRINCIPAL_FEE_IN_ADVANCE_PENALTY_INTEREST_PRINCIPAL_FEE_STRATEGY);
-            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2023");
+            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "20230101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID, "1000", "30", "30", "1", "0",
                     LoanApplicationTestBuilder.DUE_PENALTY_INTEREST_PRINCIPAL_FEE_IN_ADVANCE_PENALTY_INTEREST_PRINCIPAL_FEE_STRATEGY,
-                    "14 May 2023", "14 May 2023");
+                    "20230514", "20230514");
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.approveLoan("14 May 2023", loanID);
+            loanStatusHashMap = loanTransactionHelper.approveLoan("20230514", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("14 May 2023", loanID, "127.95");
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("20230514", loanID, "127.95");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
                     .date("2023.06.11").dateFormat("yyyy.MM.dd").locale("en"));
 
             final PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder()
-                    .updateRescheduleFromDate("13 June 2023").updateAdjustedDueDate("13 July 2023").updateSubmittedOnDate("11 June 2023")
+                    .updateRescheduleFromDate("20230613").updateAdjustedDueDate("20230713").updateSubmittedOnDate("20230611")
                     .updateGraceOnPrincipal(null).updateGraceOnInterest(null).updateExtraTerms(null).buildRequest(loanID.longValue());
             final PostCreateRescheduleLoansResponse loanRescheduleRequestResponse = LoanRescheduleRequestHelper
                     .createLoanRescheduleRequest(createRequest);
             final Long loanRescheduleRequestId = loanRescheduleRequestResponse.getResourceId();
             LoanRescheduleRequestHelper.approveLoanRescheduleRequest(loanRescheduleRequestId,
-                    new LoanRescheduleRequestTestBuilder().updateRescheduleFromDate("13 June 2023").updateAdjustedDueDate("13 July 2023")
-                            .updateSubmittedOnDate("11 June 2023").updateGraceOnPrincipal(null).updateGraceOnInterest(null)
+                    new LoanRescheduleRequestTestBuilder().updateRescheduleFromDate("20230613").updateAdjustedDueDate("20230713")
+                            .updateSubmittedOnDate("20230611").updateGraceOnPrincipal(null).updateGraceOnInterest(null)
                             .updateExtraTerms(null).getApproveRequest());
             Integer penalty1LoanChargeId = loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "13 July 2023", "3.65"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "20230713", "3.65"));
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
                     .date("2023.06.12").dateFormat("yyyy.MM.dd").locale("en"));
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanID.longValue()));
@@ -1444,7 +1444,7 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
                     .date("2023.06.17").dateFormat("yyyy.MM.dd").locale("en"));
             PostLoansLoanIdTransactionsResponse merchantIssuedRefund1 = loanTransactionHelper.makeMerchantIssuedRefund(Long.valueOf(loanID),
-                    new PostLoansLoanIdTransactionsRequest().locale("en").dateFormat("dd MMMM yyyy").transactionDate("17 June 2023")
+                    new PostLoansLoanIdTransactionsRequest().locale("en").dateFormat("yyyyMMdd").transactionDate("20230617")
                             .transactionAmount(125.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -1503,7 +1503,7 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
             assertEquals(0.0, Utils.getDoubleValue(loanDetails.getTransactions().get(2).getOutstandingLoanBalance()));
 
             PostLoansLoanIdTransactionsResponse merchantIssuedRefund2 = loanTransactionHelper.makeMerchantIssuedRefund(Long.valueOf(loanID),
-                    new PostLoansLoanIdTransactionsRequest().locale("en").dateFormat("dd MMMM yyyy").transactionDate("17 June 2023")
+                    new PostLoansLoanIdTransactionsRequest().locale("en").dateFormat("yyyyMMdd").transactionDate("20230617")
                             .transactionAmount(2.95));
 
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -1564,37 +1564,37 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
                     ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, "3.65", false));
             final Integer loanProductID = createLoanProductWithNoAccountingNoInterest("1000", "30", "1", "0",
                     LoanProductTestBuilder.DUE_PENALTY_FEE_INTEREST_PRINCIPAL_IN_ADVANCE_PRINCIPAL_PENALTY_FEE_INTEREST_STRATEGY);
-            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "01 January 2023");
+            final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec, "20230101");
 
             final Integer loanID = applyForLoanApplication(clientID, loanProductID, "1000", "30", "30", "1", "0",
                     LoanApplicationTestBuilder.DUE_PENALTY_FEE_INTEREST_PRINCIPAL_IN_ADVANCE_PRINCIPAL_PENALTY_FEE_INTEREST_STRATEGY,
-                    "14 May 2023", "14 May 2023");
+                    "20230514", "20230514");
 
             HashMap<String, Object> loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.approveLoan("14 May 2023", loanID);
+            loanStatusHashMap = loanTransactionHelper.approveLoan("20230514", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
             LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("14 May 2023", loanID, "127.95");
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithTransactionAmount("20230514", loanID, "127.95");
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
                     .date("2023.06.11").dateFormat("yyyy.MM.dd").locale("en"));
 
             final PostCreateRescheduleLoansRequest createRequest = new LoanRescheduleRequestTestBuilder()
-                    .updateRescheduleFromDate("13 June 2023").updateAdjustedDueDate("13 July 2023").updateSubmittedOnDate("11 June 2023")
+                    .updateRescheduleFromDate("20230613").updateAdjustedDueDate("20230713").updateSubmittedOnDate("20230611")
                     .updateGraceOnPrincipal(null).updateGraceOnInterest(null).updateExtraTerms(null).buildRequest(loanID.longValue());
             final PostCreateRescheduleLoansResponse loanRescheduleRequestResponse = LoanRescheduleRequestHelper
                     .createLoanRescheduleRequest(createRequest);
             final Long loanRescheduleRequestId = loanRescheduleRequestResponse.getResourceId();
             LoanRescheduleRequestHelper.approveLoanRescheduleRequest(loanRescheduleRequestId,
-                    new LoanRescheduleRequestTestBuilder().updateRescheduleFromDate("13 June 2023").updateAdjustedDueDate("13 July 2023")
-                            .updateSubmittedOnDate("11 June 2023").updateGraceOnPrincipal(null).updateGraceOnInterest(null)
+                    new LoanRescheduleRequestTestBuilder().updateRescheduleFromDate("20230613").updateAdjustedDueDate("20230713")
+                            .updateSubmittedOnDate("20230611").updateGraceOnPrincipal(null).updateGraceOnInterest(null)
                             .updateExtraTerms(null).getApproveRequest());
             Integer penalty1LoanChargeId = loanTransactionHelper.addChargesForLoan(loanID,
-                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "13 July 2023", "3.65"));
+                    LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), "20230713", "3.65"));
             businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
                     .date("2023.06.12").dateFormat("yyyy.MM.dd").locale("en"));
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanID.longValue()));
@@ -1628,7 +1628,7 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
                     .date("2023.06.17").dateFormat("yyyy.MM.dd").locale("en"));
 
             PostLoansLoanIdTransactionsResponse merchantIssuedRefund1 = loanTransactionHelper.makeMerchantIssuedRefund(Long.valueOf(loanID),
-                    new PostLoansLoanIdTransactionsRequest().locale("en").dateFormat("dd MMMM yyyy").transactionDate("17 June 2023")
+                    new PostLoansLoanIdTransactionsRequest().locale("en").dateFormat("yyyyMMdd").transactionDate("20230617")
                             .transactionAmount(125.0));
 
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanID);
@@ -1687,7 +1687,7 @@ public class DueDateRespectiveLoanRepaymentScheduleTest extends BaseLoanIntegrat
             assertEquals(0.0, Utils.getDoubleValue(loanDetails.getTransactions().get(2).getOutstandingLoanBalance()));
 
             PostLoansLoanIdTransactionsResponse merchantIssuedRefund2 = loanTransactionHelper.makeMerchantIssuedRefund(Long.valueOf(loanID),
-                    new PostLoansLoanIdTransactionsRequest().locale("en").dateFormat("dd MMMM yyyy").transactionDate("17 June 2023")
+                    new PostLoansLoanIdTransactionsRequest().locale("en").dateFormat("yyyyMMdd").transactionDate("20230617")
                             .transactionAmount(2.95));
 
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanID);

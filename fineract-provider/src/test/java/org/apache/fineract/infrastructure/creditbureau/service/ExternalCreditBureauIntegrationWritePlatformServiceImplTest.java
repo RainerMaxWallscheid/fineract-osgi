@@ -420,7 +420,7 @@ public class ExternalCreditBureauIntegrationWritePlatformServiceImplTest {
         jsonResponse.put("userName", "testUser");
         jsonResponse.put(".issued", "sample");
         jsonResponse.put(".expires", ZonedDateTime.now(ZoneId.systemDefault()).plusSeconds(3600)
-                .format(new DateTimeFormatterBuilder().appendPattern("EEE, dd MMM yyyy kk:mm:ss zzz").toFormatter(Locale.ENGLISH)));
+                .format(new DateTimeFormatterBuilder().appendPattern("EEE, yyyyMMdd kk:mm:ss zzz").toFormatter(Locale.ENGLISH)));
         return mapper.writeValueAsString(jsonResponse);
     }
 

@@ -491,9 +491,9 @@ final class ProductsApiResourceSwagger {
 
             @Schema(example = "en")
             public String locale;
-            @Schema(example = "dd MMMM yyyy")
+            @Schema(example = "yyyyMMdd")
             public String dateFormat;
-            @Schema(example = "04 May 2016")
+            @Schema(example = "20160504")
             public String fromDate;
             @Schema(example = "2")
             public Integer shareValue;

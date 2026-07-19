@@ -61,7 +61,7 @@ public class SavingsAccountRecalculateBalanceTest {
     public static final String WITHDRAW_AMOUNT_ADJUSTED = "500";
     public static final String MINIMUM_OPENING_BALANCE = "1000.0";
     public static final String ACCOUNT_TYPE_INDIVIDUAL = "INDIVIDUAL";
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
 
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;

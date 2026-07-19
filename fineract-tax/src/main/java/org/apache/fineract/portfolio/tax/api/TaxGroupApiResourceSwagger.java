@@ -74,7 +74,7 @@ final class TaxGroupApiResourceSwagger {
 
             @Schema(example = "7")
             public Long taxComponentId;
-            @Schema(example = "11 April 2016")
+            @Schema(example = "20160411")
             public String startDate;
         }
 
@@ -83,7 +83,7 @@ final class TaxGroupApiResourceSwagger {
         @Schema(example = "en")
         public String locale;
         public Set<PostTaxesGroupTaxComponents> taxComponents;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
     }
 
@@ -109,7 +109,7 @@ final class TaxGroupApiResourceSwagger {
             public Long id;
             @Schema(example = "7")
             public Long taxComponentId;
-            @Schema(example = "22 April 2016")
+            @Schema(example = "20160422")
             public String endDate;
         }
 
@@ -118,7 +118,7 @@ final class TaxGroupApiResourceSwagger {
         @Schema(example = "en")
         public String locale;
         public Set<PutTaxesGroupTaxComponents> taxComponents;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
     }
 

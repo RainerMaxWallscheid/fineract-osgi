@@ -32,7 +32,7 @@ public class ProgressiveLoanDisbursementChargeTest extends FeignLoanTestBase {
 
     @Test
     public void testProgressiveLoanDisbursementChargeIsIncludedInTotalRepaymentExpected() {
-        runAt("01 June 2024", () -> {
+        runAt("20240601", () -> {
             // 1. Create a client
             Long clientId = createClient();
             // 2. Create a percentage-based disbursement charge (10% of amount) in EUR
@@ -40,13 +40,13 @@ public class ProgressiveLoanDisbursementChargeTest extends FeignLoanTestBase {
             // 3. Create a progressive loan product
             final Long loanProductId = createLoanProduct(create4IProgressive());
             // 4. Apply for a loan with 1000 EUR principal
-            Long loanId = applyForLoan(applyLP2ProgressiveLoanRequest(clientId, loanProductId, "01 June 2024", 1000.0, 10.0, 4, null));
+            Long loanId = applyForLoan(applyLP2ProgressiveLoanRequest(clientId, loanProductId, "20240601", 1000.0, 10.0, 4, null));
             // 5. Add the disbursement charge to the loan account before approval
             addDisbursementCharge(loanId, chargeId, 10.0);
             // 6. Approve the loan
-            approveLoan(loanId, LoanRequestBuilders.approveLoan(1000.0, "01 June 2024"));
+            approveLoan(loanId, LoanRequestBuilders.approveLoan(1000.0, "20240601"));
             // 7. Disburse the loan
-            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 June 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20240601");
             // 8. Retrieve the loan details
             final GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             // 9. Verify the disbursement charge is calculated correctly (10% of 1000 = 100 EUR)

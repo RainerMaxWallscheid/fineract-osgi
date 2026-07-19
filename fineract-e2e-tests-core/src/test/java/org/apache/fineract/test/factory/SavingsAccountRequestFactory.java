@@ -25,7 +25,7 @@ import org.apache.fineract.client.models.PostSavingsAccountsRequest;
 
 public final class SavingsAccountRequestFactory {
 
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     public static final String DEFAULT_LOCALE = "en";
     public static final String DEFAULT_TRANSACTION_DATE = "";
     public static final Long DEFAULT_CLIENT_ID = 1L;

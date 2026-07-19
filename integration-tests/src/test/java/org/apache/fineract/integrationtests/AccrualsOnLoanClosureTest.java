@@ -37,16 +37,16 @@ import org.junit.jupiter.api.Test;
 public class AccrualsOnLoanClosureTest extends FeignLoanTestBase {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AccrualsOnLoanClosureTest.class);
-    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
-    private static final String startDate = "22 April 2025";
-    private static final String disbursementDate = "22 April 2024";
-    private static final String repaymentDate = "25 April 2024";
+    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
+    private static final String startDate = "20250422";
+    private static final String disbursementDate = "20240422";
+    private static final String repaymentDate = "20240425";
     private static final Double disbursementAmount = 800.0;
     private static final Double repaymentAmount = 820.0;
     private static final Double chargeAmount = 20.0;
     private static Long loanId;
     private static PostChargesResponse penaltyResponse;
-    private static final String penaltyCharge1AddedDate = "24 April 2024";
+    private static final String penaltyCharge1AddedDate = "20240424";
 
     @Test
     public void testAccrualCreatedOnLoanClosureWithSubmittedDate() {
@@ -58,14 +58,14 @@ public class AccrualsOnLoanClosureTest extends FeignLoanTestBase {
         penaltyResponse = chargesHelper.createCharge(new ChargeRequest().active(true).chargeTimeType(2).chargeAppliesTo(1).chargeCalculationType(1).penalty(true).amount(20.0).currencyCode("USD").locale("en").chargePaymentMode(0).name(Utils.randomStringGenerator("PENALTY_", 6)));
         runAt(startDate, () -> {
             globalConfigurationHelper.updateGlobalConfiguration(CHARGE_ACCRUAL_DATE, new PutGlobalConfigurationsRequest().stringValue("submitted-date"));
-            addLoanCharge(loanId, new PostLoansLoanIdChargesRequest().dateFormat("dd MMMM yyyy").locale("en").chargeId(penaltyResponse.getResourceId()).amount(chargeAmount).dueDate(penaltyCharge1AddedDate));
-            addRepayment(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("dd MMMM yyyy").transactionDate(repaymentDate).locale("en").transactionAmount(repaymentAmount));
+            addLoanCharge(loanId, new PostLoansLoanIdChargesRequest().dateFormat("yyyyMMdd").locale("en").chargeId(penaltyResponse.getResourceId()).amount(chargeAmount).dueDate(penaltyCharge1AddedDate));
+            addRepayment(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat("yyyyMMdd").transactionDate(repaymentDate).locale("en").transactionAmount(repaymentAmount));
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             verifyRepaymentSchedule(loanId,  //
-            installment(800.0, null, "22 April 2024"),  //
-            installment(800.0, 0.0, 0.0, 20.0, 0.0, true, "22 May 2024"));
+            installment(800.0, null, "20240422"),  //
+            installment(800.0, 0.0, 0.0, 20.0, 0.0, true, "20240522"));
             verifyTransactions(loanId,  //
-            transaction(800.0, "Disbursement", "22 April 2024", 800.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), transaction(820.0, "Repayment", "25 April 2024", 0.0, 800.0, 0.0, 0.0, 20.0, 0.0, 0.0), transaction(20.0, "Accrual", "25 April 2024", 0.0, 0.0, 0.0, 0.0, 20.0, 0.0, 0.0));
+            transaction(800.0, "Disbursement", "20240422", 800.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), transaction(820.0, "Repayment", "20240425", 0.0, 800.0, 0.0, 0.0, 20.0, 0.0, 0.0), transaction(20.0, "Accrual", "20240425", 0.0, 0.0, 0.0, 0.0, 20.0, 0.0, 0.0));
             globalConfigurationHelper.updateGlobalConfiguration(CHARGE_ACCRUAL_DATE, new PutGlobalConfigurationsRequest().stringValue("due-date"));
         });
     }

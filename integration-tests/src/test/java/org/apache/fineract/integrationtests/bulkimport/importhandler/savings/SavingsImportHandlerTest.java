@@ -67,7 +67,7 @@ public class SavingsImportHandlerTest {
     private RequestSpecification requestSpec;
 
     private static final String CREATE_CLIENT_URL = "/fineract-provider/api/v1/clients?" + Utils.TENANT_IDENTIFIER;
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
 
     @BeforeEach
     public void setup() {
@@ -102,7 +102,7 @@ public class SavingsImportHandlerTest {
         clientMap.put("dateFormat", DATE_FORMAT);
         clientMap.put("locale", "en");
         clientMap.put("active", "true");
-        clientMap.put("activationDate", "04 March 2011");
+        clientMap.put("activationDate", "20110304");
 
         Integer outcome_client_creation = Utils.performServerPost(requestSpec, responseSpec, CREATE_CLIENT_URL,
                 new Gson().toJson(clientMap), "clientId");
@@ -125,7 +125,7 @@ public class SavingsImportHandlerTest {
         Assertions.assertNotNull(outcome_sp_creaction, "Could not create Savings product");
 
         SavingsAccountHelper savingsAccountHelper = new SavingsAccountHelper(requestSpec, responseSpec);
-        Workbook workbook = savingsAccountHelper.getSavingsWorkbook("dd MMMM yyyy");
+        Workbook workbook = savingsAccountHelper.getSavingsWorkbook("yyyyMMdd");
 
         // insert dummy data into Savings sheet
         Sheet savingsSheet = workbook.getSheet(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME);
@@ -138,8 +138,8 @@ public class SavingsImportHandlerTest {
         firstSavingsRow.createCell(SavingsConstants.PRODUCT_COL)
                 .setCellValue(savingsProductSheet.getRow(1).getCell(1).getStringCellValue());
         firstSavingsRow.createCell(SavingsConstants.FIELD_OFFICER_NAME_COL).setCellValue((String) staffMap.get("displayName"));
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-        Date date = simpleDateFormat.parse("13 May 2017");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        Date date = simpleDateFormat.parse("20170513");
         firstSavingsRow.createCell(SavingsConstants.SUBMITTED_ON_DATE_COL).setCellValue(date);
         firstSavingsRow.createCell(SavingsConstants.APPROVED_DATE_COL).setCellValue(date);
         firstSavingsRow.createCell(SavingsConstants.ACTIVATION_DATE_COL).setCellValue(date);

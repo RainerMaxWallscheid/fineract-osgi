@@ -54,7 +54,7 @@ public class LoanRescheduleStepDef extends AbstractStepDef {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanRescheduleStepDef.class);
     public static final String DATE_FORMAT_HU = "yyyy-MM-dd";
-    public static final String DATE_FORMAT_EN = "dd MMMM yyyy";
+    public static final String DATE_FORMAT_EN = "yyyyMMdd";
     public static final DateTimeFormatter FORMATTER_HU = DateTimeFormatter.ofPattern(DATE_FORMAT_HU);
     public static final DateTimeFormatter FORMATTER_EN = DateTimeFormatter.ofPattern(DATE_FORMAT_EN, Locale.ENGLISH);
     @Autowired
@@ -92,13 +92,13 @@ public class LoanRescheduleStepDef extends AbstractStepDef {
         //
         //
         //
-        new PostCreateRescheduleLoansRequest().loanId(loanId).rescheduleFromDate(rescheduleFromDate).submittedOnDate(submittedOnDate).adjustedDueDate(adjustedDueDate).graceOnPrincipal(graceOfPrincipal).graceOnInterest(graceOnInterest).extraTerms(extraTerms).newInterestRate(newInterestRate).rescheduleReasonId(codeValueResolver.resolve(CodeNames.LOAN_RESCHEDULE_REASON.getValue(), DefaultCodeValue.TEST.getName())).rescheduleReasonComment("").dateFormat("dd MMMM yyyy").locale("en");//
+        new PostCreateRescheduleLoansRequest().loanId(loanId).rescheduleFromDate(rescheduleFromDate).submittedOnDate(submittedOnDate).adjustedDueDate(adjustedDueDate).graceOnPrincipal(graceOfPrincipal).graceOnInterest(graceOnInterest).extraTerms(extraTerms).newInterestRate(newInterestRate).rescheduleReasonId(codeValueResolver.resolve(CodeNames.LOAN_RESCHEDULE_REASON.getValue(), DefaultCodeValue.TEST.getName())).rescheduleReasonComment("").dateFormat("yyyyMMdd").locale("en");//
         PostCreateRescheduleLoansResponse createResponse = ok(() -> fineractClient.rescheduleLoans().createRescheduleLoan(request));
         Long scheduleId = createResponse.getResourceId();
         PostUpdateRescheduleLoansRequest approveRequest = //
         //
         //
-        new PostUpdateRescheduleLoansRequest().approvedOnDate(submittedOnDate).dateFormat("dd MMMM yyyy").locale("en");//
+        new PostUpdateRescheduleLoansRequest().approvedOnDate(submittedOnDate).dateFormat("yyyyMMdd").locale("en");//
         ok(() -> fineractClient.rescheduleLoans().updateRescheduleLoan(scheduleId, approveRequest, Map.<String, Object>of("command", "approve")));
         if (newInterestRate != null) {
             eventCheckHelper.loanBalanceChangedEventCheck(loanId);
@@ -130,7 +130,7 @@ public class LoanRescheduleStepDef extends AbstractStepDef {
         //
         //
         //
-        new PostCreateRescheduleLoansRequest().loanId(loanId).rescheduleFromDate(rescheduleFromDate).submittedOnDate(submittedOnDate).adjustedDueDate(adjustedDueDate).graceOnPrincipal(graceOfPrincipal).graceOnInterest(graceOnInterest).extraTerms(extraTerms).newInterestRate(newInterestRate).rescheduleReasonId(54L).rescheduleReasonComment("").dateFormat("dd MMMM yyyy").locale("en");//
+        new PostCreateRescheduleLoansRequest().loanId(loanId).rescheduleFromDate(rescheduleFromDate).submittedOnDate(submittedOnDate).adjustedDueDate(adjustedDueDate).graceOnPrincipal(graceOfPrincipal).graceOnInterest(graceOnInterest).extraTerms(extraTerms).newInterestRate(newInterestRate).rescheduleReasonId(54L).rescheduleReasonComment("").dateFormat("yyyyMMdd").locale("en");//
         LoanRescheduleErrorMessage loanRescheduleErrorMessage = LoanRescheduleErrorMessage.valueOf(errorMessageType);
         LocalDate localDate = LocalDate.parse(rescheduleFromDate, FORMATTER_EN);
         String rescheduleFromDateFormatted = localDate.format(FORMATTER_HU);

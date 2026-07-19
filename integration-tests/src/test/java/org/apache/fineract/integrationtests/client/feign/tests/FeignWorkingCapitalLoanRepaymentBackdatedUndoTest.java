@@ -151,16 +151,16 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
     @DisplayName("a backdated repayment that brings the total repaid to the full principal closes the loan with zero outstanding")
     void backdatedRepayment_closesLoan_whenBalanceReachesZero() {
         businessDateHelper.runAt("2026-01-01", () -> {
-            final Long client = clientHelper.createClient("01 January 2026");
-            final Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 January 2026");
+            final Long client = clientHelper.createClient("20260101");
+            final Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260101");
 
             // Partial repayment on day 10 leaves 5000 outstanding.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-10");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(4000), "10 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(4000), "20260110"));
 
             // Backdated repayment on day 5 brings the total repaid to exactly the 9000 principal.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-01-15");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(5000), "05 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(5000), "20260105"));
 
             final GetWorkingCapitalLoansLoanIdResponse loan = wcLoanHelper.getLoanDetails(loanId);
             assertNotNull(loan.getBalance(), "Balance should exist");
@@ -178,16 +178,16 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
     @DisplayName("a backdated repayment that exceeds the principal marks the loan overpaid with the exact excess as overpayment")
     void backdatedRepayment_overpaysLoan_whenBalanceNegative() {
         businessDateHelper.runAt("2026-02-01", () -> {
-            final Long client = clientHelper.createClient("01 February 2026");
-            final Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 February 2026");
+            final Long client = clientHelper.createClient("20260201");
+            final Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260201");
 
             // Repayment on day 10 leaves 2000 outstanding.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-02-10");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(7000), "10 February 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(7000), "20260210"));
 
             // Backdated repayment on day 5 pushes the total repaid to 12000 against a 9000 principal.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-02-15");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(5000), "05 February 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(5000), "20260205"));
 
             final GetWorkingCapitalLoansLoanIdResponse loan = wcLoanHelper.getLoanDetails(loanId);
             assertNotNull(loan.getBalance(), "Balance should exist");
@@ -205,12 +205,12 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
     @DisplayName("undoing a partial repayment on an active loan flags the transaction reversed and restores the outstanding balance")
     void undoRepayment_onActiveLoan_restoresBalance() {
         businessDateHelper.runAt("2026-03-01", () -> {
-            final Long client = clientHelper.createClient("01 March 2026");
-            final Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 March 2026");
+            final Long client = clientHelper.createClient("20260301");
+            final Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260301");
 
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-03-05");
             final Long repaymentTxnId = wcLoanHelper.makeRepayment(loanId,
-                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "05 March 2026"));
+                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "20260305"));
 
             final GetWorkingCapitalLoansLoanIdResponse afterRepayment = wcLoanHelper.getLoanDetails(loanId);
             assertEqualBigDecimal(BigDecimal.valueOf(6000), afterRepayment.getBalance().getPrincipalOutstanding(),
@@ -237,12 +237,12 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
     @DisplayName("undoing the closing repayment re-opens a closed loan back to active with the full outstanding restored")
     void undoRepayment_reopensClosedLoan() {
         businessDateHelper.runAt("2026-04-01", () -> {
-            final Long client = clientHelper.createClient("01 April 2026");
-            final Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 April 2026");
+            final Long client = clientHelper.createClient("20260401");
+            final Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260401");
 
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-04-05");
             final Long closingTxnId = wcLoanHelper.makeRepayment(loanId,
-                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(9000), "05 April 2026"));
+                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(9000), "20260405"));
 
             final GetWorkingCapitalLoansLoanIdResponse closed = wcLoanHelper.getLoanDetails(loanId);
             assertEquals(Boolean.TRUE, closed.getStatus().getClosedObligationsMet(), "Loan should be closed after the full repayment");
@@ -262,15 +262,15 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
     @DisplayName("a backdated repayment followed by COB posts exactly one discount fee amortization transaction capped by the discount")
     void backdatedRepayment_thenCOB_postsDiscountFeeAmortization() {
         businessDateHelper.runAt("2026-05-01", () -> {
-            final Long client = clientHelper.createClient("01 May 2026");
+            final Long client = clientHelper.createClient("20260501");
             final BigDecimal principal = BigDecimal.valueOf(9000);
             final BigDecimal discount = BigDecimal.valueOf(1000);
             final Long productId = createAccrualProductWithDiscount();
-            final Long loanId = submitApproveDisburseWithDiscount(client, productId, principal, discount, "01 May 2026");
+            final Long loanId = submitApproveDisburseWithDiscount(client, productId, principal, discount, "20260501");
 
             // Backdated repayment (booked on day 5 while the business date has advanced to day 10).
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-05-10");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "05 May 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "20260505"));
 
             wcLoanHelper.executeInlineWCCOB(loanId);
 
@@ -290,15 +290,15 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
     @DisplayName("undoing the only repayment and running COB posts one amortization adjustment and returns net amortized income to zero")
     void undoRepayment_thenCOB_postsAmortizationAdjustment() {
         businessDateHelper.runAt("2026-06-01", () -> {
-            final Long client = clientHelper.createClient("01 June 2026");
+            final Long client = clientHelper.createClient("20260601");
             final BigDecimal principal = BigDecimal.valueOf(9000);
             final BigDecimal discount = BigDecimal.valueOf(1000);
             final Long productId = createAccrualProductWithDiscount();
-            final Long loanId = submitApproveDisburseWithDiscount(client, productId, principal, discount, "01 June 2026");
+            final Long loanId = submitApproveDisburseWithDiscount(client, productId, principal, discount, "20260601");
 
             // Repayment + COB recognizes some discount via an amortization transaction.
             final Long repaymentTxnId = wcLoanHelper.makeRepayment(loanId,
-                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "01 June 2026"));
+                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(3000), "20260601"));
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-06-02");
             wcLoanHelper.executeInlineWCCOB(loanId);
             assertEquals(1, filterByType(wcLoanHelper.getTransactions(loanId), DISCOUNT_FEE_AMORTIZATION_CODE).size(),
@@ -324,10 +324,10 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
     @DisplayName("a backdated repayment covering the past-due minimum payment clears the loan's delinquency")
     void backdatedRepayment_reevaluatesDelinquency() {
         businessDateHelper.runAt("2026-07-01", () -> {
-            final Long client = clientHelper.createClient("01 July 2026");
+            final Long client = clientHelper.createClient("20260701");
             final BigDecimal principal = BigDecimal.valueOf(9000);
             final Long productId = createDelinquencyProduct();
-            final Long loanId = createAndDisburseLoanOnProduct(client, productId, principal, "01 July 2026");
+            final Long loanId = createAndDisburseLoanOnProduct(client, productId, principal, "20260701");
 
             // Let the first delinquency period elapse unpaid, then COB classifies the loan as delinquent.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-07-26");
@@ -337,7 +337,7 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
                     "Loan must become delinquent (start date = disbursement + grace) once the first period elapses unpaid");
 
             // A backdated repayment that covers the period's minimum payment (3% of 9000 = 270) clears the delinquency.
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(300), "05 July 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(300), "20260705"));
 
             assertNull(wcLoanHelper.getLoanDetails(loanId).getDelinquencyStartDate(),
                     "Delinquency must be cleared after a backdated repayment that covers the past-due minimum payment");
@@ -348,10 +348,10 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
     @DisplayName("undoing a delinquency-clearing repayment restores the loan to delinquent after COB re-evaluation")
     void undoRepayment_reevaluatesDelinquency() {
         businessDateHelper.runAt("2026-08-01", () -> {
-            final Long client = clientHelper.createClient("01 August 2026");
+            final Long client = clientHelper.createClient("20260801");
             final BigDecimal principal = BigDecimal.valueOf(9000);
             final Long productId = createDelinquencyProduct();
-            final Long loanId = createAndDisburseLoanOnProduct(client, productId, principal, "01 August 2026");
+            final Long loanId = createAndDisburseLoanOnProduct(client, productId, principal, "20260801");
 
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-08-26");
             wcLoanHelper.executeInlineWCCOB(loanId);
@@ -361,7 +361,7 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
 
             // A repayment covering the minimum payment clears the delinquency.
             final Long repaymentTxnId = wcLoanHelper.makeRepayment(loanId,
-                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(300), "05 August 2026"));
+                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(300), "20260805"));
             assertNull(wcLoanHelper.getLoanDetails(loanId).getDelinquencyStartDate(),
                     "Delinquency must be cleared once the minimum payment is covered");
 
@@ -379,9 +379,9 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
     @DisplayName("a backdated repayment covering the past-due minimum clears the breached period's outstanding and breach flag")
     void backdatedRepayment_reevaluatesBreach() {
         businessDateHelper.runAt("2026-01-01", () -> {
-            final Long client = clientHelper.createClient("01 January 2026");
+            final Long client = clientHelper.createClient("20260101");
             final Long productId = createBreachProduct();
-            final Long loanId = createAndDisburseLoanOnProduct(client, productId, BigDecimal.valueOf(9000), "01 January 2026");
+            final Long loanId = createAndDisburseLoanOnProduct(client, productId, BigDecimal.valueOf(9000), "20260101");
 
             // Period 1 spans 01-31 Jan. The COB step runs one day behind the business date, so COB on 01 Feb evaluates
             // 31 Jan (the period's last day) and flags it breached while the 500 minimum is unpaid.
@@ -396,7 +396,7 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
 
             // A backdated repayment dated inside period 1 that covers the 500 minimum re-evaluates and clears the
             // breach.
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(500), "15 January 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(500), "20260115"));
 
             final WorkingCapitalLoanBreachScheduleData cleared = findBreachPeriod(wcLoanHelper.getBreachSchedule(loanId), 1);
             assertEqualBigDecimal(BigDecimal.ZERO, cleared.getOutstandingAmount(),
@@ -410,9 +410,9 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
     @DisplayName("undoing a breach-clearing repayment restores the ended period's outstanding and breach flag")
     void undoRepayment_reevaluatesBreach() {
         businessDateHelper.runAt("2026-03-01", () -> {
-            final Long client = clientHelper.createClient("01 March 2026");
+            final Long client = clientHelper.createClient("20260301");
             final Long productId = createBreachProduct();
-            final Long loanId = createAndDisburseLoanOnProduct(client, productId, BigDecimal.valueOf(9000), "01 March 2026");
+            final Long loanId = createAndDisburseLoanOnProduct(client, productId, BigDecimal.valueOf(9000), "20260301");
 
             // Period 1 spans 01-31 Mar. The COB step runs one day behind the business date, so COB on 01 Apr evaluates
             // 31 Mar (the period's last day) and flags it breached (500 minimum outstanding).
@@ -423,7 +423,7 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
 
             // A repayment dated inside period 1 that covers the 500 minimum clears the breach.
             final Long repaymentTxnId = wcLoanHelper.makeRepayment(loanId,
-                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(500), "15 March 2026"));
+                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(500), "20260315"));
             final WorkingCapitalLoanBreachScheduleData cleared = findBreachPeriod(wcLoanHelper.getBreachSchedule(loanId), 1);
             assertEqualBigDecimal(BigDecimal.ZERO, cleared.getOutstandingAmount(), "Period 1 outstanding cleared to 0 by the repayment");
             assertEquals(Boolean.FALSE, cleared.getBreach(), "Period 1 breach cleared (false) by the repayment");
@@ -444,13 +444,13 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
     @DisplayName("a backdated repayment triggers reprocessing that redistributes the later repayment's charge allocation onto principal")
     void backdatedRepayment_withCharges_reallocatesTransactions() {
         businessDateHelper.runAt("2026-09-01", () -> {
-            final Long client = clientHelper.createClient("01 September 2026");
-            final Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "01 September 2026");
-            final Long feeLoanChargeId = addCharge(loanId, false, 100, "01 September 2026");
+            final Long client = clientHelper.createClient("20260901");
+            final Long loanId = createAndDisburseLoanOnDate(client, BigDecimal.valueOf(9000), "20260901");
+            final Long feeLoanChargeId = addCharge(loanId, false, 100, "20260901");
 
             // R1 on day 20 is the only repayment so far, so the 100 settles the fee in full.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-09-20");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(100), "20 September 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(100), "20260920"));
             final GetWorkingCapitalLoanTransactionIdResponse r1Before = findTransaction(wcLoanHelper.getTransactions(loanId),
                     LocalDate.of(2026, 9, 20), BigDecimal.valueOf(100));
             assertEqualBigDecimal(BigDecimal.valueOf(100), r1Before.getFeeChargesPortion(), "Before reprocessing R1 settles the whole fee");
@@ -459,7 +459,7 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
             // A backdated R2 on day 10 settles the fee first when replayed chronologically, so reprocessing must move
             // R1's allocation from the fee onto principal.
             businessDateHelper.updateBusinessDate("BUSINESS_DATE", "2026-09-25");
-            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(100), "10 September 2026"));
+            wcLoanHelper.makeRepayment(loanId, WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(100), "20260910"));
 
             final List<GetWorkingCapitalLoanTransactionIdResponse> transactions = wcLoanHelper.getTransactions(loanId);
             final GetWorkingCapitalLoanTransactionIdResponse r2 = findTransaction(transactions, LocalDate.of(2026, 9, 10),
@@ -488,14 +488,14 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
     @DisplayName("undoing a fee-settling repayment flags the original GL legs reversed and posts mirrored reversal legs")
     void undoRepayment_withFees_reversesGLEntries() {
         businessDateHelper.runAt("2026-10-01", () -> {
-            final Long client = clientHelper.createClient("01 October 2026");
+            final Long client = clientHelper.createClient("20261001");
             final Long productId = createAccrualProductWithoutDiscount();
-            final Long loanId = createAndDisburseLoanOnProduct(client, productId, BigDecimal.valueOf(9000), "01 October 2026");
-            addCharge(loanId, false, 100, "01 October 2026");
+            final Long loanId = createAndDisburseLoanOnProduct(client, productId, BigDecimal.valueOf(9000), "20261001");
+            addCharge(loanId, false, 100, "20261001");
 
             // A 100 repayment settles the fee in full.
             final Long repaymentTxnId = wcLoanHelper.makeRepayment(loanId,
-                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(100), "01 October 2026"));
+                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(100), "20261001"));
             final List<JournalEntryTransactionItem> original = journalEntriesFor(repaymentTxnId);
             assertJournalEntry(original, "DEBIT", fundSourceAccount, BigDecimal.valueOf(100), false);
             assertJournalEntry(original, "CREDIT", feesReceivableAccount, BigDecimal.valueOf(100), false);
@@ -518,14 +518,14 @@ public class FeignWorkingCapitalLoanRepaymentBackdatedUndoTest extends FeignInte
     @DisplayName("undoing a penalty-settling repayment flags the original GL legs reversed and posts mirrored reversal legs")
     void undoRepayment_withPenalties_reversesGLEntries() {
         businessDateHelper.runAt("2026-11-01", () -> {
-            final Long client = clientHelper.createClient("01 November 2026");
+            final Long client = clientHelper.createClient("20261101");
             final Long productId = createAccrualProductWithoutDiscount();
-            final Long loanId = createAndDisburseLoanOnProduct(client, productId, BigDecimal.valueOf(9000), "01 November 2026");
-            addCharge(loanId, true, 100, "01 November 2026");
+            final Long loanId = createAndDisburseLoanOnProduct(client, productId, BigDecimal.valueOf(9000), "20261101");
+            addCharge(loanId, true, 100, "20261101");
 
             // A 100 repayment settles the penalty in full.
             final Long repaymentTxnId = wcLoanHelper.makeRepayment(loanId,
-                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(100), "01 November 2026"));
+                    WorkingCapitalLoanRequestBuilders.repayment(BigDecimal.valueOf(100), "20261101"));
             final List<JournalEntryTransactionItem> original = journalEntriesFor(repaymentTxnId);
             assertJournalEntry(original, "DEBIT", fundSourceAccount, BigDecimal.valueOf(100), false);
             assertJournalEntry(original, "CREDIT", penaltiesReceivableAccount, BigDecimal.valueOf(100), false);

@@ -101,14 +101,14 @@ public class GroupLoanIntegrationTest {
         LOG.info("LoanId : {} ", loanId);
 
         List<Map<String, Object>> approvalFormData = new ArrayList<>();
-        approvalFormData.add(approvalFormData(loanId, "20 September 2011"));
+        approvalFormData.add(approvalFormData(loanId, "20110920"));
 
         HashMap loanStatusHashMap = this.loanTransactionHelper.approveGlimAccount(this.requestSpec, this.responseSpec, approvalFormData,
                 glimId);
         LOG.info("glim approval loanSchedule: {} ", loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
 
-        loanStatusHashMap = this.loanTransactionHelper.disburseGlimAccount("25 September 2011", glimId);
+        loanStatusHashMap = this.loanTransactionHelper.disburseGlimAccount("20110925", glimId);
         LOG.info("glim disbursement loanSchedule: {} ", loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
 
@@ -120,7 +120,7 @@ public class GroupLoanIntegrationTest {
         LOG.info("glim undoApproval loanSchedule: {} ", loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-        loanStatusHashMap = this.loanTransactionHelper.rejectGlimAccount("22 September 2011", glimId);
+        loanStatusHashMap = this.loanTransactionHelper.rejectGlimAccount("20110922", glimId);
         LOG.info("glim reject loanSchedule: {} ", loanStatusHashMap);
         LoanStatusChecker.verifyLoanAccountRejected(loanStatusHashMap);
     }
@@ -221,8 +221,8 @@ public class GroupLoanIntegrationTest {
                 .withAmortizationTypeAsEqualInstallments() //
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("20 September 2011") //
-                .withSubmittedOnDate("20 September 2011") //
+                .withExpectedDisbursementDate("20110920") //
+                .withSubmittedOnDate("20110920") //
                 .withLoanType("group").build(groupID.toString(), loanProductID.toString(), null);
         LOG.info(loanApplicationJSON);
         return this.loanTransactionHelper.getLoanId(loanApplicationJSON);
@@ -251,8 +251,8 @@ public class GroupLoanIntegrationTest {
                 .withAmortizationTypeAsEqualInstallments() //
                 .withInterestTypeAsDecliningBalance() //
                 .withInterestCalculationPeriodTypeSameAsRepaymentPeriod() //
-                .withExpectedDisbursementDate("20 September 2011") //
-                .withSubmittedOnDate("20 September 2011").withLoanType("glim").withtotalLoan("10000").withParentAccount("1")
+                .withExpectedDisbursementDate("20110920") //
+                .withSubmittedOnDate("20110920").withLoanType("glim").withtotalLoan("10000").withParentAccount("1")
                 .withCollaterals(collaterals).build(clientID.toString(), groupID.toString(), loanProductID.toString(), null);
         LOG.info(GlimApplicationJSON);
         return this.loanTransactionHelper.getGlimId(GlimApplicationJSON);

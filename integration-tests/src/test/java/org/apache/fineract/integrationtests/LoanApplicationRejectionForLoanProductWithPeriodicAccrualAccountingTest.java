@@ -87,7 +87,7 @@ public class LoanApplicationRejectionForLoanProductWithPeriodicAccrualAccounting
 
         // Reject Loan application
         PostLoansLoanIdResponse result = this.loanTransactionHelper.rejectLoan(loanExternalIdStr,
-                new PostLoansLoanIdRequest().rejectedOnDate("3 September 2022").locale("en").dateFormat("dd MMMM yyyy"));
+                new PostLoansLoanIdRequest().rejectedOnDate("20220903").locale("en").dateFormat("yyyyMMdd"));
 
         // Verify Loan application status is Rejected
         assertTrue(result.getChanges().getStatus().getValue().equals("Rejected"));
@@ -111,7 +111,7 @@ public class LoanApplicationRejectionForLoanProductWithPeriodicAccrualAccounting
                 .withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1")
                 .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance()
                 .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("03 September 2022").withSubmittedOnDate("01 September 2022").withLoanType("individual")
+                .withExpectedDisbursementDate("20220903").withSubmittedOnDate("20220901").withLoanType("individual")
                 .withExternalId(externalId).build(clientID.toString(), loanProductID.toString(), null);
 
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);

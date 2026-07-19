@@ -28,7 +28,7 @@ public final class PeriodicAccrualAccountingHelper {
     private PeriodicAccrualAccountingHelper() {}
 
     public static void runPeriodicAccrualAccounting(final String date) {
-        final PostRunaccrualsRequest request = new PostRunaccrualsRequest().dateFormat("dd MMMM yyyy").locale("en_GB").tillDate(date);
+        final PostRunaccrualsRequest request = new PostRunaccrualsRequest().dateFormat("yyyyMMdd").locale("en_GB").tillDate(date);
         ok(() -> {
             FineractFeignClientHelper.getFineractFeignClient().periodicAccrualAccounting().executePeriodicAccrualAccounting(request);
             return null;

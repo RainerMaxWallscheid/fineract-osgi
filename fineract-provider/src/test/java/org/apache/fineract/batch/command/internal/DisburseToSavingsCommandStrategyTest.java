@@ -99,7 +99,7 @@ public class DisburseToSavingsCommandStrategyTest {
         br.setRelativeUrl(String.format("loans/%s?command=disburseToSavings", loanId));
         br.setMethod(HttpMethod.POST);
         br.setReference(Long.valueOf(RandomStringUtils.randomNumeric(5)));
-        br.setBody("{\"actualDisbursementDate\":\"01 March 2026\",\"locale\":\"en\",\"dateFormat\":\"dd MMMM yyyy\"}");
+        br.setBody("{\"actualDisbursementDate\":\"20260301\",\"locale\":\"en\",\"dateFormat\":\"yyyyMMdd\"}");
         return br;
     }
 

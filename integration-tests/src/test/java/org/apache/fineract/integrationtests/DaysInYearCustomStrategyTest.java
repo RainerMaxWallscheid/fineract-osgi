@@ -56,26 +56,26 @@ public class DaysInYearCustomStrategyTest extends FeignLoanTestBase {
     @Test
     public void testFEB_29_PERIOD_ONLY() {
         Long clientId = createClient();
-        runAt("1 January 2024", () -> {
+        runAt("20240101", () -> {
             Long loanProductId = createLoanProduct(create4IProgressive().currencyCode("USD").daysInYearType(DAYS_IN_YEAR_ACTUAL)
                     .daysInYearCustomStrategy(FEB_29_PERIOD_ONLY));
-            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "1 January 2024", 10000.0, 99.99, 12, null);
+            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "20240101", 10000.0, 99.99, 12, null);
             Assertions.assertNotNull(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(10000), "1 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(10000), "20240101");
             verifyRepaymentSchedule(loanId, //
-                    installment(10000.0, null, "01 January 2024"), //
-                    installment(519.92, 821.84, 1341.76, false, "01 February 2024"), //
-                    installment(564.78, 776.98, 1341.76, false, "01 March 2024"), //
-                    installment(609.07, 732.69, 1341.76, false, "01 April 2024"), //
-                    installment(659.12, 682.64, 1341.76, false, "01 May 2024"), //
-                    installment(713.29, 628.47, 1341.76, false, "01 June 2024"), //
-                    installment(771.91, 569.85, 1341.76, false, "01 July 2024"), //
-                    installment(835.35, 506.41, 1341.76, false, "01 August 2024"), //
-                    installment(904.0, 437.76, 1341.76, false, "01 September 2024"), //
-                    installment(978.3, 363.46, 1341.76, false, "01 October 2024"), //
-                    installment(1058.7, 283.06, 1341.76, false, "01 November 2024"), //
-                    installment(1145.71, 196.05, 1341.76, false, "01 December 2024"), //
-                    installment(1239.85, 101.9, 1341.75, false, "01 January 2025") //
+                    installment(10000.0, null, "20240101"), //
+                    installment(519.92, 821.84, 1341.76, false, "20240201"), //
+                    installment(564.78, 776.98, 1341.76, false, "20240301"), //
+                    installment(609.07, 732.69, 1341.76, false, "20240401"), //
+                    installment(659.12, 682.64, 1341.76, false, "20240501"), //
+                    installment(713.29, 628.47, 1341.76, false, "20240601"), //
+                    installment(771.91, 569.85, 1341.76, false, "20240701"), //
+                    installment(835.35, 506.41, 1341.76, false, "20240801"), //
+                    installment(904.0, 437.76, 1341.76, false, "20240901"), //
+                    installment(978.3, 363.46, 1341.76, false, "20241001"), //
+                    installment(1058.7, 283.06, 1341.76, false, "20241101"), //
+                    installment(1145.71, 196.05, 1341.76, false, "20241201"), //
+                    installment(1239.85, 101.9, 1341.75, false, "20250101") //
             );
         });
     }
@@ -83,26 +83,26 @@ public class DaysInYearCustomStrategyTest extends FeignLoanTestBase {
     @Test
     public void testFULL_LEAP_YEAR() {
         Long clientId = createClient();
-        runAt("1 January 2024", () -> {
+        runAt("20240101", () -> {
             Long loanProductId = createLoanProduct(
                     create4IProgressive().currencyCode("USD").daysInYearType(DAYS_IN_YEAR_ACTUAL).daysInYearCustomStrategy(FULL_LEAP_YEAR));
-            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "1 January 2024", 10000.0, 99.99, 12, null);
+            Long loanId = applyAndApproveProgressiveLoan(clientId, loanProductId, "20240101", 10000.0, 99.99, 12, null);
             Assertions.assertNotNull(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(10000), "1 January 2024");
+            disburseLoan(loanId, BigDecimal.valueOf(10000), "20240101");
             verifyRepaymentSchedule(loanId, //
-                    installment(10000.0, null, "01 January 2024"), //
-                    installment(521.04, 819.59, 1340.63, false, "01 February 2024"), //
-                    installment(563.74, 776.89, 1340.63, false, "01 March 2024"), //
-                    installment(609.95, 730.68, 1340.63, false, "01 April 2024"), //
-                    installment(659.94, 680.69, 1340.63, false, "01 May 2024"), //
-                    installment(714.03, 626.6, 1340.63, false, "01 June 2024"), //
-                    installment(772.55, 568.08, 1340.63, false, "01 July 2024"), //
-                    installment(835.86, 504.77, 1340.63, false, "01 August 2024"), //
-                    installment(904.37, 436.26, 1340.63, false, "01 September 2024"), //
-                    installment(978.49, 362.14, 1340.63, false, "01 October 2024"), //
-                    installment(1058.69, 281.94, 1340.63, false, "01 November 2024"), //
-                    installment(1145.46, 195.17, 1340.63, false, "01 December 2024"), //
-                    installment(1235.88, 104.68, 1340.56, false, "01 January 2025") //
+                    installment(10000.0, null, "20240101"), //
+                    installment(521.04, 819.59, 1340.63, false, "20240201"), //
+                    installment(563.74, 776.89, 1340.63, false, "20240301"), //
+                    installment(609.95, 730.68, 1340.63, false, "20240401"), //
+                    installment(659.94, 680.69, 1340.63, false, "20240501"), //
+                    installment(714.03, 626.6, 1340.63, false, "20240601"), //
+                    installment(772.55, 568.08, 1340.63, false, "20240701"), //
+                    installment(835.86, 504.77, 1340.63, false, "20240801"), //
+                    installment(904.37, 436.26, 1340.63, false, "20240901"), //
+                    installment(978.49, 362.14, 1340.63, false, "20241001"), //
+                    installment(1058.69, 281.94, 1340.63, false, "20241101"), //
+                    installment(1145.46, 195.17, 1340.63, false, "20241201"), //
+                    installment(1235.88, 104.68, 1340.56, false, "20250101") //
             );
         });
     }

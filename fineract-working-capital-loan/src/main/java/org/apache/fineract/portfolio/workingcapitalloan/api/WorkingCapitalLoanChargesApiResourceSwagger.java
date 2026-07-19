@@ -37,9 +37,9 @@ final class WorkingCapitalLoanChargesApiResourceSwagger {
         public String locale;
         @Schema(example = "100.00")
         public Double amount;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "29 April 2013")
+        @Schema(example = "20130429")
         public String dueDate;
         @Schema(example = "786444UUUYYH7")
         public String externalId;
@@ -71,7 +71,7 @@ final class WorkingCapitalLoanChargesApiResourceSwagger {
         public BigDecimal amount;
         @Schema(example = "en")
         public String locale;
-        @Schema(example = "dd MMMM yyyy")
+        @Schema(example = "yyyyMMdd")
         public String dateFormat;
         @Schema(example = "786444UUUYYH7")
         public String externalId;

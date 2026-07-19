@@ -40,11 +40,11 @@ public class LoanRefundTransactionTest extends FeignLoanTestBase {
 
     @Test
     public void testMerchantIssuedRefundCreatesAndReversesInterestRefund() {
-        runAt("01 July 2024", () -> {
+        runAt("20240701", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             final Long loanId = createAndDisburseLoanForMerchantIssuedRefundWithInterestRefund(clientId);
             final PostLoansLoanIdTransactionsResponse merchantIssuedRefundResponse = makeMerchantIssuedRefund(loanId,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("01 July 2024")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("20240701")
                             .locale(LoanTestData.LOCALE).transactionAmount(100.0));
 
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
@@ -56,7 +56,7 @@ public class LoanRefundTransactionTest extends FeignLoanTestBase {
                     .anyMatch(transaction -> transaction.getType().getCode().equals("loanTransactionType.interestRefund")
                             && Boolean.FALSE.equals(transaction.getManuallyReversed())));
 
-            reverseLoanTransaction(loanId, merchantIssuedRefundResponse.getResourceId(), "01 July 2024");
+            reverseLoanTransaction(loanId, merchantIssuedRefundResponse.getResourceId(), "20240701");
 
             loanDetails = getLoanDetails(loanId);
             Assertions.assertTrue(
@@ -71,11 +71,11 @@ public class LoanRefundTransactionTest extends FeignLoanTestBase {
 
     @Test
     public void testPayoutRefundCreatesAndReversesInterestRefund() {
-        runAt("01 July 2024", () -> {
+        runAt("20240701", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
             final Long loanId = createAndDisburseLoanForPayoutRefundWithInterestRefund(clientId);
             final PostLoansLoanIdTransactionsResponse payoutRefundResponse = makePayoutRefund(loanId,
-                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("01 July 2024")
+                    new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("20240701")
                             .locale(LoanTestData.LOCALE).transactionAmount(100.0));
 
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
@@ -86,7 +86,7 @@ public class LoanRefundTransactionTest extends FeignLoanTestBase {
                     .anyMatch(transaction -> transaction.getType().getCode().equals("loanTransactionType.interestRefund")
                             && Boolean.FALSE.equals(transaction.getManuallyReversed())));
 
-            reverseLoanTransaction(loanId, payoutRefundResponse.getResourceId(), "01 July 2024");
+            reverseLoanTransaction(loanId, payoutRefundResponse.getResourceId(), "20240701");
 
             loanDetails = getLoanDetails(loanId);
             Assertions.assertTrue(loanDetails.getTransactions().stream().anyMatch(
@@ -100,18 +100,18 @@ public class LoanRefundTransactionTest extends FeignLoanTestBase {
 
     @Test
     public void testMerchantIssuedRefundDoesNotCreateInterestRefundWithLessThanOrEqualToZeroInterest() {
-        runAt("20 April 2025", () -> {
+        runAt("20250420", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-            Long loanId = createLoanForRefundWithInterestRefund(clientId, "MERCHANT_ISSUED_REFUND", "05 April 2025", 500.0, 20.99, 6);
-            disburseLoan(loanId, BigDecimal.valueOf(265.91), "05 April 2025");
-            disburseLoan(loanId, BigDecimal.valueOf(1.99), "05 April 2025");
-            disburseLoan(loanId, BigDecimal.valueOf(20.00), "05 April 2025");
+            Long loanId = createLoanForRefundWithInterestRefund(clientId, "MERCHANT_ISSUED_REFUND", "20250405", 500.0, 20.99, 6);
+            disburseLoan(loanId, BigDecimal.valueOf(265.91), "20250405");
+            disburseLoan(loanId, BigDecimal.valueOf(1.99), "20250405");
+            disburseLoan(loanId, BigDecimal.valueOf(20.00), "20250405");
 
             makeMerchantIssuedRefund(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN)
-                    .transactionDate("06 April 2025").locale(LoanTestData.LOCALE).transactionAmount(6.29));
+                    .transactionDate("20250406").locale(LoanTestData.LOCALE).transactionAmount(6.29));
 
             makeMerchantIssuedRefund(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN)
-                    .transactionDate("07 April 2025").locale(LoanTestData.LOCALE).transactionAmount(1.99));
+                    .transactionDate("20250407").locale(LoanTestData.LOCALE).transactionAmount(1.99));
 
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             Assertions.assertTrue(loanDetails.getTransactions().stream()
@@ -124,23 +124,23 @@ public class LoanRefundTransactionTest extends FeignLoanTestBase {
     public void testMerchantIssuedRefundAndCreditBalanceRefundWithAdjustSchedule() {
         final AtomicReference<Long> loanIdRef = new AtomicReference<>();
 
-        runAt("24 September 2025", () -> {
+        runAt("20250924", () -> {
             final Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-            final Long loanId = createLoanForRefundWithInterestRefund(clientId, "MERCHANT_ISSUED_REFUND", "24 September 2025", 116.89,
+            final Long loanId = createLoanForRefundWithInterestRefund(clientId, "MERCHANT_ISSUED_REFUND", "20250924", 116.89,
                     35.99, 3);
             loanIdRef.set(loanId);
-            disburseLoan(loanId, BigDecimal.valueOf(116.89), "24 September 2025");
+            disburseLoan(loanId, BigDecimal.valueOf(116.89), "20250924");
         });
 
-        runAt("26 September 2025", () -> {
+        runAt("20250926", () -> {
             executeInlineCOB(loanIdRef.get());
-            addRepaymentForLoan(loanIdRef.get(), 117.12, "26 September 2025");
+            addRepaymentForLoan(loanIdRef.get(), 117.12, "20250926");
         });
 
-        runAt("06 October 2025", () -> {
+        runAt("20251006", () -> {
             executeInlineCOB(loanIdRef.get());
             makeMerchantIssuedRefund(loanIdRef.get(), new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN)
-                    .transactionDate("06 October 2025").locale(LoanTestData.LOCALE).transactionAmount(8.13));
+                    .transactionDate("20251006").locale(LoanTestData.LOCALE).transactionAmount(8.13));
 
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanIdRef.get());
             assertTrue(loanDetails.getStatus().getOverpaid());
@@ -148,20 +148,20 @@ public class LoanRefundTransactionTest extends FeignLoanTestBase {
             validateLoanSummaryBalances(loanDetails, 0.00, 117.12, 0.00, 116.89, 8.14);
         });
 
-        runAt("07 October 2025", () -> {
+        runAt("20251007", () -> {
             executeInlineCOB(loanIdRef.get());
             makeCreditBalanceRefund(loanIdRef.get(), new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN)
-                    .transactionDate("07 October 2025").locale(LoanTestData.LOCALE).transactionAmount(8.14));
+                    .transactionDate("20251007").locale(LoanTestData.LOCALE).transactionAmount(8.14));
 
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanIdRef.get());
             assertTrue(loanDetails.getStatus().getClosedObligationsMet());
             validateLoanSummaryBalances(loanDetails, 0.00, 117.12, 0.00, 116.89, null);
 
             Long scheduleId = createRescheduleRequest(new PostCreateRescheduleLoansRequest().loanId(loanIdRef.get()).rescheduleReasonId(1L)
-                    .rescheduleFromDate("25 September 2025").dateFormat(DATETIME_PATTERN).locale(LoanTestData.LOCALE)
-                    .submittedOnDate("07 October 2025").newInterestRate(BigDecimal.valueOf(25.99)));
+                    .rescheduleFromDate("20250925").dateFormat(DATETIME_PATTERN).locale(LoanTestData.LOCALE)
+                    .submittedOnDate("20251007").newInterestRate(BigDecimal.valueOf(25.99)));
 
-            approveRescheduleRequest(scheduleId, new PostUpdateRescheduleLoansRequest().approvedOnDate("07 October 2025")
+            approveRescheduleRequest(scheduleId, new PostUpdateRescheduleLoansRequest().approvedOnDate("20251007")
                     .locale(LoanTestData.LOCALE).dateFormat(DATETIME_PATTERN));
 
             loanDetails = getLoanDetails(loanIdRef.get());
@@ -180,8 +180,8 @@ public class LoanRefundTransactionTest extends FeignLoanTestBase {
     }
 
     private Long createAndDisburseLoanForRefundWithInterestRefund(Long clientId, String refundType) {
-        Long loanId = createLoanForRefundWithInterestRefund(clientId, refundType, "01 June 2024", 1000.0, 10.0, 4);
-        disburseLoan(loanId, BigDecimal.valueOf(1000.0), "01 June 2024");
+        Long loanId = createLoanForRefundWithInterestRefund(clientId, refundType, "20240601", 1000.0, 10.0, 4);
+        disburseLoan(loanId, BigDecimal.valueOf(1000.0), "20240601");
         return loanId;
     }
 

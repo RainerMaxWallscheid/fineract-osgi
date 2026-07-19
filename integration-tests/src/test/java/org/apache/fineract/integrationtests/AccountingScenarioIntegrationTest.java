@@ -92,15 +92,15 @@ public class AccountingScenarioIntegrationTest {
     private static RequestSpecification requestSpec;
     private static ResponseSpecification responseSpec;
 
-    private static final String DATE_OF_JOINING = "01 January 2011";
+    private static final String DATE_OF_JOINING = "20110101";
 
     private static final Float LP_PRINCIPAL = 10000.0f;
     private static final String LP_REPAYMENTS = "5";
     private static final String LP_REPAYMENT_PERIOD = "2";
     private static final String LP_INTEREST_RATE = "1";
-    private static final String EXPECTED_DISBURSAL_DATE = "04 March 2011";
-    private static final String LOAN_APPLICATION_SUBMISSION_DATE = "03 March 2011";
-    private static final String TRANSACTION_DATE = "01 March 2013";
+    private static final String EXPECTED_DISBURSAL_DATE = "20110304";
+    private static final String LOAN_APPLICATION_SUBMISSION_DATE = "20110303";
+    private static final String TRANSACTION_DATE = "20130301";
     private static final String LOAN_TERM_FREQUENCY = "10";
     private static final String INDIVIDUAL_LOAN = "individual";
     public static final String ACCOUNT_TYPE_INDIVIDUAL = "INDIVIDUAL";
@@ -114,8 +114,8 @@ public class AccountingScenarioIntegrationTest {
     static Float SP_WITHDRAWAL_AMOUNT = Float.valueOf(WITHDRAWAL_AMOUNT);
     static Float SP_WITHDRAWAL_AMOUNT_ADJUSTED = Float.valueOf(WITHDRAWAL_AMOUNT_ADJUSTED);
 
-    private static final String[] REPAYMENT_DATE = { "", "04 May 2011", "04 July 2011", "04 September 2011", "04 November 2011",
-            "04 January 2012" };
+    private static final String[] REPAYMENT_DATE = { "", "20110504", "20110704", "20110904", "20111104",
+            "20120104" };
     private static final Float[] REPAYMENT_AMOUNT = { .0f, 2200.0f, 3000.0f, 900.0f, 2000.0f, 2500.0f };
 
     private static final Float AMOUNT_TO_BE_WAIVE = 400.0f;
@@ -476,7 +476,7 @@ public class AccountingScenarioIntegrationTest {
         this.accountHelper = new AccountHelper(requestSpec, responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(requestSpec, responseSpec);
 
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US);
+        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
 
         LocalDate todaysDate = Utils.getLocalDateOfTenant();
         todaysDate = todaysDate.minusMonths(3);
@@ -554,7 +554,7 @@ public class AccountingScenarioIntegrationTest {
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
 
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US);
+        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
 
         LocalDate todaysDate = Utils.getLocalDateOfTenant();
         todaysDate = todaysDate.minusMonths(3);
@@ -922,7 +922,7 @@ public class AccountingScenarioIntegrationTest {
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.US);
+        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
 
         final LocalDate localDate = LocalDate.now(this.tenantTimeZone.toZoneId());
         final ZonedDateTime currentDate = ZonedDateTime.of(localDate, LocalTime.MIDNIGHT, this.tenantTimeZone.toZoneId());
@@ -1024,7 +1024,7 @@ public class AccountingScenarioIntegrationTest {
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
 
         Calendar todayDate = Calendar.getInstance(this.tenantTimeZone);
 
@@ -1256,15 +1256,15 @@ public class AccountingScenarioIntegrationTest {
         // Approve share Account
         final Map<String, Object> approveMap = new HashMap<>();
         approveMap.put("note", "Share Account Approval Note");
-        approveMap.put("dateFormat", "dd MMMM yyyy");
-        approveMap.put("approvedDate", "01 Jan 2016");
+        approveMap.put("dateFormat", "yyyyMMdd");
+        approveMap.put("approvedDate", "20160101");
         approveMap.put("locale", "en");
         final String approve = new Gson().toJson(approveMap);
         ShareAccountTransactionHelper.postCommand("approve", shareAccountId, approve, requestSpec, responseSpec);
         // Activate Share Account
         final Map<String, Object> activateMap = new HashMap<>();
-        activateMap.put("dateFormat", "dd MMMM yyyy");
-        activateMap.put("activatedDate", "01 Jan 2016");
+        activateMap.put("dateFormat", "yyyyMMdd");
+        activateMap.put("activatedDate", "20160101");
         activateMap.put("locale", "en");
         final String activateJson = new Gson().toJson(activateMap);
         ShareAccountTransactionHelper.postCommand("activate", shareAccountId, activateJson, requestSpec, responseSpec);
@@ -1274,11 +1274,11 @@ public class AccountingScenarioIntegrationTest {
         final JournalEntry[] liabilityAccountEntry = { new JournalEntry(Float.parseFloat("200"), JournalEntry.TransactionType.CREDIT) };
         final JournalEntry[] checkJournalEntryForEquityAccount = {
                 new JournalEntry(Float.parseFloat("200"), JournalEntry.TransactionType.CREDIT) };
-        this.journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, "01 Jan 2016", assetAccountEntry);
-        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, "01 Jan 2016", liabilityAccountEntry);
-        this.journalEntryHelper.checkJournalEntryForEquityAccount(equityAccount, "01 Jan 2016", checkJournalEntryForEquityAccount);
+        this.journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, "20160101", assetAccountEntry);
+        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, "20160101", liabilityAccountEntry);
+        this.journalEntryHelper.checkJournalEntryForEquityAccount(equityAccount, "20160101", checkJournalEntryForEquityAccount);
 
-        final String transactionId = this.journalEntryHelper.getJournalEntryTransactionIdByAccount(assetAccount, "01 Jan 2016",
+        final String transactionId = this.journalEntryHelper.getJournalEntryTransactionIdByAccount(assetAccount, "20160101",
                 assetAccountEntry);
         Assertions.assertNotEquals("", transactionId);
 
@@ -1296,7 +1296,7 @@ public class AccountingScenarioIntegrationTest {
     private Integer createShareAccount(final Integer clientId, final Integer productId, final Integer savingsAccountId) {
         final String shareAccountJSON = new ShareAccountHelper().withClientId(String.valueOf(clientId))
                 .withProductId(String.valueOf(productId)).withExternalId("External1").withSavingsAccountId(String.valueOf(savingsAccountId))
-                .withSubmittedDate("01 Jan 2016").withApplicationDate("01 Jan 2016").withRequestedShares("100").build();
+                .withSubmittedDate("20160101").withApplicationDate("20160101").withRequestedShares("100").build();
         return ShareAccountTransactionHelper.createShareAccount(shareAccountJSON, requestSpec, responseSpec);
     }
 }

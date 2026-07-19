@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkingCapitalLoanRequestFactory {
     private final WorkingCapitalLoanProductResolver workingCapitalLoanProductResolver;
-    public static final String DATE_FORMAT = "dd MMMM yyyy";
+    public static final String DATE_FORMAT = "yyyyMMdd";
     public static final String DEFAULT_LOCALE = "en";
     public static final DefaultWorkingCapitalLoanProduct DEFAULT_WORKING_CAPITAL_LOAN_PRODUCT = DefaultWorkingCapitalLoanProduct.WCLP;
     public static final BigDecimal DEFAULT_PRINCIPAL = new BigDecimal(100);
