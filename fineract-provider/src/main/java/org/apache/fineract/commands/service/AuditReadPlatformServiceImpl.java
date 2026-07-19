@@ -59,7 +59,8 @@ import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
 import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
-import org.apache.fineract.portfolio.savings.data.DepositProductData;
+import org.apache.fineract.portfolio.savings.data.FixedDepositProductData;
+import org.apache.fineract.portfolio.savings.data.RecurringDepositProductData;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 import org.apache.fineract.portfolio.savings.service.DepositProductReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
@@ -261,10 +262,12 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
                     final SavingsProductData savingProduct = this.savingsProductReadPlatformService.retrieveOne(productId);
                     commandAsJsonMap.put("productName", savingProduct.getName());
                 } else if (auditResult.getEntityName().equalsIgnoreCase("RECURRINGDEPOSITACCOUNT")) {
-                    final DepositProductData depositProduct = this.depositProductReadPlatformService.retrieveOne(DepositAccountType.RECURRING_DEPOSIT, productId);
+                    final RecurringDepositProductData depositProduct = (RecurringDepositProductData) this.depositProductReadPlatformService
+                            .retrieveOne(DepositAccountType.RECURRING_DEPOSIT, productId);
                     commandAsJsonMap.put("productName", depositProduct.getName());
                 } else if (auditResult.getEntityName().equalsIgnoreCase("FIXEDDEPOSITACCOUNT")) {
-                    final DepositProductData depositProduct = this.depositProductReadPlatformService.retrieveOne(DepositAccountType.FIXED_DEPOSIT, productId);
+                    final FixedDepositProductData depositProduct = (FixedDepositProductData) this.depositProductReadPlatformService
+                            .retrieveOne(DepositAccountType.FIXED_DEPOSIT, productId);
                     commandAsJsonMap.put("productName", depositProduct.getName());
                 } else {
                     commandAsJsonMap.put("productName", "");

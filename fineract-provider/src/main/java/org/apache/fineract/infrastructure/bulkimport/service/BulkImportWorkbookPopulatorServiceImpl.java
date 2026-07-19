@@ -23,6 +23,7 @@ import jakarta.ws.rs.core.Response.ResponseBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
 import org.apache.fineract.accounting.glaccount.service.GLAccountReadPlatformService;
@@ -96,7 +97,6 @@ import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
 import org.apache.fineract.portfolio.products.data.ProductData;
 import org.apache.fineract.portfolio.products.service.ShareProductReadPlatformService;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
-import org.apache.fineract.portfolio.savings.data.DepositProductData;
 import org.apache.fineract.portfolio.savings.data.FixedDepositProductData;
 import org.apache.fineract.portfolio.savings.data.RecurringDepositProductData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
@@ -590,12 +590,10 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
     }
 
     private List<RecurringDepositProductData> fetchRecurringDepositProducts() {
-        List<DepositProductData> depositProducts = (List<DepositProductData>) depositProductReadPlatformService
-                .retrieveAll(DepositAccountType.RECURRING_DEPOSIT);
-        List<RecurringDepositProductData> recurringDepositProducts = new ArrayList<>();
-        for (DepositProductData depositproduct : depositProducts) {
-            RecurringDepositProductData recurringDepositProduct = (RecurringDepositProductData) depositproduct;
-            recurringDepositProducts.add(recurringDepositProduct);
+        final Collection<?> depositProducts = depositProductReadPlatformService.retrieveAll(DepositAccountType.RECURRING_DEPOSIT);
+        final List<RecurringDepositProductData> recurringDepositProducts = new ArrayList<>();
+        for (final Object depositproduct : depositProducts) {
+            recurringDepositProducts.add((RecurringDepositProductData) depositproduct);
         }
         return recurringDepositProducts;
     }
@@ -631,15 +629,12 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
     }
 
     private List<FixedDepositProductData> fetchFixedDepositProducts() {
-        List<DepositProductData> depositProducts = (List<DepositProductData>) depositProductReadPlatformService
-                .retrieveAll(DepositAccountType.FIXED_DEPOSIT);
-        List<FixedDepositProductData> fixedDepositProducts = new ArrayList<>();
-        for (DepositProductData depositproduct : depositProducts) {
-            FixedDepositProductData fixedDepositProduct = (FixedDepositProductData) depositproduct;
-            fixedDepositProducts.add(fixedDepositProduct);
+        final Collection<?> depositProducts = depositProductReadPlatformService.retrieveAll(DepositAccountType.FIXED_DEPOSIT);
+        final List<FixedDepositProductData> fixedDepositProducts = new ArrayList<>();
+        for (final Object depositproduct : depositProducts) {
+            fixedDepositProducts.add((FixedDepositProductData) depositproduct);
         }
         return fixedDepositProducts;
-
     }
 
     private WorkbookPopulator populateUserWorkbook(Long officeId, Long staffId) {

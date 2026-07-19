@@ -126,35 +126,44 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
     private final PaymentTypeReadService paymentTypeReadPlatformService;
 
     @Override
-    public Collection<DepositAccountData> retrieveAll(final DepositAccountType depositAccountType, final PaginationParameters paginationParameters) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Collection<?> retrieveAll(final DepositAccountType depositAccountType, final PaginationParameters paginationParameters) {
         this.context.authenticatedUser();
         this.paginationParametersDataValidator.validateParameterValues(paginationParameters, supportedOrderByValues, depositAccountType.resourceName());
-        final DepositAccountMapper depositAccountMapper = this.getDepositAccountMapper(depositAccountType);
-        if (depositAccountMapper == null) {
-            return null;
-        }
         final StringBuilder sqlBuilder = new StringBuilder(400);
         sqlBuilder.append("select ");
-        sqlBuilder.append(depositAccountMapper.schema());
-        sqlBuilder.append(" where sa.deposit_type_enum = ? ");
-        // always append at the end of a sql statement
-        sqlBuilder.append(paginationParameters.paginationSql());
-        return jdbcTemplate.query(sqlBuilder.toString(), depositAccountMapper, new Object[] {depositAccountType.getValue()}); // NOSONAR
+        if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
+            sqlBuilder.append(FIXED_DEPOSIT_ACCOUNT_MAPPER.schema());
+            sqlBuilder.append(" where sa.deposit_type_enum = ? ");
+            sqlBuilder.append(paginationParameters.paginationSql());
+            return jdbcTemplate.query(sqlBuilder.toString(), FIXED_DEPOSIT_ACCOUNT_MAPPER, new Object[] {depositAccountType.getValue()}); // NOSONAR
+        } else if (depositAccountType == DepositAccountType.RECURRING_DEPOSIT) {
+            sqlBuilder.append(RECURRING_DEPOSIT_ACCOUNT_MAPPER.schema());
+            sqlBuilder.append(" where sa.deposit_type_enum = ? ");
+            sqlBuilder.append(paginationParameters.paginationSql());
+            return jdbcTemplate.query(sqlBuilder.toString(), RECURRING_DEPOSIT_ACCOUNT_MAPPER, new Object[] {depositAccountType.getValue()}); // NOSONAR
+        }
+        return null;
     }
 
     @Override
-    public Page<DepositAccountData> retrieveAllPaged(final DepositAccountType depositAccountType, final PaginationParameters paginationParameters) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Page<?> retrieveAllPaged(final DepositAccountType depositAccountType, final PaginationParameters paginationParameters) {
         this.paginationParametersDataValidator.validateParameterValues(paginationParameters, supportedOrderByValues, depositAccountType.resourceName());
-        final DepositAccountMapper depositAccountMapper = this.getDepositAccountMapper(depositAccountType);
-        if (depositAccountMapper == null) {
-            return null;
-        }
         final StringBuilder sqlBuilder = new StringBuilder(400);
         sqlBuilder.append("select " + sqlGenerator.calcFoundRows() + " ");
-        sqlBuilder.append(depositAccountMapper.schema());
-        sqlBuilder.append(" where sa.deposit_type_enum = ? ");
-        sqlBuilder.append(paginationParameters.paginationSql());
-        return this.paginationHelper.fetchPage(this.jdbcTemplate, sqlBuilder.toString(), new Object[] {depositAccountType.getValue()}, depositAccountMapper);
+        if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
+            sqlBuilder.append(FIXED_DEPOSIT_ACCOUNT_MAPPER.schema());
+            sqlBuilder.append(" where sa.deposit_type_enum = ? ");
+            sqlBuilder.append(paginationParameters.paginationSql());
+            return this.paginationHelper.fetchPage(this.jdbcTemplate, sqlBuilder.toString(), new Object[] {depositAccountType.getValue()}, FIXED_DEPOSIT_ACCOUNT_MAPPER);
+        } else if (depositAccountType == DepositAccountType.RECURRING_DEPOSIT) {
+            sqlBuilder.append(RECURRING_DEPOSIT_ACCOUNT_MAPPER.schema());
+            sqlBuilder.append(" where sa.deposit_type_enum = ? ");
+            sqlBuilder.append(paginationParameters.paginationSql());
+            return this.paginationHelper.fetchPage(this.jdbcTemplate, sqlBuilder.toString(), new Object[] {depositAccountType.getValue()}, RECURRING_DEPOSIT_ACCOUNT_MAPPER);
+        }
+        return null;
     }
 
     @Override
@@ -176,63 +185,68 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
     }
 
     @Override
-    public DepositAccountData retrieveOne(final DepositAccountType depositAccountType, final Long accountId) {
+    public Object retrieveOne(final DepositAccountType depositAccountType, final Long accountId) {
         try {
             this.context.authenticatedUser();
-            final DepositAccountMapper depositAccountMapper = this.getDepositAccountMapper(depositAccountType);
-            if (depositAccountMapper == null) {
-                return null;
-            }
             final StringBuilder sqlBuilder = new StringBuilder(400);
             sqlBuilder.append("select ");
-            sqlBuilder.append(depositAccountMapper.schema());
-            sqlBuilder.append(" where sa.id = ? and sa.deposit_type_enum = ? ");
-            return this.jdbcTemplate.queryForObject(sqlBuilder.toString(), depositAccountMapper, accountId, depositAccountType.getValue());
+            if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
+                sqlBuilder.append(FIXED_DEPOSIT_ACCOUNT_MAPPER.schema());
+                sqlBuilder.append(" where sa.id = ? and sa.deposit_type_enum = ? ");
+                return this.jdbcTemplate.queryForObject(sqlBuilder.toString(), FIXED_DEPOSIT_ACCOUNT_MAPPER, accountId, depositAccountType.getValue());
+            } else if (depositAccountType == DepositAccountType.RECURRING_DEPOSIT) {
+                sqlBuilder.append(RECURRING_DEPOSIT_ACCOUNT_MAPPER.schema());
+                sqlBuilder.append(" where sa.id = ? and sa.deposit_type_enum = ? ");
+                return this.jdbcTemplate.queryForObject(sqlBuilder.toString(), RECURRING_DEPOSIT_ACCOUNT_MAPPER, accountId, depositAccountType.getValue());
+            }
+            return null;
         } catch (final EmptyResultDataAccessException e) {
             throw new DepositAccountNotFoundException(depositAccountType, accountId, e);
         }
     }
 
     @Override
-    public DepositAccountData retrieveOneWithClosureTemplate(final DepositAccountType depositAccountType, final Long accountId) {
+    public Object retrieveOneWithClosureTemplate(final DepositAccountType depositAccountType, final Long accountId) {
         try {
             this.context.authenticatedUser();
-            final DepositAccountMapper depositAccountMapper = this.getDepositAccountMapper(depositAccountType);
-            if (depositAccountMapper == null) {
-                return null;
-            }
-            final StringBuilder sqlBuilder = new StringBuilder(400);
-            sqlBuilder.append("select ");
-            sqlBuilder.append(depositAccountMapper.schema());
-            sqlBuilder.append(" where sa.id = ? and sa.deposit_type_enum = ? ");
-            DepositAccountData account = this.jdbcTemplate.queryForObject(sqlBuilder.toString(), depositAccountMapper, accountId, depositAccountType.getValue());
             Collection<EnumOptionData> onAccountClosureOptions = SavingsEnumerations.depositAccountOnClosureType(DepositAccountOnClosureType.values());
             final Collection<PaymentTypeData> paymentTypeOptions = this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
-            final Collection<SavingsAccountData> savingsAccountDatas = this.savingsAccountReadPlatformService.retrieveActiveForLookup(account.getClientId(), DepositAccountType.SAVINGS_DEPOSIT);
             if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
-                account = FixedDepositAccountData.withClosureTemplateDetails((FixedDepositAccountData) account, onAccountClosureOptions, paymentTypeOptions, savingsAccountDatas);
+                final StringBuilder sqlBuilder = new StringBuilder(400);
+                sqlBuilder.append("select ");
+                sqlBuilder.append(FIXED_DEPOSIT_ACCOUNT_MAPPER.schema());
+                sqlBuilder.append(" where sa.id = ? and sa.deposit_type_enum = ? ");
+                FixedDepositAccountData account = this.jdbcTemplate.queryForObject(sqlBuilder.toString(), FIXED_DEPOSIT_ACCOUNT_MAPPER, accountId, depositAccountType.getValue());
+                final Collection<SavingsAccountData> savingsAccountDatas = this.savingsAccountReadPlatformService.retrieveActiveForLookup(account.getClientId(), DepositAccountType.SAVINGS_DEPOSIT);
+                return FixedDepositAccountData.withClosureTemplateDetails(account, onAccountClosureOptions, paymentTypeOptions, savingsAccountDatas);
             } else if (depositAccountType == DepositAccountType.RECURRING_DEPOSIT) {
-                account = RecurringDepositAccountData.withClosureTemplateDetails((RecurringDepositAccountData) account, onAccountClosureOptions, paymentTypeOptions, savingsAccountDatas);
+                final StringBuilder sqlBuilder = new StringBuilder(400);
+                sqlBuilder.append("select ");
+                sqlBuilder.append(RECURRING_DEPOSIT_ACCOUNT_MAPPER.schema());
+                sqlBuilder.append(" where sa.id = ? and sa.deposit_type_enum = ? ");
+                RecurringDepositAccountData account = this.jdbcTemplate.queryForObject(sqlBuilder.toString(), RECURRING_DEPOSIT_ACCOUNT_MAPPER, accountId, depositAccountType.getValue());
+                final Collection<SavingsAccountData> savingsAccountDatas = this.savingsAccountReadPlatformService.retrieveActiveForLookup(account.getClientId(), DepositAccountType.SAVINGS_DEPOSIT);
+                return RecurringDepositAccountData.withClosureTemplateDetails(account, onAccountClosureOptions, paymentTypeOptions, savingsAccountDatas);
             }
-            return account;
+            return null;
         } catch (final EmptyResultDataAccessException e) {
             throw new DepositAccountNotFoundException(depositAccountType, accountId, e);
         }
     }
 
     @Override
-    public DepositAccountData retrieveOneWithChartSlabs(final DepositAccountType depositAccountType, Long accountId) {
-        DepositAccountData depositAccount = this.retrieveOne(depositAccountType, accountId);
+    public Object retrieveOneWithChartSlabs(final DepositAccountType depositAccountType, Long accountId) {
+        final Object depositAccount = this.retrieveOne(depositAccountType, accountId);
         DepositAccountInterestRateChartData chart = this.accountChartReadPlatformService.retrieveOneWithSlabsOnAccountId(accountId);
         if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
-            depositAccount = FixedDepositAccountData.withInterestChart((FixedDepositAccountData) depositAccount, chart);
+            return FixedDepositAccountData.withInterestChart((FixedDepositAccountData) depositAccount, chart);
         } else if (depositAccountType == DepositAccountType.RECURRING_DEPOSIT) {
             CalendarData calendar = this.calendarReadPlatformService.retrieveCollctionCalendarByEntity(accountId, CalendarEntityType.SAVINGS.getValue());
             final Integer frequency = calendar.getInterval() == -1 ? 1 : calendar.getInterval();
             final CalendarFrequencyType calendarFrequencyType = CalendarFrequencyType.fromInt(calendar.getFrequency().getId().intValue());
             final PeriodFrequencyType periodFrequencyType = CalendarFrequencyType.from(calendarFrequencyType);
             final EnumOptionData frequencyType = CommonEnumerations.termFrequencyType(periodFrequencyType, "recurring.deposit.frequency.");
-            depositAccount = RecurringDepositAccountData.withInterestChartAndRecurringDetails((RecurringDepositAccountData) depositAccount, chart, frequency, frequencyType);
+            return RecurringDepositAccountData.withInterestChartAndRecurringDetails((RecurringDepositAccountData) depositAccount, chart, frequency, frequencyType);
         }
         return depositAccount;
     }
@@ -244,7 +258,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
     }
 
     @Override
-    public DepositAccountData retrieveTemplate(final DepositAccountType depositAccountType, final Long clientId, final Long groupId, final Long productId, final boolean staffInSelectedOfficeOnly) {
+    public Object retrieveTemplate(final DepositAccountType depositAccountType, final Long clientId, final Long groupId, final Long productId, final boolean staffInSelectedOfficeOnly) {
         final AppUser loggedInUser = this.context.authenticatedUser();
         Long officeId = loggedInUser.getOffice().getId();
         ClientData client = null;
@@ -262,11 +276,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
         final Collection<EnumOptionData> preClosurePenalInterestOnTypeOptions = this.depositsDropdownReadPlatformService.retrievePreClosurePenalInterestOnTypeOptions();
         final Collection<EnumOptionData> periodFrequencyTypeOptions = this.dropdownReadPlatformService.retrievePeriodFrequencyTypeOptions();
         final Collection<DepositProductData> productOptions = this.depositProductReadPlatformService.retrieveAllForLookup(depositAccountType);
-        DepositAccountData template = null;
         if (productId != null) {
-            final DepositAccountTemplateMapper mapper = getDepositAccountTemplaMapper(depositAccountType, client, group);
-            final String sql = "select " + mapper.schema() + " where sa.id = ? and sa.deposit_type_enum = ? ";
-            template = this.jdbcTemplate.queryForObject(sql, mapper, new Object[] {productId, depositAccountType.getValue()}); // NOSONAR
             final Collection<EnumOptionData> interestCompoundingPeriodTypeOptions = this.savingsDropdownReadPlatformService.retrieveCompoundingInterestPeriodTypeOptions();
             final Collection<EnumOptionData> interestPostingPeriodTypeOptions = this.savingsDropdownReadPlatformService.retrieveInterestPostingPeriodTypeOptions();
             final Collection<EnumOptionData> interestCalculationTypeOptions = this.savingsDropdownReadPlatformService.retrieveInterestCalculationTypeOptions();
@@ -303,42 +313,48 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
             final InterestRateChartData productChartData = this.productChartReadPlatformService.retrieveActiveChartWithTemplate(productId);
             final DepositAccountInterestRateChartData accountChart = DepositAccountInterestRateChartData.from(productChartData);
             if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
-                template = FixedDepositAccountData.withTemplateOptions((FixedDepositAccountData) template, productOptions, fieldOfficerOptions, interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, transactions, charges, chargeOptions, preClosurePenalInterestOnTypeOptions, periodFrequencyTypeOptions, savingsAccountDatas, maturityInstructionOptions);
-                template = FixedDepositAccountData.withInterestChart((FixedDepositAccountData) template, accountChart);
+                final FixedDepositAccountTemplateMapper mapper = new FixedDepositAccountTemplateMapper(client, group);
+                final String sql = "select " + mapper.schema() + " where sa.id = ? and sa.deposit_type_enum = ? ";
+                FixedDepositAccountData template = this.jdbcTemplate.queryForObject(sql, mapper, new Object[] {productId, depositAccountType.getValue()}); // NOSONAR
+                template = FixedDepositAccountData.withTemplateOptions(template, productOptions, fieldOfficerOptions, interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, transactions, charges, chargeOptions, preClosurePenalInterestOnTypeOptions, periodFrequencyTypeOptions, savingsAccountDatas, maturityInstructionOptions);
+                return FixedDepositAccountData.withInterestChart(template, accountChart);
             } else if (depositAccountType == DepositAccountType.RECURRING_DEPOSIT) {
-                template = RecurringDepositAccountData.withTemplateOptions((RecurringDepositAccountData) template, productOptions, fieldOfficerOptions, interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, transactions, charges, chargeOptions, preClosurePenalInterestOnTypeOptions, periodFrequencyTypeOptions);
-                template = RecurringDepositAccountData.withInterestChartAndRecurringDetails((RecurringDepositAccountData) template, accountChart, null, null);
+                final RecurringDepositAccountTemplateMapper mapper = new RecurringDepositAccountTemplateMapper(client, group);
+                final String sql = "select " + mapper.schema() + " where sa.id = ? and sa.deposit_type_enum = ? ";
+                RecurringDepositAccountData template = this.jdbcTemplate.queryForObject(sql, mapper, new Object[] {productId, depositAccountType.getValue()}); // NOSONAR
+                template = RecurringDepositAccountData.withTemplateOptions(template, productOptions, fieldOfficerOptions, interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, transactions, charges, chargeOptions, preClosurePenalInterestOnTypeOptions, periodFrequencyTypeOptions);
+                return RecurringDepositAccountData.withInterestChartAndRecurringDetails(template, accountChart, null, null);
             }
-        } else {
-            String clientName = null;
-            if (client != null) {
-                clientName = client.getDisplayName();
-            }
-            String groupName = null;
-            if (group != null) {
-                groupName = group.getName();
-            }
-            final Collection<StaffData> fieldOfficerOptions = null;
-            final Collection<EnumOptionData> interestCompoundingPeriodTypeOptions = null;
-            final Collection<EnumOptionData> interestPostingPeriodTypeOptions = null;
-            final Collection<EnumOptionData> interestCalculationTypeOptions = null;
-            final Collection<EnumOptionData> interestCalculationDaysInYearTypeOptions = null;
-            final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = null;
-            final Collection<EnumOptionData> withdrawalFeeTypeOptions = null;
-            final Collection<SavingsAccountTransactionData> transactions = null;
-            final Collection<SavingsAccountChargeData> charges = null;
-            final Collection<EnumOptionData> maturityInstructionOptions = null;
-            final boolean feeChargesOnly = true;
-            final Collection<ChargeData> chargeOptions = this.chargeReadPlatformService.retrieveSavingsProductApplicableCharges(feeChargesOnly);
-            if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
-                template = FixedDepositAccountData.withClientTemplate(clientId, clientName, groupId, groupName);
-                template = FixedDepositAccountData.withTemplateOptions((FixedDepositAccountData) template, productOptions, fieldOfficerOptions, interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, transactions, charges, chargeOptions, preClosurePenalInterestOnTypeOptions, periodFrequencyTypeOptions, savingsAccountDatas, maturityInstructionOptions);
-            } else if (depositAccountType == DepositAccountType.RECURRING_DEPOSIT) {
-                template = RecurringDepositAccountData.withClientTemplate(clientId, clientName, groupId, groupName);
-                template = RecurringDepositAccountData.withTemplateOptions((RecurringDepositAccountData) template, productOptions, fieldOfficerOptions, interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, transactions, charges, chargeOptions, preClosurePenalInterestOnTypeOptions, periodFrequencyTypeOptions);
-            }
+            return null;
         }
-        return template;
+        String clientName = null;
+        if (client != null) {
+            clientName = client.getDisplayName();
+        }
+        String groupName = null;
+        if (group != null) {
+            groupName = group.getName();
+        }
+        final Collection<StaffData> fieldOfficerOptions = null;
+        final Collection<EnumOptionData> interestCompoundingPeriodTypeOptions = null;
+        final Collection<EnumOptionData> interestPostingPeriodTypeOptions = null;
+        final Collection<EnumOptionData> interestCalculationTypeOptions = null;
+        final Collection<EnumOptionData> interestCalculationDaysInYearTypeOptions = null;
+        final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = null;
+        final Collection<EnumOptionData> withdrawalFeeTypeOptions = null;
+        final Collection<SavingsAccountTransactionData> transactions = null;
+        final Collection<SavingsAccountChargeData> charges = null;
+        final Collection<EnumOptionData> maturityInstructionOptions = null;
+        final boolean feeChargesOnly = true;
+        final Collection<ChargeData> chargeOptions = this.chargeReadPlatformService.retrieveSavingsProductApplicableCharges(feeChargesOnly);
+        if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
+            FixedDepositAccountData template = FixedDepositAccountData.withClientTemplate(clientId, clientName, groupId, groupName);
+            return FixedDepositAccountData.withTemplateOptions(template, productOptions, fieldOfficerOptions, interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, transactions, charges, chargeOptions, preClosurePenalInterestOnTypeOptions, periodFrequencyTypeOptions, savingsAccountDatas, maturityInstructionOptions);
+        } else if (depositAccountType == DepositAccountType.RECURRING_DEPOSIT) {
+            RecurringDepositAccountData template = RecurringDepositAccountData.withClientTemplate(clientId, clientName, groupId, groupName);
+            return RecurringDepositAccountData.withTemplateOptions(template, productOptions, fieldOfficerOptions, interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, transactions, charges, chargeOptions, preClosurePenalInterestOnTypeOptions, periodFrequencyTypeOptions);
+        }
+        return null;
     }
 
     @Override
@@ -383,24 +399,6 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
         return this.jdbcTemplate.queryForList(sb.toString(), SavingsAccountStatusType.ACTIVE.getValue(), CalendarEntityType.SAVINGS.getValue(), CalendarType.COLLECTION.getValue());
     }
 
-    private DepositAccountMapper getDepositAccountMapper(final DepositAccountType depositAccountType) {
-        if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
-            return FIXED_DEPOSIT_ACCOUNT_MAPPER;
-        } else if (depositAccountType == DepositAccountType.RECURRING_DEPOSIT) {
-            return RECURRING_DEPOSIT_ACCOUNT_MAPPER;
-        }
-        return null;
-    }
-
-    private DepositAccountTemplateMapper getDepositAccountTemplaMapper(final DepositAccountType depositAccountType, ClientData client, GroupGeneralData group) {
-        if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
-            return new FixedDepositAccountTemplateMapper(client, group);
-        } else if (depositAccountType == DepositAccountType.RECURRING_DEPOSIT) {
-            return new RecurringDepositAccountTemplateMapper(client, group);
-        }
-        return null;
-    }
-
     private Collection<SavingsAccountChargeData> fromChargesToSavingsCharges(final Collection<ChargeData> productCharges) {
         final Collection<SavingsAccountChargeData> savingsCharges = new ArrayList<>();
         for (final ChargeData chargeData : productCharges) {
@@ -411,7 +409,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
     }
 
 
-    private static abstract class DepositAccountMapper implements RowMapper<DepositAccountData> {
+    private static abstract class DepositAccountMapper {
         public static final String ACCOUNT_NO = "accountNo";
         public static final String ID = "id";
         public static final String EXTERNAL_ID = "externalId";
@@ -564,7 +562,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
 
         public abstract String schema();
 
-        public DepositAccountData mapRow(final ResultSet rs) throws SQLException {
+        public DepositAccountData mapBase(final ResultSet rs) throws SQLException {
             final Long id = rs.getLong(ID);
             final String accountNo = rs.getString(ACCOUNT_NO);
             final String externalId = rs.getString(EXTERNAL_ID);
@@ -653,7 +651,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
     }
 
 
-    private static class FixedDepositAccountMapper extends DepositAccountMapper {
+    private static class FixedDepositAccountMapper extends DepositAccountMapper implements RowMapper<FixedDepositAccountData> {
         public static final String PRE_CLOSURE_PENAL_APPLICABLE = "preClosurePenalApplicable";
         public static final String PRE_CLOSURE_PENAL_INTEREST = "preClosurePenalInterest";
         public static final String PRE_CLOSURE_PENAL_INTEREST_ON_ID = "preClosurePenalInterestOnId";
@@ -704,7 +702,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
 
         @Override
         public FixedDepositAccountData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-            final DepositAccountData depositAccountData = super.mapRow(rs);
+            final DepositAccountData depositAccountData = super.mapBase(rs);
             final boolean preClosurePenalApplicable = rs.getBoolean(PRE_CLOSURE_PENAL_APPLICABLE);
             final BigDecimal preClosurePenalInterest = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs, PRE_CLOSURE_PENAL_INTEREST);
             final Integer preClosurePenalInterestOnTypeId = JdbcSupport.getInteger(rs, PRE_CLOSURE_PENAL_INTEREST_ON_ID);
@@ -733,7 +731,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
     }
 
 
-    private static class RecurringDepositAccountMapper extends DepositAccountMapper {
+    private static class RecurringDepositAccountMapper extends DepositAccountMapper implements RowMapper<RecurringDepositAccountData> {
         public static final String PRE_CLOSURE_PENAL_APPLICABLE = "preClosurePenalApplicable";
         public static final String PRE_CLOSURE_PENAL_INTEREST = "preClosurePenalInterest";
         public static final String PRE_CLOSURE_PENAL_INTEREST_ON_ID = "preClosurePenalInterestOnId";
@@ -797,7 +795,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
 
         @Override
         public RecurringDepositAccountData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-            final DepositAccountData depositAccountData = super.mapRow(rs);
+            final DepositAccountData depositAccountData = super.mapBase(rs);
             final boolean preClosurePenalApplicable = rs.getBoolean(PRE_CLOSURE_PENAL_APPLICABLE);
             final BigDecimal preClosurePenalInterest = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs, PRE_CLOSURE_PENAL_INTEREST);
             final Integer preClosurePenalInterestOnTypeId = JdbcSupport.getInteger(rs, PRE_CLOSURE_PENAL_INTEREST_ON_ID);
@@ -981,7 +979,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
     }
 
 
-    private static abstract class DepositAccountTemplateMapper implements RowMapper<DepositAccountData> {
+    private static abstract class DepositAccountTemplateMapper {
         public static final String DEPOSIT_TYPE_ID = "depositTypeId";
         public static final String PRODUCT_ID = "productId";
         public static final String PRODUCT_NAME = "productName";
@@ -1049,7 +1047,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
 
         public abstract String schema();
 
-        public DepositAccountData mapRow(final ResultSet rs) throws SQLException {
+        public DepositAccountData mapBase(final ResultSet rs) throws SQLException {
             final Integer depositTypeId = JdbcSupport.getInteger(rs, DEPOSIT_TYPE_ID);
             final EnumOptionData depositType = (depositTypeId == null) ? null : SavingsEnumerations.depositType(depositTypeId);
             final Long productId = rs.getLong(PRODUCT_ID);
@@ -1105,7 +1103,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
     }
 
 
-    private static class FixedDepositAccountTemplateMapper extends DepositAccountTemplateMapper {
+    private static class FixedDepositAccountTemplateMapper extends DepositAccountTemplateMapper implements RowMapper<FixedDepositAccountData> {
         public static final String PRE_CLOSURE_PENAL_APPLICABLE = "preClosurePenalApplicable";
         public static final String PRE_CLOSURE_PENAL_INTEREST = "preClosurePenalInterest";
         public static final String PRE_CLOSURE_PENAL_INTEREST_ON_ID = "preClosurePenalInterestOnId";
@@ -1141,7 +1139,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
 
         @Override
         public FixedDepositAccountData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-            final DepositAccountData depositAccountData = super.mapRow(rs);
+            final DepositAccountData depositAccountData = super.mapBase(rs);
             final boolean preClosurePenalApplicable = rs.getBoolean(PRE_CLOSURE_PENAL_APPLICABLE);
             final BigDecimal preClosurePenalInterest = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs, PRE_CLOSURE_PENAL_INTEREST);
             final Integer preClosurePenalInterestOnTypeId = JdbcSupport.getInteger(rs, PRE_CLOSURE_PENAL_INTEREST_ON_ID);
@@ -1167,7 +1165,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
     }
 
 
-    private static class RecurringDepositAccountTemplateMapper extends DepositAccountTemplateMapper {
+    private static class RecurringDepositAccountTemplateMapper extends DepositAccountTemplateMapper implements RowMapper<RecurringDepositAccountData> {
         public static final String PRE_CLOSURE_PENAL_APPLICABLE = "preClosurePenalApplicable";
         public static final String PRE_CLOSURE_PENAL_INTEREST = "preClosurePenalInterest";
         public static final String PRE_CLOSURE_PENAL_INTEREST_ON_ID = "preClosurePenalInterestOnId";
@@ -1210,7 +1208,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
 
         @Override
         public RecurringDepositAccountData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-            final DepositAccountData depositAccountData = super.mapRow(rs);
+            final DepositAccountData depositAccountData = super.mapBase(rs);
             final boolean preClosurePenalApplicable = rs.getBoolean(PRE_CLOSURE_PENAL_APPLICABLE);
             final BigDecimal preClosurePenalInterest = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs, PRE_CLOSURE_PENAL_INTEREST);
             final Integer preClosurePenalInterestOnTypeId = JdbcSupport.getInteger(rs, PRE_CLOSURE_PENAL_INTEREST_ON_ID);

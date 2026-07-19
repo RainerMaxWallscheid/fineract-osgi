@@ -24,12 +24,23 @@ import org.apache.fineract.portfolio.savings.data.DepositProductData;
 
 public interface DepositProductReadPlatformService {
 
-    Collection<DepositProductData> retrieveAll(DepositAccountType depositAccountType);
+    /**
+     * Full product rows for the given deposit type. Concrete element type is
+     * {@link org.apache.fineract.portfolio.savings.data.FixedDepositProductData} or
+     * {@link org.apache.fineract.portfolio.savings.data.RecurringDepositProductData}.
+     */
+    Collection<?> retrieveAll(DepositAccountType depositAccountType);
 
     Collection<DepositProductData> retrieveAllForLookup(DepositAccountType depositAccountType);
 
-    DepositProductData retrieveOne(DepositAccountType depositAccountType, Long productId);
+    /**
+     * Full product for the given deposit type. Concrete type is Fixed or Recurring product data.
+     */
+    Object retrieveOne(DepositAccountType depositAccountType, Long productId);
 
-    DepositProductData retrieveOneWithChartSlabs(DepositAccountType depositAccountType, Long productId);
+    /**
+     * Full product including interest charts. Concrete type is Fixed or Recurring product data.
+     */
+    Object retrieveOneWithChartSlabs(DepositAccountType depositAccountType, Long productId);
 
 }

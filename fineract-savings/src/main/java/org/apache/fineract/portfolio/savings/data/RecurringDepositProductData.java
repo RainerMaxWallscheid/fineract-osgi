@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import org.apache.fineract.accounting.common.AccountingRuleType;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
 import org.apache.fineract.accounting.producttoaccountmapping.data.ChargeToGLAccountMapper;
 import org.apache.fineract.accounting.producttoaccountmapping.data.PaymentTypeToGLAccountMapper;
@@ -33,28 +34,70 @@ import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 
 /**
- * Immutable data object represent a Recurring Deposit product.
+ * Immutable data object representing a Recurring Deposit product.
+ * <p>
+ * Composes shared {@link DepositProductData} fields (flattened for Gson/API compatibility)
+ * instead of extending that type.
  */
-public final class RecurringDepositProductData extends DepositProductData {
+public final class RecurringDepositProductData {
 
-    private boolean preClosurePenalApplicable;
-    private BigDecimal preClosurePenalInterest;
-    private EnumOptionData preClosurePenalInterestOnType;
-    private Integer minDepositTerm;
-    private Integer maxDepositTerm;
-    private EnumOptionData minDepositTermType;
-    private EnumOptionData maxDepositTermType;
-    private Integer inMultiplesOfDepositTerm;
-    private EnumOptionData inMultiplesOfDepositTermType;
-    private BigDecimal minDepositAmount;
-    private BigDecimal depositAmount;
-    private BigDecimal maxDepositAmount;
-    private boolean isMandatoryDeposit;
-    private boolean allowWithdrawal;
-    private boolean adjustAdvanceTowardsFuturePayments;
+    // Flattened shared product fields (composed from DepositProductData)
+    private final Long id;
+    private final String name;
+    private final String shortName;
+    private final String description;
+    private final CurrencyData currency;
+    private final BigDecimal nominalAnnualInterestRate;
+    private final EnumOptionData interestCompoundingPeriodType;
+    private final EnumOptionData interestPostingPeriodType;
+    private final EnumOptionData interestCalculationType;
+    private final EnumOptionData interestCalculationDaysInYearType;
+    private final Integer lockinPeriodFrequency;
+    private final EnumOptionData lockinPeriodFrequencyType;
+    private final BigDecimal minBalanceForInterestCalculation;
+    private final boolean withHoldTax;
+    private final TaxGroupData taxGroup;
+    private final EnumOptionData accountingRule;
+    private final Map<String, Object> accountingMappings;
+    private final Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings;
+    private final Collection<ChargeToGLAccountMapper> feeToIncomeAccountMappings;
+    private final Collection<ChargeToGLAccountMapper> penaltyToIncomeAccountMappings;
+    private final Collection<ChargeData> charges;
+    private final Collection<InterestRateChartData> interestRateCharts;
+    private final InterestRateChartData activeChart;
+    private final Collection<CurrencyData> currencyOptions;
+    private final Collection<EnumOptionData> interestCompoundingPeriodTypeOptions;
+    private final Collection<EnumOptionData> interestPostingPeriodTypeOptions;
+    private final Collection<EnumOptionData> interestCalculationTypeOptions;
+    private final Collection<EnumOptionData> interestCalculationDaysInYearTypeOptions;
+    private final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions;
+    private final Collection<EnumOptionData> withdrawalFeeTypeOptions;
+    private final Collection<PaymentTypeData> paymentTypeOptions;
+    private final Collection<EnumOptionData> accountingRuleOptions;
+    private final Map<String, List<GLAccountData>> accountingMappingOptions;
+    private final Collection<ChargeData> chargeOptions;
+    private final Collection<ChargeData> penaltyOptions;
+    private final InterestRateChartData chartTemplate;
+    private final Collection<TaxGroupData> taxGroupOptions;
 
-    private Collection<EnumOptionData> preClosurePenalInterestOnTypeOptions;
-    private Collection<EnumOptionData> periodFrequencyTypeOptions;
+    // Recurring-deposit specific fields
+    private final boolean preClosurePenalApplicable;
+    private final BigDecimal preClosurePenalInterest;
+    private final EnumOptionData preClosurePenalInterestOnType;
+    private final Integer minDepositTerm;
+    private final Integer maxDepositTerm;
+    private final EnumOptionData minDepositTermType;
+    private final EnumOptionData maxDepositTermType;
+    private final Integer inMultiplesOfDepositTerm;
+    private final EnumOptionData inMultiplesOfDepositTermType;
+    private final BigDecimal minDepositAmount;
+    private final BigDecimal depositAmount;
+    private final BigDecimal maxDepositAmount;
+    private final boolean isMandatoryDeposit;
+    private final boolean allowWithdrawal;
+    private final boolean adjustAdvanceTowardsFuturePayments;
+    private final Collection<EnumOptionData> preClosurePenalInterestOnTypeOptions;
+    private final Collection<EnumOptionData> periodFrequencyTypeOptions;
 
     public static RecurringDepositProductData template(final CurrencyData currency, final EnumOptionData interestCompoundingPeriodType,
             final EnumOptionData interestPostingPeriodType, final EnumOptionData interestCalculationType,
@@ -70,84 +113,20 @@ public final class RecurringDepositProductData extends DepositProductData {
             final Collection<EnumOptionData> preClosurePenalInterestOnTypeOptions,
             final Collection<EnumOptionData> periodFrequencyTypeOptions, final Collection<TaxGroupData> taxGroupOptions) {
 
-        final Long id = null;
-        final String name = null;
-        final String shortName = null;
-        final String description = null;
-        final BigDecimal nominalAnnualInterestRate = null;
-
-        final Integer lockinPeriodFrequency = null;
-        final EnumOptionData lockinPeriodFrequencyType = null;
-        final BigDecimal minBalanceForInterestCalculation = null;
-
-        final Map<String, Object> accountingMappings = null;
-        final Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings = null;
-        final Collection<ChargeData> charges = null;
-        final Collection<ChargeToGLAccountMapper> feeToIncomeAccountMappings = null;
-        final Collection<ChargeToGLAccountMapper> penaltyToIncomeAccountMappings = null;
-        final Collection<InterestRateChartData> interestRateCharts = null;
-        final boolean preClosurePenalApplicable = false;
-        final BigDecimal preClosurePenalInterest = null;
-        final EnumOptionData preClosurePenalInterestOnType = null;
-        final boolean isMandatoryDeposit = false;
-        final boolean allowWithdrawal = false;
-        final boolean adjustAdvanceTowardsFuturePayments = false;
-        final Integer minDepositTerm = null;
-        final Integer maxDepositTerm = null;
-        final EnumOptionData minDepositTermType = null;
-        final EnumOptionData maxDepositTermType = null;
-        final Integer inMultiplesOfDepositTerm = null;
-        final EnumOptionData inMultiplesOfDepositTermType = null;
-        final BigDecimal minDepositAmount = null;
-        final BigDecimal depositAmount = null;
-        final BigDecimal maxDepositAmount = null;
-        final boolean withHoldTax = false;
-        final TaxGroupData taxGroup = null;
-
-        return new RecurringDepositProductData(id, name, shortName, description, currency, nominalAnnualInterestRate,
-                interestCompoundingPeriodType, interestPostingPeriodType, interestCalculationType, interestCalculationDaysInYearType,
-                lockinPeriodFrequency, lockinPeriodFrequencyType, minBalanceForInterestCalculation, accountingRule, accountingMappings,
-                paymentChannelToFundSourceMappings, currencyOptions, interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions,
-                interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions,
-                withdrawalFeeTypeOptions, paymentTypeOptions, accountingRuleOptions, accountingMappingOptions, charges, chargeOptions,
-                penaltyOptions, feeToIncomeAccountMappings, penaltyToIncomeAccountMappings, interestRateCharts, chartTemplate,
-                preClosurePenalApplicable, preClosurePenalInterest, preClosurePenalInterestOnType, preClosurePenalInterestOnTypeOptions,
-                minDepositTerm, maxDepositTerm, minDepositTermType, maxDepositTermType, inMultiplesOfDepositTerm,
-                inMultiplesOfDepositTermType, isMandatoryDeposit, allowWithdrawal, adjustAdvanceTowardsFuturePayments,
-                periodFrequencyTypeOptions, minDepositAmount, depositAmount, maxDepositAmount, withHoldTax, taxGroup, taxGroupOptions);
+        final DepositProductData product = DepositProductData.template(currency, interestCompoundingPeriodType, interestPostingPeriodType,
+                interestCalculationType, interestCalculationDaysInYearType, accountingRule, currencyOptions,
+                interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions,
+                interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, paymentTypeOptions,
+                accountingRuleOptions, accountingMappingOptions, chargeOptions, penaltyOptions, chartTemplate, taxGroupOptions);
+        return fromProduct(product, false, null, null, null, null, null, null, null, null, false, false, false, null, null, null,
+                preClosurePenalInterestOnTypeOptions, periodFrequencyTypeOptions);
     }
 
     public static RecurringDepositProductData withCharges(final RecurringDepositProductData existingProduct,
             final Collection<ChargeData> charges) {
-        return new RecurringDepositProductData(existingProduct.id, existingProduct.name, existingProduct.shortName,
-                existingProduct.description, existingProduct.currency, existingProduct.nominalAnnualInterestRate,
-                existingProduct.interestCompoundingPeriodType, existingProduct.interestPostingPeriodType,
-                existingProduct.interestCalculationType, existingProduct.interestCalculationDaysInYearType,
-                existingProduct.lockinPeriodFrequency, existingProduct.lockinPeriodFrequencyType,
-                existingProduct.minBalanceForInterestCalculation, existingProduct.accountingRule, existingProduct.accountingMappings,
-                existingProduct.paymentChannelToFundSourceMappings, existingProduct.currencyOptions,
-                existingProduct.interestCompoundingPeriodTypeOptions, existingProduct.interestPostingPeriodTypeOptions,
-                existingProduct.interestCalculationTypeOptions, existingProduct.interestCalculationDaysInYearTypeOptions,
-                existingProduct.lockinPeriodFrequencyTypeOptions, existingProduct.withdrawalFeeTypeOptions,
-                existingProduct.paymentTypeOptions, existingProduct.accountingRuleOptions, existingProduct.accountingMappingOptions,
-                charges, existingProduct.chargeOptions, existingProduct.penaltyOptions, existingProduct.feeToIncomeAccountMappings,
-                existingProduct.penaltyToIncomeAccountMappings, existingProduct.interestRateCharts, existingProduct.chartTemplate,
-                existingProduct.preClosurePenalApplicable, existingProduct.preClosurePenalInterest,
-                existingProduct.preClosurePenalInterestOnType, existingProduct.preClosurePenalInterestOnTypeOptions,
-                existingProduct.minDepositTerm, existingProduct.maxDepositTerm, existingProduct.minDepositTermType,
-                existingProduct.maxDepositTermType, existingProduct.inMultiplesOfDepositTerm, existingProduct.inMultiplesOfDepositTermType,
-                existingProduct.isMandatoryDeposit, existingProduct.allowWithdrawal, existingProduct.adjustAdvanceTowardsFuturePayments,
-                existingProduct.periodFrequencyTypeOptions, existingProduct.minDepositAmount, existingProduct.depositAmount,
-                existingProduct.maxDepositAmount, existingProduct.withHoldTax, existingProduct.taxGroup, existingProduct.taxGroupOptions);
+        return fromProduct(DepositProductData.withCharges(existingProduct.asProductData(), charges), existingProduct);
     }
 
-    /**
-     * Returns a {@link RecurringDepositProductData} that contains and exist {@link RecurringDepositProductData} data
-     * with further template data for dropdowns.
-     *
-     * @param taxGroupOptions
-     *            TODO
-     */
     public static RecurringDepositProductData withTemplate(final RecurringDepositProductData existingProduct,
             final Collection<CurrencyData> currencyOptions, final Collection<EnumOptionData> interestCompoundingPeriodTypeOptions,
             final Collection<EnumOptionData> interestPostingPeriodTypeOptions,
@@ -160,240 +139,116 @@ public final class RecurringDepositProductData extends DepositProductData {
             final Collection<EnumOptionData> preClosurePenalInterestOnTypeOptions,
             final Collection<EnumOptionData> periodFrequencyTypeOptions, final Collection<TaxGroupData> taxGroupOptions) {
 
-        return new RecurringDepositProductData(existingProduct.id, existingProduct.name, existingProduct.shortName,
-                existingProduct.description, existingProduct.currency, existingProduct.nominalAnnualInterestRate,
-                existingProduct.interestCompoundingPeriodType, existingProduct.interestPostingPeriodType,
-                existingProduct.interestCalculationType, existingProduct.interestCalculationDaysInYearType,
-                existingProduct.lockinPeriodFrequency, existingProduct.lockinPeriodFrequencyType,
-                existingProduct.minBalanceForInterestCalculation, existingProduct.accountingRule, existingProduct.accountingMappings,
-                existingProduct.paymentChannelToFundSourceMappings, currencyOptions, interestCompoundingPeriodTypeOptions,
-                interestPostingPeriodTypeOptions, interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions,
-                lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, paymentTypeOptions, accountingRuleOptions,
-                accountingMappingOptions, existingProduct.charges, chargeOptions, penaltyOptions,
-                existingProduct.feeToIncomeAccountMappings, existingProduct.penaltyToIncomeAccountMappings,
-                existingProduct.interestRateCharts, chartTemplate, existingProduct.preClosurePenalApplicable,
-                existingProduct.preClosurePenalInterest, existingProduct.preClosurePenalInterestOnType,
-                preClosurePenalInterestOnTypeOptions, existingProduct.minDepositTerm, existingProduct.maxDepositTerm,
+        final DepositProductData product = DepositProductData.withTemplate(existingProduct.asProductData(), currencyOptions,
+                interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions,
+                interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, paymentTypeOptions,
+                accountingRuleOptions, accountingMappingOptions, chargeOptions, penaltyOptions, chartTemplate, taxGroupOptions);
+        return fromProduct(product, existingProduct.preClosurePenalApplicable, existingProduct.preClosurePenalInterest,
+                existingProduct.preClosurePenalInterestOnType, existingProduct.minDepositTerm, existingProduct.maxDepositTerm,
                 existingProduct.minDepositTermType, existingProduct.maxDepositTermType, existingProduct.inMultiplesOfDepositTerm,
                 existingProduct.inMultiplesOfDepositTermType, existingProduct.isMandatoryDeposit, existingProduct.allowWithdrawal,
-                existingProduct.adjustAdvanceTowardsFuturePayments, periodFrequencyTypeOptions, existingProduct.minDepositAmount,
-                existingProduct.depositAmount, existingProduct.maxDepositAmount, existingProduct.withHoldTax, existingProduct.taxGroup,
-                taxGroupOptions);
-
+                existingProduct.adjustAdvanceTowardsFuturePayments, existingProduct.minDepositAmount, existingProduct.depositAmount,
+                existingProduct.maxDepositAmount, preClosurePenalInterestOnTypeOptions, periodFrequencyTypeOptions);
     }
 
     public static RecurringDepositProductData withAccountingDetails(final RecurringDepositProductData existingProduct,
             final Map<String, Object> accountingMappings, final Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings,
             final Collection<ChargeToGLAccountMapper> feeToIncomeAccountMappings,
             final Collection<ChargeToGLAccountMapper> penaltyToIncomeAccountMappings) {
-
-        final Collection<CurrencyData> currencyOptions = null;
-        final Collection<EnumOptionData> interestCompoundingPeriodTypeOptions = null;
-        final Collection<EnumOptionData> interestPostingPeriodTypeOptions = null;
-        final Collection<EnumOptionData> interestCalculationTypeOptions = null;
-        final Collection<EnumOptionData> interestCalculationDaysInYearTypeOptions = null;
-        final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = null;
-        final Collection<EnumOptionData> withdrawalFeeTypeOptions = null;
-        final Collection<PaymentTypeData> paymentTypeOptions = null;
-        final Collection<EnumOptionData> accountingRuleOptions = null;
-        final Map<String, List<GLAccountData>> accountingMappingOptions = null;
-        final Collection<ChargeData> chargeOptions = null;
-        final Collection<ChargeData> penaltyOptions = null;
-
-        return new RecurringDepositProductData(existingProduct.id, existingProduct.name, existingProduct.shortName,
-                existingProduct.description, existingProduct.currency, existingProduct.nominalAnnualInterestRate,
-                existingProduct.interestCompoundingPeriodType, existingProduct.interestPostingPeriodType,
-                existingProduct.interestCalculationType, existingProduct.interestCalculationDaysInYearType,
-                existingProduct.lockinPeriodFrequency, existingProduct.lockinPeriodFrequencyType,
-                existingProduct.minBalanceForInterestCalculation, existingProduct.accountingRule, accountingMappings,
-                paymentChannelToFundSourceMappings, currencyOptions, interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions,
-                interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions,
-                withdrawalFeeTypeOptions, paymentTypeOptions, accountingRuleOptions, accountingMappingOptions, existingProduct.charges,
-                chargeOptions, penaltyOptions, feeToIncomeAccountMappings, penaltyToIncomeAccountMappings,
-                existingProduct.interestRateCharts, existingProduct.chartTemplate, existingProduct.preClosurePenalApplicable,
-                existingProduct.preClosurePenalInterest, existingProduct.preClosurePenalInterestOnType,
-                existingProduct.preClosurePenalInterestOnTypeOptions, existingProduct.minDepositTerm, existingProduct.maxDepositTerm,
-                existingProduct.minDepositTermType, existingProduct.maxDepositTermType, existingProduct.inMultiplesOfDepositTerm,
-                existingProduct.inMultiplesOfDepositTermType, existingProduct.isMandatoryDeposit, existingProduct.allowWithdrawal,
-                existingProduct.adjustAdvanceTowardsFuturePayments, existingProduct.periodFrequencyTypeOptions,
-                existingProduct.minDepositAmount, existingProduct.depositAmount, existingProduct.maxDepositAmount,
-                existingProduct.withHoldTax, existingProduct.taxGroup, existingProduct.taxGroupOptions);
+        return fromProduct(DepositProductData.withAccountingDetails(existingProduct.asProductData(), accountingMappings,
+                paymentChannelToFundSourceMappings, feeToIncomeAccountMappings, penaltyToIncomeAccountMappings), existingProduct);
     }
 
     public static RecurringDepositProductData instance(final DepositProductData depositProductData, final boolean preClosurePenalApplicable,
             final BigDecimal preClosurePenalInterest, final EnumOptionData preClosurePenalInterestOnType, final Integer minDepositTerm,
             final Integer maxDepositTerm, final EnumOptionData minDepositTermType, final EnumOptionData maxDepositTermType,
             final Integer inMultiplesOfDepositTerm, final EnumOptionData inMultiplesOfDepositTermType, final boolean isMandatoryDeposit,
-            boolean allowWithdrawal, boolean adjustAdvanceTowardsFuturePayments, final BigDecimal minDepositAmount,
+            final boolean allowWithdrawal, final boolean adjustAdvanceTowardsFuturePayments, final BigDecimal minDepositAmount,
             final BigDecimal depositAmount, final BigDecimal maxDepositAmount) {
-
-        final Map<String, Object> accountingMappings = null;
-        final Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings = null;
-
-        final Collection<CurrencyData> currencyOptions = null;
-        final Collection<EnumOptionData> interestCompoundingPeriodTypeOptions = null;
-        final Collection<EnumOptionData> interestPostingPeriodTypeOptions = null;
-        final Collection<EnumOptionData> interestCalculationTypeOptions = null;
-        final Collection<EnumOptionData> interestCalculationDaysInYearTypeOptions = null;
-        final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = null;
-        final Collection<EnumOptionData> withdrawalFeeTypeOptions = null;
-        final Collection<PaymentTypeData> paymentTypeOptions = null;
-        final Collection<EnumOptionData> accountingRuleOptions = null;
-        final Map<String, List<GLAccountData>> accountingMappingOptions = null;
-        final Collection<ChargeData> chargeOptions = null;
-        final Collection<ChargeData> penaltyOptions = null;
-        final Collection<ChargeData> charges = null;
-        final Collection<ChargeToGLAccountMapper> feeToIncomeAccountMappings = null;
-        final Collection<ChargeToGLAccountMapper> penaltyToIncomeAccountMappings = null;
-        final Collection<InterestRateChartData> interestRateCharts = null;
-        final InterestRateChartData chartTemplate = null;
-        final Collection<EnumOptionData> preClosurePenalInterestOnTypeOptions = null;
-        final Collection<EnumOptionData> periodFrequencyTypeOptions = null;
-        final Collection<TaxGroupData> taxGroupOptions = null;
-
-        return new RecurringDepositProductData(depositProductData.id, depositProductData.name, depositProductData.shortName,
-                depositProductData.description, depositProductData.currency, depositProductData.nominalAnnualInterestRate,
-                depositProductData.interestCompoundingPeriodType, depositProductData.interestPostingPeriodType,
-                depositProductData.interestCalculationType, depositProductData.interestCalculationDaysInYearType,
-                depositProductData.lockinPeriodFrequency, depositProductData.lockinPeriodFrequencyType,
-                depositProductData.minBalanceForInterestCalculation, depositProductData.accountingRule, accountingMappings,
-                paymentChannelToFundSourceMappings, currencyOptions, interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions,
-                interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions,
-                withdrawalFeeTypeOptions, paymentTypeOptions, accountingRuleOptions, accountingMappingOptions, charges, chargeOptions,
-                penaltyOptions, feeToIncomeAccountMappings, penaltyToIncomeAccountMappings, interestRateCharts, chartTemplate,
-                preClosurePenalApplicable, preClosurePenalInterest, preClosurePenalInterestOnType, preClosurePenalInterestOnTypeOptions,
+        return fromProduct(depositProductData, preClosurePenalApplicable, preClosurePenalInterest, preClosurePenalInterestOnType,
                 minDepositTerm, maxDepositTerm, minDepositTermType, maxDepositTermType, inMultiplesOfDepositTerm,
-                inMultiplesOfDepositTermType, isMandatoryDeposit, allowWithdrawal, adjustAdvanceTowardsFuturePayments,
-                periodFrequencyTypeOptions, minDepositAmount, depositAmount, maxDepositAmount, depositProductData.withHoldTax,
-                depositProductData.taxGroup, taxGroupOptions);
+                inMultiplesOfDepositTermType, isMandatoryDeposit, allowWithdrawal, adjustAdvanceTowardsFuturePayments, minDepositAmount,
+                depositAmount, maxDepositAmount, null, null);
     }
 
     public static RecurringDepositProductData lookup(final Long id, final String name) {
-
-        final String shortName = null;
-        final CurrencyData currency = null;
-        final String description = null;
-        final BigDecimal nominalAnnualInterestRate = null;
-        final EnumOptionData interestCompoundingPeriodType = null;
-        final EnumOptionData interestPostingPeriodType = null;
-        final EnumOptionData interestCalculationType = null;
-        final EnumOptionData interestCalculationDaysInYearType = null;
-
-        final Integer lockinPeriodFrequency = null;
-        final EnumOptionData lockinPeriodFrequencyType = null;
-        final BigDecimal minBalanceForInterestCalculation = null;
-
-        final EnumOptionData accountingType = null;
-        final Map<String, Object> accountingMappings = null;
-        final Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings = null;
-
-        final Collection<CurrencyData> currencyOptions = null;
-        final Collection<EnumOptionData> interestCompoundingPeriodTypeOptions = null;
-        final Collection<EnumOptionData> interestPostingPeriodTypeOptions = null;
-        final Collection<EnumOptionData> interestCalculationTypeOptions = null;
-        final Collection<EnumOptionData> interestCalculationDaysInYearTypeOptions = null;
-        final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = null;
-        final Collection<EnumOptionData> withdrawalFeeTypeOptions = null;
-        final Collection<PaymentTypeData> paymentTypeOptions = null;
-        final Collection<EnumOptionData> accountingRuleOptions = null;
-        final Map<String, List<GLAccountData>> accountingMappingOptions = null;
-        final Collection<ChargeData> charges = null;
-        final Collection<ChargeData> chargeOptions = null;
-        final Collection<ChargeData> penaltyOptions = null;
-        final Collection<ChargeToGLAccountMapper> feeToIncomeAccountMappings = null;
-        final Collection<ChargeToGLAccountMapper> penaltyToIncomeAccountMappings = null;
-        final Collection<InterestRateChartData> interestRateCharts = null;
-        final InterestRateChartData chartTemplate = null;
-        final boolean preClosurePenalApplicable = false;
-        final BigDecimal preClosurePenalInterest = null;
-        final EnumOptionData preClosurePenalInterestOnType = null;
-        final Collection<EnumOptionData> preClosurePenalInterestOnTypeOptions = null;
-        final boolean isMandatoryDeposit = false;
-        final boolean allowWithdrawal = false;
-        final boolean adjustAdvanceTowardsFuturePayments = false;
-        final Integer minDepositTerm = null;
-        final Integer maxDepositTerm = null;
-        final EnumOptionData minDepositTermType = null;
-        final EnumOptionData maxDepositTermType = null;
-        final Integer inMultiplesOfDepositTerm = null;
-        final EnumOptionData inMultiplesOfDepositTermType = null;
-        final Collection<EnumOptionData> periodFrequencyTypeOptions = null;
-        final BigDecimal minDepositAmount = null;
-        final BigDecimal depositAmount = null;
-        final BigDecimal maxDepositAmount = null;
-        final boolean withHoldTax = false;
-        final TaxGroupData taxGroup = null;
-        final Collection<TaxGroupData> taxGroupOptions = null;
-
-        return new RecurringDepositProductData(id, name, shortName, description, currency, nominalAnnualInterestRate,
-                interestCompoundingPeriodType, interestPostingPeriodType, interestCalculationType, interestCalculationDaysInYearType,
-                lockinPeriodFrequency, lockinPeriodFrequencyType, minBalanceForInterestCalculation, accountingType, accountingMappings,
-                paymentChannelToFundSourceMappings, currencyOptions, interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions,
-                interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions,
-                withdrawalFeeTypeOptions, paymentTypeOptions, accountingRuleOptions, accountingMappingOptions, charges, chargeOptions,
-                penaltyOptions, feeToIncomeAccountMappings, penaltyToIncomeAccountMappings, interestRateCharts, chartTemplate,
-                preClosurePenalApplicable, preClosurePenalInterest, preClosurePenalInterestOnType, preClosurePenalInterestOnTypeOptions,
-                minDepositTerm, maxDepositTerm, minDepositTermType, maxDepositTermType, inMultiplesOfDepositTerm,
-                inMultiplesOfDepositTermType, isMandatoryDeposit, allowWithdrawal, adjustAdvanceTowardsFuturePayments,
-                periodFrequencyTypeOptions, minDepositAmount, depositAmount, maxDepositAmount, withHoldTax, taxGroup, taxGroupOptions);
+        return fromProduct(DepositProductData.lookup(id, name), false, null, null, null, null, null, null, null, null, false, false, false,
+                null, null, null, null, null);
     }
 
     public static RecurringDepositProductData withInterestChart(final RecurringDepositProductData product,
             final Collection<InterestRateChartData> interestRateCharts) {
-        return new RecurringDepositProductData(product.id, product.name, product.shortName, product.description, product.currency,
-                product.nominalAnnualInterestRate, product.interestCompoundingPeriodType, product.interestPostingPeriodType,
-                product.interestCalculationType, product.interestCalculationDaysInYearType, product.lockinPeriodFrequency,
-                product.lockinPeriodFrequencyType, product.minBalanceForInterestCalculation, product.accountingRule,
-                product.accountingMappings, product.paymentChannelToFundSourceMappings, product.currencyOptions,
-                product.interestCompoundingPeriodTypeOptions, product.interestPostingPeriodTypeOptions,
-                product.interestCalculationTypeOptions, product.interestCalculationDaysInYearTypeOptions,
-                product.lockinPeriodFrequencyTypeOptions, product.withdrawalFeeTypeOptions, product.paymentTypeOptions,
-                product.accountingRuleOptions, product.accountingMappingOptions, product.charges, product.chargeOptions,
-                product.penaltyOptions, product.feeToIncomeAccountMappings, product.penaltyToIncomeAccountMappings, interestRateCharts,
-                product.chartTemplate, product.preClosurePenalApplicable, product.preClosurePenalInterest,
-                product.preClosurePenalInterestOnType, product.preClosurePenalInterestOnTypeOptions, product.minDepositTerm,
-                product.maxDepositTerm, product.minDepositTermType, product.maxDepositTermType, product.inMultiplesOfDepositTerm,
-                product.inMultiplesOfDepositTermType, product.isMandatoryDeposit, product.allowWithdrawal,
-                product.adjustAdvanceTowardsFuturePayments, product.periodFrequencyTypeOptions, product.minDepositAmount,
-                product.depositAmount, product.maxDepositAmount, product.withHoldTax, product.taxGroup, product.taxGroupOptions);
-
+        return fromProduct(DepositProductData.withInterestChart(product.asProductData(), interestRateCharts), product);
     }
 
-    private RecurringDepositProductData(final Long id, final String name, final String shortName, final String description,
-            final CurrencyData currency, final BigDecimal nominalAnnualInterestRate, final EnumOptionData interestCompoundingPeriodType,
-            final EnumOptionData interestPostingPeriodType, final EnumOptionData interestCalculationType,
-            final EnumOptionData interestCalculationDaysInYearType, final Integer lockinPeriodFrequency,
-            final EnumOptionData lockinPeriodFrequencyType, final BigDecimal minBalanceForInterestCalculation,
-            final EnumOptionData accountingType, final Map<String, Object> accountingMappings,
-            final Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings,
-            final Collection<CurrencyData> currencyOptions, final Collection<EnumOptionData> interestCompoundingPeriodTypeOptions,
-            final Collection<EnumOptionData> interestPostingPeriodTypeOptions,
-            final Collection<EnumOptionData> interestCalculationTypeOptions,
-            final Collection<EnumOptionData> interestCalculationDaysInYearTypeOptions,
-            final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions, final Collection<EnumOptionData> withdrawalFeeTypeOptions,
-            final Collection<PaymentTypeData> paymentTypeOptions, final Collection<EnumOptionData> accountingRuleOptions,
-            final Map<String, List<GLAccountData>> accountingMappingOptions, final Collection<ChargeData> charges,
-            final Collection<ChargeData> chargeOptions, final Collection<ChargeData> penaltyOptions,
-            final Collection<ChargeToGLAccountMapper> feeToIncomeAccountMappings,
-            final Collection<ChargeToGLAccountMapper> penaltyToIncomeAccountMappings,
-            final Collection<InterestRateChartData> interestRateCharts, final InterestRateChartData chartTemplate,
-            final boolean preClosurePenalApplicable, final BigDecimal preClosurePenalInterest,
-            final EnumOptionData preClosurePenalInterestOnType, final Collection<EnumOptionData> preClosurePenalInterestOnTypeOptions,
-            final Integer minDepositTerm, final Integer maxDepositTerm, final EnumOptionData minDepositTermType,
-            final EnumOptionData maxDepositTermType, final Integer inMultiplesOfDepositTerm,
-            final EnumOptionData inMultiplesOfDepositTermType, final boolean isMandatoryDeposit, boolean allowWithdrawal,
-            boolean adjustAdvanceTowardsFuturePayments, final Collection<EnumOptionData> periodFrequencyTypeOptions,
-            final BigDecimal minDepositAmount, final BigDecimal depositAmount, final BigDecimal maxDepositAmount, final boolean withHoldTax,
-            final TaxGroupData taxGroup, final Collection<TaxGroupData> taxGroupOptions) {
+    private static RecurringDepositProductData fromProduct(final DepositProductData product, final RecurringDepositProductData existing) {
+        return fromProduct(product, existing.preClosurePenalApplicable, existing.preClosurePenalInterest,
+                existing.preClosurePenalInterestOnType, existing.minDepositTerm, existing.maxDepositTerm, existing.minDepositTermType,
+                existing.maxDepositTermType, existing.inMultiplesOfDepositTerm, existing.inMultiplesOfDepositTermType,
+                existing.isMandatoryDeposit, existing.allowWithdrawal, existing.adjustAdvanceTowardsFuturePayments,
+                existing.minDepositAmount, existing.depositAmount, existing.maxDepositAmount,
+                existing.preClosurePenalInterestOnTypeOptions, existing.periodFrequencyTypeOptions);
+    }
 
-        super(id, name, shortName, description, currency, nominalAnnualInterestRate, interestCompoundingPeriodType,
-                interestPostingPeriodType, interestCalculationType, interestCalculationDaysInYearType, lockinPeriodFrequency,
-                lockinPeriodFrequencyType, accountingType, accountingMappings, paymentChannelToFundSourceMappings, currencyOptions,
-                interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions,
-                interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, paymentTypeOptions,
-                accountingRuleOptions, accountingMappingOptions, charges, chargeOptions, penaltyOptions, feeToIncomeAccountMappings,
-                penaltyToIncomeAccountMappings, interestRateCharts, chartTemplate, minBalanceForInterestCalculation, withHoldTax, taxGroup,
-                taxGroupOptions);
+    private static RecurringDepositProductData fromProduct(final DepositProductData product, final boolean preClosurePenalApplicable,
+            final BigDecimal preClosurePenalInterest, final EnumOptionData preClosurePenalInterestOnType, final Integer minDepositTerm,
+            final Integer maxDepositTerm, final EnumOptionData minDepositTermType, final EnumOptionData maxDepositTermType,
+            final Integer inMultiplesOfDepositTerm, final EnumOptionData inMultiplesOfDepositTermType, final boolean isMandatoryDeposit,
+            final boolean allowWithdrawal, final boolean adjustAdvanceTowardsFuturePayments, final BigDecimal minDepositAmount,
+            final BigDecimal depositAmount, final BigDecimal maxDepositAmount,
+            final Collection<EnumOptionData> preClosurePenalInterestOnTypeOptions,
+            final Collection<EnumOptionData> periodFrequencyTypeOptions) {
+        return new RecurringDepositProductData(product, preClosurePenalApplicable, preClosurePenalInterest, preClosurePenalInterestOnType,
+                minDepositTerm, maxDepositTerm, minDepositTermType, maxDepositTermType, inMultiplesOfDepositTerm,
+                inMultiplesOfDepositTermType, isMandatoryDeposit, allowWithdrawal, adjustAdvanceTowardsFuturePayments, minDepositAmount,
+                depositAmount, maxDepositAmount, preClosurePenalInterestOnTypeOptions, periodFrequencyTypeOptions);
+    }
+
+    private RecurringDepositProductData(final DepositProductData product, final boolean preClosurePenalApplicable,
+            final BigDecimal preClosurePenalInterest, final EnumOptionData preClosurePenalInterestOnType, final Integer minDepositTerm,
+            final Integer maxDepositTerm, final EnumOptionData minDepositTermType, final EnumOptionData maxDepositTermType,
+            final Integer inMultiplesOfDepositTerm, final EnumOptionData inMultiplesOfDepositTermType, final boolean isMandatoryDeposit,
+            final boolean allowWithdrawal, final boolean adjustAdvanceTowardsFuturePayments, final BigDecimal minDepositAmount,
+            final BigDecimal depositAmount, final BigDecimal maxDepositAmount,
+            final Collection<EnumOptionData> preClosurePenalInterestOnTypeOptions,
+            final Collection<EnumOptionData> periodFrequencyTypeOptions) {
+        this.id = product.id;
+        this.name = product.name;
+        this.shortName = product.shortName;
+        this.description = product.description;
+        this.currency = product.currency;
+        this.nominalAnnualInterestRate = product.nominalAnnualInterestRate;
+        this.interestCompoundingPeriodType = product.interestCompoundingPeriodType;
+        this.interestPostingPeriodType = product.interestPostingPeriodType;
+        this.interestCalculationType = product.interestCalculationType;
+        this.interestCalculationDaysInYearType = product.interestCalculationDaysInYearType;
+        this.lockinPeriodFrequency = product.lockinPeriodFrequency;
+        this.lockinPeriodFrequencyType = product.lockinPeriodFrequencyType;
+        this.minBalanceForInterestCalculation = product.minBalanceForInterestCalculation;
+        this.withHoldTax = product.withHoldTax;
+        this.taxGroup = product.taxGroup;
+        this.accountingRule = product.accountingRule;
+        this.accountingMappings = product.accountingMappings;
+        this.paymentChannelToFundSourceMappings = product.paymentChannelToFundSourceMappings;
+        this.feeToIncomeAccountMappings = product.feeToIncomeAccountMappings;
+        this.penaltyToIncomeAccountMappings = product.penaltyToIncomeAccountMappings;
+        this.charges = product.charges;
+        this.interestRateCharts = product.interestRateCharts;
+        this.activeChart = product.activeChart;
+        this.currencyOptions = product.currencyOptions;
+        this.interestCompoundingPeriodTypeOptions = product.interestCompoundingPeriodTypeOptions;
+        this.interestPostingPeriodTypeOptions = product.interestPostingPeriodTypeOptions;
+        this.interestCalculationTypeOptions = product.interestCalculationTypeOptions;
+        this.interestCalculationDaysInYearTypeOptions = product.interestCalculationDaysInYearTypeOptions;
+        this.lockinPeriodFrequencyTypeOptions = product.lockinPeriodFrequencyTypeOptions;
+        this.withdrawalFeeTypeOptions = product.withdrawalFeeTypeOptions;
+        this.paymentTypeOptions = product.paymentTypeOptions;
+        this.accountingRuleOptions = product.accountingRuleOptions;
+        this.accountingMappingOptions = product.accountingMappingOptions;
+        this.chargeOptions = product.chargeOptions;
+        this.penaltyOptions = product.penaltyOptions;
+        this.chartTemplate = product.chartTemplate;
+        this.taxGroupOptions = product.taxGroupOptions;
 
         this.preClosurePenalApplicable = preClosurePenalApplicable;
         this.preClosurePenalInterest = preClosurePenalInterest;
@@ -410,10 +265,75 @@ public final class RecurringDepositProductData extends DepositProductData {
         this.isMandatoryDeposit = isMandatoryDeposit;
         this.allowWithdrawal = allowWithdrawal;
         this.adjustAdvanceTowardsFuturePayments = adjustAdvanceTowardsFuturePayments;
-
-        // template data
         this.preClosurePenalInterestOnTypeOptions = preClosurePenalInterestOnTypeOptions;
         this.periodFrequencyTypeOptions = periodFrequencyTypeOptions;
+    }
+
+    DepositProductData asProductData() {
+        return new DepositProductData(id, name, shortName, description, currency, nominalAnnualInterestRate,
+                interestCompoundingPeriodType, interestPostingPeriodType, interestCalculationType, interestCalculationDaysInYearType,
+                lockinPeriodFrequency, lockinPeriodFrequencyType, accountingRule, accountingMappings, paymentChannelToFundSourceMappings,
+                currencyOptions, interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions,
+                interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, paymentTypeOptions,
+                accountingRuleOptions, accountingMappingOptions, charges, chargeOptions, penaltyOptions, feeToIncomeAccountMappings,
+                penaltyToIncomeAccountMappings, interestRateCharts, chartTemplate, minBalanceForInterestCalculation, withHoldTax, taxGroup,
+                taxGroupOptions);
+    }
+
+    public boolean hasAccountingEnabled() {
+        return this.accountingRule != null && this.accountingRule.getId() > AccountingRuleType.NONE.getValue();
+    }
+
+    public int accountingRuleTypeId() {
+        return this.accountingRule.getId().intValue();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public CurrencyData getCurrency() {
+        return currency;
+    }
+
+    public BigDecimal getNominalAnnualInterestRate() {
+        return nominalAnnualInterestRate;
+    }
+
+    public EnumOptionData getInterestCompoundingPeriodType() {
+        return interestCompoundingPeriodType;
+    }
+
+    public EnumOptionData getInterestPostingPeriodType() {
+        return interestPostingPeriodType;
+    }
+
+    public EnumOptionData getInterestCalculationType() {
+        return interestCalculationType;
+    }
+
+    public EnumOptionData getInterestCalculationDaysInYearType() {
+        return interestCalculationDaysInYearType;
+    }
+
+    public Integer getLockinPeriodFrequency() {
+        return lockinPeriodFrequency;
+    }
+
+    public EnumOptionData getLockinPeriodFrequencyType() {
+        return lockinPeriodFrequencyType;
+    }
+
+    public BigDecimal getMinBalanceForInterestCalculation() {
+        return minBalanceForInterestCalculation;
     }
 
     public EnumOptionData getMinDepositTermType() {

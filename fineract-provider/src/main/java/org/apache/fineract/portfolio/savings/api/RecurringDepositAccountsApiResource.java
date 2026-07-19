@@ -89,7 +89,7 @@ import org.springframework.util.CollectionUtils;
 public class RecurringDepositAccountsApiResource {
     private final DepositAccountReadPlatformService depositAccountReadPlatformService;
     private final PlatformSecurityContext context;
-    private final DefaultToApiJsonSerializer<DepositAccountData> toApiJsonSerializer;
+    private final DefaultToApiJsonSerializer<RecurringDepositAccountData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService;
@@ -107,7 +107,7 @@ public class RecurringDepositAccountsApiResource {
     @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = RecurringDepositAccountsApiResourceSwagger.GetRecurringDepositAccountsTemplateResponse.class)))})
     public String template(@QueryParam("clientId") @Parameter(description = "clientId") final Long clientId, @QueryParam("groupId") @Parameter(description = "groupId") final Long groupId, @QueryParam("productId") @Parameter(description = "productId") final Long productId, @DefaultValue("false") @QueryParam("staffInSelectedOfficeOnly") @Parameter(description = "staffInSelectedOfficeOnly") final boolean staffInSelectedOfficeOnly, @Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_ACCOUNT_RESOURCE_NAME);
-        final DepositAccountData account = this.depositAccountReadPlatformService.retrieveTemplate(DepositAccountType.RECURRING_DEPOSIT, clientId, groupId, productId, staffInSelectedOfficeOnly);
+        final RecurringDepositAccountData account = (RecurringDepositAccountData) this.depositAccountReadPlatformService.retrieveTemplate(DepositAccountType.RECURRING_DEPOSIT, clientId, groupId, productId, staffInSelectedOfficeOnly);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, account, DepositsApiConstants.RECURRING_DEPOSIT_ACCOUNT_RESPONSE_DATA_PARAMETERS);
     }
@@ -124,10 +124,12 @@ public class RecurringDepositAccountsApiResource {
         final PaginationParameters paginationParameters = PaginationParameters.builder().paged(Boolean.TRUE.equals(paged)).limit(limit).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (paginationParameters.isPaged()) {
-            final Page<DepositAccountData> account = this.depositAccountReadPlatformService.retrieveAllPaged(DepositAccountType.RECURRING_DEPOSIT, paginationParameters);
+            @SuppressWarnings({"unchecked", "rawtypes"})
+            final Page<RecurringDepositAccountData> account = (Page) this.depositAccountReadPlatformService.retrieveAllPaged(DepositAccountType.RECURRING_DEPOSIT, paginationParameters);
             return this.toApiJsonSerializer.serialize(settings, account, DepositsApiConstants.RECURRING_DEPOSIT_ACCOUNT_RESPONSE_DATA_PARAMETERS);
         }
-        final Collection<DepositAccountData> account = this.depositAccountReadPlatformService.retrieveAll(DepositAccountType.RECURRING_DEPOSIT, paginationParameters);
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        final Collection<RecurringDepositAccountData> account = (Collection) this.depositAccountReadPlatformService.retrieveAll(DepositAccountType.RECURRING_DEPOSIT, paginationParameters);
         return this.toApiJsonSerializer.serialize(settings, account, DepositsApiConstants.RECURRING_DEPOSIT_ACCOUNT_RESPONSE_DATA_PARAMETERS);
     }
 
@@ -255,7 +257,7 @@ public class RecurringDepositAccountsApiResource {
         } else if (is(commandParam, "calculatePrematureAmount")) {
             final JsonElement parsedQuery = this.fromJsonHelper.parse(apiRequestBodyAsJson);
             final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson, parsedQuery, this.fromJsonHelper);
-            final DepositAccountData account = this.accountPreMatureCalculationPlatformService.calculatePreMatureAmount(accountId, query, DepositAccountType.RECURRING_DEPOSIT);
+            final RecurringDepositAccountData account = (RecurringDepositAccountData) this.accountPreMatureCalculationPlatformService.calculatePreMatureAmount(accountId, query, DepositAccountType.RECURRING_DEPOSIT);
             final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
             return this.toApiJsonSerializer.serialize(settings, account, DepositsApiConstants.RECURRING_DEPOSIT_ACCOUNT_RESPONSE_DATA_PARAMETERS);
         }
@@ -288,9 +290,9 @@ public class RecurringDepositAccountsApiResource {
     @AlternativeOperationId("accountClosureTemplate_1")
     public String accountClosureTemplate(@PathParam("accountId") @Parameter(description = "accountId") final Long accountId, @QueryParam("command") @Parameter(description = "command") final String commandParam, @Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_ACCOUNT_RESOURCE_NAME);
-        DepositAccountData account = null;
+        RecurringDepositAccountData account = null;
         if (is(commandParam, "close")) {
-            account = this.depositAccountReadPlatformService.retrieveOneWithClosureTemplate(DepositAccountType.RECURRING_DEPOSIT, accountId);
+            account = (RecurringDepositAccountData) this.depositAccountReadPlatformService.retrieveOneWithClosureTemplate(DepositAccountType.RECURRING_DEPOSIT, accountId);
         }
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, account, DepositsApiConstants.RECURRING_DEPOSIT_ACCOUNT_RESPONSE_DATA_PARAMETERS);
@@ -329,7 +331,7 @@ public class RecurringDepositAccountsApiResource {
     }
 
     @java.lang.SuppressWarnings("all")
-        public RecurringDepositAccountsApiResource(final DepositAccountReadPlatformService depositAccountReadPlatformService, final PlatformSecurityContext context, final DefaultToApiJsonSerializer<DepositAccountData> toApiJsonSerializer, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final ApiRequestParameterHelper apiRequestParameterHelper, final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService, final FromJsonHelper fromJsonHelper, final DepositAccountPreMatureCalculationPlatformService accountPreMatureCalculationPlatformService, final BulkImportWorkbookService bulkImportWorkbookService, final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService, final SqlValidator sqlValidator) {
+        public RecurringDepositAccountsApiResource(final DepositAccountReadPlatformService depositAccountReadPlatformService, final PlatformSecurityContext context, final DefaultToApiJsonSerializer<RecurringDepositAccountData> toApiJsonSerializer, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final ApiRequestParameterHelper apiRequestParameterHelper, final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService, final FromJsonHelper fromJsonHelper, final DepositAccountPreMatureCalculationPlatformService accountPreMatureCalculationPlatformService, final BulkImportWorkbookService bulkImportWorkbookService, final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService, final SqlValidator sqlValidator) {
         this.depositAccountReadPlatformService = depositAccountReadPlatformService;
         this.context = context;
         this.toApiJsonSerializer = toApiJsonSerializer;

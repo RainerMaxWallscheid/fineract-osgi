@@ -93,7 +93,7 @@ import org.springframework.util.CollectionUtils;
 public class FixedDepositAccountsApiResource {
     private final DepositAccountReadPlatformService depositAccountReadPlatformService;
     private final PlatformSecurityContext context;
-    private final DefaultToApiJsonSerializer<DepositAccountData> toApiJsonSerializer;
+    private final DefaultToApiJsonSerializer<FixedDepositAccountData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService;
@@ -124,7 +124,7 @@ public class FixedDepositAccountsApiResource {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = FixedDepositAccountsApiResourceSwagger.GetFixedDepositAccountsTemplateResponse.class)))
     public String template(@QueryParam("clientId") @Parameter(description = "clientId") final Long clientId, @QueryParam("groupId") @Parameter(description = "groupId") final Long groupId, @QueryParam("productId") @Parameter(description = "productId") final Long productId, @DefaultValue("false") @QueryParam("staffInSelectedOfficeOnly") @Parameter(description = "staffInSelectedOfficeOnly") final boolean staffInSelectedOfficeOnly, @Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESOURCE_NAME);
-        final DepositAccountData account = this.depositAccountReadPlatformService.retrieveTemplate(DepositAccountType.FIXED_DEPOSIT, clientId, groupId, productId, staffInSelectedOfficeOnly);
+        final FixedDepositAccountData account = (FixedDepositAccountData) this.depositAccountReadPlatformService.retrieveTemplate(DepositAccountType.FIXED_DEPOSIT, clientId, groupId, productId, staffInSelectedOfficeOnly);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, account, DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESPONSE_DATA_PARAMETERS);
     }
@@ -152,10 +152,12 @@ public class FixedDepositAccountsApiResource {
         final PaginationParameters paginationParameters = PaginationParameters.builder().paged(Boolean.TRUE.equals(paged)).limit(limit).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (paginationParameters.isPaged()) {
-            final Page<DepositAccountData> account = this.depositAccountReadPlatformService.retrieveAllPaged(DepositAccountType.FIXED_DEPOSIT, paginationParameters);
+            @SuppressWarnings({"unchecked", "rawtypes"})
+            final Page<FixedDepositAccountData> account = (Page) this.depositAccountReadPlatformService.retrieveAllPaged(DepositAccountType.FIXED_DEPOSIT, paginationParameters);
             return this.toApiJsonSerializer.serialize(settings, account, DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESPONSE_DATA_PARAMETERS);
         }
-        final Collection<DepositAccountData> account = this.depositAccountReadPlatformService.retrieveAll(DepositAccountType.FIXED_DEPOSIT, paginationParameters);
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        final Collection<FixedDepositAccountData> account = (Collection) this.depositAccountReadPlatformService.retrieveAll(DepositAccountType.FIXED_DEPOSIT, paginationParameters);
         return this.toApiJsonSerializer.serialize(settings, account, DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESPONSE_DATA_PARAMETERS);
     }
 
@@ -331,7 +333,7 @@ public class FixedDepositAccountsApiResource {
         } else if (is(commandParam, "calculatePrematureAmount")) {
             final JsonElement parsedQuery = this.fromJsonHelper.parse(apiRequestBodyAsJson);
             final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson, parsedQuery, this.fromJsonHelper);
-            final DepositAccountData account = this.accountPreMatureCalculationPlatformService.calculatePreMatureAmount(accountId, query, DepositAccountType.FIXED_DEPOSIT);
+            final FixedDepositAccountData account = (FixedDepositAccountData) this.accountPreMatureCalculationPlatformService.calculatePreMatureAmount(accountId, query, DepositAccountType.FIXED_DEPOSIT);
             final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
             return this.toApiJsonSerializer.serialize(settings, account, DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESPONSE_DATA_PARAMETERS);
         }
@@ -362,9 +364,9 @@ public class FixedDepositAccountsApiResource {
     @Produces({MediaType.APPLICATION_JSON})
     public String accountClosureTemplate(@PathParam("accountId") @Parameter(description = "accountId") final Long accountId, @QueryParam("command") @Parameter(description = "command") final String commandParam, @Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESOURCE_NAME);
-        DepositAccountData account = null;
+        FixedDepositAccountData account = null;
         if (is(commandParam, "close")) {
-            account = this.depositAccountReadPlatformService.retrieveOneWithClosureTemplate(DepositAccountType.FIXED_DEPOSIT, accountId);
+            account = (FixedDepositAccountData) this.depositAccountReadPlatformService.retrieveOneWithClosureTemplate(DepositAccountType.FIXED_DEPOSIT, accountId);
         }
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, account, DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESPONSE_DATA_PARAMETERS);
@@ -403,7 +405,7 @@ public class FixedDepositAccountsApiResource {
     }
 
     @java.lang.SuppressWarnings("all")
-        public FixedDepositAccountsApiResource(final DepositAccountReadPlatformService depositAccountReadPlatformService, final PlatformSecurityContext context, final DefaultToApiJsonSerializer<DepositAccountData> toApiJsonSerializer, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final ApiRequestParameterHelper apiRequestParameterHelper, final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService, final FromJsonHelper fromJsonHelper, final DepositAccountPreMatureCalculationPlatformService accountPreMatureCalculationPlatformService, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final BulkImportWorkbookService bulkImportWorkbookService, final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService, final FixedDepositAccountInterestCalculationService fixedDepositAccountInterestCalculationService, final SqlValidator sqlValidator) {
+        public FixedDepositAccountsApiResource(final DepositAccountReadPlatformService depositAccountReadPlatformService, final PlatformSecurityContext context, final DefaultToApiJsonSerializer<FixedDepositAccountData> toApiJsonSerializer, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final ApiRequestParameterHelper apiRequestParameterHelper, final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService, final FromJsonHelper fromJsonHelper, final DepositAccountPreMatureCalculationPlatformService accountPreMatureCalculationPlatformService, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final BulkImportWorkbookService bulkImportWorkbookService, final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService, final FixedDepositAccountInterestCalculationService fixedDepositAccountInterestCalculationService, final SqlValidator sqlValidator) {
         this.depositAccountReadPlatformService = depositAccountReadPlatformService;
         this.context = context;
         this.toApiJsonSerializer = toApiJsonSerializer;

@@ -29,21 +29,41 @@ import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
 
 public interface DepositAccountReadPlatformService {
 
-    Collection<DepositAccountData> retrieveAll(DepositAccountType depositAccountType, PaginationParameters paginationParameters);
+    /**
+     * Full account rows for the given deposit type. Concrete element type is
+     * {@link org.apache.fineract.portfolio.savings.data.FixedDepositAccountData} or
+     * {@link org.apache.fineract.portfolio.savings.data.RecurringDepositAccountData}.
+     */
+    Collection<?> retrieveAll(DepositAccountType depositAccountType, PaginationParameters paginationParameters);
 
-    Page<DepositAccountData> retrieveAllPaged(DepositAccountType depositAccountType, PaginationParameters paginationParameters);
+    /**
+     * Paged full account rows. Page content element type is Fixed or Recurring account data.
+     */
+    Page<?> retrieveAllPaged(DepositAccountType depositAccountType, PaginationParameters paginationParameters);
 
     Collection<DepositAccountData> retrieveAllForLookup(DepositAccountType depositAccountType);
 
-    DepositAccountData retrieveOne(DepositAccountType depositAccountType, Long accountId);
+    /**
+     * Full account for the given deposit type. Concrete type is Fixed or Recurring account data.
+     */
+    Object retrieveOne(DepositAccountType depositAccountType, Long accountId);
 
-    DepositAccountData retrieveOneWithClosureTemplate(DepositAccountType depositAccountType, Long accountId);
+    /**
+     * Full account with closure template options. Concrete type is Fixed or Recurring account data.
+     */
+    Object retrieveOneWithClosureTemplate(DepositAccountType depositAccountType, Long accountId);
 
-    DepositAccountData retrieveOneWithChartSlabs(DepositAccountType depositAccountType, Long productId);
+    /**
+     * Full account including interest chart slabs. Concrete type is Fixed or Recurring account data.
+     */
+    Object retrieveOneWithChartSlabs(DepositAccountType depositAccountType, Long productId);
 
     Collection<SavingsAccountTransactionData> retrieveAllTransactions(DepositAccountType depositAccountType, Long accountId);
 
-    DepositAccountData retrieveTemplate(DepositAccountType depositAccountType, Long clientId, Long groupId, Long productId,
+    /**
+     * Account template for the given deposit type. Concrete type is Fixed or Recurring account data.
+     */
+    Object retrieveTemplate(DepositAccountType depositAccountType, Long clientId, Long groupId, Long productId,
             boolean staffInSelectedOfficeOnly);
 
     Collection<DepositAccountData> retrieveForMaturityUpdate();

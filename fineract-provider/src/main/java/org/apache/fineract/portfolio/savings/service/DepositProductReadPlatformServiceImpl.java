@@ -48,17 +48,23 @@ public class DepositProductReadPlatformServiceImpl implements DepositProductRead
     private final InterestRateChartReadService chartReadPlatformService;
 
     @Override
-    public Collection<DepositProductData> retrieveAll(final DepositAccountType depositAccountType) {
+    @SuppressWarnings("unchecked")
+    public Collection<?> retrieveAll(final DepositAccountType depositAccountType) {
         this.context.authenticatedUser();
-        final DepositProductMapper depositProductMapper = this.getDepositProductMapper(depositAccountType);
-        if (depositProductMapper == null) {
-            return null;
+        if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
+            final StringBuilder sqlBuilder = new StringBuilder(400);
+            sqlBuilder.append("select ");
+            sqlBuilder.append(FIXED_DEPOSIT_PRODUCT_MAPPER.schema());
+            sqlBuilder.append(" where sp.deposit_type_enum = ? ");
+            return this.jdbcTemplate.query(sqlBuilder.toString(), FIXED_DEPOSIT_PRODUCT_MAPPER, depositAccountType.getValue());
+        } else if (depositAccountType == DepositAccountType.RECURRING_DEPOSIT) {
+            final StringBuilder sqlBuilder = new StringBuilder(400);
+            sqlBuilder.append("select ");
+            sqlBuilder.append(RECURRING_DEPOSIT_PRODUCT_MAPPER.schema());
+            sqlBuilder.append(" where sp.deposit_type_enum = ? ");
+            return this.jdbcTemplate.query(sqlBuilder.toString(), RECURRING_DEPOSIT_PRODUCT_MAPPER, depositAccountType.getValue());
         }
-        final StringBuilder sqlBuilder = new StringBuilder(400);
-        sqlBuilder.append("select ");
-        sqlBuilder.append(depositProductMapper.schema());
-        sqlBuilder.append(" where sp.deposit_type_enum = ? ");
-        return this.jdbcTemplate.query(sqlBuilder.toString(), depositProductMapper, depositAccountType.getValue());
+        return null;
     }
 
     @Override
@@ -71,49 +77,46 @@ public class DepositProductReadPlatformServiceImpl implements DepositProductRead
     }
 
     @Override
-    public DepositProductData retrieveOne(final DepositAccountType depositAccountType, final Long fixedDepositProductId) {
+    public Object retrieveOne(final DepositAccountType depositAccountType, final Long fixedDepositProductId) {
         try {
             this.context.authenticatedUser();
-            final DepositProductMapper depositProductMapper = this.getDepositProductMapper(depositAccountType);
-            if (depositProductMapper == null) {
-                return null;
+            if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
+                final StringBuilder sqlBuilder = new StringBuilder(400);
+                sqlBuilder.append("select ");
+                sqlBuilder.append(FIXED_DEPOSIT_PRODUCT_MAPPER.schema());
+                sqlBuilder.append(" where sp.id = ? and sp.deposit_type_enum = ? ");
+                return this.jdbcTemplate.queryForObject(sqlBuilder.toString(), FIXED_DEPOSIT_PRODUCT_MAPPER, fixedDepositProductId,
+                        depositAccountType.getValue());
+            } else if (depositAccountType == DepositAccountType.RECURRING_DEPOSIT) {
+                final StringBuilder sqlBuilder = new StringBuilder(400);
+                sqlBuilder.append("select ");
+                sqlBuilder.append(RECURRING_DEPOSIT_PRODUCT_MAPPER.schema());
+                sqlBuilder.append(" where sp.id = ? and sp.deposit_type_enum = ? ");
+                return this.jdbcTemplate.queryForObject(sqlBuilder.toString(), RECURRING_DEPOSIT_PRODUCT_MAPPER, fixedDepositProductId,
+                        depositAccountType.getValue());
             }
-            final StringBuilder sqlBuilder = new StringBuilder(400);
-            sqlBuilder.append("select ");
-            sqlBuilder.append(depositProductMapper.schema());
-            sqlBuilder.append(" where sp.id = ? and sp.deposit_type_enum = ? ");
-            return this.jdbcTemplate.queryForObject(sqlBuilder.toString(), depositProductMapper, fixedDepositProductId, depositAccountType.getValue());
+            return null;
         } catch (final EmptyResultDataAccessException e) {
             throw new FixedDepositProductNotFoundException(fixedDepositProductId, e);
         }
     }
 
     @Override
-    public DepositProductData retrieveOneWithChartSlabs(final DepositAccountType depositAccountType, Long depositProductId) {
-        DepositProductData depositProduct = this.retrieveOne(depositAccountType, depositProductId);
-        Collection<InterestRateChartData> charts = this.chartReadPlatformService.retrieveAllWithSlabsWithTemplate(depositProductId);
+    public Object retrieveOneWithChartSlabs(final DepositAccountType depositAccountType, Long depositProductId) {
+        final Object depositProduct = this.retrieveOne(depositAccountType, depositProductId);
+        final Collection<InterestRateChartData> charts = this.chartReadPlatformService.retrieveAllWithSlabsWithTemplate(depositProductId);
         if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
-            depositProduct = FixedDepositProductData.withInterestChart(depositProduct, charts);
+            return FixedDepositProductData.withInterestChart((FixedDepositProductData) depositProduct, charts);
         } else if (depositAccountType == DepositAccountType.RECURRING_DEPOSIT) {
-            depositProduct = RecurringDepositProductData.withInterestChart(depositProduct, charts);
+            return RecurringDepositProductData.withInterestChart((RecurringDepositProductData) depositProduct, charts);
         }
         return depositProduct;
     }
 
-    private DepositProductMapper getDepositProductMapper(final DepositAccountType depositAccountType) {
-        if (depositAccountType == DepositAccountType.FIXED_DEPOSIT) {
-            return FIXED_DEPOSIT_PRODUCT_MAPPER;
-        } else if (depositAccountType == DepositAccountType.RECURRING_DEPOSIT) {
-            return RECURRING_DEPOSIT_PRODUCT_MAPPER;
-        }
-        return null;
-    }
-
-
-    private static abstract class DepositProductMapper implements RowMapper<DepositProductData> {
+    private static class SharedDepositProductColumns {
         private final String schemaSql;
 
-        protected DepositProductMapper() {
+        SharedDepositProductColumns() {
             final StringBuilder sqlBuilder = new StringBuilder(400);
             sqlBuilder.append("sp.id as id, sp.name as name, sp.short_name as shortName, sp.description as description, ");
             sqlBuilder.append("sp.currency_code as currencyCode, sp.currency_digits as currencyDigits, sp.currency_multiplesof as inMultiplesOf, ");
@@ -137,7 +140,7 @@ public class DepositProductReadPlatformServiceImpl implements DepositProductRead
             return this.schemaSql;
         }
 
-        public DepositProductData mapRow(final ResultSet rs) throws SQLException {
+        public DepositProductData mapBase(final ResultSet rs) throws SQLException {
             final Long id = rs.getLong("id");
             final String name = rs.getString("name");
             final String shortName = rs.getString("shortName");
@@ -181,13 +184,14 @@ public class DepositProductReadPlatformServiceImpl implements DepositProductRead
         }
     }
 
+    private static final SharedDepositProductColumns SHARED_COLUMNS = new SharedDepositProductColumns();
 
-    private static class FixedDepositProductMapper extends DepositProductMapper {
+    private static class FixedDepositProductMapper implements RowMapper<FixedDepositProductData> {
         private final String schemaSql;
 
         FixedDepositProductMapper() {
             final StringBuilder sqlBuilder = new StringBuilder(400);
-            sqlBuilder.append(super.schema());
+            sqlBuilder.append(SHARED_COLUMNS.schema());
             sqlBuilder.append(", dptp.pre_closure_penal_applicable as preClosurePenalApplicable, ");
             sqlBuilder.append("dptp.pre_closure_penal_interest as preClosurePenalInterest, ");
             sqlBuilder.append("dptp.pre_closure_penal_interest_on_enum as preClosurePenalInterestOnId, ");
@@ -206,14 +210,13 @@ public class DepositProductReadPlatformServiceImpl implements DepositProductRead
             this.schemaSql = sqlBuilder.toString();
         }
 
-        @Override
         public String schema() {
             return this.schemaSql;
         }
 
         @Override
         public FixedDepositProductData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-            final DepositProductData depositProductData = super.mapRow(rs);
+            final DepositProductData depositProductData = SHARED_COLUMNS.mapBase(rs);
             final boolean preClosurePenalApplicable = rs.getBoolean("preClosurePenalApplicable");
             final BigDecimal preClosurePenalInterest = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs, "preClosurePenalInterest");
             final Integer preClosurePenalInterestOnTypeId = JdbcSupport.getInteger(rs, "preClosurePenalInterestOnId");
@@ -234,13 +237,12 @@ public class DepositProductReadPlatformServiceImpl implements DepositProductRead
         }
     }
 
-
-    private static class RecurringDepositProductMapper extends DepositProductMapper {
+    private static class RecurringDepositProductMapper implements RowMapper<RecurringDepositProductData> {
         private final String schemaSql;
 
         RecurringDepositProductMapper() {
             final StringBuilder sqlBuilder = new StringBuilder(400);
-            sqlBuilder.append(super.schema());
+            sqlBuilder.append(SHARED_COLUMNS.schema());
             sqlBuilder.append(", dptp.pre_closure_penal_applicable as preClosurePenalApplicable, ");
             sqlBuilder.append("dptp.pre_closure_penal_interest as preClosurePenalInterest, ");
             sqlBuilder.append("dptp.pre_closure_penal_interest_on_enum as preClosurePenalInterestOnId, ");
@@ -264,14 +266,13 @@ public class DepositProductReadPlatformServiceImpl implements DepositProductRead
             this.schemaSql = sqlBuilder.toString();
         }
 
-        @Override
         public String schema() {
             return this.schemaSql;
         }
 
         @Override
         public RecurringDepositProductData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-            final DepositProductData depositProductData = super.mapRow(rs);
+            final DepositProductData depositProductData = SHARED_COLUMNS.mapBase(rs);
             final boolean isMandatoryDeposit = rs.getBoolean("isMandatoryDeposit");
             final boolean allowWithdrawal = rs.getBoolean("allowWithdrawal");
             final boolean adjustAdvanceTowardsFuturePayments = rs.getBoolean("adjustAdvanceTowardsFuturePayments");
@@ -294,7 +295,6 @@ public class DepositProductReadPlatformServiceImpl implements DepositProductRead
             return RecurringDepositProductData.instance(depositProductData, preClosurePenalApplicable, preClosurePenalInterest, preClosurePenalInterestOnType, minDepositTerm, maxDepositTerm, minDepositTermType, maxDepositTermType, inMultiplesOfDepositTerm, inMultiplesOfDepositTermType, isMandatoryDeposit, allowWithdrawal, adjustAdvanceTowardsFuturePayments, minDepositAmount, depositAmount, maxDepositAmount);
         }
     }
-
 
     private static final class DepositProductLookupMapper implements RowMapper<DepositProductData> {
         public String schema() {
