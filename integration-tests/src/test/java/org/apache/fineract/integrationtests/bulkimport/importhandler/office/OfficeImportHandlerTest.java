@@ -34,7 +34,6 @@ import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import org.apache.fineract.infrastructure.bulkimport.constants.OfficeConstants;
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import org.apache.fineract.integrationtests.bulkimport.importhandler.BulkImportOutputTemplateHelper;
@@ -71,7 +70,7 @@ public class OfficeImportHandlerTest {
         firstOfficeRow.createCell(OfficeConstants.OFFICE_NAME_COL).setCellValue(Utils.uniqueRandomStringGenerator("Test_Off_", 6));
         firstOfficeRow.createCell(OfficeConstants.PARENT_OFFICE_NAME_COL).setCellValue(firstOfficeRow.getCell(OfficeConstants.LOOKUP_OFFICE_COL).getStringCellValue());
         firstOfficeRow.createCell(OfficeConstants.PARENT_OFFICE_ID_COL).setCellValue(firstOfficeRow.getCell(OfficeConstants.LOOKUP_OFFICE_ID_COL).getNumericCellValue());
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Date date = simpleDateFormat.parse("20010514");
         firstOfficeRow.createCell(OfficeConstants.OPENED_ON_COL).setCellValue(date);
         Path directory = Path.of("").toAbsolutePath().resolve("src").resolve("integrationTest").resolve("resources").resolve("bulkimport").resolve("importhandler").resolve("office");

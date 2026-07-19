@@ -31,7 +31,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
@@ -83,7 +82,7 @@ public class LoanInterestRecalculationCOBTest extends BaseLoanIntegrationTest {
         log.info("index, dueDate, principal, fee, penalty, interest");
         Assertions.assertNotNull(loanDetails.getRepaymentSchedule());
         Assertions.assertNotNull(loanDetails.getRepaymentSchedule().getPeriods());
-        loanDetails.getRepaymentSchedule().getPeriods().forEach(period -> log.info("{}, \"{}\", {}, {}, {}, {}", period.getPeriod(), DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH).format(Objects.requireNonNull(period.getDueDate())), period.getPrincipalDue(), period.getFeeChargesDue(), period.getPenaltyChargesDue(), period.getInterestDue()));
+        loanDetails.getRepaymentSchedule().getPeriods().forEach(period -> log.info("{}, \"{}\", {}, {}, {}, {}", period.getPeriod(), DateTimeFormatter.ofPattern(DATETIME_PATTERN).format(Objects.requireNonNull(period.getDueDate())), period.getPrincipalDue(), period.getFeeChargesDue(), period.getPenaltyChargesDue(), period.getInterestDue()));
     }
 
     @Test

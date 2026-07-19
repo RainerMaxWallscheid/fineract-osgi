@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import org.apache.fineract.client.models.PagedLocalRequestAdvancedQueryRequest;
 import org.apache.fineract.client.models.PostSavingsAccountTransactionsRequest;
@@ -135,7 +134,7 @@ public class SavingsAccountHelper {
     }
 
     public static String getFutureDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT, Locale.US);
+        SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT);
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR) + 1);
         return sdf.format(calendar.getTime());
@@ -589,7 +588,7 @@ public class SavingsAccountHelper {
 
     public Integer payCharge(final Integer chargeId, final Integer savingsId, String amount, LocalDate dueDate) {
         return (Integer) performSavingActions(createChargesURL("paycharge", savingsId, chargeId),
-                getSavingsPayChargeJSON(amount, dueDate.format(DateTimeFormatter.ofPattern(CommonConstants.DATE_FORMAT, Locale.ENGLISH))),
+                getSavingsPayChargeJSON(amount, dueDate.format(DateTimeFormatter.ofPattern(CommonConstants.DATE_FORMAT))),
                 CommonConstants.RESPONSE_RESOURCE_ID);
     }
 

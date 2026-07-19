@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import org.apache.fineract.integrationtests.common.ClientHelper;
 import org.apache.fineract.integrationtests.common.CollateralManagementHelper;
 import org.apache.fineract.integrationtests.common.CommonConstants;
@@ -105,7 +104,7 @@ public class GuarantorTest {
                 String.valueOf(EXTERNAL2_BALANCE));
 
         final Integer loanProductID = createLoanProductWithHoldFunds("50", "20", "20");
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.DAY_OF_MONTH, -7 * 4);
         final String loanDisbursementDate = dateFormat.format(todaysDate.getTime());
@@ -265,7 +264,7 @@ public class GuarantorTest {
                 String.valueOf(EXTERNAL2_BALANCE));
 
         final Integer loanProductID = createLoanProductWithHoldFunds("50", "20", "20");
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.DAY_OF_MONTH, -7 * 4);
         final String loanDisbursementDate = dateFormat.format(todaysDate.getTime());
@@ -456,7 +455,7 @@ public class GuarantorTest {
                 String.valueOf(EXTERNAL1_BALANCE));
 
         final Integer loanProductID = createLoanProductWithHoldFunds("40", "20", "20");
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.DAY_OF_MONTH, -21);
         final String loanDisbursementDate = dateFormat.format(todaysDate.getTime());
@@ -532,7 +531,7 @@ public class GuarantorTest {
                 String.valueOf(externalBalance));
 
         final Integer loanProductID = createLoanProductWithHoldFunds("40", "20", "20");
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.DAY_OF_MONTH, -21);
         final String loanDisbursementDate = dateFormat.format(todaysDate.getTime());
@@ -604,7 +603,7 @@ public class GuarantorTest {
                 String.valueOf(EXTERNAL1_BALANCE));
 
         final Integer loanProductID = createLoanProductWithHoldFunds("40", "20", "20");
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.DAY_OF_MONTH, -21);
         final String loanDisbursementDate = dateFormat.format(todaysDate.getTime());

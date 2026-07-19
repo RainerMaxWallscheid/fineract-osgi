@@ -67,7 +67,6 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
 
     public static final String ACCOUNT_TYPE_INDIVIDUAL = "INDIVIDUAL";
     public static final String DEFAULT_DATE_FORMAT = "yyyyMMdd";
-    public static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
     final String startDate = "20230501";
     final String firstDepositDate = "20230505";
     final String secondDepositDate = "20230509";
@@ -152,8 +151,8 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
         this.savingsAccountHelper.withdrawalFromSavingsAccount(savingsId, "100", withdrawDate, CommonConstants.RESPONSE_RESOURCE_ID);
 
         TransactionSearchRequest searchParameters = new TransactionSearchRequest()
-                .fromDate(firstDepositDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE).toDate(withdrawDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE);
-        Map<String, Object> queryParams = buildTransactionsSearchQuery(searchParameters, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE);
+                .fromDate(firstDepositDate, DEFAULT_DATE_FORMAT, null).toDate(withdrawDate, DEFAULT_DATE_FORMAT, null);
+        Map<String, Object> queryParams = buildTransactionsSearchQuery(searchParameters, DEFAULT_DATE_FORMAT, null);
         SavingsAccountTransactionsSearchResponse transactionsResponse = this.savingsAccountHelper.searchSavingsTransactions(savingsId,
                 queryParams);
 
@@ -162,8 +161,8 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
         Assertions.assertNotNull(transactionsResponse.getContent());
         List<GetSavingsAccountTransactionsPageItem> pageItemsList = List.copyOf(transactionsResponse.getContent());
         assertEquals(3, pageItemsList.size());
-        assertEquals(parseLocalDate(withdrawDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), pageItemsList.get(0).getDate());
-        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), pageItemsList.get(1).getDate());
+        assertEquals(parseLocalDate(withdrawDate, DEFAULT_DATE_FORMAT), pageItemsList.get(0).getDate());
+        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT), pageItemsList.get(1).getDate());
     }
 
     @Test
@@ -185,11 +184,11 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
             globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
                     new PutGlobalConfigurationsRequest().enabled(false));
         }
-        String submittedDate = DateUtils.format(businessDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE);
+        String submittedDate = DateUtils.format(businessDate, DEFAULT_DATE_FORMAT);
         TransactionSearchRequest searchParameters = new TransactionSearchRequest()
-                .fromSubmittedDate(submittedDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE)
-                .toSubmittedDate(submittedDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE);
-        Map<String, Object> queryParams = buildTransactionsSearchQuery(searchParameters, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE);
+                .fromSubmittedDate(submittedDate, DEFAULT_DATE_FORMAT, null)
+                .toSubmittedDate(submittedDate, DEFAULT_DATE_FORMAT, null);
+        Map<String, Object> queryParams = buildTransactionsSearchQuery(searchParameters, DEFAULT_DATE_FORMAT, null);
         SavingsAccountTransactionsSearchResponse transactionsResponse = this.savingsAccountHelper.searchSavingsTransactions(savingsId,
                 queryParams);
 
@@ -215,7 +214,7 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
 
         int typeD = SavingsAccountTransactionType.DEPOSIT.getId();
         TransactionSearchRequest searchParameters = new TransactionSearchRequest().types(String.valueOf(typeD));
-        Map<String, Object> queryParams = buildTransactionsSearchQuery(searchParameters, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE);
+        Map<String, Object> queryParams = buildTransactionsSearchQuery(searchParameters, DEFAULT_DATE_FORMAT, null);
         SavingsAccountTransactionsSearchResponse transactionsResponse = this.savingsAccountHelper.searchSavingsTransactions(savingsId,
                 queryParams);
 
@@ -227,11 +226,11 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
         GetSavingsAccountTransactionsPageItem first = pageItemsList.get(0);
         assertEquals(Long.valueOf(typeD), first.getTransactionType().getId());
         assertTrue(MathUtil.isEqualTo(BigDecimal.valueOf(300), first.getAmount()));
-        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), first.getDate());
+        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT), first.getDate());
         GetSavingsAccountTransactionsPageItem second = pageItemsList.get(1);
         assertEquals(Long.valueOf(typeD), second.getTransactionType().getId());
         assertTrue(MathUtil.isEqualTo(BigDecimal.valueOf(100), second.getAmount()));
-        assertEquals(parseLocalDate(firstDepositDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), second.getDate());
+        assertEquals(parseLocalDate(firstDepositDate, DEFAULT_DATE_FORMAT), second.getDate());
     }
 
     @Test
@@ -247,7 +246,7 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
         int typeD = SavingsAccountTransactionType.DEPOSIT.getId();
         int typeW = SavingsAccountTransactionType.WITHDRAWAL.getId();
         TransactionSearchRequest searchParameters = new TransactionSearchRequest().types(String.valueOf(typeD) + ',' + typeW);
-        Map<String, Object> queryParams = buildTransactionsSearchQuery(searchParameters, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE);
+        Map<String, Object> queryParams = buildTransactionsSearchQuery(searchParameters, DEFAULT_DATE_FORMAT, null);
         SavingsAccountTransactionsSearchResponse transactionsResponse = this.savingsAccountHelper.searchSavingsTransactions(savingsId,
                 queryParams);
 
@@ -298,7 +297,7 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
         int typeD = SavingsAccountTransactionType.DEPOSIT.getId();
         TransactionSearchRequest searchParameters = new TransactionSearchRequest().types(String.valueOf(typeD)).pageable(null, null,
                 "amount", Sort.Direction.ASC);
-        Map<String, Object> queryParams = buildTransactionsSearchQuery(searchParameters, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE);
+        Map<String, Object> queryParams = buildTransactionsSearchQuery(searchParameters, DEFAULT_DATE_FORMAT, null);
         SavingsAccountTransactionsSearchResponse transactionsResponse = this.savingsAccountHelper.searchSavingsTransactions(savingsId,
                 queryParams);
 
@@ -310,11 +309,11 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
         GetSavingsAccountTransactionsPageItem first = pageItemsList.get(0);
         assertEquals(Long.valueOf(typeD), first.getTransactionType().getId());
         assertTrue(MathUtil.isEqualTo(BigDecimal.valueOf(100), first.getAmount()));
-        assertEquals(parseLocalDate(firstDepositDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), first.getDate());
+        assertEquals(parseLocalDate(firstDepositDate, DEFAULT_DATE_FORMAT), first.getDate());
         GetSavingsAccountTransactionsPageItem second = pageItemsList.get(1);
         assertEquals(Long.valueOf(typeD), second.getTransactionType().getId());
         assertTrue(MathUtil.isEqualTo(BigDecimal.valueOf(300), second.getAmount()));
-        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), second.getDate());
+        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT), second.getDate());
     }
 
     @Test
@@ -332,10 +331,10 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
 
         int typeD = SavingsAccountTransactionType.DEPOSIT.getId();
         TransactionSearchRequest searchParameters = new TransactionSearchRequest().fromAmount(BigDecimal.valueOf(100))
-                .toAmount(BigDecimal.valueOf(500)).fromDate("2023-05-06", DateUtils.DEFAULT_DATE_FORMAT, DEFAULT_LOCALE)
-                .toDate("2023-06-01", DateUtils.DEFAULT_DATE_FORMAT, DEFAULT_LOCALE).types(String.valueOf(typeD))
+                .toAmount(BigDecimal.valueOf(500)).fromDate("2023-05-06", DateUtils.DEFAULT_DATE_FORMAT, null)
+                .toDate("2023-06-01", DateUtils.DEFAULT_DATE_FORMAT, null).types(String.valueOf(typeD))
                 .pageable(0, 2, "amount", Sort.Direction.DESC);
-        Map<String, Object> queryParams = buildTransactionsSearchQuery(searchParameters, DateUtils.DEFAULT_DATE_FORMAT, DEFAULT_LOCALE);
+        Map<String, Object> queryParams = buildTransactionsSearchQuery(searchParameters, DateUtils.DEFAULT_DATE_FORMAT, null);
         SavingsAccountTransactionsSearchResponse transactionsResponse = this.savingsAccountHelper.searchSavingsTransactions(savingsId,
                 queryParams);
 
@@ -347,11 +346,11 @@ public class SavingsAccountTransactionsSearchIntegrationTest {
         GetSavingsAccountTransactionsPageItem first = pageItemsList.get(0);
         assertEquals(Long.valueOf(typeD), first.getTransactionType().getId());
         assertTrue(MathUtil.isEqualTo(BigDecimal.valueOf(400), first.getAmount()));
-        assertEquals(parseLocalDate(thirdDepositDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), first.getDate());
+        assertEquals(parseLocalDate(thirdDepositDate, DEFAULT_DATE_FORMAT), first.getDate());
         GetSavingsAccountTransactionsPageItem second = pageItemsList.get(1);
         assertEquals(Long.valueOf(typeD), second.getTransactionType().getId());
         assertTrue(MathUtil.isEqualTo(BigDecimal.valueOf(300), second.getAmount()));
-        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT, DEFAULT_LOCALE), second.getDate());
+        assertEquals(parseLocalDate(secondDepositDate, DEFAULT_DATE_FORMAT), second.getDate());
     }
 
     @Test

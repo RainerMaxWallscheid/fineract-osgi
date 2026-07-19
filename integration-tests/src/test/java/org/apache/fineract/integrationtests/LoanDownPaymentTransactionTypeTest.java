@@ -31,7 +31,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.Locale;
 import org.apache.fineract.client.models.DelinquencyBucketResponse;
 import org.apache.fineract.client.models.GetLoanProductsProductIdResponse;
 import org.apache.fineract.client.models.GetLoansLoanIdTransactionsTransactionIdResponse;
@@ -70,7 +69,7 @@ public class LoanDownPaymentTransactionTypeTest {
     @Test
     public void loanDownPaymentTransactionTypeTest() {
 
-        DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
+        DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter();
 
         String loanExternalIdStr = UUID.randomUUID().toString();
 

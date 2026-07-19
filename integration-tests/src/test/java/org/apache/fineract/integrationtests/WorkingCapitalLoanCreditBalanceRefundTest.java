@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.Locale;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.GetBalance;
 import org.apache.fineract.client.models.GetWorkingCapitalLoansLoanIdResponse;
@@ -104,7 +103,7 @@ public class WorkingCapitalLoanCreditBalanceRefundTest {
         final Long loanId = createOverpaidLoan(BigDecimal.valueOf(200), disbursementDate);
         final GetBalance balanceBeforeRefund = loanHelper.retrieveById(loanId).getBalance();
         final LocalDate refundDate = disbursementDate.plusDays(2);
-        BusinessDateHelper.runAt(refundDate.format(DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH)),
+        BusinessDateHelper.runAt(refundDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")),
                 () -> loanHelper.makeCreditBalanceRefundByLoanId(loanId, WorkingCapitalLoanDisbursementTestBuilder
                         .buildCreditBalanceRefundRequest(refundDate, BigDecimal.valueOf(150), null, "cbr", 1, "cbr-account")));
 
@@ -131,7 +130,7 @@ public class WorkingCapitalLoanCreditBalanceRefundTest {
         final Long loanId = createOverpaidLoan(BigDecimal.valueOf(100), disbursementDate);
         final GetBalance balanceBeforeRefund = loanHelper.retrieveById(loanId).getBalance();
         final LocalDate refundDate = disbursementDate.plusDays(2);
-        BusinessDateHelper.runAt(refundDate.format(DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH)),
+        BusinessDateHelper.runAt(refundDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")),
                 () -> loanHelper.makeCreditBalanceRefundByLoanId(loanId, WorkingCapitalLoanDisbursementTestBuilder
                         .buildCreditBalanceRefundRequest(refundDate, BigDecimal.valueOf(100), null, "cbr-close", 1, "cbr-account")));
 
@@ -178,7 +177,7 @@ public class WorkingCapitalLoanCreditBalanceRefundTest {
         final LocalDate disbursementDate = LocalDate.now(ZoneId.systemDefault());
         final Long loanId = createOverpaidLoan(BigDecimal.valueOf(100), disbursementDate);
         final LocalDate refundDate = disbursementDate.plusDays(2);
-        BusinessDateHelper.runAt(refundDate.format(DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH)), () -> {
+        BusinessDateHelper.runAt(refundDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")), () -> {
             externalEventHelper.deleteAllExternalEvents();
             loanHelper.makeCreditBalanceRefundByLoanId(loanId, WorkingCapitalLoanDisbursementTestBuilder
                     .buildCreditBalanceRefundRequest(refundDate, BigDecimal.valueOf(100), null, "cbr-events", 1, "cbr-account"));
@@ -197,7 +196,7 @@ public class WorkingCapitalLoanCreditBalanceRefundTest {
         final var request = WorkingCapitalLoanDisbursementTestBuilder.buildCreditBalanceRefundRequest(disbursementDate.plusDays(2),
                 BigDecimal.valueOf(50), null, "cbr-null-payment-details", null, null).paymentDetails(null);
 
-        BusinessDateHelper.runAt(disbursementDate.plusDays(2).format(DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH)),
+        BusinessDateHelper.runAt(disbursementDate.plusDays(2).format(DateTimeFormatter.ofPattern("yyyyMMdd")),
                 () -> loanHelper.makeCreditBalanceRefundByLoanId(loanId, request));
 
         final GetWorkingCapitalLoansLoanIdResponse loanData = loanHelper.retrieveById(loanId);
@@ -225,7 +224,7 @@ public class WorkingCapitalLoanCreditBalanceRefundTest {
         final LocalDate refundDate = disbursementDate.plusDays(2);
 
         BusinessDateHelper
-                .runAt(refundDate.format(DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH)),
+                .runAt(refundDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")),
                         () -> loanHelper.makeCreditBalanceRefundByLoanId(loanId1,
                                 WorkingCapitalLoanDisbursementTestBuilder.buildTransactionRequest(refundDate, BigDecimal.valueOf(50), null,
                                         "cbr-ext-1", 1, "cbr-account-1", sharedExternalId)));
@@ -237,10 +236,10 @@ public class WorkingCapitalLoanCreditBalanceRefundTest {
 
     private Long createOverpaidLoan(final BigDecimal overpaymentAmount, final LocalDate disbursementDate) {
         AtomicLong loanId = new AtomicLong();
-        BusinessDateHelper.runAt(disbursementDate.format(DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH)), () -> loanId.set(
+        BusinessDateHelper.runAt(disbursementDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")), () -> loanId.set(
                 createApprovedAndDisbursedLoan(createProduct(), BigDecimal.valueOf(5000), BigDecimal.valueOf(5000), disbursementDate)));
         final LocalDate repaymentDate = disbursementDate.plusDays(1);
-        BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH)),
+        BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")),
                 () -> loanHelper.makeRepaymentByLoanId(loanId.get(),
                         WorkingCapitalLoanDisbursementTestBuilder.buildRepaymentRequest(repaymentDate,
                                 BigDecimal.valueOf(5000).add(overpaymentAmount), null, "repayment-for-cbr", 1, "repayment-account")));
@@ -250,7 +249,7 @@ public class WorkingCapitalLoanCreditBalanceRefundTest {
     private Long createApprovedAndDisbursedLoan(final Long productId, final BigDecimal principal, final BigDecimal disburseAmount,
             final LocalDate approvedOnDate) {
         AtomicLong loanId = new AtomicLong();
-        BusinessDateHelper.runAt(approvedOnDate.format(DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH)), () -> {
+        BusinessDateHelper.runAt(approvedOnDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")), () -> {
             loanId.set(submitAndTrackLoan(new WorkingCapitalLoanApplicationTestBuilder().withClientId(createdClientId)
                     .withProductId(productId).withPrincipal(principal)
                     .withPeriodPaymentRate(WorkingCapitalLoanProductTestBuilder.DEFAULT_PERIOD_PAYMENT_RATE_PERCENT).buildSubmitRequest()));

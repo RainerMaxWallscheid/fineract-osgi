@@ -33,7 +33,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import org.apache.fineract.integrationtests.common.ClientHelper;
 import org.apache.fineract.integrationtests.common.CommonConstants;
@@ -105,7 +104,7 @@ public class SavingsAccrualAccountingIntegrationTest {
 
             final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20200101");
             final LocalDate startDate = LocalDate.of(2021, 8, 12).minusDays(daysToSubtract);
-            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
+            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd").format(startDate);
             final Integer savingsAccountId = this.savingsAccountHelper.applyForSavingsApplicationOnDate(clientId, savingsProductId,
                     SavingsAccountHelper.ACCOUNT_TYPE_INDIVIDUAL, startDateString);
             this.savingsAccountHelper.approveSavingsOnDate(savingsAccountId, startDateString);
@@ -189,7 +188,7 @@ public class SavingsAccrualAccountingIntegrationTest {
 
             final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "20200101");
             final LocalDate startDate = LocalDate.of(2021, 8, 12).minusDays(daysToSubtract);
-            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
+            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd").format(startDate);
             final Integer savingsAccountId = this.savingsAccountHelper.applyForSavingsApplicationOnDate(clientId, savingsProductId,
                     SavingsAccountHelper.ACCOUNT_TYPE_INDIVIDUAL, startDateString);
             this.savingsAccountHelper.approveSavingsOnDate(savingsAccountId, startDateString);

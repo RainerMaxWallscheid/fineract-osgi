@@ -21,7 +21,6 @@ package org.apache.fineract.test.helper;
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.Locale;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.BusinessDateResponse;
 import org.apache.fineract.client.models.BusinessDateUpdateRequest;
@@ -53,7 +52,7 @@ public class BusinessDateHelper {
     }
 
     public void setBusinessDateToday() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         String today = formatter.format(Utils.now());
         setBusinessDate(today);
     }

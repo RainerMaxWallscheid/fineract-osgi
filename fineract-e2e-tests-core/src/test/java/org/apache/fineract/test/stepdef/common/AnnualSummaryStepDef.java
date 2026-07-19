@@ -24,7 +24,6 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.PostOfficesResponse;
 import org.apache.fineract.test.stepdef.AbstractStepDef;
@@ -32,7 +31,7 @@ import org.apache.fineract.test.support.TestContextKey;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class AnnualSummaryStepDef extends AbstractStepDef {
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final String OFFICE_ID_CONFIG = "office-id";
     private final JdbcTemplate testJdbcTemplate;
     private final FineractFeignClient fineractClient;

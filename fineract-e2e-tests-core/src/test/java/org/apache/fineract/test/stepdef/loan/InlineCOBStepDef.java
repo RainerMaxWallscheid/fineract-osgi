@@ -26,7 +26,6 @@ import io.cucumber.java.en.When;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.InlineJobRequest;
 import org.apache.fineract.client.models.PostLoansResponse;
@@ -42,7 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class InlineCOBStepDef extends AbstractStepDef {
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     @Autowired
     private FineractFeignClient fineractClient;

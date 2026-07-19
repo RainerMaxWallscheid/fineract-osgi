@@ -38,7 +38,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.Locale;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.fineract.avro.loan.v1.LoanSchedulePeriodDataV1;
 import org.apache.fineract.client.feign.FineractFeignClient;
@@ -169,7 +168,7 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest2.reference(BATCH_API_SAMPLE_REQUEST_ID_1);
         batchRequest2.body(bodyLoansRequestMod);
         // request 3 - charge Loan
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         String dateOfCharge = formatter.format(Utils.now().minusMonths(1L).plusDays(1L));
         PostLoansLoanIdChargesRequest loanIdChargesRequest = new PostLoansLoanIdChargesRequest();
         loanIdChargesRequest.chargeId(chargeProductResolver.resolve(ChargeProductType.LOAN_NSF_FEE));
@@ -407,7 +406,7 @@ public class BatchApiStepDef extends AbstractStepDef {
 
     @When("Batch API call with steps: rescheduleLoan from {string} to {string} submitted on date: {string}, approveReschedule on date: {string} runs with enclosingTransaction: {string}")
     public void runBatchApiCreateAndApproveLoanReschedule(String fromDateStr, String toDateStr, String submittedOnDate, String approvedOnDate, String enclosingTransaction) throws IOException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         String idempotencyKey = UUID.randomUUID().toString();
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         Long loanId = loanResponse.getLoanId();
@@ -433,7 +432,7 @@ public class BatchApiStepDef extends AbstractStepDef {
 
     @When("Batch API call with created user and with steps: rescheduleLoan from {string} to {string} submitted on date: {string}, approveReschedule on date: {string} runs with enclosingTransaction: {string}")
     public void runBatchApiCreateAndApproveLoanRescheduleWithGivenUser(String fromDateStr, String toDateStr, String submittedOnDate, String approvedOnDate, String enclosingTransaction) throws IOException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         String idempotencyKey = UUID.randomUUID().toString();
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         Long loanId = loanResponse.getLoanId();
@@ -873,8 +872,8 @@ public class BatchApiStepDef extends AbstractStepDef {
         disburseRequest.body(bodyLoanDisburseRequest);
         requestList.add(disburseRequest);
         // Apply interest pause (1 day starting from tomorrow)
-        String startDate = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH).format(Utils.now().minusMonths(1).plusDays(1));
-        String endDate = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH).format(Utils.now().minusMonths(1).plusDays(2));
+        String startDate = DateTimeFormatter.ofPattern(DATE_FORMAT).format(Utils.now().minusMonths(1).plusDays(1));
+        String endDate = DateTimeFormatter.ofPattern(DATE_FORMAT).format(Utils.now().minusMonths(1).plusDays(2));
         requestList.add(applyInterestPauseByExternalId(5L, 2L, idempotencyKey, startDate, endDate));
         // Execute batch request
         Map<String, Object> queryParams = new HashMap<>();
@@ -920,8 +919,8 @@ public class BatchApiStepDef extends AbstractStepDef {
         disburseRequest.body(bodyLoanDisburseRequest);
         requestList.add(disburseRequest);
         // Apply interest pause (1 day starting from tomorrow)
-        String startDate = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH).format(Utils.now().minusMonths(1).plusDays(1));
-        String endDate = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH).format(Utils.now().minusMonths(1).plusDays(2));
+        String startDate = DateTimeFormatter.ofPattern(DATE_FORMAT).format(Utils.now().minusMonths(1).plusDays(1));
+        String endDate = DateTimeFormatter.ofPattern(DATE_FORMAT).format(Utils.now().minusMonths(1).plusDays(2));
         requestList.add(applyInterestPause(5L, 2L, idempotencyKey, startDate, endDate));
         // Execute batch request
         Map<String, Object> queryParams = new HashMap<>();
@@ -974,7 +973,7 @@ public class BatchApiStepDef extends AbstractStepDef {
         loanQueryParams.put("associations", "all");
         GetLoansLoanIdResponse loanDetails = loansApi().retrieveOneLoan(loanId, loanQueryParams);
         // Check loan has a CHARGE_OFF transaction on the specified date
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         boolean hasChargeOffTransaction = loanDetails.getTransactions().stream().anyMatch(t -> t.getType().getCode().equals("loanTransactionType.chargeOff") && formatter.format(t.getDate()).equals(chargeOffDate));
         assertThat(hasChargeOffTransaction).as("Loan should have a CHARGE_OFF transaction on " + chargeOffDate).isTrue();
     }

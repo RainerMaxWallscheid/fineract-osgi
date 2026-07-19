@@ -34,7 +34,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -59,7 +58,7 @@ class DelinquencyActionParseAndValidatorTest {
     private final DelinquencyEffectivePauseHelper delinquencyEffectivePauseHelper = Mockito.mock(DelinquencyEffectivePauseHelper.class);
     private final DelinquencyActionParseAndValidator underTest = new DelinquencyActionParseAndValidator(fromJsonHelper,
             delinquencyEffectivePauseHelper);
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     @Test
     public void testParseAndValidationIsOKForPause() throws JsonProcessingException {

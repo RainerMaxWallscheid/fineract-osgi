@@ -38,7 +38,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import org.apache.fineract.client.models.GetOfficesResponse;
@@ -186,7 +185,7 @@ public class LoanImportHandlerTest {
         firstLoanRow.createCell(LoanConstants.PRODUCT_COL).setCellValue(loanProductJson.getString("name"));
         firstLoanRow.createCell(LoanConstants.LOAN_OFFICER_NAME_COL).setCellValue((String) staffMap.get("displayName"));
 
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US);
+        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern(DATE_FORMAT);
         final LocalDate localDate = LocalDate.parse("20170517", dateFormat);
 
         firstLoanRow.createCell(LoanConstants.SUBMITTED_ON_DATE_COL).setCellValue(localDate);

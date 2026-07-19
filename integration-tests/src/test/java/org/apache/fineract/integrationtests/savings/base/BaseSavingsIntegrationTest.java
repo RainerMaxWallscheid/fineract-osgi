@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.Locale;
 import org.apache.fineract.client.models.BusinessDateUpdateRequest;
 import org.apache.fineract.client.models.PostSavingsAccountTransactionsRequest;
 import org.apache.fineract.client.models.PostSavingsAccountTransactionsResponse;
@@ -70,7 +69,7 @@ public class BaseSavingsIntegrationTest extends IntegrationTest {
     private final String fullAdminAuthKey = getFullAdminAuthKey();
     protected final RequestSpecification requestSpec = createRequestSpecification(fullAdminAuthKey);
     protected BusinessDateHelper businessDateHelper = new BusinessDateHelper();
-    protected DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH);
+    protected DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
     protected GlobalConfigurationHelper globalConfigurationHelper = new GlobalConfigurationHelper();
     protected final CodeHelper codeHelper = new CodeHelper();
     protected JournalEntryHelper journalEntryHelper = new JournalEntryHelper(requestSpec, responseSpec);
@@ -78,7 +77,7 @@ public class BaseSavingsIntegrationTest extends IntegrationTest {
     protected SchedulerJobHelper schedulerJobHelper = new SchedulerJobHelper(requestSpec);
 
     protected void runFromToInclusive(String fromDate, String toDate, Consumer<String> runnable) {
-        DateTimeFormatter format = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH);
+        DateTimeFormatter format = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
         LocalDate startDate = LocalDate.parse(fromDate, format);
         LocalDate endDate = LocalDate.parse(toDate, format);
         LocalDate currentDate = startDate;

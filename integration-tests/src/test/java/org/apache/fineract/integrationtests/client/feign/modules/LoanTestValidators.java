@@ -27,7 +27,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Function;
 import org.apache.fineract.client.models.GetLoansLoanIdRepaymentPeriod;
@@ -39,7 +38,7 @@ import org.junit.jupiter.api.Assertions;
 
 public final class LoanTestValidators {
 
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(LoanTestData.DATETIME_PATTERN, Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(LoanTestData.DATETIME_PATTERN);
 
     private LoanTestValidators() {}
 
@@ -253,28 +252,28 @@ public final class LoanTestValidators {
     public static void validateFullyUnpaidRepaymentPeriod(GetLoansLoanIdResponse loanDetails, Integer index, String dueDate,
             double principalDue, double feeDue, double penaltyDue, double interestDue) {
         validateRepaymentPeriod(loanDetails, index,
-                LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(LoanTestData.DATETIME_PATTERN, Locale.ENGLISH)), principalDue, 0,
+                LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(LoanTestData.DATETIME_PATTERN)), principalDue, 0,
                 principalDue, feeDue, 0, feeDue, penaltyDue, 0, penaltyDue, interestDue, 0, interestDue, 0, 0);
     }
 
     public static void validateFullyPaidRepaymentPeriod(GetLoansLoanIdResponse loanDetails, Integer index, String dueDate,
             double principalDue, double feeDue, double penaltyDue, double interestDue) {
         validateRepaymentPeriod(loanDetails, index,
-                LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(LoanTestData.DATETIME_PATTERN, Locale.ENGLISH)), principalDue,
+                LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(LoanTestData.DATETIME_PATTERN)), principalDue,
                 principalDue, 0, feeDue, feeDue, 0, penaltyDue, penaltyDue, 0, interestDue, interestDue, 0, 0, 0);
     }
 
     public static void validateFullyPaidRepaymentPeriod(GetLoansLoanIdResponse loanDetails, Integer index, String dueDate,
             double principalDue, double feeDue, double penaltyDue, double interestDue, double paidLate) {
         validateRepaymentPeriod(loanDetails, index,
-                LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(LoanTestData.DATETIME_PATTERN, Locale.ENGLISH)), principalDue,
+                LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(LoanTestData.DATETIME_PATTERN)), principalDue,
                 principalDue, 0, feeDue, feeDue, 0, penaltyDue, penaltyDue, 0, interestDue, interestDue, 0, 0, paidLate);
     }
 
     public static void validateFullyPaidRepaymentPeriod(GetLoansLoanIdResponse loanDetails, Integer index, String dueDate,
             double principalDue, double feeDue, double penaltyDue, double interestDue, double paidLate, double paidInAdvance) {
         validateRepaymentPeriod(loanDetails, index,
-                LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(LoanTestData.DATETIME_PATTERN, Locale.ENGLISH)), principalDue,
+                LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(LoanTestData.DATETIME_PATTERN)), principalDue,
                 principalDue, 0, feeDue, feeDue, 0, penaltyDue, penaltyDue, 0, interestDue, interestDue, 0, paidInAdvance, paidLate);
     }
 

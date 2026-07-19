@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 import org.apache.fineract.accounting.common.AccountingConstants.FinancialActivity;
@@ -148,8 +147,8 @@ public class RecurringDepositTest {
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
         Calendar todaysDate = Calendar.getInstance();
@@ -298,8 +297,8 @@ public class RecurringDepositTest {
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
         Calendar todaysDate = Calendar.getInstance();
@@ -500,8 +499,8 @@ public class RecurringDepositTest {
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
         final Account liabilityAccountForTax = this.accountHelper.createLiabilityAccount();
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
         Calendar todaysDate = Calendar.getInstance();
@@ -855,8 +854,8 @@ public class RecurringDepositTest {
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
         Calendar todaysDate = Calendar.getInstance();
@@ -987,8 +986,8 @@ public class RecurringDepositTest {
         this.recurringDepositProductHelper = new RecurringDepositProductHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
 
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -1030,8 +1029,8 @@ public class RecurringDepositTest {
         this.recurringDepositProductHelper = new RecurringDepositProductHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
 
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -1078,8 +1077,8 @@ public class RecurringDepositTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
 
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -1124,8 +1123,8 @@ public class RecurringDepositTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
 
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -1169,8 +1168,8 @@ public class RecurringDepositTest {
         this.recurringDepositProductHelper = new RecurringDepositProductHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
 
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -1221,8 +1220,8 @@ public class RecurringDepositTest {
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
 
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
@@ -1342,8 +1341,8 @@ public class RecurringDepositTest {
         this.recurringDepositProductHelper = new RecurringDepositProductHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
         Calendar todaysDate = Calendar.getInstance();
@@ -1417,8 +1416,8 @@ public class RecurringDepositTest {
         this.recurringDepositProductHelper = new RecurringDepositProductHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
         Calendar todaysDate = Calendar.getInstance();
@@ -1497,8 +1496,8 @@ public class RecurringDepositTest {
         this.recurringDepositProductHelper = new RecurringDepositProductHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
         Calendar todaysDate = Calendar.getInstance();
@@ -1594,8 +1593,8 @@ public class RecurringDepositTest {
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
         Calendar todaysDate = Calendar.getInstance();
@@ -1718,8 +1717,8 @@ public class RecurringDepositTest {
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
         Calendar todaysDate = Calendar.getInstance();
@@ -1847,7 +1846,7 @@ public class RecurringDepositTest {
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
 
         LocalDate todaysDate = LocalDate.of(2022, 6, 20);
         LocalDate validFromDate = todaysDate.minusMonths(3);
@@ -1970,7 +1969,7 @@ public class RecurringDepositTest {
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
 
         LocalDate todaysDate = LocalDate.of(2022, 6, 20);
         final String VALID_FROM = dateFormat.format(todaysDate.minusMonths(3));
@@ -2092,8 +2091,8 @@ public class RecurringDepositTest {
         this.recurringDepositProductHelper = new RecurringDepositProductHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
         Calendar todaysDate = Calendar.getInstance();
@@ -2171,8 +2170,8 @@ public class RecurringDepositTest {
         this.recurringDepositProductHelper = new RecurringDepositProductHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
         Calendar todaysDate = Calendar.getInstance();
@@ -2254,8 +2253,8 @@ public class RecurringDepositTest {
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
@@ -2344,8 +2343,8 @@ public class RecurringDepositTest {
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
@@ -2432,8 +2431,8 @@ public class RecurringDepositTest {
         this.recurringDepositProductHelper = new RecurringDepositProductHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
@@ -2522,8 +2521,8 @@ public class RecurringDepositTest {
         this.recurringDepositProductHelper = new RecurringDepositProductHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
@@ -2614,8 +2613,8 @@ public class RecurringDepositTest {
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 
@@ -2704,8 +2703,8 @@ public class RecurringDepositTest {
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.recurringDepositAccountHelper = new RecurringDepositAccountHelper(this.requestSpec, this.responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        DateFormat monthDayFormat = new SimpleDateFormat("MMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        DateFormat monthDayFormat = new SimpleDateFormat("MMdd");
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
 

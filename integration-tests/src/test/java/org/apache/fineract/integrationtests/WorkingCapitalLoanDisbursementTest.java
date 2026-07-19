@@ -33,7 +33,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.Locale;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.GetCodesResponse;
 import org.apache.fineract.client.models.GetDisbursementDetail;
@@ -79,7 +78,7 @@ public class WorkingCapitalLoanDisbursementTest {
 
     private static final PostWorkingCapitalLoansLoanIdRequest CLEANUP_EMPTY_COMMAND_REQUEST = WorkingCapitalLoanApplicationTestBuilder
             .buildUndoApproveRequest();
-    private static final DateTimeFormatter BUSINESS_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
+    private static final DateTimeFormatter BUSINESS_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final String WC_DISBURSAL_TXN_EVENT = "WorkingCapitalLoanDisbursalTransactionBusinessEvent";
     private static final String WC_UNDO_DISBURSAL_TXN_EVENT = "WorkingCapitalLoanUndoDisbursalTransactionBusinessEvent";
 

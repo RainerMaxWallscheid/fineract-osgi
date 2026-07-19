@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -87,7 +86,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(LoanTestLifecycleExtension.class)
 public abstract class FeignLoanTestBase extends FeignIntegrationTest implements LoanProductTemplates {
 
-    protected static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(LoanTestData.DATETIME_PATTERN, Locale.ENGLISH);
+    protected static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(LoanTestData.DATETIME_PATTERN);
 
     protected static FeignAccountHelper accountHelper;
     protected static FeignLoanHelper loanHelper;

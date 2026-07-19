@@ -26,7 +26,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Locale;
 import org.apache.fineract.integrationtests.common.CommonConstants;
 import org.apache.fineract.integrationtests.common.Utils;
 import org.slf4j.Logger;
@@ -245,7 +244,7 @@ public class RecurringDepositAccountHelper {
     public HashMap updateRecurringDepositAccount(final String clientID, final String productID, final String accountID,
             final String validFrom, final String validTo, final String penalInterestType, final String submittedOnDate) {
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         todaysDate.add(Calendar.DATE, -1);

@@ -184,8 +184,8 @@ public class LoanStepDef extends AbstractStepDef {
     public static final String LOAN_STATE_REJECTED = "Rejected";
     public static final String LOAN_STATE_WITHDRAWN = "Withdrawn by applicant";
     public static final String LOAN_STATE_ACTIVE = "Active";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
-    private static final DateTimeFormatter FORMATTER_EVENTS = DateTimeFormatter.ofPattern(DATE_FORMAT_EVENTS, Locale.ENGLISH);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
+    private static final DateTimeFormatter FORMATTER_EVENTS = DateTimeFormatter.ofPattern(DATE_FORMAT_EVENTS);
     private static final String TRANSACTION_DATE_FORMAT = "yyyyMMdd";
     private final BusinessDateHelper businessDateHelper;
     private final FineractFeignClient fineractClient;
@@ -1339,7 +1339,7 @@ public class LoanStepDef extends AbstractStepDef {
         // add new entry with expected disbursement detail
         DisbursementDetail disbursementDetailsEntryNew = new DisbursementDetail().principal(BigDecimal.valueOf(disbursementAmount)).expectedDisbursementDate(expectedDisbursementDate);
         disbursementData.add(disbursementDetailsEntryNew);
-        DateTimeFormatter parsingFormatter = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
+        DateTimeFormatter parsingFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         disbursementData.forEach(detail -> detail.expectedDisbursementDate(FORMATTER.format(LocalDate.parse(detail.getExpectedDisbursementDate(), parsingFormatter))));
         disbursementData.sort(Comparator.comparing(detail -> LocalDate.parse(detail.getExpectedDisbursementDate(), parsingFormatter)));
         PostAddAndDeleteDisbursementDetailRequest disbursementDetailRequest = loanRequestFactory.defaultLoanDisbursementDetailRequest(disbursementData);
@@ -1567,7 +1567,7 @@ public class LoanStepDef extends AbstractStepDef {
         PostLoansLoanIdTransactionsResponse chargeOffResponse = ok(() -> fineractClient.loanTransactions().handleCommandsLoanTransaction(loanId, chargeOffRequest, Map.of("command", "charge-off")));
         testContext().set(TestContextKey.LOAN_CHARGE_OFF_RESPONSE, chargeOffResponse);
         Long transactionId = chargeOffResponse.getResourceId();
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         final GetLoansLoanIdResponse loanDetailsResponse = ok(() -> fineractClient.loans().retrieveOneLoan(loanId, Map.of("staffInSelectedOfficeOnly", "false", "associations", "transactions")));
         assert loanDetailsResponse != null;
         final List<GetLoansLoanIdTransactions> transactions = loanDetailsResponse.getTransactions();
@@ -4510,7 +4510,7 @@ public class LoanStepDef extends AbstractStepDef {
 
     @And("Loan Amortization Allocation Mapping for {string} transaction created on {string} contains the following data:")
     public void checkLoanAmortizationAllocationMapping(final String transactionType, final String transactionDate, DataTable table) {
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         final PostLoansResponse loanCreateResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         final long loanId = loanCreateResponse.getLoanId();
         final String resourceId = String.valueOf(loanId);
@@ -4535,7 +4535,7 @@ public class LoanStepDef extends AbstractStepDef {
 
     @And("Loan Amortization Allocation Mapping for the {string}th {string} transaction created on {string} contains the following data:")
     public void checkLoanAmortizationAllocationMapping(final String nthTransactionStr, final String transactionType, final String transactionDate, DataTable table) {
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         final PostLoansResponse loanCreateResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         final long loanId = loanCreateResponse.getLoanId();
         final String resourceId = String.valueOf(loanId);

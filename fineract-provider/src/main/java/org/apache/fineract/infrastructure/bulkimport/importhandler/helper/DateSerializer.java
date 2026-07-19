@@ -49,7 +49,7 @@ public class DateSerializer implements JsonSerializer<LocalDate> {
             formatter = DateTimeFormatter.ofPattern(dateFormat, Locale.of(localeCode));
         } else {
             // Bulk import defaults to English month names when no locale is supplied.
-            formatter = DateTimeFormatter.ofPattern(dateFormat, Locale.ENGLISH);
+            formatter = DateTimeFormatter.ofPattern(dateFormat);
         }
         return new JsonPrimitive(src.format(formatter));
     }

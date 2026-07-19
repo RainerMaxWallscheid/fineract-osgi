@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.Locale;
 import org.apache.fineract.client.models.GetLoanProductsProductIdResponse;
 import org.apache.fineract.client.models.GetLoansLoanIdRepaymentPeriod;
 import org.apache.fineract.client.models.GetLoansLoanIdResponse;
@@ -69,7 +68,7 @@ public class LoanAccrualTransactionOnChargeSubmittedDateTest extends BaseLoanInt
     private RequestSpecification requestSpec;
     private LoanTransactionHelper loanTransactionHelper;
     private ClientHelper clientHelper;
-    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
+    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter();
     private AccountHelper accountHelper;
     private InlineLoanCOBHelper inlineLoanCOBHelper;
 

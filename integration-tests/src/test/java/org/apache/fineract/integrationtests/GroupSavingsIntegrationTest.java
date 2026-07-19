@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import org.apache.fineract.client.models.PaymentTypeCreateRequest;
 import org.apache.fineract.integrationtests.common.ClientHelper;
@@ -182,7 +181,7 @@ public class GroupSavingsIntegrationTest {
         savingsStatusHashMap = this.savingsAccountHelper.activateSavings(savingsId);
         SavingsStatusChecker.verifySavingsIsActive(savingsStatusHashMap);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar todaysDate = Calendar.getInstance();
         final String CLOSEDON_DATE = dateFormat.format(todaysDate.getTime());
         String withdrawBalance = "false";
@@ -444,7 +443,7 @@ public class GroupSavingsIntegrationTest {
         savingsStatusHashMap = this.savingsAccountHelper.activateGsimSavings(gsimID);
         SavingsStatusChecker.verifySavingsIsActive(savingsStatusHashMap);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar todaysDate = Calendar.getInstance();
         final String CLOSEDON_DATE = dateFormat.format(todaysDate.getTime());
         String withdrawBalance = "false";
@@ -783,7 +782,7 @@ public class GroupSavingsIntegrationTest {
         Assertions.assertEquals(1, charges.size());
 
         HashMap savingsChargeForPay = charges.get(0);
-        SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT, Locale.US);
+        SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT);
         Calendar cal = Calendar.getInstance();
         List dates = (List) savingsChargeForPay.get("dueDate");
         cal.set(Calendar.YEAR, (Integer) dates.get(0));

@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.apache.fineract.integrationtests.common.ClientHelper;
@@ -168,7 +167,7 @@ public class ConcurrencyIntegrationTest {
         private final String repaymentDate;
         private final LoanTransactionHelper loanTransactionHelper;
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
         LoanRepaymentExecutor(LoanTransactionHelper loanTransactionHelper, Integer loanId, Float repaymentAmount, Calendar repaymentDate) {
             this.loanId = loanId;

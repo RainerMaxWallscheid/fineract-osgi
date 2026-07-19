@@ -27,7 +27,6 @@ import io.restassured.specification.ResponseSpecification;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import org.apache.fineract.integrationtests.common.Utils;
 import org.apache.fineract.integrationtests.common.report.ReportData;
 import org.springframework.util.Assert;
@@ -111,7 +110,7 @@ public class CampaignsHelper {
     public Integer performActionsOnCampaign(final RequestSpecification requestSpec, final ResponseSpecification responseSpec, final Integer generatedCampaignId, String command) {
         log.info("------------------------------PERFORM ACTION ON CAMPAIGN DETAILS------------------------------------\n");
         final String SMS_CAMPAIGNS_ACTION_URL = SMS_CAMPAIGNS_URL + "/" + generatedCampaignId + "?command=" + command + "&" + Utils.TENANT_IDENTIFIER;
-        String actionDate = Utils.getLocalDateOfTenant().format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH));
+        String actionDate = Utils.getLocalDateOfTenant().format(DateTimeFormatter.ofPattern(DATE_FORMAT));
         return Utils.performServerPost(requestSpec, responseSpec, SMS_CAMPAIGNS_ACTION_URL, getJSONForCampaignAction(command, actionDate), "resourceId");
     }
 
@@ -140,7 +139,7 @@ public class CampaignsHelper {
         map.put("providerId", 1);
         map.put("triggerType", triggerType);
         if (2 == triggerType) {
-            map.put("recurrenceStartDate", Utils.getLocalDateTimeOfTenant().plusMinutes(1).format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT, Locale.ENGLISH)));
+            map.put("recurrenceStartDate", Utils.getLocalDateTimeOfTenant().plusMinutes(1).format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)));
             map.put("frequency", 1);
             map.put("interval", "1");
         }
@@ -171,7 +170,7 @@ public class CampaignsHelper {
         map.put("providerId", 1);
         map.put("triggerType", triggerType);
         if (2 == triggerType) {
-            map.put("recurrenceStartDate", Utils.getLocalDateTimeOfTenant().plusMinutes(1).format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT, Locale.ENGLISH)));
+            map.put("recurrenceStartDate", Utils.getLocalDateTimeOfTenant().plusMinutes(1).format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)));
         }
         map.put("campaignName", Utils.randomStringGenerator("Campaign_Name_", 5));
         map.put("campaignType", 1);

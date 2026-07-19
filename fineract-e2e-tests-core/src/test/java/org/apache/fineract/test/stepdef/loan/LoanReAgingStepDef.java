@@ -57,7 +57,7 @@ public class LoanReAgingStepDef extends AbstractStepDef {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanReAgingStepDef.class);
     private static final String DATE_FORMAT = "yyyyMMdd";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
     private final EventAssertion eventAssertion;
     private final FineractFeignClient fineractClient;
     private final LoanRequestFactory loanRequestFactory;

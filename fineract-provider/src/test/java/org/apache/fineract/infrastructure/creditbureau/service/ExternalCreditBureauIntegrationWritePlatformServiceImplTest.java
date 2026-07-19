@@ -39,11 +39,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.Locale;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -420,7 +419,7 @@ public class ExternalCreditBureauIntegrationWritePlatformServiceImplTest {
         jsonResponse.put("userName", "testUser");
         jsonResponse.put(".issued", "sample");
         jsonResponse.put(".expires", ZonedDateTime.now(ZoneId.systemDefault()).plusSeconds(3600)
-                .format(new DateTimeFormatterBuilder().appendPattern("EEE, yyyyMMdd kk:mm:ss zzz").toFormatter(Locale.ENGLISH)));
+                .format(DateTimeFormatter.RFC_1123_DATE_TIME));
         return mapper.writeValueAsString(jsonResponse);
     }
 

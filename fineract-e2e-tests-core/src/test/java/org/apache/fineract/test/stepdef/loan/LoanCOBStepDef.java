@@ -27,7 +27,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.Locale;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.LoanAccountLock;
 import org.apache.fineract.client.models.LoanAccountLockResponseDTO;
@@ -132,7 +131,7 @@ public class LoanCOBStepDef extends AbstractStepDef {
     public void placeLockOnLoanAccountWithExplicitCobBusinessDate(final String cobBusinessDate) {
         final PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         final Long loanId = loanResponse.getLoanId();
-        final LocalDate parsed = LocalDate.parse(cobBusinessDate, DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH));
+        final LocalDate parsed = LocalDate.parse(cobBusinessDate, DateTimeFormatter.ofPattern("yyyyMMdd"));
         executeVoid(() -> fineractClient.loanAccountLock().placeLockOnLoanAccount(loanId, "LOAN_COB_CHUNK_PROCESSING", new LockRequest().cobBusinessDate(parsed)));
     }
 

@@ -43,7 +43,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -171,7 +170,7 @@ public abstract class BaseLoanIntegrationTest extends IntegrationTest {
     protected ClientHelper clientHelper = new ClientHelper(requestSpec, responseSpec);
     protected SchedulerJobHelper schedulerJobHelper = new SchedulerJobHelper(requestSpec);
     protected final InlineLoanCOBHelper inlineLoanCOBHelper = new InlineLoanCOBHelper(requestSpec, responseSpec);
-    protected DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH);
+    protected DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
     protected final CodeHelper codeHelper = new CodeHelper();
     protected final ChargesHelper chargesHelper = new ChargesHelper();
     protected final ExternalEventHelper externalEventHelper = new ExternalEventHelper();
@@ -196,19 +195,19 @@ public abstract class BaseLoanIntegrationTest extends IntegrationTest {
     }
 
     protected static void validateFullyUnpaidRepaymentPeriod(GetLoansLoanIdResponse loanDetails, Integer index, String dueDate, double principalDue, double feeDue, double penaltyDue, double interestDue) {
-        validateRepaymentPeriod(loanDetails, index, LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH)), principalDue, 0, principalDue, feeDue, 0, feeDue, penaltyDue, 0, penaltyDue, interestDue, 0, interestDue, 0, 0);
+        validateRepaymentPeriod(loanDetails, index, LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(DATETIME_PATTERN)), principalDue, 0, principalDue, feeDue, 0, feeDue, penaltyDue, 0, penaltyDue, interestDue, 0, interestDue, 0, 0);
     }
 
     protected static void validateFullyPaidRepaymentPeriod(GetLoansLoanIdResponse loanDetails, Integer index, String dueDate, double principalDue, double feeDue, double penaltyDue, double interestDue) {
-        validateRepaymentPeriod(loanDetails, index, LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH)), principalDue, principalDue, 0, feeDue, feeDue, 0, penaltyDue, penaltyDue, 0, interestDue, interestDue, 0, 0, 0);
+        validateRepaymentPeriod(loanDetails, index, LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(DATETIME_PATTERN)), principalDue, principalDue, 0, feeDue, feeDue, 0, penaltyDue, penaltyDue, 0, interestDue, interestDue, 0, 0, 0);
     }
 
     protected static void validateFullyPaidRepaymentPeriod(GetLoansLoanIdResponse loanDetails, Integer index, String dueDate, double principalDue, double feeDue, double penaltyDue, double interestDue, double paidLate) {
-        validateRepaymentPeriod(loanDetails, index, LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH)), principalDue, principalDue, 0, feeDue, feeDue, 0, penaltyDue, penaltyDue, 0, interestDue, interestDue, 0, 0, paidLate);
+        validateRepaymentPeriod(loanDetails, index, LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(DATETIME_PATTERN)), principalDue, principalDue, 0, feeDue, feeDue, 0, penaltyDue, penaltyDue, 0, interestDue, interestDue, 0, 0, paidLate);
     }
 
     protected static void validateFullyPaidRepaymentPeriod(GetLoansLoanIdResponse loanDetails, Integer index, String dueDate, double principalDue, double feeDue, double penaltyDue, double interestDue, double paidLate, double paidInAdvance) {
-        validateRepaymentPeriod(loanDetails, index, LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH)), principalDue, principalDue, 0, feeDue, feeDue, 0, penaltyDue, penaltyDue, 0, interestDue, interestDue, 0, paidInAdvance, paidLate);
+        validateRepaymentPeriod(loanDetails, index, LocalDate.parse(dueDate, DateTimeFormatter.ofPattern(DATETIME_PATTERN)), principalDue, principalDue, 0, feeDue, feeDue, 0, penaltyDue, penaltyDue, 0, interestDue, interestDue, 0, paidInAdvance, paidLate);
     }
 
     protected static void validateRepaymentPeriod(GetLoansLoanIdResponse loanDetails, Integer index, LocalDate dueDate, double principalDue, double feeDue, double penaltyDue, double interestDue) {
@@ -1093,7 +1092,7 @@ public abstract class BaseLoanIntegrationTest extends IntegrationTest {
 
     protected void verifyRepaymentSchedule(Long loanId, Installment... installments) {
         GetLoansLoanIdResponse loanResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId.intValue());
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
         assertNotNull(loanResponse.getRepaymentSchedule());
         assertNotNull(loanResponse.getRepaymentSchedule().getPeriods());
         Assertions.assertEquals(installments.length, loanResponse.getRepaymentSchedule().getPeriods().size(), "Expected installments are not matching with the installments configured on the loan");
@@ -1161,7 +1160,7 @@ public abstract class BaseLoanIntegrationTest extends IntegrationTest {
     }
 
     protected void runFromToInclusive(String fromDate, String toDate, Runnable runnable) {
-        DateTimeFormatter format = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH);
+        DateTimeFormatter format = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
         LocalDate startDate = LocalDate.parse(fromDate, format);
         LocalDate endDate = LocalDate.parse(toDate, format);
         LocalDate currentDate = startDate;
@@ -1438,7 +1437,7 @@ public abstract class BaseLoanIntegrationTest extends IntegrationTest {
         Assertions.assertNotNull(businessEvents);
         Assertions.assertNotNull(allExternalEvents);
         Assertions.assertTrue(businessEvents.length <= allExternalEvents.size(), "Expected business event count is less than actual. Expected: " + businessEvents.length + " Actual: " + allExternalEvents.size());
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH);
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
         for (BusinessEvent businessEvent : businessEvents) {
             long count = allExternalEvents.stream().filter(externalEvent -> businessEvent.verify(externalEvent, formatter)).count();
             Assertions.assertEquals(1, count, "Expected business event not found " + businessEvent);

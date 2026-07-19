@@ -33,7 +33,6 @@ import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import org.apache.fineract.infrastructure.bulkimport.constants.ClientEntityConstants;
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import org.apache.fineract.infrastructure.bulkimport.data.GlobalEntityType;
@@ -106,7 +105,7 @@ public class ClientEntityImportHandlerTest {
         Sheet staffSheet = workbook.getSheet(TemplatePopulateImportConstants.STAFF_SHEET_NAME);
         firstClientRow.createCell(ClientEntityConstants.OFFICE_NAME_COL).setCellValue(staffSheet.getRow(1).getCell(0).getStringCellValue());
         firstClientRow.createCell(ClientEntityConstants.STAFF_NAME_COL).setCellValue(staffSheet.getRow(1).getCell(1).getStringCellValue());
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Date incoporationDate = simpleDateFormat.parse("20010514");
         firstClientRow.createCell(ClientEntityConstants.INCOPORATION_DATE_COL).setCellValue(incoporationDate);
         Date validTill = simpleDateFormat.parse("20190514");

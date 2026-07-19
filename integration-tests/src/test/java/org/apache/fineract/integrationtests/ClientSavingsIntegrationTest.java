@@ -246,7 +246,7 @@ public class ClientSavingsIntegrationTest {
         final ResponseSpecification errorResponse = new ResponseSpecBuilder().expectStatusCode(403).build();
         final SavingsAccountHelper validationErrorHelper = new SavingsAccountHelper(this.requestSpec, errorResponse);
 
-        SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT, Locale.US);
+        SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT);
         Calendar cal = Calendar.getInstance();
         List dates = (List) summaryAfterPosting.get("interestPostedTillDate");
         cal.set(Calendar.YEAR, (Integer) dates.get(0));
@@ -345,7 +345,7 @@ public class ClientSavingsIntegrationTest {
         savingsStatusHashMap = this.savingsAccountHelper.activateSavings(savingsId);
         SavingsStatusChecker.verifySavingsIsActive(savingsStatusHashMap);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar todaysDate = Calendar.getInstance();
         final String CLOSEDON_DATE = dateFormat.format(todaysDate.getTime());
         String withdrawBalance = "false";
@@ -402,7 +402,7 @@ public class ClientSavingsIntegrationTest {
         balance -= chargeAmt;
         assertEquals(balance, summary.get("accountBalance"), "Verifying opening Balance");
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar todaysDate = Calendar.getInstance();
         final String TRANSACTION_DATE = dateFormat.format(todaysDate.getTime());
         final String withdrawAmt = "800";
@@ -823,7 +823,7 @@ public class ClientSavingsIntegrationTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testSavingsAccountWithOverdraft() {
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
+        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
 
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         final ResponseSpecification errorResponse = new ResponseSpecBuilder().expectStatusCode(400).build();
@@ -1006,7 +1006,7 @@ public class ClientSavingsIntegrationTest {
             savingsStatusHashMap = this.savingsAccountHelper.approveSavings(savingsId);
             SavingsStatusChecker.verifySavingsIsApproved(savingsStatusHashMap);
 
-            final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
+            final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
 
             LocalDate todaysDate = Utils.getLocalDateOfTenant();
             todaysDate = todaysDate.minusMonths(1);
@@ -1229,7 +1229,7 @@ public class ClientSavingsIntegrationTest {
                     new PutGlobalConfigurationsRequest().enabled(true));
 
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, Utils.getLocalDateOfTenant());
-            final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
+            final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
             this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
 
             /***
@@ -1505,7 +1505,7 @@ public class ClientSavingsIntegrationTest {
                     new PutGlobalConfigurationsRequest().enabled(true));
 
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, Utils.getLocalDateOfTenant());
-            final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
+            final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
             this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
             final ResponseSpecification errorResponse = new ResponseSpecBuilder().expectStatusCode(403).build();
 
@@ -1722,7 +1722,7 @@ public class ClientSavingsIntegrationTest {
         savingsStatusHashMap = this.savingsAccountHelper.approveSavings(savingsId);
         SavingsStatusChecker.verifySavingsIsApproved(savingsStatusHashMap);
 
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
+        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
 
         LocalDate todaysDate = Utils.getLocalDateOfTenant();
         todaysDate = todaysDate.minusMonths(1);
@@ -1997,7 +1997,7 @@ public class ClientSavingsIntegrationTest {
 
         savingsList.add(savingsId);
 
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate transactionDate = LocalDate.now(Utils.getZoneIdOfTenant());
         for (int i = 0; i < 4; i++) {
             String transactionDateValue = formatter.format(transactionDate);
@@ -2310,7 +2310,7 @@ public class ClientSavingsIntegrationTest {
         Integer releaseTransactionId = this.savingsAccountHelper.releaseAmount(savingsId, holdTransactionId);
         Date today = Date.from(Utils.getLocalDateOfTenant().atStartOfDay(Utils.getZoneIdOfTenant()).toInstant());
         String todayDate = today.toString();
-        SimpleDateFormat dt1 = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
+        SimpleDateFormat dt1 = new SimpleDateFormat("yyyyMMdd");
         todayDate = dt1.format(today).toString();
         withdrawTransactionId = (Integer) this.savingsAccountHelper.withdrawalFromSavingsAccount(savingsId, "300", todayDate,
                 CommonConstants.RESPONSE_RESOURCE_ID);
@@ -2367,7 +2367,7 @@ public class ClientSavingsIntegrationTest {
         assertEquals(balance, summary.get("availableBalance"), "Verifying available Balance is -1000");
         Integer depositTransactionId = (Integer) this.savingsAccountHelper.depositToSavingsAccount(savingsId, "1200",
                 SavingsAccountHelper.TRANSACTION_DATE, CommonConstants.RESPONSE_RESOURCE_ID);
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar todaysDate = Calendar.getInstance();
         final String TRANSACTION_DATE = dateFormat.format(todaysDate.getTime());
 
@@ -2431,7 +2431,7 @@ public class ClientSavingsIntegrationTest {
 
         Integer depositTransactionId = (Integer) this.savingsAccountHelper.depositToSavingsAccount(savingsId, "1200",
                 SavingsAccountHelper.TRANSACTION_DATE, CommonConstants.RESPONSE_RESOURCE_ID);
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar todaysDate = Calendar.getInstance();
         final String TRANSACTION_DATE = dateFormat.format(todaysDate.getTime());
 
@@ -2495,7 +2495,7 @@ public class ClientSavingsIntegrationTest {
 
         Integer depositTransactionId = (Integer) this.savingsAccountHelper.depositToSavingsAccount(savingsId, "1100",
                 SavingsAccountHelper.TRANSACTION_DATE, CommonConstants.RESPONSE_RESOURCE_ID);
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar todaysDate = Calendar.getInstance();
         final String TRANSACTION_DATE = dateFormat.format(todaysDate.getTime());
 
@@ -2571,7 +2571,7 @@ public class ClientSavingsIntegrationTest {
                 // hold
 
                 SavingsAccountHelper.TRANSACTION_DATE, CommonConstants.RESPONSE_RESOURCE_ID);
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar todaysDate = Calendar.getInstance();
         final String TRANSACTION_DATE = dateFormat.format(todaysDate.getTime());
 
@@ -2924,7 +2924,7 @@ public class ClientSavingsIntegrationTest {
         savingsStatusHashMap = this.savingsAccountHelper.activateSavings(savingsId);
         SavingsStatusChecker.verifySavingsIsActive(savingsStatusHashMap);
         LocalDate transactionDate = LocalDate.now(Utils.getZoneIdOfTenant()).minusDays(5);
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String startDate = formatter.format(transactionDate);
         // withdrawal transaction 1
         Integer withdrawalTransactionId = (Integer) this.savingsAccountHelper.withdrawalFromSavingsAccount(savingsId, "500", startDate,
@@ -3231,7 +3231,7 @@ public class ClientSavingsIntegrationTest {
         configurationForBackdatedTransaction();
 
         LocalDate transactionDate = LocalDate.now(Utils.getZoneIdOfTenant()).minusDays(10);
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String startDate = formatter.format(transactionDate);
 
         final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
@@ -3258,7 +3258,7 @@ public class ClientSavingsIntegrationTest {
                 new PutGlobalConfigurationsRequest().enabled(true));
         LocalDate transactionDate = LocalDate.now(Utils.getZoneIdOfTenant()).minusDays(5);
         LocalDate nextTransactionDate = transactionDate.plusDays(2);
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String startDate = formatter.format(transactionDate);
         String nxtTransaction = formatter.format(nextTransactionDate);
         final String jobName = "Post Interest For Savings";
@@ -3291,7 +3291,7 @@ public class ClientSavingsIntegrationTest {
                 new PutGlobalConfigurationsRequest().enabled(false));
         LocalDate transactionDate = LocalDate.now(Utils.getZoneIdOfTenant()).minusDays(5);
         LocalDate nextTransactionDate = transactionDate.plusDays(2);
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String startDate = formatter.format(transactionDate);
         String nxtTransaction = formatter.format(nextTransactionDate);
         final String jobName = "Post Interest For Savings";
@@ -3361,7 +3361,7 @@ public class ClientSavingsIntegrationTest {
 
     @Test
     public void testSavingsAccountWithdrawalWithoutPriorTransactionsWithoutOverdraft() {
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
+        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
 
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         final ResponseSpecification errorResponse = new ResponseSpecBuilder().expectStatusCode(403).build();
@@ -3436,7 +3436,7 @@ public class ClientSavingsIntegrationTest {
 
     @Test
     public void testWithdrawalWithPriorTransactionsWithOverdraft_AMT_GT_Balance() {
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
+        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
 
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         final ResponseSpecification errorResponse = new ResponseSpecBuilder().expectStatusCode(400).build();
@@ -3517,7 +3517,7 @@ public class ClientSavingsIntegrationTest {
 
     @Test
     public void testWithdrawalWithPriorTransactionsWithOverdraft_AMT_LT_Balance() {
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
+        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
 
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         final ResponseSpecification errorResponse = new ResponseSpecBuilder().expectStatusCode(400).build();
@@ -3596,7 +3596,7 @@ public class ClientSavingsIntegrationTest {
 
     @Test
     public void testWithdrawalWithPriorTransactionsWithOverdraft_AMT_EQ_Balance() {
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
+        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
 
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         final ResponseSpecification errorResponse = new ResponseSpecBuilder().expectStatusCode(400).build();

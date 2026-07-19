@@ -31,7 +31,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.Locale;
 import org.apache.fineract.client.models.BuyDownFeeAmortizationDetails;
 import org.apache.fineract.client.models.ExternalAssetOwnerRequest;
 import org.apache.fineract.client.models.GetCodesResponse;
@@ -254,7 +253,7 @@ public class LoanBuyDownFeeTest extends BaseLoanIntegrationTest {
             GetLoansLoanIdTransactions adjustmentTransaction = transactions.stream().filter(txn -> "Buy Down Fee Adjustment".equals(txn.getType().getValue())).findFirst().orElse(null);
             assertNotNull(adjustmentTransaction);
             assertEquals(0, BigDecimal.valueOf(100.0).compareTo(adjustmentTransaction.getAmount()));
-            assertEquals("20240906", adjustmentTransaction.getDate().format(DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH)));
+            assertEquals("20240906", adjustmentTransaction.getDate().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
             deleteAllExternalEvents();
             loanTransactionHelper.reverseLoanTransaction(loanId, adjustmentResponse.getResourceId(), "20240906");
             verifyBusinessEvents(new LoanAdjustTransactionBusinessEvent("LoanAdjustTransactionBusinessEvent", "20240906", "loanTransactionType.buyDownFeeAdjustment", "2024-09-06"));

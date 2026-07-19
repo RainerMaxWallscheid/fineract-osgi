@@ -36,7 +36,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -113,7 +112,7 @@ public class SavingsInterestPostingTest {
 
             final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "20250101");
             final LocalDate startDate = LocalDate.of(2025, 2, 1);
-            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
+            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd").format(startDate);
 
             final Integer accountId = createTrackedSavingsAccount(clientId, productId, startDateString);
             savingsAccountHelper.approveSavingsOnDate(accountId, startDateString);
@@ -159,7 +158,7 @@ public class SavingsInterestPostingTest {
 
             final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "20250101");
             final LocalDate startDate = LocalDate.of(2025, 2, 1);
-            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
+            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd").format(startDate);
 
             final Integer accountId = createTrackedSavingsAccount(clientId, productId, startDateString);
             savingsAccountHelper.approveSavingsOnDate(accountId, startDateString);
@@ -209,7 +208,7 @@ public class SavingsInterestPostingTest {
 
             final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "20250101");
             final LocalDate startDate = LocalDate.of(2025, 2, 1);
-            final String startStr = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
+            final String startStr = DateTimeFormatter.ofPattern("yyyyMMdd").format(startDate);
 
             final Integer accountId = createTrackedSavingsAccount(clientId, productId, startStr);
             savingsAccountHelper.approveSavingsOnDate(accountId, startStr);
@@ -217,7 +216,7 @@ public class SavingsInterestPostingTest {
             savingsAccountHelper.depositToSavingsAccount(accountId, amountDeposit, startStr, CommonConstants.RESPONSE_RESOURCE_ID);
 
             final LocalDate withdrawalDate = LocalDate.of(2025, 2, 16);
-            final String withdrawalStr = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(withdrawalDate);
+            final String withdrawalStr = DateTimeFormatter.ofPattern("yyyyMMdd").format(withdrawalDate);
             savingsAccountHelper.withdrawalFromSavingsAccount(accountId, amountWithdrawal, withdrawalStr,
                     CommonConstants.RESPONSE_RESOURCE_ID);
 
@@ -274,7 +273,7 @@ public class SavingsInterestPostingTest {
 
             final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "20250101");
             final LocalDate startDate = LocalDate.of(2025, 2, 1);
-            final String startStr = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
+            final String startStr = DateTimeFormatter.ofPattern("yyyyMMdd").format(startDate);
 
             final Integer accountId = createTrackedSavingsAccount(clientId, productId, startStr);
             savingsAccountHelper.approveSavingsOnDate(accountId, startStr);
@@ -282,7 +281,7 @@ public class SavingsInterestPostingTest {
             savingsAccountHelper.withdrawalFromSavingsAccount(accountId, amountWithdrawal, startStr, CommonConstants.RESPONSE_RESOURCE_ID);
 
             final LocalDate depositDate = LocalDate.of(2025, 2, 16);
-            final String depositStr = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(depositDate);
+            final String depositStr = DateTimeFormatter.ofPattern("yyyyMMdd").format(depositDate);
             savingsAccountHelper.depositToSavingsAccount(accountId, amountDeposit, depositStr, CommonConstants.RESPONSE_RESOURCE_ID);
 
             LocalDate marchDate = LocalDate.of(2025, 3, 2);
@@ -338,7 +337,7 @@ public class SavingsInterestPostingTest {
 
             final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "20250101");
             final LocalDate startDate = LocalDate.of(2025, 1, 1);
-            final String startStr = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
+            final String startStr = DateTimeFormatter.ofPattern("yyyyMMdd").format(startDate);
 
             final Integer accountId = createTrackedSavingsAccount(clientId, productId, startStr);
             savingsAccountHelper.approveSavingsOnDate(accountId, startStr);
@@ -356,7 +355,7 @@ public class SavingsInterestPostingTest {
             Assertions.assertEquals(expectedFebruary, BigDecimal.valueOf(((Double) txsFebruary.get(0).get("amount"))));
 
             final LocalDate withdrawalDate = LocalDate.of(2025, 2, 1);
-            final String withdrawal = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(withdrawalDate);
+            final String withdrawal = DateTimeFormatter.ofPattern("yyyyMMdd").format(withdrawalDate);
 
             BigDecimal runningBalance = new BigDecimal(txsFebruary.get(0).get("runningBalance").toString());
             String withdrawalRunning = runningBalance.setScale(2, RoundingMode.HALF_UP).toString();
@@ -415,7 +414,7 @@ public class SavingsInterestPostingTest {
 
             final LocalDate startDate = LocalDate.of(2025, 2, 1);
 
-            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
+            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd").format(startDate);
             List<Integer> accountIdList = new CopyOnWriteArrayList<>();
             ParallelExecutionHelper.runInParallel(IntStream.range(0, 200).boxed().toList(), (i) -> {
                 final Integer clientId = ClientHelper.createClient(requestSpec, responseSpec, "20250101");
@@ -616,8 +615,8 @@ public class SavingsInterestPostingTest {
 
             if (v instanceof String) {
                 String s = (String) v;
-                DateTimeFormatter[] fmts = new DateTimeFormatter[] { DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US),
-                        DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US), DateTimeFormatter.ofPattern("yyyy-MM-dd") };
+                DateTimeFormatter[] fmts = new DateTimeFormatter[] { DateTimeFormatter.ofPattern("yyyyMMdd"),
+                        DateTimeFormatter.ofPattern("yyyyMMdd"), DateTimeFormatter.ofPattern("yyyy-MM-dd") };
                 for (DateTimeFormatter f : fmts) {
                     try {
                         return LocalDate.parse(s, f);

@@ -22,7 +22,6 @@ import static org.apache.fineract.integrationtests.client.feign.modules.LoanTest
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import org.apache.fineract.client.models.GetLoansLoanIdResponse;
 import org.apache.fineract.client.models.GetLoansLoanIdTransactionsTemplateResponse;
 import org.apache.fineract.integrationtests.client.feign.FeignLoanTestBase;
@@ -84,7 +83,7 @@ public class LoanPrepayAmountTest extends FeignLoanTestBase {
         for (int i = 1; i < 4; i++) {
             executeInlineCOB(loanId);
             LocalDate date = LocalDate.of(2025, 3, 17).plusDays(i * 11);
-            String formattedDate = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH).format(date);
+            String formattedDate = DateTimeFormatter.ofPattern(DATETIME_PATTERN).format(date);
             runAt(formattedDate, () -> {
                 GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
                 GetLoansLoanIdTransactionsTemplateResponse prepayAmountResponse = getPrepaymentAmount(loanId, formattedDate, DATETIME_PATTERN);

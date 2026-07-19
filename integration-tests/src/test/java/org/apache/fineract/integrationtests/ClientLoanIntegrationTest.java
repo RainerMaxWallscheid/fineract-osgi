@@ -167,7 +167,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     private static final LoanProductHelper LOAN_PRODUCT_HELPER = new LoanProductHelper();
     private static final String DATETIME_PATTERN = "yyyyMMdd";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = new DateTimeFormatterBuilder().appendPattern(DATETIME_PATTERN)
-            .toFormatter(Locale.ENGLISH);
+            .toFormatter();
     private static final BusinessDateHelper BUSINESS_DATE_HELPER = new BusinessDateHelper();
     private static final ChargesHelper CHARGES_HELPER = new ChargesHelper();
     private static final ClientHelper CLIENT_HELPER = new ClientHelper(REQUEST_SPEC, RESPONSE_SPEC);
@@ -436,7 +436,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         HashMap loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());
         final String LOAN_DISBURSEMENT_DATE = "20140602";
 
@@ -3240,7 +3240,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testLoanScheduleWithInterestRecalculation_WITH_REST_SAME_AS_REPAYMENT_INTEREST_COMPOUND_NONE_STRATEGY_REDUCE_EMI() {
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
 
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());
@@ -3350,7 +3350,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testLoanScheduleWithInterestRecalculation_WITH_REST_SAME_AS_REPAYMENT_INTEREST_COMPOUND_NONE_STRATEGY_REDUCE_EMI_WITH_INSTALLMENT_CHARGE() {
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
 
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());
@@ -3447,7 +3447,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testLoanScheduleWithInterestRecalculation_WITH_REST_DAILY_INTEREST_COMPOUND_INTEREST_STRATEGY_REDUCE_NUMBER_OF_INSTALLMENTS() {
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
 
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());
@@ -3560,7 +3560,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testInteroperationLoanRepaymentAPI() {
         try {
-            DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+            DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
             dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
             globalConfigurationHelper.updateGlobalConfiguration(
                     GlobalConfigurationConstants.IS_INTEREST_TO_BE_RECOVERED_FIRST_WHEN_GREATER_THAN_EMI,
@@ -3622,7 +3622,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testLoanScheduleWithInterestRecalculation_WITH_REST_WEEKLY_INTEREST_COMPOUND_INTEREST_FEE_STRATEGY_REDUCE_NEXT_INSTALLMENTS() {
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
 
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());
@@ -3759,7 +3759,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     public void testLoanScheduleWithInterestRecalculation_WITH_REST_DAILY_INTEREST_COMPOUND_INTEREST_FEE_STRATEGY_WITH_OVERDUE_CHARGE()
             throws InterruptedException {
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
 
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());
@@ -3870,7 +3870,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testLoanScheduleWithInterestRecalculation_WITH_PERIODIC_ACCOUNTING() {
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
 
         final Account assetAccount = ACCOUNT_HELPER.createAssetAccount();
@@ -3975,7 +3975,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testLoanScheduleWithInterestRecalculation_WITH_CURRENT_REPAYMENT_BASED_ARREARS_AGEING() {
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
 
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());
@@ -4056,7 +4056,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testLoanScheduleWithInterestRecalculation_WITH_ORIGINAL_REPAYMENT_BASED_ARREARS_AGEING() {
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
 
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());
@@ -4826,7 +4826,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testLoanScheduleWithInterestRecalculation_WITH_INTEREST_FIRST_STRATEGY_AND_REST_DAILY_INTEREST_COMPOUND_INTEREST_STRATEGY_REDUCE_NUMBER_OF_INSTALLMENTS() {
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
 
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());
@@ -4940,7 +4940,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testLoanScheduleWithInterestRecalculation_WITH_INTEREST_FIRST_STRATEGY_AND_REST_DAILY_INTEREST_COMPOUND_INTEREST_STRATEGY_REDUCE_NUMBER_OF_INSTALLMENTS_EARLY_REPAYMENT() {
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
 
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());
@@ -5051,7 +5051,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testLoanScheduleWithInterestRecalculationMakePrepaymentAfterRepayment() {
         try {
-            DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+            DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
             dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
             globalConfigurationHelper.updateGlobalConfiguration(
                     GlobalConfigurationConstants.IS_INTEREST_TO_BE_RECOVERED_FIRST_WHEN_GREATER_THAN_EMI,
@@ -5120,7 +5120,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
         try {
             final ResponseSpecification errorResponse = new ResponseSpecBuilder().expectStatusCode(403).build();
             final LoanTransactionHelper validationErrorHelper = new LoanTransactionHelper(REQUEST_SPEC, errorResponse);
-            DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+            DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
             dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
             globalConfigurationHelper.updateGlobalConfiguration(
                     GlobalConfigurationConstants.IS_INTEREST_TO_BE_RECOVERED_FIRST_WHEN_GREATER_THAN_EMI,
@@ -7498,7 +7498,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             List<HashMap> collaterals) {
         LOG.info("--------------------------------APPLYING FOR LOAN APPLICATION--------------------------------");
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.ENGLISH);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
         final String loanApplicationJSON = new LoanApplicationTestBuilder() //
                 .withPrincipal(principal) //
@@ -7726,7 +7726,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     private void testLoanScheduleWithInterestRecalculation_FOR_PRE_CLOSE_WITH_MORATORIUM(final String preCloseStrategy,
             final String preCloseAmount) {
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
 
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());
@@ -8064,7 +8064,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     private void testLoanScheduleWithInterestRecalculation_WITH_REST_SAME_AS_REPAYMENT_INTEREST_COMPOUND_NONE_STRATEGY_REDUCE_EMI_PRE_CLOSE_INTEREST(
             String preCloseInterestStrategy, String preCloseAmount) {
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
 
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());
@@ -8144,7 +8144,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     private void testLoanScheduleWithInterestRecalculation_WITH_REST_WEEKLY_INTEREST_COMPOUND_INTEREST_FEE_STRATEGY_REDUCE_NEXT_INSTALLMENTS_PRE_CLOSE_INTEREST(
             String preCloseInterestStrategy, String preCloseAmount) {
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
 
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());

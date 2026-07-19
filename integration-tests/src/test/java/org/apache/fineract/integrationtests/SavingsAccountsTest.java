@@ -19,7 +19,6 @@
 package org.apache.fineract.integrationtests;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import org.apache.fineract.client.models.PostSavingsAccountsAccountIdRequest;
 import org.apache.fineract.client.models.PostSavingsAccountsAccountIdResponse;
 import org.apache.fineract.client.models.PostSavingsAccountsRequest;
@@ -46,7 +45,7 @@ public class SavingsAccountsTest extends IntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(SavingsAccountsTest.class);
     private final String dateFormat = "yyyyMMdd";
     private final String locale = "en";
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(dateFormat, Locale.ENGLISH);
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(dateFormat);
     private final String formattedDate = dateFormatter.format(Utils.getLocalDateOfTenant());
     private int savingId = 1;
 

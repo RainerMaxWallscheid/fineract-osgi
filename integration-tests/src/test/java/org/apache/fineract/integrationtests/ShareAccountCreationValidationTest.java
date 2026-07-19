@@ -19,7 +19,6 @@
 package org.apache.fineract.integrationtests;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import org.apache.fineract.client.models.AccountRequest;
 import org.apache.fineract.client.models.PostAccountsTypeResponse;
 import org.apache.fineract.client.models.PostProductsTypeRequest;
@@ -36,7 +35,7 @@ import retrofit2.Response;
 public class ShareAccountCreationValidationTest extends IntegrationTest {
 
     private static final String DATE_FORMAT = "yyyyMMdd";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
     @Test
     public void shouldReturn400WhenRequiredShareAccountFieldsMissing() {

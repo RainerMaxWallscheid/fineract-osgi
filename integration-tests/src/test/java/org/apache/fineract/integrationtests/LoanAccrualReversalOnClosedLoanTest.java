@@ -27,7 +27,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.Locale;
 import org.apache.fineract.client.models.GetLoansLoanIdResponse;
 import org.apache.fineract.client.models.GetLoansLoanIdTransactions;
 import org.apache.fineract.client.models.PostClientsResponse;
@@ -82,7 +81,7 @@ public class LoanAccrualReversalOnClosedLoanTest extends BaseLoanIntegrationTest
             log.info("Loan disbursed: id={}, amount=220.0", loanId);
         });
         Long loanId = loanIdRef.get();
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
         // Step 2: Run COB through November and make monthly repayments to close the loan
         runCobRange(loanId, fmt, LocalDate.of(2024, 11, 2), LocalDate.of(2024, 11, 30));
         payInstallment(loanId, 1, "20241201");
@@ -205,7 +204,7 @@ public class LoanAccrualReversalOnClosedLoanTest extends BaseLoanIntegrationTest
             disburseLoan(loanId, BigDecimal.valueOf(220.0), "20241101");
         });
         Long loanId = loanIdRef.get();
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
         // Pay off the loan
         runCobRange(loanId, fmt, LocalDate.of(2024, 11, 2), LocalDate.of(2024, 11, 30));
         payInstallment(loanId, 1, "20241201");
@@ -274,7 +273,7 @@ public class LoanAccrualReversalOnClosedLoanTest extends BaseLoanIntegrationTest
             log.info("[Backdated CBR] Loan disbursed: id={}", loanId);
         });
         Long loanId = loanIdRef.get();
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
         // Pay off the loan
         runCobRange(loanId, fmt, LocalDate.of(2024, 11, 2), LocalDate.of(2024, 11, 30));
         payInstallment(loanId, 1, "20241201");
@@ -352,7 +351,7 @@ public class LoanAccrualReversalOnClosedLoanTest extends BaseLoanIntegrationTest
             log.info("[Cumulative+Backdated] Loan disbursed: id={}", loanId);
         });
         Long loanId = loanIdRef.get();
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
         runCobRange(loanId, fmt, LocalDate.of(2024, 11, 2), LocalDate.of(2024, 11, 30));
         payInstallment(loanId, 1, "20241201");
         runCobRange(loanId, fmt, LocalDate.of(2024, 12, 2), LocalDate.of(2024, 12, 31));
@@ -431,7 +430,7 @@ public class LoanAccrualReversalOnClosedLoanTest extends BaseLoanIntegrationTest
             log.info("[AccrualFix] Loan disbursed: id={}", loanId);
         });
         Long loanId = loanIdRef.get();
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
         // Pay installments 1-3 on time with COB — these get fully accrued
         runCobRange(loanId, fmt, LocalDate.of(2024, 11, 2), LocalDate.of(2024, 11, 30));
         payInstallment(loanId, 1, "20241201");
@@ -507,7 +506,7 @@ public class LoanAccrualReversalOnClosedLoanTest extends BaseLoanIntegrationTest
             log.info("[AccrualFix] Loan disbursed: id={}", loanId);
         });
         Long loanId = loanIdRef.get();
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
         // Pay installments 1-3 on time with COB
         runCobRange(loanId, fmt, LocalDate.of(2024, 11, 2), LocalDate.of(2024, 11, 30));
         payInstallment(loanId, 1, "20241201");

@@ -28,7 +28,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Locale;
 import org.apache.fineract.client.feign.FeignException;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.BusinessDateResponse;
@@ -105,7 +104,7 @@ public class LoanChargeAdjustmentStepDef extends AbstractStepDef {
         Long transactionId = getTransactionIdForTransactionMetConditions(transactionDate, transactionAmount, loanDetailsResponse);
         BusinessDateResponse businessDateResponse = ok(() -> fineractClient.businessDateManagement().getBusinessDate("BUSINESS_DATE", Map.of()));
         LocalDate businessDate = businessDateResponse.getDate();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         String businessDateActual = formatter.format(businessDate);
         PostLoansLoanIdTransactionsTransactionIdRequest chargeAdjustmentUndoRequest = loanRequestFactory.defaultChargeAdjustmentTransactionUndoRequest().transactionDate(businessDateActual);
         ok(() -> fineractClient.loanTransactions().adjustLoanTransaction(loanId, transactionId, chargeAdjustmentUndoRequest, Map.<String, Object>of()));
@@ -122,7 +121,7 @@ public class LoanChargeAdjustmentStepDef extends AbstractStepDef {
         GetLoansLoanIdTransactions transactionMetConditions = new GetLoansLoanIdTransactions();
         for (int i = 0; i < transactions.size(); i++) {
             LocalDate date = transactions.get(i).getDate();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
             String dateActual = formatter.format(date);
             Double amountActual = transactions.get(i).getAmount().doubleValue();
             if (dateActual.equals(transactionDate) && amountActual.equals(transactionAmount)) {
@@ -149,7 +148,7 @@ public class LoanChargeAdjustmentStepDef extends AbstractStepDef {
         charges.forEach(charge -> {
             Long chargeId = charge.getChargeId();
             LocalDate dueDate = charge.getDueDate();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
             String chargeDueDate = formatter.format(dueDate);
             if (chargeId.equals(chargeProductId) && chargeDueDate.equals(date)) {
                 resultList.add(charge);

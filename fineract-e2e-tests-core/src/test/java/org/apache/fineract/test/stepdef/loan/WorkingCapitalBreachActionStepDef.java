@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.Locale;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.PostWorkingCapitalLoansBreachActionRequest;
@@ -47,7 +46,7 @@ import org.junit.jupiter.api.Assertions;
 public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalBreachActionStepDef.class);
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final Long NON_EXISTENT_LOAN_ID = 999999999L;
     private final FineractFeignClient fineractClient;
     private final WorkingCapitalLoanRequestFactory workingCapitalLoanRequestFactory;

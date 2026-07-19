@@ -32,7 +32,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Locale;
 import org.apache.fineract.avro.loan.v1.LoanTransactionAdjustmentDataV1;
 import org.apache.fineract.avro.loan.v1.LoanTransactionDataV1;
 import org.apache.fineract.client.feign.FineractFeignClient;
@@ -303,7 +302,7 @@ public class LoanRepaymentStepDef extends AbstractStepDef {
     @When("Customer undo {string}th transaction made on {string}")
     public void undoNthTransaction(String nthItemStr, String transactionDate) throws IOException {
         eventStore.reset();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         long loanId = loanResponse.getLoanId();
         List<GetLoansLoanIdTransactions> transactions = ok(() -> fineractClient.loans().retrieveOneLoan(loanId, Map.<String, Object>of("associations", "transactions"))).getTransactions();
@@ -504,7 +503,7 @@ public class LoanRepaymentStepDef extends AbstractStepDef {
     @Then("Customer undo {string}th transaction made on {string} results a {int} error and {string} error message")
     public void undoTransactionResultsError(final String nthItemStr, final String transactionDate, final int errorCodeExpected, final String errorMessageCode) {
         eventStore.reset();
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         final PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         assert loanResponse != null;
         final long loanId = loanResponse.getLoanId();

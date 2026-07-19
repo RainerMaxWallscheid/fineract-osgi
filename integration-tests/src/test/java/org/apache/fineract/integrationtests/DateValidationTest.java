@@ -34,7 +34,6 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import org.apache.fineract.client.models.PostClientsRequest;
@@ -123,7 +122,7 @@ public class DateValidationTest {
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
-        DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.US);
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter();
         LocalDate todaysDate = LocalDate.now(ZoneId.systemDefault()).minusMonths(3);
         final String VALID_FROM = todaysDate.format(formatter);
         todaysDate = todaysDate.plusYears(10);

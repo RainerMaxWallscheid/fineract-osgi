@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.Locale;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.BatchRequest;
@@ -467,7 +466,7 @@ public class WorkingCapitalBatchApiStepDef extends AbstractStepDef {
         final List<String> header = table.row(0);
         final List<String> expectedValues = table.row(1);
         final List<String> actualValues = new ArrayList<>();
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         for (final String field : header) {
             switch (field) {
                 case "transactionDate" -> actualValues.add(txn.getTransactionDate() == null ? null : formatter.format(txn.getTransactionDate()));

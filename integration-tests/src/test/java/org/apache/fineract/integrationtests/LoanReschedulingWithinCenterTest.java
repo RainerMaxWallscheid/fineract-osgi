@@ -37,7 +37,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import org.apache.fineract.integrationtests.common.CalendarHelper;
 import org.apache.fineract.integrationtests.common.CenterDomain;
@@ -106,7 +105,7 @@ public class LoanReschedulingWithinCenterTest extends BaseLoanIntegrationTest {
 
         associateClientsToGroup(groupId, clientId);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
         Calendar today = Calendar.getInstance(Utils.getTimeZoneOfTenant());
         today.add(Calendar.DAY_OF_MONTH, -14);
@@ -197,7 +196,7 @@ public class LoanReschedulingWithinCenterTest extends BaseLoanIntegrationTest {
     }
 
     private Long createCalendarMeeting(Integer centerId) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
         Calendar today = Calendar.getInstance(Utils.getTimeZoneOfTenant());
         final String startDate = dateFormat.format(today.getTime());
@@ -240,7 +239,7 @@ public class LoanReschedulingWithinCenterTest extends BaseLoanIntegrationTest {
         associateClientsToGroup(groupId, clientId);
 
         // CREATE A LOAN PRODUCT
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
         Calendar today = Calendar.getInstance(Utils.getTimeZoneOfTenant());
         today.add(Calendar.DAY_OF_MONTH, -14);

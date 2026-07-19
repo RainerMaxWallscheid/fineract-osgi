@@ -26,7 +26,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import org.apache.fineract.integrationtests.common.accounting.Account;
 import org.apache.fineract.integrationtests.common.loans.LoanApplicationTestBuilder;
@@ -382,7 +381,7 @@ public class VariableInstallmentsDecliningBalanceHelper {
         cal.set(Calendar.MONTH, (int) list.get(1) - 1);
         cal.set(Calendar.DAY_OF_MONTH, (int) list.get(2));
         Date date = cal.getTime();
-        DateFormat requiredFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat requiredFormat = new SimpleDateFormat("yyyyMMdd");
         return requiredFormat.format(date);
     }
 

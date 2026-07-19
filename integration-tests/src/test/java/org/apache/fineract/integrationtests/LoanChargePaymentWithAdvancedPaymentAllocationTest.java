@@ -32,7 +32,6 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import org.apache.fineract.client.models.AdvancedPaymentData;
 import org.apache.fineract.client.models.BusinessDateUpdateRequest;
 import org.apache.fineract.client.models.GetLoansLoanIdResponse;
@@ -71,7 +70,7 @@ public class LoanChargePaymentWithAdvancedPaymentAllocationTest extends BaseLoan
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanChargePaymentWithAdvancedPaymentAllocationTest.class);
     private static final String DATETIME_PATTERN = "yyyyMMdd";
     private static final String ACCOUNT_TYPE_INDIVIDUAL = "INDIVIDUAL";
-    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern(DATETIME_PATTERN).toFormatter(Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern(DATETIME_PATTERN).toFormatter();
     private static RequestSpecification requestSpec;
     private static ResponseSpecification responseSpec;
     private static LoanTransactionHelper loanTransactionHelper;

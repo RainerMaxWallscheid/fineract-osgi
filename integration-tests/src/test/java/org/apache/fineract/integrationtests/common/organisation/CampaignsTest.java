@@ -30,7 +30,6 @@ import io.restassured.specification.ResponseSpecification;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import org.apache.fineract.integrationtests.common.BusinessDateHelper;
 import org.apache.fineract.integrationtests.common.CommonConstants;
 import org.apache.fineract.integrationtests.common.Utils;
@@ -93,7 +92,7 @@ public class CampaignsTest {
 
     @Test
     public void testSupportedActionsForCampaignWithTriggerTypeAsDirect() {
-        BusinessDateHelper.runAt(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH).format(Utils.getLocalDateOfTenant()), () -> {
+        BusinessDateHelper.runAt(DateTimeFormatter.ofPattern(DATE_FORMAT).format(Utils.getLocalDateOfTenant()), () -> {
             // creating new campaign
             Integer campaignId = this.campaignsHelper.createCampaign(NON_TRIGGERED_REPORT_NAME, DIRECT_TRIGGER_TYPE);
             this.campaignsHelper.verifyCampaignCreatedOnServer(this.requestSpec, this.responseSpec, campaignId);
@@ -131,7 +130,7 @@ public class CampaignsTest {
 
     @Test
     public void testSupportedActionsForCampaignWithTriggerTypeAsScheduled() {
-        BusinessDateHelper.runAt(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH).format(Utils.getLocalDateOfTenant()), () -> {
+        BusinessDateHelper.runAt(DateTimeFormatter.ofPattern(DATE_FORMAT).format(Utils.getLocalDateOfTenant()), () -> {
             // creating new campaign
             Integer campaignId = this.campaignsHelper.createCampaign(NON_TRIGGERED_REPORT_NAME, SCHEDULED_TRIGGER_TYPE);
             this.campaignsHelper.verifyCampaignCreatedOnServer(this.requestSpec, this.responseSpec, campaignId);
@@ -169,7 +168,7 @@ public class CampaignsTest {
 
     @Test
     public void testSupportedActionsForCampaignWithTriggerTypeAsTriggered() {
-        BusinessDateHelper.runAt(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH).format(Utils.getLocalDateOfTenant()), () -> {
+        BusinessDateHelper.runAt(DateTimeFormatter.ofPattern(DATE_FORMAT).format(Utils.getLocalDateOfTenant()), () -> {
             // creating new campaign
             Integer campaignId = this.campaignsHelper.createCampaign(TRIGGERED_REPORT_NAME, TRIGGERED_TRIGGER_TYPE);
             this.campaignsHelper.verifyCampaignCreatedOnServer(this.requestSpec, this.responseSpec, campaignId);
@@ -208,7 +207,7 @@ public class CampaignsTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testSupportedActionsForCampaignWithError() {
-        BusinessDateHelper.runAt(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH).format(Utils.getLocalDateOfTenant()), () -> {
+        BusinessDateHelper.runAt(DateTimeFormatter.ofPattern(DATE_FORMAT).format(Utils.getLocalDateOfTenant()), () -> {
             final ResponseSpecification responseSpecWithError = new ResponseSpecBuilder().expectStatusCode(400).build();
             CampaignsHelper campaignsHelperWithError = new CampaignsHelper(this.requestSpec, responseSpecWithError);
             // creating new campaign
@@ -218,7 +217,7 @@ public class CampaignsTest {
             // activating campaign with failure
             ArrayList<HashMap<String, Object>> campaignDateValidationData = (ArrayList<HashMap<String, Object>>) campaignsHelperWithError
                     .performActionsOnCampaignWithFailure(campaignId, ACTIVATE_COMMAND,
-                            Utils.getLocalDateOfTenant().plusDays(1).format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH)),
+                            Utils.getLocalDateOfTenant().plusDays(1).format(DateTimeFormatter.ofPattern(DATE_FORMAT)),
                             CommonConstants.RESPONSE_ERROR);
             assertEquals("error.msg.campaign.activationDate.in.the.future",
                     campaignDateValidationData.get(0).get(CommonConstants.RESPONSE_ERROR_MESSAGE_CODE));
@@ -231,7 +230,7 @@ public class CampaignsTest {
             // activating campaign with failure
             ArrayList<HashMap<String, Object>> campaignErrorData = (ArrayList<HashMap<String, Object>>) campaignsHelperWithError
                     .performActionsOnCampaignWithFailure(activatedCampaignId, ACTIVATE_COMMAND,
-                            Utils.getLocalDateOfTenant().format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH)), CommonConstants.RESPONSE_ERROR);
+                            Utils.getLocalDateOfTenant().format(DateTimeFormatter.ofPattern(DATE_FORMAT)), CommonConstants.RESPONSE_ERROR);
             assertEquals("error.msg.campaign.already.active", campaignErrorData.get(0).get(CommonConstants.RESPONSE_ERROR_MESSAGE_CODE));
 
             // closing campaign again for deletion

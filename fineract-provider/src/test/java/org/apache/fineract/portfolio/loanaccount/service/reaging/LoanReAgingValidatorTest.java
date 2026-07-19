@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Locale;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.ActionContext;
@@ -433,7 +432,7 @@ class LoanReAgingValidatorTest {
     }
 
     private String formatDate(LocalDate date) {
-        return DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH).format(date);
+        return DateTimeFormatter.ofPattern(DATE_FORMAT).format(date);
     }
 
     private JsonCommand jsonCommand(String externalId, String startDate) {

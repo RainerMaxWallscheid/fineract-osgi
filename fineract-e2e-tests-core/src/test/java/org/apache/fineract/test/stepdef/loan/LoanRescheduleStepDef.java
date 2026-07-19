@@ -31,7 +31,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Locale;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.GetLoanRescheduleRequestResponse;
@@ -56,7 +55,7 @@ public class LoanRescheduleStepDef extends AbstractStepDef {
     public static final String DATE_FORMAT_HU = "yyyy-MM-dd";
     public static final String DATE_FORMAT_EN = "yyyyMMdd";
     public static final DateTimeFormatter FORMATTER_HU = DateTimeFormatter.ofPattern(DATE_FORMAT_HU);
-    public static final DateTimeFormatter FORMATTER_EN = DateTimeFormatter.ofPattern(DATE_FORMAT_EN, Locale.ENGLISH);
+    public static final DateTimeFormatter FORMATTER_EN = DateTimeFormatter.ofPattern(DATE_FORMAT_EN);
     @Autowired
     private FineractFeignClient fineractClient;
     @Autowired

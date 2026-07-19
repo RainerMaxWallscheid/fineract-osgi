@@ -33,7 +33,6 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.Locale;
 import org.apache.fineract.client.models.AdvancedPaymentData;
 import org.apache.fineract.client.models.GetLoansLoanIdTransactionsTransactionIdResponse;
 import org.apache.fineract.client.models.PostLoansLoanIdTransactionsRequest;
@@ -61,7 +60,7 @@ public class LoanTransactionReprocessForAdvancedPaymentAllocationTest extends Ba
     private static RequestSpecification REQUEST_SPEC;
     private static ClientHelper CLIENT_HELPER;
     private static AccountHelper ACCOUNT_HELPER;
-    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter();
 
     @BeforeAll
     public static void setupTests() {

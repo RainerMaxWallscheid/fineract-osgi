@@ -33,7 +33,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Locale;
 import org.apache.fineract.integrationtests.common.ClientHelper;
 import org.apache.fineract.integrationtests.common.Utils;
 import org.apache.fineract.integrationtests.common.charges.ChargesHelper;
@@ -134,7 +133,7 @@ public class ShareAccountIntegrationTests {
         Calendar cal = Calendar.getInstance();
         cal.set(dateList.get(0), dateList.get(1) - 1, dateList.get(2));
         Date date = cal.getTime();
-        DateFormat simple = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
+        DateFormat simple = new SimpleDateFormat("yyyyMMdd");
         Assertions.assertEquals("20160302", simple.format(date));
     }
 
@@ -395,7 +394,7 @@ public class ShareAccountIntegrationTests {
         List<Map<String, Object>> transactions = (List<Map<String, Object>>) shareAccountData.get("purchasedShares");
         Assertions.assertNotNull(transactions);
         Assertions.assertEquals(2, transactions.size());
-        DateFormat simple = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
+        DateFormat simple = new SimpleDateFormat("yyyyMMdd");
         for (int i = 0; i < transactions.size(); i++) {
             Map<String, Object> transaction = transactions.get(i);
             Map<String, Object> transactionTypeMap = (Map<String, Object>) transaction.get("type");
@@ -1178,7 +1177,7 @@ public class ShareAccountIntegrationTests {
         transactions = (List<Map<String, Object>>) shareAccountData.get("purchasedShares");
 
         // Count how many transactions exist for 20160415
-        DateFormat simple = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
+        DateFormat simple = new SimpleDateFormat("yyyyMMdd");
         int countForDate = 0;
         int appliedCountForDate = 0;
 
@@ -1338,7 +1337,7 @@ public class ShareAccountIntegrationTests {
     }
 
     private String findTransactionId(List<Map<String, Object>> transactions, String transactionTypeCode, String expectedDate) {
-        DateFormat simple = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
+        DateFormat simple = new SimpleDateFormat("yyyyMMdd");
         for (Map<String, Object> transaction : transactions) {
             Map<String, Object> transactionTypeMap = (Map<String, Object>) transaction.get("type");
             List<Integer> dateList = (List<Integer>) transaction.get("purchasedDate");
@@ -1365,7 +1364,7 @@ public class ShareAccountIntegrationTests {
 
     private void verifyTransactionStatus(List<Map<String, Object>> transactions, String transactionTypeCode, String expectedDate,
             String expectedStatus) {
-        DateFormat simple = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
+        DateFormat simple = new SimpleDateFormat("yyyyMMdd");
         boolean transactionFound = false;
 
         for (Map<String, Object> transaction : transactions) {
@@ -1388,7 +1387,7 @@ public class ShareAccountIntegrationTests {
 
     private void verifyTransactionWithShares(List<Map<String, Object>> transactions, String transactionTypeCode, String expectedDate,
             String expectedShares, String expectedStatus) {
-        DateFormat simple = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
+        DateFormat simple = new SimpleDateFormat("yyyyMMdd");
         boolean transactionFound = false;
 
         for (Map<String, Object> transaction : transactions) {

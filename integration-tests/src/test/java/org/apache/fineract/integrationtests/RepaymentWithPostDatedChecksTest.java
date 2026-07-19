@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import org.apache.fineract.client.models.PaymentTypeCreateRequest;
 import org.apache.fineract.client.models.PaymentTypeData;
 import org.apache.fineract.integrationtests.common.ClientHelper;
@@ -55,7 +54,7 @@ public class RepaymentWithPostDatedChecksTest {
 
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
-    private final SimpleDateFormat dateFormatterStandard = new SimpleDateFormat("yyyyMMdd", Locale.US);
+    private final SimpleDateFormat dateFormatterStandard = new SimpleDateFormat("yyyyMMdd");
     private LoanTransactionHelper loanTransactionHelper;
     private PaymentTypeHelper paymentTypeHelper;
 
@@ -106,7 +105,7 @@ public class RepaymentWithPostDatedChecksTest {
         List<HashMap> postDatedChecks = new ArrayList<>();
         Gson gson = new Gson();
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
 
         // Get the first installment date

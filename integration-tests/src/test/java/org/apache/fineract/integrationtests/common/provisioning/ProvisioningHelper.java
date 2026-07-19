@@ -26,7 +26,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import org.apache.fineract.integrationtests.common.Utils;
 import org.apache.fineract.integrationtests.common.accounting.Account;
@@ -50,7 +49,7 @@ public final class ProvisioningHelper {
         final HashMap<String, Object> map = new HashMap<>();
         map.put("loanProducts", addLoanProducts(loanProducts));
         map.put("definitions", addProvisioningCategories(categories, liability, expense));
-        DateFormat simple = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat simple = new SimpleDateFormat("yyyyMMdd");
         String formattedString = simple.format(Date.from(Utils.getLocalDateOfTenant().atStartOfDay(Utils.getZoneIdOfTenant()).toInstant()));
 
         String criteriaName = "General Provisioning Criteria" + formattedString + rand.nextLong();
@@ -68,7 +67,7 @@ public final class ProvisioningHelper {
         map.put("createjournalentries", Boolean.FALSE);
         map.put("locale", "en");
         map.put("dateFormat", "yyyyMMdd");
-        DateFormat simple = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat simple = new SimpleDateFormat("yyyyMMdd");
         map.put("date", simple.format(Date.from(Utils.getLocalDateOfTenant().atStartOfDay(Utils.getZoneIdOfTenant()).toInstant())));
         String provisioningEntryCreateJson = new Gson().toJson(map);
         return provisioningEntryCreateJson;
@@ -83,7 +82,7 @@ public final class ProvisioningHelper {
         map.put("createjournalentries", Boolean.TRUE);
         map.put("locale", "en");
         map.put("dateFormat", "yyyyMMdd");
-        DateFormat simple = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat simple = new SimpleDateFormat("yyyyMMdd");
         map.put("date", simple.format(Date.from(Utils.getLocalDateOfTenant().atStartOfDay(Utils.getZoneIdOfTenant()).toInstant())));
         String provisioningEntryCreateJson = new Gson().toJson(map);
         return provisioningEntryCreateJson;

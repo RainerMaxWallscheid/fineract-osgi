@@ -28,7 +28,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import org.apache.fineract.client.models.DelinquencyBucketResponse;
 import org.apache.fineract.client.models.GetLoanProductsProductIdResponse;
@@ -1229,7 +1228,7 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
 
             PostLoanProductsResponse loanProductsResponse = loanTransactionHelper.createLoanProduct(loanProductsRequest);
 
-            String disbursementDateStr = DateUtils.format(disbursementDate, DATETIME_PATTERN, Locale.ENGLISH);
+            String disbursementDateStr = DateUtils.format(disbursementDate, DATETIME_PATTERN);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(new PostLoansRequest().clientId(client.getResourceId())
                     .productId(loanProductsResponse.getResourceId()).loanType("individual").locale("en").dateFormat(DATETIME_PATTERN)
                     .amortizationType(1).interestRatePerPeriod(BigDecimal.ZERO).interestCalculationPeriodType(1).interestType(0)
@@ -1442,7 +1441,7 @@ public class LoanRepaymentScheduleWithDownPaymentTest extends BaseLoanIntegratio
 
             PostLoanProductsResponse loanProductsResponse = loanTransactionHelper.createLoanProduct(loanProductsRequest);
 
-            String disbursementDateStr = DateUtils.format(disbursementDate, DATETIME_PATTERN, Locale.ENGLISH);
+            String disbursementDateStr = DateUtils.format(disbursementDate, DATETIME_PATTERN);
             PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(new PostLoansRequest().clientId(client.getResourceId())
                     .productId(loanProductsResponse.getResourceId()).loanType("individual").locale("en").dateFormat(DATETIME_PATTERN)
                     .amortizationType(1).interestRatePerPeriod(BigDecimal.ZERO).interestCalculationPeriodType(1).interestType(0)

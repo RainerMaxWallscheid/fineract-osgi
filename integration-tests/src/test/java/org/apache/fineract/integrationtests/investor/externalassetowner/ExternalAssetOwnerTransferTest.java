@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Locale;
 import org.apache.fineract.client.models.ExternalAssetOwnerRequest;
 import org.apache.fineract.client.models.ExternalOwnerJournalEntryData;
 import org.apache.fineract.client.models.ExternalOwnerTransferJournalEntryData;
@@ -85,7 +84,7 @@ public class ExternalAssetOwnerTransferTest extends BaseLoanIntegrationTest {
     protected static SchedulerJobHelper SCHEDULER_JOB_HELPER;
     protected static LocalDate TODAYS_DATE;
     public String ownerExternalId;
-    protected DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
+    protected DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter();
 
     @BeforeAll
     public static void setupInvestorBusinessStep() {

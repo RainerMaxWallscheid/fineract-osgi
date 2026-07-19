@@ -24,7 +24,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Pattern;
 import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.portfolio.client.data.ClientData;
@@ -81,12 +80,12 @@ public abstract class AbstractWorkbookPopulator implements WorkbookPopulator {
                 formatinDB = new DateTimeFormatterBuilder().appendPattern("d/M/yyyy").toFormatter();
             } else if (value.matches("\\d{1,2} \\w{3,12} \\d{4}")) {
                 // Legacy text-month input (English month names).
-                formatinDB = new DateTimeFormatterBuilder().appendPattern("d MMMM yyyy").toFormatter(Locale.ENGLISH);
+                formatinDB = new DateTimeFormatterBuilder().appendPattern("d MMMM yyyy").toFormatter();
             } else {
                 throw new IllegalArgumentException("Unrecognised format of date value: " + value);
             }
             LocalDate date1 = LocalDate.parse(value, formatinDB);
-            DateTimeFormatter expectedFormat = new DateTimeFormatterBuilder().appendPattern(dateFormat).toFormatter(Locale.ENGLISH);
+            DateTimeFormatter expectedFormat = new DateTimeFormatterBuilder().appendPattern(dateFormat).toFormatter();
             row.createCell(colIndex).setCellValue(expectedFormat.format(date1));
             row.getCell(colIndex).setCellStyle(dateCellStyle);
         } catch (DateTimeParseException pe) {
@@ -123,8 +122,8 @@ public abstract class AbstractWorkbookPopulator implements WorkbookPopulator {
         dateCellStyle.setDataFormat(df);
         int rowIndex = 0;
         // Templates are generated for locale=en with text month patterns (yyyyMMdd).
-        DateTimeFormatter outputFormat = new DateTimeFormatterBuilder().appendPattern(dateFormat).toFormatter(Locale.ENGLISH);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat, Locale.ENGLISH);
+        DateTimeFormatter outputFormat = new DateTimeFormatterBuilder().appendPattern(dateFormat).toFormatter();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat);
         try {
             if (clients != null) {
                 for (ClientData client : clients) {

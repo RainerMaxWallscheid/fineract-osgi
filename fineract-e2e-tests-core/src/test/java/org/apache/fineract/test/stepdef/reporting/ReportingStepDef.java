@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -38,7 +37,7 @@ import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 
 public class ReportingStepDef extends AbstractStepDef {
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ENGLISH);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final String TRIAL_BALANCE_REPORT = "Trial Balance Summary Report with Asset Owner";
     private final FineractFeignClient fineractClient;
 

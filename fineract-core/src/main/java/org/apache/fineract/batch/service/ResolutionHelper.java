@@ -27,7 +27,6 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -200,8 +199,7 @@ public class ResolutionHelper {
                 final String resParamValue = responseCtx.read(resolvableParamVal).toString();
                 JsonArray date = (JsonArray) this.fromJsonHelper.parse(resParamValue);
                 String dateFormat = JsonPath.read(requestBody, "$.dateFormat");
-                // Use English locale so month/day names in API date formats are stable regardless of JVM default locale.
-                return new JsonPrimitive(DateTimeFormatter.ofPattern(dateFormat, Locale.ENGLISH)
+                return new JsonPrimitive(DateTimeFormatter.ofPattern(dateFormat)
                         .format(LocalDate.of(date.get(0).getAsInt(), date.get(1).getAsInt(), date.get(2).getAsInt())));
             } else if (paramVal.contains("$.")) {
                 // Get the value of the parameter from parent response

@@ -29,7 +29,6 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.Locale;
 import org.apache.fineract.client.models.AllowAttributeOverrides;
 import org.apache.fineract.client.models.GetJournalEntriesTransactionIdResponse;
 import org.apache.fineract.client.models.GetLoanPaymentChannelToFundSourceMappings;
@@ -64,7 +63,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(LoanTestLifecycleExtension.class)
 public class LoanPostChargeOffScenariosTest extends FeignLoanTestBase {
 
-    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter();
     // asset
     private Account loansReceivable;
     private Account interestFeeReceivable;

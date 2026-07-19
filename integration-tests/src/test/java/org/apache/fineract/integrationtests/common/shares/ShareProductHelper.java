@@ -25,7 +25,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import org.apache.fineract.integrationtests.common.Utils;
 import org.apache.fineract.integrationtests.common.accounting.Account;
@@ -123,7 +122,7 @@ public class ShareProductHelper {
         this.marketPrices = new ArrayList<>();
         LocalDate currentDate = Utils.getLocalDateOfTenant();
         String[] prices = { "3.0", "4.0", "5.0", "6.0", "7.0" };
-        DateFormat simple = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat simple = new SimpleDateFormat("yyyyMMdd");
         for (int i = 0; i < prices.length; i++) {
             currentDate = currentDate.plusMonths(2);
             Map<String, String> marketPrice = new HashMap<>();

@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.Locale;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.PostClientsResponse;
 import org.apache.fineract.client.models.PostSavingsAccountTransactionsRequest;
@@ -59,7 +58,7 @@ public class SavingsAccountStepDef extends AbstractStepDef {
     private FineractFeignClient fineractClient;
 
     public static final String DATE_FORMAT = "yyyyMMdd";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
     private static final String EUR = "EUR";
 
     @And("Admin creates a EUR savings product")

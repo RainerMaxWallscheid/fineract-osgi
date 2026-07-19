@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import org.apache.fineract.integrationtests.common.ClientHelper;
 import org.apache.fineract.integrationtests.common.CommonConstants;
 import org.apache.fineract.integrationtests.common.Utils;
@@ -596,7 +595,7 @@ public class ClientLoanChargeRefundIntegrationTest {
     }
 
     private String getTodaysDate() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
         Calendar todaysDate = Calendar.getInstance(Utils.getTimeZoneOfTenant());
         return dateFormat.format(todaysDate.getTime());

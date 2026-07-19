@@ -476,7 +476,7 @@ public class AccountingScenarioIntegrationTest {
         this.accountHelper = new AccountHelper(requestSpec, responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(requestSpec, responseSpec);
 
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
+        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
 
         LocalDate todaysDate = Utils.getLocalDateOfTenant();
         todaysDate = todaysDate.minusMonths(3);
@@ -554,7 +554,7 @@ public class AccountingScenarioIntegrationTest {
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
 
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
+        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
 
         LocalDate todaysDate = Utils.getLocalDateOfTenant();
         todaysDate = todaysDate.minusMonths(3);
@@ -922,7 +922,7 @@ public class AccountingScenarioIntegrationTest {
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
+        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
 
         final LocalDate localDate = LocalDate.now(this.tenantTimeZone.toZoneId());
         final ZonedDateTime currentDate = ZonedDateTime.of(localDate, LocalTime.MIDNIGHT, this.tenantTimeZone.toZoneId());
@@ -1024,7 +1024,7 @@ public class AccountingScenarioIntegrationTest {
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
         LoanStatusChecker.verifyLoanIsWaitingForDisbursal(loanStatusHashMap);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
         Calendar todayDate = Calendar.getInstance(this.tenantTimeZone);
 

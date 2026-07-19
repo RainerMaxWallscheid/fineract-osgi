@@ -33,7 +33,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import org.apache.fineract.integrationtests.common.ClientHelper;
 import org.apache.fineract.integrationtests.common.CommonConstants;
@@ -101,7 +100,7 @@ public class SavingsAccrualIntegrationTest {
             Assertions.assertNotNull(clientId, "Error creating client.");
 
             final LocalDate startDate = LocalDate.of(2021, 8, 12).minusDays(daysToTest);
-            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
+            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd").format(startDate);
 
             final Integer savingsAccountId = this.savingsAccountHelper.applyForSavingsApplicationOnDate(clientId, savingsProductId,
                     SavingsAccountHelper.ACCOUNT_TYPE_INDIVIDUAL, startDateString);
@@ -178,7 +177,7 @@ public class SavingsAccrualIntegrationTest {
 
             final LocalDate today = LocalDate.of(2021, 8, 12);
             final LocalDate startDate = today.minusDays(daysToTest);
-            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US).format(startDate);
+            final String startDateString = DateTimeFormatter.ofPattern("yyyyMMdd").format(startDate);
 
             final Integer savingsAccountId = this.savingsAccountHelper.applyForSavingsApplicationOnDate(clientId, savingsProductId,
                     SavingsAccountHelper.ACCOUNT_TYPE_INDIVIDUAL, startDateString);
@@ -193,7 +192,7 @@ public class SavingsAccrualIntegrationTest {
             schedulerJobHelper.executeAndAwaitJob("Add Accrual Transactions For Savings");
 
             final LocalDate backdatedTransactionDate = startDate.plusDays(daysUntilTransaction);
-            final String backdatedTransactionDateString = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US)
+            final String backdatedTransactionDateString = DateTimeFormatter.ofPattern("yyyyMMdd")
                     .format(backdatedTransactionDate);
             this.savingsAccountHelper.withdrawalFromSavingsAccount(savingsAccountId, "1000", backdatedTransactionDateString,
                     CommonConstants.RESPONSE_RESOURCE_ID);

@@ -31,7 +31,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Locale;
 import org.apache.fineract.client.models.GetLoanRescheduleRequestResponse;
 import org.apache.fineract.client.models.PostCreateRescheduleLoansRequest;
 import org.apache.fineract.client.models.PostCreateRescheduleLoansResponse;
@@ -74,7 +73,7 @@ public class DisbursalAndRepaymentScheduleTest {
     private final String numberOfRepayments = "12";
     private final String interestRatePerPeriod = "18";
 
-    private final SimpleDateFormat dateFormatterStandard = new SimpleDateFormat("yyyyMMdd", Locale.US);
+    private final SimpleDateFormat dateFormatterStandard = new SimpleDateFormat("yyyyMMdd");
 
     @BeforeEach
     public void setup() {

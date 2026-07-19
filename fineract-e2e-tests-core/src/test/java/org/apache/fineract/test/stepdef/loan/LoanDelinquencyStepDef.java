@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.Locale;
 import org.apache.fineract.avro.loan.v1.LoanAccountDelinquencyRangeDataV1;
 import org.apache.fineract.avro.loan.v1.LoanInstallmentDelinquencyBucketDataV1;
 import org.apache.fineract.client.feign.FineractFeignClient;
@@ -63,7 +62,7 @@ public class LoanDelinquencyStepDef extends AbstractStepDef {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanDelinquencyStepDef.class);
     public static final String DATE_FORMAT = "yyyyMMdd";
     public static final String DEFAULT_LOCALE = "en";
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
     private final FineractFeignClient fineractClient;
     private final FineractClientConfiguration fineractClientConfiguration;
     private final EventAssertion eventAssertion;
@@ -93,7 +92,7 @@ public class LoanDelinquencyStepDef extends AbstractStepDef {
 
     @Then("Admin checks that {string}th delinquency range is: {string} and added on: {string} and has delinquentDate {string}")
     public void checkDelinquencyRange(String nthInList, String range, String addedOnDate, String delinquentDateExpected) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         Long loanId = loanResponse.getLoanId();
         String delinquentDateExpectedValue = "".equals(delinquentDateExpected) ? null : delinquentDateExpected;
@@ -115,7 +114,7 @@ public class LoanDelinquencyStepDef extends AbstractStepDef {
 
     @Then("Loan delinquency history has the following details:")
     public void delinquencyHistoryCheck(DataTable table) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         List<List<String>> dataExpected = table.asLists();
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         Long loanId = loanResponse.getLoanId();

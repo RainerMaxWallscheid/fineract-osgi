@@ -22,7 +22,6 @@ import static org.apache.fineract.infrastructure.configuration.api.GlobalConfigu
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.util.Locale;
 import org.apache.fineract.client.models.ChargeRequest;
 import org.apache.fineract.client.models.GetLoansLoanIdResponse;
 import org.apache.fineract.client.models.PostChargesResponse;
@@ -37,7 +36,7 @@ import org.junit.jupiter.api.Test;
 public class AccrualsOnLoanClosureTest extends FeignLoanTestBase {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AccrualsOnLoanClosureTest.class);
-    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
+    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter();
     private static final String startDate = "20250422";
     private static final String disbursementDate = "20240422";
     private static final String repaymentDate = "20240425";

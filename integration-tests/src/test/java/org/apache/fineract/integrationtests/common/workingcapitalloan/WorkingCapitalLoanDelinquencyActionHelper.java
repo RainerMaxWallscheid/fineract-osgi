@@ -22,7 +22,6 @@ import static org.apache.fineract.client.feign.util.FeignCalls.ok;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import org.apache.fineract.client.models.PostWorkingCapitalLoansDelinquencyActionRequest;
 import org.apache.fineract.client.models.PostWorkingCapitalLoansDelinquencyActionResponse;
 import org.apache.fineract.client.models.WorkingCapitalLoanDelinquencyActionData;
@@ -62,7 +61,7 @@ public final class WorkingCapitalLoanDelinquencyActionHelper {
     }
 
     public static void activateLoan(final Long loanId, final LocalDate disbursementDate) {
-        final String dateStr = disbursementDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH));
+        final String dateStr = disbursementDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT));
         log.info("Activating WC loan {} with disbursement date {}", loanId, dateStr);
         ok(() -> {
             FineractFeignClientHelper.getFineractFeignClient().internalWorkingCapitalLoans().activateLoan(loanId, dateStr);
@@ -71,7 +70,7 @@ public final class WorkingCapitalLoanDelinquencyActionHelper {
     }
 
     public static void generateNextDelinquencyPeriod(final Long loanId, final LocalDate businessDate) {
-        final String dateStr = businessDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH));
+        final String dateStr = businessDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT));
         log.info("Generating next delinquency period for WC loan {} with business date {}", loanId, dateStr);
         ok(() -> {
             FineractFeignClientHelper.getFineractFeignClient().internalWorkingCapitalLoans().generateNextDelinquencyPeriod(loanId, dateStr);
@@ -82,9 +81,9 @@ public final class WorkingCapitalLoanDelinquencyActionHelper {
     public static PostWorkingCapitalLoansDelinquencyActionRequest buildActionRequest(final String action, final LocalDate startDate, final LocalDate endDate) {
         final PostWorkingCapitalLoansDelinquencyActionRequest request = new PostWorkingCapitalLoansDelinquencyActionRequest();
         request.setAction(action);
-        request.setStartDate(startDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH)));
+        request.setStartDate(startDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT)));
         if (endDate != null) {
-            request.setEndDate(endDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH)));
+            request.setEndDate(endDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT)));
         }
         request.setDateFormat(DATE_FORMAT);
         request.setLocale("en");

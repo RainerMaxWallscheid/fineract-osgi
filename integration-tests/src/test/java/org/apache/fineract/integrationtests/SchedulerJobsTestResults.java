@@ -124,7 +124,7 @@ public class SchedulerJobsTestResults extends IntegrationTest {
     private JournalEntryHelper journalEntryHelper;
     private ClientHelper clientHelper;
     private TimeZone systemTimeZone;
-    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter(Locale.ENGLISH);
+    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter();
     private BusinessDateHelper businessDateHelper;
     private static BusinessStepHelper businessStepHelper;
     private GlobalConfigurationHelper globalConfigurationHelper;
@@ -676,8 +676,8 @@ public class SchedulerJobsTestResults extends IntegrationTest {
         savingsAccountHelper = new SavingsAccountHelper(requestSpec, responseSpec);
         StandingInstructionsHelper standingInstructionsHelper = new StandingInstructionsHelper(requestSpec, responseSpec);
 
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US);
-        final DateTimeFormatter monthDayFormat = DateTimeFormatter.ofPattern("MMdd", Locale.US);
+        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
+        final DateTimeFormatter monthDayFormat = DateTimeFormatter.ofPattern("MMdd");
 
         // Create the LocalDate with the Zone used by default
         final LocalDate localDate = LocalDate.now(this.systemTimeZone.toZoneId());
@@ -1260,7 +1260,7 @@ public class SchedulerJobsTestResults extends IntegrationTest {
         this.savingsAccountHelper = new SavingsAccountHelper(requestSpec, responseSpec);
         FixedDepositAccountHelper fixedDepositAccountHelper = new FixedDepositAccountHelper(requestSpec, responseSpec);
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());

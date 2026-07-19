@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Locale;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.ChargeData;
@@ -67,8 +66,8 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalChargeStepDef.class);
     private static final String DATE_FORMAT = "yyyyMMdd";
     private static final String DATE_FORMAT_API = "dd-MM-yyyy";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
-    private static final DateTimeFormatter FORMATTER_API = DateTimeFormatter.ofPattern(DATE_FORMAT_API, Locale.ENGLISH);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
+    private static final DateTimeFormatter FORMATTER_API = DateTimeFormatter.ofPattern(DATE_FORMAT_API);
     private static final Long REGULAR_PAYMENT_MODE_ID = 0L;
     private static final Long SPECIFIED_DUE_DATE_ID = 2L;
     private static final Long FLAT_CALCULATION_TYPE_ID = 1L;

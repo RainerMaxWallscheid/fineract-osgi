@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.fineract.client.models.AdvancedPaymentData;
 import org.apache.fineract.client.models.GetLoanProductsProductIdResponse;
@@ -434,7 +433,7 @@ public class LoanDisbursementDetailsIntegrationTest {
 
     private String formatExpectedDisbursementDate(String expectedDisbursementDate) throws ParseException {
         SimpleDateFormat source = new SimpleDateFormat("[yyyy, MM, dd]");
-        SimpleDateFormat target = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        SimpleDateFormat target = new SimpleDateFormat("yyyyMMdd");
         String date = target.format(source.parse(expectedDisbursementDate));
         return date;
     }

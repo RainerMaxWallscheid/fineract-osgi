@@ -26,7 +26,6 @@ import java.math.MathContext;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.Locale;
 import org.apache.fineract.avro.client.v1.ClientDataV1;
 import org.apache.fineract.avro.loan.v1.DelinquencyPausePeriodV1;
 import org.apache.fineract.avro.loan.v1.LoanAccountDataV1;
@@ -94,7 +93,7 @@ public class EventCheckHelper {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(EventCheckHelper.class);
     private static final DateTimeFormatter FORMATTER_EVENTS = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
     private static final long TRANSACTION_COMMIT_DELAY_MS = 100L;
     @Autowired
     private FineractFeignClient fineractClient;
@@ -221,7 +220,7 @@ public class EventCheckHelper {
     }
 
     public GetLoansLoanIdTransactions getNthTransactionType(String nthItemStr, String transactionType, String transactionDate, List<GetLoansLoanIdTransactions> transactions) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         int nthItem = Integer.parseInt(nthItemStr) - 1;
         GetLoansLoanIdTransactions targetTransaction = //
         //

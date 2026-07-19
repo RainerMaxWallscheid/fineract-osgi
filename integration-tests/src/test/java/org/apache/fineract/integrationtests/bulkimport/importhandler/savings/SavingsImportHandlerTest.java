@@ -35,7 +35,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import org.apache.fineract.client.models.GetOfficesResponse;
@@ -138,7 +137,7 @@ public class SavingsImportHandlerTest {
         firstSavingsRow.createCell(SavingsConstants.PRODUCT_COL)
                 .setCellValue(savingsProductSheet.getRow(1).getCell(1).getStringCellValue());
         firstSavingsRow.createCell(SavingsConstants.FIELD_OFFICER_NAME_COL).setCellValue((String) staffMap.get("displayName"));
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Date date = simpleDateFormat.parse("20170513");
         firstSavingsRow.createCell(SavingsConstants.SUBMITTED_ON_DATE_COL).setCellValue(date);
         firstSavingsRow.createCell(SavingsConstants.APPROVED_DATE_COL).setCellValue(date);

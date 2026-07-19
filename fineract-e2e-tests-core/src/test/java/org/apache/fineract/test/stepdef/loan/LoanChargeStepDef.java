@@ -29,7 +29,6 @@ import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.Locale;
 import org.apache.fineract.avro.loan.v1.LoanChargeDataV1;
 import org.apache.fineract.client.feign.FeignException;
 import org.apache.fineract.client.feign.FineractFeignClient;
@@ -236,7 +235,7 @@ public class LoanChargeStepDef extends AbstractStepDef {
     }
 
     private void addChargeEventCheck(PostLoansLoanIdChargesResponse loanChargeResponse) throws IOException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT_EVENTS, Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT_EVENTS);
         GetLoansLoanIdChargesChargeIdResponse chargeDetails = ok(() -> fineractClient.loanCharges().retrieveOneLoanCharge(loanChargeResponse.getLoanId(), loanChargeResponse.getResourceId()));
         GetLoansLoanIdChargesChargeIdResponse body = chargeDetails;
         eventAssertion.assertEvent(LoanAddChargeEvent.class, loanChargeResponse.getResourceId()).extractingData(LoanChargeDataV1::getName).isEqualTo(body.getName()).extractingBigDecimal(LoanChargeDataV1::getAmount).isEqualTo(BigDecimal.valueOf(body.getAmount())).extractingData(LoanChargeDataV1::getDueDate).isEqualTo(formatter.format(body.getDueDate()));

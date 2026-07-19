@@ -23,7 +23,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import org.apache.fineract.client.models.DisbursementDetail;
 import org.apache.fineract.client.models.InterestPauseRequestDto;
 import org.apache.fineract.client.models.JournalEntryCommand;
@@ -88,7 +87,7 @@ public class LoanRequestFactory {
     public static final Integer DEFAULT_REPAYMENT_FREQUENCY = 30;
     public static final String DEFAULT_TRANSACTION_PROCESSING_STRATEGY_CODE = TransactionProcessingStrategyCode.PENALTIES_FEES_INTEREST_PRINCIPAL_ORDER.value;
     public static final String DEFAULT_PROGRESSIVE_TRANSACTION_PROCESSING_STRATEGY_CODE = TransactionProcessingStrategyCode.ADVANCED_PAYMENT_ALLOCATION.value;
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
     public static final String DATE_SUBMIT_STRING = FORMATTER.format(Utils.now().minusMonths(1L));
     public static final String DATE_REJECT_STRING = FORMATTER.format(Utils.now().minusMonths(1L));
     public static final String DATE_WITHDRAWN_STRING = FORMATTER.format(Utils.now().minusMonths(1L));
@@ -144,7 +143,7 @@ public class LoanRequestFactory {
     }
 
     public PutLoansLoanIdRequest modifySubmittedOnDateOnLoan(Long clientId, String newSubmittedOnDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         String dateDisburseStr = formatter.format(Utils.now());
         return //
         //
