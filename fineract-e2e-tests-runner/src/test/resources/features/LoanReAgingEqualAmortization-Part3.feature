@@ -160,7 +160,7 @@ Feature: LoanReAgingEqualAmortization - Part3
       | 20240201 | Chargeback       | 17.01  | 17.01     | 0.0      | 0.0  | 0.0       | 92.59        | false    | false    |
       | 20240301    | Re-age           | 93.92  | 92.59     | 1.33     | 0.0  | 0.0       | 0.0          | false    | false    |
 
-    When Loan Pay-off is made on "01 MArch 2024"
+    When Loan Pay-off is made on "20240301"
     Then Loan is closed with zero outstanding balance and it's all installments have obligations met
 
   @TestRailId:C4341 @AdvancedPaymentAllocation

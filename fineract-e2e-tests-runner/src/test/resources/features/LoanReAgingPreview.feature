@@ -1747,7 +1747,7 @@ Feature: LoanReAgingPreview
       | Principal due | Interest | Fees | Penalties | Due    | Paid  | In advance | Late | Outstanding |
       | 117.01        | 1.91     | 0.0  | 0.0       | 118.92 | 25.0  | 7.99       | 0.0  | 93.92       |
 
-    When Loan Pay-off is made on "01 MArch 2024"
+    When Loan Pay-off is made on "20240301"
     Then Loan is closed with zero outstanding balance and it's all installments have obligations met
 
   @TestRailId:C4349 @AdvancedPaymentAllocation

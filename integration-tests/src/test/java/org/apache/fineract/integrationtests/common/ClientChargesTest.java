@@ -85,7 +85,7 @@ public class ClientChargesTest {
                 ClientHelper.getSpecifiedDueDateChargesClientAsJSON(chargeId.toString(), "20111029"));
         Assertions.assertNotNull(clientChargeId);
         final String clientChargePaidTransactionId = ClientHelper.payChargesForClients(this.requestSpec, this.responseSpec, clientId,
-                clientChargeId, ClientHelper.getPayChargeJSON("25 AUGUST 2015", "10"));
+                clientChargeId, ClientHelper.getPayChargeJSON("20150825", "10"));
         Assertions.assertNotNull(clientChargePaidTransactionId);
         isValidOutstandingAmount(ClientHelper.getClientCharge(requestSpec, responseSpec, clientId.toString(), clientChargeId.toString()),
                 (float) 190.0);
@@ -134,13 +134,13 @@ public class ClientChargesTest {
          * pay client charge more than outstanding amount amount and ensured its a failure test case
          */
         final String responseId_moreAmount_failure = ClientHelper.payChargesForClients(this.requestSpec, responseSpecFailure, clientId,
-                clientChargeId, ClientHelper.getPayChargeJSON("25 AUGUST 2015", "300"));
+                clientChargeId, ClientHelper.getPayChargeJSON("20150825", "300"));
         Assertions.assertNull(responseId_moreAmount_failure);
         /**
          * pay client charge for 10 USD and ensure outstanding amount is updated properly
          */
         final String chargePaid_responseId = ClientHelper.payChargesForClients(this.requestSpec, this.responseSpec, clientId,
-                clientChargeId, ClientHelper.getPayChargeJSON("25 AUGUST 2015", "100"));
+                clientChargeId, ClientHelper.getPayChargeJSON("20150825", "100"));
         Assertions.assertNotNull(chargePaid_responseId);
 
         isValidOutstandingAmount(ClientHelper.getClientCharge(requestSpec, responseSpec, clientId.toString(), clientChargeId.toString()),

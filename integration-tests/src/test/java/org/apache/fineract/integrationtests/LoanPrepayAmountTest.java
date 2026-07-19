@@ -50,7 +50,7 @@ public class LoanPrepayAmountTest extends FeignLoanTestBase {
             approveLoan(loanId, LoanRequestBuilders.approveLoan(1000.0, "20240101"));
             disburseLoan(loanId, BigDecimal.valueOf(250.0), "20240101");
         });
-        runAt("7 january 2024", () -> {
+        runAt("20240107", () -> {
             disburseLoan(loanId, BigDecimal.valueOf(350.0), "20240104");
             disburseLoan(loanId, BigDecimal.valueOf(400.0), "20240105");
         });

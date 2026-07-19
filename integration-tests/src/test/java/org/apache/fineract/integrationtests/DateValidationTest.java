@@ -142,7 +142,8 @@ public class DateValidationTest {
         assertNotNull(errors);
         Map<String, Object> error = errors.get(0);
         assertNotNull(error);
-        assertEquals("The parameter `feeOnMonthDay` is invalid based on the monthDayFormat: `dd MMM` and locale: `en_GB` provided:", error.get("developerMessage"));
+        assertEquals("The parameter `feeOnMonthDay` is invalid based on the monthDayFormat: `MMdd` and locale: `en_GB` provided:",
+                error.get("developerMessage"));
     }
 
     private String buildRequestBody(final String requestCode, final InteropTransactionRole role) {
@@ -185,7 +186,8 @@ public class DateValidationTest {
     private List<HashMap<String, String>> getCharges() {
         List<HashMap<String, String>> list = new ArrayList<>();
         HashMap<String, String> map = new HashMap<>();
-        map.put("feeOnMonthDay", "31 June");
+        // Invalid day for June under numeric monthDayFormat MMdd
+        map.put("feeOnMonthDay", "0631");
         list.add(map);
         return list;
     }

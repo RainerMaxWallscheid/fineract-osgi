@@ -97,7 +97,7 @@ public class InterestRateChartSlabsReadServiceImpl implements InterestRateChartS
                 iri.incentive_type as incentiveType, iri.amount as amount, code.code_value as attributeValueDesc
                 from m_interest_rate_slab ircd
                 left join m_interest_incentives iri on iri.interest_rate_slab_id = ircd.id
-                left join m_code_value code on """ + sqlGenerator.castChar("code.id") + """
+                left join m_code_value code """ + " on " + sqlGenerator.castChar("code.id") + """
                  = iri.attribute_value left join m_currency curr on ircd.currency_code= curr.code """;
         }
 
