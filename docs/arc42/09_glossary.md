@@ -78,6 +78,7 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **Gherkin** | A | BDD-Notation (Given/When/Then); Anforderungsartefakte unter [`docs/gherkin/`](../gherkin/README.md), getaggt mit `@arc42-*` / `@adr-*` / `@quality-Q-*`. → [08](08_design_decisions.md) |
 | **HikariCP** | T | JDBC-Connection-Pool von Fineract; Konfiguration über `FINERACT_HIKARI_*`. |
 | **Hook** | T | Konfigurierbare Integration/Webhook auf Business Events; auch Command Hooks im neuen Stack. |
+| **Hexagonale Architektur** | A | *Ports & Adapters* – Domain im Zentrum, Driving-/Driven-Adapter am Rand; Leitbild für fineract-osgi. → [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **Hot-Deploy** | B | Nachladen/Aktualisieren von OSGi-Bundles ohne vollständigen App-Rebuild. |
 | **Hot-Path** | A | Latenzkritischer Request-Pfad (typisch synchrone Writes) – KI default **nicht** sync darauf. → [07](07_quality_attributes.md) |
 | **Idempotency Key** | T | Client-seitiger Schlüssel, der Wiederholungen desselben Writes entdoppelt. → [06](06_crosscutting_concepts.md) |
@@ -121,6 +122,7 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **Permission** | F | Feingranulares Recht, das Rollen zugewiesen und vor Commands geprüft wird. |
 | **Platform Security Context** | T | Laufzeitkontext des aktuellen Benutzers und seiner Rechte. |
 | **Policy Gate** | A | Synchrone Entscheidungsstelle (z. B. KI-Score) vor Fortsetzung eines Commands. → [04](04_runtime_view.md) |
+| **Port (Hexagon)** | A | Fachliche Schnittstelle zwischen Application/Domain und Adapter (nicht TCP-Port). → [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **PostgreSQL** | B | Primäre Zieldatenbank in der fineract-osgi-Referenzarchitektur. → [08](08_design_decisions.md) |
 | **Quality Scenario** | A | Messbares Qualitätsszenario (Stimulus, Umgebung, Response, Maß). → [07](07_quality_attributes.md) |
 | **Read Node** | B | Instanz mit `read-enabled` (und typisch ohne Write/Batch), für Queries/Reports. |

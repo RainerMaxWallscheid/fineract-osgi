@@ -59,13 +59,16 @@ flowchart TB
 
 ---
 
-## 3.2 Level 2 – Schichten und Modulgruppen
+## 3.2 Level 2 – Schichten, Modulgruppen und Hexagon-Mapping
+
+fineract-osgi folgt einem **hexagonalen Leitbild** (Ports & Adapters, [ADR-017](decisions/ADR-017-hexagonale-architektur.md)): Domain im Zentrum, Application/Use-Cases darum, **Driving**-Adapter (REST, Jobs) und **Driven**-Adapter (JPA, JDBC, Events, KI) am Rand. Die Gradle-Module bleiben die physische Zerlegung; das Hexagon ist die **logische** Abhängigkeitssicht.
 
 ```mermaid
 flowchart TB
-    subgraph Presentation
+    subgraph Driving["Driving Adapters"]
       REST[JAX-RS / Spring MVC Resources]
       ACT[Actuator Health Metrics]
+      JOBDRV[COB / Batch Entry]
     end
 
     subgraph Application
@@ -83,27 +86,40 @@ flowchart TB
       REP[Report / MIX / Document]
     end
 
-    subgraph Platform
-      CORE[fineract-core]
+    subgraph Driven["Driven Adapters / Platform"]
+      CORE[fineract-core JPA JDBC]
       VAL[fineract-validation]
       COB[fineract-cob]
+      INT[Events Hooks Messaging KI]
     end
 
     subgraph Modular Runtime
       EQ[Equinox]
-      BND[Feature Bundles]
+      BND[Feature Bundles as Adapters]
       REG[OSGi Service Registry]
     end
 
-    REST --> SEC --> TEN --> CMD --> Domain
+    REST --> SEC --> TEN --> CMD
+    JOBDRV --> JOB
+    CMD --> Domain
     JOB --> COB --> LOAN
-    CMD --> CORE
     Domain --> CORE
-    SEC --> REG
-    CMD --> REG
+    Domain --> INT
+    CMD --> CORE
     BND --> REG
+    REG -.-> INT
+    REG -.-> CMD
+    SEC --> REG
     EQ --> BND
 ```
+
+| Hexagon-Ring | Bausteine (Beispiele) |
+|--------------|----------------------|
+| **Driving** | REST Resources, Actuator, COB/Batch-Entry, OSGi-Eingänge |
+| **Application** | Security/Tenant-Filter, Command-Pipelines, Job-Orchestrierung |
+| **Domain** | Loan, Savings, Accounting, Client, … |
+| **Driven** | JPA/JDBC (`fineract-core`), Validation, COB-Infra, Events/Hooks/Messaging/KI |
+| **Steckbar** | Equinox Feature-Bundles hinter Service-Registry-Ports |
 
 ### 3.2.1 Application Shell
 

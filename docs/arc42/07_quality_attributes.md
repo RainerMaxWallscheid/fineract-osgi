@@ -346,6 +346,7 @@ Fineract ist groß und historisch gewachsen (JSON-Strings, Gson-Helfer). finerac
 | Gradle-Module (`fineract-loan`, `fineract-command`, …) | Build- und Team-Grenzen |
 | Neuer Command-Stack | Typsicherheit, weniger Magic Strings |
 | API-DTO Composition ([ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)) | Weniger fragile Vererbung; Shared-Felder explizit komponiert; JSON bleibt flach |
+| Hexagonale Architektur ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)) | Dependency Rule; Domain testbar ohne REST/DB; OSGi/KI als steckbare Adapter |
 | OSGi API vs. Impl Bundles | Stabile Extension-Verträge |
 | arc42 + Gherkin | Gemeinsames Verständnis |
 | Parallele Legacy/Neu-Migration | Risikoarm, reviewbar |

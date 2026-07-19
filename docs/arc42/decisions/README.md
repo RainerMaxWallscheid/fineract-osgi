@@ -20,6 +20,7 @@ Einzelne Architekturentscheidungen für **fineract-osgi**. Übersicht und Format
 | ADR-014 | [ADR-014-arc42-gherkin-als-doku-strategie.md](ADR-014-arc42-gherkin-als-doku-strategie.md) |
 | ADR-015 | [ADR-015-api-dtos-composition-statt-vererbung.md](ADR-015-api-dtos-composition-statt-vererbung.md) |
 | ADR-016 | [ADR-016-jpa-ausbau-read-write-persistenz.md](ADR-016-jpa-ausbau-read-write-persistenz.md) |
+| ADR-017 | [ADR-017-hexagonale-architektur.md](ADR-017-hexagonale-architektur.md) |
 
 ## Neues ADR anlegen
 

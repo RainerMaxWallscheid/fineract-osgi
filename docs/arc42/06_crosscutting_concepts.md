@@ -22,6 +22,7 @@ Crosscutting Concepts sind architekturweite Lösungsansätze, die **mehrere Baus
 | 10 | Configuration & Feature Modes | Umgebungsspezifisches Verhalten | Env, Modes, Config Domain Service |
 | 11 | Data Access & Caching | Performance, Pooling | HikariCP, optionale Caches |
 | 12 | API-Stil, DTO Composition & Compatibility | Stabile Integrationen | REST, Idempotency, OpenAPI, Gson SPI |
+| 13 | Hexagonale Architektur | Dependency Rule, austauschbare Ränder | Ports & Adapters, CQRS, OSGi, KI |
 
 ```mermaid
 flowchart TB
@@ -514,7 +515,45 @@ Beispiele: Loan COB on/off, External Events, Correlation IDs, IP Tracking, Journ
 
 ---
 
-## 6.13 API-Stil, DTO Composition, Idempotenz & Compatibility
+## 6.13 Hexagonale Architektur (Ports & Adapters)
+
+### Motivation
+
+Domain und Use-Cases sollen **unabhängig** von Transport (REST, Batch) und Technik (JPA, JDBC, Kafka, KI) bleiben – testbar, OSGi-erweiterbar, modernisierbar ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)).
+
+### Leitbild
+
+```mermaid
+flowchart LR
+    DRV[Driving: REST Jobs OSGi] --> APP[Application: Commands Queries]
+    APP --> DOM[Domain]
+    APP --> PRT[Ports]
+    PRT --> DDN[Driven: JPA JDBC Events KI MQ]
+```
+
+| Ring | fineract-osgi |
+|------|----------------|
+| **Driving** | `*ApiResource`, COB/Batch, optionale Bundle-Eingänge |
+| **Application** | Command Handler, WritePlatformServices, Validation-Orchestrierung |
+| **Domain** | Aggregates, Domain Services, Invarianten |
+| **Driven** | Spring Data JPA / EclipseLink, JdbcTemplate-Reads, Hooks, Kafka/JMS, KI-Client |
+
+CQRS: **Commands** und **Queries** sind Application-Use-Cases mit **unterschiedlichen** Driven-Adaptern (Write oft JPA, Read oft JDBC – [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md)).
+
+### Regeln
+
+- Domain importiert keine JAX-RS-/Broker-/Servlet-Typen.
+- Resources bleiben dünne Driving-Adapter (HTTP ↔ Command/DTO).
+- Neue Ports nur bei echter Austauschbarkeit oder Testnaht (kein Interface-Theater).
+- OSGi-Bundles = steckbare Adapter hinter stabilen Ports ([ADR-002](decisions/ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md)).
+
+### Bezug Building Blocks / Runtime
+
+- Statisch: [03.2](03_building_block_view.md) · Dynamisch: [04.3](04_runtime_view.md) Commands
+
+---
+
+## 6.14 API-Stil, DTO Composition, Idempotenz & Compatibility
 
 | Thema | Konzept |
 |-------|---------|
@@ -567,7 +606,7 @@ Shared-Typen (`DepositProductData`, `DepositAccountData`, `InteropRequestData`) 
 
 ---
 
-## 6.14 Zusammenspiel der Konzepte (Beispielfluss)
+## 6.15 Zusammenspiel der Konzepte (Beispielfluss)
 
 Loan Creation mit optionaler KI – Crosscutting-Schichten:
 
@@ -597,7 +636,7 @@ sequenceDiagram
 
 ---
 
-## 6.15 Qualitätsbezug
+## 6.16 Qualitätsbezug
 
 | Crosscutting Concept | Unterstützte Qualität ([Kap. 7](07_quality_attributes.md)) |
 |----------------------|--------------------------------------------------------------|
@@ -605,6 +644,7 @@ sequenceDiagram
 | Security & Audit | Vertraulichkeit, Compliance, Nachvollziehbarkeit |
 | CQRS / Commands | Skalierbarkeit Writes/Reads, Maintainability |
 | API-DTO Composition | Maintainability, Compatibility (flache JSON-Verträge) |
+| Hexagonale Architektur | Maintainability, Extensibility, Testability |
 | OSGi | Extensibility, Maintainability, Deployment-Flexibilität |
 | KI-Integration | Extensibility, Innovation ohne Core-Komplexität |
 | Observability | Operability, Performance-Diagnose |
@@ -613,7 +653,7 @@ sequenceDiagram
 
 ---
 
-## 6.16 Offene Punkte / nächste Iterationen
+## 6.17 Offene Punkte / nächste Iterationen
 
 - Einheitliches **Outbox-Pattern** für External Events (exactly-once / at-least-once klar definieren)
 - Standard-Interfaces für OSGi Extension Points (API-Bundle versioniert)
@@ -622,10 +662,11 @@ sequenceDiagram
 - Policy-as-Code für Fail-Open/Fail-Closed pro Produkt
 - Cache-/Idempotency-Store-Entscheidung (DB only vs. Redis)
 - Weitere DTO-Hierarchien auf Composition migrieren (Loan/Savings-Product wo sinnvoll); ggf. generierte OpenAPI-Modelle angleichen
+- Hexagon E3: Ports an Persistenz-/Event-/KI-Hotspots extrahieren; Dependency-Rule in Reviews/ArchUnit
 
 ---
 
-## 6.17 Verwandte Gherkin-Features
+## 6.18 Verwandte Gherkin-Features
 
 | Konzept | Feature |
 |---------|---------|
