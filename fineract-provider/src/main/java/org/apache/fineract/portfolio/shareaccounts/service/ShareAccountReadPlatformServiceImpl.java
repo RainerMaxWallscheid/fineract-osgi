@@ -325,14 +325,16 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
         final PurchasedSharesDataRowMapper purchasedSharesDataRowMapper = new PurchasedSharesDataRowMapper();
 
         ShareAccountMapperForDividents() {
+            // Explicit spaces around concatenations: text blocks strip trailing whitespace, which
+            // previously produced "amountPaidfrom m_share_account" and broke dividend creation.
             schema = """
                 sa.id as id, sa.status_enum as statusEnum,
                 c.id as clientId, c.display_name as clientName,
                 sa.account_no as accountNo,
-                sa.currency_code as currencyCode, sa.currency_digits as currencyDigits, sa.currency_multiplesof as inMultiplesOf, """ + purchasedSharesDataRowMapper.schema() + """
-                from m_share_account sa
-                join m_client c ON c.id = sa.client_id
-                join m_share_account_transactions saps ON saps.account_id = sa.id """;
+                sa.currency_code as currencyCode, sa.currency_digits as currencyDigits, sa.currency_multiplesof as inMultiplesOf, """
+                    + purchasedSharesDataRowMapper.schema() + " from m_share_account sa "
+                    + "join m_client c ON c.id = sa.client_id "
+                    + "join m_share_account_transactions saps ON saps.account_id = sa.id ";
         }
 
         @Override
@@ -377,7 +379,7 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
         private static final String PURCHASED_SHARES_SCHEMA = """
             saps.id as purchasedId, saps.account_id as accountId, saps.transaction_date as transactionDate, saps.total_shares as purchasedShares, saps.unit_price as unitPrice,
             saps.status_enum as purchaseStatus, saps.type_enum as purchaseType, saps.amount as amount, saps.charge_amount as chargeamount,
-            saps.amount_paid as amountPaid """;
+            saps.amount_paid as amountPaid""";
 
         PurchasedSharesDataRowMapper() {
         }

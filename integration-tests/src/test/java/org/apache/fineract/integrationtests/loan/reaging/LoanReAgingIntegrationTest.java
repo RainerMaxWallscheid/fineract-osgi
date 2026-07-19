@@ -1257,7 +1257,7 @@ public class LoanReAgingIntegrationTest extends BaseLoanIntegrationTest {
 
             // Call preview API via REST
             String previewUrl = "/fineract-provider/api/v1/loans/" + loanId + "/transactions/reage-preview" //
-                    + "?frequencyType=MONTHS&frequencyNumber=1&startDate=28+February+2026&numberOfInstallments=6" //
+                    + "?frequencyType=MONTHS&frequencyNumber=1&startDate=20260228&numberOfInstallments=6" //
                     + "&dateFormat=yyyyMMdd&locale=en&" + Utils.TENANT_IDENTIFIER;
 
             String jsonResponse = Utils.performServerGet(requestSpec, responseSpec, previewUrl);
