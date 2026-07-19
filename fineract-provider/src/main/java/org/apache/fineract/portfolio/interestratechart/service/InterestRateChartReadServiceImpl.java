@@ -67,9 +67,8 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
     public Collection<InterestRateChartData> retrieveAllWithSlabs(Long productId) {
         String sql = "select " + chartExtractor.schema()
                 + " where sp.id = ? order by irc.id, CASE WHEN irc.is_primary_grouping_by_amount then ircd.amount_range_from WHEN irc.is_primary_grouping_by_amount then ircd.amount_range_to END,ircd.from_period, ircd.to_period,CASE WHEN NOT irc.is_primary_grouping_by_amount then ircd.amount_range_from WHEN NOT irc.is_primary_grouping_by_amount then ircd.amount_range_to END";
-        // TYPE_FORWARD_ONLY: PostgreSQL JDBC does not support TYPE_SCROLL_SENSITIVE well and can yield empty SQL errors.
-        return jdbcTemplate.query(con -> con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY),
-                ps -> ps.setLong(1, productId), chartExtractor);
+        // Forward-only is fine: InterestRateChartExtractor walks the join result in a single pass.
+        return jdbcTemplate.query(sql, chartExtractor, productId); // NOSONAR
     }
 
     @Override
@@ -116,7 +115,8 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
 
     public static final class InterestRateChartExtractor implements ResultSetExtractor<Collection<InterestRateChartData>> {
         InterestRateChartMapper chartMapper = new InterestRateChartMapper();
-        InterestRateChartSlabExtractor chartSlabsMapper;
+        InterestRateChartSlabsMapper chartSlabsMapper;
+        InterestIncentiveMapper incentiveMapper = new InterestIncentiveMapper();
         private final String schemaSql;
 
         public String schema() {
@@ -124,7 +124,7 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
         }
 
         public InterestRateChartExtractor(DatabaseSpecificSQLGenerator sqlGenerator) {
-            chartSlabsMapper = new InterestRateChartSlabExtractor(sqlGenerator);
+            chartSlabsMapper = new InterestRateChartSlabsMapper(sqlGenerator);
             this.schemaSql = """
                 irc.id as ircId, irc.name as ircName, irc.description as ircDescription,irc.from_date as ircFromDate, irc.end_date as ircEndDate, irc.is_primary_grouping_by_amount as isPrimaryGroupingByAmount, ircd.id as ircdId, ircd.description as ircdDescription, ircd.period_type_enum ircdPeriodTypeId, ircd.from_period as ircdFromPeriod, ircd.to_period as ircdToPeriod, ircd.amount_range_from as ircdAmountRangeFrom, ircd.amount_range_to as ircdAmountRangeTo, ircd.annual_interest_rate as ircdAnnualInterestRate, curr.code as currencyCode, curr.name as currencyName, curr.internationalized_name_code as currencyNameCode, curr.display_symbol as currencyDisplaySymbol, curr.decimal_places as currencyDigits, curr.currency_multiplesof as inMultiplesOf, sp.id as savingsProductId, sp.name as savingsProductName, iri.id as iriId, iri.entiry_type as entityType, iri.attribute_name as attributeName ,iri.condition_type as conditionType, iri.attribute_value as attributeValue, iri.incentive_type as incentiveType, iri.amount as amount, code.code_value as attributeValueDesc from m_interest_rate_chart irc left join m_interest_rate_slab ircd on irc.id=ircd.interest_rate_chart_id left join m_interest_incentives iri on iri.interest_rate_slab_id = ircd.id left join m_code_value code """ + " on " + sqlGenerator.castChar("code.id") + """
                  = iri.attribute_value left join m_currency curr on ircd.currency_code= curr.code left join m_deposit_product_interest_rate_chart dpirc on irc.id=dpirc.interest_rate_chart_id left join m_savings_product sp on sp.id=dpirc.deposit_product_id """;
@@ -132,21 +132,42 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
 
         @Override
         public List<InterestRateChartData> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            List<InterestRateChartData> chartDataList = new ArrayList<>();
+            // Single forward-only pass over the chart/slab/incentive join. Nested extractors used
+            // rs.previous() and required a scrollable ResultSet, which PostgreSQL JDBC does not
+            // provide reliably (TYPE_SCROLL_SENSITIVE fails; TYPE_FORWARD_ONLY rejects previous()).
+            final List<InterestRateChartData> chartDataList = new ArrayList<>();
             InterestRateChartData chartData = null;
             Long interestRateChartId = null;
-            int ircIndex = 0;// Interest rate chart index
+            InterestRateChartSlabData chartSlabData = null;
+            Long interestRateChartSlabId = null;
+            int ircIndex = 0;
+            int ircdIndex = 0;
+            int incentiveIndex = 0;
             while (rs.next()) {
-                Long tempIrcId = rs.getLong("ircId");
-                // first row or when interest rate chart id changes
+                final Long tempIrcId = rs.getLong("ircId");
                 if (chartData == null || (interestRateChartId != null && !interestRateChartId.equals(tempIrcId))) {
                     interestRateChartId = tempIrcId;
                     chartData = chartMapper.mapRow(rs, ircIndex++);
                     chartDataList.add(chartData);
+                    chartSlabData = null;
+                    interestRateChartSlabId = null;
                 }
-                final InterestRateChartSlabData chartSlabsData = chartSlabsMapper.extractData(rs);
-                if (chartSlabsData != null) {
-                    chartData.addChartSlab(chartSlabsData);
+
+                final Long tempIrcdId = JdbcSupport.getLongDefaultToNullIfZero(rs, "ircdId");
+                if (tempIrcdId == null) {
+                    continue;
+                }
+                if (chartSlabData == null || (interestRateChartSlabId != null && !interestRateChartSlabId.equals(tempIrcdId))) {
+                    interestRateChartSlabId = tempIrcdId;
+                    chartSlabData = chartSlabsMapper.mapRow(rs, ircdIndex++);
+                    if (chartSlabData != null) {
+                        chartData.addChartSlab(chartSlabData);
+                    }
+                }
+
+                final InterestIncentiveData incentiveData = incentiveMapper.mapRow(rs, incentiveIndex++);
+                if (incentiveData != null && chartSlabData != null) {
+                    chartSlabData.addIncentives(incentiveData);
                 }
             }
             return chartDataList;
@@ -227,73 +248,30 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
     }
 
 
-    private static final class InterestRateChartSlabExtractor implements ResultSetExtractor<InterestRateChartSlabData> {
-        InterestRateChartSlabsMapper chartSlabsMapper;
-        InterestIncentiveMapper incentiveMapper = new InterestIncentiveMapper();
-        private final String schemaSql;
-
-        @SuppressWarnings("unused")
-        public String schema() {
-            return this.schemaSql;
-        }
-
-        private InterestRateChartSlabExtractor(DatabaseSpecificSQLGenerator sqlGenerator) {
-            chartSlabsMapper = new InterestRateChartSlabsMapper(sqlGenerator);
-            this.schemaSql = chartSlabsMapper.schema();
-        }
-
+    private static final class InterestIncentiveMapper implements RowMapper<InterestIncentiveData> {
         @Override
-        public InterestRateChartSlabData extractData(ResultSet rs) throws SQLException, DataAccessException {
-            InterestRateChartSlabData chartSlabData = null;
-            Long interestRateChartSlabId = null;
-            int ircIndex = 0;// Interest rate chart index
-            int ircdIndex = 0;// Interest rate chart Slabs index
-            rs.previous();
-            while (rs.next()) {
-                Long tempIrcdId = rs.getLong("ircdId");
-                if (interestRateChartSlabId == null || interestRateChartSlabId.equals(tempIrcdId)) {
-                    if (chartSlabData == null) {
-                        interestRateChartSlabId = tempIrcdId;
-                        chartSlabData = chartSlabsMapper.mapRow(rs, ircIndex++);
-                    }
-                    final InterestIncentiveData incentiveData = incentiveMapper.mapRow(rs, ircdIndex++);
-                    if (incentiveData != null) {
-                        chartSlabData.addIncentives(incentiveData);
-                    }
-                } else {
-                    rs.previous();
-                    break;
-                }
+        public InterestIncentiveData mapRow(ResultSet rs, @SuppressWarnings("unused") int rowNum) throws SQLException {
+            final Long id = JdbcSupport.getLongDefaultToNullIfZero(rs, "iriId");
+            // If no incentive is associated, iriId is null/zero in the outer join.
+            if (id == null) {
+                return null;
             }
-            return chartSlabData;
-        }
-
-
-        private static final class InterestIncentiveMapper implements RowMapper<InterestIncentiveData> {
-            @Override
-            public InterestIncentiveData mapRow(ResultSet rs, @SuppressWarnings("unused") int rowNum) throws SQLException {
-                final Long id = JdbcSupport.getLongDefaultToNullIfZero(rs, "iriId");
-                // If there are not Incentive are associated then in
-                // InterestRateChartExtractor the incentive id will be null.
-                if (id == null) {
-                    return null;
-                }
-                final String attributeValue = rs.getString("attributeValue");
-                String attributeValueDesc = null;
-                final Integer entityType = JdbcSupport.getInteger(rs, "entityType");
-                final EnumOptionData entityTypeData = InterestIncentivesEnumerations.entityType(entityType);
-                final Integer attributeName = JdbcSupport.getInteger(rs, "attributeName");
-                if (InterestIncentiveAttributeName.isCodeValueAttribute(InterestIncentiveAttributeName.fromInt(attributeName))) {
-                    attributeValueDesc = rs.getString("attributeValueDesc");
-                }
-                final EnumOptionData attributeNameData = InterestIncentivesEnumerations.attributeName(attributeName);
-                final Integer conditionType = JdbcSupport.getInteger(rs, "conditionType");
-                final EnumOptionData conditionTypeData = CommonEnumerations.conditionType(conditionType, "incentive");
-                final Integer incentiveType = JdbcSupport.getInteger(rs, "incentiveType");
-                final EnumOptionData incentiveTypeData = InterestIncentivesEnumerations.incentiveType(incentiveType);
-                final BigDecimal amount = rs.getBigDecimal("amount");
-                return InterestIncentiveData.instance(id, entityTypeData, attributeNameData, conditionTypeData, attributeValue, attributeValueDesc, incentiveTypeData, amount);
+            final String attributeValue = rs.getString("attributeValue");
+            String attributeValueDesc = null;
+            final Integer entityType = JdbcSupport.getInteger(rs, "entityType");
+            final EnumOptionData entityTypeData = InterestIncentivesEnumerations.entityType(entityType);
+            final Integer attributeName = JdbcSupport.getInteger(rs, "attributeName");
+            if (InterestIncentiveAttributeName.isCodeValueAttribute(InterestIncentiveAttributeName.fromInt(attributeName))) {
+                attributeValueDesc = rs.getString("attributeValueDesc");
             }
+            final EnumOptionData attributeNameData = InterestIncentivesEnumerations.attributeName(attributeName);
+            final Integer conditionType = JdbcSupport.getInteger(rs, "conditionType");
+            final EnumOptionData conditionTypeData = CommonEnumerations.conditionType(conditionType, "incentive");
+            final Integer incentiveType = JdbcSupport.getInteger(rs, "incentiveType");
+            final EnumOptionData incentiveTypeData = InterestIncentivesEnumerations.incentiveType(incentiveType);
+            final BigDecimal amount = rs.getBigDecimal("amount");
+            return InterestIncentiveData.instance(id, entityTypeData, attributeNameData, conditionTypeData, attributeValue, attributeValueDesc,
+                    incentiveTypeData, amount);
         }
     }
 
