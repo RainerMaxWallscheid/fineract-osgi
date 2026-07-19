@@ -245,8 +245,10 @@ flowchart LR
 | **CommandDispatcher** | Neuer austauschbarer Ausführungskanal |
 | **CommandHookManager** | Before/After/Error-Querschnitt |
 | **CommandStore / Audit-Module** | Persistenz Command-Zustände (neu/alt) |
+| **API-DTOs (data packages)** | Request/Response-Nutzlast; spezialisierte Typen **komponieren** Shared-Felder und bleiben für Gson flach ([ADR-015](08_design_decisions.md)) |
+| **FineractGsonTypeAdapterRegistrar** | SPI in `fineract-core` – Module registrieren Gson-TypeAdapter (z. B. Flatten) via ServiceLoader |
 
-Details Runtime: [04.3](04_runtime_view.md) · ADR: [08 ADR-004](08_design_decisions.md)
+Details Runtime: [04.3](04_runtime_view.md) · ADR: [08 ADR-004](08_design_decisions.md), [ADR-015](08_design_decisions.md)
 
 ---
 

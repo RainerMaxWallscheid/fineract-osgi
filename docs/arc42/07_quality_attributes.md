@@ -345,10 +345,11 @@ Fineract ist groß und historisch gewachsen (JSON-Strings, Gson-Helfer). finerac
 |-------|--------|
 | Gradle-Module (`fineract-loan`, `fineract-command`, …) | Build- und Team-Grenzen |
 | Neuer Command-Stack | Typsicherheit, weniger Magic Strings |
+| API-DTO Composition (ADR-015) | Weniger fragile Vererbung; Shared-Felder explizit komponiert; JSON bleibt flach |
 | OSGi API vs. Impl Bundles | Stabile Extension-Verträge |
 | arc42 + Gherkin | Gemeinsames Verständnis |
 | Parallele Legacy/Neu-Migration | Risikoarm, reviewbar |
-| Tests (Unit, Integration, E2E) | Regressionsnetz |
+| Tests (Unit, Integration, E2E) | Regressionsnetz; Composition-Smoke-Tests pro DTO-Familie |
 
 ### Szenario Q-MAINT-1: Neues Pflichtfeld am Loan
 

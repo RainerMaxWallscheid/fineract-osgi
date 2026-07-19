@@ -21,7 +21,7 @@ Crosscutting Concepts sind architekturweite Lösungsansätze, die **mehrere Baus
 | 9 | Jobs, COB & Resilience | Batch-Zuverlässigkeit | Partitioned Jobs, Retry, Message Handler |
 | 10 | Configuration & Feature Modes | Umgebungsspezifisches Verhalten | Env, Modes, Config Domain Service |
 | 11 | Data Access & Caching | Performance, Pooling | HikariCP, optionale Caches |
-| 12 | API-Stil & Compatibility | Stabile Integrationen | REST, Idempotency, OpenAPI |
+| 12 | API-Stil, DTO Composition & Compatibility | Stabile Integrationen | REST, Idempotency, OpenAPI, Gson SPI |
 
 ```mermaid
 flowchart TB
@@ -512,7 +512,7 @@ Beispiele: Loan COB on/off, External Events, Correlation IDs, IP Tracking, Journ
 
 ---
 
-## 6.13 API-Stil, Idempotenz & Compatibility
+## 6.13 API-Stil, DTO Composition, Idempotenz & Compatibility
 
 | Thema | Konzept |
 |-------|---------|
@@ -520,13 +520,47 @@ Beispiele: Loan COB on/off, External Events, Correlation IDs, IP Tracking, Journ
 | **CQRS nach außen** | Writes als Commands, Reads als Queries – auch wenn URL-Design historisch gemischt ist |
 | **Idempotenz** | Header/Key für Writes; Pflicht für Integrations-Retries |
 | **OpenAPI** | Client-Generierung (`fineract-client`); Dummy/DTO-Typen für Spec |
-| **Compatibility** | Neue Command-Pipeline darf REST-Verträge nicht brechen |
+| **DTO Composition** | Spezialisierte API-DTOs **komponieren** Shared-Felder statt tiefer Vererbung ([ADR-015](08_design_decisions.md)) |
+| **Compatibility** | Neue Command-Pipeline und DTO-Refactors dürfen REST-JSON-Verträge nicht brechen (flach halten) |
 | **Correlation** | `X-Correlation-ID` für Support-Fälle |
+
+### API-DTO Composition (ADR-015)
+
+Historisch erben viele Response-/Request-Objekte von Shared-Parents (`DepositProductData`, `CommandProcessingResult`, …). fineract-osgi stellt schrittweise auf **Composition** um:
+
+```mermaid
+flowchart LR
+    subgraph Shared
+      SPD[DepositProductData / InteropRequestData / SmsCampaignDto]
+    end
+    subgraph Specialized
+      FD[FixedDepositProductData]
+      RQ[InteropQuoteRequestData]
+      SMS[SmsCampaignCreationDto]
+    end
+    SPD -->|compose + flatten fields| FD
+    SPD -->|nested component + getters| RQ
+    SPD -->|JsonUnwrapped / toCommandMap| SMS
+    FD -->|Gson flat JSON| API[REST Client]
+    RQ --> API
+    SMS --> API
+```
+
+| Regel | Bedeutung |
+|-------|-----------|
+| **Wire-Form bleibt flach** | JSON enthält `id`, `state`, `depositAmount` auf Root-Ebene – keine Pflicht zu `product.id` |
+| **GET ≠ CommandResult** | Read-only Interop-DTOs erben nicht mehr von `CommandProcessingResult` |
+| **Write-Pipeline behält CPR** | Responses, die durch `logCommandSource` laufen, bleiben CPR-Subtypen; Shared-Interop-Felder werden flach kopiert |
+| **Gson SPI** | `FineractGsonTypeAdapterRegistrar` + `ServiceLoader` in `GoogleGsonSerializerHelper` – Module registrieren Flatten-Adapter ohne Core-Änderung |
+| **Jackson wo Jackson bindet** | Request-Bodies mit `@JsonUnwrapped`; Gson-Command-Re-Serialisierung ggf. über flache Map |
+
+Shared-Typen (`DepositProductData`, `DepositAccountData`, `InteropRequestData`) bleiben für Lookup, Mapper-Basiszeilen und Composition-Quellen erhalten.
 
 ### Integrationsregeln
 
 - Clients senden Tenant + Auth + Idempotency Key bei Writes.
 - Breaking Changes nur versioniert; OSGi-Extensions dürfen öffentliche API nicht still verändern.
+- DTO-Refactors müssen bestehende JSON-Feldnamen und Partial-Response-Parameter respektieren.
 - Externe KI ist **kein** Teil der stabilen Banking-API – eigene Facades/DTOs.
 
 ---
@@ -568,6 +602,7 @@ sequenceDiagram
 | Multi-Tenancy | Security, Isolation, SaaS-Skalierung |
 | Security & Audit | Vertraulichkeit, Compliance, Nachvollziehbarkeit |
 | CQRS / Commands | Skalierbarkeit Writes/Reads, Maintainability |
+| API-DTO Composition | Maintainability, Compatibility (flache JSON-Verträge) |
 | OSGi | Extensibility, Maintainability, Deployment-Flexibilität |
 | KI-Integration | Extensibility, Innovation ohne Core-Komplexität |
 | Observability | Operability, Performance-Diagnose |
@@ -584,6 +619,7 @@ sequenceDiagram
 - Correlation-ID verpflichtend in Worker-Messaging
 - Policy-as-Code für Fail-Open/Fail-Closed pro Produkt
 - Cache-/Idempotency-Store-Entscheidung (DB only vs. Redis)
+- Weitere DTO-Hierarchien auf Composition migrieren (Loan/Savings-Product wo sinnvoll); ggf. generierte OpenAPI-Modelle angleichen
 
 ---
 

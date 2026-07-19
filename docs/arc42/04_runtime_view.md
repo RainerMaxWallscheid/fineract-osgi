@@ -54,12 +54,12 @@ Erstellung eines neuen Kreditantrags über die REST-API. Das Szenario zeigt den 
    Loan-Application-Entity wird angelegt; verknüpfte Daten (Charges, Collaterals, Schedule-Vorbereitung)  
    werden in **PostgreSQL** in einer Transaktion geschrieben.
 8. **Command Result & Audit-Abschluss**  
-   `CommandProcessingResult` (Resource-ID, Changes) wird serialisiert; Command-Status → `PROCESSED`.
+   `CommandProcessingResult` (Resource-ID, Changes) – ggf. als spezialisierter Subtyp mit **flach komponierten** Domain-Feldern (Interop Quote/Transfer, Identifier-Account) – wird serialisiert; Command-Status → `PROCESSED`.
 9. **Event Publishing**  
    Business Event / Hook (z. B. Loan Created).  
    Optional: asynchroner Consumer ruft **externe KI-Analyse** (Scoring, Fraud-Hints) auf – ohne den Write-Pfad zu blockieren.
 10. **HTTP Response**  
-    Client erhält `200/201` mit Loan-ID und Status.
+    Client erhält `200/201` mit Loan-ID und Status (Gson-Serialisierung; Wire-JSON bleibt flach, siehe [ADR-015](08_design_decisions.md)).
 
 ### Sequenzdiagramm
 
@@ -122,6 +122,7 @@ Eigenschaften:
 - Zentrale Idempotency- und Maker-Checker-Logik
 - Starke Kopplung an Gson-Helfer und String-Keys
 - Synchrone Ausführung im Request-Thread (Retry via Resilience4j möglich)
+- Response-DTOs: wo sinnvoll **Composition statt Vererbung** (Shared-Felder flach in Spezialtypen; GET-only ohne CPR-Vererbung) – [ADR-015](08_design_decisions.md), Crosscutting [6.13](06_crosscutting_concepts.md)
 
 ### 4.3.2 Neuer Command-Stack (`fineract-command`)
 
@@ -136,6 +137,7 @@ REST (Spring MVC, DTO)
 Eigenschaften:
 
 - **Typsichere** `Command<REQ>`-Payloads und Jakarta Validation
+- Request-DTOs bevorzugt als **Composition** (Shared-Komponente + create/update-spezifische Felder), nicht als tiefe Vererbung
 - Austauschbare Dispatcher: synchron, asynchron, LMAX Disruptor
 - Hooks für Cross-Cutting (Username, Timestamp, Headers, Audit)
 - Migration schrittweise pro Modul, REST-API bleibt rückwärtskompatibel

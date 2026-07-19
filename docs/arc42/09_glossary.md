@@ -55,10 +55,13 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **Disruptor** | T | LMAX Disruptor – optionale hochperformante, non-blocking Command-Dispatcher-Variante. |
 | **Docker Compose** | B | Orchestrierung lokaler Multi-Container-Setups; Referenzdateien `docker-compose*.yml`. → [05](05_deployment_view.md) |
 | **DTO** | T | *Data Transfer Object* – typisierte Nutzlast zwischen API, Command und Domain (Ziel des neuen Command-Stacks). |
+| **DTO Composition** | A | Spezialisierte API-DTOs halten Shared-Felder als Komponente oder flache Kopie statt durch Vererbung; Wire-JSON bleibt flach. → [08 ADR-015](08_design_decisions.md) |
 | **Equinox** | T | Eclipse OSGi-Framework, in fineract-osgi als OSGi-Runtime vorgesehen. → [05](05_deployment_view.md), [08](08_design_decisions.md) |
 | **External Event** | T | Für Systeme außerhalb des Prozesses publiziertes Ereignis (Kafka/JMS). |
 | **Fail-Closed** | A | Bei Fehler/Timeout des Downstream (z. B. KI) wird die Operation **abgelehnt**. → [06](06_crosscutting_concepts.md) |
 | **Fail-Open** | A | Bei Fehler/Timeout läuft die Kernoperation **weiter** (Default für async KI). → [08](08_design_decisions.md) |
+| **Flatten (API JSON)** | T | Serialisierung komponierter DTOs so, dass Shared- und Spezialfelder auf Root-Ebene erscheinen (Gson/Jackson), ohne Breaking Change. → [ADR-015](08_design_decisions.md) |
+| **FineractGsonTypeAdapterRegistrar** | T | SPI-Interface in `fineract-core`; Module registrieren Gson-TypeAdapter via `ServiceLoader` in `GoogleGsonSerializerHelper`. → [06.13](06_crosscutting_concepts.md) |
 | **Feature Bundle** | T | OSGi-Bundle mit optionaler Fach-/Integrationsfunktion (KI, Produktregeln, …). |
 | **fineract-command** | T | Modul für den modernen, typsicheren Command-Stack parallel zur Legacy-Pipeline. |
 | **fineract-osgi** | A | Dieser Arbeitsstrang/Fork: Fineract-Kern + OSGi-Modularität + KI-Erweiterbarkeit. → [01](01_introduction.md) |
