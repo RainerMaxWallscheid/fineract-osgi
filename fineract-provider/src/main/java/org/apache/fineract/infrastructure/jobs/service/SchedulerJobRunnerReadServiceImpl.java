@@ -99,8 +99,11 @@ public class SchedulerJobRunnerReadServiceImpl implements SchedulerJobRunnerRead
         }
         sqlBuilder.append(" = ?");
         if (searchParameters.hasOrderBy()) {
-            sqlBuilder.append(" order by ").append(searchParameters.getOrderBy());
-            this.columnValidator.validateSqlInjection(sqlBuilder.toString(), searchParameters.getOrderBy());
+            // Qualify columns: both job and runHistory have "id"/"version", so a bare
+            // "order by id" is ambiguous and can return a non-latest history row.
+            final String orderBy = qualifyJobHistoryOrderBy(searchParameters.getOrderBy());
+            sqlBuilder.append(" order by ").append(orderBy);
+            this.columnValidator.validateSqlInjection(sqlBuilder.toString(), orderBy);
             if (searchParameters.hasSortOrder()) {
                 sqlBuilder.append(' ').append(searchParameters.getSortOrder());
                 this.columnValidator.validateSqlInjection(sqlBuilder.toString(), searchParameters.getSortOrder());
@@ -144,6 +147,25 @@ public class SchedulerJobRunnerReadServiceImpl implements SchedulerJobRunnerRead
             case ID -> jobDetailRepository.existsById(Long.valueOf(jobId));
             case SHORT_NAME -> jobDetailRepository.existsByShortName(jobId);
             default -> false;
+        };
+    }
+
+    /**
+     * Map client orderBy values onto unambiguous runHistory columns. The join selects from both {@code job} and
+     * {@code runHistory}, which both expose {@code id} and {@code version}.
+     */
+    static String qualifyJobHistoryOrderBy(final String orderBy) {
+        if (orderBy == null) {
+            return null;
+        }
+        return switch (orderBy) {
+            case "id" -> "runHistory.id";
+            case "version" -> "runHistory.version";
+            case "jobRunStartTime", "runStartTime", "start_time" -> "runHistory.start_time";
+            case "jobRunEndTime", "runEndTime", "end_time" -> "runHistory.end_time";
+            case "status" -> "runHistory.status";
+            case "triggerType", "trigger_type" -> "runHistory.trigger_type";
+            default -> orderBy;
         };
     }
 

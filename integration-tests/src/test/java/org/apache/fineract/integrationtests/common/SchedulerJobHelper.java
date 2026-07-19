@@ -243,20 +243,29 @@ public class SchedulerJobHelper {
         final Duration pause = Duration.ofSeconds(1);
         // Await a new completed run-history entry for this job. The history id is
         // monotonic and avoids false positives from timestamp precision.
-        Map<String, Object> finalRunHistory = await().atMost(timeout) //
-                .pollInterval(pause) //
-                .pollDelay(pause) //
-                .until(() -> getLatestJobRunHistory(jobId), //
-                        lastRunHistory -> {
-                            if (lastRunHistory == null || lastRunHistory.get("jobRunEndTime") == null) {
-                                return false;
-                            }
-                            Long jobRunHistoryId = getRunHistoryId(lastRunHistory);
-                            if (jobRunHistoryId == null) {
-                                return false;
-                            }
-                            return previousRunHistoryId == null || jobRunHistoryId > previousRunHistoryId;
-                        });
+        Map<String, Object> finalRunHistory;
+        try {
+            finalRunHistory = await().atMost(timeout) //
+                    .pollInterval(pause) //
+                    .pollDelay(Duration.ZERO) //
+                    .alias("job " + jobId + " new run history after id=" + previousRunHistoryId) //
+                    .until(() -> getLatestJobRunHistory(jobId), //
+                            lastRunHistory -> {
+                                if (lastRunHistory == null || lastRunHistory.get("jobRunEndTime") == null) {
+                                    return false;
+                                }
+                                Long jobRunHistoryId = getRunHistoryId(lastRunHistory);
+                                if (jobRunHistoryId == null) {
+                                    return false;
+                                }
+                                return previousRunHistoryId == null || jobRunHistoryId > previousRunHistoryId;
+                            });
+        } catch (Exception e) {
+            Map<String, Object> latest = getLatestJobRunHistory(jobId);
+            fail("Timed out waiting for jobId=" + jobId + " new run history after previousId=" + previousRunHistoryId
+                    + ", latest=" + latest, e);
+            return;
+        }
 
         // Verify triggerType
         MatcherAssert.assertThat(finalRunHistory.get("triggerType"), is("application"));
