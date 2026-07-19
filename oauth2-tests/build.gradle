@@ -83,6 +83,8 @@ cargo {
             property 'cargo.tomcat.connector.clientAuth', false
             property 'cargo.protocol', 'https'
             property 'cargo.servlet.port', 8443
+            // Avoid clashes with integration-tests / twofactor-tests Cargo instances
+            property 'cargo.rmi.port', 8216
         }
     }
 }

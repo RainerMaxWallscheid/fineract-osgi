@@ -87,6 +87,7 @@ cargo {
             property 'cargo.tomcat.connector.clientAuth', false
             property 'cargo.protocol', 'https'
             property 'cargo.servlet.port', 8443
+            property 'cargo.rmi.port', 8205
         }
     }
 }
