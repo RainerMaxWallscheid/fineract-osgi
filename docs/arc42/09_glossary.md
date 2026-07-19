@@ -63,6 +63,8 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **DTO Composition** | A | Spezialisierte API-DTOs halten Shared-Felder als Komponente oder flache Kopie statt durch Vererbung; Wire-JSON bleibt flach. → [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md) |
 | **EclipseLink** | T | JPA-Provider in fineract-osgi (statt Hibernate); Static Weaving, Spring `EclipseLinkJpaVendorAdapter`. → [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md) |
 | **Equinox** | T | Eclipse OSGi-Framework, in fineract-osgi als OSGi-Runtime vorgesehen. → [05](05_deployment_view.md), [08](08_design_decisions.md) |
+| **Event Sourcing** | A | Persistenzmuster: Zustand als append-only Sequenz von Domain Events; Pflicht für Domain-Writes. → [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) |
+| **Event Store** | T | Append-only Speicher der Aggregat-Event-Streams (Write Source of Truth). → [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) |
 | **External Event** | T | Für Systeme außerhalb des Prozesses publiziertes Ereignis (Kafka/JMS). |
 | **Fail-Closed** | A | Bei Fehler/Timeout des Downstream (z. B. KI) wird die Operation **abgelehnt**. → [06](06_crosscutting_concepts.md) |
 | **Fail-Open** | A | Bei Fehler/Timeout läuft die Kernoperation **weiter** (Default für async KI). → [08](08_design_decisions.md) |

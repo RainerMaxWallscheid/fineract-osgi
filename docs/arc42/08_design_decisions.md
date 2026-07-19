@@ -42,6 +42,7 @@ Die einzelnen ADRs liegen unter [`decisions/`](decisions/) – **eine Datei pro 
 | [ADR-017](decisions/ADR-017-hexagonale-architektur.md) | Hexagonale Architektur | accepted | Ports & Adapters als Leitbild; Mapping auf CQRS/OSGi/KI |
 | [ADR-018](decisions/ADR-018-clean-code.md) | Clean Code | accepted | Lesbarer, testbarer Code; Boy Scout; SOLID als Orientierung |
 | [ADR-019](decisions/ADR-019-domain-driven-design.md) | Domain-Driven Design | accepted | Bounded Contexts, Aggregates, UL; pragmatisch mit CQRS/Hexagon |
+| [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) | Event Sourcing Writes | accepted | Create/Update/Delete event-sourced; Journal/Reads als Projektionen |
 
 ```mermaid
 flowchart TB
@@ -61,6 +62,9 @@ flowchart TB
     ADR004 --> ADR019[ADR-019 DDD]
     ADR017 --> ADR019
     ADR018 --> ADR019
+    ADR004 --> ADR020[ADR-020 Event Sourcing]
+    ADR016 --> ADR020
+    ADR019 --> ADR020
     ADR002 --> ADR005[ADR-005 Externe KI]
     ADR005 --> ADR006[ADR-006 Async KI]
     ADR003 --> ADR007[ADR-007 Node Modes]
@@ -80,7 +84,8 @@ flowchart TB
 | Thema | Status | Kommentar |
 |-------|--------|-----------|
 | Kompletter Microservice-Schnitt pro Domain | deferred | Transaktions- und COB-Konsistenz zu teuer als Start |
-| Event Sourcing als Ledger | rejected (jetzt) | Anderes Paradigma; Double-Entry bleibt relational |
+| Event Store **ersetzt** Accounting-Journal | rejected | Double-Entry bleibt relational; siehe [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) |
+| Event Sourcing nur optional | rejected | [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md): Pflicht für Domain-Writes |
 | Embedded ML im Provider | rejected | [ADR-005](decisions/ADR-005-externe-ki-xai-grok-statt-embedded-ml.md) |
 | Big-Bang Command-Migration | rejected | [ADR-004](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) |
 | Redis-Idempotency store | deferred | Erst nach stabilem neuem Command-Stack bewerten |
@@ -114,6 +119,7 @@ flowchart TB
 | 017 Hexagon | + | | | | ++ | ++ | | | + |
 | 018 Clean Code | + | | + | | ++ | | | + | + |
 | 019 DDD | ++ | | + | | ++ | + | | | + |
+| 020 Event Sourcing | ++ | + | + | ± | + | + | ± | ± | ± |
 
 *(++ stark positiv, + positiv, ± gemischt/Trade-off)*
 
@@ -164,6 +170,7 @@ Details: [`decisions/README.md`](decisions/README.md).
 | [ADR-017](decisions/ADR-017-hexagonale-architektur.md) Hexagon | Modul-Reviews Dependency Rule; Domain-Unit-Tests mit Fake-Ports |
 | [ADR-018](decisions/ADR-018-clean-code.md) Clean Code | Review-Checkliste; Spotless/CI; Boy Scout in angefassten Diffs |
 | [ADR-019](decisions/ADR-019-domain-driven-design.md) DDD | Context/Aggregate in Reviews; Gherkin-UL; Domain-Events nach Commit |
+| [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) Event Sourcing | Event-Store-Port; Pilot-Aggregat; Projector-/Idempotenz-ITs |
 
 ---
 

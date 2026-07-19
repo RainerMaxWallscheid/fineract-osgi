@@ -54,10 +54,11 @@ Erstellung eines neuen Kreditantrags über die REST-API. Das Szenario zeigt den 
    Loan-Application-Entity wird angelegt; verknüpfte Daten (Charges, Collaterals, Schedule-Vorbereitung)  
    werden in **PostgreSQL** in einer Transaktion geschrieben.
 8. **Command Result & Audit-Abschluss**  
-   `CommandProcessingResult` (Resource-ID, Changes) – ggf. als spezialisierter Subtyp mit **flach komponierten** Domain-Feldern (Interop Quote/Transfer, Identifier-Account) – wird serialisiert; Command-Status → `PROCESSED`.
+   `CommandProcessingResult` (Resource-ID, Changes) – ggf. als spezialisierter Subtyp mit **flach komponierten** Domain-Feldern – wird serialisiert; Command-Status → `PROCESSED`.  
+   Zielbild ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)): zustandsändernde Commands **appenden Domain Events** in den Event Store; Projektionen aktualisieren Read Models / Journal.
 9. **Event Publishing**  
-   Business Event / Hook (z. B. Loan Created).  
-   Optional: asynchroner Consumer ruft **externe KI-Analyse** (Scoring, Fraud-Hints) auf – ohne den Write-Pfad zu blockieren.
+   Domain-/Business Events (aus dem Stream bzw. nach Append) → Hooks / External Events.  
+   Optional: asynchroner Consumer ruft **externe KI-Analyse** auf – ohne den Write-Pfad zu blockieren.
 10. **HTTP Response**  
     Client erhält `200/201` mit Loan-ID und Status (Gson-Serialisierung; Wire-JSON bleibt flach, siehe [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)).
 
@@ -106,7 +107,8 @@ sequenceDiagram
 Schreibende Operationen laufen über CQRS. fineract-osgi behält den **Legacy-Pfad** und baut parallel den **typsicheren Command-Stack** (`fineract-command`) aus.
 
 Im **hexagonalen Leitbild** ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)) sind REST/Batch **Driving Adapters**, Command Handler **Application**, Domain-Services **Domain**, JPA/JDBC/Events/KI **Driven Adapters**.  
-**DDD** ([ADR-019](decisions/ADR-019-domain-driven-design.md)): der Handler orchestriert typisch **ein Aggregat** (z. B. Loan) pro Command; Nebenwirkungen (Accounting, Events) bewusst und nach Invarianten.
+**DDD** ([ADR-019](decisions/ADR-019-domain-driven-design.md)): der Handler orchestriert typisch **ein Aggregat** (z. B. Loan) pro Command; Nebenwirkungen (Accounting, Events) bewusst und nach Invarianten.  
+**Event Sourcing** ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)): Create/Update/Delete des Aggregates appenden Domain Events (Write-SoT); Read Models und Journal sind Projektionen.
 
 ### 4.3.1 Legacy-Pfad (heutiger Default)
 

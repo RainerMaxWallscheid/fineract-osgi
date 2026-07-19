@@ -117,8 +117,8 @@ flowchart TB
 |--------------|----------------------|
 | **Driving** | REST Resources, Actuator, COB/Batch-Entry, OSGi-Eingänge |
 | **Application** | Security/Tenant-Filter, Command-Pipelines, Job-Orchestrierung |
-| **Domain** | Loan, Savings, Accounting, Client, … (DDD Aggregates / Domain Services) |
-| **Driven** | JPA/JDBC (`fineract-core`), Validation, COB-Infra, Events/Hooks/Messaging/KI |
+| **Domain** | Loan, Savings, Accounting, Client, … (DDD Aggregates; Write-Events) |
+| **Driven** | Event Store (Ziel), JPA/JDBC Projectors & Reads, Validation, COB, Hooks/Messaging/KI |
 | **Steckbar** | Equinox Feature-Bundles hinter Service-Registry-Ports |
 
 ### 3.2.1 Application Shell

@@ -94,24 +94,22 @@ flowchart LR
 | Option | Bewertung |
 |--------|-----------|
 | Nur technische Schichten ohne DDD | Fachliche Grenzen bleiben implizit |
-| Event Sourcing als Default | Abgelehnt/deferred; Double-Entry bleibt relational |
 | Microservices pro Bounded Context sofort | Zu teuer; Hexagon/Module reichen zuerst |
 | Striktes DDD-Framework (z. B. erzwungene Base-Klassen) | Overhead; Fineract-Patterns reichen |
 
 ### Konsequenzen
 
 - **+** Gemeinsame Fach- und Modellsprache für Teams und Agenten  
-- **+** Passt zu CQRS, Hexagon, JPA-Write/JDBC-Read, Clean Code  
-- **+** Bessere Review-Fragen: „Welches Aggregat? Welcher Context?“  
+- **+** Passt zu CQRS, Hexagon, Clean Code; Write-Modell künftig event-sourced ([ADR-020](ADR-020-event-sourcing-writes-pflicht.md))  
+- **+** Bessere Review-Fragen: „Welches Aggregat? Welcher Context? Welche Events?“  
 - **−** Bestand oft anämisch / service-lastig – Migration inkrementell  
 - **−** Risiko übermodellierter Aggregates – Pragmatismus und Performance (COB) beachten  
 
 ### Non-Goals
 
-- Event Sourcing oder CQRS-pur mit separatem Event Store als Pflicht  
 - Umbenennen aller Packages nach `domain`/`application` in einem Schritt  
 - Ein Aggregat für „das ganze Portfolio“  
-- Ersetzen von Accounting-Double-Entry durch „reine“ Domain-Events ohne Journal  
+- Ersetzen von Accounting-Double-Entry durch Domain-Events **ohne** Journal-Projektion (Journal bleibt, siehe [ADR-020](ADR-020-event-sourcing-writes-pflicht.md))  
 
 ### Bezug
 
@@ -119,6 +117,7 @@ flowchart LR
 - [ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md) Persistenz  
 - [ADR-017](ADR-017-hexagonale-architektur.md) Hexagon  
 - [ADR-018](ADR-018-clean-code.md) Clean Code / Ubiquitous Language  
+- [ADR-020](ADR-020-event-sourcing-writes-pflicht.md) Event Sourcing für Writes (Pflicht)  
 - Building Blocks [03](../03_building_block_view.md) · Runtime [04](../04_runtime_view.md) · Crosscutting [06](../06_crosscutting_concepts.md)
 
 ---

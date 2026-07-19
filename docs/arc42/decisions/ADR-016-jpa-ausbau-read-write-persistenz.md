@@ -28,11 +28,13 @@ Bereits vorhanden und zu nutzen:
 
 | Pfad | Technologie | Verantwortung |
 |------|-------------|----------------|
-| **Write / Domain** | Spring Data JPA + EclipseLink | Aggregates, Commands, Transaktionen, Optimistic Locking |
-| **Einfache Reads** | JPA Projection / Specs / EntityGraph | Lookup, kleine Listen, Filter-APIs |
-| **Komplexe Reads / Reports / COB-SQL** | JdbcTemplate, SQL, ggf. DB-Views | Performance, DB-spezifische SQL, Partial Response |
+| **Write / Domain (Ziel)** | **Event Sourcing** ([ADR-020](ADR-020-event-sourcing-writes-pflicht.md)) | Append-only Event Store; Aggregates entscheiden Events |
+| **Write / Domain (Übergang)** | Spring Data JPA + EclipseLink | Legacy-State bis Aggregat-Cutover; kein neues State-only ohne Event-Plan |
+| **Snapshots / materialisierter Zustand** | JPA oder SQL-Tabellen | Abgeleitet aus Events; Performance |
+| **Einfache Reads** | JPA Projection / Specs / EntityGraph / Projector-Tabellen | Lookup, kleine Listen, Filter-APIs |
+| **Komplexe Reads / Reports / COB-SQL / Journal** | JdbcTemplate, SQL, ggf. DB-Views | Performance; Accounting-Double-Entry relational |
 
-Der Hybrid ist **gewollt**, kein reiner Übergangszustand.
+Der Hybrid **Read vs. Write** bleibt; die **Write-Source-of-Truth** wandert zu Events (Pflicht im Zielbild).
 
 #### Provider und Stack (fix)
 
@@ -72,7 +74,7 @@ Der Hybrid ist **gewollt**, kein reiner Übergangszustand.
 | Provider-Wechsel zu Hibernate | Hohes Risiko, EclipseLink-spezifischer Code und Weaving |
 | **EMF pro Tenant** | Memory/Startup; RoutingDataSource reicht für Isolation der DB |
 | Globaler Second-Level-Cache | Stale Data + Multi-Tenant |
-| JPA als Pflicht für den gesamten neuen Command-Stack in einem Big-Bang | Blockiert Migration ohne Mehrwert |
+| JPA als alleinige **dauerhafte** Write-Source-of-Truth | Widerspricht [ADR-020](ADR-020-event-sourcing-writes-pflicht.md); JPA bleibt für Snapshots/Reads/Übergang |
 | Ersetzen von Spring Batch / Job-SQL durch JPA-only COB | Andere Last- und Isolation-Profile |
 
 ### Alternativen
@@ -111,6 +113,7 @@ Empfohlene Reihenfolge: **S1 in 1–2 Pilotmodulen** (z. B. Client + ein Loan-Lo
 - [ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) CQRS / Commands  
 - [ADR-008](ADR-008-multi-tenancy-mit-getrennten-tenant-datenbanken.md) Multi-Tenancy  
 - [ADR-009](ADR-009-postgresql-als-primaere-datenbank-fuer-fineract-osgi.md) PostgreSQL  
+- [ADR-020](ADR-020-event-sourcing-writes-pflicht.md) Event Sourcing Writes (Pflicht)  
 - Crosscutting Data Access: [06.12](../06_crosscutting_concepts.md) · Quality Maintainability/Perf: [07](../07_quality_attributes.md)
 
 ---

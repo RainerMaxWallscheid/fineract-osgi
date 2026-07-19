@@ -25,6 +25,7 @@ Crosscutting Concepts sind architekturweite Lösungsansätze, die **mehrere Baus
 | 13 | Hexagonale Architektur | Dependency Rule, austauschbare Ränder | Ports & Adapters, CQRS, OSGi, KI |
 | 14 | Clean Code | Lesbarkeit, Testbarkeit, sichere Evolution | Namen, kleine Einheiten, Boy Scout, SOLID, CI |
 | 15 | Domain-Driven Design | Fachliche Modelle und Context-Grenzen | Aggregates, UL, Events, Bounded Contexts |
+| 16 | Event Sourcing (Writes) | Append-only Write-Historie | Event Store, Projectors, Snapshots |
 
 ```mermaid
 flowchart TB
@@ -501,7 +502,7 @@ Beispiele: Loan COB on/off, External Events, Correlation IDs, IP Tracking, Journ
 - Tenants-DB nur für Routing/Metadaten; Fachdaten in Tenant-DB.
 - Optional Read-only Replica-Parameter pro Tenant.
 - **JPA-Stack**: Spring Data JPA + **EclipseLink** (Hibernate excluded); Multi-Tenant über `RoutingDataSource`, eine EMF.
-- **CQRS-Persistenz** ([ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md)): Writes/Domain → JPA; einfache Reads → Projection/Specs; schwere Reads/COB → JdbcTemplate/SQL. Ausbau in Stufen **S1** (Hygiene) und **S2** (Performance), kein Big-Bang „alles JPA“.
+- **CQRS-Persistenz** ([ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md), [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)): **Writes** im Zielbild → **Event Sourcing** (Create/Update/Delete); JPA/SQL für Snapshots, Read Models und Journal; schwere Reads/COB → JdbcTemplate/SQL. JPA-Hygiene **S1/S2** bleibt für Projectors/Legacy-Übergang.
 
 ### Transaktionen
 
@@ -622,7 +623,33 @@ DDD sitzt im **Domain- und Application-Ring** des Hexagons ([ADR-017](decisions/
 
 ---
 
-## 6.16 API-Stil, DTO Composition, Idempotenz & Compatibility
+## 6.16 Event Sourcing (Write-Pflicht)
+
+### Motivation
+
+Create/Update/Delete an Domain-Aggregates sollen eine **vollständige, append-only Historie** haben – nicht nur den aktuellen Zustand ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)).
+
+### Pflicht
+
+| Operation | Write-Modell |
+|-----------|--------------|
+| Create / Update / Delete / Transition | Domain Events in Event Store (Source of Truth) |
+| Command | Entscheidet Events; Optimistic Concurrency auf Stream-Version |
+| Read / Report / Journal | **Projektionen** (JDBC/JPA-Tabellen); Journal bleibt relational |
+
+### Abgrenzung
+
+- **Nicht** Event Store = alleiniges Accounting-Ledger.  
+- **Nicht** Replay pro GET.  
+- Migration **Strangler** (ES0–ES4): Greenfield zuerst, Kern-Aggregates schrittweise.
+
+### Bezug
+
+Commands [6.4](06_crosscutting_concepts.md) · DDD [6.15](06_crosscutting_concepts.md) · Persistenz [6.12](06_crosscutting_concepts.md) · Runtime [04.3](04_runtime_view.md)
+
+---
+
+## 6.17 API-Stil, DTO Composition, Idempotenz & Compatibility
 
 | Thema | Konzept |
 |-------|---------|
@@ -675,7 +702,7 @@ Shared-Typen (`DepositProductData`, `DepositAccountData`, `InteropRequestData`) 
 
 ---
 
-## 6.17 Zusammenspiel der Konzepte (Beispielfluss)
+## 6.18 Zusammenspiel der Konzepte (Beispielfluss)
 
 Loan Creation mit optionaler KI – Crosscutting-Schichten:
 
@@ -705,7 +732,7 @@ sequenceDiagram
 
 ---
 
-## 6.18 Qualitätsbezug
+## 6.19 Qualitätsbezug
 
 | Crosscutting Concept | Unterstützte Qualität ([Kap. 7](07_quality_attributes.md)) |
 |----------------------|--------------------------------------------------------------|
@@ -716,6 +743,7 @@ sequenceDiagram
 | Hexagonale Architektur | Maintainability, Extensibility, Testability |
 | Clean Code | Maintainability, Reliability, Testability |
 | Domain-Driven Design | Correctness, Maintainability, Extensibility |
+| Event Sourcing (Writes) | Correctness, Reliability, Auditierbarkeit |
 | OSGi | Extensibility, Maintainability, Deployment-Flexibilität |
 | KI-Integration | Extensibility, Innovation ohne Core-Komplexität |
 | Observability | Operability, Performance-Diagnose |
@@ -724,7 +752,7 @@ sequenceDiagram
 
 ---
 
-## 6.19 Offene Punkte / nächste Iterationen
+## 6.20 Offene Punkte / nächste Iterationen
 
 - Einheitliches **Outbox-Pattern** für External Events (exactly-once / at-least-once klar definieren)
 - Standard-Interfaces für OSGi Extension Points (API-Bundle versioniert)
@@ -735,10 +763,11 @@ sequenceDiagram
 - Weitere DTO-Hierarchien auf Composition migrieren (Loan/Savings-Product wo sinnvoll); ggf. generierte OpenAPI-Modelle angleichen
 - Hexagon E3: Ports an Persistenz-/Event-/KI-Hotspots extrahieren; Dependency-Rule in Reviews/ArchUnit
 - DDD D3: Aggregatgrenzen Loan/Savings/Accounting schärfen; Context-Map für Interop/KI dokumentieren
+- Event Sourcing ES0/ES1: Event-Store-Port, Metamodell, Greenfield-Pflicht; Pilot-Aggregat (ES2)
 
 ---
 
-## 6.20 Verwandte Gherkin-Features
+## 6.21 Verwandte Gherkin-Features
 
 | Konzept | Feature |
 |---------|---------|
