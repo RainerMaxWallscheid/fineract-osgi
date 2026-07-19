@@ -95,10 +95,24 @@ buildscript {
     }
     repositories {
         maven { url 'https://plugins.gradle.org/m2/' }
+        mavenCentral()
+    }
+
+    configurations.classpath {
+        resolutionStrategy {
+            // Cargo 1.9.x NPEs on File.list()/listFiles() == null (seen with Java 25 /
+            // incomplete extract dirs). Force a current Cargo for the Ant tasks used by
+            // the bmuschko cargo plugin.
+            force 'org.codehaus.cargo:cargo-core-uberjar:1.10.28'
+            force 'org.codehaus.cargo:cargo-ant:1.10.28'
+            force 'org.codehaus.cargo:cargo-daemon-client:1.10.28'
+            force 'org.codehaus.cargo:cargo-licensed-dtds:1.10.28'
+        }
     }
 
     dependencies {
         classpath 'com.bmuschko:gradle-cargo-plugin:2.9.0'
+        classpath 'org.codehaus.cargo:cargo-ant:1.10.28'
         classpath 'org.eclipse.persistence:eclipselink:4.0.9'
         classpath 'jakarta.ws.rs:jakarta.ws.rs-api:3.1.0'
         classpath 'com.google.cloud.tools:jib-layer-filter-extension-gradle:0.3.0'

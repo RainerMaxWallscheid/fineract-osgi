@@ -78,6 +78,8 @@ cargo {
             property 'cargo.tomcat.httpSecure', true
             property 'cargo.tomcat.connector.sslProtocol', 'TLS'
             property 'cargo.tomcat.connector.clientAuth', false
+            // Explicit value: Cargo 1.9 left the property name unsubstituted in server.xml
+            property 'cargo.tomcat.connector.emptySessionPath', 'false'
             property 'cargo.protocol', 'https'
             property 'cargo.servlet.port', 8443
             // Avoid clashes with integration-tests / oauth2-tests Cargo instances
