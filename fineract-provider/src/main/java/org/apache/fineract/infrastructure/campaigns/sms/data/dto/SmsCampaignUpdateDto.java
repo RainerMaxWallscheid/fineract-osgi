@@ -18,23 +18,107 @@
  */
 package org.apache.fineract.infrastructure.campaigns.sms.data.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Map;
 
+/**
+ * Update-campaign request: shared fields via composition ({@link SmsCampaignDto}) plus
+ * update-only {@code recurrence}.
+ * <p>
+ * See {@link SmsCampaignCreationDto} for Jackson vs Gson serialization notes.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SmsCampaignUpdateDto extends SmsCampaignDto {
+public final class SmsCampaignUpdateDto implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    @JsonUnwrapped
+    private SmsCampaignDto campaign = new SmsCampaignDto();
+
     private String recurrence;
 
-    @java.lang.SuppressWarnings("all")
-        public String getRecurrence() {
-        return this.recurrence;
+    public SmsCampaignUpdateDto() {}
+
+    @JsonIgnore
+    public SmsCampaignDto getCampaign() {
+        return campaign;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setRecurrence(final String recurrence) {
+    public void setCampaign(final SmsCampaignDto campaign) {
+        this.campaign = campaign != null ? campaign : new SmsCampaignDto();
+    }
+
+    public String getRecurrence() {
+        return recurrence;
+    }
+
+    public void setRecurrence(final String recurrence) {
         this.recurrence = recurrence;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public SmsCampaignUpdateDto() {
+    /**
+     * Flat payload for the legacy Gson command serializer (top-level field names).
+     */
+    public Map<String, Object> toCommandMap() {
+        final Map<String, Object> map = SmsCampaignDto.toCommandMap(campaign);
+        if (recurrence != null) {
+            map.put("recurrence", recurrence);
+        }
+        return map;
+    }
+
+    // --- convenience accessors (delegate to composed campaign) ---
+
+    public String getCampaignName() {
+        return campaign.getCampaignName();
+    }
+
+    public Long getCampaignType() {
+        return campaign.getCampaignType();
+    }
+
+    public Long getTriggerType() {
+        return campaign.getTriggerType();
+    }
+
+    public Long getRunReportId() {
+        return campaign.getRunReportId();
+    }
+
+    public String getMessage() {
+        return campaign.getMessage();
+    }
+
+    public SmsCampaignParamReq getParamValue() {
+        return campaign.getParamValue();
+    }
+
+    public String getRecurrenceStartDate() {
+        return campaign.getRecurrenceStartDate();
+    }
+
+    public String getSubmittedOnDate() {
+        return campaign.getSubmittedOnDate();
+    }
+
+    public Boolean getIsNotification() {
+        return campaign.getIsNotification();
+    }
+
+    public String getLocale() {
+        return campaign.getLocale();
+    }
+
+    public String getDateFormat() {
+        return campaign.getDateFormat();
+    }
+
+    public String getDateTimeFormat() {
+        return campaign.getDateTimeFormat();
     }
 }

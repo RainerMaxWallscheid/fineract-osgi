@@ -18,56 +18,143 @@
  */
 package org.apache.fineract.infrastructure.campaigns.sms.data.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Map;
 
+/**
+ * Create-campaign request: shared fields via composition ({@link SmsCampaignDto}) plus
+ * create-only scheduling attributes.
+ * <p>
+ * Jackson binds a flat JSON body onto the nested {@code campaign} via {@link JsonUnwrapped}.
+ * The command pipeline re-serializes with Gson, which does not understand {@code JsonUnwrapped};
+ * use {@link #toCommandMap()} for a flat map before Gson serialization.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SmsCampaignCreationDto extends SmsCampaignDto {
+public final class SmsCampaignCreationDto implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    @JsonUnwrapped
+    private SmsCampaignDto campaign = new SmsCampaignDto();
+
     private Long providerId;
     private String frequency;
     private String interval;
     private String repeatsOnDay;
 
-    @java.lang.SuppressWarnings("all")
-        public Long getProviderId() {
-        return this.providerId;
+    public SmsCampaignCreationDto() {}
+
+    @JsonIgnore
+    public SmsCampaignDto getCampaign() {
+        return campaign;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public String getFrequency() {
-        return this.frequency;
+    public void setCampaign(final SmsCampaignDto campaign) {
+        this.campaign = campaign != null ? campaign : new SmsCampaignDto();
     }
 
-    @java.lang.SuppressWarnings("all")
-        public String getInterval() {
-        return this.interval;
+    public Long getProviderId() {
+        return providerId;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public String getRepeatsOnDay() {
-        return this.repeatsOnDay;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public void setProviderId(final Long providerId) {
+    public void setProviderId(final Long providerId) {
         this.providerId = providerId;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setFrequency(final String frequency) {
+    public String getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(final String frequency) {
         this.frequency = frequency;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setInterval(final String interval) {
+    public String getInterval() {
+        return interval;
+    }
+
+    public void setInterval(final String interval) {
         this.interval = interval;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setRepeatsOnDay(final String repeatsOnDay) {
+    public String getRepeatsOnDay() {
+        return repeatsOnDay;
+    }
+
+    public void setRepeatsOnDay(final String repeatsOnDay) {
         this.repeatsOnDay = repeatsOnDay;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public SmsCampaignCreationDto() {
+    /**
+     * Flat payload for the legacy Gson command serializer (top-level field names).
+     */
+    public Map<String, Object> toCommandMap() {
+        final Map<String, Object> map = SmsCampaignDto.toCommandMap(campaign);
+        putIfPresent(map, "providerId", providerId);
+        putIfPresent(map, "frequency", frequency);
+        putIfPresent(map, "interval", interval);
+        putIfPresent(map, "repeatsOnDay", repeatsOnDay);
+        return map;
+    }
+
+    private static void putIfPresent(final Map<String, Object> map, final String key, final Object value) {
+        if (value != null) {
+            map.put(key, value);
+        }
+    }
+
+    // --- convenience accessors (delegate to composed campaign) ---
+
+    public String getCampaignName() {
+        return campaign.getCampaignName();
+    }
+
+    public Long getCampaignType() {
+        return campaign.getCampaignType();
+    }
+
+    public Long getTriggerType() {
+        return campaign.getTriggerType();
+    }
+
+    public Long getRunReportId() {
+        return campaign.getRunReportId();
+    }
+
+    public String getMessage() {
+        return campaign.getMessage();
+    }
+
+    public SmsCampaignParamReq getParamValue() {
+        return campaign.getParamValue();
+    }
+
+    public String getRecurrenceStartDate() {
+        return campaign.getRecurrenceStartDate();
+    }
+
+    public String getSubmittedOnDate() {
+        return campaign.getSubmittedOnDate();
+    }
+
+    public Boolean getIsNotification() {
+        return campaign.getIsNotification();
+    }
+
+    public String getLocale() {
+        return campaign.getLocale();
+    }
+
+    public String getDateFormat() {
+        return campaign.getDateFormat();
+    }
+
+    public String getDateTimeFormat() {
+        return campaign.getDateTimeFormat();
     }
 }

@@ -107,7 +107,9 @@ public class SmsCampaignApiResource {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CommandProcessingResult.class)))
     public CommandProcessingResult createCampaign(@Parameter(hidden = true) final SmsCampaignCreationDto smsCampaignCreationDto) {
         platformSecurityContext.authenticatedUser();
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createSmsCampaign().withJson(toApiJsonSerializer.serialize(smsCampaignCreationDto)).build();
+        // Flatten composed DTO: Gson does not honour Jackson @JsonUnwrapped.
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createSmsCampaign()
+                .withJson(toApiJsonSerializer.serialize(smsCampaignCreationDto.toCommandMap())).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
@@ -149,7 +151,9 @@ public class SmsCampaignApiResource {
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CommandWrapper.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CommandProcessingResult.class)))
     public CommandProcessingResult updateCampaign(@PathParam("campaignId") final Long campaignId, @Parameter(hidden = true) final SmsCampaignUpdateDto smsCampaignUpdateDto) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateSmsCampaign(campaignId).withJson(toApiJsonSerializer.serialize(smsCampaignUpdateDto)).build();
+        // Flatten composed DTO: Gson does not honour Jackson @JsonUnwrapped.
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateSmsCampaign(campaignId)
+                .withJson(toApiJsonSerializer.serialize(smsCampaignUpdateDto.toCommandMap())).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 

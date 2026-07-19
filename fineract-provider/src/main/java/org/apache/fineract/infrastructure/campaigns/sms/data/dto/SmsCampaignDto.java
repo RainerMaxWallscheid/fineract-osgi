@@ -21,11 +21,20 @@ package org.apache.fineract.infrastructure.campaigns.sms.data.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
+/**
+ * Shared SMS campaign request fields. Used by composition (not inheritance) in
+ * {@link SmsCampaignCreationDto} and {@link SmsCampaignUpdateDto}; Jackson flattens this
+ * via {@code @JsonUnwrapped} so the public JSON shape stays flat.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public abstract class SmsCampaignDto implements Serializable {
+public final class SmsCampaignDto implements Serializable {
+
     @Serial
     private static final long serialVersionUID = 1L;
+
     private String campaignName;
     private Long campaignType;
     private Long triggerType;
@@ -39,127 +48,130 @@ public abstract class SmsCampaignDto implements Serializable {
     private String dateFormat;
     private String dateTimeFormat;
 
-    @java.lang.SuppressWarnings("all")
-        public String getCampaignName() {
-        return this.campaignName;
+    public SmsCampaignDto() {}
+
+    /**
+     * Flat field map for Gson command serialization (no nested {@code campaign} object).
+     */
+    public static Map<String, Object> toCommandMap(final SmsCampaignDto campaign) {
+        final Map<String, Object> map = new LinkedHashMap<>();
+        if (campaign == null) {
+            return map;
+        }
+        putIfPresent(map, "campaignName", campaign.getCampaignName());
+        putIfPresent(map, "campaignType", campaign.getCampaignType());
+        putIfPresent(map, "triggerType", campaign.getTriggerType());
+        putIfPresent(map, "runReportId", campaign.getRunReportId());
+        putIfPresent(map, "message", campaign.getMessage());
+        putIfPresent(map, "paramValue", campaign.getParamValue());
+        putIfPresent(map, "recurrenceStartDate", campaign.getRecurrenceStartDate());
+        putIfPresent(map, "submittedOnDate", campaign.getSubmittedOnDate());
+        putIfPresent(map, "isNotification", campaign.getIsNotification());
+        putIfPresent(map, "locale", campaign.getLocale());
+        putIfPresent(map, "dateFormat", campaign.getDateFormat());
+        putIfPresent(map, "dateTimeFormat", campaign.getDateTimeFormat());
+        return map;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public Long getCampaignType() {
-        return this.campaignType;
+    private static void putIfPresent(final Map<String, Object> map, final String key, final Object value) {
+        if (value != null) {
+            map.put(key, value);
+        }
     }
 
-    @java.lang.SuppressWarnings("all")
-        public Long getTriggerType() {
-        return this.triggerType;
+    public String getCampaignName() {
+        return campaignName;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public Long getRunReportId() {
-        return this.runReportId;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public String getMessage() {
-        return this.message;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public SmsCampaignParamReq getParamValue() {
-        return this.paramValue;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public String getRecurrenceStartDate() {
-        return this.recurrenceStartDate;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public String getSubmittedOnDate() {
-        return this.submittedOnDate;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public Boolean getIsNotification() {
-        return this.isNotification;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public String getLocale() {
-        return this.locale;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public String getDateFormat() {
-        return this.dateFormat;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public String getDateTimeFormat() {
-        return this.dateTimeFormat;
-    }
-
-    @java.lang.SuppressWarnings("all")
-        public void setCampaignName(final String campaignName) {
+    public void setCampaignName(final String campaignName) {
         this.campaignName = campaignName;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setCampaignType(final Long campaignType) {
+    public Long getCampaignType() {
+        return campaignType;
+    }
+
+    public void setCampaignType(final Long campaignType) {
         this.campaignType = campaignType;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setTriggerType(final Long triggerType) {
+    public Long getTriggerType() {
+        return triggerType;
+    }
+
+    public void setTriggerType(final Long triggerType) {
         this.triggerType = triggerType;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setRunReportId(final Long runReportId) {
+    public Long getRunReportId() {
+        return runReportId;
+    }
+
+    public void setRunReportId(final Long runReportId) {
         this.runReportId = runReportId;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setMessage(final String message) {
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(final String message) {
         this.message = message;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setParamValue(final SmsCampaignParamReq paramValue) {
+    public SmsCampaignParamReq getParamValue() {
+        return paramValue;
+    }
+
+    public void setParamValue(final SmsCampaignParamReq paramValue) {
         this.paramValue = paramValue;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setRecurrenceStartDate(final String recurrenceStartDate) {
+    public String getRecurrenceStartDate() {
+        return recurrenceStartDate;
+    }
+
+    public void setRecurrenceStartDate(final String recurrenceStartDate) {
         this.recurrenceStartDate = recurrenceStartDate;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setSubmittedOnDate(final String submittedOnDate) {
+    public String getSubmittedOnDate() {
+        return submittedOnDate;
+    }
+
+    public void setSubmittedOnDate(final String submittedOnDate) {
         this.submittedOnDate = submittedOnDate;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setIsNotification(final Boolean isNotification) {
+    public Boolean getIsNotification() {
+        return isNotification;
+    }
+
+    public void setIsNotification(final Boolean isNotification) {
         this.isNotification = isNotification;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setLocale(final String locale) {
+    public String getLocale() {
+        return locale;
+    }
+
+    public void setLocale(final String locale) {
         this.locale = locale;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setDateFormat(final String dateFormat) {
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+    public void setDateFormat(final String dateFormat) {
         this.dateFormat = dateFormat;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setDateTimeFormat(final String dateTimeFormat) {
-        this.dateTimeFormat = dateTimeFormat;
+    public String getDateTimeFormat() {
+        return dateTimeFormat;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public SmsCampaignDto() {
+    public void setDateTimeFormat(final String dateTimeFormat) {
+        this.dateTimeFormat = dateTimeFormat;
     }
 }
