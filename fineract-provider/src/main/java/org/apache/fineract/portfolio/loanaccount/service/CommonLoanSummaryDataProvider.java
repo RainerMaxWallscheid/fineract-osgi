@@ -25,7 +25,7 @@ import java.util.Optional;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanSummaryData;
-import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionBalance;
+import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionBalanceView;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanScheduleData;
@@ -35,7 +35,7 @@ public abstract class CommonLoanSummaryDataProvider implements LoanSummaryDataPr
 
     @Override
     public LoanSummaryData withTransactionAmountsSummary(Loan loan, LoanSummaryData defaultSummaryData, LoanScheduleData repaymentSchedule,
-            Collection<? extends LoanTransactionBalance> loanTransactionBalances) {
+            Collection<? extends LoanTransactionBalanceView> loanTransactionBalances) {
         final LocalDate businessDate = DateUtils.getBusinessLocalDate();
 
         BigDecimal totalMerchantRefund = BigDecimal.ZERO;
@@ -56,35 +56,35 @@ public abstract class CommonLoanSummaryDataProvider implements LoanSummaryDataPr
         BigDecimal totalUnpaidPayableDueInterest = BigDecimal.ZERO;
         BigDecimal totalUnpaidPayableNotDueInterest = BigDecimal.ZERO;
 
-        totalChargeAdjustment = fetchLoanTransactionBalanceByType(loanTransactionBalances, LoanTransactionType.CHARGE_ADJUSTMENT);
-        totalChargeAdjustmentReversed = fetchLoanTransactionBalanceReversedByType(loanTransactionBalances,
+        totalChargeAdjustment = fetchLoanTransactionBalanceViewByType(loanTransactionBalances, LoanTransactionType.CHARGE_ADJUSTMENT);
+        totalChargeAdjustmentReversed = fetchLoanTransactionBalanceViewReversedByType(loanTransactionBalances,
                 LoanTransactionType.CHARGE_ADJUSTMENT);
 
-        totalChargeback = fetchLoanTransactionBalanceByType(loanTransactionBalances, LoanTransactionType.CHARGEBACK);
+        totalChargeback = fetchLoanTransactionBalanceViewByType(loanTransactionBalances, LoanTransactionType.CHARGEBACK);
 
-        totalCreditBalanceRefund = fetchLoanTransactionBalanceByType(loanTransactionBalances, LoanTransactionType.CREDIT_BALANCE_REFUND);
-        totalCreditBalanceRefundReversed = fetchLoanTransactionBalanceReversedByType(loanTransactionBalances,
+        totalCreditBalanceRefund = fetchLoanTransactionBalanceViewByType(loanTransactionBalances, LoanTransactionType.CREDIT_BALANCE_REFUND);
+        totalCreditBalanceRefundReversed = fetchLoanTransactionBalanceViewReversedByType(loanTransactionBalances,
                 LoanTransactionType.CREDIT_BALANCE_REFUND);
 
-        totalGoodwillCredit = fetchLoanTransactionBalanceByType(loanTransactionBalances, LoanTransactionType.GOODWILL_CREDIT);
-        totalGoodwillCreditReversed = fetchLoanTransactionBalanceReversedByType(loanTransactionBalances,
+        totalGoodwillCredit = fetchLoanTransactionBalanceViewByType(loanTransactionBalances, LoanTransactionType.GOODWILL_CREDIT);
+        totalGoodwillCreditReversed = fetchLoanTransactionBalanceViewReversedByType(loanTransactionBalances,
                 LoanTransactionType.GOODWILL_CREDIT);
 
-        totalInterestRefund = fetchLoanTransactionBalanceByType(loanTransactionBalances, LoanTransactionType.INTEREST_REFUND);
+        totalInterestRefund = fetchLoanTransactionBalanceViewByType(loanTransactionBalances, LoanTransactionType.INTEREST_REFUND);
 
-        totalInterestPaymentWaiver = fetchLoanTransactionBalanceByType(loanTransactionBalances,
+        totalInterestPaymentWaiver = fetchLoanTransactionBalanceViewByType(loanTransactionBalances,
                 LoanTransactionType.INTEREST_PAYMENT_WAIVER);
 
-        totalMerchantRefund = fetchLoanTransactionBalanceByType(loanTransactionBalances, LoanTransactionType.MERCHANT_ISSUED_REFUND);
-        totalMerchantRefundReversed = fetchLoanTransactionBalanceReversedByType(loanTransactionBalances,
+        totalMerchantRefund = fetchLoanTransactionBalanceViewByType(loanTransactionBalances, LoanTransactionType.MERCHANT_ISSUED_REFUND);
+        totalMerchantRefundReversed = fetchLoanTransactionBalanceViewReversedByType(loanTransactionBalances,
                 LoanTransactionType.MERCHANT_ISSUED_REFUND);
 
-        totalPayoutRefund = fetchLoanTransactionBalanceByType(loanTransactionBalances, LoanTransactionType.PAYOUT_REFUND);
-        totalPayoutRefundReversed = fetchLoanTransactionBalanceReversedByType(loanTransactionBalances, LoanTransactionType.PAYOUT_REFUND);
+        totalPayoutRefund = fetchLoanTransactionBalanceViewByType(loanTransactionBalances, LoanTransactionType.PAYOUT_REFUND);
+        totalPayoutRefundReversed = fetchLoanTransactionBalanceViewReversedByType(loanTransactionBalances, LoanTransactionType.PAYOUT_REFUND);
 
-        totalRepaymentTransaction = fetchLoanTransactionBalanceByType(loanTransactionBalances, LoanTransactionType.REPAYMENT)
-                .add(fetchLoanTransactionBalanceByType(loanTransactionBalances, LoanTransactionType.DOWN_PAYMENT));
-        totalRepaymentTransactionReversed = fetchLoanTransactionBalanceReversedByType(loanTransactionBalances,
+        totalRepaymentTransaction = fetchLoanTransactionBalanceViewByType(loanTransactionBalances, LoanTransactionType.REPAYMENT)
+                .add(fetchLoanTransactionBalanceViewByType(loanTransactionBalances, LoanTransactionType.DOWN_PAYMENT));
+        totalRepaymentTransactionReversed = fetchLoanTransactionBalanceViewReversedByType(loanTransactionBalances,
                 LoanTransactionType.REPAYMENT);
 
         if (repaymentSchedule != null && defaultSummaryData.getInterestCharged().compareTo(BigDecimal.ZERO) > 0) {
@@ -139,20 +139,20 @@ public abstract class CommonLoanSummaryDataProvider implements LoanSummaryDataPr
                 .totalUnpaidPayableNotDueInterest(totalUnpaidPayableNotDueInterest).totalInterestRefund(totalInterestRefund).build();
     }
 
-    private static BigDecimal fetchLoanTransactionBalanceByType(final Collection<? extends LoanTransactionBalance> loanTransactionBalances,
+    private static BigDecimal fetchLoanTransactionBalanceViewByType(final Collection<? extends LoanTransactionBalanceView> loanTransactionBalances,
             final LoanTransactionType transactionType) {
-        final Optional<? extends LoanTransactionBalance> optLoanTransactionBalance = loanTransactionBalances.stream()
+        final Optional<? extends LoanTransactionBalanceView> optLoanTransactionBalanceView = loanTransactionBalances.stream()
                 .filter(balance -> balance.getTransactionType().equals(transactionType) && !balance.isReversed()).findFirst();
-        return optLoanTransactionBalance.isPresent() ? optLoanTransactionBalance.get().getAmount() : BigDecimal.ZERO;
+        return optLoanTransactionBalanceView.isPresent() ? optLoanTransactionBalanceView.get().getAmount() : BigDecimal.ZERO;
     }
 
-    private static BigDecimal fetchLoanTransactionBalanceReversedByType(
-            final Collection<? extends LoanTransactionBalance> loanTransactionBalances, final LoanTransactionType transactionType) {
-        final Optional<? extends LoanTransactionBalance> optLoanTransactionBalance = loanTransactionBalances.stream()
+    private static BigDecimal fetchLoanTransactionBalanceViewReversedByType(
+            final Collection<? extends LoanTransactionBalanceView> loanTransactionBalances, final LoanTransactionType transactionType) {
+        final Optional<? extends LoanTransactionBalanceView> optLoanTransactionBalanceView = loanTransactionBalances.stream()
                 .filter(balance -> balance.getTransactionType().equals(transactionType) && balance.isReversed()
                         && balance.isManuallyAdjustedOrReversed())
                 .findFirst();
-        return optLoanTransactionBalance.isPresent() ? optLoanTransactionBalance.get().getAmount() : BigDecimal.ZERO;
+        return optLoanTransactionBalanceView.isPresent() ? optLoanTransactionBalanceView.get().getAmount() : BigDecimal.ZERO;
     }
 
     @Override

@@ -23,7 +23,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanSummaryData;
-import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionBalance;
+import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionBalanceView;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanScheduleData;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanSchedulePeriodData;
@@ -38,10 +38,10 @@ public interface LoanSummaryDataProvider {
     LoanSummaryData withOnlyCurrencyData(CurrencyData currencyData);
 
     LoanSummaryData withTransactionAmountsSummary(Long loanId, LoanSummaryData defaultSummaryData, LoanScheduleData repaymentSchedule,
-            Collection<? extends LoanTransactionBalance> loanTransactionBalances);
+            Collection<? extends LoanTransactionBalanceView> loanTransactionBalances);
 
     LoanSummaryData withTransactionAmountsSummary(Loan loan, LoanSummaryData defaultSummaryData, LoanScheduleData repaymentSchedule,
-            Collection<? extends LoanTransactionBalance> loanTransactionBalances);
+            Collection<? extends LoanTransactionBalanceView> loanTransactionBalances);
 
     boolean accept(String loanProcessingStrategyCode);
 }

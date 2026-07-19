@@ -22,28 +22,18 @@ import java.math.BigDecimal;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 
 /**
- * Immutable aggregate of loan transaction amounts by type (without loan id).
+ * Shared contract for loan transaction balance aggregates.
+ * <p>
+ * Replaces class inheritance between balance DTOs so implementations can be
+ * Java records (composition / independent types) without a common superclass.
  */
-public record LoanTransactionBalance(LoanTransactionType transactionType, boolean reversed, boolean manuallyAdjustedOrReversed,
-        BigDecimal amount) implements LoanTransactionBalanceView {
+public interface LoanTransactionBalanceView {
 
-    @Override
-    public LoanTransactionType getTransactionType() {
-        return transactionType;
-    }
+    LoanTransactionType getTransactionType();
 
-    @Override
-    public boolean isReversed() {
-        return reversed;
-    }
+    boolean isReversed();
 
-    @Override
-    public boolean isManuallyAdjustedOrReversed() {
-        return manuallyAdjustedOrReversed;
-    }
+    boolean isManuallyAdjustedOrReversed();
 
-    @Override
-    public BigDecimal getAmount() {
-        return amount;
-    }
+    BigDecimal getAmount();
 }

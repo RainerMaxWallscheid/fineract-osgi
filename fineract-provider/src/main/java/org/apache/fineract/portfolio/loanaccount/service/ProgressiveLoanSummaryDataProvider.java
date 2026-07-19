@@ -25,7 +25,7 @@ import java.util.Optional;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanSummaryData;
-import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionBalance;
+import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionBalanceView;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleInstallment;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
@@ -52,13 +52,13 @@ public class ProgressiveLoanSummaryDataProvider extends CommonLoanSummaryDataPro
 
     @Override
     @Transactional(readOnly = true)
-    public LoanSummaryData withTransactionAmountsSummary(Long loanId, LoanSummaryData defaultSummaryData, LoanScheduleData repaymentSchedule, Collection<? extends LoanTransactionBalance> loanTransactionBalances) {
+    public LoanSummaryData withTransactionAmountsSummary(Long loanId, LoanSummaryData defaultSummaryData, LoanScheduleData repaymentSchedule, Collection<? extends LoanTransactionBalanceView> loanTransactionBalances) {
         final Loan loan = loanRepository.findOneWithNotFoundDetection(loanId, true);
         return super.withTransactionAmountsSummary(loan, defaultSummaryData, repaymentSchedule, loanTransactionBalances);
     }
 
     @Override
-    public LoanSummaryData withTransactionAmountsSummary(Loan loan, LoanSummaryData defaultSummaryData, LoanScheduleData repaymentSchedule, Collection<? extends LoanTransactionBalance> loanTransactionBalances) {
+    public LoanSummaryData withTransactionAmountsSummary(Loan loan, LoanSummaryData defaultSummaryData, LoanScheduleData repaymentSchedule, Collection<? extends LoanTransactionBalanceView> loanTransactionBalances) {
         return super.withTransactionAmountsSummary(loan, defaultSummaryData, repaymentSchedule, loanTransactionBalances);
     }
 

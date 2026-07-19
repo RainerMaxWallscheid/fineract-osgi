@@ -21,16 +21,42 @@ package org.apache.fineract.portfolio.loanaccount.data;
 import java.math.BigDecimal;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 
-public class LoanTransactionBalanceWithLoanId extends LoanTransactionBalance {
-    private final Long loanId;
+/**
+ * Loan-scoped transaction balance aggregate.
+ * <p>
+ * Intentionally <strong>not</strong> a subclass of {@link LoanTransactionBalance}: composition of the same conceptual
+ * fields plus {@code loanId}. Fields are flat so JPA {@code CriteriaBuilder.construct} can materialize this type.
+ * JSON is flat (same shape as before inheritance, plus {@code loanId}).
+ */
+public record LoanTransactionBalanceWithLoanId(LoanTransactionType transactionType, boolean reversed, boolean manuallyAdjustedOrReversed,
+        BigDecimal amount, Long loanId) implements LoanTransactionBalanceView {
 
-    public LoanTransactionBalanceWithLoanId(LoanTransactionType transactionType, boolean reversed, boolean manuallyAdjustedOrReversed, BigDecimal amount, Long loanId) {
-        super(transactionType, reversed, manuallyAdjustedOrReversed, amount);
-        this.loanId = loanId;
+    @Override
+    public LoanTransactionType getTransactionType() {
+        return transactionType;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public Long getLoanId() {
-        return this.loanId;
+    @Override
+    public boolean isReversed() {
+        return reversed;
+    }
+
+    @Override
+    public boolean isManuallyAdjustedOrReversed() {
+        return manuallyAdjustedOrReversed;
+    }
+
+    @Override
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public Long getLoanId() {
+        return loanId;
+    }
+
+    /** Composition: project to the loan-agnostic balance view. */
+    public LoanTransactionBalance toBalance() {
+        return new LoanTransactionBalance(transactionType, reversed, manuallyAdjustedOrReversed, amount);
     }
 }
