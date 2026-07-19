@@ -41,6 +41,7 @@ Die einzelnen ADRs liegen unter [`decisions/`](decisions/) – **eine Datei pro 
 | [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md) | JPA-Ausbau Read/Write | accepted | Spring Data + EclipseLink; Hybrid Reads; Scope S1/S2 |
 | [ADR-017](decisions/ADR-017-hexagonale-architektur.md) | Hexagonale Architektur | accepted | Ports & Adapters als Leitbild; Mapping auf CQRS/OSGi/KI |
 | [ADR-018](decisions/ADR-018-clean-code.md) | Clean Code | accepted | Lesbarer, testbarer Code; Boy Scout; SOLID als Orientierung |
+| [ADR-019](decisions/ADR-019-domain-driven-design.md) | Domain-Driven Design | accepted | Bounded Contexts, Aggregates, UL; pragmatisch mit CQRS/Hexagon |
 
 ```mermaid
 flowchart TB
@@ -57,6 +58,9 @@ flowchart TB
     ADR017 --> ADR018[ADR-018 Clean Code]
     ADR015 --> ADR018
     ADR014 --> ADR018
+    ADR004 --> ADR019[ADR-019 DDD]
+    ADR017 --> ADR019
+    ADR018 --> ADR019
     ADR002 --> ADR005[ADR-005 Externe KI]
     ADR005 --> ADR006[ADR-006 Async KI]
     ADR003 --> ADR007[ADR-007 Node Modes]
@@ -109,6 +113,7 @@ flowchart TB
 | 016 JPA Ausbau | + | | + | + | ++ | | + | + | + |
 | 017 Hexagon | + | | | | ++ | ++ | | | + |
 | 018 Clean Code | + | | + | | ++ | | | + | + |
+| 019 DDD | ++ | | + | | ++ | + | | | + |
 
 *(++ stark positiv, + positiv, ± gemischt/Trade-off)*
 
@@ -158,6 +163,7 @@ Details: [`decisions/README.md`](decisions/README.md).
 | [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md) JPA Ausbau | Repository-/COB-ITs; N+1- und Batch-Messungen an Pilotmodulen |
 | [ADR-017](decisions/ADR-017-hexagonale-architektur.md) Hexagon | Modul-Reviews Dependency Rule; Domain-Unit-Tests mit Fake-Ports |
 | [ADR-018](decisions/ADR-018-clean-code.md) Clean Code | Review-Checkliste; Spotless/CI; Boy Scout in angefassten Diffs |
+| [ADR-019](decisions/ADR-019-domain-driven-design.md) DDD | Context/Aggregate in Reviews; Gherkin-UL; Domain-Events nach Commit |
 
 ---
 

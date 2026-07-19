@@ -22,6 +22,7 @@ Einzelne Architekturentscheidungen für **fineract-osgi**. Übersicht und Format
 | ADR-016 | [ADR-016-jpa-ausbau-read-write-persistenz.md](ADR-016-jpa-ausbau-read-write-persistenz.md) |
 | ADR-017 | [ADR-017-hexagonale-architektur.md](ADR-017-hexagonale-architektur.md) |
 | ADR-018 | [ADR-018-clean-code.md](ADR-018-clean-code.md) |
+| ADR-019 | [ADR-019-domain-driven-design.md](ADR-019-domain-driven-design.md) |
 
 ## Neues ADR anlegen
 

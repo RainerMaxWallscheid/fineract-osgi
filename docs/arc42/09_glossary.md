@@ -30,6 +30,7 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **Batch Worker** | B | Node-Rolle, die Job-Partitionen ausführt (`batch-worker-enabled`). Horizontal skalierbar. → [05](05_deployment_view.md) |
 | **Bundle (OSGi)** | T | Installierbare OSGi-Einheit (JAR) mit Manifest, Lifecycle und optionalen Services. → [04](04_runtime_view.md), [05](05_deployment_view.md) |
 | **Business Date** | F | Fachliches Geschäftstag-Datum eines Tenants; steuert u. a. Buchungslogik und COB. Filter: `BusinessDateFilter`. |
+| **Bounded Context** | A | DDD: explizite Grenze eines Fachmodells (oft ein Domain-Modul). → [ADR-019](decisions/ADR-019-domain-driven-design.md) |
 | **Boy Scout Rule** | A | Hinterlasse angefassten Code etwas sauberer als vorgefunden (im PR-Scope). → [ADR-018](decisions/ADR-018-clean-code.md) |
 | **Business Event** | T | Domänenereignis nach fachlicher Änderung (z. B. Loan created); intern oder als External Event. → [06](06_crosscutting_concepts.md) |
 | **Business Step** | F/T | Einzelner Schritt in einer COB-/Job-Pipeline (z. B. Accrual, Penalty). |
@@ -54,6 +55,7 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **Defense in Depth** | A | Mehrschichtige Sicherheit (TLS/Proxy, AuthN/Z, Tenant, Audit). → [08](08_design_decisions.md) |
 | **Degradation** | A | Kontrolliertes Weiterlaufen ohne optionales Feature (z. B. KI-Bundle fehlt). → [04](04_runtime_view.md) |
 | **Deployable** | B | Laufzeit-Artefakt (Container-Image, JAR, Bundle), das auf Infrastruktur ausgerollt wird. → [05](05_deployment_view.md) |
+| **Domain-Driven Design (DDD)** | A | Fachliche Modellierung mit Bounded Contexts, Aggregates, Ubiquitous Language und Domain Events. → [ADR-019](decisions/ADR-019-domain-driven-design.md) |
 | **Disruptor** | T | LMAX Disruptor – optionale hochperformante, non-blocking Command-Dispatcher-Variante. |
 | **Docker Compose** | B | Orchestrierung lokaler Multi-Container-Setups; Referenzdateien `docker-compose*.yml`. → [05](05_deployment_view.md) |
 | **DTO** | T | *Data Transfer Object* – typisierte Nutzlast zwischen API, Command und Domain (Ziel des neuen Command-Stacks). |
@@ -138,7 +140,8 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **Spring Boot** | T | Application-Framework des Fineract-Kerns; bleibt laut ADR-003 erhalten. → [08](08_design_decisions.md) |
 | **Spring Events** | T | In-Process-Events; Default für lokale Job-Verteilung ohne Broker. |
 | **SynchronousCommandProcessingService** | T | Zentrale Legacy-Komponente zur synchronen Command-Ausführung. |
-| **Tenant** | F | Logisches Institut/Mandant mit eigener Fachdatenbank und Konfiguration. |
+| **Tenant** |
+ F | Logisches Institut/Mandant mit eigener Fachdatenbank und Konfiguration. |
 
 ---
 

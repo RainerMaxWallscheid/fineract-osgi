@@ -348,6 +348,7 @@ Fineract ist groß und historisch gewachsen (JSON-Strings, Gson-Helfer). finerac
 | API-DTO Composition ([ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)) | Weniger fragile Vererbung; Shared-Felder explizit komponiert; JSON bleibt flach |
 | Hexagonale Architektur ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)) | Dependency Rule; Domain testbar ohne REST/DB; OSGi/KI als steckbare Adapter |
 | Clean Code ([ADR-018](decisions/ADR-018-clean-code.md)) | Namen, kleine Einheiten, Boy Scout, Tests; SOLID als Orientierung |
+| Domain-Driven Design ([ADR-019](decisions/ADR-019-domain-driven-design.md)) | Bounded Contexts, Aggregates, Ubiquitous Language; Read/Write-Modelle getrennt |
 | OSGi API vs. Impl Bundles | Stabile Extension-Verträge |
 | arc42 + Gherkin | Gemeinsames Verständnis |
 | Parallele Legacy/Neu-Migration | Risikoarm, reviewbar |

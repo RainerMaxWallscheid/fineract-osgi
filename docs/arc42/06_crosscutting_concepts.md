@@ -24,6 +24,7 @@ Crosscutting Concepts sind architekturweite Lösungsansätze, die **mehrere Baus
 | 12 | API-Stil, DTO Composition & Compatibility | Stabile Integrationen | REST, Idempotency, OpenAPI, Gson SPI |
 | 13 | Hexagonale Architektur | Dependency Rule, austauschbare Ränder | Ports & Adapters, CQRS, OSGi, KI |
 | 14 | Clean Code | Lesbarkeit, Testbarkeit, sichere Evolution | Namen, kleine Einheiten, Boy Scout, SOLID, CI |
+| 15 | Domain-Driven Design | Fachliche Modelle und Context-Grenzen | Aggregates, UL, Events, Bounded Contexts |
 
 ```mermaid
 flowchart TB
@@ -584,7 +585,44 @@ Kein Repo-weites Reformat in einem PR; kein Ersatz für fachliche Komplexität; 
 
 ---
 
-## 6.15 API-Stil, DTO Composition, Idempotenz & Compatibility
+## 6.15 Domain-Driven Design (DDD)
+
+### Motivation
+
+Core Banking braucht **klare Fachmodelle und Context-Grenzen** – nicht nur technische Schichten ([ADR-019](decisions/ADR-019-domain-driven-design.md)).
+
+### Strategisch
+
+| Konzept | Umsetzung |
+|---------|-----------|
+| **Bounded Context** | Domain-Gradle-Module (Loan, Savings, Accounting, Client, …) |
+| **Ubiquitous Language** | Code, Commands, Gherkin, arc42 dieselbe Fachsprache |
+| **Context Map** | Integration über Commands, Events, IDs, GL-Mappings – nicht freies Entity-Sharing |
+| **Anti-Corruption Layer** | Interop/KI/Import/Legacy-JSON → typsichere Application-Modelle |
+
+### Taktisch
+
+| Baustein | Rolle |
+|----------|--------|
+| **Aggregate** | Konsistenzgrenze beim Write (z. B. Loan, SavingsAccount) |
+| **Entity / Value Object** | Identität vs. Werte (Money, Enums/Converter) |
+| **Repository** | Persistenz-Port des Aggregates (Spring Data / Wrapper) |
+| **Domain Service** | Fachlogik über Entities hinweg (Zins, Accounting) |
+| **Application Service** | Use Case + Transaktion (Command Handler) |
+| **Domain Event** | Tatsache nach Commit (Hooks / External Events) |
+
+DDD sitzt im **Domain- und Application-Ring** des Hexagons ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)); CQRS trennt Write-Aggregate und Read-Modelle ([ADR-004](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md), [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md)).
+
+### Regeln (Kurz)
+
+- Ein Write-Use-Case idealerweise ein Aggregat (Querschnitt bewusst orchestrieren).  
+- Queries blähen Write-Aggregate nicht auf.  
+- Neue Features: Aggregate + Command + Event benennen.  
+- Legacy anämisch: Boy Scout, kein Big-Bang-Remodel.
+
+---
+
+## 6.16 API-Stil, DTO Composition, Idempotenz & Compatibility
 
 | Thema | Konzept |
 |-------|---------|
@@ -637,7 +675,7 @@ Shared-Typen (`DepositProductData`, `DepositAccountData`, `InteropRequestData`) 
 
 ---
 
-## 6.16 Zusammenspiel der Konzepte (Beispielfluss)
+## 6.17 Zusammenspiel der Konzepte (Beispielfluss)
 
 Loan Creation mit optionaler KI – Crosscutting-Schichten:
 
@@ -667,7 +705,7 @@ sequenceDiagram
 
 ---
 
-## 6.17 Qualitätsbezug
+## 6.18 Qualitätsbezug
 
 | Crosscutting Concept | Unterstützte Qualität ([Kap. 7](07_quality_attributes.md)) |
 |----------------------|--------------------------------------------------------------|
@@ -677,6 +715,7 @@ sequenceDiagram
 | API-DTO Composition | Maintainability, Compatibility (flache JSON-Verträge) |
 | Hexagonale Architektur | Maintainability, Extensibility, Testability |
 | Clean Code | Maintainability, Reliability, Testability |
+| Domain-Driven Design | Correctness, Maintainability, Extensibility |
 | OSGi | Extensibility, Maintainability, Deployment-Flexibilität |
 | KI-Integration | Extensibility, Innovation ohne Core-Komplexität |
 | Observability | Operability, Performance-Diagnose |
@@ -685,7 +724,7 @@ sequenceDiagram
 
 ---
 
-## 6.18 Offene Punkte / nächste Iterationen
+## 6.19 Offene Punkte / nächste Iterationen
 
 - Einheitliches **Outbox-Pattern** für External Events (exactly-once / at-least-once klar definieren)
 - Standard-Interfaces für OSGi Extension Points (API-Bundle versioniert)
@@ -695,10 +734,11 @@ sequenceDiagram
 - Cache-/Idempotency-Store-Entscheidung (DB only vs. Redis)
 - Weitere DTO-Hierarchien auf Composition migrieren (Loan/Savings-Product wo sinnvoll); ggf. generierte OpenAPI-Modelle angleichen
 - Hexagon E3: Ports an Persistenz-/Event-/KI-Hotspots extrahieren; Dependency-Rule in Reviews/ArchUnit
+- DDD D3: Aggregatgrenzen Loan/Savings/Accounting schärfen; Context-Map für Interop/KI dokumentieren
 
 ---
 
-## 6.19 Verwandte Gherkin-Features
+## 6.20 Verwandte Gherkin-Features
 
 | Konzept | Feature |
 |---------|---------|

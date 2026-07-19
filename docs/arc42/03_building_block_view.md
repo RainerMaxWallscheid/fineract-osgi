@@ -41,7 +41,7 @@ flowchart TB
 |----------|----------------|--------------------|
 | **API & Application Shell** | Boot, REST, Actuator, Verdrahtung | `fineract-provider`, optional `fineract-war` |
 | **Platform Infrastructure** | Tenant, Security, Commands, Config, Jobs-Infra | `fineract-core`, `fineract-security`, `fineract-command*`, `fineract-validation` |
-| **Domain Modules** | Fachlogik Portfolio & Accounting | `fineract-loan`, `fineract-savings`, … |
+| **Domain Modules** | Fachlogik Portfolio & Accounting (**Bounded Contexts**, [ADR-019](decisions/ADR-019-domain-driven-design.md)) | `fineract-loan`, `fineract-savings`, … |
 | **OSGi Runtime** | Dynamische Modularität | `osgi/`, Equinox, Feature-JARs |
 | **Integration Edge** | Events, Messaging, KI-Calls | Hooks, Kafka/JMS Producer, KI-Bundle |
 | **Persistence** | Tenants-Registry + Tenant-Fachdaten | PostgreSQL (primary) |
@@ -117,7 +117,7 @@ flowchart TB
 |--------------|----------------------|
 | **Driving** | REST Resources, Actuator, COB/Batch-Entry, OSGi-Eingänge |
 | **Application** | Security/Tenant-Filter, Command-Pipelines, Job-Orchestrierung |
-| **Domain** | Loan, Savings, Accounting, Client, … |
+| **Domain** | Loan, Savings, Accounting, Client, … (DDD Aggregates / Domain Services) |
 | **Driven** | JPA/JDBC (`fineract-core`), Validation, COB-Infra, Events/Hooks/Messaging/KI |
 | **Steckbar** | Equinox Feature-Bundles hinter Service-Registry-Ports |
 

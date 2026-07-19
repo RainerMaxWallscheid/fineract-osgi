@@ -50,7 +50,7 @@ Abgeleitet aus den Qualitätszielen in [Kapitel 7](07_quality_attributes.md):
 | 2 | **Sichere Mandantentrennung** | Tenant-Isolation, AuthN/Z |
 | 3 | **Betriebssicherer COB** | Partitionierte Jobs, Recovery |
 | 4 | **Erweiterbar ohne Core-Fork** | OSGi-Bundles, Events, KI-Provider |
-| 5 | **Wartbare Modernisierung** | Parallele Command-Stacks, modulweise Migration, Hexagon + Clean Code |
+| 5 | **Wartbare Modernisierung** | Parallele Command-Stacks, modulweise Migration, Hexagon + DDD + Clean Code |
 | 6 | **Skalierbare Topologien** | Read/Write/Batch-Modes, Container/K8s |
 | 7 | **Stabile Integrationen** | Headless REST, Rückwärtskompatibilität |
 

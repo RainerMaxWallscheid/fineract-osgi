@@ -105,7 +105,8 @@ sequenceDiagram
 
 Schreibende Operationen laufen über CQRS. fineract-osgi behält den **Legacy-Pfad** und baut parallel den **typsicheren Command-Stack** (`fineract-command`) aus.
 
-Im **hexagonalen Leitbild** ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)) sind REST/Batch **Driving Adapters**, Command Handler **Application**, Domain-Services **Domain**, JPA/JDBC/Events/KI **Driven Adapters**.
+Im **hexagonalen Leitbild** ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)) sind REST/Batch **Driving Adapters**, Command Handler **Application**, Domain-Services **Domain**, JPA/JDBC/Events/KI **Driven Adapters**.  
+**DDD** ([ADR-019](decisions/ADR-019-domain-driven-design.md)): der Handler orchestriert typisch **ein Aggregat** (z. B. Loan) pro Command; Nebenwirkungen (Accounting, Events) bewusst und nach Invarianten.
 
 ### 4.3.1 Legacy-Pfad (heutiger Default)
 
