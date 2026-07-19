@@ -70,7 +70,8 @@ class ClientDataValidatorTest {
 
     @Test
     void validateForCreate_withInvalidDateFormat_throwsPlatformApiDataValidationException() {
-        String json = validMinimalCreateJson("20260202");
+        // literal date value, not a format pattern — digits-only would be a valid all-literal pattern
+        String json = validMinimalCreateJson("02 February 2026");
 
         PlatformApiDataValidationException ex = assertThrows(PlatformApiDataValidationException.class,
                 () -> validator.validateForCreate(json));
@@ -115,7 +116,8 @@ class ClientDataValidatorTest {
 
     @Test
     void validateForUpdate_withInvalidDateFormat_throwsPlatformApiDataValidationException() {
-        String json = validMinimalUpdateJson("20260202");
+        // literal date value, not a format pattern — digits-only would be a valid all-literal pattern
+        String json = validMinimalUpdateJson("02 February 2026");
 
         PlatformApiDataValidationException ex = assertThrows(PlatformApiDataValidationException.class,
                 () -> validator.validateForUpdate(json));
