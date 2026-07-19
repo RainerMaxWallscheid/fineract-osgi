@@ -236,21 +236,28 @@ tasks.register('dropDB') {
 }
 
 tasks.register('createPGDB') {
-    description = "Creates the PostgreSQL Database. Needs database name to be passed (like: -PdbName=someDBname)"
+    description = "Creates the PostgreSQL Database. Needs database name to be passed (like: -PdbName=someDBname). Idempotent if DB already exists."
     doLast {
         // Connect to the maintenance DB "postgres". A trailing slash alone makes the
         // driver fall back to a database named like the user (e.g. "root"), which often does not exist.
         def sql = Sql.newInstance('jdbc:postgresql://localhost:5432/postgres', pgUser, pgPassword, 'org.postgresql.Driver')
-        sql.execute('create database ' + "\"$dbName\"")
+        def exists = sql.firstRow('SELECT 1 FROM pg_database WHERE datname = ?', [dbName])
+        if (exists) {
+            logger.lifecycle("PostgreSQL database '${dbName}' already exists — skipping create.")
+        } else {
+            sql.execute('CREATE DATABASE ' + "\"$dbName\"")
+            logger.lifecycle("Created PostgreSQL database '${dbName}'.")
+        }
         sql.close()
     }
 }
 
 tasks.register('dropPGDB') {
-    description = "Drops the specified PostgreSQL database. The database name has to be passed (like: -PdbName=someDBname)"
+    description = "Drops the specified PostgreSQL database. The database name has to be passed (like: -PdbName=someDBname). No-op if missing."
     doLast {
         def sql = Sql.newInstance('jdbc:postgresql://localhost:5432/postgres', pgUser, pgPassword, 'org.postgresql.Driver')
-        sql.execute('DROP DATABASE ' + "\"$dbName\"")
+        sql.execute('DROP DATABASE IF EXISTS ' + "\"$dbName\"")
+        logger.lifecycle("Dropped PostgreSQL database '${dbName}' if it existed.")
         sql.close()
     }
 }
