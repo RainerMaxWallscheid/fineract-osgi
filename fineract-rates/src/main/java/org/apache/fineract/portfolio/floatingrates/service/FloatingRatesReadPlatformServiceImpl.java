@@ -25,7 +25,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRateData;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
@@ -35,9 +34,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-@RequiredArgsConstructor
 public class FloatingRatesReadPlatformServiceImpl implements FloatingRatesReadPlatformService {
-
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -66,7 +63,7 @@ public class FloatingRatesReadPlatformServiceImpl implements FloatingRatesReadPl
         try {
             FloatingRateRowMapper rateMapper = new FloatingRateRowMapper(true);
             final String sql = "select " + rateMapper.schema() + " where rate.id = ?";
-            return this.jdbcTemplate.queryForObject(sql, rateMapper, new Object[] { floatingRateId }); // NOSONAR
+            return this.jdbcTemplate.queryForObject(sql, rateMapper, new Object[] {floatingRateId}); // NOSONAR
         } catch (final EmptyResultDataAccessException e) {
             throw new FloatingRateNotFoundException(floatingRateId, e);
         }
@@ -76,7 +73,7 @@ public class FloatingRatesReadPlatformServiceImpl implements FloatingRatesReadPl
     public List<InterestRatePeriodData> retrieveInterestRatePeriods(final Long productId) {
         try {
             FloatingInterestRatePeriodRowMapper mapper = new FloatingInterestRatePeriodRowMapper();
-            return this.jdbcTemplate.query(mapper.schema(), mapper, new Object[] { productId }); // NOSONAR
+            return this.jdbcTemplate.query(mapper.schema(), mapper, new Object[] {productId}); // NOSONAR
         } catch (final EmptyResultDataAccessException e) {
             throw new FloatingRateNotFoundException("error.msg.floatingrate.not.found.for.product", e);
         }
@@ -93,18 +90,17 @@ public class FloatingRatesReadPlatformServiceImpl implements FloatingRatesReadPl
         }
     }
 
+
     private final class FloatingRateRowMapper implements RowMapper<FloatingRateData> {
-
         private final boolean addRatePeriods;
-
         private static final String FLOATING_RATE_SCHEMA = """
-                rate.id as id, rate.name as name,
-                rate.is_base_lending_rate as isBaseLendingRate, rate.is_active as isActive,
-                crappu.username as createdBy, rate.created_date as createdOn,
-                rate.created_on_utc as createdOnUTC, moappu.username as modifiedBy,
-                rate.lastmodified_date as modifiedOn, rate.last_modified_on_utc as modifiedOnUTC
-                FROM m_floating_rates as rate LEFT JOIN m_appuser as crappu on rate.created_by = crappu.id
-                LEFT JOIN m_appuser as moappu on rate.last_modified_by = moappu.id\s""";
+            rate.id as id, rate.name as name,
+            rate.is_base_lending_rate as isBaseLendingRate, rate.is_active as isActive,
+            crappu.username as createdBy, rate.created_date as createdOn,
+            rate.created_on_utc as createdOnUTC, moappu.username as modifiedBy,
+            rate.lastmodified_date as modifiedOn, rate.last_modified_on_utc as modifiedOnUTC
+            FROM m_floating_rates as rate LEFT JOIN m_appuser as crappu on rate.created_by = crappu.id
+            LEFT JOIN m_appuser as moappu on rate.last_modified_by = moappu.id """;
 
         FloatingRateRowMapper(final boolean addRatePeriods) {
             this.addRatePeriods = addRatePeriods;
@@ -127,12 +123,10 @@ public class FloatingRatesReadPlatformServiceImpl implements FloatingRatesReadPl
             final OffsetDateTime modifiedOn = modifiedOnUtc != null ? modifiedOnUtc : modifiedOnLocal;
             if (addRatePeriods) {
                 FloatingRatePeriodRowMapper ratePeriodMapper = new FloatingRatePeriodRowMapper();
-                final String sql = "select " + ratePeriodMapper.schema()
-                        + " where period.is_active = true and period.floating_rates_id = ? " + " order by period.from_date desc ";
+                final String sql = "select " + ratePeriodMapper.schema() + " where period.is_active = true and period.floating_rates_id = ? " + " order by period.from_date desc ";
                 ratePeriods = jdbcTemplate.query(sql, ratePeriodMapper, id); // NOSONAR
             }
-            return new FloatingRateData(id, name, isBaseLendingRate, isActive, createdBy, createdOn, modifiedBy, modifiedOn, ratePeriods,
-                    null);
+            return new FloatingRateData(id, name, isBaseLendingRate, isActive, createdBy, createdOn, modifiedBy, modifiedOn, ratePeriods, null);
         }
 
         public String schema() {
@@ -140,18 +134,18 @@ public class FloatingRatesReadPlatformServiceImpl implements FloatingRatesReadPl
         }
     }
 
-    private static final class FloatingRatePeriodRowMapper implements RowMapper<FloatingRatePeriodData> {
 
+    private static final class FloatingRatePeriodRowMapper implements RowMapper<FloatingRatePeriodData> {
         private static final String FLOATING_RATE_PERIOD_SCHEMA = """
-                period.id as id, period.from_date as fromDate,
-                period.interest_rate as interestRate,
-                period.is_differential_to_base_lending_rate as isDifferentialToBaseLendingRate,
-                period.is_active as isActive, crappu.username as createdBy,
-                period.created_date as createdOn, period.created_on_utc as createdOnUTC,
-                moappu.username as modifiedBy, period.lastmodified_date as modifiedOn,
-                period.last_modified_on_utc as modifiedOnUTC FROM m_floating_rates_periods as period
-                LEFT JOIN m_appuser as crappu on period.created_by = crappu.id
-                LEFT JOIN m_appuser as moappu on period.last_modified_by = moappu.id\s""";
+            period.id as id, period.from_date as fromDate,
+            period.interest_rate as interestRate,
+            period.is_differential_to_base_lending_rate as isDifferentialToBaseLendingRate,
+            period.is_active as isActive, crappu.username as createdBy,
+            period.created_date as createdOn, period.created_on_utc as createdOnUTC,
+            moappu.username as modifiedBy, period.lastmodified_date as modifiedOn,
+            period.last_modified_on_utc as modifiedOnUTC FROM m_floating_rates_periods as period
+            LEFT JOIN m_appuser as crappu on period.created_by = crappu.id
+            LEFT JOIN m_appuser as moappu on period.last_modified_by = moappu.id """;
 
         @Override
         public FloatingRatePeriodData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
@@ -168,8 +162,7 @@ public class FloatingRatesReadPlatformServiceImpl implements FloatingRatesReadPl
             final OffsetDateTime modifiedOnUtc = JdbcSupport.getOffsetDateTime(rs, "modifiedOnUTC");
             final OffsetDateTime createdOn = createdOnUtc != null ? createdOnUtc : createdOnLocal;
             final OffsetDateTime modifiedOn = modifiedOnUtc != null ? modifiedOnUtc : modifiedOnLocal;
-            return new FloatingRatePeriodData(id, fromDate, interestRate, isDifferentialToBaseLendingRate, isActive, createdBy, createdOn,
-                    modifiedBy, modifiedOn);
+            return new FloatingRatePeriodData(id, fromDate, interestRate, isDifferentialToBaseLendingRate, isActive, createdBy, createdOn, modifiedBy, modifiedOn);
         }
 
         public String schema() {
@@ -177,11 +170,11 @@ public class FloatingRatesReadPlatformServiceImpl implements FloatingRatesReadPl
         }
     }
 
-    private static final class FloatingRateLookupMapper implements RowMapper<FloatingRateData> {
 
+    private static final class FloatingRateLookupMapper implements RowMapper<FloatingRateData> {
         private static final String FLOATING_RATE_LOOKUP_SCHEMA = """
-                rate.id as id, rate.name as name,
-                rate.is_base_lending_rate as isBaseLendingRate FROM m_floating_rates as rate\s""";
+            rate.id as id, rate.name as name,
+            rate.is_base_lending_rate as isBaseLendingRate FROM m_floating_rates as rate """;
 
         @Override
         public FloatingRateData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
@@ -196,42 +189,42 @@ public class FloatingRatesReadPlatformServiceImpl implements FloatingRatesReadPl
         }
     }
 
-    private static final class FloatingInterestRatePeriodRowMapper implements RowMapper<InterestRatePeriodData> {
 
+    private static final class FloatingInterestRatePeriodRowMapper implements RowMapper<InterestRatePeriodData> {
         private static final String FLOATING_INTEREST_RATE_PERIOD_SCHEMA = """
-                select
-                    linkedrateperiods.from_date as linkedrateperiods_from_date,
-                    linkedrateperiods.interest_rate as linkedrateperiods_interest_rate,
-                    linkedrateperiods.is_differential_to_base_lending_rate as linkedrateperiods_is_differential_to_base_lending_rate,
-                    baserate.from_date as baserate_from_date, baserate.interest_rate as baserate_interest_rate
-                 from m_product_loan as lp
-                 join m_product_loan_floating_rates as plfr on lp.id = plfr.loan_product_id
-                 join  m_floating_rates as linkedrate on linkedrate.id = plfr.floating_rates_id
-                left join m_floating_rates_periods as linkedrateperiods on (linkedrate.id = linkedrateperiods.floating_rates_id and linkedrateperiods.is_active = true)
-                left join (
-                    select blr.name,
-                    blr.is_base_lending_rate,
-                    blr.is_active,
-                    blrperiods.from_date,
-                    blrperiods.interest_rate
-                    from m_floating_rates as blr
-                    left join m_floating_rates_periods as blrperiods on (blr.id = blrperiods.floating_rates_id and blrperiods.is_active = true)
-                    where blr.is_base_lending_rate = true and blr.is_active = true
-                ) as baserate on (linkedrateperiods.is_differential_to_base_lending_rate = true and linkedrate.is_base_lending_rate = false)
-                where (baserate.from_date is null
-                    or baserate.from_date = (select MAX(b.from_date)
-                        from (select blr.name,
-                            blr.is_base_lending_rate,
-                            blr.is_active,
-                            blrperiods.from_date,
-                            blrperiods.interest_rate
-                            from m_floating_rates as blr
-                            left join m_floating_rates_periods as blrperiods on (blr.id = blrperiods.floating_rates_id and blrperiods.is_active = true)
-                            where blr.is_base_lending_rate = true and blr.is_active = true
-                        ) as b
-                        where b.from_date <= linkedrateperiods.from_date))
-                and lp.id = ?
-                order by linkedratePeriods_from_date desc\s""";
+            select
+                linkedrateperiods.from_date as linkedrateperiods_from_date,
+                linkedrateperiods.interest_rate as linkedrateperiods_interest_rate,
+                linkedrateperiods.is_differential_to_base_lending_rate as linkedrateperiods_is_differential_to_base_lending_rate,
+                baserate.from_date as baserate_from_date, baserate.interest_rate as baserate_interest_rate
+             from m_product_loan as lp
+             join m_product_loan_floating_rates as plfr on lp.id = plfr.loan_product_id
+             join  m_floating_rates as linkedrate on linkedrate.id = plfr.floating_rates_id
+            left join m_floating_rates_periods as linkedrateperiods on (linkedrate.id = linkedrateperiods.floating_rates_id and linkedrateperiods.is_active = true)
+            left join (
+                select blr.name,
+                blr.is_base_lending_rate,
+                blr.is_active,
+                blrperiods.from_date,
+                blrperiods.interest_rate
+                from m_floating_rates as blr
+                left join m_floating_rates_periods as blrperiods on (blr.id = blrperiods.floating_rates_id and blrperiods.is_active = true)
+                where blr.is_base_lending_rate = true and blr.is_active = true
+            ) as baserate on (linkedrateperiods.is_differential_to_base_lending_rate = true and linkedrate.is_base_lending_rate = false)
+            where (baserate.from_date is null
+                or baserate.from_date = (select MAX(b.from_date)
+                    from (select blr.name,
+                        blr.is_base_lending_rate,
+                        blr.is_active,
+                        blrperiods.from_date,
+                        blrperiods.interest_rate
+                        from m_floating_rates as blr
+                        left join m_floating_rates_periods as blrperiods on (blr.id = blrperiods.floating_rates_id and blrperiods.is_active = true)
+                        where blr.is_base_lending_rate = true and blr.is_active = true
+                    ) as b
+                    where b.from_date <= linkedrateperiods.from_date))
+            and lp.id = ?
+            order by linkedratePeriods_from_date desc """;
 
         @Override
         public InterestRatePeriodData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
@@ -250,4 +243,8 @@ public class FloatingRatesReadPlatformServiceImpl implements FloatingRatesReadPl
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public FloatingRatesReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 }

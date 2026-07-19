@@ -18,11 +18,40 @@
  */
 package org.apache.fineract.command.test.sample.command;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.test.sample.data.DummyErrorRequest;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class DummyErrorCommand extends Command<DummyErrorRequest> {}
+public class DummyErrorCommand extends Command<DummyErrorRequest> {
+	@java.lang.SuppressWarnings("all")
+		public DummyErrorCommand() {
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public java.lang.String toString() {
+		return "DummyErrorCommand()";
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public boolean equals(final java.lang.Object o) {
+		if (o == this) return true;
+		if (!(o instanceof DummyErrorCommand)) return false;
+		final DummyErrorCommand other = (DummyErrorCommand) o;
+		if (!other.canEqual((java.lang.Object) this)) return false;
+		if (!super.equals(o)) return false;
+		return true;
+	}
+
+	@java.lang.SuppressWarnings("all")
+		protected boolean canEqual(final java.lang.Object other) {
+		return other instanceof DummyErrorCommand;
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public int hashCode() {
+		final int result = super.hashCode();
+		return result;
+	}
+}

@@ -19,14 +19,16 @@
 package org.apache.fineract.infrastructure.event.external.service.message.domain;
 
 import java.util.Objects;
-import lombok.Getter;
 
-@Getter
 public class MessageDataSchema {
-
     private final String dataSchema;
 
     public MessageDataSchema(String dataSchema) {
         this.dataSchema = Objects.requireNonNull(dataSchema, "dataSchema cannot be null");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDataSchema() {
+        return this.dataSchema;
     }
 }

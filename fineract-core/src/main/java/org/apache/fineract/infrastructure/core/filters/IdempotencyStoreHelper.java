@@ -21,16 +21,13 @@ package org.apache.fineract.infrastructure.core.filters;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.service.CommandSourceService;
 import org.apache.fineract.commands.service.SynchronousCommandProcessingService;
 import org.apache.fineract.infrastructure.core.domain.FineractRequestContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class IdempotencyStoreHelper {
-
     private final CommandSourceService commandSourceService;
     private final FineractRequestContextHolder fineractRequestContextHolder;
 
@@ -39,25 +36,24 @@ public class IdempotencyStoreHelper {
     }
 
     public boolean isAllowedContentTypeResponse(HttpServletResponse response) {
-        return Optional.ofNullable(response.getContentType()).map(String::toLowerCase).map(ct -> ct.contains("application/json"))
-                .orElse(false) || (response.getStatus() > 200 && response.getStatus() < 300);
+        return Optional.ofNullable(response.getContentType()).map(String::toLowerCase).map(ct -> ct.contains("application/json")).orElse(false) || (response.getStatus() > 200 && response.getStatus() < 300);
     }
 
     public boolean isAllowedContentTypeRequest(HttpServletRequest request) {
-        return Optional.ofNullable(request.getContentType()).map(String::toLowerCase).map(ct -> ct.contains("application/json"))
-                .orElse(false);
+        return Optional.ofNullable(request.getContentType()).map(String::toLowerCase).map(ct -> ct.contains("application/json")).orElse(false);
     }
 
     public boolean isStoreIdempotencyKey(HttpServletRequest request) {
-        return Optional
-                .ofNullable(
-                        fineractRequestContextHolder.getAttribute(SynchronousCommandProcessingService.IDEMPOTENCY_KEY_STORE_FLAG, request))
-                .filter(Boolean.class::isInstance).map(Boolean.class::cast).orElse(false);
+        return Optional.ofNullable(fineractRequestContextHolder.getAttribute(SynchronousCommandProcessingService.IDEMPOTENCY_KEY_STORE_FLAG, request)).filter(Boolean.class::isInstance).map(Boolean.class::cast).orElse(false);
     }
 
     public Optional<Long> getCommandId(HttpServletRequest request) {
-        return Optional
-                .ofNullable(fineractRequestContextHolder.getAttribute(SynchronousCommandProcessingService.COMMAND_SOURCE_ID, request))
-                .filter(Long.class::isInstance).map(Long.class::cast);
+        return Optional.ofNullable(fineractRequestContextHolder.getAttribute(SynchronousCommandProcessingService.COMMAND_SOURCE_ID, request)).filter(Long.class::isInstance).map(Long.class::cast);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public IdempotencyStoreHelper(final CommandSourceService commandSourceService, final FineractRequestContextHolder fineractRequestContextHolder) {
+        this.commandSourceService = commandSourceService;
+        this.fineractRequestContextHolder = fineractRequestContextHolder;
     }
 }

@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.event.external.producer.jms;
 
 import static org.apache.fineract.infrastructure.core.diagnostics.performance.MeasuringUtil.measure;
-
 import jakarta.jms.Connection;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.Destination;
@@ -33,8 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
@@ -49,24 +46,18 @@ import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.stereotype.Component;
 
 @Component
-@Slf4j
-@RequiredArgsConstructor
 @ConditionalOnProperty(value = "fineract.events.external.producer.jms.enabled", havingValue = "true")
 public class JMSMultiExternalEventProducer implements ExternalEventProducer {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JMSMultiExternalEventProducer.class);
     @Qualifier("externalEventDestination")
     private final Destination destination;
-
     @Qualifier("externalEventConnectionFactory")
     private final ConnectionFactory connectionFactory;
-
     private final MessageFactory messageFactory;
-
     @Qualifier(TaskExecutorConstant.EVENT_TASK_EXECUTOR_BEAN_NAME)
     private final AsyncTaskExecutor taskExecutor;
-
     private final HashingService hashingService;
-
     private final FineractProperties fineractProperties;
 
     private int getProducerCount() {
@@ -153,7 +144,6 @@ public class JMSMultiExternalEventProducer implements ExternalEventProducer {
         for (Map.Entry<Long, List<byte[]>> partition : partitions.entrySet()) {
             Long key = partition.getKey();
             List<byte[]> messages = partition.getValue();
-
             int producerIndex = hashingService.consistentHash(key, getProducerCount());
             indexedPartitions.putIfAbsent(producerIndex, new ArrayList<>());
             indexedPartitions.get(producerIndex).addAll(messages);
@@ -169,5 +159,15 @@ public class JMSMultiExternalEventProducer implements ExternalEventProducer {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JMSMultiExternalEventProducer(@Qualifier("externalEventDestination") final Destination destination, @Qualifier("externalEventConnectionFactory") final ConnectionFactory connectionFactory, final MessageFactory messageFactory, @Qualifier(TaskExecutorConstant.EVENT_TASK_EXECUTOR_BEAN_NAME) final AsyncTaskExecutor taskExecutor, final HashingService hashingService, final FineractProperties fineractProperties) {
+        this.destination = destination;
+        this.connectionFactory = connectionFactory;
+        this.messageFactory = messageFactory;
+        this.taskExecutor = taskExecutor;
+        this.hashingService = hashingService;
+        this.fineractProperties = fineractProperties;
     }
 }

@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import lombok.AllArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -51,9 +50,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 public class ClientEntityImportHandler implements ImportHandler {
-
     public static final String SEPARATOR = "-";
     private static final Logger LOG = LoggerFactory.getLogger(ClientEntityImportHandler.class);
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
@@ -61,7 +58,6 @@ public class ClientEntityImportHandler implements ImportHandler {
 
     @Override
     public Count process(final Workbook workbook, final String locale, final String dateFormat) {
-
         List<ClientData> clients = readExcelFile(workbook, locale, dateFormat);
         return importEntity(workbook, clients, dateFormat, locale);
     }
@@ -99,7 +95,6 @@ public class ClientEntityImportHandler implements ImportHandler {
         if (ImportHandlerUtils.readAsLong(ClientEntityConstants.MOBILE_NO_COL, row) != null) {
             mobileNo = Objects.requireNonNull(ImportHandlerUtils.readAsLong(ClientEntityConstants.MOBILE_NO_COL, row)).toString();
         }
-
         String clientType = ImportHandlerUtils.readAsString(ClientEntityConstants.CLIENT_TYPE_COL, row);
         Long clientTypeId = null;
         if (clientType != null) {
@@ -117,12 +112,10 @@ public class ClientEntityImportHandler implements ImportHandler {
             }
         }
         String incorporationNo = ImportHandlerUtils.readAsString(ClientEntityConstants.INCOPORATION_NUMBER_COL, row);
-
         String mainBusinessLine = ImportHandlerUtils.readAsString(ClientEntityConstants.MAIN_BUSINESS_LINE, row);
         Long mainBusinessId = null;
         if (mainBusinessLine != null) {
-            List<String> mainBusinessLineAr = Splitter.on(SEPARATOR)
-                    .splitToList(Objects.requireNonNull(ImportHandlerUtils.readAsString(ClientEntityConstants.MAIN_BUSINESS_LINE, row)));
+            List<String> mainBusinessLineAr = Splitter.on(SEPARATOR).splitToList(Objects.requireNonNull(ImportHandlerUtils.readAsString(ClientEntityConstants.MAIN_BUSINESS_LINE, row)));
             if (mainBusinessLineAr.get(1) != null) {
                 mainBusinessId = Long.parseLong(mainBusinessLineAr.get(1));
             }
@@ -136,16 +129,10 @@ public class ClientEntityImportHandler implements ImportHandler {
             }
         }
         String remarks = ImportHandlerUtils.readAsString(ClientEntityConstants.REMARKS_COL, row);
-
-        ClientNonPersonData clientNonPersonData = ClientNonPersonData.importInstance(incorporationNo, incorporationTill, remarks,
-                mainBusinessId, constitutionId, locale, dateFormat);
-
+        ClientNonPersonData clientNonPersonData = ClientNonPersonData.importInstance(incorporationNo, incorporationTill, remarks, mainBusinessId, constitutionId, locale, dateFormat);
         ExternalId externalId = externalIdFactory.create(ImportHandlerUtils.readAsString(ClientEntityConstants.EXTERNAL_ID_COL, row));
-
         Boolean active = ImportHandlerUtils.readAsBoolean(ClientEntityConstants.ACTIVE_COL, row);
-
         LocalDate submittedOn = ImportHandlerUtils.readAsDate(ClientEntityConstants.SUBMITTED_ON_COL, row);
-
         LocalDate activationDate = ImportHandlerUtils.readAsDate(ClientEntityConstants.ACTIVATION_DATE_COL, row);
         if (!active) {
             activationDate = submittedOn;
@@ -166,10 +153,8 @@ public class ClientEntityImportHandler implements ImportHandler {
             String addressLine2 = ImportHandlerUtils.readAsString(ClientEntityConstants.ADDRESS_LINE_2_COL, row);
             String addressLine3 = ImportHandlerUtils.readAsString(ClientEntityConstants.ADDRESS_LINE_3_COL, row);
             String city = ImportHandlerUtils.readAsString(ClientEntityConstants.CITY_COL, row);
-
             String postalCode = ImportHandlerUtils.readAsString(ClientEntityConstants.POSTAL_CODE_COL, row);
             Boolean isActiveAddress = ImportHandlerUtils.readAsBoolean(ClientEntityConstants.IS_ACTIVE_ADDRESS_COL, row);
-
             String stateProvince = ImportHandlerUtils.readAsString(ClientEntityConstants.STATE_PROVINCE_COL, row);
             Long stateProvinceId = null;
             if (stateProvince != null) {
@@ -186,32 +171,26 @@ public class ClientEntityImportHandler implements ImportHandler {
                     countryId = Long.parseLong(countryAr.get(1));
                 }
             }
-            addressDataObj = new AddressData(addressTypeId, street, addressLine1, addressLine2, addressLine3, city, postalCode,
-                    isActiveAddress, stateProvinceId, countryId);
+            addressDataObj = new AddressData(addressTypeId, street, addressLine1, addressLine2, addressLine3, city, postalCode, isActiveAddress, stateProvinceId, countryId);
             addressList = new ArrayList<>(List.of(addressDataObj));
         }
-        return ClientData.importClientEntityInstance(legalFormId, row.getRowNum(), name, officeId, clientTypeId, clientClassicationId,
-                staffId, active, activationDate, submittedOn, externalId, incorportionDate, mobileNo, clientNonPersonData, addressList,
-                locale, dateFormat);
+        return ClientData.importClientEntityInstance(legalFormId, row.getRowNum(), name, officeId, clientTypeId, clientClassicationId, staffId, active, activationDate, submittedOn, externalId, incorportionDate, mobileNo, clientNonPersonData, addressList, locale, dateFormat);
     }
 
     private Count importEntity(final Workbook workbook, final List<ClientData> clients, final String dateFormat, final String locale) {
         Sheet clientSheet = workbook.getSheet(TemplatePopulateImportConstants.CLIENT_ENTITY_SHEET_NAME);
-
         int successCount = 0;
         int errorCount = 0;
         String errorMessage;
-
         GsonBuilder gsonBuilder = GoogleGsonSerializerHelper.createGsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDate.class, new DateSerializer(dateFormat, locale));
-
         for (ClientData client : clients) {
             try {
                 String payload = gsonBuilder.create().toJson(client);
-                final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-                        .createClient() //
-                        .withJson(payload) //
-                        .build(); //
+                final CommandWrapper commandRequest =  //
+                //
+                //
+                new CommandWrapperBuilder().createClient().withJson(payload).build(); //
                 commandsSourceWritePlatformService.logCommandSource(commandRequest);
                 successCount++;
                 Cell statusCell = clientSheet.getRow(client.getRowIndex()).createCell(ClientEntityConstants.STATUS_COL);
@@ -225,10 +204,13 @@ public class ClientEntityImportHandler implements ImportHandler {
             }
         }
         clientSheet.setColumnWidth(ClientEntityConstants.STATUS_COL, TemplatePopulateImportConstants.SMALL_COL_SIZE);
-        ImportHandlerUtils.writeString(ClientEntityConstants.STATUS_COL,
-                clientSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX), TemplatePopulateImportConstants.STATUS_COLUMN_HEADER);
-
+        ImportHandlerUtils.writeString(ClientEntityConstants.STATUS_COL, clientSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX), TemplatePopulateImportConstants.STATUS_COLUMN_HEADER);
         return Count.instance(successCount, errorCount);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ClientEntityImportHandler(final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final ExternalIdFactory externalIdFactory) {
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.externalIdFactory = externalIdFactory;
+    }
 }

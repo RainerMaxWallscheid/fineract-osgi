@@ -24,8 +24,6 @@ import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import java.util.List;
 import java.util.Map;
-import lombok.Builder;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.ExternalEventConfigurationUpdateRequest;
 import org.apache.fineract.client.models.ExternalEventConfigurationUpdateResponse;
 import org.apache.fineract.client.util.Calls;
@@ -36,16 +34,16 @@ import org.apache.fineract.integrationtests.common.FineractClientHelper;
 import org.apache.fineract.integrationtests.common.Utils;
 import org.junit.jupiter.api.Assertions;
 
-@Slf4j
 public final class ExternalEventHelper {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExternalEventHelper.class);
     private static final Gson GSON = new JSON().getGson();
 
-    public ExternalEventHelper() {}
+    public ExternalEventHelper() {
+    }
 
-    @Builder
+
     public static class Filter {
-
         private final String idempotencyKey;
         private final String type;
         private final String category;
@@ -56,21 +54,93 @@ public final class ExternalEventHelper {
             if (idempotencyKey != null) {
                 stringBuilder.append("idempotencyKey=").append(idempotencyKey).append("&");
             }
-
             if (type != null) {
                 stringBuilder.append("type=").append(type).append("&");
             }
-
             if (category != null) {
                 stringBuilder.append("category=").append(category).append("&");
             }
-
             if (aggregateRootId != null) {
                 stringBuilder.append("aggregateRootId=").append(aggregateRootId).append("&");
             }
-
             return stringBuilder.toString();
+        }
 
+        @java.lang.SuppressWarnings("all")
+                Filter(final String idempotencyKey, final String type, final String category, final Long aggregateRootId) {
+            this.idempotencyKey = idempotencyKey;
+            this.type = type;
+            this.category = category;
+            this.aggregateRootId = aggregateRootId;
+        }
+
+
+        @java.lang.SuppressWarnings("all")
+                public static class FilterBuilder {
+            @java.lang.SuppressWarnings("all")
+                        private String idempotencyKey;
+            @java.lang.SuppressWarnings("all")
+                        private String type;
+            @java.lang.SuppressWarnings("all")
+                        private String category;
+            @java.lang.SuppressWarnings("all")
+                        private Long aggregateRootId;
+
+            @java.lang.SuppressWarnings("all")
+                        FilterBuilder() {
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public ExternalEventHelper.Filter.FilterBuilder idempotencyKey(final String idempotencyKey) {
+                this.idempotencyKey = idempotencyKey;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public ExternalEventHelper.Filter.FilterBuilder type(final String type) {
+                this.type = type;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public ExternalEventHelper.Filter.FilterBuilder category(final String category) {
+                this.category = category;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public ExternalEventHelper.Filter.FilterBuilder aggregateRootId(final Long aggregateRootId) {
+                this.aggregateRootId = aggregateRootId;
+                return this;
+            }
+
+            @java.lang.SuppressWarnings("all")
+                        public ExternalEventHelper.Filter build() {
+                return new ExternalEventHelper.Filter(this.idempotencyKey, this.type, this.category, this.aggregateRootId);
+            }
+
+            @java.lang.Override
+            @java.lang.SuppressWarnings("all")
+                        public java.lang.String toString() {
+                return "ExternalEventHelper.Filter.FilterBuilder(idempotencyKey=" + this.idempotencyKey + ", type=" + this.type + ", category=" + this.category + ", aggregateRootId=" + this.aggregateRootId + ")";
+            }
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public static ExternalEventHelper.Filter.FilterBuilder builder() {
+            return new ExternalEventHelper.Filter.FilterBuilder();
         }
     }
 
@@ -78,24 +148,24 @@ public final class ExternalEventHelper {
     // Example: org.apache.fineract.integrationtests.common.loans.LoanTransactionHelper.disburseLoan(java.lang.Long,
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
-    public static List<ExternalEventResponse> getAllExternalEvents(final RequestSpecification requestSpec,
-            final ResponseSpecification responseSpec) {
+    public static List<ExternalEventResponse> getAllExternalEvents(final RequestSpecification requestSpec, final ResponseSpecification responseSpec) {
         final String url = "/fineract-provider/api/v1/internal/externalevents?" + Utils.TENANT_IDENTIFIER;
         log.info("---------------------------------GETTING ALL EXTERNAL EVENTS---------------------------------------------");
         String response = Utils.performServerGet(requestSpec, responseSpec, url);
-        return GSON.fromJson(response, new TypeToken<List<ExternalEventResponse>>() {}.getType());
+        return GSON.fromJson(response, new TypeToken<List<ExternalEventResponse>>() {
+        }.getType());
     }
 
     // TODO: Rewrite to use fineract-client instead!
     // Example: org.apache.fineract.integrationtests.common.loans.LoanTransactionHelper.disburseLoan(java.lang.Long,
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
-    public static List<ExternalEventResponse> getAllExternalEvents(final RequestSpecification requestSpec,
-            final ResponseSpecification responseSpec, Filter filter) {
+    public static List<ExternalEventResponse> getAllExternalEvents(final RequestSpecification requestSpec, final ResponseSpecification responseSpec, Filter filter) {
         final String url = "/fineract-provider/api/v1/internal/externalevents?" + filter.toQueryParams() + Utils.TENANT_IDENTIFIER;
         log.info("---------------------------------GETTING ALL EXTERNAL EVENTS---------------------------------------------");
         String response = Utils.performServerGet(requestSpec, responseSpec, url);
-        return GSON.fromJson(response, new TypeToken<List<ExternalEventResponse>>() {}.getType());
+        return GSON.fromJson(response, new TypeToken<List<ExternalEventResponse>>() {
+        }.getType());
     }
 
     // TODO: Rewrite to use fineract-client instead!
@@ -112,19 +182,15 @@ public final class ExternalEventHelper {
     // Example: org.apache.fineract.integrationtests.common.loans.LoanTransactionHelper.disburseLoan(java.lang.Long,
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
-    public static void changeEventState(final RequestSpecification requestSpec, final ResponseSpecification responseSpec, String eventName,
-            boolean status) {
-        final Map<String, Boolean> updatedConfigurations = ExternalEventConfigurationHelper.updateExternalEventConfigurations(requestSpec,
-                responseSpec, "{\"externalEventConfigurations\":{\"" + eventName + "\":" + status + "}}\n");
+    public static void changeEventState(final RequestSpecification requestSpec, final ResponseSpecification responseSpec, String eventName, boolean status) {
+        final Map<String, Boolean> updatedConfigurations = ExternalEventConfigurationHelper.updateExternalEventConfigurations(requestSpec, responseSpec, "{\"externalEventConfigurations\":{\"" + eventName + "\":" + status + "}}\n");
         Assertions.assertEquals(updatedConfigurations.size(), 1);
         Assertions.assertTrue(updatedConfigurations.containsKey(eventName));
         Assertions.assertEquals(status, updatedConfigurations.get(eventName));
     }
 
     public void configureBusinessEvent(String eventName, boolean enabled) {
-        ExternalEventConfigurationUpdateResponse result = Calls
-                .ok(FineractClientHelper.getFineractClient().externalEventConfigurationApi.updateExternalEventConfigurations(
-                        new ExternalEventConfigurationUpdateRequest().externalEventConfigurations(Map.of(eventName, enabled))));
+        ExternalEventConfigurationUpdateResponse result = Calls.ok(FineractClientHelper.getFineractClient().externalEventConfigurationApi.updateExternalEventConfigurations(new ExternalEventConfigurationUpdateRequest().externalEventConfigurations(Map.of(eventName, enabled))));
         Map<String, Object> changes = result.getChanges();
         Assertions.assertNotNull(changes);
         Assertions.assertInstanceOf(Map.class, changes);
@@ -142,5 +208,4 @@ public final class ExternalEventHelper {
     public void disableBusinessEvent(String eventName) {
         configureBusinessEvent(eventName, false);
     }
-
 }

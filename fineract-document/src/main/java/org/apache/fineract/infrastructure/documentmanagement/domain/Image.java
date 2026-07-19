@@ -20,35 +20,80 @@ package org.apache.fineract.infrastructure.documentmanagement.domain;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("m_image")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Accessors(chain = true)
-@FieldNameConstants
 public final class Image implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id
     @Column("id")
     private Long id;
-
     @Column("location")
     private String location;
-
     @Column("storage_type_enum")
     private Integer storageType;
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLocation() {
+        return this.location;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getStorageType() {
+        return this.storageType;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Image setId(final Long id) {
+        this.id = id;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Image setLocation(final String location) {
+        this.location = location;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Image setStorageType(final Integer storageType) {
+        this.storageType = storageType;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Image() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Image(final Long id, final String location, final Integer storageType) {
+        this.id = id;
+        this.location = location;
+        this.storageType = storageType;
+    }
+
+
+    @java.lang.SuppressWarnings("all")
+        public static final class Fields {
+        public static final java.lang.String id = "id";
+        public static final java.lang.String location = "location";
+        public static final java.lang.String storageType = "storageType";
+    }
 }

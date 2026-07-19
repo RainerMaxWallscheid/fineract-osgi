@@ -19,8 +19,6 @@
 package org.apache.fineract.mix.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.mix.data.MixTaxonomyMappingUpdateRequest;
@@ -29,12 +27,10 @@ import org.apache.fineract.mix.service.MixTaxonomyMappingWriteService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
-public class MixTaxonomyMappingUpdateCommandHandler
-        implements CommandHandler<MixTaxonomyMappingUpdateRequest, MixTaxonomyMappingUpdateResponse> {
-
+public class MixTaxonomyMappingUpdateCommandHandler implements CommandHandler<MixTaxonomyMappingUpdateRequest, MixTaxonomyMappingUpdateResponse> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MixTaxonomyMappingUpdateCommandHandler.class);
     private final MixTaxonomyMappingWriteService writeTaxonomyService;
 
     @Retry(name = "commandMixTaxonomyMappingUpdate", fallbackMethod = "fallback")
@@ -47,5 +43,10 @@ public class MixTaxonomyMappingUpdateCommandHandler
     @Override
     public MixTaxonomyMappingUpdateResponse fallback(Command<MixTaxonomyMappingUpdateRequest> command, Throwable t) {
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomyMappingUpdateCommandHandler(final MixTaxonomyMappingWriteService writeTaxonomyService) {
+        this.writeTaxonomyService = writeTaxonomyService;
     }
 }

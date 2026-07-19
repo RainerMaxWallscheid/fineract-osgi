@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.DataIntegrityErrorHandler;
@@ -31,23 +30,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN", action = "CAPITALIZEDINCOME")
 public class AddCapitalizedIncomeCommandHandler implements NewCommandSourceHandler {
-
     private final CapitalizedIncomePlatformService capitalizedIncomePlatformService;
     private final DataIntegrityErrorHandler dataIntegrityErrorHandler;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         try {
             return this.capitalizedIncomePlatformService.addCapitalizedIncome(command.getLoanId(), command);
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.capitalized.income",
-                    "Capitalized Income");
+            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.capitalized.income", "Capitalized Income");
             return CommandProcessingResult.empty();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AddCapitalizedIncomeCommandHandler(final CapitalizedIncomePlatformService capitalizedIncomePlatformService, final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
+        this.capitalizedIncomePlatformService = capitalizedIncomePlatformService;
+        this.dataIntegrityErrorHandler = dataIntegrityErrorHandler;
     }
 }

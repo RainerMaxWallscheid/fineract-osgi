@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.paymentdetail.service;
 
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.portfolio.paymentdetail.PaymentDetailConstants;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
@@ -29,9 +28,7 @@ import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
 import org.apache.fineract.portfolio.paymenttype.exception.PaymentTypeNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements PaymentDetailWritePlatformService {
-
     private final PaymentDetailRepository paymentDetailRepository;
     // private final CodeValueRepositoryWrapper codeValueRepositoryWrapper;
     private final PaymentTypeRepository paymentTypeRepository;
@@ -42,12 +39,9 @@ public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements Payme
         if (paymentTypeId == null) {
             return null;
         }
-
-        final PaymentType paymentType = this.paymentTypeRepository.findById(paymentTypeId)
-                .orElseThrow(() -> new PaymentTypeNotFoundException(paymentTypeId));
+        final PaymentType paymentType = this.paymentTypeRepository.findById(paymentTypeId).orElseThrow(() -> new PaymentTypeNotFoundException(paymentTypeId));
         final PaymentDetail paymentDetail = PaymentDetail.generatePaymentDetail(paymentType, command, changes);
         return paymentDetail;
-
     }
 
     @Override
@@ -64,5 +58,11 @@ public class PaymentDetailWritePlatformServiceJpaRepositoryImpl implements Payme
             return persistPaymentDetail(paymentDetail);
         }
         return paymentDetail;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PaymentDetailWritePlatformServiceJpaRepositoryImpl(final PaymentDetailRepository paymentDetailRepository, final PaymentTypeRepository paymentTypeRepository) {
+        this.paymentDetailRepository = paymentDetailRepository;
+        this.paymentTypeRepository = paymentTypeRepository;
     }
 }

@@ -18,23 +18,27 @@
  */
 package org.apache.fineract.test.data.datatable;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.test.support.EnumResolver;
 
-@RequiredArgsConstructor
-@Getter
 public enum DatatableEntityType {
-
-    LOAN("m_loan"), //
-    LOAN_PRODUCT("m_product_loan"), //
-    WC_LOAN("m_wc_loan"), //
-    WC_LOAN_PRODUCT("m_wc_loan_product"), //
-    ;
-
+    LOAN("m_loan"),  //
+    LOAN_PRODUCT("m_product_loan"),  //
+    WC_LOAN("m_wc_loan"),  //
+    WC_LOAN_PRODUCT("m_wc_loan_product");
+    //
     private final String referencedTableName;
 
     public static DatatableEntityType fromString(String entityType) {
         return EnumResolver.fromString(DatatableEntityType.class, entityType);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private DatatableEntityType(final String referencedTableName) {
+        this.referencedTableName = referencedTableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getReferencedTableName() {
+        return this.referencedTableName;
     }
 }

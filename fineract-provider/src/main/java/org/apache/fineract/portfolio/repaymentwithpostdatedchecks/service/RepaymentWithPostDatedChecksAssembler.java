@@ -27,22 +27,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleInstallment;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.domain.PostDatedChecks;
 
-@RequiredArgsConstructor
 public class RepaymentWithPostDatedChecksAssembler {
-
     private final FromJsonHelper fromApiJsonHelper;
 
     public Set<PostDatedChecks> fromParsedJson(final String json, final Loan loan) {
         final Set<PostDatedChecks> postDatedChecks = new HashSet<>();
         final JsonElement jsonElement = this.fromApiJsonHelper.parse(json);
         final List<LoanRepaymentScheduleInstallment> loanRepaymentScheduleInstallments = loan.getRepaymentScheduleInstallments();
-
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         final Locale locale = this.fromApiJsonHelper.extractLocaleParameter(jsonObject);
         if (jsonObject.has("postDatedChecks") && jsonObject.get("postDatedChecks").isJsonArray()) {
@@ -52,21 +48,20 @@ public class RepaymentWithPostDatedChecksAssembler {
                 if (postDatedCheck == null) {
                     continue;
                 }
-
                 final String name = this.fromApiJsonHelper.extractStringNamed("name", postDatedCheck);
-
                 final BigDecimal amount = this.fromApiJsonHelper.extractBigDecimalNamed("amount", postDatedCheck, locale);
-
                 final Integer installmentId = this.fromApiJsonHelper.extractIntegerNamed("installmentId", postDatedCheck, locale);
-                final List<LoanRepaymentScheduleInstallment> installmentList = loanRepaymentScheduleInstallments.stream()
-                        .filter(repayment -> repayment.getInstallmentNumber().equals(installmentId)).collect(Collectors.toList());
+                final List<LoanRepaymentScheduleInstallment> installmentList = loanRepaymentScheduleInstallments.stream().filter(repayment -> repayment.getInstallmentNumber().equals(installmentId)).collect(Collectors.toList());
                 final Long accountNo = this.fromApiJsonHelper.extractLongNamed("accountNo", postDatedCheck);
                 final Long checkNo = this.fromApiJsonHelper.extractLongNamed("checkNo", postDatedCheck);
-
                 postDatedChecks.add(PostDatedChecks.instanceOf(accountNo, name, amount, installmentList.get(0), loan, checkNo));
             }
         }
-
         return postDatedChecks;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RepaymentWithPostDatedChecksAssembler(final FromJsonHelper fromApiJsonHelper) {
+        this.fromApiJsonHelper = fromApiJsonHelper;
     }
 }

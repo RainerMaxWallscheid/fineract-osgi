@@ -20,9 +20,6 @@ package org.apache.fineract.command.hook;
 
 import static org.apache.fineract.command.core.CommandConstants.COMMAND_HOOK_ORDER_HEADERS;
 import static org.apache.fineract.command.core.CommandConstants.COMMAND_HTTP_HEADER_IP;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHookBefore;
@@ -33,13 +30,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @Order(COMMAND_HOOK_ORDER_HEADERS)
 @ConditionalOnProperty(value = "fineract.command.hooks.servlet-header-pre", havingValue = "true")
 final class ServletHeadersCommandHook implements CommandHookBefore<Object> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ServletHeadersCommandHook.class);
     private final CommandProperties properties;
 
     @Override
@@ -54,17 +50,18 @@ final class ServletHeadersCommandHook implements CommandHookBefore<Object> {
 
     private String getHeader(String name, boolean searchParameter) {
         var attributes = RequestContextHolder.getRequestAttributes();
-
         if (attributes instanceof ServletRequestAttributes servletAttributes) {
             var value = servletAttributes.getRequest().getHeader(name.toLowerCase());
-
             if (searchParameter && StringUtils.isEmpty(value)) {
                 value = servletAttributes.getRequest().getParameter(name.toLowerCase());
             }
-
             return value;
         }
-
         return null;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ServletHeadersCommandHook(final CommandProperties properties) {
+        this.properties = properties;
     }
 }

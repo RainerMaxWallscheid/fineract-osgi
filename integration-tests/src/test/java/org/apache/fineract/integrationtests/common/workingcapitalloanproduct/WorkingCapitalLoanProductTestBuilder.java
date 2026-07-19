@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.PaymentAllocationOrder;
 import org.apache.fineract.client.models.PostAllowAttributeOverrides;
 import org.apache.fineract.client.models.PostPaymentAllocation;
@@ -33,9 +32,9 @@ import org.apache.fineract.client.models.PutWorkingCapitalLoanProductsProductIdR
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanPeriodFrequencyType;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.domain.WorkingCapitalAmortizationType;
 
-@Slf4j
 public class WorkingCapitalLoanProductTestBuilder {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanProductTestBuilder.class);
     private static final String DEFAULT_NAME = "Test WCP Product";
     private static final String DEFAULT_SHORT_NAME = "TWCP";
     private static final String DEFAULT_CURRENCY_CODE = "USD";
@@ -49,10 +48,8 @@ public class WorkingCapitalLoanProductTestBuilder {
     public static final BigDecimal DEFAULT_MAX_PERIOD_PAYMENT_RATE_PERCENT = BigDecimal.valueOf(25);
     private static final Integer DEFAULT_PERIOD_PAYMENT_FREQUENCY = 30;
     private static final String DEFAULT_PERIOD_PAYMENT_FREQUENCY_TYPE = WorkingCapitalLoanPeriodFrequencyType.DAYS.name();
-    private static final List<String> DEFAULT_PAYMENT_ALLOCATION_TYPES = List.of("DUE_PENALTY", "DUE_FEE", "DUE_PRINCIPAL",
-            "IN_ADVANCE_PENALTY", "IN_ADVANCE_FEE", "IN_ADVANCE_PRINCIPAL");
+    private static final List<String> DEFAULT_PAYMENT_ALLOCATION_TYPES = List.of("DUE_PENALTY", "DUE_FEE", "DUE_PRINCIPAL", "IN_ADVANCE_PENALTY", "IN_ADVANCE_FEE", "IN_ADVANCE_PRINCIPAL");
     private static final AccountingRuleEnum DEFAULT_ACCOUNTING_RULE = AccountingRuleEnum.NONE;
-
     private String name = DEFAULT_NAME;
     private String shortName = DEFAULT_SHORT_NAME;
     private String description;
@@ -82,7 +79,6 @@ public class WorkingCapitalLoanProductTestBuilder {
     private Integer breachGraceDays;
     private AccountingRuleEnum accountingRule = DEFAULT_ACCOUNTING_RULE;
     private Long nearBreachId;
-
     // GL account IDs for accrual with deferred revenue amortization accounting
     private Long fundSourceAccountId;
     private Long loanPortfolioAccountId;
@@ -162,8 +158,7 @@ public class WorkingCapitalLoanProductTestBuilder {
      * on top of the DEFAULT rule. {@code allocationOrder} must contain every
      * {@link org.apache.fineract.client.models.PaymentAllocationOrder} rule exactly once.
      */
-    public WorkingCapitalLoanProductTestBuilder withPaymentAllocationForTransactionType(
-            final PostPaymentAllocation.TransactionTypeEnum transactionType, final List<String> allocationOrder) {
+    public WorkingCapitalLoanProductTestBuilder withPaymentAllocationForTransactionType(final PostPaymentAllocation.TransactionTypeEnum transactionType, final List<String> allocationOrder) {
         this.additionalPaymentAllocations.add(buildPaymentAllocationEntry(transactionType, allocationOrder));
         return this;
     }
@@ -347,8 +342,7 @@ public class WorkingCapitalLoanProductTestBuilder {
         request.setDiscount(this.discount);
         request.setRepaymentEvery(this.repaymentEvery);
         if (this.repaymentFrequencyType != null) {
-            request.setRepaymentFrequencyType(
-                    PostWorkingCapitalLoanProductsRequest.RepaymentFrequencyTypeEnum.valueOf(this.repaymentFrequencyType));
+            request.setRepaymentFrequencyType(PostWorkingCapitalLoanProductsRequest.RepaymentFrequencyTypeEnum.valueOf(this.repaymentFrequencyType));
         }
         request.setDelinquencyGraceDays(this.delinquencyGraceDays);
         request.setDelinquencyStartType(this.delinquencyStartType);
@@ -394,8 +388,7 @@ public class WorkingCapitalLoanProductTestBuilder {
         request.setDiscount(this.discount);
         request.setRepaymentEvery(this.repaymentEvery);
         if (this.repaymentFrequencyType != null) {
-            request.setRepaymentFrequencyType(
-                    PutWorkingCapitalLoanProductsProductIdRequest.RepaymentFrequencyTypeEnum.valueOf(this.repaymentFrequencyType));
+            request.setRepaymentFrequencyType(PutWorkingCapitalLoanProductsProductIdRequest.RepaymentFrequencyTypeEnum.valueOf(this.repaymentFrequencyType));
         }
         request.setDelinquencyGraceDays(this.delinquencyGraceDays);
         request.setDelinquencyStartType(this.delinquencyStartType);
@@ -432,8 +425,7 @@ public class WorkingCapitalLoanProductTestBuilder {
         return allocations;
     }
 
-    private static PostPaymentAllocation buildPaymentAllocationEntry(final PostPaymentAllocation.TransactionTypeEnum transactionType,
-            final List<String> allocationOrder) {
+    private static PostPaymentAllocation buildPaymentAllocationEntry(final PostPaymentAllocation.TransactionTypeEnum transactionType, final List<String> allocationOrder) {
         final PostPaymentAllocation paymentAllocation = new PostPaymentAllocation();
         paymentAllocation.setTransactionType(transactionType);
         paymentAllocation.setPaymentAllocationOrder(IntStream.range(0, allocationOrder.size()).mapToObj(index -> {
@@ -461,8 +453,7 @@ public class WorkingCapitalLoanProductTestBuilder {
             for (final Map.Entry<String, Boolean> entry : this.allowAttributeOverrides.entrySet()) {
                 switch (entry.getKey()) {
                     case "breach" -> defaultAllowAttributeOverrides.breach(entry.getValue());
-                    case "delinquencyBucketClassification" ->
-                        defaultAllowAttributeOverrides.delinquencyBucketClassification(entry.getValue());
+                    case "delinquencyBucketClassification" -> defaultAllowAttributeOverrides.delinquencyBucketClassification(entry.getValue());
                     case "periodPaymentFrequency" -> defaultAllowAttributeOverrides.periodPaymentFrequency(entry.getValue());
                     case "periodPaymentFrequencyType" -> defaultAllowAttributeOverrides.periodPaymentFrequencyType(entry.getValue());
                     case "discountDefault" -> defaultAllowAttributeOverrides.discountDefault(entry.getValue());

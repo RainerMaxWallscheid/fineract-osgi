@@ -19,8 +19,6 @@
 package org.apache.fineract.portfolio.group.service;
 
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -42,10 +40,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.NonTransientDataAccessException;
 import org.springframework.orm.jpa.JpaSystemException;
 
-@Slf4j
-@RequiredArgsConstructor
 public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRolesWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GroupRolesWritePlatformServiceJpaRepositoryImpl.class);
     private final PlatformSecurityContext context;
     private final GroupRepositoryWrapper groupRepository;
     private final GroupRolesDataValidator fromApiJsonDeserializer;
@@ -55,50 +52,39 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
 
     @Override
     public CommandProcessingResult createRole(final JsonCommand command) {
-
         try {
             this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForCreateGroupRole(command);
-
             final Long roleId = command.longValueOfParameterNamed(GroupingTypesApiConstants.roleParamName);
             final CodeValue role = this.codeValueRepository.findOneWithNotFoundDetection(roleId);
-
             final Long clientId = command.longValueOfParameterNamed(GroupingTypesApiConstants.clientIdParamName);
             final Client client = this.clientRepository.findOneWithNotFoundDetection(clientId);
-
             final Group group = this.groupRepository.findOneWithNotFoundDetection(command.getGroupId());
             if (!group.hasClientAsMember(client)) {
                 throw new ClientNotInGroupException(clientId, command.getGroupId());
             }
             final GroupRole groupRole = GroupRole.createGroupRole(group, client, role);
             this.groupRoleRepository.saveAndFlush(groupRole);
-            return new CommandProcessingResultBuilder() //
-                    .withClientId(client.getId()) //
-                    .withGroupId(group.getId()) //
-                    .withEntityId(groupRole.getId()) //
-                    .build();
-
+            return  //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withClientId(client.getId()).withGroupId(group.getId()).withEntityId(groupRole.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleGroupDataIntegrityIssues(command, throwable, dve);
             return CommandProcessingResult.empty();
         }
-
     }
 
-    private void handleGroupDataIntegrityIssues(final JsonCommand command, final Throwable realCause,
-            final NonTransientDataAccessException dve) {
-
+    private void handleGroupDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final NonTransientDataAccessException dve) {
         if (realCause.getMessage().contains("UNIQUE_GROUP_ROLES")) {
             final String clientId = command.stringValueOfParameterNamed(GroupingTypesApiConstants.clientIdParamName);
             final String roleId = command.stringValueOfParameterNamed(GroupingTypesApiConstants.roleParamName);
-            final String errorMessageForUser = "Group Role with roleId `" + roleId + "`, clientId `" + clientId + "`, groupId `"
-                    + command.getGroupId() + "` already exists.";
+            final String errorMessageForUser = "Group Role with roleId `" + roleId + "`, clientId `" + clientId + "`, groupId `" + command.getGroupId() + "` already exists.";
             final String errorMessageForMachine = "error.msg.group.role.already.exists";
-            throw new PlatformDataIntegrityException(errorMessageForMachine, errorMessageForUser,
-                    GroupingTypesApiConstants.clientIdParamName, roleId, clientId, command.getGroupId());
+            throw new PlatformDataIntegrityException(errorMessageForMachine, errorMessageForUser, GroupingTypesApiConstants.clientIdParamName, roleId, clientId, command.getGroupId());
         }
-
         log.error("Error occured.", dve);
         throw ErrorHandler.getMappable(dve, "error.msg.group.unknown.data.integrity.issue", "Unknown data integrity issue with resource.");
     }
@@ -108,25 +94,19 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
         try {
             this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForUpdateRole(command);
-
             final Group group = this.groupRepository.findOneWithNotFoundDetection(command.getGroupId());
-
             final GroupRole groupRole = this.groupRoleRepository.findOneWithNotFoundDetection(command.entityId());
             final Map<String, Object> actualChanges = groupRole.update(command);
-
             if (actualChanges.containsKey(GroupingTypesApiConstants.roleParamName)) {
                 final Long newValue = command.longValueOfParameterNamed(GroupingTypesApiConstants.roleParamName);
-
                 CodeValue role = null;
                 if (newValue != null) {
                     role = this.codeValueRepository.findOneWithNotFoundDetection(newValue);
                 }
                 groupRole.updateRole(role);
             }
-
             if (actualChanges.containsKey(GroupingTypesApiConstants.clientIdParamName)) {
                 final Long newValue = command.longValueOfParameterNamed(GroupingTypesApiConstants.clientIdParamName);
-
                 Client client = null;
                 if (newValue != null) {
                     client = this.clientRepository.findOneWithNotFoundDetection(newValue);
@@ -136,19 +116,17 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
                 }
                 groupRole.updateClient(client);
             }
-
             this.groupRoleRepository.saveAndFlush(groupRole);
-            return new CommandProcessingResultBuilder() //
-                    .with(actualChanges) //
-                    .withGroupId(group.getId()) //
-                    .withEntityId(groupRole.getId()) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().with(actualChanges).withGroupId(group.getId()).withEntityId(groupRole.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleGroupDataIntegrityIssues(command, throwable, dve);
             return CommandProcessingResult.empty();
         }
-
     }
 
     @Override
@@ -156,9 +134,18 @@ public class GroupRolesWritePlatformServiceJpaRepositoryImpl implements GroupRol
         this.context.authenticatedUser();
         final GroupRole groupRole = this.groupRoleRepository.findOneWithNotFoundDetection(ruleId);
         this.groupRoleRepository.delete(groupRole);
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(groupRole.getId()) //
-                .build();
+        return  //
+        //
+        new CommandProcessingResultBuilder().withEntityId(groupRole.getId()).build();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public GroupRolesWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final GroupRepositoryWrapper groupRepository, final GroupRolesDataValidator fromApiJsonDeserializer, final CodeValueRepositoryWrapper codeValueRepository, final ClientRepositoryWrapper clientRepository, final GroupRoleRepositoryWrapper groupRoleRepository) {
+        this.context = context;
+        this.groupRepository = groupRepository;
+        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
+        this.codeValueRepository = codeValueRepository;
+        this.clientRepository = clientRepository;
+        this.groupRoleRepository = groupRoleRepository;
+    }
 }

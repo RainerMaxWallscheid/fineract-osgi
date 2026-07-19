@@ -24,7 +24,6 @@ import com.google.gson.JsonObject;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -32,15 +31,15 @@ import org.apache.fineract.infrastructure.core.exception.InvalidJsonException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 
-@Slf4j
 public class ParseAndValidator {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ParseAndValidator.class);
 
     protected JsonObject extractJsonObject(final FromJsonHelper jsonHelper, final JsonCommand command) {
         String json = command.json();
         if (StringUtils.isBlank(json)) {
             throw new InvalidJsonException();
         }
-
         final JsonElement element = jsonHelper.parse(json);
         return element.getAsJsonObject();
     }
@@ -48,8 +47,7 @@ public class ParseAndValidator {
     protected void throwExceptionIfValidationWarningsExist(DataValidatorBuilder dataValidator) {
         if (dataValidator.hasError()) {
             log.error("Validation errors: {}", dataValidator.getDataValidationErrors());
-            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
-                    dataValidator.getDataValidationErrors());
+            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.", dataValidator.getDataValidationErrors());
         }
     }
 
@@ -59,10 +57,9 @@ public class ParseAndValidator {
         }
     }
 
-    protected void validateForSupportedParameters(final String json, final Collection<String> supportedParameters,
-            final FromJsonHelper fromApiJsonHelper) {
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+    protected void validateForSupportedParameters(final String json, final Collection<String> supportedParameters, final FromJsonHelper fromApiJsonHelper) {
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+        }.getType();
         fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
     }
-
 }

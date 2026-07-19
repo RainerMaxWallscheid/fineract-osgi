@@ -18,16 +18,13 @@
  */
 package org.apache.fineract.infrastructure.event.external.config;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
-@RequiredArgsConstructor
 public class EventTaskExecutorConfig {
-
     private final FineractProperties fineractProperties;
 
     @Bean(TaskExecutorConstant.EVENT_MARKS_AS_SENT_EXECUTOR_BEAN_NAME)
@@ -38,7 +35,11 @@ public class EventTaskExecutorConfig {
         threadPoolTaskExecutor.setQueueCapacity(fineractProperties.getEvents().getExternal().getThreadPoolQueueCapacity());
         threadPoolTaskExecutor.setThreadNamePrefix("external-events-");
         threadPoolTaskExecutor.initialize();
-
         return threadPoolTaskExecutor;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EventTaskExecutorConfig(final FineractProperties fineractProperties) {
+        this.fineractProperties = fineractProperties;
     }
 }

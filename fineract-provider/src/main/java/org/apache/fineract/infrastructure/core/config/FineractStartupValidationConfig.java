@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.infrastructure.core.config;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.condition.FineractValidationCondition;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -29,13 +27,12 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@RequiredArgsConstructor
 @Conditional(FineractValidationCondition.class)
 public class FineractStartupValidationConfig implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FineractStartupValidationConfig.class);
     private final ApplicationContext applicationContext;
 
     @Override
@@ -46,5 +43,10 @@ public class FineractStartupValidationConfig implements InitializingBean {
     private void terminateApplication() {
         log.error("The application startup fails on validations. Please check the log above for the details");
         ((ConfigurableApplicationContext) applicationContext).close();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FineractStartupValidationConfig(final ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 }

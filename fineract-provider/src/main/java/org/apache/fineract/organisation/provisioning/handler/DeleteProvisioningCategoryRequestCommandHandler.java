@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.organisation.provisioning.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "PROVISIONCATEGORY", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteProvisioningCategoryRequestCommandHandler implements NewCommandSourceHandler {
-
     private final ProvisioningCategoryWritePlatformService provisioningCategoryWritePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class DeleteProvisioningCategoryRequestCommandHandler implements NewComma
         return this.provisioningCategoryWritePlatformService.deleteProvisioningCateogry(jsonCommand);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DeleteProvisioningCategoryRequestCommandHandler(final ProvisioningCategoryWritePlatformService provisioningCategoryWritePlatformService) {
+        this.provisioningCategoryWritePlatformService = provisioningCategoryWritePlatformService;
+    }
 }

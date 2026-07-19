@@ -20,14 +20,11 @@ package org.apache.fineract.infrastructure.jobs.service.aggregationjob.listener;
 
 import static org.apache.fineract.infrastructure.jobs.service.aggregationjob.JournalEntryAggregationJobConstant.JOB_SUMMARY_STEP_NAME;
 import static org.apache.fineract.infrastructure.jobs.service.aggregationjob.JournalEntryAggregationJobConstant.JOURNAL_ENTRY_AGGREGATION_JOB_NAME;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
@@ -41,30 +38,24 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.stereotype.Component;
 
 @Component
-@Slf4j
-@RequiredArgsConstructor
 public class JournalEntryAggregationJobListener implements JobExecutionListener {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JournalEntryAggregationJobListener.class);
     private static final List<String> successJobStatus = List.of(ExitStatus.COMPLETED.getExitCode(), ExitStatus.NOOP.getExitCode());
-
     private final FineractProperties fineractProperties;
     private final JournalEntryAggregationTrackingRepository journalEntryAggregationTrackingRepository;
     private final JournalEntryAggregationWriterService journalEntryAggregationWriterService;
 
     @Override
     public void beforeJob(final JobExecution jobExecution) {
-        log.info("Journal Entry Aggregation Job Started  jobName={}, jobExecutionId={}", JOURNAL_ENTRY_AGGREGATION_JOB_NAME,
-                jobExecution.getId());
-        LocalDate providedAggregatedOnDate = (LocalDate) jobExecution.getExecutionContext()
-                .get(JournalEntryAggregationJobConstant.AGGREGATED_ON_DATE);
+        log.info("Journal Entry Aggregation Job Started  jobName={}, jobExecutionId={}", JOURNAL_ENTRY_AGGREGATION_JOB_NAME, jobExecution.getId());
+        LocalDate providedAggregatedOnDate = (LocalDate) jobExecution.getExecutionContext().get(JournalEntryAggregationJobConstant.AGGREGATED_ON_DATE);
         // if aggregatedOnDate not provided in the parameter it will be defaulted to businessDate.
-        final LocalDate aggregatedOnDate = providedAggregatedOnDate != null //
-                ? providedAggregatedOnDate.minusDays(fineractProperties.getJob().getJournalEntryAggregation().getExcludeRecentNDays()) //
-                : ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.BUSINESS_DATE)
-                        .minusDays(fineractProperties.getJob().getJournalEntryAggregation().getExcludeRecentNDays()); //
+        final LocalDate aggregatedOnDate =  //
+        providedAggregatedOnDate != null ? providedAggregatedOnDate.minusDays(fineractProperties.getJob().getJournalEntryAggregation().getExcludeRecentNDays()) //
+         : ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.BUSINESS_DATE).minusDays(fineractProperties.getJob().getJournalEntryAggregation().getExcludeRecentNDays()); //
         // get last or most recent aggregatedOnDate from tacking table.
         final LocalDate lastAggregatedOnDate = journalEntryAggregationTrackingRepository.findLatestAggregatedOnDate();
-
         initializeDates(jobExecution, aggregatedOnDate, lastAggregatedOnDate);
     }
 
@@ -94,14 +85,10 @@ public class JournalEntryAggregationJobListener implements JobExecutionListener 
     }
 
     private void logJobExecutionSummary(final JobExecution jobExecution) {
-        final LocalDate aggregatedOnDateFrom = (LocalDate) jobExecution.getExecutionContext()
-                .get(JournalEntryAggregationJobConstant.AGGREGATED_ON_DATE_FROM);
-        final LocalDate aggregatedOnDateTo = (LocalDate) jobExecution.getExecutionContext()
-                .get(JournalEntryAggregationJobConstant.AGGREGATED_ON_DATE_TO);
+        final LocalDate aggregatedOnDateFrom = (LocalDate) jobExecution.getExecutionContext().get(JournalEntryAggregationJobConstant.AGGREGATED_ON_DATE_FROM);
+        final LocalDate aggregatedOnDateTo = (LocalDate) jobExecution.getExecutionContext().get(JournalEntryAggregationJobConstant.AGGREGATED_ON_DATE_TO);
         final Long jobExecutionId = jobExecution.getId();
-        final Long recordProcessCount = jobExecution.getStepExecutions().stream()
-                .filter(stepExecution -> stepExecution.getStepName().equals(JOB_SUMMARY_STEP_NAME)).mapToLong(StepExecution::getWriteCount)
-                .sum();
+        final Long recordProcessCount = jobExecution.getStepExecutions().stream().filter(stepExecution -> stepExecution.getStepName().equals(JOB_SUMMARY_STEP_NAME)).mapToLong(StepExecution::getWriteCount).sum();
         final Instant startDateTime = jobExecution.getStartTime() != null ? jobExecution.getStartTime().toInstant(ZoneOffset.UTC) : null;
         final Instant endDateTime = jobExecution.getEndTime() != null ? jobExecution.getEndTime().toInstant(ZoneOffset.UTC) : null;
         long jobDuration = 0L;
@@ -112,11 +99,13 @@ public class JournalEntryAggregationJobListener implements JobExecutionListener 
             endDateTimeMilliSecond = endDateTime.toEpochMilli();
             jobDuration = startDateTime.until(endDateTime, ChronoUnit.MINUTES);
         }
-        log.info(
-                "Execution Summary for jobName={}, aggregatedDateFrom={}, aggregatedDateTo={}, totalRecordProcessCount={}, startTime={}, endTime={}, startTime_ms={}, endTime_ms={}, "
-                        + "jobExecutionId={}, jobExecutionDurationInMinutes={}, tenantId={}",
-                JOURNAL_ENTRY_AGGREGATION_JOB_NAME, aggregatedOnDateFrom, aggregatedOnDateTo, recordProcessCount, startDateTime,
-                endDateTime, startDateTimeMilliSecond, endDateTimeMilliSecond, jobExecutionId, jobDuration,
-                ThreadLocalContextUtil.getTenant().getTenantIdentifier());
+        log.info("Execution Summary for jobName={}, aggregatedDateFrom={}, aggregatedDateTo={}, totalRecordProcessCount={}, startTime={}, endTime={}, startTime_ms={}, endTime_ms={}, " + "jobExecutionId={}, jobExecutionDurationInMinutes={}, tenantId={}", JOURNAL_ENTRY_AGGREGATION_JOB_NAME, aggregatedOnDateFrom, aggregatedOnDateTo, recordProcessCount, startDateTime, endDateTime, startDateTimeMilliSecond, endDateTimeMilliSecond, jobExecutionId, jobDuration, ThreadLocalContextUtil.getTenant().getTenantIdentifier());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JournalEntryAggregationJobListener(final FineractProperties fineractProperties, final JournalEntryAggregationTrackingRepository journalEntryAggregationTrackingRepository, final JournalEntryAggregationWriterService journalEntryAggregationWriterService) {
+        this.fineractProperties = fineractProperties;
+        this.journalEntryAggregationTrackingRepository = journalEntryAggregationTrackingRepository;
+        this.journalEntryAggregationWriterService = journalEntryAggregationWriterService;
     }
 }

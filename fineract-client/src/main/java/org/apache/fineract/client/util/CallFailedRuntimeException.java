@@ -19,7 +19,6 @@
 package org.apache.fineract.client.util;
 
 import java.io.IOException;
-import lombok.extern.slf4j.Slf4j;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -28,9 +27,9 @@ import retrofit2.Response;
  *
  * @author Michael Vorburger.ch
  */
-@Slf4j
 public class CallFailedRuntimeException extends RuntimeException {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CallFailedRuntimeException.class);
     private final Call<?> call;
     private final Response<?> response;
 

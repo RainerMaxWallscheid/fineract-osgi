@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.data.BusinessStepNameAndOrder;
 import org.apache.fineract.cob.domain.BatchBusinessStep;
 import org.apache.fineract.cob.domain.BatchBusinessStepRepository;
@@ -42,19 +40,17 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
-@RequiredArgsConstructor
 public class COBBusinessStepServiceImpl implements COBBusinessStepService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(COBBusinessStepServiceImpl.class);
     private final BatchBusinessStepRepository batchBusinessStepRepository;
     private final ApplicationContext applicationContext;
     private final ListableBeanFactory beanFactory;
     private final BusinessEventNotifierService businessEventNotifierService;
     private final ConfigurationDomainService configurationDomainService;
-
     private final ReloaderService reloaderService;
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     @Override
     public <T extends COBBusinessStep<S>, S extends AbstractPersistableCustom<Long>> S run(TreeMap<Long, String> executionMap, S item) {
         if (executionMap == null || executionMap.isEmpty()) {
@@ -66,7 +62,6 @@ public class COBBusinessStepServiceImpl implements COBBusinessStepService {
             if (bulkEventEnabled) {
                 businessEventNotifierService.startExternalEventRecording();
             }
-
             for (String businessStep : executionMap.values()) {
                 try {
                     ThreadLocalContextUtil.setActionContext(ActionContext.COB);
@@ -94,18 +89,25 @@ public class COBBusinessStepServiceImpl implements COBBusinessStepService {
 
     @NonNull
     @Override
-    public <T extends COBBusinessStep<S>, S extends AbstractPersistableCustom<Long>> Set<BusinessStepNameAndOrder> getCOBBusinessSteps(
-            Class<T> businessStepClass, String cobJobName) {
+    public <T extends COBBusinessStep<S>, S extends AbstractPersistableCustom<Long>> Set<BusinessStepNameAndOrder> getCOBBusinessSteps(Class<T> businessStepClass, String cobJobName) {
         List<BatchBusinessStep> cobStepConfigs = batchBusinessStepRepository.findAllByJobName(cobJobName);
         List<String> businessSteps = Arrays.stream(beanFactory.getBeanNamesForType(businessStepClass)).toList();
         Set<BusinessStepNameAndOrder> executionMap = new HashSet<>();
         for (String businessStep : businessSteps) {
             T businessStepBean = applicationContext.getBean(businessStep, businessStepClass);
-            Optional<BatchBusinessStep> businessStepConfig = cobStepConfigs.stream()
-                    .filter(stepConfig -> businessStepBean.getEnumStyledName().equals(stepConfig.getStepName())).findFirst();
-            businessStepConfig.ifPresent(
-                    batchBusinessStep -> executionMap.add(new BusinessStepNameAndOrder(businessStep, batchBusinessStep.getStepOrder())));
+            Optional<BatchBusinessStep> businessStepConfig = cobStepConfigs.stream().filter(stepConfig -> businessStepBean.getEnumStyledName().equals(stepConfig.getStepName())).findFirst();
+            businessStepConfig.ifPresent(batchBusinessStep -> executionMap.add(new BusinessStepNameAndOrder(businessStep, batchBusinessStep.getStepOrder())));
         }
         return executionMap;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public COBBusinessStepServiceImpl(final BatchBusinessStepRepository batchBusinessStepRepository, final ApplicationContext applicationContext, final ListableBeanFactory beanFactory, final BusinessEventNotifierService businessEventNotifierService, final ConfigurationDomainService configurationDomainService, final ReloaderService reloaderService) {
+        this.batchBusinessStepRepository = batchBusinessStepRepository;
+        this.applicationContext = applicationContext;
+        this.beanFactory = beanFactory;
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.configurationDomainService = configurationDomainService;
+        this.reloaderService = reloaderService;
     }
 }

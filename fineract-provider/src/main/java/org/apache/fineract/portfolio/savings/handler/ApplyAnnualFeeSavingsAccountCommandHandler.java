@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "SAVINGSACCOUNT", action = "APPLYANNUALFEE")
-@RequiredArgsConstructor
 public class ApplyAnnualFeeSavingsAccountCommandHandler implements NewCommandSourceHandler {
-
     @SuppressWarnings("unused")
     private final SavingsAccountWritePlatformService writePlatformService;
 
@@ -41,10 +38,14 @@ public class ApplyAnnualFeeSavingsAccountCommandHandler implements NewCommandSou
         // TODO: why do we keep this class when we literally do nothing here?!?
         // final LocalDate annualFeeTransactionDate =
         // command.localDateValueOfParameterNamed("annualFeeTransactionDate");
-
         // return
         // this.writePlatformService.applyAnnualFee(command.getSavingsId(),
         // annualFeeTransactionDate);
         return null;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ApplyAnnualFeeSavingsAccountCommandHandler(final SavingsAccountWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

@@ -20,7 +20,6 @@ package org.apache.fineract.infrastructure.core.filters;
 
 import jakarta.ws.rs.core.UriInfo;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
 import org.apache.fineract.batch.domain.Header;
@@ -30,17 +29,14 @@ import org.apache.fineract.infrastructure.core.domain.FineractRequestContextHold
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class IdempotencyStoreBatchFilter implements BatchFilter {
-
     private final FineractRequestContextHolder fineractRequestContextHolder;
     private final IdempotencyStoreHelper helper;
     private final FineractProperties fineractProperties;
 
     @Override
     public BatchResponse doFilter(BatchRequest batchRequest, UriInfo uriInfo, BatchFilterChain chain) {
-        extractIdempotentKeyFromBatchRequest(batchRequest).ifPresent(idempotentKey -> fineractRequestContextHolder
-                .setAttribute(SynchronousCommandProcessingService.IDEMPOTENCY_KEY_ATTRIBUTE, idempotentKey));
+        extractIdempotentKeyFromBatchRequest(batchRequest).ifPresent(idempotentKey -> fineractRequestContextHolder.setAttribute(SynchronousCommandProcessingService.IDEMPOTENCY_KEY_ATTRIBUTE, idempotentKey));
         BatchResponse result = chain.serviceCall(batchRequest, uriInfo);
         Optional<Long> commandId = helper.getCommandId(null);
         boolean isSuccessWithoutStored = commandId.isPresent() && helper.isStoreIdempotencyKey(null);
@@ -54,10 +50,16 @@ public class IdempotencyStoreBatchFilter implements BatchFilter {
         if (request.getHeaders() == null) {
             return Optional.empty();
         }
-        return request.getHeaders() //
-                .stream().filter(header -> header.getName().equals(fineractProperties.getIdempotencyKeyHeaderName())) //
-                .map(Header::getValue) //
-                .findAny(); //
+        return  //
+        //
+        //
+        request.getHeaders().stream().filter(header -> header.getName().equals(fineractProperties.getIdempotencyKeyHeaderName())).map(Header::getValue).findAny(); //
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public IdempotencyStoreBatchFilter(final FineractRequestContextHolder fineractRequestContextHolder, final IdempotencyStoreHelper helper, final FineractProperties fineractProperties) {
+        this.fineractRequestContextHolder = fineractRequestContextHolder;
+        this.helper = helper;
+        this.fineractProperties = fineractProperties;
     }
 }

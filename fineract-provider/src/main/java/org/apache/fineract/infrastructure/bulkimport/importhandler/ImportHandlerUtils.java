@@ -21,7 +21,6 @@ package org.apache.fineract.infrastructure.bulkimport.importhandler;
 import com.google.common.base.Splitter;
 import java.time.LocalDate;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -43,11 +42,11 @@ import org.apache.poi.ss.usermodel.SheetVisibility;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellReference;
 
-@Slf4j
 public final class ImportHandlerUtils {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ImportHandlerUtils.class);
 
     private ImportHandlerUtils() {
-
     }
 
     public static Integer getNumberOfRows(Sheet sheet, int primaryColumn) {
@@ -102,7 +101,6 @@ public final class ImportHandlerUtils {
     }
 
     public static String readAsString(int colIndex, Row row) {
-
         Cell c = row.getCell(colIndex);
         if (c == null || c.getCellType() == CellType.BLANK) {
             return null;
@@ -113,9 +111,7 @@ public final class ImportHandlerUtils {
                 CellValue value;
                 try {
                     value = eval.evaluate(c);
-
                     String res = trimEmptyDecimalPortion(value.getStringValue());
-
                     if (StringUtils.isNotEmpty(res)) {
                         return res.trim();
                     }
@@ -127,7 +123,6 @@ public final class ImportHandlerUtils {
         } else if (c.getCellType() == CellType.STRING) {
             String res = trimEmptyDecimalPortion(c.getStringCellValue().trim());
             return res.trim();
-
         } else if (c.getCellType() == CellType.NUMERIC) {
             return ((Double) row.getCell(colIndex).getNumericCellValue()).intValue() + "";
         } else if (c.getCellType() == CellType.BOOLEAN) {
@@ -150,7 +145,6 @@ public final class ImportHandlerUtils {
         if (c == null || c.getCellType() == CellType.BLANK) {
             return null;
         }
-
         return LocalDate.ofInstant(c.getDateCellValue().toInstant(), DateUtils.getDateTimeZoneOfTenant());
     }
 
@@ -250,13 +244,11 @@ public final class ImportHandlerUtils {
         CellStyle style = workbook.createCellStyle();
         style.setFillForegroundColor(color.getIndex());
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
         Sheet cache = workbook.createSheet(color.toString());
         workbook.setSheetVisibility(workbook.getSheetIndex(cache), SheetVisibility.VERY_HIDDEN);
         Row row = cache.createRow(cellReference.getRow());
         Cell cell = row.createCell(cellReference.getCol());
         cell.setCellStyle(style);
-
         return style;
     }
 
@@ -307,20 +299,12 @@ public final class ImportHandlerUtils {
                 for (Cell cell : row) {
                     if (name != null) {
                         if (cell.getCellType() == CellType.STRING && cell.getRichStringCellValue().getString().trim().equals(name)) {
-                            if (sheetName.equals(TemplatePopulateImportConstants.OFFICE_SHEET_NAME)
-                                    || sheetName.equals(TemplatePopulateImportConstants.GL_ACCOUNTS_SHEET_NAME)
-                                    || sheetName.equals(TemplatePopulateImportConstants.EXTRAS_SHEET_NAME)
-                                    || sheetName.equals(TemplatePopulateImportConstants.CHARGE_SHEET_NAME)
-                                    || sheetName.equals(TemplatePopulateImportConstants.SHARED_PRODUCTS_SHEET_NAME)
-                                    || sheetName.equals(TemplatePopulateImportConstants.ROLES_SHEET_NAME)) {
+                            if (sheetName.equals(TemplatePopulateImportConstants.OFFICE_SHEET_NAME) || sheetName.equals(TemplatePopulateImportConstants.GL_ACCOUNTS_SHEET_NAME) || sheetName.equals(TemplatePopulateImportConstants.EXTRAS_SHEET_NAME) || sheetName.equals(TemplatePopulateImportConstants.CHARGE_SHEET_NAME) || sheetName.equals(TemplatePopulateImportConstants.SHARED_PRODUCTS_SHEET_NAME) || sheetName.equals(TemplatePopulateImportConstants.ROLES_SHEET_NAME)) {
                                 if (row.getCell(cell.getColumnIndex() - 1).getCellType() == CellType.NUMERIC) {
                                     return ((Double) row.getCell(cell.getColumnIndex() - 1).getNumericCellValue()).longValue();
                                 }
                                 return 0L;
-                            } else if (sheetName.equals(TemplatePopulateImportConstants.CLIENT_SHEET_NAME)
-                                    || sheetName.equals(TemplatePopulateImportConstants.CENTER_SHEET_NAME)
-                                    || sheetName.equals(TemplatePopulateImportConstants.GROUP_SHEET_NAME)
-                                    || sheetName.equals(TemplatePopulateImportConstants.STAFF_SHEET_NAME)) {
+                            } else if (sheetName.equals(TemplatePopulateImportConstants.CLIENT_SHEET_NAME) || sheetName.equals(TemplatePopulateImportConstants.CENTER_SHEET_NAME) || sheetName.equals(TemplatePopulateImportConstants.GROUP_SHEET_NAME) || sheetName.equals(TemplatePopulateImportConstants.STAFF_SHEET_NAME)) {
                                 if (row.getCell(cell.getColumnIndex() + 1).getCellType() == CellType.NUMERIC) {
                                     return ((Double) row.getCell(cell.getColumnIndex() + 1).getNumericCellValue()).longValue();
                                 }
@@ -359,7 +343,6 @@ public final class ImportHandlerUtils {
                     if (name != null) {
                         if (cell.getCellType() == CellType.STRING && cell.getRichStringCellValue().getString().trim().equals(name)) {
                             chargeTimeType = row.getCell(cell.getColumnIndex() + 3).getStringCellValue().toString();
-
                         }
                     }
                 }
@@ -399,7 +382,6 @@ public final class ImportHandlerUtils {
                     if (name != null) {
                         if (cell.getCellType() == CellType.STRING && cell.getRichStringCellValue().getString().trim().equals(name)) {
                             return row.getCell(cell.getColumnIndex() - 1).getStringCellValue().toString();
-
                         }
                     }
                 }

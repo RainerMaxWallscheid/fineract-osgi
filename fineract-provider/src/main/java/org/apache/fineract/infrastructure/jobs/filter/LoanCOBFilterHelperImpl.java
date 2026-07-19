@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.infrastructure.jobs.filter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.domain.BatchRequest;
@@ -57,11 +55,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 @Component
 @Conditional(LoanCOBEnabledCondition.class)
 public class LoanCOBFilterHelperImpl extends COBFilterApiMatcher implements LoanCOBFilterHelper, InitializingBean {
-
     private final GLIMAccountInfoRepository glimAccountInfoRepository;
     private final LoanAccountLockService loanAccountLockService;
     private final PlatformSecurityContext context;
@@ -69,17 +65,12 @@ public class LoanCOBFilterHelperImpl extends COBFilterApiMatcher implements Loan
     private final LoanRepository loanRepository;
     private final FineractProperties fineractProperties;
     private final RetrieveLoanIdService retrieveIdService;
-
     private final LoanRescheduleRequestRepository loanRescheduleRequestRepository;
-
     private static final List<HttpMethod> HTTP_METHODS = List.of(HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE);
-
     public static final Pattern IGNORE_LOAN_PATH_PATTERN = Pattern.compile("/v[1-9][0-9]*/loans/catch-up");
     public static final Pattern LOAN_PATH_PATTERN = Pattern.compile("/v[1-9][0-9]*/(?:reschedule)?loans/(?:external-id/)?([^/?]+).*");
-
     public static final Pattern LOAN_GLIMACCOUNT_PATH_PATTERN = Pattern.compile("/v[1-9][0-9]*/loans/glimAccount/(\\d+).*");
-    private static final Predicate<String> URL_FUNCTION = s -> LOAN_PATH_PATTERN.matcher(s).find()
-            || LOAN_GLIMACCOUNT_PATH_PATTERN.matcher(s).find();
+    private static final Predicate<String> URL_FUNCTION = s -> LOAN_PATH_PATTERN.matcher(s).find() || LOAN_GLIMACCOUNT_PATH_PATTERN.matcher(s).find();
 
     private Long getLoanId(boolean isGlim, String pathInfo) {
         if (!isGlim) {
@@ -109,8 +100,7 @@ public class LoanCOBFilterHelperImpl extends COBFilterApiMatcher implements Loan
 
     @Override
     protected boolean isApiMatching(String method, String pathInfo) {
-        return HTTP_METHODS.contains(HttpMethod.valueOf(method)) && !IGNORE_LOAN_PATH_PATTERN.matcher(pathInfo).find()
-                && URL_FUNCTION.test(pathInfo);
+        return HTTP_METHODS.contains(HttpMethod.valueOf(method)) && !IGNORE_LOAN_PATH_PATTERN.matcher(pathInfo).find() && URL_FUNCTION.test(pathInfo);
     }
 
     private boolean isGlim(String pathInfo) {
@@ -148,10 +138,8 @@ public class LoanCOBFilterHelperImpl extends COBFilterApiMatcher implements Loan
         List<COBIdAndLastClosedBusinessDate> loanIdAndLastClosedBusinessDates = new ArrayList<>();
         List<List<Long>> partitions = Lists.partition(loanIds, fineractProperties.getQuery().getInClauseParameterSizeLimit());
         partitions.forEach(partition -> {
-            loanIdAndLastClosedBusinessDates.addAll(retrieveIdService
-                    .retrieveLoanIdsBehindDate(ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE), partition));
-            loanIdAndLastClosedBusinessDates.addAll(retrieveIdService.retrieveLoanBehindOnDisbursementDate(
-                    ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE), partition));
+            loanIdAndLastClosedBusinessDates.addAll(retrieveIdService.retrieveLoanIdsBehindDate(ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE), partition));
+            loanIdAndLastClosedBusinessDates.addAll(retrieveIdService.retrieveLoanBehindOnDisbursementDate(ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE), partition));
         });
         return CollectionUtils.isNotEmpty(loanIdAndLastClosedBusinessDates);
     }
@@ -177,7 +165,6 @@ public class LoanCOBFilterHelperImpl extends COBFilterApiMatcher implements Loan
                 // first, so skipping it
                 loanIds.addAll(getLoanIdsFromApi(relativeUrl));
             }
-
             // check the body for Loan ID
             Long loanId = getTopLevelLoanIdFromBatchRequest(batchRequest);
             if (loanId != null) {
@@ -234,4 +221,15 @@ public class LoanCOBFilterHelperImpl extends COBFilterApiMatcher implements Loan
         objectMapper.configure(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS.mappedFeature(), true);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanCOBFilterHelperImpl(final GLIMAccountInfoRepository glimAccountInfoRepository, final LoanAccountLockService loanAccountLockService, final PlatformSecurityContext context, final InlineLoanCOBExecutorServiceImpl inlineLoanCOBExecutorService, final LoanRepository loanRepository, final FineractProperties fineractProperties, final RetrieveLoanIdService retrieveIdService, final LoanRescheduleRequestRepository loanRescheduleRequestRepository) {
+        this.glimAccountInfoRepository = glimAccountInfoRepository;
+        this.loanAccountLockService = loanAccountLockService;
+        this.context = context;
+        this.inlineLoanCOBExecutorService = inlineLoanCOBExecutorService;
+        this.loanRepository = loanRepository;
+        this.fineractProperties = fineractProperties;
+        this.retrieveIdService = retrieveIdService;
+        this.loanRescheduleRequestRepository = loanRescheduleRequestRepository;
+    }
 }

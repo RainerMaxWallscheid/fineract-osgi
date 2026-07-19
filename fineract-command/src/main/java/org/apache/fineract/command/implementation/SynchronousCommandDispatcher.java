@@ -19,10 +19,7 @@
 package org.apache.fineract.command.implementation;
 
 import static java.util.Objects.requireNonNull;
-
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.command.core.CommandHandlerManager;
@@ -30,33 +27,33 @@ import org.apache.fineract.command.core.CommandHookManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @ConditionalOnMissingBean(value = CommandDispatcher.class, ignored = SynchronousCommandDispatcher.class)
 public class SynchronousCommandDispatcher implements CommandDispatcher {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SynchronousCommandDispatcher.class);
     private final CommandHandlerManager handlerManager;
     private final CommandHookManager hookManager;
 
     @Override
     public <REQ, RES> Supplier<RES> dispatch(final Command<REQ> command) {
         requireNonNull(command, "Command must not be null");
-
         return () -> {
             try {
                 hookManager.before(command);
-
                 RES response = handlerManager.handle(command);
-
                 hookManager.after(command, response);
-
                 return response;
             } catch (Exception e) {
                 hookManager.error(command, e);
-
                 throw e;
             }
         };
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SynchronousCommandDispatcher(final CommandHandlerManager handlerManager, final CommandHookManager hookManager) {
+        this.handlerManager = handlerManager;
+        this.hookManager = hookManager;
     }
 }

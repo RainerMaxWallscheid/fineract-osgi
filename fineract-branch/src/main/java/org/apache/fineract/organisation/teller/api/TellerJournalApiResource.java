@@ -26,7 +26,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.organisation.teller.data.TellerJournalData;
 import org.apache.fineract.organisation.teller.service.TellerManagementReadPlatformService;
@@ -36,20 +35,20 @@ import org.springframework.stereotype.Component;
 @Path("/v1/cashiersjournal")
 @Component
 @Tag(name = "Cashier Journals", description = "")
-@RequiredArgsConstructor
 public class TellerJournalApiResource {
-
     private final TellerManagementReadPlatformService readPlatformService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "List Cashier Journals", operationId = "retrieveAllCashierJournals")
     @AlternativeOperationId("getJournalData_1")
-    public Collection<TellerJournalData> getJournalData(@QueryParam("officeId") final Long officeId,
-            @QueryParam("tellerId") final Long tellerId, @QueryParam("cashierId") final Long cashierId,
-            @QueryParam("dateRange") final String dateRange) {
+    public Collection<TellerJournalData> getJournalData(@QueryParam("officeId") final Long officeId, @QueryParam("tellerId") final Long tellerId, @QueryParam("cashierId") final Long cashierId, @QueryParam("dateRange") final String dateRange) {
         final DateRange dateRangeHolder = DateRange.fromString(dateRange);
-
         return readPlatformService.getJournals(officeId, tellerId, cashierId, dateRangeHolder.getStartDate(), dateRangeHolder.getEndDate());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TellerJournalApiResource(final TellerManagementReadPlatformService readPlatformService) {
+        this.readPlatformService = readPlatformService;
     }
 }

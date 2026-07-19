@@ -19,7 +19,6 @@
 package org.apache.fineract.investor.service;
 
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.configuration.service.ConfigurationReadPlatformService;
 import org.apache.fineract.infrastructure.event.business.domain.loan.LoanStatusChangedBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
@@ -27,23 +26,26 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class ExternalAssetOwnerLoanStatusChangePlatformServiceImpl implements ExternalAssetOwnerLoanStatusChangePlatformService {
-
     private final BusinessEventNotifierService businessEventNotifierService;
     private final ConfigurationReadPlatformService configurationReadPlatformService;
     private final LoanAccountOwnerTransferService loanAccountOwnerTransferService;
-
     private static final String ASSET_EXTERNALIZATION_OF_NON_ACTIVE_LOANS = "asset-externalization-of-non-active-loans";
 
     @PostConstruct
     public void addListeners() {
         businessEventNotifierService.addPostBusinessEventListener(LoanStatusChangedBusinessEvent.class, event -> {
             final Loan loan = event.get();
-            if (configurationReadPlatformService.retrieveGlobalConfiguration(ASSET_EXTERNALIZATION_OF_NON_ACTIVE_LOANS).isEnabled()
-                    && (event.getOldStatus().isActive() && (loan.isClosed() || loan.getStatus().isOverpaid()))) {
+            if (configurationReadPlatformService.retrieveGlobalConfiguration(ASSET_EXTERNALIZATION_OF_NON_ACTIVE_LOANS).isEnabled() && (event.getOldStatus().isActive() && (loan.isClosed() || loan.getStatus().isOverpaid()))) {
                 loanAccountOwnerTransferService.handleLoanClosedOrOverpaid(loan);
             }
         });
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnerLoanStatusChangePlatformServiceImpl(final BusinessEventNotifierService businessEventNotifierService, final ConfigurationReadPlatformService configurationReadPlatformService, final LoanAccountOwnerTransferService loanAccountOwnerTransferService) {
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.configurationReadPlatformService = configurationReadPlatformService;
+        this.loanAccountOwnerTransferService = loanAccountOwnerTransferService;
     }
 }

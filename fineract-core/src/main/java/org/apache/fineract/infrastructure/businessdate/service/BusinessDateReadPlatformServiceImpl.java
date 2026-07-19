@@ -22,8 +22,6 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.businessdate.data.service.BusinessDateDTO;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDate;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateRepository;
@@ -35,12 +33,11 @@ import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BusinessDateReadPlatformServiceImpl implements BusinessDateReadPlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BusinessDateReadPlatformServiceImpl.class);
     private final BusinessDateRepository repository;
     private final BusinessDateMapper businessDateMapper;
     private final ConfigurationDomainService configurationDomainService;
@@ -81,5 +78,12 @@ public class BusinessDateReadPlatformServiceImpl implements BusinessDateReadPlat
             }
         }
         return businessDateMap;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BusinessDateReadPlatformServiceImpl(final BusinessDateRepository repository, final BusinessDateMapper businessDateMapper, final ConfigurationDomainService configurationDomainService) {
+        this.repository = repository;
+        this.businessDateMapper = businessDateMapper;
+        this.configurationDomainService = configurationDomainService;
     }
 }

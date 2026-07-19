@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -31,12 +30,9 @@ import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.cache.support.NoOpCacheManager;
 import org.springframework.util.Assert;
 
-@RequiredArgsConstructor
 public class SpecifiedCacheSupportingCacheManager implements CacheManager, InitializingBean {
-
     private JCacheCacheManager delegateCacheManager;
     private NoOpCacheManager noOpCacheManager;
-
     private final Set<String> supportedCacheNames = new LinkedHashSet<>(16);
 
     @Override
@@ -78,5 +74,9 @@ public class SpecifiedCacheSupportingCacheManager implements CacheManager, Initi
 
     public void setSupportedCaches(String... cacheNames) {
         supportedCacheNames.addAll(Arrays.asList(cacheNames));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SpecifiedCacheSupportingCacheManager() {
     }
 }

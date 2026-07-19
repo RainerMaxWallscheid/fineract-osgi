@@ -18,15 +18,16 @@
  */
 package org.apache.fineract.infrastructure.event.business.domain;
 
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
 public abstract class AbstractBusinessEvent<T> implements BusinessEvent<T> {
-
     private final T value;
 
     @Override
     public T get() {
         return value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AbstractBusinessEvent(final T value) {
+        this.value = value;
     }
 }

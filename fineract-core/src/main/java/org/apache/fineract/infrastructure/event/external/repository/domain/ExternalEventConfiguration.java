@@ -22,25 +22,37 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "m_external_event_configuration")
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
 public class ExternalEventConfiguration {
-
     @Id
     @Column(name = "type", nullable = false)
     private String type;
-
     @Column(name = "enabled", nullable = false)
     private boolean enabled = false;
 
     public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getType() {
+        return this.type;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isEnabled() {
+        return this.enabled;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalEventConfiguration() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalEventConfiguration(final String type, final boolean enabled) {
+        this.type = type;
         this.enabled = enabled;
     }
 }

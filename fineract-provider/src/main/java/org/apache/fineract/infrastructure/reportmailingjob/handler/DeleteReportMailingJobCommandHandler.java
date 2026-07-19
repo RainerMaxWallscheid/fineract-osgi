@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.reportmailingjob.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -30,14 +29,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME, action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteReportMailingJobCommandHandler implements NewCommandSourceHandler {
-
     private final ReportMailingJobWritePlatformService reportMailingJobWritePlatformService;
 
     @Override
     @Transactional
     public CommandProcessingResult processCommand(JsonCommand jsonCommand) {
         return this.reportMailingJobWritePlatformService.deleteReportMailingJob(jsonCommand.entityId());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DeleteReportMailingJobCommandHandler(final ReportMailingJobWritePlatformService reportMailingJobWritePlatformService) {
+        this.reportMailingJobWritePlatformService = reportMailingJobWritePlatformService;
     }
 }

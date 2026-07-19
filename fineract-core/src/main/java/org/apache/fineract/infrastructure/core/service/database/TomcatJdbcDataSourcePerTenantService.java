@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.configuration.service.MoneyHelperInitializationService;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenantConnection;
@@ -45,18 +43,15 @@ import org.springframework.stereotype.Service;
  *
  * {@link ThreadLocalContextUtil} is used to retrieve the {@link FineractPlatformTenant} for the request.
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class TomcatJdbcDataSourcePerTenantService implements RoutingDataSourceService, ApplicationListener<ContextRefreshedEvent> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TomcatJdbcDataSourcePerTenantService.class);
     private static final Map<Long, DataSource> TENANT_TO_DATA_SOURCE_MAP = new ConcurrentHashMap<>();
     @Qualifier("hikariTenantDataSource")
     private final DataSource tenantDataSource;
     private final TenantDetailsService tenantDetailsService;
-
     private final DataSourcePerTenantServiceFactory dataSourcePerTenantServiceFactory;
-
     private final Set<Long> tenantMoneyInitializingSet = Sets.newConcurrentHashSet();
     @Autowired(required = false)
     private MoneyHelperInitializationService moneyHelperInitializationService;
@@ -65,17 +60,14 @@ public class TomcatJdbcDataSourcePerTenantService implements RoutingDataSourceSe
     public DataSource retrieveDataSource() {
         // default to tenant database datasource
         DataSource actualDataSource = this.tenantDataSource;
-
         final FineractPlatformTenant tenant = ThreadLocalContextUtil.getTenant();
         if (tenant != null) {
             final FineractPlatformTenantConnection tenantConnection = tenant.getConnection();
             Long tenantConnectionKey = tenantConnection.getConnectionId();
             // if tenantConnection information available switch to the
             // appropriate datasource for that tenant.
-            actualDataSource = TENANT_TO_DATA_SOURCE_MAP.computeIfAbsent(tenantConnectionKey,
-                    (key) -> dataSourcePerTenantServiceFactory.createNewDataSourceFor(tenant, tenantConnection));
+            actualDataSource = TENANT_TO_DATA_SOURCE_MAP.computeIfAbsent(tenantConnectionKey, key -> dataSourcePerTenantServiceFactory.createNewDataSourceFor(tenant, tenantConnection));
         }
-
         // TODO: This is definitely not the optimal place to initialize the rounding modes
         // Preferably nothing should use a statically referenced context and the initialization
         // should happen within the rounding mode retrieval
@@ -92,7 +84,6 @@ public class TomcatJdbcDataSourcePerTenantService implements RoutingDataSourceSe
                 }
             }
         }
-
         return actualDataSource;
     }
 
@@ -108,7 +99,7 @@ public class TomcatJdbcDataSourcePerTenantService implements RoutingDataSourceSe
         log.debug("Initializing database connection for {}", tenant.getName());
         final FineractPlatformTenantConnection tenantConnection = tenant.getConnection();
         Long tenantConnectionKey = tenantConnection.getConnectionId();
-        TENANT_TO_DATA_SOURCE_MAP.computeIfAbsent(tenantConnectionKey, (key) -> {
+        TENANT_TO_DATA_SOURCE_MAP.computeIfAbsent(tenantConnectionKey, key -> {
             DataSource tenantSpecificDataSource = dataSourcePerTenantServiceFactory.createNewDataSourceFor(tenant, tenantConnection);
             try (Connection connection = tenantSpecificDataSource.getConnection()) {
                 String url = connection.getMetaData().getURL();
@@ -119,6 +110,12 @@ public class TomcatJdbcDataSourcePerTenantService implements RoutingDataSourceSe
             return tenantSpecificDataSource;
         });
         log.debug("Database connection for {} initialized", tenant.getName());
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public TomcatJdbcDataSourcePerTenantService(@Qualifier("hikariTenantDataSource") final DataSource tenantDataSource, final TenantDetailsService tenantDetailsService, final DataSourcePerTenantServiceFactory dataSourcePerTenantServiceFactory) {
+        this.tenantDataSource = tenantDataSource;
+        this.tenantDetailsService = tenantDetailsService;
+        this.dataSourcePerTenantServiceFactory = dataSourcePerTenantServiceFactory;
     }
 }

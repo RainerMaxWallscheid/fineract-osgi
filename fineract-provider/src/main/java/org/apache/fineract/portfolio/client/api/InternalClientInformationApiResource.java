@@ -22,7 +22,6 @@ import static org.apache.fineract.infrastructure.core.domain.AuditableFieldsCons
 import static org.apache.fineract.infrastructure.core.domain.AuditableFieldsConstants.CREATED_DATE;
 import static org.apache.fineract.infrastructure.core.domain.AuditableFieldsConstants.LAST_MODIFIED_BY;
 import static org.apache.fineract.infrastructure.core.domain.AuditableFieldsConstants.LAST_MODIFIED_DATE;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.ws.rs.GET;
@@ -34,8 +33,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.boot.FineractProfiles;
@@ -50,10 +47,9 @@ import org.springframework.stereotype.Component;
 @Profile(FineractProfiles.TEST)
 @Component
 @Path("/v1/internal/client")
-@RequiredArgsConstructor
-@Slf4j
 public class InternalClientInformationApiResource implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InternalClientInformationApiResource.class);
     private final ClientRepositoryWrapper clientRepositoryWrapper;
     private final ToApiJsonSerializer<Map> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -68,12 +64,11 @@ public class InternalClientInformationApiResource implements InitializingBean {
         log.warn("DO NOT USE THIS IN PRODUCTION!");
         log.warn("                                                            ");
         log.warn("------------------------------------------------------------");
-
     }
 
     @GET
     @Path("{clientId}/audit")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Get internal client audit fields", operationId = "getInternalClientAuditFields")
     @AlternativeOperationId("getClientAuditFields")
     @SuppressFBWarnings("SLF4J_SIGN_ONLY_FORMAT")
@@ -83,12 +78,16 @@ public class InternalClientInformationApiResource implements InitializingBean {
         log.warn("Fetching client with {}", clientId);
         log.warn("                                                            ");
         log.warn("------------------------------------------------------------");
-
         final Client client = clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
-        Map<String, Object> auditFields = new HashMap<>(
-                Map.of(CREATED_BY, client.getCreatedBy().orElse(null), CREATED_DATE, client.getCreatedDate().orElse(null), LAST_MODIFIED_BY,
-                        client.getLastModifiedBy().orElse(null), LAST_MODIFIED_DATE, client.getLastModifiedDate().orElse(null)));
+        Map<String, Object> auditFields = new HashMap<>(Map.of(CREATED_BY, client.getCreatedBy().orElse(null), CREATED_DATE, client.getCreatedDate().orElse(null), LAST_MODIFIED_BY, client.getLastModifiedBy().orElse(null), LAST_MODIFIED_DATE, client.getLastModifiedDate().orElse(null)));
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, auditFields);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InternalClientInformationApiResource(final ClientRepositoryWrapper clientRepositoryWrapper, final ToApiJsonSerializer<Map> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper) {
+        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
     }
 }

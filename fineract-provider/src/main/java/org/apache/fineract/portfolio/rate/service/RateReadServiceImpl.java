@@ -16,14 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.rate.service;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.rate.data.RateData;
@@ -37,10 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Bowpi GT Created by Jose on 19/07/2017.
  */
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RateReadServiceImpl implements RateReadService {
-
     private final JdbcTemplate jdbcTemplate;
     private final PlatformSecurityContext context;
 
@@ -58,9 +54,8 @@ public class RateReadServiceImpl implements RateReadService {
             this.context.authenticatedUser();
             final RateMapper rm = new RateMapper();
             final String sql = "select " + rm.rateSchema() + " where r.id = ?";
-            final RateData selectedRate = this.jdbcTemplate.queryForObject(sql, rm, new Object[] { rateId }); // NOSONAR
+            final RateData selectedRate = this.jdbcTemplate.queryForObject(sql, rm, new Object[] {rateId}); // NOSONAR
             return selectedRate;
-
         } catch (final EmptyResultDataAccessException e) {
             throw new RateNotFoundException(rateId, e);
         }
@@ -72,9 +67,8 @@ public class RateReadServiceImpl implements RateReadService {
             this.context.authenticatedUser();
             final RateMapper rm = new RateMapper();
             final String sql = "select " + rm.rateSchema() + " where r.name = ?";
-            final RateData selectedRate = this.jdbcTemplate.queryForObject(sql, rm, new Object[] { name }); // NOSONAR
+            final RateData selectedRate = this.jdbcTemplate.queryForObject(sql, rm, new Object[] {name}); // NOSONAR
             return selectedRate;
-
         } catch (final EmptyResultDataAccessException e) {
             throw new RateNotFoundException(name, e);
         }
@@ -85,28 +79,27 @@ public class RateReadServiceImpl implements RateReadService {
         this.context.authenticatedUser();
         final RateMapper rm = new RateMapper();
         final String sql = "select " + rm.rateSchema() + " where r.active = ? and product_apply=?";
-        return this.jdbcTemplate.query(sql, rm, new Object[] { true, RateAppliesTo.LOAN.getValue() }); // NOSONAR
+        return this.jdbcTemplate.query(sql, rm, new Object[] {true, RateAppliesTo.LOAN.getValue()}); // NOSONAR
     }
 
     @Override
     public List<RateData> retrieveLoanRates(Long loanId) {
         final RateMapper rm = new RateMapper();
         final String sql = "select " + rm.loanRateSchema() + " where lr.loan_id = ?";
-        return this.jdbcTemplate.query(sql, rm, new Object[] { loanId }); // NOSONAR
+        return this.jdbcTemplate.query(sql, rm, new Object[] {loanId}); // NOSONAR
     }
 
     @Override
     public List<RateData> retrieveProductLoanRates(Long loanId) {
         final RateMapper rm = new RateMapper();
         final String sql = "select " + rm.productLoanRateSchema() + " where lr.product_loan_id = ?";
-        return this.jdbcTemplate.query(sql, rm, new Object[] { loanId }); // NOSONAR
+        return this.jdbcTemplate.query(sql, rm, new Object[] {loanId}); // NOSONAR
     }
 
-    private static final class RateMapper implements RowMapper<RateData> {
 
+    private static final class RateMapper implements RowMapper<RateData> {
         public String rateSchema() {
-            return " r.id as id, r.name as name, r.percentage as percentage, "
-                    + "r.product_apply as productApply, r.active as active from m_rate r ";
+            return " r.id as id, r.name as name, r.percentage as percentage, " + "r.product_apply as productApply, r.active as active from m_rate r ";
         }
 
         public String loanRateSchema() {
@@ -117,7 +110,8 @@ public class RateReadServiceImpl implements RateReadService {
             return rateSchema() + " join m_product_loan_rate lr on lr.rate_id = r.id";
         }
 
-        RateMapper() {}
+        RateMapper() {
+        }
 
         @Override
         public RateData mapRow(ResultSet resultSet, int i) throws SQLException {
@@ -129,6 +123,11 @@ public class RateReadServiceImpl implements RateReadService {
             final boolean active = resultSet.getBoolean("active");
             return RateData.instance(id, name, percentage, productAppliesTo, active);
         }
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public RateReadServiceImpl(final JdbcTemplate jdbcTemplate, final PlatformSecurityContext context) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.context = context;
     }
 }

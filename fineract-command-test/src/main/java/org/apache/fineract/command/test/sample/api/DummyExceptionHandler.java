@@ -19,15 +19,12 @@
 package org.apache.fineract.command.test.sample.api;
 
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON;
-
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.test.sample.data.DummyError;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -39,11 +36,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
 
-@Slf4j
-@RequiredArgsConstructor
 @RestControllerAdvice
 public class DummyExceptionHandler {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DummyExceptionHandler.class);
     private final MessageSource messageSource;
 
     @ExceptionHandler(Throwable.class)
@@ -51,13 +47,11 @@ public class DummyExceptionHandler {
         var problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
         problemDetails.setType(URI.create("https://fineract.apache.org/validation"));
         problemDetails.setTitle(messageSource.getMessage("org.apache.fineract.common.validation.error", null, Locale.US)); // TODO:
-                                                                                                                           // check
-                                                                                                                           // this,
-                                                                                                                           // get
-                                                                                                                           // locale
-
+        // check
+        // this,
+        // get
+        // locale
         List<DummyError> errors = new ArrayList<>();
-
         if (ex instanceof ConstraintViolationException cve) {
             for (ConstraintViolation<?> violation : cve.getConstraintViolations()) {
                 errors.add(new DummyError(violation.getPropertyPath().toString(), violation.getMessage(), violation.getMessageTemplate()));
@@ -71,11 +65,14 @@ public class DummyExceptionHandler {
                 errors.add(new DummyError(fieldError.getField(), fieldError.getDefaultMessage(), fieldError.getCode()));
             }
         }
-
         if (!errors.isEmpty()) {
             problemDetails.setProperty("errors", errors);
         }
-
         return ResponseEntity.badRequest().contentType(APPLICATION_PROBLEM_JSON).body(problemDetails);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DummyExceptionHandler(final MessageSource messageSource) {
+        this.messageSource = messageSource;
     }
 }

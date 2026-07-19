@@ -20,17 +20,14 @@ package org.apache.fineract.organisation.staff.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.organisation.staff.data.StaffUpdateRequest;
 import org.apache.fineract.organisation.staff.service.StaffReadService;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 final class StaffForceStatusValidator implements ConstraintValidator<StaffForceStatus, StaffUpdateRequest> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StaffForceStatusValidator.class);
     private final StaffReadService staffReadService;
 
     @Override
@@ -38,22 +35,21 @@ final class StaffForceStatusValidator implements ConstraintValidator<StaffForceS
         if (value == null) {
             return true;
         }
-
         if (value.getIsActive() != null) {
             if ((!value.getIsActive() && value.getForceStatus() == null) || (!value.getIsActive() && value.getForceStatus())) {
                 Object[] result = staffReadService.hasAssociatedItems(value.getId());
-
                 if (result != null && result.length > 0) {
                     context.disableDefaultConstraintViolation();
-                    context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate()).addPropertyNode("isActive")
-                            .addConstraintViolation();
-
+                    context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate()).addPropertyNode("isActive").addConstraintViolation();
                     return false;
                 }
-
             }
         }
-
         return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public StaffForceStatusValidator(final StaffReadService staffReadService) {
+        this.staffReadService = staffReadService;
     }
 }

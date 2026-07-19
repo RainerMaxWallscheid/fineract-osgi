@@ -20,11 +20,8 @@ package org.apache.fineract.batch.command;
 
 import java.util.Map;
 import java.util.function.BiFunction;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public final class CommandHandlerRegistry<K, P1, P2, R> {
-
     private final Map<K, BiFunction<P1, P2, R>> handlers;
 
     public void register(K key, BiFunction<P1, P2, R> handler) {
@@ -35,6 +32,10 @@ public final class CommandHandlerRegistry<K, P1, P2, R> {
         return handlers.getOrDefault(key, (p1, p2) -> {
             throw ex;
         }).apply(param1, param2);
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public CommandHandlerRegistry(final Map<K, BiFunction<P1, P2, R>> handlers) {
+        this.handlers = handlers;
     }
 }

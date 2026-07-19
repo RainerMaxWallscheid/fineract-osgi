@@ -18,11 +18,40 @@
  */
 package org.apache.fineract.infrastructure.businessdate.command;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.infrastructure.businessdate.data.api.BusinessDateUpdateRequest;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class BusinessDateUpdateCommand extends Command<BusinessDateUpdateRequest> {}
+public class BusinessDateUpdateCommand extends Command<BusinessDateUpdateRequest> {
+	@java.lang.SuppressWarnings("all")
+		public BusinessDateUpdateCommand() {
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public java.lang.String toString() {
+		return "BusinessDateUpdateCommand()";
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public boolean equals(final java.lang.Object o) {
+		if (o == this) return true;
+		if (!(o instanceof BusinessDateUpdateCommand)) return false;
+		final BusinessDateUpdateCommand other = (BusinessDateUpdateCommand) o;
+		if (!other.canEqual((java.lang.Object) this)) return false;
+		if (!super.equals(o)) return false;
+		return true;
+	}
+
+	@java.lang.SuppressWarnings("all")
+		protected boolean canEqual(final java.lang.Object other) {
+		return other instanceof BusinessDateUpdateCommand;
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public int hashCode() {
+		final int result = super.hashCode();
+		return result;
+	}
+}

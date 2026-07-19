@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.springbatch.messagehandler;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
@@ -32,25 +31,20 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 @ConditionalOnProperty(value = "fineract.mode.batch-worker-enabled", havingValue = "true")
 public class StepExecutionRequestHandler {
-
     private final JobRepository jobRepository;
     private final StepLocator stepLocator;
     private final JobExplorer jobExplorer;
 
     public void handle(StepExecutionRequest request) {
-
         Long jobExecutionId = request.getJobExecutionId();
         Long stepExecutionId = request.getStepExecutionId();
         String stepName = request.getStepName();
-
         StepExecution stepExecution = jobExplorer.getStepExecution(jobExecutionId, stepExecutionId);
         if (stepExecution == null) {
             throw new IllegalStateException("stepExecution cannot be null");
         }
-
         /*
          * no need to check the status of the StepExecution because only a single worker can work on a particular
          * partition due to the fact that a JMS queue is used and not a topic (i.e. only one consumer receives a single
@@ -64,13 +58,21 @@ public class StepExecutionRequestHandler {
             stepExecution.addFailureException(e);
             stepExecution.setStatus(BatchStatus.STOPPED);
         } catch (OptimisticLockingFailureException e) {
-            // no need to do anything, just another worker picked up a partition that's being processed
-            // since we're using queues instead of topics, only a single worker should receive the msg
-        } catch (Exception e) {
+        } catch (
+        // no need to do anything, just another worker picked up a partition that's being processed
+        // since we're using queues instead of topics, only a single worker should receive the msg
+        Exception e) {
             stepExecution.addFailureException(e);
             stepExecution.setStatus(BatchStatus.FAILED);
         } finally {
             jobRepository.update(stepExecution);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public StepExecutionRequestHandler(final JobRepository jobRepository, final StepLocator stepLocator, final JobExplorer jobExplorer) {
+        this.jobRepository = jobRepository;
+        this.stepLocator = stepLocator;
+        this.jobExplorer = jobExplorer;
     }
 }

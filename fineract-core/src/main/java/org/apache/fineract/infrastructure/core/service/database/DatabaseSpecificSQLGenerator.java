@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.core.service.database;
 
 import static java.lang.String.format;
-
 import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -27,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.dataqueries.data.ResultsetColumnHeaderData;
 import org.apache.logging.log4j.util.Strings;
@@ -38,13 +36,11 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class DatabaseSpecificSQLGenerator {
-
     private final DatabaseTypeResolver databaseTypeResolver;
     private final RoutingDataSource dataSource;
     public static final String SELECT_CLAUSE = "SELECT %s";
-    public static final int IN_CLAUSE_MAX_PARAMS = 10_000;
+    public static final int IN_CLAUSE_MAX_PARAMS = 10000;
 
     public DatabaseType getDialect() {
         return databaseTypeResolver.databaseType();
@@ -60,7 +56,7 @@ public class DatabaseSpecificSQLGenerator {
     }
 
     public String formatValue(JdbcJavaType columnType, String value) {
-        return (columnType.isStringType() || columnType.isAnyDateType()) ? format("'%s'", value) : value;
+        return (columnType.isStringType() || columnType.isAnyDateType()) ? format("\'%s\'", value) : value;
     }
 
     public String groupConcat(String arg) {
@@ -68,7 +64,7 @@ public class DatabaseSpecificSQLGenerator {
             return format("GROUP_CONCAT(%s)", arg);
         } else if (databaseTypeResolver.isPostgreSQL()) {
             // STRING_AGG only works with strings
-            return format("STRING_AGG(%s::varchar, ',')", arg);
+            return format("STRING_AGG(%s::varchar, \',\')", arg);
         } else {
             throw new IllegalStateException("Database type is not supported for group concat " + databaseTypeResolver.databaseType());
         }
@@ -112,9 +108,9 @@ public class DatabaseSpecificSQLGenerator {
 
     public String currentBusinessDate() {
         if (databaseTypeResolver.isMySQL()) {
-            return format("DATE('%s')", DateUtils.getBusinessLocalDate().format(DateUtils.DEFAULT_DATE_FORMATTER));
+            return format("DATE(\'%s\')", DateUtils.getBusinessLocalDate().format(DateUtils.DEFAULT_DATE_FORMATTER));
         } else if (databaseTypeResolver.isPostgreSQL()) {
-            return format("DATE '%s'", DateUtils.getBusinessLocalDate().format(DateUtils.DEFAULT_DATE_FORMATTER));
+            return format("DATE \'%s\'", DateUtils.getBusinessLocalDate().format(DateUtils.DEFAULT_DATE_FORMATTER));
         } else {
             throw new IllegalStateException("Database type is not supported for current date " + databaseTypeResolver.databaseType());
         }
@@ -122,9 +118,9 @@ public class DatabaseSpecificSQLGenerator {
 
     public String currentTenantDate() {
         if (databaseTypeResolver.isMySQL()) {
-            return format("DATE('%s')", DateUtils.getLocalDateOfTenant().format(DateUtils.DEFAULT_DATE_FORMATTER));
+            return format("DATE(\'%s\')", DateUtils.getLocalDateOfTenant().format(DateUtils.DEFAULT_DATE_FORMATTER));
         } else if (databaseTypeResolver.isPostgreSQL()) {
-            return format("DATE '%s'", DateUtils.getLocalDateOfTenant().format(DateUtils.DEFAULT_DATE_FORMATTER));
+            return format("DATE \'%s\'", DateUtils.getLocalDateOfTenant().format(DateUtils.DEFAULT_DATE_FORMATTER));
         } else {
             throw new IllegalStateException("Database type is not supported for current date " + databaseTypeResolver.databaseType());
         }
@@ -132,9 +128,9 @@ public class DatabaseSpecificSQLGenerator {
 
     public String currentTenantDateTime() {
         if (databaseTypeResolver.isMySQL()) {
-            return format("TIMESTAMP('%s')", DateUtils.getLocalDateTimeOfSystem().format(DateUtils.DEFAULT_DATETIME_FORMATTER));
+            return format("TIMESTAMP(\'%s\')", DateUtils.getLocalDateTimeOfSystem().format(DateUtils.DEFAULT_DATETIME_FORMATTER));
         } else if (databaseTypeResolver.isPostgreSQL()) {
-            return format("TIMESTAMP '%s'", DateUtils.getLocalDateTimeOfSystem().format(DateUtils.DEFAULT_DATETIME_FORMATTER));
+            return format("TIMESTAMP \'%s\'", DateUtils.getLocalDateTimeOfSystem().format(DateUtils.DEFAULT_DATETIME_FORMATTER));
         } else {
             throw new IllegalStateException("Database type is not supported for current date time" + databaseTypeResolver.databaseType());
         }
@@ -144,7 +140,7 @@ public class DatabaseSpecificSQLGenerator {
         if (databaseTypeResolver.isMySQL()) {
             return format("DATE_SUB(%s, INTERVAL %s %s)", date, multiplier, unit);
         } else if (databaseTypeResolver.isPostgreSQL()) {
-            return format("(%s::TIMESTAMP - %s * INTERVAL '1 %s')", date, multiplier, unit);
+            return format("(%s::TIMESTAMP - %s * INTERVAL \'1 %s\')", date, multiplier, unit);
         } else {
             throw new IllegalStateException("Database type is not supported for subtracting date " + databaseTypeResolver.databaseType());
         }
@@ -166,8 +162,7 @@ public class DatabaseSpecificSQLGenerator {
         } else if (databaseTypeResolver.isPostgreSQL()) {
             return format("%s::CHAR", sql);
         } else {
-            throw new IllegalStateException(
-                    "Database type is not supported for casting to character " + databaseTypeResolver.databaseType());
+            throw new IllegalStateException("Database type is not supported for casting to character " + databaseTypeResolver.databaseType());
         }
     }
 
@@ -227,8 +222,7 @@ public class DatabaseSpecificSQLGenerator {
         return from + escape(definition) + (Strings.isEmpty(alias) ? "" : (" " + alias));
     }
 
-    public String buildJoin(@NonNull String definition, String alias, @NonNull String fkCol, String refAlias, @NonNull String refCol,
-            String joinType) {
+    public String buildJoin(@NonNull String definition, String alias, @NonNull String fkCol, String refAlias, @NonNull String refCol, String joinType) {
         String join = Strings.isEmpty(joinType) ? "JOIN" : (joinType + " JOIN");
         alias = Strings.isEmpty(alias) ? "" : (" " + alias);
         return format("%s %s%s ON %s = %s", join, escape(definition), alias, alias(escape(fkCol), alias), alias(escape(refCol), refAlias));
@@ -242,24 +236,21 @@ public class DatabaseSpecificSQLGenerator {
         if (!embedded) {
             orderBy = "ORDER BY ";
         }
-        return orderBy + orders.stream().map(e -> String.join(" ", alias(escape(e.getProperty()), alias), e.getDirection().name()))
-                .collect(Collectors.joining(", "));
+        return orderBy + orders.stream().map(e -> String.join(" ", alias(escape(e.getProperty()), alias), e.getDirection().name())).collect(Collectors.joining(", "));
     }
 
     public String buildInsert(@NonNull String definition, List<String> fields, Map<String, ResultsetColumnHeaderData> headers) {
         if (fields == null || fields.isEmpty()) {
             return "";
         }
-        return "INSERT INTO " + escape(definition) + '(' + fields.stream().map(this::escape).collect(Collectors.joining(", "))
-                + ") VALUES (" + fields.stream().map(e -> decoratePlaceHolder(headers, e, "?")).collect(Collectors.joining(", ")) + ")";
+        return "INSERT INTO " + escape(definition) + '(' + fields.stream().map(this::escape).collect(Collectors.joining(", ")) + ") VALUES (" + fields.stream().map(e -> decoratePlaceHolder(headers, e, "?")).collect(Collectors.joining(", ")) + ")";
     }
 
     public String buildUpdate(@NonNull String definition, List<String> fields, Map<String, ResultsetColumnHeaderData> headers) {
         if (fields == null || fields.isEmpty()) {
             return "";
         }
-        return "UPDATE " + escape(definition) + " SET "
-                + fields.stream().map(e -> escape(e) + " = " + decoratePlaceHolder(headers, e, "?")).collect(Collectors.joining(", "));
+        return "UPDATE " + escape(definition) + " SET " + fields.stream().map(e -> escape(e) + " = " + decoratePlaceHolder(headers, e, "?")).collect(Collectors.joining(", "));
     }
 
     private String decoratePlaceHolder(Map<String, ResultsetColumnHeaderData> headers, String field, String placeHolder) {
@@ -296,7 +287,6 @@ public class DatabaseSpecificSQLGenerator {
             case POSTGRESQL -> " " + dateColumn + "+1";
             case MYSQL -> " DATE_ADD(" + dateColumn + ", INTERVAL 1 DAY) ";
         };
-
     }
 
     /**
@@ -354,12 +344,18 @@ public class DatabaseSpecificSQLGenerator {
         return switch (getDialect()) {
             case POSTGRESQL -> {
                 try {
-                    yield new Object[] { DataSourceUtils.getConnection(dataSource).createArrayOf("bigint", ids.toArray(new Long[0])) };
+                    yield new Object[] {DataSourceUtils.getConnection(dataSource).createArrayOf("bigint", ids.toArray(new Long[0]))};
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
             }
             case MYSQL -> ids.toArray();
         };
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DatabaseSpecificSQLGenerator(final DatabaseTypeResolver databaseTypeResolver, final RoutingDataSource dataSource) {
+        this.databaseTypeResolver = databaseTypeResolver;
+        this.dataSource = dataSource;
     }
 }

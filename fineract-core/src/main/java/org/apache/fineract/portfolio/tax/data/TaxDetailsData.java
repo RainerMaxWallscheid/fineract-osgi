@@ -19,18 +19,33 @@
 package org.apache.fineract.portfolio.tax.data;
 
 import java.math.BigDecimal;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
 public class TaxDetailsData {
-
     private TaxComponentData taxComponent;
-
-    @Setter
     private BigDecimal amount;
+
+    @java.lang.SuppressWarnings("all")
+        public TaxComponentData getTaxComponent() {
+        return this.taxComponent;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TaxDetailsData(final TaxComponentData taxComponent, final BigDecimal amount) {
+        this.taxComponent = taxComponent;
+        this.amount = amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TaxDetailsData() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAmount(final BigDecimal amount) {
+        this.amount = amount;
+    }
 }

@@ -20,7 +20,6 @@ package org.apache.fineract.cob.loan;
 
 import java.util.Map;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.COBBusinessStepService;
 import org.apache.fineract.cob.common.CommonPartitioner;
 import org.apache.fineract.cob.data.BusinessStepNameAndOrder;
@@ -32,27 +31,23 @@ import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.NonNull;
 
-@Slf4j
 public class LoanCOBPartitioner extends CommonPartitioner implements Partitioner {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanCOBPartitioner.class);
     private final PropertyService propertyService;
     private final COBBusinessStepService cobBusinessStepService;
 
-    public LoanCOBPartitioner(PropertyService propertyService, COBBusinessStepService cobBusinessStepService,
-            RetrieveIdService retrieveIdService, JobOperator jobOperator, StepExecution stepExecution, Long numberOfDaysBehind) {
+    public LoanCOBPartitioner(PropertyService propertyService, COBBusinessStepService cobBusinessStepService, RetrieveIdService retrieveIdService, JobOperator jobOperator, StepExecution stepExecution, Long numberOfDaysBehind) {
         super(jobOperator, stepExecution, numberOfDaysBehind, retrieveIdService);
         this.propertyService = propertyService;
         this.cobBusinessStepService = cobBusinessStepService;
-
     }
 
     @NonNull
     @Override
     public Map<String, ExecutionContext> partition(int gridSize) {
         int partitionSize = propertyService.getPartitionSize(LoanCOBConstant.JOB_NAME);
-        Set<BusinessStepNameAndOrder> cobBusinessSteps = cobBusinessStepService.getCOBBusinessSteps(LoanCOBBusinessStep.class,
-                LoanCOBConstant.LOAN_COB_JOB_NAME);
+        Set<BusinessStepNameAndOrder> cobBusinessSteps = cobBusinessStepService.getCOBBusinessSteps(LoanCOBBusinessStep.class, LoanCOBConstant.LOAN_COB_JOB_NAME);
         return getPartitions(partitionSize, cobBusinessSteps);
     }
-
 }

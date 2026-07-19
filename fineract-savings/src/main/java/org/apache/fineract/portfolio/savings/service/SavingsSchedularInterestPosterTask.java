@@ -20,9 +20,6 @@ package org.apache.fineract.portfolio.savings.service;
 
 import java.util.Collection;
 import java.util.concurrent.Callable;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.FineractContext;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
@@ -31,13 +28,10 @@ import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 /**
  * @author manoj
  */
-
-@Slf4j
-@RequiredArgsConstructor
 public class SavingsSchedularInterestPosterTask implements Callable<Void> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SavingsSchedularInterestPosterTask.class);
     private final SavingsSchedularInterestPoster interestPoster;
-    @Setter
     private FineractContext context;
 
     @Override
@@ -57,5 +51,15 @@ public class SavingsSchedularInterestPosterTask implements Callable<Void> {
 
     public void setBackdatedTxnsAllowedTill(boolean backdatedTxnsAllowedTill) {
         this.interestPoster.setBackdatedTxnsAllowedTill(backdatedTxnsAllowedTill);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsSchedularInterestPosterTask(final SavingsSchedularInterestPoster interestPoster) {
+        this.interestPoster = interestPoster;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setContext(final FineractContext context) {
+        this.context = context;
     }
 }

@@ -19,20 +19,43 @@
 package org.apache.fineract.accounting.producttoaccountmapping.data;
 
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 
-@RequiredArgsConstructor
-@Getter
-@Setter
-@Accessors(chain = true)
 public class ChargeToGLAccountMapper implements Serializable {
-
     private static final long serialVersionUID = 1L;
     private ChargeData charge;
     private GLAccountData incomeAccount;
+
+    @java.lang.SuppressWarnings("all")
+        public ChargeToGLAccountMapper() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ChargeData getCharge() {
+        return this.charge;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GLAccountData getIncomeAccount() {
+        return this.incomeAccount;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ChargeToGLAccountMapper setCharge(final ChargeData charge) {
+        this.charge = charge;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ChargeToGLAccountMapper setIncomeAccount(final GLAccountData incomeAccount) {
+        this.incomeAccount = incomeAccount;
+        return this;
+    }
 }

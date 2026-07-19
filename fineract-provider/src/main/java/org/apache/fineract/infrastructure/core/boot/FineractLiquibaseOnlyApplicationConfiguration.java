@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.core.boot;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.condition.FineractLiquibaseOnlyApplicationCondition;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.config.HikariCpConfig;
@@ -31,12 +30,12 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
 
 @Conditional(FineractLiquibaseOnlyApplicationCondition.class)
-@Slf4j
-@EnableConfigurationProperties({ FineractProperties.class, LiquibaseProperties.class })
-@Import({ HikariCpConfig.class, JdbcConfig.class })
-@ComponentScan(basePackages = { "org.apache.fineract.infrastructure.core.service.migration",
-        "org.apache.fineract.infrastructure.core.service.database", "org.apache.fineract.infrastructure.core.service.tenant" })
+@EnableConfigurationProperties({FineractProperties.class, LiquibaseProperties.class})
+@Import({HikariCpConfig.class, JdbcConfig.class})
+@ComponentScan(basePackages = {"org.apache.fineract.infrastructure.core.service.migration", "org.apache.fineract.infrastructure.core.service.database", "org.apache.fineract.infrastructure.core.service.tenant"})
 public class FineractLiquibaseOnlyApplicationConfiguration implements InitializingBean {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FineractLiquibaseOnlyApplicationConfiguration.class);
 
     @Override
     public void afterPropertiesSet() throws Exception {

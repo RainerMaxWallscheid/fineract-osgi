@@ -21,8 +21,6 @@ package org.apache.fineract.commands.service;
 import com.google.gson.JsonElement;
 import java.util.List;
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.commands.domain.CommandSource;
 import org.apache.fineract.commands.domain.CommandSourceRepository;
 import org.apache.fineract.commands.domain.CommandWrapper;
@@ -41,10 +39,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class PortfolioCommandSourceWritePlatformServiceImpl implements PortfolioCommandSourceWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PortfolioCommandSourceWritePlatformServiceImpl.class);
     private final PlatformSecurityContext context;
     private final CommandSourceRepository commandSourceRepository;
     private final FromJsonHelper fromApiJsonHelper;
@@ -56,28 +53,23 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements Portfolio
     @Override
     public CommandProcessingResult logCommandSource(final CommandWrapper wrapper) {
         boolean isApprovedByChecker = false;
-
         // check if is update of own account details
         if (wrapper.isChangeOfOwnUserDetails(this.context.authenticatedUser(wrapper).getId())) {
             // then allow this operation to proceed.
             // maker checker doesnt mean anything here.
             isApprovedByChecker = true; // set to true in case permissions have
-                                        // been maker-checker enabled by
-                                        // accident.
-        } else {
+        } else 
+        // been maker-checker enabled by
+        // accident.
+        {
             // if not user changing their own details - check user has
             // permission to perform specific task.
             this.context.authenticatedUser(wrapper).validateHasPermissionTo(wrapper.getTaskPermissionName());
         }
         validateIsUpdateAllowed();
-
         final String json = wrapper.getJson();
         final JsonElement parsedCommand = this.fromApiJsonHelper.parse(json);
-        JsonCommand command = JsonCommand.from(json, parsedCommand, this.fromApiJsonHelper, wrapper.getEntityName(), wrapper.getEntityId(),
-                wrapper.getSubentityId(), wrapper.getGroupId(), wrapper.getClientId(), wrapper.getLoanId(), wrapper.getSavingsId(),
-                wrapper.getTransactionId(), wrapper.getHref(), wrapper.getProductId(), wrapper.getCreditBureauId(),
-                wrapper.getOrganisationCreditBureauId(), wrapper.getJobName(), wrapper.getLoanExternalId());
-
+        JsonCommand command = JsonCommand.from(json, parsedCommand, this.fromApiJsonHelper, wrapper.getEntityName(), wrapper.getEntityId(), wrapper.getSubentityId(), wrapper.getGroupId(), wrapper.getClientId(), wrapper.getLoanId(), wrapper.getSavingsId(), wrapper.getTransactionId(), wrapper.getHref(), wrapper.getProductId(), wrapper.getCreditBureauId(), wrapper.getOrganisationCreditBureauId(), wrapper.getJobName(), wrapper.getLoanExternalId());
         return this.processAndLogCommandService.executeCommand(wrapper, command, isApprovedByChecker);
     }
 
@@ -85,41 +77,23 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements Portfolio
     public CommandProcessingResult approveEntry(final Long makerCheckerId) {
         final CommandSource commandSourceInput = validateMakerCheckerTransaction(makerCheckerId);
         validateIsUpdateAllowed();
-
-        final CommandWrapper wrapper = CommandWrapper.fromExistingCommand(makerCheckerId, commandSourceInput.getActionName(),
-                commandSourceInput.getEntityName(), commandSourceInput.getResourceId(), commandSourceInput.getSubResourceId(),
-                commandSourceInput.getResourceGetUrl(), commandSourceInput.getProductId(), commandSourceInput.getOfficeId(),
-                commandSourceInput.getGroupId(), commandSourceInput.getClientId(), commandSourceInput.getLoanId(),
-                commandSourceInput.getSavingsId(), commandSourceInput.getTransactionId(), commandSourceInput.getCreditBureauId(),
-                commandSourceInput.getOrganisationCreditBureauId(), commandSourceInput.getIdempotencyKey(),
-                commandSourceInput.getLoanExternalId());
+        final CommandWrapper wrapper = CommandWrapper.fromExistingCommand(makerCheckerId, commandSourceInput.getActionName(), commandSourceInput.getEntityName(), commandSourceInput.getResourceId(), commandSourceInput.getSubResourceId(), commandSourceInput.getResourceGetUrl(), commandSourceInput.getProductId(), commandSourceInput.getOfficeId(), commandSourceInput.getGroupId(), commandSourceInput.getClientId(), commandSourceInput.getLoanId(), commandSourceInput.getSavingsId(), commandSourceInput.getTransactionId(), commandSourceInput.getCreditBureauId(), commandSourceInput.getOrganisationCreditBureauId(), commandSourceInput.getIdempotencyKey(), commandSourceInput.getLoanExternalId());
         final JsonElement parsedCommand = this.fromApiJsonHelper.parse(commandSourceInput.getCommandAsJson());
-        final JsonCommand command = JsonCommand.fromExistingCommand(makerCheckerId, commandSourceInput.getCommandAsJson(), parsedCommand,
-                this.fromApiJsonHelper, commandSourceInput.getEntityName(), commandSourceInput.getResourceId(),
-                commandSourceInput.getSubResourceId(), commandSourceInput.getGroupId(), commandSourceInput.getClientId(),
-                commandSourceInput.getLoanId(), commandSourceInput.getSavingsId(), commandSourceInput.getTransactionId(),
-                commandSourceInput.getResourceGetUrl(), commandSourceInput.getProductId(), commandSourceInput.getCreditBureauId(),
-                commandSourceInput.getOrganisationCreditBureauId(), commandSourceInput.getJobName(),
-                commandSourceInput.getLoanExternalId());
-
+        final JsonCommand command = JsonCommand.fromExistingCommand(makerCheckerId, commandSourceInput.getCommandAsJson(), parsedCommand, this.fromApiJsonHelper, commandSourceInput.getEntityName(), commandSourceInput.getResourceId(), commandSourceInput.getSubResourceId(), commandSourceInput.getGroupId(), commandSourceInput.getClientId(), commandSourceInput.getLoanId(), commandSourceInput.getSavingsId(), commandSourceInput.getTransactionId(), commandSourceInput.getResourceGetUrl(), commandSourceInput.getProductId(), commandSourceInput.getCreditBureauId(), commandSourceInput.getOrganisationCreditBureauId(), commandSourceInput.getJobName(), commandSourceInput.getLoanExternalId());
         return this.processAndLogCommandService.executeCommand(wrapper, command, true);
     }
 
     @Transactional
     @Override
     public Long deleteEntry(final Long makerCheckerId) {
-
         validateMakerCheckerTransaction(makerCheckerId);
         validateIsUpdateAllowed();
-
         this.commandSourceRepository.deleteById(makerCheckerId);
-
         return makerCheckerId;
     }
 
     private CommandSource validateMakerCheckerTransaction(final Long makerCheckerId) {
-        final CommandSource commandSource = this.commandSourceRepository.findById(makerCheckerId)
-                .orElseThrow(() -> new CommandNotFoundException(makerCheckerId));
+        final CommandSource commandSource = this.commandSourceRepository.findById(makerCheckerId).orElseThrow(() -> new CommandNotFoundException(makerCheckerId));
         if (!commandSource.isAwaitingApproval()) {
             throw new CommandNotAwaitingApprovalException(makerCheckerId);
         }
@@ -155,5 +129,16 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements Portfolio
             }
         }
         return makerCheckerId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PortfolioCommandSourceWritePlatformServiceImpl(final PlatformSecurityContext context, final CommandSourceRepository commandSourceRepository, final FromJsonHelper fromApiJsonHelper, final CommandProcessingService processAndLogCommandService, final SchedulerJobRunnerReadService schedulerJobRunnerReadService, final ConfigurationDomainService configurationService, final List<CleanupService> cleanupServices) {
+        this.context = context;
+        this.commandSourceRepository = commandSourceRepository;
+        this.fromApiJsonHelper = fromApiJsonHelper;
+        this.processAndLogCommandService = processAndLogCommandService;
+        this.schedulerJobRunnerReadService = schedulerJobRunnerReadService;
+        this.configurationService = configurationService;
+        this.cleanupServices = cleanupServices;
     }
 }

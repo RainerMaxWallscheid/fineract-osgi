@@ -18,11 +18,40 @@
  */
 package org.apache.fineract.template.command;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.template.data.TemplateUpdateRequest;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class TemplateUpdateCommand extends Command<TemplateUpdateRequest> {}
+public class TemplateUpdateCommand extends Command<TemplateUpdateRequest> {
+	@java.lang.SuppressWarnings("all")
+		public TemplateUpdateCommand() {
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public java.lang.String toString() {
+		return "TemplateUpdateCommand()";
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public boolean equals(final java.lang.Object o) {
+		if (o == this) return true;
+		if (!(o instanceof TemplateUpdateCommand)) return false;
+		final TemplateUpdateCommand other = (TemplateUpdateCommand) o;
+		if (!other.canEqual((java.lang.Object) this)) return false;
+		if (!super.equals(o)) return false;
+		return true;
+	}
+
+	@java.lang.SuppressWarnings("all")
+		protected boolean canEqual(final java.lang.Object other) {
+		return other instanceof TemplateUpdateCommand;
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public int hashCode() {
+		final int result = super.hashCode();
+		return result;
+	}
+}

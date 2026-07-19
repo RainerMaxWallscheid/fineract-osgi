@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.accountnumberformat.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberFormatWritePlatformService;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "ACCOUNTNUMBERFORMAT", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateAccountNumberFormatCommandHandler implements NewCommandSourceHandler {
-
     private final AccountNumberFormatWritePlatformService accountNumberFormatWritePlatformService;
 
     @Override
@@ -40,4 +37,8 @@ public class UpdateAccountNumberFormatCommandHandler implements NewCommandSource
         return this.accountNumberFormatWritePlatformService.updateAccountNumberFormat(command.entityId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public UpdateAccountNumberFormatCommandHandler(final AccountNumberFormatWritePlatformService accountNumberFormatWritePlatformService) {
+        this.accountNumberFormatWritePlatformService = accountNumberFormatWritePlatformService;
+    }
 }

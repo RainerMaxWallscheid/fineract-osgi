@@ -19,7 +19,6 @@
 package org.apache.fineract.batch.command.internal;
 
 import jakarta.ws.rs.core.UriInfo;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
@@ -40,9 +39,7 @@ import org.springframework.stereotype.Component;
  * functionally equivalent.
  */
 @Component
-@RequiredArgsConstructor
 public class CreateAccountTransferCommandStrategy implements CommandStrategy {
-
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer;
 
@@ -51,14 +48,16 @@ public class CreateAccountTransferCommandStrategy implements CommandStrategy {
         final BatchResponse response = new BatchResponse();
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createAccountTransfer().withJson(request.getBody()).build();
-
         final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         response.setStatusCode(HttpStatus.SC_OK);
         response.setBody(toApiJsonSerializer.serialize(result));
-
         return response;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateAccountTransferCommandStrategy(final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer) {
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
     }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.collateral.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "COLLATERAL", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteCollateralCommandHandler implements NewCommandSourceHandler {
-
     private final CollateralWritePlatformService collateralWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.collateralWritePlatformService.deleteCollateral(command.getLoanId(), command.entityId(), command.commandId());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DeleteCollateralCommandHandler(final CollateralWritePlatformService collateralWritePlatformService) {
+        this.collateralWritePlatformService = collateralWritePlatformService;
     }
 }

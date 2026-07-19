@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "RECURRINGDEPOSITACCOUNT", action = "ADJUSTTRANSACTION")
-@RequiredArgsConstructor
 public class RecurringDepositTransactionAdjustmentCommandHandler implements NewCommandSourceHandler {
-
     private final DepositAccountWritePlatformService depositAccountWritePlatformService;
 
     @Transactional
@@ -39,5 +36,10 @@ public class RecurringDepositTransactionAdjustmentCommandHandler implements NewC
     public CommandProcessingResult processCommand(final JsonCommand command) {
         final Long transactionId = Long.valueOf(command.getTransactionId());
         return this.depositAccountWritePlatformService.adjustRDTransaction(command.entityId(), transactionId, command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RecurringDepositTransactionAdjustmentCommandHandler(final DepositAccountWritePlatformService depositAccountWritePlatformService) {
+        this.depositAccountWritePlatformService = depositAccountWritePlatformService;
     }
 }

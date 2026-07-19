@@ -19,8 +19,6 @@
 package org.apache.fineract.commands.jobs;
 
 import java.time.OffsetDateTime;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.commands.domain.CommandProcessingResultType;
 import org.apache.fineract.commands.domain.CommandSourceRepository;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
@@ -31,11 +29,10 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@AllArgsConstructor
 @Component
 public class PurgeProcessedCommandsTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PurgeProcessedCommandsTasklet.class);
     private final CommandSourceRepository repository;
     private final ConfigurationDomainService configurationDomainService;
 
@@ -51,4 +48,9 @@ public class PurgeProcessedCommandsTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public PurgeProcessedCommandsTasklet(final CommandSourceRepository repository, final ConfigurationDomainService configurationDomainService) {
+        this.repository = repository;
+        this.configurationDomainService = configurationDomainService;
+    }
 }

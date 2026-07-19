@@ -20,8 +20,6 @@ package org.apache.fineract.portfolio.floatingrates.service;
 
 import jakarta.persistence.PersistenceException;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -35,10 +33,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
-@Slf4j
 public class FloatingRateWritePlatformServiceImpl implements FloatingRateWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FloatingRateWritePlatformServiceImpl.class);
     private final FloatingRateDataValidator fromApiJsonDeserializer;
     private final FloatingRateRepositoryWrapper floatingRateRepository;
 
@@ -49,10 +46,10 @@ public class FloatingRateWritePlatformServiceImpl implements FloatingRateWritePl
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             final FloatingRate newFloatingRate = FloatingRate.createNew(command);
             this.floatingRateRepository.saveAndFlush(newFloatingRate);
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(newFloatingRate.getId()) //
-                    .build();
+            return  //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(newFloatingRate.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
@@ -70,16 +67,14 @@ public class FloatingRateWritePlatformServiceImpl implements FloatingRateWritePl
             final FloatingRate floatingRateForUpdate = this.floatingRateRepository.findOneWithNotFoundDetection(command.entityId());
             this.fromApiJsonDeserializer.validateForUpdate(command.json(), floatingRateForUpdate);
             final Map<String, Object> changes = floatingRateForUpdate.update(command);
-
             if (!changes.isEmpty()) {
                 this.floatingRateRepository.save(floatingRateForUpdate);
             }
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(command.entityId()) //
-                    .with(changes) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(command.entityId()).with(changes).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
@@ -93,15 +88,18 @@ public class FloatingRateWritePlatformServiceImpl implements FloatingRateWritePl
     private void handleDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final Exception dve) {
         if (realCause.getMessage().contains("unq_name")) {
             final String name = command.stringValueOfParameterNamed("name");
-            throw new PlatformDataIntegrityException("error.msg.floatingrates.duplicate.name",
-                    "Floating Rate with name `" + name + "` already exists", "name", name);
+            throw new PlatformDataIntegrityException("error.msg.floatingrates.duplicate.name", "Floating Rate with name `" + name + "` already exists", "name", name);
         }
         if (realCause.getMessage().contains("unq_rate_period")) {
-            throw new PlatformDataIntegrityException("error.msg.floatingrates.duplicate.active.fromdate",
-                    "Attempt to add multiple floating rate periods with same fromdate", "fromdate", "");
+            throw new PlatformDataIntegrityException("error.msg.floatingrates.duplicate.active.fromdate", "Attempt to add multiple floating rate periods with same fromdate", "fromdate", "");
         }
         log.error("Error occured.", dve);
-        throw ErrorHandler.getMappable(dve, "error.msg.floatingrates.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource: " + realCause.getMessage());
+        throw ErrorHandler.getMappable(dve, "error.msg.floatingrates.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FloatingRateWritePlatformServiceImpl(final FloatingRateDataValidator fromApiJsonDeserializer, final FloatingRateRepositoryWrapper floatingRateRepository) {
+        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
+        this.floatingRateRepository = floatingRateRepository;
     }
 }

@@ -19,7 +19,6 @@
 package org.apache.fineract.cob.service;
 
 import java.time.LocalDate;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.conditions.LoanCOBEnabledCondition;
 import org.apache.fineract.cob.domain.LockOwner;
 import org.apache.fineract.cob.domain.WorkingCapitalAccountLockRepository;
@@ -37,17 +36,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
-@Slf4j
 @Conditional(LoanCOBEnabledCondition.class)
 public class InlineWorkingCapitalLoanCOBExecutorServiceImpl extends InlineCommonLockableCOBExecutorService<WorkingCapitalLoanAccountLock> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InlineWorkingCapitalLoanCOBExecutorServiceImpl.class);
 
-    public InlineWorkingCapitalLoanCOBExecutorServiceImpl(WorkingCapitalAccountLockRepository loanAccountLockRepository,
-            InlineLoanCOBExecutionDataParser dataParser, JobLauncher jobLauncher, JobLocator jobLocator, JobExplorer jobExplorer,
-            @Qualifier("requiresNewTransactionTemplate") TransactionTemplate requiresNewTransactionTemplate,
-            CustomJobParameterRepository customJobParameterRepository, PlatformSecurityContext context,
-            WorkingCapitalLoanRetrieveIdService retrieveIdService, FineractProperties fineractProperties) {
-        super(loanAccountLockRepository, dataParser, jobLauncher, jobLocator, jobExplorer, requiresNewTransactionTemplate,
-                customJobParameterRepository, context, retrieveIdService, fineractProperties);
+    public InlineWorkingCapitalLoanCOBExecutorServiceImpl(WorkingCapitalAccountLockRepository loanAccountLockRepository, InlineLoanCOBExecutionDataParser dataParser, JobLauncher jobLauncher, JobLocator jobLocator, JobExplorer jobExplorer, @Qualifier("requiresNewTransactionTemplate") TransactionTemplate requiresNewTransactionTemplate, CustomJobParameterRepository customJobParameterRepository, PlatformSecurityContext context, WorkingCapitalLoanRetrieveIdService retrieveIdService, FineractProperties fineractProperties) {
+        super(loanAccountLockRepository, dataParser, jobLauncher, jobLocator, jobExplorer, requiresNewTransactionTemplate, customJobParameterRepository, context, retrieveIdService, fineractProperties);
     }
 
     @Override

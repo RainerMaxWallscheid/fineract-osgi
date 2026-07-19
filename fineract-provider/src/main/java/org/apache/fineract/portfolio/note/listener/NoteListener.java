@@ -18,18 +18,15 @@
  */
 package org.apache.fineract.portfolio.note.listener;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.portfolio.note.data.NoteCreateRequest;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 class NoteListener {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NoteListener.class);
     private final NoteWritePlatformService noteWritePlatformService;
 
     @EventListener
@@ -45,5 +42,10 @@ class NoteListener {
     @EventListener
     void onDelete(NoteCreateRequest request) {
         noteWritePlatformService.createNote(request);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public NoteListener(final NoteWritePlatformService noteWritePlatformService) {
+        this.noteWritePlatformService = noteWritePlatformService;
     }
 }

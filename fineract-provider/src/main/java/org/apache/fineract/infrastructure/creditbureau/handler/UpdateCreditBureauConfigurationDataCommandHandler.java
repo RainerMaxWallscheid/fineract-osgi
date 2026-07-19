@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.creditbureau.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "CREDITBUREAU_CONFIGURATION", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateCreditBureauConfigurationDataCommandHandler implements NewCommandSourceHandler {
-
     private final CreditBureauConfigurationWritePlatformService writePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class UpdateCreditBureauConfigurationDataCommandHandler implements NewCom
         return this.writePlatformService.updateCreditBureauConfiguration(command.entityId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public UpdateCreditBureauConfigurationDataCommandHandler(final CreditBureauConfigurationWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
+    }
 }

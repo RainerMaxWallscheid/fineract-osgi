@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanAllocationPlan;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanAllocationPlan.ChargeAllocation;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanCharge;
@@ -41,46 +39,41 @@ import org.springframework.stereotype.Component;
  * persist, does not refresh the balance buckets ({@link WorkingCapitalLoanBalanceUpdater} does, driven by the
  * orchestrator), and does not touch the amortization schedule; those stay with the orchestrator.
  */
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class WorkingCapitalLoanAllocationApplier {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanAllocationApplier.class);
     private final WorkingCapitalLoanChargePaymentHandler chargePaymentHandler;
 
-    public WorkingCapitalLoanTransactionAllocation apply(final WorkingCapitalLoanTransaction transaction,
-            final WorkingCapitalLoanTransactionAllocation existingAllocation, final WorkingCapitalLoanAllocationPlan plan,
-            final List<WorkingCapitalLoanCharge> charges) {
-        final Map<Long, WorkingCapitalLoanCharge> chargesById = charges.stream()
-                .collect(Collectors.toMap(WorkingCapitalLoanCharge::getId, Function.identity()));
+    public WorkingCapitalLoanTransactionAllocation apply(final WorkingCapitalLoanTransaction transaction, final WorkingCapitalLoanTransactionAllocation existingAllocation, final WorkingCapitalLoanAllocationPlan plan, final List<WorkingCapitalLoanCharge> charges) {
+        final Map<Long, WorkingCapitalLoanCharge> chargesById = charges.stream().collect(Collectors.toMap(WorkingCapitalLoanCharge::getId, Function.identity()));
         return apply(transaction, existingAllocation, plan, chargesById);
     }
 
-    public WorkingCapitalLoanTransactionAllocation apply(final WorkingCapitalLoanTransaction transaction,
-            final WorkingCapitalLoanTransactionAllocation existingAllocation, final WorkingCapitalLoanAllocationPlan plan,
-            final Map<Long, WorkingCapitalLoanCharge> chargesById) {
+    public WorkingCapitalLoanTransactionAllocation apply(final WorkingCapitalLoanTransaction transaction, final WorkingCapitalLoanTransactionAllocation existingAllocation, final WorkingCapitalLoanAllocationPlan plan, final Map<Long, WorkingCapitalLoanCharge> chargesById) {
         for (final ChargeAllocation chargeAllocation : plan.chargeAllocations()) {
             final WorkingCapitalLoanCharge charge = chargesById.get(chargeAllocation.chargeId());
             if (charge != null) {
                 chargePaymentHandler.applyChargePayment(charge, chargeAllocation.amount());
             } else {
-                log.warn("WC loan allocation plan references chargeId {} not found in provided charges; skipping",
-                        chargeAllocation.chargeId());
+                log.warn("WC loan allocation plan references chargeId {} not found in provided charges; skipping", chargeAllocation.chargeId());
             }
         }
-
         return applyAllocation(transaction, existingAllocation, plan);
     }
 
-    private WorkingCapitalLoanTransactionAllocation applyAllocation(final WorkingCapitalLoanTransaction transaction,
-            final WorkingCapitalLoanTransactionAllocation existing, final WorkingCapitalLoanAllocationPlan plan) {
+    private WorkingCapitalLoanTransactionAllocation applyAllocation(final WorkingCapitalLoanTransaction transaction, final WorkingCapitalLoanTransactionAllocation existing, final WorkingCapitalLoanAllocationPlan plan) {
         if (existing == null) {
-            return WorkingCapitalLoanTransactionAllocation.forPortions(transaction, plan.principalPortion(), plan.feeChargesPortion(),
-                    plan.penaltyChargesPortion());
+            return WorkingCapitalLoanTransactionAllocation.forPortions(transaction, plan.principalPortion(), plan.feeChargesPortion(), plan.penaltyChargesPortion());
         }
         existing.setPrincipalPortion(plan.principalPortion());
         existing.setFeeChargesPortion(plan.feeChargesPortion());
         existing.setPenaltyChargesPortion(plan.penaltyChargesPortion());
         return existing;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanAllocationApplier(final WorkingCapitalLoanChargePaymentHandler chargePaymentHandler) {
+        this.chargePaymentHandler = chargePaymentHandler;
     }
 }

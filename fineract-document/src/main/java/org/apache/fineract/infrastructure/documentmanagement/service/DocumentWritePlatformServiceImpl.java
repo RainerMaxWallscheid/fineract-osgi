@@ -19,12 +19,9 @@
 package org.apache.fineract.infrastructure.documentmanagement.service;
 
 import static java.util.Objects.requireNonNull;
-
 import jakarta.validation.Valid;
 import java.util.Objects;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -46,13 +43,11 @@ import org.apache.fineract.infrastructure.event.business.service.BusinessEventNo
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 public class DocumentWritePlatformServiceImpl implements DocumentWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DocumentWritePlatformServiceImpl.class);
     private static final String STORE_PREFIX = "documents";
-
     private final DocumentRepository documentRepository;
     private final DocumentMapper documentMapper;
     private final ContentStoreService storeService;
@@ -65,26 +60,15 @@ public class DocumentWritePlatformServiceImpl implements DocumentWritePlatformSe
             requireNonNull(request, "Request parameter required");
             requireNonNull(request.getFileName(), "File name parameter required");
             requireNonNull(request.getStream(), "Document content required");
-
             // TODO: make "prefix" configurable
-            var path = getPath(STORE_PREFIX, request.getEntityType(), request.getEntityId(), request.getFileName(),
-                    storeService.getDelimiter());
-
+            var path = getPath(STORE_PREFIX, request.getEntityType(), request.getEntityId(), request.getFileName(), storeService.getDelimiter());
             path = storeService.upload(path, request.getStream(), request.getType());
-
-            final var doc = new Document().setParentEntityType(request.getEntityType()).setParentEntityId(request.getEntityId())
-                    .setName(Optional.ofNullable(request.getName()).orElse(request.getFileName())).setFileName(request.getFileName())
-                    .setSize(request.getSize()).setType(request.getType()).setDescription(request.getDescription()).setLocation(path)
-                    .setStorageType(storeService.getType().getValue());
-
+            final var doc = new Document().setParentEntityType(request.getEntityType()).setParentEntityId(request.getEntityId()).setName(Optional.ofNullable(request.getName()).orElse(request.getFileName())).setFileName(request.getFileName()).setSize(request.getSize()).setType(request.getType()).setDescription(request.getDescription()).setLocation(path).setStorageType(storeService.getType().getValue());
             documentRepository.save(doc);
-
             businessEventNotifierService.notifyPostBusinessEvent(new DocumentCreatedBusinessEvent(documentMapper.map(doc)));
-
             return DocumentCreateResponse.builder().resourceId(doc.getId()).resourceIdentifier(request.getEntityType()).build();
         } catch (final Exception e) {
-            throw ErrorHandler.getMappable(e, "error.msg.document.unknown.data.integrity.issue",
-                    "Unknown data integrity issue with resource.");
+            throw ErrorHandler.getMappable(e, "error.msg.document.unknown.data.integrity.issue", "Unknown data integrity issue with resource.");
         }
     }
 
@@ -93,23 +77,15 @@ public class DocumentWritePlatformServiceImpl implements DocumentWritePlatformSe
     public DocumentUpdateResponse updateDocument(@Valid final DocumentUpdateRequest request) {
         try {
             requireNonNull(request, "Request parameter required");
-
             String path = null;
-
             if (StringUtils.isNotEmpty(request.getFileName())) {
                 // TODO: make "prefix" configurable
-                path = getPath(STORE_PREFIX, request.getEntityType(), request.getEntityId(), request.getFileName(),
-                        storeService.getDelimiter());
+                path = getPath(STORE_PREFIX, request.getEntityType(), request.getEntityId(), request.getFileName(), storeService.getDelimiter());
             }
-
-            final var doc = this.documentRepository.findById(request.getId())
-                    .orElseThrow(() -> new DocumentNotFoundException(request.getEntityType(), request.getEntityId(), request.getId()));
-
+            final var doc = this.documentRepository.findById(request.getId()).orElseThrow(() -> new DocumentNotFoundException(request.getEntityType(), request.getEntityId(), request.getId()));
             doc.setStorageType(storeService.getType().getValue());
-
             if (StringUtils.isNotEmpty(request.getFileName())) {
                 // these two only make sense if we have an actual file
-
                 if (request.getStream() != null && StringUtils.isNotEmpty(path) && !Strings.CI.equals(doc.getLocation(), path)) {
                     storeService.delete(doc.getLocation());
                     storeService.upload(path, request.getStream(), request.getType());
@@ -128,16 +104,12 @@ public class DocumentWritePlatformServiceImpl implements DocumentWritePlatformSe
             if (Objects.requireNonNullElse(request.getSize(), 0L) > 1L && !Objects.equals(doc.getSize(), request.getSize())) {
                 doc.setSize(request.getSize());
             }
-
             documentRepository.save(doc);
-
             // TODO: shouldn't we send a business event?
             // businessEventNotifierService.notifyPostBusinessEvent(new DocumentUpdateBusinessEvent(doc));
-
             return DocumentUpdateResponse.builder().resourceId(doc.getId()).resourceIdentifier(request.getEntityType()).build();
         } catch (final Exception e) {
-            throw ErrorHandler.getMappable(e, "error.msg.document.unknown.data.integrity.issue",
-                    "Unknown data integrity issue with resource.");
+            throw ErrorHandler.getMappable(e, "error.msg.document.unknown.data.integrity.issue", "Unknown data integrity issue with resource.");
         }
     }
 
@@ -145,19 +117,13 @@ public class DocumentWritePlatformServiceImpl implements DocumentWritePlatformSe
     @Override
     public DocumentDeleteResponse deleteDocument(@Valid final DocumentDeleteRequest request) {
         try {
-            final var doc = this.documentRepository.findById(request.getId())
-                    .orElseThrow(() -> new DocumentNotFoundException(request.getEntityType(), request.getEntityId(), request.getId()));
-
+            final var doc = this.documentRepository.findById(request.getId()).orElseThrow(() -> new DocumentNotFoundException(request.getEntityType(), request.getEntityId(), request.getId()));
             storeService.delete(doc.getLocation());
-
             documentRepository.deleteById(request.getId());
-
             businessEventNotifierService.notifyPostBusinessEvent(new DocumentDeletedBusinessEvent(documentMapper.map(doc)));
-
             return DocumentDeleteResponse.builder().resourceId(doc.getId()).resourceIdentifier(request.getEntityType()).build();
         } catch (final Exception e) {
-            throw ErrorHandler.getMappable(e, "error.msg.document.unknown.data.integrity.issue",
-                    "Unknown data integrity issue with resource.");
+            throw ErrorHandler.getMappable(e, "error.msg.document.unknown.data.integrity.issue", "Unknown data integrity issue with resource.");
         }
     }
 
@@ -167,7 +133,14 @@ public class DocumentWritePlatformServiceImpl implements DocumentWritePlatformSe
         requireNonNull(entityId);
         requireNonNull(fileName);
         requireNonNull(delimiter);
-
         return String.join(delimiter, prefix, entityType, String.valueOf(entityId), fileName);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DocumentWritePlatformServiceImpl(final DocumentRepository documentRepository, final DocumentMapper documentMapper, final ContentStoreService storeService, final BusinessEventNotifierService businessEventNotifierService) {
+        this.documentRepository = documentRepository;
+        this.documentMapper = documentMapper;
+        this.storeService = storeService;
+        this.businessEventNotifierService = businessEventNotifierService;
     }
 }

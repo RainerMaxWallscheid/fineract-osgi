@@ -23,34 +23,94 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "m_hook_schema")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class HookSchema extends AbstractPersistableCustom<Long> {
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "hook_template_id", referencedColumnName = "id", nullable = false)
     private HookTemplate template;
-
     @Column(name = "field_type", nullable = false, length = 20)
     private String fieldType;
-
     @Column(name = "field_name", nullable = false, length = 100)
     private String fieldName;
-
     @Column(name = "placeholder", length = 100)
     private String placeholder;
-
     @Column(name = "optional", nullable = false)
     private boolean optional = false;
 
+    @java.lang.SuppressWarnings("all")
+        public HookTemplate getTemplate() {
+        return this.template;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getFieldType() {
+        return this.fieldType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getFieldName() {
+        return this.fieldName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getPlaceholder() {
+        return this.placeholder;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isOptional() {
+        return this.optional;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookSchema setTemplate(final HookTemplate template) {
+        this.template = template;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookSchema setFieldType(final String fieldType) {
+        this.fieldType = fieldType;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookSchema setFieldName(final String fieldName) {
+        this.fieldName = fieldName;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookSchema setPlaceholder(final String placeholder) {
+        this.placeholder = placeholder;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookSchema setOptional(final boolean optional) {
+        this.optional = optional;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public HookSchema() {
+    }
 }

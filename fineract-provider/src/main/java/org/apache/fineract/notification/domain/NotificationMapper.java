@@ -24,32 +24,80 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.useradministration.domain.AppUser;
 
 @Entity
 @Table(name = "notification_mapper")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class NotificationMapper extends AbstractPersistableCustom<Long> {
-
     @ManyToOne
     @JoinColumn(name = "notification_id")
     private Notification notification;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private AppUser userId;
-
     @Column(name = "is_read")
     private boolean isRead;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @java.lang.SuppressWarnings("all")
+        public Notification getNotification() {
+        return this.notification;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AppUser getUserId() {
+        return this.userId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isRead() {
+        return this.isRead;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDateTime getCreatedAt() {
+        return this.createdAt;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public NotificationMapper setNotification(final Notification notification) {
+        this.notification = notification;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public NotificationMapper setUserId(final AppUser userId) {
+        this.userId = userId;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public NotificationMapper setRead(final boolean isRead) {
+        this.isRead = isRead;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public NotificationMapper setCreatedAt(final LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public NotificationMapper() {
+    }
 }

@@ -16,12 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.infrastructure.core.config;
 
 import com.google.common.base.Strings;
 import java.net.URI;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,24 +32,21 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3ClientBuilder;
 
-@Slf4j
 @Configuration
 public class ContentS3Config {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ContentS3Config.class);
 
     @Bean
     @ConditionalOnProperty("fineract.content.s3.enabled")
     public S3Client contentS3Client(FineractProperties fineractProperties) {
-        S3ClientBuilder builder = S3Client.builder().credentialsProvider(getCredentialProvider(fineractProperties.getContent().getS3()))
-                .requestChecksumCalculation(RequestChecksumCalculation.WHEN_REQUIRED);
-
+        S3ClientBuilder builder = S3Client.builder().credentialsProvider(getCredentialProvider(fineractProperties.getContent().getS3())).requestChecksumCalculation(RequestChecksumCalculation.WHEN_REQUIRED);
         if (!Strings.isNullOrEmpty(fineractProperties.getContent().getS3().getRegion())) {
             builder.region(Region.of(fineractProperties.getContent().getS3().getRegion()));
         }
         if (!Strings.isNullOrEmpty(fineractProperties.getContent().getS3().getEndpoint())) {
-            builder.endpointOverride(URI.create(fineractProperties.getContent().getS3().getEndpoint()))
-                    .forcePathStyle(fineractProperties.getContent().getS3().getPathStyleAddressingEnabled());
+            builder.endpointOverride(URI.create(fineractProperties.getContent().getS3().getEndpoint())).forcePathStyle(fineractProperties.getContent().getS3().getPathStyleAddressingEnabled());
         }
-
         return builder.build();
     }
 
@@ -59,7 +54,6 @@ public class ContentS3Config {
         if (Strings.isNullOrEmpty(s3Properties.getAccessKey()) || Strings.isNullOrEmpty(s3Properties.getSecretKey())) {
             return DefaultCredentialsProvider.builder().build();
         }
-
         return StaticCredentialsProvider.create(AwsBasicCredentials.create(s3Properties.getAccessKey(), s3Properties.getSecretKey()));
     }
 }

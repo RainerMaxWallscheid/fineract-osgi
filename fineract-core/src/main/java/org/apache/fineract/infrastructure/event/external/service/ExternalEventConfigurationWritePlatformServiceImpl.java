@@ -20,7 +20,6 @@ package org.apache.fineract.infrastructure.event.external.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import lombok.AllArgsConstructor;
 import org.apache.fineract.infrastructure.event.external.data.ExternalEventConfigurationUpdateRequest;
 import org.apache.fineract.infrastructure.event.external.data.ExternalEventConfigurationUpdateResponse;
 import org.apache.fineract.infrastructure.event.external.repository.ExternalEventConfigurationRepository;
@@ -29,9 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@AllArgsConstructor
 public class ExternalEventConfigurationWritePlatformServiceImpl implements ExternalEventConfigurationWritePlatformService {
-
     private final ExternalEventConfigurationRepository repository;
 
     @Transactional
@@ -41,22 +38,23 @@ public class ExternalEventConfigurationWritePlatformServiceImpl implements Exter
         final var changes = new HashMap<String, Object>();
         final var changedConfigurations = new HashMap<String, Boolean>();
         final var modifiedConfigurations = new ArrayList<ExternalEventConfiguration>();
-
         for (var entry : commandConfigurations.entrySet()) {
             final var configuration = repository.findExternalEventConfigurationByTypeWithNotFoundDetection(entry.getKey());
             configuration.setEnabled(entry.getValue());
             changedConfigurations.put(entry.getKey(), entry.getValue());
             modifiedConfigurations.add(configuration);
         }
-
         if (!modifiedConfigurations.isEmpty()) {
             repository.saveAll(modifiedConfigurations);
         }
-
         if (!changedConfigurations.isEmpty()) {
             changes.put("externalEventConfigurations", changedConfigurations);
         }
-
         return ExternalEventConfigurationUpdateResponse.builder().changes(changes).build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalEventConfigurationWritePlatformServiceImpl(final ExternalEventConfigurationRepository repository) {
+        this.repository = repository;
     }
 }

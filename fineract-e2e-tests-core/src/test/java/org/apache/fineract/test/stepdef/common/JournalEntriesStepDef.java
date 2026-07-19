@@ -20,7 +20,6 @@ package org.apache.fineract.test.stepdef.common;
 
 import static org.apache.fineract.test.stepdef.loan.LoanRescheduleStepDef.FORMATTER_EN;
 import static org.assertj.core.api.Assertions.assertThat;
-
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Then;
 import java.io.IOException;
@@ -34,7 +33,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.feign.services.JournalEntriesApi;
 import org.apache.fineract.client.feign.services.LoansApi;
@@ -52,14 +50,12 @@ import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Slf4j
 public class JournalEntriesStepDef extends AbstractStepDef {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JournalEntriesStepDef.class);
     public static final String DATE_FORMAT = "dd MMMM yyyy";
-
     @Autowired
     private FineractFeignClient fineractFeignClient;
-
     @Autowired
     private LoanRequestFactory loanRequestFactory;
 
@@ -76,40 +72,30 @@ public class JournalEntriesStepDef extends AbstractStepDef {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         long loanId = loanResponse.getLoanId();
-
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("staffInSelectedOfficeOnly", false);
         queryParams.put("associations", "transactions");
         GetLoansLoanIdResponse loanDetailsResponse = loansApi().retrieveOneLoan(loanId, queryParams);
         TransactionType transactionType1 = TransactionType.valueOf(transactionType);
         String transactionTypeExpected = transactionType1.getValue();
-
         List<GetLoansLoanIdTransactions> transactions = loanDetailsResponse.getTransactions();
-        List<GetLoansLoanIdTransactions> transactionsMatch = transactions.stream()
-                .filter(t -> transactionDate.equals(formatter.format(t.getDate()))
-                        && transactionTypeExpected.equals(t.getType().getCode().substring(20)))
-                .collect(Collectors.toList());
-
+        List<GetLoansLoanIdTransactions> transactionsMatch = transactions.stream().filter(t -> transactionDate.equals(formatter.format(t.getDate())) && transactionTypeExpected.equals(t.getType().getCode().substring(20))).collect(Collectors.toList());
         List<List<JournalEntryTransactionItem>> journalLinesActualList = getJournalLinesActualList(transactionsMatch);
         checkJournalEntryData(journalLinesActualList, loanId, table);
     }
 
     public void checkJournalEntryData(List<List<JournalEntryTransactionItem>> journalLinesActualList, long loanId, DataTable table) {
         String resourceId = String.valueOf(loanId);
-
         List<List<String>> data = table.asLists();
         final int expectedCount = data.size() - 1;
         final int actualCount = journalLinesActualList.stream().mapToInt(List::size).sum();
-        assertThat(actualCount).as("The number of journal entries for the transaction does not match the expected count! Expected: "
-                + expectedCount + ", Actual: " + actualCount).isEqualTo(expectedCount);
+        assertThat(actualCount).as("The number of journal entries for the transaction does not match the expected count! Expected: " + expectedCount + ", Actual: " + actualCount).isEqualTo(expectedCount);
         for (int i = 1; i < data.size(); i++) {
             List<List<List<String>>> possibleActualValuesList = new ArrayList<>();
             List<String> expectedValues = data.get(i);
             boolean containsAnyExpected = false;
-
             for (int j = 0; j < journalLinesActualList.size(); j++) {
                 List<JournalEntryTransactionItem> journalLinesActual = journalLinesActualList.get(j);
-
                 List<List<String>> actualValuesList = journalLinesActual.stream().map(t -> {
                     List<String> actualValues = new ArrayList<>();
                     actualValues.add(t.getGlAccountType().getValue() == null ? null : t.getGlAccountType().getValue());
@@ -117,20 +103,15 @@ public class JournalEntriesStepDef extends AbstractStepDef {
                     actualValues.add(t.getGlAccountName() == null ? null : t.getGlAccountName());
                     actualValues.add("DEBIT".equals(t.getEntryType().getValue()) ? String.valueOf(t.getAmount()) : null);
                     actualValues.add("CREDIT".equals(t.getEntryType().getValue()) ? String.valueOf(t.getAmount()) : null);
-
                     return actualValues;
                 }).collect(Collectors.toList());
                 possibleActualValuesList.add(actualValuesList);
-
-                boolean containsExpectedValues = actualValuesList.stream()
-                        .anyMatch(actualValues -> matchesWithBigDecimalComparison(actualValues, expectedValues));
+                boolean containsExpectedValues = actualValuesList.stream().anyMatch(actualValues -> matchesWithBigDecimalComparison(actualValues, expectedValues));
                 if (containsExpectedValues) {
                     containsAnyExpected = true;
                 }
             }
-            assertThat(containsAnyExpected)
-                    .as(ErrorMessageHelper.wrongValueInLineInJournalEntries(resourceId, i, possibleActualValuesList, expectedValues))
-                    .isTrue();
+            assertThat(containsAnyExpected).as(ErrorMessageHelper.wrongValueInLineInJournalEntries(resourceId, i, possibleActualValuesList, expectedValues)).isTrue();
         }
     }
 
@@ -176,7 +157,6 @@ public class JournalEntriesStepDef extends AbstractStepDef {
             } catch (Exception e) {
                 log.error("Exception", e);
             }
-
             return journalEntryDataResponse.getPageItems();
         }).collect(Collectors.toList());
     }
@@ -186,24 +166,15 @@ public class JournalEntriesStepDef extends AbstractStepDef {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         long loanId = loanResponse.getLoanId();
-
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("staffInSelectedOfficeOnly", false);
         queryParams.put("associations", "transactions");
         GetLoansLoanIdResponse loanDetailsResponse = loansApi().retrieveOneLoan(loanId, queryParams);
         TransactionType transactionType1 = TransactionType.valueOf(transactionType);
         String transactionTypeExpected = transactionType1.getValue();
-
         List<GetLoansLoanIdTransactions> transactions = loanDetailsResponse.getTransactions();
-        List<GetLoansLoanIdTransactions> transactionsMatch = transactions.stream()
-                .filter(t -> transactionDate.equals(formatter.format(t.getDate()))
-                        && transactionTypeExpected.equals(t.getType().getCode().substring(20)))
-                .collect(Collectors.toList());
-        assertThat(transactionsMatch.size())
-                .as("The number of journal entries for the transaction does not match the expected count! Expected: " + numberTrns
-                        + ", Actual: " + transactionsMatch.size())
-                .isEqualTo(numberTrns);
-
+        List<GetLoansLoanIdTransactions> transactionsMatch = transactions.stream().filter(t -> transactionDate.equals(formatter.format(t.getDate())) && transactionTypeExpected.equals(t.getType().getCode().substring(20))).collect(Collectors.toList());
+        assertThat(transactionsMatch.size()).as("The number of journal entries for the transaction does not match the expected count! Expected: " + numberTrns + ", Actual: " + transactionsMatch.size()).isEqualTo(numberTrns);
         List<List<JournalEntryTransactionItem>> journalLinesActualList = getJournalLinesActualList(transactionsMatch);
         checkJournalEntryData(journalLinesActualList, loanId, table);
     }
@@ -214,7 +185,6 @@ public class JournalEntriesStepDef extends AbstractStepDef {
         final PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         final long loanId = loanResponse.getLoanId();
         final String resourceId = String.valueOf(loanId);
-
         final String transactionId = "L" + capitalizedIncomeAmortizationId;
         GetJournalEntriesTransactionIdResponse journalEntryDataResponse = null;
         try {
@@ -230,39 +200,28 @@ public class JournalEntriesStepDef extends AbstractStepDef {
         if (journalEntryDataResponse != null) {
             journalLinesActualList = journalEntryDataResponse.getPageItems();
         }
-
         final List<List<String>> data = table.asLists();
         for (int i = 1; i < data.size(); i++) {
             final List<List<String>> possibleActualValuesList = new ArrayList<>();
             final List<String> expectedValues = data.get(i);
             boolean containsAnyExpected = false;
-
             for (int j = 0; j < Objects.requireNonNull(journalLinesActualList).size(); j++) {
                 final JournalEntryTransactionItem journalLinesActual = journalLinesActualList.get(j);
                 final List<String> actualValues = new ArrayList<>();
                 assert journalLinesActual.getGlAccountType() != null;
-                actualValues.add(
-                        journalLinesActual.getGlAccountType().getValue() == null ? null : journalLinesActual.getGlAccountType().getValue());
+                actualValues.add(journalLinesActual.getGlAccountType().getValue() == null ? null : journalLinesActual.getGlAccountType().getValue());
                 actualValues.add(journalLinesActual.getGlAccountCode() == null ? null : journalLinesActual.getGlAccountCode());
                 actualValues.add(journalLinesActual.getGlAccountName() == null ? null : journalLinesActual.getGlAccountName());
                 assert journalLinesActual.getEntryType() != null;
-                actualValues
-                        .add("DEBIT".equals(journalLinesActual.getEntryType().getValue()) ? String.valueOf(journalLinesActual.getAmount())
-                                : null);
-                actualValues
-                        .add("CREDIT".equals(journalLinesActual.getEntryType().getValue()) ? String.valueOf(journalLinesActual.getAmount())
-                                : null);
+                actualValues.add("DEBIT".equals(journalLinesActual.getEntryType().getValue()) ? String.valueOf(journalLinesActual.getAmount()) : null);
+                actualValues.add("CREDIT".equals(journalLinesActual.getEntryType().getValue()) ? String.valueOf(journalLinesActual.getAmount()) : null);
                 possibleActualValuesList.add(actualValues);
-
-                final boolean containsExpectedValues = possibleActualValuesList.stream()
-                        .anyMatch(actualValue -> matchesWithBigDecimalComparison(actualValue, expectedValues));
+                final boolean containsExpectedValues = possibleActualValuesList.stream().anyMatch(actualValue -> matchesWithBigDecimalComparison(actualValue, expectedValues));
                 if (containsExpectedValues) {
                     containsAnyExpected = true;
                 }
             }
-            assertThat(containsAnyExpected)
-                    .as(ErrorMessageHelper.wrongValueInLineInJournalEntry(resourceId, i, possibleActualValuesList, expectedValues))
-                    .isTrue();
+            assertThat(containsAnyExpected).as(ErrorMessageHelper.wrongValueInLineInJournalEntry(resourceId, i, possibleActualValuesList, expectedValues)).isTrue();
         }
     }
 
@@ -272,25 +231,15 @@ public class JournalEntriesStepDef extends AbstractStepDef {
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         long loanId = loanResponse.getLoanId();
         String resourceId = String.valueOf(loanId);
-
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("staffInSelectedOfficeOnly", false);
         queryParams.put("associations", "transactions");
         GetLoansLoanIdResponse loanDetailsResponse = loansApi().retrieveOneLoan(loanId, queryParams);
         TransactionType transactionType1 = TransactionType.valueOf(transactionType);
         String transactionTypeExpected = transactionType1.getValue();
-
         List<GetLoansLoanIdTransactions> transactions = loanDetailsResponse.getTransactions();
-
-        List<GetLoansLoanIdTransactions> transactionsMatch = transactions.stream()
-                .filter(t -> transactionDate.equals(formatter.format(t.getDate()))
-                        && transactionTypeExpected.equals(t.getType().getCode().substring(20)))
-                .collect(Collectors.toList());
-
-        List<String> transactionIdList = transactionsMatch.stream().flatMap(t -> t.getTransactionRelations().stream()
-                .filter(e -> "REPLAYED".equals(e.getRelationType())).map(c -> "L" + c.getToLoanTransaction().toString()))
-                .collect(Collectors.toList());
-
+        List<GetLoansLoanIdTransactions> transactionsMatch = transactions.stream().filter(t -> transactionDate.equals(formatter.format(t.getDate())) && transactionTypeExpected.equals(t.getType().getCode().substring(20))).collect(Collectors.toList());
+        List<String> transactionIdList = transactionsMatch.stream().flatMap(t -> t.getTransactionRelations().stream().filter(e -> "REPLAYED".equals(e.getRelationType())).map(c -> "L" + c.getToLoanTransaction().toString())).collect(Collectors.toList());
         List<List<JournalEntryTransactionItem>> journalLinesActualList = transactionIdList.stream().map(t -> {
             GetJournalEntriesTransactionIdResponse journalEntryDataResponse = null;
             try {
@@ -301,19 +250,15 @@ public class JournalEntriesStepDef extends AbstractStepDef {
             } catch (Exception e) {
                 log.error("Exception", e);
             }
-
             return journalEntryDataResponse.getPageItems();
         }).collect(Collectors.toList());
-
         List<List<String>> data = table.asLists();
         for (int i = 1; i < data.size(); i++) {
             List<List<List<String>>> possibleActualValuesList = new ArrayList<>();
             List<String> expectedValues = data.get(i);
             boolean containsAnyExpected = false;
-
             for (int j = 0; j < journalLinesActualList.size(); j++) {
                 List<JournalEntryTransactionItem> journalLinesActual = journalLinesActualList.get(j);
-
                 List<List<String>> actualValuesList = journalLinesActual.stream().map(t -> {
                     List<String> actualValues = new ArrayList<>();
                     actualValues.add(t.getGlAccountType().getValue() == null ? null : t.getGlAccountType().getValue());
@@ -321,20 +266,15 @@ public class JournalEntriesStepDef extends AbstractStepDef {
                     actualValues.add(t.getGlAccountName() == null ? null : t.getGlAccountName());
                     actualValues.add("DEBIT".equals(t.getEntryType().getValue()) ? String.valueOf(t.getAmount()) : null);
                     actualValues.add("CREDIT".equals(t.getEntryType().getValue()) ? String.valueOf(t.getAmount()) : null);
-
                     return actualValues;
                 }).collect(Collectors.toList());
                 possibleActualValuesList.add(actualValuesList);
-
-                boolean containsExpectedValues = actualValuesList.stream()
-                        .anyMatch(actualValues -> matchesWithBigDecimalComparison(actualValues, expectedValues));
+                boolean containsExpectedValues = actualValuesList.stream().anyMatch(actualValues -> matchesWithBigDecimalComparison(actualValues, expectedValues));
                 if (containsExpectedValues) {
                     containsAnyExpected = true;
                 }
             }
-            assertThat(containsAnyExpected)
-                    .as(ErrorMessageHelper.wrongValueInLineInJournalEntries(resourceId, i, possibleActualValuesList, expectedValues))
-                    .isTrue();
+            assertThat(containsAnyExpected).as(ErrorMessageHelper.wrongValueInLineInJournalEntries(resourceId, i, possibleActualValuesList, expectedValues)).isTrue();
         }
     }
 
@@ -343,20 +283,14 @@ public class JournalEntriesStepDef extends AbstractStepDef {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         long loanId = loanResponse.getLoanId();
-
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("staffInSelectedOfficeOnly", false);
         queryParams.put("associations", "transactions");
         GetLoansLoanIdResponse loanDetailsResponse = loansApi().retrieveOneLoan(loanId, queryParams);
         TransactionType transactionType1 = TransactionType.valueOf(transactionType);
         String transactionTypeExpected = transactionType1.getValue();
-
         List<GetLoansLoanIdTransactions> transactions = loanDetailsResponse.getTransactions();
-        List<GetLoansLoanIdTransactions> transactionsMatch = transactions.stream()
-                .filter(t -> transactionDate.equals(formatter.format(t.getDate()))
-                        && transactionTypeExpected.equals(t.getType().getCode().substring(20)))
-                .collect(Collectors.toList());
-
+        List<GetLoansLoanIdTransactions> transactionsMatch = transactions.stream().filter(t -> transactionDate.equals(formatter.format(t.getDate())) && transactionTypeExpected.equals(t.getType().getCode().substring(20))).collect(Collectors.toList());
         List<List<JournalEntryTransactionItem>> journalLinesActualList = transactionsMatch.stream().map(t -> {
             String transactionId = "L" + t.getId();
             GetJournalEntriesTransactionIdResponse journalEntryDataResponse = null;
@@ -368,34 +302,27 @@ public class JournalEntriesStepDef extends AbstractStepDef {
             } catch (Exception e) {
                 log.error("Exception", e);
             }
-
             return journalEntryDataResponse.getPageItems();
         }).collect(Collectors.toList());
-
         assertThat(journalLinesActualList.stream().findFirst().get().size()).isZero();
     }
 
     public PostJournalEntriesResponse addManualJournalEntryWithoutExternalAssetOwner(String amount, String date) throws IOException {
         LocalDate transactionDate = LocalDate.parse(date, FORMATTER_EN);
-        JournalEntryCommand journalEntriesRequest = loanRequestFactory.defaultManualJournalEntryRequest(new BigDecimal(amount))
-                .transactionDate(transactionDate);
+        JournalEntryCommand journalEntriesRequest = loanRequestFactory.defaultManualJournalEntryRequest(new BigDecimal(amount)).transactionDate(transactionDate);
         Map<String, Object> createJournalQueryParams = new HashMap<>();
         createJournalQueryParams.put("command", "");
-        PostJournalEntriesResponse journalEntriesResponse = journalEntriesApi().createGLJournalEntry(journalEntriesRequest,
-                createJournalQueryParams);
+        PostJournalEntriesResponse journalEntriesResponse = journalEntriesApi().createGLJournalEntry(journalEntriesRequest, createJournalQueryParams);
         testContext().set(TestContextKey.MANUAL_JOURNAL_ENTRIES_REQUEST, journalEntriesRequest);
         return journalEntriesResponse;
     }
 
-    public PostJournalEntriesResponse addManualJournalEntryWithExternalAssetOwner(String amount, String date, String externalAssetOwner)
-            throws IOException {
+    public PostJournalEntriesResponse addManualJournalEntryWithExternalAssetOwner(String amount, String date, String externalAssetOwner) throws IOException {
         LocalDate transactionDate = LocalDate.parse(date, FORMATTER_EN);
-        JournalEntryCommand journalEntriesRequest = loanRequestFactory
-                .defaultManualJournalEntryRequest(new BigDecimal(amount), externalAssetOwner).transactionDate(transactionDate);
+        JournalEntryCommand journalEntriesRequest = loanRequestFactory.defaultManualJournalEntryRequest(new BigDecimal(amount), externalAssetOwner).transactionDate(transactionDate);
         Map<String, Object> createJournalQueryParams = new HashMap<>();
         createJournalQueryParams.put("command", "");
-        PostJournalEntriesResponse journalEntriesResponse = journalEntriesApi().createGLJournalEntry(journalEntriesRequest,
-                createJournalQueryParams);
+        PostJournalEntriesResponse journalEntriesResponse = journalEntriesApi().createGLJournalEntry(journalEntriesRequest, createJournalQueryParams);
         testContext().set(TestContextKey.MANUAL_JOURNAL_ENTRIES_REQUEST, journalEntriesRequest);
         return journalEntriesResponse;
     }
@@ -403,23 +330,19 @@ public class JournalEntriesStepDef extends AbstractStepDef {
     @Then("Admin creates manual Journal entry with {string} amount and {string} date and unique External Asset Owner")
     public void createManualJournalEntryWithExternalAssetOwner(String amount, String date) throws IOException {
         String ownerExternalIdStored = testContext().get(TestContextKey.ASSET_EXTERNALIZATION_OWNER_EXTERNAL_ID);
-        PostJournalEntriesResponse journalEntriesResponse = addManualJournalEntryWithExternalAssetOwner(amount, date,
-                ownerExternalIdStored);
-
+        PostJournalEntriesResponse journalEntriesResponse = addManualJournalEntryWithExternalAssetOwner(amount, date, ownerExternalIdStored);
         testContext().set(TestContextKey.MANUAL_JOURNAL_ENTRIES_RESPONSE, journalEntriesResponse);
     }
 
     @Then("Admin creates manual Journal entry with {string} amount and {string} date and empty External Asset Owner")
     public void createManualJournalEntryWithEmptyExternalAssetOwner(String amount, String date) throws IOException {
         PostJournalEntriesResponse journalEntriesResponse = addManualJournalEntryWithExternalAssetOwner(amount, date, "");
-
         testContext().set(TestContextKey.MANUAL_JOURNAL_ENTRIES_RESPONSE, journalEntriesResponse);
     }
 
     @Then("Admin creates manual Journal entry with {string} amount and {string} date and without External Asset Owner")
     public void createManualJournalEntryWithoutExternalAssetOwner(String amount, String date) throws IOException {
         PostJournalEntriesResponse journalEntriesResponse = addManualJournalEntryWithoutExternalAssetOwner(amount, date);
-
         testContext().set(TestContextKey.MANUAL_JOURNAL_ENTRIES_RESPONSE, journalEntriesResponse);
     }
 
@@ -428,9 +351,7 @@ public class JournalEntriesStepDef extends AbstractStepDef {
         PostJournalEntriesResponse journalEnriesResponse = testContext().get(TestContextKey.MANUAL_JOURNAL_ENTRIES_RESPONSE);
         PostJournalEntriesResponse journalEntriesResponseBody = journalEnriesResponse;
         String transactionId = journalEntriesResponseBody.getTransactionId();
-
         JournalEntryCommand journalEntriesRequest = testContext().get(TestContextKey.MANUAL_JOURNAL_ENTRIES_REQUEST);
-
         GetJournalEntriesTransactionIdResponse journalEntryDataResponse = null;
         try {
             Map<String, Object> journalQueryParams = new HashMap<>();
@@ -440,21 +361,16 @@ public class JournalEntriesStepDef extends AbstractStepDef {
         } catch (Exception e) {
             log.error("Exception", e);
         }
-
         List<List<String>> data = table.asLists();
         for (int i = 1; i < data.size(); i++) {
             List<List<List<String>>> possibleActualValuesList = new ArrayList<>();
             List<String> expectedValues = data.get(i);
             if (Boolean.parseBoolean(externalAssetOwnerEnabled)) {
-                expectedValues
-                        .add(journalEntriesRequest.getExternalAssetOwner() == null ? null : journalEntriesRequest.getExternalAssetOwner());
+                expectedValues.add(journalEntriesRequest.getExternalAssetOwner() == null ? null : journalEntriesRequest.getExternalAssetOwner());
             }
             boolean containsAnyExpected = false;
-
             GetJournalEntriesTransactionIdResponse journalEntryData = journalEntryDataResponse;
-
             List<JournalEntryTransactionItem> journalLinesActual = journalEntryData.getPageItems();
-
             List<List<String>> actualValuesList = journalLinesActual.stream().map(t -> {
                 List<String> actualValues = new ArrayList<>();
                 actualValues.add(t.getGlAccountType().getValue() == null ? null : t.getGlAccountType().getValue());
@@ -466,22 +382,14 @@ public class JournalEntriesStepDef extends AbstractStepDef {
                 if (Boolean.parseBoolean(externalAssetOwnerEnabled)) {
                     actualValues.add(t.getExternalAssetOwner() == null ? null : t.getExternalAssetOwner());
                 }
-
                 return actualValues;
             }).collect(Collectors.toList());
-
             possibleActualValuesList.add(actualValuesList);
-
-            boolean containsExpectedValues = actualValuesList.stream()
-                    .anyMatch(actualValues -> matchesWithBigDecimalComparison(actualValues, expectedValues));
+            boolean containsExpectedValues = actualValuesList.stream().anyMatch(actualValues -> matchesWithBigDecimalComparison(actualValues, expectedValues));
             if (containsExpectedValues) {
                 containsAnyExpected = true;
             }
-
-            assertThat(containsAnyExpected)
-                    .as(ErrorMessageHelper.wrongValueInLineInJournalEntries(transactionId, i, possibleActualValuesList, expectedValues))
-                    .isTrue();
+            assertThat(containsAnyExpected).as(ErrorMessageHelper.wrongValueInLineInJournalEntries(transactionId, i, possibleActualValuesList, expectedValues)).isTrue();
         }
     }
-
 }

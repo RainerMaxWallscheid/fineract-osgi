@@ -18,12 +18,9 @@
  */
 package org.apache.fineract.portfolio.search.data;
 
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
-@Getter
 public class SearchData {
-
     private final Long entityId;
     private final String entityAccountNo;
     private final String entityExternalId;
@@ -36,10 +33,7 @@ public class SearchData {
     private final String parentType;
     private final String subEntityType;
 
-    public SearchData(final Long entityId, final String entityAccountNo, final String entityExternalId, final String entityName,
-            final String entityType, final Long parentId, final String parentName, final String parentType, final String entityMobileNo,
-            final EnumOptionData entityStatus, final String subEntityType) {
-
+    public SearchData(final Long entityId, final String entityAccountNo, final String entityExternalId, final String entityName, final String entityType, final Long parentId, final String parentName, final String parentType, final String entityMobileNo, final EnumOptionData entityStatus, final String subEntityType) {
         this.entityId = entityId;
         this.entityAccountNo = entityAccountNo;
         this.entityExternalId = entityExternalId;
@@ -53,4 +47,58 @@ public class SearchData {
         this.subEntityType = subEntityType;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Long getEntityId() {
+        return this.entityId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEntityAccountNo() {
+        return this.entityAccountNo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEntityExternalId() {
+        return this.entityExternalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEntityName() {
+        return this.entityName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEntityType() {
+        return this.entityType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getParentId() {
+        return this.parentId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getParentName() {
+        return this.parentName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEntityMobileNo() {
+        return this.entityMobileNo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getEntityStatus() {
+        return this.entityStatus;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getParentType() {
+        return this.parentType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getSubEntityType() {
+        return this.subEntityType;
+    }
 }

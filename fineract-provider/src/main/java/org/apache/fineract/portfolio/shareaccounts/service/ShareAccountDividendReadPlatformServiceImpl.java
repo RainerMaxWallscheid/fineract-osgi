@@ -24,7 +24,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.Page;
@@ -39,9 +38,7 @@ import org.apache.fineract.portfolio.shareproducts.domain.ShareProductDividendSt
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-@RequiredArgsConstructor
 public class ShareAccountDividendReadPlatformServiceImpl implements ShareAccountDividendReadPlatformService {
-
     private final JdbcTemplate jdbcTemplate;
     private final ColumnValidator columnValidator;
     private final PaginationHelper paginationHelper;
@@ -57,8 +54,7 @@ public class ShareAccountDividendReadPlatformServiceImpl implements ShareAccount
         sb.append(" inner join m_share_product_dividend_pay_out spdpo on spdpo.id = sadd.dividend_pay_out_id ");
         sb.append(" inner join m_share_account sa on sa.id = sadd.account_id ");
         sb.append(" where spdpo.status = ? and sadd.status = ?");
-        return this.jdbcTemplate.queryForList(sb.toString(), ShareProductDividendStatusType.APPROVED.getValue(),
-                ShareAccountDividendStatusType.INITIATED.getValue());
+        return this.jdbcTemplate.queryForList(sb.toString(), ShareProductDividendStatusType.APPROVED.getValue(), ShareAccountDividendStatusType.INITIATED.getValue());
     }
 
     @Override
@@ -77,14 +73,11 @@ public class ShareAccountDividendReadPlatformServiceImpl implements ShareAccount
         if (searchParameters.hasOrderBy()) {
             sqlBuilder.append(" order by ").append(searchParameters.getOrderBy());
             this.columnValidator.validateSqlInjection(sqlBuilder.toString(), searchParameters.getOrderBy());
-
             if (searchParameters.hasSortOrder()) {
                 sqlBuilder.append(' ').append(searchParameters.getSortOrder());
                 this.columnValidator.validateSqlInjection(sqlBuilder.toString(), searchParameters.getSortOrder());
-
             }
         }
-
         if (searchParameters.hasLimit()) {
             sqlBuilder.append(" ");
             if (searchParameters.hasOffset()) {
@@ -93,13 +86,12 @@ public class ShareAccountDividendReadPlatformServiceImpl implements ShareAccount
                 sqlBuilder.append(sqlGenerator.limit(searchParameters.getLimit()));
             }
         }
-
         Object[] paramsObj = params.toArray();
         return this.paginationHelper.fetchPage(this.jdbcTemplate, sqlBuilder.toString(), paramsObj, shareAccountDividendMapper);
     }
 
-    private static final class ShareAccountDividendMapper implements RowMapper<ShareAccountDividendData> {
 
+    private static final class ShareAccountDividendMapper implements RowMapper<ShareAccountDividendData> {
         private final String sql;
 
         ShareAccountDividendMapper() {
@@ -125,7 +117,6 @@ public class ShareAccountDividendReadPlatformServiceImpl implements ShareAccount
             final Integer status = JdbcSupport.getInteger(rs, "status");
             final EnumOptionData statusEnum = SharesEnumerations.shareAccountDividendStatusEnum(status);
             final Long savingsTransactionId = JdbcSupport.getLong(rs, "savingsTransactionId");
-
             final Long accounId = rs.getLong("accountId");
             final String accountNumber = rs.getString("accountNumber");
             final String clientName = rs.getString("clientName");
@@ -133,7 +124,13 @@ public class ShareAccountDividendReadPlatformServiceImpl implements ShareAccount
             final ShareAccountData accountData = ShareAccountData.lookup(accounId, accountNumber, clientId, clientName);
             return new ShareAccountDividendData(id, accountData, amount, statusEnum, savingsTransactionId);
         }
-
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ShareAccountDividendReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final ColumnValidator columnValidator, final PaginationHelper paginationHelper, final DatabaseSpecificSQLGenerator sqlGenerator) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.columnValidator = columnValidator;
+        this.paginationHelper = paginationHelper;
+        this.sqlGenerator = sqlGenerator;
+    }
 }

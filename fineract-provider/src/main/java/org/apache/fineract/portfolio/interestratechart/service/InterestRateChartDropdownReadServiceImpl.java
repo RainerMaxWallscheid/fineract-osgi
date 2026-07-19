@@ -16,20 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.interestratechart.service;
 
 import java.util.Collection;
-import lombok.NoArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 
-@NoArgsConstructor
 public class InterestRateChartDropdownReadServiceImpl implements InterestRateChartDropdownReadService {
-
     @Override
     public Collection<EnumOptionData> retrievePeriodTypeOptions() {
         return InterestRateChartEnumerations.periodType(PeriodFrequencyType.values());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public InterestRateChartDropdownReadServiceImpl() {
+    }
 }

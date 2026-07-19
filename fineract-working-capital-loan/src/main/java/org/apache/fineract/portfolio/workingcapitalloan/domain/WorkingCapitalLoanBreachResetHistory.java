@@ -25,35 +25,23 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "m_wc_loan_breach_reset_history")
 public class WorkingCapitalLoanBreachResetHistory extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "breach_action_id", nullable = false)
     private WorkingCapitalLoanBreachAction breachAction;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "breach_schedule_id", nullable = false)
     private WorkingCapitalLoanBreachSchedule breachSchedule;
-
     @Column(name = "min_payment_amount", scale = 6, precision = 19)
     private BigDecimal minPaymentAmount;
-
     @Column(name = "outstanding_amount", scale = 6, precision = 19)
     private BigDecimal outstandingAmount;
-
     @Column(name = "breach")
     private Boolean breach;
-
     @Column(name = "near_breach")
     private Boolean nearBreach;
 
@@ -64,5 +52,69 @@ public class WorkingCapitalLoanBreachResetHistory extends AbstractAuditableWithU
         setBreach(period.getBreach());
         setNearBreach(period.getNearBreach());
         setMinPaymentAmount(period.getMinPaymentAmount());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanBreachAction getBreachAction() {
+        return this.breachAction;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanBreachSchedule getBreachSchedule() {
+        return this.breachSchedule;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getMinPaymentAmount() {
+        return this.minPaymentAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getOutstandingAmount() {
+        return this.outstandingAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Boolean getBreach() {
+        return this.breach;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Boolean getNearBreach() {
+        return this.nearBreach;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setBreachAction(final WorkingCapitalLoanBreachAction breachAction) {
+        this.breachAction = breachAction;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setBreachSchedule(final WorkingCapitalLoanBreachSchedule breachSchedule) {
+        this.breachSchedule = breachSchedule;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMinPaymentAmount(final BigDecimal minPaymentAmount) {
+        this.minPaymentAmount = minPaymentAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setOutstandingAmount(final BigDecimal outstandingAmount) {
+        this.outstandingAmount = outstandingAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setBreach(final Boolean breach) {
+        this.breach = breach;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setNearBreach(final Boolean nearBreach) {
+        this.nearBreach = nearBreach;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanBreachResetHistory() {
     }
 }

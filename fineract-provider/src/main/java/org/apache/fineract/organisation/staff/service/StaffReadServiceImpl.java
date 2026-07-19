@@ -24,7 +24,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamException;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
@@ -38,26 +37,20 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-@RequiredArgsConstructor
 public class StaffReadServiceImpl implements StaffReadService {
-
     private final PlatformSecurityContext context;
     private final JdbcTemplate jdbcTemplate;
-
     private static final StaffLookupMapper LOOKUP_MAPPER = new StaffLookupMapper();
     private static final StaffInOfficeHierarchyMapper STAFF_IN_OFFICE_HIERARCHY_MAPPER = new StaffInOfficeHierarchyMapper();
 
-    private static final class StaffMapper implements RowMapper<StaffData> {
 
+    private static final class StaffMapper implements RowMapper<StaffData> {
         public String schema() {
-            return " s.id as id,s.office_id as officeId, o.name as officeName, s.firstname as firstname, s.lastname as lastname,"
-                    + " s.display_name as displayName, s.is_loan_officer as isLoanOfficer, s.external_id as externalId, s.mobile_no as mobileNo,"
-                    + " s.is_active as isActive, s.joining_date as joiningDate from m_staff s " + " join m_office o on o.id = s.office_id";
+            return " s.id as id,s.office_id as officeId, o.name as officeName, s.firstname as firstname, s.lastname as lastname," + " s.display_name as displayName, s.is_loan_officer as isLoanOfficer, s.external_id as externalId, s.mobile_no as mobileNo," + " s.is_active as isActive, s.joining_date as joiningDate from m_staff s " + " join m_office o on o.id = s.office_id";
         }
 
         @Override
         public StaffData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-
             final Long id = rs.getLong("id");
             final String firstname = rs.getString("firstname");
             final String lastname = rs.getString("lastname");
@@ -69,39 +62,30 @@ public class StaffReadServiceImpl implements StaffReadService {
             final String mobileNo = rs.getString("mobileNo");
             final boolean isActive = rs.getBoolean("isActive");
             final LocalDate joiningDate = JdbcSupport.getLocalDate(rs, "joiningDate");
-
-            return StaffData.builder().id(id).firstname(firstname).lastname(lastname).displayName(displayName).officeId(officeId)
-                    .officeName(officeName).isLoanOfficer(isLoanOfficer).externalId(externalId).mobileNo(mobileNo).isActive(isActive)
-                    .joiningDate(joiningDate).build();
+            return StaffData.builder().id(id).firstname(firstname).lastname(lastname).displayName(displayName).officeId(officeId).officeName(officeName).isLoanOfficer(isLoanOfficer).externalId(externalId).mobileNo(mobileNo).isActive(isActive).joiningDate(joiningDate).build();
         }
     }
 
+
     private static final class StaffInOfficeHierarchyMapper implements RowMapper<StaffData> {
-
         public String schema(final boolean loanOfficersOnly) {
-
             final StringBuilder sqlBuilder = new StringBuilder(200);
-
             sqlBuilder.append("s.id as id, s.office_id as officeId, ohierarchy.name as officeName,");
             sqlBuilder.append("s.firstname as firstname, s.lastname as lastname,");
             sqlBuilder.append("s.display_name as displayName, s.is_loan_officer as isLoanOfficer, s.external_id as externalId, ");
             sqlBuilder.append("s.mobile_no as mobileNo, s.is_active as isActive, s.joining_date as joiningDate ");
             sqlBuilder.append("from m_office o ");
-            sqlBuilder.append("join m_office ohierarchy on o.hierarchy like concat(ohierarchy.hierarchy, '%') ");
+            sqlBuilder.append("join m_office ohierarchy on o.hierarchy like concat(ohierarchy.hierarchy, \'%\') ");
             sqlBuilder.append("join m_staff s on s.office_id = ohierarchy.id and s.is_active=true ");
-
             if (loanOfficersOnly) {
                 sqlBuilder.append("and s.is_loan_officer is true ");
             }
-
             sqlBuilder.append("where o.id = ? ");
-
             return sqlBuilder.toString();
         }
 
         @Override
         public StaffData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-
             final Long id = rs.getLong("id");
             final String firstname = rs.getString("firstname");
             final String lastname = rs.getString("lastname");
@@ -113,24 +97,19 @@ public class StaffReadServiceImpl implements StaffReadService {
             final String mobileNo = rs.getString("mobileNo");
             final boolean isActive = rs.getBoolean("isActive");
             final LocalDate joiningDate = JdbcSupport.getLocalDate(rs, "joiningDate");
-
-            return StaffData.builder().id(id).firstname(firstname).lastname(lastname).displayName(displayName).officeId(officeId)
-                    .officeName(officeName).isLoanOfficer(isLoanOfficer).externalId(externalId).mobileNo(mobileNo).isActive(isActive)
-                    .joiningDate(joiningDate).build();
+            return StaffData.builder().id(id).firstname(firstname).lastname(lastname).displayName(displayName).officeId(officeId).officeName(officeName).isLoanOfficer(isLoanOfficer).externalId(externalId).mobileNo(mobileNo).isActive(isActive).joiningDate(joiningDate).build();
         }
     }
 
-    private static final class StaffLookupMapper implements RowMapper<StaffData> {
 
+    private static final class StaffLookupMapper implements RowMapper<StaffData> {
         private final String schemaSql;
 
         StaffLookupMapper() {
-
             final StringBuilder sqlBuilder = new StringBuilder(100);
             sqlBuilder.append("s.id as id, s.display_name as displayName ");
             sqlBuilder.append("from m_staff s ");
             sqlBuilder.append("join m_office o on o.id = s.office_id ");
-
             this.schemaSql = sqlBuilder.toString();
         }
 
@@ -140,7 +119,6 @@ public class StaffReadServiceImpl implements StaffReadService {
 
         @Override
         public StaffData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-
             final Long id = rs.getLong("id");
             final String displayName = rs.getString("displayName");
             return StaffData.builder().id(id).displayName(displayName).build();
@@ -157,16 +135,12 @@ public class StaffReadServiceImpl implements StaffReadService {
 
     @Override
     public List<StaffData> retrieveAllStaffForDropdown(final Long officeId) {
-
         // adding the Authorization criteria so that a user cannot see an
         // employee who does not belong to his office or a sub office for his
         // office.
         final String hierarchy = this.context.authenticatedUser().getOffice().getHierarchy() + "%";
-
         final Long defaultOfficeId = defaultToUsersOfficeIfNull(officeId);
-
         final String sql = "select " + LOOKUP_MAPPER.schema() + " where s.office_id = ? and s.is_active=true and o.hierarchy like ? ";
-
         return this.jdbcTemplate.query(sql, LOOKUP_MAPPER, defaultOfficeId, hierarchy); // NOSONAR
     }
 
@@ -180,16 +154,13 @@ public class StaffReadServiceImpl implements StaffReadService {
 
     @Override
     public StaffData retrieveStaff(final Long staffId) {
-
         // adding the Authorization criteria so that a user cannot see an
         // employee who does not belong to his office or a sub office for his
         // office.
         final String hierarchy = this.context.authenticatedUser().getOffice().getHierarchy() + "%";
-
         try {
             final StaffMapper rm = new StaffMapper();
             final String sql = "select " + rm.schema() + " where s.id = ? and o.hierarchy like ? ";
-
             return this.jdbcTemplate.queryForObject(sql, rm, staffId, hierarchy); // NOSONAR
         } catch (final EmptyResultDataAccessException e) {
             throw new StaffNotFoundException(staffId, e);
@@ -203,28 +174,21 @@ public class StaffReadServiceImpl implements StaffReadService {
     }
 
     private List<StaffData> retrieveAllStaff(final SQLBuilder extraCriteria) {
-
         final StaffMapper rm = new StaffMapper();
         String sql = "select " + rm.schema();
-
         final String hierarchy = this.context.authenticatedUser().getOffice().getHierarchy() + "%";
         // adding the Authorization criteria so that a user cannot see an
         // employee who does not belong to his office or a sub office for his
         // office.
         extraCriteria.addCriteria(" o.hierarchy like ", hierarchy);
-
         sql += " " + extraCriteria.getSQLTemplate();
         sql = sql + " order by s.lastname ";
-
         return this.jdbcTemplate.query(sql, rm, extraCriteria.getArguments()); // NOSONAR
     }
 
     private SQLBuilder getStaffCriteria(final Long officeId, final boolean loanOfficersOnly, final String status) {
-
         final SQLBuilder extraCriteria = new SQLBuilder();
-
         extraCriteria.addNonNullCriteria(" s.office_id = ", officeId);
-
         if (loanOfficersOnly) {
             extraCriteria.addCriteria(" s.is_loan_officer = ", true);
         }
@@ -241,13 +205,11 @@ public class StaffReadServiceImpl implements StaffReadService {
                 }
             }
         }
-
         return extraCriteria;
     }
 
     @Override
     public List<StaffData> retrieveAllStaffInOfficeAndItsParentOfficeHierarchy(final Long officeId, final boolean loanOfficersOnly) {
-
         String sql = "select " + STAFF_IN_OFFICE_HIERARCHY_MAPPER.schema(loanOfficersOnly);
         sql = sql + " order by s.lastname";
         return this.jdbcTemplate.query(sql, STAFF_IN_OFFICE_HIERARCHY_MAPPER, officeId); // NOSONAR
@@ -256,16 +218,8 @@ public class StaffReadServiceImpl implements StaffReadService {
     @Override
     public Object[] hasAssociatedItems(final Long staffId) {
         ArrayList<String> params = new ArrayList<>();
-
-        String sql = "select c.display_name as client, g.display_name as grp,l.loan_officer_id as loan, s.field_officer_id as sav"
-                + " from m_staff staff " + " left outer join m_client c on staff.id = c.staff_id  AND c.status_enum < ? "
-                + " left outer join m_group g on staff.id = g.staff_id "
-                + " left outer join m_loan l on staff.id = l.loan_officer_id and l.loan_status_id < ? "
-                + " left outer join m_savings_account s on c.staff_id = s.field_officer_id and s.status_enum < ? "
-                + " where  staff.id  = ? " + " group by staff.id, client, grp, loan, sav";
-
-        List<Map<String, Object>> result = this.jdbcTemplate.queryForList(sql, ClientStatus.CLOSED.getValue(),
-                LoanStatus.WITHDRAWN_BY_CLIENT.getValue(), SavingsAccountStatusType.WITHDRAWN_BY_APPLICANT.getValue(), staffId);
+        String sql = "select c.display_name as client, g.display_name as grp,l.loan_officer_id as loan, s.field_officer_id as sav" + " from m_staff staff " + " left outer join m_client c on staff.id = c.staff_id  AND c.status_enum < ? " + " left outer join m_group g on staff.id = g.staff_id " + " left outer join m_loan l on staff.id = l.loan_officer_id and l.loan_status_id < ? " + " left outer join m_savings_account s on c.staff_id = s.field_officer_id and s.status_enum < ? " + " where  staff.id  = ? " + " group by staff.id, client, grp, loan, sav";
+        List<Map<String, Object>> result = this.jdbcTemplate.queryForList(sql, ClientStatus.CLOSED.getValue(), LoanStatus.WITHDRAWN_BY_CLIENT.getValue(), SavingsAccountStatusType.WITHDRAWN_BY_APPLICANT.getValue(), staffId);
         if (result != null) {
             for (Map<String, Object> map : result) {
                 if (map.get("client") != null) {
@@ -283,6 +237,11 @@ public class StaffReadServiceImpl implements StaffReadService {
             }
         }
         return params.toArray();
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public StaffReadServiceImpl(final PlatformSecurityContext context, final JdbcTemplate jdbcTemplate) {
+        this.context = context;
+        this.jdbcTemplate = jdbcTemplate;
     }
 }

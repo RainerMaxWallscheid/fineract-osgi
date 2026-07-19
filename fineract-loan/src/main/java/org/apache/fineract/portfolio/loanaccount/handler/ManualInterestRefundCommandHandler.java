@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,15 +27,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN", action = "MANUAL_INTEREST_REFUND_TRANSACTION")
 public class ManualInterestRefundCommandHandler implements NewCommandSourceHandler {
-
     private final LoanWritePlatformService loanWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return loanWritePlatformService.makeManualInterestRefund(command.getLoanId(), command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ManualInterestRefundCommandHandler(final LoanWritePlatformService loanWritePlatformService) {
+        this.loanWritePlatformService = loanWritePlatformService;
     }
 }

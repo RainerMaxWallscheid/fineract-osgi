@@ -20,14 +20,9 @@ package org.apache.fineract.accounting.journalentry.data;
 
 import java.time.LocalDate;
 import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
 
-@RequiredArgsConstructor
-@Getter
 public final class OfficeOpeningBalancesData {
-
     private final Long officeId;
     private final String officeName;
     private final LocalDate transactionDate;
@@ -38,11 +33,65 @@ public final class OfficeOpeningBalancesData {
     private final List<JournalEntryData> equityAccountOpeningBalances;
     private final List<JournalEntryData> expenseAccountOpeningBalances;
 
-    public static OfficeOpeningBalancesData createNew(final Long officeId, final String officeName, final LocalDate transactionDate,
-            final GLAccountData contraAccount, final List<JournalEntryData> assetAccountOpeningBalances,
-            final List<JournalEntryData> liabityAccountOpeningBalances, final List<JournalEntryData> incomeAccountOpeningBalances,
-            final List<JournalEntryData> equityAccountOpeningBalances, final List<JournalEntryData> expenseAccountOpeningBalances) {
-        return new OfficeOpeningBalancesData(officeId, officeName, transactionDate, contraAccount, assetAccountOpeningBalances,
-                liabityAccountOpeningBalances, incomeAccountOpeningBalances, equityAccountOpeningBalances, expenseAccountOpeningBalances);
+    public static OfficeOpeningBalancesData createNew(final Long officeId, final String officeName, final LocalDate transactionDate, final GLAccountData contraAccount, final List<JournalEntryData> assetAccountOpeningBalances, final List<JournalEntryData> liabityAccountOpeningBalances, final List<JournalEntryData> incomeAccountOpeningBalances, final List<JournalEntryData> equityAccountOpeningBalances, final List<JournalEntryData> expenseAccountOpeningBalances) {
+        return new OfficeOpeningBalancesData(officeId, officeName, transactionDate, contraAccount, assetAccountOpeningBalances, liabityAccountOpeningBalances, incomeAccountOpeningBalances, equityAccountOpeningBalances, expenseAccountOpeningBalances);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OfficeOpeningBalancesData(final Long officeId, final String officeName, final LocalDate transactionDate, final GLAccountData contraAccount, final List<JournalEntryData> assetAccountOpeningBalances, final List<JournalEntryData> liabityAccountOpeningBalances, final List<JournalEntryData> incomeAccountOpeningBalances, final List<JournalEntryData> equityAccountOpeningBalances, final List<JournalEntryData> expenseAccountOpeningBalances) {
+        this.officeId = officeId;
+        this.officeName = officeName;
+        this.transactionDate = transactionDate;
+        this.contraAccount = contraAccount;
+        this.assetAccountOpeningBalances = assetAccountOpeningBalances;
+        this.liabityAccountOpeningBalances = liabityAccountOpeningBalances;
+        this.incomeAccountOpeningBalances = incomeAccountOpeningBalances;
+        this.equityAccountOpeningBalances = equityAccountOpeningBalances;
+        this.expenseAccountOpeningBalances = expenseAccountOpeningBalances;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getOfficeId() {
+        return this.officeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getOfficeName() {
+        return this.officeName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getTransactionDate() {
+        return this.transactionDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GLAccountData getContraAccount() {
+        return this.contraAccount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<JournalEntryData> getAssetAccountOpeningBalances() {
+        return this.assetAccountOpeningBalances;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<JournalEntryData> getLiabityAccountOpeningBalances() {
+        return this.liabityAccountOpeningBalances;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<JournalEntryData> getIncomeAccountOpeningBalances() {
+        return this.incomeAccountOpeningBalances;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<JournalEntryData> getEquityAccountOpeningBalances() {
+        return this.equityAccountOpeningBalances;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<JournalEntryData> getExpenseAccountOpeningBalances() {
+        return this.expenseAccountOpeningBalances;
     }
 }

@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -44,10 +43,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class LoanPointInTimeServiceImpl implements LoanPointInTimeService {
-
     private final LoanUtilService loanUtilService;
     private final LoanScheduleService loanScheduleService;
     private final LoanAssembler loanAssembler;
@@ -59,25 +56,20 @@ public class LoanPointInTimeServiceImpl implements LoanPointInTimeService {
     public LoanPointInTimeData retrieveAt(Long loanId, LocalDate date) {
         entityManager.setFlushMode(FlushModeType.COMMIT);
         validateSingularRetrieval(loanId, date);
-
         // Note: since everything is running in a readOnly transaction
         // whatever we modify on the loan is not going to be propagated to the DB
         // Note2: Interest is always calculated against the current date of the system so we need to roll time back
         HashMap<BusinessDateType, LocalDate> originalBDs = ThreadLocalContextUtil.getBusinessDates();
         try {
             ThreadLocalContextUtil.setBusinessDates(new HashMap<>(Map.of(BusinessDateType.BUSINESS_DATE, date)));
-
             Loan loan = loanAssembler.assembleFrom(loanId);
-
             int txCount = loan.getLoanTransactions().size();
             int chargeCount = loan.getCharges().size();
             removeAfterDateTransactions(loan, date);
             removeAfterDateCharges(loan, date);
             int afterRemovalTxCount = loan.getLoanTransactions().size();
             int afterRemovalChargeCount = loan.getCharges().size();
-
             boolean needsScheduleRegeneration = txCount != afterRemovalTxCount || chargeCount != afterRemovalChargeCount;
-
             if (needsScheduleRegeneration) {
                 ScheduleGeneratorDTO scheduleGeneratorDTO = loanUtilService.buildScheduleGeneratorDTO(loan, null, null);
                 loanScheduleService.regenerateScheduleWithReprocessingTransactions(loan, scheduleGeneratorDTO);
@@ -85,9 +77,7 @@ public class LoanPointInTimeServiceImpl implements LoanPointInTimeService {
             } else if (!loan.isClosed()) {
                 recalculateSummaryForInstallmentsUpToDate(loan, date);
             }
-
             LoanArrearsData arrearsData = arrearsAgingService.calculateArrearsForLoan(loan);
-
             LoanPointInTimeData result = dataMapper.map(loan);
             result.setArrears(arrearsData);
             return result;
@@ -109,19 +99,15 @@ public class LoanPointInTimeServiceImpl implements LoanPointInTimeService {
     private void recalculateSummaryForInstallmentsUpToDate(Loan loan, LocalDate date) {
         var currency = loan.getCurrency();
         var summary = loan.getSummary();
-
         // Calculate fee charged based only on charges due by the specified date.
         // This excludes after-date charges and only includes installment fee portions for installments due by the date.
         Money feeChargedFromRemainingCharges = calculateTotalFeeChargedFromCharges(loan, date, currency);
-
         // Include fees due at disbursement which are always included regardless of date
         Money adjustedFeeCharged = feeChargedFromRemainingCharges.plus(summary.getTotalFeeChargesDueAtDisbursement(currency));
-
         // Only proceed with adjustment if the fee charged differs from summary
         if (adjustedFeeCharged.getAmount().compareTo(summary.getTotalFeeChargesCharged()) == 0) {
             return;
         }
-
         // Delegate to domain to recalculate all derived totals consistently
         summary.recalculateDerivedTotalsForAdjustedFeeCharged(adjustedFeeCharged.getAmount());
     }
@@ -187,8 +173,17 @@ public class LoanPointInTimeServiceImpl implements LoanPointInTimeService {
 
     private void throwExceptionIfValidationWarningsExist(List<ApiParameterError> dataValidationErrors) {
         if (!dataValidationErrors.isEmpty()) {
-            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
-                    dataValidationErrors);
+            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.", dataValidationErrors);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanPointInTimeServiceImpl(final LoanUtilService loanUtilService, final LoanScheduleService loanScheduleService, final LoanAssembler loanAssembler, final LoanPointInTimeData.Mapper dataMapper, final EntityManager entityManager, final LoanArrearsAgingService arrearsAgingService) {
+        this.loanUtilService = loanUtilService;
+        this.loanScheduleService = loanScheduleService;
+        this.loanAssembler = loanAssembler;
+        this.dataMapper = dataMapper;
+        this.entityManager = entityManager;
+        this.arrearsAgingService = arrearsAgingService;
     }
 }

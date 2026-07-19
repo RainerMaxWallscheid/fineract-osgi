@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,15 +27,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN_AVAILABLE_DISBURSEMENT_AMOUNT", action = "UPDATE")
 public class LoanAvailableDisbursementAmountModificationCommandHandler implements NewCommandSourceHandler {
-
     private final LoanApprovedAmountWritePlatformService loanApprovedAmountWritePlatformService;
 
     @Override
     @Transactional
     public CommandProcessingResult processCommand(JsonCommand command) {
         return loanApprovedAmountWritePlatformService.modifyLoanAvailableDisbursementAmount(command.getLoanId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanAvailableDisbursementAmountModificationCommandHandler(final LoanApprovedAmountWritePlatformService loanApprovedAmountWritePlatformService) {
+        this.loanApprovedAmountWritePlatformService = loanApprovedAmountWritePlatformService;
     }
 }

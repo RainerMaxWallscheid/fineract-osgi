@@ -23,7 +23,6 @@ import static org.apache.fineract.portfolio.meeting.MeetingApiConstants.attendan
 import static org.apache.fineract.portfolio.meeting.MeetingApiConstants.calendarIdParamName;
 import static org.apache.fineract.portfolio.meeting.MeetingApiConstants.clientIdParamName;
 import static org.apache.fineract.portfolio.meeting.MeetingApiConstants.clientsAttendanceParamName;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -32,8 +31,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
@@ -60,14 +57,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @Deprecated(forRemoval = true)
 final class LegacyMeetingAttendanceListener {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LegacyMeetingAttendanceListener.class);
     private static final String COLLECTIONSHEET_ENTITY_NAME = "collectionsheet";
-
     private final ConfigurationDomainService configurationDomainService;
     private final CalendarRepository calendarRepository;
     private final CalendarInstanceRepository calendarInstanceRepository;
@@ -87,10 +82,8 @@ final class LegacyMeetingAttendanceListener {
     private void updateCollectionSheetAttendance(final JsonCommand command) {
         var meetingDate = command.dateValueOfParameterNamed("transactionDate");
         var isTransactionDateOnNonMeetingDate = command.booleanPrimitiveValueOfParameterNamed("isTransactionDateOnNonMeetingDate");
-
         try {
             var calendarInstance = getCalendarInstance(command);
-
             var meeting = meetingRepository.findByCalendarInstanceIdAndMeetingDate(calendarInstance.getId(), meetingDate);
             var isSkipRepaymentOnFirstMonth = false;
             var numberOfDays = 0;
@@ -102,12 +95,8 @@ final class LegacyMeetingAttendanceListener {
                 }
             }
             // create new meeting
-            var newMeeting = (meeting != null) ? meeting
-                    : createNew(calendarInstance, meetingDate, isTransactionDateOnNonMeetingDate, isSkipRepaymentOnFirstMonth,
-                            numberOfDays);
-
+            var newMeeting = (meeting != null) ? meeting : createNew(calendarInstance, meetingDate, isTransactionDateOnNonMeetingDate, isSkipRepaymentOnFirstMonth, numberOfDays);
             var clientsAttendance = getClientsAttendance(newMeeting, command);
-
             if (!clientsAttendance.isEmpty()) {
                 updateAttendance(newMeeting, clientsAttendance);
             }
@@ -121,10 +110,10 @@ final class LegacyMeetingAttendanceListener {
 
     public void updateAttendance(Meeting meeting, final Collection<MeetingAttendance> clientsAttendance) {
         var result = new ArrayList<MeetingAttendance>();
-
         // TODO: never use "goto" statemements... ever; leaving it here, because the whole class will eventually
         // disappear
-        updateAttendanceLoop: for (final MeetingAttendance clientAttendance : clientsAttendance) {
+        updateAttendanceLoop:
+        for (final MeetingAttendance clientAttendance : clientsAttendance) {
             if (meeting.getClientsAttendance() == null) {
                 meeting.setClientsAttendance(new HashSet<>());
             }
@@ -136,10 +125,8 @@ final class LegacyMeetingAttendanceListener {
                     continue updateAttendanceLoop;
                 }
             }
-
             result.add(clientAttendance);
         }
-
         if (!result.isEmpty()) {
             clientsAttendance.addAll(result);
         }
@@ -147,25 +134,19 @@ final class LegacyMeetingAttendanceListener {
 
     private void handleMeetingDataIntegrityIssues(final LocalDate meetingDate, final Throwable realCause, final Exception dve) {
         if (realCause.getMessage().contains("unique_calendar_instance_id_meeting_date")) {
-            throw new PlatformDataIntegrityException("error.msg.meeting.duplicate",
-                    "A meeting with date '" + meetingDate + "' already exists", "meetingDate", meetingDate);
+            throw new PlatformDataIntegrityException("error.msg.meeting.duplicate", "A meeting with date \'" + meetingDate + "\' already exists", "meetingDate", meetingDate);
         }
-
-        throw ErrorHandler.getMappable(dve, "error.msg.meeting.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource: " + realCause.getMessage());
+        throw ErrorHandler.getMappable(dve, "error.msg.meeting.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
     }
 
     private Collection<MeetingAttendance> getClientsAttendance(final Meeting meeting, final JsonCommand command) {
         // TODO: maybe slightly more modern approach could be to introduce Jackson's ObjectMapper to avoid all these
         // magic strings; not sure if it's worth it though
-
         final Collection<MeetingAttendance> clientsAttendance = new ArrayList<>();
-
         Collection<Group> childGroups = null;
         if (CalendarEntityType.isCenter(meeting.getCalendarInstance().getEntityTypeId())) {
             childGroups = this.groupRepository.findByParentId(meeting.getCalendarInstance().getEntityId());
         }
-
         final String json = command.json();
         final JsonElement element = this.fromApiJsonHelper.parse(json);
         final JsonObject topLevelJsonElement = element.getAsJsonObject();
@@ -175,13 +156,9 @@ final class LegacyMeetingAttendanceListener {
                 for (int i = 0; i < array.size(); i++) {
                     final JsonObject attendanceElement = array.get(i).getAsJsonObject();
                     final Long clientId = this.fromApiJsonHelper.extractLongNamed(clientIdParamName, attendanceElement);
-                    final Integer attendanceTypeId = this.fromApiJsonHelper.extractIntegerSansLocaleNamed(attendanceTypeParamName,
-                            attendanceElement);
-
+                    final Integer attendanceTypeId = this.fromApiJsonHelper.extractIntegerSansLocaleNamed(attendanceTypeParamName, attendanceElement);
                     final Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId, true);
-
-                    if (CalendarEntityType.isGroup(meeting.getCalendarInstance().getEntityTypeId())
-                            && !client.isChildOfGroup(meeting.getCalendarInstance().getEntityId())) {
+                    if (CalendarEntityType.isGroup(meeting.getCalendarInstance().getEntityTypeId()) && !client.isChildOfGroup(meeting.getCalendarInstance().getEntityId())) {
                         throw new ClientNotInGroupException(clientId, meeting.getCalendarInstance().getEntityId());
                     } else if (CalendarEntityType.isCenter(meeting.getCalendarInstance().getEntityTypeId())) {
                         if (childGroups != null && !childGroups.isEmpty()) {
@@ -193,14 +170,11 @@ final class LegacyMeetingAttendanceListener {
                                 }
                             }
                             if (!isChildClient) {
-                                final String defaultUserMessage = "Client with identifier " + clientId + " is not in center "
-                                        + meeting.getCalendarInstance().getEntityId();
-                                throw new ClientNotInGroupException("client.not.in.center", defaultUserMessage, clientId,
-                                        meeting.getCalendarInstance().getEntityId());
+                                final String defaultUserMessage = "Client with identifier " + clientId + " is not in center " + meeting.getCalendarInstance().getEntityId();
+                                throw new ClientNotInGroupException("client.not.in.center", defaultUserMessage, clientId, meeting.getCalendarInstance().getEntityId());
                             }
                         }
                     }
-
                     var clientAttendance = new MeetingAttendance(client, meeting, attendanceTypeId);
                     clientsAttendance.add(clientAttendance);
                 }
@@ -209,22 +183,16 @@ final class LegacyMeetingAttendanceListener {
         return clientsAttendance;
     }
 
-    private Meeting createNew(final CalendarInstance calendarInstance, final LocalDate meetingDate,
-            Boolean isTransactionDateOnNonMeetingDate, final boolean isSkipRepaymentOnFirstMonth, final int numberOfDays) {
-
-        if (!isTransactionDateOnNonMeetingDate && (meetingDate == null
-                || !calendarInstance.getCalendar().isValidRecurringDate(meetingDate, isSkipRepaymentOnFirstMonth, numberOfDays))) {
-            throw new NotValidRecurringDateException("meeting", "The date '" + meetingDate + "' is not a valid meeting date.", meetingDate);
+    private Meeting createNew(final CalendarInstance calendarInstance, final LocalDate meetingDate, Boolean isTransactionDateOnNonMeetingDate, final boolean isSkipRepaymentOnFirstMonth, final int numberOfDays) {
+        if (!isTransactionDateOnNonMeetingDate && (meetingDate == null || !calendarInstance.getCalendar().isValidRecurringDate(meetingDate, isSkipRepaymentOnFirstMonth, numberOfDays))) {
+            throw new NotValidRecurringDateException("meeting", "The date \'" + meetingDate + "\' is not a valid meeting date.", meetingDate);
         }
-
         return new Meeting(calendarInstance, meetingDate, Set.of());
     }
 
     private CalendarInstance getCalendarInstance(final JsonCommand command) {
-
         var calendarId = command.longValueOfParameterNamed(calendarIdParamName);
         var calendarForUpdate = this.calendarRepository.findById(calendarId).orElseThrow(() -> new CalendarNotFoundException(calendarId));
-
         Long entityId = null;// command.getSupportedEntityId();
         CalendarEntityType entityType = CalendarEntityType.INVALID;// CalendarEntityType.valueOf(command.getSupportedEntityType().toUpperCase());
         if (command.getLoanId() != null) {
@@ -247,15 +215,24 @@ final class LegacyMeetingAttendanceListener {
                 entityId = group.getParent().getId();
             }
         }
-
-        final CalendarInstance calendarInstance = this.calendarInstanceRepository
-                .findByCalendarIdAndEntityIdAndEntityTypeId(calendarForUpdate.getId(), entityId, entityType.getValue());
+        final CalendarInstance calendarInstance = this.calendarInstanceRepository.findByCalendarIdAndEntityIdAndEntityTypeId(calendarForUpdate.getId(), entityId, entityType.getValue());
         if (calendarInstance == null) {
             final String postFix = "for." + entityType.name().toLowerCase() + "not.found";
-            final String defaultUserMessage = "No Calendar Instance details found for group with identifier " + entityId
-                    + " and calendar with identifier " + calendarId;
+            final String defaultUserMessage = "No Calendar Instance details found for group with identifier " + entityId + " and calendar with identifier " + calendarId;
             throw new CalendarInstanceNotFoundException(postFix, defaultUserMessage, entityId, calendarId);
         }
         return calendarInstance;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LegacyMeetingAttendanceListener(final ConfigurationDomainService configurationDomainService, final CalendarRepository calendarRepository, final CalendarInstanceRepository calendarInstanceRepository, final MeetingRepository meetingRepository, final MeetingRepositoryWrapper meetingRepositoryWrapper, final GroupRepository groupRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final FromJsonHelper fromApiJsonHelper) {
+        this.configurationDomainService = configurationDomainService;
+        this.calendarRepository = calendarRepository;
+        this.calendarInstanceRepository = calendarInstanceRepository;
+        this.meetingRepository = meetingRepository;
+        this.meetingRepositoryWrapper = meetingRepositoryWrapper;
+        this.groupRepository = groupRepository;
+        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.fromApiJsonHelper = fromApiJsonHelper;
     }
 }

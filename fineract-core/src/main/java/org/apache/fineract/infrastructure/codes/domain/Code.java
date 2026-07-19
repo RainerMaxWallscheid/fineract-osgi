@@ -28,29 +28,18 @@ import jakarta.persistence.UniqueConstraint;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.codes.exception.SystemDefinedCodeCannotBeChangedException;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
-@Table(name = "m_code", uniqueConstraints = { @UniqueConstraint(columnNames = { "code_name" }, name = "code_name") })
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
+@Table(name = "m_code", uniqueConstraints = {@UniqueConstraint(columnNames = {"code_name"}, name = "code_name")})
 public class Code extends AbstractPersistableCustom<Long> {
-
     @Column(name = "code_name", length = 100)
     private String name;
-
     @Column(name = "is_system_defined")
     private boolean systemDefined;
-
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "code", orphanRemoval = true)
     private Set<CodeValue> values;
 
@@ -64,24 +53,66 @@ public class Code extends AbstractPersistableCustom<Long> {
     }
 
     public Map<String, Object> update(final JsonCommand command) {
-
         if (this.systemDefined) {
             throw new SystemDefinedCodeCannotBeChangedException();
         }
-
         final Map<String, Object> actualChanges = new LinkedHashMap<>(1);
-
         final String firstnameParamName = "name";
         if (command.isChangeInStringParameterNamed(firstnameParamName, this.name)) {
             final String newValue = command.stringValueOfParameterNamed(firstnameParamName);
             actualChanges.put(firstnameParamName, newValue);
             this.name = StringUtils.defaultIfEmpty(newValue, null);
         }
-
         return actualChanges;
     }
 
     public boolean remove(final CodeValue codeValueToDelete) {
         return this.values.remove(codeValueToDelete);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isSystemDefined() {
+        return this.systemDefined;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Set<CodeValue> getValues() {
+        return this.values;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Code setName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Code setSystemDefined(final boolean systemDefined) {
+        this.systemDefined = systemDefined;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Code setValues(final Set<CodeValue> values) {
+        this.values = values;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Code() {
     }
 }

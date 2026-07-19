@@ -30,7 +30,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
 import org.apache.fineract.batch.exception.BatchReferenceInvalidException;
@@ -45,17 +44,14 @@ import org.springframework.stereotype.Component;
  * @see BatchApiServiceImpl
  */
 @Component
-@RequiredArgsConstructor
 public class ResolutionHelper {
 
     /**
      * Provides a Node like object for the request tree.
      *
      * @author Rishabh shukla
-     *
      */
     public static class BatchRequestNode {
-
         private BatchRequest request;
         private final List<BatchRequestNode> childRequests = new ArrayList<>();
 
@@ -74,7 +70,6 @@ public class ResolutionHelper {
         public void addChildNode(final BatchRequestNode batchRequest) {
             this.childRequests.add(batchRequest);
         }
-
     }
 
     private final FromJsonHelper fromJsonHelper;
@@ -142,7 +137,6 @@ public class ResolutionHelper {
             // Set the body after dependency resolution
             request.setBody(jsonResultBody.toString());
         }
-
         // Also check the relativeUrl for any dependency resolution
         String relativeUrl = request.getRelativeUrl();
         if (relativeUrl.contains("$.")) {
@@ -151,7 +145,6 @@ public class ResolutionHelper {
                 queryParams = relativeUrl.substring(relativeUrl.indexOf("?"));
                 relativeUrl = relativeUrl.substring(0, relativeUrl.indexOf("?"));
             }
-
             final Iterable<String> parameters = Splitter.on('/').split(relativeUrl);
             for (String parameter : parameters) {
                 if (parameter.contains("$.")) {
@@ -161,7 +154,6 @@ public class ResolutionHelper {
                 }
             }
         }
-
         return request;
     }
 
@@ -207,8 +199,7 @@ public class ResolutionHelper {
                 final String resParamValue = responseCtx.read(resolvableParamVal).toString();
                 JsonArray date = (JsonArray) this.fromJsonHelper.parse(resParamValue);
                 String dateFormat = JsonPath.read(requestBody, "$.dateFormat");
-                return new JsonPrimitive(DateTimeFormatter.ofPattern(dateFormat)
-                        .format(LocalDate.of(date.get(0).getAsInt(), date.get(1).getAsInt(), date.get(2).getAsInt())));
+                return new JsonPrimitive(DateTimeFormatter.ofPattern(dateFormat).format(LocalDate.of(date.get(0).getAsInt(), date.get(1).getAsInt(), date.get(2).getAsInt())));
             } else if (paramVal.contains("$.")) {
                 // Get the value of the parameter from parent response
                 final String resParamValue = responseCtx.read(paramVal).toString();
@@ -218,4 +209,8 @@ public class ResolutionHelper {
         return value;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ResolutionHelper(final FromJsonHelper fromJsonHelper) {
+        this.fromJsonHelper = fromJsonHelper;
+    }
 }

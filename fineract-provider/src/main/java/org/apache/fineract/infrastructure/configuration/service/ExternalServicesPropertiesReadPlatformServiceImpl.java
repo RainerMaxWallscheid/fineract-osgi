@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.campaigns.sms.data.MessageGatewayConfigurationData;
 import org.apache.fineract.infrastructure.configuration.data.ExternalServicesPropertiesData;
 import org.apache.fineract.infrastructure.configuration.data.S3CredentialsData;
@@ -38,13 +37,11 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class ExternalServicesPropertiesReadPlatformServiceImpl implements ExternalServicesPropertiesReadPlatformService {
-
     private final JdbcTemplate jdbcTemplate;
 
-    private static final class S3CredentialsDataExtractor implements ResultSetExtractor<S3CredentialsData> {
 
+    private static final class S3CredentialsDataExtractor implements ResultSetExtractor<S3CredentialsData> {
         @Override
         public S3CredentialsData extractData(final ResultSet rs) throws SQLException, DataAccessException {
             String accessKey = null;
@@ -63,8 +60,8 @@ public class ExternalServicesPropertiesReadPlatformServiceImpl implements Extern
         }
     }
 
-    private static final class SMTPCredentialsDataExtractor implements ResultSetExtractor<SMTPCredentialsData> {
 
+    private static final class SMTPCredentialsDataExtractor implements ResultSetExtractor<SMTPCredentialsData> {
         @Override
         public SMTPCredentialsData extractData(final ResultSet rs) throws SQLException, DataAccessException {
             String username = null;
@@ -74,11 +71,9 @@ public class ExternalServicesPropertiesReadPlatformServiceImpl implements Extern
             boolean useTLS = false;
             String fromEmail = null;
             String fromName = null;
-
             while (rs.next()) {
                 String name = rs.getString("name");
                 String value = rs.getString("value");
-
                 if (ExternalServicesConstants.SMTP_USERNAME.equalsIgnoreCase(name)) {
                     username = value;
                 } else if (ExternalServicesConstants.SMTP_PORT.equalsIgnoreCase(name)) {
@@ -95,13 +90,12 @@ public class ExternalServicesPropertiesReadPlatformServiceImpl implements Extern
                     fromName = value;
                 }
             }
-            return new SMTPCredentialsData().setUsername(username).setPassword(password).setHost(host).setPort(port).setUseTLS(useTLS)
-                    .setFromEmail(fromEmail).setFromName(fromName);
+            return new SMTPCredentialsData().setUsername(username).setPassword(password).setHost(host).setPort(port).setUseTLS(useTLS).setFromEmail(fromEmail).setFromName(fromName);
         }
     }
 
-    private static final class ExternalServiceMapper implements RowMapper<ExternalServicesPropertiesData> {
 
+    private static final class ExternalServiceMapper implements RowMapper<ExternalServicesPropertiesData> {
         List<String> secretAttributes;
 
         ExternalServiceMapper() {
@@ -120,18 +114,16 @@ public class ExternalServicesPropertiesReadPlatformServiceImpl implements Extern
             }
             return new ExternalServicesPropertiesData().setName(name).setValue(value);
         }
-
     }
 
-    private static final class MessageGatewayDataExtractor implements ResultSetExtractor<MessageGatewayConfigurationData> {
 
+    private static final class MessageGatewayDataExtractor implements ResultSetExtractor<MessageGatewayConfigurationData> {
         @Override
         public MessageGatewayConfigurationData extractData(final ResultSet rs) throws SQLException, DataAccessException {
             String host = null;
             int port = 9191;
             String endPoint = null;
             String tenantAppKey = null;
-
             while (rs.next()) {
                 if (rs.getString("name").equalsIgnoreCase(ExternalServicesConstants.SMS_HOST)) {
                     host = rs.getString("value");
@@ -150,8 +142,7 @@ public class ExternalServicesPropertiesReadPlatformServiceImpl implements Extern
     @Override
     public S3CredentialsData getS3Credentials() {
         final ResultSetExtractor<S3CredentialsData> resultSetExtractor = new S3CredentialsDataExtractor();
-        final String sql = "SELECT esp.name, esp.value FROM c_external_service_properties esp inner join c_external_service es on esp.external_service_id = es.id where es.name = '"
-                + ExternalServicesConstants.S3_SERVICE_NAME + "'";
+        final String sql = "SELECT esp.name, esp.value FROM c_external_service_properties esp inner join c_external_service es on esp.external_service_id = es.id where es.name = \'" + ExternalServicesConstants.S3_SERVICE_NAME + "\'";
         final S3CredentialsData s3CredentialsData = this.jdbcTemplate.query(sql, resultSetExtractor, new Object[] {});
         return s3CredentialsData;
     }
@@ -159,8 +150,7 @@ public class ExternalServicesPropertiesReadPlatformServiceImpl implements Extern
     @Override
     public SMTPCredentialsData getSMTPCredentials() {
         final ResultSetExtractor<SMTPCredentialsData> resultSetExtractor = new SMTPCredentialsDataExtractor();
-        final String sql = "SELECT esp.name, esp.value FROM c_external_service_properties esp inner join c_external_service es on esp.external_service_id = es.id where es.name = '"
-                + ExternalServicesConstants.SMTP_SERVICE_NAME + "'";
+        final String sql = "SELECT esp.name, esp.value FROM c_external_service_properties esp inner join c_external_service es on esp.external_service_id = es.id where es.name = \'" + ExternalServicesConstants.SMTP_SERVICE_NAME + "\'";
         final SMTPCredentialsData smtpCredentialsData = this.jdbcTemplate.query(sql, resultSetExtractor, new Object[] {});
         return smtpCredentialsData;
     }
@@ -168,10 +158,8 @@ public class ExternalServicesPropertiesReadPlatformServiceImpl implements Extern
     @Override
     public MessageGatewayConfigurationData getSMSGateway() {
         final ResultSetExtractor<MessageGatewayConfigurationData> resultSetExtractor = new MessageGatewayDataExtractor();
-        final String sql = "SELECT esp.name, esp.value FROM c_external_service_properties esp inner join c_external_service es on esp.external_service_id = es.id where es.name = '"
-                + ExternalServicesConstants.SMS_SERVICE_NAME + "'";
-        final MessageGatewayConfigurationData messageGatewayConfigurationData = this.jdbcTemplate.query(sql, resultSetExtractor,
-                new Object[] {});
+        final String sql = "SELECT esp.name, esp.value FROM c_external_service_properties esp inner join c_external_service es on esp.external_service_id = es.id where es.name = \'" + ExternalServicesConstants.SMS_SERVICE_NAME + "\'";
+        final MessageGatewayConfigurationData messageGatewayConfigurationData = this.jdbcTemplate.query(sql, resultSetExtractor, new Object[] {});
         return messageGatewayConfigurationData;
     }
 
@@ -179,34 +167,28 @@ public class ExternalServicesPropertiesReadPlatformServiceImpl implements Extern
     public Collection<ExternalServicesPropertiesData> retrieveOne(String serviceName) {
         String serviceNameToUse = null;
         switch (serviceName) {
-            case "S3":
-                serviceNameToUse = ExternalServicesConstants.S3_SERVICE_NAME;
+        case "S3": 
+            serviceNameToUse = ExternalServicesConstants.S3_SERVICE_NAME;
             break;
-
-            case "SMTP":
-                serviceNameToUse = ExternalServicesConstants.SMTP_SERVICE_NAME;
+        case "SMTP": 
+            serviceNameToUse = ExternalServicesConstants.SMTP_SERVICE_NAME;
             break;
-
-            case "SMS":
-                serviceNameToUse = ExternalServicesConstants.SMS_SERVICE_NAME;
+        case "SMS": 
+            serviceNameToUse = ExternalServicesConstants.SMS_SERVICE_NAME;
             break;
-
-            case "NOTIFICATION":
-                serviceNameToUse = ExternalServicesConstants.NOTIFICATION_SERVICE_NAME;
+        case "NOTIFICATION": 
+            serviceNameToUse = ExternalServicesConstants.NOTIFICATION_SERVICE_NAME;
             break;
-
-            default:
-                throw new ExternalServiceConfigurationNotFoundException(serviceName);
+        default: 
+            throw new ExternalServiceConfigurationNotFoundException(serviceName);
         }
         final ExternalServiceMapper mapper = new ExternalServiceMapper();
-        final String sql = "SELECT esp.name, esp.value FROM c_external_service_properties esp inner join c_external_service es on esp.external_service_id = es.id where es.name = '"
-                + serviceNameToUse + "'";
+        final String sql = "SELECT esp.name, esp.value FROM c_external_service_properties esp inner join c_external_service es on esp.external_service_id = es.id where es.name = \'" + serviceNameToUse + "\'";
         return this.jdbcTemplate.query(sql, mapper); // NOSONAR
-
     }
 
-    private static final class NotificationDataExtractor implements ResultSetExtractor<NotificationConfigurationData> {
 
+    private static final class NotificationDataExtractor implements ResultSetExtractor<NotificationConfigurationData> {
         @Override
         public NotificationConfigurationData extractData(final ResultSet rs) throws SQLException, DataAccessException {
             String serverKey = null;
@@ -228,11 +210,13 @@ public class ExternalServicesPropertiesReadPlatformServiceImpl implements Extern
     @Override
     public NotificationConfigurationData getNotificationConfiguration() {
         final ResultSetExtractor<NotificationConfigurationData> resultSetExtractor = new NotificationDataExtractor();
-        final String sql = "SELECT esp.name, esp.value FROM c_external_service_properties esp inner join c_external_service es on esp.external_service_id = es.id where es.name = '"
-                + ExternalServicesConstants.NOTIFICATION_SERVICE_NAME + "'";
-        final NotificationConfigurationData notificationConfigurationData = this.jdbcTemplate.query(sql, resultSetExtractor,
-                new Object[] {});
+        final String sql = "SELECT esp.name, esp.value FROM c_external_service_properties esp inner join c_external_service es on esp.external_service_id = es.id where es.name = \'" + ExternalServicesConstants.NOTIFICATION_SERVICE_NAME + "\'";
+        final NotificationConfigurationData notificationConfigurationData = this.jdbcTemplate.query(sql, resultSetExtractor, new Object[] {});
         return notificationConfigurationData;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ExternalServicesPropertiesReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 }

@@ -22,20 +22,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.FineractContext;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
 
-@RequiredArgsConstructor
-@Slf4j
 public class RecalculateInterestPoster implements Callable<Void> {
-
-    @Setter
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RecalculateInterestPoster.class);
     private Collection<Long> loanIds;
-    @Setter
     private FineractContext fineractContext;
     private final LoanWritePlatformService loanWritePlatformService;
 
@@ -62,5 +56,20 @@ public class RecalculateInterestPoster implements Callable<Void> {
             ThreadLocalContextUtil.reset();
         }
         return null;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RecalculateInterestPoster(final LoanWritePlatformService loanWritePlatformService) {
+        this.loanWritePlatformService = loanWritePlatformService;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanIds(final Collection<Long> loanIds) {
+        this.loanIds = loanIds;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setFineractContext(final FineractContext fineractContext) {
+        this.fineractContext = fineractContext;
     }
 }

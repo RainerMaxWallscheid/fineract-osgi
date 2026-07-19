@@ -16,10 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -30,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "GSIMACCOUNT", action = "DEPOSIT")
-@RequiredArgsConstructor
 public class GSIMDepositCommandHandler implements NewCommandSourceHandler {
-
     private final SavingsAccountWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.gsimDeposit(command.getSavingsId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GSIMDepositCommandHandler(final SavingsAccountWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

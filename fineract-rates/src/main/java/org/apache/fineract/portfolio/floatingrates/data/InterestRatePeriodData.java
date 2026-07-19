@@ -20,11 +20,8 @@ package org.apache.fineract.portfolio.floatingrates.data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.Getter;
 
-@Getter
 public class InterestRatePeriodData {
-
     private LocalDate fromDate;
     private final BigDecimal interestRate;
     private final boolean isDifferentialToBLR;
@@ -34,8 +31,7 @@ public class InterestRatePeriodData {
     private BigDecimal loanProductDifferentialInterestRate;
     private BigDecimal effectiveInterestRate;
 
-    public InterestRatePeriodData(LocalDate fromDate, BigDecimal interestRate, boolean isDifferentialToBLR, LocalDate blrFromDate,
-            BigDecimal blrInterestRate) {
+    public InterestRatePeriodData(LocalDate fromDate, BigDecimal interestRate, boolean isDifferentialToBLR, LocalDate blrFromDate, BigDecimal blrInterestRate) {
         this.fromDate = fromDate;
         this.interestRate = interestRate;
         this.isDifferentialToBLR = isDifferentialToBLR;
@@ -65,5 +61,40 @@ public class InterestRatePeriodData {
 
     public void setEffectiveInterestRate(BigDecimal effectiveInterestRate) {
         this.effectiveInterestRate = effectiveInterestRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getFromDate() {
+        return this.fromDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getInterestRate() {
+        return this.interestRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getBlrFromDate() {
+        return this.blrFromDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getBlrInterestRate() {
+        return this.blrInterestRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getLoanDifferentialInterestRate() {
+        return this.loanDifferentialInterestRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getLoanProductDifferentialInterestRate() {
+        return this.loanProductDifferentialInterestRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getEffectiveInterestRate() {
+        return this.effectiveInterestRate;
     }
 }

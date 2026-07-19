@@ -19,20 +19,20 @@
 package org.apache.fineract.infrastructure.contentstore.config;
 
 import static org.apache.fineract.infrastructure.contentstore.processor.ContentProcessor.BEAN_NAME_EXECUTOR;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@RequiredArgsConstructor
 class ContentStoreConfig {
-
     @Bean(BEAN_NAME_EXECUTOR)
     ExecutorService contentProcessorExecutor() {
         // TODO: make this more configurable?
         return Executors.newCachedThreadPool();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ContentStoreConfig() {
     }
 }

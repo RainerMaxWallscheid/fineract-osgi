@@ -24,7 +24,6 @@ import com.google.gson.JsonElement;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.portfolio.loanproduct.domain.PaymentAllocationTransactionType;
@@ -32,9 +31,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 public class WorkingCapitalAdvancedPaymentAllocationsJsonParser {
-
     public final WorkingCapitalAdvancedPaymentAllocationsValidator validator;
 
     public List<WorkingCapitalLoanProductPaymentAllocationRule> assembleWCPaymentAllocationRules(final JsonCommand command) {
@@ -53,8 +50,7 @@ public class WorkingCapitalAdvancedPaymentAllocationsJsonParser {
         return productPaymentAllocationRules;
     }
 
-    private void populatePaymentAllocationRules(final Map<String, JsonElement> map,
-            final WorkingCapitalLoanProductPaymentAllocationRule rule) {
+    private void populatePaymentAllocationRules(final Map<String, JsonElement> map, final WorkingCapitalLoanProductPaymentAllocationRule rule) {
         final JsonArray paymentAllocationOrder = asJsonArrayOrNull(map.get("paymentAllocationOrder"));
         if (paymentAllocationOrder != null) {
             rule.setAllocationTypes(getPaymentAllocationTypes(paymentAllocationOrder));
@@ -75,23 +71,19 @@ public class WorkingCapitalAdvancedPaymentAllocationsJsonParser {
             if (paymentAllocationOrder.isEmpty()) {
                 validator.raiseValidationError("wc-payment-allocation-order.cannot.be.empty", "Payment allocation order cannot be empty");
             }
-            final List<Pair<Integer, WorkingCapitalPaymentAllocationType>> parsedListWithOrder = paymentAllocationOrder.asList().stream()
-                    .map(json -> {
-                        final Map<String, JsonElement> map = json.getAsJsonObject().asMap();
-                        WorkingCapitalPaymentAllocationType paymentAllocationType = null;
-                        final String paymentAllocationRule = asStringOrNull(map.get("paymentAllocationRule"));
-                        if (paymentAllocationRule != null) {
-                            paymentAllocationType = Enums.getIfPresent(WorkingCapitalPaymentAllocationType.class, paymentAllocationRule)
-                                    .orNull();
-                        }
-                        return Pair.of(asIntegerOrNull(map.get("order")), paymentAllocationType);
-                    }).toList();
+            final List<Pair<Integer, WorkingCapitalPaymentAllocationType>> parsedListWithOrder = paymentAllocationOrder.asList().stream().map(json -> {
+                final Map<String, JsonElement> map = json.getAsJsonObject().asMap();
+                WorkingCapitalPaymentAllocationType paymentAllocationType = null;
+                final String paymentAllocationRule = asStringOrNull(map.get("paymentAllocationRule"));
+                if (paymentAllocationRule != null) {
+                    paymentAllocationType = Enums.getIfPresent(WorkingCapitalPaymentAllocationType.class, paymentAllocationRule).orNull();
+                }
+                return Pair.of(asIntegerOrNull(map.get("order")), paymentAllocationType);
+            }).toList();
             if (parsedListWithOrder.stream().anyMatch(p -> p.getLeft() == null)) {
-                validator.raiseValidationError("wc-payment-allocation-order.order.required",
-                        "Each paymentAllocationOrder entry must have an 'order' field.");
+                validator.raiseValidationError("wc-payment-allocation-order.order.required", "Each paymentAllocationOrder entry must have an \'order\' field.");
             }
-            final List<Pair<Integer, WorkingCapitalPaymentAllocationType>> sorted = parsedListWithOrder.stream()
-                    .sorted(Comparator.comparing(Pair::getLeft)).toList();
+            final List<Pair<Integer, WorkingCapitalPaymentAllocationType>> sorted = parsedListWithOrder.stream().sorted(Comparator.comparing(Pair::getLeft)).toList();
             validator.validatePairOfOrderAndPaymentAllocationType(sorted);
             return sorted.stream().map(Pair::getRight).toList();
         } else {
@@ -120,4 +112,8 @@ public class WorkingCapitalAdvancedPaymentAllocationsJsonParser {
         return null;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalAdvancedPaymentAllocationsJsonParser(final WorkingCapitalAdvancedPaymentAllocationsValidator validator) {
+        this.validator = validator;
+    }
 }

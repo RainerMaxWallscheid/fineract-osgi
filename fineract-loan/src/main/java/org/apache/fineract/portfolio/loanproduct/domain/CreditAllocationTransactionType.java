@@ -21,21 +21,32 @@ package org.apache.fineract.portfolio.loanproduct.domain;
 // TODO FINERACT-1932-Fineract modularization: Move to fineract-progressive-loan module after refactor of Loan and LoanProduct classes
 import java.util.Arrays;
 import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 
-@Getter
-@RequiredArgsConstructor
 public enum CreditAllocationTransactionType {
-
-    CHARGEBACK(LoanTransactionType.CHARGEBACK, "Chargeback"); //
-
+    CHARGEBACK(LoanTransactionType.CHARGEBACK, "Chargeback");
+    //
     private final LoanTransactionType loanTransactionType;
     private final String humanReadableName;
 
     public static List<EnumOptionData> getValuesAsEnumOptionDataList() {
         return Arrays.stream(values()).map(v -> new EnumOptionData((long) (v.ordinal() + 1), v.name(), v.getHumanReadableName())).toList();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionType getLoanTransactionType() {
+        return this.loanTransactionType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private CreditAllocationTransactionType(final LoanTransactionType loanTransactionType, final String humanReadableName) {
+        this.loanTransactionType = loanTransactionType;
+        this.humanReadableName = humanReadableName;
     }
 }

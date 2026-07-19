@@ -22,11 +22,8 @@ import static org.apache.fineract.portfolio.account.AccountDetailConstants.fromA
 import static org.apache.fineract.portfolio.account.AccountDetailConstants.fromClientIdParamName;
 import static org.apache.fineract.portfolio.account.AccountDetailConstants.toAccountTypeParamName;
 import static org.apache.fineract.portfolio.account.api.StandingInstructionApiConstants.statusParamName;
-
 import java.util.HashMap;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -47,10 +44,9 @@ import org.springframework.dao.NonTransientDataAccessException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 public class StandingInstructionWritePlatformServiceImpl implements StandingInstructionWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StandingInstructionWritePlatformServiceImpl.class);
     private final StandingInstructionDataValidator standingInstructionDataValidator;
     private final StandingInstructionAssembler standingInstructionAssembler;
     private final AccountTransferDetailRepository accountTransferDetailRepository;
@@ -59,22 +55,16 @@ public class StandingInstructionWritePlatformServiceImpl implements StandingInst
     @Transactional
     @Override
     public CommandProcessingResult create(final JsonCommand command) {
-
         this.standingInstructionDataValidator.validateForCreate(command);
-
         final Integer fromAccountTypeId = command.integerValueSansLocaleOfParameterNamed(fromAccountTypeParamName);
         final PortfolioAccountType fromAccountType = PortfolioAccountType.fromInt(fromAccountTypeId);
-
         final Integer toAccountTypeId = command.integerValueSansLocaleOfParameterNamed(toAccountTypeParamName);
         final PortfolioAccountType toAccountType = PortfolioAccountType.fromInt(toAccountTypeId);
-
         final Long fromClientId = command.longValueOfParameterNamed(fromClientIdParamName);
-
         Long standingInstructionId = null;
         try {
             if (isSavingsToSavingsAccountTransfer(fromAccountType, toAccountType)) {
-                final AccountTransferDetails standingInstruction = this.standingInstructionAssembler
-                        .assembleSavingsToSavingsTransfer(command);
+                final AccountTransferDetails standingInstruction = this.standingInstructionAssembler.assembleSavingsToSavingsTransfer(command);
                 this.accountTransferDetailRepository.saveAndFlush(standingInstruction);
                 standingInstructionId = standingInstruction.accountTransferStandingInstruction().getId();
             } else if (isSavingsToLoanAccountTransfer(fromAccountType, toAccountType)) {
@@ -82,32 +72,28 @@ public class StandingInstructionWritePlatformServiceImpl implements StandingInst
                 this.accountTransferDetailRepository.saveAndFlush(standingInstruction);
                 standingInstructionId = standingInstruction.accountTransferStandingInstruction().getId();
             } else if (isLoanToSavingsAccountTransfer(fromAccountType, toAccountType)) {
-
                 final AccountTransferDetails standingInstruction = this.standingInstructionAssembler.assembleLoanToSavingsTransfer(command);
                 this.accountTransferDetailRepository.saveAndFlush(standingInstruction);
                 standingInstructionId = standingInstruction.accountTransferStandingInstruction().getId();
-
             }
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleDataIntegrityIssues(command, throwable, dve);
             return CommandProcessingResult.empty();
         }
-        final CommandProcessingResultBuilder builder = new CommandProcessingResultBuilder() //
-                .withEntityId(standingInstructionId) //
-                .withClientId(fromClientId);
+        final CommandProcessingResultBuilder builder =  //
+        //
+        new CommandProcessingResultBuilder().withEntityId(standingInstructionId).withClientId(fromClientId);
         return builder.build();
     }
 
     private void handleDataIntegrityIssues(final JsonCommand command, Throwable realCause, final NonTransientDataAccessException dve) {
         if (realCause.getMessage().contains("name")) {
             final String name = command.stringValueOfParameterNamed(StandingInstructionApiConstants.nameParamName);
-            throw new PlatformDataIntegrityException("error.msg.standinginstruction.duplicate.name",
-                    "Standinginstruction with name `" + name + "` already exists", "name", name);
+            throw new PlatformDataIntegrityException("error.msg.standinginstruction.duplicate.name", "Standinginstruction with name `" + name + "` already exists", "name", name);
         }
         log.error("Error occured.", dve);
-        throw ErrorHandler.getMappable(dve, "error.msg.client.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource: " + realCause.getMessage());
+        throw ErrorHandler.getMappable(dve, "error.msg.client.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
     }
 
     private boolean isLoanToSavingsAccountTransfer(final PortfolioAccountType fromAccountType, final PortfolioAccountType toAccountType) {
@@ -118,22 +104,20 @@ public class StandingInstructionWritePlatformServiceImpl implements StandingInst
         return PortfolioAccountType.SAVINGS.equals(fromAccountType) && PortfolioAccountType.LOAN.equals(toAccountType);
     }
 
-    private boolean isSavingsToSavingsAccountTransfer(final PortfolioAccountType fromAccountType,
-            final PortfolioAccountType toAccountType) {
+    private boolean isSavingsToSavingsAccountTransfer(final PortfolioAccountType fromAccountType, final PortfolioAccountType toAccountType) {
         return PortfolioAccountType.SAVINGS.equals(fromAccountType) && PortfolioAccountType.SAVINGS.equals(toAccountType);
     }
 
     @Override
     public CommandProcessingResult update(final Long id, final JsonCommand command) {
         this.standingInstructionDataValidator.validateForUpdate(command);
-        AccountTransferStandingInstruction standingInstructionsForUpdate = this.standingInstructionRepository.findById(id)
-                .orElseThrow(() -> new StandingInstructionNotFoundException(id));
+        AccountTransferStandingInstruction standingInstructionsForUpdate = this.standingInstructionRepository.findById(id).orElseThrow(() -> new StandingInstructionNotFoundException(id));
         final Map<String, Object> actualChanges = standingInstructionsForUpdate.update(command);
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(id) //
-                .with(actualChanges) //
-                .build();
+        return  //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(id).with(actualChanges).build();
     }
 
     @Override
@@ -142,12 +126,19 @@ public class StandingInstructionWritePlatformServiceImpl implements StandingInst
         // update the "deleted" and "name" properties of the standing
         // instruction
         standingInstructionsForUpdate.delete();
-
         final Map<String, Object> actualChanges = new HashMap<>();
         actualChanges.put(statusParamName, StandingInstructionStatus.DELETED.getValue());
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(id) //
-                .with(actualChanges) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withEntityId(id).with(actualChanges).build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public StandingInstructionWritePlatformServiceImpl(final StandingInstructionDataValidator standingInstructionDataValidator, final StandingInstructionAssembler standingInstructionAssembler, final AccountTransferDetailRepository accountTransferDetailRepository, final StandingInstructionRepository standingInstructionRepository) {
+        this.standingInstructionDataValidator = standingInstructionDataValidator;
+        this.standingInstructionAssembler = standingInstructionAssembler;
+        this.accountTransferDetailRepository = accountTransferDetailRepository;
+        this.standingInstructionRepository = standingInstructionRepository;
     }
 }

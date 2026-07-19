@@ -19,8 +19,6 @@
 package org.apache.fineract.infrastructure.event.external.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.infrastructure.event.external.data.ExternalEventConfigurationUpdateRequest;
@@ -29,12 +27,10 @@ import org.apache.fineract.infrastructure.event.external.service.ExternalEventCo
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
-public class ExternalEventConfigurationUpdateHandler
-        implements CommandHandler<ExternalEventConfigurationUpdateRequest, ExternalEventConfigurationUpdateResponse> {
-
+public class ExternalEventConfigurationUpdateHandler implements CommandHandler<ExternalEventConfigurationUpdateRequest, ExternalEventConfigurationUpdateResponse> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExternalEventConfigurationUpdateHandler.class);
     private final ExternalEventConfigurationWritePlatformService writePlatformService;
 
     @Retry(name = "commandExternalEventConfigurationUpdate", fallbackMethod = "fallback")
@@ -48,5 +44,10 @@ public class ExternalEventConfigurationUpdateHandler
     public ExternalEventConfigurationUpdateResponse fallback(Command<ExternalEventConfigurationUpdateRequest> command, Throwable t) {
         // NOTE: fallback method needs to be in the same class
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalEventConfigurationUpdateHandler(final ExternalEventConfigurationWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

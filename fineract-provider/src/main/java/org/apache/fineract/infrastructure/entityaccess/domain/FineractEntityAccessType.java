@@ -18,30 +18,14 @@
  */
 package org.apache.fineract.infrastructure.entityaccess.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class FineractEntityAccessType {
-
     private String str;
-
-    public static final FineractEntityAccessType OFFICE_ACCESS_TO_LOAN_PRODUCTS = new FineractEntityAccessType()
-            .setStr("office_access_to_loan_products");
-    public static final FineractEntityAccessType OFFICE_ACCESS_TO_SAVINGS_PRODUCTS = new FineractEntityAccessType()
-            .setStr("office_access_to_savings_products");
-    public static final FineractEntityAccessType OFFICE_ACCESS_TO_CHARGES = new FineractEntityAccessType()
-            .setStr("office_access_to_fees/charges");
+    public static final FineractEntityAccessType OFFICE_ACCESS_TO_LOAN_PRODUCTS = new FineractEntityAccessType().setStr("office_access_to_loan_products");
+    public static final FineractEntityAccessType OFFICE_ACCESS_TO_SAVINGS_PRODUCTS = new FineractEntityAccessType().setStr("office_access_to_savings_products");
+    public static final FineractEntityAccessType OFFICE_ACCESS_TO_CHARGES = new FineractEntityAccessType().setStr("office_access_to_fees/charges");
 
     public static FineractEntityAccessType get(String type) {
-
         FineractEntityAccessType retType = null;
-
         if (type.equals(OFFICE_ACCESS_TO_LOAN_PRODUCTS.str)) {
             retType = OFFICE_ACCESS_TO_LOAN_PRODUCTS;
         } else if (type.equals(OFFICE_ACCESS_TO_SAVINGS_PRODUCTS.str)) {
@@ -49,7 +33,24 @@ public class FineractEntityAccessType {
         } else if (type.equals(OFFICE_ACCESS_TO_CHARGES.str)) {
             retType = OFFICE_ACCESS_TO_CHARGES;
         }
-
         return retType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getStr() {
+        return this.str;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public FineractEntityAccessType setStr(final String str) {
+        this.str = str;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FineractEntityAccessType() {
     }
 }

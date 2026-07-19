@@ -20,10 +20,7 @@ package org.apache.fineract.command.audit.hook;
 
 import static org.apache.fineract.command.audit.AuditCommandConstants.COMMAND_HOOK_AUDIT_ERROR;
 import static org.apache.fineract.command.core.CommandState.ERROR;
-
 import java.time.Instant;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHookError;
 import org.apache.fineract.command.core.CommandStore;
@@ -31,23 +28,25 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @Order(COMMAND_HOOK_AUDIT_ERROR)
 @ConditionalOnProperty(value = "fineract.command.hooks.audit-error", havingValue = "true")
 final class AuditCommandHookError implements CommandHookError<Object> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuditCommandHookError.class);
     private final CommandStore store;
 
     @Override
     public void onError(Command<Object> command, Throwable error) {
         final var now = Instant.now();
-
         command.setError(error.getMessage());
         command.setUpdatedAt(now);
         command.setExecutedAt(now);
-
         store.store(command, null, ERROR);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AuditCommandHookError(final CommandStore store) {
+        this.store = store;
     }
 }

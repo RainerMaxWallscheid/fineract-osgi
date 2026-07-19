@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.campaigns.sms.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.campaigns.sms.service.SmsCampaignWritePlatformService;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "SMSCAMPAIGN", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteSmsCampaignCommandHandler implements NewCommandSourceHandler {
-
     private final SmsCampaignWritePlatformService smsCampaignWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(JsonCommand command) {
         return this.smsCampaignWritePlatformService.delete(command.entityId());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DeleteSmsCampaignCommandHandler(final SmsCampaignWritePlatformService smsCampaignWritePlatformService) {
+        this.smsCampaignWritePlatformService = smsCampaignWritePlatformService;
     }
 }

@@ -19,8 +19,6 @@
 package org.apache.fineract.cob.loan;
 
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.service.LoanBuyDownFeeAmortizationProcessingService;
@@ -28,10 +26,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class BuyDownFeeAmortizationBusinessStep implements LoanCOBBusinessStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BuyDownFeeAmortizationBusinessStep.class);
     private final LoanBuyDownFeeAmortizationProcessingService loanBuyDownFeeAmortizationProcessingService;
 
     @Transactional
@@ -40,11 +37,8 @@ public class BuyDownFeeAmortizationBusinessStep implements LoanCOBBusinessStep {
         if (!loan.getLoanProductRelatedDetail().isEnableBuyDownFee()) {
             return loan;
         }
-
         LocalDate businessDate = DateUtils.getBusinessLocalDate();
-
         loanBuyDownFeeAmortizationProcessingService.processBuyDownFeeAmortizationTillDate(loan, businessDate, true);
-
         return loan;
     }
 
@@ -56,5 +50,10 @@ public class BuyDownFeeAmortizationBusinessStep implements LoanCOBBusinessStep {
     @Override
     public String getHumanReadableName() {
         return "Buy Down Fee amortization";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BuyDownFeeAmortizationBusinessStep(final LoanBuyDownFeeAmortizationProcessingService loanBuyDownFeeAmortizationProcessingService) {
+        this.loanBuyDownFeeAmortizationProcessingService = loanBuyDownFeeAmortizationProcessingService;
     }
 }

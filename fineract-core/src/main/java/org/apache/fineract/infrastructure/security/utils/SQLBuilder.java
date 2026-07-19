@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
-import lombok.Getter;
 
 /**
  * Utility to assemble the WHERE clause of an SQL query without the risk of SQL injection. When using this utility
@@ -34,16 +33,12 @@ import lombok.Getter;
  * @author Michael Vorburger (mike at vorburger.ch)
  */
 public class SQLBuilder {
-
     private static final Pattern ATOZ = Pattern.compile("([a-zA-Z_][a-zA-Z0-9_-]*\\.)?[a-zA-Z_-][a-zA-Z0-9_-]*");
-
     // This holds the query string, with the '?' placeholders, but no argument
     // values
     private final StringBuilder sb = new StringBuilder();
-
     // This holds the arguments, in the order of the '?' placeholders in sb
     private final List<Object> args = new ArrayList<>();
-
     // This holds the criterias, where nth element corresponds to nth element in
     // args
     private final ArrayList<String> crts = new ArrayList<String>();
@@ -66,8 +61,7 @@ public class SQLBuilder {
         }
         String trimmedCriteria = criteria.trim();
         if (trimmedCriteria.contains("?")) {
-            throw new IllegalArgumentException(
-                    "criteria cannot contain a '?' (that is automatically added at the end): " + trimmedCriteria);
+            throw new IllegalArgumentException("criteria cannot contain a \'?\' (that is automatically added at the end): " + trimmedCriteria);
         }
         int columnOperatorIndex = trimmedCriteria.indexOf(' ');
         if (columnOperatorIndex == -1) {
@@ -75,22 +69,18 @@ public class SQLBuilder {
         }
         String columnName = trimmedCriteria.substring(0, columnOperatorIndex).trim().toLowerCase(Locale.ROOT);
         if (!ATOZ.matcher(columnName).matches()) {
-            throw new IllegalArgumentException(
-                    "criteria column name must match [a-zA-Z_][a-zA-Z0-9_-]*\\.)?[a-zA-Z_-][a-zA-Z0-9_-]* : " + trimmedCriteria);
+            throw new IllegalArgumentException("criteria column name must match [a-zA-Z_][a-zA-Z0-9_-]*\\.)?[a-zA-Z_-][a-zA-Z0-9_-]* : " + trimmedCriteria);
         }
         String operator = trimmedCriteria.substring(columnOperatorIndex).trim();
         if (operator.indexOf(' ') > -1) {
-            throw new IllegalArgumentException(
-                    "criteria cannot contain more than 1 space (between column name and operator): " + trimmedCriteria);
+            throw new IllegalArgumentException("criteria cannot contain more than 1 space (between column name and operator): " + trimmedCriteria);
         }
-        if (!operator.equals("=") && !operator.equals("<") && !operator.equals(">") && !operator.equals("<=") && !operator.equals(">=")
-                && !operator.equals("<>") && !operator.equalsIgnoreCase("like") && !operator.equalsIgnoreCase("is")) {
+        if (!operator.equals("=") && !operator.equals("<") && !operator.equals(">") && !operator.equals("<=") && !operator.equals(">=") && !operator.equals("<>") && !operator.equalsIgnoreCase("like") && !operator.equalsIgnoreCase("is")) {
             // add support for SQL's BETWEEN and IN, if/when ever needed.. (it's
             // a little more than just adding above, as it can have multiple
             // arguments)
             throw new IllegalArgumentException("criteria must end with valid SQL operator for WHERE: " + trimmedCriteria);
         }
-
         // TODO: Would be better to use SqlOperator functionality to handle
         if (!sb.isEmpty()) {
             sb.append(whereLogicalOperator.getSqlStr());
@@ -167,9 +157,9 @@ public class SQLBuilder {
             whereClause.append(" ");
             whereClause.append("[");
             if (currentArg instanceof String) {
-                whereClause.append("'");
+                whereClause.append("\'");
                 whereClause.append(currentArg);
-                whereClause.append("'");
+                whereClause.append("\'");
             } else if (currentArg == null) {
                 whereClause.append("null");
             } else {
@@ -181,18 +171,21 @@ public class SQLBuilder {
         return whereClause.toString();
     }
 
-    @Getter
+
     public enum WhereLogicalOperator {
-
-        NONE(""), //
-        AND(" AND "), //
-        OR(" OR "); //
-
+        NONE(""),  //
+        AND(" AND "),  //
+        OR(" OR ");
+        //
         private final String sqlStr;
 
         WhereLogicalOperator(String sqlStr) {
             this.sqlStr = sqlStr;
         }
 
+        @java.lang.SuppressWarnings("all")
+                public String getSqlStr() {
+            return this.sqlStr;
+        }
     }
 }

@@ -58,8 +58,6 @@ dependencies {
 
     testImplementation 'org.assertj:assertj-core:3.27.7'
 
-    testCompileOnly 'org.projectlombok:lombok:1.18.46'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.46'
 
     testImplementation "ch.qos.logback:logback-core:1.5.32"
     testImplementation "ch.qos.logback:logback-classic:1.5.32"

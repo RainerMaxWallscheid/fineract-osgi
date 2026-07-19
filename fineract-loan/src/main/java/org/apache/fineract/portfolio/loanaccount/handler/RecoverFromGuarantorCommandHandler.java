@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -27,10 +26,8 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanWritePlatformServic
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN", action = "RECOVERGUARANTEES")
 public class RecoverFromGuarantorCommandHandler implements NewCommandSourceHandler {
-
     private final LoanWritePlatformService writePlatformService;
 
     @Override
@@ -38,4 +35,8 @@ public class RecoverFromGuarantorCommandHandler implements NewCommandSourceHandl
         return this.writePlatformService.recoverFromGuarantor(command.getLoanId());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public RecoverFromGuarantorCommandHandler(final LoanWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
+    }
 }

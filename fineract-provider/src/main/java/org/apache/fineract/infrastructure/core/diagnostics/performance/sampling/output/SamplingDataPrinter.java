@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.core.diagnostics.performance.sampling.output;
 
 import static java.lang.System.lineSeparator;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.util.Arrays;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.stat.StatUtils;
@@ -35,17 +33,18 @@ import org.apache.fineract.infrastructure.core.diagnostics.performance.sampling.
 import org.springframework.stereotype.Component;
 
 @Component
-@Slf4j
 public class SamplingDataPrinter {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SamplingDataPrinter.class);
 
-    @SuppressFBWarnings({ "SLF4J_FORMAT_SHOULD_BE_CONST" })
+    @SuppressFBWarnings({"SLF4J_FORMAT_SHOULD_BE_CONST"})
     public void print(Map<Class<?>, SamplingData> data) {
         if (log.isInfoEnabled()) {
             if (MapUtils.isNotEmpty(data)) {
-                String logMsg = data.entrySet() //
-                        .stream() //
-                        .map(e -> getFormattedSamplingData(e.getKey(), e.getValue())) //
-                        .filter(Objects::nonNull).collect(Collectors.joining(lineSeparator())); //
+                String logMsg =  //
+                //
+                //
+                data.entrySet().stream().map(e -> getFormattedSamplingData(e.getKey(), e.getValue())).filter(Objects::nonNull).collect(Collectors.joining(lineSeparator())); //
                 if (StringUtils.isNotBlank(logMsg)) {
                     log.info(logMsg);
                 }
@@ -53,26 +52,26 @@ public class SamplingDataPrinter {
         }
     }
 
-    @SuppressFBWarnings({ "VA_FORMAT_STRING_USES_NEWLINE" })
+    @SuppressFBWarnings({"VA_FORMAT_STRING_USES_NEWLINE"})
     private String getFormattedSamplingData(Class<?> clazz, SamplingData samplingData) {
         if (clazz != null && samplingData != null) {
             Map<String, List<Duration>> timings = samplingData.getTimings();
             if (!timings.isEmpty()) {
                 return """
-
-                        Sampling data for %s
-                        -------------
-                        %s
-                        """.formatted(clazz.getName(), getTimingsLog(timings));
+                    
+                    Sampling data for %s
+                    -------------
+                    %s
+                    """.formatted(clazz.getName(), getTimingsLog(timings));
             }
         }
         return null;
     }
 
     private String getTimingsLog(Map<String, List<Duration>> timings) {
-        return timings.entrySet().stream() //
-                .map(e -> getSingleTimingLog(e.getKey(), e.getValue())) //
-                .collect(Collectors.joining(lineSeparator())); //
+        return  //
+        //
+        timings.entrySet().stream().map(e -> getSingleTimingLog(e.getKey(), e.getValue())).collect(Collectors.joining(lineSeparator())); //
     }
 
     private String getSingleTimingLog(String key, List<Duration> durations) {
@@ -81,7 +80,6 @@ public class SamplingDataPrinter {
         double average = Arrays.stream(millis).average().orElse(Double.NaN);
         double median = StatUtils.percentile(millis, 50);
         double lowest = StatUtils.min(millis);
-        return "%s with %d data points -> 99th percentile: %.0fms, average: %.0fms, median: %.0fms, lowest: %.0fms".formatted(key,
-                millis.length, percentile99, average, median, lowest);
+        return "%s with %d data points -> 99th percentile: %.0fms, average: %.0fms, median: %.0fms, lowest: %.0fms".formatted(key, millis.length, percentile99, average, median, lowest);
     }
 }

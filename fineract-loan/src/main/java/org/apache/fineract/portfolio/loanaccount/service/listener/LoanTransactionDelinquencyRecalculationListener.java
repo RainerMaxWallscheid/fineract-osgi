@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.loanaccount.service.listener;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.event.business.BusinessEventListener;
 import org.apache.fineract.infrastructure.event.business.domain.loan.transaction.LoanTransactionBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.loan.transaction.reaging.LoanReAgeTransactionBusinessEvent;
@@ -33,19 +32,15 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-public class LoanTransactionDelinquencyRecalculationListener
-        implements InitializingBean, BusinessEventListener<LoanTransactionBusinessEvent> {
-
+public class LoanTransactionDelinquencyRecalculationListener implements InitializingBean, BusinessEventListener<LoanTransactionBusinessEvent> {
     // Extend this list to support more event types so the hardcoded delinquency recalculation can be removed from the
     // use-cases
     private static final List<Class<? extends LoanTransactionBusinessEvent>> SUPPORTED_EVENT_TYPES = List.of(//
-            LoanReAgeTransactionBusinessEvent.class, //
-            LoanUndoReAgeTransactionBusinessEvent.class, //
-            LoanReAmortizeTransactionBusinessEvent.class, //
-            LoanUndoReAmortizeTransactionBusinessEvent.class //
+    LoanReAgeTransactionBusinessEvent.class,  //
+    LoanUndoReAgeTransactionBusinessEvent.class,  //
+    LoanReAmortizeTransactionBusinessEvent.class,  //
+    LoanUndoReAmortizeTransactionBusinessEvent.class //
     );//
-
     private final LoanAccountDomainService loanAccountDomainService;
     private final BusinessEventNotifierService businessEventNotifierService;
 
@@ -60,5 +55,11 @@ public class LoanTransactionDelinquencyRecalculationListener
             LoanTransaction tx = event.get();
             loanAccountDomainService.setLoanDelinquencyTag(tx.getLoan(), tx.getTransactionDate());
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionDelinquencyRecalculationListener(final LoanAccountDomainService loanAccountDomainService, final BusinessEventNotifierService businessEventNotifierService) {
+        this.loanAccountDomainService = loanAccountDomainService;
+        this.businessEventNotifierService = businessEventNotifierService;
     }
 }

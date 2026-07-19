@@ -22,16 +22,14 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.security.exception.InputValidationException;
 import org.apache.fineract.infrastructure.security.service.InputValidator;
 
-@Slf4j
 public abstract class AbstractReportingProcessService implements ReportingProcessService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AbstractReportingProcessService.class);
     private static final String NUMERIC_FORMAT_TYPE = "number";
     private static final String DATE_FORMAT_TYPE = "date";
-
     private final InputValidator inputValidator;
     private final ReportParameterTypeResolver reportParameterTypeResolver;
 
@@ -45,25 +43,19 @@ public abstract class AbstractReportingProcessService implements ReportingProces
         final Map<String, String> paramFormatTypes = this.reportParameterTypeResolver.loadParamFormatTypes(reportName);
         final boolean hasRegisteredParams = !paramFormatTypes.isEmpty();
         final Map<String, String> reportParams = new HashMap<>();
-
         for (Map.Entry<String, List<String>> entry : queryParams.entrySet()) {
             if (entry.getKey().startsWith("R_")) {
                 String paramVariable = entry.getKey().substring(2);
                 String pKey = "${" + paramVariable + "}";
                 String pValue = entry.getValue().get(0);
-
                 if (hasRegisteredParams) {
                     String formatType = paramFormatTypes.get(paramVariable);
                     if (formatType == null) {
-                        log.warn("Report '{}' received unknown parameter '{}' with no registered type — rejected", reportName,
-                                paramVariable);
-                        throw new InputValidationException(String.format("unknown report parameter '%s' is not registered for report '%s'",
-                                paramVariable, reportName));
+                        log.warn("Report \'{}\' received unknown parameter \'{}\' with no registered type — rejected", reportName, paramVariable);
+                        throw new InputValidationException(String.format("unknown report parameter \'%s\' is not registered for report \'%s\'", paramVariable, reportName));
                     }
-
                     validateParamByType(paramVariable, pValue, formatType);
                 }
-
                 reportParams.put(pKey, pValue);
             }
         }

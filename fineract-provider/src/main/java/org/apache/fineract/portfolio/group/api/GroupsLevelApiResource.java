@@ -25,7 +25,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.group.data.GroupLevelData;
@@ -35,20 +34,22 @@ import org.springframework.stereotype.Component;
 @Path("/v1/grouplevels")
 @Component
 @Tag(name = "Groups Level", description = "")
-@RequiredArgsConstructor
 public class GroupsLevelApiResource {
-
     private final PlatformSecurityContext context;
     private final GroupLevelReadPlatformService groupLevelReadPlatformService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve All Group Levels", operationId = "retrieveAllGroupLevels")
     @AlternativeOperationId("retrieveAllGroups")
     public List<GroupLevelData> retrieveAllGroups() {
-
         this.context.authenticatedUser().validateHasReadPermission("GROUP");
-
         return this.groupLevelReadPlatformService.retrieveAllLevels();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GroupsLevelApiResource(final PlatformSecurityContext context, final GroupLevelReadPlatformService groupLevelReadPlatformService) {
+        this.context = context;
+        this.groupLevelReadPlatformService = groupLevelReadPlatformService;
     }
 }

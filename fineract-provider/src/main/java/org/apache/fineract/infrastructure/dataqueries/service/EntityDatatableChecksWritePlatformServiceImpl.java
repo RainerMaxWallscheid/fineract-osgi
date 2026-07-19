@@ -24,8 +24,6 @@ import com.google.gson.JsonObject;
 import jakarta.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -52,11 +50,10 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@AllArgsConstructor
 @Service
 public class EntityDatatableChecksWritePlatformServiceImpl implements EntityDatatableChecksWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(EntityDatatableChecksWritePlatformServiceImpl.class);
     private final PlatformSecurityContext context;
     private final EntityDatatableChecksDataValidator fromApiJsonDeserializer;
     private final EntityDatatableChecksRepository entityDatatableChecksRepository;
@@ -72,35 +69,25 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
     public CommandProcessingResult createCheck(final JsonCommand command) {
         try {
             this.context.authenticatedUser();
-
             this.fromApiJsonDeserializer.validateForCreate(command.json());
-
             // check if the datatable is linked to the entity
-
             String datatableName = command.stringValueOfParameterNamed("datatableName");
             DatatableData datatableData = this.datatableReadService.retrieveDatatable(datatableName);
-
             if (datatableData == null) {
                 throw new DatatableNotFoundException(datatableName);
             }
-
             final String entity = command.stringValueOfParameterNamed("entity");
             final String foreignKeyColumnName = EntityTables.getForeignKeyColumnNameOnDatatable(entity);
             final boolean columnExist = datatableData.hasColumn(foreignKeyColumnName);
-
             log.debug("{} has column {} ? {}", datatableData.getRegisteredTableName(), foreignKeyColumnName, columnExist);
-
             if (!columnExist) {
                 throw new EntityDatatableCheckNotSupportedException(datatableData.getRegisteredTableName(), entity);
             }
-
             final Long productId = command.longValueOfParameterNamed("productId");
             final Integer status = command.integerValueSansLocaleOfParameterNamed("status");
-
             List<EntityDatatableChecks> entityDatatableCheck;
             if (productId == null) {
-                entityDatatableCheck = this.entityDatatableChecksRepository.findByEntityStatusAndDatatableIdAndNoProduct(entity, status,
-                        datatableName);
+                entityDatatableCheck = this.entityDatatableChecksRepository.findByEntityStatusAndDatatableIdAndNoProduct(entity, status, datatableName);
                 if (!entityDatatableCheck.isEmpty()) {
                     throw new EntityDatatableCheckAlreadyExistsException(entity, status, datatableName);
                 }
@@ -115,21 +102,17 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
                 } else {
                     throw new EntityDatatableCheckNotSupportedException(entity, productId);
                 }
-                entityDatatableCheck = this.entityDatatableChecksRepository.findByEntityStatusAndDatatableIdAndProductId(entity, status,
-                        datatableName, productId);
+                entityDatatableCheck = this.entityDatatableChecksRepository.findByEntityStatusAndDatatableIdAndProductId(entity, status, datatableName, productId);
                 if (!entityDatatableCheck.isEmpty()) {
                     throw new EntityDatatableCheckAlreadyExistsException(entity, status, datatableName, productId);
                 }
             }
-
             final EntityDatatableChecks check = EntityDatatableChecks.fromJson(command);
-
             this.entityDatatableChecksRepository.saveAndFlush(check);
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(check.getId()) //
-                    .build();
+            return  //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(check.getId()).build();
         } catch (final DataAccessException e) {
             handleReportDataIntegrityIssues(command, e.getMostSpecificCause(), e);
             return CommandProcessingResult.empty();
@@ -140,23 +123,18 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
     }
 
     @Override
-    public void runTheCheck(final Long entityId, final String entityName, final Integer status, String foreignKeyColumn,
-            final String entitySubtype) {
+    public void runTheCheck(final Long entityId, final String entityName, final Integer status, String foreignKeyColumn, final String entitySubtype) {
         List<EntityDatatableChecks> tableRequiredBeforeClientActivation;
         if (entitySubtype == null) {
             tableRequiredBeforeClientActivation = entityDatatableChecksRepository.findByEntityAndStatus(entityName, status);
         } else {
-            tableRequiredBeforeClientActivation = entityDatatableChecksRepository.findByEntityAndStatusAndSubtype(entityName, status,
-                    entitySubtype.toUpperCase());
+            tableRequiredBeforeClientActivation = entityDatatableChecksRepository.findByEntityAndStatusAndSubtype(entityName, status, entitySubtype.toUpperCase());
         }
-
         if (tableRequiredBeforeClientActivation != null) {
             List<String> reqDatatables = new ArrayList<>();
             for (EntityDatatableChecks t : tableRequiredBeforeClientActivation) {
-
                 final String datatableName = t.getDatatableName();
                 final Long countEntries = datatableReadService.countDatatableEntries(datatableName, entityId, foreignKeyColumn);
-
                 log.debug("The are {} entries in the table {}", countEntries, datatableName);
                 if (countEntries.intValue() == 0) {
                     reqDatatables.add(datatableName);
@@ -170,21 +148,16 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
 
     @Transactional(readOnly = true)
     @Override
-    public void runTheCheckForProduct(final Long entityId, final String entityName, final Integer status, String foreignKeyColumn,
-            long productId) {
-        List<EntityDatatableChecks> tableRequiredBeforAction = entityDatatableChecksRepository.findByEntityStatusAndProduct(entityName,
-                status, productId);
-
+    public void runTheCheckForProduct(final Long entityId, final String entityName, final Integer status, String foreignKeyColumn, long productId) {
+        List<EntityDatatableChecks> tableRequiredBeforAction = entityDatatableChecksRepository.findByEntityStatusAndProduct(entityName, status, productId);
         if (tableRequiredBeforAction == null || tableRequiredBeforAction.isEmpty()) {
             tableRequiredBeforAction = entityDatatableChecksRepository.findByEntityStatusAndNoProduct(entityName, status);
         }
         if (tableRequiredBeforAction != null) {
             List<String> reqDatatables = new ArrayList<>();
             for (EntityDatatableChecks t : tableRequiredBeforAction) {
-
                 final String datatableName = t.getDatatableName();
                 final Long countEntries = datatableReadService.countDatatableEntries(datatableName, entityId, foreignKeyColumn);
-
                 log.debug("The are {} entries in the table {}", countEntries, datatableName);
                 if (countEntries.intValue() == 0) {
                     reqDatatables.add(datatableName);
@@ -198,19 +171,15 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
 
     @Transactional
     @Override
-    public boolean saveDatatables(final Integer status, final String entity, final Long entityId, final Long productId,
-            final JsonArray datatableDatas) {
+    public boolean saveDatatables(final Integer status, final String entity, final Long entityId, final Long productId, final JsonArray datatableDatas) {
         final AppUser user = this.context.authenticatedUser();
         boolean isMakerCheckerEnabled = false;
         if (datatableDatas != null && datatableDatas.size() > 0) {
             for (JsonElement element : datatableDatas) {
                 final String datatableName = this.fromApiJsonHelper.extractStringNamed("registeredTableName", element);
                 final JsonObject datatableData = this.fromApiJsonHelper.extractJsonObjectNamed("data", element);
-
                 if (datatableName == null || datatableData == null) {
-                    final ApiParameterError error = ApiParameterError.generalError(
-                            "registeredTableName.and.data.parameters.must.be.present.in.each.list.items.in.datatables",
-                            "registeredTableName and data parameters must be present in each list items in datatables");
+                    final ApiParameterError error = ApiParameterError.generalError("registeredTableName.and.data.parameters.must.be.present.in.each.list.items.in.datatables", "registeredTableName and data parameters must be present in each list items in datatables");
                     List<ApiParameterError> errors = new ArrayList<>();
                     errors.add(error);
                     throw new PlatformApiDataValidationException(errors);
@@ -236,14 +205,11 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
     @Transactional
     @Override
     public CommandProcessingResult deleteCheck(final Long entityDatatableCheckId) {
-        final EntityDatatableChecks check = this.entityDatatableChecksRepository.findById(entityDatatableCheckId)
-                .orElseThrow(() -> new EntityDatatableChecksNotFoundException(entityDatatableCheckId));
-
+        final EntityDatatableChecks check = this.entityDatatableChecksRepository.findById(entityDatatableCheckId).orElseThrow(() -> new EntityDatatableChecksNotFoundException(entityDatatableCheckId));
         this.entityDatatableChecksRepository.delete(check);
-
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(entityDatatableCheckId) //
-                .build();
+        return  //
+        //
+        new CommandProcessingResultBuilder().withEntityId(entityDatatableCheckId).build();
     }
 
     /*
@@ -258,9 +224,9 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
         if (checkEx.getMessage().contains("FOREIGN KEY (x_registered_table_name)")) {
             final String datatableName = command.stringValueOfParameterNamed("datatableName");
             msgCode += ".foreign.key.constraint";
-            msg = "Datatable with name '" + datatableName + "' does not exist";
+            msg = "Datatable with name \'" + datatableName + "\' does not exist";
             param = "datatableName";
-            msgArgs = new Object[] { datatableName, dae };
+            msgArgs = new Object[] {datatableName, dae};
         } else if (checkEx.getMessage().contains("unique_entity_check")) {
             final String datatableName = command.stringValueOfParameterNamed("datatableName");
             final Integer status = command.integerValueSansLocaleOfParameterNamed("status");
@@ -269,9 +235,22 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
             throw new EntityDatatableCheckAlreadyExistsException(entity, status, datatableName, productId);
         } else {
             msgCode += ".unknown.data.integrity.issue";
-            msgArgs = new Object[] { dae };
+            msgArgs = new Object[] {dae};
         }
         log.error("Error occured.", dae);
         throw ErrorHandler.getMappable(dae, msgCode, msg, param, msgArgs);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EntityDatatableChecksWritePlatformServiceImpl(final PlatformSecurityContext context, final EntityDatatableChecksDataValidator fromApiJsonDeserializer, final EntityDatatableChecksRepository entityDatatableChecksRepository, final DatatableReadService datatableReadService, final DatatableWriteService datatableWriteService, final LoanProductReadPlatformService loanProductReadPlatformService, final SavingsProductReadPlatformService savingsProductReadPlatformService, final FromJsonHelper fromApiJsonHelper, final ConfigurationDomainService configurationDomainService) {
+        this.context = context;
+        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
+        this.entityDatatableChecksRepository = entityDatatableChecksRepository;
+        this.datatableReadService = datatableReadService;
+        this.datatableWriteService = datatableWriteService;
+        this.loanProductReadPlatformService = loanProductReadPlatformService;
+        this.savingsProductReadPlatformService = savingsProductReadPlatformService;
+        this.fromApiJsonHelper = fromApiJsonHelper;
+        this.configurationDomainService = configurationDomainService;
     }
 }

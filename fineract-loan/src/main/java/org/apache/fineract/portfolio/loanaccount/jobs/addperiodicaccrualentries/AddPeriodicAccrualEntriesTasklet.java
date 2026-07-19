@@ -19,8 +19,6 @@
 package org.apache.fineract.portfolio.loanaccount.jobs.addperiodicaccrualentries;
 
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.exception.MultiException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
@@ -30,10 +28,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class AddPeriodicAccrualEntriesTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AddPeriodicAccrualEntriesTasklet.class);
     private final LoanAccrualsProcessingService loanAccrualsProcessingService;
 
     @Override
@@ -48,5 +45,10 @@ public class AddPeriodicAccrualEntriesTasklet implements Tasklet {
 
     private void addPeriodicAccruals(final LocalDate tilldate) throws MultiException {
         loanAccrualsProcessingService.addPeriodicAccruals(tilldate);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AddPeriodicAccrualEntriesTasklet(final LoanAccrualsProcessingService loanAccrualsProcessingService) {
+        this.loanAccrualsProcessingService = loanAccrualsProcessingService;
     }
 }

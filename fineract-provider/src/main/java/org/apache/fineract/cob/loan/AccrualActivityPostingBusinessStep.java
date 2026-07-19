@@ -19,28 +19,23 @@
 package org.apache.fineract.cob.loan;
 
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.service.LoanAccrualActivityProcessingService;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class AccrualActivityPostingBusinessStep implements LoanCOBBusinessStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AccrualActivityPostingBusinessStep.class);
     private final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService;
 
     @Override
     public Loan execute(Loan loan) {
         log.debug("start processing loan accrual activity posting on installment due date with id [{}]", loan.getId());
         final LocalDate currentDate = DateUtils.getBusinessLocalDate();
-
         // check if loan capable for posting
         loanAccrualActivityProcessingService.makeAccrualActivityTransaction(loan, currentDate);
-
         log.debug("end processing loan accrual activity posting on installment due date with id [{}]", loan.getId());
         return loan;
     }
@@ -55,4 +50,8 @@ public class AccrualActivityPostingBusinessStep implements LoanCOBBusinessStep {
         return "Accrual Activity Posting on Installment Due Date";
     }
 
+    @java.lang.SuppressWarnings("all")
+        public AccrualActivityPostingBusinessStep(final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService) {
+        this.loanAccrualActivityProcessingService = loanAccrualActivityProcessingService;
+    }
 }

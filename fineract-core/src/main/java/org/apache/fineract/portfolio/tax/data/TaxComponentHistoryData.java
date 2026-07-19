@@ -21,12 +21,9 @@ package org.apache.fineract.portfolio.tax.data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 
-@Getter
 public class TaxComponentHistoryData implements Serializable {
-
     @SuppressWarnings("unused")
     private final BigDecimal percentage;
     @SuppressWarnings("unused")
@@ -44,4 +41,18 @@ public class TaxComponentHistoryData implements Serializable {
         return DateUtils.isAfter(target, getStartDate()) && (endDate == null || !DateUtils.isAfter(target, getEndDate()));
     }
 
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPercentage() {
+        return this.percentage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getStartDate() {
+        return this.startDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getEndDate() {
+        return this.endDate;
+    }
 }

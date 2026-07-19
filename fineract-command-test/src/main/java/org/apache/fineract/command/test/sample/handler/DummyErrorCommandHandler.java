@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.command.test.sample.handler;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.command.test.sample.data.DummyErrorRequest;
@@ -27,13 +25,17 @@ import org.apache.fineract.command.test.sample.data.DummyErrorResponse;
 import org.apache.fineract.command.test.sample.exception.DummyException;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class DummyErrorCommandHandler implements CommandHandler<DummyErrorRequest, DummyErrorResponse> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DummyErrorCommandHandler.class);
 
     @Override
     public DummyErrorResponse handle(Command<DummyErrorRequest> command) {
         throw new DummyException("Simulating a business logic error: " + command.getPayload().getContent());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DummyErrorCommandHandler() {
     }
 }

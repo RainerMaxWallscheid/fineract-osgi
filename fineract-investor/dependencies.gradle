@@ -60,8 +60,6 @@ dependencies {
             )
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
     testCompileOnly 'com.github.spotbugs:spotbugs-annotations'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'org.mapstruct:mapstruct-processor'
     implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
         exclude group: 'org.hibernate'

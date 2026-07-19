@@ -19,8 +19,6 @@
 package org.apache.fineract.command.audit;
 
 import static org.mockito.Mockito.mock;
-
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.CommandProperties;
 import org.apache.fineract.command.core.CommandStore;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -31,14 +29,15 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-@Slf4j
 @Configuration
-@EnableConfigurationProperties({ CommandProperties.class, AuditCommandProperties.class })
-@EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
+@EnableConfigurationProperties({CommandProperties.class, AuditCommandProperties.class})
+@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
 @PropertySource("classpath:application-test.properties")
 @ComponentScan("org.apache.fineract.command.audit.hook")
 @ComponentScan("org.apache.fineract.command.test.sample")
 class TestConfiguration {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TestConfiguration.class);
 
     @Bean
     CommandStore commandStore() {

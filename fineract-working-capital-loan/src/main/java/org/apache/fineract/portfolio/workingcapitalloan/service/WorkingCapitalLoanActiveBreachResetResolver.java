@@ -23,7 +23,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanBreachAction;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanBreachActionType;
@@ -31,14 +30,11 @@ import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapita
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class WorkingCapitalLoanActiveBreachResetResolver {
-
     private final WorkingCapitalLoanBreachActionRepository breachActionRepository;
 
     public Optional<WorkingCapitalLoanBreachAction> findLatestActiveReset(final Long workingCapitalLoanId) {
-        List<WorkingCapitalLoanBreachAction> filtereredList = breachActionRepository.findByLoanAndActionType(workingCapitalLoanId,
-                List.of(WorkingCapitalLoanBreachActionType.RESET, WorkingCapitalLoanBreachActionType.UNDO_RESET));
+        List<WorkingCapitalLoanBreachAction> filtereredList = breachActionRepository.findByLoanAndActionType(workingCapitalLoanId, List.of(WorkingCapitalLoanBreachActionType.RESET, WorkingCapitalLoanBreachActionType.UNDO_RESET));
         Deque<WorkingCapitalLoanBreachAction> queue = new ArrayDeque<>();
         filtereredList.forEach(action -> {
             if (action.getAction().equals(WorkingCapitalLoanBreachActionType.RESET)) {
@@ -57,7 +53,11 @@ public class WorkingCapitalLoanActiveBreachResetResolver {
     }
 
     public boolean existsActiveResetInPeriod(final Long workingCapitalLoanId, final LocalDate fromDate, final LocalDate toDate) {
-        return findLatestActiveReset(workingCapitalLoanId).filter(a -> DateUtils.isDateInRangeInclusive(a.getStartDate(), fromDate, toDate))
-                .isPresent();
+        return findLatestActiveReset(workingCapitalLoanId).filter(a -> DateUtils.isDateInRangeInclusive(a.getStartDate(), fromDate, toDate)).isPresent();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanActiveBreachResetResolver(final WorkingCapitalLoanBreachActionRepository breachActionRepository) {
+        this.breachActionRepository = breachActionRepository;
     }
 }

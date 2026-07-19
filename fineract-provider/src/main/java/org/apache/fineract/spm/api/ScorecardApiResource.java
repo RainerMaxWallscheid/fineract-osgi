@@ -34,7 +34,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.domain.Client;
@@ -53,9 +52,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Path("/v1/surveys/scorecards")
 @Component
 @Tag(name = "Score Card", description = "")
-@RequiredArgsConstructor
 public class ScorecardApiResource {
-
     private final PlatformSecurityContext securityContext;
     private final SpmService spmService;
     private final ScorecardService scorecardService;
@@ -64,11 +61,10 @@ public class ScorecardApiResource {
 
     @GET
     @Path("{surveyId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Transactional
     @Operation(summary = "List all Scorecard entries", description = "List all Scorecard entries for a survey.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Scorecard.class)))) })
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Scorecard.class))))})
     public List<ScorecardData> findBySurvey(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId) {
         this.securityContext.authenticatedUser();
         this.spmService.findById(surveyId);
@@ -77,15 +73,13 @@ public class ScorecardApiResource {
 
     @POST
     @Path("{surveyId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Transactional
-    @Operation(operationId = "createScorecard", summary = "Create a Scorecard entry", description = "Add a new entry to a survey.\n" + "\n"
-            + "Mandatory Fields\n" + "clientId, createdOn, questionId, responseId, staffId")
+    @Operation(operationId = "createScorecard", summary = "Create a Scorecard entry", description = "Add a new entry to a survey.\n" + "\n" + "Mandatory Fields\n" + "clientId, createdOn, questionId, responseId, staffId")
     @AlternativeOperationId("createScorecard_1")
-    @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK") })
-    public void createScorecard(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId,
-            @Parameter(description = "scorecardData") final ScorecardData scorecardData) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK")})
+    public void createScorecard(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId, @Parameter(description = "scorecardData") final ScorecardData scorecardData) {
         final AppUser appUser = this.securityContext.authenticatedUser();
         final Survey survey = this.spmService.findById(surveyId);
         final Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(scorecardData.getClientId());
@@ -94,20 +88,18 @@ public class ScorecardApiResource {
 
     @GET
     @Path("{surveyId}/clients/{clientId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Transactional
-    public List<ScorecardData> findBySurveyAndClient(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId,
-            @PathParam("clientId") @Parameter(description = "Enter clientId") final Long clientId) {
+    public List<ScorecardData> findBySurveyAndClient(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId, @PathParam("clientId") @Parameter(description = "Enter clientId") final Long clientId) {
         this.securityContext.authenticatedUser();
         this.spmService.findById(surveyId);
         this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
         return (List<ScorecardData>) this.scorecardReadPlatformService.retrieveScorecardBySurveyAndClient(surveyId, clientId);
-
     }
 
     @GET
     @Path("clients/{clientId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Transactional
     @Operation(operationId = "findByClient")
     @AlternativeOperationId("findByClient_1")
@@ -115,5 +107,14 @@ public class ScorecardApiResource {
         this.securityContext.authenticatedUser();
         this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
         return (List<ScorecardData>) this.scorecardReadPlatformService.retrieveScorecardByClient(clientId);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ScorecardApiResource(final PlatformSecurityContext securityContext, final SpmService spmService, final ScorecardService scorecardService, final ClientRepositoryWrapper clientRepositoryWrapper, final ScorecardReadPlatformService scorecardReadPlatformService) {
+        this.securityContext = securityContext;
+        this.spmService = spmService;
+        this.scorecardService = scorecardService;
+        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.scorecardReadPlatformService = scorecardReadPlatformService;
     }
 }

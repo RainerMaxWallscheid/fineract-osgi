@@ -29,35 +29,73 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
-@Getter
-@Setter
 @Entity
-@Table(name = "m_loan_product_payment_allocation_rule", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "loan_product_id", "transaction_type" }, name = "uq_m_loan_product_payment_allocation_rule") })
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "m_loan_product_payment_allocation_rule", uniqueConstraints = {@UniqueConstraint(columnNames = {"loan_product_id", "transaction_type"}, name = "uq_m_loan_product_payment_allocation_rule")})
 public class LoanProductPaymentAllocationRule extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @ManyToOne
     @JoinColumn(name = "loan_product_id", nullable = false)
     private LoanProduct loanProduct;
-
     @Column(name = "transaction_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentAllocationTransactionType transactionType;
-
     @Convert(converter = PaymentAllocationTypeListConverter.class)
     @Column(name = "allocation_types", nullable = false)
     private List<PaymentAllocationType> allocationTypes;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "future_installment_allocation_rule", nullable = false)
     private FutureInstallmentAllocationRule futureInstallmentAllocationRule;
+
+    @java.lang.SuppressWarnings("all")
+        public LoanProduct getLoanProduct() {
+        return this.loanProduct;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PaymentAllocationTransactionType getTransactionType() {
+        return this.transactionType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<PaymentAllocationType> getAllocationTypes() {
+        return this.allocationTypes;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FutureInstallmentAllocationRule getFutureInstallmentAllocationRule() {
+        return this.futureInstallmentAllocationRule;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanProduct(final LoanProduct loanProduct) {
+        this.loanProduct = loanProduct;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setTransactionType(final PaymentAllocationTransactionType transactionType) {
+        this.transactionType = transactionType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAllocationTypes(final List<PaymentAllocationType> allocationTypes) {
+        this.allocationTypes = allocationTypes;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setFutureInstallmentAllocationRule(final FutureInstallmentAllocationRule futureInstallmentAllocationRule) {
+        this.futureInstallmentAllocationRule = futureInstallmentAllocationRule;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanProductPaymentAllocationRule(final LoanProduct loanProduct, final PaymentAllocationTransactionType transactionType, final List<PaymentAllocationType> allocationTypes, final FutureInstallmentAllocationRule futureInstallmentAllocationRule) {
+        this.loanProduct = loanProduct;
+        this.transactionType = transactionType;
+        this.allocationTypes = allocationTypes;
+        this.futureInstallmentAllocationRule = futureInstallmentAllocationRule;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected LoanProductPaymentAllocationRule() {
+    }
 }

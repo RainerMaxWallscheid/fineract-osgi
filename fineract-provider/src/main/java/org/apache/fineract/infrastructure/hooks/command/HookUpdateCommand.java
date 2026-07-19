@@ -18,11 +18,40 @@
  */
 package org.apache.fineract.infrastructure.hooks.command;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.infrastructure.hooks.data.HookUpdateRequest;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class HookUpdateCommand extends Command<HookUpdateRequest> {}
+public class HookUpdateCommand extends Command<HookUpdateRequest> {
+	@java.lang.SuppressWarnings("all")
+		public HookUpdateCommand() {
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public java.lang.String toString() {
+		return "HookUpdateCommand()";
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public boolean equals(final java.lang.Object o) {
+		if (o == this) return true;
+		if (!(o instanceof HookUpdateCommand)) return false;
+		final HookUpdateCommand other = (HookUpdateCommand) o;
+		if (!other.canEqual((java.lang.Object) this)) return false;
+		if (!super.equals(o)) return false;
+		return true;
+	}
+
+	@java.lang.SuppressWarnings("all")
+		protected boolean canEqual(final java.lang.Object other) {
+		return other instanceof HookUpdateCommand;
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public int hashCode() {
+		final int result = super.hashCode();
+		return result;
+	}
+}

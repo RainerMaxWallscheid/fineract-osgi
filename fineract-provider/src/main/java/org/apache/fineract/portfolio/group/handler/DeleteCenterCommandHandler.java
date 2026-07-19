@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.group.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "CENTER", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteCenterCommandHandler implements NewCommandSourceHandler {
-
     private final GroupingTypesWritePlatformService groupWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.groupWritePlatformService.deleteGroup(command.entityId());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DeleteCenterCommandHandler(final GroupingTypesWritePlatformService groupWritePlatformService) {
+        this.groupWritePlatformService = groupWritePlatformService;
     }
 }

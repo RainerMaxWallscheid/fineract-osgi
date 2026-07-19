@@ -20,8 +20,6 @@ package org.apache.fineract.accounting.closure.service;
 
 import java.time.LocalDate;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.accounting.closure.api.GLClosureJsonInputParams;
 import org.apache.fineract.accounting.closure.command.GLClosureCommand;
 import org.apache.fineract.accounting.closure.domain.GLClosure;
@@ -46,10 +44,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class GLClosureWritePlatformServiceJpaRepositoryImpl implements GLClosureWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GLClosureWritePlatformServiceJpaRepositoryImpl.class);
     private final GLClosureRepository glClosureRepository;
     private final OfficeRepositoryWrapper officeRepositoryWrapper;
     private final GLClosureCommandFromApiJsonDeserializer fromApiJsonDeserializer;
@@ -60,7 +57,6 @@ public class GLClosureWritePlatformServiceJpaRepositoryImpl implements GLClosure
         try {
             final GLClosureCommand closureCommand = this.fromApiJsonDeserializer.commandFromApiJson(command.json());
             closureCommand.validateForCreate();
-
             // check office is valid
             final Long officeId = command.longValueOfParameterNamed(GLClosureJsonInputParams.OFFICE_ID.getValue());
             final Office office = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
@@ -74,17 +70,14 @@ public class GLClosureWritePlatformServiceJpaRepositoryImpl implements GLClosure
             final GLClosure latestGLClosure = this.glClosureRepository.getLatestGLClosureByBranch(officeId);
             if (latestGLClosure != null && DateUtils.isAfter(latestGLClosure.getClosingDate(), closureDate)) {
                 throw new GLClosureInvalidException(GlClosureInvalidReason.ACCOUNTING_CLOSED, latestGLClosure.getClosingDate());
-
             }
             final GLClosure glClosure = GLClosure.fromJson(office, command);
-
             this.glClosureRepository.saveAndFlush(glClosure);
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withOfficeId(officeId) //
-                    .withEntityId(glClosure.getId()) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withOfficeId(officeId).withEntityId(glClosure.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleGLClosureIntegrityIssues(command, throwable, dve);
@@ -97,47 +90,37 @@ public class GLClosureWritePlatformServiceJpaRepositoryImpl implements GLClosure
     public CommandProcessingResult updateGLClosure(final Long glClosureId, final JsonCommand command) {
         final GLClosureCommand closureCommand = this.fromApiJsonDeserializer.commandFromApiJson(command.json());
         closureCommand.validateForUpdate();
-
         // is the glClosure valid
-        final GLClosure glClosure = this.glClosureRepository.findById(glClosureId)
-                .orElseThrow(() -> new GLClosureNotFoundException(glClosureId));
-
+        final GLClosure glClosure = this.glClosureRepository.findById(glClosureId).orElseThrow(() -> new GLClosureNotFoundException(glClosureId));
         final Map<String, Object> changesOnly = glClosure.update(command);
-
         if (!changesOnly.isEmpty()) {
             this.glClosureRepository.saveAndFlush(glClosure);
         }
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withOfficeId(glClosure.getOffice().getId()) //
-                .withEntityId(glClosure.getId()) //
-                .with(changesOnly) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withOfficeId(glClosure.getOffice().getId()).withEntityId(glClosure.getId()).with(changesOnly).build();
     }
 
     @Transactional
     @Override
     public CommandProcessingResult deleteGLClosure(final Long glClosureId) {
-        final GLClosure glClosure = this.glClosureRepository.findById(glClosureId)
-                .orElseThrow(() -> new GLClosureNotFoundException(glClosureId));
-
+        final GLClosure glClosure = this.glClosureRepository.findById(glClosureId).orElseThrow(() -> new GLClosureNotFoundException(glClosureId));
         /**
          * check if any closures are present for this branch at a later date than this closure date
-         **/
+         */
         final LocalDate closureDate = glClosure.getClosingDate();
         final GLClosure latestGLClosure = this.glClosureRepository.getLatestGLClosureByBranch(glClosure.getOffice().getId());
         if (DateUtils.isAfter(latestGLClosure.getClosingDate(), closureDate)) {
-            throw new GLClosureInvalidDeleteException(latestGLClosure.getOffice().getId(), latestGLClosure.getOffice().getName(),
-                    latestGLClosure.getClosingDate());
+            throw new GLClosureInvalidDeleteException(latestGLClosure.getOffice().getId(), latestGLClosure.getOffice().getName(), latestGLClosure.getClosingDate());
         }
-
         this.glClosureRepository.delete(glClosure);
-
-        return new CommandProcessingResultBuilder() //
-                .withOfficeId(glClosure.getOffice().getId()) //
-                .withEntityId(glClosure.getId()) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withOfficeId(glClosure.getOffice().getId()).withEntityId(glClosure.getId()).build();
     }
 
     /**
@@ -147,12 +130,16 @@ public class GLClosureWritePlatformServiceJpaRepositoryImpl implements GLClosure
      */
     private void handleGLClosureIntegrityIssues(final JsonCommand command, final Throwable realCause, NonTransientDataAccessException dve) {
         if (realCause.getMessage().contains("office_id_closing_date")) {
-            throw new GLClosureDuplicateException(command.longValueOfParameterNamed(GLClosureJsonInputParams.OFFICE_ID.getValue()),
-                    command.localDateValueOfParameterNamed(GLClosureJsonInputParams.CLOSING_DATE.getValue()));
+            throw new GLClosureDuplicateException(command.longValueOfParameterNamed(GLClosureJsonInputParams.OFFICE_ID.getValue()), command.localDateValueOfParameterNamed(GLClosureJsonInputParams.CLOSING_DATE.getValue()));
         }
-
         log.error("Error occured.", dve);
-        throw ErrorHandler.getMappable(dve, "error.msg.glClosure.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource GL Closure: " + realCause.getMessage());
+        throw ErrorHandler.getMappable(dve, "error.msg.glClosure.unknown.data.integrity.issue", "Unknown data integrity issue with resource GL Closure: " + realCause.getMessage());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GLClosureWritePlatformServiceJpaRepositoryImpl(final GLClosureRepository glClosureRepository, final OfficeRepositoryWrapper officeRepositoryWrapper, final GLClosureCommandFromApiJsonDeserializer fromApiJsonDeserializer) {
+        this.glClosureRepository = glClosureRepository;
+        this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
     }
 }

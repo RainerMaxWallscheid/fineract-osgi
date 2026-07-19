@@ -23,11 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class InMemorySamplingService extends AbstractSamplingService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InMemorySamplingService.class);
     private final Map<String, List<Duration>> timings = new ConcurrentHashMap<>();
 
     InMemorySamplingService(int samplingRate) {

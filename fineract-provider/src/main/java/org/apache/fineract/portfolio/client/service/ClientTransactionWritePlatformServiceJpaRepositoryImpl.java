@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.client.service;
 
 import java.util.Map;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -35,38 +34,29 @@ import org.apache.fineract.portfolio.client.exception.ClientTransactionCannotBeU
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class ClientTransactionWritePlatformServiceJpaRepositoryImpl implements ClientTransactionWritePlatformService {
-
     private final ClientTransactionRepositoryWrapper clientTransactionRepository;
-
     private final ClientRepositoryWrapper clientRepository;
     private final OrganisationCurrencyRepositoryWrapper organisationCurrencyRepository;
     private final JournalEntryWritePlatformService journalEntryWritePlatformService;
 
     @Override
     public CommandProcessingResult undo(Long clientId, Long transactionId) {
-
         final Client client = this.clientRepository.getActiveClientInUserScope(clientId);
-
         final ClientTransaction clientTransaction = this.clientTransactionRepository.findOneWithNotFoundDetection(clientId, transactionId);
-
         // validate that transaction can be undone
         if (clientTransaction.isReversed()) {
             throw new ClientTransactionCannotBeUndoneException(clientId, transactionId);
         }
-
         // mark transaction as reversed
         clientTransaction.reverse();
-
         // revert any charges paid back to their original state
         if (clientTransaction.isPayChargeTransaction() || clientTransaction.isWaiveChargeTransaction()) {
             // undo charge
             final Set<ClientChargePaidBy> chargesPaidBy = clientTransaction.getClientChargePaidByCollection();
             for (final ClientChargePaidBy clientChargePaidBy : chargesPaidBy) {
                 final ClientCharge clientCharge = clientChargePaidBy.getClientCharge();
-                clientCharge.setCurrency(
-                        organisationCurrencyRepository.findOneWithNotFoundDetection(clientCharge.getCharge().getCurrencyCode()));
+                clientCharge.setCurrency(organisationCurrencyRepository.findOneWithNotFoundDetection(clientCharge.getCharge().getCurrencyCode()));
                 if (clientTransaction.isPayChargeTransaction()) {
                     clientCharge.undoPayment(clientTransaction.getAmount());
                 } else if (clientTransaction.isWaiveChargeTransaction()) {
@@ -74,16 +64,14 @@ public class ClientTransactionWritePlatformServiceJpaRepositoryImpl implements C
                 }
             }
         }
-
         // generate accounting entries
         this.clientTransactionRepository.saveAndFlush(clientTransaction);
         generateAccountingEntries(clientTransaction);
-
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(transactionId) //
-                .withOfficeId(client.officeId()) //
-                .withClientId(clientId) //
-                .build();
+        return  //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withEntityId(transactionId).withOfficeId(client.officeId()).withClientId(clientId).build();
     }
 
     private void generateAccountingEntries(ClientTransaction clientTransaction) {
@@ -91,4 +79,11 @@ public class ClientTransactionWritePlatformServiceJpaRepositoryImpl implements C
         journalEntryWritePlatformService.createJournalEntriesForClientTransactions(accountingBridgeData);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ClientTransactionWritePlatformServiceJpaRepositoryImpl(final ClientTransactionRepositoryWrapper clientTransactionRepository, final ClientRepositoryWrapper clientRepository, final OrganisationCurrencyRepositoryWrapper organisationCurrencyRepository, final JournalEntryWritePlatformService journalEntryWritePlatformService) {
+        this.clientTransactionRepository = clientTransactionRepository;
+        this.clientRepository = clientRepository;
+        this.organisationCurrencyRepository = organisationCurrencyRepository;
+        this.journalEntryWritePlatformService = journalEntryWritePlatformService;
+    }
 }

@@ -20,7 +20,6 @@ package org.apache.fineract.infrastructure.configuration.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.configuration.data.ExternalServicesData;
 import org.apache.fineract.infrastructure.configuration.exception.ExternalServiceConfigurationNotFoundException;
 import org.springframework.dao.DataAccessException;
@@ -29,9 +28,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class ExternalServicesReadPlatformServiceImpl implements ExternalServicesReadPlatformService {
-
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -40,32 +37,28 @@ public class ExternalServicesReadPlatformServiceImpl implements ExternalServices
         final ResultSetExtractor<ExternalServicesData> resultSetExtractor = new ExternalServicesDetailsDataExtractor();
         String serviceNameToUse = null;
         switch (serviceName) {
-            case "S3":
-                serviceNameToUse = ExternalServicesConstants.S3_SERVICE_NAME;
+        case "S3": 
+            serviceNameToUse = ExternalServicesConstants.S3_SERVICE_NAME;
             break;
-
-            case "SMTP":
-                serviceNameToUse = ExternalServicesConstants.SMTP_SERVICE_NAME;
+        case "SMTP": 
+            serviceNameToUse = ExternalServicesConstants.SMTP_SERVICE_NAME;
             break;
-
-            case "SMS":
-                serviceNameToUse = ExternalServicesConstants.SMS_SERVICE_NAME;
+        case "SMS": 
+            serviceNameToUse = ExternalServicesConstants.SMS_SERVICE_NAME;
             break;
-
-            case "NOTIFICATION":
-                serviceNameToUse = ExternalServicesConstants.NOTIFICATION_SERVICE_NAME;
+        case "NOTIFICATION": 
+            serviceNameToUse = ExternalServicesConstants.NOTIFICATION_SERVICE_NAME;
             break;
-
-            default:
-                throw new ExternalServiceConfigurationNotFoundException(serviceName);
+        default: 
+            throw new ExternalServiceConfigurationNotFoundException(serviceName);
         }
-        final String sql = "SELECT es.name as name, es.id as id FROM c_external_service es where es.name='" + serviceNameToUse + "'";
+        final String sql = "SELECT es.name as name, es.id as id FROM c_external_service es where es.name=\'" + serviceNameToUse + "\'";
         final ExternalServicesData externalServicesData = this.jdbcTemplate.query(sql, resultSetExtractor); // NOSONAR
         return externalServicesData;
     }
 
-    private static final class ExternalServicesDetailsDataExtractor implements ResultSetExtractor<ExternalServicesData> {
 
+    private static final class ExternalServicesDetailsDataExtractor implements ResultSetExtractor<ExternalServicesData> {
         @Override
         public ExternalServicesData extractData(ResultSet rs) throws SQLException, DataAccessException {
             // TODO Auto-generated method stub
@@ -75,11 +68,12 @@ public class ExternalServicesReadPlatformServiceImpl implements ExternalServices
                 name = rs.getString("name");
                 id = rs.getLong("id");
             }
-
             return new ExternalServicesData().setId(id).setName(name);
-
         }
-
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ExternalServicesReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 }

@@ -19,7 +19,6 @@
 package org.apache.fineract.batch.command.internal;
 
 import jakarta.ws.rs.core.UriInfo;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
@@ -41,18 +40,19 @@ import org.springframework.stereotype.Component;
  * @see org.apache.fineract.batch.domain.BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class ApplySavingsCommandStrategy implements CommandStrategy {
-
     private final SavingsAccountsApiResource savingsAccountsApiResource;
 
     @Override
     public BatchResponse execute(BatchRequest request, @SuppressWarnings("unused") UriInfo uriInfo) {
         // Calls 'submitApplication' function from 'SavingsAccountsApiResource' to Apply Savings to an existing client
         String responseBody = savingsAccountsApiResource.submitApplication(request.getBody());
-
         // Sets the body of the response after savings is successfully applied
-        return new BatchResponse().setRequestId(request.getRequestId()).setStatusCode(HttpStatus.SC_OK).setBody(responseBody)
-                .setHeaders(request.getHeaders());
+        return new BatchResponse().setRequestId(request.getRequestId()).setStatusCode(HttpStatus.SC_OK).setBody(responseBody).setHeaders(request.getHeaders());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ApplySavingsCommandStrategy(final SavingsAccountsApiResource savingsAccountsApiResource) {
+        this.savingsAccountsApiResource = savingsAccountsApiResource;
     }
 }

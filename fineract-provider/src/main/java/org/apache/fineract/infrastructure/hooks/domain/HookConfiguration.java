@@ -23,30 +23,18 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "m_hook_configuration")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class HookConfiguration extends AbstractPersistableCustom<Long> {
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "hook_id", referencedColumnName = "id", nullable = false)
     private Hook hook;
-
     @Column(name = "field_type", nullable = false, length = 20)
     private String fieldType;
-
     @Column(name = "field_name", nullable = false, length = 100)
     private String fieldName;
-
     @Column(name = "field_value", nullable = false, length = 100)
     private String fieldValue;
 
@@ -58,4 +46,63 @@ public class HookConfiguration extends AbstractPersistableCustom<Long> {
         return new HookConfiguration().setHook(hook).setFieldType(fieldType).setFieldName(fieldName).setFieldValue(fieldValue);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Hook getHook() {
+        return this.hook;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getFieldType() {
+        return this.fieldType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getFieldName() {
+        return this.fieldName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getFieldValue() {
+        return this.fieldValue;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookConfiguration setHook(final Hook hook) {
+        this.hook = hook;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookConfiguration setFieldType(final String fieldType) {
+        this.fieldType = fieldType;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookConfiguration setFieldName(final String fieldName) {
+        this.fieldName = fieldName;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookConfiguration setFieldValue(final String fieldValue) {
+        this.fieldValue = fieldValue;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public HookConfiguration() {
+    }
 }

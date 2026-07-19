@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "SAVINGSACCOUNT", action = "BLOCKCREDIT")
-@RequiredArgsConstructor
 public class BlockCreditsToSavingsAccountCommandHandler implements NewCommandSourceHandler {
-
     private final SavingsAccountWritePlatformService writePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class BlockCreditsToSavingsAccountCommandHandler implements NewCommandSou
         return this.writePlatformService.blockCredits(command.getSavingsId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public BlockCreditsToSavingsAccountCommandHandler(final SavingsAccountWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
+    }
 }

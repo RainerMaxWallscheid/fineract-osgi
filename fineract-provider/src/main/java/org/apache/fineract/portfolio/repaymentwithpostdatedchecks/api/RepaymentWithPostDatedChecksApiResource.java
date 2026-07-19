@@ -37,7 +37,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -52,9 +51,7 @@ import org.springframework.stereotype.Component;
 @Path("/v1/loans/{loanId}/postdatedchecks")
 @Component
 @Tag(name = "repayment with post dated checks", description = "Repay with post dated checks")
-@RequiredArgsConstructor
 public class RepaymentWithPostDatedChecksApiResource {
-
     private final PlatformSecurityContext context;
     private final FromJsonHelper fromJsonHelper;
     private final DefaultToApiJsonSerializer<PostDatedChecksData> apiJsonSerializer;
@@ -62,70 +59,61 @@ public class RepaymentWithPostDatedChecksApiResource {
     private final RepaymentWithPostDatedChecksReadPlatformService repaymentWithPostDatedChecksReadPlatformService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Get All Post Dated Checks", description = "Get All Post dated Checks")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostDatedChecksApiResourceSwagger.GetPostDatedChecks.class)))) })
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostDatedChecksApiResourceSwagger.GetPostDatedChecks.class))))})
     public String getPostDatedChecks(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
         this.context.authenticatedUser();
-        final List<PostDatedChecksData> postDatedChecksDataList = this.repaymentWithPostDatedChecksReadPlatformService
-                .getPostDatedChecks(loanId);
+        final List<PostDatedChecksData> postDatedChecksDataList = this.repaymentWithPostDatedChecksReadPlatformService.getPostDatedChecks(loanId);
         return this.apiJsonSerializer.serialize(postDatedChecksDataList);
     }
 
     @GET
     @Path("{installmentId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Get Post Dated Check", description = "Get Post Dated Check")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostDatedChecksApiResourceSwagger.GetPostDatedChecks.class)))) })
-    public String getPostDatedCheck(@PathParam("installmentId") @Parameter(description = "installmentId") final Integer installmentId,
-            @PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostDatedChecksApiResourceSwagger.GetPostDatedChecks.class))))})
+    public String getPostDatedCheck(@PathParam("installmentId") @Parameter(description = "installmentId") final Integer installmentId, @PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
         this.context.authenticatedUser();
-        final PostDatedChecksData postDatedChecksData = this.repaymentWithPostDatedChecksReadPlatformService
-                .getPostDatedCheckByInstallmentId(installmentId, loanId);
+        final PostDatedChecksData postDatedChecksData = this.repaymentWithPostDatedChecksReadPlatformService.getPostDatedCheckByInstallmentId(installmentId, loanId);
         return this.apiJsonSerializer.serialize(postDatedChecksData);
     }
 
     @PUT
     @Path("{postDatedCheckId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update Post Dated Check, Bounced Check", description = "Update Post Dated Check, Bounced Check")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = PostDatedChecksApiResourceSwagger.UpdatePostDatedCheckRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostDatedChecksApiResourceSwagger.UpdatePostDatedCheckResponse.class)))) })
-    public String updatePostDatedChecks(@PathParam("postDatedCheckId") @Parameter(description = "postDatedCheckId") final Long id,
-            @PathParam("loanId") @Parameter(description = "loanId") final Long loanId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson,
-            @QueryParam("editType") @Parameter(description = "editType") final String type) {
-
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostDatedChecksApiResourceSwagger.UpdatePostDatedCheckResponse.class))))})
+    public String updatePostDatedChecks(@PathParam("postDatedCheckId") @Parameter(description = "postDatedCheckId") final Long id, @PathParam("loanId") @Parameter(description = "loanId") final Long loanId, @Parameter(hidden = true) final String apiRequestBodyAsJson, @QueryParam("editType") @Parameter(description = "editType") final String type) {
         CommandWrapper commandRequest = null;
-
         if ("update".equals(type)) {
             commandRequest = new CommandWrapperBuilder().updatePostDatedCheck(id, loanId).withJson(apiRequestBodyAsJson).build();
         } else if ("bounced".equals(type)) {
             commandRequest = new CommandWrapperBuilder().bouncedCheck(id, loanId).withJson(apiRequestBodyAsJson).build();
         }
-
         final CommandProcessingResult commandProcessingResult = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.apiJsonSerializer.serialize(commandProcessingResult);
     }
 
     @DELETE
     @Path("{postDatedCheckId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete Post Dated Check", description = "Delete Post Dated Check")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostDatedChecksApiResourceSwagger.DeletePostDatedCheck.class)))) })
-    public String deletePostDatedCheck(@PathParam("postDatedCheckId") @Parameter(description = "postDatedCheckId") final Long id,
-            @PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostDatedChecksApiResourceSwagger.DeletePostDatedCheck.class))))})
+    public String deletePostDatedCheck(@PathParam("postDatedCheckId") @Parameter(description = "postDatedCheckId") final Long id, @PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deletePostDatedCheck(id, loanId).build();
-
         final CommandProcessingResult commandProcessingResult = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.apiJsonSerializer.serialize(commandProcessingResult);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public RepaymentWithPostDatedChecksApiResource(final PlatformSecurityContext context, final FromJsonHelper fromJsonHelper, final DefaultToApiJsonSerializer<PostDatedChecksData> apiJsonSerializer, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final RepaymentWithPostDatedChecksReadPlatformService repaymentWithPostDatedChecksReadPlatformService) {
+        this.context = context;
+        this.fromJsonHelper = fromJsonHelper;
+        this.apiJsonSerializer = apiJsonSerializer;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.repaymentWithPostDatedChecksReadPlatformService = repaymentWithPostDatedChecksReadPlatformService;
+    }
 }

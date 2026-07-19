@@ -18,17 +18,14 @@
  */
 package org.apache.fineract.infrastructure.campaigns.sms.constants;
 
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
-@Getter
 public enum SmsCampaignTriggerType {
-
-    INVALID(-1, "triggerType.invalid"), //
-    DIRECT(1, "triggerType.direct"), //
-    SCHEDULE(2, "triggerType.schedule"), //
-    TRIGGERED(3, "triggerType.triggered"); //
-
+    INVALID(-1, "triggerType.invalid"),  //
+    DIRECT(1, "triggerType.direct"),  //
+    SCHEDULE(2, "triggerType.schedule"),  //
+    TRIGGERED(3, "triggerType.triggered");
+    //
     private final Integer value;
     private final String code;
 
@@ -41,7 +38,6 @@ public enum SmsCampaignTriggerType {
         if (v == null) {
             return INVALID;
         }
-
         return switch (v) {
             case 1 -> DIRECT;
             case 2 -> SCHEDULE;
@@ -63,4 +59,13 @@ public enum SmsCampaignTriggerType {
         };
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
 }

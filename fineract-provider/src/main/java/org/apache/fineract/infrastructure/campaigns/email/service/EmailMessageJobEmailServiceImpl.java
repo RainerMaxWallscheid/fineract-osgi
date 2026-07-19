@@ -23,7 +23,6 @@ import jakarta.mail.internet.MimeMessage;
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.campaigns.email.data.EmailMessageWithAttachmentData;
 import org.apache.fineract.infrastructure.configuration.data.SMTPCredentialsData;
 import org.apache.fineract.infrastructure.configuration.service.ExternalServicesPropertiesReadPlatformService;
@@ -34,9 +33,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public final class EmailMessageJobEmailServiceImpl implements EmailMessageJobEmailService {
-
     private static final Logger LOG = LoggerFactory.getLogger(EmailMessageJobEmailServiceImpl.class);
     private final ExternalServicesPropertiesReadPlatformService externalServicesReadPlatformService;
 
@@ -49,14 +46,10 @@ public final class EmailMessageJobEmailServiceImpl implements EmailMessageJobEma
             javaMailSenderImpl.setPort(Integer.parseInt(smtpCredentialsData.getPort()));
             javaMailSenderImpl.setUsername(smtpCredentialsData.getUsername());
             javaMailSenderImpl.setPassword(smtpCredentialsData.getPassword());
-            javaMailSenderImpl
-                    .setJavaMailProperties(this.getJavaMailProperties(smtpCredentialsData, javaMailSenderImpl.getJavaMailProperties()));
-
+            javaMailSenderImpl.setJavaMailProperties(this.getJavaMailProperties(smtpCredentialsData, javaMailSenderImpl.getJavaMailProperties()));
             MimeMessage mimeMessage = javaMailSenderImpl.createMimeMessage();
-
             // use the true flag to indicate you need a multipart message
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-
             mimeMessageHelper.setFrom(smtpCredentialsData.getFromEmail());
             mimeMessageHelper.setTo(emailMessageWithAttachmentData.getTo());
             mimeMessageHelper.setText(emailMessageWithAttachmentData.getText(), true);
@@ -69,13 +62,10 @@ public final class EmailMessageJobEmailServiceImpl implements EmailMessageJobEma
                     }
                 }
             }
-
             javaMailSenderImpl.send(mimeMessage);
-
         } catch (MessagingException e) {
             LOG.error("Could not send emai Problem occurred in sendEmailWithAttachment function", e);
         }
-
     }
 
     private Properties getJavaMailProperties(SMTPCredentialsData smtpCredentialsData, Properties properties) {
@@ -91,5 +81,10 @@ public final class EmailMessageJobEmailServiceImpl implements EmailMessageJobEma
             }
         }
         return properties;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EmailMessageJobEmailServiceImpl(final ExternalServicesPropertiesReadPlatformService externalServicesReadPlatformService) {
+        this.externalServicesReadPlatformService = externalServicesReadPlatformService;
     }
 }

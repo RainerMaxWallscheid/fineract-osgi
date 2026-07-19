@@ -24,7 +24,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
@@ -47,30 +46,24 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-@RequiredArgsConstructor
 public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService {
-
     private final JdbcTemplate jdbcTemplate;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
     private final PlatformSecurityContext context;
     private final CurrencyReadPlatformService currencyReadPlatformService;
     private final InputValidator inputValidator;
-
     private final OfficeRepository officeRepository;
     private final OfficeDataMapper officeDataMapper;
-    private static final String nameDecoratedBaseOnHierarchy = "concat(substring('........................................', 1, ((LENGTH(o.hierarchy) - LENGTH(REPLACE(o.hierarchy, '.', '')) - 1) * 4)), o.name)";
+    private static final String nameDecoratedBaseOnHierarchy = "concat(substring(\'........................................\', 1, ((LENGTH(o.hierarchy) - LENGTH(REPLACE(o.hierarchy, \'.\', \'\')) - 1) * 4)), o.name)";
+
 
     private static final class OfficeMapper implements RowMapper<OfficeData> {
-
         public String officeSchema() {
-            return " o.id as id, o.name as name, " + nameDecoratedBaseOnHierarchy
-                    + " as nameDecorated, o.external_id as externalId, o.opening_date as openingDate, o.hierarchy as hierarchy, parent.id as parentId, parent.name as parentName "
-                    + "from m_office o LEFT JOIN m_office AS parent ON parent.id = o.parent_id ";
+            return " o.id as id, o.name as name, " + nameDecoratedBaseOnHierarchy + " as nameDecorated, o.external_id as externalId, o.opening_date as openingDate, o.hierarchy as hierarchy, parent.id as parentId, parent.name as parentName " + "from m_office o LEFT JOIN m_office AS parent ON parent.id = o.parent_id ";
         }
 
         @Override
         public OfficeData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-
             final Long id = rs.getLong("id");
             final String name = rs.getString("name");
             final String nameDecorated = rs.getString("nameDecorated");
@@ -79,31 +72,27 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
             final String hierarchy = rs.getString("hierarchy");
             final Long parentId = JdbcSupport.getLong(rs, "parentId");
             final String parentName = rs.getString("parentName");
-
-            return new OfficeData(id, name, nameDecorated, ExternalIdFactory.produce(externalId), openingDate, hierarchy, parentId,
-                    parentName, null);
+            return new OfficeData(id, name, nameDecorated, ExternalIdFactory.produce(externalId), openingDate, hierarchy, parentId, parentName, null);
         }
     }
 
-    private static final class OfficeDropdownMapper implements RowMapper<OfficeData> {
 
+    private static final class OfficeDropdownMapper implements RowMapper<OfficeData> {
         public String schema() {
             return " o.id as id, " + nameDecoratedBaseOnHierarchy + " as nameDecorated, o.name as name from m_office o ";
         }
 
         @Override
         public OfficeData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-
             final Long id = rs.getLong("id");
             final String name = rs.getString("name");
             final String nameDecorated = rs.getString("nameDecorated");
-
             return OfficeData.dropdown(id, name, nameDecorated);
         }
     }
 
-    private static final class OfficeTransactionMapper implements RowMapper<OfficeTransactionData> {
 
+    private static final class OfficeTransactionMapper implements RowMapper<OfficeTransactionData> {
         private final DatabaseSpecificSQLGenerator sqlGenerator;
 
         OfficeTransactionMapper(DatabaseSpecificSQLGenerator sqlGenerator) {
@@ -111,45 +100,32 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
         }
 
         public String schema() {
-            return " ot.id as id, ot.transaction_date as transactionDate, ot.from_office_id as fromOfficeId, fromoff.name as fromOfficeName, "
-                    + " ot.to_office_id as toOfficeId, tooff.name as toOfficeName, ot.transaction_amount as transactionAmount, ot.description as description, "
-                    + " ot.currency_code as currencyCode, rc.decimal_places as currencyDigits, rc.currency_multiplesof as inMultiplesOf, "
-                    + " rc.name as currencyName, rc.internationalized_name_code as currencyNameCode, rc.display_symbol as currencyDisplaySymbol "
-                    + " from m_office_transaction ot " + " left join m_office fromoff on fromoff.id = ot.from_office_id "
-                    + " left join m_office tooff on tooff.id = ot.to_office_id " + " join m_currency rc on rc."
-                    + sqlGenerator.escape("code") + " = ot.currency_code";
+            return " ot.id as id, ot.transaction_date as transactionDate, ot.from_office_id as fromOfficeId, fromoff.name as fromOfficeName, " + " ot.to_office_id as toOfficeId, tooff.name as toOfficeName, ot.transaction_amount as transactionAmount, ot.description as description, " + " ot.currency_code as currencyCode, rc.decimal_places as currencyDigits, rc.currency_multiplesof as inMultiplesOf, " + " rc.name as currencyName, rc.internationalized_name_code as currencyNameCode, rc.display_symbol as currencyDisplaySymbol " + " from m_office_transaction ot " + " left join m_office fromoff on fromoff.id = ot.from_office_id " + " left join m_office tooff on tooff.id = ot.to_office_id " + " join m_currency rc on rc." + sqlGenerator.escape("code") + " = ot.currency_code";
         }
 
         @Override
         public OfficeTransactionData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-
             final Long id = rs.getLong("id");
             final LocalDate transactionDate = JdbcSupport.getLocalDate(rs, "transactionDate");
             final Long fromOfficeId = JdbcSupport.getLong(rs, "fromOfficeId");
             final String fromOfficeName = rs.getString("fromOfficeName");
             final Long toOfficeId = JdbcSupport.getLong(rs, "toOfficeId");
             final String toOfficeName = rs.getString("toOfficeName");
-
             final String currencyCode = rs.getString("currencyCode");
             final String currencyName = rs.getString("currencyName");
             final String currencyNameCode = rs.getString("currencyNameCode");
             final String currencyDisplaySymbol = rs.getString("currencyDisplaySymbol");
             final Integer currencyDigits = JdbcSupport.getInteger(rs, "currencyDigits");
             final Integer inMultiplesOf = JdbcSupport.getInteger(rs, "inMultiplesOf");
-
-            final CurrencyData currencyData = new CurrencyData(currencyCode, currencyName, currencyDigits, inMultiplesOf,
-                    currencyDisplaySymbol, currencyNameCode);
-
+            final CurrencyData currencyData = new CurrencyData(currencyCode, currencyName, currencyDigits, inMultiplesOf, currencyDisplaySymbol, currencyNameCode);
             final BigDecimal transactionAmount = rs.getBigDecimal("transactionAmount");
             final String description = rs.getString("description");
-
-            return OfficeTransactionData.instance(id, transactionDate, fromOfficeId, fromOfficeName, toOfficeId, toOfficeName, currencyData,
-                    transactionAmount, description);
+            return OfficeTransactionData.instance(id, transactionDate, fromOfficeId, fromOfficeName, toOfficeId, toOfficeName, currencyData, transactionAmount, description);
         }
     }
 
     @Override
-    @Cacheable(value = "offices", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+'of')")
+    @Cacheable(value = "offices", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'of\')")
     public Collection<OfficeData> retrieveAllOffices(final boolean includeAllOffices, final SearchParameters searchParameters) {
         final AppUser currentUser = this.context.authenticatedUser();
         final String hierarchy = currentUser.getOffice().getHierarchy();
@@ -167,7 +143,7 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
                 if (searchParameters.hasSortOrder()) {
                     String sortOrder = searchParameters.getSortOrder();
                     if (!"ASC".equalsIgnoreCase(sortOrder) && !"DESC".equalsIgnoreCase(sortOrder)) {
-                        throw new InputValidationException(String.format("invalid sortOrder value '%s'", sortOrder));
+                        throw new InputValidationException(String.format("invalid sortOrder value \'%s\'", sortOrder));
                     }
                     sqlBuilder.append(' ').append(sortOrder);
                 }
@@ -175,36 +151,28 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
                 sqlBuilder.append("order by o.hierarchy");
             }
         }
-
-        return this.jdbcTemplate.query(sqlBuilder.toString(), rm, new Object[] { hierarchySearchString }); // NOSONAR
+        return this.jdbcTemplate.query(sqlBuilder.toString(), rm, new Object[] {hierarchySearchString}); // NOSONAR
     }
 
     @Override
-    @Cacheable(value = "officesForDropdown", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+'ofd')")
+    @Cacheable(value = "officesForDropdown", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'ofd\')")
     public Collection<OfficeData> retrieveAllOfficesForDropdown() {
         final AppUser currentUser = this.context.authenticatedUser();
-
         final String hierarchy = currentUser.getOffice().getHierarchy();
         final String hierarchySearchString = hierarchy + "%";
-
         final OfficeDropdownMapper rm = new OfficeDropdownMapper();
         final String sql = "select " + rm.schema() + "where o.hierarchy like ? order by o.hierarchy";
-
-        return this.jdbcTemplate.query(sql, rm, new Object[] { hierarchySearchString }); // NOSONAR
+        return this.jdbcTemplate.query(sql, rm, new Object[] {hierarchySearchString}); // NOSONAR
     }
 
     @Override
     @Cacheable(value = "officesById", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#officeId)")
     public OfficeData retrieveOffice(final Long officeId) {
-
         try {
             this.context.authenticatedUser();
-
             final OfficeMapper rm = new OfficeMapper();
             final String sql = "select " + rm.officeSchema() + " where o.id = ?";
-
-            final OfficeData selectedOffice = this.jdbcTemplate.queryForObject(sql, rm, new Object[] { officeId }); // NOSONAR
-
+            final OfficeData selectedOffice = this.jdbcTemplate.queryForObject(sql, rm, new Object[] {officeId}); // NOSONAR
             return selectedOffice;
         } catch (final EmptyResultDataAccessException e) {
             throw new OfficeNotFoundException(officeId, e);
@@ -214,34 +182,27 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
     @Override
     public OfficeData retrieveOfficeWithExternalId(ExternalId externalId) {
         this.context.authenticatedUser();
-        return officeRepository.findByExternalId(externalId).map(officeDataMapper::toOfficeData)
-                .orElseThrow(() -> new OfficeNotFoundException(externalId));
+        return officeRepository.findByExternalId(externalId).map(officeDataMapper::toOfficeData).orElseThrow(() -> new OfficeNotFoundException(externalId));
     }
 
     @Override
     public OfficeData retrieveNewOfficeTemplate() {
-
         this.context.authenticatedUser();
-
         return OfficeData.template(null, LocalDate.now(DateUtils.getDateTimeZoneOfTenant()));
     }
 
     @Override
     public Collection<OfficeData> retrieveAllowedParents(final Long officeId) {
-
         this.context.authenticatedUser();
         final Collection<OfficeData> filterParentLookups = new ArrayList<>();
-
         if (isNotHeadOffice(officeId)) {
             final Collection<OfficeData> parentLookups = retrieveAllOfficesForDropdown();
-
             for (final OfficeData office : parentLookups) {
                 if (!office.hasIdentifyOf(officeId)) {
                     filterParentLookups.add(office);
                 }
             }
         }
-
         return filterParentLookups;
     }
 
@@ -251,30 +212,34 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
 
     @Override
     public Collection<OfficeTransactionData> retrieveAllOfficeTransactions() {
-
         final AppUser currentUser = this.context.authenticatedUser();
-
         final String hierarchy = currentUser.getOffice().getHierarchy();
         final String hierarchySearchString = hierarchy + "%";
-
         final OfficeTransactionMapper rm = new OfficeTransactionMapper(sqlGenerator);
-        final String sql = "select " + rm.schema()
-                + " where (fromoff.hierarchy like ? or tooff.hierarchy like ?) order by ot.transaction_date, ot.id";
-
-        return this.jdbcTemplate.query(sql, rm, new Object[] { hierarchySearchString, hierarchySearchString }); // NOSONAR
+        final String sql = "select " + rm.schema() + " where (fromoff.hierarchy like ? or tooff.hierarchy like ?) order by ot.transaction_date, ot.id";
+        return this.jdbcTemplate.query(sql, rm, new Object[] {hierarchySearchString, hierarchySearchString}); // NOSONAR
     }
 
     @Override
     public OfficeTransactionData retrieveNewOfficeTransactionDetails() {
         this.context.authenticatedUser();
-
         final Collection<OfficeData> parentLookups = retrieveAllOfficesForDropdown();
         final Collection<CurrencyData> currencyOptions = this.currencyReadPlatformService.retrieveAllowedCurrencies();
-
         return OfficeTransactionData.template(LocalDate.now(DateUtils.getDateTimeZoneOfTenant()), parentLookups, currencyOptions);
     }
 
     public PlatformSecurityContext getContext() {
         return this.context;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OfficeReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final DatabaseSpecificSQLGenerator sqlGenerator, final PlatformSecurityContext context, final CurrencyReadPlatformService currencyReadPlatformService, final InputValidator inputValidator, final OfficeRepository officeRepository, final OfficeDataMapper officeDataMapper) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.sqlGenerator = sqlGenerator;
+        this.context = context;
+        this.currencyReadPlatformService = currencyReadPlatformService;
+        this.inputValidator = inputValidator;
+        this.officeRepository = officeRepository;
+        this.officeDataMapper = officeDataMapper;
     }
 }

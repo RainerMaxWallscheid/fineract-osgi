@@ -19,20 +19,16 @@
 package org.apache.fineract.portfolio.savings.data;
 
 import java.io.Serializable;
-import lombok.Getter;
 import org.apache.fineract.portfolio.TransactionEntryType;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
 
 /**
  * Immutable data object represent savings account transaction type enumerations.
  */
-@Getter
 public class SavingsAccountTransactionEnumData implements Serializable {
-
     private final Long id;
     private final String code;
     private final String value;
-
     private final boolean deposit;
     private final boolean dividendPayout;
     private final boolean withdrawal;
@@ -61,9 +57,7 @@ public class SavingsAccountTransactionEnumData implements Serializable {
         this.accrual = transactionType == SavingsAccountTransactionType.ACCRUAL;
         this.withdrawal = transactionType == SavingsAccountTransactionType.WITHDRAWAL;
         this.interestPosting = transactionType == SavingsAccountTransactionType.INTEREST_POSTING;
-        this.feeDeduction = transactionType == SavingsAccountTransactionType.ANNUAL_FEE
-                || transactionType == SavingsAccountTransactionType.WITHDRAWAL_FEE
-                || transactionType == SavingsAccountTransactionType.PAY_CHARGE;
+        this.feeDeduction = transactionType == SavingsAccountTransactionType.ANNUAL_FEE || transactionType == SavingsAccountTransactionType.WITHDRAWAL_FEE || transactionType == SavingsAccountTransactionType.PAY_CHARGE;
         this.initiateTransfer = transactionType == SavingsAccountTransactionType.INITIATE_TRANSFER;
         this.approveTransfer = transactionType == SavingsAccountTransactionType.APPROVE_TRANSFER;
         this.withdrawTransfer = transactionType == SavingsAccountTransactionType.WITHDRAW_TRANSFER;
@@ -122,5 +116,105 @@ public class SavingsAccountTransactionEnumData implements Serializable {
 
     public SavingsAccountTransactionType getTransactionTypeEnum() {
         return id == null ? null : SavingsAccountTransactionType.fromInt(id.intValue());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isDeposit() {
+        return this.deposit;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isDividendPayout() {
+        return this.dividendPayout;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isWithdrawal() {
+        return this.withdrawal;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isInterestPosting() {
+        return this.interestPosting;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isFeeDeduction() {
+        return this.feeDeduction;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isInitiateTransfer() {
+        return this.initiateTransfer;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isApproveTransfer() {
+        return this.approveTransfer;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isWithdrawTransfer() {
+        return this.withdrawTransfer;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isRejectTransfer() {
+        return this.rejectTransfer;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isOverdraftInterest() {
+        return this.overdraftInterest;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isWrittenoff() {
+        return this.writtenoff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isOverdraftFee() {
+        return this.overdraftFee;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isWithholdTax() {
+        return this.withholdTax;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isEscheat() {
+        return this.escheat;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isAmountHold() {
+        return this.amountHold;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isAmountRelease() {
+        return this.amountRelease;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isAccrual() {
+        return this.accrual;
     }
 }

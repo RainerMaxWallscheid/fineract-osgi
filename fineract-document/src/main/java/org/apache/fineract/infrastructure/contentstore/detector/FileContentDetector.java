@@ -19,26 +19,27 @@
 package org.apache.fineract.infrastructure.contentstore.detector;
 
 import java.nio.file.Files;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.fineract.infrastructure.contentstore.exception.ContentDetectorException;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public final class FileContentDetector implements ContentDetector {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FileContentDetector.class);
 
     @Override
     public ContentDetectorContext detect(ContentDetectorContext ctx) {
         try {
             final var mimeType = Files.probeContentType(java.nio.file.Path.of(ctx.getFileName()));
             final var format = FilenameUtils.getExtension(ctx.getFileName());
-
             return ctx.clone(mimeType, "." + format, format);
         } catch (Exception e) {
             throw new ContentDetectorException(e);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FileContentDetector() {
     }
 }

@@ -25,8 +25,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
@@ -34,41 +32,28 @@ import org.apache.fineract.organisation.monetary.domain.Money;
 
 @Entity
 @Table(name = "m_loan_transaction_repayment_schedule_mapping")
-@Getter
 public class LoanTransactionToRepaymentScheduleMapping extends AbstractPersistableCustom<Long> {
-
-    @Setter
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "loan_transaction_id", nullable = false)
     private LoanTransaction loanTransaction;
-
-    @Setter
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "loan_repayment_schedule_id", nullable = false)
     private LoanRepaymentScheduleInstallment installment;
-
     @Column(name = "principal_portion_derived", scale = 6, precision = 19, nullable = true)
     private BigDecimal principalPortion;
-
     @Column(name = "interest_portion_derived", scale = 6, precision = 19, nullable = true)
     private BigDecimal interestPortion;
-
     @Column(name = "fee_charges_portion_derived", scale = 6, precision = 19, nullable = true)
     private BigDecimal feeChargesPortion;
-
     @Column(name = "penalty_charges_portion_derived", scale = 6, precision = 19, nullable = true)
     private BigDecimal penaltyChargesPortion;
-
     @Column(name = "amount", scale = 6, precision = 19)
     private BigDecimal amount;
 
     protected LoanTransactionToRepaymentScheduleMapping() {
-
     }
 
-    private LoanTransactionToRepaymentScheduleMapping(final LoanTransaction loanTransaction,
-            final LoanRepaymentScheduleInstallment installment, final BigDecimal principalPortion, final BigDecimal interestPortion,
-            final BigDecimal feeChargesPortion, final BigDecimal penaltyChargesPortion, final BigDecimal amount) {
+    private LoanTransactionToRepaymentScheduleMapping(final LoanTransaction loanTransaction, final LoanRepaymentScheduleInstallment installment, final BigDecimal principalPortion, final BigDecimal interestPortion, final BigDecimal feeChargesPortion, final BigDecimal penaltyChargesPortion, final BigDecimal amount) {
         this.loanTransaction = loanTransaction;
         this.installment = installment;
         this.principalPortion = principalPortion;
@@ -78,12 +63,8 @@ public class LoanTransactionToRepaymentScheduleMapping extends AbstractPersistab
         this.amount = amount;
     }
 
-    public static LoanTransactionToRepaymentScheduleMapping createFrom(final LoanTransaction loanTransaction,
-            final LoanRepaymentScheduleInstallment installment, final Money principalPortion, final Money interestPortion,
-            final Money feeChargesPortion, final Money penaltyChargesPortion) {
-        return new LoanTransactionToRepaymentScheduleMapping(loanTransaction, installment, defaultToNullIfZero(principalPortion),
-                defaultToNullIfZero(interestPortion), defaultToNullIfZero(feeChargesPortion), defaultToNullIfZero(penaltyChargesPortion),
-                defaultToNullIfZero(MathUtil.plus(principalPortion, interestPortion, feeChargesPortion, penaltyChargesPortion)));
+    public static LoanTransactionToRepaymentScheduleMapping createFrom(final LoanTransaction loanTransaction, final LoanRepaymentScheduleInstallment installment, final Money principalPortion, final Money interestPortion, final Money feeChargesPortion, final Money penaltyChargesPortion) {
+        return new LoanTransactionToRepaymentScheduleMapping(loanTransaction, installment, defaultToNullIfZero(principalPortion), defaultToNullIfZero(interestPortion), defaultToNullIfZero(feeChargesPortion), defaultToNullIfZero(penaltyChargesPortion), defaultToNullIfZero(MathUtil.plus(principalPortion, interestPortion, feeChargesPortion, penaltyChargesPortion)));
     }
 
     private static BigDecimal defaultToNullIfZero(final Money value) {
@@ -95,12 +76,10 @@ public class LoanTransactionToRepaymentScheduleMapping extends AbstractPersistab
     }
 
     public void updateComponents(Money principal, Money interest, Money feeCharges, Money penaltyCharges) {
-        updateComponents(MathUtil.toBigDecimal(principal), MathUtil.toBigDecimal(interest), MathUtil.toBigDecimal(feeCharges),
-                MathUtil.toBigDecimal(penaltyCharges));
+        updateComponents(MathUtil.toBigDecimal(principal), MathUtil.toBigDecimal(interest), MathUtil.toBigDecimal(feeCharges), MathUtil.toBigDecimal(penaltyCharges));
     }
 
-    void updateComponents(final BigDecimal principal, final BigDecimal interest, final BigDecimal feeCharges,
-            final BigDecimal penaltyCharges) {
+    void updateComponents(final BigDecimal principal, final BigDecimal interest, final BigDecimal feeCharges, final BigDecimal penaltyCharges) {
         this.principalPortion = MathUtil.zeroToNull(MathUtil.add(getPrincipalPortion(), principal));
         this.interestPortion = MathUtil.zeroToNull(MathUtil.add(getInterestPortion(), interest));
         updateChargesComponents(feeCharges, penaltyCharges);
@@ -111,8 +90,7 @@ public class LoanTransactionToRepaymentScheduleMapping extends AbstractPersistab
         this.amount = MathUtil.add(getPrincipalPortion(), getInterestPortion(), getFeeChargesPortion(), getPenaltyChargesPortion());
     }
 
-    public void setComponents(final BigDecimal principal, final BigDecimal interest, final BigDecimal feeCharges,
-            final BigDecimal penaltyCharges) {
+    public void setComponents(final BigDecimal principal, final BigDecimal interest, final BigDecimal feeCharges, final BigDecimal penaltyCharges) {
         this.principalPortion = principal;
         this.interestPortion = interest;
         this.feeChargesPortion = feeCharges;
@@ -145,4 +123,48 @@ public class LoanTransactionToRepaymentScheduleMapping extends AbstractPersistab
         return this.amount == null || this.amount.compareTo(BigDecimal.ZERO) == 0;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanTransaction getLoanTransaction() {
+        return this.loanTransaction;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanRepaymentScheduleInstallment getInstallment() {
+        return this.installment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPrincipalPortion() {
+        return this.principalPortion;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getInterestPortion() {
+        return this.interestPortion;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getFeeChargesPortion() {
+        return this.feeChargesPortion;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPenaltyChargesPortion() {
+        return this.penaltyChargesPortion;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanTransaction(final LoanTransaction loanTransaction) {
+        this.loanTransaction = loanTransaction;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setInstallment(final LoanRepaymentScheduleInstallment installment) {
+        this.installment = installment;
+    }
 }

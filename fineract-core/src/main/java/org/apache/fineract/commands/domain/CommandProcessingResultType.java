@@ -22,23 +22,15 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor
 public enum CommandProcessingResultType {
-
-    INVALID(0, "commandProcessingResultType.invalid"), //
-    PROCESSED(1, "commandProcessingResultType.processed"), //
-    AWAITING_APPROVAL(2, "commandProcessingResultType.awaiting.approval"), //
-    REJECTED(3, "commandProcessingResultType.rejected"), //
-    UNDER_PROCESSING(4, "commandProcessingResultType.underProcessing"), //
+    INVALID(0, "commandProcessingResultType.invalid"),  //
+    PROCESSED(1, "commandProcessingResultType.processed"),  //
+    AWAITING_APPROVAL(2, "commandProcessingResultType.awaiting.approval"),  //
+    REJECTED(3, "commandProcessingResultType.rejected"),  //
+    UNDER_PROCESSING(4, "commandProcessingResultType.underProcessing"),  //
     ERROR(5, "commandProcessingResultType.error");
-
-    private static final Map<Integer, CommandProcessingResultType> BY_ID = Arrays.stream(values())
-            .collect(Collectors.toMap(CommandProcessingResultType::getValue, v -> v));
-
+    private static final Map<Integer, CommandProcessingResultType> BY_ID = Arrays.stream(values()).collect(Collectors.toMap(CommandProcessingResultType::getValue, v -> v));
     private final Integer value;
     private final String code;
 
@@ -58,5 +50,21 @@ public enum CommandProcessingResultType {
 
     public boolean isRejected() {
         return this == REJECTED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private CommandProcessingResultType(final Integer value, final String code) {
+        this.value = value;
+        this.code = code;
     }
 }

@@ -20,33 +20,29 @@ package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductVariableInstallmentConfig;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class LoanProductVariableInstallmentConfigUpdateUtil {
-
     public Map<? extends String, ?> update(LoanProductVariableInstallmentConfig loanProductVariableInstallmentConfig, JsonCommand command) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>(3);
-
-        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.minimumGapBetweenInstallments,
-                loanProductVariableInstallmentConfig.getMinimumGap())) {
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.minimumGapBetweenInstallments, loanProductVariableInstallmentConfig.getMinimumGap())) {
             final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.minimumGapBetweenInstallments);
             actualChanges.put(LoanProductConstants.minimumGapBetweenInstallments, newValue);
             loanProductVariableInstallmentConfig.setMinimumGap(newValue);
         }
-
-        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.maximumGapBetweenInstallments,
-                loanProductVariableInstallmentConfig.getMaximumGap())) {
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.maximumGapBetweenInstallments, loanProductVariableInstallmentConfig.getMaximumGap())) {
             final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.maximumGapBetweenInstallments);
             actualChanges.put(LoanProductConstants.maximumGapBetweenInstallments, newValue);
             loanProductVariableInstallmentConfig.setMaximumGap(newValue);
         }
-
         return actualChanges;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanProductVariableInstallmentConfigUpdateUtil() {
     }
 }

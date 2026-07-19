@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.DataIntegrityErrorHandler;
@@ -31,23 +30,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN", action = "BUYDOWNFEE")
 public class AddBuyDownFeeCommandHandler implements NewCommandSourceHandler {
-
     private final BuyDownFeePlatformService buyDownFeePlatformService;
     private final DataIntegrityErrorHandler dataIntegrityErrorHandler;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         try {
             return this.buyDownFeePlatformService.makeLoanBuyDownFee(command.getLoanId(), command);
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.buy.down.fee",
-                    "Buy Down Fee");
+            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.buy.down.fee", "Buy Down Fee");
             return CommandProcessingResult.empty();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AddBuyDownFeeCommandHandler(final BuyDownFeePlatformService buyDownFeePlatformService, final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
+        this.buyDownFeePlatformService = buyDownFeePlatformService;
+        this.dataIntegrityErrorHandler = dataIntegrityErrorHandler;
     }
 }

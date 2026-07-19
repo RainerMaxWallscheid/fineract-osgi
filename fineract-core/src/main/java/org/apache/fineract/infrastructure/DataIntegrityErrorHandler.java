@@ -18,25 +18,22 @@
  */
 package org.apache.fineract.infrastructure;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.springframework.stereotype.Component;
 
 @Component
-@Slf4j
 public class DataIntegrityErrorHandler {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DataIntegrityErrorHandler.class);
 
-    public void handleDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final Exception dve, final String msgType,
-            final String msgDescription) {
+    public void handleDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final Exception dve, final String msgType, final String msgDescription) {
         if (realCause.getMessage().contains("external_id")) {
             final String externalId = command.stringValueOfParameterNamed("externalId");
-            throw new PlatformDataIntegrityException("error.msg." + msgType + ".duplicate.externalId",
-                    msgDescription + ": externalId `" + externalId + "` already exists", "externalId", externalId);
+            throw new PlatformDataIntegrityException("error.msg." + msgType + ".duplicate.externalId", msgDescription + ": externalId `" + externalId + "` already exists", "externalId", externalId);
         }
         log.error("Error occured.", dve);
-        throw ErrorHandler.getMappable(dve, "error.msg." + msgType + ".unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource: " + msgDescription);
+        throw ErrorHandler.getMappable(dve, "error.msg." + msgType + ".unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + msgDescription);
     }
 }

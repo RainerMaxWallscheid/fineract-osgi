@@ -20,19 +20,98 @@ package org.apache.fineract.portfolio.meeting.data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Builder
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class MeetingDeleteResponse implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private Long entityId;
+
+
+    @java.lang.SuppressWarnings("all")
+        public static class MeetingDeleteResponseBuilder {
+        @java.lang.SuppressWarnings("all")
+                private Long entityId;
+
+        @java.lang.SuppressWarnings("all")
+                MeetingDeleteResponseBuilder() {
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public MeetingDeleteResponse.MeetingDeleteResponseBuilder entityId(final Long entityId) {
+            this.entityId = entityId;
+            return this;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public MeetingDeleteResponse build() {
+            return new MeetingDeleteResponse(this.entityId);
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "MeetingDeleteResponse.MeetingDeleteResponseBuilder(entityId=" + this.entityId + ")";
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static MeetingDeleteResponse.MeetingDeleteResponseBuilder builder() {
+        return new MeetingDeleteResponse.MeetingDeleteResponseBuilder();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getEntityId() {
+        return this.entityId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setEntityId(final Long entityId) {
+        this.entityId = entityId;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof MeetingDeleteResponse)) return false;
+        final MeetingDeleteResponse other = (MeetingDeleteResponse) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$entityId = this.getEntityId();
+        final java.lang.Object other$entityId = other.getEntityId();
+        if (this$entityId == null ? other$entityId != null : !this$entityId.equals(other$entityId)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof MeetingDeleteResponse;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $entityId = this.getEntityId();
+        result = result * PRIME + ($entityId == null ? 43 : $entityId.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "MeetingDeleteResponse(entityId=" + this.getEntityId() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MeetingDeleteResponse() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MeetingDeleteResponse(final Long entityId) {
+        this.entityId = entityId;
+    }
 }

@@ -19,11 +19,9 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
@@ -36,9 +34,7 @@ import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class GetWorkingCapitalLoanTransactionByIdCommandStrategy implements CommandStrategy {
-
     private final WorkingCapitalLoanTransactionsApiResource workingCapitalLoanTransactionsApiResource;
     private final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer;
 
@@ -46,12 +42,9 @@ public class GetWorkingCapitalLoanTransactionByIdCommandStrategy implements Comm
     public BatchResponse execute(BatchRequest request, @SuppressWarnings("unused") UriInfo uriInfo) {
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final String relativeUrl = relativeUrlWithoutVersion(request);
-
         // Get the loan and transaction ids for use in loanTransactionsApiResource
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrl);
         final Long loanId = Long.parseLong(pathParameters.get(1));
@@ -61,13 +54,15 @@ public class GetWorkingCapitalLoanTransactionByIdCommandStrategy implements Comm
         } else {
             transactionId = Long.parseLong(pathParameters.get(3));
         }
-
-        final WorkingCapitalLoanTransactionData workingCapitalLoanTransactionData = workingCapitalLoanTransactionsApiResource
-                .retrieveTransactionByLoanIdAndTransactionId(loanId, transactionId);
-
+        final WorkingCapitalLoanTransactionData workingCapitalLoanTransactionData = workingCapitalLoanTransactionsApiResource.retrieveTransactionByLoanIdAndTransactionId(loanId, transactionId);
         response.setStatusCode(HttpStatus.SC_OK);
         response.setBody(toApiJsonSerializer.serialize(workingCapitalLoanTransactionData));
-
         return response;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GetWorkingCapitalLoanTransactionByIdCommandStrategy(final WorkingCapitalLoanTransactionsApiResource workingCapitalLoanTransactionsApiResource, final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer) {
+        this.workingCapitalLoanTransactionsApiResource = workingCapitalLoanTransactionsApiResource;
+        this.toApiJsonSerializer = toApiJsonSerializer;
     }
 }

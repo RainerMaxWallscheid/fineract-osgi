@@ -36,7 +36,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -52,21 +51,17 @@ import org.springframework.stereotype.Component;
 @Path("/v1/taxes/component")
 @Component
 @Tag(name = "Tax Components", description = "This defines the Tax Components")
-@RequiredArgsConstructor
 public class TaxComponentApiResource {
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "TAXCOMPONENT";
-
     private final PlatformSecurityContext context;
     private final TaxReadPlatformService readPlatformService;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final DefaultToApiJsonSerializer<String> toApiJsonSerializer;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "List Tax Components", operationId = "retrieveAllTaxComponents", description = "List Tax Components")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TaxComponentApiResourceSwagger.GetTaxesComponentsResponse.class)))) })
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TaxComponentApiResourceSwagger.GetTaxesComponentsResponse.class))))})
     public List<TaxComponentData> retrieveAllTaxComponents() {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveAllTaxComponents();
@@ -74,20 +69,18 @@ public class TaxComponentApiResource {
 
     @GET
     @Path("{taxComponentId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Tax Component", operationId = "retrieveOneTaxComponent", description = "Retrieve Tax Component")
     @AlternativeOperationId("retrieveTaxComponent")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TaxComponentApiResourceSwagger.GetTaxesComponentsResponse.class))) })
-    public TaxComponentData retrieveTaxComponent(
-            @PathParam("taxComponentId") @Parameter(description = "taxComponentId") final Long taxComponentId) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TaxComponentApiResourceSwagger.GetTaxesComponentsResponse.class)))})
+    public TaxComponentData retrieveTaxComponent(@PathParam("taxComponentId") @Parameter(description = "taxComponentId") final Long taxComponentId) {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveTaxComponentData(taxComponentId);
     }
 
     @GET
     @Path("template")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Tax Component Template", operationId = "retrieveTemplateTaxComponent")
     @AlternativeOperationId("retrieveTemplate_21")
     public TaxComponentData retrieveTemplate() {
@@ -96,35 +89,34 @@ public class TaxComponentApiResource {
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Create a new Tax Component", operationId = "createTaxComponent", description = "Creates a new Tax Component\n\n"
-            + "Mandatory Fields: name, percentage\n\n"
-            + "Optional Fields: debitAccountType, debitAccountId, creditAccountType, creditAccountId, startDate")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Create a new Tax Component", operationId = "createTaxComponent", description = "Creates a new Tax Component\n\n" + "Mandatory Fields: name, percentage\n\n" + "Optional Fields: debitAccountType, debitAccountId, creditAccountType, creditAccountId, startDate")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = TaxComponentApiResourceSwagger.PostTaxesComponentsRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TaxComponentApiResourceSwagger.PostTaxesComponentsResponse.class))) })
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TaxComponentApiResourceSwagger.PostTaxesComponentsResponse.class)))})
     public CommandProcessingResult createTaxComponent(@Parameter(hidden = true) TaxComponentRequest taxComponentRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createTaxComponent()
-                .withJson(toApiJsonSerializer.serialize(taxComponentRequest)).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createTaxComponent().withJson(toApiJsonSerializer.serialize(taxComponentRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @PUT
     @Path("{taxComponentId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update Tax Component", operationId = "updateTaxComponent", description = "Updates Tax component. Debit and credit account details cannot be modified. All the future tax components would be replaced with the new percentage.")
     @AlternativeOperationId("updateTaxCompoent")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = TaxComponentApiResourceSwagger.PutTaxesComponentsTaxComponentIdRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TaxComponentApiResourceSwagger.PutTaxesComponentsTaxComponentIdResponse.class))) })
-    public CommandProcessingResult updateTaxCompoent(
-            @PathParam("taxComponentId") @Parameter(description = "taxComponentId") final Long taxComponentId,
-            @Parameter(hidden = true) TaxComponentRequest taxComponentRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateTaxComponent(taxComponentId)
-                .withJson(toApiJsonSerializer.serialize(taxComponentRequest)).build();
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TaxComponentApiResourceSwagger.PutTaxesComponentsTaxComponentIdResponse.class)))})
+    public CommandProcessingResult updateTaxCompoent(@PathParam("taxComponentId") @Parameter(description = "taxComponentId") final Long taxComponentId, @Parameter(hidden = true) TaxComponentRequest taxComponentRequest) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateTaxComponent(taxComponentId).withJson(toApiJsonSerializer.serialize(taxComponentRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public TaxComponentApiResource(final PlatformSecurityContext context, final TaxReadPlatformService readPlatformService, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final DefaultToApiJsonSerializer<String> toApiJsonSerializer) {
+        this.context = context;
+        this.readPlatformService = readPlatformService;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+    }
 }

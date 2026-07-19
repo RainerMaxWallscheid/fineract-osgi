@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import lombok.Getter;
 import org.apache.fineract.accounting.common.AccountingRuleType;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
 import org.apache.fineract.accounting.producttoaccountmapping.data.ChargeToGLAccountMapper;
@@ -32,9 +31,7 @@ import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.products.data.ProductData;
 
-@Getter
 public final class ShareProductData implements ProductData {
-
     private final Long id;
     private final String name;
     private final String shortName;
@@ -51,35 +48,22 @@ public final class ShareProductData implements ProductData {
     private final Collection<ShareProductMarketPriceData> marketPrice;
     private final Collection<ChargeData> charges;
     private final Boolean allowDividendCalculationForInactiveClients;
-
     private final Integer lockinPeriod;
     private final EnumOptionData lockPeriodTypeEnum;
-
     private final Integer minimumActivePeriod;
     private final EnumOptionData minimumActivePeriodForDividendsTypeEnum;
-
     // accounting
     private final EnumOptionData accountingRule;
     private final Map<String, Object> accountingMappings;
     private final Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings;
     private final Collection<ChargeToGLAccountMapper> feeToGLAccountMappings;
-
     private final Collection<CurrencyData> currencyOptions;
     private final Collection<ChargeData> chargeOptions;
     final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions;
     final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions;
     private final Map<String, List<GLAccountData>> accountingMappingOptions;
 
-    private ShareProductData(final Long id, final String name, final String shortName, final String description, final String externalId,
-            final CurrencyData currency, final Long totalShares, final Long totalSharesIssued, final BigDecimal unitPrice,
-            final BigDecimal shareCapital, final Long minimumShares, final Long nominaltShares, final Long maximumShares,
-            Collection<ShareProductMarketPriceData> marketPrice, final Collection<ChargeData> charges,
-            final Boolean allowDividendCalculationForInactiveClients, final Integer lockinPeriod, final EnumOptionData lockPeriodEnum,
-            final Integer minimumActivePeriod, final EnumOptionData minimumActivePeriodForDividendsTypeEnum, EnumOptionData accountingRule,
-            Map<String, Object> accountingMappings, Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings,
-            Collection<ChargeToGLAccountMapper> feeToGLAccountMappings, final Collection<CurrencyData> currencyOptions,
-            final Collection<ChargeData> chargeOptions, final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions,
-            final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions, Map<String, List<GLAccountData>> accountingMappingOptions) {
+    private ShareProductData(final Long id, final String name, final String shortName, final String description, final String externalId, final CurrencyData currency, final Long totalShares, final Long totalSharesIssued, final BigDecimal unitPrice, final BigDecimal shareCapital, final Long minimumShares, final Long nominaltShares, final Long maximumShares, Collection<ShareProductMarketPriceData> marketPrice, final Collection<ChargeData> charges, final Boolean allowDividendCalculationForInactiveClients, final Integer lockinPeriod, final EnumOptionData lockPeriodEnum, final Integer minimumActivePeriod, final EnumOptionData minimumActivePeriodForDividendsTypeEnum, EnumOptionData accountingRule, Map<String, Object> accountingMappings, Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings, Collection<ChargeToGLAccountMapper> feeToGLAccountMappings, final Collection<CurrencyData> currencyOptions, final Collection<ChargeData> chargeOptions, final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions, final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions, Map<String, List<GLAccountData>> accountingMappingOptions) {
         this.id = id;
         this.name = name;
         this.shortName = shortName;
@@ -111,36 +95,19 @@ public final class ShareProductData implements ProductData {
         this.accountingMappingOptions = accountingMappingOptions;
     }
 
-    public static ShareProductData data(final Long id, final String name, final String shortName, final String description,
-            final String externalId, final CurrencyData currency, final Long totalShares, final Long totalSharesIssued,
-            final BigDecimal unitPrice, final BigDecimal shareCapital, final Long minimumShares, final Long nominaltShares,
-            final Long maximumShares, Collection<ShareProductMarketPriceData> marketPrice, final Collection<ChargeData> charges,
-
-            final Boolean allowDividendCalculationForInactiveClients, final Integer lockinPeriod, final EnumOptionData lockPeriodTypeEnum,
-            final Integer minimumActivePeriod, final EnumOptionData minimumActivePeriodForDividendsEnum, EnumOptionData accountingRule) {
-
+    public static ShareProductData data(final Long id, final String name, final String shortName, final String description, final String externalId, final CurrencyData currency, final Long totalShares, final Long totalSharesIssued, final BigDecimal unitPrice, final BigDecimal shareCapital, final Long minimumShares, final Long nominaltShares, final Long maximumShares, Collection<ShareProductMarketPriceData> marketPrice, final Collection<ChargeData> charges, final Boolean allowDividendCalculationForInactiveClients, final Integer lockinPeriod, final EnumOptionData lockPeriodTypeEnum, final Integer minimumActivePeriod, final EnumOptionData minimumActivePeriodForDividendsEnum, EnumOptionData accountingRule) {
         final Map<String, Object> accountingMappings = null;
         final Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings = null;
         final Map<String, List<GLAccountData>> accountingMappingOptions = null;
         final Collection<ChargeToGLAccountMapper> feeToGLAccountMappings = null;
-
         final Collection<CurrencyData> currencyOptions = null;
         final Collection<ChargeData> chargeOptions = null;
         final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions = null;
         final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = null;
-        return new ShareProductData(id, name, shortName, description, externalId, currency, totalShares, totalSharesIssued, unitPrice,
-                shareCapital, minimumShares, nominaltShares, maximumShares, marketPrice, charges,
-                allowDividendCalculationForInactiveClients, lockinPeriod, lockPeriodTypeEnum, minimumActivePeriod,
-                minimumActivePeriodForDividendsEnum, accountingRule, accountingMappings, paymentChannelToFundSourceMappings,
-                feeToGLAccountMappings, currencyOptions, chargeOptions, minimumActivePeriodFrequencyTypeOptions,
-                lockinPeriodFrequencyTypeOptions, accountingMappingOptions);
-
+        return new ShareProductData(id, name, shortName, description, externalId, currency, totalShares, totalSharesIssued, unitPrice, shareCapital, minimumShares, nominaltShares, maximumShares, marketPrice, charges, allowDividendCalculationForInactiveClients, lockinPeriod, lockPeriodTypeEnum, minimumActivePeriod, minimumActivePeriodForDividendsEnum, accountingRule, accountingMappings, paymentChannelToFundSourceMappings, feeToGLAccountMappings, currencyOptions, chargeOptions, minimumActivePeriodFrequencyTypeOptions, lockinPeriodFrequencyTypeOptions, accountingMappingOptions);
     }
 
-    private ShareProductData(final Collection<CurrencyData> currencyOptions, final Collection<ChargeData> chargeOptions,
-            final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions,
-            final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions,
-            final Map<String, List<GLAccountData>> accountingMappingOptions) {
+    private ShareProductData(final Collection<CurrencyData> currencyOptions, final Collection<ChargeData> chargeOptions, final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions, final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions, final Map<String, List<GLAccountData>> accountingMappingOptions) {
         this.id = null;
         this.name = null;
         this.shortName = null;
@@ -172,35 +139,16 @@ public final class ShareProductData implements ProductData {
         this.accountingMappingOptions = accountingMappingOptions;
     }
 
-    public static ShareProductData template(final Collection<CurrencyData> currencyOptions, final Collection<ChargeData> chargeOptions,
-            final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions,
-            final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions, Map<String, List<GLAccountData>> accountingMappingOptions) {
-        return new ShareProductData(currencyOptions, chargeOptions, minimumActivePeriodFrequencyTypeOptions,
-                lockinPeriodFrequencyTypeOptions, accountingMappingOptions);
+    public static ShareProductData template(final Collection<CurrencyData> currencyOptions, final Collection<ChargeData> chargeOptions, final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions, final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions, Map<String, List<GLAccountData>> accountingMappingOptions) {
+        return new ShareProductData(currencyOptions, chargeOptions, minimumActivePeriodFrequencyTypeOptions, lockinPeriodFrequencyTypeOptions, accountingMappingOptions);
     }
 
-    public static ShareProductData template(final ShareProductData data, final Collection<CurrencyData> currencyOptions,
-            final Collection<ChargeData> chargeOptions, final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions,
-            final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions,
-            final Map<String, List<GLAccountData>> accountingMappingOptions) {
-
-        return new ShareProductData(data.id, data.name, data.shortName, data.description, data.externalId, data.currency, data.totalShares,
-                data.totalSharesIssued, data.unitPrice, data.shareCapital, data.minimumShares, data.nominalShares, data.maximumShares,
-                data.marketPrice, data.charges, data.allowDividendCalculationForInactiveClients, data.lockinPeriod, data.lockPeriodTypeEnum,
-                data.minimumActivePeriod, data.minimumActivePeriodForDividendsTypeEnum, data.accountingRule, data.accountingMappings,
-                data.paymentChannelToFundSourceMappings, data.feeToGLAccountMappings, currencyOptions, chargeOptions,
-                minimumActivePeriodFrequencyTypeOptions, lockinPeriodFrequencyTypeOptions, accountingMappingOptions);
+    public static ShareProductData template(final ShareProductData data, final Collection<CurrencyData> currencyOptions, final Collection<ChargeData> chargeOptions, final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions, final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions, final Map<String, List<GLAccountData>> accountingMappingOptions) {
+        return new ShareProductData(data.id, data.name, data.shortName, data.description, data.externalId, data.currency, data.totalShares, data.totalSharesIssued, data.unitPrice, data.shareCapital, data.minimumShares, data.nominalShares, data.maximumShares, data.marketPrice, data.charges, data.allowDividendCalculationForInactiveClients, data.lockinPeriod, data.lockPeriodTypeEnum, data.minimumActivePeriod, data.minimumActivePeriodForDividendsTypeEnum, data.accountingRule, data.accountingMappings, data.paymentChannelToFundSourceMappings, data.feeToGLAccountMappings, currencyOptions, chargeOptions, minimumActivePeriodFrequencyTypeOptions, lockinPeriodFrequencyTypeOptions, accountingMappingOptions);
     }
 
-    public static ShareProductData withAccountingDetails(final ShareProductData data, final Map<String, Object> accountingMappings,
-            final Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings,
-            final Collection<ChargeToGLAccountMapper> feeToGLAccountMappings) {
-        return new ShareProductData(data.id, data.name, data.shortName, data.description, data.externalId, data.currency, data.totalShares,
-                data.totalSharesIssued, data.unitPrice, data.shareCapital, data.minimumShares, data.nominalShares, data.maximumShares,
-                data.marketPrice, data.charges, data.allowDividendCalculationForInactiveClients, data.lockinPeriod, data.lockPeriodTypeEnum,
-                data.minimumActivePeriod, data.minimumActivePeriodForDividendsTypeEnum, data.accountingRule, accountingMappings,
-                paymentChannelToFundSourceMappings, feeToGLAccountMappings, data.currencyOptions, data.chargeOptions,
-                data.minimumActivePeriodFrequencyTypeOptions, data.lockinPeriodFrequencyTypeOptions, data.accountingMappingOptions);
+    public static ShareProductData withAccountingDetails(final ShareProductData data, final Map<String, Object> accountingMappings, final Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings, final Collection<ChargeToGLAccountMapper> feeToGLAccountMappings) {
+        return new ShareProductData(data.id, data.name, data.shortName, data.description, data.externalId, data.currency, data.totalShares, data.totalSharesIssued, data.unitPrice, data.shareCapital, data.minimumShares, data.nominalShares, data.maximumShares, data.marketPrice, data.charges, data.allowDividendCalculationForInactiveClients, data.lockinPeriod, data.lockPeriodTypeEnum, data.minimumActivePeriod, data.minimumActivePeriodForDividendsTypeEnum, data.accountingRule, accountingMappings, paymentChannelToFundSourceMappings, feeToGLAccountMappings, data.currencyOptions, data.chargeOptions, data.minimumActivePeriodFrequencyTypeOptions, data.lockinPeriodFrequencyTypeOptions, data.accountingMappingOptions);
     }
 
     private ShareProductData(final Long id, final String name, final String shortName, final Long totalShares) {
@@ -243,7 +191,6 @@ public final class ShareProductData implements ProductData {
         final String shortName = null;
         final Long totalShares = null;
         return new ShareProductData(id, name, shortName, totalShares);
-
     }
 
     public boolean hasAccountingEnabled() {
@@ -252,5 +199,150 @@ public final class ShareProductData implements ProductData {
 
     public int accountingRuleTypeId() {
         return this.accountingRule.getId().intValue();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getShortName() {
+        return this.shortName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getExternalId() {
+        return this.externalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CurrencyData getCurrency() {
+        return this.currency;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getTotalShares() {
+        return this.totalShares;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getTotalSharesIssued() {
+        return this.totalSharesIssued;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getUnitPrice() {
+        return this.unitPrice;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getShareCapital() {
+        return this.shareCapital;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getMinimumShares() {
+        return this.minimumShares;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getNominalShares() {
+        return this.nominalShares;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getMaximumShares() {
+        return this.maximumShares;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<ShareProductMarketPriceData> getMarketPrice() {
+        return this.marketPrice;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<ChargeData> getCharges() {
+        return this.charges;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Boolean getAllowDividendCalculationForInactiveClients() {
+        return this.allowDividendCalculationForInactiveClients;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getLockinPeriod() {
+        return this.lockinPeriod;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getLockPeriodTypeEnum() {
+        return this.lockPeriodTypeEnum;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getMinimumActivePeriod() {
+        return this.minimumActivePeriod;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getMinimumActivePeriodForDividendsTypeEnum() {
+        return this.minimumActivePeriodForDividendsTypeEnum;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getAccountingRule() {
+        return this.accountingRule;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Map<String, Object> getAccountingMappings() {
+        return this.accountingMappings;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<PaymentTypeToGLAccountMapper> getPaymentChannelToFundSourceMappings() {
+        return this.paymentChannelToFundSourceMappings;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<ChargeToGLAccountMapper> getFeeToGLAccountMappings() {
+        return this.feeToGLAccountMappings;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<CurrencyData> getCurrencyOptions() {
+        return this.currencyOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<ChargeData> getChargeOptions() {
+        return this.chargeOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<EnumOptionData> getMinimumActivePeriodFrequencyTypeOptions() {
+        return this.minimumActivePeriodFrequencyTypeOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<EnumOptionData> getLockinPeriodFrequencyTypeOptions() {
+        return this.lockinPeriodFrequencyTypeOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Map<String, List<GLAccountData>> getAccountingMappingOptions() {
+        return this.accountingMappingOptions;
     }
 }

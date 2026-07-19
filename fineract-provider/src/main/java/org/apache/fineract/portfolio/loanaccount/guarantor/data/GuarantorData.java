@@ -23,7 +23,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.organisation.staff.data.StaffData;
@@ -32,28 +31,25 @@ import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.loanaccount.guarantor.domain.GuarantorType;
 import org.apache.fineract.portfolio.loanaccount.guarantor.service.GuarantorEnumerations;
 
-@Getter
 public class GuarantorData implements IGuarantor {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private final Long id;
     private final Long loanId;
     private final CodeValueData clientRelationshipType;
     private final EnumOptionData guarantorType;
-
     private final String firstname;
     private final String lastname;
-
-    /*** Fields for current customers/staff serving as guarantors **/
+    /**
+     * Fields for current customers/staff serving as guarantors *
+     */
     private final Long entityId;
     private final String externalId;
     private final String officeName;
     private final LocalDate joinedDate;
-
-    /*** Fields for external persons serving as guarantors ***/
-
+    /**
+     * Fields for external persons serving as guarantors **
+     */
     private final String addressLine1;
     private final String addressLine2;
     private final String city;
@@ -66,13 +62,11 @@ public class GuarantorData implements IGuarantor {
     private final LocalDate dob;
     private final Collection<GuarantorFundingData> guarantorFundingDetails;
     private final boolean status;
-
     // template
     @SuppressWarnings("unused")
     private final List<EnumOptionData> guarantorTypeOptions;
     private final Collection<CodeValueData> allowedClientRelationshipTypes;
     private final Collection<PortfolioAccountData> accountLinkingOptions;
-
     // import fields
     private Integer guarantorTypeId;
     private Integer clientRelationshipTypeId;
@@ -83,16 +77,11 @@ public class GuarantorData implements IGuarantor {
     private String dateFormat;
     private String locale;
 
-    public static GuarantorData importInstance(Integer guarantorTypeId, Integer clientRelationshipTypeId, Long entityId, String firstname,
-            String lastname, String addressLine1, String addressLine2, String city, LocalDate dob, String zip, Integer savingsId,
-            BigDecimal amount, Integer rowIndex, Long accountId, String locale, String dateFormat) {
-        return new GuarantorData(guarantorTypeId, clientRelationshipTypeId, entityId, firstname, lastname, addressLine1, addressLine2, city,
-                dob, zip, savingsId, amount, rowIndex, accountId, locale, dateFormat);
+    public static GuarantorData importInstance(Integer guarantorTypeId, Integer clientRelationshipTypeId, Long entityId, String firstname, String lastname, String addressLine1, String addressLine2, String city, LocalDate dob, String zip, Integer savingsId, BigDecimal amount, Integer rowIndex, Long accountId, String locale, String dateFormat) {
+        return new GuarantorData(guarantorTypeId, clientRelationshipTypeId, entityId, firstname, lastname, addressLine1, addressLine2, city, dob, zip, savingsId, amount, rowIndex, accountId, locale, dateFormat);
     }
 
-    private GuarantorData(Integer guarantorTypeId, Integer clientRelationshipTypeId, Long entityId, String firstname, String lastname,
-            String addressLine1, String addressLine2, String city, LocalDate dob, String zip, Integer savingsId, BigDecimal amount,
-            Integer rowIndex, Long accountId, String locale, String dateFormat) {
+    private GuarantorData(Integer guarantorTypeId, Integer clientRelationshipTypeId, Long entityId, String firstname, String lastname, String addressLine1, String addressLine2, String city, LocalDate dob, String zip, Integer savingsId, BigDecimal amount, Integer rowIndex, Long accountId, String locale, String dateFormat) {
         this.rowIndex = rowIndex;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -128,47 +117,25 @@ public class GuarantorData implements IGuarantor {
         this.accountLinkingOptions = null;
     }
 
-    public static GuarantorData template(final List<EnumOptionData> guarantorTypeOptions,
-            final Collection<CodeValueData> allowedClientRelationshipTypes, Collection<PortfolioAccountData> accountLinkingOptions) {
+    public static GuarantorData template(final List<EnumOptionData> guarantorTypeOptions, final Collection<CodeValueData> allowedClientRelationshipTypes, Collection<PortfolioAccountData> accountLinkingOptions) {
         final Collection<GuarantorFundingData> guarantorFundingDetails = null;
         final boolean status = false;
-        return new GuarantorData(null, null, null, null, GuarantorEnumerations.guarantorType(GuarantorType.CUSTOMER), null, null, null,
-                null, null, null, null, null, null, null, null, null, null, null, null, status, guarantorFundingDetails,
-                guarantorTypeOptions, allowedClientRelationshipTypes, accountLinkingOptions);
+        return new GuarantorData(null, null, null, null, GuarantorEnumerations.guarantorType(GuarantorType.CUSTOMER), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, status, guarantorFundingDetails, guarantorTypeOptions, allowedClientRelationshipTypes, accountLinkingOptions);
     }
 
-    public static GuarantorData templateOnTop(final GuarantorData guarantorData, final List<EnumOptionData> guarantorTypeOptions,
-            final Collection<CodeValueData> allowedClientRelationshipTypes, Collection<PortfolioAccountData> accountLinkingOptions) {
-        return new GuarantorData(guarantorData.id, guarantorData.loanId, guarantorData.clientRelationshipType, guarantorData.entityId,
-                guarantorData.guarantorType, guarantorData.firstname, guarantorData.lastname, guarantorData.dob, guarantorData.addressLine1,
-                guarantorData.addressLine2, guarantorData.city, guarantorData.state, guarantorData.zip, guarantorData.country,
-                guarantorData.mobileNumber, guarantorData.housePhoneNumber, guarantorData.comment, guarantorData.officeName,
-                guarantorData.joinedDate, guarantorData.externalId, guarantorData.status, guarantorData.guarantorFundingDetails,
-                guarantorTypeOptions, allowedClientRelationshipTypes, accountLinkingOptions);
+    public static GuarantorData templateOnTop(final GuarantorData guarantorData, final List<EnumOptionData> guarantorTypeOptions, final Collection<CodeValueData> allowedClientRelationshipTypes, Collection<PortfolioAccountData> accountLinkingOptions) {
+        return new GuarantorData(guarantorData.id, guarantorData.loanId, guarantorData.clientRelationshipType, guarantorData.entityId, guarantorData.guarantorType, guarantorData.firstname, guarantorData.lastname, guarantorData.dob, guarantorData.addressLine1, guarantorData.addressLine2, guarantorData.city, guarantorData.state, guarantorData.zip, guarantorData.country, guarantorData.mobileNumber, guarantorData.housePhoneNumber, guarantorData.comment, guarantorData.officeName, guarantorData.joinedDate, guarantorData.externalId, guarantorData.status, guarantorData.guarantorFundingDetails, guarantorTypeOptions, allowedClientRelationshipTypes, accountLinkingOptions);
     }
 
     public static GuarantorData mergeClientData(final ClientData clientData, final GuarantorData guarantorData) {
-        return new GuarantorData(guarantorData.id, guarantorData.loanId, guarantorData.clientRelationshipType, guarantorData.entityId,
-                guarantorData.guarantorType, clientData.getFirstname(), clientData.getLastname(), null, null, null, null, null, null, null,
-                null, null, null, clientData.getOfficeName(), clientData.getActivationDate(), clientData.getExternalId().getValue(),
-                guarantorData.status, guarantorData.guarantorFundingDetails, null, guarantorData.allowedClientRelationshipTypes,
-                guarantorData.accountLinkingOptions);
+        return new GuarantorData(guarantorData.id, guarantorData.loanId, guarantorData.clientRelationshipType, guarantorData.entityId, guarantorData.guarantorType, clientData.getFirstname(), clientData.getLastname(), null, null, null, null, null, null, null, null, null, null, clientData.getOfficeName(), clientData.getActivationDate(), clientData.getExternalId().getValue(), guarantorData.status, guarantorData.guarantorFundingDetails, null, guarantorData.allowedClientRelationshipTypes, guarantorData.accountLinkingOptions);
     }
 
     public static GuarantorData mergeStaffData(final StaffData staffData, final GuarantorData guarantorData) {
-        return new GuarantorData(guarantorData.id, guarantorData.loanId, guarantorData.clientRelationshipType, guarantorData.entityId,
-                guarantorData.guarantorType, staffData.getFirstname(), staffData.getLastname(), null, null, null, null, null, null, null,
-                null, null, null, staffData.getOfficeName(), null, null, guarantorData.status, guarantorData.guarantorFundingDetails, null,
-                guarantorData.allowedClientRelationshipTypes, guarantorData.accountLinkingOptions);
+        return new GuarantorData(guarantorData.id, guarantorData.loanId, guarantorData.clientRelationshipType, guarantorData.entityId, guarantorData.guarantorType, staffData.getFirstname(), staffData.getLastname(), null, null, null, null, null, null, null, null, null, null, staffData.getOfficeName(), null, null, guarantorData.status, guarantorData.guarantorFundingDetails, null, guarantorData.allowedClientRelationshipTypes, guarantorData.accountLinkingOptions);
     }
 
-    public GuarantorData(final Long id, final Long loanId, final CodeValueData clientRelationshipType, final Long entityId,
-            final EnumOptionData guarantorType, final String firstname, final String lastname, final LocalDate dob,
-            final String addressLine1, final String addressLine2, final String city, final String state, final String zip,
-            final String country, final String mobileNumber, final String housePhoneNumber, final String comment, final String officeName,
-            final LocalDate joinedDate, final String externalId, final boolean status,
-            Collection<GuarantorFundingData> guarantorFundingDetails, final List<EnumOptionData> guarantorTypeOptions,
-            final Collection<CodeValueData> allowedClientRelationshipTypes, final Collection<PortfolioAccountData> accountLinkingOptions) {
+    public GuarantorData(final Long id, final Long loanId, final CodeValueData clientRelationshipType, final Long entityId, final EnumOptionData guarantorType, final String firstname, final String lastname, final LocalDate dob, final String addressLine1, final String addressLine2, final String city, final String state, final String zip, final String country, final String mobileNumber, final String housePhoneNumber, final String comment, final String officeName, final LocalDate joinedDate, final String externalId, final boolean status, Collection<GuarantorFundingData> guarantorFundingDetails, final List<EnumOptionData> guarantorTypeOptions, final Collection<CodeValueData> allowedClientRelationshipTypes, final Collection<PortfolioAccountData> accountLinkingOptions) {
         this.id = id;
         this.loanId = loanId;
         this.clientRelationshipType = clientRelationshipType;
@@ -210,5 +177,176 @@ public class GuarantorData implements IGuarantor {
 
     public boolean isExistingGroup() {
         return GuarantorType.GROUP.getValue().equals(this.guarantorType.getId().intValue());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanId() {
+        return this.loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValueData getClientRelationshipType() {
+        return this.clientRelationshipType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getGuarantorType() {
+        return this.guarantorType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getFirstname() {
+        return this.firstname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLastname() {
+        return this.lastname;
+    }
+
+    /**
+     * Fields for current customers/staff serving as guarantors *
+     */
+    @java.lang.SuppressWarnings("all")
+        public Long getEntityId() {
+        return this.entityId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getExternalId() {
+        return this.externalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getOfficeName() {
+        return this.officeName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getJoinedDate() {
+        return this.joinedDate;
+    }
+
+    /**
+     * Fields for external persons serving as guarantors **
+     */
+    @java.lang.SuppressWarnings("all")
+        public String getAddressLine1() {
+        return this.addressLine1;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getAddressLine2() {
+        return this.addressLine2;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCity() {
+        return this.city;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getState() {
+        return this.state;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getZip() {
+        return this.zip;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCountry() {
+        return this.country;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getMobileNumber() {
+        return this.mobileNumber;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHousePhoneNumber() {
+        return this.housePhoneNumber;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getComment() {
+        return this.comment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getDob() {
+        return this.dob;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<GuarantorFundingData> getGuarantorFundingDetails() {
+        return this.guarantorFundingDetails;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isStatus() {
+        return this.status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<EnumOptionData> getGuarantorTypeOptions() {
+        return this.guarantorTypeOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<CodeValueData> getAllowedClientRelationshipTypes() {
+        return this.allowedClientRelationshipTypes;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<PortfolioAccountData> getAccountLinkingOptions() {
+        return this.accountLinkingOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getGuarantorTypeId() {
+        return this.guarantorTypeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getClientRelationshipTypeId() {
+        return this.clientRelationshipTypeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getSavingsId() {
+        return this.savingsId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getAccountId() {
+        return this.accountId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getRowIndex() {
+        return this.rowIndex;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDateFormat() {
+        return this.dateFormat;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLocale() {
+        return this.locale;
     }
 }

@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.client.domain;
 
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
@@ -34,9 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
  * </p>
  */
 @Service
-@RequiredArgsConstructor
 public class ClientRepositoryWrapper {
-
     private final ClientRepository repository;
     private final PlatformSecurityContext context;
 
@@ -104,4 +101,9 @@ public class ClientRepositoryWrapper {
         return this.repository.findIdByExternalId(externalId);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ClientRepositoryWrapper(final ClientRepository repository, final PlatformSecurityContext context) {
+        this.repository = repository;
+        this.context = context;
+    }
 }

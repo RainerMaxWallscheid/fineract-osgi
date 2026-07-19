@@ -18,15 +18,10 @@
  */
 package org.apache.fineract.integrationtests.common.accounting;
 
-import lombok.ToString;
-
-@ToString
 public class Account {
 
     public enum AccountType {
-
         ASSET("1"), INCOME("4"), EXPENSE("5"), LIABILITY("2"), EQUITY("3");
-
         private final String accountValue;
 
         AccountType(final String accountValue) {
@@ -53,5 +48,11 @@ public class Account {
 
     public Integer getAccountID() {
         return this.accountID;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "Account(accountType=" + this.getAccountType() + ", accountID=" + this.getAccountID() + ")";
     }
 }

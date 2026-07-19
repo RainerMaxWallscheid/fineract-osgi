@@ -19,7 +19,6 @@
 package org.apache.fineract.cob.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.domain.AccountLock;
 import org.apache.fineract.cob.domain.AccountLockRepository;
 import org.apache.fineract.cob.domain.CustomLoanAccountLockRepository;
@@ -30,12 +29,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 public abstract class AbstractAccountLockService<T extends AccountLock> implements AccountLockService<T> {
-
-    protected static final List<LockOwner> COB_LOCK_OWNERS = List.of(LockOwner.LOAN_COB_CHUNK_PROCESSING,
-            LockOwner.LOAN_INLINE_COB_PROCESSING);
-
+    protected static final List<LockOwner> COB_LOCK_OWNERS = List.of(LockOwner.LOAN_COB_CHUNK_PROCESSING, LockOwner.LOAN_INLINE_COB_PROCESSING);
     private final AccountLockRepository<T> loanAccountLockRepository;
     private final CustomLoanAccountLockRepository<T> customLoanAccountLockRepository;
 
@@ -71,4 +66,9 @@ public abstract class AbstractAccountLockService<T extends AccountLock> implemen
         return loanAccountLockRepository.deleteOrphanedLocksForProcessedAccounts(COB_LOCK_OWNERS);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public AbstractAccountLockService(final AccountLockRepository<T> loanAccountLockRepository, final CustomLoanAccountLockRepository<T> customLoanAccountLockRepository) {
+        this.loanAccountLockRepository = loanAccountLockRepository;
+        this.customLoanAccountLockRepository = customLoanAccountLockRepository;
+    }
 }

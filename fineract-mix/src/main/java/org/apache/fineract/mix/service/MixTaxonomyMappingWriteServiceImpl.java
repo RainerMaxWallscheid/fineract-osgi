@@ -19,8 +19,6 @@
 package org.apache.fineract.mix.service;
 
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.mix.data.MixTaxonomyMappingUpdateRequest;
 import org.apache.fineract.mix.data.MixTaxonomyMappingUpdateResponse;
 import org.apache.fineract.mix.domain.MixTaxonomyMappingRepository;
@@ -28,11 +26,10 @@ import org.apache.fineract.mix.mapping.MixTaxonomyMappingUpdateRequestMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 public class MixTaxonomyMappingWriteServiceImpl implements MixTaxonomyMappingWriteService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MixTaxonomyMappingWriteServiceImpl.class);
     private final MixTaxonomyMappingRepository repository;
     private final MixTaxonomyMappingUpdateRequestMapper mapper;
 
@@ -40,9 +37,13 @@ public class MixTaxonomyMappingWriteServiceImpl implements MixTaxonomyMappingWri
     @Override
     public MixTaxonomyMappingUpdateResponse updateMapping(@Valid final MixTaxonomyMappingUpdateRequest request) {
         final var taxonomyMapping = mapper.map(request);
-
         repository.save(taxonomyMapping);
-
         return MixTaxonomyMappingUpdateResponse.builder().entityId(taxonomyMapping.getId()).build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomyMappingWriteServiceImpl(final MixTaxonomyMappingRepository repository, final MixTaxonomyMappingUpdateRequestMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
     }
 }

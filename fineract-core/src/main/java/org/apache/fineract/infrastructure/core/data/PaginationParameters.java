@@ -18,22 +18,13 @@
  */
 package org.apache.fineract.infrastructure.core.data;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
-@Builder
-@Getter
 public class PaginationParameters {
-
     // TODO: why do we really need this class? SearchParameters seems to provide similar functionality
-
     public static final int DEFAULT_MAX_LIMIT = 200;
-
     private boolean paged;
     private Integer offset;
-    @Getter(AccessLevel.NONE)
     private Integer limit;
     private String orderBy;
     private String sortOrder;
@@ -42,11 +33,9 @@ public class PaginationParameters {
         if (limit == null) {
             return DEFAULT_MAX_LIMIT;
         }
-
         if (limit > 0) {
             return limit;
         }
-
         return null; // unlimited (0 or less)
     }
 
@@ -67,10 +56,8 @@ public class PaginationParameters {
     }
 
     // TODO: following functions are just doing too much in one place; will disappear with type safe queries
-
     public String orderBySql() {
         final StringBuilder sql = new StringBuilder();
-
         if (this.hasOrderBy()) {
             sql.append(" order by ").append(this.getOrderBy());
             if (this.hasSortOrder()) {
@@ -99,7 +86,115 @@ public class PaginationParameters {
         if (this.hasLimit()) {
             sqlBuilder.append(' ').append(this.limitSql());
         }
-
         return sqlBuilder.toString();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        PaginationParameters(final boolean paged, final Integer offset, final Integer limit, final String orderBy, final String sortOrder) {
+        this.paged = paged;
+        this.offset = offset;
+        this.limit = limit;
+        this.orderBy = orderBy;
+        this.sortOrder = sortOrder;
+    }
+
+
+    @java.lang.SuppressWarnings("all")
+        public static class PaginationParametersBuilder {
+        @java.lang.SuppressWarnings("all")
+                private boolean paged;
+        @java.lang.SuppressWarnings("all")
+                private Integer offset;
+        @java.lang.SuppressWarnings("all")
+                private Integer limit;
+        @java.lang.SuppressWarnings("all")
+                private String orderBy;
+        @java.lang.SuppressWarnings("all")
+                private String sortOrder;
+
+        @java.lang.SuppressWarnings("all")
+                PaginationParametersBuilder() {
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public PaginationParameters.PaginationParametersBuilder paged(final boolean paged) {
+            this.paged = paged;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public PaginationParameters.PaginationParametersBuilder offset(final Integer offset) {
+            this.offset = offset;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public PaginationParameters.PaginationParametersBuilder limit(final Integer limit) {
+            this.limit = limit;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public PaginationParameters.PaginationParametersBuilder orderBy(final String orderBy) {
+            this.orderBy = orderBy;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public PaginationParameters.PaginationParametersBuilder sortOrder(final String sortOrder) {
+            this.sortOrder = sortOrder;
+            return this;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public PaginationParameters build() {
+            return new PaginationParameters(this.paged, this.offset, this.limit, this.orderBy, this.sortOrder);
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "PaginationParameters.PaginationParametersBuilder(paged=" + this.paged + ", offset=" + this.offset + ", limit=" + this.limit + ", orderBy=" + this.orderBy + ", sortOrder=" + this.sortOrder + ")";
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static PaginationParameters.PaginationParametersBuilder builder() {
+        return new PaginationParameters.PaginationParametersBuilder();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isPaged() {
+        return this.paged;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getOffset() {
+        return this.offset;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getOrderBy() {
+        return this.orderBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getSortOrder() {
+        return this.sortOrder;
     }
 }

@@ -20,7 +20,6 @@ package org.apache.fineract.infrastructure.event.external.service.message;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.avro.BulkMessageItemV1;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
 import org.apache.fineract.infrastructure.core.service.DataEnricherProcessor;
@@ -31,9 +30,7 @@ import org.apache.fineract.infrastructure.event.external.service.support.ByteBuf
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class BulkMessageItemFactory {
-
     private final BusinessEventSerializerFactory serializerFactory;
     private final ByteBufferConverter byteBufferConverter;
     private final DataEnricherProcessor dataEnricherProcessor;
@@ -48,5 +45,12 @@ public class BulkMessageItemFactory {
         String schema = eventSerializer.getSupportedSchema().getName();
         ByteBuffer data = byteBufferConverter.convert(serializedContent);
         return new BulkMessageItemV1(id, type, category, schema, data);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BulkMessageItemFactory(final BusinessEventSerializerFactory serializerFactory, final ByteBufferConverter byteBufferConverter, final DataEnricherProcessor dataEnricherProcessor) {
+        this.serializerFactory = serializerFactory;
+        this.byteBufferConverter = byteBufferConverter;
+        this.dataEnricherProcessor = dataEnricherProcessor;
     }
 }

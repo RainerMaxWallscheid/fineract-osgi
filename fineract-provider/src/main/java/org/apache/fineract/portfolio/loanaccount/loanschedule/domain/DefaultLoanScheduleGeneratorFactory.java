@@ -18,14 +18,11 @@
  */
 package org.apache.fineract.portfolio.loanaccount.loanschedule.domain;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.loanproduct.domain.InterestMethod;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class DefaultLoanScheduleGeneratorFactory implements LoanScheduleGeneratorFactory {
-
     private final ProgressiveLoanScheduleGenerator progressiveLoanScheduleGenerator;
     private final CumulativeFlatInterestLoanScheduleGenerator cumulativeFlatInterestLoanScheduleGenerator;
     private final CumulativeDecliningBalanceInterestLoanScheduleGenerator cumulativeDecliningBalanceInterestLoanScheduleGenerator;
@@ -50,4 +47,10 @@ public class DefaultLoanScheduleGeneratorFactory implements LoanScheduleGenerato
         return progressiveLoanScheduleGenerator;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DefaultLoanScheduleGeneratorFactory(final ProgressiveLoanScheduleGenerator progressiveLoanScheduleGenerator, final CumulativeFlatInterestLoanScheduleGenerator cumulativeFlatInterestLoanScheduleGenerator, final CumulativeDecliningBalanceInterestLoanScheduleGenerator cumulativeDecliningBalanceInterestLoanScheduleGenerator) {
+        this.progressiveLoanScheduleGenerator = progressiveLoanScheduleGenerator;
+        this.cumulativeFlatInterestLoanScheduleGenerator = cumulativeFlatInterestLoanScheduleGenerator;
+        this.cumulativeDecliningBalanceInterestLoanScheduleGenerator = cumulativeDecliningBalanceInterestLoanScheduleGenerator;
+    }
 }

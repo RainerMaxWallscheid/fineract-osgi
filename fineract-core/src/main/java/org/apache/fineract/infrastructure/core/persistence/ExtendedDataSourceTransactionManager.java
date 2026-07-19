@@ -21,17 +21,13 @@ package org.apache.fineract.infrastructure.core.persistence;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-import lombok.Getter;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
 public class ExtendedDataSourceTransactionManager extends DataSourceTransactionManager {
-
     private final List<TransactionLifecycleCallback> lifecycleCallbacks = new CopyOnWriteArrayList<>();
-
-    @Getter
     private final boolean readOnly;
 
     public ExtendedDataSourceTransactionManager(boolean readOnly) {
@@ -41,11 +37,9 @@ public class ExtendedDataSourceTransactionManager extends DataSourceTransactionM
     @Override
     protected void doBegin(@NonNull Object transaction, @NonNull TransactionDefinition definition) {
         super.doBegin(transaction, definition);
-
         if (isReadOnly()) {
             setEnforceReadOnly(true);
         }
-
         invokeLifecycleCallbacks(TransactionLifecycleCallback::afterBegin);
     }
 
@@ -69,4 +63,8 @@ public class ExtendedDataSourceTransactionManager extends DataSourceTransactionM
         this.lifecycleCallbacks.addAll(lifecycleCallbacks);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public boolean isReadOnly() {
+        return this.readOnly;
+    }
 }

@@ -20,17 +20,11 @@ package org.apache.fineract.portfolio.tax.data;
 
 import java.io.Serializable;
 import java.util.Collection;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@AllArgsConstructor
-@Getter
 public final class TaxGroupData implements Serializable {
-
     private final Long id;
     private final String name;
     private final Collection<TaxGroupMappingsData> taxAssociations;
-
     // Template options
     @SuppressWarnings("unused")
     private final Collection<TaxComponentData> taxComponents;
@@ -52,4 +46,31 @@ public final class TaxGroupData implements Serializable {
         return new TaxGroupData(taxGroupData.id, taxGroupData.name, taxGroupData.taxAssociations, taxComponents);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public TaxGroupData(final Long id, final String name, final Collection<TaxGroupMappingsData> taxAssociations, final Collection<TaxComponentData> taxComponents) {
+        this.id = id;
+        this.name = name;
+        this.taxAssociations = taxAssociations;
+        this.taxComponents = taxComponents;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<TaxGroupMappingsData> getTaxAssociations() {
+        return this.taxAssociations;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<TaxComponentData> getTaxComponents() {
+        return this.taxComponents;
+    }
 }

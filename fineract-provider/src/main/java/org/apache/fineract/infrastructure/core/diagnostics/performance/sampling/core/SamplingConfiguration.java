@@ -22,19 +22,15 @@ import com.google.common.base.Splitter;
 import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
-@Slf4j
 public class SamplingConfiguration implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SamplingConfiguration.class);
     private final Set<Class<?>> classesToSample = ConcurrentHashMap.newKeySet();
-
     private final FineractProperties properties;
 
     @Override
@@ -70,5 +66,10 @@ public class SamplingConfiguration implements InitializingBean {
 
     public Duration getResetPeriod() {
         return Duration.ofSeconds(properties.getSampling().getResetPeriodSec());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SamplingConfiguration(final FineractProperties properties) {
+        this.properties = properties;
     }
 }

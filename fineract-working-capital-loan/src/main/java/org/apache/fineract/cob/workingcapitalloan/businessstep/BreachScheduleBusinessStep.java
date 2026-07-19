@@ -20,8 +20,6 @@ package org.apache.fineract.cob.workingcapitalloan.businessstep;
 
 import java.time.LocalDate;
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanDisbursementDetails;
@@ -29,37 +27,30 @@ import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLo
 import org.apache.fineract.portfolio.workingcapitalloanproduct.domain.WorkingCapitalLoanProductRelatedDetails;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class BreachScheduleBusinessStep extends WorkingCapitalLoanCOBBusinessStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BreachScheduleBusinessStep.class);
     private final WorkingCapitalLoanBreachScheduleService breachScheduleService;
 
     @Override
     public WorkingCapitalLoan execute(final WorkingCapitalLoan loan) {
-        final boolean isDisbursed = loan.getDisbursementDetails().stream()
-                .map(WorkingCapitalLoanDisbursementDetails::getActualDisbursementDate).anyMatch(Objects::nonNull);
+        final boolean isDisbursed = loan.getDisbursementDetails().stream().map(WorkingCapitalLoanDisbursementDetails::getActualDisbursementDate).anyMatch(Objects::nonNull);
         if (!isDisbursed) {
             log.debug("Skipping breach schedule for WC loan {} - not yet disbursed", loan.getId());
             return loan;
         }
-
         final WorkingCapitalLoanProductRelatedDetails details = loan.getLoanProductRelatedDetails();
         if (details == null || details.getBreach() == null) {
             log.debug("Skipping breach schedule for WC loan {} - no breach configuration", loan.getId());
             return loan;
         }
-
         final LocalDate businessDate = DateUtils.getBusinessLocalDate();
-
         if (!breachScheduleService.hasSchedule(loan.getId())) {
             breachScheduleService.generateInitialPeriod(loan);
         }
-
         breachScheduleService.generateNextPeriodIfNeeded(loan, businessDate);
         breachScheduleService.evaluateBreach(loan, businessDate);
-
         return loan;
     }
 
@@ -71,5 +62,10 @@ public class BreachScheduleBusinessStep extends WorkingCapitalLoanCOBBusinessSte
     @Override
     public String getHumanReadableName() {
         return "WC Breach Schedule";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BreachScheduleBusinessStep(final WorkingCapitalLoanBreachScheduleService breachScheduleService) {
+        this.breachScheduleService = breachScheduleService;
     }
 }

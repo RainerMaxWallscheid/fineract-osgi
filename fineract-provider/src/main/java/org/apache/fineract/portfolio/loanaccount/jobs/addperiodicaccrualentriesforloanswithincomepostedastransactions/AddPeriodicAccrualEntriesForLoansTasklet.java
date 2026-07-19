@@ -21,8 +21,6 @@ package org.apache.fineract.portfolio.loanaccount.jobs.addperiodicaccrualentries
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
 import org.apache.fineract.portfolio.loanaccount.service.LoanAccrualsProcessingService;
@@ -32,10 +30,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class AddPeriodicAccrualEntriesForLoansTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AddPeriodicAccrualEntriesForLoansTasklet.class);
     private final LoanReadPlatformService loanReadPlatformService;
     private final LoanAccrualsProcessingService loanAccrualsProcessingService;
 
@@ -57,5 +54,11 @@ public class AddPeriodicAccrualEntriesForLoansTasklet implements Tasklet {
             }
         }
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AddPeriodicAccrualEntriesForLoansTasklet(final LoanReadPlatformService loanReadPlatformService, final LoanAccrualsProcessingService loanAccrualsProcessingService) {
+        this.loanReadPlatformService = loanReadPlatformService;
+        this.loanAccrualsProcessingService = loanAccrualsProcessingService;
     }
 }

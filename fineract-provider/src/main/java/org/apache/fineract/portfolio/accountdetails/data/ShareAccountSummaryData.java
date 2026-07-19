@@ -19,14 +19,11 @@
 package org.apache.fineract.portfolio.accountdetails.data;
 
 import java.io.Serializable;
-import lombok.Getter;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountApplicationTimelineData;
 import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountStatusEnumData;
 
-@Getter
 public class ShareAccountSummaryData implements Serializable {
-
     private final Long id;
     private final String accountNo;
     private final Long totalApprovedShares;
@@ -39,9 +36,7 @@ public class ShareAccountSummaryData implements Serializable {
     private final CurrencyData currency;
     private final ShareAccountApplicationTimelineData timeline;
 
-    public ShareAccountSummaryData(final Long id, final String accountNo, final String externalId, final Long productId,
-            final String productName, final String shortProductName, final ShareAccountStatusEnumData status, final CurrencyData currency,
-            final Long approvedShares, final Long pendingForApprovalShares, final ShareAccountApplicationTimelineData timeline) {
+    public ShareAccountSummaryData(final Long id, final String accountNo, final String externalId, final Long productId, final String productName, final String shortProductName, final ShareAccountStatusEnumData status, final CurrencyData currency, final Long approvedShares, final Long pendingForApprovalShares, final ShareAccountApplicationTimelineData timeline) {
         this.id = id;
         this.accountNo = accountNo;
         this.externalId = externalId;
@@ -63,4 +58,58 @@ public class ShareAccountSummaryData implements Serializable {
         this.timeline = timeline;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getAccountNo() {
+        return this.accountNo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getTotalApprovedShares() {
+        return this.totalApprovedShares;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getTotalPendingForApprovalShares() {
+        return this.totalPendingForApprovalShares;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getExternalId() {
+        return this.externalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getProductId() {
+        return this.productId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getProductName() {
+        return this.productName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getShortProductName() {
+        return this.shortProductName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ShareAccountStatusEnumData getStatus() {
+        return this.status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CurrencyData getCurrency() {
+        return this.currency;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ShareAccountApplicationTimelineData getTimeline() {
+        return this.timeline;
+    }
 }

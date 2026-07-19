@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler.loan.contracttermination;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -27,14 +26,17 @@ import org.apache.fineract.portfolio.loanaccount.service.contracttermination.Loa
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN", action = "CONTRACT_TERMINATION_UNDO")
 public class UndoLoanContractTerminationCommandHandler implements NewCommandSourceHandler {
-
     private final LoanContractTerminationServiceImpl loanContractTerminationService;
 
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return loanContractTerminationService.undoContractTermination(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UndoLoanContractTerminationCommandHandler(final LoanContractTerminationServiceImpl loanContractTerminationService) {
+        this.loanContractTerminationService = loanContractTerminationService;
     }
 }

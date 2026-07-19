@@ -19,8 +19,6 @@
 package org.apache.fineract.infrastructure.documentmanagement.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.fineract.infrastructure.contentstore.detector.ContentDetectorContext;
 import org.apache.fineract.infrastructure.contentstore.detector.ContentDetectorManager;
@@ -31,11 +29,10 @@ import org.apache.fineract.infrastructure.documentmanagement.domain.ImageReposit
 import org.apache.fineract.infrastructure.documentmanagement.exception.DocumentNotFoundException;
 import org.springframework.stereotype.Service;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 public class ImageReadPlatformServiceImpl implements ImageReadPlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ImageReadPlatformServiceImpl.class);
     @Deprecated
     private final List<EntityImageIdAdapter> imageIdAdapters;
     private final ContentStoreService storeService;
@@ -44,15 +41,14 @@ public class ImageReadPlatformServiceImpl implements ImageReadPlatformService {
 
     @Override
     public DocumentContent retrieveImage(final String entityType, final Long entityId) {
-        return imageIdAdapters.stream().filter(imageIdAdapter -> imageIdAdapter.accept(entityType)).findFirst()
-                .flatMap(imageIdAdapter -> imageIdAdapter.get(entityId))
-                .flatMap(imageIdResult -> imageRepository.findById(imageIdResult.getId()).map(image -> DocumentContent.builder()
-                        .fileName(FilenameUtils.getName(image.getLocation())).format(FilenameUtils.getExtension(image.getLocation()))
-                        .displayName(imageIdResult.getDisplayName())
-                        .contentType(contentDetectorManager
-                                .detect(ContentDetectorContext.builder().fileName(FilenameUtils.getName(image.getLocation())).build())
-                                .getMimeType())
-                        .stream(storeService.download(image.getLocation())).build()))
-                .orElseThrow(() -> new DocumentNotFoundException(entityType, entityId, -1L));
+        return imageIdAdapters.stream().filter(imageIdAdapter -> imageIdAdapter.accept(entityType)).findFirst().flatMap(imageIdAdapter -> imageIdAdapter.get(entityId)).flatMap(imageIdResult -> imageRepository.findById(imageIdResult.getId()).map(image -> DocumentContent.builder().fileName(FilenameUtils.getName(image.getLocation())).format(FilenameUtils.getExtension(image.getLocation())).displayName(imageIdResult.getDisplayName()).contentType(contentDetectorManager.detect(ContentDetectorContext.builder().fileName(FilenameUtils.getName(image.getLocation())).build()).getMimeType()).stream(storeService.download(image.getLocation())).build())).orElseThrow(() -> new DocumentNotFoundException(entityType, entityId, -1L));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ImageReadPlatformServiceImpl(final List<EntityImageIdAdapter> imageIdAdapters, final ContentStoreService storeService, final ImageRepository imageRepository, final ContentDetectorManager contentDetectorManager) {
+        this.imageIdAdapters = imageIdAdapters;
+        this.storeService = storeService;
+        this.imageRepository = imageRepository;
+        this.contentDetectorManager = contentDetectorManager;
     }
 }

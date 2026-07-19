@@ -26,49 +26,34 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleInstallment;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "m_loan_installment_delinquency_tag")
 public class LoanInstallmentDelinquencyTag extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @ManyToOne
     @JoinColumn(name = "delinquency_range_id", nullable = false)
     private DelinquencyRange delinquencyRange;
-
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
-
     @ManyToOne
     @JoinColumn(name = "installment_id", nullable = false)
     private LoanRepaymentScheduleInstallment installment;
-
     @Column(name = "addedon_date", nullable = false)
     private LocalDate addedOnDate;
-
     @Column(name = "liftedon_date", nullable = true)
     private LocalDate liftedOnDate;
-
     @Column(name = "first_overdue_date", nullable = false)
     private LocalDate firstOverdueDate;
-
     @Column(name = "outstanding_amount", scale = 6, precision = 19)
     private BigDecimal outstandingAmount;
-
     @Version
     private Long version;
 
-    public LoanInstallmentDelinquencyTag(DelinquencyRange delinquencyRange, Loan loan, LoanRepaymentScheduleInstallment installment,
-            LocalDate addedOnDate, LocalDate liftedOnDate, LocalDate firstOverdueDate, BigDecimal outstandingAmount) {
+    public LoanInstallmentDelinquencyTag(DelinquencyRange delinquencyRange, Loan loan, LoanRepaymentScheduleInstallment installment, LocalDate addedOnDate, LocalDate liftedOnDate, LocalDate firstOverdueDate, BigDecimal outstandingAmount) {
         this.delinquencyRange = delinquencyRange;
         this.loan = loan;
         this.installment = installment;
@@ -76,5 +61,89 @@ public class LoanInstallmentDelinquencyTag extends AbstractAuditableWithUTCDateT
         this.liftedOnDate = liftedOnDate;
         this.firstOverdueDate = firstOverdueDate;
         this.outstandingAmount = outstandingAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyRange getDelinquencyRange() {
+        return this.delinquencyRange;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Loan getLoan() {
+        return this.loan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanRepaymentScheduleInstallment getInstallment() {
+        return this.installment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getAddedOnDate() {
+        return this.addedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getLiftedOnDate() {
+        return this.liftedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getFirstOverdueDate() {
+        return this.firstOverdueDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getOutstandingAmount() {
+        return this.outstandingAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getVersion() {
+        return this.version;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDelinquencyRange(final DelinquencyRange delinquencyRange) {
+        this.delinquencyRange = delinquencyRange;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoan(final Loan loan) {
+        this.loan = loan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setInstallment(final LoanRepaymentScheduleInstallment installment) {
+        this.installment = installment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAddedOnDate(final LocalDate addedOnDate) {
+        this.addedOnDate = addedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLiftedOnDate(final LocalDate liftedOnDate) {
+        this.liftedOnDate = liftedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setFirstOverdueDate(final LocalDate firstOverdueDate) {
+        this.firstOverdueDate = firstOverdueDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setOutstandingAmount(final BigDecimal outstandingAmount) {
+        this.outstandingAmount = outstandingAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setVersion(final Long version) {
+        this.version = version;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanInstallmentDelinquencyTag() {
     }
 }

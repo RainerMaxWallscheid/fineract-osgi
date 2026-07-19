@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.cob.common;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.ActionContext;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.springframework.batch.core.StepContribution;
@@ -28,13 +26,17 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.lang.NonNull;
 
-@Slf4j
-@RequiredArgsConstructor
 public class ResetContextTasklet implements Tasklet {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ResetContextTasklet.class);
 
     @Override
     public RepeatStatus execute(@NonNull StepContribution contribution, @NonNull ChunkContext chunkContext) throws Exception {
         ThreadLocalContextUtil.setActionContext(ActionContext.DEFAULT);
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ResetContextTasklet() {
     }
 }

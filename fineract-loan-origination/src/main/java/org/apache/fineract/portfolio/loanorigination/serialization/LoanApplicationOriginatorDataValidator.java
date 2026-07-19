@@ -23,12 +23,10 @@ import static org.apache.fineract.portfolio.loanorigination.api.LoanOriginatorAp
 import static org.apache.fineract.portfolio.loanorigination.api.LoanOriginatorApiConstants.EXTERNAL_ID_PARAM;
 import static org.apache.fineract.portfolio.loanorigination.api.LoanOriginatorApiConstants.ORIGINATOR_TYPE_CODE_NAME;
 import static org.apache.fineract.portfolio.loanorigination.api.LoanOriginatorApiConstants.ORIGINATOR_TYPE_ID_PARAM;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
 import org.apache.fineract.infrastructure.codes.exception.CodeValueNotFoundException;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -39,43 +37,32 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 @ConditionalOnProperty(value = "fineract.module.loan-origination.enabled", havingValue = "true")
 public class LoanApplicationOriginatorDataValidator {
-
     private static final String RESOURCE_NAME = "loan.originator";
     private static final String ID_PARAM = "id";
     private static final String NAME_PARAM = "name";
-
     private final CodeValueRepositoryWrapper codeValueRepositoryWrapper;
 
     public LoanApplicationOriginatorData validateAndExtract(JsonObject jsonObject) {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(RESOURCE_NAME);
-
         final Long id = extractLong(jsonObject, ID_PARAM);
         final String externalId = extractString(jsonObject, EXTERNAL_ID_PARAM);
-
         if (id == null && (externalId == null || externalId.isBlank())) {
-            baseDataValidator.reset().parameter(ID_PARAM).failWithCode("or.externalId.required",
-                    "Either 'id' or 'externalId' must be provided for originator");
+            baseDataValidator.reset().parameter(ID_PARAM).failWithCode("or.externalId.required", "Either \'id\' or \'externalId\' must be provided for originator");
         }
-
         final String name = extractString(jsonObject, NAME_PARAM);
         baseDataValidator.reset().parameter(NAME_PARAM).value(name).ignoreIfNull().notExceedingLengthOf(255);
-
         final Long typeId = extractLong(jsonObject, ORIGINATOR_TYPE_ID_PARAM);
         if (typeId != null) {
             validateCodeValue(typeId, ORIGINATOR_TYPE_CODE_NAME, ORIGINATOR_TYPE_ID_PARAM, baseDataValidator);
         }
-
         final Long channelTypeId = extractLong(jsonObject, CHANNEL_TYPE_ID_PARAM);
         if (channelTypeId != null) {
             validateCodeValue(channelTypeId, CHANNEL_TYPE_CODE_NAME, CHANNEL_TYPE_ID_PARAM, baseDataValidator);
         }
-
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
-
         return new LoanApplicationOriginatorData(id, externalId, name, typeId, channelTypeId);
     }
 
@@ -107,8 +94,7 @@ public class LoanApplicationOriginatorDataValidator {
         try {
             this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(codeName, codeValueId);
         } catch (CodeValueNotFoundException e) {
-            baseDataValidator.reset().parameter(paramName).value(codeValueId).failWithCode("invalid.code.value",
-                    "Invalid code value id " + codeValueId + " for " + codeName);
+            baseDataValidator.reset().parameter(paramName).value(codeValueId).failWithCode("invalid.code.value", "Invalid code value id " + codeValueId + " for " + codeName);
         }
     }
 
@@ -116,5 +102,10 @@ public class LoanApplicationOriginatorDataValidator {
         if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanApplicationOriginatorDataValidator(final CodeValueRepositoryWrapper codeValueRepositoryWrapper) {
+        this.codeValueRepositoryWrapper = codeValueRepositoryWrapper;
     }
 }

@@ -19,17 +19,13 @@
 package org.apache.fineract.infrastructure.jobs.service.jobname;
 
 import static java.util.stream.Collectors.toSet;
-
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class JobNameService {
-
     private final Collection<JobNameProvider> providers;
 
     public JobNameData getJobByHumanReadableName(String jobName) {
@@ -39,5 +35,10 @@ public class JobNameService {
 
     private Set<JobNameData> getJobNames() {
         return providers.stream().map(JobNameProvider::provide).flatMap(Collection::stream).collect(toSet());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JobNameService(final Collection<JobNameProvider> providers) {
+        this.providers = providers;
     }
 }

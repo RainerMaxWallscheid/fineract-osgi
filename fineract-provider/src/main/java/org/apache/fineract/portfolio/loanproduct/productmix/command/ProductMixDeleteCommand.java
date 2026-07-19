@@ -18,11 +18,40 @@
  */
 package org.apache.fineract.portfolio.loanproduct.productmix.command;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.portfolio.loanproduct.productmix.data.ProductMixDeleteRequest;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class ProductMixDeleteCommand extends Command<ProductMixDeleteRequest> {}
+public class ProductMixDeleteCommand extends Command<ProductMixDeleteRequest> {
+	@java.lang.SuppressWarnings("all")
+		public ProductMixDeleteCommand() {
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public java.lang.String toString() {
+		return "ProductMixDeleteCommand()";
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public boolean equals(final java.lang.Object o) {
+		if (o == this) return true;
+		if (!(o instanceof ProductMixDeleteCommand)) return false;
+		final ProductMixDeleteCommand other = (ProductMixDeleteCommand) o;
+		if (!other.canEqual((java.lang.Object) this)) return false;
+		if (!super.equals(o)) return false;
+		return true;
+	}
+
+	@java.lang.SuppressWarnings("all")
+		protected boolean canEqual(final java.lang.Object other) {
+		return other instanceof ProductMixDeleteCommand;
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public int hashCode() {
+		final int result = super.hashCode();
+		return result;
+	}
+}

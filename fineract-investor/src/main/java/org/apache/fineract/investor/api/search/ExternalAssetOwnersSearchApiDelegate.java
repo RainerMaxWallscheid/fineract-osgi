@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.investor.api.search;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.PagedRequest;
 import org.apache.fineract.investor.data.ExternalTransferData;
 import org.apache.fineract.investor.service.search.ExternalAssetOwnerSearchService;
@@ -27,9 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class ExternalAssetOwnersSearchApiDelegate implements ExternalAssetOwnersSearchApi {
-
     private final ExternalAssetOwnerSearchService externalAssetOwnerSearchService;
 
     @Override
@@ -37,4 +34,8 @@ public class ExternalAssetOwnersSearchApiDelegate implements ExternalAssetOwners
         return externalAssetOwnerSearchService.searchInvestorData(request);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnersSearchApiDelegate(final ExternalAssetOwnerSearchService externalAssetOwnerSearchService) {
+        this.externalAssetOwnerSearchService = externalAssetOwnerSearchService;
+    }
 }

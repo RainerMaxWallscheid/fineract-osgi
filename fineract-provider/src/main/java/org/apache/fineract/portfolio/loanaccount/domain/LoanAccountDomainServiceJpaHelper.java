@@ -19,8 +19,6 @@
 package org.apache.fineract.portfolio.loanaccount.domain;
 
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.BatchRequestContextHolder;
 import org.apache.fineract.infrastructure.core.domain.FineractRequestContextHolder;
 import org.apache.fineract.organisation.monetary.domain.Money;
@@ -31,17 +29,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 @Component
-@Slf4j
 public class LoanAccountDomainServiceJpaHelper {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanAccountDomainServiceJpaHelper.class);
     private final LoanAssembler loanAssembler;
     private final LoanTransactionProcessingService loanTransactionProcessingService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-    public LocalDate calculateRecalculateTillDate(Loan loan, LocalDate transactionDate, ScheduleGeneratorDTO scheduleGeneratorDTOForPrepay,
-            Money repaymentAmount) {
+    public LocalDate calculateRecalculateTillDate(Loan loan, LocalDate transactionDate, ScheduleGeneratorDTO scheduleGeneratorDTOForPrepay, Money repaymentAmount) {
         LocalDate recalculateTill = null;
         try {
             if (FineractRequestContextHolder.isBatchRequest() && BatchRequestContextHolder.isEnclosingTransaction()) {
@@ -63,10 +59,8 @@ public class LoanAccountDomainServiceJpaHelper {
                 return null;
             }
             loan = loanAssembler.assembleFrom(loan.getId());
-            if (loan.isInterestBearingAndInterestRecalculationEnabled() && loan.getLoanProduct().getProductInterestRecalculationDetails()
-                    .getPreCloseInterestCalculationStrategy().calculateTillPreClosureDateEnabled()) {
-                Money outstanding = loanTransactionProcessingService
-                        .fetchPrepaymentDetail(scheduleGeneratorDTOForPrepay, transactionDate, loan).getTotalOutstanding();
+            if (loan.isInterestBearingAndInterestRecalculationEnabled() && loan.getLoanProduct().getProductInterestRecalculationDetails().getPreCloseInterestCalculationStrategy().calculateTillPreClosureDateEnabled()) {
+                Money outstanding = loanTransactionProcessingService.fetchPrepaymentDetail(scheduleGeneratorDTOForPrepay, transactionDate, loan).getTotalOutstanding();
                 if (repaymentAmount.isGreaterThanOrEqualTo(outstanding)) {
                     recalculateTill = transactionDate;
                 }
@@ -79,5 +73,11 @@ public class LoanAccountDomainServiceJpaHelper {
             log.warn("Unable to calculate prepayment amount", e);
         }
         return recalculateTill;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanAccountDomainServiceJpaHelper(final LoanAssembler loanAssembler, final LoanTransactionProcessingService loanTransactionProcessingService) {
+        this.loanAssembler = loanAssembler;
+        this.loanTransactionProcessingService = loanTransactionProcessingService;
     }
 }

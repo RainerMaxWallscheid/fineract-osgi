@@ -25,15 +25,9 @@ import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public class MutableUriInfo implements UriInfo {
-
     private final UriInfo delegate;
-
-    @Getter
     private final MultivaluedMap<String, String> additionalQueryParameters = new MultivaluedHashMap<>();
 
     @Override
@@ -143,5 +137,15 @@ public class MutableUriInfo implements UriInfo {
     @Override
     public URI relativize(URI uri) {
         return delegate.relativize(uri);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MutableUriInfo(final UriInfo delegate) {
+        this.delegate = delegate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MultivaluedMap<String, String> getAdditionalQueryParameters() {
+        return this.additionalQueryParameters;
     }
 }

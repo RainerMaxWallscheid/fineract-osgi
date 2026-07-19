@@ -19,18 +19,12 @@
 package org.apache.fineract.test.messaging.config;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Getter
 @Component
-@RequiredArgsConstructor
 public class MessagingProperties implements InitializingBean {
-
     @Value("${fineract-test.messaging.jms.broker-url}")
     private String brokerUrl;
     @Value("${fineract-test.messaging.jms.broker-username}")
@@ -39,7 +33,6 @@ public class MessagingProperties implements InitializingBean {
     private String brokerPassword;
     @Value("${fineract-test.messaging.jms.topic-name}")
     private String topicName;
-
     private final EventProperties eventProperties;
 
     @Override
@@ -47,5 +40,35 @@ public class MessagingProperties implements InitializingBean {
         if (eventProperties.isEventVerificationEnabled() && (isBlank(brokerUrl) || isBlank(topicName))) {
             throw new IllegalStateException("Broker and topic must be configured in case event verification is enabled");
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getBrokerUrl() {
+        return this.brokerUrl;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getBrokerUsername() {
+        return this.brokerUsername;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getBrokerPassword() {
+        return this.brokerPassword;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getTopicName() {
+        return this.topicName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EventProperties getEventProperties() {
+        return this.eventProperties;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MessagingProperties(final EventProperties eventProperties) {
+        this.eventProperties = eventProperties;
     }
 }

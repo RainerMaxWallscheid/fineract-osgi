@@ -36,7 +36,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -52,58 +51,42 @@ import org.apache.fineract.infrastructure.dataqueries.service.EntityDatatableChe
 import org.springframework.stereotype.Component;
 
 @Path("/v1/entityDatatableChecks")
-@RequiredArgsConstructor
 @Component
 @Tag(name = "Entity Data Table", description = "This defines Entity-Datatable Check.")
 public class EntityDatatableChecksApiResource {
-
     private final EntityDatatableChecksReadService readEntityDatatableChecksService;
     private final ToApiJsonSerializer<GenericResultsetData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "List Entity-Datatable Checks", operationId = "retrieveAllEntityDatatableChecks", description = "The list capability of Entity-Datatable Checks can support pagination.\n"
-            + "\n" + "OPTIONAL ARGUMENTS\n"
-            + "offset Integer optional, defaults to 0 Indicates the result from which pagination startslimit Integer optional, defaults to 200 Restricts the size of results returned. To override the default and return all entries you must explicitly pass a non-positive integer value for limit e.g. limit=0, or limit=-1\n"
-            + "Example Request:\n" + "\n" + "entityDatatableChecks?offset=0&limit=15")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "List Entity-Datatable Checks", operationId = "retrieveAllEntityDatatableChecks", description = "The list capability of Entity-Datatable Checks can support pagination.\n" + "\n" + "OPTIONAL ARGUMENTS\n" + "offset Integer optional, defaults to 0 Indicates the result from which pagination startslimit Integer optional, defaults to 200 Restricts the size of results returned. To override the default and return all entries you must explicitly pass a non-positive integer value for limit e.g. limit=0, or limit=-1\n" + "Example Request:\n" + "\n" + "entityDatatableChecks?offset=0&limit=15")
     @AlternativeOperationId("retrieveAll_6")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = EntityDatatableChecksApiResourceSwagger.PageGetEntityDatatableChecksResponse.class)))
-    public String retrieveAll(@Context final UriInfo uriInfo, @QueryParam("status") @Parameter(description = "status") final Integer status,
-            @QueryParam("entity") @Parameter(description = "entity") final String entity,
-            @QueryParam("productId") @Parameter(description = "productId") final Long productId,
-            @QueryParam("offset") @Parameter(description = "offset") final Integer offset,
-            @QueryParam("limit") @Parameter(description = "limit") final Integer limit) {
+    public String retrieveAll(@Context final UriInfo uriInfo, @QueryParam("status") @Parameter(description = "status") final Integer status, @QueryParam("entity") @Parameter(description = "entity") final String entity, @QueryParam("productId") @Parameter(description = "productId") final Long productId, @QueryParam("offset") @Parameter(description = "offset") final Integer offset, @QueryParam("limit") @Parameter(description = "limit") final Integer limit) {
         final SearchParameters searchParameters = SearchParameters.builder().limit(limit).offset(offset).build();
-        final Page<EntityDataTableChecksData> result = this.readEntityDatatableChecksService.retrieveAll(searchParameters, status, entity,
-                productId);
-
+        final Page<EntityDataTableChecksData> result = this.readEntityDatatableChecksService.retrieveAll(searchParameters, status, entity, productId);
         return this.toApiJsonSerializer.serialize(result);
     }
 
     @GET
     @Path("template")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve Entity-Datatable Checks Template", operationId = "retrieveTemplateEntityDatatableChecks", description = "This is a convenience resource useful for building maintenance user interface screens for Entity-Datatable Checks applications. The template data returned consists of:\n"
-            + "\n" + "Allowed description Lists\n" + "Example Request:\n" + "\n" + "entityDatatableChecks/template")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve Entity-Datatable Checks Template", operationId = "retrieveTemplateEntityDatatableChecks", description = "This is a convenience resource useful for building maintenance user interface screens for Entity-Datatable Checks applications. The template data returned consists of:\n" + "\n" + "Allowed description Lists\n" + "Example Request:\n" + "\n" + "entityDatatableChecks/template")
     @AlternativeOperationId("getTemplate")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = EntityDatatableChecksApiResourceSwagger.GetEntityDatatableChecksTemplateResponse.class)))
     public String getTemplate(@Context final UriInfo uriInfo) {
-
         final EntityDataTableChecksTemplateData result = this.readEntityDatatableChecksService.retrieveTemplate();
-
         return this.toApiJsonSerializer.serialize(result);
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Create Entity-Datatable Checks", operationId = "createEntityDatatableCheck", description = "Mandatory Fields : \n"
-            + "entity, status, datatableName\n" + "\n" + "Non-Mandatory Fields : \n" + "productId")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Create Entity-Datatable Checks", operationId = "createEntityDatatableCheck", description = "Mandatory Fields : \n" + "entity, status, datatableName\n" + "\n" + "Non-Mandatory Fields : \n" + "productId")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = EntityDatatableChecksApiResourceSwagger.PostEntityDatatableChecksTemplateRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = EntityDatatableChecksApiResourceSwagger.PostEntityDatatableChecksTemplateResponse.class)))
     public String createEntityDatatableCheck(@Parameter(hidden = true) final String apiRequestBodyAsJson) {
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createEntityDatatableChecks(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
@@ -111,20 +94,21 @@ public class EntityDatatableChecksApiResource {
 
     @DELETE
     @Path("{entityDatatableCheckId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete Entity-Datatable Checks", operationId = "deleteEntityDatatableCheck", description = "Deletes an existing Entity-Datatable Check")
     @AlternativeOperationId("deleteDatatable_1")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = EntityDatatableChecksApiResourceSwagger.DeleteEntityDatatableChecksTemplateResponse.class)))
-    public String deleteDatatable(
-            @PathParam("entityDatatableCheckId") @Parameter(description = "entityDatatableCheckId") final long entityDatatableCheckId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder()
-                .deleteEntityDatatableChecks(entityDatatableCheckId, apiRequestBodyAsJson).build();
-
+    public String deleteDatatable(@PathParam("entityDatatableCheckId") @Parameter(description = "entityDatatableCheckId") final long entityDatatableCheckId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteEntityDatatableChecks(entityDatatableCheckId, apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public EntityDatatableChecksApiResource(final EntityDatatableChecksReadService readEntityDatatableChecksService, final ToApiJsonSerializer<GenericResultsetData> toApiJsonSerializer, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.readEntityDatatableChecksService = readEntityDatatableChecksService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+    }
 }

@@ -26,7 +26,6 @@ import static org.apache.fineract.infrastructure.dataqueries.data.ResultsetColum
 import static org.apache.fineract.infrastructure.dataqueries.data.ResultsetColumnHeaderData.DisplayType.DECIMAL;
 import static org.apache.fineract.infrastructure.dataqueries.data.ResultsetColumnHeaderData.DisplayType.INTEGER;
 import static org.apache.fineract.infrastructure.dataqueries.data.ResultsetColumnHeaderData.DisplayType.TIME;
-
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -34,8 +33,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseIndependentQueryService;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseType;
@@ -56,10 +53,9 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
-@RequiredArgsConstructor
 public class GenericDataServiceImpl implements GenericDataService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GenericDataServiceImpl.class);
     private final JdbcTemplate jdbcTemplate;
     private final RoutingDataSource dataSource;
     private final DatabaseIndependentQueryService databaseIndependentQueryService;
@@ -70,21 +66,15 @@ public class GenericDataServiceImpl implements GenericDataService {
     public GenericResultsetData fillGenericResultSet(final String sql) {
         try {
             final SqlRowSet rs = this.jdbcTemplate.queryForRowSet(sql); // NOSONAR
-
             final List<ResultsetColumnHeaderData> columnHeaders = new ArrayList<>();
-
             final SqlRowSetMetaData rsmd = rs.getMetaData();
             for (int i = 0; i < rsmd.getColumnCount(); i++) {
                 final String columnName = rsmd.getColumnName(i + 1);
                 final String columnType = rsmd.getColumnTypeName(i + 1);
-
-                final ResultsetColumnHeaderData columnHeader = ResultsetColumnHeaderData.basic(columnName, columnType,
-                        databaseTypeResolver.databaseType());
+                final ResultsetColumnHeaderData columnHeader = ResultsetColumnHeaderData.basic(columnName, columnType, databaseTypeResolver.databaseType());
                 columnHeaders.add(columnHeader);
             }
-
             final List<ResultsetRowData> resultsetDataRows = fillResultsetRowData(rs, columnHeaders);
-
             return new GenericResultsetData(columnHeaders, resultsetDataRows);
         } catch (DataAccessException e) {
             log.error("Reporting error: {}", e.getMessage());
@@ -96,21 +86,15 @@ public class GenericDataServiceImpl implements GenericDataService {
     public GenericResultsetData fillGenericResultSet(final String sql, final Object... args) {
         try {
             final SqlRowSet rs = this.jdbcTemplate.queryForRowSet(sql, args);
-
             final List<ResultsetColumnHeaderData> columnHeaders = new ArrayList<>();
-
             final SqlRowSetMetaData rsmd = rs.getMetaData();
             for (int i = 0; i < rsmd.getColumnCount(); i++) {
                 final String columnName = rsmd.getColumnName(i + 1);
                 final String columnType = rsmd.getColumnTypeName(i + 1);
-
-                final ResultsetColumnHeaderData columnHeader = ResultsetColumnHeaderData.basic(columnName, columnType,
-                        databaseTypeResolver.databaseType());
+                final ResultsetColumnHeaderData columnHeader = ResultsetColumnHeaderData.basic(columnName, columnType, databaseTypeResolver.databaseType());
                 columnHeaders.add(columnHeader);
             }
-
             final List<ResultsetRowData> resultsetDataRows = fillResultsetRowData(rs, columnHeaders);
-
             return new GenericResultsetData(columnHeaders, resultsetDataRows);
         } catch (DataAccessException e) {
             log.error("Reporting error: {}", e.getMessage());
@@ -122,10 +106,8 @@ public class GenericDataServiceImpl implements GenericDataService {
     public List<ResultsetColumnHeaderData> fillResultsetColumnHeaders(final String tableName) {
         final SqlRowSet columnDefinitions = getTableMetaData(tableName);
         final List<IndexDetail> indexDefinitions = getDatatableIndexData(tableName);
-
         DatabaseType dialect = databaseTypeResolver.databaseType();
         final List<ResultsetColumnHeaderData> columnHeaders = new ArrayList<>();
-
         columnDefinitions.beforeFirst();
         while (columnDefinitions.next()) {
             final String columnName = columnDefinitions.getString(1);
@@ -133,18 +115,13 @@ public class GenericDataServiceImpl implements GenericDataService {
             final String isPrimaryKey = columnDefinitions.getString(5);
             final String columnType = columnDefinitions.getString(3);
             final Long columnLength = columnDefinitions.getLong(4);
-
             final boolean columnNullable = "YES".equalsIgnoreCase(isNullable) || "TRUE".equalsIgnoreCase(isNullable);
             final boolean columnIsPrimaryKey = "PRI".equalsIgnoreCase(isPrimaryKey) || "TRUE".equalsIgnoreCase(isPrimaryKey);
-
             // primary keys are automatically unique
             final boolean columnIsUnique = columnIsPrimaryKey || isExplicitlyUnique(tableName, columnName, indexDefinitions);
-
             // primary keys and unique constrained columns are automatically indexed
-            final boolean columnIsIndexed = columnIsPrimaryKey || columnIsUnique
-                    || isExplicitlyIndexed(tableName, columnName, indexDefinitions);
+            final boolean columnIsIndexed = columnIsPrimaryKey || columnIsUnique || isExplicitlyIndexed(tableName, columnName, indexDefinitions);
             JdbcJavaType jdbcType = JdbcJavaType.getByTypeName(dialect, columnType, false);
-
             List<ResultsetColumnValueData> columnValues = new ArrayList<>();
             String codeName = null;
             final int codePosition = columnName.indexOf("_cd");
@@ -152,11 +129,8 @@ public class GenericDataServiceImpl implements GenericDataService {
                 codeName = columnName.substring(0, codePosition);
                 columnValues = retrieveCodeValues(codeName);
             }
-
-            columnHeaders.add(ResultsetColumnHeaderData.detailed(columnName, columnType, columnLength, columnNullable, columnIsPrimaryKey,
-                    columnValues, codeName, columnIsUnique, columnIsIndexed, dialect));
+            columnHeaders.add(ResultsetColumnHeaderData.detailed(columnName, columnType, columnLength, columnNullable, columnIsPrimaryKey, columnValues, codeName, columnIsUnique, columnIsIndexed, dialect));
         }
-
         return columnHeaders;
     }
 
@@ -188,8 +162,7 @@ public class GenericDataServiceImpl implements GenericDataService {
                     columnValues.add(tmpDate == null ? null : tmpDate.toLocalDate());
                 } else if (colType == DATETIME || colType == TIMESTAMP) {
                     Object tmpDate = rs.getObject(columnName);
-                    columnValues.add(
-                            tmpDate == null ? null : (tmpDate instanceof Timestamp ? ((Timestamp) tmpDate).toLocalDateTime() : tmpDate));
+                    columnValues.add(tmpDate == null ? null : (tmpDate instanceof Timestamp ? ((Timestamp) tmpDate).toLocalDateTime() : tmpDate));
                 } else {
                     columnValues.add(rs.getObject(columnName));
                 }
@@ -207,7 +180,6 @@ public class GenericDataServiceImpl implements GenericDataService {
         int s = 0;
         int e = 0;
         final StringBuilder result = new StringBuilder();
-
         while ((e = str.indexOf(pattern, s)) >= 0) {
             result.append(str.substring(s, e));
             result.append(replace);
@@ -221,7 +193,6 @@ public class GenericDataServiceImpl implements GenericDataService {
     public String wrapSQL(final String sql) {
         // wrap sql to prevent JDBC sql errors, prevent malicious sql and a
         // CachedRowSetImpl bug
-
         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7046875 - prevent
         // Invalid Column Name bug in sun's CachedRowSetImpl where it doesn't
         // pick up on label names, only column names
@@ -231,11 +202,8 @@ public class GenericDataServiceImpl implements GenericDataService {
     @Override
     public String generateJsonFromGenericResultsetData(final GenericResultsetData grs) {
         final StringBuilder writer = new StringBuilder();
-
         writer.append("[");
-
         final List<ResultsetColumnHeaderData> columnHeaders = grs.getColumnHeaders();
-
         final List<ResultsetRowData> data = grs.getData();
         List<Object> row;
         Integer rSize;
@@ -243,10 +211,8 @@ public class GenericDataServiceImpl implements GenericDataService {
         final String slashDoubleQuote = "\\\"";
         ResultsetColumnHeaderData.DisplayType colDisplayType;
         Object currVal;
-
         for (int i = 0; i < data.size(); i++) {
             writer.append("\n{");
-
             row = data.get(i).getRow();
             rSize = row.size();
             for (int j = 0; j < rSize; j++) {
@@ -264,13 +230,10 @@ public class GenericDataServiceImpl implements GenericDataService {
                         writer.append(format("[%d,%d,%d]", localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth()));
                     } else if (colDisplayType == ResultsetColumnHeaderData.DisplayType.DATETIME) {
                         final LocalDateTime localDateTime = (LocalDateTime) currVal;
-                        writer.append(format("[%d,%d,%d,%d,%d,%d,%d]", localDateTime.getYear(), localDateTime.getMonthValue(),
-                                localDateTime.getDayOfMonth(), localDateTime.getHour(), localDateTime.getMinute(),
-                                localDateTime.getSecond(), localDateTime.getNano()));
+                        writer.append(format("[%d,%d,%d,%d,%d,%d,%d]", localDateTime.getYear(), localDateTime.getMonthValue(), localDateTime.getDayOfMonth(), localDateTime.getHour(), localDateTime.getMinute(), localDateTime.getSecond(), localDateTime.getNano()));
                     } else if (colDisplayType == TIME) {
                         final LocalTime localTime = (LocalTime) currVal;
-                        writer.append(format("[%d,%d,%d,%d]", localTime.getHour(), localTime.getMinute(), localTime.getSecond(),
-                                localTime.getNano()));
+                        writer.append(format("[%d,%d,%d,%d]", localTime.getHour(), localTime.getMinute(), localTime.getSecond(), localTime.getNano()));
                     } else if (colDisplayType == DECIMAL || colDisplayType == INTEGER || colDisplayType == CODELOOKUP) {
                         writer.append(currVal);
                     } else {
@@ -283,14 +246,12 @@ public class GenericDataServiceImpl implements GenericDataService {
                     writer.append(",\n");
                 }
             }
-
             if (i < (data.size() - 1)) {
                 writer.append("},");
             } else {
                 writer.append("}");
             }
         }
-
         writer.append("\n]");
         return writer.toString();
     }
@@ -339,18 +300,14 @@ public class GenericDataServiceImpl implements GenericDataService {
     private List<ResultsetColumnValueData> retrieveCodeValues(final String codeName) {
         final String sql = "select v.id, v.code_score, v.code_value from m_code m join m_code_value v on v.code_id = m.id where m.code_name = ? order by v.order_position, v.id";
         final SqlRowSet rsValues = this.jdbcTemplate.queryForRowSet(sql, codeName); // NOSONAR
-
         final List<ResultsetColumnValueData> columnValues = new ArrayList<>();
-
         rsValues.beforeFirst();
         while (rsValues.next()) {
             final Integer id = rsValues.getInt("id");
             final String codeValue = rsValues.getString("code_value");
             final Integer score = rsValues.getInt("code_score");
-
             columnValues.add(new ResultsetColumnValueData(id, codeValue, score));
         }
-
         return columnValues;
     }
 
@@ -361,5 +318,14 @@ public class GenericDataServiceImpl implements GenericDataService {
         } catch (IllegalArgumentException e) {
             throw new DatatableNotFoundException(tableName);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GenericDataServiceImpl(final JdbcTemplate jdbcTemplate, final RoutingDataSource dataSource, final DatabaseIndependentQueryService databaseIndependentQueryService, final DatatableKeywordGenerator datatableKeywordGenerator, final DatabaseTypeResolver databaseTypeResolver) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.dataSource = dataSource;
+        this.databaseIndependentQueryService = databaseIndependentQueryService;
+        this.datatableKeywordGenerator = datatableKeywordGenerator;
+        this.databaseTypeResolver = databaseTypeResolver;
     }
 }

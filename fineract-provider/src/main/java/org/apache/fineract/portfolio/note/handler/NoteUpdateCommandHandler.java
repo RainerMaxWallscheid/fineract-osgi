@@ -19,8 +19,6 @@
 package org.apache.fineract.portfolio.note.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.portfolio.note.data.NoteUpdateRequest;
@@ -29,11 +27,10 @@ import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class NoteUpdateCommandHandler implements CommandHandler<NoteUpdateRequest, NoteUpdateResponse> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NoteUpdateCommandHandler.class);
     private final NoteWritePlatformService writePlatformService;
 
     @Retry(name = "commandNoteUpdate", fallbackMethod = "fallback")
@@ -47,5 +44,10 @@ public class NoteUpdateCommandHandler implements CommandHandler<NoteUpdateReques
     public NoteUpdateResponse fallback(Command<NoteUpdateRequest> command, Throwable t) {
         // NOTE: fallback method needs to be in the same class
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public NoteUpdateCommandHandler(final NoteWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

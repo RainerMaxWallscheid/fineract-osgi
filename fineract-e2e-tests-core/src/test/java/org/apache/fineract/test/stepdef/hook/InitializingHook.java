@@ -22,16 +22,16 @@ import io.cucumber.java.After;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
 import io.cucumber.java.BeforeAll;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.test.initializer.FineractInitializerFactory;
 import org.apache.fineract.test.initializer.InitializerProperties;
 import org.apache.fineract.test.support.PropertiesFactory;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.support.ResourcePropertySource;
 
-@Slf4j
-@SuppressWarnings({ "HideUtilityClassConstructor" })
+@SuppressWarnings({"HideUtilityClassConstructor"})
 public class InitializingHook {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InitializingHook.class);
 
     @BeforeAll
     public static void beforeAll() throws Exception {
@@ -44,7 +44,6 @@ public class InitializingHook {
         } else {
             log.info("Skipping global defaults for Fineract");
         }
-
         FineractInitializerFactory.get().setupDefaultsForSuite();
     }
 

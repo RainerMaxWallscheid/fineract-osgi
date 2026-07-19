@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.dataqueries.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,15 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "REPORT", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateReportCommandHandler implements NewCommandSourceHandler {
-
     private final ReportWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.updateReport(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateReportCommandHandler(final ReportWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

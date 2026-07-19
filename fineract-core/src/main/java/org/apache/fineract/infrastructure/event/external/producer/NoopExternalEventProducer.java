@@ -20,16 +20,17 @@ package org.apache.fineract.infrastructure.event.external.producer;
 
 import java.util.List;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.event.external.exception.AcknowledgementTimeoutException;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
 @Component
 @Conditional(NoopExternalEventEnabled.class)
-@Slf4j
 public class NoopExternalEventProducer implements ExternalEventProducer {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NoopExternalEventProducer.class);
 
     @Override
-    public void sendEvents(Map<Long, List<byte[]>> messages) throws AcknowledgementTimeoutException {}
+    public void sendEvents(Map<Long, List<byte[]>> messages) throws AcknowledgementTimeoutException {
+    }
 }

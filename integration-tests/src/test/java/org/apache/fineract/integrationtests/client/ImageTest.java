@@ -22,12 +22,10 @@ import static com.github.romankh3.image.comparison.model.ImageComparisonState.MA
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import com.github.romankh3.image.comparison.ImageComparison;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -46,14 +44,12 @@ import retrofit2.http.Headers;
  *
  * @author Michael Vorburger.ch
  */
-@Slf4j
 class ImageTest extends IntegrationTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ImageTest.class);
     static final String TEST_RESOURCE = "michael.vorburger-crepes.jpg";
     static final int TEST_IMAGE_DIFF_PERCENTAGE = 2;
-
     final MultipartBody.Part testPart = createPart(TEST_RESOURCE, TEST_RESOURCE, "image/jpeg");
-
     Long clientId = new ClientTest().getClientId();
     Long staffId = new StaffTest().getStaffId();
 
@@ -98,7 +94,6 @@ class ImageTest extends IntegrationTest {
             assertThat(body.contentType()).isEqualTo(MediaType.get("image/jpeg"));
             assertImage(body);
         }
-
         var staff = ok(fineractClient().staff.retrieveOneStaff(staffId));
         assertThat(Parts.fileName(r)).hasValue(staff.getDisplayName());
     }
@@ -155,33 +150,24 @@ class ImageTest extends IntegrationTest {
     @Test
     @Order(100)
     void pathTraversalJsp() {
-        final var part = createPart("image-text-wrong-content.jsp", "../../../../../../../../../../tmp/image-text-wrong-content.jsp",
-                "image/gif");
-
+        final var part = createPart("image-text-wrong-content.jsp", "../../../../../../../../../../tmp/image-text-wrong-content.jsp", "image/gif");
         assertThat(part).isNotNull();
-
         var exception = assertThrows(Exception.class, () -> {
             ok(fineractClient().images.create("clients", clientId, part));
         });
-
         assertThat(exception).isNotNull();
-
-        log.warn("Should not be able to upload a file that doesn't match the indicated content type: {}", exception.getMessage());
+        log.warn("Should not be able to upload a file that doesn\'t match the indicated content type: {}", exception.getMessage());
     }
 
     @Test
     @Order(101)
     void gifWithPngExtension() {
         final var part = createPart("image-gif-wrong-extension.png", "image-gif-wrong-extension.png", "image/png");
-
         assertThat(part).isNotNull();
-
         var exception = assertThrows(Exception.class, () -> {
             ok(fineractClient().images.create("clients", clientId, part));
         });
-
         assertThat(exception).isNotNull();
-
         log.warn("Should not be able to upload a gif by just renaming the file extension: {}", exception.getMessage());
     }
 
@@ -189,32 +175,23 @@ class ImageTest extends IntegrationTest {
     @Order(102)
     void gifImage() {
         final var part = createPart("image-gif-correct-extension.gif", "image-gif-correct-extension.gif", "image/png");
-
         assertThat(part).isNotNull();
-
         var exception = assertThrows(Exception.class, () -> {
             ok(fineractClient().images.create("clients", clientId, part));
         });
-
         assertThat(exception).isNotNull();
-
         log.warn("Should not be able to upload a gif it is not whitelisted: {}", exception.getMessage());
     }
 
     @Test
     @Order(103)
     void pathTraversalJpg() {
-        final var part = createPart("michael.vorburger-crepes.jpg", "../../../../../../../../../../tmp/michael.vorburger-crepes.jpg",
-                "image/jpeg");
-
+        final var part = createPart("michael.vorburger-crepes.jpg", "../../../../../../../../../../tmp/michael.vorburger-crepes.jpg", "image/jpeg");
         assertThat(part).isNotNull();
-
         var exception = assertThrows(Exception.class, () -> {
             ok(fineractClient().images.create("clients", clientId, part));
         });
-
         assertThat(exception).isNotNull();
-
         log.warn("Should not be able to upload a file with a forbidden name pattern: {}", exception.getMessage());
     }
 
@@ -223,15 +200,11 @@ class ImageTest extends IntegrationTest {
     void pathTraversalWithAbsolutePathJpg() {
         create();
         final var part = createPart("michael.vorburger-crepes.jpg", "../17/michael.vorburger-crepes.jpg", "image/jpeg");
-
         assertThat(part).isNotNull();
-
         var exception = assertThrows(Exception.class, () -> {
             ok(fineractClient().images.create("clients", clientId, part));
         });
-
         assertThat(exception).isNotNull();
-
         log.warn("Should not be able to upload a file with a forbidden name pattern: {}", exception.getMessage());
     }
 
@@ -239,15 +212,11 @@ class ImageTest extends IntegrationTest {
     @Order(105)
     void pathTraversalWithAbsolutePathJpg2() {
         final var part = createPart("michael.vorburger-crepes.jpg", "..//17//michael.vorburger-crepes.jpg", "image/jpeg");
-
         assertThat(part).isNotNull();
-
         var exception = assertThrows(Exception.class, () -> {
             ok(fineractClient().images.create("clients", clientId, part));
         });
-
         assertThat(exception).isNotNull();
-
         log.warn("Should not be able to upload a file with a forbidden name pattern: {}", exception.getMessage());
     }
 
@@ -259,7 +228,6 @@ class ImageTest extends IntegrationTest {
         } catch (Exception e) {
             log.error("Error creating file part.", e);
         }
-
         return null;
     }
 
@@ -285,33 +253,25 @@ class ImageTest extends IntegrationTest {
     private void assertImage(byte[] data, double diffPercent) {
         try (var resource = ImageTest.class.getClassLoader().getResourceAsStream(TEST_RESOURCE)) {
             requireNonNull(resource);
-
             var expectedImage = ImageIO.read(resource);
             var actualImage = ImageIO.read(new ByteArrayInputStream(data));
-
             var result = new ImageComparison(expectedImage, actualImage).setAllowingPercentOfDifferentPixels(diffPercent).compareImages();
             // result.writeResultTo(new File("build/diff.png"));
-
             log.info("Image diff percentage: {}", result.getDifferencePercent());
-
             assertEquals(MATCH, result.getImageComparisonState(), "The images should be identical");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    interface ImagesApiWithHeadersForTest extends ImagesApi {
 
+    interface ImagesApiWithHeadersForTest extends ImagesApi {
         @Headers("Accept: text/plain")
         @GET("v1/{entityType}/{entityId}/images")
-        Call<ResponseBody> getText(@retrofit2.http.Path("entityType") String entityType, @retrofit2.http.Path("entityId") Long entityId,
-                @retrofit2.http.Query("maxWidth") Integer maxWidth, @retrofit2.http.Query("maxHeight") Integer maxHeight,
-                @retrofit2.http.Query("output") String output);
+        Call<ResponseBody> getText(@retrofit2.http.Path("entityType") String entityType, @retrofit2.http.Path("entityId") Long entityId, @retrofit2.http.Query("maxWidth") Integer maxWidth, @retrofit2.http.Query("maxHeight") Integer maxHeight, @retrofit2.http.Query("output") String output);
 
         @Headers("Accept: application/octet-stream")
         @GET("v1/{entityType}/{entityId}/images")
-        Call<ResponseBody> getBytes(@retrofit2.http.Path("entityType") String entityType, @retrofit2.http.Path("entityId") Long entityId,
-                @retrofit2.http.Query("maxWidth") Integer maxWidth, @retrofit2.http.Query("maxHeight") Integer maxHeight,
-                @retrofit2.http.Query("output") String output);
+        Call<ResponseBody> getBytes(@retrofit2.http.Path("entityType") String entityType, @retrofit2.http.Path("entityId") Long entityId, @retrofit2.http.Query("maxWidth") Integer maxWidth, @retrofit2.http.Query("maxHeight") Integer maxHeight, @retrofit2.http.Query("output") String output);
     }
 }

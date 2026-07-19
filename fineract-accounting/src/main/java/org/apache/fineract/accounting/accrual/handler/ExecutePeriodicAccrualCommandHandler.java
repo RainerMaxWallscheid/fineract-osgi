@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.accounting.accrual.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.accrual.service.AccrualAccountingWritePlatformService;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "PERIODICACCRUALACCOUNTING", action = "EXECUTE")
-@RequiredArgsConstructor
 public class ExecutePeriodicAccrualCommandHandler implements NewCommandSourceHandler {
-
     private final AccrualAccountingWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.executeLoansPeriodicAccrual(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExecutePeriodicAccrualCommandHandler(final AccrualAccountingWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

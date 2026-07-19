@@ -21,7 +21,6 @@ package org.apache.fineract.infrastructure.campaigns.sms.api;
 import static org.apache.fineract.infrastructure.campaigns.sms.data.dto.SmsCampaignHandlerDto.ACTIVATE_COMMAND;
 import static org.apache.fineract.infrastructure.campaigns.sms.data.dto.SmsCampaignHandlerDto.CLOSE_COMMAND;
 import static org.apache.fineract.infrastructure.campaigns.sms.data.dto.SmsCampaignHandlerDto.REACTIVATE_COMMAND;
-
 import com.google.gson.JsonElement;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,7 +38,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
@@ -66,9 +64,7 @@ import org.springframework.stereotype.Component;
 
 @Path("/v1/smscampaigns")
 @Component
-@RequiredArgsConstructor
 public class SmsCampaignApiResource {
-
     private final PlatformSecurityContext platformSecurityContext;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final SmsCampaignReadPlatformService smsCampaignReadPlatformService;
@@ -76,21 +72,20 @@ public class SmsCampaignApiResource {
     private final SmsCampaignWritePlatformService smsCampaignWritePlatformService;
     private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<String> toApiJsonSerializer;
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "SMS_CAMPAIGN";
 
     @GET
     @Path("template")
     @Operation(summary = "Retrieve a SMS Campaign", operationId = "retrieveTemplateSmsCampaign", description = """
-            Example Requests:
-
-            smscampaigns/1
-
-
-            smscampaigns/1?template=true
-
-
-            smscampaigns/template""")
+        Example Requests:
+        
+        smscampaigns/1
+        
+        
+        smscampaigns/1?template=true
+        
+        
+        smscampaigns/template""")
     @AlternativeOperationId("template_2")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SmsCampaignData.class)))
     public SmsCampaignData template() {
@@ -99,32 +94,31 @@ public class SmsCampaignApiResource {
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create a SMS Campaign", operationId = "createSmsCampaign", description = """
-            Mandatory Fields
-            campaignName, campaignType, triggerType, providerId, runReportId, message
-
-            Mandatory Fields for Cash based on selected report id
-            paramValue in json format""")
+        Mandatory Fields
+        campaignName, campaignType, triggerType, providerId, runReportId, message
+        
+        Mandatory Fields for Cash based on selected report id
+        paramValue in json format""")
     @AlternativeOperationId("createCampaign_1")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CommandWrapper.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CommandProcessingResult.class)))
     public CommandProcessingResult createCampaign(@Parameter(hidden = true) final SmsCampaignCreationDto smsCampaignCreationDto) {
         platformSecurityContext.authenticatedUser();
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createSmsCampaign()
-                .withJson(toApiJsonSerializer.serialize(smsCampaignCreationDto)).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createSmsCampaign().withJson(toApiJsonSerializer.serialize(smsCampaignCreationDto)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @GET
     @Path("{resourceId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve a SMS Campaign", operationId = "retrieveOneSmsCampaign", description = """
-            Example Requests:
-
-            smscampaigns/1
-            """)
+        Example Requests:
+        
+        smscampaigns/1
+        """)
     @AlternativeOperationId("retrieveCampaign")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SmsCampaignData.class)))
     public SmsCampaignData retrieveCampaign(@PathParam("resourceId") final Long resourceId) {
@@ -133,53 +127,48 @@ public class SmsCampaignApiResource {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "List SMS Campaigns", operationId = "retrieveAllSmsCampaigns", description = """
-            Example Requests:
-
-            smscampaigns""")
+        Example Requests:
+        
+        smscampaigns""")
     @AlternativeOperationId("retrieveAllEmails_1")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SmsCampaignData.class)))
-    public Page<SmsCampaignData> retrieveAllEmails(@QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit,
-            @QueryParam("orderBy") final String orderBy, @QueryParam("sortOrder") final String sortOrder) {
+    public Page<SmsCampaignData> retrieveAllEmails(@QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit, @QueryParam("orderBy") final String orderBy, @QueryParam("sortOrder") final String sortOrder) {
         platformSecurityContext.authenticatedUser().validateHasReadPermission(SmsCampaignConstants.RESOURCE_NAME);
-        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).offset(offset).orderBy(orderBy)
-                .sortOrder(sortOrder).build();
+        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
         return smsCampaignReadPlatformService.retrieveAll(searchParameters);
     }
 
     @PUT
     @Path("{campaignId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a Campaign", operationId = "updateSmsCampaign")
     @AlternativeOperationId("updateCampaign_1")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CommandWrapper.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CommandProcessingResult.class)))
-    public CommandProcessingResult updateCampaign(@PathParam("campaignId") final Long campaignId,
-            @Parameter(hidden = true) final SmsCampaignUpdateDto smsCampaignUpdateDto) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateSmsCampaign(campaignId)
-                .withJson(toApiJsonSerializer.serialize(smsCampaignUpdateDto)).build();
+    public CommandProcessingResult updateCampaign(@PathParam("campaignId") final Long campaignId, @Parameter(hidden = true) final SmsCampaignUpdateDto smsCampaignUpdateDto) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateSmsCampaign(campaignId).withJson(toApiJsonSerializer.serialize(smsCampaignUpdateDto)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @POST
     @Path("{campaignId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "SMS Campaign", operationId = "handleCommandsSmsCampaign", description = "Activates | Deactivates | Reactivates")
     @AlternativeOperationId("handleCommands")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CommandProcessingResult.class)))
-    public CommandProcessingResult handleCommands(@PathParam("campaignId") final Long campaignId,
-            @QueryParam("command") final String commandParam, @Parameter(hidden = true) SmsCampaignHandlerDto campaignHandlerDto) {
+    public CommandProcessingResult handleCommands(@PathParam("campaignId") final Long campaignId, @QueryParam("command") final String commandParam, @Parameter(hidden = true) SmsCampaignHandlerDto campaignHandlerDto) {
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(toApiJsonSerializer.serialize(campaignHandlerDto));
         return getCommandProcessingResult(commandParam, builder, campaignId);
     }
 
     @POST
     @Path("preview")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Preview SMS Campaign message", operationId = "previewSmsCampaign")
     @AlternativeOperationId("preview_1")
     public CampaignPreviewData preview(SmsCampaignPreviewDto previewDto) {
@@ -207,9 +196,19 @@ public class SmsCampaignApiResource {
         return switch (commandParam.trim().toLowerCase()) {
             case ACTIVATE_COMMAND -> commandsSourceWritePlatformService.logCommandSource(builder.activateSmsCampaign(campaignId).build());
             case CLOSE_COMMAND -> commandsSourceWritePlatformService.logCommandSource(builder.closeSmsCampaign(campaignId).build());
-            case REACTIVATE_COMMAND ->
-                commandsSourceWritePlatformService.logCommandSource(builder.reactivateSmsCampaign(campaignId).build());
+            case REACTIVATE_COMMAND -> commandsSourceWritePlatformService.logCommandSource(builder.reactivateSmsCampaign(campaignId).build());
             default -> null;
         };
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SmsCampaignApiResource(final PlatformSecurityContext platformSecurityContext, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final SmsCampaignReadPlatformService smsCampaignReadPlatformService, final FromJsonHelper fromJsonHelper, final SmsCampaignWritePlatformService smsCampaignWritePlatformService, final PlatformSecurityContext context, final DefaultToApiJsonSerializer<String> toApiJsonSerializer) {
+        this.platformSecurityContext = platformSecurityContext;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.smsCampaignReadPlatformService = smsCampaignReadPlatformService;
+        this.fromJsonHelper = fromJsonHelper;
+        this.smsCampaignWritePlatformService = smsCampaignWritePlatformService;
+        this.context = context;
+        this.toApiJsonSerializer = toApiJsonSerializer;
     }
 }

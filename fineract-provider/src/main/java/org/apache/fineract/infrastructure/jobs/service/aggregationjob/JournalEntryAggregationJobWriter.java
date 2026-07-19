@@ -19,8 +19,6 @@
 package org.apache.fineract.infrastructure.jobs.service.aggregationjob;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.jobs.service.aggregationjob.data.JournalEntryAggregationSummaryData;
 import org.apache.fineract.infrastructure.jobs.service.aggregationjob.services.JournalEntryAggregationWriterService;
 import org.springframework.batch.core.StepExecution;
@@ -33,10 +31,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @StepScope
-@Slf4j
-@RequiredArgsConstructor
 public class JournalEntryAggregationJobWriter implements ItemWriter<JournalEntryAggregationSummaryData>, StepExecutionListener {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JournalEntryAggregationJobWriter.class);
     private final JournalEntryAggregationWriterService journalEntryAggregationWriterService;
     private StepExecution stepExecution;
 
@@ -55,4 +52,8 @@ public class JournalEntryAggregationJobWriter implements ItemWriter<JournalEntry
         journalEntryAggregationWriterService.insertJournalEntrySummaryBatch(summariesList);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public JournalEntryAggregationJobWriter(final JournalEntryAggregationWriterService journalEntryAggregationWriterService) {
+        this.journalEntryAggregationWriterService = journalEntryAggregationWriterService;
+    }
 }

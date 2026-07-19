@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.codes.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.codes.service.CodeValueWritePlatformService;
@@ -29,15 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "CODEVALUE", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteCodeValueCommandHandler implements NewCommandSourceHandler {
-
     private final CodeValueWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.deleteCodeValue(command.entityId(), command.subentityId());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DeleteCodeValueCommandHandler(final CodeValueWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

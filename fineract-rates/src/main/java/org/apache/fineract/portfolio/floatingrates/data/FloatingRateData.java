@@ -21,15 +21,12 @@ package org.apache.fineract.portfolio.floatingrates.data;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.List;
-import lombok.Getter;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
-@Getter
 public class FloatingRateData implements Comparable<FloatingRateData>, Serializable {
-
     private final Long id;
     private final String name;
     private final Boolean isBaseLendingRate;
@@ -41,9 +38,7 @@ public class FloatingRateData implements Comparable<FloatingRateData>, Serializa
     private final List<FloatingRatePeriodData> ratePeriods;
     private final List<EnumOptionData> interestRateFrequencyTypeOptions;
 
-    public FloatingRateData(Long id, String name, Boolean isBaseLendingRate, Boolean isActive, String createdBy, OffsetDateTime createdOn,
-            String modifiedBy, OffsetDateTime modifiedOn, List<FloatingRatePeriodData> ratePeriods,
-            List<EnumOptionData> interestRateFrequencyTypeOptions) {
+    public FloatingRateData(Long id, String name, Boolean isBaseLendingRate, Boolean isActive, String createdBy, OffsetDateTime createdOn, String modifiedBy, OffsetDateTime modifiedOn, List<FloatingRatePeriodData> ratePeriods, List<EnumOptionData> interestRateFrequencyTypeOptions) {
         this.id = id;
         this.name = name;
         this.isBaseLendingRate = isBaseLendingRate;
@@ -61,12 +56,12 @@ public class FloatingRateData implements Comparable<FloatingRateData>, Serializa
         if (obj == null) {
             return -1;
         }
-        return new CompareToBuilder() //
-                .append(this.id, obj.id) //
-                .append(this.name, obj.name) //
-                .append(this.isBaseLendingRate, obj.isBaseLendingRate) //
-                .append(this.isActive, obj.isActive) //
-                .toComparison();
+        return  //
+        //
+        //
+        //
+        //
+        new CompareToBuilder().append(this.id, obj.id).append(this.name, obj.name).append(this.isBaseLendingRate, obj.isBaseLendingRate).append(this.isActive, obj.isActive).toComparison();
     }
 
     @Override
@@ -81,26 +76,76 @@ public class FloatingRateData implements Comparable<FloatingRateData>, Serializa
             return false;
         }
         final FloatingRateData rhs = (FloatingRateData) obj;
-        return new EqualsBuilder() //
-                .append(this.id, rhs.id) //
-                .append(this.name, rhs.name) //
-                .append(this.isBaseLendingRate, rhs.isBaseLendingRate) //
-                .append(this.isActive, rhs.isActive) //
-                .isEquals();
+        return  //
+        //
+        //
+        //
+        //
+        new EqualsBuilder().append(this.id, rhs.id).append(this.name, rhs.name).append(this.isBaseLendingRate, rhs.isBaseLendingRate).append(this.isActive, rhs.isActive).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37) //
-                .append(this.id) //
-                .append(this.name) //
-                .append(this.isBaseLendingRate) //
-                .append(this.isActive) //
-                .toHashCode();
+        return  //
+        //
+        //
+        //
+        //
+        new HashCodeBuilder(17, 37).append(this.id).append(this.name).append(this.isBaseLendingRate).append(this.isActive).toHashCode();
     }
 
     public static FloatingRateData toTemplate(List<EnumOptionData> interestRateFrequencyTypeOptions) {
         // TODO Auto-generated method stub
         return new FloatingRateData(null, null, false, true, null, null, null, null, null, interestRateFrequencyTypeOptions);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Boolean getIsBaseLendingRate() {
+        return this.isBaseLendingRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Boolean getIsActive() {
+        return this.isActive;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCreatedBy() {
+        return this.createdBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OffsetDateTime getCreatedOn() {
+        return this.createdOn;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getModifiedBy() {
+        return this.modifiedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OffsetDateTime getModifiedOn() {
+        return this.modifiedOn;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<FloatingRatePeriodData> getRatePeriods() {
+        return this.ratePeriods;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<EnumOptionData> getInterestRateFrequencyTypeOptions() {
+        return this.interestRateFrequencyTypeOptions;
     }
 }

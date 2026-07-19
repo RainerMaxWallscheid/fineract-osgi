@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.jobs.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,19 +27,22 @@ import org.apache.fineract.infrastructure.jobs.service.JobRegisterService;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "SCHEDULER", action = "EXECUTEJOB")
 public class ExecuteJobCommandHandler implements NewCommandSourceHandler {
-
     private final JobRegisterService jobRegisterService;
 
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         final Long jobId = command.entityId();
         jobRegisterService.executeJobWithParameters(jobId, command.json());
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(jobId) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(jobId).build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExecuteJobCommandHandler(final JobRegisterService jobRegisterService) {
+        this.jobRegisterService = jobRegisterService;
     }
 }

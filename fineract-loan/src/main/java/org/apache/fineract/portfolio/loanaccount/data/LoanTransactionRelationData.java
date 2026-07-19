@@ -20,16 +20,9 @@ package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelationTypeEnum;
 
-@Getter
-@Setter
-@AllArgsConstructor
 public class LoanTransactionRelationData implements Serializable {
-
     private Long fromLoanTransaction;
     private Long toLoanTransaction;
     private Long toLoanCharge;
@@ -37,4 +30,73 @@ public class LoanTransactionRelationData implements Serializable {
     private BigDecimal amount;
     private String paymentType;
 
+    @java.lang.SuppressWarnings("all")
+        public Long getFromLoanTransaction() {
+        return this.fromLoanTransaction;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getToLoanTransaction() {
+        return this.toLoanTransaction;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getToLoanCharge() {
+        return this.toLoanCharge;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionRelationTypeEnum getRelationType() {
+        return this.relationType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getPaymentType() {
+        return this.paymentType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setFromLoanTransaction(final Long fromLoanTransaction) {
+        this.fromLoanTransaction = fromLoanTransaction;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setToLoanTransaction(final Long toLoanTransaction) {
+        this.toLoanTransaction = toLoanTransaction;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setToLoanCharge(final Long toLoanCharge) {
+        this.toLoanCharge = toLoanCharge;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setRelationType(final LoanTransactionRelationTypeEnum relationType) {
+        this.relationType = relationType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAmount(final BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setPaymentType(final String paymentType) {
+        this.paymentType = paymentType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionRelationData(final Long fromLoanTransaction, final Long toLoanTransaction, final Long toLoanCharge, final LoanTransactionRelationTypeEnum relationType, final BigDecimal amount, final String paymentType) {
+        this.fromLoanTransaction = fromLoanTransaction;
+        this.toLoanTransaction = toLoanTransaction;
+        this.toLoanCharge = toLoanCharge;
+        this.relationType = relationType;
+        this.amount = amount;
+        this.paymentType = paymentType;
+    }
 }

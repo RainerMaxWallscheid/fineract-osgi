@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.event.external.service.message;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
-
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -27,8 +26,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.avro.MessageV1;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.event.external.repository.domain.ExternalEventView;
@@ -45,29 +42,22 @@ import org.apache.fineract.infrastructure.event.external.service.support.ByteBuf
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class MessageFactory implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MessageFactory.class);
     public static final DateTimeFormatter CUSTOM_ISO_LOCAL_DATE_TIME_FORMATTER;
     private static final String SOURCE_UUID = UUID.randomUUID().toString();
-
     private static final DateTimeFormatter CUSTOM_ISO_LOCAL_TIME_FORMATTER;
 
     static {
-        CUSTOM_ISO_LOCAL_TIME_FORMATTER = new DateTimeFormatterBuilder().appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral(':')
-                .appendValue(ChronoField.MINUTE_OF_HOUR, 2).optionalStart().appendLiteral(':').appendValue(ChronoField.SECOND_OF_MINUTE, 2)
-                .optionalStart().appendFraction(ChronoField.NANO_OF_SECOND, 6, 9, true).toFormatter();
-        CUSTOM_ISO_LOCAL_DATE_TIME_FORMATTER = new DateTimeFormatterBuilder().parseCaseInsensitive().append(ISO_LOCAL_DATE)
-                .appendLiteral('T').append(CUSTOM_ISO_LOCAL_TIME_FORMATTER).toFormatter();
+        CUSTOM_ISO_LOCAL_TIME_FORMATTER = new DateTimeFormatterBuilder().appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral(':').appendValue(ChronoField.MINUTE_OF_HOUR, 2).optionalStart().appendLiteral(':').appendValue(ChronoField.SECOND_OF_MINUTE, 2).optionalStart().appendFraction(ChronoField.NANO_OF_SECOND, 6, 9, true).toFormatter();
+        CUSTOM_ISO_LOCAL_DATE_TIME_FORMATTER = new DateTimeFormatterBuilder().parseCaseInsensitive().append(ISO_LOCAL_DATE).appendLiteral('T').append(CUSTOM_ISO_LOCAL_TIME_FORMATTER).toFormatter();
     }
 
     private final ByteBufferConverter byteBufferConverter;
 
-    public MessageV1 createMessage(MessageId id, MessageSource source, MessageType type, MessageCategory category,
-            MessageCreatedAt createdAt, MessageBusinessDate businessDate, MessageIdempotencyKey idempotencyKey,
-            MessageDataSchema dataSchema, MessageData data) {
+    public MessageV1 createMessage(MessageId id, MessageSource source, MessageType type, MessageCategory category, MessageCreatedAt createdAt, MessageBusinessDate businessDate, MessageIdempotencyKey idempotencyKey, MessageDataSchema dataSchema, MessageData data) {
         MessageV1 result = new MessageV1();
         result.setId(id.getId());
         result.setSource(source.getSource());
@@ -110,5 +100,10 @@ public class MessageFactory implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         log.info("Message source set to {}", SOURCE_UUID);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MessageFactory(final ByteBufferConverter byteBufferConverter) {
+        this.byteBufferConverter = byteBufferConverter;
     }
 }

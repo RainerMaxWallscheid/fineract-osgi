@@ -20,20 +20,11 @@ package org.apache.fineract.infrastructure.core.service;
 
 import java.util.Locale;
 import java.util.Objects;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.serialization.JsonParserHelper;
 
-@Getter
-@Setter
-@RequiredArgsConstructor
 public class PagedLocalRequest<T> extends PagedRequest<T> {
-
     private String dateFormat;
-
     private String dateTimeFormat;
-
     private String locale;
 
     public Locale getLocaleObject() {
@@ -52,12 +43,45 @@ public class PagedLocalRequest<T> extends PagedRequest<T> {
             return false;
         }
         PagedLocalRequest<?> that = (PagedLocalRequest<?>) o;
-        return Objects.equals(dateFormat, that.dateFormat) && Objects.equals(dateTimeFormat, that.dateTimeFormat)
-                && Objects.equals(locale, that.locale);
+        return Objects.equals(dateFormat, that.dateFormat) && Objects.equals(dateTimeFormat, that.dateTimeFormat) && Objects.equals(locale, that.locale);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), dateFormat, dateTimeFormat, locale);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDateFormat() {
+        return this.dateFormat;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDateTimeFormat() {
+        return this.dateTimeFormat;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLocale() {
+        return this.locale;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDateFormat(final String dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDateTimeFormat(final String dateTimeFormat) {
+        this.dateTimeFormat = dateTimeFormat;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLocale(final String locale) {
+        this.locale = locale;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PagedLocalRequest() {
     }
 }

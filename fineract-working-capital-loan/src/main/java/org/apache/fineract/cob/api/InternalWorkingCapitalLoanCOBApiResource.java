@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.cob.api;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -27,8 +26,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.internal.TestData;
 import org.apache.fineract.infrastructure.core.boot.FineractProfiles;
 import org.springframework.beans.factory.InitializingBean;
@@ -39,10 +36,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Path("/v1/internal/working-capital-loans")
 @Tag(name = "Working Capital Loan Internal COB Api")
-@RequiredArgsConstructor
-@Slf4j
 public class InternalWorkingCapitalLoanCOBApiResource implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InternalWorkingCapitalLoanCOBApiResource.class);
     private final TestData testData;
 
     @Override
@@ -59,17 +55,22 @@ public class InternalWorkingCapitalLoanCOBApiResource implements InitializingBea
 
     @POST
     @Path("internal/lastCobRun")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     public Map<String, Object> getLastCobRun() {
         return testData.getData();
     }
 
     @DELETE
     @Path("internal/lastCobRun")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     public Map<String, Object> deleteLastCobRun() {
         testData.getData().put(TestData.COB_JOB_AFTER_LISTENER, null);
         testData.getData().put(TestData.COB_JOB_BEFORE_LISTENER, null);
         return testData.getData();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InternalWorkingCapitalLoanCOBApiResource(final TestData testData) {
+        this.testData = testData;
     }
 }

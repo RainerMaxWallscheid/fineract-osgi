@@ -18,19 +18,21 @@
  */
 package org.apache.fineract.organisation.teller.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.organisation.teller.service.TellerTransactionWritePlatformService;
 
-@RequiredArgsConstructor
 public class CreateTellerTransactionCommandHandler implements NewCommandSourceHandler {
-
     private final TellerTransactionWritePlatformService writePlatformService;
 
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.createTellerTransaction(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateTellerTransactionCommandHandler(final TellerTransactionWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

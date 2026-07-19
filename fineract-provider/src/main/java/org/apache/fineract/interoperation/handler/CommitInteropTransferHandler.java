@@ -20,8 +20,6 @@ package org.apache.fineract.interoperation.handler;
 
 import static org.apache.fineract.interoperation.util.InteropUtil.ACTION_TRANSFER_COMMIT;
 import static org.apache.fineract.interoperation.util.InteropUtil.ENTITY_NAME_TRANSFER;
-
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -32,14 +30,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = ENTITY_NAME_TRANSFER, action = ACTION_TRANSFER_COMMIT)
-@RequiredArgsConstructor
 public class CommitInteropTransferHandler implements NewCommandSourceHandler {
-
     private final InteropService interopService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.interopService.commitTransfer(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CommitInteropTransferHandler(final InteropService interopService) {
+        this.interopService = interopService;
     }
 }

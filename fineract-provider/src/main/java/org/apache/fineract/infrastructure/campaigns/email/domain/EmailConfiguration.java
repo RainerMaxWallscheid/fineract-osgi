@@ -21,23 +21,45 @@ package org.apache.fineract.infrastructure.campaigns.email.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "scheduled_email_configuration")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class EmailConfiguration extends AbstractPersistableCustom<Long> {
-
     @Column(name = "name", nullable = false)
     private String name;
-
     @Column(name = "value", nullable = false)
     private String value;
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getValue() {
+        return this.value;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public EmailConfiguration setName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public EmailConfiguration setValue(final String value) {
+        this.value = value;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EmailConfiguration() {
+    }
 }

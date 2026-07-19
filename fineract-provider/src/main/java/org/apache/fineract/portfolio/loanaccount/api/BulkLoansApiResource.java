@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -55,20 +54,15 @@ import org.springframework.stereotype.Component;
 @Path("/v1/loans/loanreassignment")
 @Component
 @Tag(name = "Bulk Loans", description = "")
-@RequiredArgsConstructor
 public class BulkLoansApiResource {
-
     public static final String OFFICE_ID = "officeId";
     public static final String FROM_LOAN_OFFICER_ID = "fromLoanOfficerId";
     public static final String ASSIGNMENT_DATE = "assignmentDate";
     public static final String OFFICE_OPTIONS = "officeOptions";
     public static final String LOAN_OFFICER_OPTIONS = "loanOfficerOptions";
     public static final String ACCOUNT_SUMMARY_COLLECTION = "accountSummaryCollection";
-    private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList(OFFICE_ID, FROM_LOAN_OFFICER_ID,
-            ASSIGNMENT_DATE, OFFICE_OPTIONS, LOAN_OFFICER_OPTIONS, ACCOUNT_SUMMARY_COLLECTION));
-
+    private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList(OFFICE_ID, FROM_LOAN_OFFICER_ID, ASSIGNMENT_DATE, OFFICE_OPTIONS, LOAN_OFFICER_OPTIONS, ACCOUNT_SUMMARY_COLLECTION));
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "LOAN";
-
     private final PlatformSecurityContext context;
     private final StaffReadService staffReadPlatformService;
     private final OfficeReadPlatformService officeReadPlatformService;
@@ -79,41 +73,40 @@ public class BulkLoansApiResource {
 
     @GET
     @Path("template")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public String loanReassignmentTemplate(@QueryParam(OFFICE_ID) final Long officeId,
-            @QueryParam(FROM_LOAN_OFFICER_ID) final Long loanOfficerId, @Context final UriInfo uriInfo) {
-
+    @Produces({MediaType.APPLICATION_JSON})
+    public String loanReassignmentTemplate(@QueryParam(OFFICE_ID) final Long officeId, @QueryParam(FROM_LOAN_OFFICER_ID) final Long loanOfficerId, @Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
         final Collection<OfficeData> offices = this.officeReadPlatformService.retrieveAllOfficesForDropdown();
-
         Collection<StaffData> loanOfficers = null;
         StaffAccountSummaryCollectionData staffAccountSummaryCollectionData = null;
-
         if (officeId != null) {
             loanOfficers = this.staffReadPlatformService.retrieveAllLoanOfficersInOfficeById(officeId);
         }
-
         if (loanOfficerId != null) {
             staffAccountSummaryCollectionData = this.bulkLoansReadPlatformService.retrieveLoanOfficerAccountSummary(loanOfficerId);
         }
-
-        final BulkTransferLoanOfficerData loanReassignmentData = BulkTransferLoanOfficerData.templateForBulk(officeId, loanOfficerId,
-                LocalDate.now(DateUtils.getDateTimeZoneOfTenant()), offices, loanOfficers, staffAccountSummaryCollectionData);
-
+        final BulkTransferLoanOfficerData loanReassignmentData = BulkTransferLoanOfficerData.templateForBulk(officeId, loanOfficerId, LocalDate.now(DateUtils.getDateTimeZoneOfTenant()), offices, loanOfficers, staffAccountSummaryCollectionData);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, loanReassignmentData, RESPONSE_DATA_PARAMETERS);
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     public String loanReassignment(final String apiRequestBodyAsJson) {
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().assignLoanOfficersInBulk().withJson(apiRequestBodyAsJson).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BulkLoansApiResource(final PlatformSecurityContext context, final StaffReadService staffReadPlatformService, final OfficeReadPlatformService officeReadPlatformService, final BulkLoansReadPlatformService bulkLoansReadPlatformService, final DefaultToApiJsonSerializer<BulkTransferLoanOfficerData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.context = context;
+        this.staffReadPlatformService = staffReadPlatformService;
+        this.officeReadPlatformService = officeReadPlatformService;
+        this.bulkLoansReadPlatformService = bulkLoansReadPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
     }
 }

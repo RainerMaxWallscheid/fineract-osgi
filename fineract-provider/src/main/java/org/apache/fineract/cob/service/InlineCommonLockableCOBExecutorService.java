@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.cob.COBConstant;
 import org.apache.fineract.cob.data.COBIdAndLastClosedBusinessDate;
@@ -70,10 +68,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@Slf4j
-@RequiredArgsConstructor
 public abstract class InlineCommonLockableCOBExecutorService<T extends AccountLock> implements InlineExecutorService<Long> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InlineCommonLockableCOBExecutorService.class);
     private static final String JOB_EXECUTION_FAILED_MESSAGE = "Job execution failed for job with name: ";
     private final AccountLockRepository<T> loanAccountLockRepository;
     private final InlineLoanCOBExecutionDataParser dataParser;
@@ -85,7 +82,6 @@ public abstract class InlineCommonLockableCOBExecutorService<T extends AccountLo
     private final PlatformSecurityContext context;
     private final RetrieveIdService retrieveIdService;
     private final FineractProperties fineractProperties;
-
     private final Gson gson = GoogleGsonSerializerHelper.createSimpleGson();
 
     public abstract T createAccountLock(Long loanId, LockOwner loanInlineCobProcessing, LocalDate businessDate);
@@ -96,9 +92,9 @@ public abstract class InlineCommonLockableCOBExecutorService<T extends AccountLo
         List<Long> loanIds = dataParser.parseExecution(command);
         validateLoanIdsListSize(loanIds);
         execute(loanIds, jobName);
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .build();
+        return  //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).build();
     }
 
     @Override
@@ -137,8 +133,7 @@ public abstract class InlineCommonLockableCOBExecutorService<T extends AccountLo
         } catch (NoSuchJobException e) {
             throw new JobNotFoundException(jobName, e);
         }
-        JobParameters jobParameters = new JobParametersBuilder(jobExplorer).getNextJobParameters(inlineLoanCOBJob)
-                .addJobParameters(new JobParameters(getJobParametersMap(loanIds, businessDate))).toJobParameters();
+        JobParameters jobParameters = new JobParametersBuilder(jobExplorer).getNextJobParameters(inlineLoanCOBJob).addJobParameters(new JobParameters(getJobParametersMap(loanIds, businessDate))).toJobParameters();
         JobExecution jobExecution;
         try {
             jobExecution = jobLauncher.run(inlineLoanCOBJob, jobParameters);
@@ -153,18 +148,14 @@ public abstract class InlineCommonLockableCOBExecutorService<T extends AccountLo
     }
 
     private LocalDate getOldestCOBBusinessDate(List<COBIdAndLastClosedBusinessDate> loans) {
-        COBIdAndLastClosedBusinessDate oldestLoan = loans.stream().min(Comparator
-                .comparing(COBIdAndLastClosedBusinessDate::getLastClosedBusinessDate, Comparator.nullsLast(Comparator.naturalOrder())))
-                .orElse(null);
-        return oldestLoan != null && oldestLoan.getLastClosedBusinessDate() != null ? oldestLoan.getLastClosedBusinessDate()
-                : ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE).minusDays(1);
+        COBIdAndLastClosedBusinessDate oldestLoan = loans.stream().min(Comparator.comparing(COBIdAndLastClosedBusinessDate::getLastClosedBusinessDate, Comparator.nullsLast(Comparator.naturalOrder()))).orElse(null);
+        return oldestLoan != null && oldestLoan.getLastClosedBusinessDate() != null ? oldestLoan.getLastClosedBusinessDate() : ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE).minusDays(1);
     }
 
     private List<COBIdAndLastClosedBusinessDate> getLoansToBeProcessed(List<Long> loanIds, LocalDate cobBusinessDate) {
         List<COBIdAndLastClosedBusinessDate> loanIdAndLastClosedBusinessDates = new ArrayList<>();
         List<List<Long>> partitions = Lists.partition(loanIds, fineractProperties.getQuery().getInClauseParameterSizeLimit());
-        partitions.forEach(partition -> loanIdAndLastClosedBusinessDates
-                .addAll(retrieveIdService.retrieveLoanIdsBehindDateOrNull(cobBusinessDate, partition)));
+        partitions.forEach(partition -> loanIdAndLastClosedBusinessDates.addAll(retrieveIdService.retrieveLoanIdsBehindDateOrNull(cobBusinessDate, partition)));
         return loanIdAndLastClosedBusinessDates;
     }
 
@@ -185,11 +176,10 @@ public abstract class InlineCommonLockableCOBExecutorService<T extends AccountLo
             }
         });
         if (!alreadyLockedLoanIds.isEmpty()) {
-            String message = "There is a hard lock on the loan account without any error, so it can't be overruled.";
+            String message = "There is a hard lock on the loan account without any error, so it can\'t be overruled.";
             String loanIdsMessage = " Locked loan IDs: " + alreadyLockedLoanIds;
             throw new AccountLockCannotBeOverruledException(message + loanIdsMessage);
         }
-
         return loanAccountLocks;
     }
 
@@ -202,8 +192,7 @@ public abstract class InlineCommonLockableCOBExecutorService<T extends AccountLo
     private Map<String, JobParameter<?>> getJobParametersMap(List<Long> loanIds, LocalDate businessDate) {
         String parameterJson = gson.toJson(loanIds);
         Long loanIdsJobParameterId = saveCustomJobParameter(COBConstant.INLINE_IDS_PARAMETER_NAME, parameterJson);
-        Long businessDateJobParameterId = saveCustomJobParameter(COBConstant.BUSINESS_DATE_PARAMETER_NAME,
-                businessDate.format(DateTimeFormatter.ISO_DATE));
+        Long businessDateJobParameterId = saveCustomJobParameter(COBConstant.BUSINESS_DATE_PARAMETER_NAME, businessDate.format(DateTimeFormatter.ISO_DATE));
         Map<String, JobParameter<?>> jobParameterMap = new HashMap<>();
         jobParameterMap.put(SpringBatchJobConstants.CUSTOM_JOB_PARAMETER_ID_KEY, new JobParameter<>(loanIdsJobParameterId, Long.class));
         jobParameterMap.put(COBConstant.BUSINESS_DATE_PARAMETER_NAME, new JobParameter<>(businessDateJobParameterId, Long.class));
@@ -219,8 +208,7 @@ public abstract class InlineCommonLockableCOBExecutorService<T extends AccountLo
                     loanAccountLockRepository.saveAndFlush(loanAccountLock);
                 } catch (Exception e) {
                     log.error("Error updating lock on loan account. Locked loan ID: {}", loanAccountLock.getLoanId(), e);
-                    throw new AccountLockCannotBeOverruledException(
-                            "Error updating lock on loan account. Locked loan ID: %s".formatted(loanAccountLock.getLoanId()), e);
+                    throw new AccountLockCannotBeOverruledException("Error updating lock on loan account. Locked loan ID: %s".formatted(loanAccountLock.getLoanId()), e);
                 }
             });
         });
@@ -244,5 +232,19 @@ public abstract class InlineCommonLockableCOBExecutorService<T extends AccountLo
             String userMessage = "Size of the loan IDs list cannot be over " + inlineLoanCobRequestItemLimit;
             throw new PlatformRequestBodyItemLimitValidationException(userMessage);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InlineCommonLockableCOBExecutorService(final AccountLockRepository<T> loanAccountLockRepository, final InlineLoanCOBExecutionDataParser dataParser, final JobLauncher jobLauncher, final JobLocator jobLocator, final JobExplorer jobExplorer, final TransactionTemplate requiresNewTransactionTemplate, final CustomJobParameterRepository customJobParameterRepository, final PlatformSecurityContext context, final RetrieveIdService retrieveIdService, final FineractProperties fineractProperties) {
+        this.loanAccountLockRepository = loanAccountLockRepository;
+        this.dataParser = dataParser;
+        this.jobLauncher = jobLauncher;
+        this.jobLocator = jobLocator;
+        this.jobExplorer = jobExplorer;
+        this.requiresNewTransactionTemplate = requiresNewTransactionTemplate;
+        this.customJobParameterRepository = customJobParameterRepository;
+        this.context = context;
+        this.retrieveIdService = retrieveIdService;
+        this.fineractProperties = fineractProperties;
     }
 }

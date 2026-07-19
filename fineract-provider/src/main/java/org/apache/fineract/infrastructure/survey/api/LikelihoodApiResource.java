@@ -28,7 +28,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -46,9 +45,7 @@ import org.springframework.stereotype.Component;
 @Path("/v1/likelihood")
 @Component
 @Tag(name = "Likelihood", description = "")
-@RequiredArgsConstructor
 public class LikelihoodApiResource {
-
     private final DefaultToApiJsonSerializer<LikelihoodData> toApiJsonSerializer;
     private final PlatformSecurityContext context;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
@@ -56,51 +53,47 @@ public class LikelihoodApiResource {
 
     @GET
     @Path("{ppiName}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "retrieveAll_5")
     @AlternativeOperationId("retrieveAll_11")
     public String retrieveAll(@PathParam("ppiName") final String ppiName) {
-
         this.context.authenticatedUser().validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
-
         List<LikelihoodData> likelihoodData = this.readService.retrieveAll(ppiName);
         return this.toApiJsonSerializer.serialize(likelihoodData);
-
     }
 
     @GET
     @Path("{ppiName}/{likelihoodId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "retrieve_1")
     @AlternativeOperationId("retrieve")
     public String retrieve(@PathParam("likelihoodId") final Long likelihoodId, @PathParam("ppiName") final String ppiName) {
-
         this.context.authenticatedUser().validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
-
         LikelihoodData likelihoodData = this.readService.retrieve(likelihoodId);
         return this.toApiJsonSerializer.serialize(likelihoodData);
-
     }
 
     @PUT
     @Path("{ppiName}/{likelihoodId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "update_2")
     @AlternativeOperationId("update_4")
-    public String update(@PathParam("likelihoodId") final Long likelihoodId, final String apiRequestBodyAsJson,
-            @PathParam("ppiName") final String ppiName) {
-
+    public String update(@PathParam("likelihoodId") final Long likelihoodId, final String apiRequestBodyAsJson, @PathParam("ppiName") final String ppiName) {
         this.context.authenticatedUser().validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-                .updateLikelihood(likelihoodId) //
-                .withJson(apiRequestBodyAsJson) //
-                .build();
-
+        final CommandWrapper commandRequest =  //
+        //
+        //
+        new CommandWrapperBuilder().updateLikelihood(likelihoodId).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public LikelihoodApiResource(final DefaultToApiJsonSerializer<LikelihoodData> toApiJsonSerializer, final PlatformSecurityContext context, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final ReadLikelihoodService readService) {
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.context = context;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.readService = readService;
     }
 }

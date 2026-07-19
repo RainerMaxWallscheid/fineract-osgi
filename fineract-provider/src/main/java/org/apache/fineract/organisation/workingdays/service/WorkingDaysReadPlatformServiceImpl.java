@@ -22,7 +22,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.organisation.workingdays.data.WorkingDaysData;
@@ -33,13 +32,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-@RequiredArgsConstructor
 public class WorkingDaysReadPlatformServiceImpl implements WorkingDaysReadPlatformService {
-
     private final JdbcTemplate jdbcTemplate;
 
-    private static final class WorkingDaysMapper implements RowMapper<WorkingDaysData> {
 
+    private static final class WorkingDaysMapper implements RowMapper<WorkingDaysData> {
         private final String schema;
 
         WorkingDaysMapper() {
@@ -48,7 +45,6 @@ public class WorkingDaysReadPlatformServiceImpl implements WorkingDaysReadPlatfo
             sqlBuilder.append("w.extend_term_daily_repayments as extendTermForDailyRepayments,");
             sqlBuilder.append("w.extend_term_holiday_repayment as extendTermForRepaymentsOnHolidays ");
             sqlBuilder.append("from m_working_days w");
-
             this.schema = sqlBuilder.toString();
         }
 
@@ -64,10 +60,7 @@ public class WorkingDaysReadPlatformServiceImpl implements WorkingDaysReadPlatfo
             final EnumOptionData status = WorkingDaysEnumerations.workingDaysStatusType(statusEnum);
             final Boolean extendTermForDailyRepayments = rs.getBoolean("extendTermForDailyRepayments");
             final Boolean extendTermForRepaymentsOnHolidays = rs.getBoolean("extendTermForRepaymentsOnHolidays");
-
-            return WorkingDaysData.builder().id(id).recurrence(recurrence).repaymentRescheduleType(status)
-                    .extendTermForDailyRepayments(extendTermForDailyRepayments)
-                    .extendTermForRepaymentsOnHolidays(extendTermForRepaymentsOnHolidays).build();
+            return WorkingDaysData.builder().id(id).recurrence(recurrence).repaymentRescheduleType(status).extendTermForDailyRepayments(extendTermForDailyRepayments).extendTermForRepaymentsOnHolidays(extendTermForRepaymentsOnHolidays).build();
         }
     }
 
@@ -79,11 +72,7 @@ public class WorkingDaysReadPlatformServiceImpl implements WorkingDaysReadPlatfo
             final String sql = " select " + rm.schema();
             WorkingDaysData data = this.jdbcTemplate.queryForObject(sql, rm); // NOSONAR
             Collection<EnumOptionData> repaymentRescheduleOptions = repaymentRescheduleTypeOptions();
-            return WorkingDaysData.builder().id(data.getId()).recurrence(data.getRecurrence())
-                    .repaymentRescheduleType(data.getRepaymentRescheduleType())
-                    .extendTermForDailyRepayments(data.getExtendTermForDailyRepayments())
-                    .extendTermForRepaymentsOnHolidays(data.getExtendTermForRepaymentsOnHolidays())
-                    .repaymentRescheduleOptions(repaymentRescheduleOptions).build();
+            return WorkingDaysData.builder().id(data.getId()).recurrence(data.getRecurrence()).repaymentRescheduleType(data.getRepaymentRescheduleType()).extendTermForDailyRepayments(data.getExtendTermForDailyRepayments()).extendTermForRepaymentsOnHolidays(data.getExtendTermForRepaymentsOnHolidays()).repaymentRescheduleOptions(repaymentRescheduleOptions).build();
         } catch (final EmptyResultDataAccessException e) {
             throw new WorkingDaysNotFoundException(e);
         }
@@ -96,9 +85,11 @@ public class WorkingDaysReadPlatformServiceImpl implements WorkingDaysReadPlatfo
     }
 
     private Collection<EnumOptionData> repaymentRescheduleTypeOptions() {
-        return Arrays.asList(WorkingDaysEnumerations.repaymentRescheduleType(RepaymentRescheduleType.SAME_DAY),
-                WorkingDaysEnumerations.repaymentRescheduleType(RepaymentRescheduleType.MOVE_TO_NEXT_WORKING_DAY),
-                WorkingDaysEnumerations.repaymentRescheduleType(RepaymentRescheduleType.MOVE_TO_NEXT_REPAYMENT_MEETING_DAY),
-                WorkingDaysEnumerations.repaymentRescheduleType(RepaymentRescheduleType.MOVE_TO_PREVIOUS_WORKING_DAY));
+        return Arrays.asList(WorkingDaysEnumerations.repaymentRescheduleType(RepaymentRescheduleType.SAME_DAY), WorkingDaysEnumerations.repaymentRescheduleType(RepaymentRescheduleType.MOVE_TO_NEXT_WORKING_DAY), WorkingDaysEnumerations.repaymentRescheduleType(RepaymentRescheduleType.MOVE_TO_NEXT_REPAYMENT_MEETING_DAY), WorkingDaysEnumerations.repaymentRescheduleType(RepaymentRescheduleType.MOVE_TO_PREVIOUS_WORKING_DAY));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingDaysReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 }

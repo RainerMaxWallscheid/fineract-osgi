@@ -25,31 +25,19 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "m_creditbureau_configuration")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class CreditBureauConfiguration extends AbstractPersistableCustom<Long> {
-
     @Column(name = "configkey")
     private String configurationKey;
-
     @Column(name = "value")
     private String value;
-
     @Column(name = "description")
     private String description;
-
     @ManyToOne
     @JoinColumn(name = "organisation_creditbureau_id")
     private OrganisationCreditBureau organisationCreditbureau;
@@ -58,39 +46,89 @@ public class CreditBureauConfiguration extends AbstractPersistableCustom<Long> {
         final String configkey = command.stringValueOfParameterNamed("configkey");
         final String value = command.stringValueOfParameterNamed("value");
         final String description = command.stringValueOfParameterNamed("description");
-
-        return new CreditBureauConfiguration().setConfigurationKey(configkey).setValue(value).setDescription(description)
-                .setOrganisationCreditbureau(organisation_creditbureau);
-
+        return new CreditBureauConfiguration().setConfigurationKey(configkey).setValue(value).setDescription(description).setOrganisationCreditbureau(organisation_creditbureau);
     }
 
     public Map<String, Object> update(final JsonCommand command) {
-
         final Map<String, Object> actualChanges = new LinkedHashMap<>(1);
-
         final String configurationKey = "configkey";
-
         if (command.isChangeInStringParameterNamed(configurationKey, this.configurationKey)) {
             final String newValue = command.stringValueOfParameterNamed(configurationKey);
             actualChanges.put(configurationKey, newValue);
             this.configurationKey = StringUtils.defaultIfEmpty(newValue, null);
         }
-
         final String value = "value";
         if (command.isChangeInStringParameterNamed(value, this.value)) {
             final String newValue = command.stringValueOfParameterNamed(value);
             actualChanges.put(value, newValue);
             this.value = StringUtils.defaultIfEmpty(newValue, null);
         }
-
         final String description = "description";
         if (command.isChangeInStringParameterNamed(description, this.configurationKey)) {
             final String newValue = command.stringValueOfParameterNamed(description);
             actualChanges.put(description, newValue);
             this.description = StringUtils.defaultIfEmpty(newValue, null);
         }
-
         return actualChanges;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public String getConfigurationKey() {
+        return this.configurationKey;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OrganisationCreditBureau getOrganisationCreditbureau() {
+        return this.organisationCreditbureau;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditBureauConfiguration setConfigurationKey(final String configurationKey) {
+        this.configurationKey = configurationKey;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditBureauConfiguration setValue(final String value) {
+        this.value = value;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditBureauConfiguration setDescription(final String description) {
+        this.description = description;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditBureauConfiguration setOrganisationCreditbureau(final OrganisationCreditBureau organisationCreditbureau) {
+        this.organisationCreditbureau = organisationCreditbureau;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreditBureauConfiguration() {
+    }
 }

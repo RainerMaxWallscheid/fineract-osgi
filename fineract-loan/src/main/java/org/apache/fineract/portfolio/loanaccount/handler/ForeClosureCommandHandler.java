@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -27,10 +26,8 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanWritePlatformServic
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN", action = "FORECLOSURE")
 public class ForeClosureCommandHandler implements NewCommandSourceHandler {
-
     private final LoanWritePlatformService writePlatformService;
 
     @Override
@@ -38,4 +35,8 @@ public class ForeClosureCommandHandler implements NewCommandSourceHandler {
         return writePlatformService.forecloseLoan(command.getLoanId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ForeClosureCommandHandler(final LoanWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
+    }
 }

@@ -22,17 +22,12 @@ import static org.apache.fineract.infrastructure.core.domain.AuditableFieldsCons
 import static org.apache.fineract.infrastructure.core.domain.AuditableFieldsConstants.CREATED_DATE_DB_FIELD;
 import static org.apache.fineract.infrastructure.core.domain.AuditableFieldsConstants.LAST_MODIFIED_BY_DB_FIELD;
 import static org.apache.fineract.infrastructure.core.domain.AuditableFieldsConstants.LAST_MODIFIED_DATE_DB_FIELD;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.Optional;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.domain.Auditable;
 import org.springframework.data.jpa.domain.AbstractAuditable;
 
@@ -44,28 +39,15 @@ import org.springframework.data.jpa.domain.AbstractAuditable;
  * Abstract base class for auditable entities. Stores the audit values in persistent fields.
  */
 @MappedSuperclass
-@Getter
-@Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AbstractAuditableWithUTCDateTimeCustom<T extends Serializable> extends AbstractPersistableCustom<T>
-        implements Auditable<Long, T, OffsetDateTime> {
-
+public abstract class AbstractAuditableWithUTCDateTimeCustom<T extends Serializable> extends AbstractPersistableCustom<T> implements Auditable<Long, T, OffsetDateTime> {
     private static final long serialVersionUID = 141481953116476081L;
-
     @Column(name = CREATED_BY_DB_FIELD, updatable = false, nullable = false)
-    @Setter
     private Long createdBy;
-
     @Column(name = CREATED_DATE_DB_FIELD, updatable = false, nullable = false)
-    @Setter
     private OffsetDateTime createdDate;
-
     @Column(name = LAST_MODIFIED_BY_DB_FIELD, nullable = false)
-    @Setter
     private Long lastModifiedBy;
-
     @Column(name = LAST_MODIFIED_DATE_DB_FIELD, nullable = false)
-    @Setter
     private OffsetDateTime lastModifiedDate;
 
     @Override
@@ -90,5 +72,29 @@ public abstract class AbstractAuditableWithUTCDateTimeCustom<T extends Serializa
     @NotNull
     public Optional<OffsetDateTime> getLastModifiedDate() {
         return Optional.ofNullable(lastModifiedDate);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected AbstractAuditableWithUTCDateTimeCustom() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setCreatedBy(final Long createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setCreatedDate(final OffsetDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLastModifiedBy(final Long lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLastModifiedDate(final OffsetDateTime lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 }

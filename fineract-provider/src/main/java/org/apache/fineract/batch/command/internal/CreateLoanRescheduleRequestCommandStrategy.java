@@ -19,7 +19,6 @@
 package org.apache.fineract.batch.command.internal;
 
 import jakarta.ws.rs.core.UriInfo;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
@@ -38,29 +37,27 @@ import org.springframework.stereotype.Component;
  * @see BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class CreateLoanRescheduleRequestCommandStrategy implements CommandStrategy {
-
     private final RescheduleLoansApiResource rescheduleLoansApiResource;
 
     @Override
     public BatchResponse execute(BatchRequest request, @SuppressWarnings("unused") UriInfo uriInfo) {
-
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         // Calls 'createLoanRescheduleRequest' function from
         // 'RescheduleLoansApiResource' to create a reschedule request on an existing loan
         responseBody = rescheduleLoansApiResource.createLoanRescheduleRequest(request.getBody());
-
         response.setStatusCode(HttpStatus.SC_OK);
         // Sets the body of the response after savings is successfully
         // applied
         response.setBody(responseBody);
-
         return response;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateLoanRescheduleRequestCommandStrategy(final RescheduleLoansApiResource rescheduleLoansApiResource) {
+        this.rescheduleLoansApiResource = rescheduleLoansApiResource;
     }
 }

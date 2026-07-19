@@ -19,7 +19,6 @@
 package org.apache.fineract.investor.service;
 
 import static org.reflections.scanners.Scanners.SubTypes;
-
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -54,39 +52,31 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class ExternalAssetOwnerLoanProductAttributesWriteServiceImpl implements ExternalAssetOwnerLoanProductAttributesWriteService {
-
     private static final String INVESTOR_PATH = "org.apache.fineract.investor";
-
     private final FromJsonHelper fromApiJsonHelper;
     private final ExternalAssetOwnerLoanProductAttributesRepository externalAssetOwnerLoanProductAttributesRepository;
     private final LoanProductRepository loanProductRepository;
-    private final Set<Class<?>> implementingClasses = new Reflections(INVESTOR_PATH)
-            .get(SubTypes.of(ExternalAssetOwnerLoanProductAttribute.class).asClass());
+    private final Set<Class<?>> implementingClasses = new Reflections(INVESTOR_PATH).get(SubTypes.of(ExternalAssetOwnerLoanProductAttribute.class).asClass());
 
     @Override
     public CommandProcessingResult createExternalAssetOwnerLoanProductAttribute(JsonCommand command) {
         final JsonElement json = fromApiJsonHelper.parse(command.json());
-        String attributeKey = fromApiJsonHelper.extractStringNamed(ExternalAssetOwnerLoanProductAttributeRequestParameters.ATTRIBUTE_KEY,
-                json);
-        String attributeValue = fromApiJsonHelper
-                .extractStringNamed(ExternalAssetOwnerLoanProductAttributeRequestParameters.ATTRIBUTE_VALUE, json);
+        String attributeKey = fromApiJsonHelper.extractStringNamed(ExternalAssetOwnerLoanProductAttributeRequestParameters.ATTRIBUTE_KEY, json);
+        String attributeValue = fromApiJsonHelper.extractStringNamed(ExternalAssetOwnerLoanProductAttributeRequestParameters.ATTRIBUTE_VALUE, json);
         Long loanProductId = command.getProductId();
         validateLoanProductAttributeRequest(command.json(), attributeKey, attributeValue);
         validateExternalAssetOwnerLoanProductAttribute(attributeKey, attributeValue);
         validateLoanProductExistsAndAttributeDoesNotExist(loanProductId, attributeKey);
-        ExternalAssetOwnerLoanProductAttributes newAttribute = createExternalAssetOwnerLoanProductAttribute(loanProductId, attributeKey,
-                attributeValue);
+        ExternalAssetOwnerLoanProductAttributes newAttribute = createExternalAssetOwnerLoanProductAttribute(loanProductId, attributeKey, attributeValue);
         externalAssetOwnerLoanProductAttributesRepository.saveAndFlush(newAttribute);
         return buildResponseData(newAttribute);
     }
 
     @Override
     @CacheEvict(cacheNames = "externalAssetOwnerLoanProductAttributes", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#command.getProductId().toString() + #attributeKey)")
-    public CommandProcessingResult updateExternalAssetOwnerLoanProductAttribute(JsonCommand command, String attributeKey,
-            String attributeValue) {
+    public CommandProcessingResult updateExternalAssetOwnerLoanProductAttribute(JsonCommand command, String attributeKey, String attributeValue) {
         Long loanProductId = command.getProductId();
         Long attributeId = command.entityId();
         validateLoanProductAttributeRequest(command.json(), attributeKey, attributeValue);
@@ -102,24 +92,16 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImpl implements 
     }
 
     private void validateLoanProductAttributeRequest(String apiRequestBodyAsJson, String attributeKey, String attributeValue) {
-        final Set<String> requestParameters = new HashSet<>(
-                Arrays.asList(ExternalAssetOwnerLoanProductAttributeRequestParameters.ATTRIBUTE_KEY,
-                        ExternalAssetOwnerLoanProductAttributeRequestParameters.ATTRIBUTE_VALUE));
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+        final Set<String> requestParameters = new HashSet<>(Arrays.asList(ExternalAssetOwnerLoanProductAttributeRequestParameters.ATTRIBUTE_KEY, ExternalAssetOwnerLoanProductAttributeRequestParameters.ATTRIBUTE_VALUE));
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+        }.getType();
         fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, apiRequestBodyAsJson, requestParameters);
-
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loanproductattribute");
-
-        baseDataValidator.reset().parameter(ExternalAssetOwnerLoanProductAttributeRequestParameters.ATTRIBUTE_KEY).value(attributeKey)
-                .notBlank().notExceedingLengthOf(255);
-
-        baseDataValidator.reset().parameter(ExternalAssetOwnerLoanProductAttributeRequestParameters.ATTRIBUTE_VALUE).value(attributeValue)
-                .notBlank().notExceedingLengthOf(255);
-
+        baseDataValidator.reset().parameter(ExternalAssetOwnerLoanProductAttributeRequestParameters.ATTRIBUTE_KEY).value(attributeKey).notBlank().notExceedingLengthOf(255);
+        baseDataValidator.reset().parameter(ExternalAssetOwnerLoanProductAttributeRequestParameters.ATTRIBUTE_VALUE).value(attributeValue).notBlank().notExceedingLengthOf(255);
         if (!dataValidationErrors.isEmpty()) {
-            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
-                    dataValidationErrors);
+            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.", dataValidationErrors);
         }
     }
 
@@ -136,15 +118,13 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImpl implements 
 
     private void validateLoanProductAttributeDoesNotExist(Long loanProductId, String attributeKey) {
         if (externalAssetOwnerLoanProductAttributesRepository.existsByLoanProductIdAndKey(loanProductId, attributeKey)) {
-            throw new ExternalAssetOwnerLoanProductAttributeAlreadyExistsException(
-                    "attributeKey already exists for the loanProductId: " + loanProductId + ". Use PUT call to UPDATE the attribute.");
+            throw new ExternalAssetOwnerLoanProductAttributeAlreadyExistsException("attributeKey already exists for the loanProductId: " + loanProductId + ". Use PUT call to UPDATE the attribute.");
         }
     }
 
     private void validateLoanProductAttributeKeysMatch(String attributeKeyFromRequest, String attributeKeyFromDB) {
         if (!attributeKeyFromRequest.equals(attributeKeyFromDB)) {
-            throw new ExternalAssetOwnerLoanProductAttributesException(
-                    "The attribute key of requested update attribute does not match the attribute key from database.");
+            throw new ExternalAssetOwnerLoanProductAttributesException("The attribute key of requested update attribute does not match the attribute key from database.");
         }
     }
 
@@ -153,28 +133,24 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImpl implements 
             if (implementingClass.isEnum()) {
                 for (Object obj : implementingClass.getEnumConstants()) {
                     ExternalAssetOwnerLoanProductAttribute objEnum = (ExternalAssetOwnerLoanProductAttribute) obj;
-                    if (objEnum.getAttributeKey().equals(attributeKey)
-                            && objEnum.getAttributeValue().equals(attributeValue.toUpperCase())) {
+                    if (objEnum.getAttributeKey().equals(attributeKey) && objEnum.getAttributeValue().equals(attributeValue.toUpperCase())) {
                         return;
                     }
                 }
             }
         }
-        throw new ExternalAssetOwnerLoanProductAttributeInvalidSettlementAttributeException(
-                "The given attribute key or attribute value is not valid.");
+        throw new ExternalAssetOwnerLoanProductAttributeInvalidSettlementAttributeException("The given attribute key or attribute value is not valid.");
     }
 
     private ExternalAssetOwnerLoanProductAttributes getLoanProductAttribute(Long attributeId) {
-        Optional<ExternalAssetOwnerLoanProductAttributes> loanProductAttribute = externalAssetOwnerLoanProductAttributesRepository
-                .findById(attributeId);
+        Optional<ExternalAssetOwnerLoanProductAttributes> loanProductAttribute = externalAssetOwnerLoanProductAttributesRepository.findById(attributeId);
         if (loanProductAttribute.isEmpty()) {
             throw new ExternalAssetOwnerLoanProductAttributeNotFoundException(attributeId);
         }
         return loanProductAttribute.get();
     }
 
-    private ExternalAssetOwnerLoanProductAttributes createExternalAssetOwnerLoanProductAttribute(Long loanProductId, String attributeKey,
-            String attributeValue) {
+    private ExternalAssetOwnerLoanProductAttributes createExternalAssetOwnerLoanProductAttribute(Long loanProductId, String attributeKey, String attributeValue) {
         ExternalAssetOwnerLoanProductAttributes attribute = new ExternalAssetOwnerLoanProductAttributes();
         attribute.setLoanProductId(loanProductId);
         attribute.setAttributeKey(attributeKey);
@@ -183,8 +159,15 @@ public class ExternalAssetOwnerLoanProductAttributesWriteServiceImpl implements 
     }
 
     private CommandProcessingResult buildResponseData(ExternalAssetOwnerLoanProductAttributes savedAttribute) {
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(savedAttribute.getLoanProductId()) //
-                .build();
+        return  //
+        //
+        new CommandProcessingResultBuilder().withEntityId(savedAttribute.getLoanProductId()).build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnerLoanProductAttributesWriteServiceImpl(final FromJsonHelper fromApiJsonHelper, final ExternalAssetOwnerLoanProductAttributesRepository externalAssetOwnerLoanProductAttributesRepository, final LoanProductRepository loanProductRepository) {
+        this.fromApiJsonHelper = fromApiJsonHelper;
+        this.externalAssetOwnerLoanProductAttributesRepository = externalAssetOwnerLoanProductAttributesRepository;
+        this.loanProductRepository = loanProductRepository;
     }
 }

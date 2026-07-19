@@ -19,14 +19,11 @@
 package org.apache.fineract.infrastructure.core.diagnostics.performance.sampling.support;
 
 import java.util.StringJoiner;
-import lombok.RequiredArgsConstructor;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.fineract.infrastructure.core.diagnostics.performance.sampling.core.SamplingService;
 
-@RequiredArgsConstructor
 public class SamplingMethodInterceptor implements MethodInterceptor {
-
     private final SamplingService samplingService;
 
     @Override
@@ -57,5 +54,10 @@ public class SamplingMethodInterceptor implements MethodInterceptor {
             }
             return "(" + stringJoiner + ")";
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SamplingMethodInterceptor(final SamplingService samplingService) {
+        this.samplingService = samplingService;
     }
 }

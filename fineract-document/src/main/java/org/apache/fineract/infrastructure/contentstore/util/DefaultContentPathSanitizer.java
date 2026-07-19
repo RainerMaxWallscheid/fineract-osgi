@@ -19,29 +19,28 @@
 package org.apache.fineract.infrastructure.contentstore.util;
 
 import java.nio.file.Path;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class DefaultContentPathSanitizer implements ContentPathSanitizer {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DefaultContentPathSanitizer.class);
     private final FineractProperties properties;
 
     @Override
     public String sanitize(String path) {
         final var sanitizedPath = Path.of(path).normalize().toString();
-
         if (log.isDebugEnabled()) {
             final var fileName = FilenameUtils.getName(sanitizedPath).toLowerCase();
-
             log.debug("Path: {} -> {} ({})", path, sanitizedPath, fileName);
         }
-
         return sanitizedPath;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DefaultContentPathSanitizer(final FineractProperties properties) {
+        this.properties = properties;
     }
 }

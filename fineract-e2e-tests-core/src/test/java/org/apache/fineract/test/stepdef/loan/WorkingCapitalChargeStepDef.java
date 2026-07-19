@@ -21,7 +21,6 @@ package org.apache.fineract.test.stepdef.loan;
 import static org.apache.fineract.client.feign.util.FeignCalls.fail;
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
 import static org.assertj.core.api.Assertions.assertThat;
-
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -32,8 +31,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.ChargeData;
@@ -64,10 +61,9 @@ import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 import org.junit.jupiter.api.Assertions;
 
-@Slf4j
-@RequiredArgsConstructor
 public class WorkingCapitalChargeStepDef extends AbstractStepDef {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalChargeStepDef.class);
     private static final String DATE_FORMAT = "dd MMMM yyyy";
     private static final String DATE_FORMAT_API = "dd-MM-yyyy";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
@@ -75,7 +71,6 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
     private static final Long REGULAR_PAYMENT_MODE_ID = 0L;
     private static final Long SPECIFIED_DUE_DATE_ID = 2L;
     private static final Long FLAT_CALCULATION_TYPE_ID = 1L;
-
     private final FineractFeignClient fineractClient;
     private final WorkingCapitalChargeRequestFactory chargeRequestFactory;
     private final ChargeProductResolver chargeProductResolver;
@@ -87,27 +82,27 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
 
     @When("Admin creates working capital loan charge as penalty")
     public void createWorkingCapitalLoanChargeAsPenalty() {
-        createChargeAndStore(chargeRequestFactory.defaultWorkingCapitalChargeRequest().penalty(true).amount(15.0D));
+        createChargeAndStore(chargeRequestFactory.defaultWorkingCapitalChargeRequest().penalty(true).amount(15.0));
     }
 
     @When("Admin creates working capital loan charge without payment mode")
     public void createWorkingCapitalLoanChargeWithoutPaymentMode() {
-        createChargeAndStore(chargeRequestFactory.defaultWorkingCapitalChargeRequest().amount(25.0D).chargePaymentMode(null));
+        createChargeAndStore(chargeRequestFactory.defaultWorkingCapitalChargeRequest().amount(25.0).chargePaymentMode(null));
     }
 
     @When("Admin creates working capital loan charge with {string} charge time type and {string} calculation type")
     public void createWorkingCapitalLoanChargeWithParams(String chargeTimeTypeName, String chargeCalcTypeName) {
         final ChargeTimeType timeType = ChargeTimeType.valueOf(chargeTimeTypeName);
         final ChargeCalculationType calcType = ChargeCalculationType.valueOf(chargeCalcTypeName);
-        createChargeAndStore(chargeRequestFactory.defaultWorkingCapitalChargeRequest() //
-                .chargeTimeType(timeType.value) //
-                .chargeCalculationType(calcType.value));
+        createChargeAndStore( //
+        //
+        chargeRequestFactory.defaultWorkingCapitalChargeRequest().chargeTimeType(timeType.value).chargeCalculationType(calcType.value));
     }
 
     @When("Admin updates working capital loan charge")
     public void updateWorkingCapitalLoanCharge() {
         final Long id = getChargeId();
-        final ChargeRequest request = chargeRequestFactory.defaultWorkingCapitalChargeRequest().amount(30.0D).penalty(true);
+        final ChargeRequest request = chargeRequestFactory.defaultWorkingCapitalChargeRequest().amount(30.0).penalty(true);
         ok(() -> fineractClient.charges().updateCharge(id, request));
     }
 
@@ -146,15 +141,10 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
         Long loanId = getLoanId();
         Long chargeId = getChargeId();
         Assertions.assertNotNull(chargeId);
-
-        WorkingCapitalLoanChargeData response = ok(
-                () -> fineractClient.workingCapitalLoanCharges().retrieveTemplateWorkingCapitalLoanCharge(loanId));
-
+        WorkingCapitalLoanChargeData response = ok(() -> fineractClient.workingCapitalLoanCharges().retrieveTemplateWorkingCapitalLoanCharge(loanId));
         Assertions.assertNotNull(response.getChargeOptions());
-
         boolean anyMatch = response.getChargeOptions().stream().anyMatch(cO -> chargeId.equals(cO.getId()));
         Assertions.assertTrue(anyMatch);
-
     }
 
     @Then("Admin add working capital loan charge by loan id and charge id with amount {double} and due date {string}")
@@ -163,40 +153,32 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
         Assertions.assertNotNull(loanId);
         Long chargeId = getChargeId();
         Assertions.assertNotNull(chargeId);
-
-        PostLoansLoanIdChargesRequest request = new PostLoansLoanIdChargesRequest() //
-                .chargeId(chargeId).amount(amount).dueDate(dueDate).dateFormat("dd-MM-yyyy").locale("en");
+        PostLoansLoanIdChargesRequest request =  //
+        new PostLoansLoanIdChargesRequest().chargeId(chargeId).amount(amount).dueDate(dueDate).dateFormat("dd-MM-yyyy").locale("en");
         PostLoansLoanIdChargesResponse response = ok(() -> fineractClient.workingCapitalLoanCharges().createLoanCharge(loanId, request));
         Assertions.assertNotNull(response);
         Assertions.assertNotNull(response.getResourceId());
-
         addLoanChargeId(response.getResourceId());
-
     }
 
     @When("Admin adds {string} specified due date charge to working capital loan with {string} due date and {double} transaction amount")
     public void addWorkingCapitalCharge(String chargeType, String dueDate, Double amount) {
         Long loanId = getLoanId();
         Assertions.assertNotNull(loanId);
-
         ChargeProductType chargeProductType = ChargeProductType.valueOf(chargeType);
         Long chargeTypeId = chargeProductResolver.resolve(chargeProductType);
-
         LocalDate dueDateParsed = LocalDate.parse(dueDate, FORMATTER);
         String dueDateFormatted = dueDateParsed.format(FORMATTER_API);
-
-        PostLoansLoanIdChargesRequest request = new PostLoansLoanIdChargesRequest() //
-                .chargeId(chargeTypeId)//
-                .amount(amount)//
-                .dueDate(dueDateFormatted)//
-                .dateFormat(DATE_FORMAT_API)//
-                .locale("en");//
+        PostLoansLoanIdChargesRequest request =  //
+        //
+        //
+        //
+        //
+        new PostLoansLoanIdChargesRequest().chargeId(chargeTypeId).amount(amount).dueDate(dueDateFormatted).dateFormat(DATE_FORMAT_API).locale("en");//
         PostLoansLoanIdChargesResponse response = ok(() -> fineractClient.workingCapitalLoanCharges().createLoanCharge(loanId, request));
         Assertions.assertNotNull(response);
         Assertions.assertNotNull(response.getResourceId());
-
         log.debug("Charge response: {}", response);
-
         testContext().set(TestContextKey.ADD_DUE_DATE_CHARGE_WORKING_CAPITAL_RESPONSE, response);
     }
 
@@ -204,44 +186,29 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
     public void verifyWorkingCapitalLoanChargesWithData(DataTable table) {
         Long loanId = getLoanId();
         Assertions.assertNotNull(loanId);
-
-        List<WorkingCapitalLoanChargeData> charges = ok(
-                () -> fineractClient.workingCapitalLoanCharges().retrieveAllWorkingCapitalLoanChargesByLoanId(loanId));
+        List<WorkingCapitalLoanChargeData> charges = ok(() -> fineractClient.workingCapitalLoanCharges().retrieveAllWorkingCapitalLoanChargesByLoanId(loanId));
         Assertions.assertNotNull(charges);
-
         log.debug("Charges list: {}", charges);
-
         List<List<String>> data = table.asLists();
         List<String> headers = data.get(0);
-
         for (int i = 1; i < data.size(); i++) {
             List<String> expectedValues = data.get(i);
             String dueDateExpected = null;
-
             for (int j = 0; j < headers.size(); j++) {
                 if (headers.get(j).equals("Due Date")) {
                     dueDateExpected = expectedValues.get(j);
                     break;
                 }
             }
-
             final String filterDueDate = dueDateExpected;
-            List<WorkingCapitalLoanChargeData> filteredCharges = charges.stream()
-                    .filter(charge -> charge.getDueDate() != null && filterDueDate.equals(FORMATTER.format(charge.getDueDate()))).toList();
-
+            List<WorkingCapitalLoanChargeData> filteredCharges = charges.stream().filter(charge -> charge.getDueDate() != null && filterDueDate.equals(FORMATTER.format(charge.getDueDate()))).toList();
             List<List<String>> actualValuesList = filteredCharges.stream().map(charge -> fetchValuesOfCharge(headers, charge)).toList();
-
             List<String> convertedExpectedValues = new ArrayList<>();
             for (int j = 0; j < headers.size(); j++) {
                 convertedExpectedValues.add(convertToApiCode(headers.get(j), expectedValues.get(j)));
             }
-
-            boolean containsExpectedValues = actualValuesList.stream()
-                    .anyMatch(actualValues -> actualValues.equals(convertedExpectedValues));
-
-            assertThat(containsExpectedValues).as(
-                    ErrorMessageHelper.wrongValueInLineInChargesTab(String.valueOf(loanId), i, actualValuesList, convertedExpectedValues))
-                    .isTrue();
+            boolean containsExpectedValues = actualValuesList.stream().anyMatch(actualValues -> actualValues.equals(convertedExpectedValues));
+            assertThat(containsExpectedValues).as(ErrorMessageHelper.wrongValueInLineInChargesTab(String.valueOf(loanId), i, actualValuesList, convertedExpectedValues)).isTrue();
         }
     }
 
@@ -249,23 +216,15 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
     public void verifyWorkingCapitalLoanChargeBalances(DataTable table) {
         Long loanId = getLoanId();
         Assertions.assertNotNull(loanId);
-
-        final GetWorkingCapitalLoansLoanIdResponse loanResponse = ok(
-                () -> fineractClient.workingCapitalLoans().retrieveWorkingCapitalLoanById(loanId));
+        final GetWorkingCapitalLoansLoanIdResponse loanResponse = ok(() -> fineractClient.workingCapitalLoans().retrieveWorkingCapitalLoanById(loanId));
         Assertions.assertNotNull(loanResponse);
         Assertions.assertNotNull(loanResponse.getBalance());
-
         List<List<String>> data = table.asLists();
         List<String> headers = data.get(0);
-
         for (int i = 1; i < data.size(); i++) {
             List<String> expectedValues = data.get(i);
             List<String> actualValues = fetchChargeBalanceValues(headers, loanResponse.getBalance());
-
-            assertThat(actualValues)
-                    .as(String.format("%nWrong value in Working Capital Loan charge balances of loan %s line %s."
-                            + "%nActual values: %s %nExpected values: %s", loanId, i, actualValues, expectedValues))
-                    .isEqualTo(expectedValues);
+            assertThat(actualValues).as(String.format("%nWrong value in Working Capital Loan charge balances of loan %s line %s." + "%nActual values: %s %nExpected values: %s", loanId, i, actualValues, expectedValues)).isEqualTo(expectedValues);
         }
     }
 
@@ -273,18 +232,12 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
         final List<String> actualValues = new ArrayList<>();
         for (final String headerName : header) {
             switch (headerName) {
-                case "Fee Amount" ->
-                    actualValues.add(balance.getFee() == null ? null : new Utils.DoubleFormatter(balance.getFee().doubleValue()).format());
-                case "Fee Outstanding" -> actualValues.add(balance.getFeeOutstanding() == null ? null
-                        : new Utils.DoubleFormatter(balance.getFeeOutstanding().doubleValue()).format());
-                case "Fee Paid" -> actualValues
-                        .add(balance.getFeePaid() == null ? null : new Utils.DoubleFormatter(balance.getFeePaid().doubleValue()).format());
-                case "Penalty Amount" -> actualValues
-                        .add(balance.getPenalty() == null ? null : new Utils.DoubleFormatter(balance.getPenalty().doubleValue()).format());
-                case "Penalty Outstanding" -> actualValues.add(balance.getPenaltyOutstanding() == null ? null
-                        : new Utils.DoubleFormatter(balance.getPenaltyOutstanding().doubleValue()).format());
-                case "Penalty Paid" -> actualValues.add(balance.getPenaltyPaid() == null ? null
-                        : new Utils.DoubleFormatter(balance.getPenaltyPaid().doubleValue()).format());
+                case "Fee Amount" -> actualValues.add(balance.getFee() == null ? null : new Utils.DoubleFormatter(balance.getFee().doubleValue()).format());
+                case "Fee Outstanding" -> actualValues.add(balance.getFeeOutstanding() == null ? null : new Utils.DoubleFormatter(balance.getFeeOutstanding().doubleValue()).format());
+                case "Fee Paid" -> actualValues.add(balance.getFeePaid() == null ? null : new Utils.DoubleFormatter(balance.getFeePaid().doubleValue()).format());
+                case "Penalty Amount" -> actualValues.add(balance.getPenalty() == null ? null : new Utils.DoubleFormatter(balance.getPenalty().doubleValue()).format());
+                case "Penalty Outstanding" -> actualValues.add(balance.getPenaltyOutstanding() == null ? null : new Utils.DoubleFormatter(balance.getPenaltyOutstanding().doubleValue()).format());
+                case "Penalty Paid" -> actualValues.add(balance.getPenaltyPaid() == null ? null : new Utils.DoubleFormatter(balance.getPenaltyPaid().doubleValue()).format());
                 default -> throw new IllegalStateException(String.format("Header name %s cannot be found", headerName));
             }
         }
@@ -295,8 +248,7 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
     public void verifyWorkingCapitalLoanChargesAreCreated() {
         Long loanId = getLoanId();
         Assertions.assertNotNull(loanId);
-        List<WorkingCapitalLoanChargeData> responses = ok(
-                () -> fineractClient.workingCapitalLoanCharges().retrieveAllWorkingCapitalLoanChargesByLoanId(loanId));
+        List<WorkingCapitalLoanChargeData> responses = ok(() -> fineractClient.workingCapitalLoanCharges().retrieveAllWorkingCapitalLoanChargesByLoanId(loanId));
         Assertions.assertNotNull(responses);
         List<Long> loanChargeIds = getLoanChargeIds();
         for (WorkingCapitalLoanChargeData response : responses) {
@@ -313,16 +265,12 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
             switch (headerName) {
                 case "Charge Name" -> actualValues.add(charge.getName());
                 case "Due Date" -> actualValues.add(charge.getDueDate() == null ? null : FORMATTER.format(charge.getDueDate()));
-                case "Amount" -> actualValues
-                        .add(charge.getAmount() == null ? null : new Utils.DoubleFormatter(charge.getAmount().doubleValue()).format());
+                case "Amount" -> actualValues.add(charge.getAmount() == null ? null : new Utils.DoubleFormatter(charge.getAmount().doubleValue()).format());
                 case "Currency" -> actualValues.add(charge.getCurrency() == null ? null : charge.getCurrency().getCode());
                 case "isPenalty" -> actualValues.add(charge.getPenalty() == null ? null : String.valueOf(charge.getPenalty()));
-                case "Charge Time Type" ->
-                    actualValues.add(charge.getChargeTimeType() == null ? null : charge.getChargeTimeType().getCode());
-                case "Charge Calculation Type" ->
-                    actualValues.add(charge.getChargeCalculationType() == null ? null : charge.getChargeCalculationType().getCode());
-                case "Charge Payment mode" ->
-                    actualValues.add(charge.getChargePaymentMode() == null ? null : charge.getChargePaymentMode().getCode());
+                case "Charge Time Type" -> actualValues.add(charge.getChargeTimeType() == null ? null : charge.getChargeTimeType().getCode());
+                case "Charge Calculation Type" -> actualValues.add(charge.getChargeCalculationType() == null ? null : charge.getChargeCalculationType().getCode());
+                case "Charge Payment mode" -> actualValues.add(charge.getChargePaymentMode() == null ? null : charge.getChargePaymentMode().getCode());
                 default -> throw new IllegalStateException(String.format("Header name %s cannot be found", headerName));
             }
         }
@@ -364,8 +312,7 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
 
     @Then("Admin retrieves the charge template for Working Capital Loan")
     public void retrieveChargeTemplateForWcl() {
-        final ChargeData templateData = ok(() -> fineractClient.charges()
-                .retrieveTemplateCharge(Map.of("chargeAppliesTo", ChargeProductAppliesTo.WORKING_CAPITAL_LOAN.value)));
+        final ChargeData templateData = ok(() -> fineractClient.charges().retrieveTemplateCharge(Map.of("chargeAppliesTo", ChargeProductAppliesTo.WORKING_CAPITAL_LOAN.value)));
         testContext().set(TestContextKey.WORKING_CAPITAL_CHARGE_TEMPLATE, templateData);
         log.info("Retrieved charge template for Working Capital Loan");
     }
@@ -373,8 +320,7 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
     @Then("Admin retrieves the charge template for Working Capital Loan with charge time type {string}")
     public void retrieveChargeTemplateForWclWithTimeType(String chargeTimeTypeName) {
         final ChargeTimeType timeType = ChargeTimeType.valueOf(chargeTimeTypeName);
-        final ChargeData templateData = ok(() -> fineractClient.charges().retrieveTemplateCharge(
-                Map.of("chargeAppliesTo", ChargeProductAppliesTo.WORKING_CAPITAL_LOAN.value, "chargeTimeType", timeType.value)));
+        final ChargeData templateData = ok(() -> fineractClient.charges().retrieveTemplateCharge(Map.of("chargeAppliesTo", ChargeProductAppliesTo.WORKING_CAPITAL_LOAN.value, "chargeTimeType", timeType.value)));
         testContext().set(TestContextKey.WORKING_CAPITAL_CHARGE_TEMPLATE, templateData);
         log.info("Retrieved charge template for Working Capital Loan with chargeTimeType={}", chargeTimeTypeName);
     }
@@ -401,29 +347,24 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
     public void createWclChargeWithInvalidParamsFails(String chargeTimeTypeName, String chargeCalcTypeName, DataTable table) {
         final ChargeTimeType timeType = ChargeTimeType.valueOf(chargeTimeTypeName);
         final ChargeCalculationType calcType = ChargeCalculationType.valueOf(chargeCalcTypeName);
-        final ChargeRequest request = chargeRequestFactory.defaultWorkingCapitalChargeRequest() //
-                .chargeTimeType(timeType.value) //
-                .chargeCalculationType(calcType.value);
-
+        final ChargeRequest request =  //
+        //
+        chargeRequestFactory.defaultWorkingCapitalChargeRequest().chargeTimeType(timeType.value).chargeCalculationType(calcType.value);
         final Map<String, String> expectedData = table.asMaps().get(0);
         final int expectedHttpCode = Integer.parseInt(expectedData.get("httpCode"));
         final String expectedErrorMessage = expectedData.get("errorMessage").trim();
-
         final CallFailedRuntimeException exception = fail(() -> fineractClient.charges().createCharge(request));
         assertHttpStatus(exception, expectedHttpCode);
         assertErrorMessage(exception, expectedErrorMessage);
-        log.info("Verified creating WCL charge with chargeTimeType={} and calcType={} failed with status {} and message: {}",
-                chargeTimeTypeName, chargeCalcTypeName, exception.getStatus(), expectedErrorMessage);
+        log.info("Verified creating WCL charge with chargeTimeType={} and calcType={} failed with status {} and message: {}", chargeTimeTypeName, chargeCalcTypeName, exception.getStatus(), expectedErrorMessage);
     }
 
     @When("Admin makes a charge adjustment for the last added charge with {double} amount on working capital loan")
     public void makeWcChargeAdjustment(final Double amount) {
         final Long loanId = getLoanId();
         final Long loanChargeId = getLastAddedLoanChargeId();
-        final PostWorkingCapitalLoansLoanIdChargesChargeIdRequest request = new PostWorkingCapitalLoansLoanIdChargesChargeIdRequest()
-                .amount(BigDecimal.valueOf(amount)).locale("en");
-        final PostWorkingCapitalLoansLoanIdChargesChargeIdResponse response = ok(
-                () -> fineractClient.workingCapitalLoanCharges().adjustLoanCharge(loanId, loanChargeId, request, "adjustment"));
+        final PostWorkingCapitalLoansLoanIdChargesChargeIdRequest request = new PostWorkingCapitalLoansLoanIdChargesChargeIdRequest().amount(BigDecimal.valueOf(amount)).locale("en");
+        final PostWorkingCapitalLoansLoanIdChargesChargeIdResponse response = ok(() -> fineractClient.workingCapitalLoanCharges().adjustLoanCharge(loanId, loanChargeId, request, "adjustment"));
         Assertions.assertNotNull(response);
         testContext().set(TestContextKey.WORKING_CAPITAL_CHARGE_ADJUSTMENT_RESPONSE, response);
         log.debug("WC charge adjustment response: {}", response);
@@ -433,10 +374,8 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
     public void makeWcFeeChargeAdjustment(final Double amount) {
         final Long loanId = getLoanId();
         final Long loanChargeId = getLastAddedFeeChargeId(loanId);
-        final PostWorkingCapitalLoansLoanIdChargesChargeIdRequest request = new PostWorkingCapitalLoansLoanIdChargesChargeIdRequest()
-                .amount(BigDecimal.valueOf(amount)).locale("en");
-        final PostWorkingCapitalLoansLoanIdChargesChargeIdResponse response = ok(
-                () -> fineractClient.workingCapitalLoanCharges().adjustLoanCharge(loanId, loanChargeId, request, "adjustment"));
+        final PostWorkingCapitalLoansLoanIdChargesChargeIdRequest request = new PostWorkingCapitalLoansLoanIdChargesChargeIdRequest().amount(BigDecimal.valueOf(amount)).locale("en");
+        final PostWorkingCapitalLoansLoanIdChargesChargeIdResponse response = ok(() -> fineractClient.workingCapitalLoanCharges().adjustLoanCharge(loanId, loanChargeId, request, "adjustment"));
         Assertions.assertNotNull(response);
         testContext().set(TestContextKey.WORKING_CAPITAL_CHARGE_ADJUSTMENT_RESPONSE, response);
         log.debug("WC fee charge adjustment response: {}", response);
@@ -446,10 +385,8 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
     public void makeWcPenaltyChargeAdjustment(final Double amount) {
         final Long loanId = getLoanId();
         final Long loanChargeId = getLastAddedPenaltyChargeId(loanId);
-        final PostWorkingCapitalLoansLoanIdChargesChargeIdRequest request = new PostWorkingCapitalLoansLoanIdChargesChargeIdRequest()
-                .amount(BigDecimal.valueOf(amount)).locale("en");
-        final PostWorkingCapitalLoansLoanIdChargesChargeIdResponse response = ok(
-                () -> fineractClient.workingCapitalLoanCharges().adjustLoanCharge(loanId, loanChargeId, request, "adjustment"));
+        final PostWorkingCapitalLoansLoanIdChargesChargeIdRequest request = new PostWorkingCapitalLoansLoanIdChargesChargeIdRequest().amount(BigDecimal.valueOf(amount)).locale("en");
+        final PostWorkingCapitalLoansLoanIdChargesChargeIdResponse response = ok(() -> fineractClient.workingCapitalLoanCharges().adjustLoanCharge(loanId, loanChargeId, request, "adjustment"));
         Assertions.assertNotNull(response);
         testContext().set(TestContextKey.WORKING_CAPITAL_CHARGE_ADJUSTMENT_RESPONSE, response);
         log.debug("WC penalty charge adjustment response: {}", response);
@@ -459,13 +396,11 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
     public void makeWcChargeAdjustmentFails(final Double amount, final DataTable table) {
         final Long loanId = getLoanId();
         final Long loanChargeId = getLastAddedLoanChargeId();
-        final PostWorkingCapitalLoansLoanIdChargesChargeIdRequest request = new PostWorkingCapitalLoansLoanIdChargesChargeIdRequest()
-                .amount(BigDecimal.valueOf(amount)).locale("en");
+        final PostWorkingCapitalLoansLoanIdChargesChargeIdRequest request = new PostWorkingCapitalLoansLoanIdChargesChargeIdRequest().amount(BigDecimal.valueOf(amount)).locale("en");
         final Map<String, String> expectedData = table.asMaps().get(0);
         final int expectedHttpCode = Integer.parseInt(expectedData.get("httpCode"));
         final String expectedErrorMessage = expectedData.get("errorMessage").trim();
-        final CallFailedRuntimeException exception = fail(
-                () -> fineractClient.workingCapitalLoanCharges().adjustLoanCharge(loanId, loanChargeId, request, "adjustment"));
+        final CallFailedRuntimeException exception = fail(() -> fineractClient.workingCapitalLoanCharges().adjustLoanCharge(loanId, loanChargeId, request, "adjustment"));
         assertHttpStatus(exception, expectedHttpCode);
         assertErrorMessage(exception, expectedErrorMessage);
         log.info("Verified WC charge adjustment failed with status {} and message: {}", exception.getStatus(), expectedErrorMessage);
@@ -476,8 +411,7 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
         final Long loanId = getLoanId();
         final GetWorkingCapitalLoanTransactionIdResponse adjustmentTxn = getLastChargeAdjustmentTransaction(loanId, false);
         ExecuteWorkingCapitalLoanTransactionCommandRequest request = new ExecuteWorkingCapitalLoanTransactionCommandRequest();
-        ok(() -> fineractClient.workingCapitalLoanTransactions().executeWorkingCapitalLoanTransactionCommandByLoanIdTransactionId(loanId,
-                adjustmentTxn.getId(), "undo", request));
+        ok(() -> fineractClient.workingCapitalLoanTransactions().executeWorkingCapitalLoanTransactionCommandByLoanIdTransactionId(loanId, adjustmentTxn.getId(), "undo", request));
         log.debug("Reverted WC charge adjustment transaction id={} on loan {}", adjustmentTxn.getId(), loanId);
     }
 
@@ -489,12 +423,10 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
         final int expectedHttpCode = Integer.parseInt(expectedData.get("httpCode"));
         final String expectedErrorMessage = expectedData.get("errorMessage").trim();
         ExecuteWorkingCapitalLoanTransactionCommandRequest request = new ExecuteWorkingCapitalLoanTransactionCommandRequest();
-        final CallFailedRuntimeException exception = fail(() -> fineractClient.workingCapitalLoanTransactions()
-                .executeWorkingCapitalLoanTransactionCommandByLoanIdTransactionId(loanId, adjustmentTxn.getId(), "undo", request));
+        final CallFailedRuntimeException exception = fail(() -> fineractClient.workingCapitalLoanTransactions().executeWorkingCapitalLoanTransactionCommandByLoanIdTransactionId(loanId, adjustmentTxn.getId(), "undo", request));
         assertHttpStatus(exception, expectedHttpCode);
         assertErrorMessage(exception, expectedErrorMessage);
-        log.info("Verified reverting already reversed WC charge adjustment failed with status {} and message: {}", expectedHttpCode,
-                expectedErrorMessage);
+        log.info("Verified reverting already reversed WC charge adjustment failed with status {} and message: {}", expectedHttpCode, expectedErrorMessage);
     }
 
     @Then("Trying to add working capital loan charge by loan id and charge id with amount {double} and due date {string} results an error with the following data:")
@@ -503,20 +435,15 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
         Assertions.assertNotNull(loanId);
         Long chargeId = getChargeId();
         Assertions.assertNotNull(chargeId);
-
         final Map<String, String> expectedData = table.asMaps().get(0);
         final int expectedHttpCode = Integer.parseInt(expectedData.get("httpCode"));
         final String expectedErrorMessage = expectedData.get("errorMessage").trim();
-
-        PostLoansLoanIdChargesRequest request = new PostLoansLoanIdChargesRequest() //
-                .chargeId(chargeId).amount(amount).dueDate(dueDate).dateFormat("dd-MM-yyyy").locale("en");
-
-        final CallFailedRuntimeException exception = fail(
-                () -> fineractClient.workingCapitalLoanCharges().createLoanCharge(loanId, request));
+        PostLoansLoanIdChargesRequest request =  //
+        new PostLoansLoanIdChargesRequest().chargeId(chargeId).amount(amount).dueDate(dueDate).dateFormat("dd-MM-yyyy").locale("en");
+        final CallFailedRuntimeException exception = fail(() -> fineractClient.workingCapitalLoanCharges().createLoanCharge(loanId, request));
         assertHttpStatus(exception, expectedHttpCode);
         assertErrorMessage(exception, expectedErrorMessage);
-        log.info("Verified adding WCL charge to loan {} failed with status {} and message: {}", loanId, exception.getStatus(),
-                expectedErrorMessage);
+        log.info("Verified adding WCL charge to loan {} failed with status {} and message: {}", loanId, exception.getStatus(), expectedErrorMessage);
     }
 
     // Charge Adjustment Helpers
@@ -535,25 +462,16 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
     }
 
     private Long getLastAddedChargeIdByPenaltyFlag(final Long loanId, final boolean isPenalty) {
-        final List<WorkingCapitalLoanChargeData> charges = ok(
-                () -> fineractClient.workingCapitalLoanCharges().retrieveAllWorkingCapitalLoanChargesByLoanId(loanId));
+        final List<WorkingCapitalLoanChargeData> charges = ok(() -> fineractClient.workingCapitalLoanCharges().retrieveAllWorkingCapitalLoanChargesByLoanId(loanId));
         Assertions.assertNotNull(charges, "No charges found on loan " + loanId);
         final String chargeType = isPenalty ? "penalty" : "fee";
-        return charges.stream().filter(c -> isPenalty == Boolean.TRUE.equals(c.getPenalty()))
-                .max(Comparator.comparing(WorkingCapitalLoanChargeData::getId)).map(WorkingCapitalLoanChargeData::getId)
-                .orElseThrow(() -> new IllegalStateException("No active " + chargeType + " charge found on loan " + loanId));
+        return charges.stream().filter(c -> isPenalty == Boolean.TRUE.equals(c.getPenalty())).max(Comparator.comparing(WorkingCapitalLoanChargeData::getId)).map(WorkingCapitalLoanChargeData::getId).orElseThrow(() -> new IllegalStateException("No active " + chargeType + " charge found on loan " + loanId));
     }
 
-    private GetWorkingCapitalLoanTransactionIdResponse getLastChargeAdjustmentTransaction(final Long loanId,
-            final Boolean excludeReversed) {
-        final GetWorkingCapitalLoanTransactionsResponse body = ok(
-                () -> fineractClient.workingCapitalLoanTransactions().retrieveWorkingCapitalLoanTransactionsById(loanId));
+    private GetWorkingCapitalLoanTransactionIdResponse getLastChargeAdjustmentTransaction(final Long loanId, final Boolean excludeReversed) {
+        final GetWorkingCapitalLoanTransactionsResponse body = ok(() -> fineractClient.workingCapitalLoanTransactions().retrieveWorkingCapitalLoanTransactionsById(loanId));
         Assertions.assertNotNull(body.getContent(), "No WC loan transactions found");
-        return body.getContent().stream()
-                .filter(t -> t.getType() != null && "loanTransactionType.chargeAdjustment".equals(t.getType().getCode()))
-                .filter(t -> excludeReversed == null || !Boolean.TRUE.equals(t.getReversed()))
-                .max(Comparator.comparing(GetWorkingCapitalLoanTransactionIdResponse::getId))
-                .orElseThrow(() -> new IllegalStateException("No charge adjustment transaction found on loan " + loanId));
+        return body.getContent().stream().filter(t -> t.getType() != null && "loanTransactionType.chargeAdjustment".equals(t.getType().getCode())).filter(t -> excludeReversed == null || !Boolean.TRUE.equals(t.getReversed())).max(Comparator.comparing(GetWorkingCapitalLoanTransactionIdResponse::getId)).orElseThrow(() -> new IllegalStateException("No charge adjustment transaction found on loan " + loanId));
     }
 
     // Charge API Helpers
@@ -614,7 +532,13 @@ public class WorkingCapitalChargeStepDef extends AbstractStepDef {
     private void assertSingleOption(final List<EnumOptionData> options, final String optionName, final Long expectedId) {
         assertThat(options).as(optionName + " should not be null or empty").isNotNull().isNotEmpty();
         assertThat(options).hasSize(1);
-        assertThat(options.get(0).getId()).as("Only " + optionName + " with ID " + expectedId + " should be available")
-                .isEqualTo(expectedId);
+        assertThat(options.get(0).getId()).as("Only " + optionName + " with ID " + expectedId + " should be available").isEqualTo(expectedId);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalChargeStepDef(final FineractFeignClient fineractClient, final WorkingCapitalChargeRequestFactory chargeRequestFactory, final ChargeProductResolver chargeProductResolver) {
+        this.fineractClient = fineractClient;
+        this.chargeRequestFactory = chargeRequestFactory;
+        this.chargeProductResolver = chargeProductResolver;
     }
 }

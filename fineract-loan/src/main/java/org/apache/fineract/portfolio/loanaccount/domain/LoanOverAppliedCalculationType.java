@@ -20,18 +20,12 @@ package org.apache.fineract.portfolio.loanaccount.domain;
 
 import java.util.Arrays;
 import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
-@Getter
-@RequiredArgsConstructor
 public enum LoanOverAppliedCalculationType {
-
-    FLAT("flat"), //
-    PERCENTAGE("percentage"), //
-    ;
-
+    FLAT("flat"),  //
+    PERCENTAGE("percentage");
+    //
     private final String humanReadableName;
 
     public static List<EnumOptionData> getValuesAsEnumOptionDataList() {
@@ -48,5 +42,15 @@ public enum LoanOverAppliedCalculationType {
 
     public boolean isPercentage() {
         return this == PERCENTAGE;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private LoanOverAppliedCalculationType(final String humanReadableName) {
+        this.humanReadableName = humanReadableName;
     }
 }

@@ -36,7 +36,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -52,16 +51,14 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnProperty(value = "fineract.module.loan-origination.enabled", havingValue = "true")
 @Tag(name = "Loan Originators", description = "Manage loan originator details for revenue sharing and reporting")
-@RequiredArgsConstructor
 public class LoanOriginatorApiResource {
-
     private final PlatformSecurityContext context;
     private final LoanOriginatorReadPlatformService loanOriginatorReadPlatformService;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create a new loan originator", operationId = "createLoanOriginator", description = "Creates a new loan originator record. Requires CREATE_LOAN_ORIGINATOR permission.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = LoanOriginatorApiResourceSwagger.PostLoanOriginatorsRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LoanOriginatorApiResourceSwagger.PostLoanOriginatorsResponse.class)))
@@ -73,95 +70,84 @@ public class LoanOriginatorApiResource {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "List all loan originators", operationId = "retrieveAllLoanOriginators", description = "Retrieves all loan originator records. Requires READ_LOAN_ORIGINATOR permission.")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = LoanOriginatorApiResourceSwagger.GetLoanOriginatorsResponse.class))))
     @ApiResponse(responseCode = "403", description = "Insufficient permissions")
     public List<LoanOriginatorData> retrieveAll() {
         this.context.authenticatedUser().validateHasReadPermission(LoanOriginatorApiConstants.RESOURCE_NAME);
-
         return this.loanOriginatorReadPlatformService.retrieveAll();
     }
 
     @GET
     @Path("template")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Get loan originator template data", description = "Retrieves the Loan Originator template data")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LoanOriginatorApiResourceSwagger.GetLoanOriginatorTemplateResponse.class)))
     @ApiResponse(responseCode = "403", description = "Insufficient permissions")
     public LoanOriginatorTemplateData retrieveLoanOriginatorTemplate() {
         this.context.authenticatedUser().validateHasReadPermission(LoanOriginatorApiConstants.RESOURCE_NAME);
-
         return this.loanOriginatorReadPlatformService.retrieveTemplate();
     }
 
     @GET
     @Path("{originatorId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve a loan originator by ID", operationId = "retrieveOneLoanOriginator", description = "Retrieves a loan originator by its internal ID. Requires READ_LOAN_ORIGINATOR permission.")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LoanOriginatorApiResourceSwagger.GetLoanOriginatorsResponse.class)))
     @ApiResponse(responseCode = "403", description = "Insufficient permissions")
     @ApiResponse(responseCode = "404", description = "Originator not found")
     public LoanOriginatorData retrieveOne(@PathParam("originatorId") @Parameter(description = "originatorId") final Long originatorId) {
         this.context.authenticatedUser().validateHasReadPermission(LoanOriginatorApiConstants.RESOURCE_NAME);
-
         return this.loanOriginatorReadPlatformService.retrieveById(originatorId);
     }
 
     @GET
     @Path("external-id/{externalId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve a loan originator by external ID", description = "Retrieves a loan originator by its external ID. Requires READ_LOAN_ORIGINATOR permission.")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LoanOriginatorApiResourceSwagger.GetLoanOriginatorsResponse.class)))
     @ApiResponse(responseCode = "403", description = "Insufficient permissions")
     @ApiResponse(responseCode = "404", description = "Originator not found")
-    public LoanOriginatorData retrieveByExternalId(
-            @PathParam("externalId") @Parameter(description = "externalId") final String externalId) {
+    public LoanOriginatorData retrieveByExternalId(@PathParam("externalId") @Parameter(description = "externalId") final String externalId) {
         this.context.authenticatedUser().validateHasReadPermission(LoanOriginatorApiConstants.RESOURCE_NAME);
-
         return this.loanOriginatorReadPlatformService.retrieveByExternalId(externalId);
     }
 
     @PUT
     @Path("{originatorId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a loan originator by ID", operationId = "updateLoanOriginator", description = "Updates a loan originator by its internal ID. Requires UPDATE_LOAN_ORIGINATOR permission.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = LoanOriginatorApiResourceSwagger.PutLoanOriginatorsRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LoanOriginatorApiResourceSwagger.PutLoanOriginatorsResponse.class)))
     @ApiResponse(responseCode = "400", description = "Incorrect format")
     @ApiResponse(responseCode = "403", description = "Insufficient permissions")
     @ApiResponse(responseCode = "404", description = "Originator not found")
-    public CommandProcessingResult update(@PathParam("originatorId") @Parameter(description = "originatorId") final Long originatorId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateLoanOriginator(originatorId).withJson(apiRequestBodyAsJson)
-                .build();
+    public CommandProcessingResult update(@PathParam("originatorId") @Parameter(description = "originatorId") final Long originatorId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateLoanOriginator(originatorId).withJson(apiRequestBodyAsJson).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @PUT
     @Path("external-id/{externalId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a loan originator by external ID", description = "Updates a loan originator by its external ID. Requires UPDATE_LOAN_ORIGINATOR permission.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = LoanOriginatorApiResourceSwagger.PutLoanOriginatorsRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LoanOriginatorApiResourceSwagger.PutLoanOriginatorsResponse.class)))
     @ApiResponse(responseCode = "400", description = "Incorrect format")
     @ApiResponse(responseCode = "403", description = "Insufficient permissions")
     @ApiResponse(responseCode = "404", description = "Originator not found")
-    public CommandProcessingResult updateByExternalId(
-            @PathParam("externalId") @Parameter(description = "externalId") final String externalId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+    public CommandProcessingResult updateByExternalId(@PathParam("externalId") @Parameter(description = "externalId") final String externalId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
         final Long originatorId = this.loanOriginatorReadPlatformService.resolveIdByExternalId(externalId);
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateLoanOriginator(originatorId).withJson(apiRequestBodyAsJson)
-                .build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateLoanOriginator(originatorId).withJson(apiRequestBodyAsJson).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @DELETE
     @Path("{originatorId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete a loan originator by ID", operationId = "deleteLoanOriginator", description = "Deletes a loan originator by its internal ID. Requires DELETE_LOAN_ORIGINATOR permission.")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LoanOriginatorApiResourceSwagger.DeleteLoanOriginatorsResponse.class)))
     @ApiResponse(responseCode = "403", description = "Originator is mapped to loans and cannot be deleted, or insufficient permissions")
@@ -173,16 +159,21 @@ public class LoanOriginatorApiResource {
 
     @DELETE
     @Path("external-id/{externalId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete a loan originator by external ID", description = "Deletes a loan originator by its external ID. Requires DELETE_LOAN_ORIGINATOR permission.")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LoanOriginatorApiResourceSwagger.DeleteLoanOriginatorsResponse.class)))
     @ApiResponse(responseCode = "403", description = "Originator is mapped to loans and cannot be deleted, or insufficient permissions")
     @ApiResponse(responseCode = "404", description = "Originator not found")
-    public CommandProcessingResult deleteByExternalId(
-            @PathParam("externalId") @Parameter(description = "externalId") final String externalId) {
+    public CommandProcessingResult deleteByExternalId(@PathParam("externalId") @Parameter(description = "externalId") final String externalId) {
         final Long originatorId = this.loanOriginatorReadPlatformService.resolveIdByExternalId(externalId);
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteLoanOriginator(originatorId).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanOriginatorApiResource(final PlatformSecurityContext context, final LoanOriginatorReadPlatformService loanOriginatorReadPlatformService, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.context = context;
+        this.loanOriginatorReadPlatformService = loanOriginatorReadPlatformService;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
     }
 }

@@ -20,21 +20,17 @@ package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.Getter;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 
 /**
  * Immutable data object representing a loan transaction.
  */
-@Getter
 public class LoanApprovalData {
-
     private final LocalDate approvalDate;
     private final BigDecimal approvalAmount;
     private final BigDecimal netDisbursalAmount;
     private final BigDecimal availableDisbursementAmountWithOverApplied;
     private final LocalDate expectedDisbursementDate;
-
     // import fields
     private LocalDate approvedOnDate;
     private String note;
@@ -60,9 +56,7 @@ public class LoanApprovalData {
         this.expectedDisbursementDate = null;
     }
 
-    public LoanApprovalData(final BigDecimal approvalAmount, final LocalDate approvalDate, final BigDecimal netDisbursalAmount,
-            final CurrencyData currency, final BigDecimal availableDisbursementAmountWithOverApplied,
-            final LocalDate expectedDisbursementDate) {
+    public LoanApprovalData(final BigDecimal approvalAmount, final LocalDate approvalDate, final BigDecimal netDisbursalAmount, final CurrencyData currency, final BigDecimal availableDisbursementAmountWithOverApplied, final LocalDate expectedDisbursementDate) {
         this.approvalDate = approvalDate;
         this.approvalAmount = approvalAmount;
         this.netDisbursalAmount = netDisbursalAmount;
@@ -71,4 +65,58 @@ public class LoanApprovalData {
         this.expectedDisbursementDate = expectedDisbursementDate;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getApprovalDate() {
+        return this.approvalDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getApprovalAmount() {
+        return this.approvalAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getNetDisbursalAmount() {
+        return this.netDisbursalAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAvailableDisbursementAmountWithOverApplied() {
+        return this.availableDisbursementAmountWithOverApplied;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getExpectedDisbursementDate() {
+        return this.expectedDisbursementDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getApprovedOnDate() {
+        return this.approvedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getNote() {
+        return this.note;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDateFormat() {
+        return this.dateFormat;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLocale() {
+        return this.locale;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getRowIndex() {
+        return this.rowIndex;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CurrencyData getCurrency() {
+        return this.currency;
+    }
 }

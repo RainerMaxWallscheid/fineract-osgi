@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.accounting.provisioning.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.provisioning.service.ProvisioningEntriesWritePlatformService;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "PROVISIONENTRIES", action = "RECREATE")
-@RequiredArgsConstructor
 public class ReCreateProvisioningEntryRequestCommandHandler implements NewCommandSourceHandler {
-
     private final ProvisioningEntriesWritePlatformService provisioningEntriesWritePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class ReCreateProvisioningEntryRequestCommandHandler implements NewComman
         return this.provisioningEntriesWritePlatformService.reCreateProvisioningEntries(jsonCommand.entityId(), jsonCommand);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ReCreateProvisioningEntryRequestCommandHandler(final ProvisioningEntriesWritePlatformService provisioningEntriesWritePlatformService) {
+        this.provisioningEntriesWritePlatformService = provisioningEntriesWritePlatformService;
+    }
 }

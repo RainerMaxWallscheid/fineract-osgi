@@ -27,38 +27,26 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "m_wc_loan_near_breach_action")
 public class WorkingCapitalLoanNearBreachAction extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wc_loan_id", nullable = false)
     private WorkingCapitalLoan workingCapitalLoan;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "action", nullable = false)
     private NearBreachActionType action;
-
     @Column(name = "threshold", scale = 6, precision = 19)
     private BigDecimal threshold;
-
     @Column(name = "frequency")
     private Integer frequency;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "frequency_type")
     private WorkingCapitalLoanPeriodFrequencyType frequencyType;
 
-    public static WorkingCapitalLoanNearBreachAction create(final WorkingCapitalLoan loan, final NearBreachActionType action,
-            final BigDecimal threshold, final Integer frequency, final WorkingCapitalLoanPeriodFrequencyType frequencyType) {
+    public static WorkingCapitalLoanNearBreachAction create(final WorkingCapitalLoan loan, final NearBreachActionType action, final BigDecimal threshold, final Integer frequency, final WorkingCapitalLoanPeriodFrequencyType frequencyType) {
         final WorkingCapitalLoanNearBreachAction entity = new WorkingCapitalLoanNearBreachAction();
         entity.workingCapitalLoan = loan;
         entity.action = action;
@@ -66,5 +54,59 @@ public class WorkingCapitalLoanNearBreachAction extends AbstractAuditableWithUTC
         entity.frequency = frequency;
         entity.frequencyType = frequencyType;
         return entity;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoan getWorkingCapitalLoan() {
+        return this.workingCapitalLoan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public NearBreachActionType getAction() {
+        return this.action;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getThreshold() {
+        return this.threshold;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getFrequency() {
+        return this.frequency;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanPeriodFrequencyType getFrequencyType() {
+        return this.frequencyType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setWorkingCapitalLoan(final WorkingCapitalLoan workingCapitalLoan) {
+        this.workingCapitalLoan = workingCapitalLoan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAction(final NearBreachActionType action) {
+        this.action = action;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setThreshold(final BigDecimal threshold) {
+        this.threshold = threshold;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setFrequency(final Integer frequency) {
+        this.frequency = frequency;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setFrequencyType(final WorkingCapitalLoanPeriodFrequencyType frequencyType) {
+        this.frequencyType = frequencyType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanNearBreachAction() {
     }
 }

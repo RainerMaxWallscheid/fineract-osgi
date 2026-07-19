@@ -25,8 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
@@ -39,13 +37,11 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanStatusChangeHistory;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatusChangeHistoryRepository;
 import org.springframework.stereotype.Service;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 public class LoanStatusChangeHistoryListener {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanStatusChangeHistoryListener.class);
     private final Set<LoanStatus> loanStatuses = new HashSet<>();
-
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanStatusChangeHistoryRepository loanStatusChangeHistoryRepository;
     private final FineractProperties fineractProperties;
@@ -54,8 +50,7 @@ public class LoanStatusChangeHistoryListener {
     public void addListeners() {
         loanStatuses.addAll(getLoanStatuses(fineractProperties.getLoan().getStatusChangeHistoryStatuses()));
         if (!loanStatuses.isEmpty()) {
-            businessEventNotifierService.addPostBusinessEventListener(LoanStatusChangedBusinessEvent.class,
-                    new LoanStatusChangedListener());
+            businessEventNotifierService.addPostBusinessEventListener(LoanStatusChangedBusinessEvent.class, new LoanStatusChangedListener());
         }
     }
 
@@ -78,17 +73,23 @@ public class LoanStatusChangeHistoryListener {
         return result;
     }
 
-    protected final class LoanStatusChangedListener implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
 
+    protected final class LoanStatusChangedListener implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanStatusChangedBusinessEvent event) {
             final Loan loan = event.get();
             log.debug("Loan Status change for loan {} with status {}", loan.getId(), loan.getStatus());
             if (loanStatuses.contains(loan.getStatus())) {
-                LoanStatusChangeHistory loanStatusChangeHistory = new LoanStatusChangeHistory(loan, loan.getStatus(),
-                        DateUtils.getBusinessLocalDate());
+                LoanStatusChangeHistory loanStatusChangeHistory = new LoanStatusChangeHistory(loan, loan.getStatus(), DateUtils.getBusinessLocalDate());
                 loanStatusChangeHistoryRepository.saveAndFlush(loanStatusChangeHistory);
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanStatusChangeHistoryListener(final BusinessEventNotifierService businessEventNotifierService, final LoanStatusChangeHistoryRepository loanStatusChangeHistoryRepository, final FineractProperties fineractProperties) {
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.loanStatusChangeHistoryRepository = loanStatusChangeHistoryRepository;
+        this.fineractProperties = fineractProperties;
     }
 }

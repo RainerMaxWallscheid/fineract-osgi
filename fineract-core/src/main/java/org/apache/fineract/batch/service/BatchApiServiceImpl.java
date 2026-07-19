@@ -20,7 +20,6 @@ package org.apache.fineract.batch.service;
 
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_OK;
-
 import com.google.gson.Gson;
 import com.jayway.jsonpath.JsonPathException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,8 +40,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.batch.command.CommandContext;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.command.CommandStrategyProvider;
@@ -80,20 +77,15 @@ import org.springframework.transaction.support.TransactionTemplate;
  * @see CommandStrategyProvider
  */
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class BatchApiServiceImpl implements BatchApiService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BatchApiServiceImpl.class);
     private final CommandStrategyProvider strategyProvider;
     private final ResolutionHelper resolutionHelper;
     private final ErrorHandler errorHandler;
-
     private final List<BatchFilter> batchFilters;
-
     private final List<BatchRequestPreprocessor> batchPreprocessors;
-
     private final RetryConfigurationAssembler retryConfigurationAssembler;
-
     private PlatformTransactionManager transactionManager;
     private EntityManager entityManager;
 
@@ -121,12 +113,10 @@ public class BatchApiServiceImpl implements BatchApiService {
         return handleBatchRequests(requestList, uriInfo, true);
     }
 
-    private List<BatchResponse> handleBatchRequests(final List<BatchRequest> requestList, final UriInfo uriInfo,
-            boolean enclosingTransaction) {
+    private List<BatchResponse> handleBatchRequests(final List<BatchRequest> requestList, final UriInfo uriInfo, boolean enclosingTransaction) {
         BatchRequestContextHolder.setIsEnclosingTransaction(enclosingTransaction);
         try {
-            return enclosingTransaction ? callInTransaction(Function.identity()::apply, () -> handleRequestNodes(requestList, uriInfo))
-                    : handleRequestNodes(requestList, uriInfo);
+            return enclosingTransaction ? callInTransaction(Function.identity()::apply, () -> handleRequestNodes(requestList, uriInfo)) : handleRequestNodes(requestList, uriInfo);
         } finally {
             BatchRequestContextHolder.resetIsEnclosingTransaction();
         }
@@ -141,8 +131,7 @@ public class BatchApiServiceImpl implements BatchApiService {
      *            consumer to configure the transaction behavior and isolation
      * @return
      */
-    private List<BatchResponse> callInTransaction(Consumer<TransactionTemplate> transactionConfigurator,
-            Supplier<List<BatchResponse>> request) {
+    private List<BatchResponse> callInTransaction(Consumer<TransactionTemplate> transactionConfigurator, Supplier<List<BatchResponse>> request) {
         Retry retry = retryConfigurationAssembler.getRetryConfigurationForBatchApiWithEnclosingTransaction();
         List<BatchResponse> responseList = new ArrayList<>();
         Supplier<List<BatchResponse>> batchSupplier = () -> {
@@ -189,7 +178,6 @@ public class BatchApiServiceImpl implements BatchApiService {
         } catch (BatchReferenceInvalidException e) {
             return List.of(buildOrThrowErrorResponse(e, null));
         }
-
         final ArrayList<BatchResponse> responseList = new ArrayList<>(requestList.size());
         for (BatchRequestNode rootNode : rootNodes) {
             this.callRequestRecursive(rootNode.getRequest(), rootNode, responseList, uriInfo);
@@ -209,8 +197,7 @@ public class BatchApiServiceImpl implements BatchApiService {
      *            the collected responses
      * @return {@code BatchResponse}
      */
-    private void callRequestRecursive(BatchRequest request, BatchRequestNode requestNode, List<BatchResponse> responseList,
-            UriInfo uriInfo) {
+    private void callRequestRecursive(BatchRequest request, BatchRequestNode requestNode, List<BatchResponse> responseList, UriInfo uriInfo) {
         // run current node
         BatchResponse response = executeRequest(request, uriInfo);
         responseList.add(response);
@@ -241,8 +228,7 @@ public class BatchApiServiceImpl implements BatchApiService {
      * @return
      */
     private BatchResponse executeRequest(BatchRequest request, UriInfo uriInfo) {
-        final CommandStrategy commandStrategy = this.strategyProvider
-                .getCommandStrategy(CommandContext.resource(request.getRelativeUrl()).method(request.getMethod()).build());
+        final CommandStrategy commandStrategy = this.strategyProvider.getCommandStrategy(CommandContext.resource(request.getRelativeUrl()).method(request.getMethod()).build());
         log.debug("Batch request: method [{}], relative url [{}]", request.getMethod(), request.getRelativeUrl());
         Either<RuntimeException, BatchRequest> preprocessorResult = runPreprocessors(request);
         if (preprocessorResult.isLeft()) {
@@ -251,17 +237,13 @@ public class BatchApiServiceImpl implements BatchApiService {
             request = preprocessorResult.get();
         }
         try {
-            BatchRequestContextHolder.setRequestAttributes(new HashMap<>(Optional.ofNullable(request.getHeaders())
-                    .map(list -> list.stream().collect(Collectors.toMap(Header::getName, Header::getValue)))
-                    .orElse(Collections.emptyMap())));
-            if (BatchRequestContextHolder.isEnclosingTransaction()
-                    && BatchRequestContextHolder.getEnclosingTransaction().stream().anyMatch(ts -> !ts.isReadOnly())) {
+            BatchRequestContextHolder.setRequestAttributes(new HashMap<>(Optional.ofNullable(request.getHeaders()).map(list -> list.stream().collect(Collectors.toMap(Header::getName, Header::getValue))).orElse(Collections.emptyMap())));
+            if (BatchRequestContextHolder.isEnclosingTransaction() && BatchRequestContextHolder.getEnclosingTransaction().stream().anyMatch(ts -> !ts.isReadOnly())) {
                 entityManager.flush();
             }
             BatchCallHandler callHandler = new BatchCallHandler(this.batchFilters, commandStrategy::execute);
             final BatchResponse rootResponse = callHandler.serviceCall(request, uriInfo);
-            log.debug("Batch response: status code [{}], method [{}], relative url [{}]", rootResponse.getStatusCode(), request.getMethod(),
-                    request.getRelativeUrl());
+            log.debug("Batch response: status code [{}], method [{}], relative url [{}]", rootResponse.getStatusCode(), request.getMethod(), request.getRelativeUrl());
             return rootResponse;
         } catch (RuntimeException ex) {
             return buildOrThrowErrorResponse(ex, request);
@@ -274,8 +256,7 @@ public class BatchApiServiceImpl implements BatchApiService {
         return runPreprocessor(batchPreprocessors, request);
     }
 
-    private Either<RuntimeException, BatchRequest> runPreprocessor(List<BatchRequestPreprocessor> remainingPreprocessor,
-            BatchRequest request) {
+    private Either<RuntimeException, BatchRequest> runPreprocessor(List<BatchRequestPreprocessor> remainingPreprocessor, BatchRequest request) {
         if (remainingPreprocessor.isEmpty()) {
             return Either.right(request);
         } else {
@@ -298,17 +279,15 @@ public class BatchApiServiceImpl implements BatchApiService {
      *            the current request node
      * @return {@code BatchResponse} list of the generated batch responses
      */
-    private List<BatchResponse> parentRequestFailedRecursive(@NonNull BatchRequest request, @NonNull BatchRequestNode requestNode,
-            @NonNull BatchResponse response, Long parentId) {
+    private List<BatchResponse> parentRequestFailedRecursive(@NonNull BatchRequest request, @NonNull BatchRequestNode requestNode, @NonNull BatchResponse response, Long parentId) {
         List<BatchResponse> responseList = new ArrayList<>();
-        if (parentId == null) { // root
+        if (parentId == null) {
+            // root
             BatchRequestContextHolder.getEnclosingTransaction().ifPresent(TransactionExecution::setRollbackOnly);
         } else {
-            responseList.add(buildErrorResponse(request.getRequestId(), response.getStatusCode(),
-                    "Parent request with id " + parentId + " was erroneous!", null));
+            responseList.add(buildErrorResponse(request.getRequestId(), response.getStatusCode(), "Parent request with id " + parentId + " was erroneous!", null));
         }
-        requestNode.getChildNodes().forEach(childNode -> responseList
-                .addAll(parentRequestFailedRecursive(childNode.getRequest(), childNode, response, request.getRequestId())));
+        requestNode.getChildNodes().forEach(childNode -> responseList.addAll(parentRequestFailedRecursive(childNode.getRequest(), childNode, response, request.getRequestId())));
         return responseList;
     }
 
@@ -351,14 +330,10 @@ public class BatchApiServiceImpl implements BatchApiService {
 
     @NonNull
     private List<BatchResponse> buildErrorResponses(Throwable ex, @NonNull List<BatchResponse> responseList) {
-        BatchResponse response = responseList.isEmpty() ? null
-                : responseList.stream().filter(e -> e.getStatusCode() == null || e.getStatusCode() != SC_OK).findFirst()
-                        .orElse(responseList.get(responseList.size() - 1));
-
+        BatchResponse response = responseList.isEmpty() ? null : responseList.stream().filter(e -> e.getStatusCode() == null || e.getStatusCode() != SC_OK).findFirst().orElse(responseList.get(responseList.size() - 1));
         if (response != null && response.getStatusCode() == SC_OK && ex instanceof TransactionSystemException tse) {
             ex = new ConcurrencyFailureException(tse.getMessage(), tse.getCause());
         }
-
         Long requestId = null;
         Integer statusCode = null;
         String body = null;
@@ -387,8 +362,7 @@ public class BatchApiServiceImpl implements BatchApiService {
 
     @SuppressFBWarnings(value = "BX_UNBOXING_IMMEDIATELY_REBOXED", justification = "TODO: fix this!")
     private BatchResponse buildErrorResponse(Long requestId, Integer statusCode, String body, Set<Header> headers) {
-        return new BatchResponse().setRequestId(requestId).setStatusCode(statusCode == null ? SC_INTERNAL_SERVER_ERROR : statusCode)
-                .setBody(body == null ? "Request with id " + requestId + " was erroneous!" : body).setHeaders(headers);
+        return new BatchResponse().setRequestId(requestId).setStatusCode(statusCode == null ? SC_INTERNAL_SERVER_ERROR : statusCode).setBody(body == null ? "Request with id " + requestId + " was erroneous!" : body).setHeaders(headers);
     }
 
     @PersistenceContext
@@ -399,5 +373,15 @@ public class BatchApiServiceImpl implements BatchApiService {
     @Autowired
     public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BatchApiServiceImpl(final CommandStrategyProvider strategyProvider, final ResolutionHelper resolutionHelper, final ErrorHandler errorHandler, final List<BatchFilter> batchFilters, final List<BatchRequestPreprocessor> batchPreprocessors, final RetryConfigurationAssembler retryConfigurationAssembler) {
+        this.strategyProvider = strategyProvider;
+        this.resolutionHelper = resolutionHelper;
+        this.errorHandler = errorHandler;
+        this.batchFilters = batchFilters;
+        this.batchPreprocessors = batchPreprocessors;
+        this.retryConfigurationAssembler = retryConfigurationAssembler;
     }
 }

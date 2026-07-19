@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.accounting.journalentry.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
@@ -28,9 +27,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @CommandType(entity = "JOURNALENTRY", action = "DEFINEOPENINGBALANCE")
-@RequiredArgsConstructor
 public class DefineOpeningBalanceCommandHandler implements NewCommandSourceHandler {
-
     private final JournalEntryWritePlatformService writePlatformService;
 
     @Override
@@ -38,4 +35,8 @@ public class DefineOpeningBalanceCommandHandler implements NewCommandSourceHandl
         return this.writePlatformService.defineOpeningBalance(command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DefineOpeningBalanceCommandHandler(final JournalEntryWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
+    }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.DataIntegrityErrorHandler;
@@ -31,10 +30,8 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN", action = "DOWNPAYMENT")
 public class LoanDownPaymentCommandHandler implements NewCommandSourceHandler {
-
     private final LoanWritePlatformService writePlatformService;
     private final DataIntegrityErrorHandler dataIntegrityErrorHandler;
 
@@ -42,12 +39,16 @@ public class LoanDownPaymentCommandHandler implements NewCommandSourceHandler {
     public CommandProcessingResult processCommand(JsonCommand command) {
         try {
             boolean isRecoveryRepayment = false;
-            return this.writePlatformService.makeLoanRepayment(LoanTransactionType.DOWN_PAYMENT, command.getLoanId(), command,
-                    isRecoveryRepayment);
+            return this.writePlatformService.makeLoanRepayment(LoanTransactionType.DOWN_PAYMENT, command.getLoanId(), command, isRecoveryRepayment);
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.downPayment",
-                    "Down Payment");
+            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.downPayment", "Down Payment");
             return CommandProcessingResult.empty();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanDownPaymentCommandHandler(final LoanWritePlatformService writePlatformService, final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
+        this.writePlatformService = writePlatformService;
+        this.dataIntegrityErrorHandler = dataIntegrityErrorHandler;
     }
 }

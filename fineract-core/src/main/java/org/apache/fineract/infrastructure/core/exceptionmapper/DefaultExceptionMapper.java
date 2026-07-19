@@ -19,21 +19,20 @@
 package org.apache.fineract.infrastructure.core.exceptionmapper;
 
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import java.util.Map;
 import java.util.Objects;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
 @Scope("singleton")
-@Slf4j
 public class DefaultExceptionMapper implements FineractExceptionMapper, ExceptionMapper<RuntimeException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DefaultExceptionMapper.class);
 
     @Override
     public int errorCode() {
@@ -43,9 +42,6 @@ public class DefaultExceptionMapper implements FineractExceptionMapper, Exceptio
     @Override
     public Response toResponse(RuntimeException exception) {
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-
-        return Response.status(SC_INTERNAL_SERVER_ERROR)
-                .entity(Map.of("Exception", Objects.requireNonNullElse(exception.getMessage(), "No error message available")))
-                .type(MediaType.APPLICATION_JSON).build();
+        return Response.status(SC_INTERNAL_SERVER_ERROR).entity(Map.of("Exception", Objects.requireNonNullElse(exception.getMessage(), "No error message available"))).type(MediaType.APPLICATION_JSON).build();
     }
 }

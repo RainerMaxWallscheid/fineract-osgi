@@ -24,7 +24,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.http.BodyCachingHttpServletRequestWrapper;
 import org.apache.fineract.infrastructure.jobs.exception.LoanIdsHardLockedException;
@@ -33,13 +32,11 @@ import org.apache.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@RequiredArgsConstructor
 public abstract class COBApiFilter extends OncePerRequestFilter {
-
     protected final COBFilterHelper helper;
 
-    protected static class Reject {
 
+    protected static class Reject {
         private final String message;
         private final Integer statusCode;
 
@@ -59,10 +56,8 @@ public abstract class COBApiFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         request = new BodyCachingHttpServletRequestWrapper(request);
-
         if (!helper.isOnApiList((BodyCachingHttpServletRequestWrapper) request)) {
             proceed(filterChain, request, response);
         } else {
@@ -87,9 +82,12 @@ public abstract class COBApiFilter extends OncePerRequestFilter {
         }
     }
 
-    private void proceed(FilterChain filterChain, HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+    private void proceed(FilterChain filterChain, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         filterChain.doFilter(request, response);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public COBApiFilter(final COBFilterHelper helper) {
+        this.helper = helper;
+    }
 }

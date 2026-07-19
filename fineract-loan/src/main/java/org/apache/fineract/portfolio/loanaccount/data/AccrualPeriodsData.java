@@ -21,17 +21,10 @@ package org.apache.fineract.portfolio.loanaccount.data;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleInstallment;
 
-@Data
-@Accessors(chain = true)
-@RequiredArgsConstructor
 public class AccrualPeriodsData {
-
     private final MonetaryCurrency currency;
     private final List<AccrualPeriodData> periods = new ArrayList<>();
 
@@ -40,25 +33,75 @@ public class AccrualPeriodsData {
         return this;
     }
 
-    public static AccrualPeriodsData create(@NotNull List<LoanRepaymentScheduleInstallment> installments, Integer firstInstallmentNumber,
-            MonetaryCurrency currency) {
+    public static AccrualPeriodsData create(@NotNull List<LoanRepaymentScheduleInstallment> installments, Integer firstInstallmentNumber, MonetaryCurrency currency) {
         AccrualPeriodsData accrualPeriods = new AccrualPeriodsData(currency);
         for (LoanRepaymentScheduleInstallment installment : installments) {
             Integer installmentNumber = installment.getInstallmentNumber();
             boolean isFirst = installmentNumber.equals(firstInstallmentNumber);
-            accrualPeriods
-                    .addPeriod(new AccrualPeriodData(installmentNumber, isFirst, installment.getFromDate(), installment.getDueDate()));
+            accrualPeriods.addPeriod(new AccrualPeriodData(installmentNumber, isFirst, installment.getFromDate(), installment.getDueDate()));
         }
         return accrualPeriods;
     }
 
     public AccrualPeriodData getPeriodByInstallmentNumber(Integer installmentNumber) {
-        return installmentNumber == null ? null
-                : periods.stream().filter(p -> installmentNumber.equals(p.getInstallmentNumber())).findFirst().orElse(null);
+        return installmentNumber == null ? null : periods.stream().filter(p -> installmentNumber.equals(p.getInstallmentNumber())).findFirst().orElse(null);
     }
 
     public Integer getFirstInstallmentNumber() {
-        return periods.stream().filter(AccrualPeriodData::isFirstPeriod).map(AccrualPeriodData::getInstallmentNumber).findFirst()
-                .orElse(null);
+        return periods.stream().filter(AccrualPeriodData::isFirstPeriod).map(AccrualPeriodData::getInstallmentNumber).findFirst().orElse(null);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MonetaryCurrency getCurrency() {
+        return this.currency;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<AccrualPeriodData> getPeriods() {
+        return this.periods;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof AccrualPeriodsData)) return false;
+        final AccrualPeriodsData other = (AccrualPeriodsData) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$currency = this.getCurrency();
+        final java.lang.Object other$currency = other.getCurrency();
+        if (this$currency == null ? other$currency != null : !this$currency.equals(other$currency)) return false;
+        final java.lang.Object this$periods = this.getPeriods();
+        final java.lang.Object other$periods = other.getPeriods();
+        if (this$periods == null ? other$periods != null : !this$periods.equals(other$periods)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof AccrualPeriodsData;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $currency = this.getCurrency();
+        result = result * PRIME + ($currency == null ? 43 : $currency.hashCode());
+        final java.lang.Object $periods = this.getPeriods();
+        result = result * PRIME + ($periods == null ? 43 : $periods.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "AccrualPeriodsData(currency=" + this.getCurrency() + ", periods=" + this.getPeriods() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AccrualPeriodsData(final MonetaryCurrency currency) {
+        this.currency = currency;
     }
 }

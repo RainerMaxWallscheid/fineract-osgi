@@ -18,28 +18,24 @@
  */
 package org.apache.fineract.cob.workingcapitalloan;
 
-import lombok.NoArgsConstructor;
 import org.apache.fineract.cob.COBConstant;
 
-@NoArgsConstructor
 public final class WorkingCapitalLoanCOBConstant extends COBConstant {
-
     // Job Related Constants
     public static final String WORKING_CAPITAL_JOB_NAME = "WC_LOAN_COB";
     public static final String WORKING_CAPITAL_JOB_HUMAN_READABLE_NAME = "Working Capital Loan COB";
     public static final String WORKING_CAPITAL_LOAN_COB_JOB_NAME = "WORKING_CAPITAL_LOAN_CLOSE_OF_BUSINESS";
-
     // Bean Names
     public static final String WORKING_CAPITAL_LOAN_COB_STEP = "workingCapitalLoanCOBStep";
     public static final String WORKING_CAPITAL_LOAN_COB_BUSINESS_STEP = "workingCapitalLoanCOBBusinessStep";
     public static final String WORKING_CAPITAL_LOAN_COB_PARTITIONER = "workingCapitalLoanCOBPartitioner";
-
     public static final String WORKING_CAPITAL_LOAN_COB_WORKER_STEP = "workingCapitalLoanCOBWorkerStep";
     public static final String WORKING_CAPITAL_LOAN_COB_FLOW = "workingCapitalLoanCOBFlow";
-
     public static final String INLINE_WORKING_CAPITAL_LOAN_COB_JOB_NAME = "INLINE_WORKING_CAPITAL_LOAN_COB";
     public static final String WORKING_CAPITAL_LOAN_IDS_PARAMETER_NAME = "LoanIds";
-
     public static final String WORKING_CAPITAL_LOAN_COB_PARTITIONER_STEP = "Working Capital Loan COB partition - Step";
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanCOBConstant() {
+    }
 }

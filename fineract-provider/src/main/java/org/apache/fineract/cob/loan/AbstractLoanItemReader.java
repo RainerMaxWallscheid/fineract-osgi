@@ -19,10 +19,6 @@
 package org.apache.fineract.cob.loan;
 
 import java.util.concurrent.LinkedBlockingQueue;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.exceptions.LockedReadException;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
@@ -33,13 +29,10 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.NonNull;
 
-@Slf4j
-@RequiredArgsConstructor
 public abstract class AbstractLoanItemReader<T extends AbstractPersistableCustom<Long>> implements ItemReader<T> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AbstractLoanItemReader.class);
     protected final CrudRepository<T, Long> loanRepository;
-
-    @Setter(AccessLevel.PROTECTED)
     private LinkedBlockingQueue<Long> remainingData;
 
     @Override
@@ -60,4 +53,13 @@ public abstract class AbstractLoanItemReader<T extends AbstractPersistableCustom
         return ExitStatus.COMPLETED;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public AbstractLoanItemReader(final CrudRepository<T, Long> loanRepository) {
+        this.loanRepository = loanRepository;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected void setRemainingData(final LinkedBlockingQueue<Long> remainingData) {
+        this.remainingData = remainingData;
+    }
 }

@@ -19,7 +19,6 @@
 package org.apache.fineract.organisation.holiday.service;
 
 import static org.apache.fineract.organisation.holiday.api.HolidayApiConstants.officesParamName;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import jakarta.persistence.PersistenceException;
@@ -29,8 +28,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -56,10 +53,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 public class HolidayWritePlatformServiceJpaRepositoryImpl implements HolidayWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(HolidayWritePlatformServiceJpaRepositoryImpl.class);
     private final HolidayDataValidator fromApiJsonDeserializer;
     private final HolidayRepositoryWrapper holidayRepository;
     private final WorkingDaysRepositoryWrapper daysRepositoryWrapper;
@@ -71,23 +67,17 @@ public class HolidayWritePlatformServiceJpaRepositoryImpl implements HolidayWrit
     @Transactional
     @Override
     public CommandProcessingResult createHoliday(final JsonCommand command) {
-
         try {
             this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForCreate(command.json());
-
             validateInputDates(command);
-
             final Set<Office> offices = getSelectedOffices(command);
-
             final Holiday holiday = Holiday.createNew(offices, command);
-
             this.holidayRepository.saveAndFlush(holiday);
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(holiday.getId()) //
-                    .build();
+            return  //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(holiday.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
@@ -101,16 +91,12 @@ public class HolidayWritePlatformServiceJpaRepositoryImpl implements HolidayWrit
     @Transactional
     @Override
     public CommandProcessingResult updateHoliday(final JsonCommand command) {
-
         try {
             this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForUpdate(command.json());
-
             final Holiday holiday = this.holidayRepository.findOneWithNotFoundDetection(command.entityId());
             Map<String, Object> changes = holiday.update(command);
-
             validateInputDates(holiday.getFromDate(), holiday.getToDate(), holiday.getRepaymentsRescheduledTo());
-
             if (changes.containsKey(officesParamName)) {
                 final Set<Office> offices = getSelectedOffices(command);
                 final boolean updated = holiday.update(offices);
@@ -118,13 +104,11 @@ public class HolidayWritePlatformServiceJpaRepositoryImpl implements HolidayWrit
                     changes.remove(officesParamName);
                 }
             }
-
             this.holidayRepository.saveAndFlush(holiday);
-
-            return new CommandProcessingResultBuilder() //
-                    .withEntityId(holiday.getId()) //
-                    .with(changes) //
-                    .build();
+            return  //
+            //
+            //
+            new CommandProcessingResultBuilder().withEntityId(holiday.getId()).with(changes).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
@@ -140,12 +124,11 @@ public class HolidayWritePlatformServiceJpaRepositoryImpl implements HolidayWrit
     public CommandProcessingResult activateHoliday(final Long holidayId) {
         this.context.authenticatedUser();
         final Holiday holiday = this.holidayRepository.findOneWithNotFoundDetection(holidayId);
-
         holiday.activate();
         this.holidayRepository.saveAndFlush(holiday);
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(holiday.getId()) //
-                .build();
+        return  //
+        //
+        new CommandProcessingResultBuilder().withEntityId(holiday.getId()).build();
     }
 
     @Transactional
@@ -155,29 +138,24 @@ public class HolidayWritePlatformServiceJpaRepositoryImpl implements HolidayWrit
         final Holiday holiday = this.holidayRepository.findOneWithNotFoundDetection(holidayId);
         holiday.delete();
         this.holidayRepository.saveAndFlush(holiday);
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(holidayId) //
-                .build();
+        return  //
+        //
+        new CommandProcessingResultBuilder().withEntityId(holidayId).build();
     }
 
     private Set<Office> getSelectedOffices(final JsonCommand command) {
         Set<Office> offices = null;
         final JsonObject topLevelJsonElement = this.fromApiJsonHelper.parse(command.json()).getAsJsonObject();
-        if (topLevelJsonElement.has(HolidayApiConstants.officesParamName)
-                && topLevelJsonElement.get(HolidayApiConstants.officesParamName).isJsonArray()) {
-
+        if (topLevelJsonElement.has(HolidayApiConstants.officesParamName) && topLevelJsonElement.get(HolidayApiConstants.officesParamName).isJsonArray()) {
             final JsonArray array = topLevelJsonElement.get(HolidayApiConstants.officesParamName).getAsJsonArray();
             Set<Long> officeIds = new HashSet<>(array.size());
             for (int i = 0; i < array.size(); i++) {
-                officeIds.add(
-                        this.fromApiJsonHelper.extractLongNamed(HolidayApiConstants.officeIdParamName, array.get(i).getAsJsonObject()));
+                officeIds.add(this.fromApiJsonHelper.extractLongNamed(HolidayApiConstants.officeIdParamName, array.get(i).getAsJsonObject()));
             }
-            Map<Long, Office> officeMap = this.officeRepository.findAllById(officeIds).stream()
-                    .collect(Collectors.toMap(Office::getId, Function.identity()));
+            Map<Long, Office> officeMap = this.officeRepository.findAllById(officeIds).stream().collect(Collectors.toMap(Office::getId, Function.identity()));
             offices = new HashSet<>(array.size());
             for (int i = 0; i < array.size(); i++) {
-                final Long officeId = this.fromApiJsonHelper.extractLongNamed(HolidayApiConstants.officeIdParamName,
-                        array.get(i).getAsJsonObject());
+                final Long officeId = this.fromApiJsonHelper.extractLongNamed(HolidayApiConstants.officeIdParamName, array.get(i).getAsJsonObject());
                 final Office office = officeMap.get(officeId);
                 if (office == null) {
                     throw new OfficeNotFoundException(officeId);
@@ -191,13 +169,10 @@ public class HolidayWritePlatformServiceJpaRepositoryImpl implements HolidayWrit
     private void handleDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final Exception dve) {
         if (realCause.getMessage().contains("holiday_name")) {
             final String name = command.stringValueOfParameterNamed("name");
-            throw new PlatformDataIntegrityException("error.msg.holiday.duplicate.name", "Holiday with name `" + name + "` already exists",
-                    "name", name);
+            throw new PlatformDataIntegrityException("error.msg.holiday.duplicate.name", "Holiday with name `" + name + "` already exists", "name", name);
         }
-
         log.error("Error occured.", dve);
-        throw ErrorHandler.getMappable(dve, "error.msg.office.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource: " + realCause.getMessage());
+        throw ErrorHandler.getMappable(dve, "error.msg.office.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
     }
 
     private void validateInputDates(final JsonCommand command) {
@@ -218,43 +193,42 @@ public class HolidayWritePlatformServiceJpaRepositoryImpl implements HolidayWrit
 
     private void validateInputDates(final LocalDate fromDate, final LocalDate toDate, final LocalDate repaymentsRescheduledTo) {
         String defaultUserMessage = "";
-
         if (DateUtils.isBefore(toDate, fromDate)) {
             defaultUserMessage = "To Date date cannot be before the From Date.";
-            throw new HolidayDateException("to.date.cannot.be.before.from.date", defaultUserMessage, fromDate.toString(),
-                    toDate.toString());
+            throw new HolidayDateException("to.date.cannot.be.before.from.date", defaultUserMessage, fromDate.toString(), toDate.toString());
         }
         if (repaymentsRescheduledTo != null) {
             if (!DateUtils.isBefore(repaymentsRescheduledTo, fromDate) && !DateUtils.isAfter(repaymentsRescheduledTo, toDate)) {
                 defaultUserMessage = "Repayments rescheduled date should be before from date or after to date.";
-                throw new HolidayDateException("repayments.rescheduled.date.should.be.before.from.date.or.after.to.date",
-                        defaultUserMessage, repaymentsRescheduledTo.toString());
+                throw new HolidayDateException("repayments.rescheduled.date.should.be.before.from.date.or.after.to.date", defaultUserMessage, repaymentsRescheduledTo.toString());
             }
-
             final WorkingDays workingDays = this.daysRepositoryWrapper.findOne();
             final Boolean isRepaymentOnWorkingDay = WorkingDaysUtil.isWorkingDay(workingDays, repaymentsRescheduledTo);
-
             if (!isRepaymentOnWorkingDay) {
                 defaultUserMessage = "Repayments rescheduled date should not fall on non working days";
-                throw new HolidayDateException("repayments.rescheduled.date.should.not.fall.on.non.working.day", defaultUserMessage,
-                        repaymentsRescheduledTo.toString());
+                throw new HolidayDateException("repayments.rescheduled.date.should.not.fall.on.non.working.day", defaultUserMessage, repaymentsRescheduledTo.toString());
             }
-
             // validate repaymentsRescheduledTo date
             // 1. should be within a 30 days date range.
             // 2. Alternative date should not be an exist holiday.//TBD
             // 3. Holiday should not be on an repaymentsRescheduledTo date of another holiday.//TBD
-
             // restricting repaymentsRescheduledTo date to be within 30 days range before or after from date and to
             // date.
-            if (DateUtils.isBefore(repaymentsRescheduledTo, fromDate.minusDays(30))
-                    || DateUtils.isAfter(repaymentsRescheduledTo, toDate.plusDays(30))) {
+            if (DateUtils.isBefore(repaymentsRescheduledTo, fromDate.minusDays(30)) || DateUtils.isAfter(repaymentsRescheduledTo, toDate.plusDays(30))) {
                 defaultUserMessage = "Repayments Rescheduled to date must be within 30 days before or after from and to dates";
-                throw new HolidayDateException("repayments.rescheduled.to.must.be.within.range", defaultUserMessage, fromDate.toString(),
-                        toDate.toString(), repaymentsRescheduledTo.toString());
+                throw new HolidayDateException("repayments.rescheduled.to.must.be.within.range", defaultUserMessage, fromDate.toString(), toDate.toString(), repaymentsRescheduledTo.toString());
             }
         }
-
     }
 
+    @java.lang.SuppressWarnings("all")
+        public HolidayWritePlatformServiceJpaRepositoryImpl(final HolidayDataValidator fromApiJsonDeserializer, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper daysRepositoryWrapper, final PlatformSecurityContext context, final OfficeRepositoryWrapper officeRepositoryWrapper, final OfficeRepository officeRepository, final FromJsonHelper fromApiJsonHelper) {
+        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
+        this.holidayRepository = holidayRepository;
+        this.daysRepositoryWrapper = daysRepositoryWrapper;
+        this.context = context;
+        this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.officeRepository = officeRepository;
+        this.fromApiJsonHelper = fromApiJsonHelper;
+    }
 }

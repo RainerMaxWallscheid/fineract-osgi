@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.common.AccountingDropdownReadPlatformService;
 import org.apache.fineract.accounting.common.AccountingEnumerations;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
@@ -53,9 +52,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-@RequiredArgsConstructor
 public class ShareProductReadPlatformServiceImpl implements ShareProductReadPlatformService {
-
     private final JdbcTemplate jdbcTemplate;
     private final CurrencyReadPlatformService currencyReadPlatformService;
     private final ChargeReadPlatformService chargeReadPlatformService;
@@ -79,7 +76,6 @@ public class ShareProductReadPlatformServiceImpl implements ShareProductReadPlat
         if (offSet != null) {
             sqlBuilder.append(" offset ").append(offSet);
         }
-
         Object[] whereClauseItemsitems = new Object[] {};
         return this.shareProductDataPaginationHelper.fetchPage(this.jdbcTemplate, sqlBuilder.toString(), whereClauseItemsitems, mapper);
     }
@@ -87,38 +83,27 @@ public class ShareProductReadPlatformServiceImpl implements ShareProductReadPlat
     @Override
     public ProductData retrieveOne(Long productId, boolean includeTemplate) {
         MarketPriceRowMapper marketRowMapper = new MarketPriceRowMapper();
-
         try {
             final String sql1 = "select " + marketRowMapper.schema() + " where marketData.product_id = ?";
-            final Collection<ShareProductMarketPriceData> shareMarketCollection = this.jdbcTemplate.query(sql1, marketRowMapper, // NOSONAR
-                    new Object[] { productId });
+            final Collection<ShareProductMarketPriceData> shareMarketCollection = this.jdbcTemplate.query(sql1, marketRowMapper,  // NOSONAR
+            new Object[] {productId});
             final Collection<ChargeData> charges = this.chargeReadPlatformService.retrieveShareProductCharges(productId);
             ShareProductRowMapper mapper = new ShareProductRowMapper(shareMarketCollection, charges);
             final String sql = "select " + mapper.schema() + " where shareproduct.id = ?";
-            ShareProductData data = (ShareProductData) this.jdbcTemplate.queryForObject(sql, mapper, new Object[] { productId }); // NOSONAR
-
+            ShareProductData data = (ShareProductData) this.jdbcTemplate.queryForObject(sql, mapper, new Object[] {productId}); // NOSONAR
             if (data.hasAccountingEnabled()) {
-                final Map<String, Object> accountingMappings = this.accountMappingReadPlatformService
-                        .fetchAccountMappingDetailsForShareProduct(productId, data.accountingRuleTypeId());
-                final Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings = this.accountMappingReadPlatformService
-                        .fetchPaymentTypeToFundSourceMappingsForShareProduct(productId);
-                Collection<ChargeToGLAccountMapper> feeToGLAccountMappings = this.accountMappingReadPlatformService
-                        .fetchFeeToIncomeAccountMappingsForShareProduct(productId);
-                data = ShareProductData.withAccountingDetails(data, accountingMappings, paymentChannelToFundSourceMappings,
-                        feeToGLAccountMappings);
+                final Map<String, Object> accountingMappings = this.accountMappingReadPlatformService.fetchAccountMappingDetailsForShareProduct(productId, data.accountingRuleTypeId());
+                final Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings = this.accountMappingReadPlatformService.fetchPaymentTypeToFundSourceMappingsForShareProduct(productId);
+                Collection<ChargeToGLAccountMapper> feeToGLAccountMappings = this.accountMappingReadPlatformService.fetchFeeToIncomeAccountMappingsForShareProduct(productId);
+                data = ShareProductData.withAccountingDetails(data, accountingMappings, paymentChannelToFundSourceMappings, feeToGLAccountMappings);
             }
-
             if (includeTemplate) {
                 Collection<ChargeData> chargeOptions = this.chargeReadPlatformService.retrieveSharesApplicableCharges();
                 final Collection<CurrencyData> currencyOptions = this.currencyReadPlatformService.retrieveAllowedCurrencies();
-                final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService
-                        .retrieveLockinPeriodFrequencyTypeOptions();
-                final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService
-                        .retrieveMinimumActivePeriodFrequencyTypeOptions();
-                final Map<String, List<GLAccountData>> accountingMappingOptions = this.accountingDropdownReadPlatformService
-                        .retrieveAccountMappingOptionsForShareProducts();
-                data = ShareProductData.template(data, currencyOptions, chargeOptions, minimumActivePeriodFrequencyTypeOptions,
-                        lockinPeriodFrequencyTypeOptions, accountingMappingOptions);
+                final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService.retrieveLockinPeriodFrequencyTypeOptions();
+                final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService.retrieveMinimumActivePeriodFrequencyTypeOptions();
+                final Map<String, List<GLAccountData>> accountingMappingOptions = this.accountingDropdownReadPlatformService.retrieveAccountMappingOptionsForShareProducts();
+                data = ShareProductData.template(data, currencyOptions, chargeOptions, minimumActivePeriodFrequencyTypeOptions, lockinPeriodFrequencyTypeOptions, accountingMappingOptions);
             }
             return data;
         } catch (final EmptyResultDataAccessException e) {
@@ -130,14 +115,10 @@ public class ShareProductReadPlatformServiceImpl implements ShareProductReadPlat
     public ProductData retrieveTemplate() {
         Collection<ChargeData> chargeOptions = this.chargeReadPlatformService.retrieveSharesApplicableCharges();
         final Collection<CurrencyData> currencyOptions = this.currencyReadPlatformService.retrieveAllowedCurrencies();
-        final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService
-                .retrieveLockinPeriodFrequencyTypeOptions();
-        final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService
-                .retrieveMinimumActivePeriodFrequencyTypeOptions();
-        final Map<String, List<GLAccountData>> accountingMappingOptions = this.accountingDropdownReadPlatformService
-                .retrieveAccountMappingOptionsForShareProducts();
-        return ShareProductData.template(currencyOptions, chargeOptions, minimumActivePeriodFrequencyTypeOptions,
-                lockinPeriodFrequencyTypeOptions, accountingMappingOptions);
+        final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService.retrieveLockinPeriodFrequencyTypeOptions();
+        final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService.retrieveMinimumActivePeriodFrequencyTypeOptions();
+        final Map<String, List<GLAccountData>> accountingMappingOptions = this.accountingDropdownReadPlatformService.retrieveAccountMappingOptionsForShareProducts();
+        return ShareProductData.template(currencyOptions, chargeOptions, minimumActivePeriodFrequencyTypeOptions, lockinPeriodFrequencyTypeOptions, accountingMappingOptions);
     }
 
     @Override
@@ -152,8 +133,8 @@ public class ShareProductReadPlatformServiceImpl implements ShareProductReadPlat
         return null;
     }
 
-    private static final class AllShareProductRowMapper implements RowMapper<ProductData> {
 
+    private static final class AllShareProductRowMapper implements RowMapper<ProductData> {
         @SuppressWarnings("unused")
         @Override
         public ShareProductData mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -169,8 +150,8 @@ public class ShareProductReadPlatformServiceImpl implements ShareProductReadPlat
         }
     }
 
-    private static final class MarketPriceRowMapper implements RowMapper<ShareProductMarketPriceData> {
 
+    private static final class MarketPriceRowMapper implements RowMapper<ShareProductMarketPriceData> {
         @SuppressWarnings("unused")
         @Override
         public ShareProductMarketPriceData mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -186,8 +167,8 @@ public class ShareProductReadPlatformServiceImpl implements ShareProductReadPlat
         }
     }
 
-    private static final class ShareProductRowMapper implements RowMapper<ProductData> {
 
+    private static final class ShareProductRowMapper implements RowMapper<ProductData> {
         Collection<ShareProductMarketPriceData> shareMarketCollection;
         Collection<ChargeData> charges;
         private StringBuilder buff = new StringBuilder();
@@ -195,24 +176,7 @@ public class ShareProductReadPlatformServiceImpl implements ShareProductReadPlat
         ShareProductRowMapper(Collection<ShareProductMarketPriceData> shareMarketCollection, Collection<ChargeData> charges) {
             this.shareMarketCollection = shareMarketCollection;
             this.charges = charges;
-            buff.append("shareproduct.id, shareproduct.name, shareproduct.short_name, ")
-                    .append("shareproduct.external_id, shareproduct.description, shareproduct.start_date,")
-                    .append("shareproduct.end_date, shareproduct.currency_code, shareproduct.currency_digits, ")
-                    .append("shareproduct.currency_multiplesof, shareproduct.total_shares, shareproduct.issued_shares, ")
-                    .append("shareproduct.unit_price, shareproduct.capital_amount,  ")
-                    .append("shareproduct.accounting_type as accountingType, ")
-                    .append("shareproduct.minimum_client_shares, shareproduct.nominal_client_shares, ")
-                    .append("shareproduct.maximum_client_shares, shareproduct.minimum_active_period_frequency, ")
-                    .append("shareproduct.minimum_active_period_frequency_enum, shareproduct.lockin_period_frequency, ")
-                    .append("shareproduct.lockin_period_frequency_enum, shareproduct.allow_dividends_inactive_clients, ")
-                    .append("shareproduct.createdby_id, created.username as createdName, modified.username as modifiedName, ")
-                    .append("shareproduct.created_date, shareproduct.lastmodifiedby_id, shareproduct.lastmodified_date, ")
-                    .append("curr.name as currencyName, curr.internationalized_name_code as currencyNameCode, ")
-                    .append("curr.display_symbol as currencyDisplaySymbol ").append("from m_share_product shareproduct ")
-                    .append("LEFT JOIN m_currency curr on curr.code = shareproduct.currency_code ")
-                    .append("LEFT JOIN m_appuser created ON created.id = shareproduct.createdby_id ")
-                    .append("LEFT JOIN m_appuser modified ON modified.id = shareproduct.lastmodifiedby_id ");
-
+            buff.append("shareproduct.id, shareproduct.name, shareproduct.short_name, ").append("shareproduct.external_id, shareproduct.description, shareproduct.start_date,").append("shareproduct.end_date, shareproduct.currency_code, shareproduct.currency_digits, ").append("shareproduct.currency_multiplesof, shareproduct.total_shares, shareproduct.issued_shares, ").append("shareproduct.unit_price, shareproduct.capital_amount,  ").append("shareproduct.accounting_type as accountingType, ").append("shareproduct.minimum_client_shares, shareproduct.nominal_client_shares, ").append("shareproduct.maximum_client_shares, shareproduct.minimum_active_period_frequency, ").append("shareproduct.minimum_active_period_frequency_enum, shareproduct.lockin_period_frequency, ").append("shareproduct.lockin_period_frequency_enum, shareproduct.allow_dividends_inactive_clients, ").append("shareproduct.createdby_id, created.username as createdName, modified.username as modifiedName, ").append("shareproduct.created_date, shareproduct.lastmodifiedby_id, shareproduct.lastmodified_date, ").append("curr.name as currencyName, curr.internationalized_name_code as currencyNameCode, ").append("curr.display_symbol as currencyDisplaySymbol ").append("from m_share_product shareproduct ").append("LEFT JOIN m_currency curr on curr.code = shareproduct.currency_code ").append("LEFT JOIN m_appuser created ON created.id = shareproduct.createdby_id ").append("LEFT JOIN m_appuser modified ON modified.id = shareproduct.lastmodifiedby_id ");
         }
 
         @SuppressWarnings("unused")
@@ -229,9 +193,7 @@ public class ShareProductReadPlatformServiceImpl implements ShareProductReadPlat
             final String currencyNameCode = rs.getString("currencyNameCode");
             final String currencyDisplaySymbol = rs.getString("currencyDisplaySymbol");
             final Integer inMultiplesOf = JdbcSupport.getInteger(rs, "currency_multiplesof");
-            final CurrencyData currency = new CurrencyData(currencyCode, currencyName, currencyDigits, inMultiplesOf, currencyDisplaySymbol,
-                    currencyNameCode);
-
+            final CurrencyData currency = new CurrencyData(currencyCode, currencyName, currencyDigits, inMultiplesOf, currencyDisplaySymbol, currencyNameCode);
             final Long totalShares = rs.getLong("total_shares");
             final Long issuedShares = JdbcSupport.getLongDefaultToNullIfZero(rs, "issued_shares");
             final BigDecimal unitPrice = rs.getBigDecimal("unit_price");
@@ -250,7 +212,6 @@ public class ShareProductReadPlatformServiceImpl implements ShareProductReadPlat
             if (minimumActviePeriodEnumValue != null) {
                 minimumActivePeriodType = SharesEnumerations.minimumActivePeriodFrequencyType(minimumActviePeriodEnumValue);
             }
-
             final Integer lockinPeriodFrequency = JdbcSupport.getInteger(rs, "lockin_period_frequency");
             EnumOptionData lockinPeriodFrequencyType = null;
             final Integer lockinPeriodFrequencyTypeValue = JdbcSupport.getInteger(rs, "lockin_period_frequency_enum");
@@ -259,15 +220,23 @@ public class ShareProductReadPlatformServiceImpl implements ShareProductReadPlat
             }
             final Integer accountingRuleId = JdbcSupport.getInteger(rs, "accountingType");
             final EnumOptionData accountingRuleType = AccountingEnumerations.accountingRuleType(accountingRuleId);
-
-            return ShareProductData.data(id, name, shortName, description, externalId, currency, totalShares, issuedShares, unitPrice,
-                    capitalAmount, minimumClientShares, nominalClientShares, maximumClientShares, shareMarketCollection, charges,
-                    allowDividendsForInactiveClients, lockinPeriodFrequency, lockinPeriodFrequencyType, minimumActivePeriod,
-                    minimumActivePeriodType, accountingRuleType);
+            return ShareProductData.data(id, name, shortName, description, externalId, currency, totalShares, issuedShares, unitPrice, capitalAmount, minimumClientShares, nominalClientShares, maximumClientShares, shareMarketCollection, charges, allowDividendsForInactiveClients, lockinPeriodFrequency, lockinPeriodFrequencyType, minimumActivePeriod, minimumActivePeriodType, accountingRuleType);
         }
 
         public String schema() {
             return this.buff.toString();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ShareProductReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final CurrencyReadPlatformService currencyReadPlatformService, final ChargeReadPlatformService chargeReadPlatformService, final ShareProductDropdownReadPlatformService shareProductDropdownReadPlatformService, final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService, final ProductToGLAccountMappingReadPlatformService accountMappingReadPlatformService, final PaginationHelper shareProductDataPaginationHelper, final DatabaseSpecificSQLGenerator sqlGenerator) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.currencyReadPlatformService = currencyReadPlatformService;
+        this.chargeReadPlatformService = chargeReadPlatformService;
+        this.shareProductDropdownReadPlatformService = shareProductDropdownReadPlatformService;
+        this.accountingDropdownReadPlatformService = accountingDropdownReadPlatformService;
+        this.accountMappingReadPlatformService = accountMappingReadPlatformService;
+        this.shareProductDataPaginationHelper = shareProductDataPaginationHelper;
+        this.sqlGenerator = sqlGenerator;
     }
 }

@@ -18,21 +18,18 @@
  */
 package org.apache.fineract.portfolio.savings;
 
-import lombok.Getter;
 import org.apache.commons.lang3.Strings;
 
 /**
  * An enumeration of different transactions that can occur on a SavingsAccount.
  */
-@Getter
 public enum DepositAccountType {
-
-    INVALID(0, "depositAccountType.invalid"), //
-    SAVINGS_DEPOSIT(100, "depositAccountType.savingsDeposit"), //
-    FIXED_DEPOSIT(200, "depositAccountType.fixedDeposit"), //
-    RECURRING_DEPOSIT(300, "depositAccountType.recurringDeposit"), //
-    CURRENT_DEPOSIT(400, "depositAccountType.currentDeposit"); //
-
+    INVALID(0, "depositAccountType.invalid"),  //
+    SAVINGS_DEPOSIT(100, "depositAccountType.savingsDeposit"),  //
+    FIXED_DEPOSIT(200, "depositAccountType.fixedDeposit"),  //
+    RECURRING_DEPOSIT(300, "depositAccountType.recurringDeposit"),  //
+    CURRENT_DEPOSIT(400, "depositAccountType.currentDeposit");
+    //
     private final Integer value;
     private final String code;
     private static final String SPACE = " ";
@@ -46,7 +43,6 @@ public enum DepositAccountType {
         if (v == null) {
             return INVALID;
         }
-
         return switch (v) {
             case 100 -> SAVINGS_DEPOSIT;
             case 200 -> FIXED_DEPOSIT;
@@ -68,5 +64,15 @@ public enum DepositAccountType {
             case SAVINGS_DEPOSIT -> DepositsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME;
             default -> "INVALID";
         };
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
     }
 }

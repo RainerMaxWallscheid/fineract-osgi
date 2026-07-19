@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.jobs.service;
 
 import java.util.Date;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.core.service.tenant.TenantDetailsService;
@@ -37,9 +36,7 @@ import org.springframework.stereotype.Component;
  * job status to database after the execution
  */
 @Component
-@RequiredArgsConstructor
 public class SchedulerJobListener implements JobListener {
-
     private final SchedularWritePlatformService schedularService;
     private final TenantDetailsService tenantDetailsService;
 
@@ -49,26 +46,25 @@ public class SchedulerJobListener implements JobListener {
     }
 
     @Override
-    public void jobToBeExecuted(@SuppressWarnings("unused") final JobExecutionContext context) {}
+    public void jobToBeExecuted(@SuppressWarnings("unused") final JobExecutionContext context) {
+    }
 
     @Override
-    public void jobExecutionVetoed(@SuppressWarnings("unused") final JobExecutionContext context) {}
+    public void jobExecutionVetoed(@SuppressWarnings("unused") final JobExecutionContext context) {
+    }
 
     @Override
     public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
         final String tenantIdentifier = context.getMergedJobDataMap().getString(SchedulerServiceConstants.TENANT_IDENTIFIER);
         final FineractPlatformTenant existingTenant = ThreadLocalContextUtil.getTenant();
         boolean contextInitialized = false;
-
         try {
             if (existingTenant == null || !existingTenant.getTenantIdentifier().equals(tenantIdentifier)) {
                 contextInitialized = true;
                 final FineractPlatformTenant tenant = tenantDetailsService.loadTenantById(tenantIdentifier);
                 ThreadLocalContextUtil.setTenant(tenant);
             }
-
             final Trigger trigger = context.getTrigger();
-
             final JobKey key = context.getJobDetail().getKey();
             final String jobKey = key.getName() + SchedulerServiceConstants.JOB_KEY_SEPERATOR + key.getGroup();
             final ScheduledJobDetail scheduledJobDetails = this.schedularService.findByJobKey(jobKey);
@@ -84,28 +80,20 @@ public class SchedulerJobListener implements JobListener {
                 stackTraceElements = throwable.getStackTrace();
                 final StringBuilder sb = new StringBuilder(throwable.toString());
                 for (final StackTraceElement element : stackTraceElements) {
-                    sb.append("\n \t at ").append(element.getClassName()).append(".").append(element.getMethodName()).append("(")
-                            .append(element.getLineNumber()).append(")");
+                    sb.append("\n \t at ").append(element.getClassName()).append(".").append(element.getMethodName()).append("(").append(element.getLineNumber()).append(")");
                 }
                 errorLog = sb.toString();
-
             }
             String triggerType = SchedulerServiceConstants.TRIGGER_TYPE_CRON;
             if (context.getMergedJobDataMap().containsKey(SchedulerServiceConstants.TRIGGER_TYPE_REFERENCE)) {
                 triggerType = context.getMergedJobDataMap().getString(SchedulerServiceConstants.TRIGGER_TYPE_REFERENCE);
             }
-            if (SchedulerServiceConstants.TRIGGER_TYPE_CRON.equals(triggerType) && trigger.getNextFireTime() != null
-                    && trigger.getNextFireTime().after(scheduledJobDetails.getNextRunTime())) {
+            if (SchedulerServiceConstants.TRIGGER_TYPE_CRON.equals(triggerType) && trigger.getNextFireTime() != null && trigger.getNextFireTime().after(scheduledJobDetails.getNextRunTime())) {
                 scheduledJobDetails.setNextRunTime(trigger.getNextFireTime());
             }
-
             scheduledJobDetails.setPreviousRunStartTime(context.getFireTime());
             scheduledJobDetails.setCurrentlyRunning(false);
-
-            final ScheduledJobRunHistory runHistory = new ScheduledJobRunHistory().setScheduledJobDetail(scheduledJobDetails)
-                    .setVersion(version).setStartTime(context.getFireTime()).setEndTime(new Date()).setStatus(status)
-                    .setErrorMessage(errorMessage).setTriggerType(triggerType).setErrorLog(errorLog);
-
+            final ScheduledJobRunHistory runHistory = new ScheduledJobRunHistory().setScheduledJobDetail(scheduledJobDetails).setVersion(version).setStartTime(context.getFireTime()).setEndTime(new Date()).setStatus(status).setErrorMessage(errorMessage).setTriggerType(triggerType).setErrorLog(errorLog);
             this.schedularService.saveOrUpdate(scheduledJobDetails, runHistory);
         } finally {
             if (contextInitialized) {
@@ -115,10 +103,7 @@ public class SchedulerJobListener implements JobListener {
     }
 
     private Throwable getCauseFromException(final Throwable exception, final int stackTraceLevel) {
-        if (stackTraceLevel <= SchedulerServiceConstants.STACK_TRACE_LEVEL && exception.getCause() != null
-                && (exception.getCause().toString().contains(SchedulerServiceConstants.SCHEDULER_EXCEPTION)
-                        || exception.getCause().toString().contains(SchedulerServiceConstants.JOB_EXECUTION_EXCEPTION)
-                        || exception.getCause().toString().contains(SchedulerServiceConstants.JOB_METHOD_INVOCATION_FAILED_EXCEPTION))) {
+        if (stackTraceLevel <= SchedulerServiceConstants.STACK_TRACE_LEVEL && exception.getCause() != null && (exception.getCause().toString().contains(SchedulerServiceConstants.SCHEDULER_EXCEPTION) || exception.getCause().toString().contains(SchedulerServiceConstants.JOB_EXECUTION_EXCEPTION) || exception.getCause().toString().contains(SchedulerServiceConstants.JOB_METHOD_INVOCATION_FAILED_EXCEPTION))) {
             return getCauseFromException(exception.getCause(), stackTraceLevel + 1);
         } else if (exception.getCause() != null) {
             return exception.getCause();
@@ -126,4 +111,9 @@ public class SchedulerJobListener implements JobListener {
         return exception;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public SchedulerJobListener(final SchedularWritePlatformService schedularService, final TenantDetailsService tenantDetailsService) {
+        this.schedularService = schedularService;
+        this.tenantDetailsService = tenantDetailsService;
+    }
 }

@@ -20,14 +20,9 @@ package org.apache.fineract.integrationtests.common.externalevents;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.fineract.infrastructure.event.external.data.ExternalEventResponse;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
 public class LoanTransactionMinimalBusinessEvent extends BusinessEvent {
-
     public Double amount;
     public Boolean reversed;
 
@@ -41,8 +36,66 @@ public class LoanTransactionMinimalBusinessEvent extends BusinessEvent {
     public boolean verify(ExternalEventResponse externalEvent, DateTimeFormatter formatter) {
         Object actualAmount = externalEvent.getPayLoad().get("amount");
         Object actualReversed = externalEvent.getPayLoad().get("reversed");
+        return super.verify(externalEvent, formatter) && Objects.equals(actualAmount, getAmount()) && Objects.equals(actualReversed, getReversed());
+    }
 
-        return super.verify(externalEvent, formatter) && Objects.equals(actualAmount, getAmount())
-                && Objects.equals(actualReversed, getReversed());
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof LoanTransactionMinimalBusinessEvent)) return false;
+        final LoanTransactionMinimalBusinessEvent other = (LoanTransactionMinimalBusinessEvent) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        if (!super.equals(o)) return false;
+        final java.lang.Object this$amount = this.getAmount();
+        final java.lang.Object other$amount = other.getAmount();
+        if (this$amount == null ? other$amount != null : !this$amount.equals(other$amount)) return false;
+        final java.lang.Object this$reversed = this.getReversed();
+        final java.lang.Object other$reversed = other.getReversed();
+        if (this$reversed == null ? other$reversed != null : !this$reversed.equals(other$reversed)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof LoanTransactionMinimalBusinessEvent;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = super.hashCode();
+        final java.lang.Object $amount = this.getAmount();
+        result = result * PRIME + ($amount == null ? 43 : $amount.hashCode());
+        final java.lang.Object $reversed = this.getReversed();
+        result = result * PRIME + ($reversed == null ? 43 : $reversed.hashCode());
+        return result;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Double getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Boolean getReversed() {
+        return this.reversed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAmount(final Double amount) {
+        this.amount = amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setReversed(final Boolean reversed) {
+        this.reversed = reversed;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "LoanTransactionMinimalBusinessEvent(amount=" + this.getAmount() + ", reversed=" + this.getReversed() + ")";
     }
 }

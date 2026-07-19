@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.cob.loan;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.exceptions.BusinessStepException;
 import org.apache.fineract.infrastructure.core.exception.MultiException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
@@ -28,10 +26,9 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanAccrualsProcessingS
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class AddPeriodicAccrualEntriesBusinessStep implements LoanCOBBusinessStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AddPeriodicAccrualEntriesBusinessStep.class);
     private final LoanAccrualsProcessingService loanAccrualsProcessingService;
 
     @Override
@@ -54,5 +51,10 @@ public class AddPeriodicAccrualEntriesBusinessStep implements LoanCOBBusinessSte
     @Override
     public String getHumanReadableName() {
         return "Add periodic accrual entries";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AddPeriodicAccrualEntriesBusinessStep(final LoanAccrualsProcessingService loanAccrualsProcessingService) {
+        this.loanAccrualsProcessingService = loanAccrualsProcessingService;
     }
 }

@@ -18,18 +18,35 @@
  */
 package org.apache.fineract.infrastructure.core.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 
-@Getter
-@AllArgsConstructor
 public enum ActionContext {
-
-    DEFAULT(0, "Default context", BusinessDateType.BUSINESS_DATE), //
-    COB(1, "Close of Business context", BusinessDateType.COB_DATE); //
-
+    DEFAULT(0, "Default context", BusinessDateType.BUSINESS_DATE),  //
+    COB(1, "Close of Business context", BusinessDateType.COB_DATE);
+    //
     private final int order;
     private final String description;
     private final BusinessDateType businessDateType;
+
+    @java.lang.SuppressWarnings("all")
+        public int getOrder() {
+        return this.order;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BusinessDateType getBusinessDateType() {
+        return this.businessDateType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private ActionContext(final int order, final String description, final BusinessDateType businessDateType) {
+        this.order = order;
+        this.description = description;
+        this.businessDateType = businessDateType;
+    }
 }

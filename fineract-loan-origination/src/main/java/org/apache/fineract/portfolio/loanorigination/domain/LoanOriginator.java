@@ -26,40 +26,28 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 
-@Getter
-@Setter
 @Entity
-@NoArgsConstructor
 @Table(name = "m_loan_originator")
 public class LoanOriginator extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @Column(name = "external_id", nullable = false, length = 100, unique = true)
     private ExternalId externalId;
-
     @Column(name = "name", length = 255)
     private String name;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private LoanOriginatorStatus status;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "originator_type_cv_id")
     private CodeValue originatorType;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_type_cv_id")
     private CodeValue channelType;
 
-    public static LoanOriginator create(ExternalId externalId, String name, LoanOriginatorStatus status, CodeValue originatorType,
-            CodeValue channelType) {
+    public static LoanOriginator create(ExternalId externalId, String name, LoanOriginatorStatus status, CodeValue originatorType, CodeValue channelType) {
         LoanOriginator originator = new LoanOriginator();
         originator.setExternalId(externalId);
         originator.setName(name);
@@ -74,5 +62,59 @@ public class LoanOriginator extends AbstractAuditableWithUTCDateTimeCustom<Long>
         this.status = status;
         this.originatorType = originatorType;
         this.channelType = channelType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalId getExternalId() {
+        return this.externalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanOriginatorStatus getStatus() {
+        return this.status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getOriginatorType() {
+        return this.originatorType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getChannelType() {
+        return this.channelType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setExternalId(final ExternalId externalId) {
+        this.externalId = externalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setName(final String name) {
+        this.name = name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setStatus(final LoanOriginatorStatus status) {
+        this.status = status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setOriginatorType(final CodeValue originatorType) {
+        this.originatorType = originatorType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setChannelType(final CodeValue channelType) {
+        this.channelType = channelType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanOriginator() {
     }
 }

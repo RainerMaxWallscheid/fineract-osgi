@@ -19,16 +19,13 @@
 package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.math.BigDecimal;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.repository.LoanCapitalizedIncomeBalanceRepository;
 
-@Slf4j
-@RequiredArgsConstructor
 public class CapitalizedIncomeBalanceServiceImpl implements CapitalizedIncomeBalanceService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CapitalizedIncomeBalanceServiceImpl.class);
     private final LoanCapitalizedIncomeBalanceRepository capitalizedIncomeBalanceRepository;
 
     @Override
@@ -41,5 +38,10 @@ public class CapitalizedIncomeBalanceServiceImpl implements CapitalizedIncomeBal
     public Money calculateCapitalizedIncomeAdjustment(Loan loan) {
         BigDecimal balance = capitalizedIncomeBalanceRepository.calculateCapitalizedIncomeAdjustment(loan.getId());
         return Money.of(loan.getCurrency(), balance);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CapitalizedIncomeBalanceServiceImpl(final LoanCapitalizedIncomeBalanceRepository capitalizedIncomeBalanceRepository) {
+        this.capitalizedIncomeBalanceRepository = capitalizedIncomeBalanceRepository;
     }
 }

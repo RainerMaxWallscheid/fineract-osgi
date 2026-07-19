@@ -31,7 +31,6 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.jpa.CriteriaQueryFactory;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.client.domain.Client;
@@ -42,12 +41,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@RequiredArgsConstructor
 public class SearchingClientRepositoryImpl implements SearchingClientRepository {
-
     @PersistenceContext
     private EntityManager entityManager;
-
     private final CriteriaQueryFactory criteriaQueryFactory;
 
     @Override
@@ -59,39 +55,30 @@ public class SearchingClientRepositoryImpl implements SearchingClientRepository 
          * https://github.com/spring-projects/spring-data-jpa/issues/2499
          */
         String hierarchyLikeValue = officeHierarchy + "%";
-
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<SearchedClient> query = cb.createQuery(SearchedClient.class);
-
         Root<Client> root = query.from(Client.class);
         Path<Office> office = root.get("office");
-
         Specification<Client> spec = (r, q, builder) -> {
             q.distinct(true);
             Path<Office> o = r.get("office");
             Join<Client, ClientIdentifier> identity = r.join("identifiers", JoinType.LEFT);
-
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.like(o.get("hierarchy"), hierarchyLikeValue));
-
             String searchLikeValue = "%" + searchText + "%";
-            predicates.add(cb.or(cb.like(r.get("accountNumber"), searchLikeValue), cb.like(r.get("displayName"), searchLikeValue),
-                    cb.like(r.get("externalId"), searchLikeValue), cb.like(r.get("mobileNo"), searchLikeValue),
-                    cb.like(identity.get("documentKey"), searchLikeValue)));
-
+            predicates.add(cb.or(cb.like(r.get("accountNumber"), searchLikeValue), cb.like(r.get("displayName"), searchLikeValue), cb.like(r.get("externalId"), searchLikeValue), cb.like(r.get("mobileNo"), searchLikeValue), cb.like(identity.get("documentKey"), searchLikeValue)));
             return cb.and(predicates.toArray(new Predicate[0]));
         };
         criteriaQueryFactory.applySpecificationToCriteria(root, spec, query);
-
         List<Order> orders = criteriaQueryFactory.ordersFromPageable(pageable, cb, root, () -> cb.desc(root.get("id")));
         query.orderBy(orders);
-
-        query.select(cb.construct(SearchedClient.class, root.get("id"), root.get("displayName"), root.get("externalId"),
-                root.get("accountNumber"), office.get("id"), office.get("name"), root.get("mobileNo"), root.get("status"),
-                root.get("activationDate"), root.get("createdDate")));
-
+        query.select(cb.construct(SearchedClient.class, root.get("id"), root.get("displayName"), root.get("externalId"), root.get("accountNumber"), office.get("id"), office.get("name"), root.get("mobileNo"), root.get("status"), root.get("activationDate"), root.get("createdDate")));
         TypedQuery<SearchedClient> queryToExecute = entityManager.createQuery(query);
-
         return criteriaQueryFactory.readPage(queryToExecute, Client.class, pageable, spec);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SearchingClientRepositoryImpl(final CriteriaQueryFactory criteriaQueryFactory) {
+        this.criteriaQueryFactory = criteriaQueryFactory;
     }
 }

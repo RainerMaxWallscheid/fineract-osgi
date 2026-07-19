@@ -25,8 +25,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.fineract.commands.service.SynchronousCommandProcessingService;
@@ -36,32 +34,25 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-@RequiredArgsConstructor
-@Slf4j
 public class IdempotencyStoreFilter extends OncePerRequestFilter {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IdempotencyStoreFilter.class);
     private final FineractRequestContextHolder fineractRequestContextHolder;
     private final IdempotencyStoreHelper helper;
     private final FineractProperties fineractProperties;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         Mutable<ContentCachingResponseWrapper> wrapper = new MutableObject<>();
         if (helper.isAllowedContentTypeRequest(request)) {
             wrapper.setValue(new ContentCachingResponseWrapper(response));
         }
-        extractIdempotentKeyFromHttpServletRequest(request).ifPresent(idempotentKey -> fineractRequestContextHolder
-                .setAttribute(SynchronousCommandProcessingService.IDEMPOTENCY_KEY_ATTRIBUTE, idempotentKey, request));
-
+        extractIdempotentKeyFromHttpServletRequest(request).ifPresent(idempotentKey -> fineractRequestContextHolder.setAttribute(SynchronousCommandProcessingService.IDEMPOTENCY_KEY_ATTRIBUTE, idempotentKey, request));
         filterChain.doFilter(request, wrapper.get() != null ? wrapper.get() : response);
         Optional<Long> commandId = helper.getCommandId(request);
-        boolean isSuccessWithoutStored = commandId.isPresent() && wrapper.get() != null && helper.isStoreIdempotencyKey(request)
-                && helper.isAllowedContentTypeResponse(response);
+        boolean isSuccessWithoutStored = commandId.isPresent() && wrapper.get() != null && helper.isStoreIdempotencyKey(request) && helper.isAllowedContentTypeResponse(response);
         if (isSuccessWithoutStored) {
-            helper.storeCommandResult(response.getStatus(), Optional.ofNullable(wrapper.get())
-                    .map(ContentCachingResponseWrapper::getContentAsByteArray).map(s -> new String(s, StandardCharsets.UTF_8)).orElse(null),
-                    commandId.get());
+            helper.storeCommandResult(response.getStatus(), Optional.ofNullable(wrapper.get()).map(ContentCachingResponseWrapper::getContentAsByteArray).map(s -> new String(s, StandardCharsets.UTF_8)).orElse(null), commandId.get());
         }
         if (wrapper.get() != null) {
             wrapper.get().copyBodyToResponse();
@@ -70,5 +61,12 @@ public class IdempotencyStoreFilter extends OncePerRequestFilter {
 
     private Optional<String> extractIdempotentKeyFromHttpServletRequest(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader(fineractProperties.getIdempotencyKeyHeaderName()));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public IdempotencyStoreFilter(final FineractRequestContextHolder fineractRequestContextHolder, final IdempotencyStoreHelper helper, final FineractProperties fineractProperties) {
+        this.fineractRequestContextHolder = fineractRequestContextHolder;
+        this.helper = helper;
+        this.fineractProperties = fineractProperties;
     }
 }

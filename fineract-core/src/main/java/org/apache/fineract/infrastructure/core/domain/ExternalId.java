@@ -21,18 +21,13 @@ package org.apache.fineract.infrastructure.core.domain;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.exception.PlatformInternalServerException;
 
 /**
  * ExternalId Value object
  */
-@Getter
-@EqualsAndHashCode
 public class ExternalId implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1;
     private static final ExternalId empty = new ExternalId();
@@ -80,5 +75,38 @@ public class ExternalId implements Serializable {
         if (isEmpty()) {
             throw new PlatformInternalServerException("error.external.id.is.not.set", "Internal state violation: External id is not set");
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getValue() {
+        return this.value;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof ExternalId)) return false;
+        final ExternalId other = (ExternalId) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$value = this.getValue();
+        final java.lang.Object other$value = other.getValue();
+        if (this$value == null ? other$value != null : !this$value.equals(other$value)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof ExternalId;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $value = this.getValue();
+        result = result * PRIME + ($value == null ? 43 : $value.hashCode());
+        return result;
     }
 }

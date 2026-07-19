@@ -24,8 +24,6 @@ import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.campaigns.email.domain.EmailCampaign;
 import org.apache.fineract.infrastructure.campaigns.email.domain.EmailCampaignRepository;
 import org.apache.fineract.infrastructure.campaigns.sms.constants.SmsCampaignTriggerType;
@@ -39,10 +37,9 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class EmailCampaignDomainServiceImpl implements EmailCampaignDomainService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(EmailCampaignDomainServiceImpl.class);
     private final BusinessEventNotifierService businessEventNotifierService;
     private final EmailCampaignWritePlatformService emailCampaignWritePlatformService;
     private final EmailCampaignRepository emailCampaignRepository;
@@ -51,12 +48,11 @@ public class EmailCampaignDomainServiceImpl implements EmailCampaignDomainServic
     public void addListeners() {
         businessEventNotifierService.addPostBusinessEventListener(LoanApprovedBusinessEvent.class, new SendEmailOnLoanApproved());
         businessEventNotifierService.addPostBusinessEventListener(LoanRejectedBusinessEvent.class, new SendEmailOnLoanRejected());
-        businessEventNotifierService.addPostBusinessEventListener(LoanTransactionMakeRepaymentPostBusinessEvent.class,
-                new SendEmailOnLoanRepayment());
+        businessEventNotifierService.addPostBusinessEventListener(LoanTransactionMakeRepaymentPostBusinessEvent.class, new SendEmailOnLoanRepayment());
     }
 
-    private final class SendEmailOnLoanRepayment implements BusinessEventListener<LoanTransactionMakeRepaymentPostBusinessEvent> {
 
+    private final class SendEmailOnLoanRepayment implements BusinessEventListener<LoanTransactionMakeRepaymentPostBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanTransactionMakeRepaymentPostBusinessEvent event) {
             LoanTransaction loanTransaction = event.get();
@@ -68,8 +64,8 @@ public class EmailCampaignDomainServiceImpl implements EmailCampaignDomainServic
         }
     }
 
-    private final class SendEmailOnLoanRejected implements BusinessEventListener<LoanRejectedBusinessEvent> {
 
+    private final class SendEmailOnLoanRejected implements BusinessEventListener<LoanRejectedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanRejectedBusinessEvent event) {
             Loan loan = event.get();
@@ -81,8 +77,8 @@ public class EmailCampaignDomainServiceImpl implements EmailCampaignDomainServic
         }
     }
 
-    private final class SendEmailOnLoanApproved implements BusinessEventListener<LoanApprovedBusinessEvent> {
 
+    private final class SendEmailOnLoanApproved implements BusinessEventListener<LoanApprovedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanApprovedBusinessEvent event) {
             Loan loan = event.get();
@@ -97,20 +93,19 @@ public class EmailCampaignDomainServiceImpl implements EmailCampaignDomainServic
     private void notifyLoanOwner(LoanTransaction loanTransaction, String paramValue) throws IOException {
         List<EmailCampaign> campaigns = this.retrieveEmailCampaigns(paramValue);
         for (EmailCampaign emailCampaign : campaigns) {
-            HashMap<String, String> campaignParams = new ObjectMapper().readValue(emailCampaign.getParamValue(),
-                    new TypeReference<HashMap<String, String>>() {});
+            HashMap<String, String> campaignParams = new ObjectMapper().readValue(emailCampaign.getParamValue(), new TypeReference<HashMap<String, String>>() {
+            });
             campaignParams.put("loanId", loanTransaction.getLoan().getId().toString());
             campaignParams.put("loanTransactionId", loanTransaction.getId().toString());
-            this.emailCampaignWritePlatformService.insertDirectCampaignIntoEmailOutboundTable(loanTransaction.getLoan(), emailCampaign,
-                    campaignParams);
+            this.emailCampaignWritePlatformService.insertDirectCampaignIntoEmailOutboundTable(loanTransaction.getLoan(), emailCampaign, campaignParams);
         }
     }
 
     private void notifyLoanOwner(Loan loan, String paramValue) throws IOException {
         List<EmailCampaign> campaigns = this.retrieveEmailCampaigns(paramValue);
         for (EmailCampaign emailCampaign : campaigns) {
-            HashMap<String, String> campaignParams = new ObjectMapper().readValue(emailCampaign.getParamValue(),
-                    new TypeReference<HashMap<String, String>>() {});
+            HashMap<String, String> campaignParams = new ObjectMapper().readValue(emailCampaign.getParamValue(), new TypeReference<HashMap<String, String>>() {
+            });
             campaignParams.put("loanId", loan.getId().toString());
             this.emailCampaignWritePlatformService.insertDirectCampaignIntoEmailOutboundTable(loan, emailCampaign, campaignParams);
         }
@@ -118,5 +113,12 @@ public class EmailCampaignDomainServiceImpl implements EmailCampaignDomainServic
 
     private List<EmailCampaign> retrieveEmailCampaigns(String paramValue) {
         return emailCampaignRepository.findActiveEmailCampaigns("%" + paramValue + "%", SmsCampaignTriggerType.TRIGGERED.getValue());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EmailCampaignDomainServiceImpl(final BusinessEventNotifierService businessEventNotifierService, final EmailCampaignWritePlatformService emailCampaignWritePlatformService, final EmailCampaignRepository emailCampaignRepository) {
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.emailCampaignWritePlatformService = emailCampaignWritePlatformService;
+        this.emailCampaignRepository = emailCampaignRepository;
     }
 }

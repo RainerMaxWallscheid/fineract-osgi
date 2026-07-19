@@ -24,7 +24,6 @@ import com.google.gson.JsonObject;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.portfolio.loanaccount.service.LoanOriginatorLinkingService;
 import org.apache.fineract.portfolio.loanorigination.data.LoanApplicationOriginatorData;
 import org.apache.fineract.portfolio.loanorigination.domain.LoanOriginator;
@@ -38,17 +37,15 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 public abstract class AbstractLoanOriginatorLinkingServiceImpl implements LoanOriginatorLinkingService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AbstractLoanOriginatorLinkingServiceImpl.class);
     private static final String SQL_STATE_INTEGRITY_CONSTRAINT_VIOLATION = "23";
-
     protected final LoanOriginatorRepository loanOriginatorRepository;
     protected final LoanApplicationOriginatorDataValidator validator;
     protected final LoanOriginatorHelper loanOriginatorHelper;
 
-    public AbstractLoanOriginatorLinkingServiceImpl(LoanOriginatorRepository loanOriginatorRepository,
-            LoanApplicationOriginatorDataValidator validator, LoanOriginatorHelper loanOriginatorHelper) {
+    public AbstractLoanOriginatorLinkingServiceImpl(LoanOriginatorRepository loanOriginatorRepository, LoanApplicationOriginatorDataValidator validator, LoanOriginatorHelper loanOriginatorHelper) {
         this.loanOriginatorRepository = loanOriginatorRepository;
         this.validator = validator;
         this.loanOriginatorHelper = loanOriginatorHelper;
@@ -60,27 +57,20 @@ public abstract class AbstractLoanOriginatorLinkingServiceImpl implements LoanOr
         if (originatorsArray == null || originatorsArray.isEmpty()) {
             return;
         }
-
         log.debug("Processing {} originators for loan application {}", originatorsArray.size(), loanId);
-
         final Set<Long> attachedOriginatorIds = new HashSet<>();
-
         for (final JsonElement element : originatorsArray) {
             if (!element.isJsonObject()) {
                 continue;
             }
-
             final JsonObject jsonObject = element.getAsJsonObject();
             final LoanApplicationOriginatorData originatorData = validator.validateAndExtract(jsonObject);
             final Long originatorId = resolveOrCreateOriginatorId(originatorData);
-
             if (attachedOriginatorIds.contains(originatorId)) {
                 log.debug("Originator {} already attached to loan {}, skipping duplicate", originatorId, loanId);
                 continue;
             }
-
             createAndSaveOriginatorMapping(loanId, originatorId);
-
             attachedOriginatorIds.add(originatorId);
         }
     }
@@ -89,8 +79,7 @@ public abstract class AbstractLoanOriginatorLinkingServiceImpl implements LoanOr
 
     private Long resolveOrCreateOriginatorId(final LoanApplicationOriginatorData originatorData) {
         if (originatorData.getId() != null) {
-            final LoanOriginator originator = loanOriginatorRepository.findById(originatorData.getId())
-                    .orElseThrow(() -> new LoanOriginatorNotFoundException(originatorData.getId()));
+            final LoanOriginator originator = loanOriginatorRepository.findById(originatorData.getId()).orElseThrow(() -> new LoanOriginatorNotFoundException(originatorData.getId()));
             if (originator.getStatus() != LoanOriginatorStatus.ACTIVE) {
                 throw new LoanOriginatorNotActiveException(originator.getId(), originator.getStatus().getValue());
             }
@@ -112,7 +101,6 @@ public abstract class AbstractLoanOriginatorLinkingServiceImpl implements LoanOr
     }
 
     private boolean isConstraintViolation(final DataAccessException e) {
-        return e.getMostSpecificCause() instanceof SQLException sqlEx && sqlEx.getSQLState() != null
-                && sqlEx.getSQLState().startsWith(SQL_STATE_INTEGRITY_CONSTRAINT_VIOLATION);
+        return e.getMostSpecificCause() instanceof SQLException sqlEx && sqlEx.getSQLState() != null && sqlEx.getSQLState().startsWith(SQL_STATE_INTEGRITY_CONSTRAINT_VIOLATION);
     }
 }

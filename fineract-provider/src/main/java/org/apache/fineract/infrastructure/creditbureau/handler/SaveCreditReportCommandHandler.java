@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.creditbureau.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,14 +27,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 @CommandType(entity = "CREDITREPORT", action = "SAVE")
-@RequiredArgsConstructor
 public class SaveCreditReportCommandHandler implements NewCommandSourceHandler {
-
     private final CreditReportWritePlatformService writePlatformService;
 
     @Override
     public CommandProcessingResult processCommand(JsonCommand command) {
-
         return this.writePlatformService.saveCreditReport(command.entityId(), command.getTransactionId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SaveCreditReportCommandHandler(final CreditReportWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

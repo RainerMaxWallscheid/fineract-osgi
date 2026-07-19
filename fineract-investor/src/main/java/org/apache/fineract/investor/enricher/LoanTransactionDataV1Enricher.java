@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.investor.enricher;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.avro.loan.v1.LoanTransactionDataV1;
 import org.apache.fineract.infrastructure.core.service.DataEnricher;
 import org.apache.fineract.infrastructure.event.external.service.serialization.mapper.support.ExternalIdMapper;
@@ -26,9 +25,7 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class LoanTransactionDataV1Enricher implements DataEnricher<LoanTransactionDataV1> {
-
     private final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository;
     private final ExternalIdMapper externalIdMapper;
 
@@ -39,7 +36,12 @@ public class LoanTransactionDataV1Enricher implements DataEnricher<LoanTransacti
 
     @Override
     public void enrich(LoanTransactionDataV1 data) {
-        externalAssetOwnerTransferRepository.findActiveOwnerByLoanId(data.getLoanId())
-                .ifPresent(owner -> data.setExternalOwnerId(externalIdMapper.mapExternalId(owner.getExternalId())));
+        externalAssetOwnerTransferRepository.findActiveOwnerByLoanId(data.getLoanId()).ifPresent(owner -> data.setExternalOwnerId(externalIdMapper.mapExternalId(owner.getExternalId())));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionDataV1Enricher(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalIdMapper externalIdMapper) {
+        this.externalAssetOwnerTransferRepository = externalAssetOwnerTransferRepository;
+        this.externalIdMapper = externalIdMapper;
     }
 }

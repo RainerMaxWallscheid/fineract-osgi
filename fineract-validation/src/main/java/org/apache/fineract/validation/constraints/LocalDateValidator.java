@@ -19,19 +19,17 @@
 package org.apache.fineract.validation.constraints;
 
 import static java.time.LocalDateTime.parse;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoField;
 import java.util.Locale;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-@Slf4j
 public class LocalDateValidator implements ConstraintValidator<LocalDate, Object> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LocalDateValidator.class);
     private String dateField;
     private String formatField;
     private String localeField;
@@ -49,21 +47,16 @@ public class LocalDateValidator implements ConstraintValidator<LocalDate, Object
             var dateAttr = value.getClass().getDeclaredField(dateField);
             var formatAttr = value.getClass().getDeclaredField(formatField);
             var localeAttr = value.getClass().getDeclaredField(localeField);
-
             dateAttr.setAccessible(true);
             formatAttr.setAccessible(true);
             localeAttr.setAccessible(true);
-
             var date = (String) dateAttr.get(value);
             var format = (String) formatAttr.get(value);
             var locale = (String) localeAttr.get(value);
-
             if (StringUtils.isBlank(date) || StringUtils.isBlank(format) || StringUtils.isBlank(locale)) {
                 return false;
             }
-
             toLocalDate(date, format, locale);
-
             return true;
         } catch (IllegalAccessException | NoSuchFieldException e) {
             throw new RuntimeException("Invalid configuration for @LocalDate", e);
@@ -73,11 +66,7 @@ public class LocalDateValidator implements ConstraintValidator<LocalDate, Object
     }
 
     private void toLocalDate(String date, String format, String locale) {
-        var formatter = new DateTimeFormatterBuilder().parseCaseInsensitive().parseLenient().appendPattern(format.replace("y", "u"))
-                .optionalStart().appendPattern(" HH:mm:ss").optionalEnd().parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0).parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
-                .toFormatter(Locale.forLanguageTag(locale)).withResolverStyle(ResolverStyle.STRICT);
-
+        var formatter = new DateTimeFormatterBuilder().parseCaseInsensitive().parseLenient().appendPattern(format.replace("y", "u")).optionalStart().appendPattern(" HH:mm:ss").optionalEnd().parseDefaulting(ChronoField.HOUR_OF_DAY, 0).parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0).parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter(Locale.forLanguageTag(locale)).withResolverStyle(ResolverStyle.STRICT);
         parse(date, formatter);
     }
 }

@@ -22,12 +22,9 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import lombok.Data;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 
-@Data
 public class GLAccountBalanceHolder {
-
     private final Map<Long, GLAccount> glAccountMap = new LinkedHashMap<>();
     private final Map<Long, BigDecimal> debitBalances = new LinkedHashMap<>();
     private final Map<Long, BigDecimal> creditBalances = new LinkedHashMap<>();
@@ -40,8 +37,7 @@ public class GLAccountBalanceHolder {
         addToProperBalance(debitBalances, debitAccount, amount);
     }
 
-    private void addToProperBalance(@NotNull Map<Long, BigDecimal> balanceMap, @NotNull @NotNull GLAccount account,
-            @NotNull BigDecimal amount) {
+    private void addToProperBalance(@NotNull Map<Long, BigDecimal> balanceMap, @NotNull @NotNull GLAccount account, @NotNull BigDecimal amount) {
         glAccountMap.putIfAbsent(account.getId(), account);
         if (balanceMap.containsKey(account.getId())) {
             BigDecimal totalAmount = balanceMap.get(account.getId()).add(amount);
@@ -49,5 +45,68 @@ public class GLAccountBalanceHolder {
         } else {
             balanceMap.put(account.getId(), amount);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GLAccountBalanceHolder() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Map<Long, GLAccount> getGlAccountMap() {
+        return this.glAccountMap;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Map<Long, BigDecimal> getDebitBalances() {
+        return this.debitBalances;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Map<Long, BigDecimal> getCreditBalances() {
+        return this.creditBalances;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof GLAccountBalanceHolder)) return false;
+        final GLAccountBalanceHolder other = (GLAccountBalanceHolder) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$glAccountMap = this.getGlAccountMap();
+        final java.lang.Object other$glAccountMap = other.getGlAccountMap();
+        if (this$glAccountMap == null ? other$glAccountMap != null : !this$glAccountMap.equals(other$glAccountMap)) return false;
+        final java.lang.Object this$debitBalances = this.getDebitBalances();
+        final java.lang.Object other$debitBalances = other.getDebitBalances();
+        if (this$debitBalances == null ? other$debitBalances != null : !this$debitBalances.equals(other$debitBalances)) return false;
+        final java.lang.Object this$creditBalances = this.getCreditBalances();
+        final java.lang.Object other$creditBalances = other.getCreditBalances();
+        if (this$creditBalances == null ? other$creditBalances != null : !this$creditBalances.equals(other$creditBalances)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof GLAccountBalanceHolder;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $glAccountMap = this.getGlAccountMap();
+        result = result * PRIME + ($glAccountMap == null ? 43 : $glAccountMap.hashCode());
+        final java.lang.Object $debitBalances = this.getDebitBalances();
+        result = result * PRIME + ($debitBalances == null ? 43 : $debitBalances.hashCode());
+        final java.lang.Object $creditBalances = this.getCreditBalances();
+        result = result * PRIME + ($creditBalances == null ? 43 : $creditBalances.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "GLAccountBalanceHolder(glAccountMap=" + this.getGlAccountMap() + ", debitBalances=" + this.getDebitBalances() + ", creditBalances=" + this.getCreditBalances() + ")";
     }
 }

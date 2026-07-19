@@ -18,12 +18,16 @@
  */
 package org.apache.fineract.infrastructure.event.external.service.validation;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
 public class ExternalEventSourceData {
-
     private final String sourcePackage;
+
+    @java.lang.SuppressWarnings("all")
+        public String getSourcePackage() {
+        return this.sourcePackage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalEventSourceData(final String sourcePackage) {
+        this.sourcePackage = sourcePackage;
+    }
 }

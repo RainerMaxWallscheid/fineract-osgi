@@ -28,7 +28,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.infrastructure.event.external.command.ExternalConfigurationsUpdateCommand;
 import org.apache.fineract.infrastructure.event.external.data.ExternalEventConfigurationResponse;
@@ -37,34 +36,34 @@ import org.apache.fineract.infrastructure.event.external.data.ExternalEventConfi
 import org.apache.fineract.infrastructure.event.external.service.ExternalEventConfigurationReadPlatformService;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Path("/v1/externalevents/configuration")
 @Component
 @Tag(name = "External event configuration", description = "External event configuration enables user to enable/disable event posting to downstream message channel")
 public class ExternalEventConfigurationApiResource {
-
     private final ExternalEventConfigurationReadPlatformService readPlatformService;
     private final CommandDispatcher dispatcher;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "List all external event configurations", description = "")
     public ExternalEventConfigurationResponse getExternalEventConfigurations() {
         return readPlatformService.findAllExternalEventConfigurations();
     }
 
     @PUT
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Enable/Disable external events posting", description = "")
-    public ExternalEventConfigurationUpdateResponse updateExternalEventConfigurations(
-            @Valid ExternalEventConfigurationUpdateRequest request) {
+    public ExternalEventConfigurationUpdateResponse updateExternalEventConfigurations(@Valid ExternalEventConfigurationUpdateRequest request) {
         final var command = new ExternalConfigurationsUpdateCommand();
-
         command.setPayload(request);
-
         final Supplier<ExternalEventConfigurationUpdateResponse> response = dispatcher.dispatch(command);
-
         return response.get();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalEventConfigurationApiResource(final ExternalEventConfigurationReadPlatformService readPlatformService, final CommandDispatcher dispatcher) {
+        this.readPlatformService = readPlatformService;
+        this.dispatcher = dispatcher;
     }
 }

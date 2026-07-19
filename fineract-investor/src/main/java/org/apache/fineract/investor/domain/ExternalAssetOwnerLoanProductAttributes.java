@@ -21,25 +21,49 @@ package org.apache.fineract.investor.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
-@Getter
-@Setter
 @Entity
-@NoArgsConstructor
 @Table(name = "m_external_asset_owner_loan_product_configurable_attributes")
 public class ExternalAssetOwnerLoanProductAttributes extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @Column(name = "loan_product_id", nullable = false)
     private Long loanProductId;
-
     @Column(name = "attribute_key", nullable = false)
     private String attributeKey;
-
     @Column(name = "attribute_value", nullable = false)
     private String attributeValue;
 
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanProductId() {
+        return this.loanProductId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getAttributeKey() {
+        return this.attributeKey;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getAttributeValue() {
+        return this.attributeValue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanProductId(final Long loanProductId) {
+        this.loanProductId = loanProductId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAttributeKey(final String attributeKey) {
+        this.attributeKey = attributeKey;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAttributeValue(final String attributeValue) {
+        this.attributeValue = attributeValue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnerLoanProductAttributes() {
+    }
 }

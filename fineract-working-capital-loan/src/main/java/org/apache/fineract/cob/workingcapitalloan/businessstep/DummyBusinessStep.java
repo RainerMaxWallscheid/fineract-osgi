@@ -18,15 +18,13 @@
  */
 package org.apache.fineract.cob.workingcapitalloan.businessstep;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class DummyBusinessStep extends WorkingCapitalLoanCOBBusinessStep {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DummyBusinessStep.class);
 
     @Override
     public WorkingCapitalLoan execute(WorkingCapitalLoan input) {
@@ -42,5 +40,9 @@ public class DummyBusinessStep extends WorkingCapitalLoanCOBBusinessStep {
     @Override
     public String getHumanReadableName() {
         return "Dummy Business Step";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DummyBusinessStep() {
     }
 }

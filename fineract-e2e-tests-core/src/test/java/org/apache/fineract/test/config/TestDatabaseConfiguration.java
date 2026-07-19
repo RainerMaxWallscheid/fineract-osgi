@@ -19,7 +19,6 @@
 package org.apache.fineract.test.config;
 
 import javax.sql.DataSource;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,24 +26,19 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 @Configuration
-@Slf4j
 public class TestDatabaseConfiguration {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TestDatabaseConfiguration.class);
     @Value("${fineract-test.db.protocol}")
     private String protocol;
-
     @Value("${fineract-test.db.hostname}")
     private String hostname;
-
     @Value("${fineract-test.db.port}")
     private String port;
-
     @Value("${fineract-test.db.name}")
     private String dbName;
-
     @Value("${fineract-test.db.username}")
     private String username;
-
     @Value("${fineract-test.db.password}")
     private String password;
 

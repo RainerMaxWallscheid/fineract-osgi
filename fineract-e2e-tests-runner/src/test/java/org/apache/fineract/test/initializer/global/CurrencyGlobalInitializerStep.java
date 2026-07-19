@@ -19,11 +19,9 @@
 package org.apache.fineract.test.initializer.global;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.CurrencyUpdateRequest;
 import org.apache.fineract.test.support.TestContext;
@@ -32,13 +30,10 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CurrencyGlobalInitializerStep implements FineractGlobalInitializerStep {
-
     public static final List<String> CURRENCIES = Arrays.asList("EUR", "USD");
-
     private final FineractFeignClient fineractClient;
 
     @Override
@@ -46,5 +41,10 @@ public class CurrencyGlobalInitializerStep implements FineractGlobalInitializerS
         var request = new CurrencyUpdateRequest();
         var response = ok(() -> fineractClient.currency().updateCurrencies(request.currencies(CURRENCIES), Map.of()));
         TestContext.INSTANCE.set(TestContextKey.PUT_CURRENCIES_RESPONSE, response);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CurrencyGlobalInitializerStep(final FineractFeignClient fineractClient) {
+        this.fineractClient = fineractClient;
     }
 }

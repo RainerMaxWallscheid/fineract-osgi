@@ -20,13 +20,10 @@ package org.apache.fineract.portfolio.loanaccount.rescheduleloan.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.Setter;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanSchedulePeriodData;
 
-@Setter
 public final class LoanRescheduleModelRepaymentPeriod implements LoanRescheduleModalPeriod {
-
     private int periodNumber;
     private int oldPeriodNumber;
     private LocalDate fromDate;
@@ -39,9 +36,7 @@ public final class LoanRescheduleModelRepaymentPeriod implements LoanRescheduleM
     private Money totalDue;
     private boolean isNew;
 
-    public LoanRescheduleModelRepaymentPeriod(final int periodNumber, final int oldPeriodNumber, LocalDate fromDate,
-            final LocalDate dueDate, final Money principalDue, final Money outstandingLoanBalance, final Money interestDue,
-            final Money feeChargesDue, final Money penaltyChargesDue, final Money totalDue, final boolean isNew) {
+    public LoanRescheduleModelRepaymentPeriod(final int periodNumber, final int oldPeriodNumber, LocalDate fromDate, final LocalDate dueDate, final Money principalDue, final Money outstandingLoanBalance, final Money interestDue, final Money feeChargesDue, final Money penaltyChargesDue, final Money totalDue, final boolean isNew) {
         this.periodNumber = periodNumber;
         this.oldPeriodNumber = oldPeriodNumber;
         this.fromDate = fromDate;
@@ -55,19 +50,13 @@ public final class LoanRescheduleModelRepaymentPeriod implements LoanRescheduleM
         this.isNew = isNew;
     }
 
-    public static LoanRescheduleModelRepaymentPeriod instance(final int periodNumber, final int oldPeriodNumber, LocalDate fromDate,
-            final LocalDate dueDate, final Money principalDue, final Money outstandingLoanBalance, final Money interestDue,
-            final Money feeChargesDue, final Money penaltyChargesDue, final Money totalDue, final boolean isNew) {
-
-        return new LoanRescheduleModelRepaymentPeriod(periodNumber, oldPeriodNumber, fromDate, dueDate, principalDue,
-                outstandingLoanBalance, interestDue, feeChargesDue, penaltyChargesDue, totalDue, isNew);
+    public static LoanRescheduleModelRepaymentPeriod instance(final int periodNumber, final int oldPeriodNumber, LocalDate fromDate, final LocalDate dueDate, final Money principalDue, final Money outstandingLoanBalance, final Money interestDue, final Money feeChargesDue, final Money penaltyChargesDue, final Money totalDue, final boolean isNew) {
+        return new LoanRescheduleModelRepaymentPeriod(periodNumber, oldPeriodNumber, fromDate, dueDate, principalDue, outstandingLoanBalance, interestDue, feeChargesDue, penaltyChargesDue, totalDue, isNew);
     }
 
     @Override
     public LoanSchedulePeriodData toData() {
-        return LoanSchedulePeriodData.repaymentOnlyPeriod(this.periodNumber, this.fromDate, this.dueDate, this.principalDue.getAmount(),
-                this.outstandingLoanBalance.getAmount(), this.interestDue.getAmount(), this.feeChargesDue.getAmount(),
-                this.penaltyChargesDue.getAmount());
+        return LoanSchedulePeriodData.repaymentOnlyPeriod(this.periodNumber, this.fromDate, this.dueDate, this.principalDue.getAmount(), this.outstandingLoanBalance.getAmount(), this.interestDue.getAmount(), this.feeChargesDue.getAmount(), this.penaltyChargesDue.getAmount());
     }
 
     @Override
@@ -93,44 +82,36 @@ public final class LoanRescheduleModelRepaymentPeriod implements LoanRescheduleM
     @Override
     public BigDecimal principalDue() {
         BigDecimal value = null;
-
         if (this.principalDue != null) {
             value = this.principalDue.getAmount();
         }
-
         return value;
     }
 
     @Override
     public BigDecimal interestDue() {
         BigDecimal value = null;
-
         if (this.interestDue != null) {
             value = this.interestDue.getAmount();
         }
-
         return value;
     }
 
     @Override
     public BigDecimal feeChargesDue() {
         BigDecimal value = null;
-
         if (this.feeChargesDue != null) {
             value = this.feeChargesDue.getAmount();
         }
-
         return value;
     }
 
     @Override
     public BigDecimal penaltyChargesDue() {
         BigDecimal value = null;
-
         if (this.penaltyChargesDue != null) {
             value = this.penaltyChargesDue.getAmount();
         }
-
         return value;
     }
 
@@ -180,6 +161,61 @@ public final class LoanRescheduleModelRepaymentPeriod implements LoanRescheduleM
     }
 
     public void updateIsNew(boolean isNew) {
+        this.isNew = isNew;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setPeriodNumber(final int periodNumber) {
+        this.periodNumber = periodNumber;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setOldPeriodNumber(final int oldPeriodNumber) {
+        this.oldPeriodNumber = oldPeriodNumber;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setFromDate(final LocalDate fromDate) {
+        this.fromDate = fromDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDueDate(final LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setPrincipalDue(final Money principalDue) {
+        this.principalDue = principalDue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setOutstandingLoanBalance(final Money outstandingLoanBalance) {
+        this.outstandingLoanBalance = outstandingLoanBalance;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setInterestDue(final Money interestDue) {
+        this.interestDue = interestDue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setFeeChargesDue(final Money feeChargesDue) {
+        this.feeChargesDue = feeChargesDue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setPenaltyChargesDue(final Money penaltyChargesDue) {
+        this.penaltyChargesDue = penaltyChargesDue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setTotalDue(final Money totalDue) {
+        this.totalDue = totalDue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setNew(final boolean isNew) {
         this.isNew = isNew;
     }
 }

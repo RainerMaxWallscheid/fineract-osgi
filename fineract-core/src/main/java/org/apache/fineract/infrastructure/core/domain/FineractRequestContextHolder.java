@@ -20,8 +20,6 @@ package org.apache.fineract.infrastructure.core.domain;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -39,9 +37,9 @@ import org.springframework.web.context.request.RequestContextHolder;
  * </pre>
  */
 @Component
-@NoArgsConstructor
-@Slf4j
 public final class FineractRequestContextHolder {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FineractRequestContextHolder.class);
 
     /**
      * Get the attribute, the request not set using only thread bound context variables
@@ -71,11 +69,9 @@ public final class FineractRequestContextHolder {
         if (request != null) {
             return request.getAttribute(key);
         } else if (isBatchRequest()) {
-            return Optional.ofNullable(BatchRequestContextHolder.getRequestAttributes()).map(attributes -> attributes.get(key))
-                    .orElse(null);
+            return Optional.ofNullable(BatchRequestContextHolder.getRequestAttributes()).map(attributes -> attributes.get(key)).orElse(null);
         } else if (RequestContextHolder.getRequestAttributes() != null) {
-            return Optional.ofNullable(RequestContextHolder.getRequestAttributes())
-                    .map(r -> r.getAttribute(key, RequestAttributes.SCOPE_REQUEST)).orElse(null);
+            return Optional.ofNullable(RequestContextHolder.getRequestAttributes()).map(r -> r.getAttribute(key, RequestAttributes.SCOPE_REQUEST)).orElse(null);
         }
         return null;
     }
@@ -113,10 +109,8 @@ public final class FineractRequestContextHolder {
         } else if (isBatchRequest()) {
             Optional.ofNullable(BatchRequestContextHolder.getRequestAttributes()).ifPresent(attributes -> attributes.put(key, value));
         } else if (RequestContextHolder.getRequestAttributes() != null) {
-            Optional.ofNullable(RequestContextHolder.getRequestAttributes())
-                    .ifPresent(requestAttributes -> requestAttributes.setAttribute(key, value, RequestAttributes.SCOPE_REQUEST));
+            Optional.ofNullable(RequestContextHolder.getRequestAttributes()).ifPresent(requestAttributes -> requestAttributes.setAttribute(key, value, RequestAttributes.SCOPE_REQUEST));
         }
-
     }
 
     /**
@@ -126,5 +120,9 @@ public final class FineractRequestContextHolder {
      */
     public static boolean isBatchRequest() {
         return BatchRequestContextHolder.isBatchRequest();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FineractRequestContextHolder() {
     }
 }

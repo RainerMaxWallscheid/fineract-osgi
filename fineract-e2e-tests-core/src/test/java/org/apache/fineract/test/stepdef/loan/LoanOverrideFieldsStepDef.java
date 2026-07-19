@@ -21,14 +21,12 @@ package org.apache.fineract.test.stepdef.loan;
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.GetLoansLoanIdResponse;
 import org.apache.fineract.client.models.PostClientsResponse;
@@ -40,9 +38,7 @@ import org.apache.fineract.test.factory.LoanRequestFactory;
 import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 
-@RequiredArgsConstructor
 public class LoanOverrideFieldsStepDef extends AbstractStepDef {
-
     private final FineractFeignClient fineractClient;
     private final LoanRequestFactory loanRequestFactory;
     private final LoanProductResolver loanProductResolver;
@@ -52,12 +48,8 @@ public class LoanOverrideFieldsStepDef extends AbstractStepDef {
         final PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         assertNotNull(loanResponse);
         final Long loanId = loanResponse.getLoanId();
-
-        final GetLoansLoanIdResponse loanDetails = ok(
-                () -> fineractClient.loans().retrieveOneLoan(loanId, Map.of("staffInSelectedOfficeOnly", "false")));
-
+        final GetLoansLoanIdResponse loanDetails = ok(() -> fineractClient.loans().retrieveOneLoan(loanId, Map.of("staffInSelectedOfficeOnly", "false")));
         assertNotNull(loanDetails);
-
         verifyFieldValue(loanDetails, fieldName, expectedValue);
     }
 
@@ -82,32 +74,23 @@ public class LoanOverrideFieldsStepDef extends AbstractStepDef {
         final PostClientsResponse clientResponse = testContext().get(TestContextKey.CLIENT_CREATE_RESPONSE);
         assertNotNull(clientResponse);
         final Long clientId = clientResponse.getClientId();
-
         final Map<String, String> overrideData = dataTable.asMap(String.class, String.class);
-
         final String loanProductName = overrideData.get("loanProduct");
         if (loanProductName == null) {
             throw new IllegalArgumentException("loanProduct is required in override data");
         }
-
-        final PostLoansRequest loansRequest = loanRequestFactory.defaultLoansRequest(clientId)
-                .productId(loanProductResolver.resolve(DefaultLoanProduct.valueOf(loanProductName))).numberOfRepayments(6)
-                .loanTermFrequency(180).interestRatePerPeriod(new BigDecimal(1));
-
+        final PostLoansRequest loansRequest = loanRequestFactory.defaultLoansRequest(clientId).productId(loanProductResolver.resolve(DefaultLoanProduct.valueOf(loanProductName))).numberOfRepayments(6).loanTermFrequency(180).interestRatePerPeriod(new BigDecimal(1));
         overrideData.forEach((fieldName, value) -> {
             if (!"loanProduct".equals(fieldName)) {
                 applyOverrideField(loansRequest, fieldName, value);
             }
         });
-
         final PostLoansResponse response = ok(() -> fineractClient.loans().calculateOrSubmitLoanApplication(loansRequest, Map.of()));
         testContext().set(TestContextKey.LOAN_CREATE_RESPONSE, response);
-
     }
 
     private void applyOverrideField(final PostLoansRequest request, final String fieldName, final String value) {
         final boolean isNull = "null".equals(value);
-
         switch (fieldName) {
             case "inArrearsTolerance" -> request.inArrearsTolerance(isNull ? null : new BigDecimal(value));
             case "graceOnInterestPayment" -> request.graceOnInterestPayment(isNull ? null : Integer.valueOf(value));
@@ -117,4 +100,10 @@ public class LoanOverrideFieldsStepDef extends AbstractStepDef {
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanOverrideFieldsStepDef(final FineractFeignClient fineractClient, final LoanRequestFactory loanRequestFactory, final LoanProductResolver loanProductResolver) {
+        this.fineractClient = fineractClient;
+        this.loanRequestFactory = loanRequestFactory;
+        this.loanProductResolver = loanProductResolver;
+    }
 }

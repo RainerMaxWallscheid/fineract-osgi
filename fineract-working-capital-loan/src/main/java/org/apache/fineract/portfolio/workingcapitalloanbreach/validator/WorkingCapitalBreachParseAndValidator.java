@@ -24,7 +24,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
@@ -34,12 +33,9 @@ import org.apache.fineract.portfolio.workingcapitalloanbreach.data.WorkingCapita
 import org.apache.fineract.portfolio.workingcapitalloanproduct.domain.WorkingCapitalBreachAmountCalculationType;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
 public class WorkingCapitalBreachParseAndValidator extends ParseAndValidator {
-
     private final FromJsonHelper jsonHelper;
-
     private static final String BREACH_FREQUENCY_PARAM = "breachFrequency";
     private static final String BREACH_FREQUENCY_TYPE_PARAM = "breachFrequencyType";
     private static final String BREACH_AMOUNT_CALCULATION_TYPE_PARAM = "breachAmountCalculationType";
@@ -54,34 +50,26 @@ public class WorkingCapitalBreachParseAndValidator extends ParseAndValidator {
         return result;
     }
 
-    private WorkingCapitalBreachRequest validateAndParse(final DataValidatorBuilder dataValidator, final JsonObject element,
-            final FromJsonHelper jsonHelper) {
+    private WorkingCapitalBreachRequest validateAndParse(final DataValidatorBuilder dataValidator, final JsonObject element, final FromJsonHelper jsonHelper) {
         if (element == null) {
             return null;
         }
-
-        jsonHelper.checkForUnsupportedParameters(element, List.of(NAME_PARAM, BREACH_FREQUENCY_PARAM, BREACH_FREQUENCY_TYPE_PARAM,
-                BREACH_AMOUNT_CALCULATION_TYPE_PARAM, BREACH_AMOUNT_PARAM));
-
+        jsonHelper.checkForUnsupportedParameters(element, List.of(NAME_PARAM, BREACH_FREQUENCY_PARAM, BREACH_FREQUENCY_TYPE_PARAM, BREACH_AMOUNT_CALCULATION_TYPE_PARAM, BREACH_AMOUNT_PARAM));
         final String name = jsonHelper.extractStringNamed(NAME_PARAM, element);
         dataValidator.reset().parameter(NAME_PARAM).value(name).notBlank().notExceedingLengthOf(100);
-
         final Integer breachFrequency = jsonHelper.extractIntegerNamed(BREACH_FREQUENCY_PARAM, element);
         dataValidator.reset().parameter(BREACH_FREQUENCY_PARAM).value(breachFrequency).notNull().integerGreaterThanZero();
-
         final String breachFrequencyTypeValue = jsonHelper.extractStringNamed(BREACH_FREQUENCY_TYPE_PARAM, element);
-        dataValidator.reset().parameter(BREACH_FREQUENCY_TYPE_PARAM).value(breachFrequencyTypeValue).notNull()
-                .isOneOfEnumValues(WorkingCapitalLoanPeriodFrequencyType.class);
-
+        dataValidator.reset().parameter(BREACH_FREQUENCY_TYPE_PARAM).value(breachFrequencyTypeValue).notNull().isOneOfEnumValues(WorkingCapitalLoanPeriodFrequencyType.class);
         final String breachAmountCalculationTypeValue = jsonHelper.extractStringNamed(BREACH_AMOUNT_CALCULATION_TYPE_PARAM, element);
-        dataValidator.reset().parameter(BREACH_AMOUNT_CALCULATION_TYPE_PARAM).value(breachAmountCalculationTypeValue).notNull()
-                .isOneOfEnumValues(WorkingCapitalBreachAmountCalculationType.class);
-
+        dataValidator.reset().parameter(BREACH_AMOUNT_CALCULATION_TYPE_PARAM).value(breachAmountCalculationTypeValue).notNull().isOneOfEnumValues(WorkingCapitalBreachAmountCalculationType.class);
         final BigDecimal breachAmount = jsonHelper.extractBigDecimalNamed(BREACH_AMOUNT_PARAM, element, new HashSet<>());
         dataValidator.reset().parameter(BREACH_AMOUNT_PARAM).value(breachAmount).notNull().zeroOrPositiveAmount();
+        return dataValidator.hasError() ? null : new WorkingCapitalBreachRequest(name, breachFrequency, breachFrequencyTypeValue, breachAmountCalculationTypeValue, breachAmount);
+    }
 
-        return dataValidator.hasError() ? null
-                : new WorkingCapitalBreachRequest(name, breachFrequency, breachFrequencyTypeValue, breachAmountCalculationTypeValue,
-                        breachAmount);
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalBreachParseAndValidator(final FromJsonHelper jsonHelper) {
+        this.jsonHelper = jsonHelper;
     }
 }

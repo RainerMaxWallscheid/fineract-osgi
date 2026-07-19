@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.organisation.teller.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -34,14 +33,17 @@ import org.springframework.stereotype.Service;
  * @since 2.0.0
  */
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "TELLER", action = "UPDATECASHIERALLOCATION")
 public class UpdateCashierAllocationCommandHandler implements NewCommandSourceHandler {
-
     private final TellerWritePlatformService writePlatformService;
 
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.updateCashierAllocation(command.entityId(), command.subentityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateCashierAllocationCommandHandler(final TellerWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

@@ -31,7 +31,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
@@ -48,9 +47,7 @@ import org.springframework.stereotype.Component;
 @Path("/v1/" + ReportMailingJobConstants.REPORT_MAILING_JOB_RUN_HISTORY_RESOURCE_NAME)
 @Component
 @Tag(name = "List Report Mailing Job History", description = "")
-@RequiredArgsConstructor
 public class ReportMailingJobRunHistoryApiResource {
-
     private final PlatformSecurityContext platformSecurityContext;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final DefaultToApiJsonSerializer<ReportMailingJobRunHistoryData> reportMailingToApiJsonSerializer;
@@ -58,28 +55,26 @@ public class ReportMailingJobRunHistoryApiResource {
     private final SqlValidator sqlValidator;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "List Report Mailing Job History", operationId = "retrieveAllReportMailingJobRunHistory", description = "The list capability of report mailing job history can support pagination and sorting.\n"
-            + "\n" + "Example Requests:\n" + "\n" + "reportmailingjobrunhistory/1")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "List Report Mailing Job History", operationId = "retrieveAllReportMailingJobRunHistory", description = "The list capability of report mailing job history can support pagination and sorting.\n" + "\n" + "Example Requests:\n" + "\n" + "reportmailingjobrunhistory/1")
     @AlternativeOperationId("retrieveAllByReportMailingJobId")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ReportMailingJobRunHistoryData.class)))
-    public String retrieveAllByReportMailingJobId(@Context final UriInfo uriInfo,
-            @QueryParam("reportMailingJobId") @Parameter(description = "reportMailingJobId") final Long reportMailingJobId,
-            @QueryParam("offset") @Parameter(description = "offset") final Integer offset,
-            @QueryParam("limit") @Parameter(description = "limit") final Integer limit,
-            @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy,
-            @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder) {
-        this.platformSecurityContext.authenticatedUser()
-                .validateHasReadPermission(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME);
+    public String retrieveAllByReportMailingJobId(@Context final UriInfo uriInfo, @QueryParam("reportMailingJobId") @Parameter(description = "reportMailingJobId") final Long reportMailingJobId, @QueryParam("offset") @Parameter(description = "offset") final Integer offset, @QueryParam("limit") @Parameter(description = "limit") final Integer limit, @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy, @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder) {
+        this.platformSecurityContext.authenticatedUser().validateHasReadPermission(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME);
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
-        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).offset(offset).orderBy(orderBy)
-                .sortOrder(sortOrder).build();
-
-        final Page<ReportMailingJobRunHistoryData> reportMailingJobRunHistoryData = this.reportMailingJobRunHistoryReadPlatformService
-                .retrieveRunHistoryByJobId(reportMailingJobId, searchParameters);
+        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
+        final Page<ReportMailingJobRunHistoryData> reportMailingJobRunHistoryData = this.reportMailingJobRunHistoryReadPlatformService.retrieveRunHistoryByJobId(reportMailingJobId, searchParameters);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-
         return this.reportMailingToApiJsonSerializer.serialize(settings, reportMailingJobRunHistoryData);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ReportMailingJobRunHistoryApiResource(final PlatformSecurityContext platformSecurityContext, final ApiRequestParameterHelper apiRequestParameterHelper, final DefaultToApiJsonSerializer<ReportMailingJobRunHistoryData> reportMailingToApiJsonSerializer, final ReportMailingJobRunHistoryReadPlatformService reportMailingJobRunHistoryReadPlatformService, final SqlValidator sqlValidator) {
+        this.platformSecurityContext = platformSecurityContext;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.reportMailingToApiJsonSerializer = reportMailingToApiJsonSerializer;
+        this.reportMailingJobRunHistoryReadPlatformService = reportMailingJobRunHistoryReadPlatformService;
+        this.sqlValidator = sqlValidator;
     }
 }

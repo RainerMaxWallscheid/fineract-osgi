@@ -19,17 +19,13 @@
 package org.apache.fineract.commands.service;
 
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.infrastructure.core.domain.FineractRequestContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class IdempotencyKeyResolver {
-
     private final FineractRequestContextHolder fineractRequestContextHolder;
-
     private final IdempotencyKeyGenerator idempotencyKeyGenerator;
 
     public String resolve(CommandWrapper wrapper) {
@@ -37,8 +33,12 @@ public class IdempotencyKeyResolver {
     }
 
     private Optional<String> getAttribute() {
-        return Optional.ofNullable(fineractRequestContextHolder.getAttribute(SynchronousCommandProcessingService.IDEMPOTENCY_KEY_ATTRIBUTE))
-                .map(String::valueOf);
+        return Optional.ofNullable(fineractRequestContextHolder.getAttribute(SynchronousCommandProcessingService.IDEMPOTENCY_KEY_ATTRIBUTE)).map(String::valueOf);
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public IdempotencyKeyResolver(final FineractRequestContextHolder fineractRequestContextHolder, final IdempotencyKeyGenerator idempotencyKeyGenerator) {
+        this.fineractRequestContextHolder = fineractRequestContextHolder;
+        this.idempotencyKeyGenerator = idempotencyKeyGenerator;
     }
 }

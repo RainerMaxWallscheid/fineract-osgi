@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.event.external.service.serialization.serializer.loan;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
 import org.apache.fineract.avro.loan.v1.LoanAccountsStayedLockedDataV1;
@@ -30,9 +29,7 @@ import org.apache.fineract.infrastructure.event.external.service.serialization.s
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class LoanAccountsStayedLockedBusinessEventSerializer implements BusinessEventSerializer {
-
     private final LoanAccountsStayedLockedDataMapper mapper;
 
     @Override
@@ -50,5 +47,10 @@ public class LoanAccountsStayedLockedBusinessEventSerializer implements Business
     @Override
     public Class<? extends GenericContainer> getSupportedSchema() {
         return LoanAccountsStayedLockedDataV1.class;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanAccountsStayedLockedBusinessEventSerializer(final LoanAccountsStayedLockedDataMapper mapper) {
+        this.mapper = mapper;
     }
 }

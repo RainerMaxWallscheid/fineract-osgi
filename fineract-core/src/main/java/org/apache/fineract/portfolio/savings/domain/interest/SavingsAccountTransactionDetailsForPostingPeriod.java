@@ -20,17 +20,12 @@ package org.apache.fineract.portfolio.savings.domain.interest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.LocalDateInterval;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 
-@Getter
-@RequiredArgsConstructor
 public class SavingsAccountTransactionDetailsForPostingPeriod {
-
     private final Long id;
     private final LocalDate transactionDate;
     private final LocalDate endOfBalanceDate;
@@ -64,43 +59,34 @@ public class SavingsAccountTransactionDetailsForPostingPeriod {
         if (isDeposit() || isDividendPayoutAndNotReversed()) {
             endOfDayBalance = openingBalance.plus(getAmount(currency));
         } else if (isWithdrawal() || isChargeTransactionAndNotReversed()) {
-
             if (openingBalance.isGreaterThanZero() || isAllowOverdraft()) {
                 endOfDayBalance = openingBalance.minus(getAmount(currency));
             } else {
                 endOfDayBalance = Money.of(currency, this.runningBalance);
             }
         }
-
         return EndOfDayBalance.from(getTransactionDate(), openingBalance, endOfDayBalance, this.balanceNumberOfDays);
     }
 
     public EndOfDayBalance toEndOfDayBalance(final LocalDateInterval periodInterval, final MonetaryCurrency currency) {
-
         final Money endOfDayBalance = Money.of(currency, this.runningBalance);
         final Money openingBalance = endOfDayBalance;
-
         LocalDate balanceDate = periodInterval.startDate();
-
         int numberOfDays = periodInterval.daysInPeriodInclusiveOfEndDate();
         if (periodInterval.contains(getTransactionDate())) {
             balanceDate = getTransactionDate();
             final LocalDateInterval newInterval = LocalDateInterval.create(getTransactionDate(), periodInterval.endDate());
             numberOfDays = newInterval.daysInPeriodInclusiveOfEndDate();
         }
-
         return EndOfDayBalance.from(balanceDate, openingBalance, endOfDayBalance, numberOfDays);
     }
 
     public EndOfDayBalance toEndOfDayBalanceBoundedBy(final Money openingBalance, final LocalDateInterval boundedBy) {
         final MonetaryCurrency currency = openingBalance.getCurrency();
         Money endOfDayBalance = openingBalance.copy();
-
         int numberOfDaysOfBalance = this.balanceNumberOfDays;
-
         LocalDate balanceStartDate = getTransactionDate();
         LocalDate balanceEndDate = getEndOfBalanceDate();
-
         if (DateUtils.isAfter(boundedBy.startDate(), balanceStartDate)) {
             balanceStartDate = boundedBy.startDate();
             final LocalDateInterval spanOfBalance = LocalDateInterval.create(balanceStartDate, balanceEndDate);
@@ -110,8 +96,9 @@ public class SavingsAccountTransactionDetailsForPostingPeriod {
                 // endOfDayBalance = openingBalance.plus(getAmount(currency));
                 // if (endOfDayBalance.isLessThanZero()) {
                 endOfDayBalance = endOfDayBalance.plus(getAmount(currency));
-                // }
-            } else if (isWithdrawal() || isChargeTransactionAndNotReversed()) {
+            } else 
+            // }
+            if (isWithdrawal() || isChargeTransactionAndNotReversed()) {
                 // endOfDayBalance = openingBalance.minus(getAmount(currency));
                 if (endOfDayBalance.isGreaterThanZero() || isAllowOverdraft()) {
                     endOfDayBalance = endOfDayBalance.minus(getAmount(currency));
@@ -120,17 +107,91 @@ public class SavingsAccountTransactionDetailsForPostingPeriod {
                 }
             }
         }
-
         if (DateUtils.isAfter(balanceEndDate, boundedBy.endDate())) {
             balanceEndDate = boundedBy.endDate();
             final LocalDateInterval spanOfBalance = LocalDateInterval.create(balanceStartDate, balanceEndDate);
             numberOfDaysOfBalance = spanOfBalance.daysInPeriodInclusiveOfEndDate();
         }
-
         return EndOfDayBalance.from(balanceStartDate, openingBalance, endOfDayBalance, numberOfDaysOfBalance);
     }
 
     private Money getAmount(MonetaryCurrency currency) {
         return Money.of(currency, getAmount());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getTransactionDate() {
+        return this.transactionDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getEndOfBalanceDate() {
+        return this.endOfBalanceDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getRunningBalance() {
+        return this.runningBalance;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MonetaryCurrency getCurrency() {
+        return this.currency;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getBalanceNumberOfDays() {
+        return this.balanceNumberOfDays;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isDeposit() {
+        return this.isDeposit;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isWithdrawal() {
+        return this.isWithdrawal;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isAllowOverdraft() {
+        return this.isAllowOverdraft;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isChargeTransactionAndNotReversed() {
+        return this.isChargeTransactionAndNotReversed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isDividendPayoutAndNotReversed() {
+        return this.isDividendPayoutAndNotReversed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsAccountTransactionDetailsForPostingPeriod(final Long id, final LocalDate transactionDate, final LocalDate endOfBalanceDate, final BigDecimal runningBalance, final BigDecimal amount, final MonetaryCurrency currency, final Integer balanceNumberOfDays, final boolean isDeposit, final boolean isWithdrawal, final boolean isAllowOverdraft, final boolean isChargeTransactionAndNotReversed, final boolean isDividendPayoutAndNotReversed) {
+        this.id = id;
+        this.transactionDate = transactionDate;
+        this.endOfBalanceDate = endOfBalanceDate;
+        this.runningBalance = runningBalance;
+        this.amount = amount;
+        this.currency = currency;
+        this.balanceNumberOfDays = balanceNumberOfDays;
+        this.isDeposit = isDeposit;
+        this.isWithdrawal = isWithdrawal;
+        this.isAllowOverdraft = isAllowOverdraft;
+        this.isChargeTransactionAndNotReversed = isChargeTransactionAndNotReversed;
+        this.isDividendPayoutAndNotReversed = isDividendPayoutAndNotReversed;
     }
 }

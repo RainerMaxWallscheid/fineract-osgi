@@ -19,8 +19,6 @@
 package org.apache.fineract.cob.internal;
 
 import static org.apache.fineract.infrastructure.jobs.service.JobName.WORKING_CAPITAL_LOAN_COB_JOB;
-
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.listener.FineractCOBAfterJobListener;
 import org.apache.fineract.infrastructure.core.boot.FineractProfiles;
 import org.springframework.batch.core.JobExecution;
@@ -29,9 +27,7 @@ import org.springframework.stereotype.Component;
 
 @Profile(FineractProfiles.TEST)
 @Component
-@RequiredArgsConstructor
 public class InternalTestCobJobAfterListener implements FineractCOBAfterJobListener {
-
     private final TestData testData;
 
     @Override
@@ -42,5 +38,10 @@ public class InternalTestCobJobAfterListener implements FineractCOBAfterJobListe
     @Override
     public String getJobName() {
         return WORKING_CAPITAL_LOAN_COB_JOB.name();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InternalTestCobJobAfterListener(final TestData testData) {
+        this.testData = testData;
     }
 }

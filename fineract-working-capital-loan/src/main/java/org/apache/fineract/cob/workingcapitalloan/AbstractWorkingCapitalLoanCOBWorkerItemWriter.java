@@ -18,9 +18,9 @@
  */
 package org.apache.fineract.cob.workingcapitalloan;
 
+import org.springframework.lang.NonNull;
+
 import java.util.List;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.domain.LockOwner;
 import org.apache.fineract.cob.domain.LockingService;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
@@ -29,19 +29,21 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.data.repository.CrudRepository;
 
-@Slf4j
 public abstract class AbstractWorkingCapitalLoanCOBWorkerItemWriter extends RepositoryItemWriter<WorkingCapitalLoan> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AbstractWorkingCapitalLoanCOBWorkerItemWriter.class);
     private final LockingService loanLockingService;
 
-    public AbstractWorkingCapitalLoanCOBWorkerItemWriter(LockingService loanLockingService,
-            CrudRepository<WorkingCapitalLoan, Long> repository) {
+    public AbstractWorkingCapitalLoanCOBWorkerItemWriter(LockingService loanLockingService, CrudRepository<WorkingCapitalLoan, Long> repository) {
         this.loanLockingService = loanLockingService;
         setRepository(repository);
     }
 
     @Override
     public void write(@NonNull Chunk<? extends WorkingCapitalLoan> items) throws Exception {
+        if (items == null) {
+            throw new java.lang.NullPointerException("items is marked non-null but is null");
+        }
         if (!items.isEmpty()) {
             super.write(items);
             List<Long> loanIds = items.getItems().stream().map(AbstractPersistableCustom::getId).toList();
@@ -50,5 +52,4 @@ public abstract class AbstractWorkingCapitalLoanCOBWorkerItemWriter extends Repo
     }
 
     protected abstract LockOwner getLockOwner();
-
 }

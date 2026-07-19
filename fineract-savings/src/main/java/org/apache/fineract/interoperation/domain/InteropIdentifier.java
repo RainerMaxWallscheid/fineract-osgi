@@ -29,50 +29,33 @@ import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 
 @Entity
-@Setter
-@Getter
-@NoArgsConstructor
-@Table(name = "interop_identifier", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_hathor_identifier_account", columnNames = { "account_id", "type" }),
-        @UniqueConstraint(name = "uk_hathor_identifier_value", columnNames = { "type", "a_value", "sub_value_or_type" }) })
+@Table(name = "interop_identifier", uniqueConstraints = {@UniqueConstraint(name = "uk_hathor_identifier_account", columnNames = {"account_id", "type"}), @UniqueConstraint(name = "uk_hathor_identifier_value", columnNames = {"type", "a_value", "sub_value_or_type"})})
 public class InteropIdentifier extends AbstractPersistableCustom<Long> {
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "account_id", nullable = false)
     private SavingsAccount account;
-
     @Column(name = "type", nullable = false, length = 32)
     @Enumerated(EnumType.STRING)
     private InteropIdentifierType type;
-
     @Column(name = "a_value", nullable = false, length = 128)
     private String value;
-
     @Column(name = "sub_value_or_type", length = 128)
     private String subType;
-
     @Column(name = "created_by", nullable = false, length = 32)
     private String createdBy;
-
     @Column(name = "created_on", nullable = false)
     private LocalDateTime createdOn;
-
     @Column(name = "modified_by", length = 32)
     private String modifiedBy;
-
     @Column(name = "modified_on")
     private LocalDateTime modifiedOn;
 
-    public InteropIdentifier(@NotNull SavingsAccount account, @NotNull InteropIdentifierType type, @NotNull String value, String subType,
-            @NotNull String createdBy) {
+    public InteropIdentifier(@NotNull SavingsAccount account, @NotNull InteropIdentifierType type, @NotNull String value, String subType, @NotNull String createdBy) {
         this.account = account;
         this.type = type;
         this.value = value;
@@ -93,9 +76,7 @@ public class InteropIdentifier extends AbstractPersistableCustom<Long> {
         if (o == null || !(o instanceof InteropIdentifier)) {
             return false;
         }
-
         InteropIdentifier that = (InteropIdentifier) o;
-
         if (!account.equals(that.account)) {
             return false;
         }
@@ -114,5 +95,89 @@ public class InteropIdentifier extends AbstractPersistableCustom<Long> {
         result = 31 * result + value.hashCode();
         result = 31 * result + (subType != null ? subType.hashCode() : 0);
         return result;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAccount(final SavingsAccount account) {
+        this.account = account;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setType(final InteropIdentifierType type) {
+        this.type = type;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setValue(final String value) {
+        this.value = value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setSubType(final String subType) {
+        this.subType = subType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setCreatedBy(final String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setCreatedOn(final LocalDateTime createdOn) {
+        this.createdOn = createdOn;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setModifiedBy(final String modifiedBy) {
+        this.modifiedBy = modifiedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setModifiedOn(final LocalDateTime modifiedOn) {
+        this.modifiedOn = modifiedOn;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsAccount getAccount() {
+        return this.account;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InteropIdentifierType getType() {
+        return this.type;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getSubType() {
+        return this.subType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCreatedBy() {
+        return this.createdBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDateTime getCreatedOn() {
+        return this.createdOn;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getModifiedBy() {
+        return this.modifiedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDateTime getModifiedOn() {
+        return this.modifiedOn;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InteropIdentifier() {
     }
 }

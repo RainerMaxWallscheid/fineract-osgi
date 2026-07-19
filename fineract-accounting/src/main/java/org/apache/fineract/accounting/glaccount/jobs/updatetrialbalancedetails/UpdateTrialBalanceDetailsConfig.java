@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.accounting.glaccount.jobs.updatetrialbalancedetails;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.glaccount.domain.TrialBalanceRepository;
 import org.apache.fineract.accounting.glaccount.domain.TrialBalanceRepositoryWrapper;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
@@ -35,9 +34,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@RequiredArgsConstructor
 public class UpdateTrialBalanceDetailsConfig {
-
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
     private final RoutingDataSourceServiceFactory dataSourceServiceFactory;
@@ -47,19 +44,26 @@ public class UpdateTrialBalanceDetailsConfig {
 
     @Bean
     protected Step updateTrialBalanceDetailsStep() {
-        return new StepBuilder(JobName.UPDATE_TRIAL_BALANCE_DETAILS.name(), jobRepository)
-                .tasklet(updateTrialBalanceDetailsTasklet(), transactionManager).build();
+        return new StepBuilder(JobName.UPDATE_TRIAL_BALANCE_DETAILS.name(), jobRepository).tasklet(updateTrialBalanceDetailsTasklet(), transactionManager).build();
     }
 
     @Bean
     public Job updateTrialBalanceDetailsJob() {
-        return new JobBuilder(JobName.UPDATE_TRIAL_BALANCE_DETAILS.name(), jobRepository).start(updateTrialBalanceDetailsStep())
-                .incrementer(new RunIdIncrementer()).build();
+        return new JobBuilder(JobName.UPDATE_TRIAL_BALANCE_DETAILS.name(), jobRepository).start(updateTrialBalanceDetailsStep()).incrementer(new RunIdIncrementer()).build();
     }
 
     @Bean
     public UpdateTrialBalanceDetailsTasklet updateTrialBalanceDetailsTasklet() {
-        return new UpdateTrialBalanceDetailsTasklet(dataSourceServiceFactory, trialBalanceRepositoryWrapper, trialBalanceRepository,
-                journalEntryRepository);
+        return new UpdateTrialBalanceDetailsTasklet(dataSourceServiceFactory, trialBalanceRepositoryWrapper, trialBalanceRepository, journalEntryRepository);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateTrialBalanceDetailsConfig(final JobRepository jobRepository, final PlatformTransactionManager transactionManager, final RoutingDataSourceServiceFactory dataSourceServiceFactory, final TrialBalanceRepositoryWrapper trialBalanceRepositoryWrapper, final TrialBalanceRepository trialBalanceRepository, final JournalEntryRepository journalEntryRepository) {
+        this.jobRepository = jobRepository;
+        this.transactionManager = transactionManager;
+        this.dataSourceServiceFactory = dataSourceServiceFactory;
+        this.trialBalanceRepositoryWrapper = trialBalanceRepositoryWrapper;
+        this.trialBalanceRepository = trialBalanceRepository;
+        this.journalEntryRepository = journalEntryRepository;
     }
 }

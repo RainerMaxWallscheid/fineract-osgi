@@ -16,12 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.cob.internal;
 
 import static org.apache.fineract.infrastructure.jobs.service.JobName.WORKING_CAPITAL_LOAN_COB_JOB;
-
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.listener.FineractCOBBeforeJobListener;
 import org.apache.fineract.infrastructure.core.boot.FineractProfiles;
 import org.springframework.batch.core.JobExecution;
@@ -30,9 +27,7 @@ import org.springframework.stereotype.Component;
 
 @Profile(FineractProfiles.TEST)
 @Component
-@RequiredArgsConstructor
 public class InternalTestCobJobBeforeListener implements FineractCOBBeforeJobListener {
-
     private final TestData testData;
 
     @Override
@@ -43,5 +38,10 @@ public class InternalTestCobJobBeforeListener implements FineractCOBBeforeJobLis
     @Override
     public String getJobName() {
         return WORKING_CAPITAL_LOAN_COB_JOB.name();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InternalTestCobJobBeforeListener(final TestData testData) {
+        this.testData = testData;
     }
 }

@@ -18,12 +18,16 @@
  */
 package org.apache.fineract.infrastructure.jobs.exception;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
-@Getter
 public class LoanIdsHardLockedException extends RuntimeException {
-
     private final Long loanIdFromRequest;
+
+    @java.lang.SuppressWarnings("all")
+        public LoanIdsHardLockedException(final Long loanIdFromRequest) {
+        this.loanIdFromRequest = loanIdFromRequest;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanIdFromRequest() {
+        return this.loanIdFromRequest;
+    }
 }

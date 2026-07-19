@@ -26,8 +26,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.avro.BulkMessageItemV1;
 import org.apache.fineract.infrastructure.core.boot.FineractProfiles;
@@ -40,10 +38,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Profile(FineractProfiles.TEST)
-@Slf4j
-@AllArgsConstructor
 public class InternalExternalEventService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InternalExternalEventService.class);
     private final ObjectMapper mapper;
     private final ExternalEventRepository externalEventRepository;
 
@@ -53,31 +50,23 @@ public class InternalExternalEventService {
 
     public List<ExternalEventResponse> getAllExternalEvents(String idempotencyKey, String type, String category, Long aggregateRootId) {
         var specifications = new ArrayList<Specification<ExternalEvent>>();
-
         if (StringUtils.isNotEmpty(idempotencyKey)) {
             specifications.add(hasIdempotencyKey(idempotencyKey));
         }
-
         if (StringUtils.isNotEmpty(type)) {
             specifications.add(hasType(type));
         }
-
         if (StringUtils.isNotEmpty(category)) {
             specifications.add(hasCategory(category));
         }
-
         if (aggregateRootId != null) {
             specifications.add(hasAggregateRootId(aggregateRootId));
         }
-
-        var reducedSpecification = specifications.stream().reduce(Specification::and)
-                .orElse((Specification<ExternalEvent>) (root, query, criteriaBuilder) -> null);
+        var reducedSpecification = specifications.stream().reduce(Specification::and).orElse((Specification<ExternalEvent>) (root, query, criteriaBuilder) -> null);
         var externalEvents = externalEventRepository.findAll(reducedSpecification);
-
         try {
             return convertToReadableFormat(externalEvents);
-        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException
-                | JsonProcessingException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | JsonProcessingException e) {
             throw new RuntimeException("Error while converting external events to readable format", e);
         }
     }
@@ -98,8 +87,7 @@ public class InternalExternalEventService {
         return (root, query, cb) -> cb.equal(root.get("aggregateRootId"), aggregateRootId);
     }
 
-    private List<ExternalEventResponse> convertToReadableFormat(List<ExternalEvent> externalEvents) throws ClassNotFoundException,
-            NoSuchMethodException, InvocationTargetException, IllegalAccessException, JsonProcessingException {
+    private List<ExternalEventResponse> convertToReadableFormat(List<ExternalEvent> externalEvents) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, JsonProcessingException {
         var eventMessages = new ArrayList<ExternalEventResponse>();
         for (var externalEvent : externalEvents) {
             var payLoadClass = Class.forName(externalEvent.getSchema());
@@ -108,12 +96,10 @@ public class InternalExternalEventService {
             var payLoad = method.invoke(null, byteBuffer);
             if (externalEvent.getType().equalsIgnoreCase("BulkBusinessEvent")) {
                 var methodToGetDatas = payLoad.getClass().getMethod("getDatas");
-
                 Object invokeResult = methodToGetDatas.invoke(payLoad);
                 if (!(invokeResult instanceof List<?> bulkMessages)) {
                     throw new IllegalStateException("Expected List from getDatas method");
                 }
-
                 var bulkMessagePayload = new StringBuilder();
                 for (var bulkMessage : bulkMessages) {
                     if (!(bulkMessage instanceof BulkMessageItemV1 bulkMessageItem)) {
@@ -123,33 +109,29 @@ public class InternalExternalEventService {
                     bulkMessagePayload.append(bulkMessageData);
                     bulkMessagePayload.append(System.lineSeparator());
                 }
-                eventMessages.add(new ExternalEventResponse(externalEvent.getId(), externalEvent.getType(), externalEvent.getCategory(),
-                        externalEvent.getCreatedAt(), toJsonMap(bulkMessagePayload.toString()), externalEvent.getBusinessDate(),
-                        externalEvent.getSchema(), externalEvent.getAggregateRootId()));
-
+                eventMessages.add(new ExternalEventResponse(externalEvent.getId(), externalEvent.getType(), externalEvent.getCategory(), externalEvent.getCreatedAt(), toJsonMap(bulkMessagePayload.toString()), externalEvent.getBusinessDate(), externalEvent.getSchema(), externalEvent.getAggregateRootId()));
             } else {
-                eventMessages.add(new ExternalEventResponse(externalEvent.getId(), externalEvent.getType(), externalEvent.getCategory(),
-                        externalEvent.getCreatedAt(), toJsonMap(payLoad.toString()), externalEvent.getBusinessDate(),
-                        externalEvent.getSchema(), externalEvent.getAggregateRootId()));
+                eventMessages.add(new ExternalEventResponse(externalEvent.getId(), externalEvent.getType(), externalEvent.getCategory(), externalEvent.getCreatedAt(), toJsonMap(payLoad.toString()), externalEvent.getBusinessDate(), externalEvent.getSchema(), externalEvent.getAggregateRootId()));
             }
         }
-
         return eventMessages;
     }
 
-    private ExternalEventResponse retrieveBulkMessage(BulkMessageItemV1 messageItem, ExternalEvent externalEvent)
-            throws ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException,
-            JsonProcessingException {
+    private ExternalEventResponse retrieveBulkMessage(BulkMessageItemV1 messageItem, ExternalEvent externalEvent) throws ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, JsonProcessingException {
         var messageBulkMessagePayLoad = Class.forName(messageItem.getDataschema());
         var methodForPayLoad = messageBulkMessagePayLoad.getMethod("fromByteBuffer", ByteBuffer.class);
         var payLoadBulkItem = methodForPayLoad.invoke(null, messageItem.getData());
-        return new ExternalEventResponse(messageItem.getId(), messageItem.getType(), messageItem.getCategory(),
-                externalEvent.getCreatedAt(), toJsonMap(payLoadBulkItem.toString()), externalEvent.getBusinessDate(),
-                externalEvent.getSchema(), externalEvent.getAggregateRootId());
+        return new ExternalEventResponse(messageItem.getId(), messageItem.getType(), messageItem.getCategory(), externalEvent.getCreatedAt(), toJsonMap(payLoadBulkItem.toString()), externalEvent.getBusinessDate(), externalEvent.getSchema(), externalEvent.getAggregateRootId());
     }
 
     private Map<String, Object> toJsonMap(String json) throws JsonProcessingException {
-        return mapper.readValue(json, new TypeReference<>() {});
+        return mapper.readValue(json, new TypeReference<>() {
+        });
     }
 
+    @java.lang.SuppressWarnings("all")
+        public InternalExternalEventService(final ObjectMapper mapper, final ExternalEventRepository externalEventRepository) {
+        this.mapper = mapper;
+        this.externalEventRepository = externalEventRepository;
+    }
 }

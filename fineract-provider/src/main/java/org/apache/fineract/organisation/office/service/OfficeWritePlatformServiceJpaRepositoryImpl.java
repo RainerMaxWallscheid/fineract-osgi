@@ -20,8 +20,6 @@ package org.apache.fineract.organisation.office.service;
 
 import jakarta.persistence.PersistenceException;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -47,10 +45,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(OfficeWritePlatformServiceJpaRepositoryImpl.class);
     private final PlatformSecurityContext context;
     private final OfficeCommandFromApiJsonDeserializer fromApiJsonDeserializer;
     private final OfficeTransactionCommandFromApiJsonDeserializer moneyTransferCommandFromApiJsonDeserializer;
@@ -60,36 +57,26 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
 
     @Transactional
     @Override
-    @Caching(evict = {
-            @CacheEvict(value = "offices", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+'of')"),
-            @CacheEvict(value = "officesForDropdown", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+'ofd')") })
+    @Caching(evict = {@CacheEvict(value = "offices", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'of\')"), @CacheEvict(value = "officesForDropdown", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'ofd\')")})
     public CommandProcessingResult createOffice(final JsonCommand command) {
-
         try {
             final AppUser currentUser = this.context.authenticatedUser();
-
             this.fromApiJsonDeserializer.validateForCreate(command.json());
-
             Long parentId = null;
             if (command.parameterExists("parentId")) {
                 parentId = command.longValueOfParameterNamed("parentId");
             }
-
             final Office parent = validateUserPriviledgeOnOfficeAndRetrieve(currentUser, parentId);
             final Office office = Office.fromJson(parent, command);
-
             // pre save to generate id for use in office hierarchy
             this.officeRepositoryWrapper.saveAndFlush(office);
-
             office.generateHierarchy();
-
             this.officeRepositoryWrapper.save(office);
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(office.getId()) //
-                    .withOfficeId(office.getId()) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(office.getId()).withOfficeId(office.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleOfficeDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
@@ -102,41 +89,30 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
 
     @Transactional
     @Override
-    @Caching(evict = {
-            @CacheEvict(value = "offices", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+'of')"),
-            @CacheEvict(value = "officesForDropdown", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+'ofd')"),
-            @CacheEvict(value = "officesById", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#officeId)") })
+    @Caching(evict = {@CacheEvict(value = "offices", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'of\')"), @CacheEvict(value = "officesForDropdown", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#root.target.context.authenticatedUser().getOffice().getHierarchy()+\'ofd\')"), @CacheEvict(value = "officesById", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#officeId)")})
     public CommandProcessingResult updateOffice(final Long officeId, final JsonCommand command) {
-
         try {
             final AppUser currentUser = this.context.authenticatedUser();
-
             this.fromApiJsonDeserializer.validateForUpdate(command.json());
-
             Long parentId = null;
             if (command.parameterExists("parentId")) {
                 parentId = command.longValueOfParameterNamed("parentId");
             }
-
             final Office office = validateUserPriviledgeOnOfficeAndRetrieve(currentUser, officeId);
-
             final Map<String, Object> changes = office.update(command);
-
             if (changes.containsKey("parentId")) {
                 final Office parent = validateUserPriviledgeOnOfficeAndRetrieve(currentUser, parentId);
                 office.update(parent);
             }
-
             if (!changes.isEmpty()) {
                 this.officeRepositoryWrapper.saveAndFlush(office);
             }
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(office.getId()) //
-                    .withOfficeId(office.getId()) //
-                    .with(changes) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(office.getId()).withOfficeId(office.getId()).with(changes).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleOfficeDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
@@ -150,11 +126,8 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
     @Transactional
     @Override
     public CommandProcessingResult officeTransaction(final JsonCommand command) {
-
         this.context.authenticatedUser();
-
         this.moneyTransferCommandFromApiJsonDeserializer.validateOfficeTransfer(command.json());
-
         Long officeId = null;
         Office fromOffice = null;
         final Long fromOfficeId = command.longValueOfParameterNamed("fromOfficeId");
@@ -168,37 +141,28 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
             toOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(toOfficeId);
             officeId = toOffice.getId();
         }
-
         final String currencyCode = command.stringValueOfParameterNamed("currencyCode");
         final ApplicationCurrency appCurrency = this.applicationCurrencyRepository.findOneWithNotFoundDetection(currencyCode);
-
-        final MonetaryCurrency currency = new MonetaryCurrency(appCurrency.getCode(), appCurrency.getDecimalPlaces(),
-                appCurrency.getCurrencyInMultiplesOf());
+        final MonetaryCurrency currency = new MonetaryCurrency(appCurrency.getCode(), appCurrency.getDecimalPlaces(), appCurrency.getCurrencyInMultiplesOf());
         final Money amount = Money.of(currency, command.bigDecimalValueOfParameterNamed("transactionAmount"));
-
         final OfficeTransaction entity = OfficeTransaction.fromJson(fromOffice, toOffice, amount, command);
-
         this.officeTransactionRepository.save(entity);
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(entity.getId()) //
-                .withOfficeId(officeId) //
-                .build();
+        return  //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(entity.getId()).withOfficeId(officeId).build();
     }
 
     @Transactional
     @Override
     public CommandProcessingResult deleteOfficeTransaction(final Long transactionId, final JsonCommand command) {
-
         this.context.authenticatedUser();
-
         this.officeTransactionRepository.deleteById(transactionId);
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(transactionId) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(transactionId).build();
     }
 
     /*
@@ -207,14 +171,11 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
     private void handleOfficeDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final Exception dve) {
         if (realCause.getMessage().contains("externalid_org")) {
             final String externalId = command.stringValueOfParameterNamed("externalId");
-            throw new PlatformDataIntegrityException("error.msg.office.duplicate.externalId",
-                    "Office with externalId `" + externalId + "` already exists", "externalId", externalId);
+            throw new PlatformDataIntegrityException("error.msg.office.duplicate.externalId", "Office with externalId `" + externalId + "` already exists", "externalId", externalId);
         } else if (realCause.getMessage().contains("name_org")) {
             final String name = command.stringValueOfParameterNamed("name");
-            throw new PlatformDataIntegrityException("error.msg.office.duplicate.name", "Office with name `" + name + "` already exists",
-                    "name", name);
+            throw new PlatformDataIntegrityException("error.msg.office.duplicate.name", "Office with name `" + name + "` already exists", "name", name);
         }
-
         log.error("Error occured.", dve);
         throw ErrorHandler.getMappable(dve, "error.msg.office.unknown.data.integrity.issue", "Unknown data integrity issue with resource.");
     }
@@ -224,22 +185,29 @@ public class OfficeWritePlatformServiceJpaRepositoryImpl implements OfficeWriteP
      * hierarchy
      */
     private Office validateUserPriviledgeOnOfficeAndRetrieve(final AppUser currentUser, final Long officeId) {
-
         final Long userOfficeId = currentUser.getOffice().getId();
         final Office userOffice = this.officeRepositoryWrapper.findOfficeHierarchy(userOfficeId);
         if (userOffice.doesNotHaveAnOfficeInHierarchyWithId(officeId)) {
             throw new NoAuthorizationException("User does not have sufficient priviledges to act on the provided office.");
         }
-
         Office officeToReturn = userOffice;
         if (!userOffice.identifiedBy(officeId)) {
             officeToReturn = this.officeRepositoryWrapper.findOfficeHierarchy(officeId);
         }
-
         return officeToReturn;
     }
 
     public PlatformSecurityContext getContext() {
         return this.context;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OfficeWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final OfficeCommandFromApiJsonDeserializer fromApiJsonDeserializer, final OfficeTransactionCommandFromApiJsonDeserializer moneyTransferCommandFromApiJsonDeserializer, final OfficeRepositoryWrapper officeRepositoryWrapper, final OfficeTransactionRepository officeTransactionRepository, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository) {
+        this.context = context;
+        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
+        this.moneyTransferCommandFromApiJsonDeserializer = moneyTransferCommandFromApiJsonDeserializer;
+        this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.officeTransactionRepository = officeTransactionRepository;
+        this.applicationCurrencyRepository = applicationCurrencyRepository;
     }
 }

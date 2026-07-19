@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.interestpauses.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -28,9 +27,7 @@ import org.apache.fineract.portfolio.interestpauses.service.InterestPauseWritePl
 import org.springframework.stereotype.Component;
 
 @Component("createInterestPauseCommandHandler")
-@RequiredArgsConstructor
 public class CreateInterestPauseCommandHandler implements NewCommandSourceHandler {
-
     private final InterestPauseWritePlatformService interestPauseService;
 
     @Override
@@ -39,7 +36,6 @@ public class CreateInterestPauseCommandHandler implements NewCommandSourceHandle
         final String endDate = command.stringValueOfParameterNamed("endDate");
         final String dateFormat = command.stringValueOfParameterNamed("dateFormat");
         final String locale = command.stringValueOfParameterNamed("locale");
-
         if (command.getLoanId() != null) {
             final Long loanId = command.getLoanId();
             return interestPauseService.createInterestPause(loanId, startDate, endDate, dateFormat, locale);
@@ -47,8 +43,12 @@ public class CreateInterestPauseCommandHandler implements NewCommandSourceHandle
             final ExternalId loanExternalId = command.getLoanExternalId();
             return interestPauseService.createInterestPause(loanExternalId, startDate, endDate, dateFormat, locale);
         } else {
-            throw new PlatformApiDataValidationException("validation.msg.missing.loan.id.or.external.id",
-                    "Either loanId or loanExternalId must be provided.", "loanId");
+            throw new PlatformApiDataValidationException("validation.msg.missing.loan.id.or.external.id", "Either loanId or loanExternalId must be provided.", "loanId");
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateInterestPauseCommandHandler(final InterestPauseWritePlatformService interestPauseService) {
+        this.interestPauseService = interestPauseService;
     }
 }

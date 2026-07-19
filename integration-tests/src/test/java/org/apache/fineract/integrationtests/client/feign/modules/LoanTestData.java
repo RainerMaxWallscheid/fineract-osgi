@@ -18,33 +18,40 @@
  */
 package org.apache.fineract.integrationtests.client.feign.modules;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.apache.fineract.integrationtests.common.accounting.Account;
 
 public final class LoanTestData {
-
     public static final String DATETIME_PATTERN = FeignTestConstants.DATETIME_PATTERN;
     public static final String ISO_DATE_PATTERN = FeignTestConstants.ISO_DATE_PATTERN;
     public static final String LOCALE = FeignTestConstants.LOCALE;
 
-    private LoanTestData() {}
+    private LoanTestData() {
+    }
 
-    @ToString
-    @AllArgsConstructor
+
     public static class Transaction {
-
         public Double amount;
         public String type;
         public String date;
         public Boolean reversed;
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "LoanTestData.Transaction(amount=" + this.amount + ", type=" + this.type + ", date=" + this.date + ", reversed=" + this.reversed + ")";
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public Transaction(final Double amount, final String type, final String date, final Boolean reversed) {
+            this.amount = amount;
+            this.type = type;
+            this.date = date;
+            this.reversed = reversed;
+        }
     }
 
-    @ToString
-    @AllArgsConstructor
-    public static class TransactionExt {
 
+    public static class TransactionExt {
         public Double amount;
         public String type;
         public String date;
@@ -56,13 +63,31 @@ public final class LoanTestData {
         public Double unrecognizedPortion;
         public Double overpaymentPortion;
         public Boolean reversed;
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "LoanTestData.TransactionExt(amount=" + this.amount + ", type=" + this.type + ", date=" + this.date + ", outstandingPrincipal=" + this.outstandingPrincipal + ", principalPortion=" + this.principalPortion + ", interestPortion=" + this.interestPortion + ", feePortion=" + this.feePortion + ", penaltyPortion=" + this.penaltyPortion + ", unrecognizedPortion=" + this.unrecognizedPortion + ", overpaymentPortion=" + this.overpaymentPortion + ", reversed=" + this.reversed + ")";
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public TransactionExt(final Double amount, final String type, final String date, final Double outstandingPrincipal, final Double principalPortion, final Double interestPortion, final Double feePortion, final Double penaltyPortion, final Double unrecognizedPortion, final Double overpaymentPortion, final Boolean reversed) {
+            this.amount = amount;
+            this.type = type;
+            this.date = date;
+            this.outstandingPrincipal = outstandingPrincipal;
+            this.principalPortion = principalPortion;
+            this.interestPortion = interestPortion;
+            this.feePortion = feePortion;
+            this.penaltyPortion = penaltyPortion;
+            this.unrecognizedPortion = unrecognizedPortion;
+            this.overpaymentPortion = overpaymentPortion;
+            this.reversed = reversed;
+        }
     }
 
-    @ToString
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Journal {
 
+    public static class Journal {
         public Double amount;
         public Account account;
         public String type;
@@ -82,12 +107,27 @@ public final class LoanTestData {
             journal.type = "CREDIT";
             return journal;
         }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "LoanTestData.Journal(amount=" + this.amount + ", account=" + this.account + ", type=" + this.type + ")";
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public Journal() {
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public Journal(final Double amount, final Account account, final String type) {
+            this.amount = amount;
+            this.account = account;
+            this.type = type;
+        }
     }
 
-    @ToString
-    @AllArgsConstructor
-    public static class Installment {
 
+    public static class Installment {
         public Double principalAmount;
         public Double interestAmount;
         public Double feeAmount;
@@ -97,44 +137,79 @@ public final class LoanTestData {
         public String dueDate;
         public OutstandingAmounts outstandingAmounts;
         public Double loanBalance;
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "LoanTestData.Installment(principalAmount=" + this.principalAmount + ", interestAmount=" + this.interestAmount + ", feeAmount=" + this.feeAmount + ", penaltyAmount=" + this.penaltyAmount + ", totalOutstandingAmount=" + this.totalOutstandingAmount + ", completed=" + this.completed + ", dueDate=" + this.dueDate + ", outstandingAmounts=" + this.outstandingAmounts + ", loanBalance=" + this.loanBalance + ")";
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public Installment(final Double principalAmount, final Double interestAmount, final Double feeAmount, final Double penaltyAmount, final Double totalOutstandingAmount, final Boolean completed, final String dueDate, final OutstandingAmounts outstandingAmounts, final Double loanBalance) {
+            this.principalAmount = principalAmount;
+            this.interestAmount = interestAmount;
+            this.feeAmount = feeAmount;
+            this.penaltyAmount = penaltyAmount;
+            this.totalOutstandingAmount = totalOutstandingAmount;
+            this.completed = completed;
+            this.dueDate = dueDate;
+            this.outstandingAmounts = outstandingAmounts;
+            this.loanBalance = loanBalance;
+        }
     }
 
-    @AllArgsConstructor
-    @ToString
-    public static class OutstandingAmounts {
 
+    public static class OutstandingAmounts {
         public Double principalOutstanding;
         public Double interestOutstanding;
         public Double feeOutstanding;
         public Double penaltyOutstanding;
         public Double totalOutstanding;
+
+        @java.lang.SuppressWarnings("all")
+                public OutstandingAmounts(final Double principalOutstanding, final Double interestOutstanding, final Double feeOutstanding, final Double penaltyOutstanding, final Double totalOutstanding) {
+            this.principalOutstanding = principalOutstanding;
+            this.interestOutstanding = interestOutstanding;
+            this.feeOutstanding = feeOutstanding;
+            this.penaltyOutstanding = penaltyOutstanding;
+            this.totalOutstanding = totalOutstanding;
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "LoanTestData.OutstandingAmounts(principalOutstanding=" + this.principalOutstanding + ", interestOutstanding=" + this.interestOutstanding + ", feeOutstanding=" + this.feeOutstanding + ", penaltyOutstanding=" + this.penaltyOutstanding + ", totalOutstanding=" + this.totalOutstanding + ")";
+        }
     }
 
-    public static final class AmortizationType {
 
+    public static final class AmortizationType {
         public static final Integer EQUAL_PRINCIPAL = 0;
         public static final Integer EQUAL_INSTALLMENTS = 1;
 
-        private AmortizationType() {}
+        private AmortizationType() {
+        }
     }
 
-    public static final class InterestType {
 
+    public static final class InterestType {
         public static final Integer DECLINING_BALANCE = 0;
         public static final Integer FLAT = 1;
 
-        private InterestType() {}
+        private InterestType() {
+        }
     }
+
 
     public static final class InterestRecalculationCompoundingMethod {
-
         public static final Integer NONE = 0;
 
-        private InterestRecalculationCompoundingMethod() {}
+        private InterestRecalculationCompoundingMethod() {
+        }
     }
 
-    public static final class RepaymentFrequencyType {
 
+    public static final class RepaymentFrequencyType {
         public static final Integer MONTHS = 2;
         public static final Long MONTHS_L = 2L;
         public static final String MONTHS_STRING = "MONTHS";
@@ -142,92 +217,103 @@ public final class LoanTestData {
         public static final Long DAYS_L = 0L;
         public static final String DAYS_STRING = "DAYS";
 
-        private RepaymentFrequencyType() {}
+        private RepaymentFrequencyType() {
+        }
     }
 
-    public static final class RecalculationRestFrequencyType {
 
+    public static final class RecalculationRestFrequencyType {
         public static final Integer SAME_AS_REPAYMENT_PERIOD = 1;
         public static final Integer DAILY = 2;
 
-        private RecalculationRestFrequencyType() {}
+        private RecalculationRestFrequencyType() {
+        }
     }
 
-    public static final class InterestCalculationPeriodType {
 
+    public static final class InterestCalculationPeriodType {
         public static final Integer DAILY = 0;
         public static final Integer SAME_AS_REPAYMENT_PERIOD = 1;
 
-        private InterestCalculationPeriodType() {}
+        private InterestCalculationPeriodType() {
+        }
     }
 
-    public static final class InterestRateFrequencyType {
 
+    public static final class InterestRateFrequencyType {
         public static final Integer MONTHS = 2;
         public static final Integer YEARS = 3;
         public static final Integer WHOLE_TERM = 4;
 
-        private InterestRateFrequencyType() {}
+        private InterestRateFrequencyType() {
+        }
     }
+
 
     public static final class TransactionProcessingStrategyCode {
-
         public static final String ADVANCED_PAYMENT_ALLOCATION_STRATEGY = "advanced-payment-allocation-strategy";
 
-        private TransactionProcessingStrategyCode() {}
+        private TransactionProcessingStrategyCode() {
+        }
     }
 
-    public static final class RescheduleStrategyMethod {
 
+    public static final class RescheduleStrategyMethod {
         public static final Integer RESCHEDULE_NEXT_REPAYMENTS = 1;
         public static final Integer REDUCE_EMI_AMOUNT = 3;
         public static final Integer ADJUST_LAST_UNPAID_PERIOD = 4;
 
-        private RescheduleStrategyMethod() {}
+        private RescheduleStrategyMethod() {
+        }
     }
 
-    public static final class DaysInYearType {
 
+    public static final class DaysInYearType {
         public static final Integer INVALID = 0;
         public static final Integer ACTUAL = 1;
         public static final Integer DAYS_360 = 360;
         public static final Integer DAYS_364 = 364;
         public static final Integer DAYS_365 = 365;
 
-        private DaysInYearType() {}
+        private DaysInYearType() {
+        }
     }
 
-    public static final class DaysInMonthType {
 
+    public static final class DaysInMonthType {
         public static final Integer INVALID = 0;
         public static final Integer ACTUAL = 1;
         public static final Integer DAYS_30 = 30;
 
-        private DaysInMonthType() {}
+        private DaysInMonthType() {
+        }
     }
 
-    public static final class FuturePaymentAllocationRule {
 
+    public static final class FuturePaymentAllocationRule {
         public static final String LAST_INSTALLMENT = "LAST_INSTALLMENT";
         public static final String NEXT_INSTALLMENT = "NEXT_INSTALLMENT";
         public static final String NEXT_LAST_INSTALLMENT = "NEXT_LAST_INSTALLMENT";
 
-        private FuturePaymentAllocationRule() {}
+        private FuturePaymentAllocationRule() {
+        }
     }
 
-    public static final class SupportedInterestRefundTypesItem {
 
+    public static final class SupportedInterestRefundTypesItem {
         public static final String MERCHANT_ISSUED_REFUND = "MERCHANT_ISSUED_REFUND";
         public static final String PAYOUT_REFUND = "PAYOUT_REFUND";
 
-        private SupportedInterestRefundTypesItem() {}
+        private SupportedInterestRefundTypesItem() {
+        }
     }
 
-    public static final class DaysInYearCustomStrategy {
 
+    public static final class DaysInYearCustomStrategy {
         public static final String FEB_29_PERIOD_ONLY = "FEB_29_PERIOD_ONLY";
         public static final String FULL_LEAP_YEAR = "FULL_LEAP_YEAR";
 
-        private DaysInYearCustomStrategy() {}
+        private DaysInYearCustomStrategy() {
+        }
     }
 }

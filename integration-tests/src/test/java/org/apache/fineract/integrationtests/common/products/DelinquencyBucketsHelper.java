@@ -20,10 +20,8 @@ package org.apache.fineract.integrationtests.common.products;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.fineract.client.models.DeleteDelinquencyBucketResponse;
 import org.apache.fineract.client.models.DelinquencyBucketRequest;
@@ -38,10 +36,12 @@ import org.apache.fineract.client.util.Calls;
 import org.apache.fineract.integrationtests.common.FineractClientHelper;
 import org.apache.fineract.integrationtests.common.Utils;
 
-@Slf4j
 public class DelinquencyBucketsHelper {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DelinquencyBucketsHelper.class);
 
-    protected DelinquencyBucketsHelper() {}
+    protected DelinquencyBucketsHelper() {
+    }
 
     public static List<DelinquencyBucketResponse> getBuckets() {
         return Calls.ok(FineractClientHelper.getFineractClient().delinquencyRangeAndBucketsManagement.getBuckets());
@@ -52,18 +52,9 @@ public class DelinquencyBucketsHelper {
     }
 
     public static Long createDefaultBucket() {
-        Long range1Id = Calls
-                .ok(FineractClientHelper.getFineractClient().delinquencyRangeAndBucketsManagement.createRange(new DelinquencyRangeRequest()
-                        .classification(Utils.randomStringGenerator("DLQ_R_", 10)).minimumAgeDays(1).maximumAgeDays(3).locale("en")))
-                .getResourceId();
-        Long range2Id = Calls
-                .ok(FineractClientHelper.getFineractClient().delinquencyRangeAndBucketsManagement.createRange(new DelinquencyRangeRequest()
-                        .classification(Utils.randomStringGenerator("DLQ_R_", 10)).minimumAgeDays(4).maximumAgeDays(60).locale("en")))
-                .getResourceId();
-        return Calls
-                .ok(FineractClientHelper.getFineractClient().delinquencyRangeAndBucketsManagement.createBucket(
-                        new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(List.of(range1Id, range2Id))))
-                .getResourceId();
+        Long range1Id = Calls.ok(FineractClientHelper.getFineractClient().delinquencyRangeAndBucketsManagement.createRange(new DelinquencyRangeRequest().classification(Utils.randomStringGenerator("DLQ_R_", 10)).minimumAgeDays(1).maximumAgeDays(3).locale("en"))).getResourceId();
+        Long range2Id = Calls.ok(FineractClientHelper.getFineractClient().delinquencyRangeAndBucketsManagement.createRange(new DelinquencyRangeRequest().classification(Utils.randomStringGenerator("DLQ_R_", 10)).minimumAgeDays(4).maximumAgeDays(60).locale("en"))).getResourceId();
+        return Calls.ok(FineractClientHelper.getFineractClient().delinquencyRangeAndBucketsManagement.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(List.of(range1Id, range2Id)))).getResourceId();
     }
 
     public static PostDelinquencyBucketResponse createBucket(DelinquencyBucketRequest bucket) {
@@ -73,13 +64,9 @@ public class DelinquencyBucketsHelper {
     public static Long createBucket(List<Pair<Integer, Integer>> rangesDef) {
         List<Long> rangeIds = new ArrayList<>();
         rangesDef.forEach(range -> {
-            rangeIds.add(Calls.ok(FineractClientHelper.getFineractClient().delinquencyRangeAndBucketsManagement
-                    .createRange(new DelinquencyRangeRequest().classification(Utils.randomStringGenerator("DLQ_R_", 10))
-                            .minimumAgeDays(range.getLeft()).maximumAgeDays(range.getRight()).locale("en")))
-                    .getResourceId());
+            rangeIds.add(Calls.ok(FineractClientHelper.getFineractClient().delinquencyRangeAndBucketsManagement.createRange(new DelinquencyRangeRequest().classification(Utils.randomStringGenerator("DLQ_R_", 10)).minimumAgeDays(range.getLeft()).maximumAgeDays(range.getRight()).locale("en"))).getResourceId());
         });
-        return createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds))
-                .getResourceId();
+        return createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds)).getResourceId();
     }
 
     public static PutDelinquencyBucketResponse updateBucket(Long id, DelinquencyBucketRequest bucket) {
@@ -90,27 +77,22 @@ public class DelinquencyBucketsHelper {
         return Calls.ok(FineractClientHelper.getFineractClient().delinquencyRangeAndBucketsManagement.deleteBucket(id));
     }
 
-    public static void evaluateLoanCollectionData(GetLoansLoanIdResponse getLoansLoanIdResponse, Integer pastDueDays,
-            Double amountExpected) {
+    public static void evaluateLoanCollectionData(GetLoansLoanIdResponse getLoansLoanIdResponse, Integer pastDueDays, Double amountExpected) {
         GetLoansLoanIdDelinquencySummary getCollectionData = getLoansLoanIdResponse.getDelinquent();
         if (getCollectionData != null) {
-            log.info("Loan Delinquency Data in Days {} and Amount {}", getCollectionData.getPastDueDays(),
-                    getCollectionData.getDelinquentAmount());
+            log.info("Loan Delinquency Data in Days {} and Amount {}", getCollectionData.getPastDueDays(), getCollectionData.getDelinquentAmount());
             assertEquals(pastDueDays, getCollectionData.getPastDueDays(), "Past due days");
             assertEquals(amountExpected, Utils.getDoubleValue(getCollectionData.getDelinquentAmount()), "Amount expected");
         } else {
             log.info("Loan Delinquency Data is null");
         }
-
         DelinquencyRangeData delinquencyRange = getLoansLoanIdResponse.getDelinquencyRange();
         if (delinquencyRange != null) {
-            log.info("Loan Delinquency Classification is {} : ({} - {}) {}", delinquencyRange.getClassification(),
-                    delinquencyRange.getMinimumAgeDays(), delinquencyRange.getMaximumAgeDays(), pastDueDays);
+            log.info("Loan Delinquency Classification is {} : ({} - {}) {}", delinquencyRange.getClassification(), delinquencyRange.getMinimumAgeDays(), delinquencyRange.getMaximumAgeDays(), pastDueDays);
             assertTrue(delinquencyRange.getMinimumAgeDays() <= pastDueDays, "Min Age Days");
             assertTrue(delinquencyRange.getMaximumAgeDays() >= pastDueDays, "Max Age Days");
         } else {
             log.info("Loan Delinquency Classification is null");
         }
     }
-
 }

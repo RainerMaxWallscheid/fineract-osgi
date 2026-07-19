@@ -19,18 +19,39 @@
 package org.apache.fineract.portfolio.workingcapitalloanbreach.data;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.data.StringEnumOptionData;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class WorkingCapitalBreachTemplateResponse {
-
     private List<StringEnumOptionData> breachFrequencyTypeOptions;
     private List<StringEnumOptionData> breachAmountCalculationTypeOptions;
+
+    @java.lang.SuppressWarnings("all")
+        public List<StringEnumOptionData> getBreachFrequencyTypeOptions() {
+        return this.breachFrequencyTypeOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<StringEnumOptionData> getBreachAmountCalculationTypeOptions() {
+        return this.breachAmountCalculationTypeOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setBreachFrequencyTypeOptions(final List<StringEnumOptionData> breachFrequencyTypeOptions) {
+        this.breachFrequencyTypeOptions = breachFrequencyTypeOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setBreachAmountCalculationTypeOptions(final List<StringEnumOptionData> breachAmountCalculationTypeOptions) {
+        this.breachAmountCalculationTypeOptions = breachAmountCalculationTypeOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalBreachTemplateResponse() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalBreachTemplateResponse(final List<StringEnumOptionData> breachFrequencyTypeOptions, final List<StringEnumOptionData> breachAmountCalculationTypeOptions) {
+        this.breachFrequencyTypeOptions = breachFrequencyTypeOptions;
+        this.breachAmountCalculationTypeOptions = breachAmountCalculationTypeOptions;
+    }
 }

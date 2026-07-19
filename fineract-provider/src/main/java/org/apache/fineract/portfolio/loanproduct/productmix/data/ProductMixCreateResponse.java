@@ -21,20 +21,126 @@ package org.apache.fineract.portfolio.loanproduct.productmix.data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Builder
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class ProductMixCreateResponse implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private Long productId;
     private Map<String, Object> changes;
+
+
+    @java.lang.SuppressWarnings("all")
+        public static class ProductMixCreateResponseBuilder {
+        @java.lang.SuppressWarnings("all")
+                private Long productId;
+        @java.lang.SuppressWarnings("all")
+                private Map<String, Object> changes;
+
+        @java.lang.SuppressWarnings("all")
+                ProductMixCreateResponseBuilder() {
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public ProductMixCreateResponse.ProductMixCreateResponseBuilder productId(final Long productId) {
+            this.productId = productId;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public ProductMixCreateResponse.ProductMixCreateResponseBuilder changes(final Map<String, Object> changes) {
+            this.changes = changes;
+            return this;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public ProductMixCreateResponse build() {
+            return new ProductMixCreateResponse(this.productId, this.changes);
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "ProductMixCreateResponse.ProductMixCreateResponseBuilder(productId=" + this.productId + ", changes=" + this.changes + ")";
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static ProductMixCreateResponse.ProductMixCreateResponseBuilder builder() {
+        return new ProductMixCreateResponse.ProductMixCreateResponseBuilder();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getProductId() {
+        return this.productId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Map<String, Object> getChanges() {
+        return this.changes;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setProductId(final Long productId) {
+        this.productId = productId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setChanges(final Map<String, Object> changes) {
+        this.changes = changes;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof ProductMixCreateResponse)) return false;
+        final ProductMixCreateResponse other = (ProductMixCreateResponse) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$productId = this.getProductId();
+        final java.lang.Object other$productId = other.getProductId();
+        if (this$productId == null ? other$productId != null : !this$productId.equals(other$productId)) return false;
+        final java.lang.Object this$changes = this.getChanges();
+        final java.lang.Object other$changes = other.getChanges();
+        if (this$changes == null ? other$changes != null : !this$changes.equals(other$changes)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof ProductMixCreateResponse;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $productId = this.getProductId();
+        result = result * PRIME + ($productId == null ? 43 : $productId.hashCode());
+        final java.lang.Object $changes = this.getChanges();
+        result = result * PRIME + ($changes == null ? 43 : $changes.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "ProductMixCreateResponse(productId=" + this.getProductId() + ", changes=" + this.getChanges() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProductMixCreateResponse() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProductMixCreateResponse(final Long productId, final Map<String, Object> changes) {
+        this.productId = productId;
+        this.changes = changes;
+    }
 }

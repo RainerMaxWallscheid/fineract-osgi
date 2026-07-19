@@ -218,8 +218,8 @@ allprojects  {
             disableWarningsInGeneratedCode = true
             disable(
                     "CanIgnoreReturnValueSuggester",
-                    "SameNameButDifferent", // Until errorprone recognizes Lombok
-                    "MultiVariableDeclaration", // Until errorprone recognizes Lombok
+                    "SameNameButDifferent", // legacy disable; was for Lombok
+                    "MultiVariableDeclaration", // legacy disable; was for Lombok
                     "UnnecessaryDefaultInEnumSwitch", // FINERACT-1911
                     "StringConcatToTextBlock", // Error Prone: keep disabled across JDK upgrades (historically crashed on JDK 21+)
                     "AssertEqualsArgumentOrderChecker",
@@ -621,8 +621,8 @@ configure(project.fineractJavaProjects) {
                     "ReturnValueIgnored",
                     "DirectInvocationOnMock",
                     "CanIgnoreReturnValueSuggester",
-                    "SameNameButDifferent", // Until errorprone recognizes Lombok
-                    "MultiVariableDeclaration", // Until errorprone recognizes Lombok
+                    "SameNameButDifferent", // legacy disable; was for Lombok
+                    "MultiVariableDeclaration", // legacy disable; was for Lombok
                     "UnnecessaryDefaultInEnumSwitch" // FINERACT-1911
                     )
             error(
@@ -718,8 +718,6 @@ configure(project.fineractJavaProjects) {
             exclude(module: "slf4j-api")
         }
 
-        compileOnly 'org.projectlombok:lombok'
-        annotationProcessor 'org.projectlombok:lombok'
 
         testImplementation( 'org.mockito:mockito-core',
                 'org.mockito:mockito-junit-jupiter',
@@ -733,8 +731,6 @@ configure(project.fineractJavaProjects) {
                 'org.awaitility:awaitility',
                 )
 
-        testCompileOnly 'org.projectlombok:lombok'
-        testAnnotationProcessor 'org.projectlombok:lombok'
     }
 
     test {
@@ -825,8 +821,6 @@ configure(project.fineractCustomProjects) {
             exclude(module: "slf4j-api")
         }
 
-        compileOnly('org.projectlombok:lombok')
-        annotationProcessor('org.projectlombok:lombok')
         annotationProcessor('org.mapstruct:mapstruct-processor')
         annotationProcessor('org.springframework.boot:spring-boot-autoconfigure-processor')
         annotationProcessor('org.springframework.boot:spring-boot-configuration-processor')
@@ -856,8 +850,6 @@ configure(project.fineractCustomProjects) {
                 'io.cucumber:cucumber-spring:7.34.3',
                 )
 
-        testCompileOnly('org.projectlombok:lombok')
-        testAnnotationProcessor('org.projectlombok:lombok')
         testAnnotationProcessor('org.mapstruct:mapstruct-processor')
         testAnnotationProcessor('org.springframework.boot:spring-boot-autoconfigure-processor')
         testAnnotationProcessor('org.springframework.boot:spring-boot-configuration-processor')

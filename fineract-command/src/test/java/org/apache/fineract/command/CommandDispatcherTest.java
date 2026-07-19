@@ -22,10 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.util.Locale;
 import java.util.function.Supplier;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.command.test.sample.command.DummyCommand;
 import org.apache.fineract.command.test.sample.command.DummyErrorCommand;
@@ -39,11 +37,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
-@Slf4j
 @SpringBootTest
 @ContextConfiguration(classes = TestConfiguration.class)
 class CommandDispatcherTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CommandDispatcherTest.class);
     @Autowired
     private CommandDispatcher dispatcher;
 
@@ -51,25 +49,17 @@ class CommandDispatcherTest {
     void process() {
         var content = "hello";
         var command = new DummyCommand();
-
         command.setPayload(DummyRequest.builder().content(content).build());
         command.setIdempotencyKey("1234567890");
         command.setIpAddress("127.0.0.1");
         command.setInitiatedByUsername("abc");
-
         Supplier<DummyResponse> result = dispatcher.dispatch(command);
-
         assertNotNull(result, "Response should not be null.");
-
         var response = result.get();
-
         assertNotNull(response, "Response should not be null.");
-
         assertInstanceOf(DummyResponse.class, response, "Response is of wrong type.");
-
         log.info("Result: {}", response);
         log.info("Command ID: {}", command.getCommandId());
-
         assertNotNull(response.getContent(), "Response body should not be null.");
         assertEquals(content.toUpperCase(Locale.ROOT), response.getContent(), "Wrong response content.");
     }
@@ -78,15 +68,11 @@ class CommandDispatcherTest {
     void error() {
         var content = "hello error";
         var command = new DummyErrorCommand();
-
         command.setPayload(DummyErrorRequest.builder().content(content).build());
-
         Supplier<DummyErrorResponse> result = dispatcher.dispatch(command);
-
         var exception = assertThrows(DummyException.class, () -> {
             var response = result.get();
         });
-
         assertNotNull(exception, "Expected exception!");
     }
 }

@@ -20,8 +20,6 @@ package org.apache.fineract.portfolio.savings.jobs.updatesavingsdormantaccounts;
 
 import java.time.LocalDate;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountWritePlatformService;
@@ -31,32 +29,28 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class UpdateSavingsDormantAccountsTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UpdateSavingsDormantAccountsTasklet.class);
     private final SavingsAccountReadPlatformService savingAccountReadPlatformService;
     private final SavingsAccountWritePlatformService savingsAccountWritePlatformService;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         LocalDate tenantLocalDate = DateUtils.getBusinessLocalDate();
-
         List<Long> savingsPendingInactive = savingAccountReadPlatformService.retrieveSavingsIdsPendingInactive(tenantLocalDate);
         if (null != savingsPendingInactive && savingsPendingInactive.size() > 0) {
             for (Long savingsId : savingsPendingInactive) {
                 savingsAccountWritePlatformService.setSubStatusInactive(savingsId);
             }
         }
-
         List<Long> savingsPendingDormant = savingAccountReadPlatformService.retrieveSavingsIdsPendingDormant(tenantLocalDate);
         if (null != savingsPendingDormant && savingsPendingDormant.size() > 0) {
             for (Long savingsId : savingsPendingDormant) {
                 savingsAccountWritePlatformService.setSubStatusDormant(savingsId);
             }
         }
-
         List<Long> savingsPendingEscheat = savingAccountReadPlatformService.retrieveSavingsIdsPendingEscheat(tenantLocalDate);
         if (null != savingsPendingEscheat && savingsPendingEscheat.size() > 0) {
             for (Long savingsId : savingsPendingEscheat) {
@@ -64,5 +58,11 @@ public class UpdateSavingsDormantAccountsTasklet implements Tasklet {
             }
         }
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateSavingsDormantAccountsTasklet(final SavingsAccountReadPlatformService savingAccountReadPlatformService, final SavingsAccountWritePlatformService savingsAccountWritePlatformService) {
+        this.savingAccountReadPlatformService = savingAccountReadPlatformService;
+        this.savingsAccountWritePlatformService = savingsAccountWritePlatformService;
     }
 }

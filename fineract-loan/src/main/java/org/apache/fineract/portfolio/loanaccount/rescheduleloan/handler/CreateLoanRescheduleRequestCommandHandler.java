@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.rescheduleloan.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,10 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "RESCHEDULELOAN", action = "CREATE")
 public class CreateLoanRescheduleRequestCommandHandler implements NewCommandSourceHandler {
-
     private final LoanRescheduleRequestWritePlatformService loanRescheduleRequestWritePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class CreateLoanRescheduleRequestCommandHandler implements NewCommandSour
         return this.loanRescheduleRequestWritePlatformService.create(jsonCommand);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public CreateLoanRescheduleRequestCommandHandler(final LoanRescheduleRequestWritePlatformService loanRescheduleRequestWritePlatformService) {
+        this.loanRescheduleRequestWritePlatformService = loanRescheduleRequestWritePlatformService;
+    }
 }

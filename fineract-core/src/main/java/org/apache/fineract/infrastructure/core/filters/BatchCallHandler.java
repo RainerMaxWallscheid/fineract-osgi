@@ -21,15 +21,11 @@ package org.apache.fineract.infrastructure.core.filters;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.function.BiFunction;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
 
-@RequiredArgsConstructor
 public class BatchCallHandler implements BatchFilterChain {
-
     private final List<? extends BatchFilter> filters;
-
     private final BiFunction<BatchRequest, UriInfo, BatchResponse> lastElement;
     private int currentPosition = 0;
 
@@ -42,5 +38,11 @@ public class BatchCallHandler implements BatchFilterChain {
             this.currentPosition++;
             return currentFilter.doFilter(batchRequest, uriInfo, this);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BatchCallHandler(final List<? extends BatchFilter> filters, final BiFunction<BatchRequest, UriInfo, BatchResponse> lastElement) {
+        this.filters = filters;
+        this.lastElement = lastElement;
     }
 }

@@ -18,16 +18,15 @@
  */
 package org.apache.fineract.infrastructure.core.condition;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 
-@Slf4j
 public class FineractRemoteJobMessageHandlerCondition extends PropertiesCondition {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FineractRemoteJobMessageHandlerCondition.class);
 
     @Override
     protected boolean matches(FineractProperties properties) {
         boolean isSpringEventsEnabled = properties.getRemoteJobMessageHandler().getSpringEvents().isEnabled();
-
         boolean conditionFails = false;
         if (isAnyMessageHandlerConfigured(properties) && isBatchInstance(properties)) {
             if (!isOnlyOneMessageHandlerEnabled(properties)) {

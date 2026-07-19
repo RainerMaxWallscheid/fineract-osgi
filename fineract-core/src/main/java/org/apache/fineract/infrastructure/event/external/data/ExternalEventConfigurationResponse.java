@@ -21,20 +21,99 @@ package org.apache.fineract.infrastructure.event.external.data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Builder
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class ExternalEventConfigurationResponse implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     // TODO: why wrap things in this useless class?!? Just more boilerplate! Keeping for compatibility...
     private List<ExternalEventConfigurationItemResponse> externalEventConfiguration;
+
+
+    @java.lang.SuppressWarnings("all")
+        public static class ExternalEventConfigurationResponseBuilder {
+        @java.lang.SuppressWarnings("all")
+                private List<ExternalEventConfigurationItemResponse> externalEventConfiguration;
+
+        @java.lang.SuppressWarnings("all")
+                ExternalEventConfigurationResponseBuilder() {
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public ExternalEventConfigurationResponse.ExternalEventConfigurationResponseBuilder externalEventConfiguration(final List<ExternalEventConfigurationItemResponse> externalEventConfiguration) {
+            this.externalEventConfiguration = externalEventConfiguration;
+            return this;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public ExternalEventConfigurationResponse build() {
+            return new ExternalEventConfigurationResponse(this.externalEventConfiguration);
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "ExternalEventConfigurationResponse.ExternalEventConfigurationResponseBuilder(externalEventConfiguration=" + this.externalEventConfiguration + ")";
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static ExternalEventConfigurationResponse.ExternalEventConfigurationResponseBuilder builder() {
+        return new ExternalEventConfigurationResponse.ExternalEventConfigurationResponseBuilder();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<ExternalEventConfigurationItemResponse> getExternalEventConfiguration() {
+        return this.externalEventConfiguration;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setExternalEventConfiguration(final List<ExternalEventConfigurationItemResponse> externalEventConfiguration) {
+        this.externalEventConfiguration = externalEventConfiguration;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof ExternalEventConfigurationResponse)) return false;
+        final ExternalEventConfigurationResponse other = (ExternalEventConfigurationResponse) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$externalEventConfiguration = this.getExternalEventConfiguration();
+        final java.lang.Object other$externalEventConfiguration = other.getExternalEventConfiguration();
+        if (this$externalEventConfiguration == null ? other$externalEventConfiguration != null : !this$externalEventConfiguration.equals(other$externalEventConfiguration)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof ExternalEventConfigurationResponse;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $externalEventConfiguration = this.getExternalEventConfiguration();
+        result = result * PRIME + ($externalEventConfiguration == null ? 43 : $externalEventConfiguration.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "ExternalEventConfigurationResponse(externalEventConfiguration=" + this.getExternalEventConfiguration() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalEventConfigurationResponse() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalEventConfigurationResponse(final List<ExternalEventConfigurationItemResponse> externalEventConfiguration) {
+        this.externalEventConfiguration = externalEventConfiguration;
+    }
 }

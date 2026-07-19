@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.loanorigination.helper;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.avro.loan.v1.OriginatorDetailsV1;
 import org.apache.fineract.portfolio.loanorigination.domain.LoanOriginator;
 import org.apache.fineract.portfolio.loanorigination.domain.LoanOriginatorMapping;
@@ -33,10 +32,8 @@ import org.springframework.stereotype.Component;
  * Resolves originator details for a given loan by fetching originator mappings and converting them to Avro format.
  */
 @Component
-@RequiredArgsConstructor
 @ConditionalOnProperty(value = "fineract.module.loan-origination.enabled", havingValue = "true")
 public class LoanOriginatorDetailsResolver {
-
     private final LoanOriginatorMappingRepository loanOriginatorMappingRepository;
     private final LoanOriginatorAvroMapper loanOriginatorAvroMapper;
 
@@ -52,7 +49,6 @@ public class LoanOriginatorDetailsResolver {
         if (mappings == null || mappings.isEmpty()) {
             return List.of();
         }
-
         final List<OriginatorDetailsV1> originators = new ArrayList<>();
         for (LoanOriginatorMapping mapping : mappings) {
             final LoanOriginator originator = mapping.getOriginator();
@@ -63,7 +59,12 @@ public class LoanOriginatorDetailsResolver {
                 }
             }
         }
-
         return List.copyOf(originators);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanOriginatorDetailsResolver(final LoanOriginatorMappingRepository loanOriginatorMappingRepository, final LoanOriginatorAvroMapper loanOriginatorAvroMapper) {
+        this.loanOriginatorMappingRepository = loanOriginatorMappingRepository;
+        this.loanOriginatorAvroMapper = loanOriginatorAvroMapper;
     }
 }

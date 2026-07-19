@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -59,9 +58,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class LoanContractTerminationServiceImpl {
-
     private final LoanAssembler loanAssembler;
     private final LoanRepository loanRepository;
     private final LoanTransactionRepository loanTransactionRepository;
@@ -79,19 +76,14 @@ public class LoanContractTerminationServiceImpl {
         Loan loan = loanAssembler.assembleFrom(command.getLoanId());
         // validate client or group is active
         loanUtilService.checkClientOrGroupActive(loan);
-
         // validate Contract Termination
         validateContractTermination(loan);
-
         final ExternalId externalId = externalIdFactory.createFromCommand(command, LoanApiConstants.externalIdParameterName);
         final Map<String, Object> changes = new LinkedHashMap<>();
-
         final LoanTransaction contractTermination = LoanTransaction.contractTermination(loan, DateUtils.getBusinessLocalDate(), externalId);
-
         // Mark Contract Termination, Update Loan SubStatus
         loan.setLoanSubStatus(LoanSubStatus.CONTRACT_TERMINATION);
         changes.put(LoanApiConstants.subStatusAttributeName, loan.getLoanSubStatus().getCode());
-
         if (loan.isInterestBearingAndInterestRecalculationEnabled()) {
             loanScheduleService.regenerateRepaymentSchedule(loan);
             reprocessLoanTransactionsService.reprocessTransactions(loan, List.of(contractTermination));
@@ -100,7 +92,6 @@ public class LoanContractTerminationServiceImpl {
             reprocessLoanTransactionsService.processLatestTransaction(contractTermination, loan);
             loan.addLoanTransaction(contractTermination);
         }
-
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
@@ -110,36 +101,29 @@ public class LoanContractTerminationServiceImpl {
         loanTransactionRepository.saveAndFlush(contractTermination);
         businessEventNotifierService.notifyPostBusinessEvent(new LoanBalanceChangedBusinessEvent(loan));
         businessEventNotifierService.notifyPostBusinessEvent(new LoanTransactionContractTerminationPostBusinessEvent(contractTermination));
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(contractTermination.getId()) //
-                .withEntityExternalId(contractTermination.getExternalId()) //
-                .withOfficeId(loan.getOfficeId()) //
-                .withClientId(loan.getClientId()) //
-                .withGroupId(loan.getGroupId()) //
-                .withLoanId(command.getLoanId()) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(contractTermination.getId()).withEntityExternalId(contractTermination.getExternalId()).withOfficeId(loan.getOfficeId()).withClientId(loan.getClientId()).withGroupId(loan.getGroupId()).withLoanId(command.getLoanId()).with(changes).build();
     }
 
     public CommandProcessingResult undoContractTermination(final JsonCommand command) {
         final Long loanId = command.getLoanId();
-
         loanTransactionValidator.validateContractTerminationUndo(command, loanId);
-
         final Loan loan = loanAssembler.assembleFrom(loanId);
         final LoanTransaction contractTerminationTransaction = loan.findContractTerminationTransaction();
-
         businessEventNotifierService.notifyPreBusinessEvent(new LoanUndoContractTerminationBusinessEvent(contractTerminationTransaction));
-        businessEventNotifierService.notifyPreBusinessEvent(
-                new LoanAdjustTransactionBusinessEvent(new LoanAdjustTransactionBusinessEvent.Data(contractTerminationTransaction)));
-
+        businessEventNotifierService.notifyPreBusinessEvent(new LoanAdjustTransactionBusinessEvent(new LoanAdjustTransactionBusinessEvent.Data(contractTerminationTransaction)));
         // check if reversalExternalId is provided
         final String reversalExternalId = command.stringValueOfParameterNamedAllowingNull(LoanApiConstants.REVERSAL_EXTERNAL_ID_PARAMNAME);
         final ExternalId reversalTxnExternalId = ExternalIdFactory.produce(reversalExternalId);
         final Map<String, Object> changes = new LinkedHashMap<>();
-
         // Add note if provided
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
@@ -147,76 +131,74 @@ public class LoanContractTerminationServiceImpl {
             final Note note = Note.loanTransactionNote(loan, contractTerminationTransaction, noteText);
             noteRepository.save(note);
         }
-
-        loanChargeValidator.validateRepaymentTypeTransactionNotBeforeAChargeRefund(contractTerminationTransaction.getLoan(),
-                contractTerminationTransaction, "reversed");
+        loanChargeValidator.validateRepaymentTypeTransactionNotBeforeAChargeRefund(contractTerminationTransaction.getLoan(), contractTerminationTransaction, "reversed");
         contractTerminationTransaction.reverse(reversalTxnExternalId);
         contractTerminationTransaction.manuallyAdjustedOrReversed();
-
         loan.liftContractTerminationSubStatus();
         changes.put(LoanApiConstants.subStatusAttributeName, loan.getLoanSubStatus());
         loanTransactionRepository.saveAndFlush(contractTerminationTransaction);
-
         final ScheduleGeneratorDTO scheduleGeneratorDTO = this.loanUtilService.buildScheduleGeneratorDTO(loan, null, null);
         if (loan.isCumulativeSchedule() && loan.isInterestBearingAndInterestRecalculationEnabled()) {
             loanScheduleService.regenerateRepaymentScheduleWithInterestRecalculation(loan, scheduleGeneratorDTO);
         } else if (loan.isProgressiveSchedule()) {
             loanScheduleService.regenerateRepaymentSchedule(loan, scheduleGeneratorDTO);
         }
-
         reprocessLoanTransactionsService.reprocessTransactions(loan);
-
         businessEventNotifierService.notifyPostBusinessEvent(new LoanBalanceChangedBusinessEvent(loan));
         businessEventNotifierService.notifyPostBusinessEvent(new LoanUndoContractTerminationBusinessEvent(contractTerminationTransaction));
-
-        final LoanAdjustTransactionBusinessEvent.Data eventData = new LoanAdjustTransactionBusinessEvent.Data(
-                contractTerminationTransaction);
+        final LoanAdjustTransactionBusinessEvent.Data eventData = new LoanAdjustTransactionBusinessEvent.Data(contractTerminationTransaction);
         businessEventNotifierService.notifyPostBusinessEvent(new LoanAdjustTransactionBusinessEvent(eventData));
-
-        return new CommandProcessingResultBuilder() //
-                .withOfficeId(loan.getOfficeId()) //
-                .withClientId(loan.getClientId()) //
-                .withGroupId(loan.getGroupId()) //
-                .withLoanId(loanId) //
-                .withEntityId(contractTerminationTransaction.getId()) //
-                .withEntityExternalId(contractTerminationTransaction.getExternalId()) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withOfficeId(loan.getOfficeId()).withClientId(loan.getClientId()).withGroupId(loan.getGroupId()).withLoanId(loanId).withEntityId(contractTerminationTransaction.getId()).withEntityExternalId(contractTerminationTransaction.getExternalId()).with(changes).build();
     }
 
     public void validateContractTermination(final Loan loan) {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-
         if (!loan.isOpen()) {
             final String defaultUserMessage = "Contract termination can not be applied, Loan Account is not Active.";
-            final ApiParameterError error = ApiParameterError.generalError("error.msg.loan.account.is.not.active.state",
-                    defaultUserMessage);
+            final ApiParameterError error = ApiParameterError.generalError("error.msg.loan.account.is.not.active.state", defaultUserMessage);
             dataValidationErrors.add(error);
         }
-
         if (!loan.getLoanProduct().getLoanProductRelatedDetail().getLoanScheduleType().equals(LoanScheduleType.PROGRESSIVE)) {
             final String defaultUserMessage = "Contract termination can not be applied, Loan product schedule type is not Progressive.";
-            final ApiParameterError error = ApiParameterError.generalError(
-                    "error.msg.loan.contract.termination.is.only.supported.for.progressive.loan.schedule.type", defaultUserMessage);
+            final ApiParameterError error = ApiParameterError.generalError("error.msg.loan.contract.termination.is.only.supported.for.progressive.loan.schedule.type", defaultUserMessage);
             dataValidationErrors.add(error);
         }
-
         if (loan.isChargedOff()) {
             final String defaultUserMessage = "Contract termination can not be applied, Loan Account is Charge-Off.";
             final ApiParameterError error = ApiParameterError.generalError("error.msg.loan.account.is.charge-off", defaultUserMessage);
             dataValidationErrors.add(error);
         }
-
         if (loan.isContractTermination()) {
             final String defaultUserMessage = "Contract termination can not be applied, Loan Account is already terminated.";
-            final ApiParameterError error = ApiParameterError
-                    .generalError("error.msg.loan.account.is.already.contract.termination.substate", defaultUserMessage);
+            final ApiParameterError error = ApiParameterError.generalError("error.msg.loan.account.is.already.contract.termination.substate", defaultUserMessage);
             dataValidationErrors.add(error);
         }
-
         if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanContractTerminationServiceImpl(final LoanAssembler loanAssembler, final LoanRepository loanRepository, final LoanTransactionRepository loanTransactionRepository, final NoteRepository noteRepository, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanUtilService loanUtilService, final ExternalIdFactory externalIdFactory, final BusinessEventNotifierService businessEventNotifierService, final LoanScheduleService loanScheduleService, final LoanChargeValidator loanChargeValidator, final ProgressiveLoanTransactionValidator loanTransactionValidator, final LoanTransactionService loanTransactionService) {
+        this.loanAssembler = loanAssembler;
+        this.loanRepository = loanRepository;
+        this.loanTransactionRepository = loanTransactionRepository;
+        this.noteRepository = noteRepository;
+        this.reprocessLoanTransactionsService = reprocessLoanTransactionsService;
+        this.loanUtilService = loanUtilService;
+        this.externalIdFactory = externalIdFactory;
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.loanScheduleService = loanScheduleService;
+        this.loanChargeValidator = loanChargeValidator;
+        this.loanTransactionValidator = loanTransactionValidator;
+        this.loanTransactionService = loanTransactionService;
+    }
 }

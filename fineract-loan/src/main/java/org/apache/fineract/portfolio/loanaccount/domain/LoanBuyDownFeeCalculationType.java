@@ -18,16 +18,26 @@
  */
 package org.apache.fineract.portfolio.loanaccount.domain;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.ApiFacingEnum;
 
-@Getter
-@RequiredArgsConstructor
 public enum LoanBuyDownFeeCalculationType implements ApiFacingEnum<LoanBuyDownFeeCalculationType> {
-
     FLAT("loanBuyDownFeeCalculationType.flat", "Flat");
-
     private final String code;
     private final String humanReadableName;
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private LoanBuyDownFeeCalculationType(final String code, final String humanReadableName) {
+        this.code = code;
+        this.humanReadableName = humanReadableName;
+    }
 }

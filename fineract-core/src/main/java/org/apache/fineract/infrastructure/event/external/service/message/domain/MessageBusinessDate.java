@@ -20,14 +20,16 @@ package org.apache.fineract.infrastructure.event.external.service.message.domain
 
 import java.time.LocalDate;
 import java.util.Objects;
-import lombok.Getter;
 
-@Getter
 public class MessageBusinessDate {
-
     private LocalDate businessDate;
 
     public MessageBusinessDate(LocalDate businessDate) {
         this.businessDate = Objects.requireNonNull(businessDate, "businessDate cannot be null");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getBusinessDate() {
+        return this.businessDate;
     }
 }

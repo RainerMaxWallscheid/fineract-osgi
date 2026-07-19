@@ -24,14 +24,12 @@ import static org.apache.fineract.portfolio.loanorigination.api.LoanOriginatorAp
 import static org.apache.fineract.portfolio.loanorigination.api.LoanOriginatorApiConstants.RESOURCE_NAME;
 import static org.apache.fineract.portfolio.loanorigination.api.LoanOriginatorApiConstants.STATUS_PARAM;
 import static org.apache.fineract.portfolio.loanorigination.api.LoanOriginatorApiConstants.UPDATE_REQUEST_PARAMS;
-
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -44,37 +42,29 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 @ConditionalOnProperty(value = "fineract.module.loan-origination.enabled", havingValue = "true")
 public class LoanOriginatorDataValidator {
-
     private final FromJsonHelper fromApiJsonHelper;
 
     public void validateForCreate(final String json) {
         if (StringUtils.isBlank(json)) {
             throw new InvalidJsonException();
         }
-
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+        }.getType();
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, CREATE_REQUEST_PARAMS);
-
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(RESOURCE_NAME);
-
         final JsonElement element = this.fromApiJsonHelper.parse(json);
-
         final String externalId = this.fromApiJsonHelper.extractStringNamed(EXTERNAL_ID_PARAM, element);
         baseDataValidator.reset().parameter(EXTERNAL_ID_PARAM).value(externalId).notBlank().notExceedingLengthOf(100);
-
         final String name = this.fromApiJsonHelper.extractStringNamed(NAME_PARAM, element);
         baseDataValidator.reset().parameter(NAME_PARAM).value(name).ignoreIfNull().notExceedingLengthOf(255);
-
         if (this.fromApiJsonHelper.parameterExists(STATUS_PARAM, element)) {
             final String status = this.fromApiJsonHelper.extractStringNamed(STATUS_PARAM, element);
             baseDataValidator.reset().parameter(STATUS_PARAM).value(status).notBlank();
             validateStatus(status);
         }
-
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
     }
 
@@ -82,24 +72,19 @@ public class LoanOriginatorDataValidator {
         if (StringUtils.isBlank(json)) {
             throw new InvalidJsonException();
         }
-
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+        }.getType();
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, UPDATE_REQUEST_PARAMS);
-
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(RESOURCE_NAME);
-
         final JsonElement element = this.fromApiJsonHelper.parse(json);
-
         final String name = this.fromApiJsonHelper.extractStringNamed(NAME_PARAM, element);
         baseDataValidator.reset().parameter(NAME_PARAM).value(name).ignoreIfNull().notExceedingLengthOf(255);
-
         if (this.fromApiJsonHelper.parameterExists(STATUS_PARAM, element)) {
             final String status = this.fromApiJsonHelper.extractStringNamed(STATUS_PARAM, element);
             baseDataValidator.reset().parameter(STATUS_PARAM).value(status).notBlank();
             validateStatus(status);
         }
-
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
     }
 
@@ -117,5 +102,10 @@ public class LoanOriginatorDataValidator {
         if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanOriginatorDataValidator(final FromJsonHelper fromApiJsonHelper) {
+        this.fromApiJsonHelper = fromApiJsonHelper;
     }
 }

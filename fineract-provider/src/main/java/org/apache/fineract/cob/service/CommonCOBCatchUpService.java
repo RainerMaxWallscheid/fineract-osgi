@@ -16,12 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.cob.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.COBConstant;
 import org.apache.fineract.cob.data.COBIdAndLastClosedBusinessDate;
 import org.apache.fineract.cob.data.IsCatchUpRunningDTO;
@@ -32,9 +30,7 @@ import org.apache.fineract.infrastructure.core.domain.FineractContext;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.jobs.domain.JobExecutionRepository;
 
-@RequiredArgsConstructor
 public abstract class CommonCOBCatchUpService<T extends AccountLock> implements COBCatchUpService {
-
     private final AsyncCOBExecutorService asyncLoanCOBExecutorService;
     private final JobExecutionRepository jobExecutionRepository;
     private final RetrieveIdService retrieveIdService;
@@ -47,13 +43,10 @@ public abstract class CommonCOBCatchUpService<T extends AccountLock> implements 
 
     @Override
     public OldestCOBProcessedLoanDTO getOldestCOBProcessedLoan() {
-        List<COBIdAndLastClosedBusinessDate> loanIdAndLastClosedBusinessDate = retrieveIdService
-                .retrieveLoanIdsOldestCobProcessed(ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE));
+        List<COBIdAndLastClosedBusinessDate> loanIdAndLastClosedBusinessDate = retrieveIdService.retrieveLoanIdsOldestCobProcessed(ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE));
         OldestCOBProcessedLoanDTO oldestCOBProcessedLoanDTO = new OldestCOBProcessedLoanDTO();
         oldestCOBProcessedLoanDTO.setLoanIds(loanIdAndLastClosedBusinessDate.stream().map(COBIdAndLastClosedBusinessDate::getId).toList());
-        oldestCOBProcessedLoanDTO
-                .setCobProcessedDate(loanIdAndLastClosedBusinessDate.stream().map(COBIdAndLastClosedBusinessDate::getLastClosedBusinessDate)
-                        .findFirst().orElse(ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE)));
+        oldestCOBProcessedLoanDTO.setCobProcessedDate(loanIdAndLastClosedBusinessDate.stream().map(COBIdAndLastClosedBusinessDate::getLastClosedBusinessDate).findFirst().orElse(ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE)));
         oldestCOBProcessedLoanDTO.setCobBusinessDate(ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE));
         return oldestCOBProcessedLoanDTO;
     }
@@ -66,11 +59,17 @@ public abstract class CommonCOBCatchUpService<T extends AccountLock> implements 
 
     @Override
     public IsCatchUpRunningDTO isCatchUpRunning() {
-        LocalDate runningCatchUpBusinessDate = jobExecutionRepository.getBusinessDateOfRunningJobByExecutionParameter(getJobName(),
-                COBConstant.COB_CUSTOM_JOB_PARAMETER_KEY, COBConstant.IS_CATCH_UP_PARAMETER_NAME, "true",
-                COBConstant.BUSINESS_DATE_PARAMETER_NAME);
+        LocalDate runningCatchUpBusinessDate = jobExecutionRepository.getBusinessDateOfRunningJobByExecutionParameter(getJobName(), COBConstant.COB_CUSTOM_JOB_PARAMETER_KEY, COBConstant.IS_CATCH_UP_PARAMETER_NAME, "true", COBConstant.BUSINESS_DATE_PARAMETER_NAME);
         return new IsCatchUpRunningDTO(runningCatchUpBusinessDate != null, runningCatchUpBusinessDate);
     }
 
     public abstract String getJobName();
+
+    @java.lang.SuppressWarnings("all")
+        public CommonCOBCatchUpService(final AsyncCOBExecutorService asyncLoanCOBExecutorService, final JobExecutionRepository jobExecutionRepository, final RetrieveIdService retrieveIdService, final AccountLockService<T> accountLockService) {
+        this.asyncLoanCOBExecutorService = asyncLoanCOBExecutorService;
+        this.jobExecutionRepository = jobExecutionRepository;
+        this.retrieveIdService = retrieveIdService;
+        this.accountLockService = accountLockService;
+    }
 }

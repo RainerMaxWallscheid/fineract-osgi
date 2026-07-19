@@ -35,7 +35,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.portfolio.collateralmanagement.command.ClientCollateralCreateCommand;
@@ -55,37 +54,30 @@ import org.springframework.stereotype.Component;
 @Path("/v1/clients/{clientId}/collaterals")
 @Component
 @Tag(name = "Client Collateral Management", description = "Client Collateral Management is for managing collateral operations")
-@RequiredArgsConstructor
-@Consumes({ MediaType.APPLICATION_JSON })
-@Produces({ MediaType.APPLICATION_JSON })
+@Consumes({MediaType.APPLICATION_JSON})
+@Produces({MediaType.APPLICATION_JSON})
 public class ClientCollateralManagementApiResource {
-
     private final CommandDispatcher dispatcher;
     private final ClientCollateralManagementReadService clientCollateralManagementReadService;
 
     @GET
     @Operation(summary = "Get Clients Collateral Products", operationId = "getClientCollateralProducts", description = "Get Collateral Product of a Client")
     @AlternativeOperationId("getClientCollateral")
-    public List<ClientCollateralManagementData> getClientCollateral(
-            @PathParam("clientId") @Parameter(description = "clientId") final Long clientId,
-            @QueryParam("prodId") @Parameter(description = "prodId") final Long prodId) {
+    public List<ClientCollateralManagementData> getClientCollateral(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId, @QueryParam("prodId") @Parameter(description = "prodId") final Long prodId) {
         return clientCollateralManagementReadService.getClientCollaterals(clientId, prodId);
     }
 
     @GET
     @Path("{clientCollateralId}")
     @Operation(summary = "Get Client Collateral Data", operationId = "getClientCollateralData", description = "Get Client Collateral Data")
-    public ClientCollateralManagementData getClientCollateralData(
-            @PathParam("clientId") @Parameter(description = "clientId") final Long clientId,
-            @PathParam("clientCollateralId") @Parameter(description = "clientCollateralId") final Long collateralId) {
+    public ClientCollateralManagementData getClientCollateralData(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId, @PathParam("clientCollateralId") @Parameter(description = "clientCollateralId") final Long collateralId) {
         return clientCollateralManagementReadService.getClientCollateralManagementData(collateralId);
     }
 
     @GET
     @Path("template")
     @Operation(summary = "Get Client Collateral Template", operationId = "getClientCollateralTemplate", description = "Get Client Collateral Template")
-    public List<LoanCollateralTemplateData> getClientCollateralTemplate(
-            @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
+    public List<LoanCollateralTemplateData> getClientCollateralTemplate(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
         return clientCollateralManagementReadService.getLoanCollateralTemplate(clientId);
     }
 
@@ -93,8 +85,7 @@ public class ClientCollateralManagementApiResource {
     @Operation(summary = "Add New Collateral For a Client", operationId = "addClientCollateral", description = "Add New Collateral For a Client")
     @AlternativeOperationId("addCollateral")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ClientCollateralCreateResponse.class)))
-    public ClientCollateralCreateResponse addCollateral(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId,
-            ClientCollateralCreateRequest request) {
+    public ClientCollateralCreateResponse addCollateral(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId, ClientCollateralCreateRequest request) {
         request.setClientId(clientId);
         final var command = new ClientCollateralCreateCommand();
         command.setPayload(request);
@@ -106,9 +97,7 @@ public class ClientCollateralManagementApiResource {
     @Operation(summary = "Update New Collateral of a Client", operationId = "updateClientCollateral", description = "Update New Collateral of a Client")
     @AlternativeOperationId("updateCollateral_1")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ClientCollateralUpdateResponse.class)))
-    public ClientCollateralUpdateResponse updateCollateral(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId,
-            @PathParam("collateralId") @Parameter(description = "collateralId") final Long collateralId,
-            ClientCollateralUpdateRequest request) {
+    public ClientCollateralUpdateResponse updateCollateral(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId, @PathParam("collateralId") @Parameter(description = "collateralId") final Long collateralId, ClientCollateralUpdateRequest request) {
         request.setClientId(clientId);
         request.setCollateralId(collateralId);
         final var command = new ClientCollateralUpdateCommand();
@@ -121,11 +110,16 @@ public class ClientCollateralManagementApiResource {
     @Operation(summary = "Delete Client Collateral", operationId = "deleteClientCollateral", description = "Delete Client Collateral")
     @AlternativeOperationId("deleteCollateral_1")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ClientCollateralDeleteResponse.class)))
-    public ClientCollateralDeleteResponse deleteCollateral(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId,
-            @PathParam("collateralId") @Parameter(description = "collateralId") final Long collateralId) {
+    public ClientCollateralDeleteResponse deleteCollateral(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId, @PathParam("collateralId") @Parameter(description = "collateralId") final Long collateralId) {
         final var request = ClientCollateralDeleteRequest.builder().clientId(clientId).collateralId(collateralId).build();
         final var command = new ClientCollateralDeleteCommand();
         command.setPayload(request);
         return dispatcher.<ClientCollateralDeleteRequest, ClientCollateralDeleteResponse>dispatch(command).get();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ClientCollateralManagementApiResource(final CommandDispatcher dispatcher, final ClientCollateralManagementReadService clientCollateralManagementReadService) {
+        this.dispatcher = dispatcher;
+        this.clientCollateralManagementReadService = clientCollateralManagementReadService;
     }
 }

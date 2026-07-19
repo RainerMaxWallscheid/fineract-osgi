@@ -21,11 +21,9 @@ package org.apache.fineract.accounting.accrual.service;
 import static org.apache.fineract.accounting.accrual.api.AccrualAccountingConstants.ACCRUE_TILL_PARAM_NAME;
 import static org.apache.fineract.accounting.accrual.api.AccrualAccountingConstants.PERIODIC_ACCRUAL_ACCOUNTING_EXECUTION_ERROR_CODE;
 import static org.apache.fineract.accounting.accrual.api.AccrualAccountingConstants.PERIODIC_ACCRUAL_ACCOUNTING_RESOURCE_NAME;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.accrual.serialization.AccrualAccountingDataValidator;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -35,9 +33,7 @@ import org.apache.fineract.infrastructure.core.exception.MultiException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.portfolio.loanaccount.service.LoanAccrualsProcessingService;
 
-@RequiredArgsConstructor
 public class AccrualAccountingWritePlatformServiceImpl implements AccrualAccountingWritePlatformService {
-
     private final LoanAccrualsProcessingService loanAccrualsProcessingService;
     private final AccrualAccountingDataValidator accountingDataValidator;
 
@@ -49,12 +45,16 @@ public class AccrualAccountingWritePlatformServiceImpl implements AccrualAccount
             this.loanAccrualsProcessingService.addPeriodicAccruals(tillDate);
         } catch (MultiException e) {
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-            final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
-                    .resource(PERIODIC_ACCRUAL_ACCOUNTING_RESOURCE_NAME);
-            baseDataValidator.reset().failWithCodeNoParameterAddedToErrorCode(PERIODIC_ACCRUAL_ACCOUNTING_EXECUTION_ERROR_CODE,
-                    e.getMessage());
+            final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(PERIODIC_ACCRUAL_ACCOUNTING_RESOURCE_NAME);
+            baseDataValidator.reset().failWithCodeNoParameterAddedToErrorCode(PERIODIC_ACCRUAL_ACCOUNTING_EXECUTION_ERROR_CODE, e.getMessage());
             throw new PlatformApiDataValidationException(dataValidationErrors, e);
         }
         return CommandProcessingResult.empty();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AccrualAccountingWritePlatformServiceImpl(final LoanAccrualsProcessingService loanAccrualsProcessingService, final AccrualAccountingDataValidator accountingDataValidator) {
+        this.loanAccrualsProcessingService = loanAccrualsProcessingService;
+        this.accountingDataValidator = accountingDataValidator;
     }
 }

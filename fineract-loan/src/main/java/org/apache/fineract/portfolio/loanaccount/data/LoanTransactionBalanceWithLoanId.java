@@ -19,17 +19,18 @@
 package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.math.BigDecimal;
-import lombok.Getter;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 
-@Getter
 public class LoanTransactionBalanceWithLoanId extends LoanTransactionBalance {
-
     private final Long loanId;
 
-    public LoanTransactionBalanceWithLoanId(LoanTransactionType transactionType, boolean reversed, boolean manuallyAdjustedOrReversed,
-            BigDecimal amount, Long loanId) {
+    public LoanTransactionBalanceWithLoanId(LoanTransactionType transactionType, boolean reversed, boolean manuallyAdjustedOrReversed, BigDecimal amount, Long loanId) {
         super(transactionType, reversed, manuallyAdjustedOrReversed, amount);
         this.loanId = loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanId() {
+        return this.loanId;
     }
 }

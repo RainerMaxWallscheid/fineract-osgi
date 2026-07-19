@@ -31,7 +31,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -47,17 +46,15 @@ import org.springframework.stereotype.Component;
 @Component
 @Path("/v1/working-capital/near-breach")
 @Tag(name = "Working Capital Near Breach", description = "Working Capital Near Breach")
-@RequiredArgsConstructor
 public class WorkingCapitalNearBreachApiResource {
-
     private final PlatformSecurityContext context;
     private final WorkingCapitalNearBreachReadPlatformService breachReadPlatformService;
     private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
     private final DefaultToApiJsonSerializer<String> jsonSerializer;
 
     @GET
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "retrieveAllWorkingCapitalNearBreaches", summary = "List Working Capital Near Breaches")
     public List<WorkingCapitalNearBreachData> retrieveAll() {
         this.context.authenticatedUser().validateHasReadPermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
@@ -66,8 +63,8 @@ public class WorkingCapitalNearBreachApiResource {
 
     @GET
     @Path("{breachId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "retrieveWorkingCapitalNearBreach", summary = "Retrieve Working Capital Near Breach")
     public WorkingCapitalNearBreachData retrieveOne(@PathParam("breachId") @Parameter(description = "breachId") final Long breachId) {
         this.context.authenticatedUser().validateHasReadPermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
@@ -75,37 +72,42 @@ public class WorkingCapitalNearBreachApiResource {
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "createWorkingCapitalNearBreach", summary = "Create Working Capital Near Breach")
     public CommandProcessingResult create(final WorkingCapitalNearBreachRequest request) {
         this.context.authenticatedUser().validateHasCreatePermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createWorkingCapitalNearBreach()
-                .withJson(jsonSerializer.serialize(request)).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createWorkingCapitalNearBreach().withJson(jsonSerializer.serialize(request)).build();
         return this.commandSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @PUT
     @Path("{breachId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "updateWorkingCapitalNearBreach", summary = "Update Working Capital Near Breach")
-    public CommandProcessingResult update(@PathParam("breachId") @Parameter(description = "breachId") final Long breachId,
-            final WorkingCapitalNearBreachRequest request) {
+    public CommandProcessingResult update(@PathParam("breachId") @Parameter(description = "breachId") final Long breachId, final WorkingCapitalNearBreachRequest request) {
         this.context.authenticatedUser().validateHasUpdatePermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateWorkingCapitalNearBreach(breachId)
-                .withJson(jsonSerializer.serialize(request)).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateWorkingCapitalNearBreach(breachId).withJson(jsonSerializer.serialize(request)).build();
         return this.commandSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @DELETE
     @Path("{breachId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "deleteWorkingCapitalNearBreach", summary = "Delete Working Capital Near Breach")
     public CommandProcessingResult delete(@PathParam("breachId") @Parameter(description = "breachId") final Long breachId) {
         this.context.authenticatedUser().validateHasDeletePermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteWorkingCapitalNearBreach(breachId).build();
         return this.commandSourceWritePlatformService.logCommandSource(commandRequest);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalNearBreachApiResource(final PlatformSecurityContext context, final WorkingCapitalNearBreachReadPlatformService breachReadPlatformService, final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService, final DefaultToApiJsonSerializer<String> jsonSerializer) {
+        this.context = context;
+        this.breachReadPlatformService = breachReadPlatformService;
+        this.commandSourceWritePlatformService = commandSourceWritePlatformService;
+        this.jsonSerializer = jsonSerializer;
     }
 }

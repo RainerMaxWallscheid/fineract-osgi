@@ -19,13 +19,11 @@
 package org.apache.fineract.infrastructure.core.exceptionmapper;
 
 import static org.apache.http.HttpStatus.SC_CONFLICT;
-
 import jakarta.persistence.OptimisticLockException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -37,8 +35,9 @@ import org.springframework.stereotype.Component;
  */
 @Provider
 @Component
-@Slf4j
 public class JakartaOptimisticLockExceptionMapper implements FineractExceptionMapper, ExceptionMapper<OptimisticLockException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JakartaOptimisticLockExceptionMapper.class);
 
     @Override
     public Response toResponse(final OptimisticLockException exception) {

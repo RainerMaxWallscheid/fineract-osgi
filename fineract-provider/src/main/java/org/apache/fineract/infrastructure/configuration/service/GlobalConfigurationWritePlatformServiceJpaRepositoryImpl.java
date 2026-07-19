@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.configuration.service;
 
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.configuration.data.GlobalConfigurationDataValidator;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationProperty;
@@ -38,11 +37,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class GlobalConfigurationWritePlatformServiceJpaRepositoryImpl implements GlobalConfigurationWritePlatformService {
-
     private static final Logger LOG = LoggerFactory.getLogger(GlobalConfigurationWritePlatformServiceJpaRepositoryImpl.class);
-
     private final PlatformSecurityContext context;
     private final GlobalConfigurationRepositoryWrapper repository;
     private final GlobalConfigurationDataValidator globalConfigurationDataValidator;
@@ -54,28 +50,22 @@ public class GlobalConfigurationWritePlatformServiceJpaRepositoryImpl implements
     public CommandProcessingResult update(final Long configId, final JsonCommand command) {
         try {
             this.globalConfigurationDataValidator.validateForUpdate(command);
-
             final GlobalConfigurationProperty configItemForUpdate = this.repository.findOneWithNotFoundDetection(configId);
-
             final Map<String, Object> changes = globalConfigurationPropertyUpdateService.update(configItemForUpdate, command);
-
             if (!changes.isEmpty()) {
                 this.configurationDomainService.removeGlobalConfigurationPropertyDataFromCache(configItemForUpdate.getName());
                 this.repository.save(configItemForUpdate);
             }
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(configId) //
-                    .with(changes) //
-                    .build();
-
+            return  //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(configId).with(changes).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleDataIntegrityIssues(throwable, dve);
             return CommandProcessingResult.empty();
         }
-
     }
 
     @Transactional
@@ -88,7 +78,6 @@ public class GlobalConfigurationWritePlatformServiceJpaRepositoryImpl implements
             final Throwable throwable = dve.getMostSpecificCause();
             handleDataIntegrityIssues(throwable, dve);
         }
-
     }
 
     /*
@@ -96,7 +85,15 @@ public class GlobalConfigurationWritePlatformServiceJpaRepositoryImpl implements
      */
     private void handleDataIntegrityIssues(final Throwable realCause, final NonTransientDataAccessException dve) {
         LOG.error("Error occured.", dve);
-        throw ErrorHandler.getMappable(dve, "error.msg.globalConfiguration.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource: " + realCause.getMessage());
+        throw ErrorHandler.getMappable(dve, "error.msg.globalConfiguration.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GlobalConfigurationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final GlobalConfigurationRepositoryWrapper repository, final GlobalConfigurationDataValidator globalConfigurationDataValidator, final ConfigurationDomainService configurationDomainService, final GlobalConfigurationPropertyUpdateService globalConfigurationPropertyUpdateService) {
+        this.context = context;
+        this.repository = repository;
+        this.globalConfigurationDataValidator = globalConfigurationDataValidator;
+        this.configurationDomainService = configurationDomainService;
+        this.globalConfigurationPropertyUpdateService = globalConfigurationPropertyUpdateService;
     }
 }

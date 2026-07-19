@@ -18,23 +18,26 @@
  */
 package org.apache.fineract.mix.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.mix.data.MixReportXBRLNamespaceData;
 import org.apache.fineract.mix.domain.MixReportXBRLNamespaceRepository;
 import org.apache.fineract.mix.mapping.MixReportXBRLNamespaceMapper;
 import org.springframework.stereotype.Service;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 public class MixReportXBRLNamespaceReadServiceImpl implements MixReportXBRLNamespaceReadService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MixReportXBRLNamespaceReadServiceImpl.class);
     private final MixReportXBRLNamespaceRepository repository;
     private final MixReportXBRLNamespaceMapper mapper;
 
     @Override
     public MixReportXBRLNamespaceData retrieveNamespaceByPrefix(final String prefix) {
         return repository.findOneByPrefix(prefix).map(mapper::map).orElse(null);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MixReportXBRLNamespaceReadServiceImpl(final MixReportXBRLNamespaceRepository repository, final MixReportXBRLNamespaceMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
     }
 }

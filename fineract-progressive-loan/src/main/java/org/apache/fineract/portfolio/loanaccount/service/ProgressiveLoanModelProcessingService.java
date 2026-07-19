@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.util.List;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
@@ -32,11 +31,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@RequiredArgsConstructor
 public class ProgressiveLoanModelProcessingService {
-
-    private static final List<LoanStatus> allowedLoanStatuses = List.of(LoanStatus.ACTIVE, LoanStatus.CLOSED_OBLIGATIONS_MET,
-            LoanStatus.CLOSED_WRITTEN_OFF, LoanStatus.OVERPAID);
+    private static final List<LoanStatus> allowedLoanStatuses = List.of(LoanStatus.ACTIVE, LoanStatus.CLOSED_OBLIGATIONS_MET, LoanStatus.CLOSED_WRITTEN_OFF, LoanStatus.OVERPAID);
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final ProgressiveLoanModelRecalculationService modelProcessingService;
     private final InterestScheduleModelRepositoryWrapper modelRepositoryWrapper;
@@ -52,15 +48,13 @@ public class ProgressiveLoanModelProcessingService {
         if (loanIds.isEmpty()) {
             return List.of();
         }
-        return progressiveLoanModelRepository.findLoanIdsRequiringModelRecalculation(Set.copyOf(loanIds), allowedLoanStatuses,
-                modelVersion);
+        return progressiveLoanModelRepository.findLoanIdsRequiringModelRecalculation(Set.copyOf(loanIds), allowedLoanStatuses, modelVersion);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void recalculateModelAndSave(Long loanId) {
         Loan loan = loanRepositoryWrapper.findOneWithNotFoundDetection(loanId);
-        ProgressiveLoanInterestScheduleModel recalculatedModel = modelProcessingService.getRecalculatedModel(loan.getId(),
-                ThreadLocalContextUtil.getBusinessDate());
+        ProgressiveLoanInterestScheduleModel recalculatedModel = modelProcessingService.getRecalculatedModel(loan.getId(), ThreadLocalContextUtil.getBusinessDate());
         if (recalculatedModel != null) {
             modelRepositoryWrapper.writeInterestScheduleModel(loan, recalculatedModel);
         }
@@ -69,5 +63,13 @@ public class ProgressiveLoanModelProcessingService {
     @Transactional(readOnly = true)
     public boolean allowedLoanStatuses(Long loanId) {
         return loanRepositoryWrapper.isLoanInAllowedStatus(loanId, allowedLoanStatuses);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProgressiveLoanModelProcessingService(final LoanRepositoryWrapper loanRepositoryWrapper, final ProgressiveLoanModelRecalculationService modelProcessingService, final InterestScheduleModelRepositoryWrapper modelRepositoryWrapper, final ProgressiveLoanModelRepository progressiveLoanModelRepository) {
+        this.loanRepositoryWrapper = loanRepositoryWrapper;
+        this.modelProcessingService = modelProcessingService;
+        this.modelRepositoryWrapper = modelRepositoryWrapper;
+        this.progressiveLoanModelRepository = progressiveLoanModelRepository;
     }
 }

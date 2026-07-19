@@ -33,7 +33,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
@@ -49,9 +48,7 @@ import org.springframework.stereotype.Component;
 @Path("/v1/notifications")
 @Component
 @Tag(name = "Notification", description = "Notification API resources")
-@RequiredArgsConstructor
 public class NotificationApiResource {
-
     private final PlatformSecurityContext context;
     private final NotificationReadPlatformService notificationReadPlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -59,23 +56,15 @@ public class NotificationApiResource {
     private final SqlValidator sqlValidator;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve all Notifications", description = "Returns a paginated list of notifications for the authenticated user, with optional filtering by read status.", tags = {
-            "Notification" })
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve all Notifications", description = "Returns a paginated list of notifications for the authenticated user, with optional filtering by read status.", tags = {"Notification"})
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = NotificationApiResourceSwagger.GetNotificationsResponse.class)))
-    public String getAllNotifications(@Context final UriInfo uriInfo,
-            @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy,
-            @QueryParam("limit") @Parameter(description = "limit") final Integer limit,
-            @QueryParam("offset") @Parameter(description = "offset") final Integer offset,
-            @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder,
-            @QueryParam("isRead") @Parameter(description = "isRead") final boolean isRead) {
-
+    public String getAllNotifications(@Context final UriInfo uriInfo, @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy, @QueryParam("limit") @Parameter(description = "limit") final Integer limit, @QueryParam("offset") @Parameter(description = "offset") final Integer offset, @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder, @QueryParam("isRead") @Parameter(description = "isRead") final boolean isRead) {
         this.context.authenticatedUser();
         final Page<NotificationData> notificationData;
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
-        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).offset(offset).orderBy(orderBy)
-                .sortOrder(sortOrder).build();
+        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
         if (!isRead) {
             notificationData = this.notificationReadPlatformService.getAllUnreadNotifications(searchParameters);
         } else {
@@ -86,13 +75,21 @@ public class NotificationApiResource {
     }
 
     @PUT
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Update Notification Read Status", operationId = "updateNotificationReadStatus", description = "Updates the read status of all notifications for the authenticated user.", tags = {
-            "Notification" })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Update Notification Read Status", operationId = "updateNotificationReadStatus", description = "Updates the read status of all notifications for the authenticated user.", tags = {"Notification"})
     @AlternativeOperationId("update_5")
     public void update() {
         this.context.authenticatedUser();
         this.notificationReadPlatformService.updateNotificationReadStatus();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public NotificationApiResource(final PlatformSecurityContext context, final NotificationReadPlatformService notificationReadPlatformService, final ApiRequestParameterHelper apiRequestParameterHelper, final ToApiJsonSerializer<NotificationData> toApiJsonSerializer, final SqlValidator sqlValidator) {
+        this.context = context;
+        this.notificationReadPlatformService = notificationReadPlatformService;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.sqlValidator = sqlValidator;
     }
 }

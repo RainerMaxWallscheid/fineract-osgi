@@ -19,7 +19,6 @@
 package org.apache.fineract.notification.service;
 
 import java.util.HashMap;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
@@ -32,11 +31,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 public class NotificationReadPlatformServiceImpl implements NotificationReadPlatformService {
-
     private HashMap<Long, HashMap<Long, CacheNotificationResponseHeader>> tenantNotificationResponseHeaderCache = new HashMap<>();
-
     private final PlatformSecurityContext context;
     private final NotificationMapperRepository notificationMapperRepository;
 
@@ -46,8 +42,7 @@ public class NotificationReadPlatformServiceImpl implements NotificationReadPlat
         Long tenantId = ThreadLocalContextUtil.getTenant().getId();
         Long now = System.currentTimeMillis() / 1000L;
         if (this.tenantNotificationResponseHeaderCache.containsKey(tenantId)) {
-            HashMap<Long, CacheNotificationResponseHeader> notificationResponseHeaderCache = this.tenantNotificationResponseHeaderCache
-                    .get(tenantId);
+            HashMap<Long, CacheNotificationResponseHeader> notificationResponseHeaderCache = this.tenantNotificationResponseHeaderCache.get(tenantId);
             if (notificationResponseHeaderCache.containsKey(appUserId)) {
                 Long lastFetch = notificationResponseHeaderCache.get(appUserId).getLastFetch();
                 if ((now - lastFetch) > 1) {
@@ -69,8 +64,7 @@ public class NotificationReadPlatformServiceImpl implements NotificationReadPlat
         return this.createUpdateCacheValue(appUserId, now, notificationResponseHeaderCache);
     }
 
-    private boolean createUpdateCacheValue(Long appUserId, Long now,
-            HashMap<Long, CacheNotificationResponseHeader> notificationResponseHeaderCache) {
+    private boolean createUpdateCacheValue(Long appUserId, Long now, HashMap<Long, CacheNotificationResponseHeader> notificationResponseHeaderCache) {
         boolean hasNotifications;
         Long tenantId = ThreadLocalContextUtil.getTenant().getId();
         CacheNotificationResponseHeader cacheNotificationResponseHeader;
@@ -95,8 +89,7 @@ public class NotificationReadPlatformServiceImpl implements NotificationReadPlat
     public Page<NotificationData> getAllUnreadNotifications(final SearchParameters searchParameters) {
         final Long appUserId = context.authenticatedUser().getId();
         final Pageable pageable = toPageable(searchParameters);
-        final org.springframework.data.domain.Page<NotificationData> springPage = this.notificationMapperRepository
-                .findUnreadNotificationDataByUserId(appUserId, pageable);
+        final org.springframework.data.domain.Page<NotificationData> springPage = this.notificationMapperRepository.findUnreadNotificationDataByUserId(appUserId, pageable);
         return toFineractPage(springPage);
     }
 
@@ -105,38 +98,36 @@ public class NotificationReadPlatformServiceImpl implements NotificationReadPlat
         final Long appUserId = context.authenticatedUser().getId();
         final Pageable pageable = toPageable(searchParameters);
         // Use the new method that doesn't filter by isRead, avoiding the NULL parameter type issue
-        final org.springframework.data.domain.Page<NotificationData> springPage = this.notificationMapperRepository
-                .findNotificationDataByUserId(appUserId, pageable);
+        final org.springframework.data.domain.Page<NotificationData> springPage = this.notificationMapperRepository.findNotificationDataByUserId(appUserId, pageable);
         return toFineractPage(springPage);
     }
 
     private Pageable toPageable(final SearchParameters searchParameters) {
         final int limit = searchParameters.hasLimit() ? searchParameters.getLimit() : SearchParameters.DEFAULT_MAX_LIMIT;
         final int offset = searchParameters.hasOffset() ? searchParameters.getOffset() : 0;
-
         if (limit <= 0) {
             throw new IllegalArgumentException("Limit must be greater than zero");
         }
-
         if (offset < 0) {
             throw new IllegalArgumentException("Offset must not be negative");
         }
-
         final int page = offset / limit;
-
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-
         if (searchParameters.hasOrderBy()) {
             final String orderBy = searchParameters.getOrderBy();
-            final Sort.Direction direction = "ASC".equalsIgnoreCase(searchParameters.getSortOrder()) ? Sort.Direction.ASC
-                    : Sort.Direction.DESC;
+            final Sort.Direction direction = "ASC".equalsIgnoreCase(searchParameters.getSortOrder()) ? Sort.Direction.ASC : Sort.Direction.DESC;
             sort = Sort.by(direction, orderBy);
         }
-
         return PageRequest.of(page, limit, sort);
     }
 
     private Page<NotificationData> toFineractPage(final org.springframework.data.domain.Page<NotificationData> springPage) {
         return new Page<>(springPage.getContent(), Math.toIntExact(springPage.getTotalElements()));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public NotificationReadPlatformServiceImpl(final PlatformSecurityContext context, final NotificationMapperRepository notificationMapperRepository) {
+        this.context = context;
+        this.notificationMapperRepository = notificationMapperRepository;
     }
 }

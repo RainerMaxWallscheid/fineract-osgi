@@ -23,12 +23,10 @@ import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import com.github.romankh3.image.comparison.ImageComparison;
 import java.io.IOException;
 import java.nio.file.Files;
 import javax.imageio.ImageIO;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.TestConfiguration;
 import org.apache.fineract.infrastructure.contentstore.exception.ContentDetectorException;
 import org.junit.jupiter.api.Test;
@@ -36,24 +34,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
-@Slf4j
 @SpringBootTest
 @ContextConfiguration(classes = TestConfiguration.class)
 class TikaContentDetectorTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TikaContentDetectorTest.class);
     @Autowired
     private TikaContentDetector tikaContentDetector;
 
     @Test
     void detectByFileName() {
         var ctx = tikaContentDetector.detect(ContentDetectorContext.builder().fileName("test.png").build());
-
         assertEquals("png", ctx.getFormat());
         assertEquals(".png", ctx.getExtension());
         assertEquals("image/png", ctx.getMimeType());
-
         ctx = tikaContentDetector.detect(ContentDetectorContext.builder().fileName("test.jpg").build());
-
         assertEquals("jpg", ctx.getFormat());
         assertEquals(".jpg", ctx.getExtension());
         assertEquals("image/jpeg", ctx.getMimeType());
@@ -61,55 +56,35 @@ class TikaContentDetectorTest {
 
     @Test
     void detectByInputStream() {
-        var ctx = tikaContentDetector.detect(
-                ContentDetectorContext.builder().inputStream(TikaContentDetectorTest.class.getClassLoader().getResourceAsStream("test.png"))
-                        .inputStreamEnabled(true).build());
-
+        var ctx = tikaContentDetector.detect(ContentDetectorContext.builder().inputStream(TikaContentDetectorTest.class.getClassLoader().getResourceAsStream("test.png")).inputStreamEnabled(true).build());
         assertEquals("png", ctx.getFormat());
         assertEquals(".png", ctx.getExtension());
         assertEquals("image/png", ctx.getMimeType());
-
         write(ctx); // make sure we can still consume the input stream
-
-        ctx = tikaContentDetector.detect(
-                ContentDetectorContext.builder().inputStream(TikaContentDetectorTest.class.getClassLoader().getResourceAsStream("test.jpg"))
-                        .inputStreamEnabled(true).build());
-
+        ctx = tikaContentDetector.detect(ContentDetectorContext.builder().inputStream(TikaContentDetectorTest.class.getClassLoader().getResourceAsStream("test.jpg")).inputStreamEnabled(true).build());
         assertEquals("jpg", ctx.getFormat());
         assertEquals(".jpg", ctx.getExtension());
         assertEquals("image/jpeg", ctx.getMimeType());
-
         write(ctx);
     }
 
     @Test
     void reuseStream() throws IOException {
-        var ctx = tikaContentDetector.detect(
-                ContentDetectorContext.builder().inputStream(TikaContentDetectorTest.class.getClassLoader().getResourceAsStream("test.png"))
-                        .inputStreamEnabled(true).build());
-
+        var ctx = tikaContentDetector.detect(ContentDetectorContext.builder().inputStream(TikaContentDetectorTest.class.getClassLoader().getResourceAsStream("test.png")).inputStreamEnabled(true).build());
         // we can run the detection again with the same stream
-
-        ctx = tikaContentDetector
-                .detect(ContentDetectorContext.builder().inputStream(ctx.getInputStream()).inputStreamEnabled(true).build());
-
+        ctx = tikaContentDetector.detect(ContentDetectorContext.builder().inputStream(ctx.getInputStream()).inputStreamEnabled(true).build());
         assertEquals("image/png", ctx.getMimeType());
-
         try (var out = Files.newOutputStream(java.nio.file.Path.of("build/test.png"))) {
             ctx.getInputStream().transferTo(out);
         }
-
-        try (var expectedIs = TikaContentDetectorTest.class.getClassLoader().getResourceAsStream("test.png");
-                var actualIs = Files.newInputStream(java.nio.file.Path.of("build/test.png"))) {
+        try (
+            var expectedIs = TikaContentDetectorTest.class.getClassLoader().getResourceAsStream("test.png");
+            var actualIs = Files.newInputStream(java.nio.file.Path.of("build/test.png"))) {
             requireNonNull(expectedIs);
-
             var expectedImage = ImageIO.read(expectedIs);
             var actualImage = ImageIO.read(actualIs);
-
             var result = new ImageComparison(expectedImage, actualImage).setAllowingPercentOfDifferentPixels(0).compareImages();
-
             log.info("Image diff percentage: {}", result.getDifferencePercent());
-
             assertEquals(MATCH, result.getImageComparisonState(), "The images should be identical");
         }
     }
@@ -117,15 +92,15 @@ class TikaContentDetectorTest {
     @Test
     void illegalArguments() {
         var exception = assertThrows(ContentDetectorException.class, () -> {
-            tikaContentDetector.detect(ContentDetectorContext.builder()
-                    .inputStream(TikaContentDetectorTest.class.getClassLoader().getResourceAsStream("test.png")).build());
+            tikaContentDetector.detect(ContentDetectorContext.builder().inputStream(TikaContentDetectorTest.class.getClassLoader().getResourceAsStream("test.png")).build());
         });
-
         assertNotNull(exception);
     }
 
     private void write(ContentDetectorContext ctx) {
-        try (var is = ctx.getInputStream(); var out = Files.newOutputStream(java.nio.file.Path.of("build/detector" + ctx.getExtension()))) {
+        try (
+            var is = ctx.getInputStream();
+            var out = Files.newOutputStream(java.nio.file.Path.of("build/detector" + ctx.getExtension()))) {
             is.transferTo(out);
         } catch (Exception e) {
             throw new RuntimeException(e);

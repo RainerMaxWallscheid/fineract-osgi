@@ -21,22 +21,27 @@ package org.apache.fineract.portfolio.loanproduct.domain;
 // TODO FINERACT-1932-Fineract modularization: Move to fineract-progressive-loan module after refactor of Loan and LoanProduct classes
 import java.util.Arrays;
 import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
-@Getter
-@RequiredArgsConstructor
 public enum FutureInstallmentAllocationRule {
-
-    NEXT_INSTALLMENT("Next installment"), //
-    LAST_INSTALLMENT("Last installment"), //
-    NEXT_LAST_INSTALLMENT("Next/Last installment"), //
-    REAMORTIZATION("Reamortization"); //
-
+    NEXT_INSTALLMENT("Next installment"),  //
+    LAST_INSTALLMENT("Last installment"),  //
+    NEXT_LAST_INSTALLMENT("Next/Last installment"),  //
+    REAMORTIZATION("Reamortization");
+    //
     private final String humanReadableName;
 
     public static List<EnumOptionData> getValuesAsEnumOptionDataList() {
         return Arrays.stream(values()).map(v -> new EnumOptionData((long) (v.ordinal() + 1), v.name(), v.getHumanReadableName())).toList();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private FutureInstallmentAllocationRule(final String humanReadableName) {
+        this.humanReadableName = humanReadableName;
     }
 }

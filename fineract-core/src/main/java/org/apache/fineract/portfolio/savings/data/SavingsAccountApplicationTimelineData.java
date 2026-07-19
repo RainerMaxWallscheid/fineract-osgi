@@ -20,18 +20,13 @@ package org.apache.fineract.portfolio.savings.data;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.jersey.serializer.legacy.JsonLocalDateArrayFormat;
 
 /**
  * Immutable data object represent the important time-line events of a savings account application.
  */
-@Getter
-@RequiredArgsConstructor
 @JsonLocalDateArrayFormat
 public class SavingsAccountApplicationTimelineData implements Serializable {
-
     private final LocalDate submittedOnDate;
     private final String submittedByUsername;
     private final String submittedByFirstname;
@@ -58,7 +53,6 @@ public class SavingsAccountApplicationTimelineData implements Serializable {
     private final String closedByLastname;
 
     public static SavingsAccountApplicationTimelineData templateDefault() {
-
         final LocalDate submittedOnDate = null;
         final String submittedByUsername = null;
         final String submittedByFirstname = null;
@@ -83,11 +77,154 @@ public class SavingsAccountApplicationTimelineData implements Serializable {
         final String closedByUsername = null;
         final String closedByFirstname = null;
         final String closedByLastname = null;
+        return new SavingsAccountApplicationTimelineData(submittedOnDate, submittedByUsername, submittedByFirstname, submittedByLastname, rejectedOnDate, rejectedByUsername, rejectedByFirstname, rejectedByLastname, withdrawnOnDate, withdrawnByUsername, withdrawnByFirstname, withdrawnByLastname, approvedOnDate, approvedByUsername, approvedByFirstname, approvedByLastname, activatedOnDate, activatedByUsername, activatedByFirstname, activatedByLastname, closedOnDate, closedByUsername, closedByFirstname, closedByLastname);
+    }
 
-        return new SavingsAccountApplicationTimelineData(submittedOnDate, submittedByUsername, submittedByFirstname, submittedByLastname,
-                rejectedOnDate, rejectedByUsername, rejectedByFirstname, rejectedByLastname, withdrawnOnDate, withdrawnByUsername,
-                withdrawnByFirstname, withdrawnByLastname, approvedOnDate, approvedByUsername, approvedByFirstname, approvedByLastname,
-                activatedOnDate, activatedByUsername, activatedByFirstname, activatedByLastname, closedOnDate, closedByUsername,
-                closedByFirstname, closedByLastname);
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getSubmittedOnDate() {
+        return this.submittedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getSubmittedByUsername() {
+        return this.submittedByUsername;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getSubmittedByFirstname() {
+        return this.submittedByFirstname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getSubmittedByLastname() {
+        return this.submittedByLastname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getRejectedOnDate() {
+        return this.rejectedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getRejectedByUsername() {
+        return this.rejectedByUsername;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getRejectedByFirstname() {
+        return this.rejectedByFirstname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getRejectedByLastname() {
+        return this.rejectedByLastname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getWithdrawnOnDate() {
+        return this.withdrawnOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getWithdrawnByUsername() {
+        return this.withdrawnByUsername;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getWithdrawnByFirstname() {
+        return this.withdrawnByFirstname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getWithdrawnByLastname() {
+        return this.withdrawnByLastname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getApprovedOnDate() {
+        return this.approvedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getApprovedByUsername() {
+        return this.approvedByUsername;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getApprovedByFirstname() {
+        return this.approvedByFirstname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getApprovedByLastname() {
+        return this.approvedByLastname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getActivatedOnDate() {
+        return this.activatedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getActivatedByUsername() {
+        return this.activatedByUsername;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getActivatedByFirstname() {
+        return this.activatedByFirstname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getActivatedByLastname() {
+        return this.activatedByLastname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getClosedOnDate() {
+        return this.closedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getClosedByUsername() {
+        return this.closedByUsername;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getClosedByFirstname() {
+        return this.closedByFirstname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getClosedByLastname() {
+        return this.closedByLastname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsAccountApplicationTimelineData(final LocalDate submittedOnDate, final String submittedByUsername, final String submittedByFirstname, final String submittedByLastname, final LocalDate rejectedOnDate, final String rejectedByUsername, final String rejectedByFirstname, final String rejectedByLastname, final LocalDate withdrawnOnDate, final String withdrawnByUsername, final String withdrawnByFirstname, final String withdrawnByLastname, final LocalDate approvedOnDate, final String approvedByUsername, final String approvedByFirstname, final String approvedByLastname, final LocalDate activatedOnDate, final String activatedByUsername, final String activatedByFirstname, final String activatedByLastname, final LocalDate closedOnDate, final String closedByUsername, final String closedByFirstname, final String closedByLastname) {
+        this.submittedOnDate = submittedOnDate;
+        this.submittedByUsername = submittedByUsername;
+        this.submittedByFirstname = submittedByFirstname;
+        this.submittedByLastname = submittedByLastname;
+        this.rejectedOnDate = rejectedOnDate;
+        this.rejectedByUsername = rejectedByUsername;
+        this.rejectedByFirstname = rejectedByFirstname;
+        this.rejectedByLastname = rejectedByLastname;
+        this.withdrawnOnDate = withdrawnOnDate;
+        this.withdrawnByUsername = withdrawnByUsername;
+        this.withdrawnByFirstname = withdrawnByFirstname;
+        this.withdrawnByLastname = withdrawnByLastname;
+        this.approvedOnDate = approvedOnDate;
+        this.approvedByUsername = approvedByUsername;
+        this.approvedByFirstname = approvedByFirstname;
+        this.approvedByLastname = approvedByLastname;
+        this.activatedOnDate = activatedOnDate;
+        this.activatedByUsername = activatedByUsername;
+        this.activatedByFirstname = activatedByFirstname;
+        this.activatedByLastname = activatedByLastname;
+        this.closedOnDate = closedOnDate;
+        this.closedByUsername = closedByUsername;
+        this.closedByFirstname = closedByFirstname;
+        this.closedByLastname = closedByLastname;
     }
 }

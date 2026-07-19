@@ -16,24 +16,102 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.interestratechart.data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Builder
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class InterestRateChartDeleteResponse implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private Long resourceId;
+
+
+    @java.lang.SuppressWarnings("all")
+        public static class InterestRateChartDeleteResponseBuilder {
+        @java.lang.SuppressWarnings("all")
+                private Long resourceId;
+
+        @java.lang.SuppressWarnings("all")
+                InterestRateChartDeleteResponseBuilder() {
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public InterestRateChartDeleteResponse.InterestRateChartDeleteResponseBuilder resourceId(final Long resourceId) {
+            this.resourceId = resourceId;
+            return this;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public InterestRateChartDeleteResponse build() {
+            return new InterestRateChartDeleteResponse(this.resourceId);
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "InterestRateChartDeleteResponse.InterestRateChartDeleteResponseBuilder(resourceId=" + this.resourceId + ")";
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static InterestRateChartDeleteResponse.InterestRateChartDeleteResponseBuilder builder() {
+        return new InterestRateChartDeleteResponse.InterestRateChartDeleteResponseBuilder();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getResourceId() {
+        return this.resourceId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setResourceId(final Long resourceId) {
+        this.resourceId = resourceId;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof InterestRateChartDeleteResponse)) return false;
+        final InterestRateChartDeleteResponse other = (InterestRateChartDeleteResponse) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$resourceId = this.getResourceId();
+        final java.lang.Object other$resourceId = other.getResourceId();
+        if (this$resourceId == null ? other$resourceId != null : !this$resourceId.equals(other$resourceId)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof InterestRateChartDeleteResponse;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $resourceId = this.getResourceId();
+        result = result * PRIME + ($resourceId == null ? 43 : $resourceId.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "InterestRateChartDeleteResponse(resourceId=" + this.getResourceId() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InterestRateChartDeleteResponse() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InterestRateChartDeleteResponse(final Long resourceId) {
+        this.resourceId = resourceId;
+    }
 }

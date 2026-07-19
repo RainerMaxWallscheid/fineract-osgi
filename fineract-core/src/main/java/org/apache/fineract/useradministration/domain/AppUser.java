@@ -19,7 +19,6 @@
 package org.apache.fineract.useradministration.domain;
 
 import static org.apache.fineract.useradministration.service.AppUserConstants.PASSWORD;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -40,7 +39,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
@@ -59,80 +57,49 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 @Entity
-@Table(name = "m_appuser", uniqueConstraints = @UniqueConstraint(columnNames = { "username" }, name = "username_org"))
+@Table(name = "m_appuser", uniqueConstraints = @UniqueConstraint(columnNames = {"username"}, name = "username_org"))
 public class AppUser extends AbstractPersistableCustom<Long> implements PlatformUser {
-
-    @Getter
     @Column(name = "email", nullable = false, length = 100)
     private String email;
-
     @Column(name = "username", nullable = false, length = 100)
     private String username;
-
-    @Getter
     @Column(name = "firstname", nullable = false, length = 100)
     private String firstname;
-
-    @Getter
     @Column(name = "lastname", nullable = false, length = 100)
     private String lastname;
-
     @Column(name = "password", nullable = false)
     private String password;
-
     @Column(name = "nonexpired", nullable = false)
     private boolean accountNonExpired;
-
     @Column(name = "nonlocked", nullable = false)
     private boolean accountNonLocked;
-
-    @Getter
     @Column(name = "failed_login_attempts", nullable = false)
     private int failedLoginAttempts;
-
-    @Getter
     @Column(name = "is_login_retries_enabled", nullable = false)
     private boolean loginRetryLimitEnabled;
-
     @Column(name = "nonexpired_credentials", nullable = false)
     private boolean credentialsNonExpired;
-
     @Column(name = "enabled", nullable = false)
     private boolean enabled;
-
     @Column(name = "firsttime_login_remaining", nullable = false)
     private boolean firstTimeLoginRemaining;
-
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted;
-
-    @Getter
     @ManyToOne
     @JoinColumn(name = "office_id", nullable = false)
     private Office office;
-
-    @Getter
     @ManyToOne
     @JoinColumn(name = "staff_id", nullable = true)
     private Staff staff;
-
-    @Getter
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "m_appuser_role", joinColumns = @JoinColumn(name = "appuser_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
-
-    @Getter
     @Column(name = "last_time_password_updated")
     private LocalDate lastTimePasswordUpdated;
-
     @Column(name = "password_never_expires", nullable = false)
     private boolean passwordNeverExpires;
-
-    @Getter
-
     @Column(name = "cannot_change_password", nullable = true)
     private Boolean cannotChangePassword;
-
     @Column(name = "password_reset_required", nullable = false)
     private boolean passwordResetRequired;
 
@@ -144,33 +111,24 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
         this.passwordResetRequired = required;
     }
 
-    @Getter
     @Column(name = "temporary_password")
     private String temporaryPassword;
-
     @Column(name = "temporary_password_expiry_time")
     private OffsetDateTime temporaryPasswordExpiryTime;
-
-    @Getter
     @Column(name = "is_password_reset_enabled", nullable = false)
     private boolean passwordResetAllowed = false;
 
     public static AppUser fromJson(final Office userOffice, final Staff linkedStaff, final Set<Role> allRoles, final JsonCommand command) {
-
         final String username = command.stringValueOfParameterNamed("username");
         String password = command.stringValueOfParameterNamed("password");
         final Boolean sendPasswordToEmail = command.booleanObjectValueOfParameterNamed("sendPasswordToEmail");
-
         if (sendPasswordToEmail) {
             password = new RandomPasswordGenerator(13).generate();
         }
-
         boolean passwordNeverExpire = false;
-
         if (command.parameterExists(AppUserConstants.PASSWORD_NEVER_EXPIRES)) {
             passwordNeverExpire = command.booleanPrimitiveValueOfParameterNamed(AppUserConstants.PASSWORD_NEVER_EXPIRES);
         }
-
         final boolean userEnabled = true;
         final boolean userAccountNonExpired = true;
         final boolean userCredentialsNonExpired = true;
@@ -180,19 +138,13 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
         if (command.parameterExists(AppUserConstants.IS_LOGIN_RETRIES_ENABLED)) {
             loginRetryLimitEnabled = command.booleanPrimitiveValueOfParameterNamed(AppUserConstants.IS_LOGIN_RETRIES_ENABLED);
         }
-
         final Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("DUMMY_ROLE_NOT_USED_OR_PERSISTED_TO_AVOID_EXCEPTION"));
-
-        final User user = new User(username, password, userEnabled, userAccountNonExpired, userCredentialsNonExpired, userAccountNonLocked,
-                authorities);
-
+        final User user = new User(username, password, userEnabled, userAccountNonExpired, userCredentialsNonExpired, userAccountNonLocked, authorities);
         final String email = command.stringValueOfParameterNamed("email");
         final String firstname = command.stringValueOfParameterNamed("firstname");
         final String lastname = command.stringValueOfParameterNamed("lastname");
-
-        final AppUser appUser = new AppUser(userOffice, user, allRoles, email, firstname, lastname, linkedStaff, passwordNeverExpire,
-                cannotChangePassword);
+        final AppUser appUser = new AppUser(userOffice, user, allRoles, email, firstname, lastname, linkedStaff, passwordNeverExpire, cannotChangePassword);
         appUser.updateLoginRetryLimitEnabled(resolveLoginRetryLimitEnabled(username, loginRetryLimitEnabled));
         if (command.parameterExists(AppUserConstants.IS_PASSWORD_RESET_ALLOWED)) {
             appUser.updatePasswordResetAllowed(command.booleanPrimitiveValueOfParameterNamed(AppUserConstants.IS_PASSWORD_RESET_ALLOWED));
@@ -208,8 +160,7 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
         this.loginRetryLimitEnabled = false;
     }
 
-    public AppUser(final Office office, final User user, final Set<Role> roles, final String email, final String firstname,
-            final String lastname, final Staff staff, final boolean passwordNeverExpire, final Boolean cannotChangePassword) {
+    public AppUser(final Office office, final User user, final Set<Role> roles, final String email, final String firstname, final String lastname, final Staff staff, final boolean passwordNeverExpire, final Boolean cannotChangePassword) {
         this.office = office;
         this.email = email.trim();
         this.username = user.getUsername().trim();
@@ -248,25 +199,21 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
 
     private void updatePassword(JsonCommand command, PlatformPasswordEncoder platformPasswordEncoder, Map<String, Object> actualChanges) {
         final String passwordParamName = PASSWORD;
-        if (command.hasParameter(passwordParamName)
-                && command.isChangeInPasswordParameterNamed(passwordParamName, this.password, platformPasswordEncoder, getId())) {
+        if (command.hasParameter(passwordParamName) && command.isChangeInPasswordParameterNamed(passwordParamName, this.password, platformPasswordEncoder, getId())) {
             final String passwordEncodedValue = command.passwordValueOfParameterNamed(passwordParamName, platformPasswordEncoder, getId());
             actualChanges.put(passwordParamName, true);
             updatePassword(passwordEncodedValue);
         }
-
     }
 
     public void updatePassword(final String encodePassword) {
         if (Boolean.TRUE.equals(cannotChangePassword)) {
             throw new NoAuthorizationException("Password of this user may not be modified");
         }
-
         this.password = encodePassword;
         clearTemporaryPassword();
         this.firstTimeLoginRemaining = false;
         this.lastTimePasswordUpdated = DateUtils.getBusinessLocalDate();
-
     }
 
     public void updateTemporaryPassword(final String encodedPassword, final OffsetDateTime expiryTime) {
@@ -315,7 +262,6 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
 
     public Map<String, Object> update(final JsonCommand command, final PlatformPasswordEncoder platformPasswordEncoder) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>(7);
-
         // unencoded password provided
         updatePassword(command, platformPasswordEncoder, actualChanges);
         final String officeIdParamName = "officeId";
@@ -323,63 +269,50 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
             final Long newValue = command.longValueOfParameterNamed(officeIdParamName);
             actualChanges.put(officeIdParamName, newValue);
         }
-
         final String staffIdParamName = "staffId";
-        if (command.hasParameter(staffIdParamName)
-                && (this.staff == null || command.isChangeInLongParameterNamed(staffIdParamName, this.staff.getId()))) {
+        if (command.hasParameter(staffIdParamName) && (this.staff == null || command.isChangeInLongParameterNamed(staffIdParamName, this.staff.getId()))) {
             final Long newValue = command.longValueOfParameterNamed(staffIdParamName);
             actualChanges.put(staffIdParamName, newValue);
         }
-
         final String rolesParamName = "roles";
         if (command.isChangeInArrayParameterNamed(rolesParamName, getRolesAsIdStringArray())) {
             final String[] newValue = command.arrayValueOfParameterNamed(rolesParamName);
             actualChanges.put(rolesParamName, newValue);
         }
-
         final String usernameParamName = "username";
         if (command.isChangeInStringParameterNamed(usernameParamName, this.username)) {
-
             // TODO Remove this check once we are identifying system user based on user ID
             if (isSystemUser()) {
                 throw new NoAuthorizationException("User name of current system user may not be modified");
             }
-
             final String newValue = command.stringValueOfParameterNamed(usernameParamName);
             actualChanges.put(usernameParamName, newValue);
             this.username = newValue;
         }
-
         final String firstnameParamName = "firstname";
         if (command.isChangeInStringParameterNamed(firstnameParamName, this.firstname)) {
             final String newValue = command.stringValueOfParameterNamed(firstnameParamName);
             actualChanges.put(firstnameParamName, newValue);
             this.firstname = newValue;
         }
-
         final String lastnameParamName = "lastname";
         if (command.isChangeInStringParameterNamed(lastnameParamName, this.lastname)) {
             final String newValue = command.stringValueOfParameterNamed(lastnameParamName);
             actualChanges.put(lastnameParamName, newValue);
             this.lastname = newValue;
         }
-
         final String emailParamName = "email";
         if (command.isChangeInStringParameterNamed(emailParamName, this.email)) {
             final String newValue = command.stringValueOfParameterNamed(emailParamName);
             actualChanges.put(emailParamName, newValue);
             this.email = newValue;
         }
-
         final String passwordNeverExpire = "passwordNeverExpires";
-
-        if (command.hasParameter(passwordNeverExpire)
-                && command.isChangeInBooleanParameterNamed(passwordNeverExpire, this.passwordNeverExpires)) {
+        if (command.hasParameter(passwordNeverExpire) && command.isChangeInBooleanParameterNamed(passwordNeverExpire, this.passwordNeverExpires)) {
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(passwordNeverExpire);
             actualChanges.put(passwordNeverExpire, newValue);
             this.passwordNeverExpires = newValue;
         }
-
         if (command.hasParameter(AppUserConstants.IS_LOGIN_RETRIES_ENABLED)) {
             final boolean requestedValue = command.booleanPrimitiveValueOfParameterNamed(AppUserConstants.IS_LOGIN_RETRIES_ENABLED);
             final boolean effectiveValue = resolveLoginRetryLimitEnabled(this.username, requestedValue);
@@ -388,9 +321,7 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
                 updateLoginRetryLimitEnabled(effectiveValue);
             }
         }
-
-        if (command.hasParameter(AppUserConstants.IS_PASSWORD_RESET_ALLOWED)
-                && command.isChangeInBooleanParameterNamed(AppUserConstants.IS_PASSWORD_RESET_ALLOWED, this.passwordResetAllowed)) {
+        if (command.hasParameter(AppUserConstants.IS_PASSWORD_RESET_ALLOWED) && command.isChangeInBooleanParameterNamed(AppUserConstants.IS_PASSWORD_RESET_ALLOWED, this.passwordResetAllowed)) {
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(AppUserConstants.IS_PASSWORD_RESET_ALLOWED);
             actualChanges.put(AppUserConstants.IS_PASSWORD_RESET_ALLOWED, newValue);
             updatePasswordResetAllowed(newValue);
@@ -400,11 +331,9 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
 
     private String[] getRolesAsIdStringArray() {
         final List<String> roleIds = new ArrayList<>();
-
         for (final Role role : this.roles) {
             roleIds.add(role.getId().toString());
         }
-
         return roleIds.toArray(new String[0]);
     }
 
@@ -417,7 +346,6 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
         if (isSystemUser()) {
             throw new NoAuthorizationException("User configured as the system user cannot be deleted");
         }
-
         this.deleted = true;
         this.enabled = false;
         this.accountNonExpired = false;
@@ -543,19 +471,14 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
     }
 
     public boolean hasNotPermissionForReport(final String reportName) {
-
         return hasNotPermissionForAnyOf("ALL_FUNCTIONS", "ALL_FUNCTIONS_READ", "REPORTING_SUPER_USER", "READ_" + reportName);
     }
 
     public boolean hasNotPermissionForDatatable(final String datatable, final String accessType) {
-
         final String matchPermission = accessType + "_" + datatable;
-
         if (accessType.equalsIgnoreCase("READ")) {
-
             return hasNotPermissionForAnyOf("ALL_FUNCTIONS", "ALL_FUNCTIONS_READ", matchPermission);
         }
-
         return hasNotPermissionForAnyOf("ALL_FUNCTIONS", matchPermission);
     }
 
@@ -606,14 +529,11 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
     }
 
     private void validateHasPermission(final String prefix, final String resourceType) {
-        final String authorizationMessage = "User has no authority to " + prefix + " " + resourceType.toLowerCase(java.util.Locale.ROOT)
-                + "s";
+        final String authorizationMessage = "User has no authority to " + prefix + " " + resourceType.toLowerCase(java.util.Locale.ROOT) + "s";
         final String matchPermission = prefix + "_" + resourceType.toUpperCase(java.util.Locale.ROOT);
-
         if (!hasNotPermissionForAnyOf("ALL_FUNCTIONS", "ALL_FUNCTIONS_READ", matchPermission)) {
             return;
         }
-
         throw new NoAuthorizationException(authorizationMessage);
     }
 
@@ -659,14 +579,12 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
 
     public boolean hasAnyPermission(final List<String> permissions) {
         boolean hasAtLeastOneOf = false;
-
         for (final String permissionCode : permissions) {
             if (hasPermissionTo(permissionCode)) {
                 hasAtLeastOneOf = true;
                 break;
             }
         }
-
         return hasAtLeastOneOf;
     }
 
@@ -728,20 +646,13 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
         final String passwordParamName = "password";
         final String passwordEncodedParamName = "passwordEncoded";
         String passwordEncodedValue = null;
-
         if (command.hasParameter(passwordParamName)) {
             if (command.isChangeInPasswordParameterNamed(passwordParamName, this.password, platformPasswordEncoder, getId())) {
-
                 passwordEncodedValue = command.passwordValueOfParameterNamed(passwordParamName, platformPasswordEncoder, getId());
-
             }
-        } else if (command.hasParameter(passwordEncodedParamName)
-                && command.isChangeInStringParameterNamed(passwordEncodedParamName, this.password)) {
-
+        } else if (command.hasParameter(passwordEncodedParamName) && command.isChangeInStringParameterNamed(passwordEncodedParamName, this.password)) {
             passwordEncodedValue = command.stringValueOfParameterNamed(passwordEncodedParamName);
-
         }
-
         return passwordEncodedValue;
     }
 
@@ -759,5 +670,65 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
     @Override
     public String toString() {
         return "AppUser [username=" + this.username + ", getId()=" + this.getId() + "]";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEmail() {
+        return this.email;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getFirstname() {
+        return this.firstname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLastname() {
+        return this.lastname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public int getFailedLoginAttempts() {
+        return this.failedLoginAttempts;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isLoginRetryLimitEnabled() {
+        return this.loginRetryLimitEnabled;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Office getOffice() {
+        return this.office;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Staff getStaff() {
+        return this.staff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Set<Role> getRoles() {
+        return this.roles;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getLastTimePasswordUpdated() {
+        return this.lastTimePasswordUpdated;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Boolean getCannotChangePassword() {
+        return this.cannotChangePassword;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getTemporaryPassword() {
+        return this.temporaryPassword;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isPasswordResetAllowed() {
+        return this.passwordResetAllowed;
     }
 }

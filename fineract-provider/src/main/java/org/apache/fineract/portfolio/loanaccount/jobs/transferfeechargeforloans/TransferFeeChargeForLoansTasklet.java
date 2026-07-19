@@ -21,8 +21,6 @@ package org.apache.fineract.portfolio.loanaccount.jobs.transferfeechargeforloans
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
@@ -44,66 +42,45 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class TransferFeeChargeForLoansTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TransferFeeChargeForLoansTasklet.class);
     private final LoanChargeReadPlatformService loanChargeReadPlatformService;
     private final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService;
     private final AccountTransfersWritePlatformService accountTransfersWritePlatformService;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        final Collection<LoanChargeData> chargeDatas = loanChargeReadPlatformService
-                .retrieveLoanChargesForFeePayment(ChargePaymentMode.ACCOUNT_TRANSFER.getValue(), LoanStatus.ACTIVE.getValue());
+        final Collection<LoanChargeData> chargeDatas = loanChargeReadPlatformService.retrieveLoanChargesForFeePayment(ChargePaymentMode.ACCOUNT_TRANSFER.getValue(), LoanStatus.ACTIVE.getValue());
         final boolean isRegularTransaction = true;
         List<Throwable> errors = new ArrayList<>();
         if (chargeDatas != null) {
             for (final LoanChargeData chargeData : chargeDatas) {
                 if (chargeData.isInstallmentFee()) {
-                    final Collection<LoanInstallmentChargeData> chargePerInstallments = loanChargeReadPlatformService
-                            .retrieveInstallmentLoanCharges(chargeData.getId(), true);
+                    final Collection<LoanInstallmentChargeData> chargePerInstallments = loanChargeReadPlatformService.retrieveInstallmentLoanCharges(chargeData.getId(), true);
                     PortfolioAccountData portfolioAccountData = null;
                     for (final LoanInstallmentChargeData installmentChargeData : chargePerInstallments) {
                         if (!DateUtils.isDateInTheFuture(installmentChargeData.getDueDate())) {
                             if (portfolioAccountData == null) {
-                                portfolioAccountData = accountAssociationsReadPlatformService
-                                        .retriveLoanLinkedAssociation(chargeData.getLoanId());
+                                portfolioAccountData = accountAssociationsReadPlatformService.retriveLoanLinkedAssociation(chargeData.getLoanId());
                             }
                             if (portfolioAccountData == null) {
-                                errors.add(new LinkedAccountRequiredException("loan.transfer.fee.charge",
-                                        "Loan with id:" + chargeData.getLoanId()
-                                                + " has a charge payable by account transfer but no linked savings account",
-                                        chargeData.getLoanId()));
+                                errors.add(new LinkedAccountRequiredException("loan.transfer.fee.charge", "Loan with id:" + chargeData.getLoanId() + " has a charge payable by account transfer but no linked savings account", chargeData.getLoanId()));
                                 break;
                             }
                             final boolean isExceptionForBalanceCheck = false;
-                            final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(DateUtils.getBusinessLocalDate(),
-                                    installmentChargeData.getAmountOutstanding(), PortfolioAccountType.SAVINGS, PortfolioAccountType.LOAN,
-                                    portfolioAccountData.getId(), chargeData.getLoanId(), "Loan Charge Payment", null, null, null, null,
-                                    LoanTransactionType.CHARGE_PAYMENT.getValue(), chargeData.getId(),
-                                    installmentChargeData.getInstallmentNumber(), AccountTransferType.CHARGE_PAYMENT.getValue(), null, null,
-                                    ExternalId.empty(), null, null, null, isRegularTransaction, isExceptionForBalanceCheck);
+                            final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(DateUtils.getBusinessLocalDate(), installmentChargeData.getAmountOutstanding(), PortfolioAccountType.SAVINGS, PortfolioAccountType.LOAN, portfolioAccountData.getId(), chargeData.getLoanId(), "Loan Charge Payment", null, null, null, null, LoanTransactionType.CHARGE_PAYMENT.getValue(), chargeData.getId(), installmentChargeData.getInstallmentNumber(), AccountTransferType.CHARGE_PAYMENT.getValue(), null, null, ExternalId.empty(), null, null, null, isRegularTransaction, isExceptionForBalanceCheck);
                             transferFeeCharge(accountTransferDTO, errors);
                         }
                     }
                 } else if (chargeData.getDueDate() != null && !DateUtils.isDateInTheFuture(chargeData.getDueDate())) {
-                    final PortfolioAccountData portfolioAccountData = accountAssociationsReadPlatformService
-                            .retriveLoanLinkedAssociation(chargeData.getLoanId());
+                    final PortfolioAccountData portfolioAccountData = accountAssociationsReadPlatformService.retriveLoanLinkedAssociation(chargeData.getLoanId());
                     if (portfolioAccountData == null) {
-                        errors.add(new LinkedAccountRequiredException("loan.transfer.fee.charge",
-                                "Loan with id:" + chargeData.getLoanId()
-                                        + " has a charge payable by account transfer but no linked savings account",
-                                chargeData.getLoanId()));
+                        errors.add(new LinkedAccountRequiredException("loan.transfer.fee.charge", "Loan with id:" + chargeData.getLoanId() + " has a charge payable by account transfer but no linked savings account", chargeData.getLoanId()));
                         continue;
                     }
                     final boolean isExceptionForBalanceCheck = false;
-                    final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(DateUtils.getBusinessLocalDate(),
-                            chargeData.getAmountOutstanding(), PortfolioAccountType.SAVINGS, PortfolioAccountType.LOAN,
-                            portfolioAccountData.getId(), chargeData.getLoanId(), "Loan Charge Payment", null, null, null, null,
-                            LoanTransactionType.CHARGE_PAYMENT.getValue(), chargeData.getId(), null,
-                            AccountTransferType.CHARGE_PAYMENT.getValue(), null, null, ExternalId.empty(), null, null, null,
-                            isRegularTransaction, isExceptionForBalanceCheck);
+                    final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(DateUtils.getBusinessLocalDate(), chargeData.getAmountOutstanding(), PortfolioAccountType.SAVINGS, PortfolioAccountType.LOAN, portfolioAccountData.getId(), chargeData.getLoanId(), "Loan Charge Payment", null, null, null, null, LoanTransactionType.CHARGE_PAYMENT.getValue(), chargeData.getId(), null, AccountTransferType.CHARGE_PAYMENT.getValue(), null, null, ExternalId.empty(), null, null, null, isRegularTransaction, isExceptionForBalanceCheck);
                     transferFeeCharge(accountTransferDTO, errors);
                 }
             }
@@ -118,9 +95,15 @@ public class TransferFeeChargeForLoansTasklet implements Tasklet {
         try {
             accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
         } catch (RuntimeException e) {
-            log.error("Exception while paying charge {} for loan id {}", accountTransferDTO.getChargeId(),
-                    accountTransferDTO.getToAccountId(), e);
+            log.error("Exception while paying charge {} for loan id {}", accountTransferDTO.getChargeId(), accountTransferDTO.getToAccountId(), e);
             errors.add(e);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TransferFeeChargeForLoansTasklet(final LoanChargeReadPlatformService loanChargeReadPlatformService, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final AccountTransfersWritePlatformService accountTransfersWritePlatformService) {
+        this.loanChargeReadPlatformService = loanChargeReadPlatformService;
+        this.accountAssociationsReadPlatformService = accountAssociationsReadPlatformService;
+        this.accountTransfersWritePlatformService = accountTransfersWritePlatformService;
     }
 }

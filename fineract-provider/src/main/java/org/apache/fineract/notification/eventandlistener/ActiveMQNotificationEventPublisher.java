@@ -19,8 +19,6 @@
 package org.apache.fineract.notification.eventandlistener;
 
 import jakarta.jms.Queue;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.fineract.infrastructure.core.condition.EnableFineractEventsCondition;
 import org.apache.fineract.notification.data.NotificationData;
@@ -34,17 +32,15 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @Service
 @Profile("activeMqEnabled")
 @Conditional(EnableFineractEventsCondition.class)
-@RequiredArgsConstructor
-@Slf4j
 public class ActiveMQNotificationEventPublisher implements NotificationEventPublisher {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ActiveMQNotificationEventPublisher.class);
     private final JmsTemplate jmsTemplate;
 
     @Override
     public void broadcastNotification(NotificationData notificationData) {
         if (TransactionSynchronizationManager.isActualTransactionActive() && TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-
                 @Override
                 public void afterCommit() {
                     try {
@@ -62,5 +58,10 @@ public class ActiveMQNotificationEventPublisher implements NotificationEventPubl
     private void send(NotificationData notificationData) {
         Queue queue = new ActiveMQQueue("NotificationQueue");
         jmsTemplate.send(queue, session -> session.createObjectMessage(notificationData));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ActiveMQNotificationEventPublisher(final JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
     }
 }

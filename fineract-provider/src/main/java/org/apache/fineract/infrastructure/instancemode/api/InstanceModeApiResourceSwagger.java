@@ -19,16 +19,11 @@
 package org.apache.fineract.infrastructure.instancemode.api;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.ToString;
 
 public class InstanceModeApiResourceSwagger {
 
-    @ToString
     @Schema(description = "ChangeInstanceModeRequest")
-    @Getter
     public static final class ChangeInstanceModeRequest {
-
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
         public boolean readEnabled;
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
@@ -37,5 +32,31 @@ public class InstanceModeApiResourceSwagger {
         public boolean batchWorkerEnabled;
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
         public boolean batchManagerEnabled;
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "InstanceModeApiResourceSwagger.ChangeInstanceModeRequest(readEnabled=" + this.isReadEnabled() + ", writeEnabled=" + this.isWriteEnabled() + ", batchWorkerEnabled=" + this.isBatchWorkerEnabled() + ", batchManagerEnabled=" + this.isBatchManagerEnabled() + ")";
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public boolean isReadEnabled() {
+            return this.readEnabled;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public boolean isWriteEnabled() {
+            return this.writeEnabled;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public boolean isBatchWorkerEnabled() {
+            return this.batchWorkerEnabled;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public boolean isBatchManagerEnabled() {
+            return this.batchManagerEnabled;
+        }
     }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.account.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.account.domain.AccountTransferRepository;
 import org.apache.fineract.portfolio.account.domain.AccountTransferTransaction;
 import org.apache.fineract.portfolio.interestpauses.service.LoanAccountTransfersService;
@@ -27,9 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class LoanAccountTransfersServiceImpl implements LoanAccountTransfersService {
-
     private final AccountTransferRepository accountTransferRepository;
 
     @Override
@@ -42,4 +39,8 @@ public class LoanAccountTransfersServiceImpl implements LoanAccountTransfersServ
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanAccountTransfersServiceImpl(final AccountTransferRepository accountTransferRepository) {
+        this.accountTransferRepository = accountTransferRepository;
+    }
 }

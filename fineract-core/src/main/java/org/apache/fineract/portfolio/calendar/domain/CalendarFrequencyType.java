@@ -20,19 +20,16 @@ package org.apache.fineract.portfolio.calendar.domain;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Getter;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.springframework.util.StringUtils;
 
-@Getter
 public enum CalendarFrequencyType {
-
-    INVALID(0, "calendarFrequencyType.invalid"), //
-    DAILY(1, "calendarFrequencyType.daily"), //
-    WEEKLY(2, "calendarFrequencyType.weekly"), //
-    MONTHLY(3, "calendarFrequencyType.monthly"), //
-    YEARLY(4, "calendarFrequencyType.yearly"); //
-
+    INVALID(0, "calendarFrequencyType.invalid"),  //
+    DAILY(1, "calendarFrequencyType.daily"),  //
+    WEEKLY(2, "calendarFrequencyType.weekly"),  //
+    MONTHLY(3, "calendarFrequencyType.monthly"),  //
+    YEARLY(4, "calendarFrequencyType.yearly");
+    //
     private final Integer value;
     private final String code;
 
@@ -42,9 +39,7 @@ public enum CalendarFrequencyType {
     }
 
     private static final Map<Integer, CalendarFrequencyType> intToEnumMap = new HashMap<>();
-    @Getter
     private static int minValue = CalendarFrequencyType.DAILY.value;
-    @Getter
     private static int maxValue = CalendarFrequencyType.YEARLY.value;
 
     static {
@@ -59,11 +54,9 @@ public enum CalendarFrequencyType {
 
     public static CalendarFrequencyType fromString(final String frequencyString) {
         CalendarFrequencyType frequency = CalendarFrequencyType.INVALID;
-
         if (!StringUtils.hasText(frequencyString)) {
             return frequency;
         }
-
         if (frequencyString.equalsIgnoreCase(CalendarFrequencyType.DAILY.toString())) {
             frequency = CalendarFrequencyType.DAILY;
         } else if (frequencyString.equalsIgnoreCase(CalendarFrequencyType.WEEKLY.toString())) {
@@ -73,7 +66,6 @@ public enum CalendarFrequencyType {
         } else if (frequencyString.equalsIgnoreCase(CalendarFrequencyType.YEARLY.toString())) {
             frequency = CalendarFrequencyType.YEARLY;
         }
-
         return frequency;
     }
 
@@ -121,5 +113,25 @@ public enum CalendarFrequencyType {
             case YEARLY -> PeriodFrequencyType.YEARS;
             default -> PeriodFrequencyType.INVALID;
         };
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static int getMinValue() {
+        return CalendarFrequencyType.minValue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static int getMaxValue() {
+        return CalendarFrequencyType.maxValue;
     }
 }

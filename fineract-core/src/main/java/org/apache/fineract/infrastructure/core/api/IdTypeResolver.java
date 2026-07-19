@@ -19,27 +19,21 @@
 package org.apache.fineract.infrastructure.core.api;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.service.DefaultOption;
 
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
 public abstract class IdTypeResolver {
 
     public enum IdType implements DefaultOption {
+        ID,  //
+        EXTERNAL_ID,  //
+        SHORT_NAME;
 
-        ID, //
-        EXTERNAL_ID, //
-        SHORT_NAME,; //
-
+        //
         @Override
         public boolean isDefault() {
             return this == ID;
         }
-
     }
 
     @NotNull
@@ -68,8 +62,7 @@ public abstract class IdTypeResolver {
     }
 
     public static RuntimeException resolveFailed(String idType, Exception e) {
-        return new PlatformApiDataValidationException("error.msg.id.type.not.found", "Provided type " + idType + " is not supported",
-                "idType", e, idType);
+        return new PlatformApiDataValidationException("error.msg.id.type.not.found", "Provided type " + idType + " is not supported", "idType", e, idType);
     }
 
     private static <T extends Enum<T>> T defaultOption(Class<T> clazz) {
@@ -83,5 +76,9 @@ public abstract class IdTypeResolver {
             }
         }
         return null;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected IdTypeResolver() {
     }
 }

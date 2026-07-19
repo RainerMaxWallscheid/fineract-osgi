@@ -20,14 +20,11 @@ package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.math.BigDecimal;
 import java.util.Objects;
-import lombok.Getter;
 
 /**
  * Immutable data object representing the total unpaid charge details
  */
-@Getter
 public class UnpaidChargeData {
-
     private static final String NULL_VALUE_IS_NOT_ALLOWED = "Null value is not allowed";
     private final Long chargeId;
     private final String chargeName;
@@ -37,5 +34,20 @@ public class UnpaidChargeData {
         this.chargeId = Objects.requireNonNull(chargeId, NULL_VALUE_IS_NOT_ALLOWED);
         this.chargeName = Objects.requireNonNull(chargeName, NULL_VALUE_IS_NOT_ALLOWED);
         this.outstandingAmount = Objects.requireNonNull(outstandingAmount, NULL_VALUE_IS_NOT_ALLOWED);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getChargeId() {
+        return this.chargeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getChargeName() {
+        return this.chargeName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getOutstandingAmount() {
+        return this.outstandingAmount;
     }
 }

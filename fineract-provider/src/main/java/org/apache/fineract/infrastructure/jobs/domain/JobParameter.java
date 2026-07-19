@@ -22,26 +22,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.util.Objects;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "job_parameters")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class JobParameter extends AbstractPersistableCustom<Long> {
-
     @Column(name = "job_id", nullable = false)
     private Long jobId;
-
     @Column(name = "parameter_name", nullable = true)
     private String parameterName;
-
     @Column(name = "parameter_value", nullable = true)
     private String parameterValue;
 
@@ -55,13 +44,57 @@ public class JobParameter extends AbstractPersistableCustom<Long> {
             return false;
         }
         JobParameter jobParameter = (JobParameter) obj;
-        return Objects.equals(jobParameter.getJobId(), this.getJobId())
-                && Objects.equals(jobParameter.getParameterName(), this.getParameterName())
-                && Objects.equals(jobParameter.getParameterValue(), this.getParameterValue());
+        return Objects.equals(jobParameter.getJobId(), this.getJobId()) && Objects.equals(jobParameter.getParameterName(), this.getParameterName()) && Objects.equals(jobParameter.getParameterValue(), this.getParameterValue());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(jobId, parameterName, parameterValue);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getJobId() {
+        return this.jobId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getParameterName() {
+        return this.parameterName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getParameterValue() {
+        return this.parameterValue;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public JobParameter setJobId(final Long jobId) {
+        this.jobId = jobId;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public JobParameter setParameterName(final String parameterName) {
+        this.parameterName = parameterName;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public JobParameter setParameterValue(final String parameterValue) {
+        this.parameterValue = parameterValue;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JobParameter() {
     }
 }

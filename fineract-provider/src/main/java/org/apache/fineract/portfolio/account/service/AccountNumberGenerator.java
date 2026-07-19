@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.account.service;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormat;
@@ -49,11 +48,8 @@ import org.springframework.stereotype.Component;
  * it ensuring the identifier is always of a given <code>maxLength</code>.
  */
 @Component
-@AllArgsConstructor
 public class AccountNumberGenerator implements AccountNumberGeneratorService {
-
     private static final int maxLength = 9;
-
     private static final String ID = "id";
     private static final String ENTITY_TYPE = "entityType";
     private static final String CLIENT_TYPE = "clientType";
@@ -109,8 +105,7 @@ public class AccountNumberGenerator implements AccountNumberGeneratorService {
     public String generate(WorkingCapitalLoan wcl, AccountNumberFormat accountNumberFormat) {
         Map<String, String> propertyMap = new HashMap<>();
         propertyMap.put(ID, wcl.getId().toString());
-        propertyMap.put(OFFICE_NAME,
-                wcl.getClient() != null && wcl.getClient().getOffice() != null ? wcl.getClient().getOffice().getName() : "");
+        propertyMap.put(OFFICE_NAME, wcl.getClient() != null && wcl.getClient().getOffice() != null ? wcl.getClient().getOffice().getName() : "");
         propertyMap.put(LOAN_PRODUCT_SHORT_NAME, wcl.getLoanProduct() != null ? wcl.getLoanProduct().getShortName() : "");
         propertyMap.put(ENTITY_TYPE, "workingCapitalLoan");
         return generateAccountNumber(propertyMap, accountNumberFormat);
@@ -124,60 +119,47 @@ public class AccountNumberGenerator implements AccountNumberGeneratorService {
             case SAVINGS -> generate((SavingsAccount) entity, format);
             case SHARES -> generate((ShareAccount) entity, format);
             case WORKING_CAPITAL_LOAN -> generate((WorkingCapitalLoan) entity, format);
-            case CENTER, GROUP ->
-                throw new UnsupportedOperationException("Use generateCenterAccountNumber / generateGroupAccountNumber for " + type);
+            case CENTER, GROUP -> throw new UnsupportedOperationException("Use generateCenterAccountNumber / generateGroupAccountNumber for " + type);
         };
     }
 
     private String generateAccountNumber(Map<String, String> propertyMap, AccountNumberFormat accountNumberFormat) {
         int accountMaxLength = AccountNumberGenerator.maxLength;
         String accountNumber = StringUtils.leftPad(propertyMap.get(ID), accountMaxLength, '0');
-
         // find if the custom length is defined
-        final GlobalConfigurationPropertyData customLength = this.configurationReadPlatformService
-                .retrieveGlobalConfiguration(GlobalConfigurationConstants.CUSTOM_ACCOUNT_NUMBER_LENGTH);
-
+        final GlobalConfigurationPropertyData customLength = this.configurationReadPlatformService.retrieveGlobalConfiguration(GlobalConfigurationConstants.CUSTOM_ACCOUNT_NUMBER_LENGTH);
         if (customLength.isEnabled()) {
             // if it is enabled, and has the value, get it from the repository.
             if (customLength.getValue() != null) {
                 accountMaxLength = customLength.getValue().intValue();
             }
         }
-
-        final GlobalConfigurationPropertyData randomAccountNumber = this.configurationReadPlatformService
-                .retrieveGlobalConfiguration(GlobalConfigurationConstants.RANDOM_ACCOUNT_NUMBER);
-
+        final GlobalConfigurationPropertyData randomAccountNumber = this.configurationReadPlatformService.retrieveGlobalConfiguration(GlobalConfigurationConstants.RANDOM_ACCOUNT_NUMBER);
         if (randomAccountNumber.isEnabled()) {
             accountNumber = randomNumberGenerator(accountMaxLength, propertyMap);
         }
-
         accountNumber = StringUtils.leftPad(accountNumber, accountMaxLength, '0');
         if (accountNumberFormat != null && accountNumberFormat.getPrefixEnum() != null) {
             AccountNumberPrefixType accountNumberPrefixType = AccountNumberPrefixType.fromInt(accountNumberFormat.getPrefixEnum());
             String prefix = null;
             switch (accountNumberPrefixType) {
-                case CLIENT_TYPE:
-                    prefix = propertyMap.get(CLIENT_TYPE);
+            case CLIENT_TYPE: 
+                prefix = propertyMap.get(CLIENT_TYPE);
                 break;
-
-                case OFFICE_NAME:
-                    prefix = propertyMap.get(OFFICE_NAME);
+            case OFFICE_NAME: 
+                prefix = propertyMap.get(OFFICE_NAME);
                 break;
-
-                case LOAN_PRODUCT_SHORT_NAME:
-                    prefix = propertyMap.get(LOAN_PRODUCT_SHORT_NAME);
+            case LOAN_PRODUCT_SHORT_NAME: 
+                prefix = propertyMap.get(LOAN_PRODUCT_SHORT_NAME);
                 break;
-
-                case SAVINGS_PRODUCT_SHORT_NAME:
-                    prefix = propertyMap.get(SAVINGS_PRODUCT_SHORT_NAME);
+            case SAVINGS_PRODUCT_SHORT_NAME: 
+                prefix = propertyMap.get(SAVINGS_PRODUCT_SHORT_NAME);
                 break;
-
-                case PREFIX_SHORT_NAME:
-                    generatePrefix(propertyMap, propertyMap.get(ID), accountMaxLength, accountNumberFormat);
-                    prefix = propertyMap.get(PREFIX_SHORT_NAME);
+            case PREFIX_SHORT_NAME: 
+                generatePrefix(propertyMap, propertyMap.get(ID), accountMaxLength, accountNumberFormat);
+                prefix = propertyMap.get(PREFIX_SHORT_NAME);
                 break;
             }
-
             // FINERACT-590
             // Because account_no is limited to 20 chars, we can only use the
             // first 10 chars of prefix - trim if necessary
@@ -186,7 +168,6 @@ public class AccountNumberGenerator implements AccountNumberGeneratorService {
             }
             if (accountNumberPrefixType.getValue().equals(AccountNumberPrefixType.PREFIX_SHORT_NAME.getValue())) {
                 Integer prefixLength = prefix.length();
-
                 if (randomAccountNumber.isEnabled()) {
                     accountNumber = accountNumber.substring(prefixLength);
                 } else {
@@ -196,11 +177,10 @@ public class AccountNumberGenerator implements AccountNumberGeneratorService {
             } else {
                 accountNumber = StringUtils.leftPad(accountNumber, Integer.valueOf(propertyMap.get(ID).length()), '0');
             }
-
             accountNumber = StringUtils.overlay(accountNumber, prefix, 0, 0);
         }
-
-        if (randomAccountNumber.isEnabled()) { // calling the main function itself until new randomNo.
+        if (randomAccountNumber.isEnabled()) {
+            // calling the main function itself until new randomNo.
             Boolean randomNumberConflict = checkAccountNumberConflict(propertyMap, accountNumberFormat, accountNumber);
             if (randomNumberConflict) {
                 accountNumber = generateAccountNumber(propertyMap, accountNumberFormat);
@@ -211,77 +191,62 @@ public class AccountNumberGenerator implements AccountNumberGeneratorService {
 
     private String randomNumberGenerator(int accountMaxLength, Map<String, String> propertyMap) {
         String randomNumber = RandomStringUtils.secure().next(accountMaxLength, false, true); // NOSONAR
-
         BigInteger accNumber = new BigInteger(randomNumber);
-        if (accNumber.equals(BigInteger.ZERO)) { // to avoid account no. 00 in randomisation
+        if (accNumber.equals(BigInteger.ZERO)) {
+            // to avoid account no. 00 in randomisation
             randomNumber = randomNumberGenerator(accountMaxLength, propertyMap);
         }
-
         String accountNumber = randomNumber.substring(0, accountMaxLength);
         return accountNumber;
     }
 
-    public Boolean checkAccountNumberConflict(Map<String, String> propertyMap, AccountNumberFormat accountNumberFormat,
-            String accountNumber) {
-
+    public Boolean checkAccountNumberConflict(Map<String, String> propertyMap, AccountNumberFormat accountNumberFormat, String accountNumber) {
         String entityType = propertyMap.get(ENTITY_TYPE);
-        if (entityType == null) { // No entityType in map -> cannot check for conflicts.
+        if (entityType == null) {
+            // No entityType in map -> cannot check for conflicts.
             return false;
         }
-
         boolean randomNumberConflict = false;
-
         switch (entityType) {
-            case "client": // avoid duplication it will loop until it finds new random account no.
-                Client client = this.clientRepository.getClientByAccountNumber(accountNumber);
-                if (client != null) {
-                    randomNumberConflict = true;
-                }
+        case "client": 
+            // avoid duplication it will loop until it finds new random account no.
+            Client client = this.clientRepository.getClientByAccountNumber(accountNumber);
+            if (client != null) {
+                randomNumberConflict = true;
+            }
             break;
-
-            case "loan":
-                Loan loan = this.loanRepository.findLoanAccountByAccountNumber(accountNumber);
-                if (loan != null) {
-                    randomNumberConflict = true;
-                }
+        case "loan": 
+            Loan loan = this.loanRepository.findLoanAccountByAccountNumber(accountNumber);
+            if (loan != null) {
+                randomNumberConflict = true;
+            }
             break;
-
-            case "savingsAccount":
-                SavingsAccount savingsAccount = this.savingsAccountRepository.findSavingsAccountByAccountNumber(accountNumber);
-                if (savingsAccount != null) {
-                    randomNumberConflict = true;
-                }
+        case "savingsAccount": 
+            SavingsAccount savingsAccount = this.savingsAccountRepository.findSavingsAccountByAccountNumber(accountNumber);
+            if (savingsAccount != null) {
+                randomNumberConflict = true;
+            }
             break;
-
-            case "workingCapitalLoan":
-                if (this.workingCapitalLoanRepository.existsByAccountNumber(accountNumber)) {
-                    randomNumberConflict = true;
-                }
+        case "workingCapitalLoan": 
+            if (this.workingCapitalLoanRepository.existsByAccountNumber(accountNumber)) {
+                randomNumberConflict = true;
+            }
             break;
-
-            default:
+        default: 
             break;
         }
-
         return randomNumberConflict;
     }
 
-    private Map<String, String> generatePrefix(Map<String, String> propertyMap, String accountNumber, Integer accountMaxLength,
-            AccountNumberFormat accountNumberFormat) {
-
+    private Map<String, String> generatePrefix(Map<String, String> propertyMap, String accountNumber, Integer accountMaxLength, AccountNumberFormat accountNumberFormat) {
         String prefix = accountNumberFormat.getPrefixCharacter();
         Integer prefixLength = prefix.length();
-
         Integer totalLength = prefixLength + Integer.valueOf(propertyMap.get(ID).length());
-
         prefixLength = totalLength - accountMaxLength;
-
         if (prefixLength > 0) {
             prefix = prefix.substring(0, prefix.length() - prefixLength);
         }
-
         propertyMap.put(PREFIX_SHORT_NAME, prefix);
-
         return propertyMap;
     }
 
@@ -299,5 +264,14 @@ public class AccountNumberGenerator implements AccountNumberGeneratorService {
         propertyMap.put(OFFICE_NAME, group.getOffice().getName());
         propertyMap.put(ENTITY_TYPE, "center");
         return generateAccountNumber(propertyMap, accountNumberFormat);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AccountNumberGenerator(final ConfigurationReadPlatformService configurationReadPlatformService, final ClientRepository clientRepository, final LoanRepository loanRepository, final SavingsAccountRepository savingsAccountRepository, final WorkingCapitalLoanRepository workingCapitalLoanRepository) {
+        this.configurationReadPlatformService = configurationReadPlatformService;
+        this.clientRepository = clientRepository;
+        this.loanRepository = loanRepository;
+        this.savingsAccountRepository = savingsAccountRepository;
+        this.workingCapitalLoanRepository = workingCapitalLoanRepository;
     }
 }

@@ -29,29 +29,58 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import java.util.Set;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
 @Entity
-@Table(name = "m_meeting", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "calendar_instance_id", "meeting_date" }, name = "unique_calendar_instance_id_meeting_date") })
+@Table(name = "m_meeting", uniqueConstraints = {@UniqueConstraint(columnNames = {"calendar_instance_id", "meeting_date"}, name = "unique_calendar_instance_id_meeting_date")})
 public class Meeting extends AbstractPersistableCustom<Long> {
-
     @ManyToOne
     @JoinColumn(name = "calendar_instance_id", nullable = false)
     private CalendarInstance calendarInstance;
-
     @Column(name = "meeting_date", nullable = false)
     private LocalDate meetingDate;
-
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "meeting", orphanRemoval = true)
     private Set<MeetingAttendance> clientsAttendance;
+
+    @java.lang.SuppressWarnings("all")
+        public Meeting(final CalendarInstance calendarInstance, final LocalDate meetingDate, final Set<MeetingAttendance> clientsAttendance) {
+        this.calendarInstance = calendarInstance;
+        this.meetingDate = meetingDate;
+        this.clientsAttendance = clientsAttendance;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Meeting() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CalendarInstance getCalendarInstance() {
+        return this.calendarInstance;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getMeetingDate() {
+        return this.meetingDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Set<MeetingAttendance> getClientsAttendance() {
+        return this.clientsAttendance;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setCalendarInstance(final CalendarInstance calendarInstance) {
+        this.calendarInstance = calendarInstance;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMeetingDate(final LocalDate meetingDate) {
+        this.meetingDate = meetingDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setClientsAttendance(final Set<MeetingAttendance> clientsAttendance) {
+        this.clientsAttendance = clientsAttendance;
+    }
 }

@@ -18,17 +18,32 @@
  */
 package org.apache.fineract.test.data.delinquency;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@Getter
-@RequiredArgsConstructor
 public enum DelinquencyBucketType {
-
-    REGULAR(1L, "bucketType.regular", "Reqular Loan Product"), //
+    REGULAR(1L, "bucketType.regular", "Reqular Loan Product"),  //
     WORKING_CAPITAL(2L, "bucketType.workingCapital", "Working Capital Loan Product");
-
     private final Long id;
     private final String code;
     private final String description;
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private DelinquencyBucketType(final Long id, final String code, final String description) {
+        this.id = id;
+        this.code = code;
+        this.description = description;
+    }
 }

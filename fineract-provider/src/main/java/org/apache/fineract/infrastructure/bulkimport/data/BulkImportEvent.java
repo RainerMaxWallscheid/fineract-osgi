@@ -18,31 +18,21 @@
  */
 package org.apache.fineract.infrastructure.bulkimport.data;
 
-import lombok.Getter;
 import org.apache.fineract.infrastructure.bulkimport.domain.ImportDocument;
 import org.apache.fineract.infrastructure.core.domain.FineractContext;
 import org.apache.fineract.infrastructure.core.domain.FineractEvent;
 import org.apache.poi.ss.usermodel.Workbook;
 
-@Getter
 public final class BulkImportEvent extends FineractEvent {
-
     private final Workbook workbook;
-
     private final ImportDocument importDocument;
-
     private final String fileName;
-
     private final String fileType;
-
     private final String locale;
-
     private final String dateFormat;
-
     private final Long entityId;
 
-    public BulkImportEvent(final Object source, final Workbook workbook, final String fileName, String fileType,
-            final ImportDocument importDocument, final String locale, final String dateFormat, FineractContext context, Long entityId) {
+    public BulkImportEvent(final Object source, final Workbook workbook, final String fileName, String fileType, final ImportDocument importDocument, final String locale, final String dateFormat, FineractContext context, Long entityId) {
         super(source, context);
         this.workbook = workbook;
         this.fileName = fileName;
@@ -51,5 +41,40 @@ public final class BulkImportEvent extends FineractEvent {
         this.locale = locale;
         this.dateFormat = dateFormat;
         this.entityId = entityId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Workbook getWorkbook() {
+        return this.workbook;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ImportDocument getImportDocument() {
+        return this.importDocument;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getFileName() {
+        return this.fileName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getFileType() {
+        return this.fileType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLocale() {
+        return this.locale;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDateFormat() {
+        return this.dateFormat;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getEntityId() {
+        return this.entityId;
     }
 }

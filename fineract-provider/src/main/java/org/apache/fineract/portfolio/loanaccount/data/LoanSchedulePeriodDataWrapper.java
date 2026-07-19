@@ -19,15 +19,38 @@
 package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.time.LocalDate;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
 public class LoanSchedulePeriodDataWrapper {
-
     private final LoanPrincipalRelatedDataHolder data;
     private final LocalDate date;
     private final boolean isDisbursement;
     private final boolean isDisbursed;
+
+    @java.lang.SuppressWarnings("all")
+        public LoanPrincipalRelatedDataHolder getData() {
+        return this.data;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getDate() {
+        return this.date;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isDisbursement() {
+        return this.isDisbursement;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isDisbursed() {
+        return this.isDisbursed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanSchedulePeriodDataWrapper(final LoanPrincipalRelatedDataHolder data, final LocalDate date, final boolean isDisbursement, final boolean isDisbursed) {
+        this.data = data;
+        this.date = date;
+        this.isDisbursement = isDisbursement;
+        this.isDisbursed = isDisbursed;
+    }
 }

@@ -20,22 +20,26 @@ package org.apache.fineract.command.jdbc.store.converter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 @WritingConverter
 public class JsonNodeWritingConverter implements Converter<JsonNode, String> {
-
     private final ObjectMapper mapper;
 
-    @SneakyThrows
     @Override
     public String convert(JsonNode source) {
-        return mapper.writeValueAsString(source);
+        try {
+            return mapper.writeValueAsString(source);
+        } catch (final java.lang.Throwable $ex) {
+            throw new java.lang.RuntimeException($ex);
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JsonNodeWritingConverter(final ObjectMapper mapper) {
+        this.mapper = mapper;
     }
 }

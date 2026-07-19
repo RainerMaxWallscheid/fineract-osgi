@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.infrastructure.core.diagnostics.performance.sampling.support;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.diagnostics.performance.sampling.core.SamplingConfiguration;
 import org.apache.fineract.infrastructure.core.diagnostics.performance.sampling.core.SamplingService;
 import org.apache.fineract.infrastructure.core.diagnostics.performance.sampling.core.SamplingServiceFactory;
@@ -30,11 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
-@Slf4j
 public class SamplingBeanPostProcessor implements BeanPostProcessor {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SamplingBeanPostProcessor.class);
     private SamplingConfiguration samplingConfiguration;
     private SamplingServiceFactory samplingServiceFactory;
 
@@ -52,7 +49,6 @@ public class SamplingBeanPostProcessor implements BeanPostProcessor {
                 return proxyFactory.getProxy();
             }
         }
-
         return bean;
     }
 
@@ -68,5 +64,9 @@ public class SamplingBeanPostProcessor implements BeanPostProcessor {
     @Autowired
     public void setSamplingConfiguration(SamplingConfiguration samplingConfiguration) {
         this.samplingConfiguration = samplingConfiguration;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SamplingBeanPostProcessor() {
     }
 }

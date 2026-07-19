@@ -18,17 +18,28 @@
  */
 package org.apache.fineract.portfolio.loanaccount.domain;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.ApiFacingEnum;
 
-@Getter
-@RequiredArgsConstructor
 public enum LoanBuyDownFeeIncomeType implements ApiFacingEnum<LoanBuyDownFeeIncomeType> {
-
-    FEE("buyDownFee.incomeType.fee", "Fee"), //
-    INTEREST("buyDownFee.incomeType.interest", "Interest"); //
-
+    FEE("buyDownFee.incomeType.fee", "Fee"),  //
+    INTEREST("buyDownFee.incomeType.interest", "Interest");
+    //
     private final String code;
     private final String humanReadableName;
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private LoanBuyDownFeeIncomeType(final String code, final String humanReadableName) {
+        this.code = code;
+        this.humanReadableName = humanReadableName;
+    }
 }

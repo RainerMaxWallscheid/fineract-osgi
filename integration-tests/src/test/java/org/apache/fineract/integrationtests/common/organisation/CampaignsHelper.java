@@ -20,7 +20,6 @@ package org.apache.fineract.integrationtests.common.organisation;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import com.google.gson.Gson;
 import io.restassured.path.json.JsonPath;
 import io.restassured.specification.RequestSpecification;
@@ -28,21 +27,18 @@ import io.restassured.specification.ResponseSpecification;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.integrationtests.common.Utils;
 import org.apache.fineract.integrationtests.common.report.ReportData;
 import org.springframework.util.Assert;
 
-@Slf4j
 public class CampaignsHelper {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CampaignsHelper.class);
     private final RequestSpecification requestSpec;
     private final ResponseSpecification responseSpec;
-
     private static final String SMS_CAMPAIGNS_URL = "/fineract-provider/api/v1/smscampaigns";
     public static final String DATE_FORMAT = "dd MMMM yyyy";
     public static final String DATE_TIME_FORMAT = "dd MMMM yyyy HH:mm:ss";
-
     private static final String BUSINESS_RULE_OPTIONS = "businessRulesOptions";
 
     // TODO: Rewrite to use fineract-client instead!
@@ -61,31 +57,26 @@ public class CampaignsHelper {
     public Integer createCampaign(String reportName, Integer triggerType) {
         log.info("---------------------------------CREATING A CAMPAIGN---------------------------------------------");
         final String CREATE_SMS_CAMPAIGNS_URL = SMS_CAMPAIGNS_URL + "?" + Utils.TENANT_IDENTIFIER;
-        return Utils.performServerPost(requestSpec, responseSpec, CREATE_SMS_CAMPAIGNS_URL, getCreateCampaignJSON(reportName, triggerType),
-                "resourceId");
+        return Utils.performServerPost(requestSpec, responseSpec, CREATE_SMS_CAMPAIGNS_URL, getCreateCampaignJSON(reportName, triggerType), "resourceId");
     }
 
     public Integer createCampaignWithName(String reportName, Integer triggerType, String campaignName) {
         log.info("---------------------------------CREATING A CAMPAIGN WITH NAME---------------------------------------------");
         final String CREATE_SMS_CAMPAIGNS_URL = SMS_CAMPAIGNS_URL + "?" + Utils.TENANT_IDENTIFIER;
-        return Utils.performServerPost(requestSpec, responseSpec, CREATE_SMS_CAMPAIGNS_URL,
-                getCreateCampaignJSONWithName(reportName, triggerType, campaignName), "resourceId");
+        return Utils.performServerPost(requestSpec, responseSpec, CREATE_SMS_CAMPAIGNS_URL, getCreateCampaignJSONWithName(reportName, triggerType, campaignName), "resourceId");
     }
 
-    public List<HashMap> createCampaignWithNameExpectingError(ResponseSpecification errorResponseSpec, String reportName,
-            Integer triggerType, String campaignName) {
+    public List<HashMap> createCampaignWithNameExpectingError(ResponseSpecification errorResponseSpec, String reportName, Integer triggerType, String campaignName) {
         log.info("---------------------------------CREATING A CAMPAIGN WITH NAME (EXPECTING ERROR)---------------------");
         final String CREATE_SMS_CAMPAIGNS_URL = SMS_CAMPAIGNS_URL + "?" + Utils.TENANT_IDENTIFIER;
-        return Utils.performServerPost(requestSpec, errorResponseSpec, CREATE_SMS_CAMPAIGNS_URL,
-                getCreateCampaignJSONWithName(reportName, triggerType, campaignName), "errors");
+        return Utils.performServerPost(requestSpec, errorResponseSpec, CREATE_SMS_CAMPAIGNS_URL, getCreateCampaignJSONWithName(reportName, triggerType, campaignName), "errors");
     }
 
     // TODO: Rewrite to use fineract-client instead!
     // Example: org.apache.fineract.integrationtests.common.loans.LoanTransactionHelper.disburseLoan(java.lang.Long,
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
-    public void verifyCampaignCreatedOnServer(final RequestSpecification requestSpec, final ResponseSpecification responseSpec,
-            final Integer generatedCampaignId) {
+    public void verifyCampaignCreatedOnServer(final RequestSpecification requestSpec, final ResponseSpecification responseSpec, final Integer generatedCampaignId) {
         log.info("------------------------------CHECK CAMPAIGN DETAILS------------------------------------\n");
         final String RETRIEVE_SMS_CAMPAIGNS_URL = SMS_CAMPAIGNS_URL + "/" + generatedCampaignId + "?" + Utils.TENANT_IDENTIFIER;
         final Integer responseCampaignId = Utils.performServerGet(requestSpec, responseSpec, RETRIEVE_SMS_CAMPAIGNS_URL, "id");
@@ -96,20 +87,17 @@ public class CampaignsHelper {
     // Example: org.apache.fineract.integrationtests.common.loans.LoanTransactionHelper.disburseLoan(java.lang.Long,
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
-    public Integer updateCampaign(final RequestSpecification requestSpec, final ResponseSpecification responseSpec,
-            final Integer generatedCampaignId, String reportName, Integer triggerType) {
+    public Integer updateCampaign(final RequestSpecification requestSpec, final ResponseSpecification responseSpec, final Integer generatedCampaignId, String reportName, Integer triggerType) {
         log.info("------------------------------UPDATE CAMPAIGN DETAILS------------------------------------\n");
         final String UPDATE_SMS_CAMPAIGNS_URL = SMS_CAMPAIGNS_URL + "/" + generatedCampaignId + "?" + Utils.TENANT_IDENTIFIER;
-        return Utils.performServerPut(requestSpec, responseSpec, UPDATE_SMS_CAMPAIGNS_URL, getUpdateCampaignJSON(reportName, triggerType),
-                "resourceId");
+        return Utils.performServerPut(requestSpec, responseSpec, UPDATE_SMS_CAMPAIGNS_URL, getUpdateCampaignJSON(reportName, triggerType), "resourceId");
     }
 
     // TODO: Rewrite to use fineract-client instead!
     // Example: org.apache.fineract.integrationtests.common.loans.LoanTransactionHelper.disburseLoan(java.lang.Long,
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
-    public Integer deleteCampaign(final RequestSpecification requestSpec, final ResponseSpecification responseSpec,
-            final Integer generatedCampaignId) {
+    public Integer deleteCampaign(final RequestSpecification requestSpec, final ResponseSpecification responseSpec, final Integer generatedCampaignId) {
         log.info("------------------------------DELETE CAMPAIGN DETAILS------------------------------------\n");
         final String DELETE_SMS_CAMPAIGNS_URL = SMS_CAMPAIGNS_URL + "/" + generatedCampaignId + "?" + Utils.TENANT_IDENTIFIER;
         return Utils.performServerDelete(requestSpec, responseSpec, DELETE_SMS_CAMPAIGNS_URL, "resourceId");
@@ -119,27 +107,21 @@ public class CampaignsHelper {
     // Example: org.apache.fineract.integrationtests.common.loans.LoanTransactionHelper.disburseLoan(java.lang.Long,
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
-    public Integer performActionsOnCampaign(final RequestSpecification requestSpec, final ResponseSpecification responseSpec,
-            final Integer generatedCampaignId, String command) {
+    public Integer performActionsOnCampaign(final RequestSpecification requestSpec, final ResponseSpecification responseSpec, final Integer generatedCampaignId, String command) {
         log.info("------------------------------PERFORM ACTION ON CAMPAIGN DETAILS------------------------------------\n");
-        final String SMS_CAMPAIGNS_ACTION_URL = SMS_CAMPAIGNS_URL + "/" + generatedCampaignId + "?command=" + command + "&"
-                + Utils.TENANT_IDENTIFIER;
+        final String SMS_CAMPAIGNS_ACTION_URL = SMS_CAMPAIGNS_URL + "/" + generatedCampaignId + "?command=" + command + "&" + Utils.TENANT_IDENTIFIER;
         String actionDate = Utils.getLocalDateOfTenant().format(DateTimeFormatter.ofPattern(DATE_FORMAT));
-        return Utils.performServerPost(requestSpec, responseSpec, SMS_CAMPAIGNS_ACTION_URL, getJSONForCampaignAction(command, actionDate),
-                "resourceId");
+        return Utils.performServerPost(requestSpec, responseSpec, SMS_CAMPAIGNS_ACTION_URL, getJSONForCampaignAction(command, actionDate), "resourceId");
     }
 
     // TODO: Rewrite to use fineract-client instead!
     // Example: org.apache.fineract.integrationtests.common.loans.LoanTransactionHelper.disburseLoan(java.lang.Long,
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
-    public Object performActionsOnCampaignWithFailure(final Integer generatedCampaignId, String command, String actionDate,
-            String responseJsonAttribute) {
+    public Object performActionsOnCampaignWithFailure(final Integer generatedCampaignId, String command, String actionDate, String responseJsonAttribute) {
         log.info("--------------------------PERFORM ACTION ON CAMPAIGN DETAILS WITH FAILURE-------------------------------\n");
-        final String SMS_CAMPAIGNS_ACTION_URL = SMS_CAMPAIGNS_URL + "/" + generatedCampaignId + "?command=" + command + "&"
-                + Utils.TENANT_IDENTIFIER;
-        return Utils.performServerPost(this.requestSpec, this.responseSpec, SMS_CAMPAIGNS_ACTION_URL,
-                getJSONForCampaignAction(command, actionDate), responseJsonAttribute);
+        final String SMS_CAMPAIGNS_ACTION_URL = SMS_CAMPAIGNS_URL + "/" + generatedCampaignId + "?command=" + command + "&" + Utils.TENANT_IDENTIFIER;
+        return Utils.performServerPost(this.requestSpec, this.responseSpec, SMS_CAMPAIGNS_ACTION_URL, getJSONForCampaignAction(command, actionDate), responseJsonAttribute);
     }
 
     // TODO: Rewrite to use fineract-client instead!
@@ -157,8 +139,7 @@ public class CampaignsHelper {
         map.put("providerId", 1);
         map.put("triggerType", triggerType);
         if (2 == triggerType) {
-            map.put("recurrenceStartDate",
-                    Utils.getLocalDateTimeOfTenant().plusMinutes(1).format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)));
+            map.put("recurrenceStartDate", Utils.getLocalDateTimeOfTenant().plusMinutes(1).format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)));
             map.put("frequency", 1);
             map.put("interval", "1");
         }
@@ -189,8 +170,7 @@ public class CampaignsHelper {
         map.put("providerId", 1);
         map.put("triggerType", triggerType);
         if (2 == triggerType) {
-            map.put("recurrenceStartDate",
-                    Utils.getLocalDateTimeOfTenant().plusMinutes(1).format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)));
+            map.put("recurrenceStartDate", Utils.getLocalDateTimeOfTenant().plusMinutes(1).format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)));
         }
         map.put("campaignName", Utils.randomStringGenerator("Campaign_Name_", 5));
         map.put("campaignType", 1);
@@ -235,15 +215,13 @@ public class CampaignsHelper {
         log.info("--------------------------------- GET REPORTS OPTIONS -------------------------------");
         Assert.notNull(jsonAttributeToGetBack, "jsonAttributeToGetBack may not be null");
         final String templateUrl = SMS_CAMPAIGNS_URL + "/template?" + Utils.TENANT_IDENTIFIER;
-        final String json = given().spec(requestSpec).expect().spec(responseSpec).log().ifError().when().get(templateUrl).andReturn()
-                .asString();
+        final String json = given().spec(requestSpec).expect().spec(responseSpec).log().ifError().when().get(templateUrl).andReturn().asString();
         Assert.notNull(json, "json");
         return JsonPath.from(json).getList(jsonAttributeToGetBack, ReportData.class);
     }
 
     private Long getSelectedReportId(final String reportName) {
         List<ReportData> reports = getReports();
-
         if (reports != null && !reports.isEmpty()) {
             for (ReportData reportData : reports) {
                 if (reportName.equals(reportData.getReportName())) {

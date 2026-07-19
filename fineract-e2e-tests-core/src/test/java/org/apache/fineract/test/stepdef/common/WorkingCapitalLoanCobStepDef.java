@@ -22,7 +22,6 @@ import static org.apache.fineract.client.feign.util.FeignCalls.executeVoid;
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
@@ -34,8 +33,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.BusinessDateResponse;
@@ -53,16 +50,14 @@ import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 import org.junit.jupiter.api.Assertions;
 
-@Slf4j
-@RequiredArgsConstructor
 public class WorkingCapitalLoanCobStepDef extends AbstractStepDef {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanCobStepDef.class);
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd MMMM yyyy");
-
     private final WorkingCapitalLoanTestHelper wcLoanHelper;
     private final FineractFeignClient fineractClient;
 
-    @Before(value = "@WCCOBFeature")
+    @Before("@WCCOBFeature")
     public void beforeWcCobScenario() {
         testContext().set(TestContextKey.WC_LOAN_IDS, new ArrayList<Long>());
     }
@@ -96,9 +91,7 @@ public class WorkingCapitalLoanCobStepDef extends AbstractStepDef {
         PostWorkingCapitalLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         Assertions.assertNotNull(loanResponse);
         Long loanId = loanResponse.getLoanId();
-
         InlineJobRequest inlineJobRequest = new InlineJobRequest().addLoanIdsItem(loanId);
-
         ok(() -> fineractClient.inlineJob().executeInlineJob("WC_LOAN_COB", inlineJobRequest));
     }
 
@@ -137,9 +130,9 @@ public class WorkingCapitalLoanCobStepDef extends AbstractStepDef {
         for (Long loanId : loanIds) {
             LocalDate actual = wcLoanHelper.getLastClosedBusinessDate(loanId);
             log.debug("WC loan id={} lastClosedBusinessDate={}", loanId, actual);
-            assertThat(actual)//
-                    .as("WC loan id=%d — expected lastClosedBusinessDate '%s' but got '%s'", loanId, expected, actual)//
-                    .isEqualTo(expected);
+            //
+            //
+            assertThat(actual).as("WC loan id=%d — expected lastClosedBusinessDate \'%s\' but got \'%s\'", loanId, expected, actual).isEqualTo(expected);
         }
     }
 
@@ -167,9 +160,9 @@ public class WorkingCapitalLoanCobStepDef extends AbstractStepDef {
         for (Long loanId : loanIds) {
             LocalDate actual = wcLoanHelper.getLastClosedBusinessDate(loanId);
             log.debug("WC loan id={} lastClosedBusinessDate={}", loanId, actual);
-            assertThat(actual)//
-                    .as("WC loan id=%d — expected null lastClosedBusinessDate but got '%s'", loanId, actual)//
-                    .isNull();
+            //
+            //
+            assertThat(actual).as("WC loan id=%d — expected null lastClosedBusinessDate but got \'%s\'", loanId, actual).isNull();
         }
     }
 
@@ -180,9 +173,9 @@ public class WorkingCapitalLoanCobStepDef extends AbstractStepDef {
         for (Long loanId : loanIds) {
             int actual = wcLoanHelper.getVersion(loanId);
             log.debug("WC loan id={} version={}", loanId, actual);
-            assertThat(actual)//
-                    .as("WC loan id=%d — expected version %d but got %d", loanId, expectedVersion, actual)//
-                    .isEqualTo(expectedVersion);
+            //
+            //
+            assertThat(actual).as("WC loan id=%d — expected version %d but got %d", loanId, expectedVersion, actual).isEqualTo(expectedVersion);
         }
     }
 
@@ -193,9 +186,9 @@ public class WorkingCapitalLoanCobStepDef extends AbstractStepDef {
         for (Long loanId : loanIds) {
             int lockCount = wcLoanHelper.countLocksByLoanId(loanId);
             log.debug("WC loan id={} lock count={}", loanId, lockCount);
-            assertThat(lockCount)//
-                    .as("WC loan id=%d — expected 0 account locks but got %d", loanId, lockCount)//
-                    .isZero();
+            //
+            //
+            assertThat(lockCount).as("WC loan id=%d — expected 0 account locks but got %d", loanId, lockCount).isZero();
         }
     }
 
@@ -206,49 +199,44 @@ public class WorkingCapitalLoanCobStepDef extends AbstractStepDef {
         for (final Long loanId : loanIds) {
             final int lockCount = wcLoanHelper.countLocksByLoanId(loanId);
             log.debug("WC loan id={} lock count={}", loanId, lockCount);
-            assertThat(lockCount)//
-                    .as("WC loan id=%d — expected at least one account lock but got %d", loanId, lockCount)//
-                    .isPositive();
+            //
+            //
+            assertThat(lockCount).as("WC loan id=%d — expected at least one account lock but got %d", loanId, lockCount).isPositive();
         }
     }
 
     @When("Admin places a chunk-processing lock without an error message on the last inserted WC loan")
     public void placeChunkLockWithoutErrorOnLastWcLoan() {
         final Long loanId = getTrackedLoanIds().getLast();
-        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId,
-                "LOAN_COB_CHUNK_PROCESSING", new LockRequest()));
+        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId, "LOAN_COB_CHUNK_PROCESSING", new LockRequest()));
         log.debug("Placed chunk-processing lock without error on WC loan id={}", loanId);
     }
 
     @When("Admin places a chunk-processing lock with error {string} on the last inserted WC loan")
     public void placeChunkLockWithErrorOnLastWcLoan(final String error) {
         final Long loanId = getTrackedLoanIds().getLast();
-        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId,
-                "LOAN_COB_CHUNK_PROCESSING", new LockRequest().error(error)));
-        log.debug("Placed chunk-processing lock with error '{}' on WC loan id={}", error, loanId);
+        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId, "LOAN_COB_CHUNK_PROCESSING", new LockRequest().error(error)));
+        log.debug("Placed chunk-processing lock with error \'{}\' on WC loan id={}", error, loanId);
     }
 
     @When("Admin places an inline-COB lock without an error message on the last inserted WC loan")
     public void placeInlineLockWithoutErrorOnLastWcLoan() {
         final Long loanId = getTrackedLoanIds().getLast();
-        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId,
-                "LOAN_INLINE_COB_PROCESSING", new LockRequest()));
+        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId, "LOAN_INLINE_COB_PROCESSING", new LockRequest()));
         log.debug("Placed inline-COB lock without error on WC loan id={}", loanId);
     }
 
     @When("Admin places an inline-COB lock with error {string} on the last inserted WC loan")
     public void placeInlineLockWithErrorOnLastWcLoan(final String error) {
         final Long loanId = getTrackedLoanIds().getLast();
-        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId,
-                "LOAN_INLINE_COB_PROCESSING", new LockRequest().error(error)));
-        log.debug("Placed inline-COB lock with error '{}' on WC loan id={}", error, loanId);
+        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId, "LOAN_INLINE_COB_PROCESSING", new LockRequest().error(error)));
+        log.debug("Placed inline-COB lock with error \'{}\' on WC loan id={}", error, loanId);
     }
 
     @When("Admin places a chunk-processing lock without an error message and null cob business date on the last inserted WC loan")
     public void placeChunkLockWithNullCobDateOnLastWcLoan() {
         final Long loanId = getTrackedLoanIds().getLast();
-        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId,
-                "LOAN_COB_CHUNK_PROCESSING", new LockRequest().nullCobBusinessDate(true)));
+        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId, "LOAN_COB_CHUNK_PROCESSING", new LockRequest().nullCobBusinessDate(true)));
         log.debug("Placed chunk-processing lock with null cob date on WC loan id={}", loanId);
     }
 
@@ -256,25 +244,22 @@ public class WorkingCapitalLoanCobStepDef extends AbstractStepDef {
     public void placeChunkLockWithExplicitCobDateOnLastWcLoan(final String cobBusinessDate) {
         final Long loanId = getTrackedLoanIds().getLast();
         final LocalDate parsed = LocalDate.parse(cobBusinessDate, DATE_FORMAT);
-        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId,
-                "LOAN_COB_CHUNK_PROCESSING", new LockRequest().cobBusinessDate(parsed)));
+        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId, "LOAN_COB_CHUNK_PROCESSING", new LockRequest().cobBusinessDate(parsed)));
         log.debug("Placed chunk-processing lock with explicit cob date {} on WC loan id={}", parsed, loanId);
     }
 
     @When("Admin places a chunk-processing lock without an error message on WC loan {int}")
     public void placeChunkLockWithoutErrorOnWcLoanAtIndex(final int index) {
         final Long loanId = loanAtIndex(index);
-        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId,
-                "LOAN_COB_CHUNK_PROCESSING", new LockRequest()));
+        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId, "LOAN_COB_CHUNK_PROCESSING", new LockRequest()));
         log.debug("Placed chunk-processing lock without error on WC loan index={} id={}", index, loanId);
     }
 
     @When("Admin places a chunk-processing lock with error {string} on WC loan {int}")
     public void placeChunkLockWithErrorOnWcLoanAtIndex(final String error, final int index) {
         final Long loanId = loanAtIndex(index);
-        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId,
-                "LOAN_COB_CHUNK_PROCESSING", new LockRequest().error(error)));
-        log.debug("Placed chunk-processing lock with error '{}' on WC loan index={} id={}", error, index, loanId);
+        executeVoid(() -> fineractClient.workingCapitalLoanAccountLock().placeLockOnWorkingCapitalLoanAccount(loanId, "LOAN_COB_CHUNK_PROCESSING", new LockRequest().error(error)));
+        log.debug("Placed chunk-processing lock with error \'{}\' on WC loan index={} id={}", error, index, loanId);
     }
 
     @Then("Admin verifies inserted WC loan {int} has no account locks")
@@ -282,9 +267,9 @@ public class WorkingCapitalLoanCobStepDef extends AbstractStepDef {
         final Long loanId = loanAtIndex(index);
         final int lockCount = wcLoanHelper.countLocksByLoanId(loanId);
         log.debug("WC loan index={} id={} lock count={}", index, loanId, lockCount);
-        assertThat(lockCount)//
-                .as("WC loan index=%d id=%d — expected 0 account locks but got %d", index, loanId, lockCount)//
-                .isZero();
+        //
+        //
+        assertThat(lockCount).as("WC loan index=%d id=%d — expected 0 account locks but got %d", index, loanId, lockCount).isZero();
     }
 
     @Then("Admin verifies inserted WC loan {int} has at least one account lock")
@@ -292,9 +277,9 @@ public class WorkingCapitalLoanCobStepDef extends AbstractStepDef {
         final Long loanId = loanAtIndex(index);
         final int lockCount = wcLoanHelper.countLocksByLoanId(loanId);
         log.debug("WC loan index={} id={} lock count={}", index, loanId, lockCount);
-        assertThat(lockCount)//
-                .as("WC loan index=%d id=%d — expected at least one account lock but got %d", index, loanId, lockCount)//
-                .isPositive();
+        //
+        //
+        assertThat(lockCount).as("WC loan index=%d id=%d — expected at least one account lock but got %d", index, loanId, lockCount).isPositive();
     }
 
     private Long loanAtIndex(final int index) {
@@ -311,9 +296,9 @@ public class WorkingCapitalLoanCobStepDef extends AbstractStepDef {
         Long loanId = loanIds.get(index - 1);
         LocalDate actual = wcLoanHelper.getLastClosedBusinessDate(loanId);
         log.debug("WC loan index={} id={} lastClosedBusinessDate={}", index, loanId, actual);
-        assertThat(actual)//
-                .as("WC loan index=%d id=%d — expected lastClosedBusinessDate '%s' but got '%s'", index, loanId, expected, actual)//
-                .isEqualTo(expected);
+        //
+        //
+        assertThat(actual).as("WC loan index=%d id=%d — expected lastClosedBusinessDate \'%s\' but got \'%s\'", index, loanId, expected, actual).isEqualTo(expected);
     }
 
     @Then("Admin verifies inserted WC loan {int} has null lastClosedBusinessDate")
@@ -323,9 +308,9 @@ public class WorkingCapitalLoanCobStepDef extends AbstractStepDef {
         Long loanId = loanIds.get(index - 1);
         LocalDate actual = wcLoanHelper.getLastClosedBusinessDate(loanId);
         log.debug("WC loan index={} id={} lastClosedBusinessDate={}", index, loanId, actual);
-        assertThat(actual)//
-                .as("WC loan index=%d id=%d — expected null lastClosedBusinessDate but got '%s'", index, loanId, actual)//
-                .isNull();
+        //
+        //
+        assertThat(actual).as("WC loan index=%d id=%d — expected null lastClosedBusinessDate but got \'%s\'", index, loanId, actual).isNull();
     }
 
     @When("Admin runs Working Capital COB catch up")
@@ -346,39 +331,32 @@ public class WorkingCapitalLoanCobStepDef extends AbstractStepDef {
         // Resolve the expected completion date upfront, before the async job potentially finishes.
         // COB catch-up processes every day from the oldest lastClosedBusinessDate up to cobBusinessDate.
         // When complete, cobProcessedDate (the oldest loan's lastClosedBusinessDate) will equal cobBusinessDate.
-        BusinessDateResponse businessDateResponse = ok(
-                () -> fineractClient.businessDateManagement().getBusinessDate(BusinessDateHelper.COB, Map.of()));
+        BusinessDateResponse businessDateResponse = ok(() -> fineractClient.businessDateManagement().getBusinessDate(BusinessDateHelper.COB, Map.of()));
         LocalDate expectedCompletionDate = businessDateResponse.getDate();
-
         // Single-phase polling: handles both the case where the job is still running AND where it
         // already finished before this polling loop started (race condition with async execution).
         // Bug fix #1: removed Phase 1 "wait until running" which timed out when the job completed
         // too quickly for the poll to catch isCatchUpRunning = true.
         // Bug fix #2: use cobProcessedDate (oldest loan's lastClosedBusinessDate) instead of
         // cobBusinessDate (which is always == current COB date, making the check vacuous).
-        await() //
-                .atMost(Duration.ofMinutes(4)) //
-                .pollInterval(Duration.ofSeconds(5)) //
-                .pollDelay(Duration.ofSeconds(2)) //
-                .until(() -> {
-                    IsCatchUpRunningDTO statusResponse = ok(() -> fineractClient.workingCapitalLoanCobCatchUpApi().isCatchUpRunning1());
-
-                    if (statusResponse.getCatchUpRunning()) {
-                        log.debug("WC COB catch-up still running, waiting...");
-                        return false;
-                    }
-
-                    // Catch-up not running — check whether it processed all days up to the expected date.
-                    // cobProcessedDate = the oldest loan's lastClosedBusinessDate after the last COB run.
-                    OldestCOBProcessedLoanDTO catchUpStatus = ok(
-                            () -> fineractClient.workingCapitalLoanCobCatchUpApi().getOldestCOBProcessedLoan1());
-                    LocalDate cobProcessedDate = catchUpStatus.getCobProcessedDate();
-
-                    boolean catchUpComplete = !cobProcessedDate.isBefore(expectedCompletionDate);
-                    log.debug("WC COB catch-up complete check: cobProcessedDate={}, expectedCompletionDate={}, complete={}",
-                            cobProcessedDate, expectedCompletionDate, catchUpComplete);
-                    return catchUpComplete;
-                });
+        //
+        //
+        //
+        //
+        await().atMost(Duration.ofMinutes(4)).pollInterval(Duration.ofSeconds(5)).pollDelay(Duration.ofSeconds(2)).until(() -> {
+            IsCatchUpRunningDTO statusResponse = ok(() -> fineractClient.workingCapitalLoanCobCatchUpApi().isCatchUpRunning1());
+            if (statusResponse.getCatchUpRunning()) {
+                log.debug("WC COB catch-up still running, waiting...");
+                return false;
+            }
+            // Catch-up not running — check whether it processed all days up to the expected date.
+            // cobProcessedDate = the oldest loan's lastClosedBusinessDate after the last COB run.
+            OldestCOBProcessedLoanDTO catchUpStatus = ok(() -> fineractClient.workingCapitalLoanCobCatchUpApi().getOldestCOBProcessedLoan1());
+            LocalDate cobProcessedDate = catchUpStatus.getCobProcessedDate();
+            boolean catchUpComplete = !cobProcessedDate.isBefore(expectedCompletionDate);
+            log.debug("WC COB catch-up complete check: cobProcessedDate={}, expectedCompletionDate={}, complete={}", cobProcessedDate, expectedCompletionDate, catchUpComplete);
+            return catchUpComplete;
+        });
     }
 
     @Then("Admin verifies internal working capital cob last run data values are empty {string}")
@@ -407,8 +385,13 @@ public class WorkingCapitalLoanCobStepDef extends AbstractStepDef {
     }
 
     private Long getProductId() {
-        final PostWorkingCapitalLoanProductsResponse workingCapitalLoanProductsResponse = testContext()
-                .get(TestContextKey.WORKING_CAPITAL_LOAN_PRODUCT_CREATE_RESPONSE);
+        final PostWorkingCapitalLoanProductsResponse workingCapitalLoanProductsResponse = testContext().get(TestContextKey.WORKING_CAPITAL_LOAN_PRODUCT_CREATE_RESPONSE);
         return workingCapitalLoanProductsResponse.getResourceId();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanCobStepDef(final WorkingCapitalLoanTestHelper wcLoanHelper, final FineractFeignClient fineractClient) {
+        this.wcLoanHelper = wcLoanHelper;
+        this.fineractClient = fineractClient;
     }
 }

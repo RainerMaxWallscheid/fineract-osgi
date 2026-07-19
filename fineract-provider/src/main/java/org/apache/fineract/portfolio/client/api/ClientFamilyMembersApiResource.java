@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.client.api;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +31,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -48,9 +46,7 @@ import org.springframework.stereotype.Component;
 @Path("/v1/clients/{clientId}/familymembers")
 @Component
 @Tag(name = "Client Family Member", description = "")
-@RequiredArgsConstructor
 public class ClientFamilyMembersApiResource {
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "FamilyMembers";
     private final PlatformSecurityContext context;
     private final ClientFamilyMembersReadPlatformService readPlatformService;
@@ -59,19 +55,16 @@ public class ClientFamilyMembersApiResource {
 
     @GET
     @Path("/{familyMemberId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve a client family member", operationId = "retrieveOneClientFamilyMember")
     @AlternativeOperationId("getFamilyMember")
-    public ClientFamilyMembersData getFamilyMember(@PathParam("familyMemberId") final Long familyMemberId,
-            @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
-
+    public ClientFamilyMembersData getFamilyMember(@PathParam("familyMemberId") final Long familyMemberId, @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
         return this.readPlatformService.getClientFamilyMember(clientId, familyMemberId);
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "List all client family members", operationId = "retrieveAllClientFamilyMembers")
     @AlternativeOperationId("getFamilyMembers")
     public List<ClientFamilyMembersData> getFamilyMembers(@PathParam("clientId") final long clientId) {
@@ -81,7 +74,7 @@ public class ClientFamilyMembersApiResource {
 
     @GET
     @Path("/template")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve client family member template", operationId = "retrieveTemplateClientFamilyMember")
     @AlternativeOperationId("getTemplate_2")
     public ClientFamilyMembersData getTemplate(@PathParam("clientId") final long clientId) {
@@ -91,42 +84,40 @@ public class ClientFamilyMembersApiResource {
 
     @PUT
     @Path("/{familyMemberId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a client family member", operationId = "updateClientFamilyMember")
     @AlternativeOperationId("updateClientFamilyMembers")
-    public CommandProcessingResult updateClientFamilyMembers(@PathParam("familyMemberId") final long familyMemberId,
-            ClientFamilyMemberRequest clientFamilyMemberRequest,
-            @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateFamilyMembers(familyMemberId)
-                .withJson(toApiJsonSerializer.serialize(clientFamilyMemberRequest)).build();
-
+    public CommandProcessingResult updateClientFamilyMembers(@PathParam("familyMemberId") final long familyMemberId, ClientFamilyMemberRequest clientFamilyMemberRequest, @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateFamilyMembers(familyMemberId).withJson(toApiJsonSerializer.serialize(clientFamilyMemberRequest)).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Add a client family member", operationId = "createClientFamilyMember")
     @AlternativeOperationId("addClientFamilyMembers")
-    public CommandProcessingResult addClientFamilyMembers(@PathParam("clientId") final long clientid,
-            ClientFamilyMemberRequest clientFamilyMemberRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().addFamilyMembers(clientid)
-                .withJson(toApiJsonSerializer.serialize(clientFamilyMemberRequest)).build();
-
+    public CommandProcessingResult addClientFamilyMembers(@PathParam("clientId") final long clientid, ClientFamilyMemberRequest clientFamilyMemberRequest) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().addFamilyMembers(clientid).withJson(toApiJsonSerializer.serialize(clientFamilyMemberRequest)).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @DELETE
     @Path("/{familyMemberId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete a client family member", operationId = "deleteClientFamilyMember")
     @AlternativeOperationId("deleteClientFamilyMembers")
-    public CommandProcessingResult deleteClientFamilyMembers(@PathParam("familyMemberId") final long familyMemberId,
-            @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
+    public CommandProcessingResult deleteClientFamilyMembers(@PathParam("familyMemberId") final long familyMemberId, @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteFamilyMembers(familyMemberId).build();
-
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ClientFamilyMembersApiResource(final PlatformSecurityContext context, final ClientFamilyMembersReadPlatformService readPlatformService, final ToApiJsonSerializer<ClientFamilyMembersData> toApiJsonSerializer, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.context = context;
+        this.readPlatformService = readPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+    }
 }

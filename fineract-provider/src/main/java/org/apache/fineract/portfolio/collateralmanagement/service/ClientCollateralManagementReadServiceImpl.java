@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.collateralmanagement.data.ClientCollateralManagementData;
 import org.apache.fineract.portfolio.collateralmanagement.data.LoanCollateralTemplateData;
 import org.apache.fineract.portfolio.collateralmanagement.data.LoanTransactionData;
@@ -35,10 +34,8 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepositor
 import org.apache.fineract.portfolio.loanaccount.exception.LoanTransactionNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ClientCollateralManagementReadServiceImpl implements ClientCollateralManagementReadService {
-
     private final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper;
     private final LoanTransactionRepository loanTransactionRepository;
 
@@ -49,8 +46,7 @@ public class ClientCollateralManagementReadServiceImpl implements ClientCollater
 
     @Override
     public List<LoanCollateralTemplateData> getLoanCollateralTemplate(Long clientId) {
-        Collection<ClientCollateralManagement> clientCollateralManagements = this.clientCollateralManagementRepositoryWrapper
-                .getCollateralsPerClient(clientId);
+        Collection<ClientCollateralManagement> clientCollateralManagements = this.clientCollateralManagementRepositoryWrapper.getCollateralsPerClient(clientId);
         List<LoanCollateralTemplateData> loanCollateralTemplateDataList = new ArrayList<>();
         for (ClientCollateralManagement clientCollateralManagement : clientCollateralManagements) {
             loanCollateralTemplateDataList.add(LoanCollateralTemplateData.instanceOf(clientCollateralManagement));
@@ -60,8 +56,7 @@ public class ClientCollateralManagementReadServiceImpl implements ClientCollater
 
     @Override
     public ClientCollateralManagementData getClientCollateralManagementData(final Long collateralId) {
-        final ClientCollateralManagement clientCollateralManagement = this.clientCollateralManagementRepositoryWrapper
-                .getCollateral(collateralId);
+        final ClientCollateralManagement clientCollateralManagement = this.clientCollateralManagementRepositoryWrapper.getCollateral(collateralId);
         BigDecimal basePrice = clientCollateralManagement.getCollaterals().getBasePrice();
         BigDecimal pctToBase = clientCollateralManagement.getCollaterals().getPctToBase().divide(BigDecimal.valueOf(100));
         BigDecimal total = BigDecimal.ZERO;
@@ -72,22 +67,21 @@ public class ClientCollateralManagementReadServiceImpl implements ClientCollater
             totalCollateral = total.multiply(pctToBase);
         }
         Set<LoanCollateralManagement> loanCollateralManagementSet = clientCollateralManagement.getLoanCollateralManagementSet();
-
         List<LoanTransactionData> loanTransactionDataList = new ArrayList<>();
         for (LoanCollateralManagement loanCollateralManagement : loanCollateralManagementSet) {
             if (loanCollateralManagement.getLoanTransaction() != null) {
                 Long transactionId = loanCollateralManagement.getLoanTransaction().getId();
-                LoanTransaction loanTransaction = this.loanTransactionRepository.findById(transactionId)
-                        .orElseThrow(() -> new LoanTransactionNotFoundException(transactionId));
-                LoanTransactionData loanTransactionData = LoanTransactionData.instance(loanTransaction.getLoan().getId(),
-                        loanTransaction.getCreatedDate().orElse(null), loanTransaction.getOutstandingLoanBalance(),
-                        loanTransaction.getPrincipalPortion());
+                LoanTransaction loanTransaction = this.loanTransactionRepository.findById(transactionId).orElseThrow(() -> new LoanTransactionNotFoundException(transactionId));
+                LoanTransactionData loanTransactionData = LoanTransactionData.instance(loanTransaction.getLoan().getId(), loanTransaction.getCreatedDate().orElse(null), loanTransaction.getOutstandingLoanBalance(), loanTransaction.getPrincipalPortion());
                 loanTransactionDataList.add(loanTransactionData);
             }
         }
+        return ClientCollateralManagementData.instance(clientCollateralManagement.getCollaterals().getName(), clientCollateralManagement.getQuantity(), total, totalCollateral, clientCollateralManagement.getClient().getId(), loanTransactionDataList, clientCollateralManagement.getId());
+    }
 
-        return ClientCollateralManagementData.instance(clientCollateralManagement.getCollaterals().getName(),
-                clientCollateralManagement.getQuantity(), total, totalCollateral, clientCollateralManagement.getClient().getId(),
-                loanTransactionDataList, clientCollateralManagement.getId());
+    @java.lang.SuppressWarnings("all")
+        public ClientCollateralManagementReadServiceImpl(final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper, final LoanTransactionRepository loanTransactionRepository) {
+        this.clientCollateralManagementRepositoryWrapper = clientCollateralManagementRepositoryWrapper;
+        this.loanTransactionRepository = loanTransactionRepository;
     }
 }

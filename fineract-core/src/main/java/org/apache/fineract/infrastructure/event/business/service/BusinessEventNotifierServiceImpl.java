@@ -23,10 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.domain.FineractContext;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
@@ -42,17 +38,14 @@ import org.springframework.transaction.TransactionExecution;
 import org.springframework.transaction.TransactionExecutionListener;
 
 @Service
-@SuppressWarnings({ "unchecked", "rawtypes" })
-@RequiredArgsConstructor
-@Slf4j
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class BusinessEventNotifierServiceImpl implements BusinessEventNotifierService, InitializingBean, TransactionExecutionListener {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BusinessEventNotifierServiceImpl.class);
     private final Map<Class, List<BusinessEventListener>> preListeners = new HashMap<>();
     private final Map<Class, List<BusinessEventListener>> postListeners = new HashMap<>();
-
     private final ThreadLocal<Boolean> eventRecordingEnabled = ThreadLocal.withInitial(() -> false);
     private final ThreadLocal<List<BusinessEvent<?>>> recordedEvents = ThreadLocal.withInitial(ArrayList::new);
-
     private final ExternalEventService externalEventService;
     private final FineractProperties fineractProperties;
     private final ThreadLocal<Stack<List<BusinessEventWithContext>>> transactionBusinessEvents = ThreadLocal.withInitial(Stack::new);
@@ -231,10 +224,8 @@ public class BusinessEventNotifierServiceImpl implements BusinessEventNotifierSe
         cleanup();
     }
 
-    @Getter
-    @Setter
-    private static final class BusinessEventWithContext {
 
+    private static final class BusinessEventWithContext {
         private BusinessEvent<?> event;
         private FineractContext fineractContext;
 
@@ -242,5 +233,33 @@ public class BusinessEventNotifierServiceImpl implements BusinessEventNotifierSe
             this.event = event;
             this.fineractContext = fineractContext;
         }
+
+        @java.lang.SuppressWarnings("all")
+                public BusinessEvent<?> getEvent() {
+            return this.event;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public FineractContext getFineractContext() {
+            return this.fineractContext;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public void setEvent(final BusinessEvent<?> event) {
+            this.event = event;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public void setFineractContext(final FineractContext fineractContext) {
+            this.fineractContext = fineractContext;
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BusinessEventNotifierServiceImpl(final ExternalEventService externalEventService, final FineractProperties fineractProperties, final TransactionHelper transactionHelper, final ExternalBusinessEventConfigurationService externalBusinessEventConfigurationService) {
+        this.externalEventService = externalEventService;
+        this.fineractProperties = fineractProperties;
+        this.transactionHelper = transactionHelper;
+        this.externalBusinessEventConfigurationService = externalBusinessEventConfigurationService;
     }
 }

@@ -19,12 +19,9 @@
 package org.apache.fineract.test.initializer.global;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.executeVoid;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.GetGLAccountsResponse;
 import org.apache.fineract.client.models.PostGLAccountsRequest;
@@ -36,12 +33,11 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GLGlobalInitializerStep implements FineractGlobalInitializerStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GLGlobalInitializerStep.class);
     public static final Integer GLA_USAGE_DETAIL = GLAUsage.DETAIL.value;
     public static final Integer GLA_TYPE_ASSET = GLAType.ASSET.value;
     public static final Integer GLA_TYPE_LIABILITY = GLAType.LIABILITY.value;
@@ -95,7 +91,6 @@ public class GLGlobalInitializerStep implements FineractGlobalInitializerStep {
     public static final String GLA_GL_CODE_22 = "145024";
     public static final String GLA_GL_CODE_23 = "450280";
     public static final String GLA_GL_CODE_24 = "450281";
-
     private final FineractFeignClient fineractClient;
 
     @Override
@@ -106,37 +101,11 @@ public class GLGlobalInitializerStep implements FineractGlobalInitializerStep {
         } catch (Exception e) {
             log.debug("Could not retrieve existing GL accounts, will create them", e);
         }
-
         final List<GetGLAccountsResponse> accounts = existingAccounts;
-
-        List<GLAccountDefinition> items = List.of(new GLAccountDefinition(GLA_NAME_1, GLA_GL_CODE_1, GLA_TYPE_ASSET),
-                new GLAccountDefinition(GLA_NAME_2, GLA_GL_CODE_2, GLA_TYPE_ASSET),
-                new GLAccountDefinition(GLA_NAME_3, GLA_GL_CODE_3, GLA_TYPE_ASSET),
-                new GLAccountDefinition(GLA_NAME_4, GLA_GL_CODE_4, GLA_TYPE_LIABILITY),
-                new GLAccountDefinition(GLA_NAME_5, GLA_GL_CODE_5, GLA_TYPE_LIABILITY),
-                new GLAccountDefinition(GLA_NAME_6, GLA_GL_CODE_6, GLA_TYPE_LIABILITY),
-                new GLAccountDefinition(GLA_NAME_7, GLA_GL_CODE_7, GLA_TYPE_LIABILITY),
-                new GLAccountDefinition(GLA_NAME_8, GLA_GL_CODE_8, GLA_TYPE_INCOME),
-                new GLAccountDefinition(GLA_NAME_9, GLA_GL_CODE_9, GLA_TYPE_INCOME),
-                new GLAccountDefinition(GLA_NAME_10, GLA_GL_CODE_10, GLA_TYPE_INCOME),
-                new GLAccountDefinition(GLA_NAME_11, GLA_GL_CODE_11, GLA_TYPE_INCOME),
-                new GLAccountDefinition(GLA_NAME_12, GLA_GL_CODE_12, GLA_TYPE_EXPENSE),
-                new GLAccountDefinition(GLA_NAME_13, GLA_GL_CODE_13, GLA_TYPE_EXPENSE),
-                new GLAccountDefinition(GLA_NAME_14, GLA_GL_CODE_14, GLA_TYPE_ASSET),
-                new GLAccountDefinition(GLA_NAME_15, GLA_GL_CODE_15, GLA_TYPE_INCOME),
-                new GLAccountDefinition(GLA_NAME_16, GLA_GL_CODE_16, GLA_TYPE_EXPENSE),
-                new GLAccountDefinition(GLA_NAME_17, GLA_GL_CODE_17, GLA_TYPE_LIABILITY),
-                new GLAccountDefinition(GLA_NAME_18, GLA_GL_CODE_18, GLA_TYPE_ASSET),
-                new GLAccountDefinition(GLA_NAME_19, GLA_GL_CODE_19, GLA_TYPE_EXPENSE),
-                new GLAccountDefinition(GLA_NAME_20, GLA_GL_CODE_20, GLA_TYPE_INCOME),
-                new GLAccountDefinition(GLA_NAME_21, GLA_GL_CODE_21, GLA_TYPE_ASSET),
-                new GLAccountDefinition(GLA_NAME_22, GLA_GL_CODE_22, GLA_TYPE_LIABILITY),
-                new GLAccountDefinition(GLA_NAME_23, GLA_GL_CODE_23, GLA_TYPE_EXPENSE),
-                new GLAccountDefinition(GLA_NAME_24, GLA_GL_CODE_24, GLA_TYPE_INCOME));
-
-        ParallelExecutionHelper.runInParallel(items,
-                (definition) -> createGLAccountIfNotExists(accounts, definition.name(), definition.glCode(), definition.type()));
+        List<GLAccountDefinition> items = List.of(new GLAccountDefinition(GLA_NAME_1, GLA_GL_CODE_1, GLA_TYPE_ASSET), new GLAccountDefinition(GLA_NAME_2, GLA_GL_CODE_2, GLA_TYPE_ASSET), new GLAccountDefinition(GLA_NAME_3, GLA_GL_CODE_3, GLA_TYPE_ASSET), new GLAccountDefinition(GLA_NAME_4, GLA_GL_CODE_4, GLA_TYPE_LIABILITY), new GLAccountDefinition(GLA_NAME_5, GLA_GL_CODE_5, GLA_TYPE_LIABILITY), new GLAccountDefinition(GLA_NAME_6, GLA_GL_CODE_6, GLA_TYPE_LIABILITY), new GLAccountDefinition(GLA_NAME_7, GLA_GL_CODE_7, GLA_TYPE_LIABILITY), new GLAccountDefinition(GLA_NAME_8, GLA_GL_CODE_8, GLA_TYPE_INCOME), new GLAccountDefinition(GLA_NAME_9, GLA_GL_CODE_9, GLA_TYPE_INCOME), new GLAccountDefinition(GLA_NAME_10, GLA_GL_CODE_10, GLA_TYPE_INCOME), new GLAccountDefinition(GLA_NAME_11, GLA_GL_CODE_11, GLA_TYPE_INCOME), new GLAccountDefinition(GLA_NAME_12, GLA_GL_CODE_12, GLA_TYPE_EXPENSE), new GLAccountDefinition(GLA_NAME_13, GLA_GL_CODE_13, GLA_TYPE_EXPENSE), new GLAccountDefinition(GLA_NAME_14, GLA_GL_CODE_14, GLA_TYPE_ASSET), new GLAccountDefinition(GLA_NAME_15, GLA_GL_CODE_15, GLA_TYPE_INCOME), new GLAccountDefinition(GLA_NAME_16, GLA_GL_CODE_16, GLA_TYPE_EXPENSE), new GLAccountDefinition(GLA_NAME_17, GLA_GL_CODE_17, GLA_TYPE_LIABILITY), new GLAccountDefinition(GLA_NAME_18, GLA_GL_CODE_18, GLA_TYPE_ASSET), new GLAccountDefinition(GLA_NAME_19, GLA_GL_CODE_19, GLA_TYPE_EXPENSE), new GLAccountDefinition(GLA_NAME_20, GLA_GL_CODE_20, GLA_TYPE_INCOME), new GLAccountDefinition(GLA_NAME_21, GLA_GL_CODE_21, GLA_TYPE_ASSET), new GLAccountDefinition(GLA_NAME_22, GLA_GL_CODE_22, GLA_TYPE_LIABILITY), new GLAccountDefinition(GLA_NAME_23, GLA_GL_CODE_23, GLA_TYPE_EXPENSE), new GLAccountDefinition(GLA_NAME_24, GLA_GL_CODE_24, GLA_TYPE_INCOME));
+        ParallelExecutionHelper.runInParallel(items, definition -> createGLAccountIfNotExists(accounts, definition.name(), definition.glCode(), definition.type()));
     }
+
 
     private record GLAccountDefinition(String name, String glCode, Integer type) {
     }
@@ -146,8 +115,12 @@ public class GLGlobalInitializerStep implements FineractGlobalInitializerStep {
         if (accountExists) {
             return;
         }
-
         PostGLAccountsRequest request = GLAccountRequestFactory.defaultGLAccountRequest(name, glCode, type, GLA_USAGE_DETAIL, true);
         executeVoid(() -> fineractClient.generalLedgerAccount().createGLAccount(request, Map.of()));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GLGlobalInitializerStep(final FineractFeignClient fineractClient) {
+        this.fineractClient = fineractClient;
     }
 }

@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.loanproduct.data;
 
 import java.math.BigDecimal;
-import lombok.Getter;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.common.domain.DaysInMonthType;
 import org.apache.fineract.portfolio.common.domain.DaysInYearCustomStrategyType;
@@ -34,7 +33,6 @@ import org.apache.fineract.portfolio.loanproduct.domain.LoanPreCloseInterestCalc
 import org.apache.fineract.portfolio.loanproduct.domain.RecalculationFrequencyType;
 
 public class LoanConfigurationDetails implements ILoanConfigurationDetails {
-
     private final CurrencyData currency;
     private final BigDecimal interestRatePerPeriod;
     private final BigDecimal annualNominalInterestRate;
@@ -53,27 +51,13 @@ public class LoanConfigurationDetails implements ILoanConfigurationDetails {
     private final boolean interestRecognitionOnDisbursementDate;
     private final DaysInYearCustomStrategyType daysInYearCustomStrategy;
     private final boolean allowPartialPeriodInterestCalculation;
-    @Getter
     private final boolean isInterestRecalculationEnabled;
-    @Getter
     private final RecalculationFrequencyType restFrequencyType;
-    @Getter
     private final LoanPreCloseInterestCalculationStrategy preCloseInterestCalculationStrategy;
-    @Getter
     private final boolean allowFullTermForTranche;
-    @Getter
     private final LoanScheduleProcessingType loanScheduleProcessingType;
 
-    public LoanConfigurationDetails(CurrencyData currency, BigDecimal interestRatePerPeriod, BigDecimal annualNominalInterestRate,
-            Integer interestChargingGrace, Integer interestPaymentGrace, Integer principalGrace,
-            Integer recurringMoratoriumOnPrincipalPeriods, InterestMethod interestMethod,
-            InterestCalculationPeriodMethod interestCalculationPeriodMethod, DaysInYearType daysInYearType, DaysInMonthType daysInMonthType,
-            AmortizationMethod amortizationMethod, PeriodFrequencyType repaymentPeriodFrequencyType, Integer repaymentEvery,
-            Integer numberOfRepayments, boolean interestRecognitionOnDisbursementDate,
-            DaysInYearCustomStrategyType daysInYearCustomStrategy, boolean allowPartialPeriodInterestCalculation,
-            boolean isInterestRecalculationEnabled, RecalculationFrequencyType restFrequencyType,
-            LoanPreCloseInterestCalculationStrategy preCloseInterestCalculationStrategy, boolean allowFullTermForTranche,
-            LoanScheduleProcessingType loanScheduleProcessingType) {
+    public LoanConfigurationDetails(CurrencyData currency, BigDecimal interestRatePerPeriod, BigDecimal annualNominalInterestRate, Integer interestChargingGrace, Integer interestPaymentGrace, Integer principalGrace, Integer recurringMoratoriumOnPrincipalPeriods, InterestMethod interestMethod, InterestCalculationPeriodMethod interestCalculationPeriodMethod, DaysInYearType daysInYearType, DaysInMonthType daysInMonthType, AmortizationMethod amortizationMethod, PeriodFrequencyType repaymentPeriodFrequencyType, Integer repaymentEvery, Integer numberOfRepayments, boolean interestRecognitionOnDisbursementDate, DaysInYearCustomStrategyType daysInYearCustomStrategy, boolean allowPartialPeriodInterestCalculation, boolean isInterestRecalculationEnabled, RecalculationFrequencyType restFrequencyType, LoanPreCloseInterestCalculationStrategy preCloseInterestCalculationStrategy, boolean allowFullTermForTranche, LoanScheduleProcessingType loanScheduleProcessingType) {
         this.currency = currency;
         this.interestRatePerPeriod = interestRatePerPeriod;
         this.annualNominalInterestRate = annualNominalInterestRate;
@@ -207,4 +191,28 @@ public class LoanConfigurationDetails implements ILoanConfigurationDetails {
         return daysInYearCustomStrategy;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public boolean isInterestRecalculationEnabled() {
+        return this.isInterestRecalculationEnabled;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RecalculationFrequencyType getRestFrequencyType() {
+        return this.restFrequencyType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanPreCloseInterestCalculationStrategy getPreCloseInterestCalculationStrategy() {
+        return this.preCloseInterestCalculationStrategy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isAllowFullTermForTranche() {
+        return this.allowFullTermForTranche;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanScheduleProcessingType getLoanScheduleProcessingType() {
+        return this.loanScheduleProcessingType;
+    }
 }

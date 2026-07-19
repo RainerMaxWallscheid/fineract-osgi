@@ -19,14 +19,16 @@
 package org.apache.fineract.infrastructure.event.external.service.message.domain;
 
 import java.util.Objects;
-import lombok.Getter;
 
-@Getter
 public class MessageCategory {
-
     private final String category;
 
     public MessageCategory(String category) {
         this.category = Objects.requireNonNull(category, "category cannot be null");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCategory() {
+        return this.category;
     }
 }

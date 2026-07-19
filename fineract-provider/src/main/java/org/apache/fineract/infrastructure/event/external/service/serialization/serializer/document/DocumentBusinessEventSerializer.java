@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.infrastructure.event.external.service.serialization.serializer.document;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.fineract.avro.document.v1.DocumentDataV1;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
@@ -31,11 +29,10 @@ import org.apache.fineract.infrastructure.event.external.service.serialization.m
 import org.apache.fineract.infrastructure.event.external.service.serialization.serializer.BusinessEventSerializer;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class DocumentBusinessEventSerializer implements BusinessEventSerializer {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DocumentBusinessEventSerializer.class);
     private final DocumentDataMapper mapper;
 
     @Override
@@ -45,14 +42,17 @@ public class DocumentBusinessEventSerializer implements BusinessEventSerializer 
 
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
-
         var event = (DocumentBusinessEvent) rawEvent;
-
         return mapper.map(event.get());
     }
 
     @Override
     public Class<? extends GenericContainer> getSupportedSchema() {
         return DocumentDataV1.class;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DocumentBusinessEventSerializer(final DocumentDataMapper mapper) {
+        this.mapper = mapper;
     }
 }

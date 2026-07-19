@@ -22,27 +22,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import lombok.Getter;
 import org.apache.fineract.portfolio.loanaccount.data.TransactionChangeData;
 
 /**
  * Stores details of {@link LoanTransaction}'s that were reversed or newly created
  */
-@Getter
 public class ChangedTransactionDetail {
-
     private final List<TransactionChangeData> transactionChanges = new ArrayList<>();
 
     public void addTransactionChange(final TransactionChangeData transactionChangeData) {
         for (TransactionChangeData change : transactionChanges) {
-            if (transactionChangeData.getOldTransaction() != null && change.getOldTransaction() != null
-                    && Objects.equals(change.getOldTransaction().getId(), transactionChangeData.getOldTransaction().getId())) {
+            if (transactionChangeData.getOldTransaction() != null && change.getOldTransaction() != null && Objects.equals(change.getOldTransaction().getId(), transactionChangeData.getOldTransaction().getId())) {
                 change.setOldTransaction(transactionChangeData.getOldTransaction());
                 change.setNewTransaction(transactionChangeData.getNewTransaction());
                 return;
-            } else if (transactionChangeData.getOldTransaction() == null && change.getOldTransaction() == null
-                    && change.getNewTransaction() != null && transactionChangeData.getNewTransaction() != null
-                    && Objects.equals(change.getNewTransaction().getId(), transactionChangeData.getNewTransaction().getId())) {
+            } else if (transactionChangeData.getOldTransaction() == null && change.getOldTransaction() == null && change.getNewTransaction() != null && transactionChangeData.getNewTransaction() != null && Objects.equals(change.getNewTransaction().getId(), transactionChangeData.getNewTransaction().getId())) {
                 change.setNewTransaction(transactionChangeData.getNewTransaction());
                 return;
             }
@@ -50,13 +44,9 @@ public class ChangedTransactionDetail {
         transactionChanges.add(transactionChangeData);
     }
 
-    public void addNewTransactionChangeBeforeExistingOne(final TransactionChangeData newTransactionChange,
-            final LoanTransaction existingLoanTransaction) {
+    public void addNewTransactionChangeBeforeExistingOne(final TransactionChangeData newTransactionChange, final LoanTransaction existingLoanTransaction) {
         if (existingLoanTransaction != null) {
-            final Optional<TransactionChangeData> existingChange = transactionChanges.stream().filter(
-                    change -> change.getNewTransaction() != null && Objects.equals(change.getNewTransaction(), existingLoanTransaction))
-                    .findFirst();
-
+            final Optional<TransactionChangeData> existingChange = transactionChanges.stream().filter(change -> change.getNewTransaction() != null && Objects.equals(change.getNewTransaction(), existingLoanTransaction)).findFirst();
             if (existingChange.isPresent()) {
                 transactionChanges.add(transactionChanges.indexOf(existingChange.get()), newTransactionChange);
                 return;
@@ -67,5 +57,10 @@ public class ChangedTransactionDetail {
 
     public void removeTransactionChange(final LoanTransaction newTransaction) {
         transactionChanges.removeIf(change -> change.getNewTransaction().equals(newTransaction));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<TransactionChangeData> getTransactionChanges() {
+        return this.transactionChanges;
     }
 }

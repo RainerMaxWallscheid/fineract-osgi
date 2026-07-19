@@ -1,4 +1,3 @@
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -21,7 +20,6 @@ package org.apache.fineract.investor.serialization;
 
 import com.google.gson.JsonElement;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.validator.ParseAndValidator;
@@ -30,9 +28,7 @@ import org.apache.fineract.portfolio.common.service.Validator;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class ExternalAssetOwnerValidator extends ParseAndValidator {
-
     private final FromJsonHelper fromApiJsonHelper;
 
     public void validateForCreate(JsonCommand command) {
@@ -40,12 +36,14 @@ public class ExternalAssetOwnerValidator extends ParseAndValidator {
         validateRequestBody(json);
         validateForSupportedParameters(json, List.of(ExternalTransferRequestParameters.OWNER_EXTERNAL_ID), fromApiJsonHelper);
         final JsonElement element = this.fromApiJsonHelper.parse(json);
-
         Validator.validateOrThrow("externalAssetOwner", baseDataValidator -> {
-            final String ownerExternalId = this.fromApiJsonHelper.extractStringNamed(ExternalTransferRequestParameters.OWNER_EXTERNAL_ID,
-                    element);
+            final String ownerExternalId = this.fromApiJsonHelper.extractStringNamed(ExternalTransferRequestParameters.OWNER_EXTERNAL_ID, element);
             baseDataValidator.reset().parameter(ExternalTransferRequestParameters.OWNER_EXTERNAL_ID).value(ownerExternalId).notNull();
         });
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnerValidator(final FromJsonHelper fromApiJsonHelper) {
+        this.fromApiJsonHelper = fromApiJsonHelper;
+    }
 }

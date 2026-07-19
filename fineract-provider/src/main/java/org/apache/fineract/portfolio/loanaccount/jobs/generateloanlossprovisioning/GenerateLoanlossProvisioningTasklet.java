@@ -20,8 +20,6 @@ package org.apache.fineract.portfolio.loanaccount.jobs.generateloanlossprovision
 
 import java.time.LocalDate;
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.fineract.accounting.provisioning.exception.ProvisioningEntryAlreadyCreatedException;
 import org.apache.fineract.accounting.provisioning.service.ProvisioningEntriesWritePlatformService;
@@ -33,10 +31,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class GenerateLoanlossProvisioningTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GenerateLoanlossProvisioningTasklet.class);
     private final ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService;
     private final ProvisioningEntriesWritePlatformService provisioningEntriesWritePlatformService;
 
@@ -45,8 +42,7 @@ public class GenerateLoanlossProvisioningTasklet implements Tasklet {
         LocalDate currentDate = DateUtils.getBusinessLocalDate();
         boolean addJournalEntries = true;
         try {
-            Collection<ProvisioningCriteriaData> criteriaCollection = provisioningCriteriaReadPlatformService
-                    .retrieveAllProvisioningCriterias();
+            Collection<ProvisioningCriteriaData> criteriaCollection = provisioningCriteriaReadPlatformService.retrieveAllProvisioningCriterias();
             if (CollectionUtils.isNotEmpty(criteriaCollection)) {
                 provisioningEntriesWritePlatformService.createProvisioningEntry(currentDate, addJournalEntries);
             }
@@ -56,5 +52,11 @@ public class GenerateLoanlossProvisioningTasklet implements Tasklet {
             log.error("Problem occurred when generating provisioning entries", e);
         }
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GenerateLoanlossProvisioningTasklet(final ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService, final ProvisioningEntriesWritePlatformService provisioningEntriesWritePlatformService) {
+        this.provisioningCriteriaReadPlatformService = provisioningCriteriaReadPlatformService;
+        this.provisioningEntriesWritePlatformService = provisioningEntriesWritePlatformService;
     }
 }

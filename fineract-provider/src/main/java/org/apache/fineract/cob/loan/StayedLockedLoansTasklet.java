@@ -21,8 +21,6 @@ package org.apache.fineract.cob.loan;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.data.COBIdAndExternalIdAndAccountNo;
 import org.apache.fineract.cob.data.LoanAccountStayedLockedData;
 import org.apache.fineract.cob.data.LoanAccountsStayedLockedData;
@@ -35,10 +33,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class StayedLockedLoansTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StayedLockedLoansTasklet.class);
     private final BusinessEventNotifierService businessEventNotifierService;
     private final RetrieveIdService retrieveIdService;
 
@@ -53,12 +50,17 @@ public class StayedLockedLoansTasklet implements Tasklet {
 
     private LoanAccountsStayedLockedData buildLoanAccountData() {
         LocalDate cobBusinessDate = ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE);
-        List<COBIdAndExternalIdAndAccountNo> stayedLockedLoanAccounts = retrieveIdService
-                .findAllStayedLockedByCobBusinessDate(cobBusinessDate);
+        List<COBIdAndExternalIdAndAccountNo> stayedLockedLoanAccounts = retrieveIdService.findAllStayedLockedByCobBusinessDate(cobBusinessDate);
         List<LoanAccountStayedLockedData> loanAccounts = new ArrayList<>();
         stayedLockedLoanAccounts.forEach(loanAccount -> {
             loanAccounts.add(new LoanAccountStayedLockedData(loanAccount.getId(), loanAccount.getExternalId(), loanAccount.getAccountNo()));
         });
         return new LoanAccountsStayedLockedData(loanAccounts);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public StayedLockedLoansTasklet(final BusinessEventNotifierService businessEventNotifierService, final RetrieveIdService retrieveIdService) {
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.retrieveIdService = retrieveIdService;
     }
 }

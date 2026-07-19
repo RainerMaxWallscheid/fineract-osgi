@@ -38,7 +38,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -59,9 +58,7 @@ import org.springframework.stereotype.Component;
 @Path("/v1/" + ReportMailingJobConstants.REPORT_MAILING_JOB_RESOURCE_NAME)
 @Component
 @Tag(name = "Report Mailing Jobs", description = "This resource allows you to create a scheduled job that runs a report and sents it by email to specified email addresses.\n\nThe scheduled job can be configured to run once or on a regular basis (once a day, twice a week, etc)")
-@RequiredArgsConstructor
 public class ReportMailingJobApiResource {
-
     private final PlatformSecurityContext platformSecurityContext;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -70,123 +67,93 @@ public class ReportMailingJobApiResource {
     private final SqlValidator sqlValidator;
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Create a Report Mailing Job", operationId = "createReportMailingJob", description = "Mandatory Fields: "
-            + "name, startDateTime, stretchyReportId, emailRecipients, emailSubject, emailMessage, emailAttachmentFileFormatId, recurrence, isActive\n"
-            + "\n" + "Optional Fields: " + "description, stretchyReportParamMap")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Create a Report Mailing Job", operationId = "createReportMailingJob", description = "Mandatory Fields: " + "name, startDateTime, stretchyReportId, emailRecipients, emailSubject, emailMessage, emailAttachmentFileFormatId, recurrence, isActive\n" + "\n" + "Optional Fields: " + "description, stretchyReportParamMap")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = ReportMailingJobApiResourceSwagger.PostReportMailingJobsRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ReportMailingJobApiResourceSwagger.PostReportMailingJobsResponse.class)))
     public String createReportMailingJob(@Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        final CommandWrapper commandWrapper = new CommandWrapperBuilder()
-                .createReportMailingJob(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME).withJson(apiRequestBodyAsJson).build();
-
+        final CommandWrapper commandWrapper = new CommandWrapperBuilder().createReportMailingJob(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult commandProcessingResult = this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
-
         return this.reportMailingToApiJsonSerializer.serialize(commandProcessingResult);
     }
 
     @PUT
     @Path("{entityId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a Report Mailing Job\n", operationId = "updateReportMailingJob", description = "")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = ReportMailingJobApiResourceSwagger.PutReportMailingJobsRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ReportMailingJobApiResourceSwagger.PutReportMailingJobsResponse.class)))
-    public String updateReportMailingJob(@PathParam("entityId") @Parameter(description = "entityId") final Long entityId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        final CommandWrapper commandWrapper = new CommandWrapperBuilder()
-                .updateReportMailingJob(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME, entityId).withJson(apiRequestBodyAsJson)
-                .build();
-
+    public String updateReportMailingJob(@PathParam("entityId") @Parameter(description = "entityId") final Long entityId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+        final CommandWrapper commandWrapper = new CommandWrapperBuilder().updateReportMailingJob(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME, entityId).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult commandProcessingResult = this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
-
         return this.reportMailingToApiJsonSerializer.serialize(commandProcessingResult);
     }
 
     @DELETE
     @Path("{entityId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete a Report Mailing Job", operationId = "deleteReportMailingJob", description = "")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ReportMailingJobApiResourceSwagger.DeleteReportMailingJobsResponse.class)))
-    public String deleteReportMailingJob(@PathParam("entityId") @Parameter(description = "entityId") final Long entityId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        final CommandWrapper commandWrapper = new CommandWrapperBuilder()
-                .deleteReportMailingJob(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME, entityId).withJson(apiRequestBodyAsJson)
-                .build();
-
+    public String deleteReportMailingJob(@PathParam("entityId") @Parameter(description = "entityId") final Long entityId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+        final CommandWrapper commandWrapper = new CommandWrapperBuilder().deleteReportMailingJob(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME, entityId).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult commandProcessingResult = this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
-
         return this.reportMailingToApiJsonSerializer.serialize(commandProcessingResult);
     }
 
     @GET
     @Path("{entityId}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve a Report Mailing Job", operationId = "retrieveOneReportMailingJob", description = "Example Requests:\n"
-            + "\n" + "reportmailingjobs/1\n" + "\n" + "\n" + "reportmailingjobs/1?template=true")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve a Report Mailing Job", operationId = "retrieveOneReportMailingJob", description = "Example Requests:\n" + "\n" + "reportmailingjobs/1\n" + "\n" + "\n" + "reportmailingjobs/1?template=true")
     @AlternativeOperationId("retrieveReportMailingJob")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ReportMailingJobApiResourceSwagger.GetReportMailingJobsResponse.class)))
-    public String retrieveReportMailingJob(@PathParam("entityId") @Parameter(description = "entityId") final Long entityId,
-            @Context final UriInfo uriInfo) {
-        this.platformSecurityContext.authenticatedUser()
-                .validateHasReadPermission(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME);
-
+    public String retrieveReportMailingJob(@PathParam("entityId") @Parameter(description = "entityId") final Long entityId, @Context final UriInfo uriInfo) {
+        this.platformSecurityContext.authenticatedUser().validateHasReadPermission(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         ReportMailingJobData reportMailingJobData = this.reportMailingJobReadPlatformService.retrieveReportMailingJob(entityId);
-
         if (settings.isTemplate()) {
-            final ReportMailingJobData ReportMailingJobDataOptions = this.reportMailingJobReadPlatformService
-                    .retrieveReportMailingJobEnumOptions();
+            final ReportMailingJobData ReportMailingJobDataOptions = this.reportMailingJobReadPlatformService.retrieveReportMailingJobEnumOptions();
             reportMailingJobData = ReportMailingJobData.newInstance(reportMailingJobData, ReportMailingJobDataOptions);
         }
-
-        return this.reportMailingToApiJsonSerializer.serialize(settings, reportMailingJobData,
-                ReportMailingJobConstants.REPORT_MAILING_JOB_DATA_PARAMETERS);
+        return this.reportMailingToApiJsonSerializer.serialize(settings, reportMailingJobData, ReportMailingJobConstants.REPORT_MAILING_JOB_DATA_PARAMETERS);
     }
 
     @GET
     @Path("template")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve Report Mailing Job Details Template", operationId = "retrieveTemplateReportMailingJob", description = "This is a convenience resource. It can be useful when building maintenance user interface screens for report mailing job applications. The template data returned consists of any or all of:\n"
-            + "\n" + "Field Defaults\n" + "Allowed description Lists\n" + "Example Request:\n" + "\n" + "reportmailingjobs/template")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve Report Mailing Job Details Template", operationId = "retrieveTemplateReportMailingJob", description = "This is a convenience resource. It can be useful when building maintenance user interface screens for report mailing job applications. The template data returned consists of any or all of:\n" + "\n" + "Field Defaults\n" + "Allowed description Lists\n" + "Example Request:\n" + "\n" + "reportmailingjobs/template")
     @AlternativeOperationId("retrieveReportMailingJobTemplate")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ReportMailingJobApiResourceSwagger.GetReportMailingJobsTemplate.class)))
     public String retrieveReportMailingJobTemplate(@Context final UriInfo uriInfo) {
-        this.platformSecurityContext.authenticatedUser()
-                .validateHasReadPermission(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME);
-
+        this.platformSecurityContext.authenticatedUser().validateHasReadPermission(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        final ReportMailingJobData ReportMailingJobDataOptions = this.reportMailingJobReadPlatformService
-                .retrieveReportMailingJobEnumOptions();
-
-        return this.reportMailingToApiJsonSerializer.serialize(settings, ReportMailingJobDataOptions,
-                ReportMailingJobConstants.REPORT_MAILING_JOB_DATA_PARAMETERS);
+        final ReportMailingJobData ReportMailingJobDataOptions = this.reportMailingJobReadPlatformService.retrieveReportMailingJobEnumOptions();
+        return this.reportMailingToApiJsonSerializer.serialize(settings, ReportMailingJobDataOptions, ReportMailingJobConstants.REPORT_MAILING_JOB_DATA_PARAMETERS);
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "List Report Mailing Jobs", operationId = "retrieveAllReportMailingJobs", description = "Example Requests:\n"
-            + "\n" + "reportmailingjobs")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "List Report Mailing Jobs", operationId = "retrieveAllReportMailingJobs", description = "Example Requests:\n" + "\n" + "reportmailingjobs")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReportMailingJobApiResourceSwagger.GetReportMailingJobsResponse.class))))
-    public String retrieveAllReportMailingJobs(@Context final UriInfo uriInfo,
-            @QueryParam("offset") @Parameter(description = "offset") final Integer offset,
-            @QueryParam("limit") @Parameter(description = "limit") final Integer limit,
-            @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy,
-            @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder) {
-        this.platformSecurityContext.authenticatedUser()
-                .validateHasReadPermission(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME);
-
+    public String retrieveAllReportMailingJobs(@Context final UriInfo uriInfo, @QueryParam("offset") @Parameter(description = "offset") final Integer offset, @QueryParam("limit") @Parameter(description = "limit") final Integer limit, @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy, @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder) {
+        this.platformSecurityContext.authenticatedUser().validateHasReadPermission(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
-        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).offset(offset).orderBy(orderBy)
-                .sortOrder(sortOrder).build();
-        final Page<ReportMailingJobData> reportMailingJobData = this.reportMailingJobReadPlatformService
-                .retrieveAllReportMailingJobs(searchParameters);
+        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
+        final Page<ReportMailingJobData> reportMailingJobData = this.reportMailingJobReadPlatformService.retrieveAllReportMailingJobs(searchParameters);
+        return this.reportMailingToApiJsonSerializer.serialize(settings, reportMailingJobData, ReportMailingJobConstants.REPORT_MAILING_JOB_DATA_PARAMETERS);
+    }
 
-        return this.reportMailingToApiJsonSerializer.serialize(settings, reportMailingJobData,
-                ReportMailingJobConstants.REPORT_MAILING_JOB_DATA_PARAMETERS);
+    @java.lang.SuppressWarnings("all")
+        public ReportMailingJobApiResource(final PlatformSecurityContext platformSecurityContext, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final ApiRequestParameterHelper apiRequestParameterHelper, final DefaultToApiJsonSerializer<ReportMailingJobData> reportMailingToApiJsonSerializer, final ReportMailingJobReadPlatformService reportMailingJobReadPlatformService, final SqlValidator sqlValidator) {
+        this.platformSecurityContext = platformSecurityContext;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.reportMailingToApiJsonSerializer = reportMailingToApiJsonSerializer;
+        this.reportMailingJobReadPlatformService = reportMailingJobReadPlatformService;
+        this.sqlValidator = sqlValidator;
     }
 }

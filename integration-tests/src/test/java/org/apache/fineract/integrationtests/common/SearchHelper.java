@@ -19,15 +19,15 @@
 package org.apache.fineract.integrationtests.common;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
-
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.GetSearchResponse;
 
-@Slf4j
 public final class SearchHelper {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SearchHelper.class);
 
-    private SearchHelper() {}
+    private SearchHelper() {
+    }
 
     public static List<GetSearchResponse> getSearch(final String query, final Boolean exactMatch, final String resources) {
         log.info("Searching: query={}, exactMatch={}, resources={}", query, exactMatch, resources);

@@ -20,15 +20,31 @@ package org.apache.fineract.portfolio.shareproducts.data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-@Getter
 public class ShareProductMarketPriceData {
-
     private final Long id;
     private final LocalDate fromDate;
     private final BigDecimal shareValue;
 
+    @java.lang.SuppressWarnings("all")
+        public ShareProductMarketPriceData(final Long id, final LocalDate fromDate, final BigDecimal shareValue) {
+        this.id = id;
+        this.fromDate = fromDate;
+        this.shareValue = shareValue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getFromDate() {
+        return this.fromDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getShareValue() {
+        return this.shareValue;
+    }
 }

@@ -18,23 +18,26 @@
  */
 package org.apache.fineract.mix.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.mix.data.MixTaxonomyMappingData;
 import org.apache.fineract.mix.domain.MixTaxonomyMappingRepository;
 import org.apache.fineract.mix.mapping.MixTaxonomyMappingMapper;
 import org.springframework.stereotype.Service;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 public class MixTaxonomyMappingReadServiceImpl implements MixTaxonomyMappingReadService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MixTaxonomyMappingReadServiceImpl.class);
     private final MixTaxonomyMappingRepository repository;
     private final MixTaxonomyMappingMapper mapper;
 
     @Override
     public MixTaxonomyMappingData retrieveTaxonomyMapping() {
         return repository.findAll().stream().findFirst().map(mapper::map).orElse(null);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomyMappingReadServiceImpl(final MixTaxonomyMappingRepository repository, final MixTaxonomyMappingMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
     }
 }

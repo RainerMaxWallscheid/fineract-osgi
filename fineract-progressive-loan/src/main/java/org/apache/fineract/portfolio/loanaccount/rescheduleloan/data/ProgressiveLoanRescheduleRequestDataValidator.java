@@ -31,14 +31,12 @@ import static org.apache.fineract.portfolio.loanaccount.rescheduleloan.data.Loan
 import static org.apache.fineract.portfolio.loanaccount.rescheduleloan.data.LoanRescheduleRequestDataValidatorImpl.validateRescheduleRequestStatus;
 import static org.apache.fineract.portfolio.loanaccount.rescheduleloan.data.LoanRescheduleRequestDataValidatorImpl.validateSubmittedOnDate;
 import static org.apache.fineract.portfolio.loanaccount.rescheduleloan.data.LoanRescheduleRequestDataValidatorImpl.validateSupportedParameters;
-
 import com.google.gson.JsonElement;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -54,21 +52,15 @@ import org.apache.fineract.portfolio.loanaccount.rescheduleloan.domain.LoanResch
 import org.springframework.stereotype.Component;
 
 @Component("progressiveLoanRescheduleRequestDataValidatorImpl")
-@AllArgsConstructor
 public class ProgressiveLoanRescheduleRequestDataValidator implements LoanRescheduleRequestDataValidator {
-
     private final FromJsonHelper fromJsonHelper;
 
     @Override
     public void validateForCreateAction(JsonCommand jsonCommand, Loan loan) {
         validateSupportedParameters(jsonCommand, CREATE_REQUEST_DATA_PARAMETERS);
-
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-        final DataValidatorBuilder dataValidatorBuilder = new DataValidatorBuilder(dataValidationErrors)
-                .resource(StringUtils.lowerCase(RescheduleLoansApiConstants.ENTITY_NAME));
-
+        final DataValidatorBuilder dataValidatorBuilder = new DataValidatorBuilder(dataValidationErrors).resource(StringUtils.lowerCase(RescheduleLoansApiConstants.ENTITY_NAME));
         final JsonElement jsonElement = jsonCommand.parsedJson();
-
         validateSubmittedOnDate(fromJsonHelper, loan, jsonElement, dataValidatorBuilder);
         final LocalDate rescheduleFromDate = validateAndRetrieveRescheduleFromDate(fromJsonHelper, jsonElement, dataValidatorBuilder);
         validateRescheduleReasonId(fromJsonHelper, jsonElement, dataValidatorBuilder);
@@ -77,17 +69,12 @@ public class ProgressiveLoanRescheduleRequestDataValidator implements LoanResche
         BigDecimal interestRate = validateInterestRateParam(fromJsonHelper, jsonElement, dataValidatorBuilder, loan);
         Integer extraTerms = validateExtraTermsParam(fromJsonHelper, jsonElement, dataValidatorBuilder, loan);
         validateUnsupportedParams(jsonElement, dataValidatorBuilder);
-
         boolean hasInterestRateChange = interestRate != null;
         boolean hasAdjustDueDateChange = adjustedDueDate != null;
         boolean hasExtraTermsChange = extraTerms != null;
-
         if (Stream.of(hasInterestRateChange, hasAdjustDueDateChange, hasExtraTermsChange).filter(f -> f).count() > 1) {
-            dataValidatorBuilder.reset().parameter(RescheduleLoansApiConstants.adjustedDueDateParamName).failWithCode(
-                    RescheduleLoansApiConstants.rescheduleMultipleOperationsNotSupportedErrorCode,
-                    "Only one operation is supported at a time during Loan Rescheduling");
+            dataValidatorBuilder.reset().parameter(RescheduleLoansApiConstants.adjustedDueDateParamName).failWithCode(RescheduleLoansApiConstants.rescheduleMultipleOperationsNotSupportedErrorCode, "Only one operation is supported at a time during Loan Rescheduling");
         }
-
         if (hasExtraTermsChange) {
             validateExtraTerms(dataValidatorBuilder, loan, rescheduleFromDate);
         } else if (hasAdjustDueDateChange) {
@@ -95,7 +82,6 @@ public class ProgressiveLoanRescheduleRequestDataValidator implements LoanResche
         } else if (hasInterestRateChange) {
             validateInterestRate(dataValidatorBuilder, loan, rescheduleFromDate);
         }
-
         if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
@@ -122,13 +108,9 @@ public class ProgressiveLoanRescheduleRequestDataValidator implements LoanResche
         validateReschedulingInstallment(dataValidatorBuilder, installment);
     }
 
-    private Integer validateExtraTermsParam(FromJsonHelper fromJsonHelper, JsonElement jsonElement,
-            DataValidatorBuilder dataValidatorBuilder, Loan loan) {
-
-        final Integer extraTerms = fromJsonHelper.extractIntegerWithLocaleNamed(RescheduleLoansApiConstants.extraTermsParamName,
-                jsonElement);
-        DataValidatorBuilder extraTermsDataValidator = dataValidatorBuilder.reset()
-                .parameter(RescheduleLoansApiConstants.extraTermsParamName).value(extraTerms).ignoreIfNull().integerGreaterThanZero();
+    private Integer validateExtraTermsParam(FromJsonHelper fromJsonHelper, JsonElement jsonElement, DataValidatorBuilder dataValidatorBuilder, Loan loan) {
+        final Integer extraTerms = fromJsonHelper.extractIntegerWithLocaleNamed(RescheduleLoansApiConstants.extraTermsParamName, jsonElement);
+        DataValidatorBuilder extraTermsDataValidator = dataValidatorBuilder.reset().parameter(RescheduleLoansApiConstants.extraTermsParamName).value(extraTerms).ignoreIfNull().integerGreaterThanZero();
         if (extraTerms != null) {
             Integer maxNumberOfRepayments = loan.getLoanProduct().getMaxNumberOfRepayments();
             if (maxNumberOfRepayments != null) {
@@ -136,29 +118,24 @@ public class ProgressiveLoanRescheduleRequestDataValidator implements LoanResche
                 extraTermsDataValidator.notGreaterThanMax(maxNumberOfRepayments - numberOfRepayments);
             }
         }
-
         return extraTerms;
     }
 
     @Override
     public void validateReschedulingInstallment(DataValidatorBuilder dataValidatorBuilder, LoanRepaymentScheduleInstallment installment) {
         if (installment == null) {
-            dataValidatorBuilder.reset().parameter(RescheduleLoansApiConstants.rescheduleFromDateParamName)
-                    .failWithCode("repayment.schedule.installment.does.not.exist", "Repayment schedule installment does not exist");
+            dataValidatorBuilder.reset().parameter(RescheduleLoansApiConstants.rescheduleFromDateParamName).failWithCode("repayment.schedule.installment.does.not.exist", "Repayment schedule installment does not exist");
         }
     }
 
     private void validateUnsupportedParams(JsonElement jsonElement, DataValidatorBuilder dataValidatorBuilder) {
-        final var unsupportedFields = List.of(RescheduleLoansApiConstants.graceOnPrincipalParamName, //
-                RescheduleLoansApiConstants.graceOnInterestParamName, //
-                RescheduleLoansApiConstants.emiParamName//
+        final var unsupportedFields = List.of(RescheduleLoansApiConstants.graceOnPrincipalParamName,  //
+        RescheduleLoansApiConstants.graceOnInterestParamName,  //
+        RescheduleLoansApiConstants.emiParamName//
         );
-
         for (var unsupportedField : unsupportedFields) {
             if (this.fromJsonHelper.parameterHasValue(unsupportedField, jsonElement)) {
-                dataValidatorBuilder.reset().parameter(unsupportedField).failWithCode(
-                        RescheduleLoansApiConstants.rescheduleSelectedOperationNotSupportedErrorCode,
-                        "Selected operation is not supported by Progressive Loan at a time during Loan Rescheduling");
+                dataValidatorBuilder.reset().parameter(unsupportedField).failWithCode(RescheduleLoansApiConstants.rescheduleSelectedOperationNotSupportedErrorCode, "Selected operation is not supported by Progressive Loan at a time during Loan Rescheduling");
             }
         }
     }
@@ -166,21 +143,17 @@ public class ProgressiveLoanRescheduleRequestDataValidator implements LoanResche
     @Override
     public void validateForApproveAction(JsonCommand jsonCommand, LoanRescheduleRequest loanRescheduleRequest) {
         validateSupportedParameters(jsonCommand, APPROVE_REQUEST_DATA_PARAMETERS);
-
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-        final DataValidatorBuilder dataValidatorBuilder = new DataValidatorBuilder(dataValidationErrors)
-                .resource(StringUtils.lowerCase(RescheduleLoansApiConstants.ENTITY_NAME));
+        final DataValidatorBuilder dataValidatorBuilder = new DataValidatorBuilder(dataValidationErrors).resource(StringUtils.lowerCase(RescheduleLoansApiConstants.ENTITY_NAME));
         final JsonElement jsonElement = jsonCommand.parsedJson();
         validateApprovalDate(fromJsonHelper, loanRescheduleRequest, jsonElement, dataValidatorBuilder);
         validateRescheduleRequestStatus(loanRescheduleRequest, dataValidatorBuilder);
         LocalDate rescheduleFromDate = loanRescheduleRequest.getRescheduleFromDate();
         final Loan loan = loanRescheduleRequest.getLoan();
         LoanRepaymentScheduleInstallment installment;
-
         boolean hasExtraTerms = false;
         boolean hasInterestRateChange = false;
-        for (LoanRescheduleRequestToTermVariationMapping mapping : loanRescheduleRequest
-                .getLoanRescheduleRequestToTermVariationMappings()) {
+        for (LoanRescheduleRequestToTermVariationMapping mapping : loanRescheduleRequest.getLoanRescheduleRequestToTermVariationMappings()) {
             LoanTermVariationType termType = mapping.getLoanTermVariations().getTermType();
             if (termType.isInterestRateVariation() || termType.isInterestRateFromInstallment()) {
                 hasInterestRateChange = true;
@@ -194,7 +167,6 @@ public class ProgressiveLoanRescheduleRequestDataValidator implements LoanResche
         } else {
             validateLoanIsActive(loan, dataValidatorBuilder);
         }
-
         if (loanRescheduleRequest.getInterestRateFromInstallmentTermVariationIfExists() != null || hasExtraTerms) {
             installment = loan.getRelatedRepaymentScheduleInstallment(rescheduleFromDate);
         } else {
@@ -204,7 +176,6 @@ public class ProgressiveLoanRescheduleRequestDataValidator implements LoanResche
         if (!hasExtraTerms) {
             validateForOverdueCharges(dataValidatorBuilder, loan, installment);
         }
-
         if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
@@ -215,22 +186,22 @@ public class ProgressiveLoanRescheduleRequestDataValidator implements LoanResche
         throw new UnsupportedOperationException("Nothing to override here");
     }
 
-    private BigDecimal validateInterestRateParam(final FromJsonHelper fromJsonHelper, final JsonElement jsonElement,
-            DataValidatorBuilder dataValidatorBuilder, Loan loan) {
-        final BigDecimal interestRate = fromJsonHelper
-                .extractBigDecimalWithLocaleNamed(RescheduleLoansApiConstants.newInterestRateParamName, jsonElement);
-        DataValidatorBuilder interestRateDataValidatorBuilder = dataValidatorBuilder.reset()
-                .parameter(RescheduleLoansApiConstants.newInterestRateParamName).value(interestRate).ignoreIfNull().zeroOrPositiveAmount();
-
+    private BigDecimal validateInterestRateParam(final FromJsonHelper fromJsonHelper, final JsonElement jsonElement, DataValidatorBuilder dataValidatorBuilder, Loan loan) {
+        final BigDecimal interestRate = fromJsonHelper.extractBigDecimalWithLocaleNamed(RescheduleLoansApiConstants.newInterestRateParamName, jsonElement);
+        DataValidatorBuilder interestRateDataValidatorBuilder = dataValidatorBuilder.reset().parameter(RescheduleLoansApiConstants.newInterestRateParamName).value(interestRate).ignoreIfNull().zeroOrPositiveAmount();
         BigDecimal minNominalInterestRatePerPeriod = loan.getLoanProduct().getMinNominalInterestRatePerPeriod();
         if (minNominalInterestRatePerPeriod != null) {
             interestRateDataValidatorBuilder.notLessThanMin(minNominalInterestRatePerPeriod);
         }
-
         BigDecimal maxNominalInterestRatePerPeriod = loan.getLoanProduct().getMaxNominalInterestRatePerPeriod();
         if (maxNominalInterestRatePerPeriod != null) {
             interestRateDataValidatorBuilder.notGreaterThanMax(maxNominalInterestRatePerPeriod);
         }
         return interestRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProgressiveLoanRescheduleRequestDataValidator(final FromJsonHelper fromJsonHelper) {
+        this.fromJsonHelper = fromJsonHelper;
     }
 }

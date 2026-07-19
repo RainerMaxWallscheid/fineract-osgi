@@ -30,7 +30,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.common.AccountingConstants.CashAccountsForLoan;
 import org.apache.fineract.accounting.common.AccountingConstants.LoanProductAccountingParams;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
@@ -56,12 +55,9 @@ import org.apache.fineract.portfolio.paymenttype.exception.PaymentTypeNotFoundEx
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class ProductToGLAccountMappingHelper {
-
     protected static final List<GLAccountType> ASSET_LIABILITY_TYPES = List.of(GLAccountType.ASSET, GLAccountType.LIABILITY);
     private static final Integer GL_ACCOUNT_EXPENSE_TYPE = 5;
-
     protected final GLAccountRepository accountRepository;
     protected final ProductToGLAccountMappingRepository accountMappingRepository;
     protected final FromJsonHelper fromApiJsonHelper;
@@ -70,27 +66,21 @@ public class ProductToGLAccountMappingHelper {
     private final PaymentTypeRepository paymentTypeRepository;
     private final CodeValueRepository codeValueRepository;
 
-    public void saveProductToAccountMapping(final JsonElement element, final String paramName, final Long productId,
-            final int placeHolderTypeId, final GLAccountType expectedAccountType, final PortfolioProductType portfolioProductType) {
+    public void saveProductToAccountMapping(final JsonElement element, final String paramName, final Long productId, final int placeHolderTypeId, final GLAccountType expectedAccountType, final PortfolioProductType portfolioProductType) {
         final Long accountId = this.fromApiJsonHelper.extractLongNamed(paramName, element);
-        if (accountId != null) { // optional entries may be null
+        if (accountId != null) {
+            // optional entries may be null
             final GLAccount glAccount = getAccountByIdAndType(paramName, expectedAccountType, accountId);
-
-            final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId)
-                    .setProductType(portfolioProductType.getValue()).setFinancialAccountType(placeHolderTypeId);
+            final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(placeHolderTypeId);
             this.accountMappingRepository.saveAndFlush(accountMapping);
         }
     }
 
-    public void mergeProductToAccountMappingChanges(final JsonElement element, final String paramName, final Long productId,
-            final int accountTypeId, final String accountTypeName, final Map<String, Object> changes,
-            final GLAccountType expectedAccountType, final PortfolioProductType portfolioProductType) {
+    public void mergeProductToAccountMappingChanges(final JsonElement element, final String paramName, final Long productId, final int accountTypeId, final String accountTypeName, final Map<String, Object> changes, final GLAccountType expectedAccountType, final PortfolioProductType portfolioProductType) {
         final Long accountId = this.fromApiJsonHelper.extractLongNamed(paramName, element);
-
         // get the existing product
         if (accountId != null) {
-            final ProductToGLAccountMapping accountMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(productId,
-                    portfolioProductType.getValue(), accountTypeId);
+            final ProductToGLAccountMapping accountMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(productId, portfolioProductType.getValue(), accountTypeId);
             if (accountMapping == null) {
                 ArrayList<String> optionalProductToGLAccountMappingEntries = new ArrayList<>();
                 optionalProductToGLAccountMappingEntries.add(LoanProductAccountingParams.GOODWILL_CREDIT.getValue());
@@ -107,7 +97,6 @@ public class ProductToGLAccountMappingHelper {
                 optionalProductToGLAccountMappingEntries.add(LoanProductAccountingParams.INCOME_FROM_CAPITALIZATION.getValue());
                 optionalProductToGLAccountMappingEntries.add(LoanProductAccountingParams.BUY_DOWN_EXPENSE.getValue());
                 optionalProductToGLAccountMappingEntries.add(LoanProductAccountingParams.INCOME_FROM_BUY_DOWN.getValue());
-
                 if (optionalProductToGLAccountMappingEntries.contains(paramName)) {
                     saveProductToAccountMapping(element, paramName, productId, accountTypeId, expectedAccountType, portfolioProductType);
                 } else {
@@ -124,20 +113,15 @@ public class ProductToGLAccountMappingHelper {
         }
     }
 
-    public void createOrmergeProductToAccountMappingChanges(final JsonElement element, final String paramName, final Long productId,
-            final int accountTypeId, final Map<String, Object> changes, final GLAccountType expectedAccountType,
-            final PortfolioProductType portfolioProductType) {
+    public void createOrmergeProductToAccountMappingChanges(final JsonElement element, final String paramName, final Long productId, final int accountTypeId, final Map<String, Object> changes, final GLAccountType expectedAccountType, final PortfolioProductType portfolioProductType) {
         final Long accountId = this.fromApiJsonHelper.extractLongNamed(paramName, element);
-
         // get the existing product
         if (accountId != null) {
-            final ProductToGLAccountMapping accountMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(productId,
-                    portfolioProductType.getValue(), accountTypeId);
+            final ProductToGLAccountMapping accountMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(productId, portfolioProductType.getValue(), accountTypeId);
             if (accountMapping == null) {
                 final GLAccount glAccount = getAccountByIdAndType(paramName, expectedAccountType, accountId);
                 changes.put(paramName, accountId);
-                ProductToGLAccountMapping newAccountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount)
-                        .setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(accountTypeId);
+                ProductToGLAccountMapping newAccountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(accountTypeId);
                 this.accountMappingRepository.saveAndFlush(newAccountMapping);
             } else if (accountMapping.getGlAccount() != null && !Objects.equals(accountMapping.getGlAccount().getId(), accountId)) {
                 final GLAccount glAccount = getAccountByIdAndType(paramName, expectedAccountType, accountId);
@@ -157,26 +141,21 @@ public class ProductToGLAccountMappingHelper {
      * @param productId
      * @param changes
      */
-    public void savePaymentChannelToFundSourceMappings(final JsonCommand command, final JsonElement element, final Long productId,
-            final Map<String, Object> changes, final PortfolioProductType portfolioProductType) {
-        final JsonArray paymentChannelMappingArray = this.fromApiJsonHelper
-                .extractJsonArrayNamed(LoanProductAccountingParams.PAYMENT_CHANNEL_FUND_SOURCE_MAPPING.getValue(), element);
+    public void savePaymentChannelToFundSourceMappings(final JsonCommand command, final JsonElement element, final Long productId, final Map<String, Object> changes, final PortfolioProductType portfolioProductType) {
+        final JsonArray paymentChannelMappingArray = this.fromApiJsonHelper.extractJsonArrayNamed(LoanProductAccountingParams.PAYMENT_CHANNEL_FUND_SOURCE_MAPPING.getValue(), element);
         if (paymentChannelMappingArray != null) {
             if (changes != null) {
-                changes.put(LoanProductAccountingParams.PAYMENT_CHANNEL_FUND_SOURCE_MAPPING.getValue(),
-                        command.jsonFragment(LoanProductAccountingParams.PAYMENT_CHANNEL_FUND_SOURCE_MAPPING.getValue()));
+                changes.put(LoanProductAccountingParams.PAYMENT_CHANNEL_FUND_SOURCE_MAPPING.getValue(), command.jsonFragment(LoanProductAccountingParams.PAYMENT_CHANNEL_FUND_SOURCE_MAPPING.getValue()));
             }
             for (int i = 0; i < paymentChannelMappingArray.size(); i++) {
                 final JsonObject jsonObject = paymentChannelMappingArray.get(i).getAsJsonObject();
                 JsonElement jsonPaymentTypeId = jsonObject.get(LoanProductAccountingParams.PAYMENT_TYPE.getValue());
                 JsonElement jsonElementFoundId = jsonObject.get(LoanProductAccountingParams.FUND_SOURCE.getValue());
                 if (jsonPaymentTypeId == null) {
-                    throw new PlatformApiDataValidationException("payment.type.id.is.mandatory", "field: paymentTypeId is mandatory",
-                            LoanProductAccountingParams.PAYMENT_TYPE.getValue());
+                    throw new PlatformApiDataValidationException("payment.type.id.is.mandatory", "field: paymentTypeId is mandatory", LoanProductAccountingParams.PAYMENT_TYPE.getValue());
                 }
                 if (jsonElementFoundId == null) {
-                    throw new PlatformApiDataValidationException("fund.source.account.id.is.mandatory",
-                            "field: fundSourceAccountId is mandatory", LoanProductAccountingParams.FUND_SOURCE.getValue());
+                    throw new PlatformApiDataValidationException("fund.source.account.id.is.mandatory", "field: fundSourceAccountId is mandatory", LoanProductAccountingParams.FUND_SOURCE.getValue());
                 }
                 final Long paymentTypeId = jsonPaymentTypeId.getAsLong();
                 final Long paymentSpecificFundAccountId = jsonElementFoundId.getAsLong();
@@ -194,33 +173,27 @@ public class ProductToGLAccountMappingHelper {
      * @param productId
      * @param changes
      */
-    public void saveChargesToGLAccountMappings(final JsonCommand command, final JsonElement element, final Long productId,
-            final Map<String, Object> changes, final PortfolioProductType portfolioProductType, final boolean isPenalty) {
+    public void saveChargesToGLAccountMappings(final JsonCommand command, final JsonElement element, final Long productId, final Map<String, Object> changes, final PortfolioProductType portfolioProductType, final boolean isPenalty) {
         String arrayName;
         if (isPenalty) {
             arrayName = LoanProductAccountingParams.PENALTY_INCOME_ACCOUNT_MAPPING.getValue();
         } else {
             arrayName = LoanProductAccountingParams.FEE_INCOME_ACCOUNT_MAPPING.getValue();
         }
-
         final JsonArray chargeToIncomeAccountMappingArray = this.fromApiJsonHelper.extractJsonArrayNamed(arrayName, element);
         if (chargeToIncomeAccountMappingArray != null) {
             if (changes != null) {
-                changes.put(LoanProductAccountingParams.FEE_INCOME_ACCOUNT_MAPPING.getValue(),
-                        command.jsonFragment(LoanProductAccountingParams.FEE_INCOME_ACCOUNT_MAPPING.getValue()));
+                changes.put(LoanProductAccountingParams.FEE_INCOME_ACCOUNT_MAPPING.getValue(), command.jsonFragment(LoanProductAccountingParams.FEE_INCOME_ACCOUNT_MAPPING.getValue()));
             }
             for (int i = 0; i < chargeToIncomeAccountMappingArray.size(); i++) {
                 final JsonObject jsonObject = chargeToIncomeAccountMappingArray.get(i).getAsJsonObject();
                 JsonElement chargeIdJson = jsonObject.get(LoanProductAccountingParams.CHARGE_ID.getValue());
                 JsonElement incomeAccountJson = jsonObject.get(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue());
                 if (chargeIdJson == null) {
-                    throw new PlatformApiDataValidationException("charge.id.is.mandatory", "chargeId is mandatory",
-                            LoanProductAccountingParams.CHARGE_ID.getValue());
+                    throw new PlatformApiDataValidationException("charge.id.is.mandatory", "chargeId is mandatory", LoanProductAccountingParams.CHARGE_ID.getValue());
                 }
                 if (incomeAccountJson == null) {
-                    throw new PlatformApiDataValidationException("income.account.id.is.mandatory", "incomeAccountId is mandatory",
-                            LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue());
-
+                    throw new PlatformApiDataValidationException("income.account.id.is.mandatory", "incomeAccountId is mandatory", LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue());
                 }
                 final Long chargeId = chargeIdJson.getAsLong();
                 final Long incomeAccountId = jsonObject.get(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue()).getAsLong();
@@ -229,61 +202,42 @@ public class ProductToGLAccountMappingHelper {
         }
     }
 
-    public void saveReasonToGLAccountMappings(final JsonCommand command, final JsonElement element, final Long productId,
-            final Map<String, Object> changes, final PortfolioProductType portfolioProductType,
-            final LoanProductAccountingParams arrayNameParam, final LoanProductAccountingParams reasonCodeValueIdParam,
-            final CashAccountsForLoan cashAccountsForLoan) {
-
+    public void saveReasonToGLAccountMappings(final JsonCommand command, final JsonElement element, final Long productId, final Map<String, Object> changes, final PortfolioProductType portfolioProductType, final LoanProductAccountingParams arrayNameParam, final LoanProductAccountingParams reasonCodeValueIdParam, final CashAccountsForLoan cashAccountsForLoan) {
         final String arrayName = arrayNameParam.getValue();
         final JsonArray reasonToExpenseAccountMappingArray = this.fromApiJsonHelper.extractJsonArrayNamed(arrayName, element);
-
         if (reasonToExpenseAccountMappingArray != null) {
             if (changes != null) {
                 changes.put(arrayName, command.jsonFragment(arrayName));
             }
-
             for (int i = 0; i < reasonToExpenseAccountMappingArray.size(); i++) {
                 final JsonObject jsonObject = reasonToExpenseAccountMappingArray.get(i).getAsJsonObject();
-
                 JsonElement reasonIdJson = jsonObject.get(reasonCodeValueIdParam.getValue());
                 JsonElement expenseAccountJson = jsonObject.get(LoanProductAccountingParams.EXPENSE_GL_ACCOUNT_ID.getValue());
                 if (reasonIdJson == null) {
-                    throw new PlatformApiDataValidationException(reasonCodeValueIdParam.getValue() + ".is.mandatory",
-                            reasonCodeValueIdParam.getValue() + " is mandatory", reasonCodeValueIdParam.getValue());
+                    throw new PlatformApiDataValidationException(reasonCodeValueIdParam.getValue() + ".is.mandatory", reasonCodeValueIdParam.getValue() + " is mandatory", reasonCodeValueIdParam.getValue());
                 }
                 if (expenseAccountJson == null) {
-                    throw new PlatformApiDataValidationException("expense.gl.account.id.is.mandatory", "expenseGlAccountId is mandatory",
-                            LoanProductAccountingParams.EXPENSE_GL_ACCOUNT_ID.getValue());
+                    throw new PlatformApiDataValidationException("expense.gl.account.id.is.mandatory", "expenseGlAccountId is mandatory", LoanProductAccountingParams.EXPENSE_GL_ACCOUNT_ID.getValue());
                 }
-
                 final Long reasonId = reasonIdJson.getAsLong();
                 final Long expenseAccountId = expenseAccountJson.getAsLong();
-
                 saveReasonToExpenseMapping(productId, reasonId, expenseAccountId, portfolioProductType, cashAccountsForLoan);
             }
         }
     }
 
-    public void saveClassificationToGLAccountMappings(final JsonCommand command, final JsonElement element, final Long productId,
-            final Map<String, Object> changes, final PortfolioProductType portfolioProductType,
-            final LoanProductAccountingParams classificationParameter) {
-
+    public void saveClassificationToGLAccountMappings(final JsonCommand command, final JsonElement element, final Long productId, final Map<String, Object> changes, final PortfolioProductType portfolioProductType, final LoanProductAccountingParams classificationParameter) {
         final String arrayName = classificationParameter.getValue();
         final JsonArray classificationToIncomeAccountMappingArray = this.fromApiJsonHelper.extractJsonArrayNamed(arrayName, element);
-
         if (classificationToIncomeAccountMappingArray != null) {
             if (changes != null) {
                 changes.put(arrayName, command.jsonFragment(arrayName));
             }
-
             for (int i = 0; i < classificationToIncomeAccountMappingArray.size(); i++) {
                 final JsonObject jsonObject = classificationToIncomeAccountMappingArray.get(i).getAsJsonObject();
-                final Long classificationId = jsonObject.get(LoanProductAccountingParams.CLASSIFICATION_CODE_VALUE_ID.getValue())
-                        .getAsLong();
+                final Long classificationId = jsonObject.get(LoanProductAccountingParams.CLASSIFICATION_CODE_VALUE_ID.getValue()).getAsLong();
                 final Long incomeAccountId = jsonObject.get(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue()).getAsLong();
-
-                saveClassificationToIncomeMapping(productId, classificationId, incomeAccountId, portfolioProductType,
-                        classificationParameter);
+                saveClassificationToIncomeMapping(productId, classificationId, incomeAccountId, portfolioProductType, classificationParameter);
             }
         }
     }
@@ -294,55 +248,41 @@ public class ProductToGLAccountMappingHelper {
      * @param productId
      * @param changes
      */
-    public void updateChargeToIncomeAccountMappings(final JsonCommand command, final JsonElement element, final Long productId,
-            final Map<String, Object> changes, final PortfolioProductType portfolioProductType, final boolean isPenalty) {
+    public void updateChargeToIncomeAccountMappings(final JsonCommand command, final JsonElement element, final Long productId, final Map<String, Object> changes, final PortfolioProductType portfolioProductType, final boolean isPenalty) {
         // find all existing payment Channel to Fund source Mappings
         List<ProductToGLAccountMapping> existingChargeToIncomeAccountMappings;
         String arrayFragmentName;
-
         if (isPenalty) {
-            existingChargeToIncomeAccountMappings = this.accountMappingRepository.findAllPenaltyToIncomeAccountMappings(productId,
-                    portfolioProductType.getValue());
+            existingChargeToIncomeAccountMappings = this.accountMappingRepository.findAllPenaltyToIncomeAccountMappings(productId, portfolioProductType.getValue());
             arrayFragmentName = LoanProductAccountingParams.PENALTY_INCOME_ACCOUNT_MAPPING.getValue();
         } else {
-            existingChargeToIncomeAccountMappings = this.accountMappingRepository.findAllFeeToIncomeAccountMappings(productId,
-                    portfolioProductType.getValue());
+            existingChargeToIncomeAccountMappings = this.accountMappingRepository.findAllFeeToIncomeAccountMappings(productId, portfolioProductType.getValue());
             arrayFragmentName = LoanProductAccountingParams.FEE_INCOME_ACCOUNT_MAPPING.getValue();
         }
-
         final JsonArray chargeToIncomeAccountMappingArray = this.fromApiJsonHelper.extractJsonArrayNamed(arrayFragmentName, element);
         /**
          * Variable stores a map representation of charges (key) and their associated income Id's (value) extracted from
          * the passed in Jsoncommand
-         **/
+         */
         final Map<Long, Long> inputChargeToIncomeAccountMap = new HashMap<>();
-        /***
+        /**
          * Variable stores all charges which have already been mapped to Income Accounts in the system
-         **/
+         */
         final Set<Long> existingCharges = new HashSet<>();
         if (chargeToIncomeAccountMappingArray != null) {
             if (changes != null) {
                 changes.put(arrayFragmentName, command.jsonFragment(arrayFragmentName));
             }
-
             for (int i = 0; i < chargeToIncomeAccountMappingArray.size(); i++) {
                 final JsonObject jsonObject = chargeToIncomeAccountMappingArray.get(i).getAsJsonObject();
                 final Long chargeId = jsonObject.get(LoanProductAccountingParams.CHARGE_ID.getValue()).getAsLong();
                 final Long incomeAccountId = jsonObject.get(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue()).getAsLong();
                 inputChargeToIncomeAccountMap.put(chargeId, incomeAccountId);
             }
-
             // If input map is empty, delete all existing mappings
             if (inputChargeToIncomeAccountMap.size() == 0) {
                 this.accountMappingRepository.deleteAll(existingChargeToIncomeAccountMappings);
-            } /**
-               * Else, <br/>
-               * update existing mappings OR <br/>
-               * delete old mappings (which are already present, but not passed in as a part of Jsoncommand)<br/>
-               * Create new mappings for charges that are passed in as a part of the Jsoncommand but not already present
-               *
-               **/
-            else {
+            } else {
                 for (final ProductToGLAccountMapping chargeToIncomeAccountMapping : existingChargeToIncomeAccountMappings) {
                     final Long currentCharge = chargeToIncomeAccountMapping.getCharge().getId();
                     existingCharges.add(currentCharge);
@@ -352,25 +292,21 @@ public class ProductToGLAccountMappingHelper {
                         if (!newGLAccountId.equals(chargeToIncomeAccountMapping.getGlAccount().getId())) {
                             final GLAccount glAccount;
                             if (isPenalty) {
-                                glAccount = getAccountByIdAndType(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue(),
-                                        GLAccountType.INCOME, newGLAccountId);
+                                glAccount = getAccountByIdAndType(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue(), GLAccountType.INCOME, newGLAccountId);
                             } else {
                                 List<GLAccountType> allowedAccountTypes = getAllowedAccountTypesForFeeMapping();
-                                glAccount = getAccountByIdAndType(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue(),
-                                        allowedAccountTypes, newGLAccountId);
+                                glAccount = getAccountByIdAndType(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue(), allowedAccountTypes, newGLAccountId);
                             }
                             chargeToIncomeAccountMapping.setGlAccount(glAccount);
                             this.accountMappingRepository.saveAndFlush(chargeToIncomeAccountMapping);
                         }
-                    } // deleted payment type
-                    else {
+                    } else  // deleted payment type
+                    {
                         this.accountMappingRepository.delete(chargeToIncomeAccountMapping);
                     }
                 }
-
                 // only the newly added
-                for (Map.Entry<Long, Long> entry : inputChargeToIncomeAccountMap.entrySet().stream()
-                        .filter(e -> !existingCharges.contains(e.getKey())).toList()) {
+                for (Map.Entry<Long, Long> entry : inputChargeToIncomeAccountMap.entrySet().stream().filter(e -> !existingCharges.contains(e.getKey())).toList()) {
                     saveChargeToFundSourceMapping(productId, entry.getKey(), entry.getValue(), portfolioProductType, isPenalty);
                 }
             }
@@ -383,47 +319,33 @@ public class ProductToGLAccountMappingHelper {
      * @param productId
      * @param changes
      */
-    public void updatePaymentChannelToFundSourceMappings(final JsonCommand command, final JsonElement element, final Long productId,
-            final Map<String, Object> changes, final PortfolioProductType portfolioProductType) {
+    public void updatePaymentChannelToFundSourceMappings(final JsonCommand command, final JsonElement element, final Long productId, final Map<String, Object> changes, final PortfolioProductType portfolioProductType) {
         // find all existing payment Channel to Fund source Mappings
-        final List<ProductToGLAccountMapping> existingPaymentChannelToFundSourceMappings = this.accountMappingRepository
-                .findAllPaymentTypeToFundSourceMappings(productId, portfolioProductType.getValue());
-        final JsonArray paymentChannelMappingArray = this.fromApiJsonHelper
-                .extractJsonArrayNamed(LoanProductAccountingParams.PAYMENT_CHANNEL_FUND_SOURCE_MAPPING.getValue(), element);
+        final List<ProductToGLAccountMapping> existingPaymentChannelToFundSourceMappings = this.accountMappingRepository.findAllPaymentTypeToFundSourceMappings(productId, portfolioProductType.getValue());
+        final JsonArray paymentChannelMappingArray = this.fromApiJsonHelper.extractJsonArrayNamed(LoanProductAccountingParams.PAYMENT_CHANNEL_FUND_SOURCE_MAPPING.getValue(), element);
         /**
          * Variable stores a map representation of Payment channels (key) and their fund sources (value) extracted from
          * the passed in Jsoncommand
-         **/
+         */
         final Map<Long, Long> inputPaymentChannelFundSourceMap = new HashMap<>();
-        /***
+        /**
          * Variable stores all payment types which have already been mapped to Fund Sources in the system
-         **/
+         */
         final Set<Long> existingPaymentTypes = new HashSet<>();
         if (paymentChannelMappingArray != null) {
             if (changes != null) {
-                changes.put(LoanProductAccountingParams.PAYMENT_CHANNEL_FUND_SOURCE_MAPPING.getValue(),
-                        command.jsonFragment(LoanProductAccountingParams.PAYMENT_CHANNEL_FUND_SOURCE_MAPPING.getValue()));
+                changes.put(LoanProductAccountingParams.PAYMENT_CHANNEL_FUND_SOURCE_MAPPING.getValue(), command.jsonFragment(LoanProductAccountingParams.PAYMENT_CHANNEL_FUND_SOURCE_MAPPING.getValue()));
             }
-
             for (int i = 0; i < paymentChannelMappingArray.size(); i++) {
                 final JsonObject jsonObject = paymentChannelMappingArray.get(i).getAsJsonObject();
                 final Long paymentTypeId = jsonObject.get(LoanProductAccountingParams.PAYMENT_TYPE.getValue()).getAsLong();
                 final Long paymentSpecificFundAccountId = jsonObject.get(LoanProductAccountingParams.FUND_SOURCE.getValue()).getAsLong();
                 inputPaymentChannelFundSourceMap.put(paymentTypeId, paymentSpecificFundAccountId);
             }
-
             // If input map is empty, delete all existing mappings
             if (inputPaymentChannelFundSourceMap.isEmpty()) {
                 this.accountMappingRepository.deleteAll(existingPaymentChannelToFundSourceMappings);
-            } /**
-               * Else, <br/>
-               * update existing mappings OR <br/>
-               * delete old mappings (which re already present, but not passed in as a part of Jsoncommand)<br/>
-               * Create new mappings for payment types that are passed in as a part of the Jsoncommand but not already
-               * present
-               *
-               **/
-            else {
+            } else {
                 for (final ProductToGLAccountMapping existingPaymentChannelToFundSourceMapping : existingPaymentChannelToFundSourceMappings) {
                     final Long currentPaymentChannelId = existingPaymentChannelToFundSourceMapping.getPaymentType().getId();
                     existingPaymentTypes.add(currentPaymentChannelId);
@@ -435,63 +357,44 @@ public class ProductToGLAccountMappingHelper {
                             existingPaymentChannelToFundSourceMapping.setGlAccount(glAccount);
                             this.accountMappingRepository.saveAndFlush(existingPaymentChannelToFundSourceMapping);
                         }
-                    } // deleted payment type
-                    else {
+                    } else  // deleted payment type
+                    {
                         this.accountMappingRepository.delete(existingPaymentChannelToFundSourceMapping);
                     }
                 }
-
                 // only the newly added
-                for (Map.Entry<Long, Long> entry : inputPaymentChannelFundSourceMap.entrySet().stream()
-                        .filter(e -> !existingPaymentTypes.contains(e.getKey())).toList()) {
+                for (Map.Entry<Long, Long> entry : inputPaymentChannelFundSourceMap.entrySet().stream().filter(e -> !existingPaymentTypes.contains(e.getKey())).toList()) {
                     savePaymentChannelToFundSourceMapping(productId, entry.getKey(), entry.getValue(), portfolioProductType);
                 }
             }
         }
     }
 
-    private Long getReasonIdByCashAccountForLoan(final ProductToGLAccountMapping productToGLAccountMapping,
-            final CashAccountsForLoan cashAccountsForLoan) {
+    private Long getReasonIdByCashAccountForLoan(final ProductToGLAccountMapping productToGLAccountMapping, final CashAccountsForLoan cashAccountsForLoan) {
         return switch (cashAccountsForLoan) {
-            case LOSSES_WRITTEN_OFF -> productToGLAccountMapping != null && productToGLAccountMapping.getWriteOffReason() != null
-                    ? productToGLAccountMapping.getWriteOffReason().getId()
-                    : null;
-            case CHARGE_OFF_EXPENSE -> productToGLAccountMapping != null && productToGLAccountMapping.getChargeOffReason() != null
-                    ? productToGLAccountMapping.getChargeOffReason().getId()
-                    : null;
+            case LOSSES_WRITTEN_OFF -> productToGLAccountMapping != null && productToGLAccountMapping.getWriteOffReason() != null ? productToGLAccountMapping.getWriteOffReason().getId() : null;
+            case CHARGE_OFF_EXPENSE -> productToGLAccountMapping != null && productToGLAccountMapping.getChargeOffReason() != null ? productToGLAccountMapping.getChargeOffReason().getId() : null;
             default -> throw new IllegalStateException("Unexpected value: " + cashAccountsForLoan);
         };
     }
 
-    public void updateReasonToGLAccountMappings(final JsonCommand command, final JsonElement element, final Long productId,
-            final Map<String, Object> changes, final PortfolioProductType portfolioProductType,
-            final List<ProductToGLAccountMapping> existingReasonToGLAccountMappings,
-            final LoanProductAccountingParams reasonToExpenseAccountMappingsParam, final LoanProductAccountingParams reasonCodeValueIdParam,
-            final CashAccountsForLoan cashAccountsForLoan) {
-
-        final JsonArray reasonToGLAccountMappingArray = this.fromApiJsonHelper
-                .extractJsonArrayNamed(reasonToExpenseAccountMappingsParam.getValue(), element);
-
+    public void updateReasonToGLAccountMappings(final JsonCommand command, final JsonElement element, final Long productId, final Map<String, Object> changes, final PortfolioProductType portfolioProductType, final List<ProductToGLAccountMapping> existingReasonToGLAccountMappings, final LoanProductAccountingParams reasonToExpenseAccountMappingsParam, final LoanProductAccountingParams reasonCodeValueIdParam, final CashAccountsForLoan cashAccountsForLoan) {
+        final JsonArray reasonToGLAccountMappingArray = this.fromApiJsonHelper.extractJsonArrayNamed(reasonToExpenseAccountMappingsParam.getValue(), element);
         final Map<Long, Long> inputReasonToGLAccountMap = new HashMap<>();
-
         final Set<Long> existingReasons = new HashSet<>();
         if (reasonToGLAccountMappingArray != null) {
             if (changes != null) {
-                changes.put(reasonToExpenseAccountMappingsParam.getValue(),
-                        command.jsonFragment(reasonToExpenseAccountMappingsParam.getValue()));
+                changes.put(reasonToExpenseAccountMappingsParam.getValue(), command.jsonFragment(reasonToExpenseAccountMappingsParam.getValue()));
             }
-
             for (int i = 0; i < reasonToGLAccountMappingArray.size(); i++) {
                 final JsonObject jsonObject = reasonToGLAccountMappingArray.get(i).getAsJsonObject();
                 final Long expenseGlAccountId = jsonObject.get(LoanProductAccountingParams.EXPENSE_GL_ACCOUNT_ID.getValue()).getAsLong();
                 final Long reasonCodeValueId = jsonObject.get(reasonCodeValueIdParam.getValue()).getAsLong();
                 inputReasonToGLAccountMap.put(reasonCodeValueId, expenseGlAccountId);
             }
-
             // If input map is empty, delete all existing mappings
             if (inputReasonToGLAccountMap.isEmpty()) {
                 this.accountMappingRepository.deleteAll(existingReasonToGLAccountMappings);
-
             } else {
                 for (final ProductToGLAccountMapping existingReasonToGLAccountMapping : existingReasonToGLAccountMappings) {
                     final Long currentReasonId = getReasonIdByCashAccountForLoan(existingReasonToGLAccountMapping, cashAccountsForLoan);
@@ -507,62 +410,41 @@ public class ProductToGLAccountMappingHelper {
                                     this.accountMappingRepository.saveAndFlush(existingReasonToGLAccountMapping);
                                 }
                             }
-                        } // deleted payment type
-                        else {
+                        } else  // deleted payment type
+                        {
                             this.accountMappingRepository.delete(existingReasonToGLAccountMapping);
                         }
                     }
                 }
-
                 // only the newly added
-                for (Map.Entry<Long, Long> entry : inputReasonToGLAccountMap.entrySet().stream()
-                        .filter(e -> !existingReasons.contains(e.getKey())).toList()) {
+                for (Map.Entry<Long, Long> entry : inputReasonToGLAccountMap.entrySet().stream().filter(e -> !existingReasons.contains(e.getKey())).toList()) {
                     saveReasonToExpenseMapping(productId, entry.getKey(), entry.getValue(), portfolioProductType, cashAccountsForLoan);
                 }
             }
         }
     }
 
-    public void updateClassificationToGLAccountMappings(final JsonCommand command, final JsonElement element, final Long productId,
-            final Map<String, Object> changes, final PortfolioProductType portfolioProductType,
-            final LoanProductAccountingParams classificationParameter) {
-
-        final List<ProductToGLAccountMapping> existingClassificationToGLAccountMappings = classificationParameter
-                .equals(LoanProductAccountingParams.CAPITALIZED_INCOME_CLASSIFICATION_TO_INCOME_ACCOUNT_MAPPINGS)
-                        ? this.accountMappingRepository.findAllCapitalizedIncomeClassificationsMappings(productId,
-                                portfolioProductType.getValue())
-                        : this.accountMappingRepository.findAllBuyDownFeeClassificationsMappings(productId,
-                                portfolioProductType.getValue());
-
-        final JsonArray classificationToGLAccountMappingArray = this.fromApiJsonHelper
-                .extractJsonArrayNamed(classificationParameter.getValue(), element);
-
+    public void updateClassificationToGLAccountMappings(final JsonCommand command, final JsonElement element, final Long productId, final Map<String, Object> changes, final PortfolioProductType portfolioProductType, final LoanProductAccountingParams classificationParameter) {
+        final List<ProductToGLAccountMapping> existingClassificationToGLAccountMappings = classificationParameter.equals(LoanProductAccountingParams.CAPITALIZED_INCOME_CLASSIFICATION_TO_INCOME_ACCOUNT_MAPPINGS) ? this.accountMappingRepository.findAllCapitalizedIncomeClassificationsMappings(productId, portfolioProductType.getValue()) : this.accountMappingRepository.findAllBuyDownFeeClassificationsMappings(productId, portfolioProductType.getValue());
+        final JsonArray classificationToGLAccountMappingArray = this.fromApiJsonHelper.extractJsonArrayNamed(classificationParameter.getValue(), element);
         final Map<Long, Long> inputClassificationToGLAccountMap = new HashMap<>();
-
         final Set<Long> existingClassifications = new HashSet<>();
         if (classificationToGLAccountMappingArray != null) {
             if (changes != null) {
                 changes.put(classificationParameter.getValue(), command.jsonFragment(classificationParameter.getValue()));
             }
-
             for (int i = 0; i < classificationToGLAccountMappingArray.size(); i++) {
                 final JsonObject jsonObject = classificationToGLAccountMappingArray.get(i).getAsJsonObject();
                 final Long incomeGlAccountId = jsonObject.get(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue()).getAsLong();
-                final Long classificationCodeValueId = jsonObject.get(LoanProductAccountingParams.CLASSIFICATION_CODE_VALUE_ID.getValue())
-                        .getAsLong();
+                final Long classificationCodeValueId = jsonObject.get(LoanProductAccountingParams.CLASSIFICATION_CODE_VALUE_ID.getValue()).getAsLong();
                 inputClassificationToGLAccountMap.put(classificationCodeValueId, incomeGlAccountId);
             }
-
             // If input map is empty, delete all existing mappings
             if (inputClassificationToGLAccountMap.isEmpty()) {
                 this.accountMappingRepository.deleteAll(existingClassificationToGLAccountMappings);
             } else {
                 for (final ProductToGLAccountMapping existingClassificationToGLAccountMapping : existingClassificationToGLAccountMappings) {
-                    final Long currentClassificationId = classificationParameter
-                            .equals(LoanProductAccountingParams.CAPITALIZED_INCOME_CLASSIFICATION_TO_INCOME_ACCOUNT_MAPPINGS)
-                                    ? existingClassificationToGLAccountMapping.getCapitalizedIncomeClassification().getId()
-                                    : existingClassificationToGLAccountMapping.getBuydownFeeClassification().getId();
-
+                    final Long currentClassificationId = classificationParameter.equals(LoanProductAccountingParams.CAPITALIZED_INCOME_CLASSIFICATION_TO_INCOME_ACCOUNT_MAPPINGS) ? existingClassificationToGLAccountMapping.getCapitalizedIncomeClassification().getId() : existingClassificationToGLAccountMapping.getBuydownFeeClassification().getId();
                     if (currentClassificationId != null) {
                         existingClassifications.add(currentClassificationId);
                         // update existing mappings (if required)
@@ -575,18 +457,15 @@ public class ProductToGLAccountMappingHelper {
                                     this.accountMappingRepository.saveAndFlush(existingClassificationToGLAccountMapping);
                                 }
                             }
-                        } // deleted previous record
-                        else {
+                        } else  // deleted previous record
+                        {
                             this.accountMappingRepository.delete(existingClassificationToGLAccountMapping);
                         }
                     }
                 }
-
                 // only the newly added
-                for (Map.Entry<Long, Long> entry : inputClassificationToGLAccountMap.entrySet().stream()
-                        .filter(e -> !existingClassifications.contains(e.getKey())).toList()) {
-                    saveClassificationToIncomeMapping(productId, entry.getKey(), entry.getValue(), portfolioProductType,
-                            classificationParameter);
+                for (Map.Entry<Long, Long> entry : inputClassificationToGLAccountMap.entrySet().stream().filter(e -> !existingClassifications.contains(e.getKey())).toList()) {
+                    saveClassificationToIncomeMapping(productId, entry.getKey(), entry.getValue(), portfolioProductType, classificationParameter);
                 }
             }
         }
@@ -594,116 +473,77 @@ public class ProductToGLAccountMappingHelper {
 
     /**
      * @param productId
-     *
      */
-    private void savePaymentChannelToFundSourceMapping(final Long productId, final Long paymentTypeId,
-            final Long paymentTypeSpecificFundAccountId, final PortfolioProductType portfolioProductType) {
-        final PaymentType paymentType = this.paymentTypeRepository.findById(paymentTypeId)
-                .orElseThrow(() -> new PaymentTypeNotFoundException(paymentTypeId));
+    private void savePaymentChannelToFundSourceMapping(final Long productId, final Long paymentTypeId, final Long paymentTypeSpecificFundAccountId, final PortfolioProductType portfolioProductType) {
+        final PaymentType paymentType = this.paymentTypeRepository.findById(paymentTypeId).orElseThrow(() -> new PaymentTypeNotFoundException(paymentTypeId));
         final GLAccount glAccount = getAccountById(LoanProductAccountingParams.FUND_SOURCE.getValue(), paymentTypeSpecificFundAccountId);
-        final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId)
-                .setProductType(portfolioProductType.getValue()).setFinancialAccountType(CashAccountsForLoan.FUND_SOURCE.getValue())
-                .setPaymentType(paymentType);
+        final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(CashAccountsForLoan.FUND_SOURCE.getValue()).setPaymentType(paymentType);
         this.accountMappingRepository.saveAndFlush(accountMapping);
     }
 
     /**
      * @param productId
-     *
      */
-    private void saveChargeToFundSourceMapping(final Long productId, final Long chargeId, final Long incomeAccountId,
-            final PortfolioProductType portfolioProductType, final boolean isPenalty) {
+    private void saveChargeToFundSourceMapping(final Long productId, final Long chargeId, final Long incomeAccountId, final PortfolioProductType portfolioProductType, final boolean isPenalty) {
         final Charge charge = this.chargeRepositoryWrapper.findOneWithNotFoundDetection(chargeId);
-
         // TODO Vishwas: Need to validate if given charge is fee or Penalty
         // based on input condition
-
         GLAccount glAccount;
         /**
          * Both CASH and Accrual placeholders have the same value for income from Interest and penalties
-         **/
+         */
         CashAccountsForLoan placeHolderAccountType;
         if (isPenalty) {
-            glAccount = getAccountByIdAndType(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue(), GLAccountType.INCOME,
-                    incomeAccountId);
+            glAccount = getAccountByIdAndType(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue(), GLAccountType.INCOME, incomeAccountId);
             placeHolderAccountType = CashAccountsForLoan.INCOME_FROM_PENALTIES;
         } else {
             List<GLAccountType> allowedAccountTypes = getAllowedAccountTypesForFeeMapping();
-            glAccount = getAccountByIdAndType(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue(), allowedAccountTypes,
-                    incomeAccountId);
+            glAccount = getAccountByIdAndType(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue(), allowedAccountTypes, incomeAccountId);
             placeHolderAccountType = CashAccountsForLoan.INCOME_FROM_FEES;
         }
-        final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId)
-                .setProductType(portfolioProductType.getValue()).setFinancialAccountType(placeHolderAccountType.getValue())
-                .setCharge(charge);
+        final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(placeHolderAccountType.getValue()).setCharge(charge);
         this.accountMappingRepository.saveAndFlush(accountMapping);
     }
 
     private Predicate<? super ProductToGLAccountMapping> matching(final CashAccountsForLoan typeDef, final Long reasonId) {
         return switch (typeDef) {
-            case CHARGE_OFF_EXPENSE -> (mapping) -> (mapping.getChargeOffReason() != null && mapping.getChargeOffReason().getId() != null
-                    && mapping.getChargeOffReason().getId().equals(reasonId));
-            case LOSSES_WRITTEN_OFF -> (mapping) -> (mapping.getWriteOffReason() != null && mapping.getWriteOffReason().getId() != null
-                    && mapping.getWriteOffReason().getId().equals(reasonId));
+            case CHARGE_OFF_EXPENSE -> mapping -> (mapping.getChargeOffReason() != null && mapping.getChargeOffReason().getId() != null && mapping.getChargeOffReason().getId().equals(reasonId));
+            case LOSSES_WRITTEN_OFF -> mapping -> (mapping.getWriteOffReason() != null && mapping.getWriteOffReason().getId() != null && mapping.getWriteOffReason().getId().equals(reasonId));
             default -> throw new IllegalStateException("Unexpected value: " + typeDef);
         };
     }
 
-    private void saveReasonToExpenseMapping(final Long productId, final Long reasonId, final Long expenseAccountId,
-            final PortfolioProductType portfolioProductType, final CashAccountsForLoan cashAccountsForLoan) {
-
+    private void saveReasonToExpenseMapping(final Long productId, final Long reasonId, final Long expenseAccountId, final PortfolioProductType portfolioProductType, final CashAccountsForLoan cashAccountsForLoan) {
         final Optional<GLAccount> glAccount = accountRepository.findById(expenseAccountId);
         final Optional<CodeValue> codeValueOptional = codeValueRepository.findById(reasonId);
-
-        final boolean reasonMappingExists = this.accountMappingRepository
-                .findAllProductToGLAccountMappingsByProductIdAndProductTypeAndFinancialAccountType(productId,
-                        portfolioProductType.getValue(), cashAccountsForLoan.getValue())
-                .stream().anyMatch(matching(cashAccountsForLoan, reasonId));
-
+        final boolean reasonMappingExists = this.accountMappingRepository.findAllProductToGLAccountMappingsByProductIdAndProductTypeAndFinancialAccountType(productId, portfolioProductType.getValue(), cashAccountsForLoan.getValue()).stream().anyMatch(matching(cashAccountsForLoan, reasonId));
         if (!reasonMappingExists && glAccount.isPresent() && codeValueOptional.isPresent()) {
-            final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount.get())
-                    .setProductId(productId).setProductType(portfolioProductType.getValue())
-                    .setFinancialAccountType(cashAccountsForLoan.getValue());
-
+            final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount.get()).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(cashAccountsForLoan.getValue());
             switch (cashAccountsForLoan) {
                 case CHARGE_OFF_EXPENSE -> accountMapping.setChargeOffReason(codeValueOptional.get());
                 case LOSSES_WRITTEN_OFF -> accountMapping.setWriteOffReason(codeValueOptional.get());
                 default -> throw new IllegalStateException("Unexpected value: " + cashAccountsForLoan);
             }
-
             this.accountMappingRepository.saveAndFlush(accountMapping);
         }
     }
 
-    private void saveClassificationToIncomeMapping(final Long productId, final Long classificationId, final Long incomeAccountId,
-            final PortfolioProductType portfolioProductType, final LoanProductAccountingParams classificationParameter) {
-
+    private void saveClassificationToIncomeMapping(final Long productId, final Long classificationId, final Long incomeAccountId, final PortfolioProductType portfolioProductType, final LoanProductAccountingParams classificationParameter) {
         final Optional<GLAccount> glAccount = accountRepository.findById(incomeAccountId);
-
         boolean classificationMappingExists = false;
         if (classificationParameter.equals(LoanProductAccountingParams.CAPITALIZED_INCOME_CLASSIFICATION_TO_INCOME_ACCOUNT_MAPPINGS)) {
-            classificationMappingExists = this.accountMappingRepository
-                    .findAllCapitalizedIncomeClassificationsMappings(productId, portfolioProductType.getValue()).stream()
-                    .anyMatch(mapping -> mapping.getCapitalizedIncomeClassification().getId().equals(classificationId));
+            classificationMappingExists = this.accountMappingRepository.findAllCapitalizedIncomeClassificationsMappings(productId, portfolioProductType.getValue()).stream().anyMatch(mapping -> mapping.getCapitalizedIncomeClassification().getId().equals(classificationId));
         } else {
-            classificationMappingExists = this.accountMappingRepository
-                    .findAllBuyDownFeeClassificationsMappings(productId, portfolioProductType.getValue()).stream()
-                    .anyMatch(mapping -> mapping.getBuydownFeeClassification().getId().equals(classificationId));
+            classificationMappingExists = this.accountMappingRepository.findAllBuyDownFeeClassificationsMappings(productId, portfolioProductType.getValue()).stream().anyMatch(mapping -> mapping.getBuydownFeeClassification().getId().equals(classificationId));
         }
-
         final Optional<CodeValue> codeValueOptional = codeValueRepository.findById(classificationId);
-
         if (glAccount.isPresent() && !classificationMappingExists && codeValueOptional.isPresent()) {
-            final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount.get())
-                    .setProductId(productId).setProductType(portfolioProductType.getValue())
-                    .setFinancialAccountType(CashAccountsForLoan.CLASSIFICATION_INCOME.getValue());
-
+            final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount.get()).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(CashAccountsForLoan.CLASSIFICATION_INCOME.getValue());
             if (classificationParameter.equals(LoanProductAccountingParams.CAPITALIZED_INCOME_CLASSIFICATION_TO_INCOME_ACCOUNT_MAPPINGS)) {
                 accountMapping.setCapitalizedIncomeClassification(codeValueOptional.get());
             } else {
                 accountMapping.setBuydownFeeClassification(codeValueOptional.get());
             }
-
             this.accountMappingRepository.saveAndFlush(accountMapping);
         }
     }
@@ -726,11 +566,9 @@ public class ProductToGLAccountMappingHelper {
      */
     public GLAccount getAccountByIdAndType(final String paramName, final GLAccountType expectedAccountType, final Long accountId) {
         final GLAccount glAccount = this.accountRepositoryWrapper.findOneWithNotFoundDetection(accountId);
-
         // validate account is of the expected Type
         if (glAccount.getType().intValue() != expectedAccountType.getValue()) {
-            throw new ProductToGLAccountMappingInvalidException(paramName, glAccount.getName(), accountId,
-                    GLAccountType.fromInt(glAccount.getType()).toString(), expectedAccountType.toString());
+            throw new ProductToGLAccountMappingInvalidException(paramName, glAccount.getName(), accountId, GLAccountType.fromInt(glAccount.getType()).toString(), expectedAccountType.toString());
         }
         return glAccount;
     }
@@ -748,24 +586,20 @@ public class ProductToGLAccountMappingHelper {
             glAccountTypeValues.add(glAccountType.getValue());
         }
         if (!glAccountTypeValues.contains(glAccount.getType())) {
-            throw new ProductToGLAccountMappingInvalidException(paramName, glAccount.getName(), accountId,
-                    GLAccountType.fromInt(glAccount.getType()).toString(), glAccountTypeValues.toString());
+            throw new ProductToGLAccountMappingInvalidException(paramName, glAccount.getName(), accountId, GLAccountType.fromInt(glAccount.getType()).toString(), glAccountTypeValues.toString());
         }
         return glAccount;
     }
 
-    public void deleteProductToGLAccountMapping(final Long loanProductId, final PortfolioProductType portfolioProductType,
-            final int accountTypeId) {
-        final ProductToGLAccountMapping accountMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(loanProductId,
-                portfolioProductType.getValue(), accountTypeId);
+    public void deleteProductToGLAccountMapping(final Long loanProductId, final PortfolioProductType portfolioProductType, final int accountTypeId) {
+        final ProductToGLAccountMapping accountMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(loanProductId, portfolioProductType.getValue(), accountTypeId);
         if (accountMapping != null && accountMapping.getGlAccount() != null) {
             this.accountMappingRepository.delete(accountMapping);
         }
     }
 
     public void deleteProductToGLAccountMapping(final Long loanProductId, final PortfolioProductType portfolioProductType) {
-        final List<ProductToGLAccountMapping> productToGLAccountMappings = this.accountMappingRepository
-                .findByProductIdAndProductType(loanProductId, portfolioProductType.getValue());
+        final List<ProductToGLAccountMapping> productToGLAccountMappings = this.accountMappingRepository.findByProductIdAndProductType(loanProductId, portfolioProductType.getValue());
         if (productToGLAccountMappings != null && !productToGLAccountMappings.isEmpty()) {
             this.accountMappingRepository.deleteAll(productToGLAccountMappings);
         }
@@ -773,51 +607,35 @@ public class ProductToGLAccountMappingHelper {
 
     public void validateWriteOffMappingsInDatabase(final List<ApiParameterError> validationErrors, final List<JsonObject> mappings) {
         for (JsonObject jsonObject : mappings) {
-            final Long writeOffReasonCodeValueId = this.fromApiJsonHelper
-                    .extractLongNamed(LoanProductAccountingParams.WRITE_OFF_REASON_CODE_VALUE_ID.getValue(), jsonObject);
-
+            final Long writeOffReasonCodeValueId = this.fromApiJsonHelper.extractLongNamed(LoanProductAccountingParams.WRITE_OFF_REASON_CODE_VALUE_ID.getValue(), jsonObject);
             // Validation: writeOffReasonCodeValueId must exist in the database
             CodeValue codeValue = this.codeValueRepository.findByCodeNameAndId("WriteOffReasons", writeOffReasonCodeValueId);
             if (codeValue == null) {
-                validationErrors.add(ApiParameterError.parameterError("validation.msg.writeoffreason.invalid",
-                        "Write-off reason with ID " + writeOffReasonCodeValueId + " does not exist",
-                        LoanProductAccountingParams.WRITE_OFF_REASON_TO_EXPENSE_ACCOUNT_MAPPINGS.getValue()));
+                validationErrors.add(ApiParameterError.parameterError("validation.msg.writeoffreason.invalid", "Write-off reason with ID " + writeOffReasonCodeValueId + " does not exist", LoanProductAccountingParams.WRITE_OFF_REASON_TO_EXPENSE_ACCOUNT_MAPPINGS.getValue()));
             }
         }
     }
 
     public void validateGLAccountInDatabase(final List<ApiParameterError> validationErrors, final List<JsonObject> mappings) {
         for (JsonObject jsonObject : mappings) {
-            final Long expenseGlAccountId = this.fromApiJsonHelper
-                    .extractLongNamed(LoanProductAccountingParams.EXPENSE_GL_ACCOUNT_ID.getValue(), jsonObject);
-
+            final Long expenseGlAccountId = this.fromApiJsonHelper.extractLongNamed(LoanProductAccountingParams.EXPENSE_GL_ACCOUNT_ID.getValue(), jsonObject);
             // Validation: expenseGLAccountId must exist as a valid Expense GL account
             final Optional<GLAccount> glAccount = accountRepository.findById(expenseGlAccountId);
-
             if (glAccount.isEmpty() || !glAccount.get().getType().equals(GL_ACCOUNT_EXPENSE_TYPE)) {
-                validationErrors.add(ApiParameterError.parameterError("validation.msg.glaccount.not.found",
-                        "GL Account with ID " + expenseGlAccountId + " does not exist or is not an Expense GL account",
-                        LoanProductAccountingParams.EXPENSE_GL_ACCOUNT_ID.getValue()));
-
+                validationErrors.add(ApiParameterError.parameterError("validation.msg.glaccount.not.found", "GL Account with ID " + expenseGlAccountId + " does not exist or is not an Expense GL account", LoanProductAccountingParams.EXPENSE_GL_ACCOUNT_ID.getValue()));
             }
         }
     }
 
     public void validateChargeOffMappingsInDatabase(final List<ApiParameterError> validationErrors, final List<JsonObject> mappings) {
-
         for (JsonObject jsonObject : mappings) {
-            final Long chargeOffReasonCodeValueId = this.fromApiJsonHelper
-                    .extractLongNamed(LoanProductAccountingParams.CHARGE_OFF_REASON_CODE_VALUE_ID.getValue(), jsonObject);
-
+            final Long chargeOffReasonCodeValueId = this.fromApiJsonHelper.extractLongNamed(LoanProductAccountingParams.CHARGE_OFF_REASON_CODE_VALUE_ID.getValue(), jsonObject);
             // Validation: chargeOffReasonCodeValueId must exist in the database
             CodeValue codeValue = this.codeValueRepository.findByCodeNameAndId("ChargeOffReasons", chargeOffReasonCodeValueId);
             if (codeValue == null) {
-                validationErrors.add(ApiParameterError.parameterError("validation.msg.chargeoffreason.invalid",
-                        "Charge-off reason with ID " + chargeOffReasonCodeValueId + " does not exist",
-                        LoanProductAccountingParams.CHARGE_OFF_REASON_TO_EXPENSE_ACCOUNT_MAPPINGS.getValue()));
+                validationErrors.add(ApiParameterError.parameterError("validation.msg.chargeoffreason.invalid", "Charge-off reason with ID " + chargeOffReasonCodeValueId + " does not exist", LoanProductAccountingParams.CHARGE_OFF_REASON_TO_EXPENSE_ACCOUNT_MAPPINGS.getValue()));
             }
         }
-
         // Throw all collected validation errors, if any
         if (!validationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(validationErrors);
@@ -826,35 +644,34 @@ public class ProductToGLAccountMappingHelper {
 
     public void validateClassificationMappingsInDatabase(final List<JsonObject> mappings, final String dataCodeName) {
         final List<ApiParameterError> validationErrors = new ArrayList<>();
-
         for (JsonObject jsonObject : mappings) {
-            final Long incomeGlAccountId = this.fromApiJsonHelper.extractLongNamed(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue(),
-                    jsonObject);
-            final Long classificationCodeValueId = this.fromApiJsonHelper
-                    .extractLongNamed(LoanProductAccountingParams.CLASSIFICATION_CODE_VALUE_ID.getValue(), jsonObject);
-
+            final Long incomeGlAccountId = this.fromApiJsonHelper.extractLongNamed(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue(), jsonObject);
+            final Long classificationCodeValueId = this.fromApiJsonHelper.extractLongNamed(LoanProductAccountingParams.CLASSIFICATION_CODE_VALUE_ID.getValue(), jsonObject);
             // Validation: classificationCodeValueId must exist in the database
             final CodeValue codeValue = this.codeValueRepository.findByCodeNameAndId(dataCodeName, classificationCodeValueId);
             if (codeValue == null) {
-                validationErrors.add(ApiParameterError.parameterError("validation.msg.classification.invalid",
-                        "Classification with ID " + classificationCodeValueId + " does not exist", dataCodeName));
+                validationErrors.add(ApiParameterError.parameterError("validation.msg.classification.invalid", "Classification with ID " + classificationCodeValueId + " does not exist", dataCodeName));
             }
-
             // Validation: expenseGLAccountId must exist as a valid Expense GL account
             final Optional<GLAccount> glAccount = accountRepository.findById(incomeGlAccountId);
-
             if (glAccount.isEmpty() || !GLAccountType.fromInt(glAccount.get().getType()).isIncomeType()) {
-                validationErrors.add(ApiParameterError.parameterError("validation.msg.glaccount.not.found",
-                        "GL Account with ID " + incomeGlAccountId + " does not exist or is not an Income GL account",
-                        LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue()));
-
+                validationErrors.add(ApiParameterError.parameterError("validation.msg.glaccount.not.found", "GL Account with ID " + incomeGlAccountId + " does not exist or is not an Income GL account", LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue()));
             }
         }
-
         // Throw all collected validation errors, if any
         if (!validationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(validationErrors);
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ProductToGLAccountMappingHelper(final GLAccountRepository accountRepository, final ProductToGLAccountMappingRepository accountMappingRepository, final FromJsonHelper fromApiJsonHelper, final ChargeRepositoryWrapper chargeRepositoryWrapper, final GLAccountRepositoryWrapper accountRepositoryWrapper, final PaymentTypeRepository paymentTypeRepository, final CodeValueRepository codeValueRepository) {
+        this.accountRepository = accountRepository;
+        this.accountMappingRepository = accountMappingRepository;
+        this.fromApiJsonHelper = fromApiJsonHelper;
+        this.chargeRepositoryWrapper = chargeRepositoryWrapper;
+        this.accountRepositoryWrapper = accountRepositoryWrapper;
+        this.paymentTypeRepository = paymentTypeRepository;
+        this.codeValueRepository = codeValueRepository;
+    }
 }

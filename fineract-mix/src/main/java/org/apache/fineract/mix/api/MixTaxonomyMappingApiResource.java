@@ -27,7 +27,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.mix.command.MixTaxonomyMappingUpdateCommand;
@@ -40,14 +39,12 @@ import org.springframework.stereotype.Component;
 @Path("/v1/mixmapping")
 @Component
 @Tag(name = "Mix Mapping", description = "")
-@RequiredArgsConstructor
 public class MixTaxonomyMappingApiResource {
-
     private final MixTaxonomyMappingReadService readTaxonomyMappingService;
     private final CommandDispatcher dispatcher;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Mix Taxonomy Mapping", operationId = "retrieveMixTaxonomyMapping")
     @AlternativeOperationId("retrieveTaxonomyMapping")
     public MixTaxonomyMappingData retrieveTaxonomyMapping() {
@@ -55,8 +52,8 @@ public class MixTaxonomyMappingApiResource {
     }
 
     @PUT
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update Mix Taxonomy Mapping", operationId = "updateMixTaxonomyMapping")
     @AlternativeOperationId("updateTaxonomyMapping")
     public MixTaxonomyMappingUpdateResponse updateTaxonomyMapping(final MixTaxonomyMappingUpdateRequest request) {
@@ -64,13 +61,15 @@ public class MixTaxonomyMappingApiResource {
         if (request.getId() == null) {
             request.setId(1L);
         }
-
         final var command = new MixTaxonomyMappingUpdateCommand();
-
         command.setPayload(request);
-
         final Supplier<MixTaxonomyMappingUpdateResponse> response = dispatcher.dispatch(command);
-
         return response.get();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomyMappingApiResource(final MixTaxonomyMappingReadService readTaxonomyMappingService, final CommandDispatcher dispatcher) {
+        this.readTaxonomyMappingService = readTaxonomyMappingService;
+        this.dispatcher = dispatcher;
     }
 }

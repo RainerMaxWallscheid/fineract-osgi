@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.survey.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.dataqueries.service.DatatableWriteService;
@@ -29,16 +28,13 @@ import org.springframework.transaction.annotation.Transactional;
  * Created by Cieyou on 3/13/14.
  */
 @Service
-@RequiredArgsConstructor
 public class WriteSurveyServiceImpl implements WriteSurveyService {
-
     private final DatatableWriteService datatableWriteService;
 
     @Override
     @Transactional
     public CommandProcessingResult registerSurvey(JsonCommand command) {
         datatableWriteService.registerDatatable(command);
-
         return CommandProcessingResult.commandOnlyResult(command.commandId());
     }
 
@@ -48,4 +44,8 @@ public class WriteSurveyServiceImpl implements WriteSurveyService {
         return datatableWriteService.createPPIEntry(dataTableName, appTableId, command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WriteSurveyServiceImpl(final DatatableWriteService datatableWriteService) {
+        this.datatableWriteService = datatableWriteService;
+    }
 }

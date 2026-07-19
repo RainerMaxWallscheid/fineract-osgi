@@ -42,7 +42,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.common.AccountingConstants;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
 import org.apache.fineract.accounting.glaccount.service.GLAccountReadPlatformService;
@@ -70,19 +69,16 @@ import org.springframework.stereotype.Component;
 @Path("/v1/accountingrules")
 @Component
 @Tag(name = "Accounting Rules", description = """
-        It is typical scenario in MFI's that non accountants pass journal entries on a regular basis. For Ex: A branch office might deposit their entire cash at hand to their Bank account at the end of a working day. The branch office users might not understand enough of accounting to figure out which account needs to get credited and which account needs to be debited to represent this transaction.
-
-        Enter accounting rules, an abstraction on top of manual journal entries for enabling simpler data entry. An accounting rule can define any of the following abstractions
-
-        A Simple journal entry where both the credit and debit account have been preselected
-        A Simple journal entry where either credit or debit accounts have been limited to a pre-selected list of accounts (Ex: Debit account should be one of "Bank of America" of "JP Morgan" and credit account should be "Cash")
-        A Compound journal entry where multiple debits and / or multiple credits may be made amongst a set of preselected list of accounts (Ex: Credit account should be either "Bank Of America" or "Cash" and debit account can be "Employee Salary" and/or "Miscellenous Expenses")
-        An accounting rule can also be optionally associated with a branch, so that only a particular Branch's users have access to the rule""")
-@RequiredArgsConstructor
+    It is typical scenario in MFI\'s that non accountants pass journal entries on a regular basis. For Ex: A branch office might deposit their entire cash at hand to their Bank account at the end of a working day. The branch office users might not understand enough of accounting to figure out which account needs to get credited and which account needs to be debited to represent this transaction.
+    
+    Enter accounting rules, an abstraction on top of manual journal entries for enabling simpler data entry. An accounting rule can define any of the following abstractions
+    
+    A Simple journal entry where both the credit and debit account have been preselected
+    A Simple journal entry where either credit or debit accounts have been limited to a pre-selected list of accounts (Ex: Debit account should be one of \"Bank of America\" of \"JP Morgan\" and credit account should be \"Cash\")
+    A Compound journal entry where multiple debits and / or multiple credits may be made amongst a set of preselected list of accounts (Ex: Credit account should be either \"Bank Of America\" or \"Cash\" and debit account can be \"Employee Salary\" and/or \"Miscellenous Expenses\")
+    An accounting rule can also be optionally associated with a branch, so that only a particular Branch\'s users have access to the rule""")
 public class AccountingRuleApiResource {
-
     private static final String RESOURCE_NAME_FOR_PERMISSION = "ACCOUNTINGRULE";
-
     private final AccountingRuleReadPlatformService accountingRuleReadPlatformService;
     private final GLAccountReadPlatformService accountReadPlatformService;
     private final OfficeReadPlatformService officeReadPlatformService;
@@ -94,15 +90,15 @@ public class AccountingRuleApiResource {
 
     @GET
     @Path("template")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Accounting Rule Details Template", operationId = "retrieveTemplateAccountingRule", description = """
-            This is a convenience resource. It can be useful when building maintenance user interface screens for client applications. The template data returned consists of any or all of:
-
-            Field Defaults
-            Allowed Value Lists
-            Example Request:
-
-            accountingrules/template""")
+        This is a convenience resource. It can be useful when building maintenance user interface screens for client applications. The template data returned consists of any or all of:
+        
+        Field Defaults
+        Allowed Value Lists
+        Example Request:
+        
+        accountingrules/template""")
     @AlternativeOperationId("retrieveTemplate_1")
     public AccountingRuleData retrieveTemplate() {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
@@ -110,20 +106,18 @@ public class AccountingRuleApiResource {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Accounting Rules", operationId = "retrieveAllAccountingRules", description = """
-            Returns the list of defined accounting rules.
-
-            Example Requests:
-
-            accountingrules""")
+        Returns the list of defined accounting rules.
+        
+        Example Requests:
+        
+        accountingrules""")
     public List<AccountingRuleData> retrieveAllAccountingRules(@Context final UriInfo uriInfo) {
         final AppUser currentUser = context.authenticatedUser();
         currentUser.validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
-
         final String hierarchy = currentUser.getOffice().getHierarchy();
         final String hierarchySearchString = hierarchy + "%";
-
         final Set<String> associationParameters = ApiParameterHelper.extractAssociationsForResponseIfProvided(uriInfo.getQueryParameters());
         boolean isAssociationParametersExists = !associationParameters.isEmpty() && associationParameters.contains("all");
         return accountingRuleReadPlatformService.retrieveAllAccountingRules(hierarchySearchString, isAssociationParametersExists);
@@ -131,115 +125,82 @@ public class AccountingRuleApiResource {
 
     @GET
     @Path("{accountingRuleId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve a Accounting rule", operationId = "retrieveOneAccountingRule", description = """
-            Returns the details of a defined Accounting rule.
-
-            Example Requests:
-
-            accountingrules/1""")
+        Returns the details of a defined Accounting rule.
+        
+        Example Requests:
+        
+        accountingrules/1""")
     @AlternativeOperationId("retreiveAccountingRule")
-    public AccountingRuleData retreiveAccountingRule(
-            @PathParam("accountingRuleId") @Parameter(description = "accountingRuleId") final Long accountingRuleId,
-            @Context final UriInfo uriInfo) {
-
+    public AccountingRuleData retreiveAccountingRule(@PathParam("accountingRuleId") @Parameter(description = "accountingRuleId") final Long accountingRuleId, @Context final UriInfo uriInfo) {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-
         final AccountingRuleData accountingRuleData = accountingRuleReadPlatformService.retrieveAccountingRuleById(accountingRuleId);
         return settings.isTemplate() ? handleTemplate(accountingRuleData) : accountingRuleData;
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create/Define a Accounting rule", operationId = "createAccountingRule", description = """
-            Define a new Accounting rule.
-
-            Mandatory Fields
-            name, officeId,
-            accountToDebit OR debitTags,
-            accountToCredit OR creditTags.
-
-            Optional Fields
-            description""")
+        Define a new Accounting rule.
+        
+        Mandatory Fields
+        name, officeId,
+        accountToDebit OR debitTags,
+        accountToCredit OR creditTags.
+        
+        Optional Fields
+        description""")
     @RequestBody(content = @Content(schema = @Schema(implementation = AccountRuleRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountingRuleApiResourceSwagger.PostAccountingRulesResponse.class)))
     public CommandProcessingResult createAccountingRule(@Parameter(hidden = true) AccountRuleRequest accountRuleRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createAccountingRule()
-                .withJson(apiJsonSerializerService.serialize(accountRuleRequest)).build();
-
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createAccountingRule().withJson(apiJsonSerializerService.serialize(accountRuleRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @PUT
     @Path("{accountingRuleId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a Accounting Rule", operationId = "updateAccountingRule", description = "Updates the details of a Accounting rule.")
     @RequestBody(content = @Content(schema = @Schema(implementation = AccountRuleRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountingRuleApiResourceSwagger.PutAccountingRulesResponse.class)))
-    public CommandProcessingResult updateAccountingRule(
-            @PathParam("accountingRuleId") @Parameter(description = "accountingRuleId") final Long accountingRuleId,
-            @Parameter(hidden = true) AccountRuleRequest accountRuleRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateAccountingRule(accountingRuleId)
-                .withJson(apiJsonSerializerService.serialize(accountRuleRequest)).build();
-
+    public CommandProcessingResult updateAccountingRule(@PathParam("accountingRuleId") @Parameter(description = "accountingRuleId") final Long accountingRuleId, @Parameter(hidden = true) AccountRuleRequest accountRuleRequest) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateAccountingRule(accountingRuleId).withJson(apiJsonSerializerService.serialize(accountRuleRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @DELETE
     @Path("{accountingRuleId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete a Accounting Rule", operationId = "deleteAccountingRule", description = "Deletes a Accounting rule.")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountingRuleApiResourceSwagger.DeleteAccountingRulesResponse.class)))
-    public CommandProcessingResult deleteAccountingRule(
-            @PathParam("accountingRuleId") @Parameter(description = "accountingRuleId") final Long accountingRuleId) {
-
+    public CommandProcessingResult deleteAccountingRule(@PathParam("accountingRuleId") @Parameter(description = "accountingRuleId") final Long accountingRuleId) {
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteAccountingRule(accountingRuleId).build();
-
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     private AccountingRuleData handleTemplate(AccountingRuleData accountingRuleData) {
         final List<GLAccountData> allowedAccounts = accountReadPlatformService.retrieveAllEnabledDetailGLAccounts();
         final List<OfficeData> allowedOffices = (List<OfficeData>) officeReadPlatformService.retrieveAllOfficesForDropdown();
-        final Collection<CodeValueData> allowedTagOptions = codeValueReadPlatformService
-                .retrieveCodeValuesByCode(AccountingConstants.ASSESTS_TAG_OPTION_CODE_NAME);
-
-        allowedTagOptions
-                .addAll(codeValueReadPlatformService.retrieveCodeValuesByCode(AccountingConstants.LIABILITIES_TAG_OPTION_CODE_NAME));
+        final Collection<CodeValueData> allowedTagOptions = codeValueReadPlatformService.retrieveCodeValuesByCode(AccountingConstants.ASSESTS_TAG_OPTION_CODE_NAME);
+        allowedTagOptions.addAll(codeValueReadPlatformService.retrieveCodeValuesByCode(AccountingConstants.LIABILITIES_TAG_OPTION_CODE_NAME));
         allowedTagOptions.addAll(codeValueReadPlatformService.retrieveCodeValuesByCode(AccountingConstants.EQUITY_TAG_OPTION_CODE_NAME));
         allowedTagOptions.addAll(codeValueReadPlatformService.retrieveCodeValuesByCode(AccountingConstants.INCOME_TAG_OPTION_CODE_NAME));
         allowedTagOptions.addAll(codeValueReadPlatformService.retrieveCodeValuesByCode(AccountingConstants.EXPENSES_TAG_OPTION_CODE_NAME));
-
         if (accountingRuleData == null) {
-            accountingRuleData = new AccountingRuleData().setAllowedOffices(allowedOffices).setAllowedAccounts(allowedAccounts)
-                    .setAllowedCreditTagOptions(allowedTagOptions).setAllowedDebitTagOptions(allowedTagOptions);
-
+            accountingRuleData = new AccountingRuleData().setAllowedOffices(allowedOffices).setAllowedAccounts(allowedAccounts).setAllowedCreditTagOptions(allowedTagOptions).setAllowedDebitTagOptions(allowedTagOptions);
         } else {
-
-            final Collection<CodeValueData> allowedCreditTagOptions = accountingRuleData.getCreditTags() != null
-                    ? retrieveSelectedTags(allowedTagOptions, accountingRuleData.getCreditTags())
-                    : allowedTagOptions;
-            final Collection<CodeValueData> allowedDebitTagOptions = accountingRuleData.getDebitTags() != null
-                    ? retrieveSelectedTags(allowedTagOptions, accountingRuleData.getDebitTags())
-                    : allowedTagOptions;
-
-            accountingRuleData = new AccountingRuleData().setId(accountingRuleData.getId()).setOfficeId(accountingRuleData.getOfficeId())
-                    .setOfficeName(accountingRuleData.getOfficeName()).setName(accountingRuleData.getName())
-                    .setDescription(accountingRuleData.getDescription()).setSystemDefined(accountingRuleData.isSystemDefined())
-                    .setAllowMultipleCreditEntries(accountingRuleData.isAllowMultipleCreditEntries())
-                    .setAllowMultipleDebitEntries(accountingRuleData.isAllowMultipleDebitEntries()).setAllowedAccounts(allowedAccounts)
-                    .setAllowedOffices(allowedOffices).setAllowedCreditTagOptions(allowedCreditTagOptions)
-                    .setAllowedDebitTagOptions(allowedDebitTagOptions);
-
+            final Collection<CodeValueData> allowedCreditTagOptions = accountingRuleData.getCreditTags() != null ? retrieveSelectedTags(allowedTagOptions, accountingRuleData.getCreditTags()) : allowedTagOptions;
+            final Collection<CodeValueData> allowedDebitTagOptions = accountingRuleData.getDebitTags() != null ? retrieveSelectedTags(allowedTagOptions, accountingRuleData.getDebitTags()) : allowedTagOptions;
+            accountingRuleData = new AccountingRuleData().setId(accountingRuleData.getId()).setOfficeId(accountingRuleData.getOfficeId()).setOfficeName(accountingRuleData.getOfficeName()).setName(accountingRuleData.getName()).setDescription(accountingRuleData.getDescription()).setSystemDefined(accountingRuleData.isSystemDefined()).setAllowMultipleCreditEntries(accountingRuleData.isAllowMultipleCreditEntries()).setAllowMultipleDebitEntries(accountingRuleData.isAllowMultipleDebitEntries()).setAllowedAccounts(allowedAccounts).setAllowedOffices(allowedOffices).setAllowedCreditTagOptions(allowedCreditTagOptions).setAllowedDebitTagOptions(allowedDebitTagOptions);
         }
         return accountingRuleData;
     }
 
-    private Collection<CodeValueData> retrieveSelectedTags(final Collection<CodeValueData> allowedTagOptions,
-            final List<AccountingTagRuleData> existedTags) {
+    private Collection<CodeValueData> retrieveSelectedTags(final Collection<CodeValueData> allowedTagOptions, final List<AccountingTagRuleData> existedTags) {
         final Collection<CodeValueData> tempOptions = new ArrayList<>(allowedTagOptions);
         final Map<Long, CodeValueData> selectedTags = new HashMap<>();
         for (final AccountingTagRuleData accountingTagRuleData : existedTags) {
@@ -251,5 +212,17 @@ public class AccountingRuleApiResource {
         }
         tempOptions.removeAll(selectedTags.values());
         return tempOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AccountingRuleApiResource(final AccountingRuleReadPlatformService accountingRuleReadPlatformService, final GLAccountReadPlatformService accountReadPlatformService, final OfficeReadPlatformService officeReadPlatformService, final DefaultToApiJsonSerializer<AccountingRuleData> apiJsonSerializerService, final ApiRequestParameterHelper apiRequestParameterHelper, final PlatformSecurityContext context, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final CodeValueReadPlatformService codeValueReadPlatformService) {
+        this.accountingRuleReadPlatformService = accountingRuleReadPlatformService;
+        this.accountReadPlatformService = accountReadPlatformService;
+        this.officeReadPlatformService = officeReadPlatformService;
+        this.apiJsonSerializerService = apiJsonSerializerService;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.context = context;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.codeValueReadPlatformService = codeValueReadPlatformService;
     }
 }

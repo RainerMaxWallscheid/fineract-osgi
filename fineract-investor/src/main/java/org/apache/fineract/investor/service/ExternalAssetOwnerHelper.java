@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.investor.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.investor.domain.ExternalAssetOwner;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerRepository;
@@ -27,9 +26,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class ExternalAssetOwnerHelper {
-
     private final ExternalAssetOwnerRepository repository;
 
     // REQUIRES_NEW isolates the INSERT into a separate transaction and persistence context,
@@ -42,5 +39,10 @@ public class ExternalAssetOwnerHelper {
             owner.setExternalId(externalId);
             return repository.saveAndFlush(owner).getId();
         });
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnerHelper(final ExternalAssetOwnerRepository repository) {
+        this.repository = repository;
     }
 }

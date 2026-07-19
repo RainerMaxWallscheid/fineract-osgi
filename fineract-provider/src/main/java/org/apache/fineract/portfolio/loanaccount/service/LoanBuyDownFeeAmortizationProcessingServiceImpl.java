@@ -23,7 +23,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
@@ -49,9 +48,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@RequiredArgsConstructor
 public class LoanBuyDownFeeAmortizationProcessingServiceImpl implements LoanBuyDownFeeAmortizationProcessingService {
-
     private final LoanTransactionRepository loanTransactionRepository;
     private final LoanBuyDownFeeBalanceRepository loanBuyDownFeeBalanceRepository;
     private final BusinessEventNotifierService businessEventNotifierService;
@@ -63,16 +60,12 @@ public class LoanBuyDownFeeAmortizationProcessingServiceImpl implements LoanBuyD
     @Transactional
     public void processBuyDownFeeAmortizationTillDate(@NonNull Loan loan, @NonNull LocalDate tillDate, boolean addJournal) {
         final List<LoanBuyDownFeeBalance> balances = loanBuyDownFeeBalanceRepository.findAllByLoanIdAndClosedFalse(loan.getId());
-
-        final LocalDate maturityDate = loan.getMaturityDate() != null ? loan.getMaturityDate()
-                : getFinalBuyDownFeeAmortizationTransactionDate(loan);
+        final LocalDate maturityDate = loan.getMaturityDate() != null ? loan.getMaturityDate() : getFinalBuyDownFeeAmortizationTransactionDate(loan);
         LocalDate tillDatePlusOne = tillDate.plusDays(1);
         if (tillDatePlusOne.isAfter(maturityDate)) {
             tillDatePlusOne = maturityDate;
         }
-
         final List<LoanAmortizationAllocationMapping> loanAmortizationAllocationMappings = new ArrayList<>();
-
         Money totalAmortization = Money.zero(loan.getCurrency());
         final BigDecimal totalAmortized = loanTransactionRepository.getAmortizedAmountBuyDownFee(loan);
         for (LoanBuyDownFeeBalance balance : balances) {
@@ -80,19 +73,15 @@ public class LoanBuyDownFeeAmortizationProcessingServiceImpl implements LoanBuyD
             AmortizationType amortizationType;
             if (!balance.isDeleted()) {
                 final List<LoanTransaction> adjustments = loanTransactionRepository.findAdjustments(balance.getLoanTransaction());
-                final BigDecimal alreadyAmortizedAmount = loanAmortizationAllocationService
-                        .calculateAlreadyAmortizedAmount(balance.getLoanTransaction().getId(), loan.getId());
+                final BigDecimal alreadyAmortizedAmount = loanAmortizationAllocationService.calculateAlreadyAmortizedAmount(balance.getLoanTransaction().getId(), loan.getId());
                 if (MathUtil.isZero(balance.getUnrecognizedAmount()) && adjustments.isEmpty()) {
                     totalAmortization = totalAmortization.add(Money.of(loan.getCurrency(), alreadyAmortizedAmount));
                     continue;
                 }
-                final BigDecimal grossAmortizedAmount = loanAmortizationAllocationService
-                        .calculateGrossAmortizedAmount(balance.getLoanTransaction().getId(), loan.getId());
-                final boolean fullyAmortizedOnSaleOrClosure = MathUtil.isZero(balance.getUnrecognizedAmount())
-                        && grossAmortizedAmount.compareTo(balance.getAmount()) >= 0;
+                final BigDecimal grossAmortizedAmount = loanAmortizationAllocationService.calculateGrossAmortizedAmount(balance.getLoanTransaction().getId(), loan.getId());
+                final boolean fullyAmortizedOnSaleOrClosure = MathUtil.isZero(balance.getUnrecognizedAmount()) && grossAmortizedAmount.compareTo(balance.getAmount()) >= 0;
                 final LocalDate effectiveTillDate = fullyAmortizedOnSaleOrClosure ? maturityDate : tillDatePlusOne;
-                final Money amortizationTillDate = BuyDownFeeAmortizationUtil.calculateTotalAmortizationTillDate(balance, adjustments,
-                        maturityDate, loan.getLoanProductRelatedDetail().getBuyDownFeeStrategy(), effectiveTillDate, loan.getCurrency());
+                final Money amortizationTillDate = BuyDownFeeAmortizationUtil.calculateTotalAmortizationTillDate(balance, adjustments, maturityDate, loan.getLoanProductRelatedDetail().getBuyDownFeeStrategy(), effectiveTillDate, loan.getCurrency());
                 totalAmortization = totalAmortization.add(amortizationTillDate);
                 if (alreadyAmortizedAmount.compareTo(amortizationTillDate.getAmount()) > 0) {
                     amortizationAmount = alreadyAmortizedAmount.subtract(amortizationTillDate.getAmount());
@@ -101,45 +90,29 @@ public class LoanBuyDownFeeAmortizationProcessingServiceImpl implements LoanBuyD
                     amortizationAmount = amortizationTillDate.getAmount().subtract(alreadyAmortizedAmount);
                     amortizationType = AmortizationType.AM;
                 }
-                balance.setUnrecognizedAmount(
-                        MathUtil.subtract(balance.getAmount(), balance.getAmountAdjustment(), amortizationTillDate.getAmount()));
+                balance.setUnrecognizedAmount(MathUtil.subtract(balance.getAmount(), balance.getAmountAdjustment(), amortizationTillDate.getAmount()));
             } else {
                 amortizationAmount = balance.getAmount().subtract(balance.getUnrecognizedAmount());
                 amortizationType = AmortizationType.AM_ADJ;
                 balance.setClosed(true);
             }
             if (amortizationAmount.compareTo(BigDecimal.ZERO) > 0) {
-                final LoanAmortizationAllocationMapping loanAmortizationAllocationMapping = loanAmortizationAllocationService
-                        .createAmortizationAllocationMappingWithBaseLoanTransaction(balance.getLoanTransaction(), amortizationAmount,
-                                amortizationType);
+                final LoanAmortizationAllocationMapping loanAmortizationAllocationMapping = loanAmortizationAllocationService.createAmortizationAllocationMappingWithBaseLoanTransaction(balance.getLoanTransaction(), amortizationAmount, amortizationType);
                 loanAmortizationAllocationMappings.add(loanAmortizationAllocationMapping);
             }
         }
-
         loanBuyDownFeeBalanceRepository.saveAll(balances);
         final BigDecimal totalAmortizationAmount = totalAmortization.getAmount().subtract(totalAmortized);
-
         if (!MathUtil.isZero(totalAmortizationAmount)) {
-            LoanTransaction transaction = MathUtil.isGreaterThanZero(totalAmortizationAmount)
-                    ? LoanTransaction.buyDownFeeAmortization(loan, loan.getOffice(), tillDate, totalAmortizationAmount,
-                            externalIdFactory.create())
-                    : LoanTransaction.buyDownFeeAmortizationAdjustment(loan,
-                            Money.of(loan.getCurrency(), MathUtil.negate(totalAmortizationAmount)), tillDate, externalIdFactory.create());
+            LoanTransaction transaction = MathUtil.isGreaterThanZero(totalAmortizationAmount) ? LoanTransaction.buyDownFeeAmortization(loan, loan.getOffice(), tillDate, totalAmortizationAmount, externalIdFactory.create()) : LoanTransaction.buyDownFeeAmortizationAdjustment(loan, Money.of(loan.getCurrency(), MathUtil.negate(totalAmortizationAmount)), tillDate, externalIdFactory.create());
             loan.addLoanTransaction(transaction);
-
             transaction = loanTransactionRepository.saveAndFlush(transaction);
             final LoanTransaction finalTransaction = transaction;
-            loanAmortizationAllocationMappings.forEach(loanAmortizationAllocationMapping -> loanAmortizationAllocationService
-                    .setAmortizationTransactionDataAndSaveAmortizationAllocationMapping(loanAmortizationAllocationMapping,
-                            finalTransaction));
-
+            loanAmortizationAllocationMappings.forEach(loanAmortizationAllocationMapping -> loanAmortizationAllocationService.setAmortizationTransactionDataAndSaveAmortizationAllocationMapping(loanAmortizationAllocationMapping, finalTransaction));
             if (addJournal) {
                 journalEntryPoster.postJournalEntriesForLoanTransaction(transaction, false, false);
             }
-
-            final BusinessEvent<?> event = MathUtil.isGreaterThanZero(totalAmortizationAmount)
-                    ? new LoanBuyDownFeeAmortizationTransactionCreatedBusinessEvent(transaction)
-                    : new LoanBuyDownFeeAmortizationAdjustmentTransactionCreatedBusinessEvent(transaction);
+            final BusinessEvent<?> event = MathUtil.isGreaterThanZero(totalAmortizationAmount) ? new LoanBuyDownFeeAmortizationTransactionCreatedBusinessEvent(transaction) : new LoanBuyDownFeeAmortizationAdjustmentTransactionCreatedBusinessEvent(transaction);
             businessEventNotifierService.notifyPostBusinessEvent(event);
         }
     }
@@ -152,22 +125,17 @@ public class LoanBuyDownFeeAmortizationProcessingServiceImpl implements LoanBuyD
 
     @Override
     @Transactional
-    public void processBuyDownFeeAmortizationOnLoanSale(@NonNull final Loan loan, @NonNull final LocalDate transactionDate,
-            final boolean addJournal) {
+    public void processBuyDownFeeAmortizationOnLoanSale(@NonNull final Loan loan, @NonNull final LocalDate transactionDate, final boolean addJournal) {
         processRemainingBuyDownFeeAmortization(loan, transactionDate, addJournal);
     }
 
-    private void processRemainingBuyDownFeeAmortization(@NonNull final Loan loan, @NonNull final LocalDate transactionDate,
-            final boolean addJournal) {
-        final Optional<LoanTransaction> amortizationTransaction = createBuyDownFeeAmortizationTransaction(loan, transactionDate, false,
-                null);
+    private void processRemainingBuyDownFeeAmortization(@NonNull final Loan loan, @NonNull final LocalDate transactionDate, final boolean addJournal) {
+        final Optional<LoanTransaction> amortizationTransaction = createBuyDownFeeAmortizationTransaction(loan, transactionDate, false, null);
         amortizationTransaction.ifPresent(loanTransaction -> {
             if (loanTransaction.isBuyDownFeeAmortization()) {
-                businessEventNotifierService
-                        .notifyPostBusinessEvent(new LoanBuyDownFeeAmortizationTransactionCreatedBusinessEvent(loanTransaction));
+                businessEventNotifierService.notifyPostBusinessEvent(new LoanBuyDownFeeAmortizationTransactionCreatedBusinessEvent(loanTransaction));
             } else {
-                businessEventNotifierService
-                        .notifyPostBusinessEvent(new LoanBuyDownFeeAmortizationAdjustmentTransactionCreatedBusinessEvent(loanTransaction));
+                businessEventNotifierService.notifyPostBusinessEvent(new LoanBuyDownFeeAmortizationAdjustmentTransactionCreatedBusinessEvent(loanTransaction));
             }
             if (addJournal) {
                 journalEntryPoster.postJournalEntriesForLoanTransaction(loanTransaction, false, false);
@@ -177,23 +145,18 @@ public class LoanBuyDownFeeAmortizationProcessingServiceImpl implements LoanBuyD
 
     @Override
     @Transactional
-    public void processBuyDownFeeAmortizationOnLoanChargeOff(@NonNull final Loan loan,
-            @NonNull final LoanTransaction chargeOffTransaction) {
+    public void processBuyDownFeeAmortizationOnLoanChargeOff(@NonNull final Loan loan, @NonNull final LoanTransaction chargeOffTransaction) {
         LocalDate transactionDate = loan.getChargedOffOnDate();
         if (transactionDate == null) {
             transactionDate = DateUtils.getBusinessLocalDate();
         }
-
-        final Optional<LoanTransaction> amortizationTransaction = createBuyDownFeeAmortizationTransaction(loan, transactionDate, true,
-                chargeOffTransaction);
+        final Optional<LoanTransaction> amortizationTransaction = createBuyDownFeeAmortizationTransaction(loan, transactionDate, true, chargeOffTransaction);
         if (amortizationTransaction.isPresent()) {
             journalEntryPoster.postJournalEntriesForLoanTransaction(amortizationTransaction.get(), false, false);
             if (amortizationTransaction.get().isBuyDownFeeAmortization()) {
-                businessEventNotifierService.notifyPostBusinessEvent(
-                        new LoanBuyDownFeeAmortizationTransactionCreatedBusinessEvent(amortizationTransaction.get()));
+                businessEventNotifierService.notifyPostBusinessEvent(new LoanBuyDownFeeAmortizationTransactionCreatedBusinessEvent(amortizationTransaction.get()));
             } else {
-                businessEventNotifierService.notifyPostBusinessEvent(
-                        new LoanBuyDownFeeAmortizationAdjustmentTransactionCreatedBusinessEvent(amortizationTransaction.get()));
+                businessEventNotifierService.notifyPostBusinessEvent(new LoanBuyDownFeeAmortizationAdjustmentTransactionCreatedBusinessEvent(amortizationTransaction.get()));
             }
         }
     }
@@ -202,32 +165,22 @@ public class LoanBuyDownFeeAmortizationProcessingServiceImpl implements LoanBuyD
     @Transactional
     public void processBuyDownFeeAmortizationOnLoanUndoChargeOff(@NonNull final LoanTransaction loanTransaction) {
         final Loan loan = loanTransaction.getLoan();
-
-        loan.getLoanTransactions().stream().filter(LoanTransaction::isBuyDownFeeAmortization)
-                .filter(transaction -> transaction.getTransactionDate().equals(loanTransaction.getTransactionDate())
-                        && transaction.getLoanTransactionRelations().stream()
-                                .anyMatch(rel -> LoanTransactionRelationTypeEnum.RELATED.equals(rel.getRelationType())
-                                        && rel.getToTransaction().equals(loanTransaction)))
-                .forEach(transaction -> {
-                    transaction.reverse();
-                    journalEntryPoster.postJournalEntriesForLoanTransaction(transaction, false, false);
-                    final LoanAdjustTransactionBusinessEvent.Data data = new LoanAdjustTransactionBusinessEvent.Data(transaction);
-                    businessEventNotifierService.notifyPostBusinessEvent(new LoanAdjustTransactionBusinessEvent(data));
-                });
-
+        loan.getLoanTransactions().stream().filter(LoanTransaction::isBuyDownFeeAmortization).filter(transaction -> transaction.getTransactionDate().equals(loanTransaction.getTransactionDate()) && transaction.getLoanTransactionRelations().stream().anyMatch(rel -> LoanTransactionRelationTypeEnum.RELATED.equals(rel.getRelationType()) && rel.getToTransaction().equals(loanTransaction))).forEach(transaction -> {
+            transaction.reverse();
+            journalEntryPoster.postJournalEntriesForLoanTransaction(transaction, false, false);
+            final LoanAdjustTransactionBusinessEvent.Data data = new LoanAdjustTransactionBusinessEvent.Data(transaction);
+            businessEventNotifierService.notifyPostBusinessEvent(new LoanAdjustTransactionBusinessEvent(data));
+        });
         for (LoanBuyDownFeeBalance balance : loanBuyDownFeeBalanceRepository.findAllByLoanIdAndDeletedFalseAndClosedFalse(loan.getId())) {
             balance.setUnrecognizedAmount(balance.getChargedOffAmount());
             balance.setChargedOffAmount(BigDecimal.ZERO);
         }
     }
 
-    private Optional<LoanTransaction> createBuyDownFeeAmortizationTransaction(final Loan loan, final LocalDate transactionDate,
-            final boolean isChargeOff, final LoanTransaction chargeOffTransaction) {
+    private Optional<LoanTransaction> createBuyDownFeeAmortizationTransaction(final Loan loan, final LocalDate transactionDate, final boolean isChargeOff, final LoanTransaction chargeOffTransaction) {
         final ExternalId externalId = externalIdFactory.create();
-
         final List<LoanBuyDownFeeBalance> balances = loanBuyDownFeeBalanceRepository.findAllByLoanIdAndClosedFalse(loan.getId());
         final List<LoanAmortizationAllocationMapping> loanAmortizationAllocationMappings = new ArrayList<>();
-
         BigDecimal totalAmortization = BigDecimal.ZERO;
         final BigDecimal totalAmortized = loanTransactionRepository.getAmortizedAmountBuyDownFee(loan);
         for (LoanBuyDownFeeBalance balance : balances) {
@@ -236,11 +189,9 @@ public class LoanBuyDownFeeAmortizationProcessingServiceImpl implements LoanBuyD
             if (!balance.isDeleted()) {
                 final List<LoanTransaction> adjustments = loanTransactionRepository.findAdjustments(balance.getLoanTransaction());
                 final LocalDate maturityDate = loan.getMaturityDate() != null ? loan.getMaturityDate() : transactionDate;
-                final Money amortizationTillDate = BuyDownFeeAmortizationUtil.calculateTotalAmortizationTillDate(balance, adjustments,
-                        maturityDate, loan.getLoanProductRelatedDetail().getBuyDownFeeStrategy(), maturityDate, loan.getCurrency());
+                final Money amortizationTillDate = BuyDownFeeAmortizationUtil.calculateTotalAmortizationTillDate(balance, adjustments, maturityDate, loan.getLoanProductRelatedDetail().getBuyDownFeeStrategy(), maturityDate, loan.getCurrency());
                 totalAmortization = totalAmortization.add(amortizationTillDate.getAmount());
-                final BigDecimal alreadyAmortizedAmount = loanAmortizationAllocationService
-                        .calculateAlreadyAmortizedAmount(balance.getLoanTransaction().getId(), loan.getId());
+                final BigDecimal alreadyAmortizedAmount = loanAmortizationAllocationService.calculateAlreadyAmortizedAmount(balance.getLoanTransaction().getId(), loan.getId());
                 if (alreadyAmortizedAmount.compareTo(amortizationTillDate.getAmount()) > 0) {
                     amortizationAmount = alreadyAmortizedAmount.subtract(amortizationTillDate.getAmount());
                     amortizationType = AmortizationType.AM_ADJ;
@@ -258,35 +209,22 @@ public class LoanBuyDownFeeAmortizationProcessingServiceImpl implements LoanBuyD
                 balance.setClosed(true);
             }
             if (amortizationAmount.compareTo(BigDecimal.ZERO) > 0) {
-                final LoanAmortizationAllocationMapping loanAmortizationAllocationMapping = loanAmortizationAllocationService
-                        .createAmortizationAllocationMappingWithBaseLoanTransaction(balance.getLoanTransaction(), amortizationAmount,
-                                amortizationType);
+                final LoanAmortizationAllocationMapping loanAmortizationAllocationMapping = loanAmortizationAllocationService.createAmortizationAllocationMappingWithBaseLoanTransaction(balance.getLoanTransaction(), amortizationAmount, amortizationType);
                 loanAmortizationAllocationMappings.add(loanAmortizationAllocationMapping);
             }
         }
-
         loanBuyDownFeeBalanceRepository.saveAll(balances);
-
         final BigDecimal totalUnrecognizedAmount = totalAmortization.subtract(totalAmortized);
         if (MathUtil.isZero(totalUnrecognizedAmount)) {
             return Optional.empty();
         }
-
-        final LoanTransaction amortizationTransaction = MathUtil.isGreaterThanZero(totalUnrecognizedAmount)
-                ? LoanTransaction.buyDownFeeAmortization(loan, loan.getOffice(), transactionDate, totalUnrecognizedAmount, externalId)
-                : LoanTransaction.buyDownFeeAmortizationAdjustment(loan,
-                        Money.of(loan.getCurrency(), MathUtil.negate(totalUnrecognizedAmount)), transactionDate, externalId);
+        final LoanTransaction amortizationTransaction = MathUtil.isGreaterThanZero(totalUnrecognizedAmount) ? LoanTransaction.buyDownFeeAmortization(loan, loan.getOffice(), transactionDate, totalUnrecognizedAmount, externalId) : LoanTransaction.buyDownFeeAmortizationAdjustment(loan, Money.of(loan.getCurrency(), MathUtil.negate(totalUnrecognizedAmount)), transactionDate, externalId);
         if (isChargeOff) {
-            amortizationTransaction.getLoanTransactionRelations().add(LoanTransactionRelation.linkToTransaction(amortizationTransaction,
-                    chargeOffTransaction, LoanTransactionRelationTypeEnum.RELATED));
+            amortizationTransaction.getLoanTransactionRelations().add(LoanTransactionRelation.linkToTransaction(amortizationTransaction, chargeOffTransaction, LoanTransactionRelationTypeEnum.RELATED));
         }
-
         loan.addLoanTransaction(amortizationTransaction);
         loanTransactionRepository.saveAndFlush(amortizationTransaction);
-        loanAmortizationAllocationMappings.forEach(loanAmortizationAllocationMapping -> loanAmortizationAllocationService
-                .setAmortizationTransactionDataAndSaveAmortizationAllocationMapping(loanAmortizationAllocationMapping,
-                        amortizationTransaction));
-
+        loanAmortizationAllocationMappings.forEach(loanAmortizationAllocationMapping -> loanAmortizationAllocationService.setAmortizationTransactionDataAndSaveAmortizationAllocationMapping(loanAmortizationAllocationMapping, amortizationTransaction));
         return Optional.of(amortizationTransaction);
     }
 
@@ -297,5 +235,15 @@ public class LoanBuyDownFeeAmortizationProcessingServiceImpl implements LoanBuyD
             case CLOSED_WRITTEN_OFF -> loan.getWrittenOffOnDate();
             default -> throw new IllegalStateException("Unexpected value: " + loan.getStatus());
         };
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanBuyDownFeeAmortizationProcessingServiceImpl(final LoanTransactionRepository loanTransactionRepository, final LoanBuyDownFeeBalanceRepository loanBuyDownFeeBalanceRepository, final BusinessEventNotifierService businessEventNotifierService, final LoanJournalEntryPoster journalEntryPoster, final ExternalIdFactory externalIdFactory, final LoanAmortizationAllocationService loanAmortizationAllocationService) {
+        this.loanTransactionRepository = loanTransactionRepository;
+        this.loanBuyDownFeeBalanceRepository = loanBuyDownFeeBalanceRepository;
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.journalEntryPoster = journalEntryPoster;
+        this.externalIdFactory = externalIdFactory;
+        this.loanAmortizationAllocationService = loanAmortizationAllocationService;
     }
 }

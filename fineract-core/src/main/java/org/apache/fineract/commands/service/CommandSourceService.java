@@ -19,13 +19,11 @@
 package org.apache.fineract.commands.service;
 
 import static org.apache.fineract.commands.domain.CommandProcessingResultType.UNDER_PROCESSING;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.Locale;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.exception.ErrorInfo;
 import org.apache.fineract.commands.domain.CommandSource;
 import org.apache.fineract.commands.domain.CommandSourceRepository;
@@ -51,12 +49,9 @@ import org.springframework.transaction.annotation.Transactional;
  * separately for idempotency, while command execution and successful result persistence run in one transaction.
  */
 @Component
-@RequiredArgsConstructor
 public class CommandSourceService {
-
     public static final String COMMAND_MASK_VALUE = "***";
     public static final String COMMAND_SANITIZE_ALL = "SANITIZE_ALL";
-
     private final ConfigurationDomainService configurationDomainService;
     private final CommandSourceRepository commandSourceRepository;
     private final ErrorHandler errorHandler;
@@ -99,13 +94,11 @@ public class CommandSourceService {
     }
 
     public CommandSource findCommandSource(CommandWrapper wrapper, String idempotencyKey) {
-        return commandSourceRepository.findByActionNameAndEntityNameAndIdempotencyKey(wrapper.actionName(), wrapper.entityName(),
-                idempotencyKey);
+        return commandSourceRepository.findByActionNameAndEntityNameAndIdempotencyKey(wrapper.actionName(), wrapper.entityName(), idempotencyKey);
     }
 
     public CommandSource getInitialCommandSource(CommandWrapper wrapper, JsonCommand jsonCommand, AppUser maker, String idempotencyKey) {
-        CommandSource commandSourceResult = CommandSource.fullEntryFrom(wrapper, jsonCommand, maker, idempotencyKey,
-                UNDER_PROCESSING.getValue(), false);
+        CommandSource commandSourceResult = CommandSource.fullEntryFrom(wrapper, jsonCommand, maker, idempotencyKey, UNDER_PROCESSING.getValue(), false);
         sanitizeJson(commandSourceResult, wrapper.getSanitizeJsonKeys());
         if (commandSourceResult.getCommandAsJson() == null) {
             commandSourceResult.setCommandAsJson("{}");
@@ -114,17 +107,14 @@ public class CommandSourceService {
     }
 
     @Transactional
-    public CommandExecutionResult processCommandAndSaveResult(NewCommandSourceHandler handler, JsonCommand command,
-            CommandSource commandSource, AppUser user, boolean isApprovedByChecker,
-            BiConsumer<CommandSource, CommandProcessingResult> resultUpdater) {
+    public CommandExecutionResult processCommandAndSaveResult(NewCommandSourceHandler handler, JsonCommand command, CommandSource commandSource, AppUser user, boolean isApprovedByChecker, BiConsumer<CommandSource, CommandProcessingResult> resultUpdater) {
         final CommandProcessingResult result = handler.processCommand(command);
         validateMakerChecker(commandSource, user, isApprovedByChecker, result);
         resultUpdater.accept(commandSource, result);
         return new CommandExecutionResult(result, saveResult(commandSource));
     }
 
-    private void validateMakerChecker(CommandSource commandSource, AppUser user, boolean isApprovedByChecker,
-            CommandProcessingResult result) {
+    private void validateMakerChecker(CommandSource commandSource, AppUser user, boolean isApprovedByChecker, CommandProcessingResult result) {
         String permission = commandSource.getPermissionCode();
         boolean isMakerChecker = configurationDomainService.isMakerCheckerEnabledForTask(permission);
         if (isMakerChecker || result.isRollbackTransaction()) {
@@ -132,15 +122,14 @@ public class CommandSourceService {
                 commandSource.markAsChecked(user);
             } else {
                 if (commandSource.isSanitized()) {
-                    throw new GeneralPlatformDomainRuleException("error.msg.invalid.sanitization",
-                            "Maker-checker command can not be sanitized, please change the permission configuration", permission);
+                    throw new GeneralPlatformDomainRuleException("error.msg.invalid.sanitization", "Maker-checker command can not be sanitized, please change the permission configuration", permission);
                 }
-
                 commandSource.markAsAwaitingApproval();
                 throw new RollbackTransactionNotApprovedException(commandSource.getId(), commandSource.getResourceId());
             }
         }
     }
+
 
     public record CommandExecutionResult(CommandProcessingResult result, CommandSource commandSource) {
     }
@@ -171,5 +160,13 @@ public class CommandSourceService {
         }
         commandSource.setCommandAsJson(sanitizedJson);
         commandSource.setSanitized(true);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CommandSourceService(final ConfigurationDomainService configurationDomainService, final CommandSourceRepository commandSourceRepository, final ErrorHandler errorHandler, final FromJsonHelper fromApiJsonHelper) {
+        this.configurationDomainService = configurationDomainService;
+        this.commandSourceRepository = commandSourceRepository;
+        this.errorHandler = errorHandler;
+        this.fromApiJsonHelper = fromApiJsonHelper;
     }
 }

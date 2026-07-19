@@ -20,29 +20,41 @@ package org.apache.fineract.portfolio.collateralmanagement.data;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import lombok.Getter;
 
-@Getter
 public final class LoanTransactionData {
-
     private final BigDecimal lastRepayment;
-
     private final BigDecimal remainingAmount;
-
     private final Long loanId;
-
     private final OffsetDateTime lastRepaymentDate;
 
-    private LoanTransactionData(final Long loanId, final OffsetDateTime lastRepaymentDate, final BigDecimal remainingAmount,
-            final BigDecimal lastRepayment) {
+    private LoanTransactionData(final Long loanId, final OffsetDateTime lastRepaymentDate, final BigDecimal remainingAmount, final BigDecimal lastRepayment) {
         this.lastRepayment = lastRepayment;
         this.lastRepaymentDate = lastRepaymentDate;
         this.remainingAmount = remainingAmount;
         this.loanId = loanId;
     }
 
-    public static LoanTransactionData instance(final Long loanId, final OffsetDateTime lastRepaymentDate, final BigDecimal remainingAmount,
-            final BigDecimal lastRepayment) {
+    public static LoanTransactionData instance(final Long loanId, final OffsetDateTime lastRepaymentDate, final BigDecimal remainingAmount, final BigDecimal lastRepayment) {
         return new LoanTransactionData(loanId, lastRepaymentDate, remainingAmount, lastRepayment);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getLastRepayment() {
+        return this.lastRepayment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getRemainingAmount() {
+        return this.remainingAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanId() {
+        return this.loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OffsetDateTime getLastRepaymentDate() {
+        return this.lastRepaymentDate;
     }
 }

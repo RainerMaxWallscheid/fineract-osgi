@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "FIXEDDEPOSITACCOUNT", action = "ACTIVATE")
-@RequiredArgsConstructor
 public class ActivateFixedDepositAccountCommandHandler implements NewCommandSourceHandler {
-
     private final DepositAccountWritePlatformService depositAccountWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.depositAccountWritePlatformService.activateFDAccount(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ActivateFixedDepositAccountCommandHandler(final DepositAccountWritePlatformService depositAccountWritePlatformService) {
+        this.depositAccountWritePlatformService = depositAccountWritePlatformService;
     }
 }

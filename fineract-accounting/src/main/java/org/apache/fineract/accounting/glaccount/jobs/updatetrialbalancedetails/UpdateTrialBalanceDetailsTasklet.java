@@ -21,8 +21,6 @@ package org.apache.fineract.accounting.glaccount.jobs.updatetrialbalancedetails;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.accounting.glaccount.domain.TrialBalance;
 import org.apache.fineract.accounting.glaccount.domain.TrialBalanceRepository;
 import org.apache.fineract.accounting.glaccount.domain.TrialBalanceRepositoryWrapper;
@@ -37,10 +35,9 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
-@Slf4j
-@RequiredArgsConstructor
 public class UpdateTrialBalanceDetailsTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UpdateTrialBalanceDetailsTasklet.class);
     private final RoutingDataSourceServiceFactory dataSourceServiceFactory;
     private final TrialBalanceRepositoryWrapper trialBalanceRepositoryWrapper;
     private final TrialBalanceRepository trialBalanceRepository;
@@ -49,10 +46,8 @@ public class UpdateTrialBalanceDetailsTasklet implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         final JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSourceServiceFactory.determineDataSourceService().retrieveDataSource());
-
         processTrialBalanceGaps(jdbcTemplate);
         updateClosingBalances(jdbcTemplate);
-
         return RepeatStatus.FINISHED;
     }
 
@@ -70,7 +65,6 @@ public class UpdateTrialBalanceDetailsTasklet implements Tasklet {
 
     private void insertTrialBalanceForDate(LocalDate tbGap) {
         List<Object[]> rows = journalEntryRepository.findTrialBalanceLinesForDate(tbGap);
-
         List<TrialBalance> trialBalances = rows.stream().map(row -> {
             TrialBalance tb = new TrialBalance();
             tb.setOfficeId((Long) row[0]);
@@ -81,16 +75,12 @@ public class UpdateTrialBalanceDetailsTasklet implements Tasklet {
             tb.setClosingBalance((BigDecimal) row[5]);
             return tb;
         }).toList();
-
         trialBalanceRepositoryWrapper.save(trialBalances);
-
-        log.debug("{}: Records affected by updateTrialBalanceDetails: {}", ThreadLocalContextUtil.getTenant().getName(),
-                trialBalances.size());
+        log.debug("{}: Records affected by updateTrialBalanceDetails: {}", ThreadLocalContextUtil.getTenant().getName(), trialBalances.size());
     }
 
     private void updateClosingBalances(JdbcTemplate jdbcTemplate) {
         final List<Long> officeIds = trialBalanceRepository.findDistinctOfficeIdsWithNullClosingBalance();
-
         for (Long officeId : officeIds) {
             updateClosingBalancesForOffice(jdbcTemplate, officeId);
         }
@@ -98,7 +88,6 @@ public class UpdateTrialBalanceDetailsTasklet implements Tasklet {
 
     private void updateClosingBalancesForOffice(JdbcTemplate jdbcTemplate, Long officeId) {
         final List<Long> accountIds = trialBalanceRepository.findDistinctAccountIdsWithNullClosingBalanceByOfficeId(officeId);
-
         for (Long accountId : accountIds) {
             updateClosingBalanceForAccount(jdbcTemplate, officeId, accountId);
         }
@@ -107,7 +96,6 @@ public class UpdateTrialBalanceDetailsTasklet implements Tasklet {
     private void updateClosingBalanceForAccount(JdbcTemplate jdbcTemplate, Long officeId, Long accountId) {
         BigDecimal closingBalance = getPreviousClosingBalance(officeId, accountId);
         List<TrialBalance> tbRows = trialBalanceRepositoryWrapper.findNewByOfficeAndAccount(officeId, accountId);
-
         updateTrialBalanceRows(tbRows, closingBalance);
     }
 
@@ -118,12 +106,19 @@ public class UpdateTrialBalanceDetailsTasklet implements Tasklet {
 
     private void updateTrialBalanceRows(List<TrialBalance> tbRows, BigDecimal initialClosingBalance) {
         BigDecimal closingBalance = initialClosingBalance;
-
         for (TrialBalance row : tbRows) {
             if (closingBalance != null) {
                 closingBalance = closingBalance.add(row.getAmount());
             }
             row.setClosingBalance(closingBalance);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateTrialBalanceDetailsTasklet(final RoutingDataSourceServiceFactory dataSourceServiceFactory, final TrialBalanceRepositoryWrapper trialBalanceRepositoryWrapper, final TrialBalanceRepository trialBalanceRepository, final JournalEntryRepository journalEntryRepository) {
+        this.dataSourceServiceFactory = dataSourceServiceFactory;
+        this.trialBalanceRepositoryWrapper = trialBalanceRepositoryWrapper;
+        this.trialBalanceRepository = trialBalanceRepository;
+        this.journalEntryRepository = journalEntryRepository;
     }
 }

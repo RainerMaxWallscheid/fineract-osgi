@@ -20,21 +20,13 @@ package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleType;
 
 /**
  * Immutable data object representing disbursement information.
  */
-@RequiredArgsConstructor
-@Getter
-@Accessors(chain = true)
 public final class DisbursementData implements LoanPrincipalRelatedDataHolder, Comparable<DisbursementData> {
-
     private final Long id;
     private final Long loanId;
     private final LocalDate expectedDisbursementDate;
@@ -44,9 +36,7 @@ public final class DisbursementData implements LoanPrincipalRelatedDataHolder, C
     private final String loanChargeId;
     private final BigDecimal chargeAmount;
     private final BigDecimal waivedChargeAmount;
-    @Setter
     private BigDecimal disburseChargeAmount;
-
     // import fields
     private transient Integer rowIndex;
     private String dateFormat;
@@ -54,8 +44,7 @@ public final class DisbursementData implements LoanPrincipalRelatedDataHolder, C
     private String note;
     private transient String linkAccountId;
 
-    public static DisbursementData importInstance(LocalDate actualDisbursementDate, String linkAccountId, Integer rowIndex, String locale,
-            String dateFormat) {
+    public static DisbursementData importInstance(LocalDate actualDisbursementDate, String linkAccountId, Integer rowIndex, String locale, String dateFormat) {
         return new DisbursementData(actualDisbursementDate, linkAccountId, rowIndex, locale, dateFormat);
     }
 
@@ -74,7 +63,6 @@ public final class DisbursementData implements LoanPrincipalRelatedDataHolder, C
         this.chargeAmount = null;
         this.waivedChargeAmount = null;
         this.netDisbursalAmount = null;
-
     }
 
     public LocalDate disbursementDate() {
@@ -102,13 +90,11 @@ public final class DisbursementData implements LoanPrincipalRelatedDataHolder, C
         };
     }
 
-    private boolean occursOnDayFromAndUpToAndIncluding(final LocalDate fromNotInclusive, final LocalDate upToAndInclusive,
-            final LocalDate target) {
+    private boolean occursOnDayFromAndUpToAndIncluding(final LocalDate fromNotInclusive, final LocalDate upToAndInclusive, final LocalDate target) {
         return DateUtils.isAfter(target, fromNotInclusive) && !DateUtils.isAfter(target, upToAndInclusive);
     }
 
-    private boolean occursOnDayFromAndIncludingAndUpTo(final LocalDate fromInclusive, final LocalDate upToNotInclusive,
-            final LocalDate target) {
+    private boolean occursOnDayFromAndIncludingAndUpTo(final LocalDate fromInclusive, final LocalDate upToNotInclusive, final LocalDate target) {
         return DateUtils.isDateInRangeFromInclusiveToExclusive(fromInclusive, upToNotInclusive, target);
     }
 
@@ -116,4 +102,95 @@ public final class DisbursementData implements LoanPrincipalRelatedDataHolder, C
         return this.waivedChargeAmount == null ? BigDecimal.ZERO : this.waivedChargeAmount;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DisbursementData(final Long id, final Long loanId, final LocalDate expectedDisbursementDate, final LocalDate actualDisbursementDate, final BigDecimal principal, final BigDecimal netDisbursalAmount, final String loanChargeId, final BigDecimal chargeAmount, final BigDecimal waivedChargeAmount) {
+        this.id = id;
+        this.loanId = loanId;
+        this.expectedDisbursementDate = expectedDisbursementDate;
+        this.actualDisbursementDate = actualDisbursementDate;
+        this.principal = principal;
+        this.netDisbursalAmount = netDisbursalAmount;
+        this.loanChargeId = loanChargeId;
+        this.chargeAmount = chargeAmount;
+        this.waivedChargeAmount = waivedChargeAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanId() {
+        return this.loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getExpectedDisbursementDate() {
+        return this.expectedDisbursementDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getActualDisbursementDate() {
+        return this.actualDisbursementDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPrincipal() {
+        return this.principal;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getNetDisbursalAmount() {
+        return this.netDisbursalAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLoanChargeId() {
+        return this.loanChargeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getChargeAmount() {
+        return this.chargeAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getDisburseChargeAmount() {
+        return this.disburseChargeAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getRowIndex() {
+        return this.rowIndex;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDateFormat() {
+        return this.dateFormat;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLocale() {
+        return this.locale;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getNote() {
+        return this.note;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLinkAccountId() {
+        return this.linkAccountId;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public DisbursementData setDisburseChargeAmount(final BigDecimal disburseChargeAmount) {
+        this.disburseChargeAmount = disburseChargeAmount;
+        return this;
+    }
 }

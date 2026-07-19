@@ -23,12 +23,9 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.IOException;
 import java.io.Serializable;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.jersey.converter.JsonConverter;
 
-@RequiredArgsConstructor
 public class JacksonSerializerAdapter<T> extends JsonSerializer<T> implements Serializable {
-
     private final JsonConverter<T> converter;
 
     @Override
@@ -39,5 +36,10 @@ public class JacksonSerializerAdapter<T> extends JsonSerializer<T> implements Se
     @Override
     public Class<T> handledType() {
         return converter.convertedType();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JacksonSerializerAdapter(final JsonConverter<T> converter) {
+        this.converter = converter;
     }
 }

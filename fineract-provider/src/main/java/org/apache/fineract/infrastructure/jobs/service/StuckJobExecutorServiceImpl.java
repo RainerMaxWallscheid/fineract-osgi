@@ -19,8 +19,6 @@
 package org.apache.fineract.infrastructure.jobs.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.jobs.data.partitionedjobs.PartitionedJob;
 import org.apache.fineract.infrastructure.jobs.domain.JobExecutionRepository;
 import org.springframework.batch.core.launch.JobOperator;
@@ -29,10 +27,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
-@Slf4j
-@RequiredArgsConstructor
 public class StuckJobExecutorServiceImpl implements StuckJobExecutorService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StuckJobExecutorServiceImpl.class);
     private final JobExecutionRepository jobExecutionRepository;
     @Qualifier("requiresNewTransactionJdbcTemplate")
     private final TransactionTemplate requiresNewTransactionJdbcTemplate;
@@ -92,8 +89,7 @@ public class StuckJobExecutorServiceImpl implements StuckJobExecutorService {
     }
 
     private void updateJobStatusToFailedInNewTransaction(Long stuckJobId, String partitionerStepName) {
-        requiresNewTransactionJdbcTemplate
-                .executeWithoutResult(status -> jobExecutionRepository.updateJobStatusToFailed(stuckJobId, partitionerStepName));
+        requiresNewTransactionJdbcTemplate.executeWithoutResult(status -> jobExecutionRepository.updateJobStatusToFailed(stuckJobId, partitionerStepName));
     }
 
     private void waitUntilAllPartitionsFinished(Long stuckJobId, String partitionerStepName) throws InterruptedException {
@@ -106,5 +102,12 @@ public class StuckJobExecutorServiceImpl implements StuckJobExecutorService {
     private boolean areAllPartitionsCompleted(Long stuckJobId, String partitionerStepName) {
         Long notCompletedPartitions = jobExecutionRepository.getNotCompletedPartitionsCount(stuckJobId, partitionerStepName);
         return notCompletedPartitions == 0L;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public StuckJobExecutorServiceImpl(final JobExecutionRepository jobExecutionRepository, @Qualifier("requiresNewTransactionJdbcTemplate") final TransactionTemplate requiresNewTransactionJdbcTemplate, final JobOperator jobOperator) {
+        this.jobExecutionRepository = jobExecutionRepository;
+        this.requiresNewTransactionJdbcTemplate = requiresNewTransactionJdbcTemplate;
+        this.jobOperator = jobOperator;
     }
 }

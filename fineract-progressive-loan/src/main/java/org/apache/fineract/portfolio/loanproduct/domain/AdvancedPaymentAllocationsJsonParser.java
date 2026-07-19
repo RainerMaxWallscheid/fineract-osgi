@@ -24,20 +24,16 @@ import com.google.gson.JsonElement;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 public class AdvancedPaymentAllocationsJsonParser {
-
     public final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator;
 
-    public List<LoanProductPaymentAllocationRule> assembleLoanProductPaymentAllocationRules(final JsonCommand command,
-            String loanTransactionProcessingStrategyCode) {
+    public List<LoanProductPaymentAllocationRule> assembleLoanProductPaymentAllocationRules(final JsonCommand command, String loanTransactionProcessingStrategyCode) {
         JsonArray paymentAllocations = command.arrayOfParameterNamed("paymentAllocation");
         List<LoanProductPaymentAllocationRule> productPaymentAllocationRules = null;
         if (paymentAllocations != null) {
@@ -54,28 +50,24 @@ public class AdvancedPaymentAllocationsJsonParser {
         return productPaymentAllocationRules;
     }
 
-    private void populatePaymentAllocationRules(Map<String, JsonElement> map,
-            LoanProductPaymentAllocationRule loanProductPaymentAllocationRule) {
+    private void populatePaymentAllocationRules(Map<String, JsonElement> map, LoanProductPaymentAllocationRule loanProductPaymentAllocationRule) {
         JsonArray paymentAllocationOrder = asJsonArrayOrNull(map.get("paymentAllocationOrder"));
         if (paymentAllocationOrder != null) {
             loanProductPaymentAllocationRule.setAllocationTypes(getPaymentAllocationTypes(paymentAllocationOrder));
         }
     }
 
-    private void populateFutureInstallment(Map<String, JsonElement> map,
-            LoanProductPaymentAllocationRule loanProductPaymentAllocationRule) {
+    private void populateFutureInstallment(Map<String, JsonElement> map, LoanProductPaymentAllocationRule loanProductPaymentAllocationRule) {
         String futureInstallmentAllocationRule = asStringOrNull(map.get("futureInstallmentAllocationRule"));
         if (futureInstallmentAllocationRule != null) {
-            loanProductPaymentAllocationRule.setFutureInstallmentAllocationRule(
-                    Enums.getIfPresent(FutureInstallmentAllocationRule.class, futureInstallmentAllocationRule).orNull());
+            loanProductPaymentAllocationRule.setFutureInstallmentAllocationRule(Enums.getIfPresent(FutureInstallmentAllocationRule.class, futureInstallmentAllocationRule).orNull());
         }
     }
 
     private void populateTransactionType(Map<String, JsonElement> map, LoanProductPaymentAllocationRule loanProductPaymentAllocationRule) {
         String transactionType = asStringOrNull(map.get("transactionType"));
         if (transactionType != null) {
-            loanProductPaymentAllocationRule
-                    .setTransactionType(Enums.getIfPresent(PaymentAllocationTransactionType.class, transactionType).orNull());
+            loanProductPaymentAllocationRule.setTransactionType(Enums.getIfPresent(PaymentAllocationTransactionType.class, transactionType).orNull());
         }
     }
 
@@ -119,4 +111,8 @@ public class AdvancedPaymentAllocationsJsonParser {
         return null;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public AdvancedPaymentAllocationsJsonParser(final AdvancedPaymentAllocationsValidator advancedPaymentAllocationsValidator) {
+        this.advancedPaymentAllocationsValidator = advancedPaymentAllocationsValidator;
+    }
 }

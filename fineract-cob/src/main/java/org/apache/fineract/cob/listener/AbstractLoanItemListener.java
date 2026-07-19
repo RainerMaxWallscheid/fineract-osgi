@@ -19,8 +19,6 @@
 package org.apache.fineract.cob.listener;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.domain.LockOwner;
 import org.apache.fineract.cob.domain.LockingService;
 import org.apache.fineract.cob.exceptions.LockedReadException;
@@ -36,10 +34,9 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@Slf4j
-@RequiredArgsConstructor
 public abstract class AbstractLoanItemListener<S extends AbstractPersistableCustom<Long>> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AbstractLoanItemListener.class);
     private final LockingService loanLockingService;
     private final TransactionTemplate requiresNewTransactionJdbcTemplate;
 
@@ -92,4 +89,9 @@ public abstract class AbstractLoanItemListener<S extends AbstractPersistableCust
 
     protected abstract LockOwner getLockOwner();
 
+    @java.lang.SuppressWarnings("all")
+        public AbstractLoanItemListener(final LockingService loanLockingService, final TransactionTemplate requiresNewTransactionJdbcTemplate) {
+        this.loanLockingService = loanLockingService;
+        this.requiresNewTransactionJdbcTemplate = requiresNewTransactionJdbcTemplate;
+    }
 }

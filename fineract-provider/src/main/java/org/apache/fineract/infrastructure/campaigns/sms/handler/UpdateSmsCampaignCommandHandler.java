@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.campaigns.sms.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.campaigns.sms.service.SmsCampaignWritePlatformService;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "SMSCAMPAIGN", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateSmsCampaignCommandHandler implements NewCommandSourceHandler {
-
     private final SmsCampaignWritePlatformService smsCampaignWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(JsonCommand command) {
         return this.smsCampaignWritePlatformService.update(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateSmsCampaignCommandHandler(final SmsCampaignWritePlatformService smsCampaignWritePlatformService) {
+        this.smsCampaignWritePlatformService = smsCampaignWritePlatformService;
     }
 }

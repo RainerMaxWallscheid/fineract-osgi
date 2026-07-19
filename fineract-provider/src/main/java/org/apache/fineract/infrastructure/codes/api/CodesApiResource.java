@@ -41,7 +41,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -57,18 +56,13 @@ import org.springframework.stereotype.Component;
 
 @Path("/v1/codes")
 @Component
-@Tag(name = "Codes", description = "Code and code values: Codes represent a specific category of data, their code values are a specific instance of that category.\n"
-        + "\n"
-        + "Codes are mostly system defined which means the code itself comes out of the box and cannot be modified however its code values can be. e.g. 'Customer Identifier', it defaults to a code value of 'Passport' but could be 'Drivers License, National Id' etc")
-@RequiredArgsConstructor
+@Tag(name = "Codes", description = "Code and code values: Codes represent a specific category of data, their code values are a specific instance of that category.\n" + "\n" + "Codes are mostly system defined which means the code itself comes out of the box and cannot be modified however its code values can be. e.g. \'Customer Identifier\', it defaults to a code value of \'Passport\' but could be \'Drivers License, National Id\' etc")
 public class CodesApiResource {
-
     /**
      * The set of parameters that are supported in response for {@link CodeData}
      */
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "name", "systemDefined"));
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "CODE";
-
     private final PlatformSecurityContext context;
     private final CodeReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<CodeData> toApiJsonSerializer;
@@ -76,95 +70,83 @@ public class CodesApiResource {
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve Codes", operationId = "retrieveAllCodes", description = "Returns the list of codes.\n" + "\n"
-            + "Example Requests:\n" + "\n" + "codes")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve Codes", operationId = "retrieveAllCodes", description = "Returns the list of codes.\n" + "\n" + "Example Requests:\n" + "\n" + "codes")
     @AlternativeOperationId("retrieveCodes")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = CodesApiResourceSwagger.GetCodesResponse.class))))
     public String retrieveCodes(@Context final UriInfo uriInfo) {
-
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
         final Collection<CodeData> codes = this.readPlatformService.retrieveAllCodes();
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, codes, RESPONSE_DATA_PARAMETERS);
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Create a Code", operationId = "createCode", description = "Creates a code. Codes created through api are always 'user defined' and so system defined is marked as false.")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Create a Code", operationId = "createCode", description = "Creates a code. Codes created through api are always \'user defined\' and so system defined is marked as false.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CodesApiResourceSwagger.PostCodesRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CodesApiResourceSwagger.PostCodesResponse.class)))
     public String createCode(@Parameter(hidden = true) final String apiRequestBodyAsJson) {
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createCode().withJson(apiRequestBodyAsJson).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 
     @GET
     @Path("{codeId}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve a Code", operationId = "retrieveOneCode", description = "Returns the details of a Code.\n" + "\n"
-            + "Example Requests:\n" + "\n" + "codes/1")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve a Code", operationId = "retrieveOneCode", description = "Returns the details of a Code.\n" + "\n" + "Example Requests:\n" + "\n" + "codes/1")
     @AlternativeOperationId("retrieveCode")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CodesApiResourceSwagger.GetCodesResponse.class)))
     public String retrieveCode(@PathParam("codeId") @Parameter(description = "codeId") final Long codeId, @Context final UriInfo uriInfo) {
-
         final CodeData code = this.readPlatformService.retrieveCode(codeId);
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, code, RESPONSE_DATA_PARAMETERS);
     }
 
     @GET
     @Path("name/{codeName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve a Code", operationId = "retrieveOneCodeByName", description = "Returns the details of a Code.\n" + "\n"
-            + "Example Requests:\n" + "\n" + "codes/1")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve a Code", operationId = "retrieveOneCodeByName", description = "Returns the details of a Code.\n" + "\n" + "Example Requests:\n" + "\n" + "codes/1")
     @AlternativeOperationId("retrieveCodeByName")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CodesApiResourceSwagger.GetCodesResponse.class)))
-    public String retrieveCodeByName(@PathParam("codeName") @Parameter(description = "codeName") final String codeName,
-            @Context final UriInfo uriInfo) {
-
+    public String retrieveCodeByName(@PathParam("codeName") @Parameter(description = "codeName") final String codeName, @Context final UriInfo uriInfo) {
         final CodeData code = this.readPlatformService.retrieveCode(codeName);
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, code, RESPONSE_DATA_PARAMETERS);
     }
 
     @PUT
     @Path("{codeId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a Code", operationId = "updateCode", description = "Updates the details of a code if it is not system defined.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CodesApiResourceSwagger.PutCodesRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CodesApiResourceSwagger.PutCodesResponse.class)))
-    public String updateCode(@PathParam("codeId") @Parameter(description = "codeId") final Long codeId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-
+    public String updateCode(@PathParam("codeId") @Parameter(description = "codeId") final Long codeId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateCode(codeId).withJson(apiRequestBodyAsJson).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 
     @DELETE
     @Path("{codeId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete a Code", operationId = "deleteCode", description = "Deletes a code if it is not system defined.")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CodesApiResourceSwagger.DeleteCodesResponse.class)))
     public String deleteCode(@PathParam("codeId") @Parameter(description = "codeId") final Long codeId) {
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteCode(codeId).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodesApiResource(final PlatformSecurityContext context, final CodeReadPlatformService readPlatformService, final DefaultToApiJsonSerializer<CodeData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.context = context;
+        this.readPlatformService = readPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
     }
 }

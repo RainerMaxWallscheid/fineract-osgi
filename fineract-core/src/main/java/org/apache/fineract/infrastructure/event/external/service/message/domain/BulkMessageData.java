@@ -19,15 +19,17 @@
 package org.apache.fineract.infrastructure.event.external.service.message.domain;
 
 import java.util.Objects;
-import lombok.Getter;
 import org.apache.fineract.avro.BulkMessagePayloadV1;
 
-@Getter
 public class BulkMessageData {
-
     private final BulkMessagePayloadV1 data;
 
     public BulkMessageData(BulkMessagePayloadV1 data) {
         this.data = Objects.requireNonNull(data, "data cannot be null");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BulkMessagePayloadV1 getData() {
+        return this.data;
     }
 }

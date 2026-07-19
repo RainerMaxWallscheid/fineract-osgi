@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanorigination.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,14 +28,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 @CommandType(entity = "WORKING_CAPITAL_LOAN_ORIGINATOR", action = "DETACH")
-@RequiredArgsConstructor
 @ConditionalOnProperty(value = "fineract.module.loan-origination.enabled", havingValue = "true")
 public class DetachWorkingCapitalLoanOriginatorCommandHandler implements NewCommandSourceHandler {
-
     private final WorkingCapitalLoanOriginatorWritePlatformServiceImpl writePlatformService;
 
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.detachOriginatorFromWorkingCapitalLoan(command.getLoanId(), command.subentityId());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DetachWorkingCapitalLoanOriginatorCommandHandler(final WorkingCapitalLoanOriginatorWritePlatformServiceImpl writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

@@ -20,8 +20,6 @@ package org.apache.fineract.useradministration.service;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.PlatformEmailService;
 import org.apache.fineract.infrastructure.security.service.RandomPasswordGenerator;
 import org.apache.fineract.useradministration.domain.AppUser;
@@ -30,14 +28,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ForgotPasswordServiceImpl implements ForgotPasswordService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ForgotPasswordServiceImpl.class);
     private static final int TEMPORARY_PASSWORD_LENGTH = 13;
     private static final int TEMPORARY_PASSWORD_EXPIRY_HOURS = 1;
-
     private final AppUserRepository appUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final PlatformEmailService emailService;
@@ -50,24 +46,25 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
             log.debug("Password reset requested for non-existent or inactive email: {}", email);
             return;
         }
-
         if (!user.isPasswordResetAllowed()) {
             log.debug("Password reset is disabled for user: {}", user.getUsername());
             return;
         }
-
         final String temporaryPassword = new RandomPasswordGenerator(TEMPORARY_PASSWORD_LENGTH).generate();
         final String encodedPassword = this.passwordEncoder.encode(temporaryPassword);
         final OffsetDateTime expiryTime = OffsetDateTime.now(ZoneOffset.UTC).plusHours(TEMPORARY_PASSWORD_EXPIRY_HOURS);
-
         user.updateTemporaryPassword(encodedPassword, expiryTime);
         this.appUserRepository.saveAndFlush(user);
-
         final String organisationName = user.getOffice().getName();
         final String contactName = user.getFirstname() + " " + user.getLastname();
-
         this.emailService.sendForgotPasswordEmail(organisationName, contactName, email, user.getUsername(), temporaryPassword);
-
         log.info("Password reset email sent to user: {}", user.getUsername());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ForgotPasswordServiceImpl(final AppUserRepository appUserRepository, final PasswordEncoder passwordEncoder, final PlatformEmailService emailService) {
+        this.appUserRepository = appUserRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 }

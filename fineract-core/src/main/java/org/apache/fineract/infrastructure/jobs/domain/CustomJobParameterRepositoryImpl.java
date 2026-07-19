@@ -24,7 +24,6 @@ import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.serialization.GoogleGsonSerializerHelper;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.jobs.data.JobParameterDTO;
@@ -36,10 +35,8 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
 public class CustomJobParameterRepositoryImpl implements CustomJobParameterRepository {
-
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final DatabaseSpecificSQLGenerator databaseSpecificSQLGenerator;
     private final Gson gson = GoogleGsonSerializerHelper.createSimpleGson();
@@ -47,8 +44,7 @@ public class CustomJobParameterRepositoryImpl implements CustomJobParameterRepos
     @Override
     public Long save(Set<JobParameterDTO> customJobParameters) {
         Objects.requireNonNull(customJobParameters);
-        final String insertSQL = "INSERT INTO batch_custom_job_parameters (parameter_json) VALUES (%s)"
-                .formatted(databaseSpecificSQLGenerator.castJson(":jsonString"));
+        final String insertSQL = "INSERT INTO batch_custom_job_parameters (parameter_json) VALUES (%s)".formatted(databaseSpecificSQLGenerator.castJson(":jsonString"));
         final String jsonString = gson.toJson(customJobParameters);
         SqlParameterSource parameters = new MapSqlParameterSource("jsonString", jsonString);
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
@@ -61,13 +57,11 @@ public class CustomJobParameterRepositoryImpl implements CustomJobParameterRepos
         Objects.requireNonNull(id);
         CustomJobParameterExtractor customJobParameterExtractor = new CustomJobParameterExtractor();
         SqlParameterSource parameters = new MapSqlParameterSource("id", id);
-        return Optional.ofNullable(namedParameterJdbcTemplate.query(
-                "SELECT cjp.parameter_json AS parameter_json FROM batch_custom_job_parameters cjp WHERE cjp.id = :id", parameters,
-                customJobParameterExtractor));
+        return Optional.ofNullable(namedParameterJdbcTemplate.query("SELECT cjp.parameter_json AS parameter_json FROM batch_custom_job_parameters cjp WHERE cjp.id = :id", parameters, customJobParameterExtractor));
     }
 
-    private static final class CustomJobParameterExtractor implements ResultSetExtractor<CustomJobParameter> {
 
+    private static final class CustomJobParameterExtractor implements ResultSetExtractor<CustomJobParameter> {
         @Override
         public CustomJobParameter extractData(ResultSet rs) throws SQLException, DataAccessException {
             CustomJobParameter jobParameter = null;
@@ -79,4 +73,9 @@ public class CustomJobParameterRepositoryImpl implements CustomJobParameterRepos
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public CustomJobParameterRepositoryImpl(final NamedParameterJdbcTemplate namedParameterJdbcTemplate, final DatabaseSpecificSQLGenerator databaseSpecificSQLGenerator) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.databaseSpecificSQLGenerator = databaseSpecificSQLGenerator;
+    }
 }

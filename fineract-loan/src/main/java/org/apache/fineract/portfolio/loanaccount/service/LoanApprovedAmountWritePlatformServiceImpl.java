@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.loanaccount.service;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -37,11 +36,8 @@ import org.apache.fineract.portfolio.loanaccount.serialization.LoanApprovedAmoun
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class LoanApprovedAmountWritePlatformServiceImpl implements LoanApprovedAmountWritePlatformService {
-
     private static final String ERROR_CODE_MUST_BE_DIFFERENT_FROM_CURRENT_APPROVED_AMOUNT = "must.be.different.from.current.approved.amount";
-
     private final LoanAssembler loanAssembler;
     private final LoanApprovedAmountValidator loanApprovedAmountValidator;
     private final LoanApprovedAmountHistoryRepository loanApprovedAmountHistoryRepository;
@@ -51,83 +47,69 @@ public class LoanApprovedAmountWritePlatformServiceImpl implements LoanApprovedA
     public CommandProcessingResult modifyLoanApprovedAmount(final Long loanId, final JsonCommand command) {
         // API rule validations
         this.loanApprovedAmountValidator.validateLoanApprovedAmountModification(command);
-
         final Map<String, Object> changes = new LinkedHashMap<>();
         changes.put("newApprovedAmount", command.stringValueOfParameterNamed(LoanApiConstants.amountParameterName));
         changes.put("locale", command.locale());
-
         Loan loan = this.loanAssembler.assembleFrom(loanId);
         changes.put("oldApprovedAmount", loan.getApprovedPrincipal());
-
         BigDecimal newApprovedAmount = command.bigDecimalValueOfParameterNamed(LoanApiConstants.amountParameterName);
-
         validateNewApprovedAmountDiffersFromCurrent(loan, newApprovedAmount);
-
-        LoanApprovedAmountHistory loanApprovedAmountHistory = new LoanApprovedAmountHistory(loan.getId(), newApprovedAmount,
-                loan.getApprovedPrincipal());
-
+        LoanApprovedAmountHistory loanApprovedAmountHistory = new LoanApprovedAmountHistory(loan.getId(), newApprovedAmount, loan.getApprovedPrincipal());
         loan.setApprovedPrincipal(newApprovedAmount);
         loanApprovedAmountHistoryRepository.saveAndFlush(loanApprovedAmountHistory);
-
         businessEventNotifierService.notifyPostBusinessEvent(new LoanApprovedAmountChangedBusinessEvent(loan));
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(loan.getId()) //
-                .withEntityExternalId(loan.getExternalId()) //
-                .withOfficeId(loan.getOfficeId()) //
-                .withClientId(loan.getClientId()) //
-                .withGroupId(loan.getGroupId()) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(loan.getId()).withEntityExternalId(loan.getExternalId()).withOfficeId(loan.getOfficeId()).withClientId(loan.getClientId()).withGroupId(loan.getGroupId()).with(changes).build();
     }
 
     @Override
     public CommandProcessingResult modifyLoanAvailableDisbursementAmount(Long loanId, JsonCommand command) {
         // API rule validations
         this.loanApprovedAmountValidator.validateLoanAvailableDisbursementAmountModification(command);
-
         final Map<String, Object> changes = new LinkedHashMap<>();
         changes.put("newAvailableDisbursementAmount", command.stringValueOfParameterNamed(LoanApiConstants.amountParameterName));
         changes.put("locale", command.locale());
-
         Loan loan = this.loanAssembler.assembleFrom(loanId);
         changes.put("oldApprovedAmount", loan.getApprovedPrincipal());
-
-        BigDecimal expectedDisbursementAmount = loan.getDisbursementDetails().stream().filter(t -> t.actualDisbursementDate() == null)
-                .map(LoanDisbursementDetails::getPrincipal).reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal oldAvailableDisbursement = loan.getApprovedPrincipal().subtract(loan.getSummary().getTotalPrincipal())
-                .subtract(expectedDisbursementAmount);
+        BigDecimal expectedDisbursementAmount = loan.getDisbursementDetails().stream().filter(t -> t.actualDisbursementDate() == null).map(LoanDisbursementDetails::getPrincipal).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal oldAvailableDisbursement = loan.getApprovedPrincipal().subtract(loan.getSummary().getTotalPrincipal()).subtract(expectedDisbursementAmount);
         changes.put("oldAvailableDisbursementAmount", oldAvailableDisbursement);
-
         BigDecimal newAvailableDisbursementAmount = command.bigDecimalValueOfParameterNamed(LoanApiConstants.amountParameterName);
-        BigDecimal newApprovedAmount = loan.getSummary().getTotalPrincipal().add(expectedDisbursementAmount)
-                .add(newAvailableDisbursementAmount);
+        BigDecimal newApprovedAmount = loan.getSummary().getTotalPrincipal().add(expectedDisbursementAmount).add(newAvailableDisbursementAmount);
         changes.put("newApprovedAmount", newApprovedAmount);
-
-        LoanApprovedAmountHistory loanApprovedAmountHistory = new LoanApprovedAmountHistory(loan.getId(), newApprovedAmount,
-                loan.getApprovedPrincipal());
-
+        LoanApprovedAmountHistory loanApprovedAmountHistory = new LoanApprovedAmountHistory(loan.getId(), newApprovedAmount, loan.getApprovedPrincipal());
         loan.setApprovedPrincipal(newApprovedAmount);
         loanApprovedAmountHistoryRepository.saveAndFlush(loanApprovedAmountHistory);
-
         businessEventNotifierService.notifyPostBusinessEvent(new LoanApprovedAmountChangedBusinessEvent(loan));
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(loan.getId()) //
-                .withEntityExternalId(loan.getExternalId()) //
-                .withOfficeId(loan.getOfficeId()) //
-                .withClientId(loan.getClientId()) //
-                .withGroupId(loan.getGroupId()) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(loan.getId()).withEntityExternalId(loan.getExternalId()).withOfficeId(loan.getOfficeId()).withClientId(loan.getClientId()).withGroupId(loan.getGroupId()).with(changes).build();
     }
 
     private static void validateNewApprovedAmountDiffersFromCurrent(final Loan loan, final BigDecimal newApprovedAmount) {
         if (newApprovedAmount.compareTo(loan.getApprovedPrincipal()) == 0) {
-            Validator.validateOrThrowDomainViolation("loan.approved.amount",
-                    baseDataValidator -> baseDataValidator.reset().parameter(LoanApiConstants.amountParameterName).value(newApprovedAmount)
-                            .failWithCode(ERROR_CODE_MUST_BE_DIFFERENT_FROM_CURRENT_APPROVED_AMOUNT));
+            Validator.validateOrThrowDomainViolation("loan.approved.amount", baseDataValidator -> baseDataValidator.reset().parameter(LoanApiConstants.amountParameterName).value(newApprovedAmount).failWithCode(ERROR_CODE_MUST_BE_DIFFERENT_FROM_CURRENT_APPROVED_AMOUNT));
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanApprovedAmountWritePlatformServiceImpl(final LoanAssembler loanAssembler, final LoanApprovedAmountValidator loanApprovedAmountValidator, final LoanApprovedAmountHistoryRepository loanApprovedAmountHistoryRepository, final BusinessEventNotifierService businessEventNotifierService) {
+        this.loanAssembler = loanAssembler;
+        this.loanApprovedAmountValidator = loanApprovedAmountValidator;
+        this.loanApprovedAmountHistoryRepository = loanApprovedAmountHistoryRepository;
+        this.businessEventNotifierService = businessEventNotifierService;
     }
 }

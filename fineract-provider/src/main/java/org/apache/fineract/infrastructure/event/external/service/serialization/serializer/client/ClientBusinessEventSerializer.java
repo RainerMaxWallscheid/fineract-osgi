@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.event.external.service.serialization.serializer.client;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.fineract.avro.client.v1.ClientDataV1;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
@@ -31,9 +30,7 @@ import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class ClientBusinessEventSerializer implements BusinessEventSerializer {
-
     private final ClientReadPlatformService service;
     private final ClientDataMapper mapper;
 
@@ -52,5 +49,11 @@ public class ClientBusinessEventSerializer implements BusinessEventSerializer {
     @Override
     public Class<? extends GenericContainer> getSupportedSchema() {
         return ClientDataV1.class;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ClientBusinessEventSerializer(final ClientReadPlatformService service, final ClientDataMapper mapper) {
+        this.service = service;
+        this.mapper = mapper;
     }
 }

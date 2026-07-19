@@ -24,13 +24,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import io.restassured.response.Response;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.ChargeRequest;
 import org.apache.fineract.client.models.CurrencyConfigurationData;
 import org.apache.fineract.client.models.CurrencyUpdateRequest;
@@ -44,9 +42,9 @@ import org.apache.fineract.integrationtests.common.charges.ChargesHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@Slf4j
 public class ClientChargeRoundingTest extends BaseLoanIntegrationTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ClientChargeRoundingTest.class);
     private Long clientId;
     private ChargesHelper chargesHelper;
     private static final String DATE = "01 January 2026";
@@ -61,11 +59,8 @@ public class ClientChargeRoundingTest extends BaseLoanIntegrationTest {
     @Test
     public void shouldRoundUsdClientChargeTo_TwoDecimalPlaces() throws Exception {
         PostChargesResponse chargesResponse = createFlatClientCharge(19.876, "USD");
-
         Integer appliedChargeId = applyChargeToClient(clientId, chargesResponse.getResourceId(), new BigDecimal("19.876"));
-
         GetClientsChargesPageItems charge = getClientCharge(clientId, appliedChargeId.longValue());
-
         assertNotNull(charge);
         BigDecimal actualChargeAmount = charge.getAmount();
         BigDecimal expectedChargeAmount = new BigDecimal("19.88");
@@ -75,11 +70,8 @@ public class ClientChargeRoundingTest extends BaseLoanIntegrationTest {
     @Test
     public void shouldRoundJpyClientChargeTo_ZeroDecimalPlaces() throws Exception {
         PostChargesResponse chargesResponse = createFlatClientCharge(19.8, "JPY");
-
         Integer appliedChargeId = applyChargeToClient(clientId, chargesResponse.getResourceId(), new BigDecimal("19.8"));
-
         GetClientsChargesPageItems charge = getClientCharge(clientId, appliedChargeId.longValue());
-
         assertNotNull(charge);
         BigDecimal actualChargeAmount = charge.getAmount();
         BigDecimal expectedChargeAmount = new BigDecimal("20");
@@ -89,11 +81,8 @@ public class ClientChargeRoundingTest extends BaseLoanIntegrationTest {
     @Test
     public void shouldRoundUpJpyClientCharge_whenValueIsAboveHalfTo_ZeroDecimalPlaces() throws Exception {
         PostChargesResponse chargesResponse = createFlatClientCharge(0.55, "JPY");
-
         Integer appliedChargeId = applyChargeToClient(clientId, chargesResponse.getResourceId(), new BigDecimal("0.55"));
-
         GetClientsChargesPageItems charge = getClientCharge(clientId, appliedChargeId.longValue());
-
         assertNotNull(charge);
         BigDecimal actualChargeAmount = charge.getAmount();
         BigDecimal expectedChargeAmount = new BigDecimal("1");
@@ -103,9 +92,7 @@ public class ClientChargeRoundingTest extends BaseLoanIntegrationTest {
     @Test
     public void shouldFailToAddJpyClientCharge_whenRoundedToZero() throws Exception {
         PostChargesResponse chargesResponse = createFlatClientCharge(0.5, "JPY");
-
         Response response = applyChargeToClientRaw(clientId, chargesResponse.getResourceId(), new BigDecimal("0.5"));
-
         assertEquals(400, response.statusCode());
         String errorBody = response.asString();
         assertTrue(errorBody.contains("error.msg.client.charge.amount.rounded.to.zero"));
@@ -115,42 +102,37 @@ public class ClientChargeRoundingTest extends BaseLoanIntegrationTest {
     // -----------------------------
     // HELPERS
     // -----------------------------
-
     private PostChargesResponse createFlatClientCharge(double amount, String currencyCode) {
         String uniqueChargeName = "Client Charge Flat " + UUID.randomUUID().toString().replace("-", "");
-        return chargesHelper.createCharges(new ChargeRequest().name(uniqueChargeName).chargeAppliesTo(3) // CLIENT
-                .chargeTimeType(2).chargeCalculationType(1) // FLAT
-                .amount(amount).currencyCode(currencyCode).locale("en").active(true).penalty(false));
+        return chargesHelper.createCharges( // CLIENT
+        // FLAT
+        new ChargeRequest().name(uniqueChargeName).chargeAppliesTo(3).chargeTimeType(2).chargeCalculationType(1).amount(amount).currencyCode(currencyCode).locale("en").active(true).penalty(false));
     }
 
     private Integer applyChargeToClient(Long clientId, Long chargeId, BigDecimal amount) {
         String request = """
-                {
-                  "chargeId": %d,
-                  "amount": %s,
-                  "locale": "en",
-                  "dateFormat": "dd MMMM yyyy",
-                  "dueDate": "%s"
-                }
-                """.formatted(chargeId, amount.toPlainString(), DATE);
-
+            {
+              \"chargeId\": %d,
+              \"amount\": %s,
+              \"locale\": \"en\",
+              \"dateFormat\": \"dd MMMM yyyy\",
+              \"dueDate\": \"%s\"
+            }
+            """.formatted(chargeId, amount.toPlainString(), DATE);
         return addChargesForClient(requestSpec, responseSpec, clientId.intValue(), request);
     }
 
     private Response applyChargeToClientRaw(Long clientId, Long chargeId, BigDecimal amount) {
-
         String request = """
-                {
-                  "chargeId": %d,
-                  "amount": %s,
-                  "locale": "en",
-                  "dateFormat": "dd MMMM yyyy",
-                  "dueDate": "%s"
-                }
-                """.formatted(chargeId, amount.toPlainString(), DATE);
-
+            {
+              \"chargeId\": %d,
+              \"amount\": %s,
+              \"locale\": \"en\",
+              \"dateFormat\": \"dd MMMM yyyy\",
+              \"dueDate\": \"%s\"
+            }
+            """.formatted(chargeId, amount.toPlainString(), DATE);
         String url = "/fineract-provider/api/v1/clients/" + clientId + "/charges?" + Utils.TENANT_IDENTIFIER;
-
         return given().spec(requestSpec).body(request).when().post(url);
     }
 
@@ -159,10 +141,7 @@ public class ClientChargeRoundingTest extends BaseLoanIntegrationTest {
     }
 
     private boolean hasAnyClientCharges(Long clientId) throws IOException {
-
-        GetClientsClientIdChargesResponse response = FineractClientHelper.getFineractClient().clientCharges
-                .retrieveAllClientCharges(clientId, "all", null, null, null).execute().body();
-
+        GetClientsClientIdChargesResponse response = FineractClientHelper.getFineractClient().clientCharges.retrieveAllClientCharges(clientId, "all", null, null, null).execute().body();
         return response != null && response.getPageItems() != null && !response.getPageItems().isEmpty();
     }
 
@@ -176,11 +155,8 @@ public class ClientChargeRoundingTest extends BaseLoanIntegrationTest {
      */
     private void enableRequiredCurrencies() throws Exception {
         CurrencyUpdateRequest request = new CurrencyUpdateRequest().currencies(List.of("USD", "JPY"));
-
         FineractClientHelper.getFineractClient().currencies.updateCurrencies(request).execute();
-
         CurrencyConfigurationData data = FineractClientHelper.getFineractClient().currencies.retrieveCurrencies().execute().body();
-
         assertNotNull(data);
         assertNotNull(data.getSelectedCurrencyOptions());
         assertCurrencyEnabled(data, "USD");
@@ -188,7 +164,6 @@ public class ClientChargeRoundingTest extends BaseLoanIntegrationTest {
     }
 
     private void assertCurrencyEnabled(CurrencyConfigurationData data, String currencyCode) {
-        assertTrue(data.getSelectedCurrencyOptions().stream().anyMatch(c -> currencyCode.equals(c.getCode())),
-                "Currency " + currencyCode + " should be enabled");
+        assertTrue(data.getSelectedCurrencyOptions().stream().anyMatch(c -> currencyCode.equals(c.getCode())), "Currency " + currencyCode + " should be enabled");
     }
 }

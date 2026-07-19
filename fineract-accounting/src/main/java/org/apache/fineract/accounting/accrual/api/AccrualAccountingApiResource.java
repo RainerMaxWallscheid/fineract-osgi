@@ -30,7 +30,6 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.accrual.request.AccrualAccountRequest;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
@@ -42,26 +41,28 @@ import org.springframework.stereotype.Component;
 @Path("/v1/runaccruals")
 @Component
 @Tag(name = "Periodic Accrual Accounting", description = "Periodic Accrual is to accrue the loan income till the specific date or till batch job scheduled time.\n")
-@RequiredArgsConstructor
 public class AccrualAccountingApiResource {
-
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final DefaultToApiJsonSerializer<String> apiJsonSerializerService;
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Executes Periodic Accrual Accounting", operationId = "executePeriodicAccrualAccounting", method = "POST", description = """
-            Mandatory Fields
-
-            tillDate
-            """)
+        Mandatory Fields
+        
+        tillDate
+        """)
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = AccrualAccountingApiResourceSwagger.PostRunaccrualsRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK")
     public CommandProcessingResult executePeriodicAccrualAccounting(@Parameter(hidden = true) AccrualAccountRequest accrualAccountRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().excuteAccrualAccounting()
-                .withJson(apiJsonSerializerService.serialize(accrualAccountRequest)).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().excuteAccrualAccounting().withJson(apiJsonSerializerService.serialize(accrualAccountRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public AccrualAccountingApiResource(final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final DefaultToApiJsonSerializer<String> apiJsonSerializerService) {
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.apiJsonSerializerService = apiJsonSerializerService;
+    }
 }

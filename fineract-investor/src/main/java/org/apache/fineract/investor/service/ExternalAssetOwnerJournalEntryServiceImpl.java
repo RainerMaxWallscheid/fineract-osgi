@@ -19,8 +19,6 @@
 package org.apache.fineract.investor.service;
 
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.infrastructure.event.business.domain.journalentry.LoanJournalEntryCreatedBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
@@ -33,11 +31,10 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 @Conditional(InvestorModuleIsEnabledCondition.class)
 public class ExternalAssetOwnerJournalEntryServiceImpl implements ExternalAssetOwnerJournalEntryService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExternalAssetOwnerJournalEntryServiceImpl.class);
     private final BusinessEventNotifierService businessEventNotifierService;
     private final ExternalAssetOwnerJournalEntryMappingRepository externalAssetOwnerJournalEntryMappingRepository;
     private final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository;
@@ -47,9 +44,7 @@ public class ExternalAssetOwnerJournalEntryServiceImpl implements ExternalAssetO
     public void addListeners() {
         businessEventNotifierService.addPostBusinessEventListener(LoanJournalEntryCreatedBusinessEvent.class, event -> {
             JournalEntry journalEntry = event.get();
-
             Long loanId = loanTransactionRepository.findLoanIdById(journalEntry.getLoanTransactionId()).orElseThrow();
-
             externalAssetOwnerTransferLoanMappingRepository.findByLoanId(loanId).ifPresent(transferLoanMapping -> {
                 ExternalAssetOwnerJournalEntryMapping mapping = new ExternalAssetOwnerJournalEntryMapping();
                 mapping.setJournalEntry(journalEntry);
@@ -57,5 +52,13 @@ public class ExternalAssetOwnerJournalEntryServiceImpl implements ExternalAssetO
                 externalAssetOwnerJournalEntryMappingRepository.saveAndFlush(mapping);
             });
         });
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnerJournalEntryServiceImpl(final BusinessEventNotifierService businessEventNotifierService, final ExternalAssetOwnerJournalEntryMappingRepository externalAssetOwnerJournalEntryMappingRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final LoanTransactionRepository loanTransactionRepository) {
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.externalAssetOwnerJournalEntryMappingRepository = externalAssetOwnerJournalEntryMappingRepository;
+        this.externalAssetOwnerTransferLoanMappingRepository = externalAssetOwnerTransferLoanMappingRepository;
+        this.loanTransactionRepository = loanTransactionRepository;
     }
 }

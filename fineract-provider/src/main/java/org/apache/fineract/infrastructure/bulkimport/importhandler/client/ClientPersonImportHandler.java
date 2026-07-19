@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import lombok.AllArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -50,9 +49,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 public class ClientPersonImportHandler implements ImportHandler {
-
     public static final String SEPARATOR = "-";
     private static final Logger LOG = LoggerFactory.getLogger(ClientPersonImportHandler.class);
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
@@ -60,7 +57,6 @@ public class ClientPersonImportHandler implements ImportHandler {
 
     @Override
     public Count process(final Workbook workbook, final String locale, final String dateFormat) {
-
         List<ClientData> clients = readExcelFile(workbook, locale, dateFormat);
         return importEntity(workbook, clients, dateFormat, locale);
     }
@@ -106,7 +102,6 @@ public class ClientPersonImportHandler implements ImportHandler {
             mobileNo = Objects.requireNonNull(ImportHandlerUtils.readAsLong(ClientPersonConstants.MOBILE_NO_COL, row)).toString();
         }
         LocalDate dob = ImportHandlerUtils.readAsDate(ClientPersonConstants.DOB_COL, row);
-
         String clientType = ImportHandlerUtils.readAsString(ClientPersonConstants.CLIENT_TYPE_COL, row);
         Long clientTypeId = null;
         if (clientType != null) {
@@ -132,7 +127,6 @@ public class ClientPersonImportHandler implements ImportHandler {
             }
         }
         Boolean isStaff = ImportHandlerUtils.readAsBoolean(ClientPersonConstants.IS_STAFF_COL, row);
-
         AddressData addressDataObj = null;
         Collection<AddressData> addressList = null;
         if (ImportHandlerUtils.readAsBoolean(ClientPersonConstants.ADDRESS_ENABLED_COL, row)) {
@@ -140,7 +134,6 @@ public class ClientPersonImportHandler implements ImportHandler {
             Long addressTypeId = null;
             if (addressType != null) {
                 List<String> addressTypeAr = Splitter.on(SEPARATOR).splitToList(addressType);
-
                 if (addressTypeAr.size() > 1 && addressTypeAr.get(1) != null) {
                     addressTypeId = Long.parseLong(addressTypeAr.get(1));
                 }
@@ -150,10 +143,8 @@ public class ClientPersonImportHandler implements ImportHandler {
             String addressLine2 = ImportHandlerUtils.readAsString(ClientPersonConstants.ADDRESS_LINE_2_COL, row);
             String addressLine3 = ImportHandlerUtils.readAsString(ClientPersonConstants.ADDRESS_LINE_3_COL, row);
             String city = ImportHandlerUtils.readAsString(ClientPersonConstants.CITY_COL, row);
-
             String postalCode = ImportHandlerUtils.readAsString(ClientPersonConstants.POSTAL_CODE_COL, row);
             Boolean isActiveAddress = ImportHandlerUtils.readAsBoolean(ClientPersonConstants.IS_ACTIVE_ADDRESS_COL, row);
-
             String stateProvince = ImportHandlerUtils.readAsString(ClientPersonConstants.STATE_PROVINCE_COL, row);
             Long stateProvinceId = null;
             if (stateProvince != null) {
@@ -173,14 +164,10 @@ public class ClientPersonImportHandler implements ImportHandler {
                     countryId = Long.parseLong(countryAr.get(1));
                 }
             }
-            addressDataObj = new AddressData(addressTypeId, street, addressLine1, addressLine2, addressLine3, city, postalCode,
-                    isActiveAddress, stateProvinceId, countryId);
+            addressDataObj = new AddressData(addressTypeId, street, addressLine1, addressLine2, addressLine3, city, postalCode, isActiveAddress, stateProvinceId, countryId);
             addressList = new ArrayList<>(List.of(addressDataObj));
         }
-        return ClientData.importClientPersonInstance(legalFormId, row.getRowNum(), firstName, lastName, middleName, submittedOn,
-                activationDate, active, externalId, officeId, staffId, mobileNo, dob, clientTypeId, genderId, clientClassificationId,
-                isStaff, addressList, locale, dateFormat);
-
+        return ClientData.importClientPersonInstance(legalFormId, row.getRowNum(), firstName, lastName, middleName, submittedOn, activationDate, active, externalId, officeId, staffId, mobileNo, dob, clientTypeId, genderId, clientClassificationId, isStaff, addressList, locale, dateFormat);
     }
 
     public Count importEntity(final Workbook workbook, final List<ClientData> clients, final String dateFormat, String locale) {
@@ -193,10 +180,10 @@ public class ClientPersonImportHandler implements ImportHandler {
         for (ClientData client : clients) {
             try {
                 String payload = gsonBuilder.create().toJson(client);
-                final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-                        .createClient() //
-                        .withJson(payload) //
-                        .build(); //
+                final CommandWrapper commandRequest =  //
+                //
+                //
+                new CommandWrapperBuilder().createClient().withJson(payload).build(); //
                 commandsSourceWritePlatformService.logCommandSource(commandRequest);
                 successCount++;
                 Cell statusCell = clientSheet.getRow(client.getRowIndex()).createCell(ClientPersonConstants.STATUS_COL);
@@ -210,10 +197,13 @@ public class ClientPersonImportHandler implements ImportHandler {
             }
         }
         clientSheet.setColumnWidth(ClientPersonConstants.STATUS_COL, TemplatePopulateImportConstants.SMALL_COL_SIZE);
-        ImportHandlerUtils.writeString(ClientPersonConstants.STATUS_COL,
-                clientSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX), TemplatePopulateImportConstants.STATUS_COLUMN_HEADER);
-
+        ImportHandlerUtils.writeString(ClientPersonConstants.STATUS_COL, clientSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX), TemplatePopulateImportConstants.STATUS_COLUMN_HEADER);
         return Count.instance(successCount, errorCount);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ClientPersonImportHandler(final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final ExternalIdFactory externalIdFactory) {
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.externalIdFactory = externalIdFactory;
+    }
 }

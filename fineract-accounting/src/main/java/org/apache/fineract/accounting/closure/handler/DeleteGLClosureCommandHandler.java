@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.accounting.closure.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.closure.service.GLClosureWritePlatformService;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "GLCLOSURE", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteGLClosureCommandHandler implements NewCommandSourceHandler {
-
     private final GLClosureWritePlatformService closureWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.closureWritePlatformService.deleteGLClosure(command.entityId());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DeleteGLClosureCommandHandler(final GLClosureWritePlatformService closureWritePlatformService) {
+        this.closureWritePlatformService = closureWritePlatformService;
     }
 }

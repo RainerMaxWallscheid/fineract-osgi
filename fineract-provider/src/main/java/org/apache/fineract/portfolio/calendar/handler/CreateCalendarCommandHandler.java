@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.calendar.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "CALENDAR", action = "CREATE")
-@RequiredArgsConstructor
 public class CreateCalendarCommandHandler implements NewCommandSourceHandler {
-
     private final CalendarWritePlatformService writePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class CreateCalendarCommandHandler implements NewCommandSourceHandler {
         return this.writePlatformService.createCalendar(command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public CreateCalendarCommandHandler(final CalendarWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
+    }
 }

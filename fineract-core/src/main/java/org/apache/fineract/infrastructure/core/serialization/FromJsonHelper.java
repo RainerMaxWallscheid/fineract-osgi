@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.InvalidJsonException;
@@ -46,11 +45,11 @@ import org.apache.fineract.infrastructure.core.exception.UnsupportedParameterExc
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Primary
 @Component
 public class FromJsonHelper {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FromJsonHelper.class);
     private final Gson gsonConverter;
     private final JsonParserHelper helperDelegator;
 
@@ -87,16 +86,13 @@ public class FromJsonHelper {
         if (StringUtils.isBlank(json)) {
             throw new InvalidJsonException();
         }
-
         final Map<String, Object> requestMap = this.gsonConverter.fromJson(json, typeOfMap);
-
         final List<String> unsupportedParameterList = new ArrayList<>();
         for (final String providedParameter : requestMap.keySet()) {
             if (!supportedParams.contains(providedParameter)) {
                 unsupportedParameterList.add(providedParameter);
             }
         }
-
         if (!unsupportedParameterList.isEmpty()) {
             throw new UnsupportedParameterException(unsupportedParameterList);
         }
@@ -106,16 +102,13 @@ public class FromJsonHelper {
         if (object == null) {
             throw new InvalidParameterException();
         }
-
         final Set<Map.Entry<String, JsonElement>> entries = object.entrySet();
         final List<String> unsupportedParameterList = new ArrayList<>();
-
         for (final Map.Entry<String, JsonElement> providedParameter : entries) {
             if (!supportedParams.contains(providedParameter.getKey())) {
                 unsupportedParameterList.add(providedParameter.getKey());
             }
         }
-
         if (!unsupportedParameterList.isEmpty()) {
             throw new UnsupportedParameterException(unsupportedParameterList);
         }
@@ -130,8 +123,7 @@ public class FromJsonHelper {
      * @param supportedParams
      */
     @SuppressWarnings("AvoidHidingCauseException")
-    public void checkForUnsupportedNestedParameters(final String parentPropertyName, final JsonObject object,
-            final Set<String> supportedParams) {
+    public void checkForUnsupportedNestedParameters(final String parentPropertyName, final JsonObject object, final Set<String> supportedParams) {
         try {
             checkForUnsupportedParameters(object, supportedParams);
         } catch (UnsupportedParameterException exception) {
@@ -143,11 +135,9 @@ public class FromJsonHelper {
             }
             throw new UnsupportedParameterException(updatedUnsupportedParameters);
         }
-
     }
 
     public JsonElement parse(final String json) {
-
         JsonElement parsedElement = null;
         if (StringUtils.isNotBlank(json)) {
             parsedElement = JsonParser.parseString(json);
@@ -206,8 +196,7 @@ public class FromJsonHelper {
         return this.helperDelegator.extractMonthDayNamed(parameterName, element);
     }
 
-    public MonthDay extractMonthDayNamed(final String parameterName, final JsonObject object, final String dateFormat,
-            final Locale clientApplicationLocale) {
+    public MonthDay extractMonthDayNamed(final String parameterName, final JsonObject object, final String dateFormat, final Locale clientApplicationLocale) {
         return this.helperDelegator.extractMonthDayNamed(parameterName, object, dateFormat, clientApplicationLocale);
     }
 
@@ -223,8 +212,7 @@ public class FromJsonHelper {
         return this.helperDelegator.extractLocalDateTimeNamed(parameterName, element, new HashSet<>());
     }
 
-    public LocalTime extractLocalTimeNamed(final String parameterName, final JsonElement element, final String dateFormat,
-            final Locale locale) {
+    public LocalTime extractLocalTimeNamed(final String parameterName, final JsonElement element, final String dateFormat, final Locale locale) {
         return this.helperDelegator.extractLocalTimeNamed(parameterName, element, dateFormat, locale, new HashSet<>());
     }
 
@@ -232,8 +220,7 @@ public class FromJsonHelper {
         return this.helperDelegator.extractLocalTimeNamed(parameterName, element, timeFormat, new HashSet<>());
     }
 
-    public LocalDateTime extractLocalDateTimeNamed(final String parameterName, final JsonElement element, final String dateFormat,
-            final Locale locale) {
+    public LocalDateTime extractLocalDateTimeNamed(final String parameterName, final JsonElement element, final String dateFormat, final Locale locale) {
         return this.helperDelegator.extractLocalDateTimeNamed(parameterName, element, dateFormat, locale, new HashSet<>());
     }
 
@@ -241,18 +228,15 @@ public class FromJsonHelper {
         return this.helperDelegator.extractLocalDateTimeNamed(parameterName, element, timeFormat, new HashSet<>());
     }
 
-    public LocalDate extractLocalDateNamed(final String parameterName, final JsonElement element, final String dateFormat,
-            final Locale locale) {
+    public LocalDate extractLocalDateNamed(final String parameterName, final JsonElement element, final String dateFormat, final Locale locale) {
         return this.helperDelegator.extractLocalDateNamed(parameterName, element.getAsJsonObject(), dateFormat, locale, new HashSet<>());
     }
 
-    public LocalDate extractLocalDateNamed(final String parameterName, final JsonElement element,
-            final Set<String> parametersPassedInRequest) {
+    public LocalDate extractLocalDateNamed(final String parameterName, final JsonElement element, final Set<String> parametersPassedInRequest) {
         return this.helperDelegator.extractLocalDateNamed(parameterName, element, parametersPassedInRequest);
     }
 
-    public LocalDate extractLocalDateAsArrayNamed(final String parameterName, final JsonElement element,
-            final Set<String> parametersPassedInRequest) {
+    public LocalDate extractLocalDateAsArrayNamed(final String parameterName, final JsonElement element, final Set<String> parametersPassedInRequest) {
         return this.helperDelegator.extractLocalDateAsArrayNamed(parameterName, element, parametersPassedInRequest);
     }
 
@@ -260,8 +244,7 @@ public class FromJsonHelper {
         return this.helperDelegator.extractBigDecimalWithLocaleNamed(parameterName, element, new HashSet<String>());
     }
 
-    public BigDecimal extractBigDecimalWithLocaleNamed(final String parameterName, final JsonElement element,
-            final Set<String> parametersPassedInRequest) {
+    public BigDecimal extractBigDecimalWithLocaleNamed(final String parameterName, final JsonElement element, final Set<String> parametersPassedInRequest) {
         return this.helperDelegator.extractBigDecimalWithLocaleNamed(parameterName, element, parametersPassedInRequest);
     }
 
@@ -269,8 +252,7 @@ public class FromJsonHelper {
         return this.helperDelegator.extractBigDecimalNamed(parameterName, element.getAsJsonObject(), locale, new HashSet<String>());
     }
 
-    public BigDecimal extractBigDecimalNamed(final String parameterName, final JsonElement element,
-            final Set<String> parametersPassedInRequest) {
+    public BigDecimal extractBigDecimalNamed(final String parameterName, final JsonElement element, final Set<String> parametersPassedInRequest) {
         return this.helperDelegator.extractBigDecimalNamed(parameterName, element.getAsJsonObject(), Locale.US, parametersPassedInRequest);
     }
 
@@ -282,8 +264,7 @@ public class FromJsonHelper {
         return this.helperDelegator.extractIntegerSansLocaleNamed(parameterName, element.getAsJsonObject(), new HashSet<String>());
     }
 
-    public Integer extractIntegerWithLocaleNamed(final String parameterName, final JsonElement element,
-            final Set<String> parametersPassedInRequest) {
+    public Integer extractIntegerWithLocaleNamed(final String parameterName, final JsonElement element, final Set<String> parametersPassedInRequest) {
         return this.helperDelegator.extractIntegerWithLocaleNamed(parameterName, element.getAsJsonObject(), parametersPassedInRequest);
     }
 
@@ -325,8 +306,7 @@ public class FromJsonHelper {
                 return null;
             }
         } catch (IllegalArgumentException e) {
-            throw new PlatformApiDataValidationException(List.of(ApiParameterError.parameterError("validation.msg.enum.value.not.found",
-                    "Enum value not exists: ", enumType.getName(), value)), e);
+            throw new PlatformApiDataValidationException(List.of(ApiParameterError.parameterError("validation.msg.enum.value.not.found", "Enum value not exists: ", enumType.getName(), value)), e);
         }
     }
 

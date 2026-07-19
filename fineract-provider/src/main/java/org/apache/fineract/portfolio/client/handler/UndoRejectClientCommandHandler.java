@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.client.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,15 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "CLIENT", action = "UNDOREJECT")
-@RequiredArgsConstructor
 public class UndoRejectClientCommandHandler implements NewCommandSourceHandler {
-
     private final ClientWritePlatformService clientWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.clientWritePlatformService.undoRejection(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UndoRejectClientCommandHandler(final ClientWritePlatformService clientWritePlatformService) {
+        this.clientWritePlatformService = clientWritePlatformService;
     }
 }

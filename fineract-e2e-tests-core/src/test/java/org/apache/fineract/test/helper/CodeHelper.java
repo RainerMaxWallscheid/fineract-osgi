@@ -19,9 +19,7 @@
 package org.apache.fineract.test.helper;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
-
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.GetCodesResponse;
 import org.apache.fineract.client.models.PostCodeValueDataResponse;
@@ -29,19 +27,15 @@ import org.apache.fineract.client.models.PostCodeValuesDataRequest;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class CodeHelper {
-
     private static final String COUNTRY_CODE_NAME = "COUNTRY";
     private static final String STATE_CODE_NAME = "STATE";
     private static final String ADDRESS_TYPE_CODE_NAME = "ADDRESS_TYPE";
-
     private final FineractFeignClient fineractClient;
 
     public PostCodeValueDataResponse createAddressTypeCodeValue(String addressTypeName) {
         Long codeId = retrieveCodeByName(ADDRESS_TYPE_CODE_NAME).getId();
-        return ok(
-                () -> fineractClient.codeValues().createCodeValue(codeId, new PostCodeValuesDataRequest().name(addressTypeName), Map.of()));
+        return ok(() -> fineractClient.codeValues().createCodeValue(codeId, new PostCodeValuesDataRequest().name(addressTypeName), Map.of()));
     }
 
     public PostCodeValueDataResponse createCountryCodeValue(String countryName) {
@@ -55,11 +49,15 @@ public class CodeHelper {
     }
 
     public GetCodesResponse retrieveCodeByName(String name) {
-        return ok(() -> fineractClient.codes().retrieveAllCodes(Map.of())).stream().filter(r -> name.equals(r.getName())).findAny()
-                .orElseThrow(() -> new IllegalArgumentException("Code with name " + name + " has not been found"));
+        return ok(() -> fineractClient.codes().retrieveAllCodes(Map.of())).stream().filter(r -> name.equals(r.getName())).findAny().orElseThrow(() -> new IllegalArgumentException("Code with name " + name + " has not been found"));
     }
 
     public PostCodeValueDataResponse createCodeValue(Long codeId, PostCodeValuesDataRequest request) {
         return ok(() -> fineractClient.codeValues().createCodeValue(codeId, request, Map.of()));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeHelper(final FineractFeignClient fineractClient) {
+        this.fineractClient = fineractClient;
     }
 }

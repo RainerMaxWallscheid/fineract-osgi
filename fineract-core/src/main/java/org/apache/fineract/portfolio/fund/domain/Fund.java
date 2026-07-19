@@ -24,31 +24,23 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
-@Table(name = "m_fund", uniqueConstraints = { @UniqueConstraint(columnNames = { "name" }, name = "fund_name_org"),
-        @UniqueConstraint(columnNames = { "external_id" }, name = "fund_externalid_org") })
+@Table(name = "m_fund", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"}, name = "fund_name_org"), @UniqueConstraint(columnNames = {"external_id"}, name = "fund_externalid_org")})
 public class Fund extends AbstractPersistableCustom<Long> {
-
-    @Getter
     @Column(name = "name")
     private String name;
-
     @Column(name = "external_id", length = 100)
     private String externalId;
 
     public static Fund fromJson(final JsonCommand command) {
-
         final String firstnameParamName = "name";
         final String name = command.stringValueOfParameterNamed(firstnameParamName);
-
         final String lastnameParamName = "externalId";
         final String externalId = command.stringValueOfParameterNamed(lastnameParamName);
-
         return new Fund(name, externalId);
     }
 
@@ -62,23 +54,24 @@ public class Fund extends AbstractPersistableCustom<Long> {
     }
 
     public Map<String, Object> update(final JsonCommand command) {
-
         final Map<String, Object> actualChanges = new LinkedHashMap<>(7);
-
         final String nameParamName = "name";
         if (command.isChangeInStringParameterNamed(nameParamName, this.name)) {
             final String newValue = command.stringValueOfParameterNamed(nameParamName);
             actualChanges.put(nameParamName, newValue);
             this.name = StringUtils.defaultIfEmpty(newValue, null);
         }
-
         final String externalIdParamName = "externalId";
         if (command.isChangeInStringParameterNamed(externalIdParamName, this.externalId)) {
             final String newValue = command.stringValueOfParameterNamed(externalIdParamName);
             actualChanges.put(externalIdParamName, newValue);
             this.externalId = StringUtils.defaultIfEmpty(newValue, null);
         }
-
         return actualChanges;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
     }
 }

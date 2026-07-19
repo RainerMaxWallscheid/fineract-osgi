@@ -19,17 +19,40 @@
 package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
-@AllArgsConstructor
-@ToString
-@Getter
-@Setter
 public class LoanDelinquencyData {
-
     private CollectionData loanCollectionData;
     private Map<Long, CollectionData> loanInstallmentsCollectionData;
+
+    @java.lang.SuppressWarnings("all")
+        public LoanDelinquencyData(final CollectionData loanCollectionData, final Map<Long, CollectionData> loanInstallmentsCollectionData) {
+        this.loanCollectionData = loanCollectionData;
+        this.loanInstallmentsCollectionData = loanInstallmentsCollectionData;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "LoanDelinquencyData(loanCollectionData=" + this.getLoanCollectionData() + ", loanInstallmentsCollectionData=" + this.getLoanInstallmentsCollectionData() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CollectionData getLoanCollectionData() {
+        return this.loanCollectionData;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Map<Long, CollectionData> getLoanInstallmentsCollectionData() {
+        return this.loanInstallmentsCollectionData;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanCollectionData(final CollectionData loanCollectionData) {
+        this.loanCollectionData = loanCollectionData;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanInstallmentsCollectionData(final Map<Long, CollectionData> loanInstallmentsCollectionData) {
+        this.loanInstallmentsCollectionData = loanInstallmentsCollectionData;
+    }
 }

@@ -19,58 +19,48 @@
 package org.apache.fineract.infrastructure.core.service.database;
 
 import static java.lang.String.format;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.exception.PlatformServiceUnavailableException;
 import org.springframework.lang.NonNull;
 
-@AllArgsConstructor
-@Getter
 public enum SqlOperator {
-
-    EQ("="), //
-    NEQ("<>"), //
-    GTE(">="), //
-    LTE("<="), //
-    GT(">"), //
-    LT("<"), //
-    LIKE("LIKE") { //
-
+    EQ("="),  //
+    NEQ("<>"),  //
+    GTE(">="),  //
+    LTE("<="),  //
+    GT(">"),  //
+    LT("<"),  //
+    LIKE("LIKE") {
+        //
         @Override
-        public String formatImpl(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition,
-                String... values) {
+        public String formatImpl(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition, String... values) {
             return format("%s %s %s", definition, getSymbol(), sqlGenerator.formatValue(columnType, "%" + values[0] + "%"));
         }
 
         @Override
         public String formatPlaceholderImpl(String definition, int paramCount, String placeholder) {
-            return format("%s %s CONCAT('%%', %s, '%%')", definition, getSymbol(), placeholder);
+            return format("%s %s CONCAT(\'%%\', %s, \'%%\')", definition, getSymbol(), placeholder);
         }
     },
-    NLIKE("NOT LIKE") { //
-
+    NLIKE("NOT LIKE") {
+        //
         @Override
-        public String formatImpl(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition,
-                String... values) {
+        public String formatImpl(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition, String... values) {
             return format("%s %s %s", definition, getSymbol(), sqlGenerator.formatValue(columnType, "%" + values[0] + "%"));
         }
 
         @Override
         public String formatPlaceholderImpl(String definition, int paramCount, String placeholder) {
-            return format("%s %s CONCAT('%%', %s, '%%')", definition, getSymbol(), placeholder);
+            return format("%s %s CONCAT(\'%%\', %s, \'%%\')", definition, getSymbol(), placeholder);
         }
     },
-    BTW("BETWEEN", 2) { //
-
+    BTW("BETWEEN", 2) {
+        //
         @Override
-        public String formatImpl(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition,
-                String... values) {
-            return format("%s %s %s AND %s", definition, getSymbol(), sqlGenerator.formatValue(columnType, values[0]),
-                    sqlGenerator.formatValue(columnType, values[1]));
+        public String formatImpl(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition, String... values) {
+            return format("%s %s %s AND %s", definition, getSymbol(), sqlGenerator.formatValue(columnType, values[0]), sqlGenerator.formatValue(columnType, values[1]));
         }
 
         @Override
@@ -78,13 +68,11 @@ public enum SqlOperator {
             return format("%s %s %s AND %s", definition, getSymbol(), placeholder, placeholder);
         }
     },
-    NBTW("NOT BETWEEN", 2) { //
-
+    NBTW("NOT BETWEEN", 2) {
+        //
         @Override
-        public String formatImpl(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition,
-                String... values) {
-            return format("%s %s %s AND %s", definition, getSymbol(), sqlGenerator.formatValue(columnType, values[0]),
-                    sqlGenerator.formatValue(columnType, values[1]));
+        public String formatImpl(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition, String... values) {
+            return format("%s %s %s AND %s", definition, getSymbol(), sqlGenerator.formatValue(columnType, values[0]), sqlGenerator.formatValue(columnType, values[1]));
         }
 
         @Override
@@ -92,13 +80,11 @@ public enum SqlOperator {
             return format("%s %s %s AND %s", definition, getSymbol(), placeholder, placeholder);
         }
     },
-    IN("IN", -1) { //
-
+    IN("IN", -1) {
+        //
         @Override
-        public String formatImpl(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition,
-                String... values) {
-            return format("%s %s (%s)", definition, getSymbol(),
-                    Arrays.stream(values).map(e -> sqlGenerator.formatValue(columnType, e)).collect(Collectors.joining(", ")));
+        public String formatImpl(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition, String... values) {
+            return format("%s %s (%s)", definition, getSymbol(), Arrays.stream(values).map(e -> sqlGenerator.formatValue(columnType, e)).collect(Collectors.joining(", ")));
         }
 
         @Override
@@ -111,13 +97,11 @@ public enum SqlOperator {
             return format("%s %s (%s)", definition, getSymbol(), namedParam);
         }
     },
-    NIN("NOT IN", -1) { //
-
+    NIN("NOT IN", -1) {
+        //
         @Override
-        public String formatImpl(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition,
-                String... values) {
-            return format("%s %s (%s)", definition, getSymbol(),
-                    Arrays.stream(values).map(e -> sqlGenerator.formatValue(columnType, e)).collect(Collectors.joining(", ")));
+        public String formatImpl(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition, String... values) {
+            return format("%s %s (%s)", definition, getSymbol(), Arrays.stream(values).map(e -> sqlGenerator.formatValue(columnType, e)).collect(Collectors.joining(", ")));
         }
 
         @Override
@@ -130,10 +114,9 @@ public enum SqlOperator {
             return format("%s %s (%s)", definition, getSymbol(), namedParam);
         }
     },
-    NULL("IS NULL", 0), //
-    NNULL("IS NOT NULL", 0), //
-    ;
-
+    NULL("IS NULL", 0),  //
+    NNULL("IS NOT NULL", 0);
+    //
     private final String symbol;
     private final int paramCount;
 
@@ -153,28 +136,23 @@ public enum SqlOperator {
         return paramCount < 0;
     }
 
-    public String formatSql(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition, String alias,
-            List<String> values) {
+    public String formatSql(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition, String alias, List<String> values) {
         return formatSql(sqlGenerator, columnType, definition, alias, values == null ? null : values.toArray(String[]::new));
     }
 
-    public String formatSql(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition, String alias,
-            String... values) {
+    public String formatSql(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition, String alias, String... values) {
         validateValues(values);
         return formatImpl(sqlGenerator, columnType, sqlGenerator.alias(sqlGenerator.escape(definition), alias), values);
     }
 
-    protected String formatImpl(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition,
-            String... values) {
-        return paramCount == 0 ? format("%s %s", definition, symbol)
-                : format("%s %s %s", definition, symbol, sqlGenerator.formatValue(columnType, values[0]));
+    protected String formatImpl(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, JdbcJavaType columnType, String definition, String... values) {
+        return paramCount == 0 ? format("%s %s", definition, symbol) : format("%s %s %s", definition, symbol, sqlGenerator.formatValue(columnType, values[0]));
     }
 
     public String formatNamedParam(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, String definition, int paramCount, String alias) {
         validateParamCount(paramCount);
         if (paramCount > 1) {
-            throw new PlatformServiceUnavailableException("error.msg.database.operator.named.invalid",
-                    "Named parameter is not allowed on " + this);
+            throw new PlatformServiceUnavailableException("error.msg.database.operator.named.invalid", "Named parameter is not allowed on " + this);
         }
         return formatNamedParamImpl(sqlGenerator.alias(sqlGenerator.escape(definition), alias), paramCount, ":" + definition);
     }
@@ -187,8 +165,7 @@ public enum SqlOperator {
         return formatPlaceholder(sqlGenerator, definition, paramCount, alias, "?");
     }
 
-    public String formatPlaceholder(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, String definition, int paramCount, String alias,
-            String placeholder) {
+    public String formatPlaceholder(@NonNull DatabaseSpecificSQLGenerator sqlGenerator, String definition, int paramCount, String alias, String placeholder) {
         validateParamCount(paramCount);
         return formatPlaceholderImpl(sqlGenerator.alias(sqlGenerator.escape(definition), alias), paramCount, placeholder);
     }
@@ -207,13 +184,28 @@ public enum SqlOperator {
 
     public void validateParamCount(int paramCount) {
         if (this.paramCount < 0 ? paramCount < -this.paramCount : paramCount != this.paramCount) {
-            throw new PlatformServiceUnavailableException("error.msg.database.operator.invalid",
-                    "Number of parameters " + paramCount + " must be " + Math.abs(this.paramCount) + " on " + this);
+            throw new PlatformServiceUnavailableException("error.msg.database.operator.invalid", "Number of parameters " + paramCount + " must be " + Math.abs(this.paramCount) + " on " + this);
         }
     }
 
     @NonNull
     public static SqlOperator forName(String name) {
         return name == null ? getDefault() : SqlOperator.valueOf(name.toUpperCase());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private SqlOperator(final String symbol, final int paramCount) {
+        this.symbol = symbol;
+        this.paramCount = paramCount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getSymbol() {
+        return this.symbol;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public int getParamCount() {
+        return this.paramCount;
     }
 }

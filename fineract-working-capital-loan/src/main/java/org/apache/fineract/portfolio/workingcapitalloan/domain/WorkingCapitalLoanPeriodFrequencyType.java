@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.portfolio.workingcapitalloan.domain;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.ApiFacingEnum;
 import org.apache.fineract.infrastructure.core.data.StringEnumOptionData;
 import org.springframework.util.StringUtils;
@@ -27,16 +25,12 @@ import org.springframework.util.StringUtils;
 /**
  * Period frequency types for Working Capital Loan Product.
  */
-@Getter
-@RequiredArgsConstructor
 public enum WorkingCapitalLoanPeriodFrequencyType implements ApiFacingEnum<WorkingCapitalLoanPeriodFrequencyType> {
-
-    DAYS(1, "DAYS", "Days"), //
-    WEEKS(2, "WEEKS", "Weeks"), //
-    MONTHS(3, "MONTHS", "Months"), //
+    DAYS(1, "DAYS", "Days"),  //
+    WEEKS(2, "WEEKS", "Weeks"),  //
+    MONTHS(3, "MONTHS", "Months"),  //
     YEARS(4, "YEARS", "Years") //
     ;
-
     private final Integer value;
     private final String code;
     private final String humanReadableName;
@@ -48,7 +42,6 @@ public enum WorkingCapitalLoanPeriodFrequencyType implements ApiFacingEnum<Worki
         if (!StringUtils.hasText(periodFrequencyTypeValue)) {
             return null;
         }
-
         if (periodFrequencyTypeValue.trim().equalsIgnoreCase(DAYS.name())) {
             return DAYS;
         }
@@ -61,11 +54,32 @@ public enum WorkingCapitalLoanPeriodFrequencyType implements ApiFacingEnum<Worki
         if (periodFrequencyTypeValue.trim().equalsIgnoreCase(YEARS.name())) {
             return YEARS;
         }
-
         return null;
     }
 
     public StringEnumOptionData toStringEnumOptionData() {
         return new StringEnumOptionData(name(), getCode(), name());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private WorkingCapitalLoanPeriodFrequencyType(final Integer value, final String code, final String humanReadableName) {
+        this.value = value;
+        this.code = code;
+        this.humanReadableName = humanReadableName;
     }
 }

@@ -18,11 +18,40 @@
  */
 package org.apache.fineract.infrastructure.documentmanagement.command;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.infrastructure.documentmanagement.data.ImageDeleteRequest;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class ImageDeleteCommand extends Command<ImageDeleteRequest> {}
+public class ImageDeleteCommand extends Command<ImageDeleteRequest> {
+	@java.lang.SuppressWarnings("all")
+		public ImageDeleteCommand() {
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public java.lang.String toString() {
+		return "ImageDeleteCommand()";
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public boolean equals(final java.lang.Object o) {
+		if (o == this) return true;
+		if (!(o instanceof ImageDeleteCommand)) return false;
+		final ImageDeleteCommand other = (ImageDeleteCommand) o;
+		if (!other.canEqual((java.lang.Object) this)) return false;
+		if (!super.equals(o)) return false;
+		return true;
+	}
+
+	@java.lang.SuppressWarnings("all")
+		protected boolean canEqual(final java.lang.Object other) {
+		return other instanceof ImageDeleteCommand;
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public int hashCode() {
+		final int result = super.hashCode();
+		return result;
+	}
+}

@@ -18,15 +18,12 @@
  */
 package org.apache.fineract.test.messaging.store;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.activemq.command.ActiveMQBytesMessage;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class MessageConsumer {
-
     private final EventStore eventStore;
 
     @JmsListener(id = "eventStoreListener", destination = "${fineract-test.messaging.jms.topic-name}")
@@ -38,5 +35,10 @@ public class MessageConsumer {
         } catch (Exception e) {
             throw new RuntimeException("Error while consuming message", e);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MessageConsumer(final EventStore eventStore) {
+        this.eventStore = eventStore;
     }
 }

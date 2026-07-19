@@ -25,7 +25,6 @@ import static org.apache.fineract.portfolio.interestratechart.InterestRateChartS
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartSlabApiConstants.fromPeriodParamName;
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartSlabApiConstants.periodTypeParamName;
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartSlabApiConstants.toPeriodParamName;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.math.BigDecimal;
@@ -35,39 +34,27 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.savings.SavingsPeriodFrequencyType;
 
 @Embeddable
-@Getter
-@Setter
 public class InterestRateChartSlabFields {
-
     @Column(name = "description", nullable = true)
     private String description;
-
     @Column(name = "period_type_enum", nullable = true)
     private Integer periodType;
-
     @Column(name = "from_period")
     private Integer fromPeriod;
-
     @Column(name = "to_period")
     private Integer toPeriod;
-
     @Column(name = "amount_range_from", scale = 6, precision = 19)
     private BigDecimal amountRangeFrom;
-
     @Column(name = "amount_range_to", scale = 6, precision = 19)
     private BigDecimal amountRangeTo;
-
     @Column(name = "annual_interest_rate", scale = 6, precision = 19, nullable = false)
     private BigDecimal annualInterestRate;
-
     @Column(name = "currency_code", nullable = false)
     private String currencyCode;
 
@@ -75,19 +62,13 @@ public class InterestRateChartSlabFields {
         //
     }
 
-    public static InterestRateChartSlabFields createNew(final String description, final SavingsPeriodFrequencyType periodFrequencyType,
-            final Integer fromPeriod, final Integer toPeriod, final BigDecimal amountRangeFrom, final BigDecimal amountRangeTo,
-            final BigDecimal annualInterestRate, final String currencyCode) {
-        return new InterestRateChartSlabFields(description, periodFrequencyType, fromPeriod, toPeriod, amountRangeFrom, amountRangeTo,
-                annualInterestRate, currencyCode);
+    public static InterestRateChartSlabFields createNew(final String description, final SavingsPeriodFrequencyType periodFrequencyType, final Integer fromPeriod, final Integer toPeriod, final BigDecimal amountRangeFrom, final BigDecimal amountRangeTo, final BigDecimal annualInterestRate, final String currencyCode) {
+        return new InterestRateChartSlabFields(description, periodFrequencyType, fromPeriod, toPeriod, amountRangeFrom, amountRangeTo, annualInterestRate, currencyCode);
     }
 
-    private InterestRateChartSlabFields(final String description, final SavingsPeriodFrequencyType periodFrequencyType,
-            final Integer fromPeriod, final Integer toPeriod, final BigDecimal amountRangeFrom, final BigDecimal amountRangeTo,
-            final BigDecimal annualInterestRate, final String currencyCode) {
+    private InterestRateChartSlabFields(final String description, final SavingsPeriodFrequencyType periodFrequencyType, final Integer fromPeriod, final Integer toPeriod, final BigDecimal amountRangeFrom, final BigDecimal amountRangeTo, final BigDecimal annualInterestRate, final String currencyCode) {
         this.description = description;
-        this.periodType = (periodFrequencyType == null || periodFrequencyType == SavingsPeriodFrequencyType.INVALID) ? null
-                : periodFrequencyType.getValue();
+        this.periodType = (periodFrequencyType == null || periodFrequencyType == SavingsPeriodFrequencyType.INVALID) ? null : periodFrequencyType.getValue();
         this.fromPeriod = fromPeriod;
         this.toPeriod = toPeriod;
         this.amountRangeFrom = amountRangeFrom;
@@ -96,65 +77,53 @@ public class InterestRateChartSlabFields {
         this.currencyCode = currencyCode;
     }
 
-    public void update(final JsonCommand command, final Map<String, Object> actualChanges, final DataValidatorBuilder baseDataValidator,
-            final Locale locale) {
-
+    public void update(final JsonCommand command, final Map<String, Object> actualChanges, final DataValidatorBuilder baseDataValidator, final Locale locale) {
         if (command.isChangeInStringParameterNamed(descriptionParamName, this.description)) {
             final String newValue = command.stringValueOfParameterNamed(descriptionParamName);
             actualChanges.put(descriptionParamName, newValue);
             this.description = newValue;
         }
-
         if (command.isChangeInIntegerParameterNamed(periodTypeParamName, this.periodType, locale)) {
             final Integer newValue = command.integerValueOfParameterNamed(periodTypeParamName, locale);
             actualChanges.put(periodTypeParamName, newValue);
             this.periodType = newValue;
         }
-
         if (command.isChangeInIntegerParameterNamed(fromPeriodParamName, this.fromPeriod, locale)) {
             final Integer newValue = command.integerValueOfParameterNamed(fromPeriodParamName, locale);
             actualChanges.put(fromPeriodParamName, newValue);
             this.fromPeriod = newValue;
         }
-
         if (command.isChangeInIntegerParameterNamed(toPeriodParamName, this.toPeriod, locale)) {
             final Integer newValue = command.integerValueOfParameterNamed(toPeriodParamName, locale);
             actualChanges.put(toPeriodParamName, newValue);
             this.toPeriod = newValue;
         }
-
         if (command.isChangeInBigDecimalParameterNamed(amountRangeFromParamName, this.amountRangeFrom, locale)) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(amountRangeFromParamName, locale);
             actualChanges.put(amountRangeFromParamName, newValue);
             this.amountRangeFrom = newValue;
         }
-
         if (command.isChangeInBigDecimalParameterNamed(amountRangeToParamName, this.amountRangeTo, locale)) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(amountRangeToParamName, locale);
             actualChanges.put(amountRangeToParamName, newValue);
             this.amountRangeTo = newValue;
         }
-
         if (command.isChangeInBigDecimalParameterNamed(annualInterestRateParamName, this.annualInterestRate, locale)) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(annualInterestRateParamName, locale);
             actualChanges.put(annualInterestRateParamName, newValue);
             this.annualInterestRate = newValue;
         }
-
         validateChartSlabPlatformRules(command, baseDataValidator, locale);
     }
 
-    public void validateChartSlabPlatformRules(final JsonCommand chartSlabsCommand, final DataValidatorBuilder baseDataValidator,
-            Locale locale) {
+    public void validateChartSlabPlatformRules(final JsonCommand chartSlabsCommand, final DataValidatorBuilder baseDataValidator, Locale locale) {
         if (isFromPeriodGreaterThanToPeriod()) {
             final Integer fromPeriod = chartSlabsCommand.integerValueOfParameterNamed(fromPeriodParamName, locale);
             baseDataValidator.parameter(fromPeriodParamName).value(fromPeriod).failWithCode("from.period.is.greater.than.to.period");
         }
-
         if (isAmountRangeFromGreaterThanTo()) {
             final BigDecimal amountRangeFrom = chartSlabsCommand.bigDecimalValueOfParameterNamed(amountRangeFromParamName, locale);
-            baseDataValidator.parameter(amountRangeFromParamName).value(amountRangeFrom)
-                    .failWithCode("amount.range.from.is.greater.than.amount.range.to");
+            baseDataValidator.parameter(amountRangeFromParamName).value(amountRangeFrom).failWithCode("amount.range.from.is.greater.than.amount.range.to");
         }
     }
 
@@ -226,9 +195,7 @@ public class InterestRateChartSlabFields {
     }
 
     public static boolean isNotProperAmountStart(final InterestRateChartSlabFields interestRateChartSlabFields) {
-        return interestRateChartSlabFields.amountRangeFrom != null
-                && (interestRateChartSlabFields.amountRangeFrom.compareTo(BigDecimal.ONE) != 0
-                        && interestRateChartSlabFields.amountRangeFrom.compareTo(BigDecimal.ZERO) != 0);
+        return interestRateChartSlabFields.amountRangeFrom != null && (interestRateChartSlabFields.amountRangeFrom.compareTo(BigDecimal.ONE) != 0 && interestRateChartSlabFields.amountRangeFrom.compareTo(BigDecimal.ZERO) != 0);
     }
 
     private boolean isNotProperAmountStart(final BigDecimal amount) {
@@ -240,8 +207,7 @@ public class InterestRateChartSlabFields {
     }
 
     public static boolean isNotProperPeriodStart(InterestRateChartSlabFields interestRateChartSlabFields) {
-        return interestRateChartSlabFields.fromPeriod != null
-                && !(interestRateChartSlabFields.fromPeriod.equals(1) || interestRateChartSlabFields.fromPeriod.equals(0));
+        return interestRateChartSlabFields.fromPeriod != null && !(interestRateChartSlabFields.fromPeriod.equals(1) || interestRateChartSlabFields.fromPeriod.equals(0));
     }
 
     public boolean isRateChartOverlapping(final InterestRateChartSlabFields that, final boolean isPrimaryGroupingByAmount) {
@@ -255,7 +221,6 @@ public class InterestRateChartSlabFields {
         } else {
             isOverlapping = (isPeriodOverLapping && !isPeriodSame) || (isAmountOverLapping && isPeriodSame);
         }
-
         return isOverlapping;
     }
 
@@ -327,20 +292,20 @@ public class InterestRateChartSlabFields {
         Integer actualDepositPeriod = 0;
         final SavingsPeriodFrequencyType periodFrequencyType = SavingsPeriodFrequencyType.fromInt(periodType());
         switch (periodFrequencyType) {
-            case DAYS:
-                actualDepositPeriod = DateUtils.getExactDifferenceInDays(periodStartDate, periodEndDate);
+        case DAYS: 
+            actualDepositPeriod = DateUtils.getExactDifferenceInDays(periodStartDate, periodEndDate);
             break;
-            case WEEKS:
-                actualDepositPeriod = DateUtils.getExactDifference(periodStartDate, periodEndDate, ChronoUnit.WEEKS);
+        case WEEKS: 
+            actualDepositPeriod = DateUtils.getExactDifference(periodStartDate, periodEndDate, ChronoUnit.WEEKS);
             break;
-            case MONTHS:
-                actualDepositPeriod = DateUtils.getExactDifference(periodStartDate, periodEndDate, ChronoUnit.MONTHS);
+        case MONTHS: 
+            actualDepositPeriod = DateUtils.getExactDifference(periodStartDate, periodEndDate, ChronoUnit.MONTHS);
             break;
-            case YEARS:
-                actualDepositPeriod = DateUtils.getExactDifference(periodStartDate, periodEndDate, ChronoUnit.YEARS);
+        case YEARS: 
+            actualDepositPeriod = DateUtils.getExactDifference(periodStartDate, periodEndDate, ChronoUnit.YEARS);
             break;
-            case INVALID:
-                actualDepositPeriod = 0;// default value
+        case INVALID: 
+            actualDepositPeriod = 0;// default value
             break;
         }
         return actualDepositPeriod;
@@ -366,4 +331,83 @@ public class InterestRateChartSlabFields {
         return returnValue;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getPeriodType() {
+        return this.periodType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getFromPeriod() {
+        return this.fromPeriod;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getToPeriod() {
+        return this.toPeriod;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountRangeFrom() {
+        return this.amountRangeFrom;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountRangeTo() {
+        return this.amountRangeTo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAnnualInterestRate() {
+        return this.annualInterestRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCurrencyCode() {
+        return this.currencyCode;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDescription(final String description) {
+        this.description = description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setPeriodType(final Integer periodType) {
+        this.periodType = periodType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setFromPeriod(final Integer fromPeriod) {
+        this.fromPeriod = fromPeriod;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setToPeriod(final Integer toPeriod) {
+        this.toPeriod = toPeriod;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAmountRangeFrom(final BigDecimal amountRangeFrom) {
+        this.amountRangeFrom = amountRangeFrom;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAmountRangeTo(final BigDecimal amountRangeTo) {
+        this.amountRangeTo = amountRangeTo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAnnualInterestRate(final BigDecimal annualInterestRate) {
+        this.annualInterestRate = annualInterestRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setCurrencyCode(final String currencyCode) {
+        this.currencyCode = currencyCode;
+    }
 }

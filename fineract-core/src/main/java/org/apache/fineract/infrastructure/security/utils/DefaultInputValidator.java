@@ -23,21 +23,17 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.security.exception.InputValidationException;
 import org.apache.fineract.infrastructure.security.service.InputValidator;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class DefaultInputValidator implements InputValidator {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DefaultInputValidator.class);
     private final FineractProperties properties;
-
     private Map<String, Pattern> patterns = new LinkedHashMap<>();
     private Map<String, FineractProperties.FineractInputValidationProfileProperties> profiles = new LinkedHashMap<>();
 
@@ -47,11 +43,9 @@ public class DefaultInputValidator implements InputValidator {
             log.info("Setup input validation pattern: {}", pattern.getName());
             patterns.put(pattern.getName(), Pattern.compile(pattern.getPattern(), Pattern.DOTALL));
         });
-
         properties.getInputValidation().getProfiles().forEach(profile -> {
             log.info("Setup input validation profile: {}", profile.getName());
-            profile.getPatternRefs()
-                    .sort(Comparator.comparing(FineractProperties.FineractInputValidationPatternReferenceProperties::getOrder));
+            profile.getPatternRefs().sort(Comparator.comparing(FineractProperties.FineractInputValidationPatternReferenceProperties::getOrder));
             profiles.put(profile.getName(), profile);
         });
     }
@@ -61,21 +55,23 @@ public class DefaultInputValidator implements InputValidator {
         if (StringUtils.isBlank(input)) {
             return;
         }
-
         var resolvedProfile = profiles.get(profile);
         if (resolvedProfile == null) {
-            log.warn("Input validation profile '{}' not found — rejecting input as unsafe", profile);
-            throw new InputValidationException(String.format("no input validation profile registered for '%s'", profile));
+            log.warn("Input validation profile \'{}\' not found — rejecting input as unsafe", profile);
+            throw new InputValidationException(String.format("no input validation profile registered for \'%s\'", profile));
         }
-
         // whitelist: input must match at least one pattern in the profile
         for (var ref : resolvedProfile.getPatternRefs()) {
             if (patterns.get(ref.getName()).matcher(input).matches()) {
                 return; // matched — input is valid
             }
         }
+        log.warn("Input validation error for profile \'{}\': >> {} <<", profile, input);
+        throw new InputValidationException(String.format("invalid input for profile \'%s\': does not match any permitted pattern", profile));
+    }
 
-        log.warn("Input validation error for profile '{}': >> {} <<", profile, input);
-        throw new InputValidationException(String.format("invalid input for profile '%s': does not match any permitted pattern", profile));
+    @java.lang.SuppressWarnings("all")
+        public DefaultInputValidator(final FineractProperties properties) {
+        this.properties = properties;
     }
 }

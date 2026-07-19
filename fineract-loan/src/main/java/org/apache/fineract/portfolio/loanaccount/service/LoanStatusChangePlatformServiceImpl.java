@@ -19,30 +19,26 @@
 package org.apache.fineract.portfolio.loanaccount.service;
 
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.event.business.BusinessEventListener;
 import org.apache.fineract.infrastructure.event.business.domain.loan.LoanStatusChangedBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class LoanStatusChangePlatformServiceImpl implements LoanStatusChangePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanStatusChangePlatformServiceImpl.class);
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService;
 
     @PostConstruct
     public void addListeners() {
         businessEventNotifierService.addPostBusinessEventListener(LoanStatusChangedBusinessEvent.class, new LoanStatusChangedListener());
-        businessEventNotifierService.addPostBusinessEventListener(LoanStatusChangedBusinessEvent.class,
-                new LoanAccrualActivityPostingLoanStatusChangedListener());
+        businessEventNotifierService.addPostBusinessEventListener(LoanStatusChangedBusinessEvent.class, new LoanAccrualActivityPostingLoanStatusChangedListener());
     }
 
-    private static final class LoanStatusChangedListener implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
 
+    private static final class LoanStatusChangedListener implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanStatusChangedBusinessEvent event) {
             final Loan loan = event.get();
@@ -53,9 +49,8 @@ public class LoanStatusChangePlatformServiceImpl implements LoanStatusChangePlat
         }
     }
 
-    private final class LoanAccrualActivityPostingLoanStatusChangedListener
-            implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
 
+    private final class LoanAccrualActivityPostingLoanStatusChangedListener implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanStatusChangedBusinessEvent event) {
             final Loan loan = event.get();
@@ -67,5 +62,11 @@ public class LoanStatusChangePlatformServiceImpl implements LoanStatusChangePlat
                 }
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanStatusChangePlatformServiceImpl(final BusinessEventNotifierService businessEventNotifierService, final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService) {
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.loanAccrualActivityProcessingService = loanAccrualActivityProcessingService;
     }
 }

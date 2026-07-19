@@ -28,7 +28,6 @@ import static org.apache.fineract.portfolio.interestratechart.InterestRateChartS
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartSlabApiConstants.fromPeriodParamName;
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartSlabApiConstants.periodTypeParamName;
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartSlabApiConstants.toPeriodParamName;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -38,7 +37,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -51,9 +49,7 @@ import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChartS
 import org.apache.fineract.portfolio.interestratechart.exception.InterestRateChartSlabNotFoundException;
 import org.apache.fineract.portfolio.savings.SavingsPeriodFrequencyType;
 
-@RequiredArgsConstructor
 public class InterestRateChartSlabAssembler {
-
     private final FromJsonHelper fromApiJsonHelper;
     private final InterestRateChartRepositoryWrapper interestRateChartRepositoryWrapper;
     private final InterestIncentiveAssembler incentiveAssembler;
@@ -62,31 +58,23 @@ public class InterestRateChartSlabAssembler {
      * Assembles a new {@link InterestRateChartSlab} from JSON Slabs passed in request
      */
     public InterestRateChartSlab assembleFrom(final JsonCommand command) {
-
         final JsonElement element = command.parsedJson();
         final JsonObject elementObject = element.getAsJsonObject();
         final Locale locale = this.fromApiJsonHelper.extractLocaleParameter(elementObject);
         final String currencyCode = command.stringValueOfParameterNamed(currencyCodeParamName);
-
         final Long chartId = command.subentityId();// returns chart id
-
         final InterestRateChart chart = this.interestRateChartRepositoryWrapper.findOneWithNotFoundDetection(chartId);
-
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
-                .resource(INTERESTRATE_CHART_SLAB_RESOURCE_NAME);
-
+        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(INTERESTRATE_CHART_SLAB_RESOURCE_NAME);
         final InterestRateChartSlab newChartSlab = assembleChartSlabs(chart, elementObject, currencyCode, locale);
         // validate chart Slabs
         newChartSlab.slabFields().validateChartSlabPlatformRules(command, baseDataValidator, locale);
         chart.validateChartSlabs(baseDataValidator);
-
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
         return newChartSlab;
     }
 
-    private InterestRateChartSlab assembleChartSlabs(final InterestRateChart interestRateChart, final JsonElement element,
-            final String currencyCode, final Locale locale) {
+    private InterestRateChartSlab assembleChartSlabs(final InterestRateChart interestRateChart, final JsonElement element, final String currencyCode, final Locale locale) {
         final String description = this.fromApiJsonHelper.extractStringNamed(descriptionParamName, element);
         final Integer periodTypeId = this.fromApiJsonHelper.extractIntegerNamed(periodTypeParamName, element, locale);
         final SavingsPeriodFrequencyType periodType = SavingsPeriodFrequencyType.fromInt(periodTypeId);
@@ -95,29 +83,23 @@ public class InterestRateChartSlabAssembler {
         final BigDecimal amountRangeFrom = this.fromApiJsonHelper.extractBigDecimalNamed(amountRangeFromParamName, element, locale);
         final BigDecimal amountRangeTo = this.fromApiJsonHelper.extractBigDecimalNamed(amountRangeToParamName, element, locale);
         final BigDecimal annualInterestRate = this.fromApiJsonHelper.extractBigDecimalNamed(annualInterestRateParamName, element, locale);
-
-        final InterestRateChartSlabFields slabFields = InterestRateChartSlabFields.createNew(description, periodType, fromPeriod, toPeriod,
-                amountRangeFrom, amountRangeTo, annualInterestRate, currencyCode);
+        final InterestRateChartSlabFields slabFields = InterestRateChartSlabFields.createNew(description, periodType, fromPeriod, toPeriod, amountRangeFrom, amountRangeTo, annualInterestRate, currencyCode);
         InterestRateChartSlab interestRateChartSlab = InterestRateChartSlab.createNew(slabFields, interestRateChart);
         this.incentiveAssembler.assembleIncentivesFrom(element, interestRateChartSlab, locale);
         return interestRateChartSlab;
-
     }
 
     public InterestRateChartSlab assembleFrom(final Long chartSlabId, final Long chartId) {
         final InterestRateChart chart = this.interestRateChartRepositoryWrapper.findOneWithNotFoundDetection(chartId);
         final InterestRateChartSlab interestRateChartSlab = chart.findChartSlab(chartSlabId);
-
         if (interestRateChartSlab == null) {
             throw new InterestRateChartSlabNotFoundException(chartSlabId, chartId);
         }
-
         return interestRateChartSlab;
     }
 
     public Collection<InterestRateChartSlab> assembleChartSlabsFrom(final JsonElement element, String currencyCode) {
         final Collection<InterestRateChartSlab> interestRateChartSlabsSet = new HashSet<>();
-
         if (element.isJsonObject()) {
             final JsonObject topLevelJsonElement = element.getAsJsonObject();
             final Locale locale = this.fromApiJsonHelper.extractLocaleParameter(topLevelJsonElement);
@@ -130,7 +112,6 @@ public class InterestRateChartSlabAssembler {
                 }
             }
         }
-
         return interestRateChartSlabsSet;
     }
 
@@ -138,5 +119,12 @@ public class InterestRateChartSlabAssembler {
         if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InterestRateChartSlabAssembler(final FromJsonHelper fromApiJsonHelper, final InterestRateChartRepositoryWrapper interestRateChartRepositoryWrapper, final InterestIncentiveAssembler incentiveAssembler) {
+        this.fromApiJsonHelper = fromApiJsonHelper;
+        this.interestRateChartRepositoryWrapper = interestRateChartRepositoryWrapper;
+        this.incentiveAssembler = incentiveAssembler;
     }
 }

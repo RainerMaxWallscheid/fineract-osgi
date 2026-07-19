@@ -20,17 +20,19 @@ package org.apache.fineract.cob.internal;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.boot.FineractProfiles;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Profile(FineractProfiles.TEST)
-@Getter
 @Service
 public class TestData {
-
     public static final String COB_JOB_AFTER_LISTENER = "cob-job-after-listener";
     public static final String COB_JOB_BEFORE_LISTENER = "cob-job-before-listener";
     private final Map<String, Object> data = new HashMap<>();
+
+    @java.lang.SuppressWarnings("all")
+        public Map<String, Object> getData() {
+        return this.data;
+    }
 }

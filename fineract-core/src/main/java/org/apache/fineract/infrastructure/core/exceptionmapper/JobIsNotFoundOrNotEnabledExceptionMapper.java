@@ -22,7 +22,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.JobIsNotFoundOrNotEnabledException;
@@ -30,14 +29,13 @@ import org.springframework.stereotype.Component;
 
 @Provider
 @Component
-@Slf4j
 public class JobIsNotFoundOrNotEnabledExceptionMapper implements ExceptionMapper<JobIsNotFoundOrNotEnabledException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JobIsNotFoundOrNotEnabledExceptionMapper.class);
 
     @Override
     public Response toResponse(JobIsNotFoundOrNotEnabledException exception) {
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-        return Response.status(Response.Status.FORBIDDEN)
-                .entity(ApiGlobalErrorResponse.jobIsDisabled(exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage()))
-                .type(MediaType.APPLICATION_JSON).build();
+        return Response.status(Response.Status.FORBIDDEN).entity(ApiGlobalErrorResponse.jobIsDisabled(exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage())).type(MediaType.APPLICATION_JSON).build();
     }
 }

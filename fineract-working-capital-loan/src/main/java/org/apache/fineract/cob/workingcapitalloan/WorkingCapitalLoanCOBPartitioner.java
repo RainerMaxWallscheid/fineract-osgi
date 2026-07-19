@@ -20,10 +20,8 @@ package org.apache.fineract.cob.workingcapitalloan;
 
 import static org.apache.fineract.cob.workingcapitalloan.WorkingCapitalLoanCOBConstant.WORKING_CAPITAL_JOB_NAME;
 import static org.apache.fineract.cob.workingcapitalloan.WorkingCapitalLoanCOBConstant.WORKING_CAPITAL_LOAN_COB_JOB_NAME;
-
 import java.util.Map;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.COBBusinessStepService;
 import org.apache.fineract.cob.common.CommonPartitioner;
 import org.apache.fineract.cob.data.BusinessStepNameAndOrder;
@@ -35,15 +33,13 @@ import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.NonNull;
 
-@Slf4j
 public class WorkingCapitalLoanCOBPartitioner extends CommonPartitioner implements Partitioner {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanCOBPartitioner.class);
     private final COBBusinessStepService cobBusinessStepService;
     private final PropertyService propertyService;
 
-    public WorkingCapitalLoanCOBPartitioner(JobOperator jobOperator, StepExecution stepExecution, Long numberOfDays,
-            WorkingCapitalLoanRetrieveIdService retrieveIdService, COBBusinessStepService cobBusinessStepService,
-            PropertyService propertyService) {
+    public WorkingCapitalLoanCOBPartitioner(JobOperator jobOperator, StepExecution stepExecution, Long numberOfDays, WorkingCapitalLoanRetrieveIdService retrieveIdService, COBBusinessStepService cobBusinessStepService, PropertyService propertyService) {
         super(jobOperator, stepExecution, numberOfDays, retrieveIdService);
         this.cobBusinessStepService = cobBusinessStepService;
         this.propertyService = propertyService;
@@ -53,9 +49,7 @@ public class WorkingCapitalLoanCOBPartitioner extends CommonPartitioner implemen
     @Override
     public Map<String, ExecutionContext> partition(int gridSize) {
         int partitionSize = propertyService.getPartitionSize(WORKING_CAPITAL_JOB_NAME);
-        Set<BusinessStepNameAndOrder> cobBusinessSteps = cobBusinessStepService.getCOBBusinessSteps(WorkingCapitalLoanCOBBusinessStep.class,
-                WORKING_CAPITAL_LOAN_COB_JOB_NAME);
+        Set<BusinessStepNameAndOrder> cobBusinessSteps = cobBusinessStepService.getCOBBusinessSteps(WorkingCapitalLoanCOBBusinessStep.class, WORKING_CAPITAL_LOAN_COB_JOB_NAME);
         return getPartitions(partitionSize, cobBusinessSteps);
     }
-
 }

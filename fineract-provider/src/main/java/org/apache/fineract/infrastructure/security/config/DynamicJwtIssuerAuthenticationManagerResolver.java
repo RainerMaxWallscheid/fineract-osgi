@@ -23,8 +23,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.config.FineractProperties.FineractSecurityProperties.FineractSecurityOidcFederationProperties.OidcIssuerProperties;
 import org.apache.fineract.infrastructure.core.domain.TenantOidcConfig;
@@ -53,18 +51,15 @@ import org.springframework.stereotype.Component;
  * Built {@link AuthenticationManager} instances are cached in memory keyed by {@code issuerUri}. The cache entry is
  * invalidated via {@link #evictFromCache(String)} when the DB config changes.
  */
-@Slf4j
 @Component
-@RequiredArgsConstructor
 @ConditionalOnProperty("fineract.security.oidc-federation.enabled")
 public class DynamicJwtIssuerAuthenticationManagerResolver implements AuthenticationManagerResolver<HttpServletRequest> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DynamicJwtIssuerAuthenticationManagerResolver.class);
     private final TenantOidcConfigService tenantOidcConfigService;
     private final FineractOidcJwtAuthenticationConverter jwtConverter;
     private final FineractProperties fineractProperties;
-
     private final BearerTokenResolver bearerTokenResolver = new DefaultBearerTokenResolver();
-
     // issuerUri → AuthenticationManager (cached after first build)
     private final ConcurrentHashMap<String, AuthenticationManager> managerCache = new ConcurrentHashMap<>();
 
@@ -84,7 +79,6 @@ public class DynamicJwtIssuerAuthenticationManagerResolver implements Authentica
             log.debug("Building AuthenticationManager from DB config for issuer: {}", issuerUri);
             return buildFromDbConfig(dbConfig.get());
         }
-
         // Priority 2: YAML issuers[] static fallback
         List<OidcIssuerProperties> yamlIssuers = fineractProperties.getSecurity().getOidcFederation().getIssuers();
         if (yamlIssuers != null) {
@@ -94,26 +88,18 @@ public class DynamicJwtIssuerAuthenticationManagerResolver implements Authentica
                 return buildFromYamlIssuer(yamlMatch.get());
             }
         }
-
-        throw new OAuth2AuthenticationException(
-                new OAuth2Error("unknown_issuer", "No OIDC configuration found for issuer: " + issuerUri, null));
+        throw new OAuth2AuthenticationException(new OAuth2Error("unknown_issuer", "No OIDC configuration found for issuer: " + issuerUri, null));
     }
 
     private AuthenticationManager buildFromDbConfig(TenantOidcConfig config) {
-        NimbusJwtDecoder decoder = config.getJwksUri() != null && !config.getJwksUri().isBlank()
-                ? NimbusJwtDecoder.withJwkSetUri(config.getJwksUri()).build()
-                : NimbusJwtDecoder.withIssuerLocation(config.getIssuerUri()).build();
-
+        NimbusJwtDecoder decoder = config.getJwksUri() != null && !config.getJwksUri().isBlank() ? NimbusJwtDecoder.withJwkSetUri(config.getJwksUri()).build() : NimbusJwtDecoder.withIssuerLocation(config.getIssuerUri()).build();
         JwtAuthenticationProvider provider = new JwtAuthenticationProvider(decoder);
         provider.setJwtAuthenticationConverter(jwtConverter);
         return provider::authenticate;
     }
 
     private AuthenticationManager buildFromYamlIssuer(OidcIssuerProperties issuerProps) {
-        NimbusJwtDecoder decoder = issuerProps.getJwksUri() != null && !issuerProps.getJwksUri().isBlank()
-                ? NimbusJwtDecoder.withJwkSetUri(issuerProps.getJwksUri()).build()
-                : NimbusJwtDecoder.withIssuerLocation(issuerProps.getIssuerUri()).build();
-
+        NimbusJwtDecoder decoder = issuerProps.getJwksUri() != null && !issuerProps.getJwksUri().isBlank() ? NimbusJwtDecoder.withJwkSetUri(issuerProps.getJwksUri()).build() : NimbusJwtDecoder.withIssuerLocation(issuerProps.getIssuerUri()).build();
         JwtAuthenticationProvider provider = new JwtAuthenticationProvider(decoder);
         provider.setJwtAuthenticationConverter(jwtConverter);
         return provider::authenticate;
@@ -127,7 +113,7 @@ public class DynamicJwtIssuerAuthenticationManagerResolver implements Authentica
             }
             return (String) JWTParser.parse(token).getJWTClaimsSet().getClaim("iss");
         } catch (Exception e) {
-            log.debug("Could not extract 'iss' claim from Bearer token", e);
+            log.debug("Could not extract \'iss\' claim from Bearer token", e);
             return null;
         }
     }
@@ -139,5 +125,12 @@ public class DynamicJwtIssuerAuthenticationManagerResolver implements Authentica
     public void evictFromCache(String issuerUri) {
         managerCache.remove(issuerUri);
         log.info("Evicted AuthenticationManager cache for issuer: {}", issuerUri);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DynamicJwtIssuerAuthenticationManagerResolver(final TenantOidcConfigService tenantOidcConfigService, final FineractOidcJwtAuthenticationConverter jwtConverter, final FineractProperties fineractProperties) {
+        this.tenantOidcConfigService = tenantOidcConfigService;
+        this.jwtConverter = jwtConverter;
+        this.fineractProperties = fineractProperties;
     }
 }

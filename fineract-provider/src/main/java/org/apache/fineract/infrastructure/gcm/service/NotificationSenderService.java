@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.configuration.service.ExternalServicesPropertiesReadPlatformService;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.gcm.GcmConstants;
@@ -39,9 +38,7 @@ import org.apache.fineract.infrastructure.sms.domain.SmsMessageStatusType;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class NotificationSenderService {
-
     private final SmsMessageRepository smsMessageRepository;
     private final ExternalServicesPropertiesReadPlatformService propertiesReadPlatformService;
 
@@ -63,22 +60,18 @@ public class NotificationSenderService {
                     List<SmsMessage> msgList = new ArrayList<>(List.of(smsMessage));
                     notificationByEachClient.put(clientId, msgList);
                 }
-
             }
         }
         return notificationByEachClient;
     }
 
     public void sendNotification(Long clientId, List<SmsMessage> smsList) {
-
         NotificationConfigurationData notificationConfigurationData = propertiesReadPlatformService.getNotificationConfiguration();
         String registrationId = null;
         for (SmsMessage smsMessage : smsList) {
             try {
-                Notification notification = new Notification.Builder(GcmConstants.defaultIcon).title(GcmConstants.title)
-                        .body(smsMessage.getMessage()).build();
-                Message message = new Message.Builder().notification(notification).dryRun(false).contentAvailable(true)
-                        .timeToLive(GcmConstants.TIME_TO_LIVE).priority(Priority.HIGH).delayWhileIdle(true).build();
+                Notification notification = new Notification.Builder(GcmConstants.defaultIcon).title(GcmConstants.title).body(smsMessage.getMessage()).build();
+                Message message = new Message.Builder().notification(notification).dryRun(false).contentAvailable(true).timeToLive(GcmConstants.TIME_TO_LIVE).priority(Priority.HIGH).delayWhileIdle(true).build();
                 Sender sender = new Sender(notificationConfigurationData.getServerKey(), notificationConfigurationData.getFcmEndPoint());
                 Result res = sender.send(message, registrationId, 3);
                 if (res.getSuccess() != null && res.getSuccess() > 0) {
@@ -91,9 +84,12 @@ public class NotificationSenderService {
                 smsMessage.setStatusType(SmsMessageStatusType.FAILED.getValue());
             }
         }
-
         smsMessageRepository.saveAll(smsList);
-
     }
 
+    @java.lang.SuppressWarnings("all")
+        public NotificationSenderService(final SmsMessageRepository smsMessageRepository, final ExternalServicesPropertiesReadPlatformService propertiesReadPlatformService) {
+        this.smsMessageRepository = smsMessageRepository;
+        this.propertiesReadPlatformService = propertiesReadPlatformService;
+    }
 }

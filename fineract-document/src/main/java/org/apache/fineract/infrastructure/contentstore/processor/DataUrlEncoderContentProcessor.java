@@ -20,50 +20,40 @@ package org.apache.fineract.infrastructure.contentstore.processor;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNullElse;
-
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.contentstore.util.ContentPipe;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class DataUrlEncoderContentProcessor implements ContentProcessor {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DataUrlEncoderContentProcessor.class);
     private static final String DATA_URL_ENCODE_PREFIX = "dataurl.encode.";
-
     public static final String DATA_URL_ENCODE_PARAM_BUFFER_SIZE = DATA_URL_ENCODE_PREFIX + "param.buffer-size";
     public static final String DATA_URL_ENCODE_PARAM_CONTENT_TYPE = DATA_URL_ENCODE_PREFIX + "param.content-type";
     public static final String DATA_URL_ENCODE_PARAM_ENCODING = DATA_URL_ENCODE_PREFIX + "param.encoding";
-
     private final ContentPipe pipe;
     private final FineractProperties properties;
 
     @Override
     public ContentProcessorContext process(final ContentProcessorContext ctx) {
-        final Integer bufferSize = ctx.getParameter(DATA_URL_ENCODE_PARAM_BUFFER_SIZE, Integer.class,
-                requireNonNullElse(properties.getContent().getDefaultBufferSize(), 8192));
+        final Integer bufferSize = ctx.getParameter(DATA_URL_ENCODE_PARAM_BUFFER_SIZE, Integer.class, requireNonNullElse(properties.getContent().getDefaultBufferSize(), 8192));
         final String contentType = ctx.getParameter(DATA_URL_ENCODE_PARAM_CONTENT_TYPE, String.class, "text/plain");
         final String encoding = ctx.getParameter(DATA_URL_ENCODE_PARAM_ENCODING, String.class, "charset=US-ASCII");
-
         final var pipedInputStream = pipe.pipe(ctx.getInputStream(), (in, out) -> {
             pipe.write(new DataUrlEncoderInputStream(in, contentType, encoding), out, new byte[bufferSize]);
         });
-
         return ctx.clone(pipedInputStream);
     }
 
-    private static class DataUrlEncoderInputStream extends FilterInputStream {
 
+    private static class DataUrlEncoderInputStream extends FilterInputStream {
         private static final String META_PART = "data:";
         private static final char COMMA_CHAR = ',';
         private static final char SEMICOLON_CHAR = ';';
-
         private final byte[] prefix;
         private int prefixIndex = 0;
 
@@ -81,9 +71,8 @@ public class DataUrlEncoderContentProcessor implements ContentProcessor {
             if (!isPrefixConsumed()) {
                 // return the next byte of the prefix
                 // we need to cast to int and mask with 0xFF to ensure positive value (0-255)
-                return prefix[prefixIndex++] & 0xFF;
+                return prefix[prefixIndex++] & 255;
             }
-
             // served the prefix, now the real stream starts
             return in.read();
         }
@@ -92,34 +81,26 @@ public class DataUrlEncoderContentProcessor implements ContentProcessor {
         public int read(byte[] b, int off, int len) throws IOException {
             // optimization: do not call super.read(b, off, len) as that might call
             // the single-byte read() repeatedly, which is slow.
-
             if (isPrefixConsumed()) {
                 return in.read(b, off, len);
             }
-
             // still have prefix data to write
             int availableInPrefix = prefix.length - prefixIndex;
-
             // fill the buffer with remaining prefix bytes (or as much as requested)
             int bytesToCopyFromPrefix = Math.min(len, availableInPrefix);
-
             System.arraycopy(prefix, prefixIndex, b, off, bytesToCopyFromPrefix);
             prefixIndex += bytesToCopyFromPrefix;
-
             // if we filled the request entirely with the prefix, return immediately
             if (bytesToCopyFromPrefix == len) {
                 return len;
             }
-
             // if we still have space in the buffer, fill the rest from the underlying stream
             int bytesToReadFromStream = len - bytesToCopyFromPrefix;
             int bytesReadFromStream = in.read(b, off + bytesToCopyFromPrefix, bytesToReadFromStream);
-
             if (bytesReadFromStream == -1) {
                 // underlying stream is empty, but we did write the prefix
                 return bytesToCopyFromPrefix;
             }
-
             return bytesToCopyFromPrefix + bytesReadFromStream;
         }
 
@@ -128,17 +109,13 @@ public class DataUrlEncoderContentProcessor implements ContentProcessor {
             if (isPrefixConsumed()) {
                 return in.skip(n);
             }
-
             long availableInPrefix = Integer.valueOf(prefix.length - prefixIndex).longValue();
             long skippableInPrefix = Math.min(n, availableInPrefix);
-
             prefixIndex += Long.valueOf(skippableInPrefix).intValue();
             long remainingToSkip = n - skippableInPrefix;
-
             if (remainingToSkip > 0) {
                 return skippableInPrefix + in.skip(remainingToSkip);
             }
-
             return skippableInPrefix;
         }
 
@@ -150,5 +127,11 @@ public class DataUrlEncoderContentProcessor implements ContentProcessor {
             // total available is prefix remaining + stream available
             return (prefix.length - prefixIndex) + in.available();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DataUrlEncoderContentProcessor(final ContentPipe pipe, final FineractProperties properties) {
+        this.pipe = pipe;
+        this.properties = properties;
     }
 }

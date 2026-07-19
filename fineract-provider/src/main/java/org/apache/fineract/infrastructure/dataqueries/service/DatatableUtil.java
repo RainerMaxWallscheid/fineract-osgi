@@ -22,11 +22,8 @@ import static org.apache.fineract.infrastructure.core.serialization.DatatableCom
 import static org.apache.fineract.infrastructure.dataqueries.api.DataTableApiConstant.API_FIELD_NAME;
 import static org.apache.fineract.infrastructure.dataqueries.api.DataTableApiConstant.TABLE_FIELD_ID;
 import static org.apache.fineract.infrastructure.dataqueries.api.DataTableApiConstant.TABLE_REGISTERED_TABLE;
-
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -48,13 +45,11 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class DatatableUtil {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DatatableUtil.class);
     private static final String APPLICATION_TABLE_NAME = "application_table_name";
-
     private final SearchUtil searchUtil;
     private final JdbcTemplate jdbcTemplate;
     private final SqlValidator sqlValidator;
@@ -91,8 +86,7 @@ public class DatatableUtil {
     public EntityTables resolveEntity(final String entityName) {
         EntityTables entityTable = EntityTables.fromEntityName(entityName);
         if (entityTable == null) {
-            throw new PlatformDataIntegrityException("error.msg.invalid.application.table", "Invalid Datatable entity: " + entityName,
-                    API_FIELD_NAME, entityName);
+            throw new PlatformDataIntegrityException("error.msg.invalid.application.table", "Invalid Datatable entity: " + entityName, API_FIELD_NAME, entityName);
         }
         return entityTable;
     }
@@ -102,7 +96,6 @@ public class DatatableUtil {
         sqlValidator.validate(datatable);
         final String sql = "SELECT application_table_name FROM x_registered_table where registered_table_name = ?";
         final SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, datatable); // NOSONAR
-
         String applicationTableName;
         if (rowSet.next()) {
             applicationTableName = rowSet.getString(APPLICATION_TABLE_NAME);
@@ -117,7 +110,6 @@ public class DatatableUtil {
         final String sql = dataScopedSQL(entityTable, appTableId, params);
         log.debug("data scoped sql: {}", sql);
         final SqlRowSet rs = this.jdbcTemplate.queryForRowSet(sql, params.toArray());
-
         if (!rs.next()) {
             throw new DatatableNotFoundException(entityTable, appTableId);
         }
@@ -128,20 +120,18 @@ public class DatatableUtil {
         final Long loanId = (Long) rs.getObject("loanId");
         final Long transactionId = (Long) rs.getObject("transactionId");
         final Long entityId = (Long) rs.getObject("entityId");
-
         if (rs.next()) {
             throw new DatatableSystemErrorException("System Error: More than one row returned from data scoping query");
         }
-
-        return new CommandProcessingResultBuilder() //
-                .withOfficeId(officeId) //
-                .withGroupId(groupId) //
-                .withClientId(clientId) //
-                .withSavingsId(savingsId) //
-                .withLoanId(loanId) //
-                .withTransactionId(transactionId == null ? null : String.valueOf(transactionId)) //
-                .withEntityId(entityId) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withOfficeId(officeId).withGroupId(groupId).withClientId(clientId).withSavingsId(savingsId).withLoanId(loanId).withTransactionId(transactionId == null ? null : String.valueOf(transactionId)).withEntityId(entityId).build();
     }
 
     public String dataScopedSQL(@NonNull EntityTables entityTable, final Long appTableId, final List<Object> params) {
@@ -158,64 +148,45 @@ public class DatatableUtil {
                 params.add(appTableId);
                 params.add(hierarchyPattern);
                 params.add(appTableId);
-                yield "select distinct x.* from ( "
-                        + "(select o.id as officeId, l.group_id as groupId, l.client_id as clientId, null as savingsId, l.id as loanId, null as transactionId, null as entityId from m_loan l "
-                        + getClientOfficeJoinCondition("l") + " where l.id = ?)" + " union all "
-                        + "(select o.id as officeId, l.group_id as groupId, l.client_id as clientId, null as savingsId, l.id as loanId, null as transactionId, null as entityId from m_loan l "
-                        + getGroupOfficeJoinCondition("l") + " where l.id = ?)" + " ) as x";
+                yield "select distinct x.* from ( " + "(select o.id as officeId, l.group_id as groupId, l.client_id as clientId, null as savingsId, l.id as loanId, null as transactionId, null as entityId from m_loan l " + getClientOfficeJoinCondition("l") + " where l.id = ?)" + " union all " + "(select o.id as officeId, l.group_id as groupId, l.client_id as clientId, null as savingsId, l.id as loanId, null as transactionId, null as entityId from m_loan l " + getGroupOfficeJoinCondition("l") + " where l.id = ?)" + " ) as x";
             }
             case SAVINGS -> {
                 params.add(hierarchyPattern);
                 params.add(appTableId);
                 params.add(hierarchyPattern);
                 params.add(appTableId);
-                yield "select distinct x.* from ( "
-                        + "(select o.id as officeId, s.group_id as groupId, s.client_id as clientId, s.id as savingsId, null as loanId, null as transactionId, null as entityId "
-                        + "from m_savings_account s " + getClientOfficeJoinCondition("s") + " where s.id = ?)" + " union all "
-                        + "(select o.id as officeId, s.group_id as groupId, s.client_id as clientId, s.id as savingsId, null as loanId, null as transactionId, null as entityId "
-                        + "from m_savings_account s " + getGroupOfficeJoinCondition("s") + " where s.id = ?)" + " ) as x";
+                yield "select distinct x.* from ( " + "(select o.id as officeId, s.group_id as groupId, s.client_id as clientId, s.id as savingsId, null as loanId, null as transactionId, null as entityId " + "from m_savings_account s " + getClientOfficeJoinCondition("s") + " where s.id = ?)" + " union all " + "(select o.id as officeId, s.group_id as groupId, s.client_id as clientId, s.id as savingsId, null as loanId, null as transactionId, null as entityId " + "from m_savings_account s " + getGroupOfficeJoinCondition("s") + " where s.id = ?)" + " ) as x";
             }
             case SAVINGS_TRANSACTION -> {
                 params.add(hierarchyPattern);
                 params.add(appTableId);
                 params.add(hierarchyPattern);
                 params.add(appTableId);
-                yield "select distinct x.* from ( "
-                        + "(select o.id as officeId, s.group_id as groupId, s.client_id as clientId, s.id as savingsId, null as loanId, t.id as transactionId, null as entityId "
-                        + "from m_savings_account_transaction t join m_savings_account s on t.savings_account_id = s.id "
-                        + getClientOfficeJoinCondition("s") + " where t.id = ?)" + " union all "
-                        + "(select o.id as officeId, s.group_id as groupId, s.client_id as clientId, s.id as savingsId, null as loanId, t.id as transactionId, null as entityId "
-                        + "from m_savings_account_transaction t join m_savings_account s on t.savings_account_id = s.id "
-                        + getGroupOfficeJoinCondition("s") + " where t.id = ?)" + " ) as x";
+                yield "select distinct x.* from ( " + "(select o.id as officeId, s.group_id as groupId, s.client_id as clientId, s.id as savingsId, null as loanId, t.id as transactionId, null as entityId " + "from m_savings_account_transaction t join m_savings_account s on t.savings_account_id = s.id " + getClientOfficeJoinCondition("s") + " where t.id = ?)" + " union all " + "(select o.id as officeId, s.group_id as groupId, s.client_id as clientId, s.id as savingsId, null as loanId, t.id as transactionId, null as entityId " + "from m_savings_account_transaction t join m_savings_account s on t.savings_account_id = s.id " + getGroupOfficeJoinCondition("s") + " where t.id = ?)" + " ) as x";
             }
             case CLIENT -> {
                 params.add(hierarchyPattern);
                 params.add(appTableId);
-                yield "select o.id as officeId, null as groupId, c.id as clientId, null as savingsId, null as loanId, null as transactionId, null as entityId from m_client c "
-                        + getOfficeJoinCondition("c") + " where c.id = ?";
+                yield "select o.id as officeId, null as groupId, c.id as clientId, null as savingsId, null as loanId, null as transactionId, null as entityId from m_client c " + getOfficeJoinCondition("c") + " where c.id = ?";
             }
             case GROUP, CENTER -> {
                 params.add(hierarchyPattern);
                 params.add(appTableId);
-                yield "select o.id as officeId, g.id as groupId, null as clientId, null as savingsId, null as loanId, null as transactionId, null as entityId from m_group g "
-                        + getOfficeJoinCondition("g") + " where g.id = ?";
+                yield "select o.id as officeId, g.id as groupId, null as clientId, null as savingsId, null as loanId, null as transactionId, null as entityId from m_group g " + getOfficeJoinCondition("g") + " where g.id = ?";
             }
             case OFFICE -> {
                 params.add(hierarchyPattern);
                 params.add(appTableId);
-                yield "select o.id as officeId, null as groupId, null as clientId, null as savingsId, null as loanId, null as transactionId, null as entityId from m_office o "
-                        + "where o.hierarchy like ? and o.id = ?";
+                yield "select o.id as officeId, null as groupId, null as clientId, null as savingsId, null as loanId, null as transactionId, null as entityId from m_office o " + "where o.hierarchy like ? and o.id = ?";
             }
             case WC_LOAN -> {
                 params.add(hierarchyPattern);
                 params.add(appTableId);
-                yield "select o.id as officeId, null as groupId, l.client_id as clientId, null as savingsId, l.id as loanId, null as transactionId, null as entityId from m_wc_loan l "
-                        + getClientOfficeJoinCondition("l") + " where l.id = ?";
+                yield "select o.id as officeId, null as groupId, l.client_id as clientId, null as savingsId, l.id as loanId, null as transactionId, null as entityId from m_wc_loan l " + getClientOfficeJoinCondition("l") + " where l.id = ?";
             }
             case LOAN_PRODUCT, SAVINGS_PRODUCT, SHARE_PRODUCT, WC_LOAN_PRODUCT -> {
                 params.add(appTableId);
-                yield "select null as officeId, null as groupId, null as clientId, null as savingsId, null as loanId, null as transactionId, p.id as entityId from "
-                        + entityTable.getName() + " as p WHERE p.id = ?";
+                yield "select null as officeId, null as groupId, null as clientId, null as savingsId, null as loanId, null as transactionId, p.id as entityId from " + entityTable.getName() + " as p WHERE p.id = ?";
             }
         };
     }
@@ -232,15 +203,12 @@ public class DatatableUtil {
         return " join m_client c on c.id = " + appTableAlias + ".client_id " + getOfficeJoinCondition("c");
     }
 
-    public GenericResultsetData retrieveDataTableGenericResultSet(final EntityTables entityTable, final String dataTableName,
-            final Long appTableId, final String order, final Long id) {
+    public GenericResultsetData retrieveDataTableGenericResultSet(final EntityTables entityTable, final String dataTableName, final Long appTableId, final String order, final Long id) {
         final List<ResultsetColumnHeaderData> columnHeaders = genericDataService.fillResultsetColumnHeaders(dataTableName);
         final boolean multiRow = isMultirowDatatable(columnHeaders);
-
         final List<Object> params = new ArrayList<>();
         params.add(appTableId);
         String sql = "select * from " + sqlGenerator.escape(dataTableName) + " where " + getFKField(entityTable) + " = ?";
-
         // id only used for reading a specific entry that belongs to appTableId (in a one to many datatable)
         if (multiRow && id != null) {
             sql = sql + " and " + TABLE_FIELD_ID + " = ?";
@@ -250,7 +218,6 @@ public class DatatableUtil {
             columnValidator.validateSqlInjection(sql, order);
             sql = sql + " order by " + order;
         }
-
         final List<ResultsetRowData> result = genericDataService.fillResultsetRowData(sql, columnHeaders, params.toArray());
         return new GenericResultsetData(columnHeaders, result);
     }
@@ -261,4 +228,14 @@ public class DatatableUtil {
         return count != null && count > 0;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DatatableUtil(final SearchUtil searchUtil, final JdbcTemplate jdbcTemplate, final SqlValidator sqlValidator, final PlatformSecurityContext context, final GenericDataService genericDataService, final DatabaseSpecificSQLGenerator sqlGenerator, final ColumnValidator columnValidator) {
+        this.searchUtil = searchUtil;
+        this.jdbcTemplate = jdbcTemplate;
+        this.sqlValidator = sqlValidator;
+        this.context = context;
+        this.genericDataService = genericDataService;
+        this.sqlGenerator = sqlGenerator;
+        this.columnValidator = columnValidator;
+    }
 }

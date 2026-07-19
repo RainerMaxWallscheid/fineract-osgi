@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.loanorigination.service;
 
 import java.util.Collections;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.portfolio.loanorigination.data.LoanOriginatorData;
 import org.apache.fineract.portfolio.loanorigination.domain.LoanOriginator;
@@ -35,11 +34,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 @ConditionalOnProperty(value = "fineract.module.loan-origination.enabled", havingValue = "true")
 public class WorkingCapitalLoanOriginatorReadPlatformServiceImpl implements WorkingCapitalLoanOriginatorReadPlatformService {
-
     private final WorkingCapitalLoanOriginatorMappingRepository loanOriginatorMappingRepository;
     private final LoanOriginatorRepository loanOriginatorRepository;
     private final LoanOriginatorMapper loanOriginatorMapper;
@@ -55,8 +52,14 @@ public class WorkingCapitalLoanOriginatorReadPlatformServiceImpl implements Work
 
     @Override
     public Long resolveIdByExternalId(final String externalId) {
-        final LoanOriginator originator = this.loanOriginatorRepository.findByExternalId(new ExternalId(externalId))
-                .orElseThrow(() -> new LoanOriginatorNotFoundException(externalId));
+        final LoanOriginator originator = this.loanOriginatorRepository.findByExternalId(new ExternalId(externalId)).orElseThrow(() -> new LoanOriginatorNotFoundException(externalId));
         return originator.getId();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanOriginatorReadPlatformServiceImpl(final WorkingCapitalLoanOriginatorMappingRepository loanOriginatorMappingRepository, final LoanOriginatorRepository loanOriginatorRepository, final LoanOriginatorMapper loanOriginatorMapper) {
+        this.loanOriginatorMappingRepository = loanOriginatorMappingRepository;
+        this.loanOriginatorRepository = loanOriginatorRepository;
+        this.loanOriginatorMapper = loanOriginatorMapper;
     }
 }

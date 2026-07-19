@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
@@ -35,33 +34,25 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagement
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagementRepository;
 import org.apache.fineract.portfolio.loanaccount.exception.InvalidAmountOfCollateralQuantity;
 
-@RequiredArgsConstructor
 public class LoanCollateralAssembler {
-
     private final FromJsonHelper fromApiJsonHelper;
     private final CodeValueRepositoryWrapper codeValueRepository;
     private final LoanCollateralManagementRepository loanCollateralRepository;
     private final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper;
 
     public Set<LoanCollateralManagement> fromParsedJson(final JsonElement element) {
-
         final Set<LoanCollateralManagement> collateralItems = new HashSet<>();
-
         JsonObject jsonObject = element.getAsJsonObject();
         final Locale locale = this.fromApiJsonHelper.extractLocaleParameter(jsonObject);
-
         if (jsonObject.has("collateral") && jsonObject.get("collateral").isJsonArray()) {
             JsonArray collaterals = jsonObject.get("collateral").getAsJsonArray();
-
             for (int i = 0; i < collaterals.size(); i++) {
                 final JsonObject collateralItemElement = collaterals.get(i).getAsJsonObject();
                 final Long id = this.fromApiJsonHelper.extractLongNamed("id", collateralItemElement);
                 final Long collateralId = this.fromApiJsonHelper.extractLongNamed("clientCollateralId", collateralItemElement);
-                final ClientCollateralManagement clientCollateral = this.clientCollateralManagementRepositoryWrapper
-                        .getCollateral(collateralId);
+                final ClientCollateralManagement clientCollateral = this.clientCollateralManagementRepositoryWrapper.getCollateral(collateralId);
                 final BigDecimal quantity = this.fromApiJsonHelper.extractBigDecimalNamed("quantity", collateralItemElement, locale);
                 BigDecimal updatedClientQuantity = null;
-
                 if (id == null) {
                     updatedClientQuantity = clientCollateral.getQuantity().subtract(quantity);
                     if (BigDecimal.ZERO.compareTo(updatedClientQuantity) > 0) {
@@ -70,26 +61,28 @@ public class LoanCollateralAssembler {
                     clientCollateral.updateQuantity(updatedClientQuantity);
                     collateralItems.add(LoanCollateralManagement.from(clientCollateral, quantity));
                 } else {
-                    LoanCollateralManagement loanCollateralManagement = this.loanCollateralRepository.findById(id)
-                            .orElseThrow(() -> new LoanCollateralManagementNotFoundException(id));
-
+                    LoanCollateralManagement loanCollateralManagement = this.loanCollateralRepository.findById(id).orElseThrow(() -> new LoanCollateralManagementNotFoundException(id));
                     if (loanCollateralManagement.getQuantity().compareTo(quantity) != 0) {
-                        updatedClientQuantity = clientCollateral.getQuantity().add(loanCollateralManagement.getQuantity())
-                                .subtract(quantity);
+                        updatedClientQuantity = clientCollateral.getQuantity().add(loanCollateralManagement.getQuantity()).subtract(quantity);
                         if (BigDecimal.ZERO.compareTo(updatedClientQuantity) > 0) {
                             throw new InvalidAmountOfCollateralQuantity(quantity);
                         }
                     } else {
                         updatedClientQuantity = quantity;
                     }
-
                     clientCollateral.updateQuantity(updatedClientQuantity);
-                    collateralItems
-                            .add(LoanCollateralManagement.fromExisting(clientCollateral, quantity, loanCollateralManagement.getLoanData(),
-                                    loanCollateralManagement.getLoanTransaction(), loanCollateralManagement.getId()));
+                    collateralItems.add(LoanCollateralManagement.fromExisting(clientCollateral, quantity, loanCollateralManagement.getLoanData(), loanCollateralManagement.getLoanTransaction(), loanCollateralManagement.getId()));
                 }
             }
         }
         return collateralItems;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanCollateralAssembler(final FromJsonHelper fromApiJsonHelper, final CodeValueRepositoryWrapper codeValueRepository, final LoanCollateralManagementRepository loanCollateralRepository, final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper) {
+        this.fromApiJsonHelper = fromApiJsonHelper;
+        this.codeValueRepository = codeValueRepository;
+        this.loanCollateralRepository = loanCollateralRepository;
+        this.clientCollateralManagementRepositoryWrapper = clientCollateralManagementRepositoryWrapper;
     }
 }

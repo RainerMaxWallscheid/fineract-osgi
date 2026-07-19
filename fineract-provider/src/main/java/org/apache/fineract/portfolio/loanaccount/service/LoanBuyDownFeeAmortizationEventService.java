@@ -19,8 +19,6 @@
 package org.apache.fineract.portfolio.loanaccount.service;
 
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.event.business.BusinessEventListener;
 import org.apache.fineract.infrastructure.event.business.domain.loan.LoanAdjustTransactionBusinessEvent;
@@ -36,105 +34,93 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 
-@Slf4j
-@RequiredArgsConstructor
 public class LoanBuyDownFeeAmortizationEventService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanBuyDownFeeAmortizationEventService.class);
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanBuyDownFeeAmortizationProcessingService loanBuyDownFeeAmortizationProcessingService;
 
     @PostConstruct
     public void addListeners() {
         businessEventNotifierService.addPreBusinessEventListener(LoanCloseBusinessEvent.class, new LoanCloseListener());
-        businessEventNotifierService.addPostBusinessEventListener(LoanBuyDownFeeTransactionCreatedBusinessEvent.class,
-                new LoanBuyDownFeeTransactionListener());
-        businessEventNotifierService.addPostBusinessEventListener(LoanBuyDownFeeAdjustmentTransactionCreatedBusinessEvent.class,
-                new LoanBuyDownFeeAdjustmentTransactionListener());
-        businessEventNotifierService.addPostBusinessEventListener(LoanAdjustTransactionBusinessEvent.class,
-                new LoanAdjustTransactionListener());
+        businessEventNotifierService.addPostBusinessEventListener(LoanBuyDownFeeTransactionCreatedBusinessEvent.class, new LoanBuyDownFeeTransactionListener());
+        businessEventNotifierService.addPostBusinessEventListener(LoanBuyDownFeeAdjustmentTransactionCreatedBusinessEvent.class, new LoanBuyDownFeeAdjustmentTransactionListener());
+        businessEventNotifierService.addPostBusinessEventListener(LoanAdjustTransactionBusinessEvent.class, new LoanAdjustTransactionListener());
         businessEventNotifierService.addPostBusinessEventListener(LoanBalanceChangedBusinessEvent.class, new LoanBalanceChangedListener());
         businessEventNotifierService.addPostBusinessEventListener(LoanChargeOffPostBusinessEvent.class, new LoanChargeOffEventListener());
-        businessEventNotifierService.addPostBusinessEventListener(LoanUndoChargeOffBusinessEvent.class,
-                new LoanUndoChargeOffEventListener());
+        businessEventNotifierService.addPostBusinessEventListener(LoanUndoChargeOffBusinessEvent.class, new LoanUndoChargeOffEventListener());
         businessEventNotifierService.addPreBusinessEventListener(LoanChargeOffPreBusinessEvent.class, new LoanChargeOffPreEventListener());
     }
 
-    private final class LoanCloseListener implements BusinessEventListener<LoanCloseBusinessEvent> {
 
+    private final class LoanCloseListener implements BusinessEventListener<LoanCloseBusinessEvent> {
         @Override
         public void onBusinessEvent(final LoanCloseBusinessEvent event) {
             final Loan loan = event.get();
             final LoanStatus status = loan.getStatus();
-            if (loan.getLoanProductRelatedDetail().isEnableBuyDownFee()
-                    && (status.isClosedObligationsMet() || status.isClosedWrittenOff() || status.isOverpaid())) {
+            if (loan.getLoanProductRelatedDetail().isEnableBuyDownFee() && (status.isClosedObligationsMet() || status.isClosedWrittenOff() || status.isOverpaid())) {
                 log.debug("Loan closure on buy down fee amortization for loan {}", loan.getId());
                 loanBuyDownFeeAmortizationProcessingService.processBuyDownFeeAmortizationOnLoanClosure(loan, false);
             }
         }
     }
 
-    private final class LoanBalanceChangedListener implements BusinessEventListener<LoanBalanceChangedBusinessEvent> {
 
+    private final class LoanBalanceChangedListener implements BusinessEventListener<LoanBalanceChangedBusinessEvent> {
         @Override
         public void onBusinessEvent(final LoanBalanceChangedBusinessEvent event) {
             final Loan loan = event.get();
             final LoanStatus status = loan.getStatus();
-            if (loan.getLoanProductRelatedDetail().isEnableBuyDownFee()
-                    && (status.isClosedObligationsMet() || status.isClosedWrittenOff() || status.isOverpaid())) {
+            if (loan.getLoanProductRelatedDetail().isEnableBuyDownFee() && (status.isClosedObligationsMet() || status.isClosedWrittenOff() || status.isOverpaid())) {
                 log.debug("Loan balance change on buy down fee amortization for loan {}", loan.getId());
                 loanBuyDownFeeAmortizationProcessingService.processBuyDownFeeAmortizationOnLoanClosure(loan, true);
             }
         }
     }
 
-    private final class LoanBuyDownFeeTransactionListener implements BusinessEventListener<LoanBuyDownFeeTransactionCreatedBusinessEvent> {
 
+    private final class LoanBuyDownFeeTransactionListener implements BusinessEventListener<LoanBuyDownFeeTransactionCreatedBusinessEvent> {
         @Override
         public void onBusinessEvent(final LoanBuyDownFeeTransactionCreatedBusinessEvent event) {
             final Loan loan = event.get().getLoan();
             final LoanStatus status = loan.getStatus();
-            if (loan.getLoanProductRelatedDetail().isEnableBuyDownFee()
-                    && (status.isClosedObligationsMet() || status.isClosedWrittenOff() || status.isOverpaid())) {
+            if (loan.getLoanProductRelatedDetail().isEnableBuyDownFee() && (status.isClosedObligationsMet() || status.isClosedWrittenOff() || status.isOverpaid())) {
                 log.debug("Loan buy down fee change on buy down fee amortization for closed loan {}", loan.getId());
                 loanBuyDownFeeAmortizationProcessingService.processBuyDownFeeAmortizationOnLoanClosure(loan, true);
             }
         }
     }
 
-    private final class LoanBuyDownFeeAdjustmentTransactionListener
-            implements BusinessEventListener<LoanBuyDownFeeAdjustmentTransactionCreatedBusinessEvent> {
 
+    private final class LoanBuyDownFeeAdjustmentTransactionListener implements BusinessEventListener<LoanBuyDownFeeAdjustmentTransactionCreatedBusinessEvent> {
         @Override
         public void onBusinessEvent(final LoanBuyDownFeeAdjustmentTransactionCreatedBusinessEvent event) {
             final Loan loan = event.get().getLoan();
             final LoanStatus status = loan.getStatus();
-            if (loan.getLoanProductRelatedDetail().isEnableBuyDownFee()
-                    && (status.isClosedObligationsMet() || status.isClosedWrittenOff() || status.isOverpaid())) {
+            if (loan.getLoanProductRelatedDetail().isEnableBuyDownFee() && (status.isClosedObligationsMet() || status.isClosedWrittenOff() || status.isOverpaid())) {
                 log.debug("Loan buy down fee change on buy down fee amortization for closed loan {}", loan.getId());
                 loanBuyDownFeeAmortizationProcessingService.processBuyDownFeeAmortizationOnLoanClosure(loan, true);
             }
         }
     }
 
-    private final class LoanAdjustTransactionListener implements BusinessEventListener<LoanAdjustTransactionBusinessEvent> {
 
+    private final class LoanAdjustTransactionListener implements BusinessEventListener<LoanAdjustTransactionBusinessEvent> {
         @Override
         public void onBusinessEvent(final LoanAdjustTransactionBusinessEvent event) {
             final LoanTransaction transactionToAdjust = event.get().getTransactionToAdjust();
-            final boolean isTransactionBuyDownFeeRelated = transactionToAdjust.isBuyDownFee()
-                    || transactionToAdjust.isBuyDownFeeAdjustment();
+            final boolean isTransactionBuyDownFeeRelated = transactionToAdjust.isBuyDownFee() || transactionToAdjust.isBuyDownFeeAdjustment();
             final Loan loan = transactionToAdjust.getLoan();
             final LoanStatus status = loan.getStatus();
-            if (loan.getLoanProductRelatedDetail().isEnableBuyDownFee() && isTransactionBuyDownFeeRelated
-                    && (status.isClosedObligationsMet() || status.isClosedWrittenOff() || status.isOverpaid())) {
+            if (loan.getLoanProductRelatedDetail().isEnableBuyDownFee() && isTransactionBuyDownFeeRelated && (status.isClosedObligationsMet() || status.isClosedWrittenOff() || status.isOverpaid())) {
                 log.debug("Loan buy down fee change on buy down fee amortization for closed loan {}", loan.getId());
                 loanBuyDownFeeAmortizationProcessingService.processBuyDownFeeAmortizationOnLoanClosure(loan, true);
             }
         }
     }
 
-    private final class LoanChargeOffEventListener implements BusinessEventListener<LoanChargeOffPostBusinessEvent> {
 
+    private final class LoanChargeOffEventListener implements BusinessEventListener<LoanChargeOffPostBusinessEvent> {
         @Override
         public void onBusinessEvent(final LoanChargeOffPostBusinessEvent event) {
             final LoanTransaction loanTransaction = event.get();
@@ -146,31 +132,35 @@ public class LoanBuyDownFeeAmortizationEventService {
         }
     }
 
-    private final class LoanChargeOffPreEventListener implements BusinessEventListener<LoanChargeOffPreBusinessEvent> {
 
+    private final class LoanChargeOffPreEventListener implements BusinessEventListener<LoanChargeOffPreBusinessEvent> {
         @Override
         public void onBusinessEvent(final LoanChargeOffPreBusinessEvent event) {
             final Loan loan = event.get();
             if (loan.getLoanProductRelatedDetail().isEnableBuyDownFee()) {
                 log.debug("Loan pre charge-off buy down fee amortization for loan {}", loan.getId());
-                loanBuyDownFeeAmortizationProcessingService.processBuyDownFeeAmortizationTillDate(loan, DateUtils.getBusinessLocalDate(),
-                        true);
+                loanBuyDownFeeAmortizationProcessingService.processBuyDownFeeAmortizationTillDate(loan, DateUtils.getBusinessLocalDate(), true);
             }
         }
     }
 
-    private final class LoanUndoChargeOffEventListener implements BusinessEventListener<LoanUndoChargeOffBusinessEvent> {
 
+    private final class LoanUndoChargeOffEventListener implements BusinessEventListener<LoanUndoChargeOffBusinessEvent> {
         @Override
         public void onBusinessEvent(final LoanUndoChargeOffBusinessEvent event) {
             final LoanTransaction loanTransaction = event.get();
             final Loan loan = loanTransaction.getLoan();
             final LoanStatus status = loan.getStatus();
-            if (loan.getLoanProductRelatedDetail().isEnableBuyDownFee() && loanTransaction.getTypeOf().isChargeOff()
-                    && !(loan.isChargedOff() || status.isClosedObligationsMet() || status.isClosedWrittenOff() || status.isOverpaid())) {
+            if (loan.getLoanProductRelatedDetail().isEnableBuyDownFee() && loanTransaction.getTypeOf().isChargeOff() && !(loan.isChargedOff() || status.isClosedObligationsMet() || status.isClosedWrittenOff() || status.isOverpaid())) {
                 log.debug("Loan undo charge-off on buy down fee amortization for loan {}", loan.getId());
                 loanBuyDownFeeAmortizationProcessingService.processBuyDownFeeAmortizationOnLoanUndoChargeOff(loanTransaction);
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanBuyDownFeeAmortizationEventService(final BusinessEventNotifierService businessEventNotifierService, final LoanBuyDownFeeAmortizationProcessingService loanBuyDownFeeAmortizationProcessingService) {
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.loanBuyDownFeeAmortizationProcessingService = loanBuyDownFeeAmortizationProcessingService;
     }
 }

@@ -22,7 +22,6 @@ import static org.apache.fineract.infrastructure.core.domain.AuditableFieldsCons
 import static org.apache.fineract.infrastructure.core.domain.AuditableFieldsConstants.CREATED_DATE_DB_FIELD;
 import static org.apache.fineract.infrastructure.core.domain.AuditableFieldsConstants.LAST_MODIFIED_BY_DB_FIELD;
 import static org.apache.fineract.infrastructure.core.domain.AuditableFieldsConstants.LAST_MODIFIED_DATE_DB_FIELD;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -30,8 +29,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.database.RoutingDataSourceServiceFactory;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
@@ -43,10 +40,9 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-@Slf4j
-@RequiredArgsConstructor
 public class GenerateRdScheduleTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GenerateRdScheduleTasklet.class);
     private final RoutingDataSourceServiceFactory dataSourceServiceFactory;
     private final DepositAccountReadPlatformService depositAccountReadPlatformService;
     private final PlatformSecurityContext securityContext;
@@ -55,9 +51,7 @@ public class GenerateRdScheduleTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         final JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSourceServiceFactory.determineDataSourceService().retrieveDataSource());
         final Collection<Map<String, Object>> scheduleDetails = depositAccountReadPlatformService.retriveDataForRDScheduleCreation();
-        String insertSql = "INSERT INTO m_mandatory_savings_schedule (savings_account_id, duedate, installment, deposit_amount, completed_derived, "
-                + CREATED_DATE_DB_FIELD + ", " + CREATED_BY_DB_FIELD + ", " + LAST_MODIFIED_DATE_DB_FIELD + ", " + LAST_MODIFIED_BY_DB_FIELD
-                + ") " + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String insertSql = "INSERT INTO m_mandatory_savings_schedule (savings_account_id, duedate, installment, deposit_amount, completed_derived, " + CREATED_DATE_DB_FIELD + ", " + CREATED_BY_DB_FIELD + ", " + LAST_MODIFIED_DATE_DB_FIELD + ", " + LAST_MODIFIED_BY_DB_FIELD + ") " + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         List<Object[]> params = new ArrayList<>();
         Long userId = securityContext.authenticatedUser().getId();
         int iterations = 0;
@@ -76,8 +70,7 @@ public class GenerateRdScheduleTasklet implements Tasklet {
                 installmentNumber++;
                 lastDepositDate = DepositAccountUtils.calculateNextDepositDate(lastDepositDate, recurrence);
                 OffsetDateTime auditTime = DateUtils.getAuditOffsetDateTime();
-                params.add(new Object[] { savingsId, lastDepositDate, installmentNumber, amount, false, auditTime, userId, auditTime,
-                        userId });
+                params.add(new Object[] {savingsId, lastDepositDate, installmentNumber, amount, false, auditTime, userId, auditTime, userId});
                 iterations++;
             }
             if (iterations > 200) {
@@ -86,10 +79,16 @@ public class GenerateRdScheduleTasklet implements Tasklet {
                 iterations = 0;
             }
         }
-
         if (!params.isEmpty()) {
             jdbcTemplate.batchUpdate(insertSql, params);
         }
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GenerateRdScheduleTasklet(final RoutingDataSourceServiceFactory dataSourceServiceFactory, final DepositAccountReadPlatformService depositAccountReadPlatformService, final PlatformSecurityContext securityContext) {
+        this.dataSourceServiceFactory = dataSourceServiceFactory;
+        this.depositAccountReadPlatformService = depositAccountReadPlatformService;
+        this.securityContext = securityContext;
     }
 }

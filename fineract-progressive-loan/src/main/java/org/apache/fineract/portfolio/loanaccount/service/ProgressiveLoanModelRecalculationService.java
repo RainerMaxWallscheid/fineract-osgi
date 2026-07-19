@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.fineract.portfolio.loanaccount.domain.ChangedTransactionDetail;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -36,9 +35,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@RequiredArgsConstructor
 public class ProgressiveLoanModelRecalculationService {
-
     private final LoanRepaymentScheduleTransactionProcessorFactory transactionProcessorFactory;
     private final LoanTransactionRepository loanTransactionRepository;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
@@ -46,16 +43,19 @@ public class ProgressiveLoanModelRecalculationService {
     @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
     public ProgressiveLoanInterestScheduleModel getRecalculatedModel(Long loanId, LocalDate tillDate) {
         Loan loan = loanRepositoryWrapper.findOneWithNotFoundDetection(loanId);
-        LoanRepaymentScheduleTransactionProcessor transactionProcessor = transactionProcessorFactory
-                .determineProcessor(loan.getTransactionProcessingStrategyCode());
+        LoanRepaymentScheduleTransactionProcessor transactionProcessor = transactionProcessorFactory.determineProcessor(loan.getTransactionProcessingStrategyCode());
         if (transactionProcessor instanceof AdvancedPaymentScheduleTransactionProcessor advancedPaymentScheduleTransactionProcessor) {
             List<LoanTransaction> loanTransactions = loanTransactionRepository.findNonReversedTransactionsForReprocessingByLoan(loan);
-            Pair<ChangedTransactionDetail, ProgressiveLoanInterestScheduleModel> result = advancedPaymentScheduleTransactionProcessor
-                    .reprocessProgressiveLoanTransactions(loan.getDisbursementDate(), tillDate, loanTransactions, loan.getCurrency(),
-                            loan.getRepaymentScheduleInstallments(), loan.getActiveCharges());
+            Pair<ChangedTransactionDetail, ProgressiveLoanInterestScheduleModel> result = advancedPaymentScheduleTransactionProcessor.reprocessProgressiveLoanTransactions(loan.getDisbursementDate(), tillDate, loanTransactions, loan.getCurrency(), loan.getRepaymentScheduleInstallments(), loan.getActiveCharges());
             return result.getRight();
         }
         return null;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ProgressiveLoanModelRecalculationService(final LoanRepaymentScheduleTransactionProcessorFactory transactionProcessorFactory, final LoanTransactionRepository loanTransactionRepository, final LoanRepositoryWrapper loanRepositoryWrapper) {
+        this.transactionProcessorFactory = transactionProcessorFactory;
+        this.loanTransactionRepository = loanTransactionRepository;
+        this.loanRepositoryWrapper = loanRepositoryWrapper;
+    }
 }

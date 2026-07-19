@@ -20,18 +20,12 @@ package org.apache.fineract.portfolio.loanaccount.loanschedule.domain;
 
 import java.util.Arrays;
 import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
-@Getter
-@RequiredArgsConstructor
 public enum LoanScheduleProcessingType {
-
-    HORIZONTAL("Horizontal"), //
-    VERTICAL("Vertical"), //
-    ;
-
+    HORIZONTAL("Horizontal"),  //
+    VERTICAL("Vertical");
+    //
     private final String humanReadableName;
 
     public static List<EnumOptionData> getValuesAsEnumOptionDataList() {
@@ -48,5 +42,15 @@ public enum LoanScheduleProcessingType {
 
     public boolean isVertical() {
         return this == VERTICAL;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private LoanScheduleProcessingType(final String humanReadableName) {
+        this.humanReadableName = humanReadableName;
     }
 }

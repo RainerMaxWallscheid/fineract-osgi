@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.event.external.service.serialization.serializer.loan;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
 import org.apache.fineract.avro.loan.v1.LoanProductDataV1;
@@ -33,9 +32,7 @@ import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatform
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class LoanProductBusinessEventSerializer extends AbstractBusinessEventWithCustomDataSerializer<LoanProductBusinessEvent> {
-
     private final LoanProductReadPlatformService service;
     private final LoanProductDataMapper mapper;
     private final List<ExternalEventCustomDataSerializer<LoanProductBusinessEvent>> externalEventCustomDataSerializers;
@@ -62,5 +59,12 @@ public class LoanProductBusinessEventSerializer extends AbstractBusinessEventWit
     @Override
     protected List<ExternalEventCustomDataSerializer<LoanProductBusinessEvent>> getExternalEventCustomDataSerializers() {
         return externalEventCustomDataSerializers;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanProductBusinessEventSerializer(final LoanProductReadPlatformService service, final LoanProductDataMapper mapper, final List<ExternalEventCustomDataSerializer<LoanProductBusinessEvent>> externalEventCustomDataSerializers) {
+        this.service = service;
+        this.mapper = mapper;
+        this.externalEventCustomDataSerializers = externalEventCustomDataSerializers;
     }
 }

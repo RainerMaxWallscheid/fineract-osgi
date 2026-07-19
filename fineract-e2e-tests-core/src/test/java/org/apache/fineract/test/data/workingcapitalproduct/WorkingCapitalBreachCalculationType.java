@@ -16,20 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.test.data.workingcapitalproduct;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@Getter
-@RequiredArgsConstructor
 public enum WorkingCapitalBreachCalculationType {
-
-    FLAT(0L, "FLAT", "Flat"), //
-    PERCENTAGE(1L, "PERCENTAGE", "Percentage"); //
-
+    FLAT(0L, "FLAT", "Flat"),  //
+    PERCENTAGE(1L, "PERCENTAGE", "Percentage");
+    //
     private final Long id;
     private final String code;
     private final String value;
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private WorkingCapitalBreachCalculationType(final Long id, final String code, final String value) {
+        this.id = id;
+        this.code = code;
+        this.value = value;
+    }
 }

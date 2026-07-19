@@ -20,16 +20,9 @@ package org.apache.fineract.portfolio.tax.data;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 
-@AllArgsConstructor
-@Getter
-@Setter
 public class TaxGroupMappingsData implements Serializable {
-
     @SuppressWarnings("unused")
     private final Long id;
     @SuppressWarnings("unused")
@@ -57,5 +50,33 @@ public class TaxGroupMappingsData implements Serializable {
             endDate = this.endDate;
         }
         return endDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TaxGroupMappingsData(final Long id, final TaxComponentData taxComponent, final LocalDate startDate, final LocalDate endDate) {
+        this.id = id;
+        this.taxComponent = taxComponent;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TaxComponentData getTaxComponent() {
+        return this.taxComponent;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getStartDate() {
+        return this.startDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getEndDate() {
+        return this.endDate;
     }
 }

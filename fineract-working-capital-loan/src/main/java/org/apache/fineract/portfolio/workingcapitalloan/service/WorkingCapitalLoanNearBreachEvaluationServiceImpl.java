@@ -23,8 +23,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
@@ -37,19 +35,16 @@ import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapita
 import org.apache.fineract.portfolio.workingcapitalloannearbreach.domain.WorkingCapitalNearBreach;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
-@Slf4j
 @Service
 public class WorkingCapitalLoanNearBreachEvaluationServiceImpl implements WorkingCapitalLoanNearBreachEvaluationService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanNearBreachEvaluationServiceImpl.class);
     private final WorkingCapitalLoanBreachScheduleRepository breachScheduleRepository;
     private final WorkingCapitalLoanBreachActionRepository breachActionRepository;
 
     @Override
-    public void evaluateNearBreach(final WorkingCapitalLoan loan, final WorkingCapitalLoanNearBreachAction latestAction,
-            final LocalDate effectiveDate) {
-        final Optional<WorkingCapitalLoanBreachSchedule> relevantPeriod = breachScheduleRepository
-                .findByLoanIdAndFromDateLessThanEqualAndToDateGreaterThanEqual(loan.getId(), effectiveDate, effectiveDate);
+    public void evaluateNearBreach(final WorkingCapitalLoan loan, final WorkingCapitalLoanNearBreachAction latestAction, final LocalDate effectiveDate) {
+        final Optional<WorkingCapitalLoanBreachSchedule> relevantPeriod = breachScheduleRepository.findByLoanIdAndFromDateLessThanEqualAndToDateGreaterThanEqual(loan.getId(), effectiveDate, effectiveDate);
         if (relevantPeriod.isEmpty()) {
             return;
         }
@@ -58,8 +53,7 @@ public class WorkingCapitalLoanNearBreachEvaluationServiceImpl implements Workin
             return;
         }
         if (isBreachEvaluationDisabled(loan.getId(), effectiveDate)) {
-            log.debug("Skipping near breach evaluation for WC loan {} - breach evaluation is disabled as of {}", loan.getId(),
-                    effectiveDate);
+            log.debug("Skipping near breach evaluation for WC loan {} - breach evaluation is disabled as of {}", loan.getId(), effectiveDate);
             return;
         }
         if (period.isReset()) {
@@ -67,7 +61,6 @@ public class WorkingCapitalLoanNearBreachEvaluationServiceImpl implements Workin
             return;
         }
         final WorkingCapitalNearBreach config = loan.getLoanProductRelatedDetails().getNearBreach();
-
         final BigDecimal effectiveThreshold;
         final Integer effectiveFrequency;
         final WorkingCapitalLoanPeriodFrequencyType effectiveFrequencyType;
@@ -85,8 +78,7 @@ public class WorkingCapitalLoanNearBreachEvaluationServiceImpl implements Workin
         }
     }
 
-    private boolean evaluatePeriod(final Long loanId, final WorkingCapitalLoanBreachSchedule period, final BigDecimal threshold,
-            final Integer frequency, final WorkingCapitalLoanPeriodFrequencyType frequencyType, final LocalDate effectiveDate) {
+    private boolean evaluatePeriod(final Long loanId, final WorkingCapitalLoanBreachSchedule period, final BigDecimal threshold, final Integer frequency, final WorkingCapitalLoanPeriodFrequencyType frequencyType, final LocalDate effectiveDate) {
         if (period.getMinPaymentAmount() == null || period.getMinPaymentAmount().compareTo(BigDecimal.ZERO) == 0) {
             return false;
         }
@@ -99,13 +91,11 @@ public class WorkingCapitalLoanNearBreachEvaluationServiceImpl implements Workin
         if (evalIndex >= 0) {
             final MonetaryCurrency currency = period.getLoan().getLoanProductRelatedDetails().getCurrency();
             final BigDecimal thresholdFraction = threshold.divide(BigDecimal.valueOf(100), MoneyHelper.getMathContext());
-            final Money requiredCumulative = calculateRequiredCumulative(currency, period.getMinPaymentAmount(), thresholdFraction,
-                    evalIndex);
+            final Money requiredCumulative = calculateRequiredCumulative(currency, period.getMinPaymentAmount(), thresholdFraction, evalIndex);
             final Money paidCumulative = Money.of(currency, period.getPaidAmount());
             if (paidCumulative.isLessThan(requiredCumulative)) {
                 period.setNearBreach(true);
-                log.debug("Near breach detected for period {} of WC loan {}: evalDate={} cumulativePaid={} requiredCumulative={}",
-                        period.getPeriodNumber(), loanId, effectiveDate, paidCumulative, requiredCumulative);
+                log.debug("Near breach detected for period {} of WC loan {}: evalDate={} cumulativePaid={} requiredCumulative={}", period.getPeriodNumber(), loanId, effectiveDate, paidCumulative, requiredCumulative);
                 return true;
             }
         }
@@ -117,17 +107,14 @@ public class WorkingCapitalLoanNearBreachEvaluationServiceImpl implements Workin
         return false;
     }
 
-    private Money calculateRequiredCumulative(final MonetaryCurrency currency, final BigDecimal minPaymentAmount,
-            final BigDecimal thresholdFraction, final int evalIndex) {
-        final BigDecimal rawAmount = thresholdFraction.multiply(BigDecimal.valueOf(evalIndex + 1L), MoneyHelper.getMathContext())
-                .multiply(minPaymentAmount, MoneyHelper.getMathContext());
+    private Money calculateRequiredCumulative(final MonetaryCurrency currency, final BigDecimal minPaymentAmount, final BigDecimal thresholdFraction, final int evalIndex) {
+        final BigDecimal rawAmount = thresholdFraction.multiply(BigDecimal.valueOf(evalIndex + 1L), MoneyHelper.getMathContext()).multiply(minPaymentAmount, MoneyHelper.getMathContext());
         return Money.of(currency, rawAmount);
     }
 
-    private List<LocalDate> listEvalDates(final LocalDate fromDate, final LocalDate toDate, final Integer frequency,
-            final WorkingCapitalLoanPeriodFrequencyType frequencyType) {
+    private List<LocalDate> listEvalDates(final LocalDate fromDate, final LocalDate toDate, final Integer frequency, final WorkingCapitalLoanPeriodFrequencyType frequencyType) {
         final List<LocalDate> dates = new ArrayList<>();
-        for (int multiplicator = 1;; multiplicator++) {
+        for (int multiplicator = 1; ; multiplicator++) {
             final LocalDate evalDate = addFrequency(fromDate, frequency * multiplicator, frequencyType);
             if (!evalDate.isBefore(toDate)) {
                 break;
@@ -150,4 +137,9 @@ public class WorkingCapitalLoanNearBreachEvaluationServiceImpl implements Workin
         return breachActionRepository.isBreachDisabledAsOf(loanId, date);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanNearBreachEvaluationServiceImpl(final WorkingCapitalLoanBreachScheduleRepository breachScheduleRepository, final WorkingCapitalLoanBreachActionRepository breachActionRepository) {
+        this.breachScheduleRepository = breachScheduleRepository;
+        this.breachActionRepository = breachActionRepository;
+    }
 }

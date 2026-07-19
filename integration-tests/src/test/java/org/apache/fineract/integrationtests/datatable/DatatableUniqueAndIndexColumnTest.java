@@ -21,10 +21,7 @@ package org.apache.fineract.integrationtests.datatable;
 import static org.apache.fineract.integrationtests.common.Utils.initializeRESTAssured;
 import static org.apache.fineract.integrationtests.datatable.DatatableEntity.LOAN;
 import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.List;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.client.models.GetDataTablesResponse;
 import org.apache.fineract.client.models.PostColumnHeaderData;
 import org.apache.fineract.client.models.PostDataTablesRequest;
@@ -42,7 +39,6 @@ import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 public class DatatableUniqueAndIndexColumnTest {
-
     private DatatableHelper datatableHelper;
 
     @BeforeEach
@@ -57,12 +53,10 @@ public class DatatableUniqueAndIndexColumnTest {
         String datatableName = DatatableTestNameGenerator.generateDatatableName(LOAN);
         String column1Name = "itsanumber";
         String column2Name = "itsastring";
-
         PostDataTablesRequest request = new PostDataTablesRequest();
         request.setDatatableName(datatableName);
         request.setApptableName(LOAN.getReferencedTableName());
         request.setMultiRow(false);
-
         PostColumnHeaderData column1HeaderRequestData = new PostColumnHeaderData();
         column1HeaderRequestData.setName(column1Name);
         column1HeaderRequestData.setType("Number");
@@ -71,9 +65,7 @@ public class DatatableUniqueAndIndexColumnTest {
         column1HeaderRequestData.setCode("");
         column1HeaderRequestData.setUnique(true);
         column1HeaderRequestData.setIndexed(true);
-
         request.addColumnsItem(column1HeaderRequestData);
-
         PostColumnHeaderData column2HeaderRequestData = new PostColumnHeaderData();
         column2HeaderRequestData.setName(column2Name);
         column2HeaderRequestData.setType("String");
@@ -82,26 +74,17 @@ public class DatatableUniqueAndIndexColumnTest {
         column2HeaderRequestData.setCode("");
         column2HeaderRequestData.setUnique(false);
         column2HeaderRequestData.setIndexed(true);
-
         request.addColumnsItem(column2HeaderRequestData);
-
         // when
         PostDataTablesResponse response = datatableHelper.createDatatable(request);
-
         // then
         assertThat(response.getResourceIdentifier()).isNotBlank();
-
         GetDataTablesResponse dataTable = datatableHelper.getDataTableDetails(datatableName);
-
         List<ResultsetColumnHeaderData> columnHeaderData = dataTable.getColumnHeaderData();
         assertThat(columnHeaderData).isNotNull().hasSize(5);
-
-        List<NameUniqueIndexedHeaderData> expected = List.of(new NameUniqueIndexedHeaderData(column1Name, true, true),
-                new NameUniqueIndexedHeaderData(column2Name, false, true));
-
+        List<NameUniqueIndexedHeaderData> expected = List.of(new NameUniqueIndexedHeaderData(column1Name, true, true), new NameUniqueIndexedHeaderData(column2Name, false, true));
         NameUniqueIndexedHeaderData.Mapper mapper = Mappers.getMapper(NameUniqueIndexedHeaderData.Mapper.class);
         List<NameUniqueIndexedHeaderData> data = mapper.map(columnHeaderData);
-
         assertThat(data).containsAll(expected);
     }
 
@@ -112,12 +95,10 @@ public class DatatableUniqueAndIndexColumnTest {
         String datatableName = DatatableTestNameGenerator.generateDatatableName(LOAN);
         String column1Name = "itsanumber";
         String column2Name = "itsastring";
-
         PostDataTablesRequest request = new PostDataTablesRequest();
         request.setDatatableName(datatableName);
         request.setApptableName(LOAN.getReferencedTableName());
         request.setMultiRow(false);
-
         PostColumnHeaderData column1HeaderRequestData = new PostColumnHeaderData();
         column1HeaderRequestData.setName(column1Name);
         column1HeaderRequestData.setType("Number");
@@ -126,9 +107,7 @@ public class DatatableUniqueAndIndexColumnTest {
         column1HeaderRequestData.setCode("");
         column1HeaderRequestData.setUnique(true);
         column1HeaderRequestData.setIndexed(true);
-
         request.addColumnsItem(column1HeaderRequestData);
-
         PostColumnHeaderData column2HeaderRequestData = new PostColumnHeaderData();
         column2HeaderRequestData.setName(column2Name);
         column2HeaderRequestData.setType("String");
@@ -137,21 +116,15 @@ public class DatatableUniqueAndIndexColumnTest {
         column2HeaderRequestData.setCode("");
         column2HeaderRequestData.setUnique(false);
         column2HeaderRequestData.setIndexed(true);
-
         request.addColumnsItem(column2HeaderRequestData);
-
         PostDataTablesResponse response = datatableHelper.createDatatable(request);
-
         assertThat(response.getResourceIdentifier()).isNotBlank();
         // endregion
-
         // region Datatable update
         PutDataTablesRequest updateRequest = new PutDataTablesRequest();
         updateRequest.setApptableName(LOAN.getReferencedTableName());
-
         String column3Name = "number1";
         String column4Name = "number2";
-
         PutDataTablesRequestAddColumns addColumn1 = new PutDataTablesRequestAddColumns();
         addColumn1.setName(column3Name);
         addColumn1.setType("Number");
@@ -159,9 +132,7 @@ public class DatatableUniqueAndIndexColumnTest {
         addColumn1.setCode("");
         addColumn1.setUnique(true);
         addColumn1.setIndexed(false);
-
         updateRequest.addAddColumnsItem(addColumn1);
-
         PutDataTablesRequestAddColumns addColumn2 = new PutDataTablesRequestAddColumns();
         addColumn2.setName(column4Name);
         addColumn2.setType("Number");
@@ -169,34 +140,24 @@ public class DatatableUniqueAndIndexColumnTest {
         addColumn2.setCode("");
         addColumn2.setUnique(false);
         addColumn2.setIndexed(true);
-
         updateRequest.addAddColumnsItem(addColumn2);
-
         PutDataTablesRequestChangeColumns changeColumns = new PutDataTablesRequestChangeColumns();
         changeColumns.setName(column1Name);
         String newColumnName = column1Name + "new";
         changeColumns.setNewName(newColumnName);
         changeColumns.setUnique(false);
         changeColumns.setIndexed(true);
-
         updateRequest.addChangeColumnsItem(changeColumns);
-
         // endregion
         // when
         PutDataTablesResponse updateResponse = datatableHelper.updateDatatable(datatableName, updateRequest);
-
         // then
         GetDataTablesResponse dataTable = datatableHelper.getDataTableDetails(datatableName);
-
         List<ResultsetColumnHeaderData> columnHeaderData = dataTable.getColumnHeaderData();
         assertThat(columnHeaderData).isNotNull().hasSize(7);
-
-        List<NameUniqueIndexedHeaderData> expected = List.of(new NameUniqueIndexedHeaderData(column3Name, true, true),
-                new NameUniqueIndexedHeaderData(column4Name, false, true), new NameUniqueIndexedHeaderData(newColumnName, false, true));
-
+        List<NameUniqueIndexedHeaderData> expected = List.of(new NameUniqueIndexedHeaderData(column3Name, true, true), new NameUniqueIndexedHeaderData(column4Name, false, true), new NameUniqueIndexedHeaderData(newColumnName, false, true));
         NameUniqueIndexedHeaderData.Mapper mapper = Mappers.getMapper(NameUniqueIndexedHeaderData.Mapper.class);
         List<NameUniqueIndexedHeaderData> data = mapper.map(columnHeaderData);
-
         assertThat(data).containsAll(expected);
     }
 
@@ -205,12 +166,10 @@ public class DatatableUniqueAndIndexColumnTest {
         // given
         String datatableName = DatatableTestNameGenerator.generateDatatableName(LOAN);
         String column1Name = "itsanumber";
-
         PostDataTablesRequest request = new PostDataTablesRequest();
         request.setDatatableName(datatableName);
         request.setApptableName(LOAN.getReferencedTableName());
         request.setMultiRow(true);
-
         PostColumnHeaderData column1HeaderRequestData = new PostColumnHeaderData();
         column1HeaderRequestData.setName(column1Name);
         column1HeaderRequestData.setType("Number");
@@ -219,27 +178,17 @@ public class DatatableUniqueAndIndexColumnTest {
         column1HeaderRequestData.setCode("");
         column1HeaderRequestData.setUnique(false);
         column1HeaderRequestData.setIndexed(false);
-
         request.addColumnsItem(column1HeaderRequestData);
-
         // when
         PostDataTablesResponse response = datatableHelper.createDatatable(request);
-
         // then
         assertThat(response.getResourceIdentifier()).isNotBlank();
-
         GetDataTablesResponse dataTable = datatableHelper.getDataTableDetails(datatableName);
-
         List<ResultsetColumnHeaderData> columnHeaderData = dataTable.getColumnHeaderData();
         assertThat(columnHeaderData).isNotNull().hasSize(5);
-
-        List<NameUniqueIndexedHeaderData> expected = List.of(new NameUniqueIndexedHeaderData("id", true, true),
-                new NameUniqueIndexedHeaderData("loan_id", false, true), new NameUniqueIndexedHeaderData(column1Name, false, false),
-                new NameUniqueIndexedHeaderData("created_at", false, false), new NameUniqueIndexedHeaderData("updated_at", false, false));
-
+        List<NameUniqueIndexedHeaderData> expected = List.of(new NameUniqueIndexedHeaderData("id", true, true), new NameUniqueIndexedHeaderData("loan_id", false, true), new NameUniqueIndexedHeaderData(column1Name, false, false), new NameUniqueIndexedHeaderData("created_at", false, false), new NameUniqueIndexedHeaderData("updated_at", false, false));
         NameUniqueIndexedHeaderData.Mapper mapper = Mappers.getMapper(NameUniqueIndexedHeaderData.Mapper.class);
         List<NameUniqueIndexedHeaderData> data = mapper.map(columnHeaderData);
-
         assertThat(data).containsExactlyInAnyOrderElementsOf(expected);
     }
 
@@ -248,12 +197,10 @@ public class DatatableUniqueAndIndexColumnTest {
         // given
         String datatableName = DatatableTestNameGenerator.generateDatatableName(LOAN);
         String column1Name = "itsanumber";
-
         PostDataTablesRequest request = new PostDataTablesRequest();
         request.setDatatableName(datatableName);
         request.setApptableName(LOAN.getReferencedTableName());
         request.setMultiRow(false);
-
         PostColumnHeaderData column1HeaderRequestData = new PostColumnHeaderData();
         column1HeaderRequestData.setName(column1Name);
         column1HeaderRequestData.setType("Number");
@@ -262,46 +209,93 @@ public class DatatableUniqueAndIndexColumnTest {
         column1HeaderRequestData.setCode("");
         column1HeaderRequestData.setUnique(false);
         column1HeaderRequestData.setIndexed(false);
-
         request.addColumnsItem(column1HeaderRequestData);
-
         // when
         PostDataTablesResponse response = datatableHelper.createDatatable(request);
-
         // then
         assertThat(response.getResourceIdentifier()).isNotBlank();
-
         GetDataTablesResponse dataTable = datatableHelper.getDataTableDetails(datatableName);
-
         List<ResultsetColumnHeaderData> columnHeaderData = dataTable.getColumnHeaderData();
         assertThat(columnHeaderData).isNotNull().hasSize(4);
-
-        List<NameUniqueIndexedHeaderData> expected = List.of(new NameUniqueIndexedHeaderData("loan_id", true, true),
-                new NameUniqueIndexedHeaderData(column1Name, false, false), new NameUniqueIndexedHeaderData("created_at", false, false),
-                new NameUniqueIndexedHeaderData("updated_at", false, false));
-
+        List<NameUniqueIndexedHeaderData> expected = List.of(new NameUniqueIndexedHeaderData("loan_id", true, true), new NameUniqueIndexedHeaderData(column1Name, false, false), new NameUniqueIndexedHeaderData("created_at", false, false), new NameUniqueIndexedHeaderData("updated_at", false, false));
         NameUniqueIndexedHeaderData.Mapper mapper = Mappers.getMapper(NameUniqueIndexedHeaderData.Mapper.class);
         List<NameUniqueIndexedHeaderData> data = mapper.map(columnHeaderData);
-
         assertThat(data).containsExactlyInAnyOrderElementsOf(expected);
     }
 
-    @RequiredArgsConstructor
-    @Data
-    public static class NameUniqueIndexedHeaderData {
 
+    public static class NameUniqueIndexedHeaderData {
         private final String name;
         private final boolean unique;
         private final boolean indexed;
 
+
         @org.mapstruct.Mapper
         public interface Mapper {
-
-            @Mappings({ @Mapping(target = "name", source = "columnName"), @Mapping(target = "unique", source = "isColumnUnique"),
-                    @Mapping(target = "indexed", source = "isColumnIndexed") })
+            @Mappings({@Mapping(target = "name", source = "columnName"), @Mapping(target = "unique", source = "isColumnUnique"), @Mapping(target = "indexed", source = "isColumnIndexed")})
             NameUniqueIndexedHeaderData map(ResultsetColumnHeaderData source);
 
             List<NameUniqueIndexedHeaderData> map(List<ResultsetColumnHeaderData> source);
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public NameUniqueIndexedHeaderData(final String name, final boolean unique, final boolean indexed) {
+            this.name = name;
+            this.unique = unique;
+            this.indexed = indexed;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public String getName() {
+            return this.name;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public boolean isUnique() {
+            return this.unique;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public boolean isIndexed() {
+            return this.indexed;
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public boolean equals(final java.lang.Object o) {
+            if (o == this) return true;
+            if (!(o instanceof DatatableUniqueAndIndexColumnTest.NameUniqueIndexedHeaderData)) return false;
+            final DatatableUniqueAndIndexColumnTest.NameUniqueIndexedHeaderData other = (DatatableUniqueAndIndexColumnTest.NameUniqueIndexedHeaderData) o;
+            if (!other.canEqual((java.lang.Object) this)) return false;
+            if (this.isUnique() != other.isUnique()) return false;
+            if (this.isIndexed() != other.isIndexed()) return false;
+            final java.lang.Object this$name = this.getName();
+            final java.lang.Object other$name = other.getName();
+            if (this$name == null ? other$name != null : !this$name.equals(other$name)) return false;
+            return true;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                protected boolean canEqual(final java.lang.Object other) {
+            return other instanceof DatatableUniqueAndIndexColumnTest.NameUniqueIndexedHeaderData;
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public int hashCode() {
+            final int PRIME = 59;
+            int result = 1;
+            result = result * PRIME + (this.isUnique() ? 79 : 97);
+            result = result * PRIME + (this.isIndexed() ? 79 : 97);
+            final java.lang.Object $name = this.getName();
+            result = result * PRIME + ($name == null ? 43 : $name.hashCode());
+            return result;
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "DatatableUniqueAndIndexColumnTest.NameUniqueIndexedHeaderData(name=" + this.getName() + ", unique=" + this.isUnique() + ", indexed=" + this.isIndexed() + ")";
         }
     }
 }

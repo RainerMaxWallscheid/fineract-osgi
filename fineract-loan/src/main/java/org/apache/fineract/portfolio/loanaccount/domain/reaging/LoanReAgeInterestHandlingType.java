@@ -20,22 +20,14 @@ package org.apache.fineract.portfolio.loanaccount.domain.reaging;
 
 import java.util.Arrays;
 import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.StringEnumOptionData;
 
-@Getter
-@RequiredArgsConstructor
 public enum LoanReAgeInterestHandlingType {
-
-    DEFAULT("loanReAgeInterestHandlingType.default", "Default"), //
-    WAIVE_INTEREST("loanReAgeInterestHandlingType.waiveInterest", "Waive Interest"), //
-    EQUAL_AMORTIZATION_PAYABLE_INTEREST("loanReAgeInterestHandlingType.equalAmortizationPayableInterest",
-            "Equal Amortization of Outstanding payable Interest"), //
-    EQUAL_AMORTIZATION_FULL_INTEREST("loanReAgeInterestHandlingType.equalAmortizationFullInterest",
-            "Equal Amortization of Outstanding full Interest"), //
-    ;
-
+    DEFAULT("loanReAgeInterestHandlingType.default", "Default"),  //
+    WAIVE_INTEREST("loanReAgeInterestHandlingType.waiveInterest", "Waive Interest"),  //
+    EQUAL_AMORTIZATION_PAYABLE_INTEREST("loanReAgeInterestHandlingType.equalAmortizationPayableInterest", "Equal Amortization of Outstanding payable Interest"),  //
+    EQUAL_AMORTIZATION_FULL_INTEREST("loanReAgeInterestHandlingType.equalAmortizationFullInterest", "Equal Amortization of Outstanding full Interest");
+    //
     private final String code;
     private final String humanReadableName;
 
@@ -47,4 +39,19 @@ public enum LoanReAgeInterestHandlingType {
         return new StringEnumOptionData(name(), getCode(), getHumanReadableName());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private LoanReAgeInterestHandlingType(final String code, final String humanReadableName) {
+        this.code = code;
+        this.humanReadableName = humanReadableName;
+    }
 }

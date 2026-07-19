@@ -21,8 +21,6 @@ package org.apache.fineract.portfolio.workingcapitalloan.service;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
@@ -38,10 +36,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class WorkingCapitalLoanDiscountFeeAmortizationServiceImpl implements WorkingCapitalLoanDiscountFeeAmortizationService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanDiscountFeeAmortizationServiceImpl.class);
     private final WorkingCapitalLoanTransactionRepository transactionRepository;
     private final WorkingCapitalLoanAccountingProcessor accountingProcessor;
     private final ExternalIdFactory externalIdFactory;
@@ -63,46 +60,34 @@ public class WorkingCapitalLoanDiscountFeeAmortizationServiceImpl implements Wor
         // Derive the already-amortized income from the (non-reversed) amortization transactions rather than the cached
         // balance, so the recalculation stays correct after backdated payments, reversals or schedule config changes.
         final BigDecimal alreadyPosted = queryNetAmortized(loan.getId());
-
         if (MathUtil.isZero(scheduleAmortization) && !fullyPaid && MathUtil.isZero(alreadyPosted)) {
             log.debug("Skipping discount fee amortization for WC loan [{}] - no amortization on schedule", loan.getId());
             return;
         }
-
-        final BigDecimal discount = loan.getLoanProductRelatedDetails() != null ? loan.getLoanProductRelatedDetails().getDiscount()
-                : BigDecimal.ZERO;
-
-        final BigDecimal amortizationAmount = fullyPaid && MathUtil.isGreaterThanZero(discount) ? discount.subtract(alreadyPosted)
-                : scheduleAmortization.subtract(alreadyPosted);
-
+        final BigDecimal discount = loan.getLoanProductRelatedDetails() != null ? loan.getLoanProductRelatedDetails().getDiscount() : BigDecimal.ZERO;
+        final BigDecimal amortizationAmount = fullyPaid && MathUtil.isGreaterThanZero(discount) ? discount.subtract(alreadyPosted) : scheduleAmortization.subtract(alreadyPosted);
         if (MathUtil.isZero(amortizationAmount)) {
-            log.debug("Skipping discount fee amortization for WC loan [{}] - no new amount to amortize (schedule={}, posted={})",
-                    loan.getId(), scheduleAmortization, alreadyPosted);
+            log.debug("Skipping discount fee amortization for WC loan [{}] - no new amount to amortize (schedule={}, posted={})", loan.getId(), scheduleAmortization, alreadyPosted);
             return;
         }
-
         // Charge-off accounting is out of scope here (see the full-discount note above), so amortization is always
         // posted as not-charged-off.
         if (MathUtil.isGreaterThanZero(amortizationAmount)) {
-            final WorkingCapitalLoanTransaction amortizationTxn = WorkingCapitalLoanTransaction.discountFeeAmortization(loan,
-                    amortizationAmount, transactionDate, externalIdFactory.create());
+            final WorkingCapitalLoanTransaction amortizationTxn = WorkingCapitalLoanTransaction.discountFeeAmortization(loan, amortizationAmount, transactionDate, externalIdFactory.create());
             transactionRepository.saveAndFlush(amortizationTxn);
             if (loan.getLoanProduct().getAccountingRule().isAccrualWithDeferredRevenueAmortization()) {
                 accountingProcessor.postJournalEntriesForDiscountFeeAmortization(loan, amortizationTxn, false);
             }
         } else {
             final BigDecimal adjustmentAmount = amortizationAmount.negate();
-            final WorkingCapitalLoanTransaction adjustmentTxn = WorkingCapitalLoanTransaction.discountFeeAmortizationAdjustment(loan,
-                    adjustmentAmount, transactionDate, externalIdFactory.create());
+            final WorkingCapitalLoanTransaction adjustmentTxn = WorkingCapitalLoanTransaction.discountFeeAmortizationAdjustment(loan, adjustmentAmount, transactionDate, externalIdFactory.create());
             linkToTriggeringDiscountAdjustment(loan, adjustmentTxn);
             transactionRepository.saveAndFlush(adjustmentTxn);
             if (loan.getLoanProduct().getAccountingRule().isAccrualWithDeferredRevenueAmortization()) {
                 accountingProcessor.postJournalEntriesForDiscountFeeAmortizationAdjustment(loan, adjustmentTxn, false);
             }
         }
-
         recalculateRealizedIncome(loan);
-
         log.debug("Posted discount fee amortization of {} for WC loan [{}]", amortizationAmount, loan.getId());
     }
 
@@ -117,14 +102,12 @@ public class WorkingCapitalLoanDiscountFeeAmortizationServiceImpl implements Wor
     }
 
     private BigDecimal queryNetAmortized(final Long loanId) {
-        return transactionRepository.sumNetAmortization(loanId, LoanTransactionType.DISCOUNT_FEE_AMORTIZATION,
-                LoanTransactionType.DISCOUNT_FEE_AMORTIZATION_ADJUSTMENT);
+        return transactionRepository.sumNetAmortization(loanId, LoanTransactionType.DISCOUNT_FEE_AMORTIZATION, LoanTransactionType.DISCOUNT_FEE_AMORTIZATION_ADJUSTMENT);
     }
 
     private BigDecimal calculateScheduleAmortization(final WorkingCapitalLoan loan, final LocalDate cobDate) {
         final MathContext mc = MoneyHelper.getMathContext();
-        return scheduleRepositoryWrapper.readModel(loan.getId(), mc, WorkingCapitalLoanCurrencyResolver.resolveCurrency(loan))
-                .map(model -> model.totalActualAmortizationWithDiscount(discountInForceOn(loan, model, cobDate))).orElse(BigDecimal.ZERO);
+        return scheduleRepositoryWrapper.readModel(loan.getId(), mc, WorkingCapitalLoanCurrencyResolver.resolveCurrency(loan)).map(model -> model.totalActualAmortizationWithDiscount(discountInForceOn(loan, model, cobDate))).orElse(BigDecimal.ZERO);
     }
 
     /**
@@ -132,18 +115,20 @@ public class WorkingCapitalLoanDiscountFeeAmortizationServiceImpl implements Wor
      * adding back the non-reversed discount fee adjustments dated after the COB date yields the discount that was
      * effective on a replayed day, so a fast-forward does not evaluate amortization against a not-yet-effective change.
      */
-    private BigDecimal discountInForceOn(final WorkingCapitalLoan loan, final ProjectedAmortizationScheduleModel model,
-            final LocalDate cobDate) {
-        final BigDecimal notYetEffective = transactionRepository.sumDiscountFeeAdjustmentsAfter(loan.getId(),
-                LoanTransactionType.DISCOUNT_FEE_ADJUSTMENT, cobDate);
+    private BigDecimal discountInForceOn(final WorkingCapitalLoan loan, final ProjectedAmortizationScheduleModel model, final LocalDate cobDate) {
+        final BigDecimal notYetEffective = transactionRepository.sumDiscountFeeAdjustmentsAfter(loan.getId(), LoanTransactionType.DISCOUNT_FEE_ADJUSTMENT, cobDate);
         return model.discountFeeAmount().getAmount().add(notYetEffective);
     }
 
-    private void linkToTriggeringDiscountAdjustment(final WorkingCapitalLoan loan,
-            final WorkingCapitalLoanTransaction amortizationAdjustment) {
-        transactionRepository.findActiveByTypeOrderByIdDesc(loan.getId(), LoanTransactionType.DISCOUNT_FEE_ADJUSTMENT).stream().findFirst()
-                .ifPresent(discountAdjustment -> amortizationAdjustment.getLoanTransactionRelations()
-                        .add(new WorkingCapitalLoanTransactionRelation(amortizationAdjustment, discountAdjustment,
-                                LoanTransactionRelationTypeEnum.RELATED)));
+    private void linkToTriggeringDiscountAdjustment(final WorkingCapitalLoan loan, final WorkingCapitalLoanTransaction amortizationAdjustment) {
+        transactionRepository.findActiveByTypeOrderByIdDesc(loan.getId(), LoanTransactionType.DISCOUNT_FEE_ADJUSTMENT).stream().findFirst().ifPresent(discountAdjustment -> amortizationAdjustment.getLoanTransactionRelations().add(new WorkingCapitalLoanTransactionRelation(amortizationAdjustment, discountAdjustment, LoanTransactionRelationTypeEnum.RELATED)));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanDiscountFeeAmortizationServiceImpl(final WorkingCapitalLoanTransactionRepository transactionRepository, final WorkingCapitalLoanAccountingProcessor accountingProcessor, final ExternalIdFactory externalIdFactory, final ProjectedAmortizationScheduleRepositoryWrapper scheduleRepositoryWrapper) {
+        this.transactionRepository = transactionRepository;
+        this.accountingProcessor = accountingProcessor;
+        this.externalIdFactory = externalIdFactory;
+        this.scheduleRepositoryWrapper = scheduleRepositoryWrapper;
     }
 }

@@ -21,21 +21,16 @@ package org.apache.fineract.portfolio.loanaccount.loanschedule.data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
-import lombok.Getter;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleModelPeriod;
 
-@Getter
 public final class LoanScheduleModelDownPaymentPeriod implements LoanScheduleModelPeriod {
-
     private final int periodNumber;
     private final LocalDate periodDate;
     private final Money principalDue;
     private final Money outstandingLoanBalance;
 
-    public static LoanScheduleModelDownPaymentPeriod downPayment(final int periodNumber, final LocalDate periodDate,
-            final Money principalDue, final Money outstandingLoanBalance) {
-
+    public static LoanScheduleModelDownPaymentPeriod downPayment(final int periodNumber, final LocalDate periodDate, final Money principalDue, final Money outstandingLoanBalance) {
         return new LoanScheduleModelDownPaymentPeriod(periodNumber, periodDate, principalDue, outstandingLoanBalance);
     }
 
@@ -48,8 +43,7 @@ public final class LoanScheduleModelDownPaymentPeriod implements LoanScheduleMod
 
     @Override
     public LoanSchedulePeriodData toData() {
-        return LoanSchedulePeriodData.downPaymentOnlyPeriod(this.periodNumber, this.periodDate, this.principalDue.getAmount(),
-                this.outstandingLoanBalance.getAmount());
+        return LoanSchedulePeriodData.downPaymentOnlyPeriod(this.periodNumber, this.periodDate, this.principalDue.getAmount(), this.outstandingLoanBalance.getAmount());
     }
 
     @Override
@@ -83,7 +77,6 @@ public final class LoanScheduleModelDownPaymentPeriod implements LoanScheduleMod
         if (this.principalDue != null) {
             value = this.principalDue.getAmount();
         }
-
         return value;
     }
 
@@ -104,7 +97,6 @@ public final class LoanScheduleModelDownPaymentPeriod implements LoanScheduleMod
 
     @Override
     public void addLoanCharges(BigDecimal feeCharge, BigDecimal penaltyCharge) {
-
     }
 
     @Override
@@ -114,12 +106,10 @@ public final class LoanScheduleModelDownPaymentPeriod implements LoanScheduleMod
 
     @Override
     public void addPrincipalAmount(Money principalDue) {
-
     }
 
     @Override
     public void addInterestAmount(Money interestDue) {
-
     }
 
     @Override
@@ -129,7 +119,6 @@ public final class LoanScheduleModelDownPaymentPeriod implements LoanScheduleMod
 
     @Override
     public void setEMIFixedSpecificToInstallmentTrue() {
-
     }
 
     @Override
@@ -144,6 +133,25 @@ public final class LoanScheduleModelDownPaymentPeriod implements LoanScheduleMod
 
     @Override
     public void setRescheduleInterestPortion(BigDecimal rescheduleInterestPortion) {
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public int getPeriodNumber() {
+        return this.periodNumber;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getPeriodDate() {
+        return this.periodDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Money getPrincipalDue() {
+        return this.principalDue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Money getOutstandingLoanBalance() {
+        return this.outstandingLoanBalance;
     }
 }

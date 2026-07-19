@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,15 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "SAVINGSACCOUNT", action = "APPROVALUNDO")
-@RequiredArgsConstructor
 public class SavingsAccountApplicationApprovalUndoCommandHandler implements NewCommandSourceHandler {
-
     private final SavingsApplicationProcessWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.undoApplicationApproval(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsAccountApplicationApprovalUndoCommandHandler(final SavingsApplicationProcessWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

@@ -19,10 +19,7 @@
 package org.apache.fineract.infrastructure.configuration.service;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.configuration.exception.GlobalConfigurationException;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.JdbcTemplateFactory;
@@ -32,11 +29,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 public class GlobalConfigurationValidationService implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GlobalConfigurationValidationService.class);
     private static final String GLOBAL_CONFIGURATION_NAME_PATTERN = "^[a-z][a-z0-9-]*$";
     private final TenantDetailsService tenantDetailsService;
     private final JdbcTemplateFactory jdbcTemplateFactory;
@@ -48,7 +44,6 @@ public class GlobalConfigurationValidationService implements InitializingBean {
 
     private void validateGlobalConfigurationNames() {
         List<FineractPlatformTenant> tenants = tenantDetailsService.findAllTenants();
-
         if (isNotEmpty(tenants)) {
             for (FineractPlatformTenant tenant : tenants) {
                 ThreadLocalContextUtil.setTenant(tenant);
@@ -60,7 +55,6 @@ public class GlobalConfigurationValidationService implements InitializingBean {
     private void validateGlobalConfigurationForIndividualTenant(FineractPlatformTenant tenant) {
         log.debug("Validating global configuration for {}", tenant.getTenantIdentifier());
         List<String> globalConfigurationNames = getGlobalConfigurationNames(tenant);
-
         globalConfigurationNames.forEach(globalConfigurationName -> {
             if (!globalConfigurationName.matches(GLOBAL_CONFIGURATION_NAME_PATTERN)) {
                 throw new GlobalConfigurationException(globalConfigurationName);
@@ -71,5 +65,11 @@ public class GlobalConfigurationValidationService implements InitializingBean {
     private List<String> getGlobalConfigurationNames(FineractPlatformTenant tenant) {
         final JdbcTemplate jdbcTemplate = jdbcTemplateFactory.create(tenant);
         return jdbcTemplate.queryForList("select gc.name as name from c_configuration gc", String.class);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GlobalConfigurationValidationService(final TenantDetailsService tenantDetailsService, final JdbcTemplateFactory jdbcTemplateFactory) {
+        this.tenantDetailsService = tenantDetailsService;
+        this.jdbcTemplateFactory = jdbcTemplateFactory;
     }
 }

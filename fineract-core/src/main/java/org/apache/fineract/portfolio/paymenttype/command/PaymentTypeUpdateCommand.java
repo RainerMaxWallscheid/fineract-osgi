@@ -18,11 +18,40 @@
  */
 package org.apache.fineract.portfolio.paymenttype.command;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeUpdateRequest;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class PaymentTypeUpdateCommand extends Command<PaymentTypeUpdateRequest> {}
+public class PaymentTypeUpdateCommand extends Command<PaymentTypeUpdateRequest> {
+	@java.lang.SuppressWarnings("all")
+		public PaymentTypeUpdateCommand() {
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public java.lang.String toString() {
+		return "PaymentTypeUpdateCommand()";
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public boolean equals(final java.lang.Object o) {
+		if (o == this) return true;
+		if (!(o instanceof PaymentTypeUpdateCommand)) return false;
+		final PaymentTypeUpdateCommand other = (PaymentTypeUpdateCommand) o;
+		if (!other.canEqual((java.lang.Object) this)) return false;
+		if (!super.equals(o)) return false;
+		return true;
+	}
+
+	@java.lang.SuppressWarnings("all")
+		protected boolean canEqual(final java.lang.Object other) {
+		return other instanceof PaymentTypeUpdateCommand;
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public int hashCode() {
+		final int result = super.hashCode();
+		return result;
+	}
+}

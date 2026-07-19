@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.portfolio.common.domain;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.ApiFacingEnum;
 
 /**
@@ -49,17 +47,32 @@ import org.apache.fineract.infrastructure.core.api.ApiFacingEnum;
  * is not within the period.</li>
  * </ul>
  */
-@Getter
-@RequiredArgsConstructor
 public enum DaysInYearCustomStrategyType implements ApiFacingEnum<DaysInYearCustomStrategyType> {
-
-    /** Always considers 366 days in a leap year. */
-    FULL_LEAP_YEAR("DaysInYearCustomStrategyType.fullLeapYear", "Full Leap Year"), //
-
-    /** Considers 366 days only if the period includes February 29th; otherwise, uses 365 days. */
-    FEB_29_PERIOD_ONLY("DaysInYearCustomStrategyType.feb29PeriodOnly", "Feb 29 Period Only"); //
-
+    /**
+     * Always considers 366 days in a leap year.
+     */
+    FULL_LEAP_YEAR("DaysInYearCustomStrategyType.fullLeapYear", "Full Leap Year"),  //
+    /**
+     * Considers 366 days only if the period includes February 29th; otherwise, uses 365 days.
+     */
+    FEB_29_PERIOD_ONLY("DaysInYearCustomStrategyType.feb29PeriodOnly", "Feb 29 Period Only");
+    //
     private final String code;
     private final String humanReadableName;
 
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private DaysInYearCustomStrategyType(final String code, final String humanReadableName) {
+        this.code = code;
+        this.humanReadableName = humanReadableName;
+    }
 }

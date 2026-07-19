@@ -19,8 +19,6 @@
 package org.apache.fineract.portfolio.loanaccount.jobs.addaccrualentries;
 
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.exception.MultiException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
@@ -32,11 +30,10 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class AddAccrualEntriesTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AddAccrualEntriesTasklet.class);
     private final LoanAccrualsProcessingService loanAccrualsProcessingService;
 
     @Override
@@ -51,5 +48,10 @@ public class AddAccrualEntriesTasklet implements Tasklet {
 
     private void addAccruals(final LocalDate tillDate) throws MultiException {
         loanAccrualsProcessingService.addAccruals(tillDate);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AddAccrualEntriesTasklet(final LoanAccrualsProcessingService loanAccrualsProcessingService) {
+        this.loanAccrualsProcessingService = loanAccrualsProcessingService;
     }
 }

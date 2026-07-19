@@ -24,27 +24,17 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
-@Table(name = "m_delinquency_bucket_mappings", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_delinquency_bucket_mapping", columnNames = { "delinquencyBucket", "delinquencyRange" }) })
+@Table(name = "m_delinquency_bucket_mappings", uniqueConstraints = {@UniqueConstraint(name = "uq_delinquency_bucket_mapping", columnNames = {"delinquencyBucket", "delinquencyRange"})})
 public class DelinquencyBucketMappings extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @ManyToOne
     @JoinColumn(name = "delinquency_bucket_id", nullable = false)
     private DelinquencyBucket delinquencyBucket;
-
     @ManyToOne
     @JoinColumn(name = "delinquency_range_id", nullable = false)
     private DelinquencyRange delinquencyRange;
-
     @Version
     private Long version;
 
@@ -57,4 +47,37 @@ public class DelinquencyBucketMappings extends AbstractAuditableWithUTCDateTimeC
         return new DelinquencyBucketMappings(delinquencyBucket, delinquencyRange);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyBucket getDelinquencyBucket() {
+        return this.delinquencyBucket;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyRange getDelinquencyRange() {
+        return this.delinquencyRange;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getVersion() {
+        return this.version;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDelinquencyBucket(final DelinquencyBucket delinquencyBucket) {
+        this.delinquencyBucket = delinquencyBucket;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDelinquencyRange(final DelinquencyRange delinquencyRange) {
+        this.delinquencyRange = delinquencyRange;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setVersion(final Long version) {
+        this.version = version;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyBucketMappings() {
+    }
 }

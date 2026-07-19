@@ -18,13 +18,12 @@
  */
 package org.apache.fineract.infrastructure.jobs.service.retainedearning;
 
+import org.springframework.lang.NonNull;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.accounting.retainedearning.domain.AccountGLJournalEntryAnnualSummaryRepository;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
@@ -45,14 +44,12 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 @StepScope
-@Slf4j
-@RequiredArgsConstructor
 public class RetainedEarningJobWriter implements ItemWriter<AccountGLJournalEntryAnnualSummaryData>, StepExecutionListener {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RetainedEarningJobWriter.class);
     private final RetainedEarningDataService retainedEarningDataService;
     private final AccountGLJournalEntryAnnualSummaryRepository annualSummaryRepository;
     private final RetainedEarningConfigurationService retainedEarningConfigurationService;
-
     private boolean shouldWrite;
 
     @Override
@@ -60,11 +57,9 @@ public class RetainedEarningJobWriter implements ItemWriter<AccountGLJournalEntr
         final LocalDate currentDate = ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.BUSINESS_DATE);
         final LocalDate lastDayOfPreviousFiscalYear = retainedEarningConfigurationService.getLastDayOfPreviousFiscalYear(currentDate);
         final boolean entriesExist = !annualSummaryRepository.findByYearEndDate(lastDayOfPreviousFiscalYear).isEmpty();
-
         if (entriesExist) {
             shouldWrite = false;
-            log.info("Retained earning Writer: entries already exist for yearEndDate={}. Will run as dry run.",
-                    lastDayOfPreviousFiscalYear);
+            log.info("Retained earning Writer: entries already exist for yearEndDate={}. Will run as dry run.", lastDayOfPreviousFiscalYear);
         } else {
             shouldWrite = true;
             log.info("Retained earning Writer: no existing entries for yearEndDate={}. Will persist records.", lastDayOfPreviousFiscalYear);
@@ -74,20 +69,26 @@ public class RetainedEarningJobWriter implements ItemWriter<AccountGLJournalEntr
     @Override
     @Transactional
     public void write(@NonNull Chunk<? extends AccountGLJournalEntryAnnualSummaryData> retainedEarningSummaries) {
-        List<AccountGLJournalEntryAnnualSummaryData> validSummaries = retainedEarningSummaries.getItems().stream().filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        if (retainedEarningSummaries == null) {
+            throw new java.lang.NullPointerException("retainedEarningSummaries is marked non-null but is null");
+        }
+        List<AccountGLJournalEntryAnnualSummaryData> validSummaries = retainedEarningSummaries.getItems().stream().filter(Objects::nonNull).collect(Collectors.toList());
         if (validSummaries.isEmpty()) {
             log.info("No valid retained earning entries to write");
             return;
         }
-
         if (!shouldWrite) {
-            log.info("Dry run complete: data pipeline validated successfully, recordsProcessed={}, no records written.",
-                    validSummaries.size());
+            log.info("Dry run complete: data pipeline validated successfully, recordsProcessed={}, no records written.", validSummaries.size());
             return;
         }
-
         retainedEarningDataService.insertRetainedEarningSummaryBatch(validSummaries);
         log.info("Year-end processing: persisted {} retained earning records.", validSummaries.size());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RetainedEarningJobWriter(final RetainedEarningDataService retainedEarningDataService, final AccountGLJournalEntryAnnualSummaryRepository annualSummaryRepository, final RetainedEarningConfigurationService retainedEarningConfigurationService) {
+        this.retainedEarningDataService = retainedEarningDataService;
+        this.annualSummaryRepository = annualSummaryRepository;
+        this.retainedEarningConfigurationService = retainedEarningConfigurationService;
     }
 }

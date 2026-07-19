@@ -27,7 +27,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.security.constants.TwoFactorConstants;
 import org.apache.fineract.infrastructure.security.data.FineractJwtAuthenticationToken;
 import org.apache.fineract.infrastructure.security.domain.TFAccessToken;
@@ -53,31 +52,24 @@ import org.springframework.web.filter.GenericFilterBean;
  * An authenticated platform user with permission 'BYPASS_TWOFACTOR' will always be granted 'TWOFACTOR_AUTHENTICATED'
  * authority regardless of the value of the 'Fineract-Platform-TFA-Token' header.
  */
-@RequiredArgsConstructor
 public class TwoFactorAuthenticationFilter extends GenericFilterBean {
-
     private final TwoFactorService twoFactorService;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-
         final HttpServletRequest request = (HttpServletRequest) req;
         final HttpServletResponse response = (HttpServletResponse) res;
-
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = null;
         if (context != null) {
             authentication = context.getAuthentication();
         }
-
         // Process two-factor only when user is authenticated
         if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof AppUser) {
             AppUser user = (AppUser) authentication.getPrincipal();
-
             if (user == null) {
                 return;
             }
-
             if (!user.hasSpecificPermissionTo(TwoFactorConstants.BYPASS_TWO_FACTOR_PERMISSION)) {
                 // User can't bypass two-factor auth, check two-factor access
                 // token
@@ -96,30 +88,28 @@ public class TwoFactorAuthenticationFilter extends GenericFilterBean {
                     return;
                 }
             }
-
             List<GrantedAuthority> updatedAuthorities = new ArrayList<>(authentication.getAuthorities());
             updatedAuthorities.add(new SimpleGrantedAuthority("TWOFACTOR_AUTHENTICATED"));
             context.setAuthentication(createUpdatedAuthentication(authentication, updatedAuthorities));
         }
-
         chain.doFilter(req, res);
     }
 
-    private Authentication createUpdatedAuthentication(final Authentication currentAuthentication,
-            final List<GrantedAuthority> updatedAuthorities) throws ServletException {
-
+    private Authentication createUpdatedAuthentication(final Authentication currentAuthentication, final List<GrantedAuthority> updatedAuthorities) throws ServletException {
         if (currentAuthentication instanceof UsernamePasswordAuthenticationToken) {
-            UsernamePasswordAuthenticationToken updatedAuthentication = new UsernamePasswordAuthenticationToken(
-                    currentAuthentication.getPrincipal(), currentAuthentication.getCredentials(), updatedAuthorities);
+            UsernamePasswordAuthenticationToken updatedAuthentication = new UsernamePasswordAuthenticationToken(currentAuthentication.getPrincipal(), currentAuthentication.getCredentials(), updatedAuthorities);
             return updatedAuthentication;
         } else if (currentAuthentication instanceof FineractJwtAuthenticationToken) {
             FineractJwtAuthenticationToken fineractJwtAuthenticationToken = (FineractJwtAuthenticationToken) currentAuthentication;
-            FineractJwtAuthenticationToken updatedAuthentication = new FineractJwtAuthenticationToken(
-                    fineractJwtAuthenticationToken.getToken(), updatedAuthorities, (UserDetails) currentAuthentication.getPrincipal());
+            FineractJwtAuthenticationToken updatedAuthentication = new FineractJwtAuthenticationToken(fineractJwtAuthenticationToken.getToken(), updatedAuthorities, (UserDetails) currentAuthentication.getPrincipal());
             return updatedAuthentication;
         } else {
             throw new ServletException("Unknown authentication type: " + currentAuthentication.getClass().getName());
         }
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public TwoFactorAuthenticationFilter(final TwoFactorService twoFactorService) {
+        this.twoFactorService = twoFactorService;
     }
 }

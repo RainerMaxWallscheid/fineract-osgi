@@ -23,8 +23,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainRuleException;
@@ -38,10 +36,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class ApplyChargeToOverdueLoanInstallmentTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ApplyChargeToOverdueLoanInstallmentTasklet.class);
     private final ConfigurationDomainService configurationDomainService;
     private final LoanReadPlatformService loanReadPlatformService;
     private final LoanChargeWritePlatformService loanChargeWritePlatformService;
@@ -50,9 +47,7 @@ public class ApplyChargeToOverdueLoanInstallmentTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         final Long penaltyWaitPeriodValue = configurationDomainService.retrievePenaltyWaitPeriod();
         final Boolean backdatePenalties = configurationDomainService.isBackdatePenaltiesEnabled();
-        final Collection<OverdueLoanScheduleData> overdueLoanScheduledInstallments = loanReadPlatformService
-                .retrieveAllLoansWithOverdueInstallments(penaltyWaitPeriodValue, backdatePenalties);
-
+        final Collection<OverdueLoanScheduleData> overdueLoanScheduledInstallments = loanReadPlatformService.retrieveAllLoansWithOverdueInstallments(penaltyWaitPeriodValue, backdatePenalties);
         if (!overdueLoanScheduledInstallments.isEmpty()) {
             final Map<Long, Collection<OverdueLoanScheduleData>> overdueScheduleData = new HashMap<>();
             for (final OverdueLoanScheduleData overdueInstallment : overdueLoanScheduledInstallments) {
@@ -64,24 +59,20 @@ public class ApplyChargeToOverdueLoanInstallmentTasklet implements Tasklet {
                     overdueScheduleData.put(overdueInstallment.getLoanId(), loanData);
                 }
             }
-
             List<Throwable> exceptions = new ArrayList<>();
             for (Map.Entry<Long, Collection<OverdueLoanScheduleData>> entry : overdueScheduleData.entrySet()) {
                 try {
                     if (!entry.getValue().isEmpty()) {
                         loanChargeWritePlatformService.applyOverdueChargesForLoan(entry.getKey(), entry.getValue());
                     }
-
                 } catch (final PlatformApiDataValidationException e) {
                     final List<ApiParameterError> errors = e.getErrors();
                     for (final ApiParameterError error : errors) {
-                        log.error("Apply Charges due for overdue loans failed for account {} with message: {}", entry.getKey(),
-                                error.getDeveloperMessage(), e);
+                        log.error("Apply Charges due for overdue loans failed for account {} with message: {}", entry.getKey(), error.getDeveloperMessage(), e);
                     }
                     exceptions.add(e);
                 } catch (final AbstractPlatformDomainRuleException e) {
-                    log.error("Apply Charges due for overdue loans failed for account {} with message: {}", entry.getKey(),
-                            e.getDefaultUserMessage(), e);
+                    log.error("Apply Charges due for overdue loans failed for account {} with message: {}", entry.getKey(), e.getDefaultUserMessage(), e);
                     exceptions.add(e);
                 } catch (Exception e) {
                     log.error("Apply Charges due for overdue loans failed for account {}", entry.getKey(), e);
@@ -93,5 +84,12 @@ public class ApplyChargeToOverdueLoanInstallmentTasklet implements Tasklet {
             }
         }
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ApplyChargeToOverdueLoanInstallmentTasklet(final ConfigurationDomainService configurationDomainService, final LoanReadPlatformService loanReadPlatformService, final LoanChargeWritePlatformService loanChargeWritePlatformService) {
+        this.configurationDomainService = configurationDomainService;
+        this.loanReadPlatformService = loanReadPlatformService;
+        this.loanChargeWritePlatformService = loanChargeWritePlatformService;
     }
 }

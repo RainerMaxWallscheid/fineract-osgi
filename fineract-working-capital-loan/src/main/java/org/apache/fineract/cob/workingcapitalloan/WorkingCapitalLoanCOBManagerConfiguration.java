@@ -25,8 +25,6 @@ import static org.apache.fineract.cob.workingcapitalloan.WorkingCapitalLoanCOBCo
 import static org.apache.fineract.cob.workingcapitalloan.WorkingCapitalLoanCOBConstant.WORKING_CAPITAL_LOAN_COB_STEP;
 import static org.apache.fineract.cob.workingcapitalloan.WorkingCapitalLoanCOBConstant.WORKING_CAPITAL_LOAN_COB_WORKER_STEP;
 import static org.apache.fineract.infrastructure.jobs.service.JobName.WORKING_CAPITAL_LOAN_COB_JOB;
-
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.COBBusinessStepService;
 import org.apache.fineract.cob.common.CustomJobParameterResolver;
 import org.apache.fineract.cob.conditions.BatchManagerCondition;
@@ -56,9 +54,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @EnableBatchIntegration
 @Conditional(BatchManagerCondition.class)
-@RequiredArgsConstructor
 public class WorkingCapitalLoanCOBManagerConfiguration {
-
     private final JobRepository jobRepository;
     private final CustomJobParameterResolver customJobParameterResolver;
     private final PlatformTransactionManager transactionManager;
@@ -73,26 +69,23 @@ public class WorkingCapitalLoanCOBManagerConfiguration {
     @Bean(WORKING_CAPITAL_LOAN_COB_PARTITIONER)
     @StepScope
     public WorkingCapitalLoanCOBPartitioner workingCapitalLoanCOBPartitioner(@Value("#{stepExecution}") StepExecution stepExecution) {
-        return new WorkingCapitalLoanCOBPartitioner(jobOperator, stepExecution, WorkingCapitalLoanCOBConstant.NUMBER_OF_DAYS_BEHIND,
-                retrieveIdService, cobBusinessStepService, propertyService);
+        return new WorkingCapitalLoanCOBPartitioner(jobOperator, stepExecution, WorkingCapitalLoanCOBConstant.NUMBER_OF_DAYS_BEHIND, retrieveIdService, cobBusinessStepService, propertyService);
     }
 
     @Bean(WORKING_CAPITAL_JOB_HUMAN_READABLE_NAME)
-    public Job workingCapitalLoanCOBJob(final WorkingCapitalLoanCOBPartitioner workingCapitalLoanCOBPartitioner,
-            final ApplicationContext applicationContext) {
-        return new JobBuilder(WORKING_CAPITAL_LOAN_COB_JOB.name(), jobRepository) //
-                .listener(new COBExecutionListenerRunner(applicationContext, WORKING_CAPITAL_LOAN_COB_JOB.name())) //
-                .start(resolveCustomJobParametersForWorkingCapitalStep()) //
-                .next(workingCapitalLoanCOBStep(workingCapitalLoanCOBPartitioner)) //
-                .next(unlockProcessedWorkingCapitalLoansStep()) //
-                .incrementer(new RunIdIncrementer()) //
-                .build();
+    public Job workingCapitalLoanCOBJob(final WorkingCapitalLoanCOBPartitioner workingCapitalLoanCOBPartitioner, final ApplicationContext applicationContext) {
+        return  //
+        //
+        //
+        //
+        //
+        //
+        new JobBuilder(WORKING_CAPITAL_LOAN_COB_JOB.name(), jobRepository).listener(new COBExecutionListenerRunner(applicationContext, WORKING_CAPITAL_LOAN_COB_JOB.name())).start(resolveCustomJobParametersForWorkingCapitalStep()).next(workingCapitalLoanCOBStep(workingCapitalLoanCOBPartitioner)).next(unlockProcessedWorkingCapitalLoansStep()).incrementer(new RunIdIncrementer()).build();
     }
 
     @Bean
     public Step unlockProcessedWorkingCapitalLoansStep() {
-        return new StepBuilder("Unlock processed working capital loan accounts - Step", jobRepository)
-                .tasklet(unlockProcessedWorkingCapitalLoansTasklet(), transactionManager).build();
+        return new StepBuilder("Unlock processed working capital loan accounts - Step", jobRepository).tasklet(unlockProcessedWorkingCapitalLoansTasklet(), transactionManager).build();
     }
 
     @Bean
@@ -107,15 +100,28 @@ public class WorkingCapitalLoanCOBManagerConfiguration {
 
     @Bean
     public Step resolveCustomJobParametersForWorkingCapitalStep() {
-        return new StepBuilder("Resolve custom job parameters - Step", jobRepository)
-                .tasklet(resolveCustomJobParametersForWorkingCapitalTasklet(), transactionManager).build();
+        return new StepBuilder("Resolve custom job parameters - Step", jobRepository).tasklet(resolveCustomJobParametersForWorkingCapitalTasklet(), transactionManager).build();
     }
 
     @Bean(WORKING_CAPITAL_LOAN_COB_STEP)
     public Step workingCapitalLoanCOBStep(WorkingCapitalLoanCOBPartitioner partitioner) {
-        return stepBuilderFactory.get(WORKING_CAPITAL_LOAN_COB_PARTITIONER_STEP)//
-                .partitioner(WORKING_CAPITAL_LOAN_COB_WORKER_STEP, partitioner)//
-                .pollInterval(propertyService.getPollInterval(WORKING_CAPITAL_JOB_NAME))//
-                .outputChannel(outboundRequests).build();//
+        return //
+        //
+        //
+        stepBuilderFactory.get(WORKING_CAPITAL_LOAN_COB_PARTITIONER_STEP).partitioner(WORKING_CAPITAL_LOAN_COB_WORKER_STEP, partitioner).pollInterval(propertyService.getPollInterval(WORKING_CAPITAL_JOB_NAME)).outputChannel(outboundRequests).build();//
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanCOBManagerConfiguration(final JobRepository jobRepository, final CustomJobParameterResolver customJobParameterResolver, final PlatformTransactionManager transactionManager, final RemotePartitioningManagerStepBuilderFactory stepBuilderFactory, final COBBusinessStepService cobBusinessStepService, final JobOperator jobOperator, final DirectChannel outboundRequests, final PropertyService propertyService, final WorkingCapitalLoanRetrieveIdService retrieveIdService, final AccountLockService<WorkingCapitalLoanAccountLock> accountLockService) {
+        this.jobRepository = jobRepository;
+        this.customJobParameterResolver = customJobParameterResolver;
+        this.transactionManager = transactionManager;
+        this.stepBuilderFactory = stepBuilderFactory;
+        this.cobBusinessStepService = cobBusinessStepService;
+        this.jobOperator = jobOperator;
+        this.outboundRequests = outboundRequests;
+        this.propertyService = propertyService;
+        this.retrieveIdService = retrieveIdService;
+        this.accountLockService = accountLockService;
     }
 }

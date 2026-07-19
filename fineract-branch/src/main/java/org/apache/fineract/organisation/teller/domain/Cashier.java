@@ -30,11 +30,6 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.office.domain.Office;
@@ -48,97 +43,70 @@ import org.apache.fineract.organisation.staff.domain.Staff;
  * @since 2.0.0
  */
 @Entity
-@Table(name = "m_cashiers", uniqueConstraints = {
-        @UniqueConstraint(name = "ux_cashiers_staff_teller", columnNames = { "staff_id", "teller_id" }) })
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Accessors(chain = true)
+@Table(name = "m_cashiers", uniqueConstraints = {@UniqueConstraint(name = "ux_cashiers_staff_teller", columnNames = {"staff_id", "teller_id"})})
 public class Cashier extends AbstractPersistableCustom<Long> {
-
     private static final String IS_FULL_DAY_PARAM_NAME = "isFullDay";
-
     @Transient
     private Office office;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "staff_id", nullable = false)
     private Staff staff;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teller_id", nullable = false)
     private Teller teller;
-
     @Column(name = "description", nullable = true, length = 500)
     private String description;
-
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
-
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
-
     @Column(name = "full_day", nullable = true)
     private Boolean isFullDay;
-
     @Column(name = "start_time", nullable = true, length = 10)
     private String startTime;
-
     @Column(name = "end_time", nullable = true, length = 10)
     private String endTime;
 
-    public static Cashier fromJson(final Office cashierOffice, final Teller teller, final Staff staff, final String startTime,
-            final String endTime, final JsonCommand command) {
+    public static Cashier fromJson(final Office cashierOffice, final Teller teller, final Staff staff, final String startTime, final String endTime, final JsonCommand command) {
         final String description = command.stringValueOfParameterNamed("description");
         final LocalDate startDate = command.localDateValueOfParameterNamed("startDate");
         final LocalDate endDate = command.localDateValueOfParameterNamed("endDate");
         final Boolean isFullDay = command.booleanObjectValueOfParameterNamed(IS_FULL_DAY_PARAM_NAME);
-
-        return new Cashier().setOffice(cashierOffice).setTeller(teller).setStaff(staff).setDescription(description).setStartDate(startDate)
-                .setEndDate(endDate).setIsFullDay(isFullDay).setStartTime(startTime).setEndTime(endTime);
+        return new Cashier().setOffice(cashierOffice).setTeller(teller).setStaff(staff).setDescription(description).setStartDate(startDate).setEndDate(endDate).setIsFullDay(isFullDay).setStartTime(startTime).setEndTime(endTime);
     }
 
     public Map<String, Object> update(final JsonCommand command) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>(7);
-
         final String dateFormatAsInput = command.dateFormat();
         final String localeAsInput = command.locale();
-
         final String descriptionParamName = "description";
         if (command.isChangeInStringParameterNamed(descriptionParamName, this.description)) {
             final String newValue = command.stringValueOfParameterNamed(descriptionParamName);
             actualChanges.put(descriptionParamName, newValue);
             this.description = newValue;
         }
-
         final String startDateParamName = "startDate";
         if (command.isChangeInLocalDateParameterNamed(startDateParamName, getStartDate())) {
             final String valueAsInput = command.stringValueOfParameterNamed(startDateParamName);
             actualChanges.put(startDateParamName, valueAsInput);
             actualChanges.put("dateFormat", dateFormatAsInput);
             actualChanges.put("locale", localeAsInput);
-
             this.startDate = command.localDateValueOfParameterNamed(startDateParamName);
         }
-
         final String endDateParamName = "endDate";
         if (command.isChangeInLocalDateParameterNamed(endDateParamName, getEndDate())) {
             final String valueAsInput = command.stringValueOfParameterNamed(endDateParamName);
             actualChanges.put(endDateParamName, valueAsInput);
             actualChanges.put("dateFormat", dateFormatAsInput);
             actualChanges.put("locale", localeAsInput);
-
             this.endDate = command.localDateValueOfParameterNamed(endDateParamName);
         }
-
         final Boolean fullDayFlag = command.booleanObjectValueOfParameterNamed(IS_FULL_DAY_PARAM_NAME);
         if (command.isChangeInBooleanParameterNamed(IS_FULL_DAY_PARAM_NAME, this.isFullDay)) {
             final Boolean newValue = command.booleanObjectValueOfParameterNamed(IS_FULL_DAY_PARAM_NAME);
             actualChanges.put(IS_FULL_DAY_PARAM_NAME, newValue);
             this.isFullDay = newValue;
         }
-
         if (!fullDayFlag) {
             String newStartHour = "";
             String newStartMin = "";
@@ -148,9 +116,7 @@ public class Cashier extends AbstractPersistableCustom<Long> {
             final String minStartTimeParamName = "minStartTime";
             final String hourEndTimeParamName = "hourEndTime";
             final String minEndTimeParamName = "minEndTime";
-
-            if (command.isChangeInLongParameterNamed(hourStartTimeParamName, this.getHourFromStartTime())
-                    || command.isChangeInLongParameterNamed(minStartTimeParamName, this.getMinFromStartTime())) {
+            if (command.isChangeInLongParameterNamed(hourStartTimeParamName, this.getHourFromStartTime()) || command.isChangeInLongParameterNamed(minStartTimeParamName, this.getMinFromStartTime())) {
                 newStartHour = command.stringValueOfParameterNamed(hourStartTimeParamName);
                 if (newStartHour.equalsIgnoreCase("0")) {
                     newStartHour = newStartHour + "0";
@@ -163,9 +129,7 @@ public class Cashier extends AbstractPersistableCustom<Long> {
                 actualChanges.put(minStartTimeParamName, newStartMin);
                 this.startTime = newStartHour + ":" + newStartMin;
             }
-
-            if (command.isChangeInLongParameterNamed(hourEndTimeParamName, this.getHourFromEndTime())
-                    || command.isChangeInLongParameterNamed(minEndTimeParamName, this.getMinFromEndTime())) {
+            if (command.isChangeInLongParameterNamed(hourEndTimeParamName, this.getHourFromEndTime()) || command.isChangeInLongParameterNamed(minEndTimeParamName, this.getMinFromEndTime())) {
                 newEndHour = command.stringValueOfParameterNamed(hourEndTimeParamName);
                 if (newEndHour.equalsIgnoreCase("0")) {
                     newEndHour = newEndHour + "0";
@@ -179,18 +143,15 @@ public class Cashier extends AbstractPersistableCustom<Long> {
                 this.endTime = newEndHour + ":" + newEndMin;
             }
         }
-
         return actualChanges;
     }
 
     public Long getHourFromStartTime() {
-        return (this.startTime != null && !this.startTime.isEmpty()) ? Long.parseLong(Splitter.on(':').splitToList(this.startTime).get(1))
-                : null;
+        return (this.startTime != null && !this.startTime.isEmpty()) ? Long.parseLong(Splitter.on(':').splitToList(this.startTime).get(1)) : null;
     }
 
     public Long getMinFromStartTime() {
-        return (this.startTime != null && !this.startTime.isEmpty()) ? Long.parseLong(Splitter.on(':').splitToList(this.startTime).get(1))
-                : null;
+        return (this.startTime != null && !this.startTime.isEmpty()) ? Long.parseLong(Splitter.on(':').splitToList(this.startTime).get(1)) : null;
     }
 
     public Long getHourFromEndTime() {
@@ -199,5 +160,148 @@ public class Cashier extends AbstractPersistableCustom<Long> {
 
     public Long getMinFromEndTime() {
         return (this.endTime != null && !this.endTime.isEmpty()) ? Long.parseLong(Splitter.on(':').splitToList(this.endTime).get(1)) : null;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Office getOffice() {
+        return this.office;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Staff getStaff() {
+        return this.staff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Teller getTeller() {
+        return this.teller;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getStartDate() {
+        return this.startDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getEndDate() {
+        return this.endDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Boolean getIsFullDay() {
+        return this.isFullDay;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getStartTime() {
+        return this.startTime;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEndTime() {
+        return this.endTime;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Cashier setOffice(final Office office) {
+        this.office = office;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Cashier setStaff(final Staff staff) {
+        this.staff = staff;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Cashier setTeller(final Teller teller) {
+        this.teller = teller;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Cashier setDescription(final String description) {
+        this.description = description;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Cashier setStartDate(final LocalDate startDate) {
+        this.startDate = startDate;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Cashier setEndDate(final LocalDate endDate) {
+        this.endDate = endDate;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Cashier setIsFullDay(final Boolean isFullDay) {
+        this.isFullDay = isFullDay;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Cashier setStartTime(final String startTime) {
+        this.startTime = startTime;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Cashier setEndTime(final String endTime) {
+        this.endTime = endTime;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Cashier() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Cashier(final Office office, final Staff staff, final Teller teller, final String description, final LocalDate startDate, final LocalDate endDate, final Boolean isFullDay, final String startTime, final String endTime) {
+        this.office = office;
+        this.staff = staff;
+        this.teller = teller;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.isFullDay = isFullDay;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 }

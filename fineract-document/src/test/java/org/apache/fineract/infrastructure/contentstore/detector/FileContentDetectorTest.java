@@ -19,32 +19,27 @@
 package org.apache.fineract.infrastructure.contentstore.detector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.TestConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
-@Slf4j
 @SpringBootTest
 @ContextConfiguration(classes = TestConfiguration.class)
 class FileContentDetectorTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FileContentDetectorTest.class);
     @Autowired
     private FileContentDetector fileContentDetector;
 
     @Test
     void detectByFileName() {
         var ctx = fileContentDetector.detect(ContentDetectorContext.builder().fileName("test.png").build());
-
         assertEquals("png", ctx.getFormat());
         assertEquals(".png", ctx.getExtension());
         assertEquals("image/png", ctx.getMimeType());
-
         ctx = fileContentDetector.detect(ContentDetectorContext.builder().fileName("test.jpg").build());
-
         assertEquals("jpg", ctx.getFormat());
         assertEquals(".jpg", ctx.getExtension());
         assertEquals("image/jpeg", ctx.getMimeType());

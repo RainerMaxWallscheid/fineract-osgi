@@ -29,7 +29,6 @@ import jakarta.ws.rs.core.UriInfo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductBasicDetailsData;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadBasicDetailsService;
@@ -38,23 +37,25 @@ import org.springframework.stereotype.Component;
 @Path("/v1/loanproducts")
 @Component
 @Tag(name = "Loan Products Details", description = "Loan product basic details to be listed")
-@RequiredArgsConstructor
 public class LoanProductsDetailsApiResource {
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "LOANPRODUCT";
     private final PlatformSecurityContext context;
     private final List<LoanProductReadBasicDetailsService> loanProductReadBasicDetailsServices;
 
     @GET
     @Path("basic-details")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "List Loan Products with basic details", operationId = "retrieveAllLoanProductsDetails", description = "Lists Loan Products with basic details to be listed")
     public Collection<LoanProductBasicDetailsData> fetchProducts(@Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
         Collection<LoanProductBasicDetailsData> products = new ArrayList<>();
         loanProductReadBasicDetailsServices.forEach(service -> products.addAll(service.retrieveProducts()));
         return products;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanProductsDetailsApiResource(final PlatformSecurityContext context, final List<LoanProductReadBasicDetailsService> loanProductReadBasicDetailsServices) {
+        this.context = context;
+        this.loanProductReadBasicDetailsServices = loanProductReadBasicDetailsServices;
+    }
 }

@@ -22,16 +22,12 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.account.data.PortfolioAccountData;
 
-@Getter
 public final class GuarantorFundingData implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @SuppressWarnings("unused")
     private final Long id;
     @SuppressWarnings("unused")
@@ -49,9 +45,7 @@ public final class GuarantorFundingData implements Serializable {
     @SuppressWarnings("unused")
     private final Collection<GuarantorTransactionData> guarantorTransactions;
 
-    private GuarantorFundingData(final Long id, final EnumOptionData status, final PortfolioAccountData savingsAccount,
-            final BigDecimal amount, final BigDecimal amountReleased, final BigDecimal amountRemaining, final BigDecimal amountTransfered,
-            final Collection<GuarantorTransactionData> guarantorTransactions) {
+    private GuarantorFundingData(final Long id, final EnumOptionData status, final PortfolioAccountData savingsAccount, final BigDecimal amount, final BigDecimal amountReleased, final BigDecimal amountRemaining, final BigDecimal amountTransfered, final Collection<GuarantorTransactionData> guarantorTransactions) {
         this.id = id;
         this.status = status;
         this.savingsAccount = savingsAccount;
@@ -62,10 +56,47 @@ public final class GuarantorFundingData implements Serializable {
         this.guarantorTransactions = guarantorTransactions;
     }
 
-    public static GuarantorFundingData instance(final Long id, final EnumOptionData status, final PortfolioAccountData savingsAccount,
-            final BigDecimal amount, final BigDecimal amountReleased, final BigDecimal amountRemaining, final BigDecimal amountTransfered,
-            final Collection<GuarantorTransactionData> guarantorTransactions) {
-        return new GuarantorFundingData(id, status, savingsAccount, amount, amountReleased, amountRemaining, amountTransfered,
-                guarantorTransactions);
+    public static GuarantorFundingData instance(final Long id, final EnumOptionData status, final PortfolioAccountData savingsAccount, final BigDecimal amount, final BigDecimal amountReleased, final BigDecimal amountRemaining, final BigDecimal amountTransfered, final Collection<GuarantorTransactionData> guarantorTransactions) {
+        return new GuarantorFundingData(id, status, savingsAccount, amount, amountReleased, amountRemaining, amountTransfered, guarantorTransactions);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getStatus() {
+        return this.status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PortfolioAccountData getSavingsAccount() {
+        return this.savingsAccount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountReleased() {
+        return this.amountReleased;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountRemaining() {
+        return this.amountRemaining;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountTransfered() {
+        return this.amountTransfered;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<GuarantorTransactionData> getGuarantorTransactions() {
+        return this.guarantorTransactions;
     }
 }

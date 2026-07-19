@@ -22,20 +22,14 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.portfolio.client.data.ClientData;
 
-@Getter
 @SuppressWarnings("unused")
-@RequiredArgsConstructor
 public class StandingInstructionHistoryData implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private final Long standingInstructionId;
     private final String name;
     private final OfficeData fromOffice;
@@ -51,4 +45,91 @@ public class StandingInstructionHistoryData implements Serializable {
     private final LocalDate executionTime;
     private final String errorLog;
 
+    @java.lang.SuppressWarnings("all")
+        public Long getStandingInstructionId() {
+        return this.standingInstructionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OfficeData getFromOffice() {
+        return this.fromOffice;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ClientData getFromClient() {
+        return this.fromClient;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getFromAccountType() {
+        return this.fromAccountType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PortfolioAccountData getFromAccount() {
+        return this.fromAccount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getToAccountType() {
+        return this.toAccountType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PortfolioAccountData getToAccount() {
+        return this.toAccount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OfficeData getToOffice() {
+        return this.toOffice;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ClientData getToClient() {
+        return this.toClient;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getStatus() {
+        return this.status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getExecutionTime() {
+        return this.executionTime;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getErrorLog() {
+        return this.errorLog;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public StandingInstructionHistoryData(final Long standingInstructionId, final String name, final OfficeData fromOffice, final ClientData fromClient, final EnumOptionData fromAccountType, final PortfolioAccountData fromAccount, final EnumOptionData toAccountType, final PortfolioAccountData toAccount, final OfficeData toOffice, final ClientData toClient, final BigDecimal amount, final String status, final LocalDate executionTime, final String errorLog) {
+        this.standingInstructionId = standingInstructionId;
+        this.name = name;
+        this.fromOffice = fromOffice;
+        this.fromClient = fromClient;
+        this.fromAccountType = fromAccountType;
+        this.fromAccount = fromAccount;
+        this.toAccountType = toAccountType;
+        this.toAccount = toAccount;
+        this.toOffice = toOffice;
+        this.toClient = toClient;
+        this.amount = amount;
+        this.status = status;
+        this.executionTime = executionTime;
+        this.errorLog = errorLog;
+    }
 }

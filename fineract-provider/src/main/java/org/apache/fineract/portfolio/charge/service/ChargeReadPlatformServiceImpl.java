@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.common.AccountingDropdownReadPlatformService;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainServiceJpa;
@@ -55,12 +54,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author vishwas
- *
  */
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService {
-
     private final CurrencyReadPlatformService currencyReadPlatformService;
     private final ChargeDropdownReadPlatformService chargeDropdownReadPlatformService;
     private final JdbcTemplate jdbcTemplate;
@@ -72,42 +68,32 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
-    @Cacheable(value = "charges", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat('ch')")
+    @Cacheable(value = "charges", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(\'ch\')")
     public List<ChargeData> retrieveAllCharges() {
         final ChargeMapper rm = new ChargeMapper();
-
         String sql = "select " + rm.chargeSchema() + " where c.is_deleted=false ";
-
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
-
         sql += " order by c.name ";
-
         return this.jdbcTemplate.query(sql, rm); // NOSONAR
     }
 
     @Override
     public List<ChargeData> retrieveAllChargesForCurrency(String currencyCode) {
         final ChargeMapper rm = new ChargeMapper();
-
         String sql = "select " + rm.chargeSchema() + " where c.is_deleted=false and c.currency_code= ? ";
-
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
         sql += " order by c.name ";
-
-        return this.jdbcTemplate.query(sql, rm, new Object[] { currencyCode }); // NOSONAR
+        return this.jdbcTemplate.query(sql, rm, new Object[] {currencyCode}); // NOSONAR
     }
 
     @Override
     public ChargeData retrieveCharge(final Long chargeId) {
         try {
             final ChargeMapper rm = new ChargeMapper();
-
             String sql = "select " + rm.chargeSchema() + " where c.id = ? and c.is_deleted=false ";
-
             sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
-
             sql = sql + " ;";
-            return this.jdbcTemplate.queryForObject(sql, rm, new Object[] { chargeId }); // NOSONAR
+            return this.jdbcTemplate.queryForObject(sql, rm, new Object[] {chargeId}); // NOSONAR
         } catch (final EmptyResultDataAccessException e) {
             throw new ChargeNotFoundException(chargeId, e);
         }
@@ -118,18 +104,10 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         if (chargeAppliesTo != null && ChargeAppliesTo.WORKING_CAPITAL_LOAN.getValue().longValue() == chargeAppliesTo) {
             final List<EnumOptionData> allowedChargeAppliesToOptions = this.chargeDropdownReadPlatformService.retrieveApplicableToTypes();
             final Collection<CurrencyData> currencyOptions = this.currencyReadPlatformService.retrieveAllowedCurrencies();
-            final List<EnumOptionData> allowedChargeTimeOptions = this.chargeDropdownReadPlatformService
-                    .retrieveCollectionTimeTypes(ChargeAppliesTo.WORKING_CAPITAL_LOAN);
-            final List<EnumOptionData> allowedChargeCalculationTypeOptions = this.chargeDropdownReadPlatformService
-                    .retrieveCalculationTypes(ChargeAppliesTo.WORKING_CAPITAL_LOAN,
-                            chargeTimeType != null ? ChargeTimeType.fromInt(chargeTimeType.intValue()) : null);
-            final List<EnumOptionData> chargePaymentOptions = this.chargeDropdownReadPlatformService
-                    .retrievePaymentModes(ChargeAppliesTo.WORKING_CAPITAL_LOAN);
-
-            return ChargeData.builder().currencyOptions(currencyOptions).chargeCalculationTypeOptions(allowedChargeCalculationTypeOptions)
-                    .chargeAppliesToOptions(allowedChargeAppliesToOptions).chargeTimeTypeOptions(allowedChargeTimeOptions)
-                    .chargePaymetModeOptions(chargePaymentOptions).build();
-
+            final List<EnumOptionData> allowedChargeTimeOptions = this.chargeDropdownReadPlatformService.retrieveCollectionTimeTypes(ChargeAppliesTo.WORKING_CAPITAL_LOAN);
+            final List<EnumOptionData> allowedChargeCalculationTypeOptions = this.chargeDropdownReadPlatformService.retrieveCalculationTypes(ChargeAppliesTo.WORKING_CAPITAL_LOAN, chargeTimeType != null ? ChargeTimeType.fromInt(chargeTimeType.intValue()) : null);
+            final List<EnumOptionData> chargePaymentOptions = this.chargeDropdownReadPlatformService.retrievePaymentModes(ChargeAppliesTo.WORKING_CAPITAL_LOAN);
+            return ChargeData.builder().currencyOptions(currencyOptions).chargeCalculationTypeOptions(allowedChargeCalculationTypeOptions).chargeAppliesToOptions(allowedChargeAppliesToOptions).chargeTimeTypeOptions(allowedChargeTimeOptions).chargePaymetModeOptions(chargePaymentOptions).build();
         }
         return retrieveNewChargeDetails();
     }
@@ -141,73 +119,46 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         final List<EnumOptionData> allowedChargeAppliesToOptions = this.chargeDropdownReadPlatformService.retrieveApplicableToTypes();
         final List<EnumOptionData> allowedChargeTimeOptions = this.chargeDropdownReadPlatformService.retrieveCollectionTimeTypes();
         final List<EnumOptionData> chargePaymentOptions = this.chargeDropdownReadPlatformService.retrievePaymentModes();
-        final List<EnumOptionData> loansChargeCalculationTypeOptions = this.chargeDropdownReadPlatformService
-                .retrieveLoanCalculationTypes();
+        final List<EnumOptionData> loansChargeCalculationTypeOptions = this.chargeDropdownReadPlatformService.retrieveLoanCalculationTypes();
         final List<EnumOptionData> loansChargeTimeTypeOptions = this.chargeDropdownReadPlatformService.retrieveLoanCollectionTimeTypes();
-        final List<EnumOptionData> savingsChargeCalculationTypeOptions = this.chargeDropdownReadPlatformService
-                .retrieveSavingsCalculationTypes();
-        final List<EnumOptionData> savingsChargeTimeTypeOptions = this.chargeDropdownReadPlatformService
-                .retrieveSavingsCollectionTimeTypes();
-        final List<EnumOptionData> clientChargeCalculationTypeOptions = this.chargeDropdownReadPlatformService
-                .retrieveClientCalculationTypes();
+        final List<EnumOptionData> savingsChargeCalculationTypeOptions = this.chargeDropdownReadPlatformService.retrieveSavingsCalculationTypes();
+        final List<EnumOptionData> savingsChargeTimeTypeOptions = this.chargeDropdownReadPlatformService.retrieveSavingsCollectionTimeTypes();
+        final List<EnumOptionData> clientChargeCalculationTypeOptions = this.chargeDropdownReadPlatformService.retrieveClientCalculationTypes();
         final List<EnumOptionData> clientChargeTimeTypeOptions = this.chargeDropdownReadPlatformService.retrieveClientCollectionTimeTypes();
         final List<EnumOptionData> feeFrequencyOptions = this.dropdownReadPlatformService.retrievePeriodFrequencyTypeOptions();
-        final Map<String, List<GLAccountData>> incomeOrLiabilityAccountOptions = this.accountingDropdownReadPlatformService
-                .retrieveAccountMappingOptionsForCharges();
-        final List<EnumOptionData> shareChargeCalculationTypeOptions = this.chargeDropdownReadPlatformService
-                .retrieveSharesCalculationTypes();
+        final Map<String, List<GLAccountData>> incomeOrLiabilityAccountOptions = this.accountingDropdownReadPlatformService.retrieveAccountMappingOptionsForCharges();
+        final List<EnumOptionData> shareChargeCalculationTypeOptions = this.chargeDropdownReadPlatformService.retrieveSharesCalculationTypes();
         final List<EnumOptionData> shareChargeTimeTypeOptions = this.chargeDropdownReadPlatformService.retrieveSharesCollectionTimeTypes();
         final Collection<TaxGroupData> taxGroupOptions = this.taxReadPlatformService.retrieveTaxGroupsForLookUp();
         final String accountMappingForChargeConfig = this.configurationDomainServiceJpa.getAccountMappingForCharge();
         final List<GLAccountData> expenseAccountOptions = this.accountingDropdownReadPlatformService.retrieveExpenseAccountOptions();
         final List<GLAccountData> assetAccountOptions = this.accountingDropdownReadPlatformService.retrieveAssetAccountOptions();
-
-        return ChargeData.builder().currencyOptions(currencyOptions).chargeCalculationTypeOptions(allowedChargeCalculationTypeOptions)
-                .chargeAppliesToOptions(allowedChargeAppliesToOptions).chargeTimeTypeOptions(allowedChargeTimeOptions)
-                .chargePaymetModeOptions(chargePaymentOptions).loanChargeCalculationTypeOptions(loansChargeCalculationTypeOptions)
-                .loanChargeTimeTypeOptions(loansChargeTimeTypeOptions)
-                .savingsChargeCalculationTypeOptions(savingsChargeCalculationTypeOptions)
-                .savingsChargeTimeTypeOptions(savingsChargeTimeTypeOptions)
-                .clientChargeCalculationTypeOptions(clientChargeCalculationTypeOptions)
-                .clientChargeTimeTypeOptions(clientChargeTimeTypeOptions).feeFrequencyOptions(feeFrequencyOptions)
-                .incomeOrLiabilityAccountOptions(incomeOrLiabilityAccountOptions).taxGroupOptions(taxGroupOptions)
-                .shareChargeCalculationTypeOptions(shareChargeCalculationTypeOptions).shareChargeTimeTypeOptions(shareChargeTimeTypeOptions)
-                .accountMappingForChargeConfig(accountMappingForChargeConfig).expenseAccountOptions(expenseAccountOptions)
-                .assetAccountOptions(assetAccountOptions).build();
+        return ChargeData.builder().currencyOptions(currencyOptions).chargeCalculationTypeOptions(allowedChargeCalculationTypeOptions).chargeAppliesToOptions(allowedChargeAppliesToOptions).chargeTimeTypeOptions(allowedChargeTimeOptions).chargePaymetModeOptions(chargePaymentOptions).loanChargeCalculationTypeOptions(loansChargeCalculationTypeOptions).loanChargeTimeTypeOptions(loansChargeTimeTypeOptions).savingsChargeCalculationTypeOptions(savingsChargeCalculationTypeOptions).savingsChargeTimeTypeOptions(savingsChargeTimeTypeOptions).clientChargeCalculationTypeOptions(clientChargeCalculationTypeOptions).clientChargeTimeTypeOptions(clientChargeTimeTypeOptions).feeFrequencyOptions(feeFrequencyOptions).incomeOrLiabilityAccountOptions(incomeOrLiabilityAccountOptions).taxGroupOptions(taxGroupOptions).shareChargeCalculationTypeOptions(shareChargeCalculationTypeOptions).shareChargeTimeTypeOptions(shareChargeTimeTypeOptions).accountMappingForChargeConfig(accountMappingForChargeConfig).expenseAccountOptions(expenseAccountOptions).assetAccountOptions(assetAccountOptions).build();
     }
 
     @Override
     public List<ChargeData> retrieveLoanProductCharges(final Long loanProductId) {
         final ChargeMapper rm = new ChargeMapper();
-
         String sql = "select " + rm.loanProductChargeSchema() + " where c.is_deleted=false and c.is_active=true and plc.product_loan_id=? ";
-
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
-
-        return this.jdbcTemplate.query(sql, rm, new Object[] { loanProductId }); // NOSONAR
+        return this.jdbcTemplate.query(sql, rm, new Object[] {loanProductId}); // NOSONAR
     }
 
     @Override
     public List<ChargeData> retrieveLoanProductCharges(final Long loanProductId, final ChargeTimeType chargeTime) {
-
         final ChargeMapper rm = new ChargeMapper();
-
-        String sql = "select " + rm.loanProductChargeSchema()
-                + " where c.is_deleted=false and c.is_active=true and plc.product_loan_id=? and c.charge_time_enum=? ";
+        String sql = "select " + rm.loanProductChargeSchema() + " where c.is_deleted=false and c.is_active=true and plc.product_loan_id=? and c.charge_time_enum=? ";
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
-
-        return this.jdbcTemplate.query(sql, rm, new Object[] { loanProductId, chargeTime.getValue() }); // NOSONAR
+        return this.jdbcTemplate.query(sql, rm, new Object[] {loanProductId, chargeTime.getValue()}); // NOSONAR
     }
 
     @Override
     public List<ChargeData> retrieveLoanApplicableFees() {
         final ChargeMapper rm = new ChargeMapper();
-        Object[] params = new Object[] { ChargeAppliesTo.LOAN.getValue() };
-        String sql = "select " + rm.chargeSchema()
-                + " where c.is_deleted=false and c.is_active=true and c.is_penalty=false and c.charge_applies_to_enum=? ";
+        Object[] params = new Object[] {ChargeAppliesTo.LOAN.getValue()};
+        String sql = "select " + rm.chargeSchema() + " where c.is_deleted=false and c.is_active=true and c.is_penalty=false and c.charge_applies_to_enum=? ";
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
         sql += " order by c.name ";
-
         return this.jdbcTemplate.query(sql, rm, params); // NOSONAR
     }
 
@@ -219,8 +170,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         paramMap.put("loanId", loanId);
         paramMap.put("chargeAppliesTo", ChargeAppliesTo.LOAN.getValue());
         processChargeExclusionsForLoans(excludeChargeTimes, excludeClause);
-        String sql = "select " + rm.chargeSchema() + " join m_loan la on la.currency_code = c.currency_code" + " where la.id=:loanId"
-                + " and c.is_deleted=false and c.is_active=true and c.charge_applies_to_enum=:chargeAppliesTo" + excludeClause + " ";
+        String sql = "select " + rm.chargeSchema() + " join m_loan la on la.currency_code = c.currency_code" + " where la.id=:loanId" + " and c.is_deleted=false and c.is_active=true and c.charge_applies_to_enum=:chargeAppliesTo" + excludeClause + " ";
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
         sql += " order by c.name ";
         return this.namedParameterJdbcTemplate.query(sql, paramMap, rm);
@@ -252,58 +202,36 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         paramMap.put("productId", loanProductId);
         paramMap.put("chargeAppliesTo", ChargeAppliesTo.LOAN.getValue());
         processChargeExclusionsForLoans(excludeChargeTimes, excludeClause);
-        String sql = "select " + rm.chargeSchema() + " join m_product_loan lp on lp.currency_code = c.currency_code"
-                + " where lp.id=:productId" + " and c.is_deleted=false and c.is_active=true and c.charge_applies_to_enum=:chargeAppliesTo"
-                + excludeClause + " ";
+        String sql = "select " + rm.chargeSchema() + " join m_product_loan lp on lp.currency_code = c.currency_code" + " where lp.id=:productId" + " and c.is_deleted=false and c.is_active=true and c.charge_applies_to_enum=:chargeAppliesTo" + excludeClause + " ";
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
         sql += " order by c.name ";
-
         return this.namedParameterJdbcTemplate.query(sql, paramMap, rm);
     }
 
     @Override
     public List<ChargeData> retrieveLoanApplicablePenalties() {
         final ChargeMapper rm = new ChargeMapper();
-
-        String sql = "select " + rm.chargeSchema()
-                + " where c.is_deleted=false and c.is_active=true and c.is_penalty=true and c.charge_applies_to_enum=? ";
+        String sql = "select " + rm.chargeSchema() + " where c.is_deleted=false and c.is_active=true and c.is_penalty=true and c.charge_applies_to_enum=? ";
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
         sql += " order by c.name ";
-        return this.jdbcTemplate.query(sql, rm, new Object[] { ChargeAppliesTo.LOAN.getValue() }); // NOSONAR
+        return this.jdbcTemplate.query(sql, rm, new Object[] {ChargeAppliesTo.LOAN.getValue()}); // NOSONAR
     }
 
     private String addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled() {
-
         String sql = "";
-
         // Check if branch specific products are enabled. If yes, fetch only
         // charges mapped to current user's office
-        String inClause = fineractEntityAccessUtil
-                .getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType.CHARGE);
+        String inClause = fineractEntityAccessUtil.getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType.CHARGE);
         if ((inClause != null) && !inClause.trim().isEmpty()) {
             sql += " and c.id in ( " + inClause + " ) ";
         }
-
         return sql;
     }
 
-    private static final class ChargeMapper implements RowMapper<ChargeData> {
 
+    private static final class ChargeMapper implements RowMapper<ChargeData> {
         public String chargeSchema() {
-            return "c.id as id, c.name as name, c.amount as amount, c.currency_code as currencyCode, "
-                    + "c.charge_applies_to_enum as chargeAppliesTo, c.charge_time_enum as chargeTime, "
-                    + "c.charge_payment_mode_enum as chargePaymentMode, "
-                    + "c.charge_calculation_enum as chargeCalculation, c.is_penalty as penalty, "
-                    + "c.is_active as active, c.is_free_withdrawal as isFreeWithdrawal, c.free_withdrawal_charge_frequency as freeWithdrawalChargeFrequency, c.restart_frequency as restartFrequency, c.restart_frequency_enum as restartFrequencyEnum,"
-                    + "oc.name as currencyName, oc.decimal_places as currencyDecimalPlaces, "
-                    + "oc.currency_multiplesof as inMultiplesOf, oc.display_symbol as currencyDisplaySymbol, "
-                    + "oc.internationalized_name_code as currencyNameCode, c.fee_on_day as feeOnDay, c.fee_on_month as feeOnMonth, "
-                    + "c.fee_interval as feeInterval, c.fee_frequency as feeFrequency,c.min_cap as minCap,c.max_cap as maxCap, "
-                    + "c.income_or_liability_account_id as glAccountId , acc.name as glAccountName, acc.gl_code as glCode, "
-                    + "tg.id as taxGroupId, c.is_payment_type as isPaymentType, pt.id as paymentTypeId, pt.value as paymentTypeName, tg.name as taxGroupName "
-                    + "from m_charge c " + "join m_organisation_currency oc on c.currency_code = oc.code "
-                    + " LEFT JOIN acc_gl_account acc on acc.id = c.income_or_liability_account_id "
-                    + " LEFT JOIN m_tax_group tg on tg.id = c.tax_group_id " + " LEFT JOIN m_payment_type pt on pt.id = c.payment_type_id ";
+            return "c.id as id, c.name as name, c.amount as amount, c.currency_code as currencyCode, " + "c.charge_applies_to_enum as chargeAppliesTo, c.charge_time_enum as chargeTime, " + "c.charge_payment_mode_enum as chargePaymentMode, " + "c.charge_calculation_enum as chargeCalculation, c.is_penalty as penalty, " + "c.is_active as active, c.is_free_withdrawal as isFreeWithdrawal, c.free_withdrawal_charge_frequency as freeWithdrawalChargeFrequency, c.restart_frequency as restartFrequency, c.restart_frequency_enum as restartFrequencyEnum," + "oc.name as currencyName, oc.decimal_places as currencyDecimalPlaces, " + "oc.currency_multiplesof as inMultiplesOf, oc.display_symbol as currencyDisplaySymbol, " + "oc.internationalized_name_code as currencyNameCode, c.fee_on_day as feeOnDay, c.fee_on_month as feeOnMonth, " + "c.fee_interval as feeInterval, c.fee_frequency as feeFrequency,c.min_cap as minCap,c.max_cap as maxCap, " + "c.income_or_liability_account_id as glAccountId , acc.name as glAccountName, acc.gl_code as glCode, " + "tg.id as taxGroupId, c.is_payment_type as isPaymentType, pt.id as paymentTypeId, pt.value as paymentTypeName, tg.name as taxGroupName " + "from m_charge c " + "join m_organisation_currency oc on c.currency_code = oc.code " + " LEFT JOIN acc_gl_account acc on acc.id = c.income_or_liability_account_id " + " LEFT JOIN m_tax_group tg on tg.id = c.tax_group_id " + " LEFT JOIN m_payment_type pt on pt.id = c.payment_type_id ";
         }
 
         public String loanProductChargeSchema() {
@@ -323,32 +251,23 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
             final Long id = rs.getLong("id");
             final String name = rs.getString("name");
             final BigDecimal amount = rs.getBigDecimal("amount");
-
             final String currencyCode = rs.getString("currencyCode");
             final String currencyName = rs.getString("currencyName");
             final String currencyNameCode = rs.getString("currencyNameCode");
             final String currencyDisplaySymbol = rs.getString("currencyDisplaySymbol");
             final Integer currencyDecimalPlaces = JdbcSupport.getInteger(rs, "currencyDecimalPlaces");
             final Integer inMultiplesOf = JdbcSupport.getInteger(rs, "inMultiplesOf");
-
-            final CurrencyData currency = new CurrencyData(currencyCode, currencyName, currencyDecimalPlaces, inMultiplesOf,
-                    currencyDisplaySymbol, currencyNameCode);
-
+            final CurrencyData currency = new CurrencyData(currencyCode, currencyName, currencyDecimalPlaces, inMultiplesOf, currencyDisplaySymbol, currencyNameCode);
             final int chargeAppliesTo = rs.getInt("chargeAppliesTo");
             final EnumOptionData chargeAppliesToType = ChargeEnumerations.chargeAppliesTo(chargeAppliesTo);
-
             final int chargeTime = rs.getInt("chargeTime");
             final EnumOptionData chargeTimeType = ChargeEnumerations.chargeTimeType(chargeTime);
-
             final int chargeCalculation = rs.getInt("chargeCalculation");
             final EnumOptionData chargeCalculationType = ChargeEnumerations.chargeCalculationType(chargeCalculation);
-
             final int paymentMode = rs.getInt("chargePaymentMode");
             final EnumOptionData chargePaymentMode = ChargeEnumerations.chargePaymentMode(paymentMode);
-
             final boolean penalty = rs.getBoolean("penalty");
             final boolean active = rs.getBoolean("active");
-
             final Integer feeInterval = JdbcSupport.getInteger(rs, "feeInterval");
             EnumOptionData feeFrequencyType = null;
             final Integer feeFrequency = JdbcSupport.getInteger(rs, "feeFrequency");
@@ -363,7 +282,6 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
             }
             final BigDecimal minCap = rs.getBigDecimal("minCap");
             final BigDecimal maxCap = rs.getBigDecimal("maxCap");
-
             // extract GL Account
             final Long glAccountId = JdbcSupport.getLong(rs, "glAccountId");
             final String glAccountName = rs.getString("glAccountName");
@@ -372,84 +290,62 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
             if (glAccountId != null) {
                 glAccountData = new GLAccountData().setId(glAccountId).setName(glAccountName).setGlCode(glCode);
             }
-
             final Long taxGroupId = JdbcSupport.getLong(rs, "taxGroupId");
             final String taxGroupName = rs.getString("taxGroupName");
             TaxGroupData taxGroupData = null;
             if (taxGroupId != null) {
                 taxGroupData = TaxGroupData.lookup(taxGroupId, taxGroupName);
             }
-
             final boolean isFreeWithdrawal = rs.getBoolean("isFreeWithdrawal");
             final int freeWithdrawalChargeFrequency = rs.getInt("freeWithdrawalChargeFrequency");
             final int restartFrequency = rs.getInt("restartFrequency");
             final int restartFrequencyEnum = rs.getInt("restartFrequencyEnum");
-
             final boolean isPaymentType = rs.getBoolean("isPaymentType");
             final Long paymentTypeId = JdbcSupport.getLong(rs, "paymentTypeId");
-
             final String paymentTypeName = rs.getString("paymentTypeName");
             PaymentTypeData paymentTypeData = null;
             if (paymentTypeId != null) {
                 paymentTypeData = PaymentTypeData.builder().id(paymentTypeId).name(paymentTypeName).build();
             }
-
-            return ChargeData.builder().id(id).name(name).amount(amount).currency(currency).chargeTimeType(chargeTimeType)
-                    .chargeAppliesTo(chargeAppliesToType).chargeCalculationType(chargeCalculationType).chargePaymentMode(chargePaymentMode)
-                    .feeOnMonthDay(feeOnMonthDay).feeInterval(feeInterval).penalty(penalty).active(active).freeWithdrawal(isFreeWithdrawal)
-                    .freeWithdrawalChargeFrequency(freeWithdrawalChargeFrequency).restartFrequency(restartFrequency)
-                    .restartFrequencyEnum(restartFrequencyEnum).isPaymentType(isPaymentType).paymentTypeOptions(paymentTypeData)
-                    .minCap(minCap).maxCap(maxCap).feeFrequency(feeFrequencyType).incomeOrLiabilityAccount(glAccountData)
-                    .taxGroup(taxGroupData).build();
-
+            return ChargeData.builder().id(id).name(name).amount(amount).currency(currency).chargeTimeType(chargeTimeType).chargeAppliesTo(chargeAppliesToType).chargeCalculationType(chargeCalculationType).chargePaymentMode(chargePaymentMode).feeOnMonthDay(feeOnMonthDay).feeInterval(feeInterval).penalty(penalty).active(active).freeWithdrawal(isFreeWithdrawal).freeWithdrawalChargeFrequency(freeWithdrawalChargeFrequency).restartFrequency(restartFrequency).restartFrequencyEnum(restartFrequencyEnum).isPaymentType(isPaymentType).paymentTypeOptions(paymentTypeData).minCap(minCap).maxCap(maxCap).feeFrequency(feeFrequencyType).incomeOrLiabilityAccount(glAccountData).taxGroup(taxGroupData).build();
         }
     }
 
     @Override
     public List<ChargeData> retrieveSavingsProductApplicableCharges(final boolean feeChargesOnly) {
         final ChargeMapper rm = new ChargeMapper();
-
         String sql = "select " + rm.chargeSchema() + " where c.is_deleted=false and c.is_active=true and c.charge_applies_to_enum=? ";
         if (feeChargesOnly) {
-            sql = "select " + rm.chargeSchema()
-                    + " where c.is_deleted=false and c.is_active=true and c.is_penalty=false and c.charge_applies_to_enum=? ";
+            sql = "select " + rm.chargeSchema() + " where c.is_deleted=false and c.is_active=true and c.is_penalty=false and c.charge_applies_to_enum=? ";
         }
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
         sql += " order by c.name ";
-
-        return this.jdbcTemplate.query(sql, rm, new Object[] { ChargeAppliesTo.SAVINGS.getValue() }); // NOSONAR
+        return this.jdbcTemplate.query(sql, rm, new Object[] {ChargeAppliesTo.SAVINGS.getValue()}); // NOSONAR
     }
 
     @Override
     public List<ChargeData> retrieveSavingsApplicablePenalties() {
         final ChargeMapper rm = new ChargeMapper();
-
-        String sql = "select " + rm.chargeSchema()
-                + " where c.is_deleted=false and c.is_active=true and c.is_penalty=true and c.charge_applies_to_enum=? ";
+        String sql = "select " + rm.chargeSchema() + " where c.is_deleted=false and c.is_active=true and c.is_penalty=true and c.charge_applies_to_enum=? ";
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
         sql += " order by c.name ";
-        return this.jdbcTemplate.query(sql, rm, new Object[] { ChargeAppliesTo.SAVINGS.getValue() }); // NOSONAR
+        return this.jdbcTemplate.query(sql, rm, new Object[] {ChargeAppliesTo.SAVINGS.getValue()}); // NOSONAR
     }
 
     @Override
     public List<ChargeData> retrieveSavingsProductCharges(final Long savingsProductId) {
         final ChargeMapper rm = new ChargeMapper();
-
-        String sql = "select " + rm.savingsProductChargeSchema()
-                + " where c.is_deleted=false and c.is_active=true and spc.savings_product_id=? ";
+        String sql = "select " + rm.savingsProductChargeSchema() + " where c.is_deleted=false and c.is_active=true and spc.savings_product_id=? ";
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
-
-        return this.jdbcTemplate.query(sql, rm, new Object[] { savingsProductId }); // NOSONAR
+        return this.jdbcTemplate.query(sql, rm, new Object[] {savingsProductId}); // NOSONAR
     }
 
     @Override
     public List<ChargeData> retrieveShareProductCharges(final Long shareProductId) {
         final ChargeMapper rm = new ChargeMapper();
-
         String sql = "select " + rm.shareProductChargeSchema() + " where c.is_deleted=false and c.is_active=true and mspc.product_id=? ";
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
-
-        return this.jdbcTemplate.query(sql, rm, new Object[] { shareProductId }); // NOSONAR
+        return this.jdbcTemplate.query(sql, rm, new Object[] {shareProductId}); // NOSONAR
     }
 
     @Override
@@ -458,8 +354,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("loanId", loanId);
         paramMap.put("chargeAppliesTo", ChargeAppliesTo.WORKING_CAPITAL_LOAN.getValue());
-        String sql = "select " + rm.chargeSchema() + " join m_wc_loan la on la.currency_code = c.currency_code" + " where la.id=:loanId"
-                + " and c.is_deleted=false and c.is_active=true and c.charge_applies_to_enum=:chargeAppliesTo ";
+        String sql = "select " + rm.chargeSchema() + " join m_wc_loan la on la.currency_code = c.currency_code" + " where la.id=:loanId" + " and c.is_deleted=false and c.is_active=true and c.charge_applies_to_enum=:chargeAppliesTo ";
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
         sql += " order by c.name ";
         return this.namedParameterJdbcTemplate.query(sql, paramMap, rm);
@@ -467,15 +362,10 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
 
     @Override
     public List<ChargeData> retrieveSavingsAccountApplicableCharges(Long savingsAccountId) {
-
         final ChargeMapper rm = new ChargeMapper();
-
-        String sql = "select " + rm.chargeSchema() + " join m_savings_account sa on sa.currency_code = c.currency_code"
-                + " where c.is_deleted=false and c.is_active=true and c.charge_applies_to_enum=? " + " and sa.id = ?";
+        String sql = "select " + rm.chargeSchema() + " join m_savings_account sa on sa.currency_code = c.currency_code" + " where c.is_deleted=false and c.is_active=true and c.charge_applies_to_enum=? " + " and sa.id = ?";
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
-
-        return this.jdbcTemplate.query(sql, rm, new Object[] { ChargeAppliesTo.SAVINGS.getValue(), savingsAccountId }); // NOSONAR
-
+        return this.jdbcTemplate.query(sql, rm, new Object[] {ChargeAppliesTo.SAVINGS.getValue(), savingsAccountId}); // NOSONAR
     }
 
     @Override
@@ -484,8 +374,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         String sql = "select " + rm.chargeSchema() + " where c.is_deleted=false and c.is_active=true and c.charge_applies_to_enum=? ";
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
         sql += " order by c.name ";
-
-        return this.jdbcTemplate.query(sql, rm, new Object[] { ChargeAppliesTo.CLIENT.getValue() }); // NOSONAR
+        return this.jdbcTemplate.query(sql, rm, new Object[] {ChargeAppliesTo.CLIENT.getValue()}); // NOSONAR
     }
 
     @Override
@@ -494,7 +383,19 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         String sql = "select " + rm.chargeSchema() + " where c.is_deleted=false and c.is_active=true and c.charge_applies_to_enum=? ";
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
         sql += " order by c.name ";
+        return this.jdbcTemplate.query(sql, rm, new Object[] {ChargeAppliesTo.SHARES.getValue()}); // NOSONAR
+    }
 
-        return this.jdbcTemplate.query(sql, rm, new Object[] { ChargeAppliesTo.SHARES.getValue() }); // NOSONAR
+    @java.lang.SuppressWarnings("all")
+        public ChargeReadPlatformServiceImpl(final CurrencyReadPlatformService currencyReadPlatformService, final ChargeDropdownReadPlatformService chargeDropdownReadPlatformService, final JdbcTemplate jdbcTemplate, final DropdownReadPlatformService dropdownReadPlatformService, final FineractEntityAccessUtil fineractEntityAccessUtil, final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService, final TaxReadPlatformService taxReadPlatformService, final ConfigurationDomainServiceJpa configurationDomainServiceJpa, final NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        this.currencyReadPlatformService = currencyReadPlatformService;
+        this.chargeDropdownReadPlatformService = chargeDropdownReadPlatformService;
+        this.jdbcTemplate = jdbcTemplate;
+        this.dropdownReadPlatformService = dropdownReadPlatformService;
+        this.fineractEntityAccessUtil = fineractEntityAccessUtil;
+        this.accountingDropdownReadPlatformService = accountingDropdownReadPlatformService;
+        this.taxReadPlatformService = taxReadPlatformService;
+        this.configurationDomainServiceJpa = configurationDomainServiceJpa;
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 }

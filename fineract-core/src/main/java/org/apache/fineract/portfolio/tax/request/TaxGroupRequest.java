@@ -21,20 +21,56 @@ package org.apache.fineract.portfolio.tax.request;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Setter
-@Getter
-@NoArgsConstructor
 public class TaxGroupRequest implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private String name;
     private String locale;
     private Set<TaxGroupComponent> taxComponents;
     private String dateFormat;
+
+    @java.lang.SuppressWarnings("all")
+        public void setName(final String name) {
+        this.name = name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLocale(final String locale) {
+        this.locale = locale;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setTaxComponents(final Set<TaxGroupComponent> taxComponents) {
+        this.taxComponents = taxComponents;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDateFormat(final String dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLocale() {
+        return this.locale;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Set<TaxGroupComponent> getTaxComponents() {
+        return this.taxComponents;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDateFormat() {
+        return this.dateFormat;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TaxGroupRequest() {
+    }
 }

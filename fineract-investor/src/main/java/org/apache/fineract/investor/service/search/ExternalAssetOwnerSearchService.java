@@ -19,7 +19,6 @@
 package org.apache.fineract.investor.service.search;
 
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.PagedRequest;
 import org.apache.fineract.investor.data.ExternalTransferData;
 import org.apache.fineract.investor.domain.search.SearchingExternalAssetOwnerRepository;
@@ -31,9 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class ExternalAssetOwnerSearchService {
-
     private final SearchingExternalAssetOwnerRepository externalAssetOwnerRepository;
     private final ExternalAssetOwnerSearchDataMapper externalAssetOwnerSearchDataMapper;
 
@@ -50,4 +47,9 @@ public class ExternalAssetOwnerSearchService {
         return externalAssetOwnerRepository.searchInvestorData(searchRequest).map(externalAssetOwnerSearchDataMapper::map);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnerSearchService(final SearchingExternalAssetOwnerRepository externalAssetOwnerRepository, final ExternalAssetOwnerSearchDataMapper externalAssetOwnerSearchDataMapper) {
+        this.externalAssetOwnerRepository = externalAssetOwnerRepository;
+        this.externalAssetOwnerSearchDataMapper = externalAssetOwnerSearchDataMapper;
+    }
 }

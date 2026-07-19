@@ -32,7 +32,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -48,11 +47,8 @@ import org.springframework.stereotype.Component;
 @Path("/v1/working-capital-loans")
 @Component
 @Tag(name = "Working Capital Loan Near Breach Actions", description = "Manages near breach actions for Working Capital loans")
-@RequiredArgsConstructor
 public class WorkingCapitalLoanNearBreachActionApiResource {
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "WC_NEAR_BREACH_ACTION";
-
     private final PlatformSecurityContext context;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final WorkingCapitalLoanNearBreachActionReadService nearBreachActionReadService;
@@ -60,61 +56,60 @@ public class WorkingCapitalLoanNearBreachActionApiResource {
 
     @POST
     @Path("{loanId}/near-breach-actions")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "createWorkingCapitalLoanNearBreachActionById", summary = "Create a near breach action for an active Working Capital Loan", description = "Creates a near breach action (reschedule) for a Working Capital loan.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = WorkingCapitalLoanNearBreachActionApiResourceSwagger.PostWorkingCapitalLoansLoanIdNearBreachActionsRequest.class)))
-    public CommandProcessingResult createNearBreachActionById(
-            @PathParam("loanId") @Parameter(description = "loanId", required = true) final Long loanId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+    public CommandProcessingResult createNearBreachActionById(@PathParam("loanId") @Parameter(description = "loanId", required = true) final Long loanId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
         return createNearBreachAction(loanId, null, apiRequestBodyAsJson);
     }
 
     @POST
     @Path("external-id/{loanExternalId}/near-breach-actions")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "createWorkingCapitalLoanNearBreachActionByExternalId", summary = "Create a near breach action for an active Working Capital Loan by external id", description = "Creates a near breach action (reschedule) for a Working Capital loan.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = WorkingCapitalLoanNearBreachActionApiResourceSwagger.PostWorkingCapitalLoansLoanIdNearBreachActionsRequest.class)))
-    public CommandProcessingResult createNearBreachActionByExternalId(
-            @PathParam("loanExternalId") @Parameter(description = "loanExternalId", required = true) final String loanExternalId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+    public CommandProcessingResult createNearBreachActionByExternalId(@PathParam("loanExternalId") @Parameter(description = "loanExternalId", required = true) final String loanExternalId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
         return createNearBreachAction(null, loanExternalId, apiRequestBodyAsJson);
     }
 
-    private CommandProcessingResult createNearBreachAction(final Long loanId, final String loanExternalIdStr,
-            final String apiRequestBodyAsJson) {
-        final Long resolvedLoanId = loanId != null ? loanId
-                : readPlatformService.getResolvedLoanId(ExternalIdFactory.produce(loanExternalIdStr));
+    private CommandProcessingResult createNearBreachAction(final Long loanId, final String loanExternalIdStr, final String apiRequestBodyAsJson) {
+        final Long resolvedLoanId = loanId != null ? loanId : readPlatformService.getResolvedLoanId(ExternalIdFactory.produce(loanExternalIdStr));
         if (resolvedLoanId == null) {
             throw new WorkingCapitalLoanNotFoundException(ExternalIdFactory.produce(loanExternalIdStr));
         }
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson)
-                .createNearBreachActionWorkingCapitalLoan(resolvedLoanId).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson).createNearBreachActionWorkingCapitalLoan(resolvedLoanId).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @GET
     @Path("{loanId}/near-breach-actions")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "getWorkingCapitalLoanNearBreachActionsById", summary = "Retrieve near breach actions for a Working Capital Loan", description = "Returns all near breach action records for the loan, ordered by most recent first.")
-    public List<WorkingCapitalLoanNearBreachActionData> getNearBreachActionsById(
-            @PathParam("loanId") @Parameter(description = "loanId", required = true) final Long loanId) {
+    public List<WorkingCapitalLoanNearBreachActionData> getNearBreachActionsById(@PathParam("loanId") @Parameter(description = "loanId", required = true) final Long loanId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.nearBreachActionReadService.retrieveNearBreachActions(loanId);
     }
 
     @GET
     @Path("external-id/{loanExternalId}/near-breach-actions")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "getWorkingCapitalLoanNearBreachActionsByExternalId", summary = "Retrieve near breach actions for a Working Capital Loan by external id", description = "Returns all near breach action records for the loan, ordered by most recent first.")
-    public List<WorkingCapitalLoanNearBreachActionData> getNearBreachActionsByExternalId(
-            @PathParam("loanExternalId") @Parameter(description = "loanExternalId", required = true) final String loanExternalId) {
+    public List<WorkingCapitalLoanNearBreachActionData> getNearBreachActionsByExternalId(@PathParam("loanExternalId") @Parameter(description = "loanExternalId", required = true) final String loanExternalId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final Long resolvedLoanId = readPlatformService.getResolvedLoanId(ExternalIdFactory.produce(loanExternalId));
         if (resolvedLoanId == null) {
             throw new WorkingCapitalLoanNotFoundException(ExternalIdFactory.produce(loanExternalId));
         }
         return this.nearBreachActionReadService.retrieveNearBreachActions(resolvedLoanId);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanNearBreachActionApiResource(final PlatformSecurityContext context, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final WorkingCapitalLoanNearBreachActionReadService nearBreachActionReadService, final WorkingCapitalLoanApplicationReadPlatformService readPlatformService) {
+        this.context = context;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.nearBreachActionReadService = nearBreachActionReadService;
+        this.readPlatformService = readPlatformService;
     }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.organisation.holiday.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "HOLIDAY", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteHolidayCommandHandler implements NewCommandSourceHandler {
-
     private final HolidayWritePlatformService holidayWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.holidayWritePlatformService.deleteHoliday(command.entityId());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DeleteHolidayCommandHandler(final HolidayWritePlatformService holidayWritePlatformService) {
+        this.holidayWritePlatformService = holidayWritePlatformService;
     }
 }

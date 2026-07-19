@@ -37,7 +37,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.ApiParameterHelper;
 import org.apache.fineract.infrastructure.core.exception.PlatformServiceUnavailableException;
 import org.apache.fineract.infrastructure.dataqueries.data.ReportExportType;
@@ -54,88 +53,56 @@ import org.springframework.stereotype.Component;
 @Path("/v1/runreports")
 @Component
 @Tag(name = "Run Reports", description = "API for executing predefined reports with dynamic parameters")
-@RequiredArgsConstructor
 public class RunreportsApiResource {
-
     private final PlatformSecurityContext context;
     private final ReadReportingService readExtraDataAndReportingService;
     private final ReportingProcessServiceProvider reportingProcessServiceProvider;
 
     @GET
     @Path("/availableExports/{reportName}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Return all available export types for the specific report", operationId = "retrieveAllAvailableExports", description = "Returns the list of all available export types for a given report.")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReportExportType.class))))
     @ApiResponse(responseCode = "400", description = "Bad Request - Invalid report name or parameters")
     @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    public Response retrieveAllAvailableExports(
-            @PathParam("reportName") @Parameter(description = "Name of the report to get available export types for", example = "Client Listing", required = true) final String reportName,
-            @Context final UriInfo uriInfo) {
+    public Response retrieveAllAvailableExports(@PathParam("reportName") @Parameter(description = "Name of the report to get available export types for", example = "Client Listing", required = true) final String reportName, @Context final UriInfo uriInfo) {
         MultivaluedMap<String, String> queryParams = new MultivaluedStringMap();
         queryParams.putAll(uriInfo.getQueryParameters());
-
         final boolean parameterType = ApiParameterHelper.parameterType(queryParams);
         String reportType = readExtraDataAndReportingService.getReportType(reportName, parameterType);
         ReportingProcessService reportingProcessService = reportingProcessServiceProvider.findReportingProcessService(reportType);
         if (reportingProcessService == null) {
-            throw new PlatformServiceUnavailableException("err.msg.report.service.implementation.missing",
-                    ReportingProcessServiceProvider.SERVICE_MISSING + reportType, reportType);
+            throw new PlatformServiceUnavailableException("err.msg.report.service.implementation.missing", ReportingProcessServiceProvider.SERVICE_MISSING + reportType, reportType);
         }
         return Response.ok().entity(reportingProcessService.getAvailableExportTargets()).build();
     }
 
     @GET
     @Path("{reportName}")
-    @Timed(value = "fineract.report.execution", description = "Time taken to execute reports", extraTags = { "component", "reporting" })
-    @Produces({ MediaType.APPLICATION_JSON, "text/csv", "application/vnd.ms-excel", "application/pdf", "text/html" })
+    @Timed(value = "fineract.report.execution", description = "Time taken to execute reports", extraTags = {"component", "reporting"})
+    @Produces({MediaType.APPLICATION_JSON, "text/csv", "application/vnd.ms-excel", "application/pdf", "text/html"})
     @Operation(summary = "Run a predefined report", operationId = "runReport", description = ReportParameters.FULL_DESCRIPTION)
     @ApiResponse(responseCode = "200", description = "OK - Report executed successfully", content = @Content(schema = @Schema(implementation = RunreportsApiResourceSwagger.RunReportsResponse.class)))
     @ApiResponse(responseCode = "400", description = "Bad Request - Missing or invalid parameters")
     @ApiResponse(responseCode = "401", description = "Unauthorized - Not authorized to run this report")
     @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    public Response runReport(
-            @PathParam("reportName") @Parameter(description = "The name of the report to execute (e.g., 'Client Listing', 'Expected Payments By Date')", example = "Client Listing", required = true) final String reportName,
-            @Context final UriInfo uriInfo,
-
-            @DefaultValue("false") @QueryParam("exportCSV") @Parameter(description = "Set to true to export results as CSV", example = "false") final Boolean exportCSV,
-
-            @DefaultValue("false") @QueryParam("parameterType") @Parameter(description = "Indicates if this is a parameter type request", example = "false") final Boolean parameterType,
-
-            @QueryParam("output-type") @Parameter(description = "Output format type (HTML, XLS, CSV, PDF)", example = "HTML") final String outputType,
-
-            @QueryParam("R_officeId") @Parameter(description = "Office ID filter", example = "1") final String rOfficeId,
-
-            @QueryParam("R_loanOfficerId") @Parameter(description = "Loan officer ID filter", example = "5") final String rLoanOfficerId,
-
-            @QueryParam("R_fromDate") @Parameter(description = "Start date filter (yyyy-MM-dd)", example = "2023-01-01") final String rFromDate,
-
-            @QueryParam("R_toDate") @Parameter(description = "End date filter (yyyy-MM-dd)", example = "2023-12-31") final String rToDate,
-
-            @QueryParam("R_currencyId") @Parameter(description = "Currency ID filter", example = "USD") final String rCurrencyId,
-
-            @QueryParam("R_accountNo") @Parameter(description = "Account number filter", example = "00010001") final String rAccountNo) {
-
+    public Response runReport(@PathParam("reportName") @Parameter(description = "The name of the report to execute (e.g., \'Client Listing\', \'Expected Payments By Date\')", example = "Client Listing", required = true) final String reportName, @Context final UriInfo uriInfo, @DefaultValue("false") @QueryParam("exportCSV") @Parameter(description = "Set to true to export results as CSV", example = "false") final Boolean exportCSV, @DefaultValue("false") @QueryParam("parameterType") @Parameter(description = "Indicates if this is a parameter type request", example = "false") final Boolean parameterType, @QueryParam("output-type") @Parameter(description = "Output format type (HTML, XLS, CSV, PDF)", example = "HTML") final String outputType, @QueryParam("R_officeId") @Parameter(description = "Office ID filter", example = "1") final String rOfficeId, @QueryParam("R_loanOfficerId") @Parameter(description = "Loan officer ID filter", example = "5") final String rLoanOfficerId, @QueryParam("R_fromDate") @Parameter(description = "Start date filter (yyyy-MM-dd)", example = "2023-01-01") final String rFromDate, @QueryParam("R_toDate") @Parameter(description = "End date filter (yyyy-MM-dd)", example = "2023-12-31") final String rToDate, @QueryParam("R_currencyId") @Parameter(description = "Currency ID filter", example = "USD") final String rCurrencyId, @QueryParam("R_accountNo") @Parameter(description = "Account number filter", example = "00010001") final String rAccountNo) {
         return processReportRequest(reportName, uriInfo);
     }
 
     public Response runReport(final String reportName, final UriInfo uriInfo) {
-
         return processReportRequest(reportName, uriInfo);
     }
 
     private Response processReportRequest(final String reportName, final UriInfo uriInfo) {
         MultivaluedMap<String, String> queryParams = new MultivaluedStringMap();
         queryParams.putAll(uriInfo.getQueryParameters());
-
         final boolean parameterTypeValue = ApiParameterHelper.parameterType(queryParams);
-
         checkUserPermissionForReport(reportName, parameterTypeValue);
-
         String reportType = readExtraDataAndReportingService.getReportType(reportName, parameterTypeValue);
         ReportingProcessService reportingProcessService = reportingProcessServiceProvider.findReportingProcessService(reportType);
         if (reportingProcessService == null) {
-            throw new PlatformServiceUnavailableException("err.msg.report.service.implementation.missing",
-                    ReportingProcessServiceProvider.SERVICE_MISSING + reportType, reportType);
+            throw new PlatformServiceUnavailableException("err.msg.report.service.implementation.missing", ReportingProcessServiceProvider.SERVICE_MISSING + reportType, reportType);
         }
         return reportingProcessService.processRequest(reportName, queryParams);
     }
@@ -149,5 +116,12 @@ public class RunreportsApiResource {
                 throw new NoAuthorizationException("Not authorised to run report: " + reportName);
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RunreportsApiResource(final PlatformSecurityContext context, final ReadReportingService readExtraDataAndReportingService, final ReportingProcessServiceProvider reportingProcessServiceProvider) {
+        this.context = context;
+        this.readExtraDataAndReportingService = readExtraDataAndReportingService;
+        this.reportingProcessServiceProvider = reportingProcessServiceProvider;
     }
 }

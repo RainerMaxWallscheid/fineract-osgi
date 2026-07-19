@@ -22,8 +22,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanAccrualActivityRepository;
@@ -36,11 +34,10 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class AccrualActivityPostingTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AccrualActivityPostingTasklet.class);
     private final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService;
     private final LoanAccrualActivityRepository loanAccrualActivityRepository;
 
@@ -48,8 +45,7 @@ public class AccrualActivityPostingTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         final LocalDate yesterday = DateUtils.getBusinessLocalDate().minusDays(1);
         List<Throwable> errors = new ArrayList<>();
-        Set<Long> loanAccounts = loanAccrualActivityRepository.fetchLoanIdsForAccrualActivityPosting(yesterday,
-                LoanTransactionType.ACCRUAL_ACTIVITY, LoanStatus.ACTIVE);
+        Set<Long> loanAccounts = loanAccrualActivityRepository.fetchLoanIdsForAccrualActivityPosting(yesterday, LoanTransactionType.ACCRUAL_ACTIVITY, LoanStatus.ACTIVE);
         for (Long accountId : loanAccounts) {
             try {
                 loanAccrualActivityProcessingService.makeAccrualActivityTransaction(accountId, yesterday);
@@ -61,7 +57,12 @@ public class AccrualActivityPostingTasklet implements Tasklet {
         if (!errors.isEmpty()) {
             throw new JobExecutionException(errors);
         }
-
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AccrualActivityPostingTasklet(final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService, final LoanAccrualActivityRepository loanAccrualActivityRepository) {
+        this.loanAccrualActivityProcessingService = loanAccrualActivityProcessingService;
+        this.loanAccrualActivityRepository = loanAccrualActivityRepository;
     }
 }

@@ -22,13 +22,10 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.fineract.portfolio.meeting.MeetingApiConstants.attendanceTypeParamName;
 import static org.apache.fineract.portfolio.meeting.MeetingApiConstants.clientIdParamName;
 import static org.apache.fineract.portfolio.meeting.MeetingApiConstants.clientsAttendanceParamName;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.meeting.data.MeetingAttendanceUpdateRequest;
 import org.apache.fineract.portfolio.meeting.data.MeetingAttendanceUpdateResponse;
@@ -39,40 +36,32 @@ import org.apache.fineract.portfolio.meeting.exception.MeetingNotFoundException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 @ConditionalOnMissingBean(value = MeetingAttendanceWriteService.class, ignored = MeetingAttendanceWriteServiceImpl.class)
 public class MeetingAttendanceWriteServiceImpl implements MeetingAttendanceWriteService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MeetingAttendanceWriteServiceImpl.class);
     private final MeetingRepository meetingRepository;
     private final MeetingWriteServiceImpl writeService;
 
     @Override
     public MeetingAttendanceUpdateResponse updateMeetingAttendance(final MeetingAttendanceUpdateRequest request) {
-        var meeting = meetingRepository.findById(request.getEntityId())
-                .orElseThrow(() -> new MeetingNotFoundException(request.getEntityId()));
+        var meeting = meetingRepository.findById(request.getEntityId()).orElseThrow(() -> new MeetingNotFoundException(request.getEntityId()));
         var clientsAttendance = writeService.getClientsAttendance(meeting, request.getMeetingAttendance());
         var changes = updateAttendance(meeting, clientsAttendance);
-
         meetingRepository.saveAndFlush(meeting);
-
-        var groupId = CalendarEntityType.isGroup(meeting.getCalendarInstance().getEntityTypeId())
-                ? meeting.getCalendarInstance().getEntityId()
-                : null;
-
+        var groupId = CalendarEntityType.isGroup(meeting.getCalendarInstance().getEntityTypeId()) ? meeting.getCalendarInstance().getEntityId() : null;
         return MeetingAttendanceUpdateResponse.builder().entityId(meeting.getId()).groupId(groupId).changes(changes).build();
     }
 
     private Map<String, Object> updateAttendance(Meeting meeting, HashSet<MeetingAttendance> clientsAttendance) {
         var result = new ArrayList<MeetingAttendance>();
-
         var actualChanges = new HashMap<String, Object>();
         var clientAttendanceChanges = new HashMap<String, Object>();
-
         // TODO: never use "goto" statemements... ever; leaving it here, because the whole class will eventually
         // disappear
-        updateAttendanceLoop: for (var clientAttendance : clientsAttendance) {
+        updateAttendanceLoop:
+        for (var clientAttendance : clientsAttendance) {
             if (meeting.getClientsAttendance() == null) {
                 meeting.setClientsAttendance(new HashSet<>());
             }
@@ -88,21 +77,22 @@ public class MeetingAttendanceWriteServiceImpl implements MeetingAttendanceWrite
                     continue updateAttendanceLoop;
                 }
             }
-
             var clientAttendanceChange = new HashMap<String, Object>();
             clientAttendanceChange.put(clientIdParamName, clientAttendance.getClient().getId());
             clientAttendanceChange.put(attendanceTypeParamName, clientAttendance.getAttendanceTypeId());
             clientAttendanceChanges.put(clientAttendance.getClient().getId().toString(), clientAttendanceChange);
-
             result.add(clientAttendance);
         }
-
         actualChanges.put(clientsAttendanceParamName, clientAttendanceChanges);
-
         if (!result.isEmpty()) {
             clientsAttendance.addAll(result);
         }
-
         return actualChanges;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MeetingAttendanceWriteServiceImpl(final MeetingRepository meetingRepository, final MeetingWriteServiceImpl writeService) {
+        this.meetingRepository = meetingRepository;
+        this.writeService = writeService;
     }
 }

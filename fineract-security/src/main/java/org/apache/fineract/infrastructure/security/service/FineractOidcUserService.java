@@ -20,8 +20,6 @@ package org.apache.fineract.infrastructure.security.service;
 
 import java.util.Collection;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.security.data.FineractOidcUser;
 import org.apache.fineract.useradministration.domain.AppUser;
@@ -36,11 +34,10 @@ import org.springframework.stereotype.Service;
  * Maps OIDC identities (browser login or Bearer JWT) to Fineract {@link AppUser} entities. User resolution and
  * auto-creation are delegated to {@link OidcAppUserResolutionService} whose implementation lives in fineract-provider.
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class FineractOidcUserService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FineractOidcUserService.class);
     private final OidcAppUserResolutionService resolutionService;
     private final FineractProperties fineractProperties;
 
@@ -52,9 +49,7 @@ public class FineractOidcUserService {
         String email = jwt.getClaimAsString("email");
         String firstName = jwt.getClaimAsString("given_name");
         String lastName = jwt.getClaimAsString("family_name");
-
-        log.debug("Resolving Fineract user for OIDC subject '{}' (username claim: '{}')", jwt.getSubject(), username);
-
+        log.debug("Resolving Fineract user for OIDC subject \'{}\' (username claim: \'{}\')", jwt.getSubject(), username);
         return resolutionService.resolveOrCreate(username, email, firstName, lastName, Set.of());
     }
 
@@ -64,24 +59,18 @@ public class FineractOidcUserService {
      */
     public FineractOidcUser processOidcUser(OidcUser oidcUser, String tenantId) {
         String usernameClaim = fineractProperties.getSecurity().getOidcFederation().getUsernameClaim();
-
         String username = oidcUser.getClaimAsString(usernameClaim);
         if (username == null) {
             username = oidcUser.getSubject();
         }
-
         String email = oidcUser.getEmail();
         String firstName = oidcUser.getGivenName();
         String lastName = oidcUser.getFamilyName();
-
-        log.debug("Processing OIDC user '{}' for tenant '{}'", username, tenantId);
-
+        log.debug("Processing OIDC user \'{}\' for tenant \'{}\'", username, tenantId);
         AppUser appUser = resolutionService.resolveOrCreate(username, email, firstName, lastName, Set.of());
-
         Collection<? extends GrantedAuthority> authorities = appUser.getAuthorities();
         OidcIdToken idToken = oidcUser.getIdToken();
         OidcUserInfo userInfo = oidcUser.getUserInfo();
-
         return new FineractOidcUser(authorities, idToken, userInfo, appUser, tenantId);
     }
 
@@ -101,5 +90,11 @@ public class FineractOidcUserService {
     public String extractTenantId(Jwt jwt) {
         String claimName = fineractProperties.getSecurity().getOidcFederation().getTenantClaimName();
         return jwt.getClaimAsString(claimName);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FineractOidcUserService(final OidcAppUserResolutionService resolutionService, final FineractProperties fineractProperties) {
+        this.resolutionService = resolutionService;
+        this.fineractProperties = fineractProperties;
     }
 }

@@ -18,15 +18,11 @@
  */
 package org.apache.fineract.infrastructure.event.business.domain.datatable;
 
-import lombok.Getter;
 import org.apache.fineract.infrastructure.event.business.domain.AbstractBusinessEvent;
 
-@Getter
 public abstract class DatatableEntryBusinessEvent extends AbstractBusinessEvent<DatatableEntryDetails> {
-
     protected static final String CATEGORY = "Datatable";
     public static final String TYPE = "DatatableEntryBusinessEvent";
-
     protected DatatableEntryDetails datatableEntryDetails;
 
     public DatatableEntryBusinessEvent(final DatatableEntryDetails datatableEntryDetails) {
@@ -44,4 +40,8 @@ public abstract class DatatableEntryBusinessEvent extends AbstractBusinessEvent<
         return CATEGORY;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DatatableEntryDetails getDatatableEntryDetails() {
+        return this.datatableEntryDetails;
+    }
 }

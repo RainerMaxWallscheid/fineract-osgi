@@ -19,10 +19,7 @@
 package org.apache.fineract.infrastructure.core.diagnostics.security;
 
 import static java.lang.System.lineSeparator;
-
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.boot.FineractProfiles;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Profile;
@@ -32,10 +29,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile(FineractProfiles.DIAGNOSTICS)
-@Slf4j
-@RequiredArgsConstructor
 public class SecurityFilterChainDiagnostics implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SecurityFilterChainDiagnostics.class);
     private final List<SecurityFilterChain> filterChains;
 
     @Override
@@ -52,13 +48,12 @@ public class SecurityFilterChainDiagnostics implements InitializingBean {
     }
 
     private void printDefaultFilterChain(DefaultSecurityFilterChain filterChain) {
-
         log.info("""
-
-                Filter chain matcher: {}
-                Filters in order:
-                {}
-                """, filterChain.getRequestMatcher(), getFormattedFilters(filterChain));
+            
+            Filter chain matcher: {}
+            Filters in order:
+            {}
+            """, filterChain.getRequestMatcher(), getFormattedFilters(filterChain));
     }
 
     private String getFormattedFilters(DefaultSecurityFilterChain filterChain) {
@@ -73,8 +68,13 @@ public class SecurityFilterChainDiagnostics implements InitializingBean {
 
     private void printUnknownFilterChain(SecurityFilterChain filterChain) {
         log.info("""
-                Filter chain:
-                {}
-                """, filterChain);
+            Filter chain:
+            {}
+            """, filterChain);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SecurityFilterChainDiagnostics(final List<SecurityFilterChain> filterChains) {
+        this.filterChains = filterChains;
     }
 }

@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -39,9 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class WorkingCapitalNearBreachWritePlatformServiceImpl implements WorkingCapitalNearBreachWritePlatformService {
-
     private final WorkingCapitalNearBreachRepository repository;
     private final WorkingCapitalNearBreachParseAndValidator dataValidator;
 
@@ -57,13 +54,10 @@ public class WorkingCapitalNearBreachWritePlatformServiceImpl implements Working
     @Override
     @Transactional
     public CommandProcessingResult update(final Long nearBreachId, final JsonCommand command) {
-        final WorkingCapitalNearBreach existing = repository.findById(nearBreachId)
-                .orElseThrow(() -> new WorkingCapitalNearBreachNotFoundException(nearBreachId));
-
+        final WorkingCapitalNearBreach existing = repository.findById(nearBreachId).orElseThrow(() -> new WorkingCapitalNearBreachNotFoundException(nearBreachId));
         final WorkingCapitalNearBreachRequest data = dataValidator.validateAndParse(command);
         final Map<String, Object> changes = new HashMap<>();
         final WorkingCapitalNearBreach updated = updateAndPersistNearBreach(existing, data, changes);
-
         return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(updated.getId()).with(changes).build();
     }
 
@@ -78,34 +72,23 @@ public class WorkingCapitalNearBreachWritePlatformServiceImpl implements Working
         return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(nearBreachId).build();
     }
 
-    private WorkingCapitalNearBreach createAndPersistNearBreach(final WorkingCapitalNearBreachRequest request,
-            final Map<String, Object> changes) {
+    private WorkingCapitalNearBreach createAndPersistNearBreach(final WorkingCapitalNearBreachRequest request, final Map<String, Object> changes) {
         validateDuplicateName(request.nearBreachName(), null);
-        final WorkingCapitalLoanPeriodFrequencyType nearBreachFrequencyType = request.nearBreachFrequencyType() != null
-                ? WorkingCapitalLoanPeriodFrequencyType.fromString(request.nearBreachFrequencyType())
-                : null;
-
-        final WorkingCapitalNearBreach created = new WorkingCapitalNearBreach(request.nearBreachName(), request.nearBreachFrequency(),
-                nearBreachFrequencyType, request.nearBreachThreshold());
+        final WorkingCapitalLoanPeriodFrequencyType nearBreachFrequencyType = request.nearBreachFrequencyType() != null ? WorkingCapitalLoanPeriodFrequencyType.fromString(request.nearBreachFrequencyType()) : null;
+        final WorkingCapitalNearBreach created = new WorkingCapitalNearBreach(request.nearBreachName(), request.nearBreachFrequency(), nearBreachFrequencyType, request.nearBreachThreshold());
         repository.saveAndFlush(created);
-
         changes.put(WorkingCapitalLoanProductConstants.nearBreachNameParamName, created.getName());
         changes.put(WorkingCapitalLoanProductConstants.nearBreachFrequencyParamName, created.getFrequency());
-        changes.put(WorkingCapitalLoanProductConstants.nearBreachFrequencyTypeParamName,
-                created.getFrequencyType() != null ? created.getFrequencyType().name() : null);
+        changes.put(WorkingCapitalLoanProductConstants.nearBreachFrequencyTypeParamName, created.getFrequencyType() != null ? created.getFrequencyType().name() : null);
         changes.put(WorkingCapitalLoanProductConstants.nearBreachThresholdParamName, created.getThreshold());
         return created;
     }
 
-    private WorkingCapitalNearBreach updateAndPersistNearBreach(final WorkingCapitalNearBreach item,
-            final WorkingCapitalNearBreachRequest request, final Map<String, Object> changes) {
+    private WorkingCapitalNearBreach updateAndPersistNearBreach(final WorkingCapitalNearBreach item, final WorkingCapitalNearBreachRequest request, final Map<String, Object> changes) {
         final String nearBreachName = request.nearBreachName();
         final Integer nearBreachFrequency = request.nearBreachFrequency();
-        final WorkingCapitalLoanPeriodFrequencyType nearBreachFrequencyType = request.nearBreachFrequencyType() != null
-                ? WorkingCapitalLoanPeriodFrequencyType.fromString(request.nearBreachFrequencyType())
-                : null;
+        final WorkingCapitalLoanPeriodFrequencyType nearBreachFrequencyType = request.nearBreachFrequencyType() != null ? WorkingCapitalLoanPeriodFrequencyType.fromString(request.nearBreachFrequencyType()) : null;
         final BigDecimal nearBreachThreshold = request.nearBreachThreshold();
-
         if (Validator.isChanged(nearBreachName, item.getName())) {
             validateDuplicateName(nearBreachName, item.getId());
             item.setName(nearBreachName);
@@ -117,8 +100,7 @@ public class WorkingCapitalNearBreachWritePlatformServiceImpl implements Working
         }
         if (Validator.isChanged(nearBreachFrequencyType, item.getFrequencyType())) {
             item.setFrequencyType(nearBreachFrequencyType);
-            changes.put(WorkingCapitalLoanProductConstants.nearBreachFrequencyTypeParamName,
-                    nearBreachFrequencyType != null ? nearBreachFrequencyType.name() : null);
+            changes.put(WorkingCapitalLoanProductConstants.nearBreachFrequencyTypeParamName, nearBreachFrequencyType != null ? nearBreachFrequencyType.name() : null);
         }
         if (Validator.isBigDecimalChanged(nearBreachThreshold, item.getThreshold())) {
             item.setThreshold(nearBreachThreshold);
@@ -131,9 +113,14 @@ public class WorkingCapitalNearBreachWritePlatformServiceImpl implements Working
         repository.findByName(name).ifPresent(existing -> {
             final boolean sameEntity = currentId != null && Objects.equals(existing.getId(), currentId);
             if (!sameEntity) {
-                throw new PlatformDataIntegrityException("error.msg.data.integrity.issue.entity.duplicated",
-                        "Data integrity issue with resource: " + existing.getId());
+                throw new PlatformDataIntegrityException("error.msg.data.integrity.issue.entity.duplicated", "Data integrity issue with resource: " + existing.getId());
             }
         });
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalNearBreachWritePlatformServiceImpl(final WorkingCapitalNearBreachRepository repository, final WorkingCapitalNearBreachParseAndValidator dataValidator) {
+        this.repository = repository;
+        this.dataValidator = dataValidator;
     }
 }

@@ -19,7 +19,6 @@
 package org.apache.fineract.accounting.glaccount.service;
 
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.common.AccountingConstants;
 import org.apache.fineract.accounting.glaccount.api.GLAccountJsonInputParams;
 import org.apache.fineract.accounting.glaccount.command.GLAccountCommand;
@@ -55,12 +54,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccountWritePlatformService {
-
     private static final Logger LOG = LoggerFactory.getLogger(GLAccountWritePlatformServiceJpaRepositoryImpl.class);
     private static final String GL_ACCOUNT = "glAccount";
-
     private final GLAccountRepository glAccountRepository;
     private final JournalEntryRepository glJournalEntryRepository;
     private final ProductToGLAccountMappingRepository productToGLAccountMappingRepository;
@@ -74,35 +70,27 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
         try {
             final GLAccountCommand accountCommand = this.fromApiJsonDeserializer.commandFromApiJson(command.json());
             accountCommand.validateForCreate();
-
             // check parent is valid
             final Long parentId = command.longValueOfParameterNamed(GLAccountJsonInputParams.PARENT_ID.getValue());
             GLAccount parentGLAccount = null;
             if (parentId != null) {
                 parentGLAccount = validateParentGLAccount(parentId);
             }
-
             CodeValue glAccountTagType = null;
             final Long tagId = command.longValueOfParameterNamed(GLAccountJsonInputParams.TAGID.getValue());
             final Long type = command.longValueOfParameterNamed(GLAccountJsonInputParams.TYPE.getValue());
             final GLAccountType accountType = GLAccountType.fromInt(type.intValue());
-
             if (tagId != null) {
                 glAccountTagType = retrieveTagId(tagId, accountType);
             }
-
             final GLAccount glAccount = GLAccount.fromJson(parentGLAccount, command, glAccountTagType);
-
             this.glAccountRepository.saveAndFlush(glAccount);
-
             glAccount.generateHierarchy();
-
             this.glAccountRepository.saveAndFlush(glAccount);
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(glAccount.getId()) //
-                    .build();
+            return  //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(glAccount.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleGLAccountDataIntegrityIssues(command, throwable, dve);
@@ -116,8 +104,7 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
         try {
             final GLAccountCommand accountCommand = this.fromApiJsonDeserializer.commandFromApiJson(command.json());
             accountCommand.validateForUpdate();
-            if (command.hasParameter(GLAccountJsonInputParams.DISABLED.getValue())
-                    && command.booleanPrimitiveValueOfParameterNamed(GLAccountJsonInputParams.DISABLED.getValue())) {
+            if (command.hasParameter(GLAccountJsonInputParams.DISABLED.getValue()) && command.booleanPrimitiveValueOfParameterNamed(GLAccountJsonInputParams.DISABLED.getValue())) {
                 validateForAttachedProduct(glAccountId);
             }
             final Long parentId = command.longValueOfParameterNamed(GLAccountJsonInputParams.PARENT_ID.getValue());
@@ -125,18 +112,14 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
                 throw new InvalidParentGLAccountHeadException(glAccountId, parentId);
             }
             // is the glAccount valid
-            final GLAccount glAccount = this.glAccountRepository.findById(glAccountId)
-                    .orElseThrow(() -> new GLAccountNotFoundException(glAccountId));
-
+            final GLAccount glAccount = this.glAccountRepository.findById(glAccountId).orElseThrow(() -> new GLAccountNotFoundException(glAccountId));
             final Map<String, Object> changesOnly = glAccount.update(command);
-
             // is the new parent valid
             if (changesOnly.containsKey(GLAccountJsonInputParams.PARENT_ID.getValue())) {
                 final GLAccount parentAccount = validateParentGLAccount(parentId);
                 glAccount.setParent(parentAccount);
                 glAccount.generateHierarchy();
             }
-
             if (changesOnly.containsKey(GLAccountJsonInputParams.TAGID.getValue())) {
                 final Long tagIdLongValue = command.longValueOfParameterNamed(GLAccountJsonInputParams.TAGID.getValue());
                 final GLAccountType accountType = GLAccountType.fromInt(glAccount.getType());
@@ -146,27 +129,23 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
                 }
                 glAccount.setTagId(tagID);
             }
-
-            /**
-             * a detail account cannot be changed to a header account if transactions are already logged against it
-             **/
             if (changesOnly.containsKey(GLAccountJsonInputParams.USAGE.getValue()) && glAccount.isHeaderAccount()) {
-                final boolean journalEntriesForAccountExist = this.glJournalEntryRepository
-                        .exists((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(GL_ACCOUNT).get("id"), glAccountId));
+                /**
+                 * a detail account cannot be changed to a header account if transactions are already logged against it
+                 */
+                final boolean journalEntriesForAccountExist = this.glJournalEntryRepository.exists((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(GL_ACCOUNT).get("id"), glAccountId));
                 if (journalEntriesForAccountExist) {
                     throw new GLAccountInvalidUpdateException(GlAccountInvalidUpdateReason.TRANSANCTIONS_LOGGED, glAccountId);
                 }
             }
-
             if (!changesOnly.isEmpty()) {
                 this.glAccountRepository.saveAndFlush(glAccount);
             }
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(glAccount.getId()) //
-                    .with(changesOnly) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(glAccount.getId()).with(changesOnly).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleGLAccountDataIntegrityIssues(command, throwable, dve);
@@ -189,31 +168,25 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
     @Transactional
     @Override
     public CommandProcessingResult deleteGLAccount(final Long glAccountId) {
-        final GLAccount glAccount = this.glAccountRepository.findById(glAccountId)
-                .orElseThrow(() -> new GLAccountNotFoundException(glAccountId));
-
+        final GLAccount glAccount = this.glAccountRepository.findById(glAccountId).orElseThrow(() -> new GLAccountNotFoundException(glAccountId));
         // validate this isn't a header account that has children
         if (glAccount.isHeaderAccount() && !glAccount.getChildren().isEmpty()) {
             throw new GLAccountInvalidDeleteException(GlAccountInvalidDeleteReason.HAS_CHILDREN, glAccountId);
         }
-
         // does this account have transactions logged against it
-        final boolean journalEntriesForAccountExist = this.glJournalEntryRepository
-                .exists((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(GL_ACCOUNT).get("id"), glAccountId));
+        final boolean journalEntriesForAccountExist = this.glJournalEntryRepository.exists((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(GL_ACCOUNT).get("id"), glAccountId));
         if (journalEntriesForAccountExist) {
             throw new GLAccountInvalidDeleteException(GlAccountInvalidDeleteReason.TRANSACTIONS_LOGGED, glAccountId);
         }
         // does this account mapped to product
-        final boolean accountMappingForAccountExists = this.productToGLAccountMappingRepository
-                .exists((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(GL_ACCOUNT).get("id"), glAccountId));
+        final boolean accountMappingForAccountExists = this.productToGLAccountMappingRepository.exists((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(GL_ACCOUNT).get("id"), glAccountId));
         if (accountMappingForAccountExists) {
             throw new GLAccountInvalidDeleteException(GlAccountInvalidDeleteReason.PRODUCT_MAPPING, glAccountId);
         }
         this.glAccountRepository.delete(glAccount);
-
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(glAccountId) //
-                .build();
+        return  //
+        //
+        new CommandProcessingResultBuilder().withEntityId(glAccountId).build();
     }
 
     /**
@@ -223,8 +196,7 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
     private GLAccount validateParentGLAccount(final Long parentAccountId) {
         GLAccount parentGLAccount = null;
         if (parentAccountId != null) {
-            parentGLAccount = this.glAccountRepository.findById(parentAccountId)
-                    .orElseThrow(() -> new GLAccountNotFoundException(parentAccountId));
+            parentGLAccount = this.glAccountRepository.findById(parentAccountId).orElseThrow(() -> new GLAccountNotFoundException(parentAccountId));
             // ensure parent is not a detail account
             if (parentGLAccount.isDetailAccount()) {
                 throw new GLAccountInvalidParentException(parentAccountId);
@@ -237,37 +209,38 @@ public class GLAccountWritePlatformServiceJpaRepositoryImpl implements GLAccount
      * @param command
      * @param dve
      */
-    private void handleGLAccountDataIntegrityIssues(final JsonCommand command, final Throwable realCause,
-            final NonTransientDataAccessException dve) {
+    private void handleGLAccountDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final NonTransientDataAccessException dve) {
         if (realCause.getMessage().contains("acc_gl_code")) {
             final String glCode = command.stringValueOfParameterNamed(GLAccountJsonInputParams.GL_CODE.getValue());
             throw new GLAccountDuplicateException(glCode);
         }
-
         LOG.error("Error occured.", dve);
-        throw ErrorHandler.getMappable(dve, "error.msg.glAccount.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource GL Account: " + realCause.getMessage());
+        throw ErrorHandler.getMappable(dve, "error.msg.glAccount.unknown.data.integrity.issue", "Unknown data integrity issue with resource GL Account: " + realCause.getMessage());
     }
 
     private CodeValue retrieveTagId(final Long tagId, final GLAccountType accountType) {
         CodeValue glAccountTagType = null;
         if (accountType.isAssetType()) {
-            glAccountTagType = this.codeValueRepositoryWrapper
-                    .findOneByCodeNameAndIdWithNotFoundDetection(AccountingConstants.ASSESTS_TAG_OPTION_CODE_NAME, tagId);
+            glAccountTagType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(AccountingConstants.ASSESTS_TAG_OPTION_CODE_NAME, tagId);
         } else if (accountType.isLiabilityType()) {
-            glAccountTagType = this.codeValueRepositoryWrapper
-                    .findOneByCodeNameAndIdWithNotFoundDetection(AccountingConstants.LIABILITIES_TAG_OPTION_CODE_NAME, tagId);
+            glAccountTagType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(AccountingConstants.LIABILITIES_TAG_OPTION_CODE_NAME, tagId);
         } else if (accountType.isEquityType()) {
-            glAccountTagType = this.codeValueRepositoryWrapper
-                    .findOneByCodeNameAndIdWithNotFoundDetection(AccountingConstants.EQUITY_TAG_OPTION_CODE_NAME, tagId);
+            glAccountTagType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(AccountingConstants.EQUITY_TAG_OPTION_CODE_NAME, tagId);
         } else if (accountType.isIncomeType()) {
-            glAccountTagType = this.codeValueRepositoryWrapper
-                    .findOneByCodeNameAndIdWithNotFoundDetection(AccountingConstants.INCOME_TAG_OPTION_CODE_NAME, tagId);
+            glAccountTagType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(AccountingConstants.INCOME_TAG_OPTION_CODE_NAME, tagId);
         } else if (accountType.isExpenseType()) {
-            glAccountTagType = this.codeValueRepositoryWrapper
-                    .findOneByCodeNameAndIdWithNotFoundDetection(AccountingConstants.EXPENSES_TAG_OPTION_CODE_NAME, tagId);
+            glAccountTagType = this.codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(AccountingConstants.EXPENSES_TAG_OPTION_CODE_NAME, tagId);
         }
         return glAccountTagType;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public GLAccountWritePlatformServiceJpaRepositoryImpl(final GLAccountRepository glAccountRepository, final JournalEntryRepository glJournalEntryRepository, final ProductToGLAccountMappingRepository productToGLAccountMappingRepository, final GLAccountCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CodeValueRepositoryWrapper codeValueRepositoryWrapper, final JdbcTemplate jdbcTemplate) {
+        this.glAccountRepository = glAccountRepository;
+        this.glJournalEntryRepository = glJournalEntryRepository;
+        this.productToGLAccountMappingRepository = productToGLAccountMappingRepository;
+        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
+        this.codeValueRepositoryWrapper = codeValueRepositoryWrapper;
+        this.jdbcTemplate = jdbcTemplate;
+    }
 }

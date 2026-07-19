@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -38,9 +37,7 @@ import org.apache.fineract.portfolio.address.service.FieldConfigurationReadPlatf
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class AddressCommandFromApiJsonDeserializer {
-
     private final FromJsonHelper fromApiJsonHelper;
     private final FieldConfigurationReadPlatformService readservice;
 
@@ -56,30 +53,23 @@ public class AddressCommandFromApiJsonDeserializer {
         if (StringUtils.isBlank(json)) {
             throw new InvalidJsonException();
         }
-
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
-
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+        }.getType();
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("Address");
-
         final JsonElement element = this.fromApiJsonHelper.parse(json);
         final List<FieldConfigurationData> configurationData = new ArrayList<>(this.readservice.retrieveFieldConfigurationList("ADDRESS"));
         // validate the json fields from the configuration data fields
         final List<FieldConfigurationData> configData = configurationData.stream().filter(FieldConfigurationData::isEnabled).toList();
-
         final Set<String> supportedParameters = configData.stream().map(FieldConfigurationData::field).collect(Collectors.toSet());
-
         supportedParameters.add("locale");
         supportedParameters.add("dateFormat");
         supportedParameters.add("street");
         supportedParameters.add(fromNewClient ? "addressTypeId" : "addressId");
-
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
-
         configData.forEach(fieldConfiguration -> {
             final String field = fieldConfiguration.field().equals("addressType") ? "addressTypeId" : fieldConfiguration.field();
             final String fieldValue = this.fromApiJsonHelper.extractStringNamed(field, element);
-
             if (fieldConfiguration.field().equals("addressType") && fromNewClient) {
                 baseDataValidator.reset().parameter(field).value(fieldValue).notBlank();
             } else {
@@ -87,21 +77,22 @@ public class AddressCommandFromApiJsonDeserializer {
                     baseDataValidator.reset().parameter(field).value(fieldValue).notBlank();
                 }
             }
-
             if (!fieldConfiguration.validationRegex().isEmpty()) {
                 baseDataValidator.reset().parameter(field).value(fieldValue).matchesRegularExpression(fieldConfiguration.validationRegex());
             }
         });
-
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
-
     }
 
     private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
         if (!dataValidationErrors.isEmpty()) {
-            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
-                    dataValidationErrors);
+            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.", dataValidationErrors);
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public AddressCommandFromApiJsonDeserializer(final FromJsonHelper fromApiJsonHelper, final FieldConfigurationReadPlatformService readservice) {
+        this.fromApiJsonHelper = fromApiJsonHelper;
+        this.readservice = readservice;
+    }
 }

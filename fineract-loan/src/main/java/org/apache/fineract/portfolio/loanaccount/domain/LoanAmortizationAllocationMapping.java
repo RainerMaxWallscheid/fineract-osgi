@@ -25,9 +25,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
 /**
@@ -37,31 +34,78 @@ import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDa
  */
 @Entity
 @Table(name = "m_loan_amortization_allocation_mapping")
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
 public class LoanAmortizationAllocationMapping extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @Column(name = "loan_id", nullable = false)
     private Long loanId;
-
     @Column(name = "base_loan_transaction_id", nullable = false)
     private Long baseLoanTransactionId;
-
     @Column(name = "date", nullable = false)
     private LocalDate date;
-
     @Column(name = "amortization_loan_transaction_id", nullable = false)
     private Long amortizationLoanTransactionId;
-
     /**
      * Type of the amortization transaction (AM - amortization, AM_ADJ - amortization adjustment)
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "amortization_type", nullable = false)
     private AmortizationType amortizationType;
-
     @Column(name = "amount", scale = 6, precision = 19, nullable = false)
     private BigDecimal amount;
 
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanId() {
+        return this.loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getBaseLoanTransactionId() {
+        return this.baseLoanTransactionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getDate() {
+        return this.date;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getAmortizationLoanTransactionId() {
+        return this.amortizationLoanTransactionId;
+    }
+
+    /**
+     * Type of the amortization transaction (AM - amortization, AM_ADJ - amortization adjustment)
+     */
+    @java.lang.SuppressWarnings("all")
+        public AmortizationType getAmortizationType() {
+        return this.amortizationType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanAmortizationAllocationMapping() {
+    }
+
+    /**
+     * Creates a new {@code LoanAmortizationAllocationMapping} instance.
+     *
+     * @param loanId
+     * @param baseLoanTransactionId
+     * @param date
+     * @param amortizationLoanTransactionId
+     * @param amortizationType Type of the amortization transaction (AM - amortization, AM_ADJ - amortization adjustment)
+     * @param amount
+     */
+    @java.lang.SuppressWarnings("all")
+        public LoanAmortizationAllocationMapping(final Long loanId, final Long baseLoanTransactionId, final LocalDate date, final Long amortizationLoanTransactionId, final AmortizationType amortizationType, final BigDecimal amount) {
+        this.loanId = loanId;
+        this.baseLoanTransactionId = baseLoanTransactionId;
+        this.date = date;
+        this.amortizationLoanTransactionId = amortizationLoanTransactionId;
+        this.amortizationType = amortizationType;
+        this.amount = amount;
+    }
 }

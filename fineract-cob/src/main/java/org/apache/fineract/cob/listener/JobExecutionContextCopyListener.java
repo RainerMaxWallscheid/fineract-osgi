@@ -19,7 +19,6 @@
 package org.apache.fineract.cob.listener;
 
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
@@ -28,9 +27,9 @@ import org.springframework.batch.item.ExecutionContext;
 /**
  * {@link StepExecutionListener} to copy values from Job execution context into Step execution context.
  */
-@Slf4j
 public class JobExecutionContextCopyListener implements StepExecutionListener {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JobExecutionContextCopyListener.class);
     private final List<String> stepExecutionKeys;
 
     public JobExecutionContextCopyListener(List<String> stepExecutionKeys) {
@@ -46,13 +45,10 @@ public class JobExecutionContextCopyListener implements StepExecutionListener {
     @Override
     public void beforeStep(final StepExecution stepExecution) {
         log.debug("Before step: copying job execution context to step [{}]", stepExecution.getStepName());
-
         final ExecutionContext stepExecutionContext = stepExecution.getExecutionContext();
         final ExecutionContext jobExecutionContext = stepExecution.getJobExecution().getExecutionContext();
-
         jobExecutionContext.entrySet().forEach(jobExecutionContextEntry -> {
-            if (stepExecutionKeys.contains(jobExecutionContextEntry.getKey())
-                    && BooleanUtils.isFalse(stepExecutionContext.containsKey(jobExecutionContextEntry.getKey()))) {
+            if (stepExecutionKeys.contains(jobExecutionContextEntry.getKey()) && BooleanUtils.isFalse(stepExecutionContext.containsKey(jobExecutionContextEntry.getKey()))) {
                 stepExecutionContext.put(jobExecutionContextEntry.getKey(), jobExecutionContextEntry.getValue());
             }
         });

@@ -24,30 +24,18 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 @Entity
-@Table(name = "acc_rule_tags", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "acc_rule_id", "tag_id", "acc_type_enum" }, name = "UNIQUE_ACCOUNT_RULE_TAGS") })
+@Table(name = "acc_rule_tags", uniqueConstraints = {@UniqueConstraint(columnNames = {"acc_rule_id", "tag_id", "acc_type_enum"}, name = "UNIQUE_ACCOUNT_RULE_TAGS")})
 public class AccountingTagRule extends AbstractPersistableCustom<Long> {
-
     @ManyToOne
     @JoinColumn(name = "acc_rule_id", nullable = false)
     private AccountingRule accountingRule;
-
     @ManyToOne
     @JoinColumn(name = "tag_id", nullable = false)
     private CodeValue tagId;
-
     @Column(name = "acc_type_enum", nullable = false)
     private Integer accountType;
 
@@ -55,4 +43,49 @@ public class AccountingTagRule extends AbstractPersistableCustom<Long> {
         return new AccountingTagRule().setTagId(tagId).setAccountType(accountType);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public AccountingRule getAccountingRule() {
+        return this.accountingRule;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getTagId() {
+        return this.tagId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getAccountType() {
+        return this.accountType;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public AccountingTagRule setAccountingRule(final AccountingRule accountingRule) {
+        this.accountingRule = accountingRule;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public AccountingTagRule setTagId(final CodeValue tagId) {
+        this.tagId = tagId;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public AccountingTagRule setAccountType(final Integer accountType) {
+        this.accountType = accountType;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AccountingTagRule() {
+    }
 }

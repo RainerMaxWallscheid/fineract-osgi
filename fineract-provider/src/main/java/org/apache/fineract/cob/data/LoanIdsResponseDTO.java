@@ -19,10 +19,55 @@
 package org.apache.fineract.cob.data;
 
 import java.util.List;
-import lombok.Data;
 
-@Data
 public class LoanIdsResponseDTO {
-
     private List<Long> loanIds;
+
+    @java.lang.SuppressWarnings("all")
+        public LoanIdsResponseDTO() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<Long> getLoanIds() {
+        return this.loanIds;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanIds(final List<Long> loanIds) {
+        this.loanIds = loanIds;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof LoanIdsResponseDTO)) return false;
+        final LoanIdsResponseDTO other = (LoanIdsResponseDTO) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$loanIds = this.getLoanIds();
+        final java.lang.Object other$loanIds = other.getLoanIds();
+        if (this$loanIds == null ? other$loanIds != null : !this$loanIds.equals(other$loanIds)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof LoanIdsResponseDTO;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $loanIds = this.getLoanIds();
+        result = result * PRIME + ($loanIds == null ? 43 : $loanIds.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "LoanIdsResponseDTO(loanIds=" + this.getLoanIds() + ")";
+    }
 }

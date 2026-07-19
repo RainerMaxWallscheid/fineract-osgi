@@ -23,7 +23,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.InvalidJsonException;
@@ -36,17 +35,16 @@ import org.springframework.stereotype.Component;
 @Provider
 @Component
 @Scope("singleton")
-@Slf4j
 public class InvalidJsonExceptionMapper implements ExceptionMapper<InvalidJsonException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InvalidJsonExceptionMapper.class);
 
     @Override
     public Response toResponse(@SuppressWarnings("unused") final InvalidJsonException exception) {
         final String globalisationMessageCode = "error.msg.invalid.request.body";
         final String defaultUserMessage = "The JSON provided in the body of the request is invalid or missing.";
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-
         final ApiParameterError error = ApiParameterError.generalError(globalisationMessageCode, defaultUserMessage);
-
         return Response.status(Status.BAD_REQUEST).entity(error).type(MediaType.APPLICATION_JSON).build();
     }
 }

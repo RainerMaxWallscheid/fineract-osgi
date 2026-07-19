@@ -30,7 +30,6 @@ import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.loanaccount.data.LoanChargePaidByData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanChargePaidBy;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
@@ -40,12 +39,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class LoanChargePaidByReadService {
-
     @PersistenceContext
     private EntityManager entityManager;
-
     private final LoanChargePaidByMapper loanChargePaidByMapper;
 
     public List<LoanChargePaidByData> fetchLoanChargesPaidByDataTransactionId(Long transactionId) {
@@ -58,22 +54,21 @@ public class LoanChargePaidByReadService {
     }
 
     public List<LoanChargePaidBy> fetchLoanChargesPaidByTransactionId(final List<Long> transactionIds) {
-
         final CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         final CriteriaQuery<LoanChargePaidBy> query = cb.createQuery(LoanChargePaidBy.class);
-
         final Root<LoanChargePaidBy> root = query.from(LoanChargePaidBy.class);
         root.fetch("loanTransaction", JoinType.INNER);
         final Path<LoanTransaction> loanTransaction = root.join("loanTransaction", JoinType.INNER);
-
         query.select(root).where(loanTransaction.get("id").in(transactionIds));
-
         final List<Order> orders = new ArrayList<>();
         orders.add(cb.desc(root.get("id")));
         query.orderBy(orders);
-
         final TypedQuery<LoanChargePaidBy> queryToExecute = entityManager.createQuery(query);
         return queryToExecute.getResultList();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanChargePaidByReadService(final LoanChargePaidByMapper loanChargePaidByMapper) {
+        this.loanChargePaidByMapper = loanChargePaidByMapper;
+    }
 }

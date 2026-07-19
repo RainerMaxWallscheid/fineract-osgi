@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.workingcapitalloanproduct.service;
 
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductBasicDetailsData;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadBasicDetailsService;
@@ -30,16 +29,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class WorkingCapitalLoanProductReadBasicDetailsServiceImpl implements LoanProductReadBasicDetailsService {
-
     private final WorkingCapitalLoanProductBasicDetailsMapper workingCapitalLoanProductBasicDetailsMapper;
     private final WorkingCapitalLoanProductRepository productRepository;
 
     @Override
     public Collection<LoanProductBasicDetailsData> retrieveProducts() {
-        return workingCapitalLoanProductBasicDetailsMapper
-                .map(productRepository.fetchActiveWorkingCapitalLoanProducts(DateUtils.getBusinessLocalDate()));
+        return workingCapitalLoanProductBasicDetailsMapper.map(productRepository.fetchActiveWorkingCapitalLoanProducts(DateUtils.getBusinessLocalDate()));
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanProductReadBasicDetailsServiceImpl(final WorkingCapitalLoanProductBasicDetailsMapper workingCapitalLoanProductBasicDetailsMapper, final WorkingCapitalLoanProductRepository productRepository) {
+        this.workingCapitalLoanProductBasicDetailsMapper = workingCapitalLoanProductBasicDetailsMapper;
+        this.productRepository = productRepository;
+    }
 }

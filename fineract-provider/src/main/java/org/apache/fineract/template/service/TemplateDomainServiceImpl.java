@@ -19,8 +19,6 @@
 package org.apache.fineract.template.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.jdbc.store.mapping.CommandMapper;
 import org.apache.fineract.template.data.TemplateCreateRequest;
 import org.apache.fineract.template.data.TemplateCreateResponse;
@@ -41,14 +39,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 @ConditionalOnMissingBean(value = TemplateDomainService.class, ignored = TemplateDomainServiceImpl.class)
 public class TemplateDomainServiceImpl implements TemplateDomainService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TemplateDomainServiceImpl.class);
     private final CommandMapper commandMapper;
-
     private final TemplateRepository templateRepository;
     private final TemplateMapper templateMapper;
     private final TemplateMapperDataMapper templateMapperDataMapper;
@@ -75,12 +71,8 @@ public class TemplateDomainServiceImpl implements TemplateDomainService {
         // name, text populated etc
         // FIXME: handle cases where data integrity constraints are fired from
         // database when saving.
-
-        var template = new Template().setName(request.getName()).setType(TemplateType.values()[request.getType()])
-                .setEntity(TemplateEntity.values()[request.getEntity()]).setText(request.getText());
-
+        var template = new Template().setName(request.getName()).setType(TemplateType.values()[request.getType()]).setEntity(TemplateEntity.values()[request.getEntity()]).setText(request.getText());
         templateRepository.saveAndFlush(template);
-
         return TemplateCreateResponse.builder().resourceId(template.getId()).build();
     }
 
@@ -91,27 +83,22 @@ public class TemplateDomainServiceImpl implements TemplateDomainService {
         // name, text populated etc
         // FIXME: handle cases where data integrity constraints are fired from
         // database when saving.
-
         var template = templateRepository.findById(request.getId()).orElseThrow(() -> new TemplateNotFoundException(request.getId()));
         template.setName(request.getName());
         template.setText(request.getText());
         template.setEntity(TemplateEntity.values()[request.getEntity()]);
-
         switch (request.getType()) {
-            case 0:
-                template.setType(TemplateType.DOCUMENT);
+        case 0: 
+            template.setType(TemplateType.DOCUMENT);
             break;
-            case 2:
-                template.setType(TemplateType.SMS);
+        case 2: 
+            template.setType(TemplateType.SMS);
             break;
-            default:
-                throw new TemplateTypeInvalidException(request.getType());
+        default: 
+            throw new TemplateTypeInvalidException(request.getType());
         }
-
         template.setMappers(templateMapperDataMapper.map(request.getMappers()));
-
         this.templateRepository.saveAndFlush(template);
-
         return TemplateUpdateResponse.builder().resourceId(request.getId()).build();
     }
 
@@ -119,14 +106,20 @@ public class TemplateDomainServiceImpl implements TemplateDomainService {
     @Override
     public TemplateDeleteResponse removeTemplate(TemplateDeleteRequest request) {
         var template = templateRepository.findById(request.getId()).orElseThrow(() -> new TemplateNotFoundException(request.getId()));
-
         this.templateRepository.delete(template);
-
         return TemplateDeleteResponse.builder().resourceId(request.getId()).build();
     }
 
     @Override
     public List<TemplateData> getAllByEntityAndType(final TemplateEntity entity, final TemplateType type) {
         return templateMapper.map(templateRepository.findByEntityAndType(entity, type));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TemplateDomainServiceImpl(final CommandMapper commandMapper, final TemplateRepository templateRepository, final TemplateMapper templateMapper, final TemplateMapperDataMapper templateMapperDataMapper) {
+        this.commandMapper = commandMapper;
+        this.templateRepository = templateRepository;
+        this.templateMapper = templateMapper;
+        this.templateMapperDataMapper = templateMapperDataMapper;
     }
 }

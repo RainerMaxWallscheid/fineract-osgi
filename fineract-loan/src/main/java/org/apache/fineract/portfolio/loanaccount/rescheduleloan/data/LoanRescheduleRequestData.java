@@ -20,16 +20,13 @@ package org.apache.fineract.portfolio.loanaccount.rescheduleloan.data;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTermVariationsData;
 
 /**
  * Immutable data object representing loan reschedule request data.
- **/
-@Getter
+ */
 public final class LoanRescheduleRequestData {
-
     private final Long id;
     private final Long loanId;
     private final Long clientId;
@@ -52,13 +49,8 @@ public final class LoanRescheduleRequestData {
      *
      * @param loanTermVariationsData
      *            TODO
-     **/
-    private LoanRescheduleRequestData(Long id, Long loanId, LoanRescheduleRequestStatusEnumData statusEnum,
-            Integer rescheduleFromInstallment, LocalDate rescheduleFromDate, CodeValueData rescheduleReasonCodeValue,
-            String rescheduleReasonComment, LoanRescheduleRequestTimelineData timeline, final String clientName,
-            final String loanAccountNumber, final Long clientId, final Boolean recalculateInterest,
-            Collection<CodeValueData> rescheduleReasons, final Collection<LoanTermVariationsData> loanTermVariationsData) {
-
+     */
+    private LoanRescheduleRequestData(Long id, Long loanId, LoanRescheduleRequestStatusEnumData statusEnum, Integer rescheduleFromInstallment, LocalDate rescheduleFromDate, CodeValueData rescheduleReasonCodeValue, String rescheduleReasonComment, LoanRescheduleRequestTimelineData timeline, final String clientName, final String loanAccountNumber, final Long clientId, final Boolean recalculateInterest, Collection<CodeValueData> rescheduleReasons, final Collection<LoanTermVariationsData> loanTermVariationsData) {
         this.id = id;
         this.loanId = loanId;
         this.statusEnum = statusEnum;
@@ -79,16 +71,9 @@ public final class LoanRescheduleRequestData {
      * @param loanTermVariationsData
      *            TODO
      * @return an instance of the LoanRescheduleRequestData class
-     **/
-    public static LoanRescheduleRequestData instance(Long id, Long loanId, LoanRescheduleRequestStatusEnumData statusEnum,
-            Integer rescheduleFromInstallment, LocalDate rescheduleFromDate, CodeValueData rescheduleReasonCodeValue,
-            String rescheduleReasonComment, LoanRescheduleRequestTimelineData timeline, final String clientName,
-            final String loanAccountNumber, final Long clientId, final Boolean recalculateInterest,
-            Collection<CodeValueData> rescheduleReasons, final Collection<LoanTermVariationsData> loanTermVariationsData) {
-
-        return new LoanRescheduleRequestData(id, loanId, statusEnum, rescheduleFromInstallment, rescheduleFromDate,
-                rescheduleReasonCodeValue, rescheduleReasonComment, timeline, clientName, loanAccountNumber, clientId, recalculateInterest,
-                rescheduleReasons, loanTermVariationsData);
+     */
+    public static LoanRescheduleRequestData instance(Long id, Long loanId, LoanRescheduleRequestStatusEnumData statusEnum, Integer rescheduleFromInstallment, LocalDate rescheduleFromDate, CodeValueData rescheduleReasonCodeValue, String rescheduleReasonComment, LoanRescheduleRequestTimelineData timeline, final String clientName, final String loanAccountNumber, final Long clientId, final Boolean recalculateInterest, Collection<CodeValueData> rescheduleReasons, final Collection<LoanTermVariationsData> loanTermVariationsData) {
+        return new LoanRescheduleRequestData(id, loanId, statusEnum, rescheduleFromInstallment, rescheduleFromDate, rescheduleReasonCodeValue, rescheduleReasonComment, timeline, clientName, loanAccountNumber, clientId, recalculateInterest, rescheduleReasons, loanTermVariationsData);
     }
 
     /**
@@ -96,11 +81,8 @@ public final class LoanRescheduleRequestData {
      *
      * @param loanTermVariationsData
      *            TODO
-     **/
-    private LoanRescheduleRequestData(Long id, Long loanId, LoanRescheduleRequestStatusEnumData statusEnum, final String clientName,
-            final String loanAccountNumber, final Long clientId, final LocalDate rescheduleFromDate,
-            final CodeValueData rescheduleReasonCodeValue) {
-
+     */
+    private LoanRescheduleRequestData(Long id, Long loanId, LoanRescheduleRequestStatusEnumData statusEnum, final String clientName, final String loanAccountNumber, final Long clientId, final LocalDate rescheduleFromDate, final CodeValueData rescheduleReasonCodeValue) {
         this.id = id;
         this.loanId = loanId;
         this.statusEnum = statusEnum;
@@ -119,13 +101,9 @@ public final class LoanRescheduleRequestData {
 
     /**
      * @return an instance of the LoanRescheduleRequestData class
-     **/
-    public static LoanRescheduleRequestData instance(Long id, Long loanId, LoanRescheduleRequestStatusEnumData statusEnum,
-            final String clientName, final String loanAccountNumber, final Long clientId, final LocalDate rescheduleFromDate,
-            final CodeValueData rescheduleReasonCodeValue) {
-
-        return new LoanRescheduleRequestData(id, loanId, statusEnum, clientName, loanAccountNumber, clientId, rescheduleFromDate,
-                rescheduleReasonCodeValue);
+     */
+    public static LoanRescheduleRequestData instance(Long id, Long loanId, LoanRescheduleRequestStatusEnumData statusEnum, final String clientName, final String loanAccountNumber, final Long clientId, final LocalDate rescheduleFromDate, final CodeValueData rescheduleReasonCodeValue) {
+        return new LoanRescheduleRequestData(id, loanId, statusEnum, clientName, loanAccountNumber, clientId, rescheduleFromDate, rescheduleReasonCodeValue);
     }
 
     /**
@@ -140,11 +118,74 @@ public final class LoanRescheduleRequestData {
      */
     public Boolean getRecalculateInterest() {
         boolean value = false;
-
         if (recalculateInterest != null) {
             value = recalculateInterest;
         }
-
         return value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanId() {
+        return this.loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getClientId() {
+        return this.clientId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getClientName() {
+        return this.clientName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLoanAccountNumber() {
+        return this.loanAccountNumber;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanRescheduleRequestStatusEnumData getStatusEnum() {
+        return this.statusEnum;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getRescheduleFromInstallment() {
+        return this.rescheduleFromInstallment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getRescheduleFromDate() {
+        return this.rescheduleFromDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValueData getRescheduleReasonCodeValue() {
+        return this.rescheduleReasonCodeValue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanRescheduleRequestTimelineData getTimeline() {
+        return this.timeline;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getRescheduleReasonComment() {
+        return this.rescheduleReasonComment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<CodeValueData> getRescheduleReasons() {
+        return this.rescheduleReasons;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<LoanTermVariationsData> getLoanTermVariationsData() {
+        return this.loanTermVariationsData;
     }
 }

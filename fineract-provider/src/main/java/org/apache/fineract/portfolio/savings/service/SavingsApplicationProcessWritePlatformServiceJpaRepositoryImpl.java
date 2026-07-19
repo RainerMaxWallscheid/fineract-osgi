@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.savings.service;
 
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import jakarta.persistence.PersistenceException;
@@ -30,8 +29,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.commands.domain.CommandWrapper;
@@ -88,10 +85,9 @@ import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl implements SavingsApplicationProcessWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl.class);
     private final PlatformSecurityContext context;
     private final SavingsAccountRepositoryWrapper savingAccountRepository;
     private final SavingsAccountAssembler savingAccountAssembler;
@@ -117,21 +113,16 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     @Transactional
     @Override
     public CommandProcessingResult submitGSIMApplication(final JsonCommand command) {
-
         CommandProcessingResult result = null;
-
         JsonArray gsimApplications = command.arrayOfParameterNamed("clientArray");
-
         final Object lock = new Object();
         synchronized (lock) {
             for (JsonElement gsimApplication : gsimApplications) {
                 // result=submitApplication(JsonCommand.fromExistingCommand(command,
                 // gsimApplication));
-                result = submitApplication(JsonCommand.fromExistingCommand(command, gsimApplication,
-                        gsimApplication.getAsJsonObject().get("clientId").getAsLong()));
+                result = submitApplication(JsonCommand.fromExistingCommand(command, gsimApplication, gsimApplication.getAsJsonObject().get("clientId").getAsLong()));
             }
         }
-
         return result;
     }
 
@@ -141,19 +132,15 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         try {
             this.savingsAccountDataValidator.validateForSubmit(command.json());
             final AppUser submittedBy = this.context.authenticatedUser();
-
             final SavingsAccount account = this.savingAccountAssembler.assembleFrom(command, submittedBy);
             this.savingAccountRepository.save(account);
             String accountNumber = "";
             GroupSavingsIndividualMonitoring gsimAccount = null;
             BigDecimal applicationId = BigDecimal.ZERO;
             Boolean isLastChildApplication = false;
-
             // gsim
             if (account.isAccountNumberRequiresAutoGeneration()) {
-
-                final AccountNumberFormat accountNumberFormat = this.accountNumberFormatRepository
-                        .findByAccountType(EntityAccountType.SAVINGS);
+                final AccountNumberFormat accountNumberFormat = this.accountNumberFormatRepository.findByAccountType(EntityAccountType.SAVINGS);
                 // if application is of GSIM type
                 if (account.getAccountTypes() == 5) {
                     final Long groupId = command.longValueOfParameterNamed("groupId");
@@ -161,34 +148,24 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                     if (command.bigDecimalValueOfParameterNamedDefaultToNullIfZero("applicationId") != null) {
                         applicationId = command.bigDecimalValueOfParameterNamedDefaultToNullIfZero("applicationId");
                     }
-
                     if (command.booleanObjectValueOfParameterNamed("lastApplication") != null) {
                         isLastChildApplication = command.booleanPrimitiveValueOfParameterNamed("lastApplication");
                     }
-
                     Group group = this.groupRepositoryWrapper.findOneWithNotFoundDetection(groupId);
-
-                    if (command.booleanObjectValueOfParameterNamed("isParentAccount") != null
-                            && ("1".equals(command.stringValueOfParameterNamed("isParentAccount"))
-                                    || command.booleanObjectValueOfParameterNamed("isParentAccount"))) {
+                    if (command.booleanObjectValueOfParameterNamed("isParentAccount") != null && ("1".equals(command.stringValueOfParameterNamed("isParentAccount")) || command.booleanObjectValueOfParameterNamed("isParentAccount"))) {
                         // empty table check
                         if (gsimRepository.count() != 0) {
                             // Parent-Not an empty table
-
                             accountNumber = this.accountNumberGenerator.generate(account, accountNumberFormat);
                             account.updateAccountNo(accountNumber + "1");
-                            gsimAccount = gsimWritePlatformService.addGSIMAccountInfo(accountNumber, group, BigDecimal.ZERO,
-                                    Long.valueOf(1), true, SavingsAccountStatusType.SUBMITTED_AND_PENDING_APPROVAL.getValue(),
-                                    applicationId);
+                            gsimAccount = gsimWritePlatformService.addGSIMAccountInfo(accountNumber, group, BigDecimal.ZERO, Long.valueOf(1), true, SavingsAccountStatusType.SUBMITTED_AND_PENDING_APPROVAL.getValue(), applicationId);
                             account.setGsim(gsimAccount);
                             this.savingAccountRepository.saveAndFlush(account);
-
                         } else {
                             // Parent-empty table
                             accountNumber = this.accountNumberGenerator.generate(account, accountNumberFormat);
                             account.updateAccountNo(accountNumber + "1");
-                            gsimWritePlatformService.addGSIMAccountInfo(accountNumber, group, BigDecimal.ZERO, Long.valueOf(1), true,
-                                    SavingsAccountStatusType.SUBMITTED_AND_PENDING_APPROVAL.getValue(), applicationId);
+                            gsimWritePlatformService.addGSIMAccountInfo(accountNumber, group, BigDecimal.ZERO, Long.valueOf(1), true, SavingsAccountStatusType.SUBMITTED_AND_PENDING_APPROVAL.getValue(), applicationId);
                             account.setGsim(gsimRepository.findOneByAccountNumber(accountNumber));
                             this.savingAccountRepository.saveAndFlush(account);
                         }
@@ -196,8 +173,7 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                         if (gsimRepository.count() != 0) {
                             // Child-Not an empty table check
                             if (applicationId.compareTo(BigDecimal.ZERO) == 0) {
-                                gsimAccount = gsimRepository.findOneByIsAcceptingChildAndApplicationIdAndGroupId(true, applicationId,
-                                        groupId);
+                                gsimAccount = gsimRepository.findOneByIsAcceptingChildAndApplicationIdAndGroupId(true, applicationId, groupId);
                             } else {
                                 gsimAccount = gsimRepository.findOneByIsAcceptingChildAndApplicationId(true, applicationId);
                             }
@@ -206,23 +182,20 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                             this.gsimWritePlatformService.incrementChildAccountCount(gsimAccount);
                             account.setGsim(gsimAccount);
                             this.savingAccountRepository.saveAndFlush(account);
-
                         } else {
                             // Child-empty table
                             // if the gsim info is empty set the current account
                             // as parent
                             accountNumber = this.accountNumberGenerator.generate(account, accountNumberFormat);
                             account.updateAccountNo(accountNumber + "1");
-                            gsimWritePlatformService.addGSIMAccountInfo(accountNumber, group, BigDecimal.ZERO, Long.valueOf(1), true,
-                                    SavingsAccountStatusType.SUBMITTED_AND_PENDING_APPROVAL.getValue(), applicationId);
+                            gsimWritePlatformService.addGSIMAccountInfo(accountNumber, group, BigDecimal.ZERO, Long.valueOf(1), true, SavingsAccountStatusType.SUBMITTED_AND_PENDING_APPROVAL.getValue(), applicationId);
                             account.setGsim(gsimAccount);
                             this.savingAccountRepository.saveAndFlush(account);
                         }
                         // reset isAcceptingChild when processing last
                         // application of GSIM
                         if (isLastChildApplication) {
-                            this.gsimWritePlatformService
-                                    .resetIsAcceptingChild(gsimRepository.findOneByIsAcceptingChildAndApplicationId(true, applicationId));
+                            this.gsimWritePlatformService.resetIsAcceptingChild(gsimRepository.findOneByIsAcceptingChildAndApplicationId(true, applicationId));
                         }
                     }
                 } else {
@@ -233,23 +206,19 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
             // end of gsim
             final Long savingsId = account.getId();
             if (command.parameterExists(SavingsApiConstants.datatables)) {
-                this.entityDatatableChecksWritePlatformService.saveDatatables(StatusEnum.CREATE.getValue(), EntityTables.SAVINGS.getName(),
-                        savingsId, account.productId(), command.arrayOfParameterNamed(SavingsApiConstants.datatables));
+                this.entityDatatableChecksWritePlatformService.saveDatatables(StatusEnum.CREATE.getValue(), EntityTables.SAVINGS.getName(), savingsId, account.productId(), command.arrayOfParameterNamed(SavingsApiConstants.datatables));
             }
-            this.entityDatatableChecksWritePlatformService.runTheCheckForProduct(savingsId, EntityTables.SAVINGS.getName(),
-                    StatusEnum.CREATE.getValue(), EntityTables.SAVINGS.getForeignKeyColumnNameOnDatatable(), account.productId());
-
+            this.entityDatatableChecksWritePlatformService.runTheCheckForProduct(savingsId, EntityTables.SAVINGS.getName(), StatusEnum.CREATE.getValue(), EntityTables.SAVINGS.getForeignKeyColumnNameOnDatatable(), account.productId());
             businessEventNotifierService.notifyPostBusinessEvent(new SavingsCreateBusinessEvent(account));
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(savingsId) //
-                    .withOfficeId(account.officeId()) //
-                    .withClientId(account.clientId()) //
-                    .withGroupId(account.groupId()) //
-                    .withSavingsId(savingsId) //
-                    .withGsimId(gsimAccount == null ? 0 : gsimAccount.getId()) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(savingsId).withOfficeId(account.officeId()).withClientId(account.clientId()).withGroupId(account.groupId()).withSavingsId(savingsId).withGsimId(gsimAccount == null ? 0 : gsimAccount.getId()).build();
         } catch (final DataAccessException dve) {
             handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
@@ -264,7 +233,6 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         if (account.isAccountNumberRequiresAutoGeneration()) {
             final AccountNumberFormat accountNumberFormat = this.accountNumberFormatRepository.findByAccountType(EntityAccountType.SAVINGS);
             account.updateAccountNo(this.accountNumberGenerator.generate(account, accountNumberFormat));
-
             this.savingAccountRepository.saveAndFlush(account);
         }
     }
@@ -272,16 +240,12 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     @Transactional
     @Override
     public CommandProcessingResult modifyGSIMApplication(final Long gsimId, final JsonCommand command) {
-
         final Long parentSavingId = gsimId;
         List<SavingsAccount> childSavings = this.savingAccountRepository.findByGsimId(parentSavingId);
-
         CommandProcessingResult result = null;
-
         for (SavingsAccount account : childSavings) {
             result = modifyApplication(account.getId(), command);
         }
-
         return result;
     }
 
@@ -290,17 +254,13 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     public CommandProcessingResult modifyApplication(final Long savingsId, final JsonCommand command) {
         try {
             this.savingsAccountDataValidator.validateForUpdate(command.json());
-
             final Map<String, Object> changes = new LinkedHashMap<>(20);
-
             final SavingsAccount account = this.savingAccountAssembler.assembleFrom(savingsId, false);
             checkClientOrGroupActive(account);
             account.modifyApplication(command, changes);
             account.validateNewApplicationState(SAVINGS_ACCOUNT_RESOURCE_NAME);
             account.validateAccountValuesWithProduct();
-
             if (!changes.isEmpty()) {
-
                 if (changes.containsKey(SavingsApiConstants.clientIdParamName)) {
                     final Long clientId = command.longValueOfParameterNamed(SavingsApiConstants.clientIdParamName);
                     if (clientId != null) {
@@ -314,7 +274,6 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                         account.update(client);
                     }
                 }
-
                 if (changes.containsKey(SavingsApiConstants.groupIdParamName)) {
                     final Long groupId = command.longValueOfParameterNamed(SavingsApiConstants.groupIdParamName);
                     if (groupId != null) {
@@ -331,14 +290,11 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                         account.update(group);
                     }
                 }
-
                 if (changes.containsKey(SavingsApiConstants.productIdParamName)) {
                     final Long productId = command.longValueOfParameterNamed(SavingsApiConstants.productIdParamName);
-                    final SavingsProduct product = this.savingsProductRepository.findById(productId)
-                            .orElseThrow(() -> new SavingsProductNotFoundException(productId));
+                    final SavingsProduct product = this.savingsProductRepository.findById(productId).orElseThrow(() -> new SavingsProductNotFoundException(productId));
                     account.update(product);
                 }
-
                 if (changes.containsKey(SavingsApiConstants.fieldOfficerIdParamName)) {
                     final Long fieldOfficerId = command.longValueOfParameterNamed(SavingsApiConstants.fieldOfficerIdParamName);
                     Staff fieldOfficer = null;
@@ -349,28 +305,24 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                     }
                     account.update(fieldOfficer);
                 }
-
                 if (changes.containsKey("charges")) {
-                    final Set<SavingsAccountCharge> charges = this.savingsAccountChargeAssembler.fromParsedJson(command.parsedJson(),
-                            account.getCurrency().getCode());
+                    final Set<SavingsAccountCharge> charges = this.savingsAccountChargeAssembler.fromParsedJson(command.parsedJson(), account.getCurrency().getCode());
                     final boolean updated = account.update(charges);
                     if (!updated) {
                         changes.remove("charges");
                     }
                 }
-
                 this.savingAccountRepository.saveAndFlush(account);
             }
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(savingsId) //
-                    .withOfficeId(account.officeId()) //
-                    .withClientId(account.clientId()) //
-                    .withGroupId(account.groupId()) //
-                    .withSavingsId(savingsId) //
-                    .with(changes) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(savingsId).withOfficeId(account.officeId()).withClientId(account.clientId()).withGroupId(account.groupId()).withSavingsId(savingsId).with(changes).build();
         } catch (final DataAccessException dve) {
             handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.resourceResult(-1L);
@@ -384,39 +336,30 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     @Transactional
     @Override
     public CommandProcessingResult deleteApplication(final Long savingsId) {
-
         final SavingsAccount account = this.savingAccountAssembler.assembleFrom(savingsId, false);
         checkClientOrGroupActive(account);
-
         if (account.isNotSubmittedAndPendingApproval()) {
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-            final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
-                    .resource(SAVINGS_ACCOUNT_RESOURCE_NAME + SavingsApiConstants.deleteApplicationAction);
-
-            baseDataValidator.reset().parameter(SavingsApiConstants.activatedOnDateParamName)
-                    .failWithCodeNoParameterAddedToErrorCode("not.in.submittedandpendingapproval.state");
-
+            final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(SAVINGS_ACCOUNT_RESOURCE_NAME + SavingsApiConstants.deleteApplicationAction);
+            baseDataValidator.reset().parameter(SavingsApiConstants.activatedOnDateParamName).failWithCodeNoParameterAddedToErrorCode("not.in.submittedandpendingapproval.state");
             if (!dataValidationErrors.isEmpty()) {
                 throw new PlatformApiDataValidationException(dataValidationErrors);
             }
         }
-
         this.noteRepository.deleteAllBySavingsAccount(account);
         this.savingAccountRepository.delete(account);
-
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(savingsId) //
-                .withOfficeId(account.officeId()) //
-                .withClientId(account.clientId()) //
-                .withGroupId(account.groupId()) //
-                .withSavingsId(savingsId) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withEntityId(savingsId).withOfficeId(account.officeId()).withClientId(account.clientId()).withGroupId(account.groupId()).withSavingsId(savingsId).build();
     }
 
     @Transactional
     @Override
     public CommandProcessingResult approveGSIMApplication(final Long gsimId, final JsonCommand command) {
-
         // GroupLoanIndividualMonitoringAccount
         // glimAccount=glimRepository.findOne(loanId);
         Long parentSavingId = gsimId;
@@ -425,9 +368,7 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         CommandProcessingResult result = null;
         int count = 0;
         for (SavingsAccount account : childSavings) {
-
             result = approveApplication(account.getId(), command);
-
             if (result != null) {
                 count++;
                 if (count == parentSavings.getChildAccountsCount()) {
@@ -442,21 +383,14 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     @Transactional
     @Override
     public CommandProcessingResult approveApplication(final Long savingsId, final JsonCommand command) {
-
         final AppUser currentUser = this.context.authenticatedUser();
-
         this.savingsAccountApplicationTransitionApiJsonValidator.validateApproval(command.json());
-
         final SavingsAccount savingsAccount = this.savingAccountAssembler.assembleFrom(savingsId, false);
         checkClientOrGroupActive(savingsAccount);
-
-        entityDatatableChecksWritePlatformService.runTheCheckForProduct(savingsId, EntityTables.SAVINGS.getName(),
-                StatusEnum.APPROVE.getValue(), EntityTables.SAVINGS.getForeignKeyColumnNameOnDatatable(), savingsAccount.productId());
-
+        entityDatatableChecksWritePlatformService.runTheCheckForProduct(savingsId, EntityTables.SAVINGS.getName(), StatusEnum.APPROVE.getValue(), EntityTables.SAVINGS.getForeignKeyColumnNameOnDatatable(), savingsAccount.productId());
         final Map<String, Object> changes = savingsAccount.approveApplication(currentUser, command);
         if (!changes.isEmpty()) {
             this.savingAccountRepository.save(savingsAccount);
-
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {
                 final Note note = Note.savingNote(savingsAccount, noteText);
@@ -464,18 +398,16 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 this.noteRepository.save(note);
             }
         }
-
         businessEventNotifierService.notifyPostBusinessEvent(new SavingsApproveBusinessEvent(savingsAccount));
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(savingsId) //
-                .withOfficeId(savingsAccount.officeId()) //
-                .withClientId(savingsAccount.clientId()) //
-                .withGroupId(savingsAccount.groupId()) //
-                .withSavingsId(savingsId) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(savingsId).withOfficeId(savingsAccount.officeId()).withClientId(savingsAccount.clientId()).withGroupId(savingsAccount.groupId()).withSavingsId(savingsId).with(changes).build();
     }
 
     @Transactional
@@ -484,12 +416,10 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         final Long parentSavingId = gsimId;
         GroupSavingsIndividualMonitoring parentSavings = gsimRepository.findById(parentSavingId).orElseThrow();
         List<SavingsAccount> childSavings = this.savingAccountRepository.findByGsimId(gsimId);
-
         CommandProcessingResult result = null;
         int count = 0;
         for (SavingsAccount account : childSavings) {
             result = undoApplicationApproval(account.getId(), command);
-
             if (result != null) {
                 count++;
                 if (count == parentSavings.getChildAccountsCount()) {
@@ -497,27 +427,20 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                     gsimRepository.save(parentSavings);
                 }
             }
-
         }
-
         return result;
     }
 
     @Transactional
     @Override
     public CommandProcessingResult undoApplicationApproval(final Long savingsId, final JsonCommand command) {
-
         this.context.authenticatedUser();
-
         this.savingsAccountApplicationTransitionApiJsonValidator.validateForUndo(command.json());
-
         final SavingsAccount savingsAccount = this.savingAccountAssembler.assembleFrom(savingsId, false);
         checkClientOrGroupActive(savingsAccount);
-
         final Map<String, Object> changes = savingsAccount.undoApplicationApproval();
         if (!changes.isEmpty()) {
             this.savingAccountRepository.save(savingsAccount);
-
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {
                 final Note note = Note.savingNote(savingsAccount, noteText);
@@ -525,31 +448,27 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 this.noteRepository.save(note);
             }
         }
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(savingsId) //
-                .withOfficeId(savingsAccount.officeId()) //
-                .withClientId(savingsAccount.clientId()) //
-                .withGroupId(savingsAccount.groupId()) //
-                .withSavingsId(savingsId) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(savingsId).withOfficeId(savingsAccount.officeId()).withClientId(savingsAccount.clientId()).withGroupId(savingsAccount.groupId()).withSavingsId(savingsId).with(changes).build();
     }
 
     @Transactional
     @Override
     public CommandProcessingResult rejectGSIMApplication(final Long gsimId, final JsonCommand command) {
-
         final Long parentSavingId = gsimId;
         GroupSavingsIndividualMonitoring parentSavings = gsimRepository.findById(parentSavingId).orElseThrow();
         List<SavingsAccount> childSavings = this.savingAccountRepository.findByGsimId(gsimId);
-
         CommandProcessingResult result = null;
         int count = 0;
         for (SavingsAccount account : childSavings) {
             result = rejectApplication(account.getId(), command);
-
             if (result != null) {
                 count++;
                 if (count == parentSavings.getChildAccountsCount()) {
@@ -564,21 +483,14 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     @Transactional
     @Override
     public CommandProcessingResult rejectApplication(final Long savingsId, final JsonCommand command) {
-
         final AppUser currentUser = this.context.authenticatedUser();
-
         this.savingsAccountApplicationTransitionApiJsonValidator.validateRejection(command.json());
-
         final SavingsAccount savingsAccount = this.savingAccountAssembler.assembleFrom(savingsId, false);
         checkClientOrGroupActive(savingsAccount);
-
-        entityDatatableChecksWritePlatformService.runTheCheckForProduct(savingsId, EntityTables.SAVINGS.getName(),
-                StatusEnum.REJECTED.getValue(), EntityTables.SAVINGS.getForeignKeyColumnNameOnDatatable(), savingsAccount.productId());
-
+        entityDatatableChecksWritePlatformService.runTheCheckForProduct(savingsId, EntityTables.SAVINGS.getName(), StatusEnum.REJECTED.getValue(), EntityTables.SAVINGS.getForeignKeyColumnNameOnDatatable(), savingsAccount.productId());
         final Map<String, Object> changes = savingsAccount.rejectApplication(currentUser, command);
         if (!changes.isEmpty()) {
             this.savingAccountRepository.save(savingsAccount);
-
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {
                 final Note note = Note.savingNote(savingsAccount, noteText);
@@ -587,34 +499,28 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
             }
         }
         businessEventNotifierService.notifyPostBusinessEvent(new SavingsRejectBusinessEvent(savingsAccount));
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(savingsId) //
-                .withOfficeId(savingsAccount.officeId()) //
-                .withClientId(savingsAccount.clientId()) //
-                .withGroupId(savingsAccount.groupId()) //
-                .withSavingsId(savingsId) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(savingsId).withOfficeId(savingsAccount.officeId()).withClientId(savingsAccount.clientId()).withGroupId(savingsAccount.groupId()).withSavingsId(savingsId).with(changes).build();
     }
 
     @Transactional
     @Override
     public CommandProcessingResult applicantWithdrawsFromApplication(final Long savingsId, final JsonCommand command) {
         final AppUser currentUser = this.context.authenticatedUser();
-
         this.savingsAccountApplicationTransitionApiJsonValidator.validateApplicantWithdrawal(command.json());
-
         final SavingsAccount savingsAccount = this.savingAccountAssembler.assembleFrom(savingsId, false);
         checkClientOrGroupActive(savingsAccount);
-
-        entityDatatableChecksWritePlatformService.runTheCheckForProduct(savingsId, EntityTables.SAVINGS.getName(),
-                StatusEnum.WITHDRAWN.getValue(), EntityTables.SAVINGS.getForeignKeyColumnNameOnDatatable(), savingsAccount.productId());
-
+        entityDatatableChecksWritePlatformService.runTheCheckForProduct(savingsId, EntityTables.SAVINGS.getName(), StatusEnum.WITHDRAWN.getValue(), EntityTables.SAVINGS.getForeignKeyColumnNameOnDatatable(), savingsAccount.productId());
         final Map<String, Object> changes = savingsAccount.applicantWithdrawsFromApplication(currentUser, command);
         if (!changes.isEmpty()) {
             this.savingAccountRepository.save(savingsAccount);
-
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {
                 final Note note = Note.savingNote(savingsAccount, noteText);
@@ -622,16 +528,15 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 this.noteRepository.save(note);
             }
         }
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(savingsId) //
-                .withOfficeId(savingsAccount.officeId()) //
-                .withClientId(savingsAccount.clientId()) //
-                .withGroupId(savingsAccount.groupId()) //
-                .withSavingsId(savingsId) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(savingsId).withOfficeId(savingsAccount.officeId()).withClientId(savingsAccount.clientId()).withGroupId(savingsAccount.groupId()).withSavingsId(savingsId).with(changes).build();
     }
 
     private void checkClientOrGroupActive(final SavingsAccount account) {
@@ -654,35 +559,25 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
 
     @Override
     public CommandProcessingResult createActiveApplication(final SavingsAccountDataDTO savingsAccountDataDTO) {
-
         final CommandWrapper commandWrapper = new CommandWrapperBuilder().savingsAccountActivation(null).build();
-        boolean rollbackTransaction = this.commandProcessingService.validateRollbackCommand(commandWrapper,
-                savingsAccountDataDTO.getAppliedBy());
-
-        final SavingsAccount account = this.savingAccountAssembler.assembleFrom(savingsAccountDataDTO.getClient(),
-                savingsAccountDataDTO.getGroup(), savingsAccountDataDTO.getSavingsProduct(), savingsAccountDataDTO.getApplicationDate(),
-                savingsAccountDataDTO.getAppliedBy());
+        boolean rollbackTransaction = this.commandProcessingService.validateRollbackCommand(commandWrapper, savingsAccountDataDTO.getAppliedBy());
+        final SavingsAccount account = this.savingAccountAssembler.assembleFrom(savingsAccountDataDTO.getClient(), savingsAccountDataDTO.getGroup(), savingsAccountDataDTO.getSavingsProduct(), savingsAccountDataDTO.getApplicationDate(), savingsAccountDataDTO.getAppliedBy());
         account.approveAndActivateApplication(savingsAccountDataDTO.getApplicationDate(), savingsAccountDataDTO.getAppliedBy());
         Money amountForDeposit = account.activateWithBalance();
-
         final Set<Long> existingTransactionIds = new HashSet<>();
         final Set<Long> existingReversedTransactionIds = new HashSet<>();
-
         if (amountForDeposit.isGreaterThanZero()) {
             this.savingAccountRepository.save(account);
         }
-        this.savingsAccountWritePlatformService.processPostActiveActions(account, savingsAccountDataDTO.getFmt(), existingTransactionIds,
-                existingReversedTransactionIds);
+        this.savingsAccountWritePlatformService.processPostActiveActions(account, savingsAccountDataDTO.getFmt(), existingTransactionIds, existingReversedTransactionIds);
         this.savingAccountRepository.saveAndFlush(account);
-
         generateAccountNumber(account);
         // post journal entries for activation charges
         this.savingsAccountDomainService.postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds, false);
-
-        return new CommandProcessingResultBuilder() //
-                .withSavingsId(account.getId()) //
-                .setRollbackTransaction(rollbackTransaction) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withSavingsId(account.getId()).setRollbackTransaction(rollbackTransaction).build();
     }
 
     /*
@@ -699,18 +594,43 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
             msgCode += ".duplicate.accountNo";
             msg = "Savings account with accountNo " + accountNo + " already exists";
             param = "accountNo";
-            msgArgs = new Object[] { accountNo, dve };
+            msgArgs = new Object[] {accountNo, dve};
         } else if (checkEx.getMessage().contains("sa_externalid_UNIQUE")) {
             final String externalId = command.stringValueOfParameterNamed("externalId");
             msgCode += ".duplicate.externalId";
             msg = "Savings account with externalId " + externalId + " already exists";
             param = "externalId";
-            msgArgs = new Object[] { externalId, dve };
+            msgArgs = new Object[] {externalId, dve};
         } else {
             msgCode += ".unknown.data.integrity.issue";
-            msgArgs = new Object[] { dve };
+            msgArgs = new Object[] {dve};
         }
         log.error("Error occured.", dve);
         throw ErrorHandler.getMappable(dve, msgCode, msg, param, msgArgs);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepository, final SavingsAccountAssembler savingAccountAssembler, final SavingsAccountDataValidator savingsAccountDataValidator, final AccountNumberGenerator accountNumberGenerator, final ClientRepositoryWrapper clientRepository, final GroupRepository groupRepository, final SavingsProductRepository savingsProductRepository, final NoteRepository noteRepository, final StaffRepositoryWrapper staffRepository, final SavingsAccountApplicationTransitionApiJsonValidator savingsAccountApplicationTransitionApiJsonValidator, final SavingsAccountChargeAssembler savingsAccountChargeAssembler, final CommandProcessingService commandProcessingService, final SavingsAccountDomainService savingsAccountDomainService, final SavingsAccountWritePlatformService savingsAccountWritePlatformService, final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final BusinessEventNotifierService businessEventNotifierService, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final GSIMRepositoy gsimRepository, final GroupRepositoryWrapper groupRepositoryWrapper, final GroupSavingsIndividualMonitoringWritePlatformService gsimWritePlatformService) {
+        this.context = context;
+        this.savingAccountRepository = savingAccountRepository;
+        this.savingAccountAssembler = savingAccountAssembler;
+        this.savingsAccountDataValidator = savingsAccountDataValidator;
+        this.accountNumberGenerator = accountNumberGenerator;
+        this.clientRepository = clientRepository;
+        this.groupRepository = groupRepository;
+        this.savingsProductRepository = savingsProductRepository;
+        this.noteRepository = noteRepository;
+        this.staffRepository = staffRepository;
+        this.savingsAccountApplicationTransitionApiJsonValidator = savingsAccountApplicationTransitionApiJsonValidator;
+        this.savingsAccountChargeAssembler = savingsAccountChargeAssembler;
+        this.commandProcessingService = commandProcessingService;
+        this.savingsAccountDomainService = savingsAccountDomainService;
+        this.savingsAccountWritePlatformService = savingsAccountWritePlatformService;
+        this.accountNumberFormatRepository = accountNumberFormatRepository;
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.entityDatatableChecksWritePlatformService = entityDatatableChecksWritePlatformService;
+        this.gsimRepository = gsimRepository;
+        this.groupRepositoryWrapper = groupRepositoryWrapper;
+        this.gsimWritePlatformService = gsimWritePlatformService;
     }
 }

@@ -19,13 +19,11 @@
 package org.apache.fineract.integrationtests.common.accounting;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import com.google.gson.Gson;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import java.util.ArrayList;
 import java.util.HashMap;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.GetJournalEntriesTransactionIdResponse;
 import org.apache.fineract.client.models.JournalEntryCommand;
 import org.apache.fineract.client.models.PostJournalEntriesResponse;
@@ -35,10 +33,10 @@ import org.apache.fineract.integrationtests.common.FineractClientHelper;
 import org.apache.fineract.integrationtests.common.Utils;
 import org.junit.jupiter.api.Assertions;
 
-@Slf4j
 @SuppressWarnings("rawtypes")
 public class JournalEntryHelper {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JournalEntryHelper.class);
     private final RequestSpecification requestSpec;
     private final ResponseSpecification responseSpec;
     private static final Gson GSON = new JSON().getGson();
@@ -64,8 +62,7 @@ public class JournalEntryHelper {
         checkJournalEntry(null, incomeAccount, date, accountEntries);
     }
 
-    public void checkJournalEntryForLiabilityAccount(final Account liabilityAccount, final String date,
-            final JournalEntry... accountEntries) {
+    public void checkJournalEntryForLiabilityAccount(final Account liabilityAccount, final String date, final JournalEntry... accountEntries) {
         checkJournalEntry(null, liabilityAccount, date, accountEntries);
     }
 
@@ -73,15 +70,13 @@ public class JournalEntryHelper {
         checkJournalEntry(null, equityAccount, date, accountEntries);
     }
 
-    public void checkJournalEntryForLiabilityAccount(final Integer officeId, final Account liabilityAccount, final String date,
-            final JournalEntry... accountEntries) {
+    public void checkJournalEntryForLiabilityAccount(final Integer officeId, final Account liabilityAccount, final String date, final JournalEntry... accountEntries) {
         checkJournalEntry(officeId, liabilityAccount, date, accountEntries);
     }
 
     public void ensureNoAccountingTransactionsWithTransactionId(final String transactionId) {
         ArrayList<HashMap> transactions = getJournalEntriesByTransactionId(transactionId);
         assertTrue(transactions.isEmpty(), "Tranasactions are is not empty");
-
     }
 
     public String getJournalEntryTransactionIdByAccount(final Account account, final String date, final JournalEntry... accountEntries) {
@@ -95,7 +90,6 @@ public class JournalEntryHelper {
     private void checkJournalEntry(final Integer officeId, final Account account, final String date, final JournalEntry... accountEntries) {
         final String url = createURLForGettingAccountEntries(account, date, officeId);
         final ArrayList<HashMap> response = Utils.performServerGet(this.requestSpec, this.responseSpec, url, "pageItems");
-
         for (JournalEntry entry : accountEntries) {
             boolean matchFound = false;
             for (HashMap map : response) {
@@ -118,7 +112,6 @@ public class JournalEntryHelper {
     private String getJournalEntryTransactionId(final Account account, final String date, final JournalEntry... accountEntries) {
         final String url = createURLForGettingAccountEntries(account, date, null);
         final ArrayList<HashMap> response = Utils.performServerGet(this.requestSpec, this.responseSpec, url, "pageItems");
-
         for (JournalEntry entry : accountEntries) {
             for (HashMap map : response) {
                 final HashMap entryType = (HashMap) map.get("entryType");
@@ -127,7 +120,6 @@ public class JournalEntryHelper {
                 }
             }
         }
-
         return "";
     }
 
@@ -136,9 +128,7 @@ public class JournalEntryHelper {
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
     private String createURLForGettingAccountEntries(final Account account, final String date, final Integer officeId) {
-        String url = new String("/fineract-provider/api/v1/journalentries?glAccountId=" + account.getAccountID() + "&type="
-                + account.getAccountType() + "&fromDate=" + date + "&toDate=" + date + "&tenantIdentifier=default"
-                + "&orderBy=id&sortOrder=desc&locale=en&dateFormat=dd MMMM yyyy");
+        String url = new String("/fineract-provider/api/v1/journalentries?glAccountId=" + account.getAccountID() + "&type=" + account.getAccountType() + "&fromDate=" + date + "&toDate=" + date + "&tenantIdentifier=default" + "&orderBy=id&sortOrder=desc&locale=en&dateFormat=dd MMMM yyyy");
         if (officeId != null) {
             url = url + "&officeId=" + officeId;
         }
@@ -160,8 +150,7 @@ public class JournalEntryHelper {
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
     private String createURLForGettingAccountEntriesByTransactionId(final String transactionId) {
-        return new String("/fineract-provider/api/v1/journalentries?transactionId=" + transactionId + "&tenantIdentifier=default"
-                + "&orderBy=id&sortOrder=desc&locale=en&dateFormat=dd MMMM yyyy");
+        return new String("/fineract-provider/api/v1/journalentries?transactionId=" + transactionId + "&tenantIdentifier=default" + "&orderBy=id&sortOrder=desc&locale=en&dateFormat=dd MMMM yyyy");
     }
 
     // TODO: Rewrite to use fineract-client instead!
@@ -182,8 +171,7 @@ public class JournalEntryHelper {
     @Deprecated(forRemoval = true)
     public GetJournalEntriesTransactionIdResponse getJournalEntriesForLoan(final Long loanId) {
         log.info("Getting GL Journal entries for loan id {}", loanId);
-        final String url = "/fineract-provider/api/v1/journalentries?loanId=" + loanId + "&tenantIdentifier=default"
-                + "&orderBy=id&sortOrder=desc&locale=en&dateFormat=dd MMMM yyyy";
+        final String url = "/fineract-provider/api/v1/journalentries?loanId=" + loanId + "&tenantIdentifier=default" + "&orderBy=id&sortOrder=desc&locale=en&dateFormat=dd MMMM yyyy";
         final String response = Utils.performServerGet(this.requestSpec, this.responseSpec, url, null);
         log.info("response {}", response);
         return GSON.fromJson(response, GetJournalEntriesTransactionIdResponse.class);
@@ -195,7 +183,7 @@ public class JournalEntryHelper {
 
     public static GetJournalEntriesTransactionIdResponse retrieveJournalEntryByTransactionId(final String transactionId) {
         return Calls.ok(FineractClientHelper.getFineractClient().journalEntries.retrieveAllJournalEntries(//
-                null, null, null, null, null, null, null, transactionId, null, //
-                null, null, null, null, null, null, null, null, null, true));
+        null, null, null, null, null, null, null, transactionId, null,  //
+        null, null, null, null, null, null, null, null, null, true));
     }
 }

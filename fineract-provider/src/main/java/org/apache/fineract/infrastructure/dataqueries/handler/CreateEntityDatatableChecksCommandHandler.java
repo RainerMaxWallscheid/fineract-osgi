@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.dataqueries.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,15 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "ENTITY_DATATABLE_CHECK", action = "CREATE")
-@RequiredArgsConstructor
 public class CreateEntityDatatableChecksCommandHandler implements NewCommandSourceHandler {
-
     private final EntityDatatableChecksWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.createCheck(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateEntityDatatableChecksCommandHandler(final EntityDatatableChecksWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

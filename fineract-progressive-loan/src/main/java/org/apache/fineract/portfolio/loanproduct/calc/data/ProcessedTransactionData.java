@@ -20,22 +20,15 @@ package org.apache.fineract.portfolio.loanproduct.calc.data;
 
 import java.time.LocalDate;
 import java.util.Optional;
-import lombok.Builder;
-import lombok.Getter;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 
-@Getter
-@Builder
 public final class ProcessedTransactionData {
-
     private final LoanTransactionType transactionType;
     private final LocalDate transactionDate;
     private final LoanReAgeParameterData reAgeParameter;
 
-    public static ProcessedTransactionData of(LoanTransactionType transactionType, LocalDate transactionDate,
-            LoanReAgeParameterData reAgeParameter) {
-        return ProcessedTransactionData.builder().transactionType(transactionType).transactionDate(transactionDate)
-                .reAgeParameter(reAgeParameter).build();
+    public static ProcessedTransactionData of(LoanTransactionType transactionType, LocalDate transactionDate, LoanReAgeParameterData reAgeParameter) {
+        return ProcessedTransactionData.builder().transactionType(transactionType).transactionDate(transactionDate).reAgeParameter(reAgeParameter).build();
     }
 
     public static ProcessedTransactionData of(LoanTransactionType transactionType, LocalDate transactionDate) {
@@ -48,5 +41,85 @@ public final class ProcessedTransactionData {
 
     public Optional<LoanReAgeParameterData> getReAgeParameterOptional() {
         return Optional.ofNullable(reAgeParameter);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        ProcessedTransactionData(final LoanTransactionType transactionType, final LocalDate transactionDate, final LoanReAgeParameterData reAgeParameter) {
+        this.transactionType = transactionType;
+        this.transactionDate = transactionDate;
+        this.reAgeParameter = reAgeParameter;
+    }
+
+
+    @java.lang.SuppressWarnings("all")
+        public static class ProcessedTransactionDataBuilder {
+        @java.lang.SuppressWarnings("all")
+                private LoanTransactionType transactionType;
+        @java.lang.SuppressWarnings("all")
+                private LocalDate transactionDate;
+        @java.lang.SuppressWarnings("all")
+                private LoanReAgeParameterData reAgeParameter;
+
+        @java.lang.SuppressWarnings("all")
+                ProcessedTransactionDataBuilder() {
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public ProcessedTransactionData.ProcessedTransactionDataBuilder transactionType(final LoanTransactionType transactionType) {
+            this.transactionType = transactionType;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public ProcessedTransactionData.ProcessedTransactionDataBuilder transactionDate(final LocalDate transactionDate) {
+            this.transactionDate = transactionDate;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public ProcessedTransactionData.ProcessedTransactionDataBuilder reAgeParameter(final LoanReAgeParameterData reAgeParameter) {
+            this.reAgeParameter = reAgeParameter;
+            return this;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public ProcessedTransactionData build() {
+            return new ProcessedTransactionData(this.transactionType, this.transactionDate, this.reAgeParameter);
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "ProcessedTransactionData.ProcessedTransactionDataBuilder(transactionType=" + this.transactionType + ", transactionDate=" + this.transactionDate + ", reAgeParameter=" + this.reAgeParameter + ")";
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static ProcessedTransactionData.ProcessedTransactionDataBuilder builder() {
+        return new ProcessedTransactionData.ProcessedTransactionDataBuilder();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionType getTransactionType() {
+        return this.transactionType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getTransactionDate() {
+        return this.transactionDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanReAgeParameterData getReAgeParameter() {
+        return this.reAgeParameter;
     }
 }

@@ -20,7 +20,6 @@ package org.apache.fineract.accounting.provisioning.api;
 
 import static org.apache.fineract.accounting.provisioning.constant.ProvisioningEntriesApiConstants.CREATE_JOURNAL_ENTRY;
 import static org.apache.fineract.accounting.provisioning.constant.ProvisioningEntriesApiConstants.RECREATE_PROVISION_IN_ENTRY;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,7 +35,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.provisioning.data.LoanProductProvisioningEntryData;
 import org.apache.fineract.accounting.provisioning.data.ProvisioningEntryData;
 import org.apache.fineract.accounting.provisioning.data.request.ProvisionEntryRequest;
@@ -56,60 +54,55 @@ import org.springframework.stereotype.Component;
 @Path("/v1/provisioningentries")
 @Component
 @Tag(name = "Provisioning Entries", description = """
-        This defines the Provisioning Entries for all active loan products
-
-        Field Descriptions
-        date
-        Date on which day provisioning entries should be created
-        createjournalentries
-        Boolean variable whether to add journal entries for generated provisioning entries
-        """)
-@RequiredArgsConstructor
+    This defines the Provisioning Entries for all active loan products
+    
+    Field Descriptions
+    date
+    Date on which day provisioning entries should be created
+    createjournalentries
+    Boolean variable whether to add journal entries for generated provisioning entries
+    """)
 public class ProvisioningEntriesApiResource {
-
     private final PlatformSecurityContext platformSecurityContext;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final DefaultToApiJsonSerializer<ProvisioningEntryData> toApiJsonSerializer;
     private final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService;
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create new Provisioning Entries", operationId = "createProvisioningEntries", description = """
-            Creates a new Provisioning Entries
-
-            Mandatory Fields
-            date
-            dateFormat
-            locale
-            Optional Fields
-            createjournalentries""")
+        Creates a new Provisioning Entries
+        
+        Mandatory Fields
+        date
+        dateFormat
+        locale
+        Optional Fields
+        createjournalentries""")
     @RequestBody(content = @Content(schema = @Schema(implementation = ProvisionEntryRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProvisioningEntriesApiResourceSwagger.PostProvisioningEntriesResponse.class)))
     public CommandProcessingResult createProvisioningEntries(@Parameter(hidden = true) ProvisionEntryRequest provisionEntryRequest) {
         platformSecurityContext.authenticatedUser();
-        CommandWrapper commandWrapper = new CommandWrapperBuilder().createProvisioningEntries()
-                .withJson(toApiJsonSerializer.serialize(provisionEntryRequest)).build();
+        CommandWrapper commandWrapper = new CommandWrapperBuilder().createProvisioningEntries().withJson(toApiJsonSerializer.serialize(provisionEntryRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandWrapper);
     }
 
     @POST
     @Path("{entryId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Recreates Provisioning Entry", operationId = "modifyProvisioningEntry", description = "Recreates Provisioning Entry | createjournalentry.")
     @RequestBody(content = @Content(schema = @Schema(implementation = ProvisioningEntriesApiResourceSwagger.PutProvisioningEntriesRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProvisioningEntriesApiResourceSwagger.PutProvisioningEntriesResponse.class)))
-    public CommandProcessingResult modifyProvisioningEntry(@PathParam("entryId") @Parameter(description = "entryId") final Long entryId,
-            @QueryParam("command") @Parameter(description = "command=createjournalentry\ncommand=recreateprovisioningentry") final String commandParam,
-            @Parameter(hidden = true) String provisionCommandRequest) {
+    public CommandProcessingResult modifyProvisioningEntry(@PathParam("entryId") @Parameter(description = "entryId") final Long entryId, @QueryParam("command") @Parameter(description = "command=createjournalentry\ncommand=recreateprovisioningentry") final String commandParam, @Parameter(hidden = true) String provisionCommandRequest) {
         platformSecurityContext.authenticatedUser();
         return getResultByCommandParam(commandParam, entryId, provisionCommandRequest);
     }
 
     @GET
     @Path("{entryId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieves a Provisioning Entry Metadata", operationId = "retrieveOneProvisioningEntry", description = "Returns the metadata of a generated Provisioning Entry.")
     @AlternativeOperationId("retrieveProvisioningEntry")
     public ProvisioningEntryData retrieveProvisioningEntry(@PathParam("entryId") @Parameter(description = "entryId") final Long entryId) {
@@ -119,26 +112,19 @@ public class ProvisioningEntriesApiResource {
 
     @GET
     @Path("entries")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Provisioning Entries Loan Products Given a Query", operationId = "retrieveProvisioningEntriesLoanProducts")
     @AlternativeOperationId("retrieveProviioningEntries")
-    public Page<LoanProductProvisioningEntryData> retrieveProviioningEntries(@QueryParam("entryId") final Long entryId,
-            @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit,
-            @QueryParam("officeId") final Long officeId, @QueryParam("productId") final Long productId,
-            @QueryParam("categoryId") final Long categoryId) {
+    public Page<LoanProductProvisioningEntryData> retrieveProviioningEntries(@QueryParam("entryId") final Long entryId, @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit, @QueryParam("officeId") final Long officeId, @QueryParam("productId") final Long productId, @QueryParam("categoryId") final Long categoryId) {
         platformSecurityContext.authenticatedUser();
-        final SearchParameters params = SearchParameters.builder().limit(limit).offset(offset).provisioningEntryId(entryId)
-                .officeId(officeId).productId(productId).categoryId(categoryId).build();
-
+        final SearchParameters params = SearchParameters.builder().limit(limit).offset(offset).provisioningEntryId(entryId).officeId(officeId).productId(productId).categoryId(categoryId).build();
         return provisioningEntriesReadPlatformService.retrieveProvisioningEntries(params);
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "List all Provisioning Entries Metadata", operationId = "retrieveAllProvisioningEntries")
-    public Page<ProvisioningEntryData> retrieveAllProvisioningEntries(
-            @QueryParam("offset") @Parameter(description = "offset") final Integer offset,
-            @QueryParam("limit") @Parameter(description = "limit") final Integer limit) {
+    public Page<ProvisioningEntryData> retrieveAllProvisioningEntries(@QueryParam("offset") @Parameter(description = "offset") final Integer offset, @QueryParam("limit") @Parameter(description = "limit") final Integer limit) {
         platformSecurityContext.authenticatedUser();
         return provisioningEntriesReadPlatformService.retrieveAllProvisioningEntries(offset, limit);
     }
@@ -147,14 +133,20 @@ public class ProvisioningEntriesApiResource {
         final CommandWrapperBuilder commandWrapperBuilder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
         switch (commandParam) {
             case CREATE_JOURNAL_ENTRY -> {
-                return commandsSourceWritePlatformService
-                        .logCommandSource(commandWrapperBuilder.createProvisioningJournalEntries(entryId).build());
+                return commandsSourceWritePlatformService.logCommandSource(commandWrapperBuilder.createProvisioningJournalEntries(entryId).build());
             }
             case RECREATE_PROVISION_IN_ENTRY -> {
-                return commandsSourceWritePlatformService
-                        .logCommandSource(commandWrapperBuilder.reCreateProvisioningEntries(entryId).build());
+                return commandsSourceWritePlatformService.logCommandSource(commandWrapperBuilder.reCreateProvisioningEntries(entryId).build());
             }
             default -> throw new UnrecognizedQueryParamException("command", commandParam);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProvisioningEntriesApiResource(final PlatformSecurityContext platformSecurityContext, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final DefaultToApiJsonSerializer<ProvisioningEntryData> toApiJsonSerializer, final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService) {
+        this.platformSecurityContext = platformSecurityContext;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.provisioningEntriesReadPlatformService = provisioningEntriesReadPlatformService;
     }
 }

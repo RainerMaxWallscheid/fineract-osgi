@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.campaigns.email.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.campaigns.email.service.EmailCampaignWritePlatformService;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "EMAIL_CAMPAIGN", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateEmailCampaignCommandHandler implements NewCommandSourceHandler {
-
     private final EmailCampaignWritePlatformService emailCampaignWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(JsonCommand command) {
         return this.emailCampaignWritePlatformService.update(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateEmailCampaignCommandHandler(final EmailCampaignWritePlatformService emailCampaignWritePlatformService) {
+        this.emailCampaignWritePlatformService = emailCampaignWritePlatformService;
     }
 }

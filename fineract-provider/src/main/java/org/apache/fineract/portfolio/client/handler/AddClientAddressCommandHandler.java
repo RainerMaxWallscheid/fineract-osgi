@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.client.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,15 +27,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 @CommandType(entity = "ADDRESS", action = "CREATE")
-@RequiredArgsConstructor
 public class AddClientAddressCommandHandler implements NewCommandSourceHandler {
-
     private final AddressWritePlatformService writePlatformService;
 
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.addClientAddress(command.getClientId(), command.entityId(), command);
-
     }
 
+    @java.lang.SuppressWarnings("all")
+        public AddClientAddressCommandHandler(final AddressWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
+    }
 }

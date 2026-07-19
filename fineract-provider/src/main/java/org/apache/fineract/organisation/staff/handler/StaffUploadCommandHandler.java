@@ -16,12 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.organisation.staff.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.infrastructure.bulkimport.data.GlobalEntityType;
@@ -31,11 +28,10 @@ import org.apache.fineract.organisation.staff.data.StaffUploadResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class StaffUploadCommandHandler implements CommandHandler<StaffUploadRequest, StaffUploadResponse> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StaffUploadCommandHandler.class);
     private final BulkImportWorkbookService bulkImportWorkbookService;
 
     @Retry(name = "commandStaffUpload", fallbackMethod = "fallback")
@@ -43,10 +39,7 @@ public class StaffUploadCommandHandler implements CommandHandler<StaffUploadRequ
     @Transactional
     public StaffUploadResponse handle(Command<StaffUploadRequest> command) {
         var payload = command.getPayload();
-
-        var id = bulkImportWorkbookService.importWorkbook(GlobalEntityType.STAFF.toString(), payload.getUploadedInputStream(),
-                payload.getFileDetail(), payload.getLocale(), payload.getDateFormat());
-
+        var id = bulkImportWorkbookService.importWorkbook(GlobalEntityType.STAFF.toString(), payload.getUploadedInputStream(), payload.getFileDetail(), payload.getLocale(), payload.getDateFormat());
         return StaffUploadResponse.builder().resourceId(id).build();
     }
 
@@ -54,5 +47,10 @@ public class StaffUploadCommandHandler implements CommandHandler<StaffUploadRequ
     public StaffUploadResponse fallback(Command<StaffUploadRequest> command, Throwable t) {
         // NOTE: fallback method needs to be in the same class
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public StaffUploadCommandHandler(final BulkImportWorkbookService bulkImportWorkbookService) {
+        this.bulkImportWorkbookService = bulkImportWorkbookService;
     }
 }

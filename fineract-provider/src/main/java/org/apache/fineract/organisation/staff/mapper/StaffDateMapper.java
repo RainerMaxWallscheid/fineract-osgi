@@ -21,21 +21,19 @@ package org.apache.fineract.organisation.staff.mapper;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 public class StaffDateMapper {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StaffDateMapper.class);
     public static final String DEFAULT_DATE_FORMAT = "dd MMMM yyyy";
 
     public String map(LocalDate date, String format) {
         if (date == null) {
             return null;
         }
-
         return DateTimeFormatter.ofPattern(Optional.ofNullable(format).orElse(DEFAULT_DATE_FORMAT)).format(date);
     }
 
@@ -43,7 +41,6 @@ public class StaffDateMapper {
         if (StringUtils.isEmpty(date)) {
             return null;
         }
-
         return LocalDate.parse(date, DateTimeFormatter.ofPattern(Optional.ofNullable(format).orElse(DEFAULT_DATE_FORMAT)));
     }
 }

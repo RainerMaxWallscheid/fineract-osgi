@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.savings.jobs.postinterestforsavings;
 
 import static org.apache.fineract.portfolio.savings.domain.SavingsAccountStatusType.ACTIVE;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,8 +27,6 @@ import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.config.TaskExecutorConstant;
@@ -47,13 +44,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
-@Slf4j
 @Component
 public class PostInterestForSavingTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PostInterestForSavingTasklet.class);
     private static final int QUEUE_SIZE = 1;
-
     private final SavingsAccountReadPlatformService savingAccountReadPlatformService;
     private final ConfigurationDomainService configurationDomainService;
     private final ApplicationContext applicationContext;
@@ -70,19 +65,14 @@ public class PostInterestForSavingTasklet implements Tasklet {
         final int pageSize = batchSize * threadPoolSize;
         Long maxSavingsIdInList = 0L;
         final boolean backdatedTxnsAllowedTill = this.configurationDomainService.retrievePivotDateConfig();
-
         long start = System.currentTimeMillis();
-
         log.debug("Reading Savings Account Data!");
-        List<SavingsAccountData> savingsAccounts = savingAccountReadPlatformService
-                .retrieveAllSavingsDataForInterestPosting(backdatedTxnsAllowedTill, pageSize, ACTIVE.getValue(), maxSavingsIdInList);
-
+        List<SavingsAccountData> savingsAccounts = savingAccountReadPlatformService.retrieveAllSavingsDataForInterestPosting(backdatedTxnsAllowedTill, pageSize, ACTIVE.getValue(), maxSavingsIdInList);
         if (savingsAccounts != null && savingsAccounts.size() > 0) {
             savingsAccounts = Collections.synchronizedList(savingsAccounts);
             long finish = System.currentTimeMillis();
             log.debug("Done fetching Data within {} milliseconds", finish - start);
             queue.add(savingsAccounts);
-
             if (!CollectionUtils.isEmpty(queue)) {
                 do {
                     int totalFilteredRecords = savingsAccounts.size();
@@ -96,26 +86,21 @@ public class PostInterestForSavingTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
-    private void postInterest(List<SavingsAccountData> savingsAccounts, int threadPoolSize, final boolean backdatedTxnsAllowedTill,
-            final int pageSize, Long maxSavingsIdInList, Queue<List<SavingsAccountData>> queue) {
+    private void postInterest(List<SavingsAccountData> savingsAccounts, int threadPoolSize, final boolean backdatedTxnsAllowedTill, final int pageSize, Long maxSavingsIdInList, Queue<List<SavingsAccountData>> queue) {
         List<Callable<Void>> posters = new ArrayList<>();
         int fromIndex = 0;
         int size = savingsAccounts.size();
         int batchSize = (int) Math.ceil((double) size / threadPoolSize);
-
         if (batchSize == 0) {
             return;
         }
-
         int toIndex = (batchSize > size - 1) ? size : batchSize;
         while (toIndex < size && savingsAccounts.get(toIndex - 1).getId().equals(savingsAccounts.get(toIndex).getId())) {
             toIndex++;
         }
         boolean lastBatch = false;
         int loopCount = size / batchSize + 1;
-
         FineractContext context = ThreadLocalContextUtil.getContext();
-
         Callable<Void> fetchData = () -> {
             try {
                 ThreadLocalContextUtil.init(context);
@@ -123,11 +108,9 @@ public class PostInterestForSavingTasklet implements Tasklet {
                 if (!queue.isEmpty()) {
                     maxId = Math.max(maxSavingsIdInList, queue.element().get(queue.element().size() - 1).getId());
                 }
-
                 while (queue.size() <= QUEUE_SIZE) {
                     log.debug("Fetching while threads are running!");
-                    List<SavingsAccountData> savingsAccountDataList = Collections.synchronizedList(this.savingAccountReadPlatformService
-                            .retrieveAllSavingsDataForInterestPosting(backdatedTxnsAllowedTill, pageSize, ACTIVE.getValue(), maxId));
+                    List<SavingsAccountData> savingsAccountDataList = Collections.synchronizedList(this.savingAccountReadPlatformService.retrieveAllSavingsDataForInterestPosting(backdatedTxnsAllowedTill, pageSize, ACTIVE.getValue(), maxId));
                     if (savingsAccountDataList.isEmpty()) {
                         break;
                     }
@@ -140,17 +123,13 @@ public class PostInterestForSavingTasklet implements Tasklet {
             }
         };
         posters.add(fetchData);
-
         for (long i = 0; i < loopCount; i++) {
             List<SavingsAccountData> subList = safeSubList(savingsAccounts, fromIndex, toIndex);
-            SavingsSchedularInterestPosterTask savingsSchedularInterestPosterTask = applicationContext
-                    .getBean(SavingsSchedularInterestPosterTask.class);
+            SavingsSchedularInterestPosterTask savingsSchedularInterestPosterTask = applicationContext.getBean(SavingsSchedularInterestPosterTask.class);
             savingsSchedularInterestPosterTask.setSavingAccounts(subList);
             savingsSchedularInterestPosterTask.setBackdatedTxnsAllowedTill(backdatedTxnsAllowedTill);
             savingsSchedularInterestPosterTask.setContext(ThreadLocalContextUtil.getContext());
-
             posters.add(savingsSchedularInterestPosterTask);
-
             if (lastBatch) {
                 break;
             }
@@ -163,10 +142,8 @@ public class PostInterestForSavingTasklet implements Tasklet {
                 toIndex++;
             }
         }
-
         List<Future<Void>> responses = new ArrayList<>();
         posters.forEach(poster -> responses.add(taskExecutor.submit(poster)));
-
         checkCompletion(responses);
         log.debug("Queue size {}", queue.size());
     }
@@ -176,10 +153,8 @@ public class PostInterestForSavingTasklet implements Tasklet {
         if (fromIndex >= size || toIndex <= 0 || fromIndex >= toIndex) {
             return Collections.emptyList();
         }
-
         fromIndex = Math.max(0, fromIndex);
         toIndex = Math.min(size, toIndex);
-
         return list.subList(fromIndex, toIndex);
     }
 
@@ -204,5 +179,13 @@ public class PostInterestForSavingTasklet implements Tasklet {
         } catch (ExecutionException e2) {
             log.error("Execution exception while interest posting entries", e2);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PostInterestForSavingTasklet(final SavingsAccountReadPlatformService savingAccountReadPlatformService, final ConfigurationDomainService configurationDomainService, final ApplicationContext applicationContext, @Qualifier(TaskExecutorConstant.CONFIGURABLE_TASK_EXECUTOR_BEAN_NAME) final ThreadPoolTaskExecutor taskExecutor) {
+        this.savingAccountReadPlatformService = savingAccountReadPlatformService;
+        this.configurationDomainService = configurationDomainService;
+        this.applicationContext = applicationContext;
+        this.taskExecutor = taskExecutor;
     }
 }

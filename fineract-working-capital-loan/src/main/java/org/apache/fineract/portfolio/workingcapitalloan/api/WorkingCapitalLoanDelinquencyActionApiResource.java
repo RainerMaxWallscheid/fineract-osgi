@@ -35,7 +35,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -52,11 +51,8 @@ import org.springframework.stereotype.Component;
 @Path("/v1/working-capital-loans")
 @Component
 @Tag(name = "Working Capital Loan Delinquency Actions", description = "Manages delinquency pause, resume and reschedule actions for Working Capital loans")
-@RequiredArgsConstructor
 public class WorkingCapitalLoanDelinquencyActionApiResource {
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "WC_DELINQUENCY_ACTION";
-
     private final PlatformSecurityContext context;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final WorkingCapitalLoanDelinquencyActionReadService readService;
@@ -64,62 +60,49 @@ public class WorkingCapitalLoanDelinquencyActionApiResource {
 
     @POST
     @Path("{loanId}/delinquency-actions")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create Delinquency Action", description = "Creates a delinquency action (pause, resume or reschedule) for a Working Capital loan.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyActionApiResourceSwagger.PostWorkingCapitalLoansDelinquencyActionRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyActionApiResourceSwagger.PostWorkingCapitalLoansDelinquencyActionResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "404", description = "Working Capital Loan not found") })
-    public CommandProcessingResult createDelinquencyAction(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyActionApiResourceSwagger.PostWorkingCapitalLoansDelinquencyActionResponse.class))), @ApiResponse(responseCode = "400", description = "Bad Request"), @ApiResponse(responseCode = "404", description = "Working Capital Loan not found")})
+    public CommandProcessingResult createDelinquencyAction(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
         this.context.authenticatedUser().validateHasCreatePermission(RESOURCE_NAME_FOR_PERMISSIONS);
-        final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-                .createWorkingCapitalLoanDelinquencyAction(loanId) //
-                .withJson(apiRequestBodyAsJson) //
-                .build();
+        final CommandWrapper commandRequest =  //
+        //
+        //
+        new CommandWrapperBuilder().createWorkingCapitalLoanDelinquencyAction(loanId).withJson(apiRequestBodyAsJson).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @POST
     @Path("external-id/{loanExternalId}/delinquency-actions")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "createDelinquencyActionByExternalId", summary = "Create Delinquency Action by external id", description = "Creates a delinquency action (pause, resume or reschedule) for a Working Capital loan identified by external id.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyActionApiResourceSwagger.PostWorkingCapitalLoansDelinquencyActionRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyActionApiResourceSwagger.PostWorkingCapitalLoansDelinquencyActionResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "404", description = "Working Capital Loan not found") })
-    public CommandProcessingResult createDelinquencyAction(
-            @PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyActionApiResourceSwagger.PostWorkingCapitalLoansDelinquencyActionResponse.class))), @ApiResponse(responseCode = "400", description = "Bad Request"), @ApiResponse(responseCode = "404", description = "Working Capital Loan not found")})
+    public CommandProcessingResult createDelinquencyAction(@PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
         return createDelinquencyAction(resolveExternalId(loanExternalId), apiRequestBodyAsJson);
     }
 
     @GET
     @Path("{loanId}/delinquency-actions")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Delinquency Actions", description = "Retrieves all delinquency actions for a Working Capital loan")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyActionData.class)))) })
-    public List<WorkingCapitalLoanDelinquencyActionData> retrieveDelinquencyActions(
-            @PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyActionData.class))))})
+    public List<WorkingCapitalLoanDelinquencyActionData> retrieveDelinquencyActions(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readService.retrieveDelinquencyActions(loanId);
     }
 
     @GET
     @Path("external-id/{loanExternalId}/delinquency-actions")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "retrieveDelinquencyActionsByExternalId", summary = "Retrieve Delinquency Actions by external id", description = "Retrieves all delinquency actions for a Working Capital loan identified by external id")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyActionData.class)))) })
-    public List<WorkingCapitalLoanDelinquencyActionData> retrieveDelinquencyActions(
-            @PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyActionData.class))))})
+    public List<WorkingCapitalLoanDelinquencyActionData> retrieveDelinquencyActions(@PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId) {
         return retrieveDelinquencyActions(resolveExternalId(loanExternalId));
     }
 
@@ -132,4 +115,11 @@ public class WorkingCapitalLoanDelinquencyActionApiResource {
         return resolvedLoanId;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanDelinquencyActionApiResource(final PlatformSecurityContext context, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final WorkingCapitalLoanDelinquencyActionReadService readService, final WorkingCapitalLoanApplicationReadPlatformService loanReadPlatformService) {
+        this.context = context;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.readService = readService;
+        this.loanReadPlatformService = loanReadPlatformService;
+    }
 }

@@ -20,20 +20,13 @@ package org.apache.fineract.portfolio.loanaccount.domain.reamortization;
 
 import java.util.Arrays;
 import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.StringEnumOptionData;
 
-@Getter
-@RequiredArgsConstructor
 public enum LoanReAmortizationInterestHandlingType {
-
-    DEFAULT("loanReAmortizationInterestHandlingType.default", "Default"), //
-    WAIVE_INTEREST("loanReAmortizationInterestHandlingType.waiveInterest", "Waive Interest"), //
-    EQUAL_AMORTIZATION_INTEREST_SPLIT("loanReAmortizationInterestHandlingType.equalAmortizationInterestSplit",
-            "Equal Amortization Interest Split"), ///
-    ;
-
+    DEFAULT("loanReAmortizationInterestHandlingType.default", "Default"),  //
+    WAIVE_INTEREST("loanReAmortizationInterestHandlingType.waiveInterest", "Waive Interest"),  //
+    EQUAL_AMORTIZATION_INTEREST_SPLIT("loanReAmortizationInterestHandlingType.equalAmortizationInterestSplit", "Equal Amortization Interest Split");
+    ///
     private final String code;
     private final String humanReadableName;
 
@@ -45,4 +38,19 @@ public enum LoanReAmortizationInterestHandlingType {
         return new StringEnumOptionData(name(), getCode(), getHumanReadableName());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private LoanReAmortizationInterestHandlingType(final String code, final String humanReadableName) {
+        this.code = code;
+        this.humanReadableName = humanReadableName;
+    }
 }

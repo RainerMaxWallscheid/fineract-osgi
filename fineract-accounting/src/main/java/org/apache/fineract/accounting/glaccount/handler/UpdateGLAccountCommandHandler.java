@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.accounting.glaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.glaccount.service.GLAccountWritePlatformService;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "GLACCOUNT", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateGLAccountCommandHandler implements NewCommandSourceHandler {
-
     private final GLAccountWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.updateGLAccount(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateGLAccountCommandHandler(final GLAccountWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

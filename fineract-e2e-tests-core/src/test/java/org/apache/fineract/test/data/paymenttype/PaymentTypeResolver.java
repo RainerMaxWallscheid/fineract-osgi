@@ -19,21 +19,17 @@
 package org.apache.fineract.test.data.paymenttype;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
-
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.PaymentTypeData;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class PaymentTypeResolver {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PaymentTypeResolver.class);
     private final FineractFeignClient fineractClient;
 
     @Cacheable(key = "#paymentType.getName()", value = "paymentTypesByName")
@@ -41,10 +37,12 @@ public class PaymentTypeResolver {
         String paymentTypeName = paymentType.getName();
         log.debug("Resolving payment type by name [{}]", paymentTypeName);
         List<PaymentTypeData> paymentTypesResponses = ok(() -> fineractClient.paymentType().getAllPaymentTypesUniversal(Map.of()));
-
-        PaymentTypeData foundPtr = paymentTypesResponses.stream().filter(ptr -> paymentTypeName.equals(ptr.getName())).findAny()
-                .orElseThrow(() -> new IllegalArgumentException("Payment type [%s] not found".formatted(paymentTypeName)));
-
+        PaymentTypeData foundPtr = paymentTypesResponses.stream().filter(ptr -> paymentTypeName.equals(ptr.getName())).findAny().orElseThrow(() -> new IllegalArgumentException("Payment type [%s] not found".formatted(paymentTypeName)));
         return foundPtr.getId();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PaymentTypeResolver(final FineractFeignClient fineractClient) {
+        this.fineractClient = fineractClient;
     }
 }

@@ -24,7 +24,6 @@ import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.GetClientsClientIdAccountsResponse;
 import org.apache.fineract.client.models.GetClientsLoanAccounts;
 import org.apache.fineract.client.models.PostClientsResponse;
@@ -40,9 +39,9 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Slf4j
 public class LoanAccountsContainsCurrencyFieldTest extends BaseLoanIntegrationTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanAccountsContainsCurrencyFieldTest.class);
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
     private LoanTransactionHelper loanTransactionHelper;
@@ -56,58 +55,39 @@ public class LoanAccountsContainsCurrencyFieldTest extends BaseLoanIntegrationTe
         requestSpec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
         requestSpec.header("Authorization", "Basic " + Utils.loginIntoServerAndGetBase64EncodedAuthenticationKey());
         responseSpec = new ResponseSpecBuilder().expectStatusCode(200).build();
-
         loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
     }
 
     @Test
     public void testGetClientLoanAccountsUsingExternalIdContainsCurrency() {
         String formattedDate = "01 September 2022";
-
         // given
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, true);
         // when
-        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID,
-                ClientHelper.LEGALFORM_ID_PERSON, null);
+        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID, ClientHelper.LEGALFORM_ID_PERSON, null);
         final String clientExternalId = clientResponse.getResourceExternalId();
         final long clientId = clientResponse.getClientId();
-
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, false);
-
         Integer loanProductId = createLoanProduct(false, NONE);
-
         // Create Loan Account
-        final Integer loanId = createLoanAccount(loanTransactionHelper, String.valueOf(clientId), String.valueOf(loanProductId),
-                formattedDate);
-
+        final Integer loanId = createLoanAccount(loanTransactionHelper, String.valueOf(clientId), String.valueOf(loanProductId), formattedDate);
         GetClientsClientIdAccountsResponse clientAccountsResponse = ClientHelper.getClientAccounts(clientExternalId);
-
         if (clientAccountsResponse.getLoanAccounts() == null) {
             // Handle the case where getClientAccounts returned null
             throw new IllegalStateException("getClientAccounts returned null");
         }
-
         final Set<GetClientsLoanAccounts> loanAccounts = clientAccountsResponse.getLoanAccounts();
-
         // Assert if loanAccounts contains a loan account with "currency" field
         boolean containsCurrency = false;
         if (loanAccounts != null) {
             containsCurrency = loanAccounts.stream().anyMatch(account -> account.getCurrency() != null);
         }
-
         // Perform assertion
         assert containsCurrency;
-
     }
 
-    private Integer createLoanAccount(final LoanTransactionHelper loanTransactionHelper, final String clientId, final String loanProductId,
-            final String operationDate) {
-        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal(principalAmount).withLoanTermFrequency("1")
-                .withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1")
-                .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance()
-                .withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate("03 September 2022").withSubmittedOnDate("01 September 2022").withLoanType("individual")
-                .build(clientId, loanProductId, null);
+    private Integer createLoanAccount(final LoanTransactionHelper loanTransactionHelper, final String clientId, final String loanProductId, final String operationDate) {
+        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal(principalAmount).withLoanTermFrequency("1").withLoanTermFrequencyAsMonths().withNumberOfRepayments("1").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("0").withInterestTypeAsFlatBalance().withAmortizationTypeAsEqualPrincipalPayments().withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate("03 September 2022").withSubmittedOnDate("01 September 2022").withLoanType("individual").build(clientId, loanProductId, null);
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
         loanTransactionHelper.approveLoan(operationDate, principalAmount, loanId, null);
         return loanId;
@@ -115,22 +95,21 @@ public class LoanAccountsContainsCurrencyFieldTest extends BaseLoanIntegrationTe
 
     private Integer createLoanProduct(final boolean multiDisburseLoan, final String accountingRule, final Account... accounts) {
         LOG.info("------------------------------CREATING NEW LOAN PRODUCT ---------------------------------------");
-        LoanProductTestBuilder builder = new LoanProductTestBuilder() //
-                .withPrincipal("12,000.00") //
-                .withNumberOfRepayments("4") //
-                .withRepaymentAfterEvery("1") //
-                .withRepaymentTypeAsMonth() //
-                .withinterestRatePerPeriod("1") //
-                .withInterestRateFrequencyTypeAsMonths() //
-                .withAmortizationTypeAsEqualInstallments() //
-                .withInterestTypeAsDecliningBalance() //
-                .withTranches(multiDisburseLoan) //
-                .withAccounting(accountingRule, accounts);
+        LoanProductTestBuilder builder =  //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        new LoanProductTestBuilder().withPrincipal("12,000.00").withNumberOfRepayments("4").withRepaymentAfterEvery("1").withRepaymentTypeAsMonth().withinterestRatePerPeriod("1").withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().withTranches(multiDisburseLoan).withAccounting(accountingRule, accounts);
         if (multiDisburseLoan) {
             builder = builder.withInterestCalculationPeriodTypeAsRepaymentPeriod(true);
         }
         final String loanProductJSON = builder.build(null);
         return loanTransactionHelper.getLoanProductId(loanProductJSON);
     }
-
 }

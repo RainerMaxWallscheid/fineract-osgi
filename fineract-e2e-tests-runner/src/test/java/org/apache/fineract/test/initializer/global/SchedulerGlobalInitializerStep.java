@@ -19,25 +19,25 @@
 package org.apache.fineract.test.initializer.global;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.executeVoid;
-
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class SchedulerGlobalInitializerStep implements FineractGlobalInitializerStep {
-
     private static final String SCHEDULER_STATUS_STOP = "stop";
-
     private final FineractFeignClient fineractClient;
 
     @Override
     public void initialize() throws Exception {
         executeVoid(() -> fineractClient.scheduler().handleCommandsScheduler(Map.of("command", SCHEDULER_STATUS_STOP)));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SchedulerGlobalInitializerStep(final FineractFeignClient fineractClient) {
+        this.fineractClient = fineractClient;
     }
 }

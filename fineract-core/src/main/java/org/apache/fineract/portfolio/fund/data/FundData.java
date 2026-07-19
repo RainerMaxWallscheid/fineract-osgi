@@ -19,14 +19,11 @@
 package org.apache.fineract.portfolio.fund.data;
 
 import java.io.Serializable;
-import lombok.Getter;
 
 /**
  * Immutable data object to represent fund data.
  */
-@Getter
 public final class FundData implements Serializable {
-
     @SuppressWarnings("unused")
     private final Long id;
     @SuppressWarnings("unused")
@@ -42,5 +39,20 @@ public final class FundData implements Serializable {
         this.id = id;
         this.name = name;
         this.externalId = externalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getExternalId() {
+        return this.externalId;
     }
 }

@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.loanaccount.serialization;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -29,25 +28,20 @@ import org.apache.fineract.portfolio.loanaccount.exception.LoanDisbursalExceptio
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public final class LoanDisbursementValidator {
-
     private final LoanApplicationValidator loanApplicationValidator;
 
     public void compareDisbursedToApprovedOrProposedPrincipal(final Loan loan, final BigDecimal totalDisbursed) {
         final BigDecimal totalCapitalizedIncome = loan.getSummary().getTotalCapitalizedIncome();
         final BigDecimal totalCapitalizedIncomeAdjustment = MathUtil.nullToZero(loan.getSummary().getTotalCapitalizedIncomeAdjustment());
         final BigDecimal netCapitalizedIncome = totalCapitalizedIncome.subtract(totalCapitalizedIncomeAdjustment);
-
         if (loan.loanProduct().isAllowApprovedDisbursedAmountsOverApplied()) {
             // Validate total disbursed amount (after this transaction) against max allowed
             validateOverMaximumAmount(loan, totalDisbursed, netCapitalizedIncome);
         } else {
-            if ((totalDisbursed.compareTo(loan.getApprovedPrincipal()) > 0)
-                    || (totalDisbursed.add(netCapitalizedIncome).compareTo(loan.getApprovedPrincipal()) > 0)) {
-                final String errorMsg = "Loan can't be disbursed, disburse amount is exceeding approved principal.";
-                throw new LoanDisbursalException(errorMsg, "disburse.amount.must.be.less.than.approved.principal", totalDisbursed,
-                        loan.getApprovedPrincipal());
+            if ((totalDisbursed.compareTo(loan.getApprovedPrincipal()) > 0) || (totalDisbursed.add(netCapitalizedIncome).compareTo(loan.getApprovedPrincipal()) > 0)) {
+                final String errorMsg = "Loan can\'t be disbursed, disburse amount is exceeding approved principal.";
+                throw new LoanDisbursalException(errorMsg, "disburse.amount.must.be.less.than.approved.principal", totalDisbursed, loan.getApprovedPrincipal());
             }
         }
     }
@@ -55,30 +49,24 @@ public final class LoanDisbursementValidator {
     public void validateOverMaximumAmount(final Loan loan, final BigDecimal totalDisbursed, final BigDecimal capitalizedIncome) {
         final BigDecimal maxDisbursedAmount = loanApplicationValidator.getOverAppliedMax(loan);
         if (totalDisbursed.add(capitalizedIncome).compareTo(maxDisbursedAmount) > 0) {
-            final String errorMessage = String.format(
-                    "Loan disbursal amount can't be greater than maximum applied loan amount calculation. "
-                            + "Total disbursed amount: %s  Maximum disbursal amount: %s",
-                    totalDisbursed.stripTrailingZeros().toPlainString(), maxDisbursedAmount.stripTrailingZeros().toPlainString());
-            throw new InvalidLoanStateTransitionException("disbursal",
-                    "amount.can't.be.greater.than.maximum.applied.loan.amount.calculation", errorMessage, totalDisbursed,
-                    maxDisbursedAmount);
+            final String errorMessage = String.format("Loan disbursal amount can\'t be greater than maximum applied loan amount calculation. " + "Total disbursed amount: %s  Maximum disbursal amount: %s", totalDisbursed.stripTrailingZeros().toPlainString(), maxDisbursedAmount.stripTrailingZeros().toPlainString());
+            throw new InvalidLoanStateTransitionException("disbursal", "amount.can\'t.be.greater.than.maximum.applied.loan.amount.calculation", errorMessage, totalDisbursed, maxDisbursedAmount);
         }
     }
 
     public void validateDisburseDate(final Loan loan, final LocalDate disbursedOn, final LocalDate expectedDate) {
-        if (expectedDate != null
-                && (DateUtils.isAfter(disbursedOn, loan.fetchRepaymentScheduleInstallment(1).getDueDate())
-                        || DateUtils.isAfter(disbursedOn, expectedDate))
-                && DateUtils.isEqual(disbursedOn, loan.getActualDisbursementDate())) {
+        if (expectedDate != null && (DateUtils.isAfter(disbursedOn, loan.fetchRepaymentScheduleInstallment(1).getDueDate()) || DateUtils.isAfter(disbursedOn, expectedDate)) && DateUtils.isEqual(disbursedOn, loan.getActualDisbursementDate())) {
             final String errorMessage = "submittedOnDate cannot be after the loans  expectedFirstRepaymentOnDate: " + expectedDate;
-            throw new InvalidLoanStateTransitionException("disbursal", "cannot.be.after.expected.first.repayment.date", errorMessage,
-                    disbursedOn, expectedDate);
+            throw new InvalidLoanStateTransitionException("disbursal", "cannot.be.after.expected.first.repayment.date", errorMessage, disbursedOn, expectedDate);
         }
-
         if (DateUtils.isDateInTheFuture(disbursedOn)) {
-            final String errorMessage = "The date on which a loan with identifier : " + loan.getAccountNumber()
-                    + " is disbursed cannot be in the future.";
+            final String errorMessage = "The date on which a loan with identifier : " + loan.getAccountNumber() + " is disbursed cannot be in the future.";
             throw new InvalidLoanStateTransitionException("disbursal", "cannot.be.a.future.date", errorMessage, disbursedOn);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanDisbursementValidator(final LoanApplicationValidator loanApplicationValidator) {
+        this.loanApplicationValidator = loanApplicationValidator;
     }
 }

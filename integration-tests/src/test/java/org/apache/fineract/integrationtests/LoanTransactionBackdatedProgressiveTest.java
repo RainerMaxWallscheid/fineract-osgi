@@ -19,7 +19,6 @@
 package org.apache.fineract.integrationtests;
 
 import java.math.BigDecimal;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.GetLoansLoanIdResponse;
 import org.apache.fineract.client.models.PostLoansLoanIdTransactionsRequest;
 import org.apache.fineract.integrationtests.client.feign.FeignLoanTestBase;
@@ -29,11 +28,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@Slf4j
 public class LoanTransactionBackdatedProgressiveTest extends FeignLoanTestBase {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanTransactionBackdatedProgressiveTest.class);
     private static final String DATETIME_PATTERN = LoanTestData.DATETIME_PATTERN;
-
     private Long clientId;
     private Long loanId;
 
@@ -53,7 +51,6 @@ public class LoanTransactionBackdatedProgressiveTest extends FeignLoanTestBase {
     public void testProgressiveBackdatedDisbursement() {
         runAt("01 July 2024", () -> {
             disburseLoan(loanId, BigDecimal.valueOf(250.0), "5 June 2024");
-
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             Assertions.assertEquals(loanDetails.getDisbursementDetails().size(), 2);
         });
@@ -63,7 +60,6 @@ public class LoanTransactionBackdatedProgressiveTest extends FeignLoanTestBase {
     public void testProgressiveBackdatedRepayment() {
         runAt("01 July 2024", () -> {
             addRepaymentForLoan(loanId, 100.0, "5 June 2024");
-
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             Assertions.assertTrue(loanDetails.getTransactions().size() >= 2);
         });
@@ -72,9 +68,7 @@ public class LoanTransactionBackdatedProgressiveTest extends FeignLoanTestBase {
     @Test
     public void testProgressiveBackdatedMerchantIssuedRefund() {
         runAt("01 July 2024", () -> {
-            makeMerchantIssuedRefund(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN)
-                    .transactionDate("5 June 2024").locale("en").transactionAmount(100.0));
-
+            makeMerchantIssuedRefund(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("5 June 2024").locale("en").transactionAmount(100.0));
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             Assertions.assertTrue(loanDetails.getTransactions().size() >= 2);
         });
@@ -83,9 +77,7 @@ public class LoanTransactionBackdatedProgressiveTest extends FeignLoanTestBase {
     @Test
     public void testProgressiveBackdatedPayoutRefund() {
         runAt("01 July 2024", () -> {
-            makePayoutRefund(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("5 June 2024")
-                    .locale("en").transactionAmount(100.0));
-
+            makePayoutRefund(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("5 June 2024").locale("en").transactionAmount(100.0));
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             Assertions.assertTrue(loanDetails.getTransactions().size() >= 2);
         });
@@ -94,9 +86,7 @@ public class LoanTransactionBackdatedProgressiveTest extends FeignLoanTestBase {
     @Test
     public void testProgressiveBackdatedGoodwillCredit() {
         runAt("01 July 2024", () -> {
-            makeGoodwillCredit(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("5 June 2024")
-                    .locale("en").transactionAmount(100.0));
-
+            makeGoodwillCredit(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("5 June 2024").locale("en").transactionAmount(100.0));
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             Assertions.assertTrue(loanDetails.getTransactions().size() >= 2);
         });
@@ -105,9 +95,7 @@ public class LoanTransactionBackdatedProgressiveTest extends FeignLoanTestBase {
     @Test
     public void testProgressiveBackdatedInterestPaymentWaiver() {
         runAt("01 July 2024", () -> {
-            makeInterestPaymentWaiver(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN)
-                    .transactionDate("5 June 2024").locale("en").transactionAmount(100.0));
-
+            makeInterestPaymentWaiver(loanId, new PostLoansLoanIdTransactionsRequest().dateFormat(DATETIME_PATTERN).transactionDate("5 June 2024").locale("en").transactionAmount(100.0));
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             Assertions.assertTrue(loanDetails.getTransactions().size() >= 2);
         });

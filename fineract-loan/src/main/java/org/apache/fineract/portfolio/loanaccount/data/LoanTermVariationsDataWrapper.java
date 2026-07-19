@@ -23,22 +23,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 
 public class LoanTermVariationsDataWrapper {
-
-    @Getter
     private final List<LoanTermVariationsData> exceptionData;
     private ListIterator<LoanTermVariationsData> iterator;
-    @Getter
     private final List<LoanTermVariationsData> interestRateChanges;
-    @Getter
     private final List<LoanTermVariationsData> interestRateFromInstallment;
-    @Getter
     private final List<LoanTermVariationsData> dueDateVariation;
     private ListIterator<LoanTermVariationsData> dueDateIterator;
-    @Getter
     private final List<LoanTermVariationsData> interestPauseVariations;
 
     public LoanTermVariationsDataWrapper(final List<LoanTermVariationsData> exceptionData) {
@@ -159,7 +152,6 @@ public class LoanTermVariationsDataWrapper {
     }
 
     public void resetVariations() {
-
         for (LoanTermVariationsData loanTermVariationsData : this.exceptionData) {
             loanTermVariationsData.setProcessed(false);
         }
@@ -167,4 +159,28 @@ public class LoanTermVariationsDataWrapper {
         this.dueDateIterator = this.dueDateVariation.listIterator();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public List<LoanTermVariationsData> getExceptionData() {
+        return this.exceptionData;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<LoanTermVariationsData> getInterestRateChanges() {
+        return this.interestRateChanges;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<LoanTermVariationsData> getInterestRateFromInstallment() {
+        return this.interestRateFromInstallment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<LoanTermVariationsData> getDueDateVariation() {
+        return this.dueDateVariation;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<LoanTermVariationsData> getInterestPauseVariations() {
+        return this.interestPauseVariations;
+    }
 }

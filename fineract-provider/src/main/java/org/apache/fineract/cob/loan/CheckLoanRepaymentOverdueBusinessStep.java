@@ -22,8 +22,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.event.business.domain.loan.repayment.LoanRepaymentOverdueBusinessEvent;
@@ -33,18 +31,16 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleIns
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class CheckLoanRepaymentOverdueBusinessStep implements LoanCOBBusinessStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CheckLoanRepaymentOverdueBusinessStep.class);
     private final ConfigurationDomainService configurationDomainService;
     private final BusinessEventNotifierService businessEventNotifierService;
 
     @Override
     public Loan execute(Loan loan) {
-        List<LoanStatus> nonDisbursedStatuses = Arrays.asList(LoanStatus.INVALID, LoanStatus.SUBMITTED_AND_PENDING_APPROVAL,
-                LoanStatus.APPROVED);
+        List<LoanStatus> nonDisbursedStatuses = Arrays.asList(LoanStatus.INVALID, LoanStatus.SUBMITTED_AND_PENDING_APPROVAL, LoanStatus.APPROVED);
         if (!nonDisbursedStatuses.contains(loan.getStatus()) && loan.getSummary().getTotalOutstanding().compareTo(BigDecimal.ZERO) > 0) {
             log.debug("start processing loan repayment overdue business step for loan with Id [{}]", loan.getId());
             Long numberOfDaysAfterDueDateToRaiseEvent = configurationDomainService.retrieveRepaymentOverdueDays();
@@ -58,8 +54,7 @@ public class CheckLoanRepaymentOverdueBusinessStep implements LoanCOBBusinessSte
             for (LoanRepaymentScheduleInstallment repaymentSchedule : loanRepaymentScheduleInstallments) {
                 if (!repaymentSchedule.isObligationsMet()) {
                     LocalDate installmentDueDate = repaymentSchedule.getDueDate();
-                    if (isOverDueEventNeededToBeSent(loan, numberOfDaysAfterDueDateToRaiseEvent, currentDate, repaymentSchedule,
-                            installmentDueDate)) {
+                    if (isOverDueEventNeededToBeSent(loan, numberOfDaysAfterDueDateToRaiseEvent, currentDate, repaymentSchedule, installmentDueDate)) {
                         businessEventNotifierService.notifyPostBusinessEvent(new LoanRepaymentOverdueBusinessEvent(repaymentSchedule));
                         break;
                     }
@@ -80,10 +75,13 @@ public class CheckLoanRepaymentOverdueBusinessStep implements LoanCOBBusinessSte
         return "Check loan repayment overdue";
     }
 
-    private static boolean isOverDueEventNeededToBeSent(Loan loan, Long numberOfDaysBeforeDueDateToRaiseEvent, LocalDate currentDate,
-            LoanRepaymentScheduleInstallment repaymentScheduleInstallment, LocalDate repaymentDate) {
-        return repaymentDate.plusDays(numberOfDaysBeforeDueDateToRaiseEvent).equals(currentDate)
-                && repaymentScheduleInstallment.getTotalOutstanding(loan.getCurrency()).isGreaterThanZero();
+    private static boolean isOverDueEventNeededToBeSent(Loan loan, Long numberOfDaysBeforeDueDateToRaiseEvent, LocalDate currentDate, LoanRepaymentScheduleInstallment repaymentScheduleInstallment, LocalDate repaymentDate) {
+        return repaymentDate.plusDays(numberOfDaysBeforeDueDateToRaiseEvent).equals(currentDate) && repaymentScheduleInstallment.getTotalOutstanding(loan.getCurrency()).isGreaterThanZero();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public CheckLoanRepaymentOverdueBusinessStep(final ConfigurationDomainService configurationDomainService, final BusinessEventNotifierService businessEventNotifierService) {
+        this.configurationDomainService = configurationDomainService;
+        this.businessEventNotifierService = businessEventNotifierService;
+    }
 }

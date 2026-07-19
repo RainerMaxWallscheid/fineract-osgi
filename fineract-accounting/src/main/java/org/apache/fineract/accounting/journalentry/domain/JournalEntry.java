@@ -26,8 +26,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
@@ -36,73 +34,50 @@ import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 
 @Entity
-@Getter
 @Table(name = "acc_gl_journal_entry")
 public class JournalEntry extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @ManyToOne
     @JoinColumn(name = "office_id", nullable = false)
     private Office office;
-
     @ManyToOne
     @JoinColumn(name = "payment_details_id")
     private PaymentDetail paymentDetail;
-
     @ManyToOne
     @JoinColumn(name = "account_id", nullable = false)
     private GLAccount glAccount;
-
     @Column(name = "currency_code", length = 3, nullable = false)
     private String currencyCode;
-
-    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reversal_id")
     private JournalEntry reversalJournalEntry;
-
     @Column(name = "transaction_id", nullable = false, length = 50)
     private String transactionId;
-
     @Column(name = "loan_transaction_id")
     private Long loanTransactionId;
-
     @Column(name = "savings_transaction_id")
     private Long savingsTransactionId;
-
     @Column(name = "client_transaction_id")
     private Long clientTransactionId;
-
     @Column(name = "share_transaction_id")
     private Long shareTransactionId;
-
-    @Setter
     @Column(name = "reversed", nullable = false)
     private boolean reversed = false;
-
     @Column(name = "manual_entry", nullable = false)
     private boolean manualEntry = false;
-
     @Column(name = "entry_date")
     private LocalDate transactionDate;
-
     @Column(name = "type_enum", nullable = false)
     private Integer type;
-
     @Column(name = "amount", scale = 6, precision = 19, nullable = false)
     private BigDecimal amount;
-
     @Column(name = "description", length = 500)
     private String description;
-
     @Column(name = "entity_type_enum", length = 50)
     private Integer entityType;
-
     @Column(name = "entity_id")
     private Long entityId;
-
     @Column(name = "ref_num")
     private String referenceNumber;
-
     @Column(name = "submitted_on_date", nullable = false)
     private LocalDate submittedOnDate;
 
@@ -110,10 +85,7 @@ public class JournalEntry extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         //
     }
 
-    protected JournalEntry(final Office office, final PaymentDetail paymentDetail, final GLAccount glAccount, final String currencyCode,
-            final String transactionId, final boolean manualEntry, final LocalDate transactionDate, final Integer type,
-            final BigDecimal amount, final String description, final Integer entityType, final Long entityId, final String referenceNumber,
-            final Long loanTransactionId, final Long savingsTransactionId, final Long clientTransactionId, final Long shareTransactionId) {
+    protected JournalEntry(final Office office, final PaymentDetail paymentDetail, final GLAccount glAccount, final String currencyCode, final String transactionId, final boolean manualEntry, final LocalDate transactionDate, final Integer type, final BigDecimal amount, final String description, final Integer entityType, final Long entityId, final String referenceNumber, final Long loanTransactionId, final Long savingsTransactionId, final Long clientTransactionId, final Long shareTransactionId) {
         this.office = office;
         this.glAccount = glAccount;
         this.reversalJournalEntry = null;
@@ -136,14 +108,8 @@ public class JournalEntry extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         this.submittedOnDate = DateUtils.getBusinessLocalDate();
     }
 
-    public static JournalEntry createNew(final Office office, final PaymentDetail paymentDetail, final GLAccount glAccount,
-            final String currencyCode, final String transactionId, final boolean manualEntry, final LocalDate transactionDate,
-            final JournalEntryType journalEntryType, final BigDecimal amount, final String description, final Integer entityType,
-            final Long entityId, final String referenceNumber, final Long loanTransaction, final Long savingsTransaction,
-            final Long clientTransaction, Long shareTransactionId) {
-        return new JournalEntry(office, paymentDetail, glAccount, currencyCode, transactionId, manualEntry, transactionDate,
-                journalEntryType.getValue(), amount, description, entityType, entityId, referenceNumber, loanTransaction,
-                savingsTransaction, clientTransaction, shareTransactionId);
+    public static JournalEntry createNew(final Office office, final PaymentDetail paymentDetail, final GLAccount glAccount, final String currencyCode, final String transactionId, final boolean manualEntry, final LocalDate transactionDate, final JournalEntryType journalEntryType, final BigDecimal amount, final String description, final Integer entityType, final Long entityId, final String referenceNumber, final Long loanTransaction, final Long savingsTransaction, final Long clientTransaction, Long shareTransactionId) {
+        return new JournalEntry(office, paymentDetail, glAccount, currencyCode, transactionId, manualEntry, transactionDate, journalEntryType.getValue(), amount, description, entityType, entityId, referenceNumber, loanTransaction, savingsTransaction, clientTransaction, shareTransactionId);
     }
 
     public boolean isDebitEntry() {
@@ -154,4 +120,113 @@ public class JournalEntry extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         return JournalEntryType.CREDIT.getValue().equals(this.type);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Office getOffice() {
+        return this.office;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PaymentDetail getPaymentDetail() {
+        return this.paymentDetail;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GLAccount getGlAccount() {
+        return this.glAccount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCurrencyCode() {
+        return this.currencyCode;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JournalEntry getReversalJournalEntry() {
+        return this.reversalJournalEntry;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getTransactionId() {
+        return this.transactionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanTransactionId() {
+        return this.loanTransactionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getSavingsTransactionId() {
+        return this.savingsTransactionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getClientTransactionId() {
+        return this.clientTransactionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getShareTransactionId() {
+        return this.shareTransactionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isReversed() {
+        return this.reversed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isManualEntry() {
+        return this.manualEntry;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getTransactionDate() {
+        return this.transactionDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getType() {
+        return this.type;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getEntityType() {
+        return this.entityType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getEntityId() {
+        return this.entityId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getReferenceNumber() {
+        return this.referenceNumber;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getSubmittedOnDate() {
+        return this.submittedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setReversalJournalEntry(final JournalEntry reversalJournalEntry) {
+        this.reversalJournalEntry = reversalJournalEntry;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setReversed(final boolean reversed) {
+        this.reversed = reversed;
+    }
 }

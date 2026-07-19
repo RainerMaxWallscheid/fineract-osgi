@@ -18,12 +18,16 @@
  */
 package org.apache.fineract.infrastructure.core.service.database;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@Getter
-@RequiredArgsConstructor
 public class IndexDetail {
-
     private final String indexName;
+
+    @java.lang.SuppressWarnings("all")
+        public String getIndexName() {
+        return this.indexName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public IndexDetail(final String indexName) {
+        this.indexName = indexName;
+    }
 }

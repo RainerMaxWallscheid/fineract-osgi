@@ -18,24 +18,20 @@
  */
 package org.apache.fineract.infrastructure.core.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class TransactionBoundApplicationEventPublisher {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TransactionBoundApplicationEventPublisher.class);
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public void publishEvent(Object event) {
         if (TransactionSynchronizationManager.isActualTransactionActive() && TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-
                 @Override
                 public void afterCommit() {
                     try {
@@ -52,5 +48,10 @@ public class TransactionBoundApplicationEventPublisher {
 
     private void doPublish(Object event) {
         applicationEventPublisher.publishEvent(event);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TransactionBoundApplicationEventPublisher(final ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 }

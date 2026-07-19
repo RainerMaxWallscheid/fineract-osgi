@@ -21,19 +21,11 @@ package org.apache.fineract.integrationtests.common.error;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.List;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.client.util.JSON;
 import retrofit2.Response;
 
-@NoArgsConstructor
-@Getter
-@Setter
 public class ErrorResponse {
-
     private static final Gson GSON = new JSON().getGson();
-
     private String developerMessage;
     private Integer httpStatusCode;
     private List<Error> errors;
@@ -55,20 +47,86 @@ public class ErrorResponse {
         }
     }
 
-    @NoArgsConstructor
-    @Getter
-    @Setter
-    public static class Error {
 
+    public static class Error {
         private String developerMessage;
         private List<ErrorMessageArg> args;
+
+        @java.lang.SuppressWarnings("all")
+                public Error() {
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public String getDeveloperMessage() {
+            return this.developerMessage;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public List<ErrorMessageArg> getArgs() {
+            return this.args;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public void setDeveloperMessage(final String developerMessage) {
+            this.developerMessage = developerMessage;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public void setArgs(final List<ErrorMessageArg> args) {
+            this.args = args;
+        }
     }
 
-    @NoArgsConstructor
-    @Getter
-    @Setter
-    public static class ErrorMessageArg {
 
+    public static class ErrorMessageArg {
         private Object value;
+
+        @java.lang.SuppressWarnings("all")
+                public ErrorMessageArg() {
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public Object getValue() {
+            return this.value;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public void setValue(final Object value) {
+            this.value = value;
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ErrorResponse() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDeveloperMessage() {
+        return this.developerMessage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getHttpStatusCode() {
+        return this.httpStatusCode;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<Error> getErrors() {
+        return this.errors;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDeveloperMessage(final String developerMessage) {
+        this.developerMessage = developerMessage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setHttpStatusCode(final Integer httpStatusCode) {
+        this.httpStatusCode = httpStatusCode;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setErrors(final List<Error> errors) {
+        this.errors = errors;
     }
 }

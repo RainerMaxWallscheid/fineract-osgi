@@ -23,7 +23,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -75,10 +74,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
 public class LoanAdjustmentServiceImpl implements LoanAdjustmentService {
-
     private final LoanTransactionValidator loanTransactionValidator;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final LoanAccountDomainService loanAccountDomainService;
@@ -100,18 +97,15 @@ public class LoanAdjustmentServiceImpl implements LoanAdjustmentService {
     private final LoanScheduleService loanScheduleService;
 
     @Override
-    public CommandProcessingResult adjustLoanTransaction(Loan loan, LoanTransaction transactionToAdjust, LoanAdjustmentParameter parameter,
-            Long commandId, Map<String, Object> changes) {
+    public CommandProcessingResult adjustLoanTransaction(Loan loan, LoanTransaction transactionToAdjust, LoanAdjustmentParameter parameter, Long commandId, Map<String, Object> changes) {
         LocalDate transactionDate = parameter.getTransactionDate();
         BigDecimal transactionAmount = parameter.getTransactionAmount();
         PaymentDetail paymentDetail = parameter.getPaymentDetail();
         ExternalId txnExternalId = parameter.getTxnExternalId();
         ExternalId reversalTxnExternalId = parameter.getReversalTxnExternalId();
         String noteText = parameter.getNoteText();
-
         final Money transactionAmountAsMoney = Money.of(loan.getCurrency(), transactionAmount);
-        LoanTransaction newTransactionDetail = LoanTransaction.repaymentType(transactionToAdjust.getTypeOf(), loan.getOffice(),
-                transactionAmountAsMoney, paymentDetail, transactionDate, txnExternalId, transactionToAdjust.getChargeRefundChargeType());
+        LoanTransaction newTransactionDetail = LoanTransaction.repaymentType(transactionToAdjust.getTypeOf(), loan.getOffice(), transactionAmountAsMoney, paymentDetail, transactionDate, txnExternalId, transactionToAdjust.getChargeRefundChargeType());
         if (transactionToAdjust.isInterestWaiver()) {
             Money unrecognizedIncome = transactionAmountAsMoney.zero();
             Money interestComponent = transactionAmountAsMoney;
@@ -122,104 +116,72 @@ public class LoanAdjustmentServiceImpl implements LoanAdjustmentService {
                     unrecognizedIncome = transactionAmountAsMoney.minus(receivableInterest);
                 }
             }
-            newTransactionDetail = LoanTransaction.waiver(loan.getOffice(), loan, transactionAmountAsMoney, transactionDate,
-                    interestComponent, unrecognizedIncome, txnExternalId);
+            newTransactionDetail = LoanTransaction.waiver(loan.getOffice(), loan, transactionAmountAsMoney, transactionDate, interestComponent, unrecognizedIncome, txnExternalId);
         }
         if (transactionToAdjust.isChargesWaiver()) {
             transactionToAdjust.getLoanChargesPaid().forEach(loanChargePaidBy -> {
                 LoanCharge loanCharge = loanChargePaidBy.getLoanCharge();
                 MonetaryCurrency currency = loanCharge.getLoan().getCurrency();
-
                 Integer installmentNumber = loanChargePaidBy.getInstallmentNumber();
-
                 loanCharge.undoWaive(currency, installmentNumber);
             });
         }
-
         if (transactionToAdjust.isCapitalizedIncome()) {
             if (newTransactionDetail.isNotZero()) {
-                throw new InvalidLoanTransactionTypeException("transaction", "capitalizedIncome.cannot.be.adjusted",
-                        "Capitalized income transaction cannot be adjusted");
+                throw new InvalidLoanTransactionTypeException("transaction", "capitalizedIncome.cannot.be.adjusted", "Capitalized income transaction cannot be adjusted");
             }
-
-            LoanCapitalizedIncomeBalance capitalizedIncomeBalance = loanCapitalizedIncomeBalanceRepository
-                    .findByLoanIdAndLoanTransactionIdAndDeletedFalseAndClosedFalse(loan.getId(), transactionToAdjust.getId());
+            LoanCapitalizedIncomeBalance capitalizedIncomeBalance = loanCapitalizedIncomeBalanceRepository.findByLoanIdAndLoanTransactionIdAndDeletedFalseAndClosedFalse(loan.getId(), transactionToAdjust.getId());
             if (MathUtil.isGreaterThanZero(capitalizedIncomeBalance.getAmountAdjustment())) {
-                throw new InvalidLoanTransactionTypeException("transaction", "capitalizedIncome.cannot.be.reversed.when.adjusted",
-                        "Capitalized income transaction cannot be reversed when non-reversed adjustment exists for it.");
+                throw new InvalidLoanTransactionTypeException("transaction", "capitalizedIncome.cannot.be.reversed.when.adjusted", "Capitalized income transaction cannot be reversed when non-reversed adjustment exists for it.");
             }
             capitalizedIncomeBalance.setDeleted(true);
             loanCapitalizedIncomeBalanceRepository.saveAndFlush(capitalizedIncomeBalance);
         }
         if (transactionToAdjust.isCapitalizedIncomeAdjustment()) {
             if (newTransactionDetail.isNotZero()) {
-                throw new InvalidLoanTransactionTypeException("transaction", "capitalizedIncomeAdjustment.cannot.be.adjusted",
-                        "Capitalized income adjustment transaction cannot be adjusted");
+                throw new InvalidLoanTransactionTypeException("transaction", "capitalizedIncomeAdjustment.cannot.be.adjusted", "Capitalized income adjustment transaction cannot be adjusted");
             }
-
-            LoanCapitalizedIncomeBalance capitalizedIncomeBalance = loanCapitalizedIncomeBalanceRepository
-                    .findBalanceForAdjustment(transactionToAdjust.getId());
-
-            capitalizedIncomeBalance
-                    .setAmountAdjustment(capitalizedIncomeBalance.getAmountAdjustment().subtract(transactionToAdjust.getAmount()));
-            capitalizedIncomeBalance
-                    .setUnrecognizedAmount(capitalizedIncomeBalance.getUnrecognizedAmount().add(transactionToAdjust.getAmount()));
+            LoanCapitalizedIncomeBalance capitalizedIncomeBalance = loanCapitalizedIncomeBalanceRepository.findBalanceForAdjustment(transactionToAdjust.getId());
+            capitalizedIncomeBalance.setAmountAdjustment(capitalizedIncomeBalance.getAmountAdjustment().subtract(transactionToAdjust.getAmount()));
+            capitalizedIncomeBalance.setUnrecognizedAmount(capitalizedIncomeBalance.getUnrecognizedAmount().add(transactionToAdjust.getAmount()));
         }
         if (transactionToAdjust.isBuyDownFee()) {
             if (newTransactionDetail.isNotZero()) {
-                throw new InvalidLoanTransactionTypeException("transaction", "buy.down.fee.cannot.be.adjusted",
-                        "Buy down fee transaction cannot be adjusted");
+                throw new InvalidLoanTransactionTypeException("transaction", "buy.down.fee.cannot.be.adjusted", "Buy down fee transaction cannot be adjusted");
             }
-
-            LoanBuyDownFeeBalance buyDownFeeBalance = loanBuyDownFeeBalanceRepository
-                    .findByLoanIdAndLoanTransactionIdAndDeletedFalseAndClosedFalse(loan.getId(), transactionToAdjust.getId());
-
+            LoanBuyDownFeeBalance buyDownFeeBalance = loanBuyDownFeeBalanceRepository.findByLoanIdAndLoanTransactionIdAndDeletedFalseAndClosedFalse(loan.getId(), transactionToAdjust.getId());
             if (MathUtil.isGreaterThanZero(buyDownFeeBalance.getAmountAdjustment())) {
-                throw new InvalidLoanTransactionTypeException("transaction", "buy.down.fee.cannot.be.reversed.when.adjusted",
-                        "Buy down fee transaction cannot be reversed when non-reversed adjustment exists for it.");
+                throw new InvalidLoanTransactionTypeException("transaction", "buy.down.fee.cannot.be.reversed.when.adjusted", "Buy down fee transaction cannot be reversed when non-reversed adjustment exists for it.");
             }
             buyDownFeeBalance.setDeleted(true);
             loanBuyDownFeeBalanceRepository.saveAndFlush(buyDownFeeBalance);
         }
         if (transactionToAdjust.isBuyDownFeeAdjustment()) {
             if (newTransactionDetail.isNotZero()) {
-                throw new InvalidLoanTransactionTypeException("transaction", "buy.down.fee.adjustment.cannot.be.adjusted",
-                        "Buy down fee adjustment transaction cannot be adjusted");
+                throw new InvalidLoanTransactionTypeException("transaction", "buy.down.fee.adjustment.cannot.be.adjusted", "Buy down fee adjustment transaction cannot be adjusted");
             }
             LoanBuyDownFeeBalance buyDownFeeBalance = loanBuyDownFeeBalanceRepository.findBalanceForAdjustment(transactionToAdjust.getId());
-
             buyDownFeeBalance.setAmountAdjustment(buyDownFeeBalance.getAmountAdjustment().subtract(transactionToAdjust.getAmount()));
             buyDownFeeBalance.setUnrecognizedAmount(buyDownFeeBalance.getUnrecognizedAmount().add(transactionToAdjust.getAmount()));
         }
-
         LocalDate recalculateFrom = null;
-
         if (loan.isInterestBearingAndInterestRecalculationEnabled()) {
-            recalculateFrom = DateUtils.isAfter(transactionToAdjust.getTransactionDate(), transactionDate) ? transactionDate
-                    : transactionToAdjust.getTransactionDate();
+            recalculateFrom = DateUtils.isAfter(transactionToAdjust.getTransactionDate(), transactionDate) ? transactionDate : transactionToAdjust.getTransactionDate();
         }
-
         ScheduleGeneratorDTO scheduleGeneratorDTO = this.loanUtilService.buildScheduleGeneratorDTO(loan, recalculateFrom);
-
         HolidayDetailDTO holidayDetailDTO = scheduleGeneratorDTO.getHolidayDetailDTO();
         if (loan.getLoanRepaymentScheduleDetail().getLoanScheduleType().equals(LoanScheduleType.CUMULATIVE)) {
             // validate cumulative
-            loanTransactionValidator.validateActivityNotBeforeLastTransactionDate(loan, transactionToAdjust.getTransactionDate(),
-                    LoanEvent.LOAN_REPAYMENT_OR_WAIVER);
+            loanTransactionValidator.validateActivityNotBeforeLastTransactionDate(loan, transactionToAdjust.getTransactionDate(), LoanEvent.LOAN_REPAYMENT_OR_WAIVER);
         }
         // common validations
-        loanTransactionValidator.validateRepaymentDateIsOnHoliday(newTransactionDetail.getTransactionDate(),
-                holidayDetailDTO.isAllowTransactionsOnHoliday(), holidayDetailDTO.getHolidays());
-        loanTransactionValidator.validateRepaymentDateIsOnNonWorkingDay(newTransactionDetail.getTransactionDate(),
-                holidayDetailDTO.getWorkingDays(), holidayDetailDTO.isAllowTransactionsOnNonWorkingDay());
-
+        loanTransactionValidator.validateRepaymentDateIsOnHoliday(newTransactionDetail.getTransactionDate(), holidayDetailDTO.isAllowTransactionsOnHoliday(), holidayDetailDTO.getHolidays());
+        loanTransactionValidator.validateRepaymentDateIsOnNonWorkingDay(newTransactionDetail.getTransactionDate(), holidayDetailDTO.getWorkingDays(), holidayDetailDTO.isAllowTransactionsOnNonWorkingDay());
         adjustExistingTransaction(loan, newTransactionDetail, transactionToAdjust, scheduleGeneratorDTO, reversalTxnExternalId);
-
         loanAccrualsProcessingService.reprocessExistingAccruals(loan, true);
         if (loan.isInterestBearingAndInterestRecalculationEnabled()) {
             loanAccrualsProcessingService.processIncomePostingAndAccruals(loan, true);
         }
-
         boolean thereIsNewTransaction = newTransactionDetail.isGreaterThanZero();
         if (thereIsNewTransaction) {
             if (paymentDetail != null) {
@@ -228,9 +190,7 @@ public class LoanAdjustmentServiceImpl implements LoanAdjustmentService {
             this.loanTransactionRepository.saveAndFlush(newTransactionDetail);
             journalEntryPoster.postJournalEntriesForLoanTransaction(newTransactionDetail, false, false);
         }
-
         loan = saveAndFlushLoanWithDataIntegrityViolationChecks(loan);
-
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
             Note note;
@@ -244,94 +204,63 @@ public class LoanAdjustmentServiceImpl implements LoanAdjustmentService {
             }
             this.noteRepository.save(note);
         }
-
         loanLifecycleStateMachine.determineAndTransition(loan, loan.getLastUserTransactionDate());
-
-        loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(),
-                true);
-
+        loanAccrualsProcessingService.processAccrualsOnInterestRecalculation(loan, loan.isInterestBearingAndInterestRecalculationEnabled(), true);
         this.loanAccountDomainService.setLoanDelinquencyTag(loan, DateUtils.getBusinessLocalDate());
-
         LoanAdjustTransactionBusinessEvent.Data eventData = new LoanAdjustTransactionBusinessEvent.Data(transactionToAdjust);
         if (newTransactionDetail.isRepaymentLikeType() && thereIsNewTransaction) {
             eventData.setNewTransactionDetail(newTransactionDetail);
         }
         Long entityId = transactionToAdjust.getId();
         ExternalId entityExternalId = transactionToAdjust.getExternalId();
-
         if (thereIsNewTransaction) {
             entityId = newTransactionDetail.getId();
             entityExternalId = newTransactionDetail.getExternalId();
         }
-
         journalEntryPoster.postJournalEntriesForLoanTransaction(transactionToAdjust, false, false);
         businessEventNotifierService.notifyPostBusinessEvent(new LoanBalanceChangedBusinessEvent(loan));
         businessEventNotifierService.notifyPostBusinessEvent(new LoanAdjustTransactionBusinessEvent(eventData));
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(commandId) //
-                .withEntityId(entityId) //
-                .withEntityExternalId(entityExternalId) //
-                .withOfficeId(loan.getOfficeId()) //
-                .withClientId(loan.getClientId()) //
-                .withGroupId(loan.getGroupId()) //
-                .withLoanId(loan.getId()) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(commandId).withEntityId(entityId).withEntityExternalId(entityExternalId).withOfficeId(loan.getOfficeId()).withClientId(loan.getClientId()).withGroupId(loan.getGroupId()).withLoanId(loan.getId()).with(changes).build();
     }
 
-    public void adjustExistingTransaction(final Loan loan, final LoanTransaction newTransactionDetail,
-            final LoanTransaction transactionForAdjustment, final ScheduleGeneratorDTO scheduleGeneratorDTO,
-            final ExternalId reversalExternalId) {
-        loanTransactionValidator.validateActivityNotBeforeClientOrGroupTransferDate(loan, LoanEvent.LOAN_REPAYMENT_OR_WAIVER,
-                transactionForAdjustment.getTransactionDate());
-
-        if (!transactionForAdjustment.isAccrualRelated() && transactionForAdjustment.isNotRepaymentLikeType()
-                && transactionForAdjustment.isNotWaiver() && transactionForAdjustment.isNotCreditBalanceRefund()
-                && !transactionForAdjustment.isDeferredIncome() && !transactionForAdjustment.isCapitalizedIncomeAdjustment()
-                && !transactionForAdjustment.isBuyDownFeeAdjustment()) {
+    public void adjustExistingTransaction(final Loan loan, final LoanTransaction newTransactionDetail, final LoanTransaction transactionForAdjustment, final ScheduleGeneratorDTO scheduleGeneratorDTO, final ExternalId reversalExternalId) {
+        loanTransactionValidator.validateActivityNotBeforeClientOrGroupTransferDate(loan, LoanEvent.LOAN_REPAYMENT_OR_WAIVER, transactionForAdjustment.getTransactionDate());
+        if (!transactionForAdjustment.isAccrualRelated() && transactionForAdjustment.isNotRepaymentLikeType() && transactionForAdjustment.isNotWaiver() && transactionForAdjustment.isNotCreditBalanceRefund() && !transactionForAdjustment.isDeferredIncome() && !transactionForAdjustment.isCapitalizedIncomeAdjustment() && !transactionForAdjustment.isBuyDownFeeAdjustment()) {
             final String errorMessage = "Only (non-reversed) transactions of type repayment, waiver, accrual, credit balance refund, capitalized income, capitalized income adjustment, buy down fee or buy down fee adjustment can be adjusted.";
-            throw new InvalidLoanTransactionTypeException("transaction",
-                    "adjustment.is.only.allowed.to.repayment.or.waiver.or.creditbalancerefund.or.capitalizedIncome.or.capitalizedIncomeAdjustment.or.buyDownFee.or.buyDownFeeAdjustment.transactions",
-                    errorMessage);
+            throw new InvalidLoanTransactionTypeException("transaction", "adjustment.is.only.allowed.to.repayment.or.waiver.or.creditbalancerefund.or.capitalizedIncome.or.capitalizedIncomeAdjustment.or.buyDownFee.or.buyDownFeeAdjustment.transactions", errorMessage);
         }
-
-        loanChargeValidator.validateRepaymentTypeTransactionNotBeforeAChargeRefund(transactionForAdjustment.getLoan(),
-                transactionForAdjustment, "reversed");
+        loanChargeValidator.validateRepaymentTypeTransactionNotBeforeAChargeRefund(transactionForAdjustment.getLoan(), transactionForAdjustment, "reversed");
         transactionForAdjustment.reverse(reversalExternalId);
         transactionForAdjustment.manuallyAdjustedOrReversed();
-
-        if (transactionForAdjustment.getTypeOf().equals(LoanTransactionType.MERCHANT_ISSUED_REFUND)
-                || transactionForAdjustment.getTypeOf().equals(LoanTransactionType.PAYOUT_REFUND)) {
-            loan.getLoanTransactions().stream() //
-                    .filter(LoanTransaction::isNotReversed)
-                    .filter(loanTransaction -> loanTransaction.getLoanTransactionRelations().stream()
-                            .anyMatch(relation -> relation.getRelationType().equals(LoanTransactionRelationTypeEnum.RELATED)
-                                    && relation.getToTransaction().getId().equals(transactionForAdjustment.getId())))
-                    .forEach(loanTransaction -> {
-                        loanChargeValidator.validateRepaymentTypeTransactionNotBeforeAChargeRefund(loanTransaction.getLoan(),
-                                loanTransaction, "reversed");
-                        loanTransaction.reverse();
-                        loanTransaction.manuallyAdjustedOrReversed();
-                        journalEntryPoster.postJournalEntriesForLoanTransaction(loanTransaction, false, false);
-                        LoanAdjustTransactionBusinessEvent.Data eventData = new LoanAdjustTransactionBusinessEvent.Data(loanTransaction);
-                        businessEventNotifierService.notifyPostBusinessEvent(new LoanAdjustTransactionBusinessEvent(eventData));
-                    });
+        if (transactionForAdjustment.getTypeOf().equals(LoanTransactionType.MERCHANT_ISSUED_REFUND) || transactionForAdjustment.getTypeOf().equals(LoanTransactionType.PAYOUT_REFUND)) {
+            //
+            loan.getLoanTransactions().stream().filter(LoanTransaction::isNotReversed).filter(loanTransaction -> loanTransaction.getLoanTransactionRelations().stream().anyMatch(relation -> relation.getRelationType().equals(LoanTransactionRelationTypeEnum.RELATED) && relation.getToTransaction().getId().equals(transactionForAdjustment.getId()))).forEach(loanTransaction -> {
+                loanChargeValidator.validateRepaymentTypeTransactionNotBeforeAChargeRefund(loanTransaction.getLoan(), loanTransaction, "reversed");
+                loanTransaction.reverse();
+                loanTransaction.manuallyAdjustedOrReversed();
+                journalEntryPoster.postJournalEntriesForLoanTransaction(loanTransaction, false, false);
+                LoanAdjustTransactionBusinessEvent.Data eventData = new LoanAdjustTransactionBusinessEvent.Data(loanTransaction);
+                businessEventNotifierService.notifyPostBusinessEvent(new LoanAdjustTransactionBusinessEvent(eventData));
+            });
         }
-
         if (loan.isClosedWrittenOff()) {
             // find write off transaction and reverse it
             final LoanTransaction writeOffTransaction = loan.findWriteOffTransaction();
-            loanChargeValidator.validateRepaymentTypeTransactionNotBeforeAChargeRefund(writeOffTransaction.getLoan(), writeOffTransaction,
-                    "reversed");
+            loanChargeValidator.validateRepaymentTypeTransactionNotBeforeAChargeRefund(writeOffTransaction.getLoan(), writeOffTransaction, "reversed");
             writeOffTransaction.reverse();
         }
-
         if (newTransactionDetail.isRepaymentLikeType() || newTransactionDetail.isWaiver()) {
-            loanDownPaymentHandlerService.handleRepaymentOrRecoveryOrWaiverTransaction(loan, newTransactionDetail, transactionForAdjustment,
-                    scheduleGeneratorDTO);
+            loanDownPaymentHandlerService.handleRepaymentOrRecoveryOrWaiverTransaction(loan, newTransactionDetail, transactionForAdjustment, scheduleGeneratorDTO);
         }
-
         if (transactionForAdjustment.getTypeOf().equals(LoanTransactionType.CAPITALIZED_INCOME)) {
             loanScheduleService.regenerateScheduleWithReprocessingTransactions(loan);
         }
@@ -356,10 +285,32 @@ public class LoanAdjustmentServiceImpl implements LoanAdjustmentService {
                 baseDataValidator.reset().parameter(LoanApiConstants.externalIdParameterName).failWithCode("value.must.be.unique");
             }
             if (!dataValidationErrors.isEmpty()) {
-                throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
-                        dataValidationErrors, e);
+                throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.", dataValidationErrors, e);
             }
             throw e;
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanAdjustmentServiceImpl(final LoanTransactionValidator loanTransactionValidator, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanAccountDomainService loanAccountDomainService, final NoteRepository noteRepository, final LoanTransactionRepository loanTransactionRepository, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final BusinessEventNotifierService businessEventNotifierService, final LoanUtilService loanUtilService, final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanDownPaymentHandlerService loanDownPaymentHandlerService, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanChargeValidator loanChargeValidator, final LoanJournalEntryPoster journalEntryPoster, final LoanBalanceService loanBalanceService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanCapitalizedIncomeBalanceRepository loanCapitalizedIncomeBalanceRepository, final LoanBuyDownFeeBalanceRepository loanBuyDownFeeBalanceRepository, final LoanScheduleService loanScheduleService) {
+        this.loanTransactionValidator = loanTransactionValidator;
+        this.loanRepositoryWrapper = loanRepositoryWrapper;
+        this.loanAccountDomainService = loanAccountDomainService;
+        this.noteRepository = noteRepository;
+        this.loanTransactionRepository = loanTransactionRepository;
+        this.paymentDetailWritePlatformService = paymentDetailWritePlatformService;
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.loanUtilService = loanUtilService;
+        this.loanRepaymentScheduleInstallmentRepository = loanRepaymentScheduleInstallmentRepository;
+        this.loanLifecycleStateMachine = loanLifecycleStateMachine;
+        this.loanDownPaymentHandlerService = loanDownPaymentHandlerService;
+        this.loanAccrualsProcessingService = loanAccrualsProcessingService;
+        this.loanChargeValidator = loanChargeValidator;
+        this.journalEntryPoster = journalEntryPoster;
+        this.loanBalanceService = loanBalanceService;
+        this.reprocessLoanTransactionsService = reprocessLoanTransactionsService;
+        this.loanCapitalizedIncomeBalanceRepository = loanCapitalizedIncomeBalanceRepository;
+        this.loanBuyDownFeeBalanceRepository = loanBuyDownFeeBalanceRepository;
+        this.loanScheduleService = loanScheduleService;
     }
 }

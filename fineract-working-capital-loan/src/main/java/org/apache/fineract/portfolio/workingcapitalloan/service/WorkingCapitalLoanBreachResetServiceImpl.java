@@ -22,8 +22,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanBreachAction;
@@ -33,11 +31,10 @@ import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapita
 import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapitalLoanBreachScheduleRepository;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
-@Slf4j
 @Service
 public class WorkingCapitalLoanBreachResetServiceImpl implements WorkingCapitalLoanBreachResetService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanBreachResetServiceImpl.class);
     private final WorkingCapitalLoanBreachScheduleRepository breachScheduleRepository;
     private final WorkingCapitalLoanBreachResetHistoryRepository breachResetHistoryRepository;
     private final WorkingCapitalLoanBreachScheduleService breachScheduleService;
@@ -50,16 +47,12 @@ public class WorkingCapitalLoanBreachResetServiceImpl implements WorkingCapitalL
             return;
         }
         final List<WorkingCapitalLoanBreachSchedule> periods = breachScheduleRepository.findByLoanIdOrderByPeriodNumberAsc(loan.getId());
-        final List<WorkingCapitalLoanBreachSchedule> pastPeriods = periods.stream()
-                .filter(period -> DateUtils.isBefore(period.getToDate(), resetAction.getStartDate())).filter(period -> !period.isReset())
-                .toList();
+        final List<WorkingCapitalLoanBreachSchedule> pastPeriods = periods.stream().filter(period -> DateUtils.isBefore(period.getToDate(), resetAction.getStartDate())).filter(period -> !period.isReset()).toList();
         final List<WorkingCapitalLoanBreachResetHistory> resetHistory = new ArrayList<>();
-
         for (final WorkingCapitalLoanBreachSchedule period : pastPeriods) {
             resetHistory.add(createResetHistory(resetAction, period));
             period.reset();
         }
-
         breachScheduleRepository.saveAllAndFlush(periods);
         breachResetHistoryRepository.saveAllAndFlush(resetHistory);
     }
@@ -69,21 +62,26 @@ public class WorkingCapitalLoanBreachResetServiceImpl implements WorkingCapitalL
         final Optional<WorkingCapitalLoanBreachAction> latestActiveReset = activeBreachResetResolver.findLatestActiveReset(loan.getId());
         final List<WorkingCapitalLoanBreachSchedule> periods = breachScheduleRepository.findByLoanIdOrderByPeriodNumberAsc(loan.getId());
         if (latestActiveReset.isPresent()) {
-            periods.stream().filter(period -> DateUtils.isAfterInclusive(period.getToDate(), latestActiveReset.get().getStartDate()))
-                    .forEach(period -> {
-                        period.setReset(false);
-                    });
+            periods.stream().filter(period -> DateUtils.isAfterInclusive(period.getToDate(), latestActiveReset.get().getStartDate())).forEach(period -> {
+                period.setReset(false);
+            });
         } else {
             periods.forEach(period -> {
                 period.setReset(false);
             });
         }
-
         breachScheduleService.reprocessBreachSchedule(loan);
     }
 
-    private WorkingCapitalLoanBreachResetHistory createResetHistory(final WorkingCapitalLoanBreachAction resetAction,
-            final WorkingCapitalLoanBreachSchedule period) {
+    private WorkingCapitalLoanBreachResetHistory createResetHistory(final WorkingCapitalLoanBreachAction resetAction, final WorkingCapitalLoanBreachSchedule period) {
         return new WorkingCapitalLoanBreachResetHistory(resetAction, period);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanBreachResetServiceImpl(final WorkingCapitalLoanBreachScheduleRepository breachScheduleRepository, final WorkingCapitalLoanBreachResetHistoryRepository breachResetHistoryRepository, final WorkingCapitalLoanBreachScheduleService breachScheduleService, final WorkingCapitalLoanActiveBreachResetResolver activeBreachResetResolver) {
+        this.breachScheduleRepository = breachScheduleRepository;
+        this.breachResetHistoryRepository = breachResetHistoryRepository;
+        this.breachScheduleService = breachScheduleService;
+        this.activeBreachResetResolver = activeBreachResetResolver;
     }
 }

@@ -19,8 +19,6 @@
 package org.apache.fineract.infrastructure.jobs.service.retainedearning;
 
 import static org.apache.fineract.infrastructure.jobs.service.retainedearning.RetainedEarningJobConstant.JOB_SUMMARY_STEP_NAME;
-
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
 import org.apache.fineract.infrastructure.jobs.service.retainedearning.data.AccountGLJournalEntryAnnualSummaryData;
@@ -39,9 +37,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * Configuration for Retained earning job
  */
 @Configuration
-@RequiredArgsConstructor
 public class RetainedEarningJobConfiguration {
-
     private final RetainedEarningJobListener retainedEarningJobListener;
     private final JobRepository jobRepository;
     private final RetainedEarningJobWriter retainedEarningItemWriter;
@@ -56,10 +52,7 @@ public class RetainedEarningJobConfiguration {
      */
     @Bean
     public Step retainedEarningSummaryStep() {
-        return new StepBuilder(JOB_SUMMARY_STEP_NAME, jobRepository)
-                .<AccountGLJournalEntryAnnualSummaryData, AccountGLJournalEntryAnnualSummaryData>chunk(
-                        fineractProperties.getJob().getRetainedEarningChunkSize(), transactionManager)
-                .reader(retainedEarningJobReader).writer(retainedEarningItemWriter).allowStartIfComplete(true).build();
+        return new StepBuilder(JOB_SUMMARY_STEP_NAME, jobRepository).<AccountGLJournalEntryAnnualSummaryData, AccountGLJournalEntryAnnualSummaryData>chunk(fineractProperties.getJob().getRetainedEarningChunkSize(), transactionManager).reader(retainedEarningJobReader).writer(retainedEarningItemWriter).allowStartIfComplete(true).build();
     }
 
     /**
@@ -69,8 +62,16 @@ public class RetainedEarningJobConfiguration {
      */
     @Bean(name = "retainedEarning")
     public Job retainedEarning() {
-        return new JobBuilder(JobName.RETAINED_EARNING.name(), jobRepository).listener(retainedEarningJobListener)
-                .start(retainedEarningSummaryStep()).incrementer(new RunIdIncrementer()).build();
+        return new JobBuilder(JobName.RETAINED_EARNING.name(), jobRepository).listener(retainedEarningJobListener).start(retainedEarningSummaryStep()).incrementer(new RunIdIncrementer()).build();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public RetainedEarningJobConfiguration(final RetainedEarningJobListener retainedEarningJobListener, final JobRepository jobRepository, final RetainedEarningJobWriter retainedEarningItemWriter, final PlatformTransactionManager transactionManager, final FineractProperties fineractProperties, final RetainedEarningJobReader retainedEarningJobReader) {
+        this.retainedEarningJobListener = retainedEarningJobListener;
+        this.jobRepository = jobRepository;
+        this.retainedEarningItemWriter = retainedEarningItemWriter;
+        this.transactionManager = transactionManager;
+        this.fineractProperties = fineractProperties;
+        this.retainedEarningJobReader = retainedEarningJobReader;
+    }
 }

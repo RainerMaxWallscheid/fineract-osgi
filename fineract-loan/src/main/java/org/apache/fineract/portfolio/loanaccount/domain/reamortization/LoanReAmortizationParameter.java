@@ -26,34 +26,50 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 
 @Entity
 @Table(name = "m_loan_reamortization_parameter")
-@AllArgsConstructor
-@Getter
 public class LoanReAmortizationParameter extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @OneToOne
     @JoinColumn(name = "loan_transaction_id", nullable = false)
     private LoanTransaction loanTransaction;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "interest_handling_type")
     private LoanReAmortizationInterestHandlingType interestHandlingType;
-
     @ManyToOne
     @JoinColumn(name = "reamortization_reason_code_value_id", nullable = true)
     private CodeValue reamortizationReason;
 
     // for JPA, don't use
-    protected LoanReAmortizationParameter() {}
+    protected LoanReAmortizationParameter() {
+    }
 
     public LoanReAmortizationParameter getCopy(LoanTransaction loanTransaction) {
         return new LoanReAmortizationParameter(loanTransaction, interestHandlingType, reamortizationReason);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanReAmortizationParameter(final LoanTransaction loanTransaction, final LoanReAmortizationInterestHandlingType interestHandlingType, final CodeValue reamortizationReason) {
+        this.loanTransaction = loanTransaction;
+        this.interestHandlingType = interestHandlingType;
+        this.reamortizationReason = reamortizationReason;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransaction getLoanTransaction() {
+        return this.loanTransaction;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanReAmortizationInterestHandlingType getInterestHandlingType() {
+        return this.interestHandlingType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getReamortizationReason() {
+        return this.reamortizationReason;
     }
 }

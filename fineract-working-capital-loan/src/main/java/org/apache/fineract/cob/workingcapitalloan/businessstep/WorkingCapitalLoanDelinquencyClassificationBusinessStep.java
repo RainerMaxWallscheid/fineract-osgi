@@ -16,25 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.cob.workingcapitalloan.businessstep;
 
 import static org.apache.fineract.infrastructure.core.diagnostics.performance.MeasuringUtil.measure;
-
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanDelinquencyClassificationService;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class WorkingCapitalLoanDelinquencyClassificationBusinessStep extends WorkingCapitalLoanCOBBusinessStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanDelinquencyClassificationBusinessStep.class);
     private final WorkingCapitalLoanDelinquencyClassificationService delinquencyClassificationService;
 
     @Override
@@ -45,25 +40,17 @@ public class WorkingCapitalLoanDelinquencyClassificationBusinessStep extends Wor
         }
         String externalId = Optional.ofNullable(loan.getExternalId()).map(ExternalId::getValue).orElse(null);
         measure(() -> setDelinquencyBucketTags(loan, externalId), duration -> {
-            log.debug(
-                    "Ending Working Capital delinquency tag processing for loan with Id [{}], account number [{}], external Id [{}], finished in [{}]ms",
-                    loan.getId(), loan.getAccountNumber(), externalId, duration.toMillis());
+            log.debug("Ending Working Capital delinquency tag processing for loan with Id [{}], account number [{}], external Id [{}], finished in [{}]ms", loan.getId(), loan.getAccountNumber(), externalId, duration.toMillis());
         });
         return loan;
     }
 
     public void setDelinquencyBucketTags(WorkingCapitalLoan loan, String externalId) {
         try {
-            log.debug(
-                    "Starting Working Capital delinquency tag processing for Working Capital Loan with Id [{}], account number [{}], external Id [{}]",
-                    loan.getId(), loan.getAccountNumber(), externalId);
-
+            log.debug("Starting Working Capital delinquency tag processing for Working Capital Loan with Id [{}], account number [{}], external Id [{}]", loan.getId(), loan.getAccountNumber(), externalId);
             delinquencyClassificationService.classifyDelinquency(loan, ThreadLocalContextUtil.getBusinessDate().plusDays(1));
         } catch (RuntimeException re) {
-            log.error(
-                    "Received exception while processing delinquency tag for Working Capital Loan with Id [{}], account number [{}], external Id [{}]",
-                    loan.getId(), loan.getAccountNumber(), externalId, re);
-
+            log.error("Received exception while processing delinquency tag for Working Capital Loan with Id [{}], account number [{}], external Id [{}]", loan.getId(), loan.getAccountNumber(), externalId, re);
             throw re;
         }
     }
@@ -76,5 +63,10 @@ public class WorkingCapitalLoanDelinquencyClassificationBusinessStep extends Wor
     @Override
     public String getHumanReadableName() {
         return "Working Capital Loan Delinquency Classification Business Step";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanDelinquencyClassificationBusinessStep(final WorkingCapitalLoanDelinquencyClassificationService delinquencyClassificationService) {
+        this.delinquencyClassificationService = delinquencyClassificationService;
     }
 }

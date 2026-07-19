@@ -19,28 +19,113 @@
 package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.math.BigDecimal;
-import lombok.Data;
 import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanSummary;
 import org.mapstruct.Mapping;
 
-@Data
 public class LoanPrincipalData {
-
     private final BigDecimal principalDisbursed;
     private final BigDecimal principalAdjustments;
     private final BigDecimal principalPaid;
     private final BigDecimal principalWrittenOff;
     private final BigDecimal principalOutstanding;
 
+
     @org.mapstruct.Mapper(config = MapstructMapperConfig.class)
     public interface Mapper {
-
         @Mapping(source = "totalPrincipalDisbursed", target = "principalDisbursed")
         @Mapping(source = "totalPrincipalAdjustments", target = "principalAdjustments")
         @Mapping(source = "totalPrincipalRepaid", target = "principalPaid")
         @Mapping(source = "totalPrincipalWrittenOff", target = "principalWrittenOff")
         @Mapping(source = "totalPrincipalOutstanding", target = "principalOutstanding")
         LoanPrincipalData map(LoanSummary source);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanPrincipalData(final BigDecimal principalDisbursed, final BigDecimal principalAdjustments, final BigDecimal principalPaid, final BigDecimal principalWrittenOff, final BigDecimal principalOutstanding) {
+        this.principalDisbursed = principalDisbursed;
+        this.principalAdjustments = principalAdjustments;
+        this.principalPaid = principalPaid;
+        this.principalWrittenOff = principalWrittenOff;
+        this.principalOutstanding = principalOutstanding;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPrincipalDisbursed() {
+        return this.principalDisbursed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPrincipalAdjustments() {
+        return this.principalAdjustments;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPrincipalPaid() {
+        return this.principalPaid;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPrincipalWrittenOff() {
+        return this.principalWrittenOff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPrincipalOutstanding() {
+        return this.principalOutstanding;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof LoanPrincipalData)) return false;
+        final LoanPrincipalData other = (LoanPrincipalData) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$principalDisbursed = this.getPrincipalDisbursed();
+        final java.lang.Object other$principalDisbursed = other.getPrincipalDisbursed();
+        if (this$principalDisbursed == null ? other$principalDisbursed != null : !this$principalDisbursed.equals(other$principalDisbursed)) return false;
+        final java.lang.Object this$principalAdjustments = this.getPrincipalAdjustments();
+        final java.lang.Object other$principalAdjustments = other.getPrincipalAdjustments();
+        if (this$principalAdjustments == null ? other$principalAdjustments != null : !this$principalAdjustments.equals(other$principalAdjustments)) return false;
+        final java.lang.Object this$principalPaid = this.getPrincipalPaid();
+        final java.lang.Object other$principalPaid = other.getPrincipalPaid();
+        if (this$principalPaid == null ? other$principalPaid != null : !this$principalPaid.equals(other$principalPaid)) return false;
+        final java.lang.Object this$principalWrittenOff = this.getPrincipalWrittenOff();
+        final java.lang.Object other$principalWrittenOff = other.getPrincipalWrittenOff();
+        if (this$principalWrittenOff == null ? other$principalWrittenOff != null : !this$principalWrittenOff.equals(other$principalWrittenOff)) return false;
+        final java.lang.Object this$principalOutstanding = this.getPrincipalOutstanding();
+        final java.lang.Object other$principalOutstanding = other.getPrincipalOutstanding();
+        if (this$principalOutstanding == null ? other$principalOutstanding != null : !this$principalOutstanding.equals(other$principalOutstanding)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof LoanPrincipalData;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $principalDisbursed = this.getPrincipalDisbursed();
+        result = result * PRIME + ($principalDisbursed == null ? 43 : $principalDisbursed.hashCode());
+        final java.lang.Object $principalAdjustments = this.getPrincipalAdjustments();
+        result = result * PRIME + ($principalAdjustments == null ? 43 : $principalAdjustments.hashCode());
+        final java.lang.Object $principalPaid = this.getPrincipalPaid();
+        result = result * PRIME + ($principalPaid == null ? 43 : $principalPaid.hashCode());
+        final java.lang.Object $principalWrittenOff = this.getPrincipalWrittenOff();
+        result = result * PRIME + ($principalWrittenOff == null ? 43 : $principalWrittenOff.hashCode());
+        final java.lang.Object $principalOutstanding = this.getPrincipalOutstanding();
+        result = result * PRIME + ($principalOutstanding == null ? 43 : $principalOutstanding.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "LoanPrincipalData(principalDisbursed=" + this.getPrincipalDisbursed() + ", principalAdjustments=" + this.getPrincipalAdjustments() + ", principalPaid=" + this.getPrincipalPaid() + ", principalWrittenOff=" + this.getPrincipalWrittenOff() + ", principalOutstanding=" + this.getPrincipalOutstanding() + ")";
     }
 }

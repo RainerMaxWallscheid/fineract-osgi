@@ -24,7 +24,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.fineract.infrastructure.core.annotation.WithFlushMode;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
@@ -57,18 +56,15 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.util.ObjectUtils;
 
 @Service
-@RequiredArgsConstructor
 @WithFlushMode(FlushModeType.COMMIT)
 public class LoanTransactionProcessingServiceImpl implements LoanTransactionProcessingService {
-
     private final LoanRepaymentScheduleTransactionProcessorFactory transactionProcessorFactory;
     private final LoanTermVariationsMapper loanMapper;
     private final InterestScheduleModelRepositoryWrapper modelRepository;
     private final LoanTransactionService loanTransactionService;
 
     @Override
-    public boolean canProcessLatestTransactionOnly(Loan loan, LoanTransaction loanTransaction,
-            LoanRepaymentScheduleInstallment currentInstallment) {
+    public boolean canProcessLatestTransactionOnly(Loan loan, LoanTransaction loanTransaction, LoanRepaymentScheduleInstallment currentInstallment) {
         if (!loan.isInterestBearingAndInterestRecalculationEnabled()) {
             return true;
         }
@@ -79,48 +75,36 @@ public class LoanTransactionProcessingServiceImpl implements LoanTransactionProc
             return false;
         }
         LoanInterestRecalculationDetails interestRecalculationDetails = loan.getLoanInterestRecalculationDetails();
-        if (interestRecalculationDetails != null && ((interestRecalculationDetails.getRestFrequencyType().isSameAsRepayment()
-                && interestRecalculationDetails.getPreCloseInterestCalculationStrategy().calculateTillPreClosureDateEnabled())
-                || (interestRecalculationDetails.getRestFrequencyType().isDaily()
-                        && interestRecalculationDetails.getPreCloseInterestCalculationStrategy().calculateTillRestFrequencyEnabled()))) {
+        if (interestRecalculationDetails != null && ((interestRecalculationDetails.getRestFrequencyType().isSameAsRepayment() && interestRecalculationDetails.getPreCloseInterestCalculationStrategy().calculateTillPreClosureDateEnabled()) || (interestRecalculationDetails.getRestFrequencyType().isDaily() && interestRecalculationDetails.getPreCloseInterestCalculationStrategy().calculateTillRestFrequencyEnabled()))) {
             return false;
         }
         if (loan.isProgressiveSchedule()) {
             return modelRepository.hasValidModelForDate(loan.getId(), loanTransaction.getTransactionDate());
         }
-        return currentInstallment != null
-                && currentInstallment.getTotalOutstanding(loan.getCurrency()).isEqualTo(loanTransaction.getAmount(loan.getCurrency()));
+        return currentInstallment != null && currentInstallment.getTotalOutstanding(loan.getCurrency()).isEqualTo(loanTransaction.getAmount(loan.getCurrency()));
     }
 
     @Override
-    public ChangedTransactionDetail processLatestTransaction(String transactionProcessingStrategyCode, LoanTransaction loanTransaction,
-            TransactionCtx ctx) {
-        final LoanRepaymentScheduleTransactionProcessor loanRepaymentScheduleTransactionProcessor = getTransactionProcessor(
-                transactionProcessingStrategyCode);
-        if (loanRepaymentScheduleTransactionProcessor instanceof AdvancedPaymentScheduleTransactionProcessor advancedProcessor
-                && loanTransaction.getLoan().isInterestRecalculationEnabled()) {
+    public ChangedTransactionDetail processLatestTransaction(String transactionProcessingStrategyCode, LoanTransaction loanTransaction, TransactionCtx ctx) {
+        final LoanRepaymentScheduleTransactionProcessor loanRepaymentScheduleTransactionProcessor = getTransactionProcessor(transactionProcessingStrategyCode);
+        if (loanRepaymentScheduleTransactionProcessor instanceof AdvancedPaymentScheduleTransactionProcessor advancedProcessor && loanTransaction.getLoan().isInterestRecalculationEnabled()) {
             return processLatestTransactionProgressiveInterestRecalculation(advancedProcessor, loanTransaction.getLoan(), loanTransaction);
         }
         return loanRepaymentScheduleTransactionProcessor.processLatestTransaction(loanTransaction, ctx);
     }
 
     @Override
-    public ChangedTransactionDetail reprocessLoanTransactions(String transactionProcessingStrategyCode, LocalDate disbursementDate,
-            List<LoanTransaction> loanTransactions, MonetaryCurrency currency, List<LoanRepaymentScheduleInstallment> installments,
-            Set<LoanCharge> charges) {
-        final LoanRepaymentScheduleTransactionProcessor loanRepaymentScheduleTransactionProcessor = getTransactionProcessor(
-                transactionProcessingStrategyCode);
+    public ChangedTransactionDetail reprocessLoanTransactions(String transactionProcessingStrategyCode, LocalDate disbursementDate, List<LoanTransaction> loanTransactions, MonetaryCurrency currency, List<LoanRepaymentScheduleInstallment> installments, Set<LoanCharge> charges) {
+        final LoanRepaymentScheduleTransactionProcessor loanRepaymentScheduleTransactionProcessor = getTransactionProcessor(transactionProcessingStrategyCode);
         if (loanRepaymentScheduleTransactionProcessor instanceof AdvancedPaymentScheduleTransactionProcessor advancedProcessor) {
             LocalDate currentDate = DateUtils.getBusinessLocalDate();
-            Pair<ChangedTransactionDetail, ProgressiveLoanInterestScheduleModel> result = advancedProcessor
-                    .reprocessProgressiveLoanTransactions(disbursementDate, currentDate, loanTransactions, currency, installments, charges);
+            Pair<ChangedTransactionDetail, ProgressiveLoanInterestScheduleModel> result = advancedProcessor.reprocessProgressiveLoanTransactions(disbursementDate, currentDate, loanTransactions, currency, installments, charges);
             if (!TransactionSynchronizationManager.isCurrentTransactionReadOnly()) {
                 modelRepository.writeInterestScheduleModel(getLoan(loanTransactions, installments, charges), result.getRight());
             }
             return result.getLeft();
         } else {
-            return loanRepaymentScheduleTransactionProcessor.reprocessLoanTransactions(disbursementDate, loanTransactions, currency,
-                    installments, charges);
+            return loanRepaymentScheduleTransactionProcessor.reprocessLoanTransactions(disbursementDate, loanTransactions, currency, installments, charges);
         }
     }
 
@@ -131,41 +115,27 @@ public class LoanTransactionProcessingServiceImpl implements LoanTransactionProc
 
     @Override
     public LoanScheduleDTO getRecalculatedSchedule(final ScheduleGeneratorDTO generatorDTO, Loan loan) {
-        if (!loan.isInterestBearingAndInterestRecalculationEnabled() || loan.isNpa()
-                || (loan.isChargedOff() && loan.isCumulativeSchedule())) {
+        if (!loan.isInterestBearingAndInterestRecalculationEnabled() || loan.isNpa() || (loan.isChargedOff() && loan.isCumulativeSchedule())) {
             return null;
         }
         final InterestMethod interestMethod = loan.getLoanRepaymentScheduleDetail().getInterestMethod();
-        final LoanScheduleGenerator loanScheduleGenerator = generatorDTO.getLoanScheduleFactory()
-                .create(loan.getLoanRepaymentScheduleDetail().getLoanScheduleType(), interestMethod);
-
+        final LoanScheduleGenerator loanScheduleGenerator = generatorDTO.getLoanScheduleFactory().create(loan.getLoanRepaymentScheduleDetail().getLoanScheduleType(), interestMethod);
         final MathContext mc = MoneyHelper.getMathContext();
-
         final LoanApplicationTerms loanApplicationTerms = loanMapper.constructLoanApplicationTerms(generatorDTO, loan);
-
-        final LoanRepaymentScheduleTransactionProcessor loanRepaymentScheduleTransactionProcessor = getTransactionProcessor(
-                loan.getTransactionProcessingStrategyCode());
-
-        return loanScheduleGenerator.rescheduleNextInstallments(mc, loanApplicationTerms, loan, generatorDTO.getHolidayDetailDTO(),
-                loanRepaymentScheduleTransactionProcessor, generatorDTO.getRecalculateFrom(), generatorDTO.getRecalculateTill());
+        final LoanRepaymentScheduleTransactionProcessor loanRepaymentScheduleTransactionProcessor = getTransactionProcessor(loan.getTransactionProcessingStrategyCode());
+        return loanScheduleGenerator.rescheduleNextInstallments(mc, loanApplicationTerms, loan, generatorDTO.getHolidayDetailDTO(), loanRepaymentScheduleTransactionProcessor, generatorDTO.getRecalculateFrom(), generatorDTO.getRecalculateTill());
     }
 
     @Override
     public OutstandingAmountsDTO fetchPrepaymentDetail(final ScheduleGeneratorDTO scheduleGeneratorDTO, final LocalDate onDate, Loan loan) {
         OutstandingAmountsDTO outstandingAmounts;
-
         if (loan.isInterestBearingAndInterestRecalculationEnabled() && !loan.isChargeOffOnDate(onDate) && !loan.isContractTermination()) {
             final MathContext mc = MoneyHelper.getMathContext();
-
             final InterestMethod interestMethod = loan.getLoanRepaymentScheduleDetail().getInterestMethod();
             final LoanApplicationTerms loanApplicationTerms = loanMapper.constructLoanApplicationTerms(scheduleGeneratorDTO, loan);
-
-            final LoanScheduleGenerator loanScheduleGenerator = scheduleGeneratorDTO.getLoanScheduleFactory()
-                    .create(loanApplicationTerms.getLoanScheduleType(), interestMethod);
-            final LoanRepaymentScheduleTransactionProcessor loanRepaymentScheduleTransactionProcessor = getTransactionProcessor(
-                    loan.getTransactionProcessingStrategyCode());
-            outstandingAmounts = loanScheduleGenerator.calculatePrepaymentAmount(loan.getCurrency(), onDate, loanApplicationTerms, mc, loan,
-                    scheduleGeneratorDTO.getHolidayDetailDTO(), loanRepaymentScheduleTransactionProcessor);
+            final LoanScheduleGenerator loanScheduleGenerator = scheduleGeneratorDTO.getLoanScheduleFactory().create(loanApplicationTerms.getLoanScheduleType(), interestMethod);
+            final LoanRepaymentScheduleTransactionProcessor loanRepaymentScheduleTransactionProcessor = getTransactionProcessor(loan.getTransactionProcessingStrategyCode());
+            outstandingAmounts = loanScheduleGenerator.calculatePrepaymentAmount(loan.getCurrency(), onDate, loanApplicationTerms, mc, loan, scheduleGeneratorDTO.getHolidayDetailDTO(), loanRepaymentScheduleTransactionProcessor);
         } else {
             outstandingAmounts = getTotalOutstandingOnLoan(loan);
         }
@@ -184,12 +154,10 @@ public class LoanTransactionProcessingServiceImpl implements LoanTransactionProc
             feeCharges = feeCharges.plus(scheduledRepayment.getFeeChargesOutstanding(loan.getCurrency()));
             penaltyCharges = penaltyCharges.plus(scheduledRepayment.getPenaltyChargesOutstanding(loan.getCurrency()));
         }
-        return new OutstandingAmountsDTO(totalPrincipal.getCurrency()).principal(totalPrincipal).interest(totalInterest)
-                .feeCharges(feeCharges).penaltyCharges(penaltyCharges);
+        return new OutstandingAmountsDTO(totalPrincipal.getCurrency()).principal(totalPrincipal).interest(totalInterest).feeCharges(feeCharges).penaltyCharges(penaltyCharges);
     }
 
-    private Loan getLoan(List<LoanTransaction> loanTransactions, List<LoanRepaymentScheduleInstallment> installments,
-            Set<LoanCharge> charges) {
+    private Loan getLoan(List<LoanTransaction> loanTransactions, List<LoanRepaymentScheduleInstallment> installments, Set<LoanCharge> charges) {
         if (!ObjectUtils.isEmpty(loanTransactions)) {
             return loanTransactions.getFirst().getLoan();
         } else if (!ObjectUtils.isEmpty(installments)) {
@@ -201,17 +169,13 @@ public class LoanTransactionProcessingServiceImpl implements LoanTransactionProc
         }
     }
 
-    private ChangedTransactionDetail processLatestTransactionProgressiveInterestRecalculation(
-            AdvancedPaymentScheduleTransactionProcessor advancedProcessor, Loan loan, LoanTransaction loanTransaction) {
-        Optional<ProgressiveLoanInterestScheduleModel> savedModel = modelRepository.getSavedModel(loan,
-                loanTransaction.getTransactionDate());
+    private ChangedTransactionDetail processLatestTransactionProgressiveInterestRecalculation(AdvancedPaymentScheduleTransactionProcessor advancedProcessor, Loan loan, LoanTransaction loanTransaction) {
+        Optional<ProgressiveLoanInterestScheduleModel> savedModel = modelRepository.getSavedModel(loan, loanTransaction.getTransactionDate());
         if (savedModel.isEmpty()) {
             throw new IllegalArgumentException("No saved model found for loan transaction " + loanTransaction);
         }
         ProgressiveLoanInterestScheduleModel model = savedModel.get();
-        ProgressiveTransactionCtx progressiveContext = new ProgressiveTransactionCtx(loan.getCurrency(),
-                loan.getRepaymentScheduleInstallments(), loan.getActiveCharges(), new MoneyHolder(loan.getTotalOverpaidAsMoney()),
-                new ChangedTransactionDetail(), model, getTotalRefundInterestAmount(loan), loan.getActiveLoanTermVariations());
+        ProgressiveTransactionCtx progressiveContext = new ProgressiveTransactionCtx(loan.getCurrency(), loan.getRepaymentScheduleInstallments(), loan.getActiveCharges(), new MoneyHolder(loan.getTotalOverpaidAsMoney()), new ChangedTransactionDetail(), model, getTotalRefundInterestAmount(loan), loan.getActiveLoanTermVariations());
         progressiveContext.getAlreadyProcessedTransactions().addAll(loanTransactionService.retrieveListOfTransactionsForReprocessing(loan));
         progressiveContext.setChargedOff(loan.isChargedOff());
         progressiveContext.setWrittenOff(loan.isClosedWrittenOff());
@@ -228,7 +192,14 @@ public class LoanTransactionProcessingServiceImpl implements LoanTransactionProc
         if (supportedInterestRefundTransactionTypes != null && supportedInterestRefundTransactionTypes.isEmpty()) {
             return Money.zero(loan.getCurrency());
         }
-        return loan.getLoanTransactions().stream().filter(LoanTransaction::isNotReversed).filter(LoanTransaction::isInterestRefund)
-                .map(t -> t.getAmount(loan.getCurrency())).reduce(Money.zero(loan.getCurrency()), Money::add);
+        return loan.getLoanTransactions().stream().filter(LoanTransaction::isNotReversed).filter(LoanTransaction::isInterestRefund).map(t -> t.getAmount(loan.getCurrency())).reduce(Money.zero(loan.getCurrency()), Money::add);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionProcessingServiceImpl(final LoanRepaymentScheduleTransactionProcessorFactory transactionProcessorFactory, final LoanTermVariationsMapper loanMapper, final InterestScheduleModelRepositoryWrapper modelRepository, final LoanTransactionService loanTransactionService) {
+        this.transactionProcessorFactory = transactionProcessorFactory;
+        this.loanMapper = loanMapper;
+        this.modelRepository = modelRepository;
+        this.loanTransactionService = loanTransactionService;
     }
 }

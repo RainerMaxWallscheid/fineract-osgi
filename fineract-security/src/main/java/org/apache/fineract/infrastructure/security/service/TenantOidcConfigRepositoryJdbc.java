@@ -24,7 +24,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Optional;
 import javax.sql.DataSource;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.TenantOidcConfig;
 import org.apache.fineract.infrastructure.security.domain.OidcFederationType;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,18 +34,16 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-@Slf4j
 @Repository
 public class TenantOidcConfigRepositoryJdbc implements TenantOidcConfigRepository {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TenantOidcConfigRepositoryJdbc.class);
     private static final TenantOidcConfigMapper ROW_MAPPER = new TenantOidcConfigMapper();
-
     private static final String SELECT_BASE = """
-            SELECT id, tenant_id, provider_type, issuer_uri, client_id, client_secret,
-                   jwks_uri, username_claim, scopes, post_logout_redirect_uri, enabled
-            FROM m_tenant_oidc_config
-            """;
-
+        SELECT id, tenant_id, provider_type, issuer_uri, client_id, client_secret,
+               jwks_uri, username_claim, scopes, post_logout_redirect_uri, enabled
+        FROM m_tenant_oidc_config
+        """;
     private final JdbcTemplate jdbcTemplate;
 
     public TenantOidcConfigRepositoryJdbc(@Qualifier("hikariTenantDataSource") DataSource dataSource) {
@@ -56,8 +53,7 @@ public class TenantOidcConfigRepositoryJdbc implements TenantOidcConfigRepositor
     @Override
     public Optional<TenantOidcConfig> findByIssuerUri(String issuerUri) {
         try {
-            TenantOidcConfig result = jdbcTemplate.queryForObject(SELECT_BASE + "WHERE issuer_uri = ? AND enabled = 1", ROW_MAPPER,
-                    issuerUri);
+            TenantOidcConfig result = jdbcTemplate.queryForObject(SELECT_BASE + "WHERE issuer_uri = ? AND enabled = 1", ROW_MAPPER, issuerUri);
             return Optional.ofNullable(result);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -67,8 +63,7 @@ public class TenantOidcConfigRepositoryJdbc implements TenantOidcConfigRepositor
     @Override
     public Optional<TenantOidcConfig> findByTenantId(String tenantId) {
         try {
-            TenantOidcConfig result = jdbcTemplate.queryForObject(SELECT_BASE + "WHERE tenant_id = ? AND enabled = 1", ROW_MAPPER,
-                    tenantId);
+            TenantOidcConfig result = jdbcTemplate.queryForObject(SELECT_BASE + "WHERE tenant_id = ? AND enabled = 1", ROW_MAPPER, tenantId);
             return Optional.ofNullable(result);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -85,12 +80,11 @@ public class TenantOidcConfigRepositoryJdbc implements TenantOidcConfigRepositor
 
     private TenantOidcConfig insert(TenantOidcConfig config) {
         String sql = """
-                INSERT INTO m_tenant_oidc_config
-                    (tenant_id, provider_type, issuer_uri, client_id, client_secret,
-                     jwks_uri, username_claim, scopes, post_logout_redirect_uri, enabled)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """;
-
+            INSERT INTO m_tenant_oidc_config
+                (tenant_id, provider_type, issuer_uri, client_id, client_secret,
+                 jwks_uri, username_claim, scopes, post_logout_redirect_uri, enabled)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """;
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(conn -> {
             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -106,24 +100,19 @@ public class TenantOidcConfigRepositoryJdbc implements TenantOidcConfigRepositor
             ps.setBoolean(10, config.isEnabled());
             return ps;
         }, keyHolder);
-
         config.setId(keyHolder.getKey().longValue());
         return config;
     }
 
     private TenantOidcConfig update(TenantOidcConfig config) {
         String sql = """
-                UPDATE m_tenant_oidc_config
-                SET provider_type = ?, issuer_uri = ?, client_id = ?, client_secret = ?,
-                    jwks_uri = ?, username_claim = ?, scopes = ?, post_logout_redirect_uri = ?,
-                    enabled = ?, updated_at = CURRENT_TIMESTAMP(6)
-                WHERE tenant_id = ?
-                """;
-
-        jdbcTemplate.update(sql, config.getProviderType().name(), config.getIssuerUri(), config.getClientId(), config.getClientSecret(),
-                config.getJwksUri(), config.getUsernameClaim(), config.getScopes(), config.getPostLogoutRedirectUri(), config.isEnabled(),
-                config.getTenantId());
-
+            UPDATE m_tenant_oidc_config
+            SET provider_type = ?, issuer_uri = ?, client_id = ?, client_secret = ?,
+                jwks_uri = ?, username_claim = ?, scopes = ?, post_logout_redirect_uri = ?,
+                enabled = ?, updated_at = CURRENT_TIMESTAMP(6)
+            WHERE tenant_id = ?
+            """;
+        jdbcTemplate.update(sql, config.getProviderType().name(), config.getIssuerUri(), config.getClientId(), config.getClientSecret(), config.getJwksUri(), config.getUsernameClaim(), config.getScopes(), config.getPostLogoutRedirectUri(), config.isEnabled(), config.getTenantId());
         return config;
     }
 
@@ -132,15 +121,11 @@ public class TenantOidcConfigRepositoryJdbc implements TenantOidcConfigRepositor
         jdbcTemplate.update("DELETE FROM m_tenant_oidc_config WHERE tenant_id = ?", tenantId);
     }
 
-    private static final class TenantOidcConfigMapper implements RowMapper<TenantOidcConfig> {
 
+    private static final class TenantOidcConfigMapper implements RowMapper<TenantOidcConfig> {
         @Override
         public TenantOidcConfig mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return TenantOidcConfig.builder().id(rs.getLong("id")).tenantId(rs.getString("tenant_id"))
-                    .providerType(OidcFederationType.valueOf(rs.getString("provider_type"))).issuerUri(rs.getString("issuer_uri"))
-                    .clientId(rs.getString("client_id")).clientSecret(rs.getString("client_secret")).jwksUri(rs.getString("jwks_uri"))
-                    .usernameClaim(rs.getString("username_claim")).scopes(rs.getString("scopes"))
-                    .postLogoutRedirectUri(rs.getString("post_logout_redirect_uri")).enabled(rs.getBoolean("enabled")).build();
+            return TenantOidcConfig.builder().id(rs.getLong("id")).tenantId(rs.getString("tenant_id")).providerType(OidcFederationType.valueOf(rs.getString("provider_type"))).issuerUri(rs.getString("issuer_uri")).clientId(rs.getString("client_id")).clientSecret(rs.getString("client_secret")).jwksUri(rs.getString("jwks_uri")).usernameClaim(rs.getString("username_claim")).scopes(rs.getString("scopes")).postLogoutRedirectUri(rs.getString("post_logout_redirect_uri")).enabled(rs.getBoolean("enabled")).build();
         }
     }
 }

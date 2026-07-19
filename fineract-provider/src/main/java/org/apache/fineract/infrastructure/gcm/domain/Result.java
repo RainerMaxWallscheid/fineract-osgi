@@ -20,9 +20,6 @@ package org.apache.fineract.infrastructure.gcm.domain;
 
 import java.io.Serializable;
 import java.util.List;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 /**
  * Result of a GCM message request that returned HTTP status code 200.
@@ -49,12 +46,7 @@ import lombok.experimental.Accessors;
  *         - otherwise, update the server datastore with the new id.
  * </pre>
  */
-
-@Data
-@NoArgsConstructor
-@Accessors(chain = true)
 public final class Result implements Serializable {
-
     private static final long serialVersionUID = 1L;
     private String messageId;
     private String canonicalRegistrationId;
@@ -64,8 +56,8 @@ public final class Result implements Serializable {
     private List<String> failedRegistrationIds;
     private int status;
 
-    public static final class Builder {
 
+    public static final class Builder {
         // optional parameters
         private String messageId;
         private String canonicalRegistrationId;
@@ -149,4 +141,154 @@ public final class Result implements Serializable {
         return builder.append(" ]").toString();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public String getMessageId() {
+        return this.messageId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCanonicalRegistrationId() {
+        return this.canonicalRegistrationId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getErrorCode() {
+        return this.errorCode;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getSuccess() {
+        return this.success;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getFailure() {
+        return this.failure;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<String> getFailedRegistrationIds() {
+        return this.failedRegistrationIds;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public int getStatus() {
+        return this.status;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Result setMessageId(final String messageId) {
+        this.messageId = messageId;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Result setCanonicalRegistrationId(final String canonicalRegistrationId) {
+        this.canonicalRegistrationId = canonicalRegistrationId;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Result setErrorCode(final String errorCode) {
+        this.errorCode = errorCode;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Result setSuccess(final Integer success) {
+        this.success = success;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Result setFailure(final Integer failure) {
+        this.failure = failure;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Result setFailedRegistrationIds(final List<String> failedRegistrationIds) {
+        this.failedRegistrationIds = failedRegistrationIds;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Result setStatus(final int status) {
+        this.status = status;
+        return this;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof Result)) return false;
+        final Result other = (Result) o;
+        if (this.getStatus() != other.getStatus()) return false;
+        final java.lang.Object this$success = this.getSuccess();
+        final java.lang.Object other$success = other.getSuccess();
+        if (this$success == null ? other$success != null : !this$success.equals(other$success)) return false;
+        final java.lang.Object this$failure = this.getFailure();
+        final java.lang.Object other$failure = other.getFailure();
+        if (this$failure == null ? other$failure != null : !this$failure.equals(other$failure)) return false;
+        final java.lang.Object this$messageId = this.getMessageId();
+        final java.lang.Object other$messageId = other.getMessageId();
+        if (this$messageId == null ? other$messageId != null : !this$messageId.equals(other$messageId)) return false;
+        final java.lang.Object this$canonicalRegistrationId = this.getCanonicalRegistrationId();
+        final java.lang.Object other$canonicalRegistrationId = other.getCanonicalRegistrationId();
+        if (this$canonicalRegistrationId == null ? other$canonicalRegistrationId != null : !this$canonicalRegistrationId.equals(other$canonicalRegistrationId)) return false;
+        final java.lang.Object this$errorCode = this.getErrorCode();
+        final java.lang.Object other$errorCode = other.getErrorCode();
+        if (this$errorCode == null ? other$errorCode != null : !this$errorCode.equals(other$errorCode)) return false;
+        final java.lang.Object this$failedRegistrationIds = this.getFailedRegistrationIds();
+        final java.lang.Object other$failedRegistrationIds = other.getFailedRegistrationIds();
+        if (this$failedRegistrationIds == null ? other$failedRegistrationIds != null : !this$failedRegistrationIds.equals(other$failedRegistrationIds)) return false;
+        return true;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        result = result * PRIME + this.getStatus();
+        final java.lang.Object $success = this.getSuccess();
+        result = result * PRIME + ($success == null ? 43 : $success.hashCode());
+        final java.lang.Object $failure = this.getFailure();
+        result = result * PRIME + ($failure == null ? 43 : $failure.hashCode());
+        final java.lang.Object $messageId = this.getMessageId();
+        result = result * PRIME + ($messageId == null ? 43 : $messageId.hashCode());
+        final java.lang.Object $canonicalRegistrationId = this.getCanonicalRegistrationId();
+        result = result * PRIME + ($canonicalRegistrationId == null ? 43 : $canonicalRegistrationId.hashCode());
+        final java.lang.Object $errorCode = this.getErrorCode();
+        result = result * PRIME + ($errorCode == null ? 43 : $errorCode.hashCode());
+        final java.lang.Object $failedRegistrationIds = this.getFailedRegistrationIds();
+        result = result * PRIME + ($failedRegistrationIds == null ? 43 : $failedRegistrationIds.hashCode());
+        return result;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Result() {
+    }
 }

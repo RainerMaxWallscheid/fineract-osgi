@@ -35,15 +35,11 @@ import static org.apache.fineract.commands.domain.CommandWrapperConstants.ENTITY
 import static org.apache.fineract.commands.domain.CommandWrapperConstants.ENTITY_SAVINGNOTE;
 import static org.apache.fineract.commands.domain.CommandWrapperConstants.ENTITY_USER;
 import static org.apache.fineract.commands.domain.CommandWrapperConstants.ENTITY_WORKINGDAYS;
-
 import java.util.Set;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.useradministration.api.PasswordPreferencesApiConstants;
 
-@Getter
 public class CommandWrapper {
-
     private final Long commandId;
     @SuppressWarnings("unused")
     private final Long officeId;
@@ -65,9 +61,7 @@ public class CommandWrapper {
     private final String jobName;
     private final ExternalId loanExternalId;
     private final Set<String> sanitizeJsonKeys;
-
     private final String idempotencyKey;
-
     @SuppressWarnings("unused")
     private Long templateId;
 
@@ -75,23 +69,15 @@ public class CommandWrapper {
         return new CommandWrapper(null, actionName, entityName, resourceId, subresourceId, null, null);
     }
 
-    public static CommandWrapper fromExistingCommand(final Long commandId, final String actionName, final String entityName,
-            final Long resourceId, final Long subresourceId, final String resourceGetUrl, final Long productId) {
+    public static CommandWrapper fromExistingCommand(final Long commandId, final String actionName, final String entityName, final Long resourceId, final Long subresourceId, final String resourceGetUrl, final Long productId) {
         return new CommandWrapper(commandId, actionName, entityName, resourceId, subresourceId, resourceGetUrl, productId);
     }
 
-    public static CommandWrapper fromExistingCommand(final Long commandId, final String actionName, final String entityName,
-            final Long resourceId, final Long subresourceId, final String resourceGetUrl, final Long productId, final Long officeId,
-            final Long groupId, final Long clientId, final Long loanId, final Long savingsId, final String transactionId,
-            final Long creditBureauId, final Long organisationCreditBureauId, final String idempotencyKey,
-            final ExternalId loanExternalId) {
-        return new CommandWrapper(commandId, actionName, entityName, resourceId, subresourceId, resourceGetUrl, productId, officeId,
-                groupId, clientId, loanId, savingsId, transactionId, creditBureauId, organisationCreditBureauId, idempotencyKey,
-                loanExternalId, null);
+    public static CommandWrapper fromExistingCommand(final Long commandId, final String actionName, final String entityName, final Long resourceId, final Long subresourceId, final String resourceGetUrl, final Long productId, final Long officeId, final Long groupId, final Long clientId, final Long loanId, final Long savingsId, final String transactionId, final Long creditBureauId, final Long organisationCreditBureauId, final String idempotencyKey, final ExternalId loanExternalId) {
+        return new CommandWrapper(commandId, actionName, entityName, resourceId, subresourceId, resourceGetUrl, productId, officeId, groupId, clientId, loanId, savingsId, transactionId, creditBureauId, organisationCreditBureauId, idempotencyKey, loanExternalId, null);
     }
 
-    private CommandWrapper(final Long commandId, final String actionName, final String entityName, final Long resourceId,
-            final Long subresourceId, final String resourceGetUrl, final Long productId) {
+    private CommandWrapper(final Long commandId, final String actionName, final String entityName, final Long resourceId, final Long subresourceId, final String resourceGetUrl, final Long productId) {
         this.commandId = commandId;
         this.officeId = null;
         this.groupId = null;
@@ -115,12 +101,7 @@ public class CommandWrapper {
         this.sanitizeJsonKeys = null;
     }
 
-    public CommandWrapper(final Long officeId, final Long groupId, final Long clientId, final Long loanId, final Long savingsId,
-            final String actionName, final String entityName, final Long entityId, final Long subentityId, final String href,
-            final String json, final String transactionId, final Long productId, final Long templateId, final Long creditBureauId,
-            final Long organisationCreditBureauId, final String jobName, final String idempotencyKey, final ExternalId loanExternalId,
-            final Set<String> sanitizeJsonKeys) {
-
+    public CommandWrapper(final Long officeId, final Long groupId, final Long clientId, final Long loanId, final Long savingsId, final String actionName, final String entityName, final Long entityId, final Long subentityId, final String href, final String json, final String transactionId, final Long productId, final Long templateId, final Long creditBureauId, final Long organisationCreditBureauId, final String jobName, final String idempotencyKey, final ExternalId loanExternalId, final Set<String> sanitizeJsonKeys) {
         this.commandId = null;
         this.officeId = officeId;
         this.groupId = groupId;
@@ -145,12 +126,7 @@ public class CommandWrapper {
         this.sanitizeJsonKeys = sanitizeJsonKeys;
     }
 
-    private CommandWrapper(final Long commandId, final String actionName, final String entityName, final Long resourceId,
-            final Long subresourceId, final String resourceGetUrl, final Long productId, final Long officeId, final Long groupId,
-            final Long clientId, final Long loanId, final Long savingsId, final String transactionId, final Long creditBureauId,
-            final Long organisationCreditBureauId, final String idempotencyKey, final ExternalId loanExternalId,
-            final Set<String> sanitizeJsonKeys) {
-
+    private CommandWrapper(final Long commandId, final String actionName, final String entityName, final Long resourceId, final Long subresourceId, final String resourceGetUrl, final Long productId, final Long officeId, final Long groupId, final Long clientId, final Long loanId, final Long savingsId, final String transactionId, final Long creditBureauId, final Long organisationCreditBureauId, final String idempotencyKey, final ExternalId loanExternalId, final Set<String> sanitizeJsonKeys) {
         this.commandId = commandId;
         this.officeId = officeId;
         this.groupId = groupId;
@@ -217,9 +193,7 @@ public class CommandWrapper {
 
     public boolean isNoteResource() {
         boolean isnoteResource = false;
-        if (ENTITY_CLIENTNOTE.equalsIgnoreCase(this.entityName) || ENTITY_LOANNOTE.equalsIgnoreCase(this.entityName)
-                || ENTITY_LOANTRANSACTIONNOTE.equalsIgnoreCase(this.entityName) || ENTITY_SAVINGNOTE.equalsIgnoreCase(this.entityName)
-                || ENTITY_GROUPNOTE.equalsIgnoreCase(this.entityName)) {
+        if (ENTITY_CLIENTNOTE.equalsIgnoreCase(this.entityName) || ENTITY_LOANNOTE.equalsIgnoreCase(this.entityName) || ENTITY_LOANTRANSACTIONNOTE.equalsIgnoreCase(this.entityName) || ENTITY_SAVINGNOTE.equalsIgnoreCase(this.entityName) || ENTITY_GROUPNOTE.equalsIgnoreCase(this.entityName)) {
             isnoteResource = true;
         }
         return isnoteResource;
@@ -231,8 +205,7 @@ public class CommandWrapper {
 
     public boolean isUpdate() {
         // some resources have special update which involves no resource identifier.
-        return isUpdateOperation() && (this.entityId != null || isPermissionResource() || isCurrencyResource() || isCacheResource()
-                || isWorkingDaysResource() || isPasswordPreferencesResource());
+        return isUpdateOperation() && (this.entityId != null || isPermissionResource() || isCurrencyResource() || isCacheResource() || isWorkingDaysResource() || isPasswordPreferencesResource());
     }
 
     public boolean isCacheResource() {
@@ -336,12 +309,120 @@ public class CommandWrapper {
     }
 
     public boolean isUpdateDisbursementDate() {
-        return ACTION_UPDATE.equalsIgnoreCase(this.actionName) && ENTITY_DISBURSEMENTDETAIL.equalsIgnoreCase(this.entityName)
-                && this.entityId != null;
+        return ACTION_UPDATE.equalsIgnoreCase(this.actionName) && ENTITY_DISBURSEMENTDETAIL.equalsIgnoreCase(this.entityName) && this.entityId != null;
     }
 
     public boolean addAndDeleteDisbursementDetails() {
-        return ACTION_UPDATE.equalsIgnoreCase(this.actionName) && ENTITY_DISBURSEMENTDETAIL.equalsIgnoreCase(this.entityName)
-                && this.entityId == null;
+        return ACTION_UPDATE.equalsIgnoreCase(this.actionName) && ENTITY_DISBURSEMENTDETAIL.equalsIgnoreCase(this.entityName) && this.entityId == null;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getCommandId() {
+        return this.commandId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getOfficeId() {
+        return this.officeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getGroupId() {
+        return this.groupId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getClientId() {
+        return this.clientId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanId() {
+        return this.loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getSavingsId() {
+        return this.savingsId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getActionName() {
+        return this.actionName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEntityName() {
+        return this.entityName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getTaskPermissionName() {
+        return this.taskPermissionName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getEntityId() {
+        return this.entityId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getSubentityId() {
+        return this.subentityId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHref() {
+        return this.href;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getJson() {
+        return this.json;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getTransactionId() {
+        return this.transactionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getProductId() {
+        return this.productId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getCreditBureauId() {
+        return this.creditBureauId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getOrganisationCreditBureauId() {
+        return this.organisationCreditBureauId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getJobName() {
+        return this.jobName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalId getLoanExternalId() {
+        return this.loanExternalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Set<String> getSanitizeJsonKeys() {
+        return this.sanitizeJsonKeys;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getIdempotencyKey() {
+        return this.idempotencyKey;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getTemplateId() {
+        return this.templateId;
     }
 }

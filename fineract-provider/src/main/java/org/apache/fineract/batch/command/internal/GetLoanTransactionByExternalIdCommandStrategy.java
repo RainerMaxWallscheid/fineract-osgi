@@ -19,13 +19,11 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.command.CommandStrategyUtils;
@@ -47,9 +45,7 @@ import org.springframework.stereotype.Component;
  * @see BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class GetLoanTransactionByExternalIdCommandStrategy implements CommandStrategy {
-
     /**
      * Loan transactions api resource {@link LoanTransactionsApiResource}.
      */
@@ -58,15 +54,11 @@ public class GetLoanTransactionByExternalIdCommandStrategy implements CommandStr
     @Override
     public BatchResponse execute(final BatchRequest request, final UriInfo uriInfo) {
         final MutableUriInfo parameterizedUriInfo = new MutableUriInfo(uriInfo);
-
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final String relativeUrl = relativeUrlWithoutVersion(request);
-
         // Expected pattern - loans\/external-id\/[\w\d_-]+\/transactions\/external-id\/[\w\d_-]+
         // Get the loan and transaction ids for use in loanTransactionsApiResource
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrl);
@@ -77,31 +69,33 @@ public class GetLoanTransactionByExternalIdCommandStrategy implements CommandStr
         } else {
             transactionExternalId = pathParameters.get(5);
         }
-
         Map<String, String> queryParameters = new HashMap<>();
         if (relativeUrl.indexOf('?') > 0) {
             queryParameters = CommandStrategyUtils.getQueryParameters(relativeUrl);
-
             // Add the query parameters sent in the relative URL to UriInfo
             CommandStrategyUtils.addQueryParametersToUriInfo(parameterizedUriInfo, queryParameters);
         }
-
         String fields = null;
         if (!queryParameters.isEmpty()) {
             if (queryParameters.containsKey("fields")) {
                 fields = queryParameters.get("fields");
             }
         }
-
         // Calls 'retrieveTransaction' function from 'loanTransactionsApiResource' using external id
-        responseBody = loanTransactionsApiResource.retrieveTransactionByLoanExternalIdAndTransactionExternalId(loanExternalId,
-                transactionExternalId, fields, uriInfo);
-
+        responseBody = loanTransactionsApiResource.retrieveTransactionByLoanExternalIdAndTransactionExternalId(loanExternalId, transactionExternalId, fields, uriInfo);
         response.setStatusCode(HttpStatus.SC_OK);
-
         // Sets the body of the response after retrieving the transaction
         response.setBody(responseBody);
-
         return response;
+    }
+
+    /**
+     * Creates a new {@code GetLoanTransactionByExternalIdCommandStrategy} instance.
+     *
+     * @param loanTransactionsApiResource Loan transactions api resource {@link LoanTransactionsApiResource}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GetLoanTransactionByExternalIdCommandStrategy(final LoanTransactionsApiResource loanTransactionsApiResource) {
+        this.loanTransactionsApiResource = loanTransactionsApiResource;
     }
 }

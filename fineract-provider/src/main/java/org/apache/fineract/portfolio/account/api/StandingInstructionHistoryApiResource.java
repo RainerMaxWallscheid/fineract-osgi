@@ -30,7 +30,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.core.api.DateParam;
@@ -45,43 +44,22 @@ import org.springframework.stereotype.Component;
 
 @Path("/v1/standinginstructionrunhistory")
 @Component
-@Produces({ MediaType.APPLICATION_JSON })
+@Produces({MediaType.APPLICATION_JSON})
 @Tag(name = "Standing Instructions History", description = "The list capability of history can support pagination and sorting.")
-@RequiredArgsConstructor
 public class StandingInstructionHistoryApiResource {
-
     private final StandingInstructionHistoryReadService standingInstructionHistoryReadService;
     private final SqlValidator sqlValidator;
 
     @GET
-    @Operation(summary = "Standing Instructions Logged History", operationId = "retrieveAllStandingInstructionHistory", description = "The list capability of history can support pagination and sorting \n\n"
-            + "Example Requests :\n" + "\n" + "standinginstructionrunhistory\n" + "\n"
-            + "standinginstructionrunhistory?orderBy=name&sortOrder=DESC\n" + "\n" + "standinginstructionrunhistory?offset=10&limit=50")
+    @Operation(summary = "Standing Instructions Logged History", operationId = "retrieveAllStandingInstructionHistory", description = "The list capability of history can support pagination and sorting \n\n" + "Example Requests :\n" + "\n" + "standinginstructionrunhistory\n" + "\n" + "standinginstructionrunhistory?orderBy=name&sortOrder=DESC\n" + "\n" + "standinginstructionrunhistory?offset=10&limit=50")
     @AlternativeOperationId("retrieveAll_20")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StandingInstructionHistoryApiResourceSwagger.GetStandingInstructionRunHistoryResponse.class)))
-    public Page<StandingInstructionHistoryData> retrieveAll(
-            @QueryParam("externalId") @Parameter(description = "externalId") final String externalId,
-            @QueryParam("offset") @Parameter(description = "offset") final Integer offset,
-            @QueryParam("limit") @Parameter(description = "limit") final Integer limit,
-            @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy,
-            @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder,
-            @QueryParam("transferType") @Parameter(description = "transferType") final Integer transferType,
-            @QueryParam("clientName") @Parameter(description = "clientName") final String clientName,
-            @QueryParam("clientId") @Parameter(description = "clientId") final Long clientId,
-            @QueryParam("fromAccountId") @Parameter(description = "fromAccountId") final Long fromAccount,
-            @QueryParam("fromAccountType") @Parameter(description = "fromAccountType") final Integer fromAccountType,
-            @QueryParam("locale") @Parameter(description = "locale") final String locale,
-            @QueryParam("dateFormat") @Parameter(description = "dateFormat") final String rawDateFormat,
-            @QueryParam("fromDate") @Parameter(description = "fromDate") final DateParam fromDateParam,
-            @QueryParam("toDate") @Parameter(description = "toDate") final DateParam toDateParam) {
-
+    public Page<StandingInstructionHistoryData> retrieveAll(@QueryParam("externalId") @Parameter(description = "externalId") final String externalId, @QueryParam("offset") @Parameter(description = "offset") final Integer offset, @QueryParam("limit") @Parameter(description = "limit") final Integer limit, @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy, @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder, @QueryParam("transferType") @Parameter(description = "transferType") final Integer transferType, @QueryParam("clientName") @Parameter(description = "clientName") final String clientName, @QueryParam("clientId") @Parameter(description = "clientId") final Long clientId, @QueryParam("fromAccountId") @Parameter(description = "fromAccountId") final Long fromAccount, @QueryParam("fromAccountType") @Parameter(description = "fromAccountType") final Integer fromAccountType, @QueryParam("locale") @Parameter(description = "locale") final String locale, @QueryParam("dateFormat") @Parameter(description = "dateFormat") final String rawDateFormat, @QueryParam("fromDate") @Parameter(description = "fromDate") final DateParam fromDateParam, @QueryParam("toDate") @Parameter(description = "toDate") final DateParam toDateParam) {
         final DateFormat dateFormat = StringUtils.isBlank(rawDateFormat) ? null : new DateFormat(rawDateFormat);
-
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
         sqlValidator.validate(externalId);
-        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).externalId(externalId).offset(offset)
-                .orderBy(orderBy).sortOrder(sortOrder).build();
+        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).externalId(externalId).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
         LocalDate startDateRange = null;
         LocalDate endDateRange = null;
         if (fromDateParam != null) {
@@ -90,10 +68,13 @@ public class StandingInstructionHistoryApiResource {
         if (toDateParam != null) {
             endDateRange = toDateParam.getDate("toDate", dateFormat, locale);
         }
-
-        StandingInstructionDTO standingInstructionDTO = new StandingInstructionDTO(searchParameters, transferType, clientName, clientId,
-                fromAccount, fromAccountType, startDateRange, endDateRange);
-
+        StandingInstructionDTO standingInstructionDTO = new StandingInstructionDTO(searchParameters, transferType, clientName, clientId, fromAccount, fromAccountType, startDateRange, endDateRange);
         return standingInstructionHistoryReadService.retrieveAll(standingInstructionDTO);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public StandingInstructionHistoryApiResource(final StandingInstructionHistoryReadService standingInstructionHistoryReadService, final SqlValidator sqlValidator) {
+        this.standingInstructionHistoryReadService = standingInstructionHistoryReadService;
+        this.sqlValidator = sqlValidator;
     }
 }

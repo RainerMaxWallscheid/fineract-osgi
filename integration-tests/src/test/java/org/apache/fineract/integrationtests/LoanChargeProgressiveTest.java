@@ -20,7 +20,6 @@ package org.apache.fineract.integrationtests;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.GetLoansLoanIdResponse;
 import org.apache.fineract.client.models.PostChargesResponse;
 import org.apache.fineract.infrastructure.configuration.api.GlobalConfigurationConstants;
@@ -32,9 +31,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@Slf4j
 public class LoanChargeProgressiveTest extends FeignLoanTestBase {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanChargeProgressiveTest.class);
     private Long clientId;
     private Long loanId;
 
@@ -54,14 +53,11 @@ public class LoanChargeProgressiveTest extends FeignLoanTestBase {
     @Test
     public void loanChargeAfterMaturityTest() {
         runAt("02 October 2024", () -> {
-            final PostChargesResponse chargeResponse = createCharge(20.0d, "EUR");
-            addLoanCharge(loanId, chargeResponse.getResourceId(), "02 October 2024", 20.0d);
-
+            final PostChargesResponse chargeResponse = createCharge(20.0, "EUR");
+            addLoanCharge(loanId, chargeResponse.getResourceId(), "02 October 2024", 20.0);
             final GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             validateRepaymentPeriod(loanDetails, 5, LocalDate.of(2024, 10, 2), 0, 20, 0, 0);
-
             executeInlineCOB(loanId);
-
             final GetLoansLoanIdResponse loanDetails2 = getLoanDetails(loanId);
             validateRepaymentPeriod(loanDetails2, 5, LocalDate.of(2024, 10, 2), 0, 20, 0, 0);
         });
@@ -71,21 +67,17 @@ public class LoanChargeProgressiveTest extends FeignLoanTestBase {
     public void immediateChargeAccrualPostMaturityTest() {
         runAt("03 October 2024", () -> {
             executeInlineCOB(loanId);
-            globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_IMMEDIATE_CHARGE_ACCRUAL_POST_MATURITY,
-                    true);
-            final PostChargesResponse chargeResponse = createCharge(20.0d, "EUR");
-            addLoanCharge(loanId, chargeResponse.getResourceId(), "03 October 2024", 20.0d);
+            globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_IMMEDIATE_CHARGE_ACCRUAL_POST_MATURITY, true);
+            final PostChargesResponse chargeResponse = createCharge(20.0, "EUR");
+            addLoanCharge(loanId, chargeResponse.getResourceId(), "03 October 2024", 20.0);
             final GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
-            Assertions.assertTrue(loanDetails.getTransactions().stream()
-                    .anyMatch(t -> t.getType().getAccrual() && Utils.getDoubleValue(t.getAmount()).equals(20.0d)));
+            Assertions.assertTrue(loanDetails.getTransactions().stream().anyMatch(t -> t.getType().getAccrual() && Utils.getDoubleValue(t.getAmount()).equals(20.0)));
         });
         runAt("04 October 2024", () -> {
-            globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_IMMEDIATE_CHARGE_ACCRUAL_POST_MATURITY,
-                    false);
+            globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_IMMEDIATE_CHARGE_ACCRUAL_POST_MATURITY, false);
             executeInlineCOB(loanId);
             final GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
-            Assertions.assertTrue(loanDetails.getTransactions().stream()
-                    .anyMatch(t -> t.getType().getAccrual() && Utils.getDoubleValue(t.getFeeChargesPortion()).equals(20.0d)));
+            Assertions.assertTrue(loanDetails.getTransactions().stream().anyMatch(t -> t.getType().getAccrual() && Utils.getDoubleValue(t.getFeeChargesPortion()).equals(20.0)));
         });
     }
 

@@ -19,16 +19,11 @@
 package org.apache.fineract.portfolio.savings.data;
 
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Immutable data object represent savings account sub-status enumerations.
  */
-@Getter
-@RequiredArgsConstructor
 public class SavingsAccountSubStatusEnumData implements Serializable {
-
     private final Long id;
     private final String code;
     private final String value;
@@ -40,4 +35,67 @@ public class SavingsAccountSubStatusEnumData implements Serializable {
     private final boolean blockCredit;
     private final boolean blockDebit;
 
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isNone() {
+        return this.none;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isInactive() {
+        return this.inactive;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isDormant() {
+        return this.dormant;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isEscheat() {
+        return this.escheat;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isBlock() {
+        return this.block;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isBlockCredit() {
+        return this.blockCredit;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isBlockDebit() {
+        return this.blockDebit;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsAccountSubStatusEnumData(final Long id, final String code, final String value, final boolean none, final boolean inactive, final boolean dormant, final boolean escheat, final boolean block, final boolean blockCredit, final boolean blockDebit) {
+        this.id = id;
+        this.code = code;
+        this.value = value;
+        this.none = none;
+        this.inactive = inactive;
+        this.dormant = dormant;
+        this.escheat = escheat;
+        this.block = block;
+        this.blockCredit = blockCredit;
+        this.blockDebit = blockDebit;
+    }
 }

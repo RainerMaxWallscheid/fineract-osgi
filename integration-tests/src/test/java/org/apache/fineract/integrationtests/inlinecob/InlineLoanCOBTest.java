@@ -20,7 +20,6 @@ package org.apache.fineract.integrationtests.inlinecob;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
@@ -33,7 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.LongStream;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
 import org.apache.fineract.client.models.DelinquencyBucketRequest;
@@ -66,9 +64,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@Slf4j
 public class InlineLoanCOBTest extends BaseLoanIntegrationTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InlineLoanCOBTest.class);
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
     private InlineLoanCOBHelper inlineLoanCOBHelper;
@@ -87,54 +85,36 @@ public class InlineLoanCOBTest extends BaseLoanIntegrationTest {
     @Test
     public void testInlineCOB() {
         try {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, LocalDate.of(2020, 3, 2));
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.PENALTY_WAIT_PERIOD,
-                    new PutGlobalConfigurationsRequest().value(0L));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.PENALTY_WAIT_PERIOD, new PutGlobalConfigurationsRequest().value(0L));
             loanTransactionHelper = new LoanTransactionHelper(requestSpec, responseSpec);
-
             final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec);
             Assertions.assertNotNull(clientID);
-
-            Integer overdueFeeChargeId = ChargesHelper.createCharges(requestSpec, responseSpec,
-                    ChargesHelper.getLoanOverdueFeeJSONWithCalculationTypePercentage("1"));
+            Integer overdueFeeChargeId = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper.getLoanOverdueFeeJSONWithCalculationTypePercentage("1"));
             Assertions.assertNotNull(overdueFeeChargeId);
-
             final Integer loanProductID = createLoanProduct(overdueFeeChargeId.toString());
             Assertions.assertNotNull(loanProductID);
             HashMap loanStatusHashMap;
-
             final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 March 2020");
-
             Assertions.assertNotNull(loanID);
-
             loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
-
             loanStatusHashMap = loanTransactionHelper.approveLoan("01 March 2020", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
-
             String loanDetails = loanTransactionHelper.getLoanDetails(requestSpec, responseSpec, loanID);
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID,
-                    JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID, JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.COB_DATE, LocalDate.of(2020, 3, 2));
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanID.longValue()));
             GetLoansLoanIdResponse loan = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanID);
             Assertions.assertEquals(LocalDate.of(2020, 3, 2), loan.getLastClosedBusinessDate());
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.COB_DATE, LocalDate.of(2020, 3, 3));
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanID.longValue()));
-
             loan = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanID);
             Assertions.assertEquals(LocalDate.of(2020, 3, 3), loan.getLastClosedBusinessDate());
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.COB_DATE, LocalDate.of(2020, 3, 10));
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanID.longValue()));
-
             loan = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanID);
             Assertions.assertEquals(LocalDate.of(2020, 3, 10), loan.getLastClosedBusinessDate());
         } finally {
@@ -142,89 +122,60 @@ public class InlineLoanCOBTest extends BaseLoanIntegrationTest {
             requestSpec.header("Authorization", "Basic " + Utils.loginIntoServerAndGetBase64EncodedAuthenticationKey());
             requestSpec.header("Fineract-Platform-TenantId", "default");
             responseSpec = new ResponseSpecBuilder().expectStatusCode(200).build();
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
     @Test
     public void testInlineCOBCatchUpLoans() {
         try {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             loanTransactionHelper = new LoanTransactionHelper(requestSpec, responseSpec);
-
             final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec);
             Assertions.assertNotNull(clientID);
-
-            Integer overdueFeeChargeId = ChargesHelper.createCharges(requestSpec, responseSpec,
-                    ChargesHelper.getLoanOverdueFeeJSONWithCalculationTypePercentage("1"));
+            Integer overdueFeeChargeId = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper.getLoanOverdueFeeJSONWithCalculationTypePercentage("1"));
             Assertions.assertNotNull(overdueFeeChargeId);
-
             ArrayList<Long> rangeIds = new ArrayList<>();
             // First Range
-            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                    .minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
             rangeIds.add(delinquencyRangeResponse.getResourceId());
-
             DelinquencyRangeResponse range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
-
             // Second Range
-            delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4)
-                    .maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+            delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
             rangeIds.add(delinquencyRangeResponse.getResourceId());
-
             range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
             final String classificationExpected = range.getClassification();
             log.info("Expected Delinquency Range classification after Disbursement {}", classificationExpected);
-
-            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper
-                    .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
             assertNotNull(delinquencyBucketResponse);
-            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper
-                    .getBucket(delinquencyBucketResponse.getResourceId());
-
+            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketResponse.getResourceId());
             final Integer loanProductID = createLoanProduct(loanTransactionHelper, delinquencyBucket.getId());
-
             Assertions.assertNotNull(loanProductID);
             HashMap loanStatusHashMap;
-
             final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 March 2020");
-
             Assertions.assertNotNull(loanID);
-
             loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
-
             loanStatusHashMap = loanTransactionHelper.approveLoan("01 March 2020", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
-
             String loanDetails = loanTransactionHelper.getLoanDetails(requestSpec, responseSpec, loanID);
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID,
-                    JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID, JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.COB_DATE, LocalDate.of(2020, 3, 2));
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanID.longValue()));
             GetLoansLoanIdResponse loan = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanID);
-            ArrayList<GetDelinquencyTagHistoryResponse> loanDelinquencyTags = loanTransactionHelper.getLoanDelinquencyTags(requestSpec,
-                    responseSpec, loanID);
+            ArrayList<GetDelinquencyTagHistoryResponse> loanDelinquencyTags = loanTransactionHelper.getLoanDelinquencyTags(requestSpec, responseSpec, loanID);
             Assertions.assertTrue(loanDelinquencyTags.isEmpty());
             Assertions.assertEquals(LocalDate.of(2020, 3, 2), loan.getLastClosedBusinessDate());
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.COB_DATE, LocalDate.of(2020, 4, 4));
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanID.longValue()));
-
             loan = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanID);
             loanDelinquencyTags = loanTransactionHelper.getLoanDelinquencyTags(requestSpec, responseSpec, loanID);
             Assertions.assertEquals(LocalDate.of(2020, 4, 4), loan.getLastClosedBusinessDate());
             Assertions.assertEquals(1, loanDelinquencyTags.size());
             Assertions.assertEquals(LocalDate.of(2020, 4, 3), loanDelinquencyTags.get(0).getAddedOnDate());
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.COB_DATE, LocalDate.of(2020, 4, 10));
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanID.longValue()));
-
             loan = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanID);
             loanDelinquencyTags = loanTransactionHelper.getLoanDelinquencyTags(requestSpec, responseSpec, loanID);
             Assertions.assertEquals(LocalDate.of(2020, 4, 10), loan.getLastClosedBusinessDate());
@@ -236,60 +187,41 @@ public class InlineLoanCOBTest extends BaseLoanIntegrationTest {
             requestSpec.header("Authorization", "Basic " + Utils.loginIntoServerAndGetBase64EncodedAuthenticationKey());
             requestSpec.header("Fineract-Platform-TenantId", "default");
             responseSpec = new ResponseSpecBuilder().expectStatusCode(200).build();
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
     @Test
     public void testInlineCOBOnRepaymentWithSoftLockedLoan() {
         try {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, LocalDate.of(2020, 3, 2));
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.PENALTY_WAIT_PERIOD,
-                    new PutGlobalConfigurationsRequest().value(0L));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.PENALTY_WAIT_PERIOD, new PutGlobalConfigurationsRequest().value(0L));
             loanTransactionHelper = new LoanTransactionHelper(requestSpec, responseSpec);
-
             final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec);
             Assertions.assertNotNull(clientID);
-
-            Integer overdueFeeChargeId = ChargesHelper.createCharges(requestSpec, responseSpec,
-                    ChargesHelper.getLoanOverdueFeeJSONWithCalculationTypePercentage("1"));
+            Integer overdueFeeChargeId = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper.getLoanOverdueFeeJSONWithCalculationTypePercentage("1"));
             Assertions.assertNotNull(overdueFeeChargeId);
-
             final Integer loanProductID = createLoanProduct(overdueFeeChargeId.toString());
             Assertions.assertNotNull(loanProductID);
             HashMap loanStatusHashMap;
             final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 March 2020");
-
             Assertions.assertNotNull(loanID);
-
             loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
-
             loanStatusHashMap = loanTransactionHelper.approveLoan("01 March 2020", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
-
             String loanDetails = loanTransactionHelper.getLoanDetails(requestSpec, responseSpec, loanID);
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID,
-                    JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID, JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.COB_DATE, LocalDate.of(2020, 3, 2));
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanID.longValue()));
             GetLoansLoanIdResponse loan = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanID);
             Assertions.assertEquals(LocalDate.of(2020, 3, 2), loan.getLastClosedBusinessDate());
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, LocalDate.of(2020, 3, 10));
-
             requestSpec = UserHelper.getSimpleUserWithoutBypassPermission(requestSpec, responseSpec);
-
             loanTransactionHelper = new LoanTransactionHelper(requestSpec, responseSpec);
-
-            loanTransactionHelper.makeRepayment("10 March 2020", 10.0f, loanID);
-
+            loanTransactionHelper.makeRepayment("10 March 2020", 10.0F, loanID);
             loan = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanID);
             Assertions.assertEquals(LocalDate.of(2020, 3, 9), loan.getLastClosedBusinessDate());
         } finally {
@@ -297,58 +229,41 @@ public class InlineLoanCOBTest extends BaseLoanIntegrationTest {
             requestSpec.header("Authorization", "Basic " + Utils.loginIntoServerAndGetBase64EncodedAuthenticationKey());
             requestSpec.header("Fineract-Platform-TenantId", "default");
             responseSpec = new ResponseSpecBuilder().expectStatusCode(200).build();
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
     @Test
     public void testInlineCOBCatchUpOnRepaymentWithNotLockedLoan() {
         try {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, LocalDate.of(2020, 3, 2));
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.PENALTY_WAIT_PERIOD,
-                    new PutGlobalConfigurationsRequest().value(0L));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.PENALTY_WAIT_PERIOD, new PutGlobalConfigurationsRequest().value(0L));
             loanTransactionHelper = new LoanTransactionHelper(requestSpec, responseSpec);
-
             final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec);
             Assertions.assertNotNull(clientID);
-
-            Integer overdueFeeChargeId = ChargesHelper.createCharges(requestSpec, responseSpec,
-                    ChargesHelper.getLoanOverdueFeeJSONWithCalculationTypePercentage("1"));
+            Integer overdueFeeChargeId = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper.getLoanOverdueFeeJSONWithCalculationTypePercentage("1"));
             Assertions.assertNotNull(overdueFeeChargeId);
-
             final Integer loanProductID = createLoanProduct(overdueFeeChargeId.toString());
             Assertions.assertNotNull(loanProductID);
             HashMap loanStatusHashMap;
             final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 March 2020");
-
             Assertions.assertNotNull(loanID);
-
             loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
-
             loanStatusHashMap = loanTransactionHelper.approveLoan("01 March 2020", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
-
             String loanDetails = loanTransactionHelper.getLoanDetails(requestSpec, responseSpec, loanID);
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID,
-                    JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID, JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.COB_DATE, LocalDate.of(2020, 3, 2));
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanID.longValue()));
             GetLoansLoanIdResponse loan = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanID);
             Assertions.assertEquals(LocalDate.of(2020, 3, 2), loan.getLastClosedBusinessDate());
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, LocalDate.of(2020, 3, 10));
-
             requestSpec = UserHelper.getSimpleUserWithoutBypassPermission(requestSpec, responseSpec);
             loanTransactionHelper = new LoanTransactionHelper(requestSpec, responseSpec);
-
-            loanTransactionHelper.makeRepayment("10 March 2020", 10.0f, loanID);
-
+            loanTransactionHelper.makeRepayment("10 March 2020", 10.0F, loanID);
             loan = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanID);
             Assertions.assertEquals(LocalDate.of(2020, 3, 9), loan.getLastClosedBusinessDate());
         } finally {
@@ -356,68 +271,46 @@ public class InlineLoanCOBTest extends BaseLoanIntegrationTest {
             requestSpec.header("Authorization", "Basic " + Utils.loginIntoServerAndGetBase64EncodedAuthenticationKey());
             requestSpec.header("Fineract-Platform-TenantId", "default");
             responseSpec = new ResponseSpecBuilder().expectStatusCode(200).build();
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
     @Test
     public void testInlineCOBOnBatchAPIWithOldRelativeUrls() {
         try {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, LocalDate.of(2020, 3, 2));
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.PENALTY_WAIT_PERIOD,
-                    new PutGlobalConfigurationsRequest().value(0L));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.PENALTY_WAIT_PERIOD, new PutGlobalConfigurationsRequest().value(0L));
             loanTransactionHelper = new LoanTransactionHelper(requestSpec, responseSpec);
-
             final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec);
             Assertions.assertNotNull(clientID);
-
-            Integer overdueFeeChargeId = ChargesHelper.createCharges(requestSpec, responseSpec,
-                    ChargesHelper.getLoanOverdueFeeJSONWithCalculationTypePercentage("1"));
+            Integer overdueFeeChargeId = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper.getLoanOverdueFeeJSONWithCalculationTypePercentage("1"));
             Assertions.assertNotNull(overdueFeeChargeId);
-
             final Integer loanProductID = createLoanProduct(overdueFeeChargeId.toString());
             Assertions.assertNotNull(loanProductID);
             HashMap loanStatusHashMap;
             final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 March 2020");
-
             Assertions.assertNotNull(loanID);
-
             loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
-
             loanStatusHashMap = loanTransactionHelper.approveLoan("01 March 2020", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
-
             String loanDetails = loanTransactionHelper.getLoanDetails(requestSpec, responseSpec, loanID);
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID,
-                    JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID, JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.COB_DATE, LocalDate.of(2020, 3, 2));
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanID.longValue()));
             GetLoansLoanIdResponse loan = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanID);
             Assertions.assertEquals(LocalDate.of(2020, 3, 2), loan.getLastClosedBusinessDate());
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, LocalDate.of(2020, 3, 10));
-
             requestSpec = UserHelper.getSimpleUserWithoutBypassPermission(requestSpec, responseSpec);
             loanTransactionHelper = new LoanTransactionHelper(requestSpec, responseSpec);
-
             final BatchRequest br1 = BatchHelper.oldRepayLoanRequestWithGivenLoanId(4730L, loanID, "10", LocalDate.of(2020, 3, 10));
-
             final List<BatchRequest> batchRequests = new ArrayList<>();
-
             batchRequests.add(br1);
-
             final String jsonifiedRequest = BatchHelper.toJsonString(batchRequests);
-
-            final List<BatchResponse> response = BatchHelper.postBatchRequestsWithoutEnclosingTransaction(this.requestSpec,
-                    this.responseSpec, jsonifiedRequest);
+            final List<BatchResponse> response = BatchHelper.postBatchRequestsWithoutEnclosingTransaction(this.requestSpec, this.responseSpec, jsonifiedRequest);
             Assertions.assertEquals(HttpStatus.SC_OK, (long) response.get(0).getStatusCode(), "Verify Status Code 200 for Repayment");
-
             loan = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanID);
             Assertions.assertEquals(LocalDate.of(2020, 3, 9), loan.getLastClosedBusinessDate());
         } finally {
@@ -425,68 +318,46 @@ public class InlineLoanCOBTest extends BaseLoanIntegrationTest {
             requestSpec.header("Authorization", "Basic " + Utils.loginIntoServerAndGetBase64EncodedAuthenticationKey());
             requestSpec.header("Fineract-Platform-TenantId", "default");
             responseSpec = new ResponseSpecBuilder().expectStatusCode(200).build();
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
     @Test
     public void testInlineCOBOnBatchAPI() {
         try {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, LocalDate.of(2020, 3, 2));
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.PENALTY_WAIT_PERIOD,
-                    new PutGlobalConfigurationsRequest().value(0L));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.PENALTY_WAIT_PERIOD, new PutGlobalConfigurationsRequest().value(0L));
             loanTransactionHelper = new LoanTransactionHelper(requestSpec, responseSpec);
-
             final Integer clientID = ClientHelper.createClient(requestSpec, responseSpec);
             Assertions.assertNotNull(clientID);
-
-            Integer overdueFeeChargeId = ChargesHelper.createCharges(requestSpec, responseSpec,
-                    ChargesHelper.getLoanOverdueFeeJSONWithCalculationTypePercentage("1"));
+            Integer overdueFeeChargeId = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper.getLoanOverdueFeeJSONWithCalculationTypePercentage("1"));
             Assertions.assertNotNull(overdueFeeChargeId);
-
             final Integer loanProductID = createLoanProduct(overdueFeeChargeId.toString());
             Assertions.assertNotNull(loanProductID);
             HashMap loanStatusHashMap;
             final Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), null, "1 March 2020");
-
             Assertions.assertNotNull(loanID);
-
             loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(requestSpec, responseSpec, loanID);
             LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
-
             loanStatusHashMap = loanTransactionHelper.approveLoan("01 March 2020", loanID);
             LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
-
             String loanDetails = loanTransactionHelper.getLoanDetails(requestSpec, responseSpec, loanID);
-            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID,
-                    JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
+            loanStatusHashMap = loanTransactionHelper.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID, JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
             LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.COB_DATE, LocalDate.of(2020, 3, 2));
             inlineLoanCOBHelper.executeInlineCOB(List.of(loanID.longValue()));
             GetLoansLoanIdResponse loan = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanID);
             Assertions.assertEquals(LocalDate.of(2020, 3, 2), loan.getLastClosedBusinessDate());
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, LocalDate.of(2020, 3, 10));
-
             requestSpec = UserHelper.getSimpleUserWithoutBypassPermission(requestSpec, responseSpec);
             loanTransactionHelper = new LoanTransactionHelper(requestSpec, responseSpec);
-
             final BatchRequest br1 = BatchHelper.repayLoanRequestWithGivenLoanId(4730L, loanID, "10", LocalDate.of(2020, 3, 10));
-
             final List<BatchRequest> batchRequests = new ArrayList<>();
-
             batchRequests.add(br1);
-
             final String jsonifiedRequest = BatchHelper.toJsonString(batchRequests);
-
-            final List<BatchResponse> response = BatchHelper.postBatchRequestsWithoutEnclosingTransaction(this.requestSpec,
-                    this.responseSpec, jsonifiedRequest);
+            final List<BatchResponse> response = BatchHelper.postBatchRequestsWithoutEnclosingTransaction(this.requestSpec, this.responseSpec, jsonifiedRequest);
             Assertions.assertEquals(HttpStatus.SC_OK, (long) response.get(0).getStatusCode(), "Verify Status Code 200 for Repayment");
-
             loan = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanID);
             Assertions.assertEquals(LocalDate.of(2020, 3, 9), loan.getLastClosedBusinessDate());
         } finally {
@@ -494,8 +365,7 @@ public class InlineLoanCOBTest extends BaseLoanIntegrationTest {
             requestSpec.header("Authorization", "Basic " + Utils.loginIntoServerAndGetBase64EncodedAuthenticationKey());
             requestSpec.header("Fineract-Platform-TenantId", "default");
             responseSpec = new ResponseSpecBuilder().expectStatusCode(200).build();
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
@@ -509,10 +379,7 @@ public class InlineLoanCOBTest extends BaseLoanIntegrationTest {
     }
 
     private Integer createLoanProduct(final String chargeId) {
-        final String loanProductJSON = new LoanProductTestBuilder().withPrincipal("15,000.00").withNumberOfRepayments("4")
-                .withRepaymentAfterEvery("1").withRepaymentTypeAsMonth().withinterestRatePerPeriod("1")
-                .withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance()
-                .build(chargeId);
+        final String loanProductJSON = new LoanProductTestBuilder().withPrincipal("15,000.00").withNumberOfRepayments("4").withRepaymentAfterEvery("1").withRepaymentTypeAsMonth().withinterestRatePerPeriod("1").withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().build(chargeId);
         return this.loanTransactionHelper.getLoanProductId(loanProductJSON);
     }
 
@@ -522,21 +389,13 @@ public class InlineLoanCOBTest extends BaseLoanIntegrationTest {
     }
 
     private Integer applyForLoanApplication(final String clientID, final String loanProductID, final String savingsID, final String date) {
-
         List<HashMap> collaterals = new ArrayList<>();
         final Integer collateralId = CollateralManagementHelper.createCollateralProduct(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(collateralId);
-        final Integer clientCollateralId = CollateralManagementHelper.createClientCollateral(this.requestSpec, this.responseSpec, clientID,
-                collateralId);
+        final Integer clientCollateralId = CollateralManagementHelper.createClientCollateral(this.requestSpec, this.responseSpec, clientID, collateralId);
         Assertions.assertNotNull(clientCollateralId);
         addCollaterals(collaterals, clientCollateralId, BigDecimal.valueOf(1));
-
-        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("15,000.00").withLoanTermFrequency("4")
-                .withLoanTermFrequencyAsMonths().withNumberOfRepayments("4").withRepaymentEveryAfter("1")
-                .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("2").withAmortizationTypeAsEqualInstallments()
-                .withInterestTypeAsDecliningBalance().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate(date).withSubmittedOnDate(date).withCollaterals(collaterals)
-                .build(clientID, loanProductID, savingsID);
+        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("15,000.00").withLoanTermFrequency("4").withLoanTermFrequencyAsMonths().withNumberOfRepayments("4").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("2").withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate(date).withSubmittedOnDate(date).withCollaterals(collaterals).build(clientID, loanProductID, savingsID);
         return this.loanTransactionHelper.getLoanId(loanApplicationJSON);
     }
 

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.cob.workingcapitalloan;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.domain.LockOwner;
 import org.apache.fineract.cob.domain.LockingService;
 import org.apache.fineract.cob.service.RetrieveIdService;
@@ -26,11 +25,11 @@ import org.apache.fineract.cob.tasklet.ApplyCommonLockTasklet;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@Slf4j
 public class ApplyWorkingCapitalLoanLockTasklet extends ApplyCommonLockTasklet {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ApplyWorkingCapitalLoanLockTasklet.class);
 
-    public ApplyWorkingCapitalLoanLockTasklet(FineractProperties fineractProperties, LockingService loanLockingService,
-            RetrieveIdService retrieveIdService, TransactionTemplate requiresNewTransactionJdbcTemplate) {
+    public ApplyWorkingCapitalLoanLockTasklet(FineractProperties fineractProperties, LockingService loanLockingService, RetrieveIdService retrieveIdService, TransactionTemplate requiresNewTransactionJdbcTemplate) {
         super(fineractProperties, loanLockingService, retrieveIdService, requiresNewTransactionJdbcTemplate);
     }
 

@@ -20,25 +20,24 @@ package org.apache.fineract.portfolio.meeting.service;
 
 import java.util.Arrays;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.meeting.data.MeetingAttendanceEnumerations;
 import org.apache.fineract.portfolio.meeting.data.MeetingAttendanceType;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 @ConditionalOnMissingBean(value = MeetingAttendanceDropdownReadService.class, ignored = MeetingAttendanceDropdownReadServiceImpl.class)
 public class MeetingAttendanceDropdownReadServiceImpl implements MeetingAttendanceDropdownReadService {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MeetingAttendanceDropdownReadServiceImpl.class);
 
     @Override
     public List<EnumOptionData> retrieveAttendanceTypeOptions() {
-        return Arrays.stream(MeetingAttendanceType.values())
-                .filter(meetingAttendanceType -> !meetingAttendanceType.equals(MeetingAttendanceType.INVALID))
-                .map(MeetingAttendanceEnumerations::attendanceType).toList();
+        return Arrays.stream(MeetingAttendanceType.values()).filter(meetingAttendanceType -> !meetingAttendanceType.equals(MeetingAttendanceType.INVALID)).map(MeetingAttendanceEnumerations::attendanceType).toList();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public MeetingAttendanceDropdownReadServiceImpl() {
+    }
 }

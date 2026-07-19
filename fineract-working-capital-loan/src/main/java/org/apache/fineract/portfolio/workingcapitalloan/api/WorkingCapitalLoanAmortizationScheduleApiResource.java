@@ -30,7 +30,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.workingcapitalloan.data.ProjectedAmortizationScheduleData;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanAmortizationScheduleReadService;
 import org.springframework.stereotype.Component;
@@ -38,29 +37,27 @@ import org.springframework.stereotype.Component;
 @Path("/v1/working-capital-loans")
 @Component
 @Tag(name = "Working Capital Loans", description = "Working Capital Loan operations including projected amortization schedule.")
-@RequiredArgsConstructor
 public class WorkingCapitalLoanAmortizationScheduleApiResource {
-
     private final WorkingCapitalLoanAmortizationScheduleReadService readService;
 
     @GET
     @Path("{loanId}/amortization-schedule")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Projected Amortization Schedule", description = """
-            Returns the projected amortization schedule for a Working Capital Loan.
-
-            The schedule contains per-payment details including expected and actual payments, \
-            expected and actual balances, expected and actual amortization amounts, \
-            and expected and actual discount fee balances.
-
-            Example Request:
-
-            working-capital-loans/1/amortization-schedule""")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProjectedAmortizationScheduleData.class))),
-            @ApiResponse(responseCode = "404", description = "Working Capital Loan or schedule not found") })
-    public ProjectedAmortizationScheduleData retrieveAmortizationSchedule(
-            @PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
+        Returns the projected amortization schedule for a Working Capital Loan.
+        
+        The schedule contains per-payment details including expected and actual payments, expected and actual balances, expected and actual amortization amounts, and expected and actual discount fee balances.
+        
+        Example Request:
+        
+        working-capital-loans/1/amortization-schedule""")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProjectedAmortizationScheduleData.class))), @ApiResponse(responseCode = "404", description = "Working Capital Loan or schedule not found")})
+    public ProjectedAmortizationScheduleData retrieveAmortizationSchedule(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
         return readService.retrieveAmortizationSchedule(loanId);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanAmortizationScheduleApiResource(final WorkingCapitalLoanAmortizationScheduleReadService readService) {
+        this.readService = readService;
     }
 }

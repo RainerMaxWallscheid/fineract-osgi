@@ -23,7 +23,6 @@ import com.zaxxer.hikari.HikariPoolMXBean;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,17 +42,15 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * The {@link RoutingDataSourceService} is responsible for returning the appropriate {@link DataSource} for the tenant
  * of this request.
  */
-@Service(value = "dataSource")
+@Service("dataSource")
 @Primary
-@Slf4j
 public class RoutingDataSource extends AbstractDataSource {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RoutingDataSource.class);
     @Autowired
     private RoutingDataSourceServiceFactory dataSourceServiceFactory;
-
     @Value("${fineract.datasource.connection-checkout-diagnostics.enabled:false}")
     private boolean connectionCheckoutDiagnosticsEnabled;
-
     @Value("${fineract.datasource.connection-checkout-diagnostics.stack-depth:12}")
     private int connectionCheckoutDiagnosticsStackDepth;
 
@@ -91,17 +88,14 @@ public class RoutingDataSource extends AbstractDataSource {
         if (!connectionCheckoutDiagnosticsEnabled) {
             return;
         }
-        log.debug("Tenant datasource connection checkout: tenant={}, username={}, transaction={}, hikari={}, stack={}", tenant(),
-                username == null ? "<default>" : username, transactionState(), hikariState(targetDataSource), compactStack());
+        log.debug("Tenant datasource connection checkout: tenant={}, username={}, transaction={}, hikari={}, stack={}", tenant(), username == null ? "<default>" : username, transactionState(), hikariState(targetDataSource), compactStack());
     }
 
     private void logConnectionCheckoutFailure(DataSource targetDataSource, String username, SQLException exception) {
         if (!connectionCheckoutDiagnosticsEnabled) {
             return;
         }
-        log.warn("Tenant datasource connection checkout failed: tenant={}, username={}, transaction={}, hikari={}, error={}, stack={}",
-                tenant(), username == null ? "<default>" : username, transactionState(), hikariState(targetDataSource),
-                exception.getMessage(), compactStack());
+        log.warn("Tenant datasource connection checkout failed: tenant={}, username={}, transaction={}, hikari={}, error={}, stack={}", tenant(), username == null ? "<default>" : username, transactionState(), hikariState(targetDataSource), exception.getMessage(), compactStack());
     }
 
     private String tenant() {
@@ -116,10 +110,7 @@ public class RoutingDataSource extends AbstractDataSource {
     }
 
     private String transactionState() {
-        return "actualActive=" + TransactionSynchronizationManager.isActualTransactionActive() + ", synchronizationActive="
-                + TransactionSynchronizationManager.isSynchronizationActive() + ", readOnly="
-                + TransactionSynchronizationManager.isCurrentTransactionReadOnly() + ", name="
-                + TransactionSynchronizationManager.getCurrentTransactionName();
+        return "actualActive=" + TransactionSynchronizationManager.isActualTransactionActive() + ", synchronizationActive=" + TransactionSynchronizationManager.isSynchronizationActive() + ", readOnly=" + TransactionSynchronizationManager.isCurrentTransactionReadOnly() + ", name=" + TransactionSynchronizationManager.getCurrentTransactionName();
     }
 
     private String hikariState(DataSource targetDataSource) {
@@ -130,9 +121,7 @@ public class RoutingDataSource extends AbstractDataSource {
         if (poolMXBean == null) {
             return "poolName=" + hikariDataSource.getPoolName() + ", mxBean=<unavailable>";
         }
-        return "poolName=" + hikariDataSource.getPoolName() + ", total=" + poolMXBean.getTotalConnections() + ", active="
-                + poolMXBean.getActiveConnections() + ", idle=" + poolMXBean.getIdleConnections() + ", waiting="
-                + poolMXBean.getThreadsAwaitingConnection();
+        return "poolName=" + hikariDataSource.getPoolName() + ", total=" + poolMXBean.getTotalConnections() + ", active=" + poolMXBean.getActiveConnections() + ", idle=" + poolMXBean.getIdleConnections() + ", waiting=" + poolMXBean.getThreadsAwaitingConnection();
     }
 
     private String compactStack() {

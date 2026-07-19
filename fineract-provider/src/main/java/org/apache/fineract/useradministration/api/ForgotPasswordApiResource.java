@@ -30,26 +30,23 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.useradministration.service.ForgotPasswordService;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/password")
 @Component
 @Tag(name = "Password Management", description = "APIs for password management operations including forgot password functionality.")
-@RequiredArgsConstructor
 public class ForgotPasswordApiResource {
-
     private final ForgotPasswordService forgotPasswordService;
 
     @POST
     @Path("/forgot")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Request password reset", operationId = "forgotPassword", description = """
-            Requests a password reset for the user with the given email.
-            If the email exists and the user is active, a temporary password will be sent to the email address.
-            The temporary password expires in 1 hour.""")
+        Requests a password reset for the user with the given email.
+        If the email exists and the user is active, a temporary password will be sent to the email address.
+        The temporary password expires in 1 hour.""")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = ForgotPasswordRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK")
     public Response forgotPassword(final ForgotPasswordRequest request) {
@@ -57,6 +54,12 @@ public class ForgotPasswordApiResource {
         return Response.ok().build();
     }
 
+
     public record ForgotPasswordRequest(String email) {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ForgotPasswordApiResource(final ForgotPasswordService forgotPasswordService) {
+        this.forgotPasswordService = forgotPasswordService;
     }
 }

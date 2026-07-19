@@ -19,9 +19,7 @@
 package org.apache.fineract.command.jdbc;
 
 import static org.apache.fineract.command.core.CommandState.ERROR;
-
 import java.time.Instant;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.jdbc.store.domain.CommandRepository;
 import org.apache.fineract.command.jdbc.store.mapping.CommandMapper;
 import org.apache.fineract.command.test.CommandBaseTest;
@@ -33,14 +31,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
-@Slf4j
 @SpringBootTest
 @ContextConfiguration(classes = TestConfiguration.class)
 class CommandRepositoryTest extends CommandBaseTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CommandRepositoryTest.class);
     @Autowired
     protected CommandRepository commandRepository;
-
     @Autowired
     protected CommandMapper commandMapper;
 
@@ -49,7 +46,6 @@ class CommandRepositoryTest extends CommandBaseTest {
         var content = "hello";
         var command = new DummyCommand();
         var now = Instant.now();
-
         command.setPayload(DummyRequest.builder().content(content).build());
         command.setIdempotencyKey("1234567890");
         command.setIpAddress("127.0.0.1");
@@ -61,19 +57,13 @@ class CommandRepositoryTest extends CommandBaseTest {
         command.setExecutedByUsername("abc");
         command.setApprovedByUsername("abc");
         command.setRejectedByUsername("abc");
-
         var response = DummyResponse.builder().content(content).build();
-
         var commandEntity = commandMapper.map(command, response);
         commandEntity.setState(ERROR);
         commandEntity.setError("Some error message");
-
         var result = commandRepository.save(commandEntity);
-
         log.info("Saved command: {}", result);
-
         var found = commandRepository.findById(result.getId());
-
         log.info("Found command: {}", found.orElse(null));
     }
 }

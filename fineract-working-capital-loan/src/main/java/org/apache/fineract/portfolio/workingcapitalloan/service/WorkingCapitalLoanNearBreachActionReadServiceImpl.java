@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.workingcapitalloan.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanNearBreachActionData;
 import org.apache.fineract.portfolio.workingcapitalloan.exception.WorkingCapitalLoanNotFoundException;
 import org.apache.fineract.portfolio.workingcapitalloan.mapper.WorkingCapitalLoanNearBreachActionMapper;
@@ -29,10 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class WorkingCapitalLoanNearBreachActionReadServiceImpl implements WorkingCapitalLoanNearBreachActionReadService {
-
     private final WorkingCapitalLoanNearBreachActionRepository actionRepository;
     private final WorkingCapitalLoanRepository loanRepository;
     private final WorkingCapitalLoanNearBreachActionMapper mapper;
@@ -43,5 +40,12 @@ public class WorkingCapitalLoanNearBreachActionReadServiceImpl implements Workin
             throw new WorkingCapitalLoanNotFoundException(loanId);
         }
         return mapper.toDataList(actionRepository.findByWorkingCapitalLoanIdOrderByIdDesc(loanId));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanNearBreachActionReadServiceImpl(final WorkingCapitalLoanNearBreachActionRepository actionRepository, final WorkingCapitalLoanRepository loanRepository, final WorkingCapitalLoanNearBreachActionMapper mapper) {
+        this.actionRepository = actionRepository;
+        this.loanRepository = loanRepository;
+        this.mapper = mapper;
     }
 }

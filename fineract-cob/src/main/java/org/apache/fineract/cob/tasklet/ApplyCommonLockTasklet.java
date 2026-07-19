@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.converter.COBParameterConverter;
 import org.apache.fineract.cob.data.COBParameter;
 import org.apache.fineract.cob.domain.LockOwner;
@@ -44,13 +42,11 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@Slf4j
-@RequiredArgsConstructor
 public abstract class ApplyCommonLockTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ApplyCommonLockTasklet.class);
     private static final long NUMBER_OF_RETRIES = 3;
     private static final String APPLY_LOCK_ATTEMPTS = "apply-lock-attempts";
-
     private final FineractProperties fineractProperties;
     private final LockingService loanLockingService;
     private final RetrieveIdService retrieveIdService;
@@ -62,24 +58,19 @@ public abstract class ApplyCommonLockTasklet implements Tasklet {
 
     @Override
     @SuppressFBWarnings("SLF4J_SIGN_ONLY_FORMAT")
-    public RepeatStatus execute(@NonNull StepContribution contribution, @NonNull ChunkContext chunkContext)
-            throws LockCannotBeAppliedException {
+    public RepeatStatus execute(@NonNull StepContribution contribution, @NonNull ChunkContext chunkContext) throws LockCannotBeAppliedException {
         ExecutionContext executionContext = contribution.getStepExecution().getExecutionContext();
         COBParameter loanCOBParameter = COBParameterConverter.convert(executionContext.get(getCOBParameter()));
         boolean isCatchUp = CatchUpFlagResolver.resolve(contribution.getStepExecution());
         List<Long> loanIds;
-        if (Objects.isNull(loanCOBParameter)
-                || (Objects.isNull(loanCOBParameter.getMinAccountId()) && Objects.isNull(loanCOBParameter.getMaxAccountId()))
-                || (loanCOBParameter.getMinAccountId().equals(0L) && loanCOBParameter.getMaxAccountId().equals(0L))) {
+        if (Objects.isNull(loanCOBParameter) || (Objects.isNull(loanCOBParameter.getMinAccountId()) && Objects.isNull(loanCOBParameter.getMaxAccountId())) || (loanCOBParameter.getMinAccountId().equals(0L) && loanCOBParameter.getMaxAccountId().equals(0L))) {
             loanIds = Collections.emptyList();
         } else {
-            loanIds = new ArrayList<>(
-                    retrieveIdService.retrieveAllNonClosedLoansByLastClosedBusinessDateAndMinAndMaxLoanId(loanCOBParameter, isCatchUp));
+            loanIds = new ArrayList<>(retrieveIdService.retrieveAllNonClosedLoansByLastClosedBusinessDateAndMinAndMaxLoanId(loanCOBParameter, isCatchUp));
         }
         List<List<Long>> loanIdPartitions = Lists.partition(loanIds, getInClauseParameterSizeLimit());
         List<Long> alreadyLockedIds = new ArrayList<>();
         loanIdPartitions.forEach(partition -> alreadyLockedIds.addAll(loanLockingService.findLockIdsByLoanIdIn(partition)));
-
         List<Long> toBeProcessedLoanIds = new ArrayList<>(loanIds);
         toBeProcessedLoanIds.removeAll(alreadyLockedIds);
         try {
@@ -95,14 +86,12 @@ public abstract class ApplyCommonLockTasklet implements Tasklet {
                 return RepeatStatus.CONTINUABLE;
             }
         }
-
         executionContext.remove(getApplyLockAttemptsKey());
         return RepeatStatus.FINISHED;
     }
 
     private void applyLocks(List<Long> toBeProcessedLoanIds) {
         requiresNewTransactionJdbcTemplate.execute(new TransactionCallbackWithoutResult() {
-
             @Override
             protected void doInTransactionWithoutResult(@NonNull TransactionStatus status) {
                 log.info("Apply locks for {} by owner {}", toBeProcessedLoanIds, getLockOwner());
@@ -117,5 +106,13 @@ public abstract class ApplyCommonLockTasklet implements Tasklet {
 
     private String getApplyLockAttemptsKey() {
         return getCOBParameter() + "." + APPLY_LOCK_ATTEMPTS;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ApplyCommonLockTasklet(final FineractProperties fineractProperties, final LockingService loanLockingService, final RetrieveIdService retrieveIdService, final TransactionTemplate requiresNewTransactionJdbcTemplate) {
+        this.fineractProperties = fineractProperties;
+        this.loanLockingService = loanLockingService;
+        this.retrieveIdService = retrieveIdService;
+        this.requiresNewTransactionJdbcTemplate = requiresNewTransactionJdbcTemplate;
     }
 }

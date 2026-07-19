@@ -22,30 +22,38 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
-@Table(name = "c_external_service", uniqueConstraints = { @UniqueConstraint(columnNames = { "name" }, name = "name_UNIQUE") })
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
+@Table(name = "c_external_service", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"}, name = "name_UNIQUE")})
 public class ExternalService extends AbstractPersistableCustom<Long> {
-
     @Column(name = "name", length = 50)
     private String name;
 
     // @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy =
     // "externalServicePropertiesPK.externalService", orphanRemoval = true)
     // private Set<ExternalServicesProperties> values;
-
     public static ExternalService fromJson(final JsonCommand command) {
         final String name = command.stringValueOfParameterNamed("name");
         return new ExternalService().setName(name);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ExternalService setName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalService() {
     }
 }

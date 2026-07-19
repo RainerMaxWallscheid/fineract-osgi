@@ -18,26 +18,31 @@
  */
 package org.apache.fineract.test.data.datatable;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.test.support.EnumResolver;
 
-@RequiredArgsConstructor
-@Getter
 public enum DatatableColumnType {
-
-    STRING("string"), //
-    NUMBER("number"), //
-    BOOLEAN("boolean"), //
-    DECIMAL("decimal"), //
-    DATE("date"), //
-    DATETIME("datetime"), //
-    TEXT("text"), //
-    DROPDOWN("dropdown"); //
-
+    STRING("string"),  //
+    NUMBER("number"),  //
+    BOOLEAN("boolean"),  //
+    DECIMAL("decimal"),  //
+    DATE("date"),  //
+    DATETIME("datetime"),  //
+    TEXT("text"),  //
+    DROPDOWN("dropdown");
+    //
     private final String typeString;
 
     public static DatatableColumnType fromTypeString(String columnType) {
         return EnumResolver.from(DatatableColumnType.class, columnType, DatatableColumnType::getTypeString);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private DatatableColumnType(final String typeString) {
+        this.typeString = typeString;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getTypeString() {
+        return this.typeString;
     }
 }

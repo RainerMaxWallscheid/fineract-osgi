@@ -18,22 +18,16 @@
  */
 package org.apache.fineract.portfolio.workingcapitalloanproduct.domain;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.ApiFacingEnum;
 import org.springframework.util.StringUtils;
 
 /**
  * Amortization types for Working Capital Loan Product.
  */
-@Getter
-@RequiredArgsConstructor
 public enum WorkingCapitalAmortizationType implements ApiFacingEnum<WorkingCapitalAmortizationType> {
-
-    EIR(1, "EIR", "Effective Interest Rate"), //
+    EIR(1, "EIR", "Effective Interest Rate"),  //
     FLAT(2, "FLAT", "Flat") //
     ;
-
     private final Integer value;
     private final String code;
     private final String humanReadableName;
@@ -45,14 +39,12 @@ public enum WorkingCapitalAmortizationType implements ApiFacingEnum<WorkingCapit
         if (!StringUtils.hasText(amortizationTypeValue)) {
             return null;
         }
-
         if (amortizationTypeValue.trim().equalsIgnoreCase(EIR.name())) {
             return EIR;
         }
         if (amortizationTypeValue.trim().equalsIgnoreCase(FLAT.name())) {
             return FLAT;
         }
-
         return null;
     }
 
@@ -60,4 +52,25 @@ public enum WorkingCapitalAmortizationType implements ApiFacingEnum<WorkingCapit
         return this.equals(WorkingCapitalAmortizationType.EIR);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private WorkingCapitalAmortizationType(final Integer value, final String code, final String humanReadableName) {
+        this.value = value;
+        this.code = code;
+        this.humanReadableName = humanReadableName;
+    }
 }

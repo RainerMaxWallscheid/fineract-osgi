@@ -19,16 +19,13 @@
 package org.apache.fineract.portfolio.shareproducts.service;
 
 import com.google.gson.JsonElement;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.products.service.ProductCommandsService;
 import org.apache.fineract.portfolio.shareproducts.constants.ShareProductApiConstants;
 
-@RequiredArgsConstructor
 public class ShareProductCommandsServiceImpl implements ProductCommandsService {
-
     private final FromJsonHelper fromApiJsonHelper;
 
     public CommandProcessingResult postDividends(Long productId, JsonCommand jsonCommand) {
@@ -38,8 +35,7 @@ public class ShareProductCommandsServiceImpl implements ProductCommandsService {
     @Override
     public Object handleCommand(Long productId, String command, String jsonBody) {
         final JsonElement parsedCommand = this.fromApiJsonHelper.parse(jsonBody);
-        final JsonCommand jsonCommand = JsonCommand.from(jsonBody, parsedCommand, this.fromApiJsonHelper, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null);
+        final JsonCommand jsonCommand = JsonCommand.from(jsonBody, parsedCommand, this.fromApiJsonHelper, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         if (ShareProductApiConstants.PREIEW_DIVIDENDS_COMMAND_STRING.equals(command)) {
             return null;
         } else if (ShareProductApiConstants.POST_DIVIDENdS_COMMAND_STRING.equals(command)) {
@@ -49,4 +45,8 @@ public class ShareProductCommandsServiceImpl implements ProductCommandsService {
         return CommandProcessingResult.empty();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ShareProductCommandsServiceImpl(final FromJsonHelper fromApiJsonHelper) {
+        this.fromApiJsonHelper = fromApiJsonHelper;
+    }
 }

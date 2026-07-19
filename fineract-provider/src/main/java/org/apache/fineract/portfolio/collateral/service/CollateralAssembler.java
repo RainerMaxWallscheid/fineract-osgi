@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
@@ -38,21 +37,16 @@ import org.apache.fineract.portfolio.collateral.domain.LoanCollateral;
 import org.apache.fineract.portfolio.collateral.domain.LoanCollateralRepository;
 import org.apache.fineract.portfolio.collateral.exception.CollateralNotFoundException;
 
-@RequiredArgsConstructor
 public class CollateralAssembler {
-
     private final FromJsonHelper fromApiJsonHelper;
     private final CodeValueRepositoryWrapper codeValueRepository;
     private final CodeValueRepository codeValueRepositoryDirect;
     private final LoanCollateralRepository loanCollateralRepository;
 
     public Set<LoanCollateral> fromParsedJson(final JsonElement element) {
-
         final Set<LoanCollateral> collateralItems = new HashSet<>();
-
         if (element.isJsonObject()) {
             final JsonObject topLevelJsonElement = element.getAsJsonObject();
-
             if (topLevelJsonElement.has("collateral") && topLevelJsonElement.get("collateral").isJsonArray()) {
                 final JsonArray array = topLevelJsonElement.get("collateral").getAsJsonArray();
                 final Locale locale = this.fromApiJsonHelper.extractLocaleParameter(topLevelJsonElement);
@@ -60,12 +54,9 @@ public class CollateralAssembler {
                 for (int i = 0; i < array.size(); i++) {
                     collateralTypeIds.add(this.fromApiJsonHelper.extractLongNamed("type", array.get(i).getAsJsonObject()));
                 }
-                Map<Long, CodeValue> codeValueMap = this.codeValueRepositoryDirect.findAllById(collateralTypeIds).stream()
-                        .collect(Collectors.toMap(CodeValue::getId, Function.identity()));
+                Map<Long, CodeValue> codeValueMap = this.codeValueRepositoryDirect.findAllById(collateralTypeIds).stream().collect(Collectors.toMap(CodeValue::getId, Function.identity()));
                 for (int i = 0; i < array.size(); i++) {
-
                     final JsonObject collateralItemElement = array.get(i).getAsJsonObject();
-
                     final Long id = this.fromApiJsonHelper.extractLongNamed("id", collateralItemElement);
                     final Long collateralTypeId = this.fromApiJsonHelper.extractLongNamed("type", collateralItemElement);
                     final CodeValue collateralType = codeValueMap.get(collateralTypeId);
@@ -74,12 +65,10 @@ public class CollateralAssembler {
                     }
                     final String description = this.fromApiJsonHelper.extractStringNamed("description", collateralItemElement);
                     final BigDecimal value = this.fromApiJsonHelper.extractBigDecimalNamed("value", collateralItemElement, locale);
-
                     if (id == null) {
                         collateralItems.add(LoanCollateral.from(collateralType, value, description));
                     } else {
-                        final LoanCollateral loanCollateralItem = this.loanCollateralRepository.findById(id)
-                                .orElseThrow(() -> new CollateralNotFoundException(id));
+                        final LoanCollateral loanCollateralItem = this.loanCollateralRepository.findById(id).orElseThrow(() -> new CollateralNotFoundException(id));
                         loanCollateralItem.assembleFrom(collateralType, value, description);
                         collateralItems.add(loanCollateralItem);
                     }
@@ -87,9 +76,15 @@ public class CollateralAssembler {
             } else {
                 // no collaterals passed, use existing ones against loan
             }
-
         }
-
         return collateralItems;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CollateralAssembler(final FromJsonHelper fromApiJsonHelper, final CodeValueRepositoryWrapper codeValueRepository, final CodeValueRepository codeValueRepositoryDirect, final LoanCollateralRepository loanCollateralRepository) {
+        this.fromApiJsonHelper = fromApiJsonHelper;
+        this.codeValueRepository = codeValueRepository;
+        this.codeValueRepositoryDirect = codeValueRepositoryDirect;
+        this.loanCollateralRepository = loanCollateralRepository;
     }
 }

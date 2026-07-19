@@ -18,21 +18,32 @@
  */
 package org.apache.fineract.investor.domain;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
-@Getter
 public class ExternalAssetOwnerLoanProductAttribute implements AttributeKey {
-
-    public static final ExternalAssetOwnerLoanProductAttribute TOTAL_OUTSTANDING_INTEREST_STRATEGY = new ExternalAssetOwnerLoanProductAttribute(
-            "OUTSTANDING_INTEREST_STRATEGY", "TOTAL_OUTSTANDING",
-            "During external owner transfer the total (due + not yet due + projected) interest participate");
-    public static final ExternalAssetOwnerLoanProductAttribute PAYABLE_OUTSTANDING_INTEREST_STRATEGY = new ExternalAssetOwnerLoanProductAttribute(
-            "OUTSTANDING_INTEREST_STRATEGY", "PAYABLE_OUTSTANDING",
-            "During external owner transfer the total (due + not yet due) interest participate");
-
+    public static final ExternalAssetOwnerLoanProductAttribute TOTAL_OUTSTANDING_INTEREST_STRATEGY = new ExternalAssetOwnerLoanProductAttribute("OUTSTANDING_INTEREST_STRATEGY", "TOTAL_OUTSTANDING", "During external owner transfer the total (due + not yet due + projected) interest participate");
+    public static final ExternalAssetOwnerLoanProductAttribute PAYABLE_OUTSTANDING_INTEREST_STRATEGY = new ExternalAssetOwnerLoanProductAttribute("OUTSTANDING_INTEREST_STRATEGY", "PAYABLE_OUTSTANDING", "During external owner transfer the total (due + not yet due) interest participate");
     private final String key;
     private final String value;
     private final String description;
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnerLoanProductAttribute(final String key, final String value, final String description) {
+        this.key = key;
+        this.value = value;
+        this.description = description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getKey() {
+        return this.key;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
 }

@@ -22,17 +22,12 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 
-@Getter
-@Setter
 public class InteropTransactionsData extends CommandProcessingResult {
-
     List<InteropTransactionData> transactions;
 
     public InteropTransactionsData(Long entityId, List<InteropTransactionData> transactions) {
@@ -44,11 +39,20 @@ public class InteropTransactionsData extends CommandProcessingResult {
         if (account == null) {
             return null;
         }
-
         List<InteropTransactionData> trans = account.getTransactions().stream().filter(filter).sorted((t1, t2) -> {
             int i = DateUtils.compare(t2.getDateOf(), t1.getDateOf());
             return i != 0 ? i : Long.signum(t2.getId() - t1.getId());
         }).map(InteropTransactionData::build).collect(Collectors.toList());
         return new InteropTransactionsData(account.getId(), trans);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<InteropTransactionData> getTransactions() {
+        return this.transactions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setTransactions(final List<InteropTransactionData> transactions) {
+        this.transactions = transactions;
     }
 }

@@ -26,7 +26,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Exception with multiple root causes.
@@ -45,9 +44,9 @@ import lombok.extern.slf4j.Slf4j;
  *
  * @author Michael Vorburger.ch (mike at vorburger.ch)
  */
-@Slf4j
 public class MultiException extends Exception {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MultiException.class);
     private final List<Throwable> throwables;
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")

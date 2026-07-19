@@ -20,7 +20,6 @@ package org.apache.fineract.infrastructure.instancemode.filter;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.fineract.infrastructure.instancemode.filter.FineractInstanceModeApiFilter.ExceptionListItem.item;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,32 +28,21 @@ import jakarta.ws.rs.HttpMethod;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Function;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@RequiredArgsConstructor
 public class FineractInstanceModeApiFilter extends OncePerRequestFilter {
-
-    private static final List<ExceptionListItem> EXCEPTION_LIST = List.of(
-            item(FineractProperties.FineractModeProperties::isBatchManagerEnabled, pi -> pi.startsWith("/v1/jobs")),
-            item(FineractProperties.FineractModeProperties::isBatchManagerEnabled, pi -> pi.startsWith("/v1/scheduler")),
-            item(FineractProperties.FineractModeProperties::isBatchManagerEnabled, pi -> pi.startsWith("/v1/loans/catch-up")),
-            item(FineractProperties.FineractModeProperties::isBatchManagerEnabled, pi -> pi.startsWith("/v1/loans/is-catch-up-running")),
-            item(p -> true, pi -> pi.startsWith("/v1/instance-mode")),
-            // Batches with all GET requests need to be allowed in read-only instances, hence this check will be
-            // moved
-            // under the Api Resource.
-            item(p -> true, pi -> pi.startsWith("/v1/batches")));
-
+    private static final List<ExceptionListItem> EXCEPTION_LIST = List.of(item(FineractProperties.FineractModeProperties::isBatchManagerEnabled, pi -> pi.startsWith("/v1/jobs")), item(FineractProperties.FineractModeProperties::isBatchManagerEnabled, pi -> pi.startsWith("/v1/scheduler")), item(FineractProperties.FineractModeProperties::isBatchManagerEnabled, pi -> pi.startsWith("/v1/loans/catch-up")), item(FineractProperties.FineractModeProperties::isBatchManagerEnabled, pi -> pi.startsWith("/v1/loans/is-catch-up-running")), item(p -> true, pi -> pi.startsWith("/v1/instance-mode")), 
+    // Batches with all GET requests need to be allowed in read-only instances, hence this check will be
+    // moved
+    // under the Api Resource.
+    item(p -> true, pi -> pi.startsWith("/v1/batches")));
     private final FineractProperties fineractProperties;
 
     @Override
-    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
         if (isOnExceptionList(request) || isActuatorApi(request)) {
             proceed(filterChain, request, response);
         } else {
@@ -79,8 +67,7 @@ public class FineractInstanceModeApiFilter extends OncePerRequestFilter {
         return request.getServletPath().startsWith("/actuator");
     }
 
-    private void proceed(FilterChain filterChain, HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+    private void proceed(FilterChain filterChain, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         filterChain.doFilter(request, response);
     }
 
@@ -101,24 +88,41 @@ public class FineractInstanceModeApiFilter extends OncePerRequestFilter {
         if (isBlank(request.getPathInfo())) {
             return false;
         }
-        return EXCEPTION_LIST.stream().anyMatch(
-                item -> item.getModeFunction().apply(fineractProperties.getMode()) && item.getPathFunction().apply(request.getPathInfo()));
+        return EXCEPTION_LIST.stream().anyMatch(item -> item.getModeFunction().apply(fineractProperties.getMode()) && item.getPathFunction().apply(request.getPathInfo()));
     }
 
     private boolean isReadMethod(HttpServletRequest request) {
         return HttpMethod.GET.equals(request.getMethod());
     }
 
-    @RequiredArgsConstructor
-    @Getter
-    static class ExceptionListItem {
 
+    static class ExceptionListItem {
         private final Function<FineractProperties.FineractModeProperties, Boolean> modeFunction;
         private final Function<String, Boolean> pathFunction;
 
-        public static ExceptionListItem item(Function<FineractProperties.FineractModeProperties, Boolean> modeFunction,
-                Function<String, Boolean> pathFunction) {
+        public static ExceptionListItem item(Function<FineractProperties.FineractModeProperties, Boolean> modeFunction, Function<String, Boolean> pathFunction) {
             return new ExceptionListItem(modeFunction, pathFunction);
         }
+
+        @java.lang.SuppressWarnings("all")
+                public ExceptionListItem(final Function<FineractProperties.FineractModeProperties, Boolean> modeFunction, final Function<String, Boolean> pathFunction) {
+            this.modeFunction = modeFunction;
+            this.pathFunction = pathFunction;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public Function<FineractProperties.FineractModeProperties, Boolean> getModeFunction() {
+            return this.modeFunction;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public Function<String, Boolean> getPathFunction() {
+            return this.pathFunction;
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FineractInstanceModeApiFilter(final FineractProperties fineractProperties) {
+        this.fineractProperties = fineractProperties;
     }
 }

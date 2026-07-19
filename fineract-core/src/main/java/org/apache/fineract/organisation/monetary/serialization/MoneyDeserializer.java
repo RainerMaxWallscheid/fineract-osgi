@@ -24,21 +24,22 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import java.lang.reflect.Type;
 import java.math.MathContext;
-import lombok.AllArgsConstructor;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 
-@AllArgsConstructor
 @Deprecated(forRemoval = true)
 public class MoneyDeserializer implements JsonDeserializer<Money> {
-
     private final MathContext mc;
     private final MonetaryCurrency currency;
 
     @Override
-    public Money deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext)
-            throws JsonParseException {
+    public Money deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         return Money.of(currency, jsonElement.getAsBigDecimal(), mc);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public MoneyDeserializer(final MathContext mc, final MonetaryCurrency currency) {
+        this.mc = mc;
+        this.currency = currency;
+    }
 }

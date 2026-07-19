@@ -19,15 +19,38 @@
 package org.apache.fineract.test.messaging;
 
 import java.time.LocalDate;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-@Getter
 public class EventMessage<T> {
-
     private final String type;
     private final LocalDate businessDate;
     private final T data;
     private final String idempotencyKey;
+
+    @java.lang.SuppressWarnings("all")
+        public EventMessage(final String type, final LocalDate businessDate, final T data, final String idempotencyKey) {
+        this.type = type;
+        this.businessDate = businessDate;
+        this.data = data;
+        this.idempotencyKey = idempotencyKey;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getType() {
+        return this.type;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getBusinessDate() {
+        return this.businessDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public T getData() {
+        return this.data;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getIdempotencyKey() {
+        return this.idempotencyKey;
+    }
 }

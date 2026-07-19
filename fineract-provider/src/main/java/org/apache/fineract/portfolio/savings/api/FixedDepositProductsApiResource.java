@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.common.AccountingDropdownReadPlatformService;
 import org.apache.fineract.accounting.common.AccountingEnumerations;
 import org.apache.fineract.accounting.common.AccountingRuleType;
@@ -87,14 +86,12 @@ import org.springframework.util.CollectionUtils;
 @Path("/v1/fixeddepositproducts")
 @Component
 @Tag(name = "Fixed Deposit Product", description = """
-        This is one of the advanced term deposit product offered by MFI's. The Fixed Deposit Products (aka FD) product offerings are modeled using this API.
-
-        The FD products are deposit accounts which are held for a fixed term – like 1 year, 2 years etc.
-
-        When creating fixed deposit accounts, the details from the fixed deposit product are used to auto fill details of the fixed deposit account application process.""")
-@RequiredArgsConstructor
+    This is one of the advanced term deposit product offered by MFI\'s. The Fixed Deposit Products (aka FD) product offerings are modeled using this API.
+    
+    The FD products are deposit accounts which are held for a fixed term – like 1 year, 2 years etc.
+    
+    When creating fixed deposit accounts, the details from the fixed deposit product are used to auto fill details of the fixed deposit account application process.""")
 public class FixedDepositProductsApiResource {
-
     private final DepositProductReadPlatformService depositProductReadPlatformService;
     private final SavingsDropdownReadPlatformService savingsDropdownReadPlatformService;
     private final CurrencyReadPlatformService currencyReadPlatformService;
@@ -113,244 +110,180 @@ public class FixedDepositProductsApiResource {
     private final TaxReadPlatformService taxReadPlatformService;
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create a Fixed Deposit Product", operationId = "createFixedDepositProduct", description = """
-            Creates a Fixed Deposit Product
-
-            Mandatory Fields: name, shortName, description, currencyCode, digitsAfterDecimal,inMultiplesOf, interestCompoundingPeriodType, interestCalculationType, interestCalculationDaysInYearType, minDepositTerm, minDepositTermTypeId, accountingRule
-
-            Optional Fields: lockinPeriodFrequency, lockinPeriodFrequencyType, maxDepositTerm, maxDepositTermTypeId, inMultiplesOfDepositTerm, inMultiplesOfDepositTermTypeId, preClosurePenalApplicable, preClosurePenalInterest, preClosurePenalInterestOnTypeId, feeToIncomeAccountMappings, penaltyToIncomeAccountMappings, charges, charts, , withHoldTax, taxGroupId
-
-
-            Mandatory Fields for Cash based accounting (accountingRule = 2): savingsReferenceAccountId, savingsControlAccountId, interestOnSavingsAccountId, incomeFromFeeAccountId, transfersInSuspenseAccountId, incomeFromPenaltyAccountId""")
+        Creates a Fixed Deposit Product
+        
+        Mandatory Fields: name, shortName, description, currencyCode, digitsAfterDecimal,inMultiplesOf, interestCompoundingPeriodType, interestCalculationType, interestCalculationDaysInYearType, minDepositTerm, minDepositTermTypeId, accountingRule
+        
+        Optional Fields: lockinPeriodFrequency, lockinPeriodFrequencyType, maxDepositTerm, maxDepositTermTypeId, inMultiplesOfDepositTerm, inMultiplesOfDepositTermTypeId, preClosurePenalApplicable, preClosurePenalInterest, preClosurePenalInterestOnTypeId, feeToIncomeAccountMappings, penaltyToIncomeAccountMappings, charges, charts, , withHoldTax, taxGroupId
+        
+        
+        Mandatory Fields for Cash based accounting (accountingRule = 2): savingsReferenceAccountId, savingsControlAccountId, interestOnSavingsAccountId, incomeFromFeeAccountId, transfersInSuspenseAccountId, incomeFromPenaltyAccountId""")
     @AlternativeOperationId("create_11")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = FixedDepositProductsApiResourceSwagger.PostFixedDepositProductsRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = FixedDepositProductsApiResourceSwagger.PostFixedDepositProductsResponse.class)))
     public String create(@Parameter(hidden = true) final String apiRequestBodyAsJson) {
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createFixedDepositProduct().withJson(apiRequestBodyAsJson)
-                .build();
-
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createFixedDepositProduct().withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 
     @PUT
     @Path("{productId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a Fixed Deposit Product", operationId = "updateFixedDepositProduct", description = "Updates a Fixed Deposit Product")
     @AlternativeOperationId("update_17")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = FixedDepositProductsApiResourceSwagger.PutFixedDepositProductsProductIdRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = FixedDepositProductsApiResourceSwagger.PutFixedDepositProductsProductIdResponse.class)))
-    public String update(@PathParam("productId") @Parameter(description = "productId") final Long productId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateFixedDepositProduct(productId)
-                .withJson(apiRequestBodyAsJson).build();
-
+    public String update(@PathParam("productId") @Parameter(description = "productId") final Long productId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateFixedDepositProduct(productId).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
-
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "List Fixed Deposit Products", operationId = "retrieveAllFixedDepositProducts", description = """
-            Lists Fixed Deposit Products
-
-            Example Requests:
-
-            fixeddepositproducts
-
-
-            fixeddepositproducts?fields=name""")
+        Lists Fixed Deposit Products
+        
+        Example Requests:
+        
+        fixeddepositproducts
+        
+        
+        fixeddepositproducts?fields=name""")
     @AlternativeOperationId("retrieveAll_30")
-
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = FixedDepositProductsApiResourceSwagger.GetFixedDepositProductsResponse.class))))
     public String retrieveAll(@Context final UriInfo uriInfo) {
-
         this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESOURCE_NAME);
-
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-        final Collection<FixedDepositProductData> products = (Collection) this.depositProductReadPlatformService
-                .retrieveAll(DepositAccountType.FIXED_DEPOSIT);
-
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        final Collection<FixedDepositProductData> products = (Collection) this.depositProductReadPlatformService.retrieveAll(DepositAccountType.FIXED_DEPOSIT);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, products, DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESPONSE_DATA_PARAMETERS);
     }
 
     @GET
     @Path("{productId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve a Fixed Deposit Product", operationId = "retrieveOneFixedDepositProduct", description = """
-            Retrieves a Fixed Deposit Product
-
-            Example Requests:
-
-            fixeddepositproducts/1
-
-
-            fixeddepositproducts/1?template=true
-
-
-            fixeddepositproducts/1?fields=name,description""")
+        Retrieves a Fixed Deposit Product
+        
+        Example Requests:
+        
+        fixeddepositproducts/1
+        
+        
+        fixeddepositproducts/1?template=true
+        
+        
+        fixeddepositproducts/1?fields=name,description""")
     @AlternativeOperationId("retrieveOne_20")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = FixedDepositProductsApiResourceSwagger.GetFixedDepositProductsProductIdResponse.class)))
-    public String retrieveOne(@PathParam("productId") @Parameter(description = "productId") final Long productId,
-            @Context final UriInfo uriInfo) {
-
+    public String retrieveOne(@PathParam("productId") @Parameter(description = "productId") final Long productId, @Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESOURCE_NAME);
-
-        FixedDepositProductData fixedDepositProductData = (FixedDepositProductData) this.depositProductReadPlatformService
-                .retrieveOne(DepositAccountType.FIXED_DEPOSIT, productId);
-
+        FixedDepositProductData fixedDepositProductData = (FixedDepositProductData) this.depositProductReadPlatformService.retrieveOne(DepositAccountType.FIXED_DEPOSIT, productId);
         final Collection<ChargeData> charges = this.chargeReadPlatformService.retrieveSavingsProductCharges(productId);
         fixedDepositProductData = FixedDepositProductData.withCharges(fixedDepositProductData, charges);
-
         final Collection<InterestRateChartData> charts = this.chartReadPlatformService.retrieveAllWithSlabsWithTemplate(productId);
         fixedDepositProductData = FixedDepositProductData.withInterestChart(fixedDepositProductData, charts);
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-
         if (fixedDepositProductData.hasAccountingEnabled()) {
-            final Map<String, Object> accountingMappings = this.accountMappingReadPlatformService
-                    .fetchAccountMappingDetailsForSavingsProduct(productId, fixedDepositProductData.accountingRuleTypeId());
-            final Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings = this.accountMappingReadPlatformService
-                    .fetchPaymentTypeToFundSourceMappingsForSavingsProduct(productId);
-            Collection<ChargeToGLAccountMapper> feeToGLAccountMappings = this.accountMappingReadPlatformService
-                    .fetchFeeToIncomeAccountMappingsForSavingsProduct(productId);
-            Collection<ChargeToGLAccountMapper> penaltyToGLAccountMappings = this.accountMappingReadPlatformService
-                    .fetchPenaltyToIncomeAccountMappingsForSavingsProduct(productId);
-            fixedDepositProductData = FixedDepositProductData.withAccountingDetails(fixedDepositProductData, accountingMappings,
-                    paymentChannelToFundSourceMappings, feeToGLAccountMappings, penaltyToGLAccountMappings);
+            final Map<String, Object> accountingMappings = this.accountMappingReadPlatformService.fetchAccountMappingDetailsForSavingsProduct(productId, fixedDepositProductData.accountingRuleTypeId());
+            final Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings = this.accountMappingReadPlatformService.fetchPaymentTypeToFundSourceMappingsForSavingsProduct(productId);
+            Collection<ChargeToGLAccountMapper> feeToGLAccountMappings = this.accountMappingReadPlatformService.fetchFeeToIncomeAccountMappingsForSavingsProduct(productId);
+            Collection<ChargeToGLAccountMapper> penaltyToGLAccountMappings = this.accountMappingReadPlatformService.fetchPenaltyToIncomeAccountMappingsForSavingsProduct(productId);
+            fixedDepositProductData = FixedDepositProductData.withAccountingDetails(fixedDepositProductData, accountingMappings, paymentChannelToFundSourceMappings, feeToGLAccountMappings, penaltyToGLAccountMappings);
         }
-
         if (settings.isTemplate()) {
             fixedDepositProductData = handleTemplateRelatedData(fixedDepositProductData);
         }
-
-        return this.toApiJsonSerializer.serialize(settings, fixedDepositProductData,
-                DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESPONSE_DATA_PARAMETERS);
+        return this.toApiJsonSerializer.serialize(settings, fixedDepositProductData, DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESPONSE_DATA_PARAMETERS);
     }
 
     @GET
     @Path("template")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Fixed Deposit Product Template", operationId = "retrieveTemplateFixedDepositProduct")
     @AlternativeOperationId("retrieveTemplate_15")
     public String retrieveTemplate(@Context final UriInfo uriInfo) {
-
         this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESOURCE_NAME);
-
         final FixedDepositProductData fixedDepositProduct = handleTemplateRelatedData(null);
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.toApiJsonSerializer.serialize(settings, fixedDepositProduct,
-                DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESPONSE_DATA_PARAMETERS);
+        return this.toApiJsonSerializer.serialize(settings, fixedDepositProduct, DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESPONSE_DATA_PARAMETERS);
     }
 
     private FixedDepositProductData handleTemplateRelatedData(final FixedDepositProductData savingsProduct) {
-
-        final EnumOptionData interestCompoundingPeriodType = SavingsEnumerations
-                .compoundingInterestPeriodType(SavingsCompoundingInterestPeriodType.DAILY);
-
-        final EnumOptionData interestPostingPeriodType = SavingsEnumerations
-                .interestPostingPeriodType(SavingsPostingInterestPeriodType.MONTHLY);
-
-        final EnumOptionData interestCalculationType = SavingsEnumerations
-                .interestCalculationType(SavingsInterestCalculationType.DAILY_BALANCE);
-
-        final EnumOptionData interestCalculationDaysInYearType = SavingsEnumerations
-                .interestCalculationDaysInYearType(SavingsInterestCalculationDaysInYearType.DAYS_365);
-
+        final EnumOptionData interestCompoundingPeriodType = SavingsEnumerations.compoundingInterestPeriodType(SavingsCompoundingInterestPeriodType.DAILY);
+        final EnumOptionData interestPostingPeriodType = SavingsEnumerations.interestPostingPeriodType(SavingsPostingInterestPeriodType.MONTHLY);
+        final EnumOptionData interestCalculationType = SavingsEnumerations.interestCalculationType(SavingsInterestCalculationType.DAILY_BALANCE);
+        final EnumOptionData interestCalculationDaysInYearType = SavingsEnumerations.interestCalculationDaysInYearType(SavingsInterestCalculationDaysInYearType.DAYS_365);
         final EnumOptionData accountingRule = AccountingEnumerations.accountingRuleType(AccountingRuleType.NONE);
-
         CurrencyData currency = CurrencyData.blank();
         final Collection<CurrencyData> currencyOptions = this.currencyReadPlatformService.retrieveAllowedCurrencies();
         if (currencyOptions.size() == 1) {
             currency = new ArrayList<>(currencyOptions).get(0);
         }
-
-        final Collection<EnumOptionData> interestCompoundingPeriodTypeOptions = this.savingsDropdownReadPlatformService
-                .retrieveCompoundingInterestPeriodTypeOptions();
-
-        final Collection<EnumOptionData> interestPostingPeriodTypeOptions = this.savingsDropdownReadPlatformService
-                .retrieveInterestPostingPeriodTypeOptions();
-
-        final Collection<EnumOptionData> interestCalculationTypeOptions = this.savingsDropdownReadPlatformService
-                .retrieveInterestCalculationTypeOptions();
-
-        final Collection<EnumOptionData> interestCalculationDaysInYearTypeOptions = this.savingsDropdownReadPlatformService
-                .retrieveInterestCalculationDaysInYearTypeOptions();
-
-        final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = this.savingsDropdownReadPlatformService
-                .retrieveLockinPeriodFrequencyTypeOptions();
-
-        final Collection<EnumOptionData> withdrawalFeeTypeOptions = this.savingsDropdownReadPlatformService
-                .retrievewithdrawalFeeTypeOptions();
-
+        final Collection<EnumOptionData> interestCompoundingPeriodTypeOptions = this.savingsDropdownReadPlatformService.retrieveCompoundingInterestPeriodTypeOptions();
+        final Collection<EnumOptionData> interestPostingPeriodTypeOptions = this.savingsDropdownReadPlatformService.retrieveInterestPostingPeriodTypeOptions();
+        final Collection<EnumOptionData> interestCalculationTypeOptions = this.savingsDropdownReadPlatformService.retrieveInterestCalculationTypeOptions();
+        final Collection<EnumOptionData> interestCalculationDaysInYearTypeOptions = this.savingsDropdownReadPlatformService.retrieveInterestCalculationDaysInYearTypeOptions();
+        final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = this.savingsDropdownReadPlatformService.retrieveLockinPeriodFrequencyTypeOptions();
+        final Collection<EnumOptionData> withdrawalFeeTypeOptions = this.savingsDropdownReadPlatformService.retrievewithdrawalFeeTypeOptions();
         final Collection<PaymentTypeData> paymentTypeOptions = this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
-
-        final Collection<EnumOptionData> accountingRuleOptions = this.accountingDropdownReadPlatformService
-                .retrieveAccountingRuleTypeOptions();
-
-        final Map<String, List<GLAccountData>> accountingMappingOptions = this.accountingDropdownReadPlatformService
-                .retrieveAccountMappingOptionsForSavingsProducts();
-
-        final Collection<EnumOptionData> preClosurePenalInterestOnTypeOptions = this.depositsDropdownReadPlatformService
-                .retrievePreClosurePenalInterestOnTypeOptions();
-
+        final Collection<EnumOptionData> accountingRuleOptions = this.accountingDropdownReadPlatformService.retrieveAccountingRuleTypeOptions();
+        final Map<String, List<GLAccountData>> accountingMappingOptions = this.accountingDropdownReadPlatformService.retrieveAccountMappingOptionsForSavingsProducts();
+        final Collection<EnumOptionData> preClosurePenalInterestOnTypeOptions = this.depositsDropdownReadPlatformService.retrievePreClosurePenalInterestOnTypeOptions();
         final Collection<EnumOptionData> periodFrequencyTypeOptions = this.dropdownReadPlatformService.retrievePeriodFrequencyTypeOptions();
-
         // charges
         final boolean feeChargesOnly = true;
         Collection<ChargeData> chargeOptions = this.chargeReadPlatformService.retrieveSavingsProductApplicableCharges(feeChargesOnly);
         chargeOptions = CollectionUtils.isEmpty(chargeOptions) ? null : chargeOptions;
-
         Collection<ChargeData> penaltyOptions = this.chargeReadPlatformService.retrieveSavingsApplicablePenalties();
         penaltyOptions = CollectionUtils.isEmpty(penaltyOptions) ? null : penaltyOptions;
-
         final Collection<TaxGroupData> taxGroupOptions = this.taxReadPlatformService.retrieveTaxGroupsForLookUp();
-
         // interest rate chart template
         final InterestRateChartData chartTemplate = this.interestRateChartReadPlatformService.template();
-
         FixedDepositProductData fixedDepositProductToReturn = null;
         if (savingsProduct != null) {
-            fixedDepositProductToReturn = FixedDepositProductData.withTemplate(savingsProduct, currencyOptions,
-                    interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions,
-                    interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions,
-                    paymentTypeOptions, accountingRuleOptions, accountingMappingOptions, chargeOptions, penaltyOptions, chartTemplate,
-                    preClosurePenalInterestOnTypeOptions, periodFrequencyTypeOptions, taxGroupOptions);
+            fixedDepositProductToReturn = FixedDepositProductData.withTemplate(savingsProduct, currencyOptions, interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, paymentTypeOptions, accountingRuleOptions, accountingMappingOptions, chargeOptions, penaltyOptions, chartTemplate, preClosurePenalInterestOnTypeOptions, periodFrequencyTypeOptions, taxGroupOptions);
         } else {
-            fixedDepositProductToReturn = FixedDepositProductData.template(currency, interestCompoundingPeriodType,
-                    interestPostingPeriodType, interestCalculationType, interestCalculationDaysInYearType, accountingRule, currencyOptions,
-                    interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions,
-                    interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions,
-                    paymentTypeOptions, accountingRuleOptions, accountingMappingOptions, chargeOptions, penaltyOptions, chartTemplate,
-                    preClosurePenalInterestOnTypeOptions, periodFrequencyTypeOptions, taxGroupOptions);
+            fixedDepositProductToReturn = FixedDepositProductData.template(currency, interestCompoundingPeriodType, interestPostingPeriodType, interestCalculationType, interestCalculationDaysInYearType, accountingRule, currencyOptions, interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, paymentTypeOptions, accountingRuleOptions, accountingMappingOptions, chargeOptions, penaltyOptions, chartTemplate, preClosurePenalInterestOnTypeOptions, periodFrequencyTypeOptions, taxGroupOptions);
         }
-
         return fixedDepositProductToReturn;
     }
 
     @DELETE
     @Path("{productId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete a Fixed Deposit Product", operationId = "deleteFixedDepositProduct", description = "Deletes a Fixed Deposit Product")
     @AlternativeOperationId("delete_15")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = FixedDepositProductsApiResourceSwagger.DeleteFixedDepositProductsProductIdResponse.class)))
     public String delete(@PathParam("productId") @Parameter(description = "productId") final Long productId) {
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteFixedDepositProduct(productId).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public FixedDepositProductsApiResource(final DepositProductReadPlatformService depositProductReadPlatformService, final SavingsDropdownReadPlatformService savingsDropdownReadPlatformService, final CurrencyReadPlatformService currencyReadPlatformService, final PlatformSecurityContext context, final DefaultToApiJsonSerializer<FixedDepositProductData> toApiJsonSerializer, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final ApiRequestParameterHelper apiRequestParameterHelper, final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService, final ProductToGLAccountMappingReadPlatformService accountMappingReadPlatformService, final ChargeReadPlatformService chargeReadPlatformService, final InterestRateChartReadService chartReadPlatformService, final InterestRateChartReadService interestRateChartReadPlatformService, final DepositsDropdownReadPlatformService depositsDropdownReadPlatformService, final DropdownReadPlatformService dropdownReadPlatformService, final PaymentTypeReadService paymentTypeReadPlatformService, final TaxReadPlatformService taxReadPlatformService) {
+        this.depositProductReadPlatformService = depositProductReadPlatformService;
+        this.savingsDropdownReadPlatformService = savingsDropdownReadPlatformService;
+        this.currencyReadPlatformService = currencyReadPlatformService;
+        this.context = context;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.accountingDropdownReadPlatformService = accountingDropdownReadPlatformService;
+        this.accountMappingReadPlatformService = accountMappingReadPlatformService;
+        this.chargeReadPlatformService = chargeReadPlatformService;
+        this.chartReadPlatformService = chartReadPlatformService;
+        this.interestRateChartReadPlatformService = interestRateChartReadPlatformService;
+        this.depositsDropdownReadPlatformService = depositsDropdownReadPlatformService;
+        this.dropdownReadPlatformService = dropdownReadPlatformService;
+        this.paymentTypeReadPlatformService = paymentTypeReadPlatformService;
+        this.taxReadPlatformService = taxReadPlatformService;
     }
 }

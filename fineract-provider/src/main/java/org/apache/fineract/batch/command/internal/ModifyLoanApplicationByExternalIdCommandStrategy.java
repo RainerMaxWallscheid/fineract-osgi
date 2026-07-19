@@ -19,12 +19,10 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.command.CommandStrategyUtils;
@@ -44,9 +42,7 @@ import org.springframework.stereotype.Component;
  * @see BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class ModifyLoanApplicationByExternalIdCommandStrategy implements CommandStrategy {
-
     /**
      * {@link LoansApiResource} object
      */
@@ -65,16 +61,12 @@ public class ModifyLoanApplicationByExternalIdCommandStrategy implements Command
     public BatchResponse execute(final BatchRequest request, final UriInfo uriInfo) {
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         // Expected pattern - loans\/external-id\/[\w\d_-]+\?command=adjust
         final String relativeUrl = relativeUrlWithoutVersion(request);
-
         // Get the loan id for use in loansApiResource
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrl);
-
         final String loanIdPathParameter = pathParameters.get(2);
         String loanExternalId;
         if (loanIdPathParameter.contains("?")) {
@@ -82,17 +74,22 @@ public class ModifyLoanApplicationByExternalIdCommandStrategy implements Command
         } else {
             loanExternalId = loanIdPathParameter;
         }
-
         final Map<String, String> queryParameters = CommandStrategyUtils.getQueryParameters(relativeUrl);
         final String command = queryParameters.get("command");
-
         responseBody = loansApiResource.modifyLoanApplication(loanExternalId, command, request.getBody());
-
         response.setStatusCode(HttpStatus.SC_OK);
-
         // Sets the body of the response modifying the loan application
         response.setBody(responseBody);
         return response;
     }
 
+    /**
+     * Creates a new {@code ModifyLoanApplicationByExternalIdCommandStrategy} instance.
+     *
+     * @param loansApiResource {@link LoansApiResource} object
+     */
+    @java.lang.SuppressWarnings("all")
+        public ModifyLoanApplicationByExternalIdCommandStrategy(final LoansApiResource loansApiResource) {
+        this.loansApiResource = loansApiResource;
+    }
 }

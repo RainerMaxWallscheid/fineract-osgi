@@ -19,8 +19,6 @@
 package org.apache.fineract.portfolio.meeting.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.portfolio.meeting.data.MeetingAttendanceUpdateRequest;
@@ -29,12 +27,10 @@ import org.apache.fineract.portfolio.meeting.service.MeetingAttendanceWriteServi
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
-public class MeetingAttendanceUpdateCommandHandler
-        implements CommandHandler<MeetingAttendanceUpdateRequest, MeetingAttendanceUpdateResponse> {
-
+public class MeetingAttendanceUpdateCommandHandler implements CommandHandler<MeetingAttendanceUpdateRequest, MeetingAttendanceUpdateResponse> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MeetingAttendanceUpdateCommandHandler.class);
     private final MeetingAttendanceWriteService writeService;
 
     @Retry(name = "commandMeetingAttendanceUpdate", fallbackMethod = "fallback")
@@ -47,5 +43,10 @@ public class MeetingAttendanceUpdateCommandHandler
     @Override
     public MeetingAttendanceUpdateResponse fallback(Command<MeetingAttendanceUpdateRequest> command, Throwable t) {
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MeetingAttendanceUpdateCommandHandler(final MeetingAttendanceWriteService writeService) {
+        this.writeService = writeService;
     }
 }

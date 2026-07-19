@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.dataqueries.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -30,20 +29,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "REPORT", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteReportCommandHandler implements NewCommandSourceHandler {
-
     private final ReportWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         this.writePlatformService.deleteReport(command.entityId());
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(command.entityId()).build();
+    }
 
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(command.entityId()) //
-                .build();
+    @java.lang.SuppressWarnings("all")
+        public DeleteReportCommandHandler(final ReportWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

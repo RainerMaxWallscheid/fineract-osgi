@@ -26,10 +26,6 @@ import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Transient;
 import java.io.Serializable;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -45,26 +41,36 @@ import org.springframework.data.domain.Persistable;
  * (it's usually implemented based on the Id), because "we end up with issues on OpenJPA" (TODO clarify this).
  */
 @MappedSuperclass
-@Getter
-@Setter
-@NoArgsConstructor
 public abstract class AbstractPersistableCustom<T extends Serializable> implements Persistable<T>, Serializable {
-
     private static final long serialVersionUID = 9181640245194392646L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter
     private T id;
-
     @Transient
-    @Setter(value = AccessLevel.NONE)
-    @Getter
     private boolean isNew = true;
 
     @PrePersist
     @PostLoad
     void markNotNew() {
         this.isNew = false;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setId(final T id) {
+        this.id = id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AbstractPersistableCustom() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public T getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isNew() {
+        return this.isNew;
     }
 }

@@ -18,15 +18,10 @@
  */
 package org.apache.fineract.portfolio.loanaccount.data;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 
-@Data
-@Accessors(chain = true, fluent = true)
 public class OutstandingAmountsDTO {
-
     private Money principal;
     private Money interest;
     private Money feeCharges;
@@ -40,10 +35,10 @@ public class OutstandingAmountsDTO {
     }
 
     public Money getTotalOutstanding() {
-        return principal() //
-                .plus(interest()) //
-                .plus(feeCharges()) //
-                .plus(penaltyCharges());
+        return  //
+        //
+        //
+        principal().plus(interest()).plus(feeCharges()).plus(penaltyCharges());
     }
 
     public OutstandingAmountsDTO plusPrincipal(Money principal) {
@@ -66,4 +61,108 @@ public class OutstandingAmountsDTO {
         return this;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Money principal() {
+        return this.principal;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Money interest() {
+        return this.interest;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Money feeCharges() {
+        return this.feeCharges;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Money penaltyCharges() {
+        return this.penaltyCharges;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public OutstandingAmountsDTO principal(final Money principal) {
+        this.principal = principal;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public OutstandingAmountsDTO interest(final Money interest) {
+        this.interest = interest;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public OutstandingAmountsDTO feeCharges(final Money feeCharges) {
+        this.feeCharges = feeCharges;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public OutstandingAmountsDTO penaltyCharges(final Money penaltyCharges) {
+        this.penaltyCharges = penaltyCharges;
+        return this;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof OutstandingAmountsDTO)) return false;
+        final OutstandingAmountsDTO other = (OutstandingAmountsDTO) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$principal = this.principal();
+        final java.lang.Object other$principal = other.principal();
+        if (this$principal == null ? other$principal != null : !this$principal.equals(other$principal)) return false;
+        final java.lang.Object this$interest = this.interest();
+        final java.lang.Object other$interest = other.interest();
+        if (this$interest == null ? other$interest != null : !this$interest.equals(other$interest)) return false;
+        final java.lang.Object this$feeCharges = this.feeCharges();
+        final java.lang.Object other$feeCharges = other.feeCharges();
+        if (this$feeCharges == null ? other$feeCharges != null : !this$feeCharges.equals(other$feeCharges)) return false;
+        final java.lang.Object this$penaltyCharges = this.penaltyCharges();
+        final java.lang.Object other$penaltyCharges = other.penaltyCharges();
+        if (this$penaltyCharges == null ? other$penaltyCharges != null : !this$penaltyCharges.equals(other$penaltyCharges)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof OutstandingAmountsDTO;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $principal = this.principal();
+        result = result * PRIME + ($principal == null ? 43 : $principal.hashCode());
+        final java.lang.Object $interest = this.interest();
+        result = result * PRIME + ($interest == null ? 43 : $interest.hashCode());
+        final java.lang.Object $feeCharges = this.feeCharges();
+        result = result * PRIME + ($feeCharges == null ? 43 : $feeCharges.hashCode());
+        final java.lang.Object $penaltyCharges = this.penaltyCharges();
+        result = result * PRIME + ($penaltyCharges == null ? 43 : $penaltyCharges.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "OutstandingAmountsDTO(principal=" + this.principal() + ", interest=" + this.interest() + ", feeCharges=" + this.feeCharges() + ", penaltyCharges=" + this.penaltyCharges() + ")";
+    }
 }

@@ -20,14 +20,16 @@ package org.apache.fineract.infrastructure.event.external.service.message.domain
 
 import java.time.OffsetDateTime;
 import java.util.Objects;
-import lombok.Getter;
 
-@Getter
 public class MessageCreatedAt {
-
     private OffsetDateTime createdAt;
 
     public MessageCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = Objects.requireNonNull(createdAt, "createdAt cannot be null");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OffsetDateTime getCreatedAt() {
+        return this.createdAt;
     }
 }

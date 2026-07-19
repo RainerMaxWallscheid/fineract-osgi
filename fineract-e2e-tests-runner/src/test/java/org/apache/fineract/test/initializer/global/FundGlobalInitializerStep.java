@@ -19,12 +19,9 @@
 package org.apache.fineract.test.initializer.global;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.executeVoid;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.FundData;
 import org.apache.fineract.client.models.FundRequest;
@@ -32,15 +29,13 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class FundGlobalInitializerStep implements FineractGlobalInitializerStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FundGlobalInitializerStep.class);
     public static final String FUNDS_LENDER_A = "Lender A";
     public static final String FUNDS_LENDER_B = "Lender B";
-
     private final FineractFeignClient fineractClient;
 
     @Override
@@ -51,7 +46,6 @@ public class FundGlobalInitializerStep implements FineractGlobalInitializerStep 
         } catch (Exception e) {
             log.debug("Could not retrieve existing funds, will create them", e);
         }
-
         final List<FundData> funds = existingFunds;
         List<String> fundNames = new ArrayList<>();
         fundNames.add(FUNDS_LENDER_A);
@@ -61,11 +55,14 @@ public class FundGlobalInitializerStep implements FineractGlobalInitializerStep 
             if (fundExists) {
                 return;
             }
-
             FundRequest postFundsRequest = new FundRequest();
             postFundsRequest.name(name);
             executeVoid(() -> fineractClient.funds().createFund(postFundsRequest, Map.of()));
         });
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public FundGlobalInitializerStep(final FineractFeignClient fineractClient) {
+        this.fineractClient = fineractClient;
     }
 }

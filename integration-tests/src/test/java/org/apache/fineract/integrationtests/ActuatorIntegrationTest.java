@@ -16,23 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.integrationtests;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.integrationtests.common.Utils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@Slf4j
 public class ActuatorIntegrationTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ActuatorIntegrationTest.class);
     private static final String INFO_URL = "/fineract-provider/actuator/info";
 
     @BeforeEach
@@ -43,14 +40,9 @@ public class ActuatorIntegrationTest {
     @Test
     public void testActuatorGitBuildInfo() {
         log.info(INFO_URL);
-        Response response = RestAssured.given().headers("Content-Type", ContentType.JSON, "Accept", ContentType.JSON).when().get(INFO_URL)
-                .then().contentType(ContentType.JSON).extract().response();
-
+        Response response = RestAssured.given().headers("Content-Type", ContentType.JSON, "Accept", ContentType.JSON).when().get(INFO_URL).then().contentType(ContentType.JSON).extract().response();
         Map<String, String> gitBuildInfo = response.jsonPath().getMap("git");
-
         assertTrue(gitBuildInfo.containsKey("branch"));
         assertTrue(gitBuildInfo.containsKey("remote"));
-
     }
-
 }

@@ -20,8 +20,6 @@ package org.apache.fineract.organisation.staff.service;
 
 import jakarta.persistence.PersistenceException;
 import java.util.HashMap;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
@@ -39,10 +37,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 public class StaffWriteServiceImpl implements StaffWriteService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StaffWriteServiceImpl.class);
     private final StaffRepository staffRepository;
     private final OfficeRepository officeRepository;
     private final StaffCreateRequestMapper staffCreateRequestMapper;
@@ -50,23 +47,15 @@ public class StaffWriteServiceImpl implements StaffWriteService {
     @Transactional
     @Override
     public StaffCreateResponse createStaff(final StaffCreateRequest request) {
-
         try {
             var staff = staffCreateRequestMapper.map(request);
-
-            var office = officeRepository.findById(request.getOfficeId())
-                    .orElseThrow(() -> new OfficeNotFoundException(request.getOfficeId()));
+            var office = officeRepository.findById(request.getOfficeId()).orElseThrow(() -> new OfficeNotFoundException(request.getOfficeId()));
             staff.setOffice(office);
-
-            staff.setDisplayName(
-                    StringUtils.isEmpty(staff.getFirstname()) ? staff.getLastname() : staff.getLastname() + ", " + staff.getFirstname());
-
+            staff.setDisplayName(StringUtils.isEmpty(staff.getFirstname()) ? staff.getLastname() : staff.getLastname() + ", " + staff.getFirstname());
             staffRepository.saveAndFlush(staff);
-
             return StaffCreateResponse.builder().resourceId(staff.getId()).officeId(request.getOfficeId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            throw handleStaffDataIntegrityIssues(request.getExternalId(), request.getFirstname(), request.getLastname(),
-                    dve.getMostSpecificCause(), dve);
+            throw handleStaffDataIntegrityIssues(request.getExternalId(), request.getFirstname(), request.getLastname(), dve.getMostSpecificCause(), dve);
         } catch (final PersistenceException dve) {
             var throwable = ExceptionUtils.getRootCause(dve.getCause());
             throw handleStaffDataIntegrityIssues(request.getExternalId(), request.getFirstname(), request.getLastname(), throwable, dve);
@@ -76,15 +65,11 @@ public class StaffWriteServiceImpl implements StaffWriteService {
     @Transactional
     @Override
     public StaffUpdateResponse updateStaff(final StaffUpdateRequest request) {
-
         try {
             var staff = this.staffRepository.findById(request.getId()).orElseThrow(() -> new StaffNotFoundException(request.getId()));
-
             var changes = new HashMap<String, Object>();
-
             if (request.getOfficeId() != null) {
-                var office = officeRepository.findById(request.getOfficeId())
-                        .orElseThrow(() -> new OfficeNotFoundException(request.getOfficeId()));
+                var office = officeRepository.findById(request.getOfficeId()).orElseThrow(() -> new OfficeNotFoundException(request.getOfficeId()));
                 staff.setOffice(office);
                 changes.put(StaffUpdateRequest.Fields.officeId, request.getOfficeId());
             }
@@ -116,42 +101,36 @@ public class StaffWriteServiceImpl implements StaffWriteService {
                 staff.setActive(request.getIsActive());
                 changes.put(StaffUpdateRequest.Fields.isActive, request.getIsActive());
             }
-
             var response = StaffUpdateResponse.builder().officeId(staff.getOffice().getId()).resourceId(staff.getId());
-
             if (!changes.isEmpty()) {
                 response.changes(changes);
-
-                staff.setDisplayName(StringUtils.isEmpty(staff.getFirstname()) ? staff.getLastname()
-                        : staff.getLastname() + ", " + staff.getFirstname());
-
+                staff.setDisplayName(StringUtils.isEmpty(staff.getFirstname()) ? staff.getLastname() : staff.getLastname() + ", " + staff.getFirstname());
                 staffRepository.saveAndFlush(staff);
             }
-
             return response.build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            throw handleStaffDataIntegrityIssues(request.getExternalId(), request.getFirstname(), request.getLastname(),
-                    dve.getMostSpecificCause(), dve);
+            throw handleStaffDataIntegrityIssues(request.getExternalId(), request.getFirstname(), request.getLastname(), dve.getMostSpecificCause(), dve);
         } catch (final PersistenceException dve) {
             Throwable throwable = ExceptionUtils.getRootCause(dve.getCause());
             throw handleStaffDataIntegrityIssues(request.getExternalId(), request.getFirstname(), request.getLastname(), throwable, dve);
         }
     }
 
-    private RuntimeException handleStaffDataIntegrityIssues(String externalId, String firstname, String lastname, final Throwable realCause,
-            final Exception dve) {
+    private RuntimeException handleStaffDataIntegrityIssues(String externalId, String firstname, String lastname, final Throwable realCause, final Exception dve) {
         if (realCause.getMessage().contains("external_id")) {
-            return new PlatformDataIntegrityException("error.msg.staff.duplicate.externalId",
-                    "Staff with externalId `" + externalId + "` already exists", "externalId", externalId);
+            return new PlatformDataIntegrityException("error.msg.staff.duplicate.externalId", "Staff with externalId `" + externalId + "` already exists", "externalId", externalId);
         } else if (realCause.getMessage().contains("display_name")) {
             var displayName = StringUtils.isEmpty(firstname) ? lastname : lastname + ", " + firstname;
-            return new PlatformDataIntegrityException("error.msg.staff.duplicate.displayName",
-                    "A staff with the given display name '" + displayName + "' already exists", "displayName", displayName);
+            return new PlatformDataIntegrityException("error.msg.staff.duplicate.displayName", "A staff with the given display name \'" + displayName + "\' already exists", "displayName", displayName);
         }
-
         log.error("Error occurred.", dve);
+        return ErrorHandler.getMappable(dve, "error.msg.staff.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
+    }
 
-        return ErrorHandler.getMappable(dve, "error.msg.staff.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource: " + realCause.getMessage());
+    @java.lang.SuppressWarnings("all")
+        public StaffWriteServiceImpl(final StaffRepository staffRepository, final OfficeRepository officeRepository, final StaffCreateRequestMapper staffCreateRequestMapper) {
+        this.staffRepository = staffRepository;
+        this.officeRepository = officeRepository;
+        this.staffCreateRequestMapper = staffCreateRequestMapper;
     }
 }

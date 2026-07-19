@@ -33,8 +33,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.campaigns.email.data.EmailCampaignData;
 import org.apache.fineract.infrastructure.campaigns.email.domain.EmailCampaign;
 import org.apache.fineract.infrastructure.campaigns.email.domain.EmailCampaignRepository;
@@ -52,10 +50,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class UpdateEmailOutboundWithCampaignMessageTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UpdateEmailOutboundWithCampaignMessageTasklet.class);
     private final EmailCampaignReadPlatformService emailCampaignReadPlatformService;
     private final EmailCampaignRepository emailCampaignRepository;
     private final ClientRepositoryWrapper clientRepositoryWrapper;
@@ -64,17 +61,14 @@ public class UpdateEmailOutboundWithCampaignMessageTasklet implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        final Collection<EmailCampaignData> emailCampaignDataCollection = emailCampaignReadPlatformService
-                .retrieveAllScheduleActiveCampaign();
+        final Collection<EmailCampaignData> emailCampaignDataCollection = emailCampaignReadPlatformService.retrieveAllScheduleActiveCampaign();
         if (emailCampaignDataCollection != null) {
             for (EmailCampaignData emailCampaignData : emailCampaignDataCollection) {
                 LocalDateTime tenantDateNow = DateUtils.getLocalDateTimeOfTenant();
                 LocalDateTime nextTriggerDate = emailCampaignData.getNextTriggerDate().toLocalDateTime();
-
                 log.debug("tenant time {} trigger time {}", tenantDateNow, nextTriggerDate);
                 if (DateUtils.isBefore(nextTriggerDate, tenantDateNow)) {
-                    insertDirectCampaignIntoEmailOutboundTable(emailCampaignData.getParamValue(), emailCampaignData.getEmailSubject(),
-                            emailCampaignData.getEmailMessage(), emailCampaignData.getCampaignName(), emailCampaignData.getId());
+                    insertDirectCampaignIntoEmailOutboundTable(emailCampaignData.getParamValue(), emailCampaignData.getEmailSubject(), emailCampaignData.getEmailMessage(), emailCampaignData.getCampaignName(), emailCampaignData.getId());
                     updateTriggerDates(emailCampaignData.getId());
                 }
             }
@@ -82,13 +76,13 @@ public class UpdateEmailOutboundWithCampaignMessageTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
-    private void insertDirectCampaignIntoEmailOutboundTable(final String emailParams, final String emailSubject,
-            final String messageTemplate, final String campaignName, final Long campaignId) {
+    private void insertDirectCampaignIntoEmailOutboundTable(final String emailParams, final String emailSubject, final String messageTemplate, final String campaignName, final Long campaignId) {
         try {
-            HashMap<String, String> campaignParams = new ObjectMapper().readValue(emailParams, new TypeReference<>() {});
-            HashMap<String, String> queryParamForRunReport = new ObjectMapper().readValue(emailParams, new TypeReference<>() {});
-            List<HashMap<String, Object>> runReportObject = emailCampaignWritePlatformService
-                    .getRunReportByServiceImpl(campaignParams.get("reportName"), queryParamForRunReport);
+            HashMap<String, String> campaignParams = new ObjectMapper().readValue(emailParams, new TypeReference<>() {
+            });
+            HashMap<String, String> queryParamForRunReport = new ObjectMapper().readValue(emailParams, new TypeReference<>() {
+            });
+            List<HashMap<String, Object>> runReportObject = emailCampaignWritePlatformService.getRunReportByServiceImpl(campaignParams.get("reportName"), queryParamForRunReport);
             if (runReportObject != null) {
                 EmailCampaign emailCampaign = emailCampaignRepository.findById(campaignId).orElse(null);
                 for (HashMap<String, Object> entry : runReportObject) {
@@ -96,10 +90,8 @@ public class UpdateEmailOutboundWithCampaignMessageTasklet implements Tasklet {
                     Integer clientId = (Integer) entry.get("id");
                     Client client = clientRepositoryWrapper.findOneWithNotFoundDetection(clientId.longValue());
                     String emailAddress = client.emailAddress();
-
                     if (emailAddress != null && isValidEmail(emailAddress)) {
-                        EmailMessage emailMessage = EmailMessage.pendingEmail(null, client, null, emailCampaign, emailSubject, message,
-                                emailAddress, campaignName);
+                        EmailMessage emailMessage = EmailMessage.pendingEmail(null, client, null, emailCampaign, emailSubject, message, emailAddress, campaignName);
                         emailMessageRepository.save(emailMessage);
                     }
                 }
@@ -110,12 +102,10 @@ public class UpdateEmailOutboundWithCampaignMessageTasklet implements Tasklet {
     }
 
     private void updateTriggerDates(Long campaignId) {
-        final EmailCampaign emailCampaign = emailCampaignRepository.findById(campaignId)
-                .orElseThrow(() -> new EmailCampaignNotFound(campaignId));
+        final EmailCampaign emailCampaign = emailCampaignRepository.findById(campaignId).orElseThrow(() -> new EmailCampaignNotFound(campaignId));
         LocalDateTime nextTriggerDate = emailCampaign.getNextTriggerDate();
         emailCampaign.setLastTriggerDate(nextTriggerDate);
-        LocalDateTime newTriggerDateWithTime = CalendarUtils.getNextRecurringDate(emailCampaign.getRecurrence(), nextTriggerDate,
-                nextTriggerDate);
+        LocalDateTime newTriggerDateWithTime = CalendarUtils.getNextRecurringDate(emailCampaign.getRecurrence(), nextTriggerDate, nextTriggerDate);
         LocalDateTime tenantDateTime = DateUtils.getLocalDateTimeOfTenant();
         if (DateUtils.isBefore(newTriggerDateWithTime, tenantDateTime)) {
             newTriggerDateWithTime = CalendarUtils.getNextRecurringDate(emailCampaign.getRecurrence(), nextTriggerDate, tenantDateTime);
@@ -124,14 +114,11 @@ public class UpdateEmailOutboundWithCampaignMessageTasklet implements Tasklet {
         emailCampaignRepository.saveAndFlush(emailCampaign);
     }
 
-    private String compileEmailTemplate(final String textMessageTemplate, final String campaignName,
-            final Map<String, Object> emailParams) {
+    private String compileEmailTemplate(final String textMessageTemplate, final String campaignName, final Map<String, Object> emailParams) {
         final MustacheFactory mf = new DefaultMustacheFactory();
         final Mustache mustache = mf.compile(new StringReader(textMessageTemplate), campaignName);
-
         final StringWriter stringWriter = new StringWriter();
         mustache.execute(stringWriter, emailParams);
-
         return stringWriter.toString();
     }
 
@@ -144,5 +131,14 @@ public class UpdateEmailOutboundWithCampaignMessageTasklet implements Tasklet {
             isValid = false;
         }
         return isValid;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateEmailOutboundWithCampaignMessageTasklet(final EmailCampaignReadPlatformService emailCampaignReadPlatformService, final EmailCampaignRepository emailCampaignRepository, final ClientRepositoryWrapper clientRepositoryWrapper, final EmailMessageRepository emailMessageRepository, final EmailCampaignWritePlatformService emailCampaignWritePlatformService) {
+        this.emailCampaignReadPlatformService = emailCampaignReadPlatformService;
+        this.emailCampaignRepository = emailCampaignRepository;
+        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.emailMessageRepository = emailMessageRepository;
+        this.emailCampaignWritePlatformService = emailCampaignWritePlatformService;
     }
 }

@@ -18,13 +18,10 @@
  */
 package org.apache.fineract.test.initializer.global;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
 public class SavingsProductGlobalInitializer implements FineractGlobalInitializerStep {
-
     @Override
     public void initialize() {
         // TODO uncomment and check when PS-1088 is done
@@ -46,6 +43,9 @@ public class SavingsProductGlobalInitializer implements FineractGlobalInitialize
         // Response<PostSavingsProductsResponse> savingsProductsResponseUSD =
         // savingsProductApi.create13(savingsProductsRequestUSD).execute();
         // testContext().set(TestContextKey.DEFAULT_SAVINGS_PRODUCT_CREATE_RESPONSE_USD, savingsProductsResponseUSD);
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public SavingsProductGlobalInitializer() {
     }
 }

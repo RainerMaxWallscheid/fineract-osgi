@@ -22,7 +22,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.security.data.FineractOidcUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
@@ -38,18 +37,15 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
  * <p>
  * This handler is only relevant for the interactive login redirect flow. Bearer token API requests do not trigger it.
  */
-@Slf4j
 public class OidcAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(OidcAuthenticationSuccessHandler.class);
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
-            throws IOException, ServletException {
-
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         if (authentication.getPrincipal() instanceof FineractOidcUser oidcUser) {
-            log.debug("OIDC login successful — user: '{}', tenant: '{}', Fineract id: {}", oidcUser.getName(), oidcUser.getTenantId(),
-                    oidcUser.getAppUser() != null ? oidcUser.getAppUser().getId() : "unknown");
+            log.debug("OIDC login successful — user: \'{}\', tenant: \'{}\', Fineract id: {}", oidcUser.getName(), oidcUser.getTenantId(), oidcUser.getAppUser() != null ? oidcUser.getAppUser().getId() : "unknown");
         }
-
         super.onAuthenticationSuccess(request, response, authentication);
     }
 }

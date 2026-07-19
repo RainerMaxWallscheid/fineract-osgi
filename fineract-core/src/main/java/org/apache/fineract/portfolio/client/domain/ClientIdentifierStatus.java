@@ -18,18 +18,13 @@
  */
 package org.apache.fineract.portfolio.client.domain;
 
-import lombok.Getter;
-
 /**
  * Enum representation of client identifier status states.
  */
-@Getter
 public enum ClientIdentifierStatus {
-
-    INACTIVE(100, "clientIdentifierStatusType.inactive"), //
-    ACTIVE(200, "clientIdentifierStatusType.active"), //
+    INACTIVE(100, "clientIdentifierStatusType.inactive"),  //
+    ACTIVE(200, "clientIdentifierStatusType.active"),  //
     INVALID(0, "clientIdentifierStatusType.invalid");
-
     private final Integer value;
     private final String code;
 
@@ -52,5 +47,15 @@ public enum ClientIdentifierStatus {
 
     public boolean isActive() {
         return this.value.equals(ClientIdentifierStatus.ACTIVE.getValue());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
     }
 }

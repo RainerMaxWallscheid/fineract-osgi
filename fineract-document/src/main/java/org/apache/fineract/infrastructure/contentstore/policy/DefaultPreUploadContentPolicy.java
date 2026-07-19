@@ -18,15 +18,12 @@
  */
 package org.apache.fineract.infrastructure.contentstore.policy;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class DefaultPreUploadContentPolicy implements ContentPolicy {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DefaultPreUploadContentPolicy.class);
     private final WhitelistContentPolicy whitelistContentPolicy;
     private final TraversalContentPolicy traversalContentPolicy;
 
@@ -34,5 +31,11 @@ public class DefaultPreUploadContentPolicy implements ContentPolicy {
     public void check(ContentPolicyContext ctx) {
         traversalContentPolicy.check(ctx);
         whitelistContentPolicy.check(ctx);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DefaultPreUploadContentPolicy(final WhitelistContentPolicy whitelistContentPolicy, final TraversalContentPolicy traversalContentPolicy) {
+        this.whitelistContentPolicy = whitelistContentPolicy;
+        this.traversalContentPolicy = traversalContentPolicy;
     }
 }

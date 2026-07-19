@@ -19,21 +19,20 @@
 package org.apache.fineract.infrastructure.event.external.service.validation;
 
 import static java.util.stream.Collectors.toList;
-
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class ExternalEventSourceService {
-
     private final Collection<ExternalEventSourceProvider> providers;
 
     public List<String> getSourcePackages() {
-        return providers.stream().map(ExternalEventSourceProvider::provide).flatMap(Collection::stream)
-                .map(source -> source.getSourcePackage()).collect(toList());
+        return providers.stream().map(ExternalEventSourceProvider::provide).flatMap(Collection::stream).map(source -> source.getSourcePackage()).collect(toList());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ExternalEventSourceService(final Collection<ExternalEventSourceProvider> providers) {
+        this.providers = providers;
+    }
 }

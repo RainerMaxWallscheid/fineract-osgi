@@ -20,8 +20,6 @@ package org.apache.fineract.portfolio.savings.jobs.applyannualfeeforsavings;
 
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
@@ -33,18 +31,15 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class ApplyAnnualFeeForSavingsTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ApplyAnnualFeeForSavingsTasklet.class);
     private final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService;
     private final SavingsAccountWritePlatformService savingsAccountWritePlatformService;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        final Collection<SavingsAccountAnnualFeeData> annualFeeData = savingsAccountChargeReadPlatformService
-                .retrieveChargesWithAnnualFeeDue();
-
+        final Collection<SavingsAccountAnnualFeeData> annualFeeData = savingsAccountChargeReadPlatformService.retrieveChargesWithAnnualFeeDue();
         for (final SavingsAccountAnnualFeeData savingsAccountReference : annualFeeData) {
             try {
                 savingsAccountWritePlatformService.applyAnnualFee(savingsAccountReference.getId(), savingsAccountReference.getAccountId());
@@ -57,9 +52,13 @@ public class ApplyAnnualFeeForSavingsTasklet implements Tasklet {
                 log.error("Apply annual fee failed for account: {}", savingsAccountReference.getAccountNo(), ex);
             }
         }
-
-        log.debug("{}: Records affected by applyAnnualFeeForSavings: {}", ThreadLocalContextUtil.getTenant().getName(),
-                annualFeeData.size());
+        log.debug("{}: Records affected by applyAnnualFeeForSavings: {}", ThreadLocalContextUtil.getTenant().getName(), annualFeeData.size());
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ApplyAnnualFeeForSavingsTasklet(final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService, final SavingsAccountWritePlatformService savingsAccountWritePlatformService) {
+        this.savingsAccountChargeReadPlatformService = savingsAccountChargeReadPlatformService;
+        this.savingsAccountWritePlatformService = savingsAccountWritePlatformService;
     }
 }

@@ -26,38 +26,25 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Objects;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 
-@Getter
 @Table(name = "m_external_asset_owner_transfer_details")
-@NoArgsConstructor
 @Entity
 public class ExternalAssetOwnerTransferDetails extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
-    @Setter
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "asset_owner_transfer_id", referencedColumnName = "id")
     private ExternalAssetOwnerTransfer externalAssetOwnerTransfer;
-
     @Column(name = "total_outstanding_derived", scale = 6, precision = 19, nullable = false)
     private BigDecimal totalOutstanding;
-
     @Column(name = "principal_outstanding_derived", scale = 6, precision = 19, nullable = false)
     private BigDecimal totalPrincipalOutstanding;
-
     @Column(name = "interest_outstanding_derived", scale = 6, precision = 19, nullable = false)
     private BigDecimal totalInterestOutstanding;
-
     @Column(name = "fee_charges_outstanding_derived", scale = 6, precision = 19, nullable = false)
     private BigDecimal totalFeeChargesOutstanding;
-
     @Column(name = "penalty_charges_outstanding_derived", scale = 6, precision = 19, nullable = false)
     private BigDecimal totalPenaltyChargesOutstanding;
-
     @Column(name = "total_overpaid_derived", scale = 6, precision = 19, nullable = false)
     private BigDecimal totalOverpaid;
 
@@ -82,11 +69,54 @@ public class ExternalAssetOwnerTransferDetails extends AbstractAuditableWithUTCD
     }
 
     private void updateTotalOutstanding() {
-        this.totalOutstanding = MathUtil.add(getTotalPrincipalOutstanding(), getTotalInterestOutstanding(), getTotalFeeChargesOutstanding(),
-                getTotalPenaltyChargesOutstanding());
+        this.totalOutstanding = MathUtil.add(getTotalPrincipalOutstanding(), getTotalInterestOutstanding(), getTotalFeeChargesOutstanding(), getTotalPenaltyChargesOutstanding());
     }
 
     public void setTotalOverpaid(BigDecimal totalOverpaid) {
         this.totalOverpaid = Objects.requireNonNullElse(totalOverpaid, BigDecimal.ZERO);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnerTransfer getExternalAssetOwnerTransfer() {
+        return this.externalAssetOwnerTransfer;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalOutstanding() {
+        return this.totalOutstanding;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalPrincipalOutstanding() {
+        return this.totalPrincipalOutstanding;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalInterestOutstanding() {
+        return this.totalInterestOutstanding;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalFeeChargesOutstanding() {
+        return this.totalFeeChargesOutstanding;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalPenaltyChargesOutstanding() {
+        return this.totalPenaltyChargesOutstanding;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalOverpaid() {
+        return this.totalOverpaid;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnerTransferDetails() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setExternalAssetOwnerTransfer(final ExternalAssetOwnerTransfer externalAssetOwnerTransfer) {
+        this.externalAssetOwnerTransfer = externalAssetOwnerTransfer;
     }
 }

@@ -28,7 +28,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.organisation.monetary.command.CurrencyUpdateCommand;
 import org.apache.fineract.organisation.monetary.data.CurrencyConfigurationData;
@@ -40,37 +39,38 @@ import org.springframework.stereotype.Component;
 @Path("/v1/currencies")
 @Component
 @Tag(name = "Currency", description = "Application related configuration around viewing/updating the currencies permitted for use within the MFI.")
-@RequiredArgsConstructor
 public class CurrenciesApiResource {
-
     private final OrganisationCurrencyReadPlatformService readPlatformService;
     private final CommandDispatcher dispatcher;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Currency Configuration", description = """
-            Returns the list of currencies permitted for use AND the list of currencies not selected (but available for selection).
-
-            Example Requests:
-
-            currencies
-            currencies?fields=selectedCurrencyOptions
-            """)
+        Returns the list of currencies permitted for use AND the list of currencies not selected (but available for selection).
+        
+        Example Requests:
+        
+        currencies
+        currencies?fields=selectedCurrencyOptions
+        """)
     public CurrencyConfigurationData retrieveCurrencies() {
         return readPlatformService.retrieveCurrencyConfiguration();
     }
 
     @PUT
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update Currency Configuration", description = "Updates the list of currencies permitted for use.")
     public CurrencyUpdateResponse updateCurrencies(@Valid CurrencyUpdateRequest request) {
         final var command = new CurrencyUpdateCommand();
-
         command.setPayload(request);
-
         final Supplier<CurrencyUpdateResponse> response = dispatcher.dispatch(command);
-
         return response.get();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CurrenciesApiResource(final OrganisationCurrencyReadPlatformService readPlatformService, final CommandDispatcher dispatcher) {
+        this.readPlatformService = readPlatformService;
+        this.dispatcher = dispatcher;
     }
 }

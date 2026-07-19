@@ -19,11 +19,9 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
@@ -40,34 +38,31 @@ import org.springframework.stereotype.Component;
  * @see BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class UpdateDatatableEntryOneToOneCommandStrategy implements CommandStrategy {
-
     private final DatatablesApiResource datatablesApiResource;
 
     @Override
     public BatchResponse execute(BatchRequest request, @SuppressWarnings("unused") UriInfo uriInfo) {
-
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrlWithoutVersion(request));
         // Pluck out the datatable name, entity id & datatable entry id out of the relative path
         final String datatableName = pathParameters.get(1);
         final Long entityId = Long.parseLong(pathParameters.get(2));
-
         // Calls 'updateDatatableEntryOneToMany' function from
         // 'DatatablesApiResource' to update a datatable entry on an existing entity in a one-one relationship
         responseBody = datatablesApiResource.updateDatatableEntryOnetoOne(datatableName, entityId, request.getBody());
-
         response.setStatusCode(200);
         // Sets the body of the response after datatable entry is successfully
         // updated
         response.setBody(responseBody);
-
         return response;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateDatatableEntryOneToOneCommandStrategy(final DatatablesApiResource datatablesApiResource) {
+        this.datatablesApiResource = datatablesApiResource;
     }
 }

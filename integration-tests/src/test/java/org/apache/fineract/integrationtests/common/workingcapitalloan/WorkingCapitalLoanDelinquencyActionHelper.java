@@ -19,54 +19,45 @@
 package org.apache.fineract.integrationtests.common.workingcapitalloan;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.PostWorkingCapitalLoansDelinquencyActionRequest;
 import org.apache.fineract.client.models.PostWorkingCapitalLoansDelinquencyActionResponse;
 import org.apache.fineract.client.models.WorkingCapitalLoanDelinquencyActionData;
 import org.apache.fineract.integrationtests.common.FineractFeignClientHelper;
 
-@Slf4j
 public final class WorkingCapitalLoanDelinquencyActionHelper {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanDelinquencyActionHelper.class);
     private static final String DATE_FORMAT = "yyyy-MM-dd";
 
-    private WorkingCapitalLoanDelinquencyActionHelper() {}
-
-    public static PostWorkingCapitalLoansDelinquencyActionResponse createDelinquencyAction(final Long loanId, final String action,
-            final LocalDate startDate, final LocalDate endDate) {
-        final PostWorkingCapitalLoansDelinquencyActionRequest request = buildActionRequest(action, startDate, endDate);
-        log.info("Creating delinquency action for loan {} request={}", loanId, request);
-        return ok(() -> FineractFeignClientHelper.getFineractFeignClient().workingCapitalLoanDelinquencyActions()
-                .createDelinquencyAction(loanId, request));
+    private WorkingCapitalLoanDelinquencyActionHelper() {
     }
 
-    public static PostWorkingCapitalLoansDelinquencyActionResponse createDelinquencyAction(final Long loanId,
-            final PostWorkingCapitalLoansDelinquencyActionRequest request) {
+    public static PostWorkingCapitalLoansDelinquencyActionResponse createDelinquencyAction(final Long loanId, final String action, final LocalDate startDate, final LocalDate endDate) {
+        final PostWorkingCapitalLoansDelinquencyActionRequest request = buildActionRequest(action, startDate, endDate);
         log.info("Creating delinquency action for loan {} request={}", loanId, request);
-        return ok(() -> FineractFeignClientHelper.getFineractFeignClient().workingCapitalLoanDelinquencyActions()
-                .createDelinquencyAction(loanId, request));
+        return ok(() -> FineractFeignClientHelper.getFineractFeignClient().workingCapitalLoanDelinquencyActions().createDelinquencyAction(loanId, request));
+    }
+
+    public static PostWorkingCapitalLoansDelinquencyActionResponse createDelinquencyAction(final Long loanId, final PostWorkingCapitalLoansDelinquencyActionRequest request) {
+        log.info("Creating delinquency action for loan {} request={}", loanId, request);
+        return ok(() -> FineractFeignClientHelper.getFineractFeignClient().workingCapitalLoanDelinquencyActions().createDelinquencyAction(loanId, request));
     }
 
     public static List<WorkingCapitalLoanDelinquencyActionData> retrieveDelinquencyActions(final Long loanId) {
-        return ok(() -> FineractFeignClientHelper.getFineractFeignClient().workingCapitalLoanDelinquencyActions()
-                .retrieveDelinquencyActions(loanId));
+        return ok(() -> FineractFeignClientHelper.getFineractFeignClient().workingCapitalLoanDelinquencyActions().retrieveDelinquencyActions(loanId));
     }
 
-    public static PostWorkingCapitalLoansDelinquencyActionResponse createDelinquencyActionByExternalId(final String loanExternalId,
-            final String action, final LocalDate startDate, final LocalDate endDate) {
+    public static PostWorkingCapitalLoansDelinquencyActionResponse createDelinquencyActionByExternalId(final String loanExternalId, final String action, final LocalDate startDate, final LocalDate endDate) {
         final PostWorkingCapitalLoansDelinquencyActionRequest request = buildActionRequest(action, startDate, endDate);
         log.info("Creating delinquency action for loan externalId={} request={}", loanExternalId, request);
-        return ok(() -> FineractFeignClientHelper.getFineractFeignClient().workingCapitalLoanDelinquencyActions()
-                .createDelinquencyActionByExternalId(loanExternalId, request));
+        return ok(() -> FineractFeignClientHelper.getFineractFeignClient().workingCapitalLoanDelinquencyActions().createDelinquencyActionByExternalId(loanExternalId, request));
     }
 
     public static List<WorkingCapitalLoanDelinquencyActionData> retrieveDelinquencyActionsByExternalId(final String loanExternalId) {
-        return ok(() -> FineractFeignClientHelper.getFineractFeignClient().workingCapitalLoanDelinquencyActions()
-                .retrieveDelinquencyActionsByExternalId(loanExternalId));
+        return ok(() -> FineractFeignClientHelper.getFineractFeignClient().workingCapitalLoanDelinquencyActions().retrieveDelinquencyActionsByExternalId(loanExternalId));
     }
 
     public static void activateLoan(final Long loanId, final LocalDate disbursementDate) {
@@ -87,8 +78,7 @@ public final class WorkingCapitalLoanDelinquencyActionHelper {
         });
     }
 
-    public static PostWorkingCapitalLoansDelinquencyActionRequest buildActionRequest(final String action, final LocalDate startDate,
-            final LocalDate endDate) {
+    public static PostWorkingCapitalLoansDelinquencyActionRequest buildActionRequest(final String action, final LocalDate startDate, final LocalDate endDate) {
         final PostWorkingCapitalLoansDelinquencyActionRequest request = new PostWorkingCapitalLoansDelinquencyActionRequest();
         request.setAction(action);
         request.setStartDate(startDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT)));

@@ -23,7 +23,6 @@ import java.math.MathContext;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Getter;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.InterestRecalculationAdditionalDetailData;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanSchedulePeriodData;
@@ -31,9 +30,7 @@ import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanScheduleP
 /**
  * Domain representation of a Loan Schedule Repayment Period (not used for persistence)
  */
-@Getter
 public final class LoanScheduleModelRepaymentPeriod implements LoanScheduleModelPeriod {
-
     private int periodNumber;
     private final LocalDate fromDate;
     private final LocalDate dueDate;
@@ -49,18 +46,11 @@ public final class LoanScheduleModelRepaymentPeriod implements LoanScheduleModel
     BigDecimal rescheduleInterestPortion;
     private final MathContext mc;
 
-    public static LoanScheduleModelRepaymentPeriod repayment(final int periodNumber, final LocalDate startDate,
-            final LocalDate scheduledDueDate, final Money principalDue, final Money outstandingLoanBalance, final Money interestDue,
-            final Money feeChargesDue, final Money penaltyChargesDue, final Money totalDue, boolean recalculatedInterestComponent,
-            final MathContext mc) {
-
-        return new LoanScheduleModelRepaymentPeriod(periodNumber, startDate, scheduledDueDate, principalDue, outstandingLoanBalance,
-                interestDue, feeChargesDue, penaltyChargesDue, totalDue, recalculatedInterestComponent, mc);
+    public static LoanScheduleModelRepaymentPeriod repayment(final int periodNumber, final LocalDate startDate, final LocalDate scheduledDueDate, final Money principalDue, final Money outstandingLoanBalance, final Money interestDue, final Money feeChargesDue, final Money penaltyChargesDue, final Money totalDue, boolean recalculatedInterestComponent, final MathContext mc) {
+        return new LoanScheduleModelRepaymentPeriod(periodNumber, startDate, scheduledDueDate, principalDue, outstandingLoanBalance, interestDue, feeChargesDue, penaltyChargesDue, totalDue, recalculatedInterestComponent, mc);
     }
 
-    public LoanScheduleModelRepaymentPeriod(final int periodNumber, final LocalDate fromDate, final LocalDate dueDate,
-            final Money principalDue, final Money outstandingLoanBalance, final Money interestDue, final Money feeChargesDue,
-            final Money penaltyChargesDue, final Money totalDue, final boolean recalculatedInterestComponent, final MathContext mc) {
+    public LoanScheduleModelRepaymentPeriod(final int periodNumber, final LocalDate fromDate, final LocalDate dueDate, final Money principalDue, final Money outstandingLoanBalance, final Money interestDue, final Money feeChargesDue, final Money penaltyChargesDue, final Money totalDue, final boolean recalculatedInterestComponent, final MathContext mc) {
         this.periodNumber = periodNumber;
         this.fromDate = fromDate;
         this.dueDate = dueDate;
@@ -76,9 +66,7 @@ public final class LoanScheduleModelRepaymentPeriod implements LoanScheduleModel
 
     @Override
     public LoanSchedulePeriodData toData() {
-        return LoanSchedulePeriodData.repaymentOnlyPeriod(this.periodNumber, this.fromDate, this.dueDate, this.principalDue.getAmount(),
-                this.outstandingLoanBalance.getAmount(), this.interestDue.getAmount(), this.feeChargesDue.getAmount(),
-                this.penaltyChargesDue.getAmount());
+        return LoanSchedulePeriodData.repaymentOnlyPeriod(this.periodNumber, this.fromDate, this.dueDate, this.principalDue.getAmount(), this.outstandingLoanBalance.getAmount(), this.interestDue.getAmount(), this.feeChargesDue.getAmount(), this.penaltyChargesDue.getAmount());
     }
 
     @Override
@@ -112,7 +100,6 @@ public final class LoanScheduleModelRepaymentPeriod implements LoanScheduleModel
         if (this.principalDue != null) {
             value = this.principalDue.getAmount();
         }
-
         return value;
     }
 
@@ -122,7 +109,6 @@ public final class LoanScheduleModelRepaymentPeriod implements LoanScheduleModel
         if (this.interestDue != null) {
             value = this.interestDue.getAmount();
         }
-
         return value;
     }
 
@@ -132,7 +118,6 @@ public final class LoanScheduleModelRepaymentPeriod implements LoanScheduleModel
         if (this.feeChargesDue != null) {
             value = this.feeChargesDue.getAmount();
         }
-
         return value;
     }
 
@@ -142,7 +127,6 @@ public final class LoanScheduleModelRepaymentPeriod implements LoanScheduleModel
         if (this.penaltyChargesDue != null) {
             value = this.penaltyChargesDue.getAmount();
         }
-
         return value;
     }
 
@@ -201,5 +185,60 @@ public final class LoanScheduleModelRepaymentPeriod implements LoanScheduleModel
     @Override
     public BigDecimal rescheduleInterestPortion() {
         return this.rescheduleInterestPortion;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public int getPeriodNumber() {
+        return this.periodNumber;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getFromDate() {
+        return this.fromDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getDueDate() {
+        return this.dueDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Money getPrincipalDue() {
+        return this.principalDue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Money getOutstandingLoanBalance() {
+        return this.outstandingLoanBalance;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Money getInterestDue() {
+        return this.interestDue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Money getFeeChargesDue() {
+        return this.feeChargesDue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Money getPenaltyChargesDue() {
+        return this.penaltyChargesDue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Money getTotalDue() {
+        return this.totalDue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getRescheduleInterestPortion() {
+        return this.rescheduleInterestPortion;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MathContext getMc() {
+        return this.mc;
     }
 }

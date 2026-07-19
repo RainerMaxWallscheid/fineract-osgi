@@ -35,7 +35,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.search.data.AdHocQuerySearchRequest;
 import org.apache.fineract.portfolio.search.data.AdHocSearchQueryData;
 import org.apache.fineract.portfolio.search.data.SearchConditions;
@@ -48,66 +47,61 @@ import org.springframework.stereotype.Component;
 @Path("/v1/search")
 @Component
 @Tag(name = "Search API", description = "Search API allows to search scoped resources clients, loans and groups on specified fields.")
-@RequiredArgsConstructor
-@Produces({ MediaType.APPLICATION_JSON })
+@Produces({MediaType.APPLICATION_JSON})
 public class SearchApiResource {
-
     private final SearchReadService searchReadService;
 
     @GET
     @Path("/template")
     @Operation(summary = "Retrive Adhoc Search query template", description = """
-            Mandatory Fields
-
-            search?query=000000001
-            """)
+        Mandatory Fields
+        
+        search?query=000000001
+        """)
     public AdHocSearchQueryData retrieveAdHocSearchQueryTemplate() {
-
         return searchReadService.retrieveAdHocQueryTemplate();
     }
 
     @GET
     @Operation(summary = "Search Resources", description = """
-            Example Requests:
-
-            search?query=000000001
-
-
-            search?query=Petra&resource=clients,groups
-
-
-            search?query=Petra&resource=clients,groups&exactMatch=true""")
+        Example Requests:
+        
+        search?query=000000001
+        
+        
+        search?query=Petra&resource=clients,groups
+        
+        
+        search?query=Petra&resource=clients,groups&exactMatch=true""")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SearchApiResourceSwagger.GetSearchResponse.class))))
-    public List<SearchData> searchData(@QueryParam("query") @Parameter(description = "query") final String query,
-            @QueryParam("resource") @Parameter(description = "resource") final String resource,
-            @DefaultValue("false") @QueryParam("exactMatch") @Parameter(description = "exactMatch") Boolean exactMatch) {
-
+    public List<SearchData> searchData(@QueryParam("query") @Parameter(description = "query") final String query, @QueryParam("resource") @Parameter(description = "resource") final String resource, @DefaultValue("false") @QueryParam("exactMatch") @Parameter(description = "exactMatch") Boolean exactMatch) {
         final AppUser currentUser = (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         final String hierarchy = currentUser.getOffice().getHierarchy();
         final SearchConditions searchConditions = new SearchConditions(query, resource, exactMatch, hierarchy);
-
         return searchReadService.retriveMatchingData(searchConditions);
     }
 
     @POST
     @Path("/advance")
-    @Consumes({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
     @Operation(summary = "Adhoc query search", description = """
-            AdHocQuery search has more search options, it is a POST request, \
-            it uses request body to send search parameters
-
-
-            Mandatory fields: entities
-
-            Optional fields: \
-            loanStatus, loanProducts, offices, loanDateOption, loanFromDate, loanToDate,
-            includeOutStandingAmountPercentage, outStandingAmountPercentageCondition,
-            minOutStandingAmountPercentage and maxOutStandingAmountPercentage OR outStandingAmountPercentage,
-            includeOutstandingAmount, outstandingAmountCondition,
-            minOutstandingAmount and maxOutstandingAmount OR outstandingAmount""")
+        AdHocQuery search has more search options, it is a POST request, it uses request body to send search parameters
+        
+        
+        Mandatory fields: entities
+        
+        Optional fields: loanStatus, loanProducts, offices, loanDateOption, loanFromDate, loanToDate,
+        includeOutStandingAmountPercentage, outStandingAmountPercentageCondition,
+        minOutStandingAmountPercentage and maxOutStandingAmountPercentage OR outStandingAmountPercentage,
+        includeOutstandingAmount, outstandingAmountCondition,
+        minOutstandingAmount and maxOutstandingAmount OR outstandingAmount""")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = SearchApiResourceSwagger.PostAdhocQuerySearchRequest.class)))
     public List<AdHocSearchQueryData> advancedSearch(final AdHocQuerySearchRequest request) {
-
         return searchReadService.retrieveAdHocQueryMatchingData(request);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SearchApiResource(final SearchReadService searchReadService) {
+        this.searchReadService = searchReadService;
     }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.configuration.domain;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.configuration.exception.GlobalConfigurationPropertyNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -31,9 +30,9 @@ import org.springframework.stereotype.Service;
  * </p>
  */
 @Service
-@Slf4j
 public class GlobalConfigurationRepositoryWrapper {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GlobalConfigurationRepositoryWrapper.class);
     private final GlobalConfigurationRepository repository;
 
     @Autowired

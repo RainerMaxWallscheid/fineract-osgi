@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.sms.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,15 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "SMS", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateSmsCommandHandler implements NewCommandSourceHandler {
-
     private final SmsWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.update(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateSmsCommandHandler(final SmsWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

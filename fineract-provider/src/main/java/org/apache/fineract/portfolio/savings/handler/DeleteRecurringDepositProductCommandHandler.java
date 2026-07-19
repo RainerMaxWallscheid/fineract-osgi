@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,13 +27,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 @CommandType(entity = "RECURRINGDEPOSITPRODUCT", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteRecurringDepositProductCommandHandler implements NewCommandSourceHandler {
-
     private final RecurringDepositProductWritePlatformService writePlatformService;
 
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.delete(command.entityId());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DeleteRecurringDepositProductCommandHandler(final RecurringDepositProductWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

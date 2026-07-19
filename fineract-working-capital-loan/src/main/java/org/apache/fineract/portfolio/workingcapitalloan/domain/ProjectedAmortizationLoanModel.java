@@ -26,32 +26,82 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "m_wc_loan_amortization_model")
-@Getter
-@Setter
 public class ProjectedAmortizationLoanModel extends AbstractPersistableCustom<Long> {
-
     @Version
     int version;
-
     @OneToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private WorkingCapitalLoan loan;
-
     @Column(name = "json_model", columnDefinition = "text", nullable = false)
     private String jsonModel;
-
     @Column(name = "business_date", nullable = false)
     private LocalDate businessDate;
-
     @Column(name = "last_modified_on_utc", nullable = false)
     private OffsetDateTime lastModifiedDate;
-
     @Column(name = "json_model_version", nullable = false)
     private String jsonModelVersion;
+
+    @java.lang.SuppressWarnings("all")
+        public int getVersion() {
+        return this.version;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoan getLoan() {
+        return this.loan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getJsonModel() {
+        return this.jsonModel;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getBusinessDate() {
+        return this.businessDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OffsetDateTime getLastModifiedDate() {
+        return this.lastModifiedDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getJsonModelVersion() {
+        return this.jsonModelVersion;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setVersion(final int version) {
+        this.version = version;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoan(final WorkingCapitalLoan loan) {
+        this.loan = loan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setJsonModel(final String jsonModel) {
+        this.jsonModel = jsonModel;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setBusinessDate(final LocalDate businessDate) {
+        this.businessDate = businessDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLastModifiedDate(final OffsetDateTime lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setJsonModelVersion(final String jsonModelVersion) {
+        this.jsonModelVersion = jsonModelVersion;
+    }
 }

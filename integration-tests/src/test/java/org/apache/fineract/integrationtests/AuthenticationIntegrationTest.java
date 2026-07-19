@@ -19,7 +19,6 @@
 package org.apache.fineract.integrationtests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.builder.RequestSpecBuilder;
@@ -29,7 +28,6 @@ import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import java.util.Collections;
 import java.util.HashMap;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.integrationtests.common.ClientHelper;
 import org.apache.fineract.integrationtests.common.Utils;
 import org.apache.fineract.integrationtests.common.accounting.AccountHelper;
@@ -43,10 +41,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-@Slf4j
 @ExtendWith(LoanTestLifecycleExtension.class)
 public class AuthenticationIntegrationTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthenticationIntegrationTest.class);
     private static final String LOAN_DATE = "11 July 2022";
     private static final String APPROVE_COMMAND = "approve";
     private ResponseSpecification responseSpec;
@@ -60,16 +58,13 @@ public class AuthenticationIntegrationTest {
         setupAuthenticatedRequestSpec();
         this.responseSpec = new ResponseSpecBuilder().expectStatusCode(200).build();
         this.loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
-
         AccountHelper accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         Integer staffId = StaffHelper.createStaff(this.requestSpec, this.responseSpec);
         String username = Utils.uniqueRandomStringGenerator("user", 8);
         UserHelper.createUser(this.requestSpec, this.responseSpec, 1, staffId, username, "A1b2c3d4e5f$", "resourceId");
         Integer clientID = ClientHelper.createClient(requestSpec, responseSpec);
-
         Integer loanProductID = setupLoanProduct(accountHelper);
-        this.loanID = loanTransactionHelper.applyForLoanApplicationWithPaymentStrategyAndPastMonth(clientID, loanProductID,
-                Collections.emptyList(), null, "10000", LoanApplicationTestBuilder.DEFAULT_STRATEGY, "10 July 2022", LOAN_DATE);
+        this.loanID = loanTransactionHelper.applyForLoanApplicationWithPaymentStrategyAndPastMonth(clientID, loanProductID, Collections.emptyList(), null, "10000", LoanApplicationTestBuilder.DEFAULT_STRATEGY, "10 July 2022", LOAN_DATE);
     }
 
     @Test
@@ -77,11 +72,8 @@ public class AuthenticationIntegrationTest {
         setupAuthenticatedRequestSpec();
         String loanApprovalCommand = createLoanApprovalCommand();
         String loanApprovalRequest = createLoanApprovalRequest();
-
-        HashMap response = Utils.performServerPost(this.requestSpec, this.responseSpec, loanApprovalCommand, loanApprovalRequest,
-                "changes");
+        HashMap response = Utils.performServerPost(this.requestSpec, this.responseSpec, loanApprovalCommand, loanApprovalRequest, "changes");
         HashMap status = (HashMap) response.get("status");
-
         assertEquals(200, (Integer) status.get("id"));
     }
 
@@ -89,23 +81,17 @@ public class AuthenticationIntegrationTest {
     public void shouldReturnUnauthorizedForUnauthenticatedAccess() throws JsonProcessingException {
         setupUnauthenticatedRequestSpec();
         this.responseSpec = new ResponseSpecBuilder().expectStatusCode(401).build();
-
         String loanApprovalCommand = createLoanApprovalCommand();
         String loanApprovalRequest = createLoanApprovalRequest();
-
         String rawResponse = Utils.performServerPost(this.requestSpec, this.responseSpec, loanApprovalCommand, loanApprovalRequest, null);
-
         ObjectMapper objectMapper = new ObjectMapper();
         HashMap response = objectMapper.readValue(rawResponse, HashMap.class);
-
         assertEquals(401, (Integer) response.get("status"));
         assertEquals("Unauthorized", response.get("error"));
     }
 
     private Integer setupLoanProduct(AccountHelper accountHelper) {
-        return this.loanTransactionHelper.createLoanProduct("0", "0", LoanProductTestBuilder.DEFAULT_STRATEGY, "2",
-                accountHelper.createAssetAccount(), accountHelper.createIncomeAccount(), accountHelper.createExpenseAccount(),
-                accountHelper.createLiabilityAccount());
+        return this.loanTransactionHelper.createLoanProduct("0", "0", LoanProductTestBuilder.DEFAULT_STRATEGY, "2", accountHelper.createAssetAccount(), accountHelper.createIncomeAccount(), accountHelper.createExpenseAccount(), accountHelper.createLiabilityAccount());
     }
 
     private void setupAuthenticatedRequestSpec() {

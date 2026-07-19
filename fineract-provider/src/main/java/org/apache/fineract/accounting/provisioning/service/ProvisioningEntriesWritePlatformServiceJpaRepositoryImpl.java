@@ -27,8 +27,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
 import org.apache.fineract.accounting.glaccount.exception.GLAccountNotFoundException;
@@ -67,10 +65,9 @@ import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 
-@RequiredArgsConstructor
-@Slf4j
 public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements ProvisioningEntriesWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl.class);
     private final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService;
     private final ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService;
     private final LoanProductRepository loanProductRepository;
@@ -85,30 +82,25 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
 
     @Override
     public CommandProcessingResult createProvisioningJournalEntries(Long provisioningEntryId, JsonCommand command) {
-        ProvisioningEntry requestedEntry = this.provisioningEntryRepository.findById(provisioningEntryId)
-                .orElseThrow(() -> new ProvisioningEntryNotfoundException(provisioningEntryId));
-
-        ProvisioningEntryData exisProvisioningEntryData = this.provisioningEntriesReadPlatformService
-                .retrieveExistingProvisioningIdDateWithJournals();
+        ProvisioningEntry requestedEntry = this.provisioningEntryRepository.findById(provisioningEntryId).orElseThrow(() -> new ProvisioningEntryNotfoundException(provisioningEntryId));
+        ProvisioningEntryData exisProvisioningEntryData = this.provisioningEntriesReadPlatformService.retrieveExistingProvisioningIdDateWithJournals();
         revertAndAddJournalEntries(exisProvisioningEntryData, requestedEntry);
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(requestedEntry.getId()) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(requestedEntry.getId()).build();
     }
 
     private void revertAndAddJournalEntries(ProvisioningEntryData existingEntryData, ProvisioningEntry requestedEntry) {
         if (existingEntryData != null) {
             validateForCreateJournalEntry(existingEntryData, requestedEntry);
-            this.journalEntryWritePlatformService.revertProvisioningJournalEntries(requestedEntry.getCreatedDate(),
-                    existingEntryData.getId(), PortfolioProductType.PROVISIONING.getValue());
+            this.journalEntryWritePlatformService.revertProvisioningJournalEntries(requestedEntry.getCreatedDate(), existingEntryData.getId(), PortfolioProductType.PROVISIONING.getValue());
         }
         if (requestedEntry.getLoanProductProvisioningEntries() == null || requestedEntry.getLoanProductProvisioningEntries().size() == 0) {
             requestedEntry.setIsJournalEntryCreated(Boolean.FALSE);
         } else {
             requestedEntry.setIsJournalEntryCreated(Boolean.TRUE);
         }
-
         this.provisioningEntryRepository.saveAndFlush(requestedEntry);
         this.journalEntryWritePlatformService.createProvisioningJournalEntries(requestedEntry);
     }
@@ -140,16 +132,15 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
         LocalDate createdDate = parseDate(command);
         boolean addJournalEntries = isJournalEntriesRequired(command);
         try {
-            Collection<ProvisioningCriteriaData> criteriaCollection = this.provisioningCriteriaReadPlatformService
-                    .retrieveAllProvisioningCriterias();
+            Collection<ProvisioningCriteriaData> criteriaCollection = this.provisioningCriteriaReadPlatformService.retrieveAllProvisioningCriterias();
             if (criteriaCollection == null || criteriaCollection.isEmpty()) {
                 throw new NoProvisioningCriteriaDefinitionFound();
             }
             ProvisioningEntry requestedEntry = createProvisioningEntry(createdDate, addJournalEntries);
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(requestedEntry.getId()) //
-                    .build();
+            return  //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(requestedEntry.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException e) {
             return CommandProcessingResult.empty();
         }
@@ -166,8 +157,7 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
         Collection<LoanProductProvisioningEntry> entries = generateLoanProvisioningEntry(requestedEntry, date);
         requestedEntry.setProvisioningEntries(entries);
         if (addJournalEntries) {
-            ProvisioningEntryData existingProvisioningEntryData = this.provisioningEntriesReadPlatformService
-                    .retrieveExistingProvisioningIdDateWithJournals();
+            ProvisioningEntryData existingProvisioningEntryData = this.provisioningEntriesReadPlatformService.retrieveExistingProvisioningIdDateWithJournals();
             revertAndAddJournalEntries(existingProvisioningEntryData, requestedEntry);
         } else {
             this.provisioningEntryRepository.saveAndFlush(requestedEntry);
@@ -177,40 +167,31 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
 
     @Override
     public CommandProcessingResult reCreateProvisioningEntries(Long provisioningEntryId, JsonCommand command) {
-        ProvisioningEntry requestedEntry = this.provisioningEntryRepository.findById(provisioningEntryId)
-                .orElseThrow(() -> new ProvisioningEntryNotfoundException(provisioningEntryId));
+        ProvisioningEntry requestedEntry = this.provisioningEntryRepository.findById(provisioningEntryId).orElseThrow(() -> new ProvisioningEntryNotfoundException(provisioningEntryId));
         requestedEntry.getLoanProductProvisioningEntries().clear();
         this.provisioningEntryRepository.saveAndFlush(requestedEntry);
         Collection<LoanProductProvisioningEntry> entries = generateLoanProvisioningEntry(requestedEntry, requestedEntry.getCreatedDate());
         requestedEntry.setProvisioningEntries(entries);
         this.provisioningEntryRepository.saveAndFlush(requestedEntry);
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(requestedEntry.getId()) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(requestedEntry.getId()).build();
     }
 
     private Collection<LoanProductProvisioningEntry> generateLoanProvisioningEntry(ProvisioningEntry parent, LocalDate date) {
-        Collection<LoanProductProvisioningEntryData> entries = this.provisioningEntriesReadPlatformService
-                .retrieveLoanProductsProvisioningData(date);
+        Collection<LoanProductProvisioningEntryData> entries = this.provisioningEntriesReadPlatformService.retrieveLoanProductsProvisioningData(date);
         // Collect all referenced IDs upfront and bulk-fetch via findAllById,
         // replacing the previous pattern of N x 5 individual repository calls per
         // loop iteration (consistent with the optimisation in FINERACT-2561).
         Set<Long> productIds = entries.stream().map(LoanProductProvisioningEntryData::getProductId).collect(Collectors.toSet());
         Set<Long> officeIds = entries.stream().map(LoanProductProvisioningEntryData::getOfficeId).collect(Collectors.toSet());
         Set<Long> categoryIds = entries.stream().map(LoanProductProvisioningEntryData::getCategoryId).collect(Collectors.toSet());
-        Set<Long> glAccountIds = entries.stream().flatMap(d -> Stream.of(d.getLiablityAccount(), d.getExpenseAccount()))
-                .collect(Collectors.toSet());
-
-        Map<Long, LoanProduct> loanProductMap = loanProductRepository.findAllById(productIds).stream()
-                .collect(Collectors.toMap(LoanProduct::getId, Function.identity()));
-        Map<Long, Office> officeMap = officeRepository.findAllById(officeIds).stream()
-                .collect(Collectors.toMap(Office::getId, Function.identity()));
-        Map<Long, ProvisioningCategory> categoryMap = provisioningCategoryRepository.findAllById(categoryIds).stream()
-                .collect(Collectors.toMap(ProvisioningCategory::getId, Function.identity()));
-        Map<Long, GLAccount> glAccountMap = glAccountRepository.findAllById(glAccountIds).stream()
-                .collect(Collectors.toMap(GLAccount::getId, Function.identity()));
-
+        Set<Long> glAccountIds = entries.stream().flatMap(d -> Stream.of(d.getLiablityAccount(), d.getExpenseAccount())).collect(Collectors.toSet());
+        Map<Long, LoanProduct> loanProductMap = loanProductRepository.findAllById(productIds).stream().collect(Collectors.toMap(LoanProduct::getId, Function.identity()));
+        Map<Long, Office> officeMap = officeRepository.findAllById(officeIds).stream().collect(Collectors.toMap(Office::getId, Function.identity()));
+        Map<Long, ProvisioningCategory> categoryMap = provisioningCategoryRepository.findAllById(categoryIds).stream().collect(Collectors.toMap(ProvisioningCategory::getId, Function.identity()));
+        Map<Long, GLAccount> glAccountMap = glAccountRepository.findAllById(glAccountIds).stream().collect(Collectors.toMap(GLAccount::getId, Function.identity()));
         Map<Integer, LoanProductProvisioningEntry> provisioningEntries = new HashMap<>();
         for (LoanProductProvisioningEntryData data : entries) {
             LoanProduct loanProduct = loanProductMap.get(data.getProductId());
@@ -234,10 +215,7 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
             Money money = Money.of(currency, data.getBalance());
             Money amountToReserve = money.percentageOf(data.getPercentage(), MoneyHelper.getMathContext());
             Long criteraId = data.getCriteriaId();
-            LoanProductProvisioningEntry entry = new LoanProductProvisioningEntry().setLoanProduct(loanProduct).setOffice(office)
-                    .setCurrencyCode(data.getCurrencyCode()).setProvisioningCategory(provisioningCategory)
-                    .setOverdueInDays(data.getOverdueInDays()).setReservedAmount(amountToReserve.getAmount())
-                    .setLiabilityAccount(liabilityAccount).setExpenseAccount(expenseAccount).setCriteriaId(criteraId);
+            LoanProductProvisioningEntry entry = new LoanProductProvisioningEntry().setLoanProduct(loanProduct).setOffice(office).setCurrencyCode(data.getCurrencyCode()).setProvisioningCategory(provisioningCategory).setOverdueInDays(data.getOverdueInDays()).setReservedAmount(amountToReserve.getAmount()).setLiabilityAccount(liabilityAccount).setExpenseAccount(expenseAccount).setCriteriaId(criteraId);
             entry.setEntry(parent);
             if (!provisioningEntries.containsKey(entry.partialHashCode())) {
                 provisioningEntries.put(entry.partialHashCode(), entry);
@@ -247,5 +225,20 @@ public class ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl implements
             }
         }
         return provisioningEntries.values();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProvisioningEntriesWritePlatformServiceJpaRepositoryImpl(final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService, final ProvisioningCriteriaReadPlatformService provisioningCriteriaReadPlatformService, final LoanProductRepository loanProductRepository, final GLAccountRepository glAccountRepository, final OfficeRepository officeRepository, final ProvisioningCategoryRepository provisioningCategoryRepository, final PlatformSecurityContext platformSecurityContext, final ProvisioningEntryRepository provisioningEntryRepository, final JournalEntryWritePlatformService journalEntryWritePlatformService, final ProvisioningEntriesDefinitionJsonDeserializer fromApiJsonDeserializer, final FromJsonHelper fromApiJsonHelper) {
+        this.provisioningEntriesReadPlatformService = provisioningEntriesReadPlatformService;
+        this.provisioningCriteriaReadPlatformService = provisioningCriteriaReadPlatformService;
+        this.loanProductRepository = loanProductRepository;
+        this.glAccountRepository = glAccountRepository;
+        this.officeRepository = officeRepository;
+        this.provisioningCategoryRepository = provisioningCategoryRepository;
+        this.platformSecurityContext = platformSecurityContext;
+        this.provisioningEntryRepository = provisioningEntryRepository;
+        this.journalEntryWritePlatformService = journalEntryWritePlatformService;
+        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
+        this.fromApiJsonHelper = fromApiJsonHelper;
     }
 }

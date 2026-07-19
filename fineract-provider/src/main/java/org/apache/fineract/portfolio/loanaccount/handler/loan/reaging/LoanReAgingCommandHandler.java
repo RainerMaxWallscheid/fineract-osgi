@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler.loan.reaging;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.DataIntegrityErrorHandler;
@@ -30,10 +29,8 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN", action = "REAGE")
 public class LoanReAgingCommandHandler implements NewCommandSourceHandler {
-
     private final LoanReAgingService loanReAgingService;
     private final DataIntegrityErrorHandler dataIntegrityErrorHandler;
 
@@ -42,9 +39,14 @@ public class LoanReAgingCommandHandler implements NewCommandSourceHandler {
         try {
             return loanReAgingService.reAge(command.getLoanId(), command);
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.reAge",
-                    "Error while handling re-aging");
+            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.reAge", "Error while handling re-aging");
             return CommandProcessingResult.empty();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanReAgingCommandHandler(final LoanReAgingService loanReAgingService, final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
+        this.loanReAgingService = loanReAgingService;
+        this.dataIntegrityErrorHandler = dataIntegrityErrorHandler;
     }
 }

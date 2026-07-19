@@ -23,28 +23,57 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "m_product_loan_variable_installment_config")
 public class LoanProductVariableInstallmentConfig extends AbstractPersistableCustom<Long> {
-
-    @Setter
     @OneToOne
     @JoinColumn(name = "loan_product_id", nullable = false)
     private LoanProduct loanProduct;
-
     @Column(name = "minimum_gap")
     private Integer minimumGap;
-
     @Column(name = "maximum_gap")
     private Integer maximumGap;
+
+    @java.lang.SuppressWarnings("all")
+        public LoanProduct getLoanProduct() {
+        return this.loanProduct;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getMinimumGap() {
+        return this.minimumGap;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getMaximumGap() {
+        return this.maximumGap;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMinimumGap(final Integer minimumGap) {
+        this.minimumGap = minimumGap;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMaximumGap(final Integer maximumGap) {
+        this.maximumGap = maximumGap;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanProductVariableInstallmentConfig() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanProductVariableInstallmentConfig(final LoanProduct loanProduct, final Integer minimumGap, final Integer maximumGap) {
+        this.loanProduct = loanProduct;
+        this.minimumGap = minimumGap;
+        this.maximumGap = maximumGap;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanProduct(final LoanProduct loanProduct) {
+        this.loanProduct = loanProduct;
+    }
 }

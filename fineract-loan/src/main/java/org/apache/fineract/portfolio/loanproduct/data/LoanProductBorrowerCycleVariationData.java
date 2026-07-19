@@ -20,14 +20,11 @@ package org.apache.fineract.portfolio.loanproduct.data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductParamType;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductValueConditionType;
 
-@Getter
 public class LoanProductBorrowerCycleVariationData implements Serializable {
-
     private final Long id;
     private final Integer borrowerCycleNumber;
     private final EnumOptionData paramType;
@@ -36,8 +33,7 @@ public class LoanProductBorrowerCycleVariationData implements Serializable {
     private final BigDecimal maxValue;
     private final BigDecimal defaultValue;
 
-    public LoanProductBorrowerCycleVariationData(final Long id, final Integer borrowerCycleNumber, final EnumOptionData paramType,
-            final EnumOptionData valueConditionType, final BigDecimal defaultValue, final BigDecimal minValue, final BigDecimal maxValue) {
+    public LoanProductBorrowerCycleVariationData(final Long id, final Integer borrowerCycleNumber, final EnumOptionData paramType, final EnumOptionData valueConditionType, final BigDecimal defaultValue, final BigDecimal minValue, final BigDecimal maxValue) {
         this.id = id;
         this.borrowerCycleNumber = borrowerCycleNumber;
         this.paramType = paramType;
@@ -55,4 +51,38 @@ public class LoanProductBorrowerCycleVariationData implements Serializable {
         return LoanProductValueConditionType.fromInt(this.valueConditionType.getId().intValue());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getBorrowerCycleNumber() {
+        return this.borrowerCycleNumber;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getParamType() {
+        return this.paramType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getValueConditionType() {
+        return this.valueConditionType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getMinValue() {
+        return this.minValue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getMaxValue() {
+        return this.maxValue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getDefaultValue() {
+        return this.defaultValue;
+    }
 }

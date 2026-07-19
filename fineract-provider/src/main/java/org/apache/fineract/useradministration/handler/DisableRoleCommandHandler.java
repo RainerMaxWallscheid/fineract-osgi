@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.useradministration.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,9 +27,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @CommandType(entity = "ROLE", action = "DISABLE")
-@RequiredArgsConstructor
 public class DisableRoleCommandHandler implements NewCommandSourceHandler {
-
     private final RoleWritePlatformService writePlatformService;
 
     @Override
@@ -38,4 +35,8 @@ public class DisableRoleCommandHandler implements NewCommandSourceHandler {
         return this.writePlatformService.disableRole(command.entityId());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DisableRoleCommandHandler(final RoleWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
+    }
 }

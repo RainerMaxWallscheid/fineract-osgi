@@ -22,7 +22,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.common.AccountingConstants.FinancialActivity;
 import org.apache.fineract.accounting.common.AccountingDropdownReadPlatformService;
 import org.apache.fineract.accounting.financialactivityaccount.data.FinancialActivityAccountData;
@@ -36,9 +35,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class FinancialActivityAccountReadPlatformServiceImpl implements FinancialActivityAccountReadPlatformService {
-
     private final JdbcTemplate jdbcTemplate;
     private final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService;
     private final FinancialActivityAccountMapper financialActivityAccountMapper = new FinancialActivityAccountMapper();
@@ -56,8 +53,7 @@ public class FinancialActivityAccountReadPlatformServiceImpl implements Financia
             sqlBuilder.append("select ");
             sqlBuilder.append(this.financialActivityAccountMapper.schema());
             sqlBuilder.append(" where faa.id=?");
-            return this.jdbcTemplate.queryForObject(sqlBuilder.toString(), this.financialActivityAccountMapper,
-                    new Object[] { financialActivityAccountId });
+            return this.jdbcTemplate.queryForObject(sqlBuilder.toString(), this.financialActivityAccountMapper, new Object[] {financialActivityAccountId});
         } catch (final EmptyResultDataAccessException e) {
             throw new FinancialActivityAccountNotFoundException(financialActivityAccountId, e);
         }
@@ -77,14 +73,13 @@ public class FinancialActivityAccountReadPlatformServiceImpl implements Financia
         return addTemplateDetails(financialActivityAccountData);
     }
 
-    private static final class FinancialActivityAccountMapper implements RowMapper<FinancialActivityAccountData> {
 
+    private static final class FinancialActivityAccountMapper implements RowMapper<FinancialActivityAccountData> {
         private final String sql;
 
         FinancialActivityAccountMapper() {
             StringBuilder sb = new StringBuilder(300);
-            sb.append(
-                    " faa.id as id, faa.financial_activity_type as financialActivityId, glaccount.id as glAccountId,glaccount.name as glAccountName,glaccount.gl_code as glCode  ");
+            sb.append(" faa.id as id, faa.financial_activity_type as financialActivityId, glaccount.id as glAccountId,glaccount.name as glAccountName,glaccount.gl_code as glCode  ");
             sb.append(" from acc_gl_financial_activity_account faa ");
             sb.append(" join acc_gl_account glaccount on glaccount.id = faa.gl_account_id");
             sql = sb.toString();
@@ -101,15 +96,16 @@ public class FinancialActivityAccountReadPlatformServiceImpl implements Financia
             final Integer financialActivityId = JdbcSupport.getInteger(rs, "financialActivityId");
             final String glAccountName = rs.getString("glAccountName");
             final String glCode = rs.getString("glCode");
-
             final GLAccountData glAccountData = new GLAccountData().setId(glAccountId).setName(glAccountName).setGlCode(glCode);
-
             final FinancialActivityData financialActivityData = FinancialActivity.toFinancialActivityData(financialActivityId);
-
-            final FinancialActivityAccountData financialActivityAccountData = new FinancialActivityAccountData(id, financialActivityData,
-                    glAccountData);
+            final FinancialActivityAccountData financialActivityAccountData = new FinancialActivityAccountData(id, financialActivityData, glAccountData);
             return financialActivityAccountData;
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public FinancialActivityAccountReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.accountingDropdownReadPlatformService = accountingDropdownReadPlatformService;
+    }
 }

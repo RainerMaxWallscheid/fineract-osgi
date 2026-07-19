@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.useradministration.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,15 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "PERMISSION", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateMakerCheckerPermissionsCommandHandler implements NewCommandSourceHandler {
-
     private final PermissionWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.updateMakerCheckerPermissions(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateMakerCheckerPermissionsCommandHandler(final PermissionWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

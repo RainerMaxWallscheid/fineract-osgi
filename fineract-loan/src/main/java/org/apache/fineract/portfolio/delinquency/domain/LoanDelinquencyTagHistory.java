@@ -25,33 +25,22 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.time.LocalDate;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "m_loan_delinquency_tag_history")
 public class LoanDelinquencyTagHistory extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @ManyToOne
     @JoinColumn(name = "delinquency_range_id", nullable = false)
     private DelinquencyRange delinquencyRange;
-
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
-
     @Column(name = "addedon_date", nullable = false)
     private LocalDate addedOnDate;
-
     @Column(name = "liftedon_date", nullable = true)
     private LocalDate liftedOnDate;
-
     @Version
     private Long version;
 
@@ -62,4 +51,57 @@ public class LoanDelinquencyTagHistory extends AbstractAuditableWithUTCDateTimeC
         this.liftedOnDate = liftedOnDate;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyRange getDelinquencyRange() {
+        return this.delinquencyRange;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Loan getLoan() {
+        return this.loan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getAddedOnDate() {
+        return this.addedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getLiftedOnDate() {
+        return this.liftedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getVersion() {
+        return this.version;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDelinquencyRange(final DelinquencyRange delinquencyRange) {
+        this.delinquencyRange = delinquencyRange;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoan(final Loan loan) {
+        this.loan = loan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAddedOnDate(final LocalDate addedOnDate) {
+        this.addedOnDate = addedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLiftedOnDate(final LocalDate liftedOnDate) {
+        this.liftedOnDate = liftedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setVersion(final Long version) {
+        this.version = version;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanDelinquencyTagHistory() {
+    }
 }

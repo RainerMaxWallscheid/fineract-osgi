@@ -21,23 +21,17 @@ package org.apache.fineract.infrastructure.jobs.config;
 import static org.springframework.batch.support.DatabaseType.MARIADB;
 import static org.springframework.batch.support.DatabaseType.MYSQL;
 import static org.springframework.batch.support.DatabaseType.POSTGRES;
-
 import java.util.List;
 import javax.sql.DataSource;
-import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.MySQLMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.PostgresSequenceMaxValueIncrementer;
 
-@RequiredArgsConstructor
 public class FineractDataFieldMaxValueIncrementerFactory implements DataFieldMaxValueIncrementerFactory {
-
     private static final List<DatabaseType> SUPPORTED_DATABASE_TYPES = List.of(MARIADB, MYSQL, POSTGRES);
-
     private final DataSource dataSource;
-
     private String incrementerColumnName = "ID";
 
     /**
@@ -56,8 +50,7 @@ public class FineractDataFieldMaxValueIncrementerFactory implements DataFieldMax
     public DataFieldMaxValueIncrementer getIncrementer(String incrementerType, String incrementerName) {
         DatabaseType databaseType = getDatabaseType(incrementerType);
         if (databaseType == MYSQL || databaseType == MARIADB) {
-            MySQLMaxValueIncrementer mySQLMaxValueIncrementer = new MySQLMaxValueIncrementer(dataSource, incrementerName,
-                    incrementerColumnName);
+            MySQLMaxValueIncrementer mySQLMaxValueIncrementer = new MySQLMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
             mySQLMaxValueIncrementer.setUseNewConnection(true);
             return mySQLMaxValueIncrementer;
         } else if (databaseType == POSTGRES) {
@@ -79,5 +72,10 @@ public class FineractDataFieldMaxValueIncrementerFactory implements DataFieldMax
 
     private DatabaseType getDatabaseType(String incrementerType) {
         return DatabaseType.valueOf(incrementerType.toUpperCase());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FineractDataFieldMaxValueIncrementerFactory(final DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 }

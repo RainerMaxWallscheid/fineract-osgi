@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.campaigns.sms.data.SmsBusinessRulesData;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.springframework.dao.DataAccessException;
@@ -33,9 +32,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class BusinessRuleMapper implements ResultSetExtractor<List<SmsBusinessRulesData>> {
-
     private String schema;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
 
@@ -54,7 +51,6 @@ public class BusinessRuleMapper implements ResultSetExtractor<List<SmsBusinessRu
         sql.append("from stretchy_report sr ");
         sql.append("left join stretchy_report_parameter as srp on srp.report_id = sr.id ");
         sql.append("left join stretchy_parameter as sp on sp.id = srp.parameter_id ");
-
         this.schema = sql.toString();
     }
 
@@ -65,11 +61,8 @@ public class BusinessRuleMapper implements ResultSetExtractor<List<SmsBusinessRu
     @Override
     public List<SmsBusinessRulesData> extractData(ResultSet rs) throws SQLException, DataAccessException {
         List<SmsBusinessRulesData> smsBusinessRulesDataList = new ArrayList<>();
-
         SmsBusinessRulesData smsBusinessRulesData = null;
-
         Map<Long, SmsBusinessRulesData> mapOfSameObjects = new HashMap<>();
-
         while (rs.next()) {
             final Long id = rs.getLong("id");
             smsBusinessRulesData = mapOfSameObjects.get(id);
@@ -80,7 +73,6 @@ public class BusinessRuleMapper implements ResultSetExtractor<List<SmsBusinessRu
                 final String paramName = rs.getString("paramName");
                 final String paramLabel = rs.getString("paramLabel");
                 final String description = rs.getString("description");
-
                 Map<String, Object> hashMap = new HashMap<String, Object>();
                 hashMap.put(paramLabel, paramName);
                 smsBusinessRulesData = SmsBusinessRulesData.instance(id, reportName, reportType, reportSubType, hashMap, description);
@@ -93,11 +85,14 @@ public class BusinessRuleMapper implements ResultSetExtractor<List<SmsBusinessRu
             final String paramName = rs.getString("paramName");
             final String paramLabel = rs.getString("paramLabel");
             hashMap.put(paramLabel, paramName);
-
             // get existing map and add new items to it
             smsBusinessRulesData.reportParamName().putAll(hashMap);
         }
-
         return smsBusinessRulesDataList;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BusinessRuleMapper(final DatabaseSpecificSQLGenerator sqlGenerator) {
+        this.sqlGenerator = sqlGenerator;
     }
 }

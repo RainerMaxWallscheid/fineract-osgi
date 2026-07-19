@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanorigination.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.portfolio.loanaccount.service.LoanOriginatorLinkingService;
 import org.apache.fineract.portfolio.loanorigination.domain.LoanOriginator;
 import org.apache.fineract.portfolio.loanorigination.domain.LoanOriginatorRepository;
@@ -32,16 +31,14 @@ import org.springframework.stereotype.Service;
  * Implementation of {@link LoanOriginatorLinkingService} that handles processing of originators during loan
  * application. This service is active only when the loan-origination module is enabled.
  */
-@Slf4j
 @Service("workingCapitalLoanOriginatorLinkingServiceImpl")
 @ConditionalOnProperty(value = "fineract.module.loan-origination.enabled", havingValue = "true")
 public class WorkingCapitalLoanOriginatorLinkingServiceImpl extends AbstractLoanOriginatorLinkingServiceImpl {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanOriginatorLinkingServiceImpl.class);
     private final WorkingCapitalLoanOriginatorMappingRepository loanOriginatorMappingRepository;
 
-    public WorkingCapitalLoanOriginatorLinkingServiceImpl(LoanOriginatorRepository loanOriginatorRepository,
-            LoanApplicationOriginatorDataValidator validator, LoanOriginatorHelper loanOriginatorHelper,
-            WorkingCapitalLoanOriginatorMappingRepository loanOriginatorMappingRepository) {
+    public WorkingCapitalLoanOriginatorLinkingServiceImpl(LoanOriginatorRepository loanOriginatorRepository, LoanApplicationOriginatorDataValidator validator, LoanOriginatorHelper loanOriginatorHelper, WorkingCapitalLoanOriginatorMappingRepository loanOriginatorMappingRepository) {
         super(loanOriginatorRepository, validator, loanOriginatorHelper);
         this.loanOriginatorMappingRepository = loanOriginatorMappingRepository;
     }

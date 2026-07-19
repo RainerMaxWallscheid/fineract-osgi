@@ -18,15 +18,11 @@
  */
 package org.apache.fineract.infrastructure.event.business.domain.loan.transaction;
 
-import lombok.Getter;
 import org.apache.fineract.infrastructure.event.business.domain.AbstractBusinessEvent;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 
-@Getter
 public abstract class LoanTransactionBusinessEvent extends AbstractBusinessEvent<LoanTransaction> {
-
     private static final String CATEGORY = "Loan";
-
     private final LoanTransactionFlagsData flags;
 
     public LoanTransactionBusinessEvent(LoanTransaction value) {
@@ -46,5 +42,10 @@ public abstract class LoanTransactionBusinessEvent extends AbstractBusinessEvent
     @Override
     public Long getAggregateRootId() {
         return get().getLoan().getId();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionFlagsData getFlags() {
+        return this.flags;
     }
 }

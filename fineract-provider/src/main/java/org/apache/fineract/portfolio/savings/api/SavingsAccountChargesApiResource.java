@@ -22,7 +22,6 @@ import static org.apache.fineract.portfolio.savings.SavingsApiConstants.COMMAND_
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.COMMAND_PAY_CHARGE;
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.COMMAND_WAIVE_CHARGE;
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.SAVINGS_ACCOUNT_CHARGE_RESOURCE_NAME;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -46,7 +45,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
@@ -66,12 +64,8 @@ import org.springframework.stereotype.Component;
 
 @Path("/v1/savingsaccounts/{savingsAccountId}/charges")
 @Component
-@Tag(name = "Savings Charges", description = "Its typical for MFIs to add maintenance and operating charges. They can be either Fees or Penalties.\n"
-        + "\n"
-        + "Savings Charges are instances of Charges and represent either fees and penalties for savings products. Refer Charges for documentation of the various properties of a charge, Only additional properties ( specific to the context of a Charge being associated with a Savings account) are described here")
-@RequiredArgsConstructor
+@Tag(name = "Savings Charges", description = "Its typical for MFIs to add maintenance and operating charges. They can be either Fees or Penalties.\n" + "\n" + "Savings Charges are instances of Charges and represent either fees and penalties for savings products. Refer Charges for documentation of the various properties of a charge, Only additional properties ( specific to the context of a Charge being associated with a Savings account) are described here")
 public class SavingsAccountChargesApiResource {
-
     private final PlatformSecurityContext context;
     private final ChargeReadPlatformService chargeReadPlatformService;
     private final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService;
@@ -84,187 +78,118 @@ public class SavingsAccountChargesApiResource {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "List Savings Charges", operationId = "retrieveAllSavingsAccountCharges", description = "Lists Savings Charges\n\n"
-            + "Example Requests:\n" + "\n" + "savingsaccounts/1/charges\n" + "\n" + "savingsaccounts/1/charges?chargeStatus=all\n" + "\n"
-            + "savingsaccounts/1/charges?chargeStatus=inactive\n" + "\n" + "savingsaccounts/1/charges?chargeStatus=active\n" + "\n"
-            + "savingsaccounts/1/charges?fields=name,amountOrPercentage")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.GetSavingsAccountsSavingsAccountIdChargesResponse.class)))) })
-    public String retrieveAllSavingsAccountCharges(
-            @PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId,
-            @DefaultValue("all") @QueryParam("chargeStatus") @Parameter(description = "chargeStatus") final String chargeStatus,
-            @Context final UriInfo uriInfo) {
-
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "List Savings Charges", operationId = "retrieveAllSavingsAccountCharges", description = "Lists Savings Charges\n\n" + "Example Requests:\n" + "\n" + "savingsaccounts/1/charges\n" + "\n" + "savingsaccounts/1/charges?chargeStatus=all\n" + "\n" + "savingsaccounts/1/charges?chargeStatus=inactive\n" + "\n" + "savingsaccounts/1/charges?chargeStatus=active\n" + "\n" + "savingsaccounts/1/charges?fields=name,amountOrPercentage")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.GetSavingsAccountsSavingsAccountIdChargesResponse.class))))})
+    public String retrieveAllSavingsAccountCharges(@PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId, @DefaultValue("all") @QueryParam("chargeStatus") @Parameter(description = "chargeStatus") final String chargeStatus, @Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(SAVINGS_ACCOUNT_CHARGE_RESOURCE_NAME);
-
         if (!(is(chargeStatus, "all") || is(chargeStatus, "active") || is(chargeStatus, "inactive"))) {
-            throw new UnrecognizedQueryParamException("status", chargeStatus, new Object[] { "all", "active", "inactive" });
+            throw new UnrecognizedQueryParamException("status", chargeStatus, new Object[] {"all", "active", "inactive"});
         }
-
-        final Collection<SavingsAccountChargeData> savingsAccountCharges = this.savingsAccountChargeReadPlatformService
-                .retrieveSavingsAccountCharges(savingsAccountId, chargeStatus);
-
+        final Collection<SavingsAccountChargeData> savingsAccountCharges = this.savingsAccountChargeReadPlatformService.retrieveSavingsAccountCharges(savingsAccountId, chargeStatus);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.toApiJsonSerializer.serialize(settings, savingsAccountCharges,
-                SavingsApiSetConstants.SAVINGS_ACCOUNT_CHARGES_RESPONSE_DATA_PARAMETERS);
+        return this.toApiJsonSerializer.serialize(settings, savingsAccountCharges, SavingsApiSetConstants.SAVINGS_ACCOUNT_CHARGES_RESPONSE_DATA_PARAMETERS);
     }
 
     @GET
     @Path("template")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve Savings Charges Template", operationId = "retrieveTemplateSavingsAccountCharge", description = "This is a convenience resource. It can be useful when building maintenance user interface screens for client applications. The template data returned consists of any or all of:\n"
-            + "\n" + "Field Defaults\n" + "Allowed description Lists\n" + "Example Request:\n" + "\n"
-            + "savingsaccounts/1/charges/template")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve Savings Charges Template", operationId = "retrieveTemplateSavingsAccountCharge", description = "This is a convenience resource. It can be useful when building maintenance user interface screens for client applications. The template data returned consists of any or all of:\n" + "\n" + "Field Defaults\n" + "Allowed description Lists\n" + "Example Request:\n" + "\n" + "savingsaccounts/1/charges/template")
     @AlternativeOperationId("retrieveTemplate_18")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.GetSavingsAccountsSavingsAccountIdChargesTemplateResponse.class))) })
-    public String retrieveTemplate(@PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId,
-            @Context final UriInfo uriInfo) {
-
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.GetSavingsAccountsSavingsAccountIdChargesTemplateResponse.class)))})
+    public String retrieveTemplate(@PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId, @Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(SAVINGS_ACCOUNT_CHARGE_RESOURCE_NAME);
-
-        final Collection<ChargeData> chargeOptions = this.chargeReadPlatformService
-                .retrieveSavingsAccountApplicableCharges(savingsAccountId);
+        final Collection<ChargeData> chargeOptions = this.chargeReadPlatformService.retrieveSavingsAccountApplicableCharges(savingsAccountId);
         final SavingsAccountChargeData savingsAccountChargeTemplate = SavingsAccountChargeData.template(chargeOptions);
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.toApiJsonSerializer.serialize(settings, savingsAccountChargeTemplate,
-                SavingsApiSetConstants.SAVINGS_ACCOUNT_CHARGES_RESPONSE_DATA_PARAMETERS);
+        return this.toApiJsonSerializer.serialize(settings, savingsAccountChargeTemplate, SavingsApiSetConstants.SAVINGS_ACCOUNT_CHARGES_RESPONSE_DATA_PARAMETERS);
     }
 
     @GET
     @Path("{savingsAccountChargeId}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve a Savings account Charge", operationId = "retrieveOneSavingsAccountCharge", description = "Retrieves a Savings account Charge\n\n"
-            + "Example Requests:\n" + "\n" + "/savingsaccounts/1/charges/5\n" + "\n" + "\n"
-            + "/savingsaccounts/1/charges/5?fields=name,amountOrPercentage")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve a Savings account Charge", operationId = "retrieveOneSavingsAccountCharge", description = "Retrieves a Savings account Charge\n\n" + "Example Requests:\n" + "\n" + "/savingsaccounts/1/charges/5\n" + "\n" + "\n" + "/savingsaccounts/1/charges/5?fields=name,amountOrPercentage")
     @AlternativeOperationId("retrieveSavingsAccountCharge")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.GetSavingsAccountsSavingsAccountIdChargesSavingsAccountChargeIdResponse.class))) })
-    public String retrieveSavingsAccountCharge(
-            @PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId,
-            @PathParam("savingsAccountChargeId") @Parameter(description = "savingsAccountChargeId") final Long savingsAccountChargeId,
-            @Context final UriInfo uriInfo) {
-
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.GetSavingsAccountsSavingsAccountIdChargesSavingsAccountChargeIdResponse.class)))})
+    public String retrieveSavingsAccountCharge(@PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId, @PathParam("savingsAccountChargeId") @Parameter(description = "savingsAccountChargeId") final Long savingsAccountChargeId, @Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(SAVINGS_ACCOUNT_CHARGE_RESOURCE_NAME);
-
-        final SavingsAccountChargeData savingsAccountCharge = this.savingsAccountChargeReadPlatformService
-                .retrieveSavingsAccountChargeDetails(savingsAccountChargeId, savingsAccountId);
-
+        final SavingsAccountChargeData savingsAccountCharge = this.savingsAccountChargeReadPlatformService.retrieveSavingsAccountChargeDetails(savingsAccountChargeId, savingsAccountId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.toApiJsonSerializer.serialize(settings, savingsAccountCharge,
-                SavingsApiSetConstants.SAVINGS_ACCOUNT_CHARGES_RESPONSE_DATA_PARAMETERS);
+        return this.toApiJsonSerializer.serialize(settings, savingsAccountCharge, SavingsApiSetConstants.SAVINGS_ACCOUNT_CHARGES_RESPONSE_DATA_PARAMETERS);
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Create a Savings account Charge", operationId = "createSavingsAccountCharge", description = "Creates a Savings account Charge\n\n"
-            + "Mandatory Fields for Savings account Charges: chargeId, amount\n\n" + "chargeId, amount, dueDate, dateFormat, locale\n\n"
-            + "chargeId, amount, feeOnMonthDay, monthDayFormat, locale")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Create a Savings account Charge", operationId = "createSavingsAccountCharge", description = "Creates a Savings account Charge\n\n" + "Mandatory Fields for Savings account Charges: chargeId, amount\n\n" + "chargeId, amount, dueDate, dateFormat, locale\n\n" + "chargeId, amount, feeOnMonthDay, monthDayFormat, locale")
     @AlternativeOperationId("addSavingsAccountCharge")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.PostSavingsAccountsSavingsAccountIdChargesRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.PostSavingsAccountsSavingsAccountIdChargesResponse.class))) })
-    public String addSavingsAccountCharge(
-            @PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createSavingsAccountCharge(savingsAccountId)
-                .withJson(apiRequestBodyAsJson).build();
-
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.PostSavingsAccountsSavingsAccountIdChargesResponse.class)))})
+    public String addSavingsAccountCharge(@PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createSavingsAccountCharge(savingsAccountId).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 
     @PUT
     @Path("{savingsAccountChargeId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a Savings account Charge", operationId = "updateSavingsAccountCharge", description = "Currently Savings account Charges may be updated only if the Savings account is not yet approved.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.PutSavingsAccountsSavingsAccountIdChargesSavingsAccountChargeIdRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.PutSavingsAccountsSavingsAccountIdChargesSavingsAccountChargeIdResponse.class))) })
-    public String updateSavingsAccountCharge(
-            @PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId,
-            @PathParam("savingsAccountChargeId") @Parameter(description = "savingsAccountChargeId") final Long savingsAccountChargeId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder()
-                .updateSavingsAccountCharge(savingsAccountId, savingsAccountChargeId).withJson(apiRequestBodyAsJson).build();
-
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.PutSavingsAccountsSavingsAccountIdChargesSavingsAccountChargeIdResponse.class)))})
+    public String updateSavingsAccountCharge(@PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId, @PathParam("savingsAccountChargeId") @Parameter(description = "savingsAccountChargeId") final Long savingsAccountChargeId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateSavingsAccountCharge(savingsAccountId, savingsAccountChargeId).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 
     @POST
     @Path("{savingsAccountChargeId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Pay a Savings account Charge | Waive off a Savings account Charge | Inactivate a Savings account Charge", operationId = "handleCommandsSavingsAccountCharge", description = "Pay a Savings account Charge:\n\n"
-            + "An active charge will be paid when savings account is active and having sufficient balance.\n\n"
-            + "Waive off a Savings account Charge:\n\n" + "Outstanding charge amount will be waived off.\n\n"
-            + "Inactivate a Savings account Charge:\n\n"
-            + "A charge will be allowed to inactivate when savings account is active and not having any dues as of today. If charge is overpaid, corresponding charge payment transactions will be reversed.\n\n"
-            + "Showing request/response for 'Pay a Savings account Charge'")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Pay a Savings account Charge | Waive off a Savings account Charge | Inactivate a Savings account Charge", operationId = "handleCommandsSavingsAccountCharge", description = "Pay a Savings account Charge:\n\n" + "An active charge will be paid when savings account is active and having sufficient balance.\n\n" + "Waive off a Savings account Charge:\n\n" + "Outstanding charge amount will be waived off.\n\n" + "Inactivate a Savings account Charge:\n\n" + "A charge will be allowed to inactivate when savings account is active and not having any dues as of today. If charge is overpaid, corresponding charge payment transactions will be reversed.\n\n" + "Showing request/response for \'Pay a Savings account Charge\'")
     @AlternativeOperationId("payOrWaiveSavingsAccountCharge")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.PostSavingsAccountsSavingsAccountIdChargesSavingsAccountChargeIdRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.PostSavingsAccountsSavingsAccountIdChargesSavingsAccountChargeIdResponse.class))) })
-    public String payOrWaiveSavingsAccountCharge(
-            @PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId,
-            @PathParam("savingsAccountChargeId") @Parameter(description = "savingsAccountChargeId") final Long savingsAccountChargeId,
-            @QueryParam("command") @Parameter(description = "command") final String commandParam,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.PostSavingsAccountsSavingsAccountIdChargesSavingsAccountChargeIdResponse.class)))})
+    public String payOrWaiveSavingsAccountCharge(@PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId, @PathParam("savingsAccountChargeId") @Parameter(description = "savingsAccountChargeId") final Long savingsAccountChargeId, @QueryParam("command") @Parameter(description = "command") final String commandParam, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
         String json = "";
         if (is(commandParam, COMMAND_WAIVE_CHARGE)) {
-            final CommandWrapper commandRequest = new CommandWrapperBuilder()
-                    .waiveSavingsAccountCharge(savingsAccountId, savingsAccountChargeId).withJson(apiRequestBodyAsJson).build();
-
+            final CommandWrapper commandRequest = new CommandWrapperBuilder().waiveSavingsAccountCharge(savingsAccountId, savingsAccountChargeId).withJson(apiRequestBodyAsJson).build();
             final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
             json = this.toApiJsonSerializer.serialize(result);
         } else if (is(commandParam, COMMAND_PAY_CHARGE)) {
-            final CommandWrapper commandRequest = new CommandWrapperBuilder()
-                    .paySavingsAccountCharge(savingsAccountId, savingsAccountChargeId).withJson(apiRequestBodyAsJson).build();
-
+            final CommandWrapper commandRequest = new CommandWrapperBuilder().paySavingsAccountCharge(savingsAccountId, savingsAccountChargeId).withJson(apiRequestBodyAsJson).build();
             final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
             json = this.toApiJsonSerializer.serialize(result);
         } else if (is(commandParam, COMMAND_INACTIVATE_CHARGE)) {
-            final CommandWrapper commandRequest = new CommandWrapperBuilder()
-                    .inactivateSavingsAccountCharge(savingsAccountId, savingsAccountChargeId).withJson(apiRequestBodyAsJson).build();
-
+            final CommandWrapper commandRequest = new CommandWrapperBuilder().inactivateSavingsAccountCharge(savingsAccountId, savingsAccountChargeId).withJson(apiRequestBodyAsJson).build();
             final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
             json = this.toApiJsonSerializer.serialize(result);
         } else {
-            throw new UnrecognizedQueryParamException("command", commandParam, COMMAND_PAY_CHARGE, COMMAND_WAIVE_CHARGE,
-                    COMMAND_INACTIVATE_CHARGE);
+            throw new UnrecognizedQueryParamException("command", commandParam, COMMAND_PAY_CHARGE, COMMAND_WAIVE_CHARGE, COMMAND_INACTIVATE_CHARGE);
         }
-
         return json;
     }
 
     @DELETE
     @Path("{savingsAccountChargeId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete a Savings account Charge", operationId = "deleteSavingsAccountCharge", description = "Note: Currently, A Savings account Charge may only be removed from Savings that are not yet approved.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.DeleteSavingsAccountsSavingsAccountIdChargesSavingsAccountChargeIdResponse.class))) })
-    public String deleteSavingsAccountCharge(
-            @PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId,
-            @PathParam("savingsAccountChargeId") @Parameter(description = "savingsAccountChargeId") final Long savingsAccountChargeId) {
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder()
-                .deleteSavingsAccountCharge(savingsAccountId, savingsAccountChargeId).build();
-
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SavingsAccountChargesApiResourceSwagger.DeleteSavingsAccountsSavingsAccountIdChargesSavingsAccountChargeIdResponse.class)))})
+    public String deleteSavingsAccountCharge(@PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId, @PathParam("savingsAccountChargeId") @Parameter(description = "savingsAccountChargeId") final Long savingsAccountChargeId) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteSavingsAccountCharge(savingsAccountId, savingsAccountChargeId).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsAccountChargesApiResource(final PlatformSecurityContext context, final ChargeReadPlatformService chargeReadPlatformService, final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService, final DefaultToApiJsonSerializer<SavingsAccountChargeData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.context = context;
+        this.chargeReadPlatformService = chargeReadPlatformService;
+        this.savingsAccountChargeReadPlatformService = savingsAccountChargeReadPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
     }
 }

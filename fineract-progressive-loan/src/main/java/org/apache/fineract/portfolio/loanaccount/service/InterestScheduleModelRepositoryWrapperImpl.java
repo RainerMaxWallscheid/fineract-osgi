@@ -23,7 +23,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.persistence.FlushModeHandler;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
@@ -42,9 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class InterestScheduleModelRepositoryWrapperImpl implements InterestScheduleModelRepositoryWrapper {
-
     private final ProgressiveLoanModelRepository loanModelRepository;
     private final ProgressiveLoanInterestScheduleModelParserService progressiveLoanInterestScheduleModelParserService;
     private final AdvancedPaymentScheduleTransactionProcessor advancedPaymentScheduleTransactionProcessor;
@@ -93,10 +90,8 @@ public class InterestScheduleModelRepositoryWrapperImpl implements InterestSched
 
     @Override
     public Optional<ProgressiveLoanInterestScheduleModel> extractModel(Optional<ProgressiveLoanModel> progressiveLoanModel) {
-        return progressiveLoanModel.map(ProgressiveLoanModel::getJsonModel) //
-                .map(jsonModel -> progressiveLoanInterestScheduleModelParserService.fromJson(jsonModel,
-                        LoanConfigurationDetailsMapper.map(progressiveLoanModel.get().getLoan()), MoneyHelper.getMathContext(),
-                        progressiveLoanModel.get().getLoan().getLoanProductRelatedDetail().getInstallmentAmountInMultiplesOf()));
+        return  //
+        progressiveLoanModel.map(ProgressiveLoanModel::getJsonModel).map(jsonModel -> progressiveLoanInterestScheduleModelParserService.fromJson(jsonModel, LoanConfigurationDetailsMapper.map(progressiveLoanModel.get().getLoan()), MoneyHelper.getMathContext(), progressiveLoanModel.get().getLoan().getLoanProductRelatedDetail().getInstallmentAmountInMultiplesOf()));
     }
 
     @Override
@@ -113,9 +108,7 @@ public class InterestScheduleModelRepositoryWrapperImpl implements InterestSched
         if (progressiveLoanModel.isPresent()) {
             savedModel = extractModel(progressiveLoanModel);
             if (savedModel.isPresent() && progressiveLoanModel.get().getBusinessDate().isBefore(businessDate)) {
-                ProgressiveTransactionCtx ctx = new ProgressiveTransactionCtx(loan.getCurrency(), loan.getRepaymentScheduleInstallments(),
-                        Set.of(), new MoneyHolder(loan.getTotalOverpaidAsMoney()), new ChangedTransactionDetail(), savedModel.get(),
-                        loan.getActiveLoanTermVariations());
+                ProgressiveTransactionCtx ctx = new ProgressiveTransactionCtx(loan.getCurrency(), loan.getRepaymentScheduleInstallments(), Set.of(), new MoneyHolder(loan.getTotalOverpaidAsMoney()), new ChangedTransactionDetail(), savedModel.get(), loan.getActiveLoanTermVariations());
                 ctx.setChargedOff(loan.isChargedOff());
                 ctx.setWrittenOff(loan.isClosedWrittenOff());
                 ctx.setContractTerminated(loan.isContractTermination());
@@ -128,16 +121,22 @@ public class InterestScheduleModelRepositoryWrapperImpl implements InterestSched
     }
 
     @Override
-    public Optional<ProgressiveLoanInterestScheduleModel> readProgressiveLoanInterestScheduleModel(final Long loanId,
-            final ILoanConfigurationDetails detail, final Integer installmentAmountInMultipliesOf) {
-        return loanModelRepository.findOneByLoanId(loanId) //
-                .map(ProgressiveLoanModel::getJsonModel) //
-                .map(jsonModel -> progressiveLoanInterestScheduleModelParserService.fromJson(jsonModel, detail,
-                        MoneyHelper.getMathContext(), installmentAmountInMultipliesOf)); //
+    public Optional<ProgressiveLoanInterestScheduleModel> readProgressiveLoanInterestScheduleModel(final Long loanId, final ILoanConfigurationDetails detail, final Integer installmentAmountInMultipliesOf) {
+        return  //
+        //
+        loanModelRepository.findOneByLoanId(loanId).map(ProgressiveLoanModel::getJsonModel).map(jsonModel -> progressiveLoanInterestScheduleModelParserService.fromJson(jsonModel, detail, MoneyHelper.getMathContext(), installmentAmountInMultipliesOf)); //
     }
 
     @Override
     public Long removeByLoanId(Long loanId) {
         return loanModelRepository.removeByLoanId(loanId);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InterestScheduleModelRepositoryWrapperImpl(final ProgressiveLoanModelRepository loanModelRepository, final ProgressiveLoanInterestScheduleModelParserService progressiveLoanInterestScheduleModelParserService, final AdvancedPaymentScheduleTransactionProcessor advancedPaymentScheduleTransactionProcessor, final FlushModeHandler flushModeHandler) {
+        this.loanModelRepository = loanModelRepository;
+        this.progressiveLoanInterestScheduleModelParserService = progressiveLoanInterestScheduleModelParserService;
+        this.advancedPaymentScheduleTransactionProcessor = advancedPaymentScheduleTransactionProcessor;
+        this.flushModeHandler = flushModeHandler;
     }
 }

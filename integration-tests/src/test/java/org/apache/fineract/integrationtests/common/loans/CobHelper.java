@@ -19,26 +19,24 @@
 package org.apache.fineract.integrationtests.common.loans;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
-
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.COBPartition;
 import org.apache.fineract.integrationtests.common.FineractFeignClientHelper;
 
-@Slf4j
 public final class CobHelper {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CobHelper.class);
 
-    private CobHelper() {}
+    private CobHelper() {
+    }
 
     public static List<COBPartition> getCobPartitions(int partitionSize) {
         return ok(() -> FineractFeignClientHelper.getFineractFeignClient().internalCob().getCobPartitions(partitionSize));
-
     }
 
     public static void fastForwardLoansLastCOBDate(final Long loanId, final String cobDate) {
         ok(() -> {
-            FineractFeignClientHelper.getFineractFeignClient().internalCob().updateLoanCobLastDate(loanId,
-                    "{\"lastClosedBusinessDate\":\"" + cobDate + "\"}");
+            FineractFeignClientHelper.getFineractFeignClient().internalCob().updateLoanCobLastDate(loanId, "{\"lastClosedBusinessDate\":\"" + cobDate + "\"}");
             return null;
         });
     }

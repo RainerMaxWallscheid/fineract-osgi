@@ -19,11 +19,9 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
@@ -45,34 +43,29 @@ import org.springframework.stereotype.Component;
  * @see org.apache.fineract.batch.domain.BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class DisburseLoanCommandStrategy implements CommandStrategy {
-
     private final LoansApiResource loansApiResource;
 
     @Override
     public BatchResponse execute(final BatchRequest request, @SuppressWarnings("unused") UriInfo uriInfo) {
-
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrlWithoutVersion(request));
         final Long loanId = Long.parseLong(pathParameters.get(1).substring(0, pathParameters.get(1).indexOf("?")));
-
         // Calls 'disburse' function from 'LoansApiResource' to disburse a
         // loan
         responseBody = loansApiResource.stateTransitions(loanId, "disburse", request.getBody());
-
         response.setStatusCode(HttpStatus.SC_OK);
-
         // Sets the body of the response after the successful disbursal of
         // the loan
         response.setBody(responseBody);
-
         return response;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DisburseLoanCommandStrategy(final LoansApiResource loansApiResource) {
+        this.loansApiResource = loansApiResource;
+    }
 }

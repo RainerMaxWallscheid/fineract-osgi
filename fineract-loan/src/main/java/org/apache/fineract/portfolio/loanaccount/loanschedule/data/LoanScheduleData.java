@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.loanaccount.loanschedule.data;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import lombok.Getter;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 
 /**
@@ -32,9 +31,7 @@ import org.apache.fineract.organisation.monetary.data.CurrencyData;
  * (both fees and penalties)</li>
  * </ul>
  */
-@Getter
 public class LoanScheduleData {
-
     /**
      * The currency associated with all monetary values in loan schedule.
      */
@@ -54,21 +51,14 @@ public class LoanScheduleData {
     private final BigDecimal totalPaidLate;
     private final BigDecimal totalOutstanding;
     private final BigDecimal totalCredits;
-
     /**
      * <code>periods</code> is collection of data objects containing specific information to each period of the loan
      * schedule including disbursement and repayment information.
      */
     private final Collection<LoanSchedulePeriodData> periods;
-
     private Collection<LoanSchedulePeriodData> futurePeriods;
 
-    public LoanScheduleData(final CurrencyData currency, final Collection<LoanSchedulePeriodData> periods, final Integer loanTermInDays,
-            final BigDecimal totalPrincipalDisbursed, final BigDecimal totalPrincipalExpected, final BigDecimal totalPrincipalPaid,
-            final BigDecimal totalInterestCharged, final BigDecimal totalFeeChargesCharged, final BigDecimal totalPenaltyChargesCharged,
-            final BigDecimal totalWaived, final BigDecimal totalWrittenOff, final BigDecimal totalRepaymentExpected,
-            final BigDecimal totalRepayment, final BigDecimal totalPaidInAdvance, final BigDecimal totalPaidLate,
-            final BigDecimal totalOutstanding, final BigDecimal totalCredits) {
+    public LoanScheduleData(final CurrencyData currency, final Collection<LoanSchedulePeriodData> periods, final Integer loanTermInDays, final BigDecimal totalPrincipalDisbursed, final BigDecimal totalPrincipalExpected, final BigDecimal totalPrincipalPaid, final BigDecimal totalInterestCharged, final BigDecimal totalFeeChargesCharged, final BigDecimal totalPenaltyChargesCharged, final BigDecimal totalWaived, final BigDecimal totalWrittenOff, final BigDecimal totalRepaymentExpected, final BigDecimal totalRepayment, final BigDecimal totalPaidInAdvance, final BigDecimal totalPaidLate, final BigDecimal totalOutstanding, final BigDecimal totalCredits) {
         this.currency = currency;
         this.periods = periods;
         this.loanTermInDays = loanTermInDays;
@@ -88,9 +78,7 @@ public class LoanScheduleData {
         this.totalCredits = totalCredits;
     }
 
-    public LoanScheduleData(final CurrencyData currency, final Collection<LoanSchedulePeriodData> periods, final Integer loanTermInDays,
-            final BigDecimal totalPrincipalDisbursed, final BigDecimal totalPrincipalExpected, final BigDecimal totalInterestCharged,
-            final BigDecimal totalFeeChargesCharged, final BigDecimal totalPenaltyChargesCharged, final BigDecimal totalRepaymentExpected) {
+    public LoanScheduleData(final CurrencyData currency, final Collection<LoanSchedulePeriodData> periods, final Integer loanTermInDays, final BigDecimal totalPrincipalDisbursed, final BigDecimal totalPrincipalExpected, final BigDecimal totalInterestCharged, final BigDecimal totalFeeChargesCharged, final BigDecimal totalPenaltyChargesCharged, final BigDecimal totalRepaymentExpected) {
         this.currency = currency;
         this.periods = periods;
         this.loanTermInDays = loanTermInDays;
@@ -112,5 +100,102 @@ public class LoanScheduleData {
 
     public void updateFuturePeriods(Collection<LoanSchedulePeriodData> futurePeriods) {
         this.futurePeriods = futurePeriods;
+    }
+
+    /**
+     * The currency associated with all monetary values in loan schedule.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CurrencyData getCurrency() {
+        return this.currency;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getLoanTermInDays() {
+        return this.loanTermInDays;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalPrincipalDisbursed() {
+        return this.totalPrincipalDisbursed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalPrincipalExpected() {
+        return this.totalPrincipalExpected;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalPrincipalPaid() {
+        return this.totalPrincipalPaid;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalInterestCharged() {
+        return this.totalInterestCharged;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalFeeChargesCharged() {
+        return this.totalFeeChargesCharged;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalPenaltyChargesCharged() {
+        return this.totalPenaltyChargesCharged;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalWaived() {
+        return this.totalWaived;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalWrittenOff() {
+        return this.totalWrittenOff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalRepaymentExpected() {
+        return this.totalRepaymentExpected;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalRepayment() {
+        return this.totalRepayment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalPaidInAdvance() {
+        return this.totalPaidInAdvance;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalPaidLate() {
+        return this.totalPaidLate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalOutstanding() {
+        return this.totalOutstanding;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalCredits() {
+        return this.totalCredits;
+    }
+
+    /**
+     * <code>periods</code> is collection of data objects containing specific information to each period of the loan
+     * schedule including disbursement and repayment information.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Collection<LoanSchedulePeriodData> getPeriods() {
+        return this.periods;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<LoanSchedulePeriodData> getFuturePeriods() {
+        return this.futurePeriods;
     }
 }

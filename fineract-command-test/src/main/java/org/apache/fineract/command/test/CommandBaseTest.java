@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.command.test;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,24 +32,17 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 
-@Slf4j
 @SpringBootTest
 public abstract class CommandBaseTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CommandBaseTest.class);
     protected static final Network network = Network.newNetwork();
-
     @Container
-    protected static final PostgreSQLContainer<?> POSTGRES_CONTAINER = new PostgreSQLContainer<>(DockerImageName.parse("postgres:18.3"))
-            .withNetwork(network).withUsername("root").withPassword("mifos").withDatabaseName("fineract-test");
-
+    protected static final PostgreSQLContainer<?> POSTGRES_CONTAINER = new PostgreSQLContainer<>(DockerImageName.parse("postgres:18.3")).withNetwork(network).withUsername("root").withPassword("mifos").withDatabaseName("fineract-test");
     @Container
-    protected static final MariaDBContainer<?> MARIADB_CONTAINER = new MariaDBContainer<>(DockerImageName.parse("mariadb:12.2"))
-            .withNetwork(network).withUsername("root").withPassword("mifos").withDatabaseName("fineract-test")
-            .withCommand("--innodb-snapshot-isolation=OFF").waitingFor(Wait.forListeningPort());
-
+    protected static final MariaDBContainer<?> MARIADB_CONTAINER = new MariaDBContainer<>(DockerImageName.parse("mariadb:12.2")).withNetwork(network).withUsername("root").withPassword("mifos").withDatabaseName("fineract-test").withCommand("--innodb-snapshot-isolation=OFF").waitingFor(Wait.forListeningPort());
     @Container
-    protected static final MySQLContainer<?> MYSQL_CONTAINER = new MySQLContainer<>(DockerImageName.parse("mysql:8")).withNetwork(network)
-            .withUsername("root").withPassword("mifos").withDatabaseName("fineract-test");
+    protected static final MySQLContainer<?> MYSQL_CONTAINER = new MySQLContainer<>(DockerImageName.parse("mysql:8")).withNetwork(network).withUsername("root").withPassword("mifos").withDatabaseName("fineract-test");
 
     @DynamicPropertySource
     protected static void configure(DynamicPropertyRegistry registry) {
@@ -66,7 +58,6 @@ public abstract class CommandBaseTest {
 
     protected static void postgres(DynamicPropertyRegistry registry) {
         POSTGRES_CONTAINER.start();
-
         registry.add("spring.datasource.driver-class-name", POSTGRES_CONTAINER::getDriverClassName);
         registry.add("spring.datasource.username", POSTGRES_CONTAINER::getUsername);
         registry.add("spring.datasource.password", POSTGRES_CONTAINER::getPassword);
@@ -78,7 +69,6 @@ public abstract class CommandBaseTest {
     @SuppressWarnings("UnusedMethod")
     protected static void mariadb(DynamicPropertyRegistry registry) {
         MARIADB_CONTAINER.start();
-
         registry.add("spring.datasource.driver-class-name", MARIADB_CONTAINER::getDriverClassName);
         registry.add("spring.datasource.username", MARIADB_CONTAINER::getUsername);
         registry.add("spring.datasource.password", MARIADB_CONTAINER::getPassword);
@@ -90,7 +80,6 @@ public abstract class CommandBaseTest {
     @SuppressWarnings("UnusedMethod")
     protected static void mysql(DynamicPropertyRegistry registry) {
         MYSQL_CONTAINER.start();
-
         registry.add("spring.datasource.driver-class-name", MYSQL_CONTAINER::getDriverClassName);
         registry.add("spring.datasource.username", MYSQL_CONTAINER::getUsername);
         registry.add("spring.datasource.password", MYSQL_CONTAINER::getPassword);

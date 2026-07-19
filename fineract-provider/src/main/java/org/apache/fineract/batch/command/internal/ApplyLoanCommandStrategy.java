@@ -19,7 +19,6 @@
 package org.apache.fineract.batch.command.internal;
 
 import jakarta.ws.rs.core.UriInfo;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
@@ -41,28 +40,26 @@ import org.springframework.stereotype.Component;
  * @see org.apache.fineract.batch.domain.BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class ApplyLoanCommandStrategy implements CommandStrategy {
-
     private final LoansApiResource loansApiResource;
 
     @Override
     public BatchResponse execute(BatchRequest request, @SuppressWarnings("unused") UriInfo uriInfo) {
-
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         // Calls 'SubmitLoanFunction' function from 'LoansApiResource' to
         // Apply Loan to an existing client
         responseBody = loansApiResource.calculateLoanScheduleOrSubmitLoanApplication(null, null, request.getBody());
-
         response.setStatusCode(HttpStatus.SC_OK);
         // Sets the body of the response after loan is successfully applied
         response.setBody(responseBody);
-
         return response;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ApplyLoanCommandStrategy(final LoansApiResource loansApiResource) {
+        this.loansApiResource = loansApiResource;
     }
 }

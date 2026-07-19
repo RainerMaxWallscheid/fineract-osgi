@@ -20,15 +20,94 @@ package org.apache.fineract.portfolio.collateralmanagement.data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.Builder;
-import lombok.Data;
 
-@Data
-@Builder
 public class CollateralProductCreateResponse implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private Long resourceId;
+
+    @java.lang.SuppressWarnings("all")
+        CollateralProductCreateResponse(final Long resourceId) {
+        this.resourceId = resourceId;
+    }
+
+
+    @java.lang.SuppressWarnings("all")
+        public static class CollateralProductCreateResponseBuilder {
+        @java.lang.SuppressWarnings("all")
+                private Long resourceId;
+
+        @java.lang.SuppressWarnings("all")
+                CollateralProductCreateResponseBuilder() {
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public CollateralProductCreateResponse.CollateralProductCreateResponseBuilder resourceId(final Long resourceId) {
+            this.resourceId = resourceId;
+            return this;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public CollateralProductCreateResponse build() {
+            return new CollateralProductCreateResponse(this.resourceId);
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "CollateralProductCreateResponse.CollateralProductCreateResponseBuilder(resourceId=" + this.resourceId + ")";
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static CollateralProductCreateResponse.CollateralProductCreateResponseBuilder builder() {
+        return new CollateralProductCreateResponse.CollateralProductCreateResponseBuilder();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getResourceId() {
+        return this.resourceId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setResourceId(final Long resourceId) {
+        this.resourceId = resourceId;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof CollateralProductCreateResponse)) return false;
+        final CollateralProductCreateResponse other = (CollateralProductCreateResponse) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$resourceId = this.getResourceId();
+        final java.lang.Object other$resourceId = other.getResourceId();
+        if (this$resourceId == null ? other$resourceId != null : !this$resourceId.equals(other$resourceId)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof CollateralProductCreateResponse;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $resourceId = this.getResourceId();
+        result = result * PRIME + ($resourceId == null ? 43 : $resourceId.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "CollateralProductCreateResponse(resourceId=" + this.getResourceId() + ")";
+    }
 }

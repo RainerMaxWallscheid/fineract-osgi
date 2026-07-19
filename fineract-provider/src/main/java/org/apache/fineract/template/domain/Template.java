@@ -31,38 +31,97 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.util.List;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
-@Table(name = "m_template", uniqueConstraints = { @UniqueConstraint(columnNames = { "name" }, name = "unq_name") })
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
+@Table(name = "m_template", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"}, name = "unq_name")})
 public class Template extends AbstractPersistableCustom<Long> {
-
     @Column(name = "name", nullable = false, unique = true)
     private String name;
-
     @Enumerated
     @JsonSerialize(using = TemplateEntitySerializer.class)
     private TemplateEntity entity;
-
     @Enumerated
     @JsonSerialize(using = TemplateTypeSerializer.class)
     private TemplateType type;
-
     @Column(name = "text", columnDefinition = "longtext", nullable = false)
     private String text;
-
-    @OrderBy(value = "mapperorder")
+    @OrderBy("mapperorder")
     @OneToMany(targetEntity = TemplateMapper.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "m_template_m_templatemappers", joinColumns = {
-            @JoinColumn(name = "m_template_id", referencedColumnName = "id") }, inverseJoinColumns = {
-                    @JoinColumn(name = "mappers_id", referencedColumnName = "id", unique = true) })
+    @JoinTable(name = "m_template_m_templatemappers", joinColumns = {@JoinColumn(name = "m_template_id", referencedColumnName = "id")}, inverseJoinColumns = {@JoinColumn(name = "mappers_id", referencedColumnName = "id", unique = true)})
     private List<TemplateMapper> mappers;
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TemplateEntity getEntity() {
+        return this.entity;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TemplateType getType() {
+        return this.type;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getText() {
+        return this.text;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<TemplateMapper> getMappers() {
+        return this.mappers;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Template setName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Template setEntity(final TemplateEntity entity) {
+        this.entity = entity;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Template setType(final TemplateType type) {
+        this.type = type;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Template setText(final String text) {
+        this.text = text;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Template setMappers(final List<TemplateMapper> mappers) {
+        this.mappers = mappers;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Template() {
+    }
 }

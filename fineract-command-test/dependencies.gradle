@@ -56,7 +56,5 @@ dependencies {
             'org.testcontainers:mariadb',
             'org.testcontainers:mysql',
             )
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'org.mapstruct:mapstruct-processor'
 }

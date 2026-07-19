@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.group.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "GROUP", action = "ASSIGNROLE")
-@RequiredArgsConstructor
 public class AssignRoleCommandHandler implements NewCommandSourceHandler {
-
     private final GroupRolesWritePlatformService groupRolesWritePlatformService;
 
     @Override
@@ -40,4 +37,8 @@ public class AssignRoleCommandHandler implements NewCommandSourceHandler {
         return this.groupRolesWritePlatformService.createRole(command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public AssignRoleCommandHandler(final GroupRolesWritePlatformService groupRolesWritePlatformService) {
+        this.groupRolesWritePlatformService = groupRolesWritePlatformService;
+    }
 }

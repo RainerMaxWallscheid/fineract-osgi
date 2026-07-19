@@ -19,35 +19,32 @@
 package org.apache.fineract.infrastructure.contentstore.processor;
 
 import static java.util.Objects.requireNonNullElse;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.fineract.infrastructure.contentstore.util.ContentPipe;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class Base64EncoderContentProcessor implements ContentProcessor {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Base64EncoderContentProcessor.class);
     private static final String BASE64_ENCODE_PREFIX = "base64.encode.";
-
     public static final String BASE64_ENCODE_PARAM_BUFFER_SIZE = BASE64_ENCODE_PREFIX + "buffer-size";
-
     private final ContentPipe pipe;
     private final FineractProperties properties;
 
     @Override
     public ContentProcessorContext process(final ContentProcessorContext ctx) {
-        final Integer bufferSize = ctx.getParameter(BASE64_ENCODE_PARAM_BUFFER_SIZE, Integer.class,
-                requireNonNullElse(properties.getContent().getDefaultBufferSize(), 8192));
-
+        final Integer bufferSize = ctx.getParameter(BASE64_ENCODE_PARAM_BUFFER_SIZE, Integer.class, requireNonNullElse(properties.getContent().getDefaultBufferSize(), 8192));
         final var pipedInputStream = pipe.pipe(ctx.getInputStream(), (in, out) -> {
             pipe.write(in, new Base64OutputStream(out), new byte[bufferSize]);
         });
-
         return ctx.clone(pipedInputStream);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Base64EncoderContentProcessor(final ContentPipe pipe, final FineractProperties properties) {
+        this.pipe = pipe;
+        this.properties = properties;
     }
 }

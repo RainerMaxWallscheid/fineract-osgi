@@ -40,8 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.template.data.TemplateData;
@@ -52,39 +50,31 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 @ConditionalOnMissingBean(value = TemplateMergeService.class, ignored = TemplateMergeServiceImpl.class)
 public class TemplateMergeServiceImpl implements TemplateMergeService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TemplateMergeServiceImpl.class);
     private final FineractProperties fineractProperties;
 
     @Override
     public String compile(final TemplateData template, final Map<String, Object> scopes) {
         scopes.put("static", TemplateFunctions.INSTANCE);
-
         var mf = new DefaultMustacheFactory();
         var mustache = mf.compile(new StringReader(template.getText()), template.getName());
-
         compiledMapFromMappers(asMap(template.getMappers()), scopes);
-
         expandMapArrays(scopes);
-
         var stringWriter = new StringWriter();
         mustache.execute(stringWriter, scopes);
-
         return stringWriter.toString();
     }
 
     private void compiledMapFromMappers(final Map<String, String> data, final Map<String, Object> scopes) {
         final MustacheFactory mf = new DefaultMustacheFactory();
-
         if (data != null) {
             for (final Map.Entry<String, String> entry : data.entrySet()) {
                 final Mustache mappersMustache = mf.compile(new StringReader(entry.getValue()), "");
                 final StringWriter stringWriter = new StringWriter();
-
                 mappersMustache.execute(stringWriter, scopes);
                 String url = stringWriter.toString();
                 if (!url.startsWith("http")) {
@@ -101,18 +91,15 @@ public class TemplateMergeServiceImpl implements TemplateMergeService {
 
     private LinkedHashMap<String, String> asMap(List<TemplateMapperData> mappers) {
         final LinkedHashMap<String, String> map = new LinkedHashMap<>();
-
         for (var mapper : mappers) {
             map.put(mapper.getMapperkey(), mapper.getMappervalue());
         }
-
         return map;
     }
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> getMapFromUrl(final String url) throws IOException {
         final HttpURLConnection connection = getConnection(url);
-
         final String response = getStringFromInputStream(connection.getInputStream());
         HashMap<String, Object> result = new HashMap<>();
         if (connection.getContentType().equals("text/plain")) {
@@ -135,9 +122,7 @@ public class TemplateMergeServiceImpl implements TemplateMergeService {
     private HttpURLConnection getConnection(final String url) {
         if (fineractProperties.getTemplate() != null && fineractProperties.getTemplate().isRegexWhitelistEnabled()) {
             boolean whitelisted = false;
-
-            if (fineractProperties.getTemplate().getRegexWhitelist() != null
-                    && !fineractProperties.getTemplate().getRegexWhitelist().isEmpty()) {
+            if (fineractProperties.getTemplate().getRegexWhitelist() != null && !fineractProperties.getTemplate().getRegexWhitelist().isEmpty()) {
                 for (String urlPattern : fineractProperties.getTemplate().getRegexWhitelist()) {
                     Pattern pattern = Pattern.compile(urlPattern);
                     Matcher matcher = pattern.matcher(url);
@@ -147,26 +132,21 @@ public class TemplateMergeServiceImpl implements TemplateMergeService {
                     }
                 }
             }
-
             if (!whitelisted) {
                 throw new TemplateForbiddenException(url);
             }
         }
-
         String authToken = ThreadLocalContextUtil.getAuthToken();
         if (authToken == null) {
             final String name = SecurityContextHolder.getContext().getAuthentication().getName();
             final String password = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
-
             Authenticator.setDefault(new Authenticator() {
-
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
                     return new PasswordAuthentication(name, password.toCharArray());
                 }
             });
         }
-
         HttpURLConnection connection = null;
         try {
             connection = (HttpURLConnection) URI.create(url).toURL().openConnection();
@@ -174,13 +154,10 @@ public class TemplateMergeServiceImpl implements TemplateMergeService {
                 connection.setRequestProperty("Authorization", "Basic " + authToken);// NOSONAR
             }
             TrustModifier.relaxHostChecking(connection);
-
             connection.setDoInput(true);
-
         } catch (IOException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
             log.error("getConnection() failed, return null", e);
         }
-
         return connection;
     }
 
@@ -189,12 +166,13 @@ public class TemplateMergeServiceImpl implements TemplateMergeService {
         if (value instanceof Map) {
             Map<String, Object> valueAsMap = (Map<String, Object>) value;
             Map<String, Object> valueAsMapTemp = new HashMap<>();
-
             for (Map.Entry<String, Object> valueAsMapEntry : valueAsMap.entrySet()) {
                 Object valueAsMapEntryValue = valueAsMapEntry.getValue();
-                if (valueAsMapEntryValue instanceof Map) { // JSON Object
+                if (valueAsMapEntryValue instanceof Map) {
+                    // JSON Object
                     expandMapArrays(valueAsMapEntryValue);
-                } else if (valueAsMapEntryValue instanceof Iterable) { // JSON
+                } else if (valueAsMapEntryValue instanceof Iterable) {
+                    // JSON
                     // Array
                     Iterable<Object> valueAsMapEntryValueIterable = (Iterable<Object>) valueAsMapEntryValue;
                     String valueAsMapEntryKey = valueAsMapEntry.getKey();
@@ -203,13 +181,15 @@ public class TemplateMergeServiceImpl implements TemplateMergeService {
                         valueAsMapTemp.put(valueAsMapEntryKey + "#" + i, object);
                         ++i;
                         expandMapArrays(object);
-
                     }
                 }
-
             }
             valueAsMap.putAll(valueAsMapTemp);
-
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TemplateMergeServiceImpl(final FineractProperties fineractProperties) {
+        this.fineractProperties = fineractProperties;
     }
 }

@@ -21,18 +21,12 @@ package org.apache.fineract.portfolio.search.data;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Immutable data object representing datatable data.
  */
-@Data
-@NoArgsConstructor
 public final class AdvancedQueryData implements Serializable {
-
     private List<ColumnFilterData> columnFilters;
-
     private List<String> resultColumns;
 
     public List<ColumnFilterData> getNonNullFilters() {
@@ -49,5 +43,62 @@ public final class AdvancedQueryData implements Serializable {
 
     public boolean hasResultColumn() {
         return resultColumns != null && !resultColumns.isEmpty();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<ColumnFilterData> getColumnFilters() {
+        return this.columnFilters;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<String> getResultColumns() {
+        return this.resultColumns;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setColumnFilters(final List<ColumnFilterData> columnFilters) {
+        this.columnFilters = columnFilters;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setResultColumns(final List<String> resultColumns) {
+        this.resultColumns = resultColumns;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof AdvancedQueryData)) return false;
+        final AdvancedQueryData other = (AdvancedQueryData) o;
+        final java.lang.Object this$columnFilters = this.getColumnFilters();
+        final java.lang.Object other$columnFilters = other.getColumnFilters();
+        if (this$columnFilters == null ? other$columnFilters != null : !this$columnFilters.equals(other$columnFilters)) return false;
+        final java.lang.Object this$resultColumns = this.getResultColumns();
+        final java.lang.Object other$resultColumns = other.getResultColumns();
+        if (this$resultColumns == null ? other$resultColumns != null : !this$resultColumns.equals(other$resultColumns)) return false;
+        return true;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $columnFilters = this.getColumnFilters();
+        result = result * PRIME + ($columnFilters == null ? 43 : $columnFilters.hashCode());
+        final java.lang.Object $resultColumns = this.getResultColumns();
+        result = result * PRIME + ($resultColumns == null ? 43 : $resultColumns.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "AdvancedQueryData(columnFilters=" + this.getColumnFilters() + ", resultColumns=" + this.getResultColumns() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AdvancedQueryData() {
     }
 }

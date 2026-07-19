@@ -18,20 +18,29 @@
  */
 package org.apache.fineract.portfolio.loanaccount.domain;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.ApiFacingEnum;
 
-@Getter
-@RequiredArgsConstructor
 public enum LoanChargeOffBehaviour implements ApiFacingEnum<LoanChargeOffBehaviour> {
-
-    REGULAR("chargeOffBehaviour.regular", "Regular"), //
-    ZERO_INTEREST("chargeOffBehaviour.zeroInterest", "Zero interest after charge-off"), //
-    ACCELERATE_MATURITY("chargeOffBehaviour.accelerateMaturity", "Accelerate maturity to charge-off date"), //
-    ;
-
+    REGULAR("chargeOffBehaviour.regular", "Regular"),  //
+    ZERO_INTEREST("chargeOffBehaviour.zeroInterest", "Zero interest after charge-off"),  //
+    ACCELERATE_MATURITY("chargeOffBehaviour.accelerateMaturity", "Accelerate maturity to charge-off date");
+    //
     private final String code;
     private final String humanReadableName;
 
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private LoanChargeOffBehaviour(final String code, final String humanReadableName) {
+        this.code = code;
+        this.humanReadableName = humanReadableName;
+    }
 }

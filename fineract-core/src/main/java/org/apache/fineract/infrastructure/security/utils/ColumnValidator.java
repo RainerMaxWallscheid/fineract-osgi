@@ -31,8 +31,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import javax.sql.DataSource;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.security.service.SqlValidator;
@@ -40,43 +38,34 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class ColumnValidator {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ColumnValidator.class);
     private final SqlValidator sqlValidator;
     private final JdbcTemplate jdbcTemplate;
 
     private void validateColumn(Map<String, Set<String>> tableColumnMap) {
         DataSource dataSource = Objects.requireNonNull(this.jdbcTemplate.getDataSource());
         Connection connection = DataSourceUtils.getConnection(dataSource);
-
         try {
             DatabaseMetaData dbMetaData = connection.getMetaData();
-
             for (Map.Entry<String, Set<String>> entry : tableColumnMap.entrySet()) {
                 Set<String> columns = entry.getValue();
-
                 try (ResultSet resultSet = dbMetaData.getColumns(null, null, entry.getKey(), null)) {
                     Set<String> tableColumns = getTableColumns(resultSet);
-
                     if (!columns.isEmpty() && tableColumns.isEmpty()) {
-                        throw new PlatformApiDataValidationException("error.msg.invalid.table.column",
-                                "Invalid table or column name detected", entry.getKey(), columns);
+                        throw new PlatformApiDataValidationException("error.msg.invalid.table.column", "Invalid table or column name detected", entry.getKey(), columns);
                     }
-
                     for (String requestedColumn : columns) {
                         if (!tableColumns.contains(requestedColumn)) {
-                            throw new PlatformApiDataValidationException("error.msg.invalid.table.column",
-                                    "Invalid table column name detected", entry.getKey(), requestedColumn);
+                            throw new PlatformApiDataValidationException("error.msg.invalid.table.column", "Invalid table column name detected", entry.getKey(), requestedColumn);
                         }
                     }
                 }
             }
         } catch (SQLException e) {
-            throw new PlatformApiDataValidationException("error.msg.database.access.error",
-                    "Database access error during column validation", e.getMessage(), e);
+            throw new PlatformApiDataValidationException("error.msg.database.access.error", "Database access error during column validation", e.getMessage(), e);
         } finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
@@ -116,7 +105,6 @@ public class ColumnValidator {
     private static Map<String, Set<String>> getTableColumnMap(String schema, Map<String, Set<String>> tableColumnAliasMap) {
         Map<String, Set<String>> tableColumnMap = new HashMap<>();
         schema = schema.substring(schema.indexOf("from"));
-
         for (Map.Entry<String, Set<String>> entry : tableColumnAliasMap.entrySet()) {
             int index = schema.indexOf(" " + entry.getKey() + " ");
             if (index > -1) {
@@ -125,11 +113,9 @@ public class ColumnValidator {
                 Set<String> columns = entry.getValue();
                 tableColumnMap.put(schema.substring(startPos, index).trim(), columns);
             } else {
-                throw new PlatformApiDataValidationException("error.msg.invalid.table.alias", "Invalid table alias in SQL query",
-                        entry.getKey());
+                throw new PlatformApiDataValidationException("error.msg.invalid.table.alias", "Invalid table alias in SQL query", entry.getKey());
             }
         }
-
         return tableColumnMap;
     }
 
@@ -148,8 +134,7 @@ public class ColumnValidator {
                     tableColumnMap.put(tableColumn[0], columns);
                 }
             } else {
-                throw new PlatformApiDataValidationException("error.msg.invalid.table.column.format",
-                        "Invalid table.column format in operand", operand);
+                throw new PlatformApiDataValidationException("error.msg.invalid.table.column.format", "Invalid table.column format in operand", operand);
             }
         }
         return tableColumnMap;
@@ -157,8 +142,7 @@ public class ColumnValidator {
 
     private static Set<String> getOperand(String condition) {
         Set<String> operandList = new HashSet<>();
-        List<String> operatorList = new ArrayList<>(
-                Arrays.asList("!=", "=", ">", "<", " like ", " between ", " in ", " in(", " is ", " is not ", " equals ", " not equals "));
+        List<String> operatorList = new ArrayList<>(Arrays.asList("!=", "=", ">", "<", " like ", " between ", " in ", " in(", " is ", " is not ", " equals ", " not equals "));
         for (String op : operatorList) {
             int startIndex = 0;
             do {
@@ -172,10 +156,8 @@ public class ColumnValidator {
                     } else {
                         operandList.add(getOperand(condition, index, currentChar));
                     }
-
                     startIndex = index + op.length();
                 }
-
             } while (condition.indexOf(op, startIndex) > -1);
         }
         return operandList;
@@ -198,13 +180,11 @@ public class ColumnValidator {
             int index = condition.indexOf(op, startIndex);
             if (index > -1) {
                 if (op.equals("=")) {
-                    if (!((condition.charAt(index - 1) + "").equals("!") || (condition.charAt(index - 1) + "").equals(">")
-                            || (condition.charAt(index - 1) + "").equals("<"))) {
+                    if (!((condition.charAt(index - 1) + "").equals("!") || (condition.charAt(index - 1) + "").equals(">") || (condition.charAt(index - 1) + "").equals("<"))) {
                         condition = condition.replace(op, " " + op + " ");
                         return condition;
                     }
                     startIndex = index + 2 + op.length();
-
                 } else if (op.equals("< =") || op.equals("> =") || op.equals("! =")) {
                     condition = condition.replace(op, op.replace(" ", ""));
                     return condition;
@@ -215,8 +195,13 @@ public class ColumnValidator {
             } else {
                 return condition;
             }
-
         } while (condition.indexOf(op, startIndex) > -1);
         return condition;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ColumnValidator(final SqlValidator sqlValidator, final JdbcTemplate jdbcTemplate) {
+        this.sqlValidator = sqlValidator;
+        this.jdbcTemplate = jdbcTemplate;
     }
 }

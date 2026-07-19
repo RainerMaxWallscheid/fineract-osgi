@@ -30,7 +30,6 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -41,68 +40,51 @@ import org.apache.fineract.useradministration.domain.AppUser;
 
 @Entity
 @Table(name = "m_loan_reschedule_request")
-@Getter
 public class LoanRescheduleRequest extends AbstractPersistableCustom<Long> {
-
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
-
     @Column(name = "status_enum", nullable = false)
     private Integer statusEnum;
-
     @Column(name = "reschedule_from_installment")
     private Integer rescheduleFromInstallment;
-
     @Column(name = "reschedule_from_date")
     private LocalDate rescheduleFromDate;
-
     @Column(name = "recalculate_interest")
     private Boolean recalculateInterest;
-
     @ManyToOne
     @JoinColumn(name = "reschedule_reason_cv_id")
     private CodeValue rescheduleReasonCodeValue;
-
     @Column(name = "reschedule_reason_comment")
     private String rescheduleReasonComment;
-
     @Column(name = "submitted_on_date")
     private LocalDate submittedOnDate;
-
     @ManyToOne
     @JoinColumn(name = "submitted_by_user_id")
     private AppUser submittedByUser;
-
     @Column(name = "approved_on_date")
     private LocalDate approvedOnDate;
-
     @ManyToOne
     @JoinColumn(name = "approved_by_user_id")
     private AppUser approvedByUser;
-
     @Column(name = "rejected_on_date")
     private LocalDate rejectedOnDate;
-
     @ManyToOne
     @JoinColumn(name = "rejected_by_user_id")
     private AppUser rejectedByUser;
-
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "loanRescheduleRequest")
     private Set<LoanRescheduleRequestToTermVariationMapping> loanRescheduleRequestToTermVariationMappings = new HashSet<>();
 
     /**
      * LoanRescheduleRequest constructor
-     **/
-    protected LoanRescheduleRequest() {}
+     */
+    protected LoanRescheduleRequest() {
+    }
 
     /**
      * LoanRescheduleRequest constructor
-     **/
-    private LoanRescheduleRequest(final Loan loan, final Integer statusEnum, final Integer rescheduleFromInstallment,
-            final LocalDate rescheduleFromDate, final Boolean recalculateInterest, final CodeValue rescheduleReasonCodeValue,
-            final String rescheduleReasonComment, final LocalDate submittedOnDate, final AppUser submittedByUser,
-            final LocalDate approvedOnDate, final AppUser approvedByUser, final LocalDate rejectedOnDate, AppUser rejectedByUser) {
+     */
+    private LoanRescheduleRequest(final Loan loan, final Integer statusEnum, final Integer rescheduleFromInstallment, final LocalDate rescheduleFromDate, final Boolean recalculateInterest, final CodeValue rescheduleReasonCodeValue, final String rescheduleReasonComment, final LocalDate submittedOnDate, final AppUser submittedByUser, final LocalDate approvedOnDate, final AppUser approvedByUser, final LocalDate rejectedOnDate, AppUser rejectedByUser) {
         this.loan = loan;
         this.statusEnum = statusEnum;
         this.rescheduleFromInstallment = rescheduleFromInstallment;
@@ -120,27 +102,19 @@ public class LoanRescheduleRequest extends AbstractPersistableCustom<Long> {
 
     /**
      * @return a new instance of the LoanRescheduleRequest class
-     **/
-    public static LoanRescheduleRequest instance(final Loan loan, final Integer statusEnum, final Integer rescheduleFromInstallment,
-            final LocalDate rescheduleFromDate, final Boolean recalculateInterest, final CodeValue rescheduleReasonCodeValue,
-            final String rescheduleReasonComment, final LocalDate submittedOnDate, final AppUser submittedByUser,
-            final LocalDate approvedOnDate, final AppUser approvedByUser, final LocalDate rejectedOnDate, AppUser rejectedByUser) {
-
-        return new LoanRescheduleRequest(loan, statusEnum, rescheduleFromInstallment, rescheduleFromDate, recalculateInterest,
-                rescheduleReasonCodeValue, rescheduleReasonComment, submittedOnDate, submittedByUser, approvedOnDate, approvedByUser,
-                rejectedOnDate, rejectedByUser);
+     */
+    public static LoanRescheduleRequest instance(final Loan loan, final Integer statusEnum, final Integer rescheduleFromInstallment, final LocalDate rescheduleFromDate, final Boolean recalculateInterest, final CodeValue rescheduleReasonCodeValue, final String rescheduleReasonComment, final LocalDate submittedOnDate, final AppUser submittedByUser, final LocalDate approvedOnDate, final AppUser approvedByUser, final LocalDate rejectedOnDate, AppUser rejectedByUser) {
+        return new LoanRescheduleRequest(loan, statusEnum, rescheduleFromInstallment, rescheduleFromDate, recalculateInterest, rescheduleReasonCodeValue, rescheduleReasonComment, submittedOnDate, submittedByUser, approvedOnDate, approvedByUser, rejectedOnDate, rejectedByUser);
     }
 
     /**
      * @return the recalculate interest option (true/false)
-     **/
+     */
     public Boolean getRecalculateInterest() {
         boolean recalculateInterest = false;
-
         if (this.recalculateInterest != null) {
             recalculateInterest = this.recalculateInterest;
         }
-
         return recalculateInterest;
     }
 
@@ -152,10 +126,8 @@ public class LoanRescheduleRequest extends AbstractPersistableCustom<Long> {
      *            the user who approved the request
      * @param approvedOnDate
      *            the date of the approval
-     *
-     **/
+     */
     public void approve(final AppUser approvedByUser, final LocalDate approvedOnDate) {
-
         if (approvedOnDate != null) {
             this.approvedByUser = approvedByUser;
             this.approvedOnDate = approvedOnDate;
@@ -171,10 +143,8 @@ public class LoanRescheduleRequest extends AbstractPersistableCustom<Long> {
      *            the user who approved the request
      * @param approvedOnDate
      *            the date of the approval
-     *
-     **/
+     */
     public void reject(final AppUser approvedByUser, final LocalDate approvedOnDate) {
-
         if (approvedOnDate != null) {
             this.rejectedByUser = approvedByUser;
             this.rejectedOnDate = approvedOnDate;
@@ -187,14 +157,75 @@ public class LoanRescheduleRequest extends AbstractPersistableCustom<Long> {
     }
 
     public LoanTermVariations getInterestRateFromInstallmentTermVariationIfExists() {
-        return this.loanRescheduleRequestToTermVariationMappings.stream()
-                .map(LoanRescheduleRequestToTermVariationMapping::getLoanTermVariations)
-                .filter(loanTermVariations -> loanTermVariations.getTermType().isInterestRateFromInstallment()).findFirst().orElse(null);
+        return this.loanRescheduleRequestToTermVariationMappings.stream().map(LoanRescheduleRequestToTermVariationMapping::getLoanTermVariations).filter(loanTermVariations -> loanTermVariations.getTermType().isInterestRateFromInstallment()).findFirst().orElse(null);
     }
 
     public LoanTermVariations getDueDateTermVariationIfExists() {
-        return this.loanRescheduleRequestToTermVariationMappings.stream()
-                .map(LoanRescheduleRequestToTermVariationMapping::getLoanTermVariations)
-                .filter(loanTermVariations -> loanTermVariations.getTermType().isDueDateVariation()).findFirst().orElse(null);
+        return this.loanRescheduleRequestToTermVariationMappings.stream().map(LoanRescheduleRequestToTermVariationMapping::getLoanTermVariations).filter(loanTermVariations -> loanTermVariations.getTermType().isDueDateVariation()).findFirst().orElse(null);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Loan getLoan() {
+        return this.loan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getStatusEnum() {
+        return this.statusEnum;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getRescheduleFromInstallment() {
+        return this.rescheduleFromInstallment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getRescheduleFromDate() {
+        return this.rescheduleFromDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getRescheduleReasonCodeValue() {
+        return this.rescheduleReasonCodeValue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getRescheduleReasonComment() {
+        return this.rescheduleReasonComment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getSubmittedOnDate() {
+        return this.submittedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AppUser getSubmittedByUser() {
+        return this.submittedByUser;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getApprovedOnDate() {
+        return this.approvedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AppUser getApprovedByUser() {
+        return this.approvedByUser;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getRejectedOnDate() {
+        return this.rejectedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AppUser getRejectedByUser() {
+        return this.rejectedByUser;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Set<LoanRescheduleRequestToTermVariationMapping> getLoanRescheduleRequestToTermVariationMappings() {
+        return this.loanRescheduleRequestToTermVariationMappings;
     }
 }

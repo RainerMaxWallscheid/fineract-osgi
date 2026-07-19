@@ -16,11 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.infrastructure.core.config.cache;
 
 import static org.apache.fineract.infrastructure.event.external.repository.ExternalEventConfigurationRepository.EXTERNAL_EVENT_CONFIGURATION_CACHE_NAME;
-
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.Arrays;
@@ -32,7 +30,6 @@ import java.util.stream.Stream;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
 import javax.cache.spi.CachingProvider;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.ExpiryPolicyBuilder;
@@ -50,9 +47,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@Slf4j
 public class CacheConfig {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CacheConfig.class);
     public static final String CONFIG_BY_NAME_CACHE_NAME = "configByName";
     @Autowired
     private FineractProperties fineractProperties;
@@ -79,32 +76,22 @@ public class CacheConfig {
         // Default cache configuration template
         Duration defaultTimeToLive = fineractProperties.getCache().getDefaultTemplate().getTtl();
         Integer defaultMaxEntries = fineractProperties.getCache().getDefaultTemplate().getMaximumEntries();
-        javax.cache.configuration.Configuration<Object, Object> defaultTemplate = generateCacheConfiguration(defaultMaxEntries,
-                defaultTimeToLive);
+        javax.cache.configuration.Configuration<Object, Object> defaultTemplate = generateCacheConfiguration(defaultMaxEntries, defaultTimeToLive);
         // Scan all packages (entire classpath)
-        Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forJavaClassPath())
-                .addScanners(Scanners.MethodsAnnotated, Scanners.TypesAnnotated));
+        Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forJavaClassPath()).addScanners(Scanners.MethodsAnnotated, Scanners.TypesAnnotated));
         // Find all methods annotated with @Cacheable
         Set<Method> annotatedMethods = reflections.getMethodsAnnotatedWith(Cacheable.class);
-        Set<String> cacheNames = annotatedMethods.stream().map(method -> method.getAnnotation(Cacheable.class))
-                .flatMap(annotation -> Stream.concat(Arrays.stream(annotation.value()), Arrays.stream(annotation.cacheNames())))
-                .collect(Collectors.toSet());
+        Set<String> cacheNames = annotatedMethods.stream().map(method -> method.getAnnotation(Cacheable.class)).flatMap(annotation -> Stream.concat(Arrays.stream(annotation.value()), Arrays.stream(annotation.cacheNames()))).collect(Collectors.toSet());
         // Find all types annotated with @Cacheable
         Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(Cacheable.class);
-        cacheNames.addAll(annotatedClasses.stream().map(clazz -> clazz.getAnnotation(Cacheable.class))
-                .flatMap(annotation -> Stream.concat(Arrays.stream(annotation.value()), Arrays.stream(annotation.cacheNames())))
-                .collect(Collectors.toSet()));
+        cacheNames.addAll(annotatedClasses.stream().map(clazz -> clazz.getAnnotation(Cacheable.class)).flatMap(annotation -> Stream.concat(Arrays.stream(annotation.value()), Arrays.stream(annotation.cacheNames()))).collect(Collectors.toSet()));
         // Find all types annotated with @CacheConfig
-        Set<Class<?>> annotatedCacheConfigClasses = reflections
-                .getTypesAnnotatedWith(org.springframework.cache.annotation.CacheConfig.class);
-        cacheNames.addAll(annotatedCacheConfigClasses.stream()
-                .map(clazz -> clazz.getAnnotation(org.springframework.cache.annotation.CacheConfig.class))
-                .flatMap(annotation -> Arrays.stream(annotation.cacheNames())).collect(Collectors.toSet()));
+        Set<Class<?>> annotatedCacheConfigClasses = reflections.getTypesAnnotatedWith(org.springframework.cache.annotation.CacheConfig.class);
+        cacheNames.addAll(annotatedCacheConfigClasses.stream().map(clazz -> clazz.getAnnotation(org.springframework.cache.annotation.CacheConfig.class)).flatMap(annotation -> Arrays.stream(annotation.cacheNames())).collect(Collectors.toSet()));
         // Register the caches into the cache manager
         cacheNames.forEach(cacheName -> {
             if (cacheManager.getCache(cacheName) == null) {
-                javax.cache.configuration.Configuration<Object, Object> configurationTemplate = generateCustomCacheConfiguration(cacheName,
-                        defaultTemplate, defaultTimeToLive, defaultMaxEntries);
+                javax.cache.configuration.Configuration<Object, Object> configurationTemplate = generateCustomCacheConfiguration(cacheName, defaultTemplate, defaultTimeToLive, defaultMaxEntries);
                 cacheManager.createCache(cacheName, configurationTemplate);
             }
         });
@@ -116,24 +103,17 @@ public class CacheConfig {
         return cacheManager;
     }
 
-    private javax.cache.configuration.Configuration<Object, Object> generateCustomCacheConfiguration(String cacheIdentifier,
-            javax.cache.configuration.Configuration<Object, Object> defaultTemplate, Duration defaultTimeToLive,
-            Integer defaultMaxEntries) {
+    private javax.cache.configuration.Configuration<Object, Object> generateCustomCacheConfiguration(String cacheIdentifier, javax.cache.configuration.Configuration<Object, Object> defaultTemplate, Duration defaultTimeToLive, Integer defaultMaxEntries) {
         javax.cache.configuration.Configuration<Object, Object> configurationTemplate = defaultTemplate;
         if (fineractProperties.getCache().getCustomTemplates().containsKey(cacheIdentifier)) {
-            Duration timeToLiveExpiration = Objects.requireNonNullElse(
-                    fineractProperties.getCache().getCustomTemplates().get(cacheIdentifier).getTtl(), defaultTimeToLive);
-            Integer maxEntries = Objects.requireNonNullElse(
-                    fineractProperties.getCache().getCustomTemplates().get(cacheIdentifier).getMaximumEntries(), defaultMaxEntries);
+            Duration timeToLiveExpiration = Objects.requireNonNullElse(fineractProperties.getCache().getCustomTemplates().get(cacheIdentifier).getTtl(), defaultTimeToLive);
+            Integer maxEntries = Objects.requireNonNullElse(fineractProperties.getCache().getCustomTemplates().get(cacheIdentifier).getMaximumEntries(), defaultMaxEntries);
             configurationTemplate = generateCacheConfiguration(maxEntries, timeToLiveExpiration);
         }
         return configurationTemplate;
     }
 
-    private static javax.cache.configuration.Configuration<Object, Object> generateCacheConfiguration(Integer defaultMaxEntries,
-            Duration defaultTimeToLive) {
-        return Eh107Configuration.fromEhcacheCacheConfiguration(CacheConfigurationBuilder
-                .newCacheConfigurationBuilder(Object.class, Object.class, ResourcePoolsBuilder.heap(defaultMaxEntries))
-                .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(defaultTimeToLive)).build());
+    private static javax.cache.configuration.Configuration<Object, Object> generateCacheConfiguration(Integer defaultMaxEntries, Duration defaultTimeToLive) {
+        return Eh107Configuration.fromEhcacheCacheConfiguration(CacheConfigurationBuilder.newCacheConfigurationBuilder(Object.class, Object.class, ResourcePoolsBuilder.heap(defaultMaxEntries)).withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(defaultTimeToLive)).build());
     }
 }

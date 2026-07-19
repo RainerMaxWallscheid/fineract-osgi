@@ -32,7 +32,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
@@ -53,11 +52,9 @@ import org.springframework.stereotype.Component;
 @Path("/v1/collateral-management")
 @Component
 @Tag(name = "Collateral Management", description = "Collateral Management is for managing collateral operations")
-@RequiredArgsConstructor
-@Consumes({ MediaType.APPLICATION_JSON })
-@Produces({ MediaType.APPLICATION_JSON })
+@Consumes({MediaType.APPLICATION_JSON})
+@Produces({MediaType.APPLICATION_JSON})
 public class CollateralManagementApiResource {
-
     private final CommandDispatcher dispatcher;
     private final CollateralManagementReadService collateralManagementReadService;
     private final CurrencyReadPlatformService currencyReadPlatformService;
@@ -73,8 +70,7 @@ public class CollateralManagementApiResource {
     @GET
     @Path("{collateralId}")
     @Operation(summary = "Get Collateral", description = "Fetch Collateral")
-    public CollateralManagementData getCollateral(
-            @PathParam("collateralId") @Parameter(description = "collateralId") final Long collateralId) {
+    public CollateralManagementData getCollateral(@PathParam("collateralId") @Parameter(description = "collateralId") final Long collateralId) {
         return collateralManagementReadService.getCollateralProduct(collateralId);
     }
 
@@ -95,9 +91,7 @@ public class CollateralManagementApiResource {
     @Path("{collateralId}")
     @Operation(operationId = "updateCollateral_1", summary = "Update Collateral", description = "Update Collateral")
     @AlternativeOperationId("updateCollateral_2")
-    public CollateralProductUpdateResponse updateCollateral(
-            @PathParam("collateralId") @Parameter(description = "collateralId") final Long collateralId,
-            @Valid CollateralProductUpdateRequest request) {
+    public CollateralProductUpdateResponse updateCollateral(@PathParam("collateralId") @Parameter(description = "collateralId") final Long collateralId, @Valid CollateralProductUpdateRequest request) {
         request.setCollateralId(collateralId);
         final var command = new CollateralProductUpdateCommand();
         command.setPayload(request);
@@ -108,11 +102,17 @@ public class CollateralManagementApiResource {
     @Path("{collateralId}")
     @Operation(operationId = "deleteCollateral_1", summary = "Delete a Collateral", description = "Delete Collateral")
     @AlternativeOperationId("deleteCollateral_2")
-    public CollateralProductDeleteResponse deleteCollateral(
-            @PathParam("collateralId") @Parameter(description = "collateralId") final Long collateralId) {
+    public CollateralProductDeleteResponse deleteCollateral(@PathParam("collateralId") @Parameter(description = "collateralId") final Long collateralId) {
         final var request = CollateralProductDeleteRequest.builder().collateralId(collateralId).build();
         final var command = new CollateralProductDeleteCommand();
         command.setPayload(request);
         return dispatcher.<CollateralProductDeleteRequest, CollateralProductDeleteResponse>dispatch(command).get();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CollateralManagementApiResource(final CommandDispatcher dispatcher, final CollateralManagementReadService collateralManagementReadService, final CurrencyReadPlatformService currencyReadPlatformService) {
+        this.dispatcher = dispatcher;
+        this.collateralManagementReadService = collateralManagementReadService;
+        this.currencyReadPlatformService = currencyReadPlatformService;
     }
 }

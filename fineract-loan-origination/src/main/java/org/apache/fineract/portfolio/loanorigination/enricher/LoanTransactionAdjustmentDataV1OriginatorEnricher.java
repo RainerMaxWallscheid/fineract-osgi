@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.loanorigination.enricher;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.avro.loan.v1.LoanTransactionAdjustmentDataV1;
 import org.apache.fineract.avro.loan.v1.LoanTransactionDataV1;
 import org.apache.fineract.avro.loan.v1.OriginatorDetailsV1;
@@ -29,10 +28,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 @ConditionalOnProperty(value = "fineract.module.loan-origination.enabled", havingValue = "true")
 public class LoanTransactionAdjustmentDataV1OriginatorEnricher implements DataEnricher<LoanTransactionAdjustmentDataV1> {
-
     private final LoanOriginatorDetailsResolver loanOriginatorDetailsResolver;
 
     @Override
@@ -46,14 +43,17 @@ public class LoanTransactionAdjustmentDataV1OriginatorEnricher implements DataEn
         if (transactionToAdjust == null || transactionToAdjust.getLoanId() == null) {
             return;
         }
-
-        final List<OriginatorDetailsV1> originators = loanOriginatorDetailsResolver
-                .resolveOriginatorDetails(transactionToAdjust.getLoanId());
+        final List<OriginatorDetailsV1> originators = loanOriginatorDetailsResolver.resolveOriginatorDetails(transactionToAdjust.getLoanId());
         if (!originators.isEmpty()) {
             transactionToAdjust.setOriginators(originators);
             if (data.getNewTransactionDetail() != null) {
                 data.getNewTransactionDetail().setOriginators(originators);
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionAdjustmentDataV1OriginatorEnricher(final LoanOriginatorDetailsResolver loanOriginatorDetailsResolver) {
+        this.loanOriginatorDetailsResolver = loanOriginatorDetailsResolver;
     }
 }

@@ -18,20 +18,22 @@
  */
 package org.apache.fineract.notification.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.notification.domain.NotificationMapper;
 import org.apache.fineract.notification.domain.NotificationMapperRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class NotificationMapperWritePlatformServiceImpl implements NotificationMapperWritePlatformService {
-
     private final NotificationMapperRepository notificationMapperRepository;
 
     @Override
     public Long create(NotificationMapper notificationMapper) {
         this.notificationMapperRepository.saveAndFlush(notificationMapper);
         return notificationMapper.getId();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public NotificationMapperWritePlatformServiceImpl(final NotificationMapperRepository notificationMapperRepository) {
+        this.notificationMapperRepository = notificationMapperRepository;
     }
 }

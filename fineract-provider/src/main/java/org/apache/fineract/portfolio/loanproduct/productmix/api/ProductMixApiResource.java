@@ -34,7 +34,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.Collection;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
@@ -55,71 +54,62 @@ import org.springframework.stereotype.Component;
 @Path("/v1/loanproducts/{productId}/productmix")
 @Component
 @Tag(name = "Product Mix")
-@RequiredArgsConstructor
 public class ProductMixApiResource {
-
     private final ProductMixReadPlatformService productMixReadPlatformService;
     private final LoanProductReadPlatformService loanProductReadPlatformService;
     private final CommandDispatcher commandDispatcher;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Product Mix Template", operationId = "retrieveTemplateProductMix")
     @AlternativeOperationId("retrieveTemplate_12")
     public ProductMixData retrieveTemplate(@PathParam("productId") final Long productId, @Context final UriInfo uriInfo) {
-
         var productMixData = productMixReadPlatformService.retrieveLoanProductMixDetails(productId);
-
         if (uriInfo.getQueryParameters().containsKey("template")) {
             final Collection<LoanProductData> productOptions = this.loanProductReadPlatformService.retrieveAvailableLoanProductsForMix();
-            productMixData = ProductMixData.builder().productId(productMixData.getProductId()).productName(productMixData.getProductName())
-                    .restrictedProducts(productMixData.getRestrictedProducts()).allowedProducts(productMixData.getAllowedProducts())
-                    .productOptions(productOptions).build();
+            productMixData = ProductMixData.builder().productId(productMixData.getProductId()).productName(productMixData.getProductName()).restrictedProducts(productMixData.getRestrictedProducts()).allowedProducts(productMixData.getAllowedProducts()).productOptions(productOptions).build();
         }
         return productMixData;
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create Product Mix", operationId = "createProductMix")
-    public ProductMixCreateResponse createProductMix(@PathParam("productId") final Long productId,
-            @Valid final ProductMixCreateRequest request) {
-
+    public ProductMixCreateResponse createProductMix(@PathParam("productId") final Long productId, @Valid final ProductMixCreateRequest request) {
         request.setProductId(productId);
-
         final var command = new ProductMixCreateCommand();
         command.setPayload(request);
-
         final Supplier<ProductMixCreateResponse> response = commandDispatcher.dispatch(command);
         return response.get();
     }
 
     @PUT
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update Product Mix", operationId = "updateProductMix")
-    public ProductMixUpdateResponse updateProductMix(@PathParam("productId") final Long productId,
-            @Valid final ProductMixUpdateRequest request) {
-
+    public ProductMixUpdateResponse updateProductMix(@PathParam("productId") final Long productId, @Valid final ProductMixUpdateRequest request) {
         request.setProductId(productId);
-
         final var command = new ProductMixUpdateCommand();
         command.setPayload(request);
-
         final Supplier<ProductMixUpdateResponse> response = commandDispatcher.dispatch(command);
         return response.get();
     }
 
     @DELETE
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete Product Mix", operationId = "deleteProductMix")
     public ProductMixDeleteResponse deleteProductMix(@PathParam("productId") final Long productId) {
-
         final var command = new ProductMixDeleteCommand();
         command.setPayload(ProductMixDeleteRequest.builder().productId(productId).build());
-
         final Supplier<ProductMixDeleteResponse> response = commandDispatcher.dispatch(command);
         return response.get();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProductMixApiResource(final ProductMixReadPlatformService productMixReadPlatformService, final LoanProductReadPlatformService loanProductReadPlatformService, final CommandDispatcher commandDispatcher) {
+        this.productMixReadPlatformService = productMixReadPlatformService;
+        this.loanProductReadPlatformService = loanProductReadPlatformService;
+        this.commandDispatcher = commandDispatcher;
     }
 }

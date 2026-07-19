@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "SAVINGSACCOUNT", action = "RELEASEAMOUNT")
-@RequiredArgsConstructor
 public class ReleaseAmountSavingsAccountCommandHandler implements NewCommandSourceHandler {
-
     private final SavingsAccountWritePlatformService writePlatformService;
 
     @Transactional
@@ -41,4 +38,8 @@ public class ReleaseAmountSavingsAccountCommandHandler implements NewCommandSour
         return this.writePlatformService.releaseAmount(command.getSavingsId(), transactionId, command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ReleaseAmountSavingsAccountCommandHandler(final SavingsAccountWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
+    }
 }

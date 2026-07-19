@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
 import org.apache.fineract.investor.domain.ExternalAssetOwner;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
@@ -27,24 +26,24 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class LoanJournalEntryPosterImpl implements LoanJournalEntryPoster {
-
     private final JournalEntryWritePlatformService journalEntryWritePlatformService;
 
     @Override
-    public void postJournalEntriesForLoanTransaction(final LoanTransaction loanTransaction, final boolean isAccountTransfer,
-            final boolean isLoanToLoanTransfer) {
-        this.journalEntryWritePlatformService.createJournalEntriesForLoanTransaction(loanTransaction, isAccountTransfer,
-                isLoanToLoanTransfer);
+    public void postJournalEntriesForLoanTransaction(final LoanTransaction loanTransaction, final boolean isAccountTransfer, final boolean isLoanToLoanTransfer) {
+        this.journalEntryWritePlatformService.createJournalEntriesForLoanTransaction(loanTransaction, isAccountTransfer, isLoanToLoanTransfer);
     }
 
     @Override
-    public void postJournalEntriesForExternalOwnerTransfer(final Loan loan, final Object externalAssetOwnerTransfer,
-            final Object previousOwner) {
+    public void postJournalEntriesForExternalOwnerTransfer(final Loan loan, final Object externalAssetOwnerTransfer, final Object previousOwner) {
         // Cast to proper types
         final ExternalAssetOwnerTransfer transfer = (ExternalAssetOwnerTransfer) externalAssetOwnerTransfer;
         final ExternalAssetOwner prevOwner = (ExternalAssetOwner) previousOwner;
         this.journalEntryWritePlatformService.createJournalEntriesForExternalOwnerTransfer(loan, transfer, prevOwner);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanJournalEntryPosterImpl(final JournalEntryWritePlatformService journalEntryWritePlatformService) {
+        this.journalEntryWritePlatformService = journalEntryWritePlatformService;
     }
 }

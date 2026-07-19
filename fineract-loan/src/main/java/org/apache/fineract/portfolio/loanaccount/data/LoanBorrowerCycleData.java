@@ -19,15 +19,38 @@
 package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-@Getter
 public class LoanBorrowerCycleData {
-
     private final BigDecimal principal;
     private final BigDecimal interestRatePerPeriod;
     private final Integer numberOfRepayments;
     private final Integer termFrequency;
+
+    @java.lang.SuppressWarnings("all")
+        public LoanBorrowerCycleData(final BigDecimal principal, final BigDecimal interestRatePerPeriod, final Integer numberOfRepayments, final Integer termFrequency) {
+        this.principal = principal;
+        this.interestRatePerPeriod = interestRatePerPeriod;
+        this.numberOfRepayments = numberOfRepayments;
+        this.termFrequency = termFrequency;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPrincipal() {
+        return this.principal;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getInterestRatePerPeriod() {
+        return this.interestRatePerPeriod;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getNumberOfRepayments() {
+        return this.numberOfRepayments;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getTermFrequency() {
+        return this.termFrequency;
+    }
 }

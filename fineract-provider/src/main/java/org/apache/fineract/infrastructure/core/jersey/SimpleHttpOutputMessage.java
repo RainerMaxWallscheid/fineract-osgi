@@ -20,13 +20,10 @@ package org.apache.fineract.infrastructure.core.jersey;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpOutputMessage;
 
-@RequiredArgsConstructor
 public final class SimpleHttpOutputMessage implements HttpOutputMessage {
-
     private final OutputStream outputStream;
     private final HttpHeaders headers;
 
@@ -38,5 +35,11 @@ public final class SimpleHttpOutputMessage implements HttpOutputMessage {
     @Override
     public HttpHeaders getHeaders() {
         return headers;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SimpleHttpOutputMessage(final OutputStream outputStream, final HttpHeaders headers) {
+        this.outputStream = outputStream;
+        this.headers = headers;
     }
 }

@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.workingcapitalloan.service;
 
 import com.google.gson.JsonElement;
@@ -24,7 +23,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -69,9 +67,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class WorkingCapitalLoanChargeWritePlatformServiceImpl implements WorkingCapitalLoanChargeWritePlatformService {
-
     private final WorkingCapitalLoanChargeDataValidator loanChargeDataValidator;
     private final WorkingCapitalLoanRepository workingCapitalLoanRepository;
     private final ChargeRepositoryWrapper chargeRepository;
@@ -89,125 +85,85 @@ public class WorkingCapitalLoanChargeWritePlatformServiceImpl implements Working
     @Override
     public CommandProcessingResult createLoanCharge(Long loanId, JsonCommand command) {
         loanChargeDataValidator.validateCreateLoanCharge(command.json());
-        WorkingCapitalLoan loan = workingCapitalLoanRepository.findById(loanId)
-                .orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
-
+        WorkingCapitalLoan loan = workingCapitalLoanRepository.findById(loanId).orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
         WorkingCapitalLoanCharge loanCharge = assemblyChargeFromCommand(loan, command);
-
         loanCharge = loanChargeRepository.saveAndFlush(loanCharge);
-
         addChargeToBalance(loan, loanCharge);
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(loanCharge.getId()) //
-                .withEntityExternalId(loanCharge.getExternalId()) //
-                .withOfficeId(loan.getOfficeId()) //
-                .withClientId(loan.getClientId()) //
-                .withLoanId(loanId) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(loanCharge.getId()).withEntityExternalId(loanCharge.getExternalId()).withOfficeId(loan.getOfficeId()).withClientId(loan.getClientId()).withLoanId(loanId).build();
     }
 
     @Transactional
     @Override
     public CommandProcessingResult adjustmentForLoanCharge(final Long loanId, final Long wcLoanChargeId, final JsonCommand command) {
         loanChargeDataValidator.validateChargeAdjustmentRequest(command.json());
-
-        final WorkingCapitalLoan loan = workingCapitalLoanRepository.findById(loanId)
-                .orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
-        final WorkingCapitalLoanCharge wcCharge = loanChargeRepository.findById(wcLoanChargeId)
-                .orElseThrow(() -> new WorkingCapitalLoanChargeNotFoundException(wcLoanChargeId));
-
+        final WorkingCapitalLoan loan = workingCapitalLoanRepository.findById(loanId).orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
+        final WorkingCapitalLoanCharge wcCharge = loanChargeRepository.findById(wcLoanChargeId).orElseThrow(() -> new WorkingCapitalLoanChargeNotFoundException(wcLoanChargeId));
         if (wcCharge.getLoan() == null || !loanId.equals(wcCharge.getLoan().getId())) {
-            throw new WorkingCapitalLoanChargeAdjustmentException("wc.loan.charge.adjustment.charge.not.belongs.to.loan",
-                    "Working capital loan charge " + wcLoanChargeId + " does not belong to loan " + loanId);
+            throw new WorkingCapitalLoanChargeAdjustmentException("wc.loan.charge.adjustment.charge.not.belongs.to.loan", "Working capital loan charge " + wcLoanChargeId + " does not belong to loan " + loanId);
         }
-
         final BigDecimal amount = command.bigDecimalValueOfParameterNamed(WorkingCapitalLoanChargeConstants.amountParamName);
         final LocalDate transactionDate = ThreadLocalContextUtil.getBusinessDate();
         final ExternalId externalId = externalIdFactory.createFromCommand(command, WorkingCapitalLoanChargeConstants.externalIdParamName);
-
         chargeAdjustmentEntranceValidation(loan, wcCharge, amount);
-
         final Map<String, Object> changes = new LinkedHashMap<>();
         changes.put(WorkingCapitalLoanChargeConstants.amountParamName, amount);
         changes.put(WorkingCapitalLoanChargeConstants.transactionDateParamName, transactionDate);
         changes.put(WorkingCapitalLoanChargeConstants.externalIdParamName, externalId);
-
         final PaymentDetail paymentDetail = createAndPersistPaymentDetailFromCommand(command, changes);
-
-        final WorkingCapitalLoanTransaction adjustmentTx = WorkingCapitalLoanTransaction.chargeAdjustment(loan, externalId, amount,
-                transactionDate, paymentDetail);
-
-        businessEventNotifierService
-                .notifyPreBusinessEvent(new WorkingCapitalLoanChargeAdjustmentPreBusinessEvent(adjustmentTx, loan.getId()));
-
-        final WorkingCapitalLoanTransactionRelation relation = WorkingCapitalLoanTransactionRelation.linkToCharge(adjustmentTx, wcCharge,
-                LoanTransactionRelationTypeEnum.CHARGE_ADJUSTMENT);
+        final WorkingCapitalLoanTransaction adjustmentTx = WorkingCapitalLoanTransaction.chargeAdjustment(loan, externalId, amount, transactionDate, paymentDetail);
+        businessEventNotifierService.notifyPreBusinessEvent(new WorkingCapitalLoanChargeAdjustmentPreBusinessEvent(adjustmentTx, loan.getId()));
+        final WorkingCapitalLoanTransactionRelation relation = WorkingCapitalLoanTransactionRelation.linkToCharge(adjustmentTx, wcCharge, LoanTransactionRelationTypeEnum.CHARGE_ADJUSTMENT);
         adjustmentTx.getLoanTransactionRelations().add(relation);
         transactionRepository.saveAndFlush(adjustmentTx);
-
-        final WorkingCapitalLoanTransactionAllocation allocation = transactionProcessor.processRepaymentLikeTransaction(loan, adjustmentTx,
-                LoanTransactionType.CHARGE_ADJUSTMENT, transactionDate, amount);
-
+        final WorkingCapitalLoanTransactionAllocation allocation = transactionProcessor.processRepaymentLikeTransaction(loan, adjustmentTx, LoanTransactionType.CHARGE_ADJUSTMENT, transactionDate, amount);
         if (loan.getLoanProduct().getAccountingRule().isAccrualWithDeferredRevenueAmortization()) {
             accountingProcessor.postJournalEntries(loan, adjustmentTx, allocation, false);
         }
-
         final String noteText = command.stringValueOfParameterNamed(WorkingCapitalLoanChargeConstants.noteParamName);
         if (StringUtils.isNotBlank(noteText)) {
             noteRepository.save(WorkingCapitalLoanNote.create(loan, noteText));
             changes.put(WorkingCapitalLoanChargeConstants.noteParamName, noteText);
         }
-
-        businessEventNotifierService
-                .notifyPostBusinessEvent(new WorkingCapitalLoanChargeAdjustmentPostBusinessEvent(adjustmentTx, loan.getId()));
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(wcLoanChargeId) //
-                .withEntityExternalId(wcCharge.getExternalId()) //
-                .withSubEntityId(adjustmentTx.getId()) //
-                .withSubEntityExternalId(adjustmentTx.getExternalId()) //
-                .withOfficeId(loan.getOfficeId()) //
-                .withClientId(loan.getClientId()) //
-                .withLoanId(loanId) //
-                .with(changes) //
-                .build();
+        businessEventNotifierService.notifyPostBusinessEvent(new WorkingCapitalLoanChargeAdjustmentPostBusinessEvent(adjustmentTx, loan.getId()));
+        return  //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(wcLoanChargeId).withEntityExternalId(wcCharge.getExternalId()).withSubEntityId(adjustmentTx.getId()).withSubEntityExternalId(adjustmentTx.getExternalId()).withOfficeId(loan.getOfficeId()).withClientId(loan.getClientId()).withLoanId(loanId).with(changes).build();
     }
 
-    private void chargeAdjustmentEntranceValidation(final WorkingCapitalLoan loan, final WorkingCapitalLoanCharge wcCharge,
-            final BigDecimal amount) {
-        if (loan.getLoanStatus() != LoanStatus.ACTIVE && loan.getLoanStatus() != LoanStatus.CLOSED_OBLIGATIONS_MET
-                && loan.getLoanStatus() != LoanStatus.OVERPAID) {
-            throw new WorkingCapitalLoanChargeAdjustmentException("wc.loan.charge.adjustment.invalid.status",
-                    "Adjustment is not supported for the status of " + loan.getLoanStatus());
+    private void chargeAdjustmentEntranceValidation(final WorkingCapitalLoan loan, final WorkingCapitalLoanCharge wcCharge, final BigDecimal amount) {
+        if (loan.getLoanStatus() != LoanStatus.ACTIVE && loan.getLoanStatus() != LoanStatus.CLOSED_OBLIGATIONS_MET && loan.getLoanStatus() != LoanStatus.OVERPAID) {
+            throw new WorkingCapitalLoanChargeAdjustmentException("wc.loan.charge.adjustment.invalid.status", "Adjustment is not supported for the status of " + loan.getLoanStatus());
         }
-
         if (!wcCharge.isActive()) {
-            throw new WorkingCapitalLoanChargeAdjustmentException("wc.loan.charge.adjustment.inactive.charge",
-                    "Adjustment is not supported for inactive charges");
+            throw new WorkingCapitalLoanChargeAdjustmentException("wc.loan.charge.adjustment.inactive.charge", "Adjustment is not supported for inactive charges");
         }
-
         if (amount.compareTo(wcCharge.getAmount()) > 0) {
-            throw new WorkingCapitalLoanChargeAdjustmentException("wc.loan.charge.adjustment.invalid.amount",
-                    "Transaction amount cannot be higher than the charge amount: " + wcCharge.getAmount());
+            throw new WorkingCapitalLoanChargeAdjustmentException("wc.loan.charge.adjustment.invalid.amount", "Transaction amount cannot be higher than the charge amount: " + wcCharge.getAmount());
         }
-
         final BigDecimal available = calculateAvailableAmountForChargeAdjustment(wcCharge);
         if (amount.compareTo(available) > 0) {
-            throw new WorkingCapitalLoanChargeAdjustmentException("wc.loan.charge.adjustment.invalid.amount",
-                    "Transaction amount cannot be higher than the available charge amount for adjustment: " + available);
+            throw new WorkingCapitalLoanChargeAdjustmentException("wc.loan.charge.adjustment.invalid.amount", "Transaction amount cannot be higher than the available charge amount for adjustment: " + available);
         }
-
         checkClientActive(loan);
     }
 
     private BigDecimal calculateAvailableAmountForChargeAdjustment(final WorkingCapitalLoanCharge wcCharge) {
-        final BigDecimal previouslyAdjusted = relationRepository
-                .findAllByToChargeAndFromTransactionReversedAndFromTransactionTransactionType(wcCharge, false,
-                        LoanTransactionType.CHARGE_ADJUSTMENT)
-                .stream().map(rel -> rel.getFromTransaction().getTransactionAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
+        final BigDecimal previouslyAdjusted = relationRepository.findAllByToChargeAndFromTransactionReversedAndFromTransactionTransactionType(wcCharge, false, LoanTransactionType.CHARGE_ADJUSTMENT).stream().map(rel -> rel.getFromTransaction().getTransactionAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
         return wcCharge.getAmount().subtract(previouslyAdjusted);
     }
 
@@ -234,34 +190,44 @@ public class WorkingCapitalLoanChargeWritePlatformServiceImpl implements Working
         final LocalDate dueDate = command.dateValueOfParameterNamed("dueDate");
         final Long chargeId = command.longValueOfParameterNamed("chargeId");
         final ExternalId externalId = externalIdFactory.createFromCommand(command, WorkingCapitalLoanConstants.externalIdParameterName);
-
         final Charge chargeDefinition = chargeRepository.findOneWithNotFoundDetection(chargeId);
         if (ChargeTimeType.SPECIFIED_DUE_DATE.getValue().equals(chargeDefinition.getChargeTimeType())) {
             if (dueDate == null) {
-                throw new PlatformApiDataValidationException("field.is.mandatory", "Field is mandatory",
-                        WorkingCapitalLoanChargeConstants.dueDateParamName);
+                throw new PlatformApiDataValidationException("field.is.mandatory", "Field is mandatory", WorkingCapitalLoanChargeConstants.dueDateParamName);
             }
             if (dueDate.isBefore(ThreadLocalContextUtil.getBusinessDate())) {
-                throw new PlatformApiDataValidationException("dueDate.cannot.be.in.the.past", "DueDate cannot be in the past",
-                        WorkingCapitalLoanChargeConstants.dueDateParamName);
+                throw new PlatformApiDataValidationException("dueDate.cannot.be.in.the.past", "DueDate cannot be in the past", WorkingCapitalLoanChargeConstants.dueDateParamName);
             }
             if (!loan.getLoanStatus().isActive()) {
-                throw new PlatformApiDataValidationException("loan.should.be.active", "Loan should be in active status",
-                        "workingCapitalLoan");
+                throw new PlatformApiDataValidationException("loan.should.be.active", "Loan should be in active status", "workingCapitalLoan");
             }
         }
-        return WorkingCapitalLoanCharge.build(loan, externalId, chargeDefinition, amount, dueDate,
-                ThreadLocalContextUtil.getBusinessDate());
+        return WorkingCapitalLoanCharge.build(loan, externalId, chargeDefinition, amount, dueDate, ThreadLocalContextUtil.getBusinessDate());
     }
 
     private void addChargeToBalance(WorkingCapitalLoan loan, WorkingCapitalLoanCharge loanCharge) {
-        final WorkingCapitalLoanBalance balance = balanceRepository.findByWcLoan_Id(loan.getId())
-                .orElseGet(() -> WorkingCapitalLoanBalance.createFor(loan));
-
+        final WorkingCapitalLoanBalance balance = balanceRepository.findByWcLoan_Id(loan.getId()).orElseGet(() -> WorkingCapitalLoanBalance.createFor(loan));
         if (loanCharge.isPenaltyCharge()) {
             balance.setPenalty(balance.getPenalty().add(loanCharge.getAmount()));
         } else {
             balance.setFee(balance.getFee().add(loanCharge.getAmount()));
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanChargeWritePlatformServiceImpl(final WorkingCapitalLoanChargeDataValidator loanChargeDataValidator, final WorkingCapitalLoanRepository workingCapitalLoanRepository, final ChargeRepositoryWrapper chargeRepository, final WorkingCapitalLoanChargeRepository loanChargeRepository, final ExternalIdFactory externalIdFactory, final WorkingCapitalLoanBalanceRepository balanceRepository, final WorkingCapitalLoanTransactionRepository transactionRepository, final WorkingCapitalLoanTransactionRelationRepository relationRepository, final PaymentDetailWritePlatformService paymentDetailService, final WorkingCapitalLoanNoteRepository noteRepository, final BusinessEventNotifierService businessEventNotifierService, final WorkingCapitalLoanAccountingProcessor accountingProcessor, final WorkingCapitalLoanTransactionProcessor transactionProcessor) {
+        this.loanChargeDataValidator = loanChargeDataValidator;
+        this.workingCapitalLoanRepository = workingCapitalLoanRepository;
+        this.chargeRepository = chargeRepository;
+        this.loanChargeRepository = loanChargeRepository;
+        this.externalIdFactory = externalIdFactory;
+        this.balanceRepository = balanceRepository;
+        this.transactionRepository = transactionRepository;
+        this.relationRepository = relationRepository;
+        this.paymentDetailService = paymentDetailService;
+        this.noteRepository = noteRepository;
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.accountingProcessor = accountingProcessor;
+        this.transactionProcessor = transactionProcessor;
     }
 }

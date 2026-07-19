@@ -26,7 +26,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import java.sql.Date;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.mix.service.MixReportXBRLBuilder;
 import org.apache.fineract.mix.service.MixReportXBRLResultService;
@@ -35,23 +34,24 @@ import org.springframework.stereotype.Component;
 @Path("/v1/mixreport")
 @Component
 @Tag(name = "Mix Report", description = """
-        """)
-@RequiredArgsConstructor
+    """)
 public class MixReportApiResource {
-
     private final MixReportXBRLResultService xbrlResultService;
     private final MixReportXBRLBuilder xbrlBuilder;
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML })
+    @Produces({MediaType.APPLICATION_XML})
     @Operation(summary = "Retrieve Mix XBRL report", operationId = "retrieveMixReport")
     @AlternativeOperationId("retrieveXBRLReport")
-    public String retrieveXBRLReport(@QueryParam("startDate") final Date startDate, @QueryParam("endDate") final Date endDate,
-            @QueryParam("currency") final String currency) {
-
+    public String retrieveXBRLReport(@QueryParam("startDate") final Date startDate, @QueryParam("endDate") final Date endDate, @QueryParam("currency") final String currency) {
         final var data = xbrlResultService.getXBRLResult(startDate, endDate, currency);
-
         // TODO: make this type safe?
         return this.xbrlBuilder.build(data);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MixReportApiResource(final MixReportXBRLResultService xbrlResultService, final MixReportXBRLBuilder xbrlBuilder) {
+        this.xbrlResultService = xbrlResultService;
+        this.xbrlBuilder = xbrlBuilder;
     }
 }

@@ -19,12 +19,10 @@
 package org.apache.fineract.infrastructure.core.exceptionmapper;
 
 import static org.apache.http.HttpStatus.SC_CONFLICT;
-
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.springframework.context.annotation.Scope;
@@ -39,8 +37,9 @@ import org.springframework.stereotype.Component;
 @Provider
 @Component
 @Scope("singleton")
-@Slf4j
 public class ConcurrencyFailureExceptionMapper implements FineractExceptionMapper, ExceptionMapper<ConcurrencyFailureException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ConcurrencyFailureExceptionMapper.class);
 
     @Override
     public Response toResponse(final ConcurrencyFailureException exception) {

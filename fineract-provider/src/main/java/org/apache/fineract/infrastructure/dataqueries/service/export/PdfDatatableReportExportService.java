@@ -23,30 +23,28 @@ import jakarta.ws.rs.core.Response;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.dataqueries.service.DatatableExportTargetParameter;
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class PdfDatatableReportExportService implements DatatableReportExportService {
-
     private final ReadReportingService readExtraDataAndReportingService;
 
     @Override
-    public ResponseHolder export(String reportName, MultivaluedMap<String, String> queryParams, Map<String, String> reportParams,
-            String parameterTypeValue) {
+    public ResponseHolder export(String reportName, MultivaluedMap<String, String> queryParams, Map<String, String> reportParams, String parameterTypeValue) {
         final String pdfFileName = this.readExtraDataAndReportingService.retrieveReportPDF(reportName, parameterTypeValue, reportParams);
-
         final File file = Path.of(pdfFileName).toFile();
-
-        return new ResponseHolder(Response.Status.OK).contentType("application/pdf")
-                .addHeader("Content-Disposition", "attachment; filename=\"" + pdfFileName + "\"").entity(file);
+        return new ResponseHolder(Response.Status.OK).contentType("application/pdf").addHeader("Content-Disposition", "attachment; filename=\"" + pdfFileName + "\"").entity(file);
     }
 
     @Override
     public boolean supports(DatatableExportTargetParameter exportType) {
         return exportType == DatatableExportTargetParameter.PDF;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PdfDatatableReportExportService(final ReadReportingService readExtraDataAndReportingService) {
+        this.readExtraDataAndReportingService = readExtraDataAndReportingService;
     }
 }

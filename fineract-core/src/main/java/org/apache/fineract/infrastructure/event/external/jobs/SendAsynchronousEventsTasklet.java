@@ -21,7 +21,6 @@ package org.apache.fineract.infrastructure.event.external.jobs;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.fineract.infrastructure.core.diagnostics.performance.MeasuringUtil.measure;
-
 import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -31,8 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.avro.MessageV1;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
@@ -57,11 +54,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class SendAsynchronousEventsTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SendAsynchronousEventsTasklet.class);
     private final FineractProperties fineractProperties;
     private final ExternalEventRepository repository;
     private final ExternalEventProducer eventProducer;
@@ -87,15 +83,13 @@ public class SendAsynchronousEventsTasklet implements Tasklet {
     }
 
     protected boolean isDownstreamChannelEnabled() {
-        return fineractProperties.getEvents().getExternal().getProducer().getJms().isEnabled()
-                || fineractProperties.getEvents().getExternal().getProducer().getKafka().isEnabled();
+        return fineractProperties.getEvents().getExternal().getProducer().getJms().isEnabled() || fineractProperties.getEvents().getExternal().getProducer().getKafka().isEnabled();
     }
 
     private List<ExternalEventView> getQueuedEventsBatch() {
         int readBatchSize = getBatchSize();
         Pageable batchSize = PageRequest.ofSize(readBatchSize);
-        return measure(() -> repository.findByStatusOrderByBusinessDateAscIdAsc(ExternalEventStatus.TO_BE_SENT, batchSize),
-                (events, timeTaken) -> log.debug("Loaded {} events in {}ms", events.size(), timeTaken.toMillis()));
+        return measure(() -> repository.findByStatusOrderByBusinessDateAscIdAsc(ExternalEventStatus.TO_BE_SENT, batchSize), (events, timeTaken) -> log.debug("Loaded {} events in {}ms", events.size(), timeTaken.toMillis()));
     }
 
     private void sendEvents(List<ExternalEventView> queuedEvents) {
@@ -111,7 +105,6 @@ public class SendAsynchronousEventsTasklet implements Tasklet {
 
     private void markEventsAsSent(final List<Long> eventIds) {
         OffsetDateTime sentAt = DateUtils.getAuditOffsetDateTime();
-
         // Partitioning dataset to avoid exception: PreparedStatement can have at most 65,535 parameters
         final int partitionSize = fineractProperties.getEvents().getExternal().getPartitionSize();
         List<List<Long>> partitions = Lists.partition(eventIds, partitionSize);
@@ -121,7 +114,7 @@ public class SendAsynchronousEventsTasklet implements Tasklet {
             tasks.add(threadPoolTaskExecutor.submit(() -> {
                 try {
                     ThreadLocalContextUtil.init(context);
-                    transactionTemplate.execute((status) -> {
+                    transactionTemplate.execute(status -> {
                         measure(() -> {
                             repository.markEventsSent(partitionedEventIds, sentAt);
                         }, timeTaken -> {
@@ -153,11 +146,9 @@ public class SendAsynchronousEventsTasklet implements Tasklet {
             }
             return aggregateRootId;
         }));
-        Map<Long, List<byte[]>> partitions = measure(
-                () -> initialPartitions.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> createMessages(e.getValue()))),
-                timeTaken -> {
-                    log.debug("Took {}ms to create message partitions", timeTaken.toMillis());
-                });
+        Map<Long, List<byte[]>> partitions = measure(() -> initialPartitions.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> createMessages(e.getValue()))), timeTaken -> {
+            log.debug("Took {}ms to create message partitions", timeTaken.toMillis());
+        });
         return partitions;
     }
 
@@ -169,8 +160,7 @@ public class SendAsynchronousEventsTasklet implements Tasklet {
                 ByteBuffer toByteBuffer = message.toByteBuffer();
                 byte[] convert = byteBufferConverter.convert(toByteBuffer);
                 messages.add(convert);
-                log.trace("Created message to send with id: [{}], type: [{}], idempotency key: [{}]", message.getId(), message.getType(),
-                        message.getIdempotencyKey());
+                log.trace("Created message to send with id: [{}], type: [{}], idempotency key: [{}]", message.getId(), message.getType(), message.getIdempotencyKey());
             }
             return messages;
         } catch (IOException e) {
@@ -183,4 +173,15 @@ public class SendAsynchronousEventsTasklet implements Tasklet {
         return externalEventBatchSize.intValue();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public SendAsynchronousEventsTasklet(final FineractProperties fineractProperties, final ExternalEventRepository repository, final ExternalEventProducer eventProducer, final MessageFactory messageFactory, final ByteBufferConverter byteBufferConverter, final ConfigurationDomainService configurationDomainService, final TransactionTemplate transactionTemplate, @Qualifier(TaskExecutorConstant.EVENT_MARKS_AS_SENT_EXECUTOR_BEAN_NAME) final ThreadPoolTaskExecutor threadPoolTaskExecutor) {
+        this.fineractProperties = fineractProperties;
+        this.repository = repository;
+        this.eventProducer = eventProducer;
+        this.messageFactory = messageFactory;
+        this.byteBufferConverter = byteBufferConverter;
+        this.configurationDomainService = configurationDomainService;
+        this.transactionTemplate = transactionTemplate;
+        this.threadPoolTaskExecutor = threadPoolTaskExecutor;
+    }
 }

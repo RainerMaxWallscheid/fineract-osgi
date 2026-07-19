@@ -23,16 +23,13 @@ import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 import io.github.resilience4j.retry.RetryRegistry;
 import java.util.Arrays;
-import lombok.AllArgsConstructor;
 import org.apache.fineract.batch.service.BatchExecutionException;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.domain.FineractRequestContextHolder;
 import org.springframework.stereotype.Service;
 
-@AllArgsConstructor
 @Service
 public class RetryConfigurationAssembler {
-
     public static final String EXECUTE_COMMAND = "executeCommand";
     public static final String BATCH_RETRY = "batchRetry";
     private static final String LAST_EXECUTION_EXCEPTION_KEY = "LAST_EXECUTION_EXCEPTION";
@@ -55,14 +52,12 @@ public class RetryConfigurationAssembler {
     public Retry getRetryConfigurationForExecuteCommand() {
         Class<? extends Throwable>[] exceptionList = fineractProperties.getRetry().getInstances().getExecuteCommand().getRetryExceptions();
         RetryConfig.Builder<Throwable> configBuilder = buildCommonExecuteCommandConfiguration();
-
         if (exceptionList != null) {
             configBuilder.retryOnException(ex -> {
                 setLastException(ex);
                 return isAssignableFrom(ex, exceptionList);
             });
         }
-
         RetryConfig config = configBuilder.build();
         return registry.retry(EXECUTE_COMMAND, config);
     }
@@ -70,7 +65,6 @@ public class RetryConfigurationAssembler {
     public Retry getRetryConfigurationForBatchApiWithEnclosingTransaction() {
         Class<? extends Throwable>[] exceptionList = fineractProperties.getRetry().getInstances().getExecuteCommand().getRetryExceptions();
         RetryConfig.Builder<Throwable> configBuilder = buildCommonExecuteCommandConfiguration();
-
         if (exceptionList != null) {
             configBuilder.retryOnException(ex -> {
                 if (ex instanceof BatchExecutionException e) {
@@ -82,16 +76,13 @@ public class RetryConfigurationAssembler {
                 }
             });
         }
-
         RetryConfig config = configBuilder.build();
         return registry.retry(BATCH_RETRY, config);
     }
 
     private RetryConfig.Builder<Throwable> buildCommonExecuteCommandConfiguration() {
         var props = fineractProperties.getRetry().getInstances().getExecuteCommand();
-
         RetryConfig.Builder<Throwable> configBuilder = RetryConfig.<Throwable>custom().maxAttempts(props.getMaxAttempts());
-
         if (props.getWaitDuration() != null && props.getWaitDuration().toMillis() >= 0) {
             if (Boolean.TRUE.equals(props.getEnableExponentialBackoff())) {
                 Double multiplier = props.getExponentialBackoffMultiplier();
@@ -104,7 +95,13 @@ public class RetryConfigurationAssembler {
                 configBuilder.waitDuration(props.getWaitDuration());
             }
         }
-
         return configBuilder;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RetryConfigurationAssembler(final RetryRegistry registry, final FineractProperties fineractProperties, final FineractRequestContextHolder fineractRequestContextHolder) {
+        this.registry = registry;
+        this.fineractProperties = fineractProperties;
+        this.fineractRequestContextHolder = fineractRequestContextHolder;
     }
 }

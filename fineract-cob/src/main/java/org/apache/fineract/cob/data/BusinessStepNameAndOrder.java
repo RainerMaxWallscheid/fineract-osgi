@@ -23,22 +23,34 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
-@Getter
-@NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 public class BusinessStepNameAndOrder {
-
     private String stepName;
     private Long stepOrder;
 
     public static TreeMap<Long, String> getBusinessStepMap(Set<BusinessStepNameAndOrder> businessSteps) {
-        Map<Long, String> businessStepMap = businessSteps.stream()
-                .collect(Collectors.toMap(BusinessStepNameAndOrder::getStepOrder, BusinessStepNameAndOrder::getStepName));
+        Map<Long, String> businessStepMap = businessSteps.stream().collect(Collectors.toMap(BusinessStepNameAndOrder::getStepOrder, BusinessStepNameAndOrder::getStepName));
         return new TreeMap<>(businessStepMap);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BusinessStepNameAndOrder(final String stepName, final Long stepOrder) {
+        this.stepName = stepName;
+        this.stepOrder = stepOrder;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getStepName() {
+        return this.stepName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getStepOrder() {
+        return this.stepOrder;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BusinessStepNameAndOrder() {
     }
 }

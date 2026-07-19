@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.campaigns.sms.service;
 
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.campaigns.sms.data.SmsBusinessRulesData;
 import org.apache.fineract.infrastructure.campaigns.sms.data.SmsCampaignData;
@@ -38,9 +37,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class SmsCampaignReadPlatformServiceImpl implements SmsCampaignReadPlatformService {
-
     private final JdbcTemplate jdbcTemplate;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
     private final SmsCampaignDropdownReadPlatformService smsCampaignDropdownReadPlatformService;
@@ -64,9 +61,7 @@ public class SmsCampaignReadPlatformServiceImpl implements SmsCampaignReadPlatfo
     public Page<SmsCampaignData> retrieveAll(final SearchParameters searchParameters) {
         final boolean visible = true;
         final StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("select ").append(sqlGenerator.calcFoundRows()).append(" ").append(this.smsCampaignMapper.schema())
-                .append(" where sc.is_visible = ? ");
-
+        sqlBuilder.append("select ").append(sqlGenerator.calcFoundRows()).append(" ").append(this.smsCampaignMapper.schema()).append(" where sc.is_visible = ? ");
         if (searchParameters.hasLimit()) {
             sqlBuilder.append(" ");
             if (searchParameters.hasOffset()) {
@@ -75,7 +70,7 @@ public class SmsCampaignReadPlatformServiceImpl implements SmsCampaignReadPlatfo
                 sqlBuilder.append(sqlGenerator.limit(searchParameters.getLimit()));
             }
         }
-        return this.paginationHelper.fetchPage(jdbcTemplate, sqlBuilder.toString(), new Object[] { visible }, this.smsCampaignMapper);
+        return this.paginationHelper.fetchPage(jdbcTemplate, sqlBuilder.toString(), new Object[] {visible}, this.smsCampaignMapper);
     }
 
     @Override
@@ -85,19 +80,26 @@ public class SmsCampaignReadPlatformServiceImpl implements SmsCampaignReadPlatfo
         if (StringUtils.isNotBlank(reportType)) {
             sqlBuilder.append(" where sr.report_type = ?");
         }
-        final Collection<SmsBusinessRulesData> businessRulesOptions = this.jdbcTemplate.query(sqlBuilder.toString(),
-                this.businessRuleMapper, // NOSONAR
-                reportType);
+        final Collection<SmsBusinessRulesData> businessRulesOptions = this.jdbcTemplate.query(sqlBuilder.toString(), this.businessRuleMapper,  // NOSONAR
+        reportType);
         final Collection<SmsProviderData> smsProviderOptions = this.smsCampaignDropdownReadPlatformService.retrieveSmsProviders();
         final Collection<EnumOptionData> campaignTypeOptions = this.smsCampaignDropdownReadPlatformService.retrieveCampaignTypes();
-        final Collection<EnumOptionData> campaignTriggerTypeOptions = this.smsCampaignDropdownReadPlatformService
-                .retrieveCampaignTriggerTypes();
+        final Collection<EnumOptionData> campaignTriggerTypeOptions = this.smsCampaignDropdownReadPlatformService.retrieveCampaignTriggerTypes();
         final Collection<EnumOptionData> months = this.smsCampaignDropdownReadPlatformService.retrieveMonths();
         final Collection<EnumOptionData> weekDays = this.smsCampaignDropdownReadPlatformService.retrieveWeeks();
-        final Collection<EnumOptionData> frequencyTypeOptions = this.calendarDropdownReadPlatformService
-                .retrieveCalendarFrequencyTypeOptions();
+        final Collection<EnumOptionData> frequencyTypeOptions = this.calendarDropdownReadPlatformService.retrieveCalendarFrequencyTypeOptions();
         final Collection<EnumOptionData> periodFrequencyOptions = this.smsCampaignDropdownReadPlatformService.retrivePeriodFrequencyTypes();
-        return SmsCampaignData.template(smsProviderOptions, campaignTypeOptions, businessRulesOptions, campaignTriggerTypeOptions, months,
-                weekDays, frequencyTypeOptions, periodFrequencyOptions);
+        return SmsCampaignData.template(smsProviderOptions, campaignTypeOptions, businessRulesOptions, campaignTriggerTypeOptions, months, weekDays, frequencyTypeOptions, periodFrequencyOptions);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SmsCampaignReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final DatabaseSpecificSQLGenerator sqlGenerator, final SmsCampaignDropdownReadPlatformService smsCampaignDropdownReadPlatformService, final CalendarDropdownReadPlatformService calendarDropdownReadPlatformService, final PaginationHelper paginationHelper, final BusinessRuleMapper businessRuleMapper, final SmsCampaignMapper smsCampaignMapper) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.sqlGenerator = sqlGenerator;
+        this.smsCampaignDropdownReadPlatformService = smsCampaignDropdownReadPlatformService;
+        this.calendarDropdownReadPlatformService = calendarDropdownReadPlatformService;
+        this.paginationHelper = paginationHelper;
+        this.businessRuleMapper = businessRuleMapper;
+        this.smsCampaignMapper = smsCampaignMapper;
     }
 }

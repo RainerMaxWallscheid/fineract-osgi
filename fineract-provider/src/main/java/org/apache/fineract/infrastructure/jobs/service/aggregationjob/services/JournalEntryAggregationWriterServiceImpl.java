@@ -19,8 +19,6 @@
 package org.apache.fineract.infrastructure.jobs.service.aggregationjob.services;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.jobs.service.aggregationjob.data.JournalEntryAggregationSummaryData;
 import org.apache.fineract.infrastructure.jobs.service.aggregationjob.data.JournalEntryAggregationTrackingData;
 import org.apache.fineract.infrastructure.jobs.service.aggregationjob.domain.JournalEntryAggregationTracking;
@@ -30,10 +28,9 @@ import org.apache.fineract.infrastructure.jobs.service.aggregationjob.domain.Jou
 import org.springframework.stereotype.Component;
 
 @Component
-@AllArgsConstructor
-@Slf4j
 public class JournalEntryAggregationWriterServiceImpl implements JournalEntryAggregationWriterService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JournalEntryAggregationWriterServiceImpl.class);
     private JournalEntrySummaryRepository journalSummaryRepository;
     private JournalEntryAggregationTrackingRepository journalEntryAggregationTrackingRepository;
 
@@ -86,4 +83,9 @@ public class JournalEntryAggregationWriterServiceImpl implements JournalEntryAgg
         return entrySummary;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public JournalEntryAggregationWriterServiceImpl(final JournalEntrySummaryRepository journalSummaryRepository, final JournalEntryAggregationTrackingRepository journalEntryAggregationTrackingRepository) {
+        this.journalSummaryRepository = journalSummaryRepository;
+        this.journalEntryAggregationTrackingRepository = journalEntryAggregationTrackingRepository;
+    }
 }

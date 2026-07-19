@@ -18,23 +18,25 @@
  */
 package org.apache.fineract.accounting.jobs.accountrunningbalanceupdate;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryRunningBalanceUpdateService;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class AccountRunningBalanceUpdateTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AccountRunningBalanceUpdateTasklet.class);
     private final JournalEntryRunningBalanceUpdateService journalEntryRunningBalanceUpdateService;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         journalEntryRunningBalanceUpdateService.updateRunningBalance();
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AccountRunningBalanceUpdateTasklet(final JournalEntryRunningBalanceUpdateService journalEntryRunningBalanceUpdateService) {
+        this.journalEntryRunningBalanceUpdateService = journalEntryRunningBalanceUpdateService;
     }
 }

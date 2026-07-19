@@ -20,18 +20,14 @@ package org.apache.fineract.test.stepdef.hook;
 
 import io.cucumber.java.After;
 import io.cucumber.java.Scenario;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.test.testrail.TestRailClient;
 import org.apache.fineract.test.testrail.TestRailProperties;
 import org.springframework.context.ApplicationContext;
 
-@Slf4j
-@RequiredArgsConstructor
 public class TestRailLifecycleHook {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TestRailLifecycleHook.class);
     private final TestRailProperties testRailProperties;
-
     private final ApplicationContext applicationContext;
 
     @After
@@ -40,5 +36,11 @@ public class TestRailLifecycleHook {
             TestRailClient testRailClient = applicationContext.getBean(TestRailClient.class);
             testRailClient.saveScenarioResult(scenario);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TestRailLifecycleHook(final TestRailProperties testRailProperties, final ApplicationContext applicationContext) {
+        this.testRailProperties = testRailProperties;
+        this.applicationContext = applicationContext;
     }
 }

@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.loanaccount.service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.exception.GeneralPlatformDomainRuleException;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.portfolio.loanaccount.data.BuyDownFeeAmortizationDetails;
@@ -29,9 +28,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanBuyDownFeeBalance;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
 import org.apache.fineract.portfolio.loanaccount.repository.LoanBuyDownFeeBalanceRepository;
 
-@RequiredArgsConstructor
 public class BuyDownFeeReadPlatformServiceImpl implements BuyDownFeeReadPlatformService {
-
     private final LoanBuyDownFeeBalanceRepository loanBuyDownFeeBalanceRepository;
     private final LoanRepository loanRepository;
 
@@ -40,26 +37,24 @@ public class BuyDownFeeReadPlatformServiceImpl implements BuyDownFeeReadPlatform
         if (!loanRepository.existsById(loanId)) {
             throw new GeneralPlatformDomainRuleException("error.msg.loan.is.not.found", "Loan: %s is not found".formatted(loanId), loanId);
         }
-
         if (!loanRepository.isEnabledBuyDownFee(loanId)) {
-            throw new GeneralPlatformDomainRuleException("error.msg.loan.is.not.enabled.buydown.fee",
-                    "Loan: %s is not enabled Buydown fee feature".formatted(loanId), loanId);
+            throw new GeneralPlatformDomainRuleException("error.msg.loan.is.not.enabled.buydown.fee", "Loan: %s is not enabled Buydown fee feature".formatted(loanId), loanId);
         }
-        final List<LoanBuyDownFeeBalance> buyDownFeeBalances = loanBuyDownFeeBalanceRepository
-                .findAllByLoanIdAndDeletedFalseAndClosedFalse(loanId);
-
+        final List<LoanBuyDownFeeBalance> buyDownFeeBalances = loanBuyDownFeeBalanceRepository.findAllByLoanIdAndDeletedFalseAndClosedFalse(loanId);
         return buyDownFeeBalances.stream().map(this::mapToLoanBuyDownFeeAmortizationData).collect(Collectors.toList());
     }
 
     private BuyDownFeeAmortizationDetails mapToLoanBuyDownFeeAmortizationData(final LoanBuyDownFeeBalance balance) {
-        final BigDecimal amortizedAmount = balance.getAmount() //
-                .subtract(MathUtil.nullToZero(balance.getUnrecognizedAmount())) //
-                .subtract(MathUtil.nullToZero(balance.getAmountAdjustment())) //
-                .subtract(MathUtil.nullToZero(balance.getChargedOffAmount()));
-
-        return new BuyDownFeeAmortizationDetails(balance.getId(), balance.getLoan().getId(), balance.getLoanTransaction().getId(),
-                balance.getDate(), balance.getAmount(), amortizedAmount, balance.getUnrecognizedAmount(), balance.getAmountAdjustment(),
-                balance.getChargedOffAmount());
+        final BigDecimal amortizedAmount =  //
+        //
+        //
+        balance.getAmount().subtract(MathUtil.nullToZero(balance.getUnrecognizedAmount())).subtract(MathUtil.nullToZero(balance.getAmountAdjustment())).subtract(MathUtil.nullToZero(balance.getChargedOffAmount()));
+        return new BuyDownFeeAmortizationDetails(balance.getId(), balance.getLoan().getId(), balance.getLoanTransaction().getId(), balance.getDate(), balance.getAmount(), amortizedAmount, balance.getUnrecognizedAmount(), balance.getAmountAdjustment(), balance.getChargedOffAmount());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public BuyDownFeeReadPlatformServiceImpl(final LoanBuyDownFeeBalanceRepository loanBuyDownFeeBalanceRepository, final LoanRepository loanRepository) {
+        this.loanBuyDownFeeBalanceRepository = loanBuyDownFeeBalanceRepository;
+        this.loanRepository = loanRepository;
+    }
 }

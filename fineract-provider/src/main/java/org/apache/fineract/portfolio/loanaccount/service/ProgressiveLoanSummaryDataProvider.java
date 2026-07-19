@@ -22,8 +22,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanSummaryData;
@@ -40,10 +38,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@AllArgsConstructor
-@Slf4j
 public class ProgressiveLoanSummaryDataProvider extends CommonLoanSummaryDataProvider {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProgressiveLoanSummaryDataProvider.class);
     private final EMICalculator emiCalculator;
     private final LoanRepositoryWrapper loanRepository;
     private final InterestScheduleModelRepositoryWrapper modelRepository;
@@ -55,33 +52,26 @@ public class ProgressiveLoanSummaryDataProvider extends CommonLoanSummaryDataPro
 
     @Override
     @Transactional(readOnly = true)
-    public LoanSummaryData withTransactionAmountsSummary(Long loanId, LoanSummaryData defaultSummaryData,
-            LoanScheduleData repaymentSchedule, Collection<? extends LoanTransactionBalance> loanTransactionBalances) {
+    public LoanSummaryData withTransactionAmountsSummary(Long loanId, LoanSummaryData defaultSummaryData, LoanScheduleData repaymentSchedule, Collection<? extends LoanTransactionBalance> loanTransactionBalances) {
         final Loan loan = loanRepository.findOneWithNotFoundDetection(loanId, true);
         return super.withTransactionAmountsSummary(loan, defaultSummaryData, repaymentSchedule, loanTransactionBalances);
     }
 
     @Override
-    public LoanSummaryData withTransactionAmountsSummary(Loan loan, LoanSummaryData defaultSummaryData, LoanScheduleData repaymentSchedule,
-            Collection<? extends LoanTransactionBalance> loanTransactionBalances) {
+    public LoanSummaryData withTransactionAmountsSummary(Loan loan, LoanSummaryData defaultSummaryData, LoanScheduleData repaymentSchedule, Collection<? extends LoanTransactionBalance> loanTransactionBalances) {
         return super.withTransactionAmountsSummary(loan, defaultSummaryData, repaymentSchedule, loanTransactionBalances);
     }
 
     private Optional<LoanRepaymentScheduleInstallment> getRelatedRepaymentScheduleInstallment(Loan loan, LocalDate businessDate) {
-        return loan.getRepaymentScheduleInstallments().stream().filter(i -> !i.isDownPayment() && !i.isAdditional()
-                && businessDate.isAfter(i.getFromDate()) && !businessDate.isAfter(i.getDueDate())).findFirst();
+        return loan.getRepaymentScheduleInstallments().stream().filter(i -> !i.isDownPayment() && !i.isAdditional() && businessDate.isAfter(i.getFromDate()) && !businessDate.isAfter(i.getDueDate())).findFirst();
     }
 
     @Override
-    public BigDecimal computeTotalUnpaidPayableNotDueInterestAmountOnActualPeriod(final Loan loan,
-            final Collection<LoanSchedulePeriodData> periods, final LocalDate businessDate, final CurrencyData currency,
-            BigDecimal totalUnpaidPayableDueInterest) {
+    public BigDecimal computeTotalUnpaidPayableNotDueInterestAmountOnActualPeriod(final Loan loan, final Collection<LoanSchedulePeriodData> periods, final LocalDate businessDate, final CurrencyData currency, BigDecimal totalUnpaidPayableDueInterest) {
         if (loan.isMatured(businessDate) || !loan.isInterestBearing()) {
             return BigDecimal.ZERO;
         }
-
         Optional<LoanRepaymentScheduleInstallment> currentRepaymentPeriod = getRelatedRepaymentScheduleInstallment(loan, businessDate);
-
         if (currentRepaymentPeriod.isPresent()) {
             if (loan.isChargedOff() || loan.hasContractTerminationTransaction()) {
                 if (currentRepaymentPeriod.get().getDueDate().isEqual(businessDate)) {
@@ -90,25 +80,27 @@ public class ProgressiveLoanSummaryDataProvider extends CommonLoanSummaryDataPro
                     return currentRepaymentPeriod.get().getInterestOutstanding(loan.getCurrency()).getAmount();
                 }
             } else {
-
                 Optional<ProgressiveLoanInterestScheduleModel> savedModel = modelRepository.getSavedModel(loan, businessDate);
-
                 ProgressiveLoanInterestScheduleModel model = savedModel.orElse(null);
                 if (model != null) {
                     OutstandingDetails outstandingDetails = emiCalculator.getOutstandingAmountsTillDate(model, businessDate);
                     if (!loan.isInterestRecalculationEnabled()) {
-                        BigDecimal interestPaid = periods.stream().map(LoanSchedulePeriodData::getInterestPaid).reduce(BigDecimal.ZERO,
-                                BigDecimal::add);
+                        BigDecimal interestPaid = periods.stream().map(LoanSchedulePeriodData::getInterestPaid).reduce(BigDecimal.ZERO, BigDecimal::add);
                         BigDecimal dueInterest = outstandingDetails.getOutstandingInterest().getAmount();
                         return MathUtil.subtractToZero(dueInterest, interestPaid, totalUnpaidPayableDueInterest);
                     } else {
-                        return MathUtil.subtractToZero(outstandingDetails.getOutstandingInterest().getAmount(),
-                                totalUnpaidPayableDueInterest);
+                        return MathUtil.subtractToZero(outstandingDetails.getOutstandingInterest().getAmount(), totalUnpaidPayableDueInterest);
                     }
                 }
             }
         }
-
         return BigDecimal.ZERO;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProgressiveLoanSummaryDataProvider(final EMICalculator emiCalculator, final LoanRepositoryWrapper loanRepository, final InterestScheduleModelRepositoryWrapper modelRepository) {
+        this.emiCalculator = emiCalculator;
+        this.loanRepository = loanRepository;
+        this.modelRepository = modelRepository;
     }
 }

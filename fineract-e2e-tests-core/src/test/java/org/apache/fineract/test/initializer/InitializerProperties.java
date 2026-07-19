@@ -18,12 +18,14 @@
  */
 package org.apache.fineract.test.initializer;
 
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 
-@Getter
 public class InitializerProperties {
-
     @Value("${fineract-test.initialization.enabled}")
     private boolean enabled;
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isEnabled() {
+        return this.enabled;
+    }
 }

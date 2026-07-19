@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.configuration.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.configuration.service.ExternalServiceWritePlatformService;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "EXTERNALSERVICES", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateExternalServiceConfigurationCommandHandler implements NewCommandSourceHandler {
-
     private final ExternalServiceWritePlatformService writePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class UpdateExternalServiceConfigurationCommandHandler implements NewComm
         return this.writePlatformService.updateExternalServicesProperties(command.getTransactionId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public UpdateExternalServiceConfigurationCommandHandler(final ExternalServiceWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
+    }
 }

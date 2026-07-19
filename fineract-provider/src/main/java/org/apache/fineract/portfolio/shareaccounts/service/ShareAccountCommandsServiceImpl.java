@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.shareaccounts.service;
 
 import com.google.gson.JsonElement;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
@@ -27,18 +26,14 @@ import org.apache.fineract.portfolio.accounts.constants.ShareAccountApiConstants
 import org.apache.fineract.portfolio.accounts.service.AccountsCommandsService;
 import org.apache.fineract.portfolio.shareaccounts.serialization.ShareAccountDataSerializer;
 
-@RequiredArgsConstructor
 public class ShareAccountCommandsServiceImpl implements AccountsCommandsService {
-
     private final FromJsonHelper fromApiJsonHelper;
-
     private final ShareAccountDataSerializer shareAccountDataSerializer;
 
     @Override
     public Object handleCommand(Long accountId, String command, String jsonBody) {
         final JsonElement parsedCommand = this.fromApiJsonHelper.parse(jsonBody);
-        final JsonCommand jsonCommand = JsonCommand.from(jsonBody, parsedCommand, this.fromApiJsonHelper, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null);
+        final JsonCommand jsonCommand = JsonCommand.from(jsonBody, parsedCommand, this.fromApiJsonHelper, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         if (ShareAccountApiConstants.APPROVE_COMMAND.equals(command)) {
             return approveShareAccount(accountId, jsonCommand);
         }
@@ -51,7 +46,6 @@ public class ShareAccountCommandsServiceImpl implements AccountsCommandsService 
         } else if (ShareAccountApiConstants.REJECT_ADDITIONSHARES_COMMAND.equals(command)) {
             return rejectAdditionalShares(accountId, jsonCommand);
         }
-
         return CommandProcessingResult.empty();
     }
 
@@ -73,5 +67,11 @@ public class ShareAccountCommandsServiceImpl implements AccountsCommandsService 
 
     public Object rejectAdditionalShares(Long accountId, JsonCommand jsonCommand) {
         return null;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ShareAccountCommandsServiceImpl(final FromJsonHelper fromApiJsonHelper, final ShareAccountDataSerializer shareAccountDataSerializer) {
+        this.fromApiJsonHelper = fromApiJsonHelper;
+        this.shareAccountDataSerializer = shareAccountDataSerializer;
     }
 }

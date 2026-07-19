@@ -20,14 +20,9 @@ package org.apache.fineract.portfolio.client.domain.search;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 
-@Getter
-@RequiredArgsConstructor
 public class SearchedClient {
-
     private final Long id;
     private final String displayName;
     private final ExternalId externalId;
@@ -38,4 +33,68 @@ public class SearchedClient {
     private final Integer status;
     private final LocalDate activationDate;
     private final OffsetDateTime createdDate;
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDisplayName() {
+        return this.displayName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalId getExternalId() {
+        return this.externalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getAccountNumber() {
+        return this.accountNumber;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getOfficeId() {
+        return this.officeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getOfficeName() {
+        return this.officeName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getMobileNo() {
+        return this.mobileNo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getStatus() {
+        return this.status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getActivationDate() {
+        return this.activationDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OffsetDateTime getCreatedDate() {
+        return this.createdDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SearchedClient(final Long id, final String displayName, final ExternalId externalId, final String accountNumber, final Long officeId, final String officeName, final String mobileNo, final Integer status, final LocalDate activationDate, final OffsetDateTime createdDate) {
+        this.id = id;
+        this.displayName = displayName;
+        this.externalId = externalId;
+        this.accountNumber = accountNumber;
+        this.officeId = officeId;
+        this.officeName = officeName;
+        this.mobileNo = mobileNo;
+        this.status = status;
+        this.activationDate = activationDate;
+        this.createdDate = createdDate;
+    }
 }

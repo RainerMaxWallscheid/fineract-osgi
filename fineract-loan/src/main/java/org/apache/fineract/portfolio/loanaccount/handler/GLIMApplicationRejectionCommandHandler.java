@@ -16,10 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.loanaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,16 +27,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "GLIMLOAN", action = "REJECT")
 public class GLIMApplicationRejectionCommandHandler implements NewCommandSourceHandler {
-
     private final LoanApplicationWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.rejectGLIMApplicationApproval(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GLIMApplicationRejectionCommandHandler(final LoanApplicationWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

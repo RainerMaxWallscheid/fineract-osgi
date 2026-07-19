@@ -25,7 +25,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.Page;
@@ -40,17 +39,14 @@ import org.apache.fineract.portfolio.shareproducts.data.ShareProductDividendPayO
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-@RequiredArgsConstructor
 public class ShareProductDividendReadPlatformServiceImpl implements ShareProductDividendReadPlatformService {
-
     private final JdbcTemplate jdbcTemplate;
     private final ColumnValidator columnValidator;
     private final PaginationHelper paginationHelper;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
 
     @Override
-    public Page<ShareProductDividendPayOutData> retriveAll(final Long productId, final Integer status,
-            final SearchParameters searchParameters) {
+    public Page<ShareProductDividendPayOutData> retriveAll(final Long productId, final Integer status, final SearchParameters searchParameters) {
         ShareProductDividendMapper shareProductDividendMapper = new ShareProductDividendMapper();
         final StringBuilder sqlBuilder = new StringBuilder(200);
         sqlBuilder.append("select " + sqlGenerator.calcFoundRows() + " ");
@@ -65,13 +61,11 @@ public class ShareProductDividendReadPlatformServiceImpl implements ShareProduct
         if (searchParameters.hasOrderBy()) {
             sqlBuilder.append(" order by ").append(searchParameters.getOrderBy());
             this.columnValidator.validateSqlInjection(sqlBuilder.toString(), searchParameters.getOrderBy());
-
             if (searchParameters.hasSortOrder()) {
                 sqlBuilder.append(' ').append(searchParameters.getSortOrder());
                 this.columnValidator.validateSqlInjection(sqlBuilder.toString(), searchParameters.getSortOrder());
             }
         }
-
         if (searchParameters.hasLimit()) {
             sqlBuilder.append(" ");
             if (searchParameters.hasOffset()) {
@@ -80,13 +74,12 @@ public class ShareProductDividendReadPlatformServiceImpl implements ShareProduct
                 sqlBuilder.append(sqlGenerator.limit(searchParameters.getLimit()));
             }
         }
-
         Object[] paramsObj = params.toArray();
         return this.paginationHelper.fetchPage(this.jdbcTemplate, sqlBuilder.toString(), paramsObj, shareProductDividendMapper);
     }
 
-    private static final class ShareProductDividendMapper implements RowMapper<ShareProductDividendPayOutData> {
 
+    private static final class ShareProductDividendMapper implements RowMapper<ShareProductDividendPayOutData> {
         private final String sql;
 
         ShareProductDividendMapper() {
@@ -112,15 +105,19 @@ public class ShareProductDividendReadPlatformServiceImpl implements ShareProduct
             final EnumOptionData statusEnum = SharesEnumerations.shareProductDividendStatusEnum(status);
             final LocalDate startDate = JdbcSupport.getLocalDate(rs, "startDate");
             final LocalDate endDate = JdbcSupport.getLocalDate(rs, "endDate");
-
             final Long productId = rs.getLong("productId");
             final String productName = rs.getString("productName");
-
             final ShareProductData productData = ShareProductData.lookup(productId, productName);
             final Collection<ShareAccountDividendData> accountDividendsData = null;
             return new ShareProductDividendPayOutData(id, productData, amount, startDate, endDate, accountDividendsData, statusEnum);
         }
-
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ShareProductDividendReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final ColumnValidator columnValidator, final PaginationHelper paginationHelper, final DatabaseSpecificSQLGenerator sqlGenerator) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.columnValidator = columnValidator;
+        this.paginationHelper = paginationHelper;
+        this.sqlGenerator = sqlGenerator;
+    }
 }

@@ -19,7 +19,6 @@
 package org.apache.fineract.integrationtests.cob;
 
 import static org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType.BUSINESS_DATE;
-
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
@@ -37,7 +36,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.accounting.common.AccountingConstants;
 import org.apache.fineract.client.models.COBPartition;
 import org.apache.fineract.client.models.GetFinancialActivityAccountsResponse;
@@ -65,9 +63,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.lang.NonNull;
 
 @SuppressWarnings("rawtypes")
-@Slf4j
 public class CobPartitioningTest extends BaseLoanIntegrationTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CobPartitioningTest.class);
     public static final int N = 10;
     private static ResponseSpecification RESPONSE_SPEC;
     private static RequestSpecification REQUEST_SPEC;
@@ -90,28 +88,21 @@ public class CobPartitioningTest extends BaseLoanIntegrationTest {
         AccountHelper accountHelper = new AccountHelper(REQUEST_SPEC, RESPONSE_SPEC);
         FINANCIAL_ACTIVITY_ACCOUNT_HELPER = new FinancialActivityAccountHelper(REQUEST_SPEC);
         LOAN_TRANSACTION_HELPER = new LoanTransactionHelper(REQUEST_SPEC, RESPONSE_SPEC);
-
         TODAYS_DATE = Utils.getLocalDateOfTenant();
-        new BusinessStepHelper().updateSteps("LOAN_CLOSE_OF_BUSINESS", "APPLY_CHARGE_TO_OVERDUE_LOANS", "LOAN_DELINQUENCY_CLASSIFICATION",
-                "CHECK_LOAN_REPAYMENT_DUE", "CHECK_LOAN_REPAYMENT_OVERDUE", "UPDATE_LOAN_ARREARS_AGING", "ADD_PERIODIC_ACCRUAL_ENTRIES",
-                "EXTERNAL_ASSET_OWNER_TRANSFER");
-
+        new BusinessStepHelper().updateSteps("LOAN_CLOSE_OF_BUSINESS", "APPLY_CHARGE_TO_OVERDUE_LOANS", "LOAN_DELINQUENCY_CLASSIFICATION", "CHECK_LOAN_REPAYMENT_DUE", "CHECK_LOAN_REPAYMENT_OVERDUE", "UPDATE_LOAN_ARREARS_AGING", "ADD_PERIODIC_ACCRUAL_ENTRIES", "EXTERNAL_ASSET_OWNER_TRANSFER");
         ASSET_ACCOUNT = accountHelper.createAssetAccount();
         FEE_PENALTY_ACCOUNT = accountHelper.createAssetAccount();
         TRANSFER_ACCOUNT = accountHelper.createAssetAccount();
         EXPENSE_ACCOUNT = accountHelper.createExpenseAccount();
         INCOME_ACCOUNT = accountHelper.createIncomeAccount();
         OVERPAYMENT_ACCOUNT = accountHelper.createLiabilityAccount();
-
         setProperFinancialActivity(TRANSFER_ACCOUNT);
     }
 
     private static void setProperFinancialActivity(Account transferAccount) {
         List<GetFinancialActivityAccountsResponse> financialMappings = FINANCIAL_ACTIVITY_ACCOUNT_HELPER.getAllFinancialActivityAccounts();
         financialMappings.forEach(mapping -> FINANCIAL_ACTIVITY_ACCOUNT_HELPER.deleteFinancialActivityAccount(mapping.getId()));
-        FINANCIAL_ACTIVITY_ACCOUNT_HELPER.createFinancialActivityAccount(new PostFinancialActivityAccountsRequest()
-                .financialActivityId((long) AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue())
-                .glAccountId((long) transferAccount.getAccountID()));
+        FINANCIAL_ACTIVITY_ACCOUNT_HELPER.createFinancialActivityAccount(new PostFinancialActivityAccountsRequest().financialActivityId((long) AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue()).glAccountId((long) transferAccount.getAccountID()));
     }
 
     @Test
@@ -120,9 +111,7 @@ public class CobPartitioningTest extends BaseLoanIntegrationTest {
             ExecutorService executorService = Executors.newFixedThreadPool(10);
             globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, true);
             setInitialBusinessDate("2020-03-02");
-
             List<Integer> loanIds = new CopyOnWriteArrayList<>();
-
             // Let's create 1, 2, ..., N-1, N loans
             final CountDownLatch createLatch = new CountDownLatch(N - 1);
             Integer loanProductID = createLoanProduct();
@@ -141,7 +130,6 @@ public class CobPartitioningTest extends BaseLoanIntegrationTest {
             }
             waitForFutures(futures, createLatch);
             futures.clear();
-
             // Force close loans 3, 4, ... , N-3, N-2
             Collections.sort(loanIds);
             final CountDownLatch closeLatch = new CountDownLatch(N - 5);
@@ -162,18 +150,14 @@ public class CobPartitioningTest extends BaseLoanIntegrationTest {
                 }
             });
             closeLatch.await();
-
             // Let's retrieve the partitions
             List<COBPartition> cobPartitions = CobHelper.getCobPartitions(3);
             log.info("\nLoans created: {},\nRetrieved partitions: {}", loanIds, cobPartitions);
             Assertions.assertEquals(2, cobPartitions.size());
-
             Assertions.assertEquals(loanIds.get(0), cobPartitions.get(0).getMinId().intValue());
             Assertions.assertEquals(loanIds.get(8), cobPartitions.get(0).getMaxId().intValue());
-
             Assertions.assertEquals(loanIds.get(9), cobPartitions.get(1).getMinId().intValue());
             Assertions.assertEquals(loanIds.get(9), cobPartitions.get(1).getMaxId().intValue());
-
             executorService.shutdown();
         } finally {
             cleanUpAndRestoreBusinessDate();
@@ -192,11 +176,9 @@ public class CobPartitioningTest extends BaseLoanIntegrationTest {
     }
 
     private void setInitialBusinessDate(String date) {
-        globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                new PutGlobalConfigurationsRequest().enabled(true));
+        globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
         BusinessDateHelper.updateBusinessDate(BUSINESS_DATE, LocalDate.parse(date));
-        globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.PENALTY_WAIT_PERIOD,
-                new PutGlobalConfigurationsRequest().value(0L));
+        globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.PENALTY_WAIT_PERIOD, new PutGlobalConfigurationsRequest().value(0L));
     }
 
     private void cleanUpAndRestoreBusinessDate() {
@@ -205,8 +187,7 @@ public class CobPartitioningTest extends BaseLoanIntegrationTest {
         REQUEST_SPEC.header("Fineract-Platform-TenantId", "default");
         RESPONSE_SPEC = new ResponseSpecBuilder().expectStatusCode(200).build();
         BusinessDateHelper.updateBusinessDate(BUSINESS_DATE, TODAYS_DATE);
-        globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                new PutGlobalConfigurationsRequest().enabled(false));
+        globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, false);
     }
 
@@ -218,10 +199,8 @@ public class CobPartitioningTest extends BaseLoanIntegrationTest {
     }
 
     private Integer createLoanProduct() {
-        Integer overdueFeeChargeId = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC,
-                ChargesHelper.getLoanOverdueFeeJSONWithCalculationTypePercentage("1"));
+        Integer overdueFeeChargeId = ChargesHelper.createCharges(REQUEST_SPEC, RESPONSE_SPEC, ChargesHelper.getLoanOverdueFeeJSONWithCalculationTypePercentage("1"));
         Assertions.assertNotNull(overdueFeeChargeId);
-
         Integer loanProductID = createLoanProduct(overdueFeeChargeId.toString());
         Assertions.assertNotNull(loanProductID);
         return loanProductID;
@@ -229,33 +208,21 @@ public class CobPartitioningTest extends BaseLoanIntegrationTest {
 
     @NonNull
     private Integer createLoanForClient(Integer clientID, Integer loanProductID) {
-
         HashMap loanStatusHashMap;
-
         Integer loanID = applyForLoanApplication(clientID.toString(), loanProductID.toString(), "1 March 2020");
-
         Assertions.assertNotNull(loanID);
-
         loanStatusHashMap = LoanStatusChecker.getStatusOfLoan(REQUEST_SPEC, RESPONSE_SPEC, loanID);
         LoanStatusChecker.verifyLoanIsPending(loanStatusHashMap);
-
         loanStatusHashMap = LOAN_TRANSACTION_HELPER.approveLoan("01 March 2020", loanID);
         LoanStatusChecker.verifyLoanIsApproved(loanStatusHashMap);
-
         String loanDetails = LOAN_TRANSACTION_HELPER.getLoanDetails(REQUEST_SPEC, RESPONSE_SPEC, loanID);
-        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID,
-                JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
+        loanStatusHashMap = LOAN_TRANSACTION_HELPER.disburseLoanWithNetDisbursalAmount("02 March 2020", loanID, JsonPath.from(loanDetails).get("netDisbursalAmount").toString());
         LoanStatusChecker.verifyLoanIsActive(loanStatusHashMap);
         return loanID;
     }
 
     private Integer createLoanProduct(final String chargeId) {
-
-        final String loanProductJSON = new LoanProductTestBuilder().withPrincipal("15,000.00").withNumberOfRepayments("4")
-                .withRepaymentAfterEvery("1").withRepaymentTypeAsMonth().withinterestRatePerPeriod("1")
-                .withAccountingRulePeriodicAccrual(new Account[] { ASSET_ACCOUNT, EXPENSE_ACCOUNT, INCOME_ACCOUNT, OVERPAYMENT_ACCOUNT })
-                .withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance()
-                .withFeeAndPenaltyAssetAccount(FEE_PENALTY_ACCOUNT).build(chargeId);
+        final String loanProductJSON = new LoanProductTestBuilder().withPrincipal("15,000.00").withNumberOfRepayments("4").withRepaymentAfterEvery("1").withRepaymentTypeAsMonth().withinterestRatePerPeriod("1").withAccountingRulePeriodicAccrual(new Account[] {ASSET_ACCOUNT, EXPENSE_ACCOUNT, INCOME_ACCOUNT, OVERPAYMENT_ACCOUNT}).withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().withFeeAndPenaltyAssetAccount(FEE_PENALTY_ACCOUNT).build(chargeId);
         return LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductJSON);
     }
 
@@ -266,13 +233,7 @@ public class CobPartitioningTest extends BaseLoanIntegrationTest {
         Integer clientCollateralId = CollateralManagementHelper.createClientCollateral(REQUEST_SPEC, RESPONSE_SPEC, clientID, collateralId);
         Assertions.assertNotNull(clientCollateralId);
         addCollaterals(collaterals, clientCollateralId, BigDecimal.valueOf(1));
-
-        String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("15,000.00").withLoanTermFrequency("4")
-                .withLoanTermFrequencyAsMonths().withNumberOfRepayments("4").withRepaymentEveryAfter("1")
-                .withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("2").withAmortizationTypeAsEqualInstallments()
-                .withInterestTypeAsDecliningBalance().withInterestCalculationPeriodTypeSameAsRepaymentPeriod()
-                .withExpectedDisbursementDate(date).withSubmittedOnDate(date).withCollaterals(collaterals)
-                .build(clientID, loanProductID, null);
+        String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal("15,000.00").withLoanTermFrequency("4").withLoanTermFrequencyAsMonths().withNumberOfRepayments("4").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("2").withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().withInterestCalculationPeriodTypeSameAsRepaymentPeriod().withExpectedDisbursementDate(date).withSubmittedOnDate(date).withCollaterals(collaterals).build(clientID, loanProductID, null);
         return LOAN_TRANSACTION_HELPER.getLoanId(loanApplicationJSON);
     }
 
@@ -286,5 +247,4 @@ public class CobPartitioningTest extends BaseLoanIntegrationTest {
         collateral.put("quantity", quantity.toString());
         return collateral;
     }
-
 }

@@ -23,10 +23,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.survey.api.LikelihoodApiConstants;
@@ -34,43 +30,77 @@ import org.apache.fineract.infrastructure.survey.data.LikelihoodStatus;
 
 @Entity
 @Table(name = "ppi_likelihoods_ppi")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public final class Likelihood extends AbstractPersistableCustom<Long> {
-
     @Column(name = "ppi_name", nullable = false)
     private String ppiName;
-
     @Column(name = "likelihood_id", nullable = false)
     private Long likelihoodId;
-
     @Column(name = "enabled", nullable = false)
     private Long enabled;
 
     public Map<String, Object> update(final JsonCommand command) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>(7);
-
         final boolean enabled = command.booleanPrimitiveValueOfParameterNamed(LikelihoodApiConstants.ACTIVE);
-
         Long changeToValue = null;
-
         if (enabled) {
             changeToValue = LikelihoodStatus.ENABLED;
         } else {
             changeToValue = LikelihoodStatus.DISABLED;
         }
-
         if (!changeToValue.equals(this.enabled)) {
             actualChanges.put(LikelihoodApiConstants.ACTIVE, enabled);
             this.enabled = changeToValue;
         }
-
         return actualChanges;
     }
 
     public boolean isActivateCommand(final JsonCommand command) {
         return command.booleanPrimitiveValueOfParameterNamed(LikelihoodApiConstants.ACTIVE);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getPpiName() {
+        return this.ppiName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getLikelihoodId() {
+        return this.likelihoodId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getEnabled() {
+        return this.enabled;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Likelihood setPpiName(final String ppiName) {
+        this.ppiName = ppiName;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Likelihood setLikelihoodId(final Long likelihoodId) {
+        this.likelihoodId = likelihoodId;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Likelihood setEnabled(final Long enabled) {
+        this.enabled = enabled;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Likelihood() {
     }
 }

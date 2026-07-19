@@ -19,17 +19,132 @@
 package org.apache.fineract.infrastructure.jobs.service.aggregationjob.data;
 
 import java.time.LocalDate;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
-@Builder(toBuilder = true)
 public class JournalEntryAggregationTrackingData {
-
     private LocalDate aggregatedOnDateFrom;
     private LocalDate aggregatedOnDateTo;
     private LocalDate submittedOnDate;
     private Long jobExecutionId;
+
+    @java.lang.SuppressWarnings("all")
+        JournalEntryAggregationTrackingData(final LocalDate aggregatedOnDateFrom, final LocalDate aggregatedOnDateTo, final LocalDate submittedOnDate, final Long jobExecutionId) {
+        this.aggregatedOnDateFrom = aggregatedOnDateFrom;
+        this.aggregatedOnDateTo = aggregatedOnDateTo;
+        this.submittedOnDate = submittedOnDate;
+        this.jobExecutionId = jobExecutionId;
+    }
+
+
+    @java.lang.SuppressWarnings("all")
+        public static class JournalEntryAggregationTrackingDataBuilder {
+        @java.lang.SuppressWarnings("all")
+                private LocalDate aggregatedOnDateFrom;
+        @java.lang.SuppressWarnings("all")
+                private LocalDate aggregatedOnDateTo;
+        @java.lang.SuppressWarnings("all")
+                private LocalDate submittedOnDate;
+        @java.lang.SuppressWarnings("all")
+                private Long jobExecutionId;
+
+        @java.lang.SuppressWarnings("all")
+                JournalEntryAggregationTrackingDataBuilder() {
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public JournalEntryAggregationTrackingData.JournalEntryAggregationTrackingDataBuilder aggregatedOnDateFrom(final LocalDate aggregatedOnDateFrom) {
+            this.aggregatedOnDateFrom = aggregatedOnDateFrom;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public JournalEntryAggregationTrackingData.JournalEntryAggregationTrackingDataBuilder aggregatedOnDateTo(final LocalDate aggregatedOnDateTo) {
+            this.aggregatedOnDateTo = aggregatedOnDateTo;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public JournalEntryAggregationTrackingData.JournalEntryAggregationTrackingDataBuilder submittedOnDate(final LocalDate submittedOnDate) {
+            this.submittedOnDate = submittedOnDate;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public JournalEntryAggregationTrackingData.JournalEntryAggregationTrackingDataBuilder jobExecutionId(final Long jobExecutionId) {
+            this.jobExecutionId = jobExecutionId;
+            return this;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public JournalEntryAggregationTrackingData build() {
+            return new JournalEntryAggregationTrackingData(this.aggregatedOnDateFrom, this.aggregatedOnDateTo, this.submittedOnDate, this.jobExecutionId);
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "JournalEntryAggregationTrackingData.JournalEntryAggregationTrackingDataBuilder(aggregatedOnDateFrom=" + this.aggregatedOnDateFrom + ", aggregatedOnDateTo=" + this.aggregatedOnDateTo + ", submittedOnDate=" + this.submittedOnDate + ", jobExecutionId=" + this.jobExecutionId + ")";
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static JournalEntryAggregationTrackingData.JournalEntryAggregationTrackingDataBuilder builder() {
+        return new JournalEntryAggregationTrackingData.JournalEntryAggregationTrackingDataBuilder();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JournalEntryAggregationTrackingData.JournalEntryAggregationTrackingDataBuilder toBuilder() {
+        return new JournalEntryAggregationTrackingData.JournalEntryAggregationTrackingDataBuilder().aggregatedOnDateFrom(this.aggregatedOnDateFrom).aggregatedOnDateTo(this.aggregatedOnDateTo).submittedOnDate(this.submittedOnDate).jobExecutionId(this.jobExecutionId);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getAggregatedOnDateFrom() {
+        return this.aggregatedOnDateFrom;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getAggregatedOnDateTo() {
+        return this.aggregatedOnDateTo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getSubmittedOnDate() {
+        return this.submittedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getJobExecutionId() {
+        return this.jobExecutionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAggregatedOnDateFrom(final LocalDate aggregatedOnDateFrom) {
+        this.aggregatedOnDateFrom = aggregatedOnDateFrom;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAggregatedOnDateTo(final LocalDate aggregatedOnDateTo) {
+        this.aggregatedOnDateTo = aggregatedOnDateTo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setSubmittedOnDate(final LocalDate submittedOnDate) {
+        this.submittedOnDate = submittedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setJobExecutionId(final Long jobExecutionId) {
+        this.jobExecutionId = jobExecutionId;
+    }
 }

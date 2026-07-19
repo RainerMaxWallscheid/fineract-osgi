@@ -20,21 +20,77 @@ package org.apache.fineract.portfolio.delinquency.data;
 
 import java.io.Serializable;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucketType;
 
-@ToString
-@AllArgsConstructor
-@Getter
-@Setter
 public class DelinquencyBucketData implements Serializable {
-
     private Long id;
     private String name;
     private List<DelinquencyRangeData> ranges;
     private DelinquencyBucketType bucketType;
     private DelinquencyMinimumPaymentPeriodAndRuleData minimumPaymentPeriodAndRule;
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "DelinquencyBucketData(id=" + this.getId() + ", name=" + this.getName() + ", ranges=" + this.getRanges() + ", bucketType=" + this.getBucketType() + ", minimumPaymentPeriodAndRule=" + this.getMinimumPaymentPeriodAndRule() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyBucketData(final Long id, final String name, final List<DelinquencyRangeData> ranges, final DelinquencyBucketType bucketType, final DelinquencyMinimumPaymentPeriodAndRuleData minimumPaymentPeriodAndRule) {
+        this.id = id;
+        this.name = name;
+        this.ranges = ranges;
+        this.bucketType = bucketType;
+        this.minimumPaymentPeriodAndRule = minimumPaymentPeriodAndRule;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<DelinquencyRangeData> getRanges() {
+        return this.ranges;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyBucketType getBucketType() {
+        return this.bucketType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyMinimumPaymentPeriodAndRuleData getMinimumPaymentPeriodAndRule() {
+        return this.minimumPaymentPeriodAndRule;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setId(final Long id) {
+        this.id = id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setName(final String name) {
+        this.name = name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setRanges(final List<DelinquencyRangeData> ranges) {
+        this.ranges = ranges;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setBucketType(final DelinquencyBucketType bucketType) {
+        this.bucketType = bucketType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMinimumPaymentPeriodAndRule(final DelinquencyMinimumPaymentPeriodAndRuleData minimumPaymentPeriodAndRule) {
+        this.minimumPaymentPeriodAndRule = minimumPaymentPeriodAndRule;
+    }
 }

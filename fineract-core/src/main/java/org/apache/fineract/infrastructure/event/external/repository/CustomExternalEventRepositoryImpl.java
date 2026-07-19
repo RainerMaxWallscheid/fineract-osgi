@@ -23,15 +23,12 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class CustomExternalEventRepositoryImpl implements CustomExternalEventRepository {
-
     private final JdbcTemplate jdbcTemplate;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
 
@@ -42,10 +39,16 @@ public class CustomExternalEventRepositoryImpl implements CustomExternalEventRep
         if (ids == null || ids.isEmpty()) {
             return;
         }
-        final String sql = "UPDATE m_external_event SET status = 'SENT', sent_at = ? WHERE %s".formatted(sqlGenerator.in("id", ids));
+        final String sql = "UPDATE m_external_event SET status = \'SENT\', sent_at = ? WHERE %s".formatted(sqlGenerator.in("id", ids));
         final List<Object> params = new ArrayList<>();
         params.add(Timestamp.from(sentAt.toInstant()));
         Collections.addAll(params, sqlGenerator.inParametersFor(ids));
         jdbcTemplate.update(sql, params.toArray());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CustomExternalEventRepositoryImpl(final JdbcTemplate jdbcTemplate, final DatabaseSpecificSQLGenerator sqlGenerator) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.sqlGenerator = sqlGenerator;
     }
 }

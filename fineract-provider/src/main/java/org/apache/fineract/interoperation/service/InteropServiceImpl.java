@@ -25,7 +25,6 @@ import static org.apache.fineract.portfolio.savings.SavingsAccountTransactionTyp
 import static org.apache.fineract.portfolio.savings.SavingsAccountTransactionType.DEPOSIT;
 import static org.apache.fineract.portfolio.savings.SavingsAccountTransactionType.WITHDRAWAL;
 import static org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction.releaseAmount;
-
 import jakarta.persistence.PersistenceException;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -37,8 +36,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.commands.domain.CommandWrapper;
@@ -116,13 +113,11 @@ import org.springframework.lang.NonNull;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 public class InteropServiceImpl implements InteropService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InteropServiceImpl.class);
     private final PlatformSecurityContext securityContext;
     private final InteropDataValidator dataValidator;
-
     private final SavingsAccountRepository savingsAccountRepository;
     private final SavingsAccountTransactionRepository savingsAccountTransactionRepository;
     private final ApplicationCurrencyRepository currencyRepository;
@@ -130,22 +125,17 @@ public class InteropServiceImpl implements InteropService {
     private final PaymentTypeRepository paymentTypeRepository;
     private final InteropIdentifierRepository identifierRepository;
     private final LoanRepositoryWrapper loanRepositoryWrapper;
-
     private final SavingsHelper savingsHelper;
     private final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper;
-
     private final SavingsAccountDomainService savingsAccountService;
     private final ConfigurationDomainService configurationDomainService;
-
     private final JdbcTemplate jdbcTemplate;
-
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-
     private final DefaultToApiJsonSerializer<LoanAccountData> toApiJsonSerializer;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
 
-    private static final class KycMapper implements RowMapper<InteropKycData> {
 
+    private static final class KycMapper implements RowMapper<InteropKycData> {
         private final DatabaseSpecificSQLGenerator sqlGenerator;
 
         KycMapper(DatabaseSpecificSQLGenerator sqlGenerator) {
@@ -153,22 +143,11 @@ public class InteropServiceImpl implements InteropService {
         }
 
         public String schema() {
-            return " country.code_value as nationality, c.date_of_birth as dateOfBirth, c.mobile_no as contactPhone, gender.code_value as gender, c.email_address as email, "
-                    + "kyc.code_value as idType, ci.document_key as idNo, ci." + sqlGenerator.escape("description") + " as description, "
-                    + "country.code_value as country, a.`address_line_1`, a.`address_line_2`, "
-                    + "a.city, state.code_value as stateProvince, a.postal_code as postalCode, c.firstname as firstName, c.middlename as middleName,"
-                    + "c.lastname as lastName, c.display_name as displayName" + " from " + "m_client c "
-                    + "left join m_client_address ca on c.id=ca.client_id " + "left join m_address a on a.id = ca.address_id "
-                    + "inner join m_code_value gender on gender.id=c.gender_cv_id "
-                    + "left join m_code_value country on country.id=a.country_id "
-                    + "left join m_code_value state on state.id = a.state_province_id "
-                    + "left join m_client_identifier ci on c.id=ci.client_id "
-                    + "left join m_code_value kyc on kyc.id = ci.document_type_id ";
+            return " country.code_value as nationality, c.date_of_birth as dateOfBirth, c.mobile_no as contactPhone, gender.code_value as gender, c.email_address as email, " + "kyc.code_value as idType, ci.document_key as idNo, ci." + sqlGenerator.escape("description") + " as description, " + "country.code_value as country, a.`address_line_1`, a.`address_line_2`, " + "a.city, state.code_value as stateProvince, a.postal_code as postalCode, c.firstname as firstName, c.middlename as middleName," + "c.lastname as lastName, c.display_name as displayName" + " from " + "m_client c " + "left join m_client_address ca on c.id=ca.client_id " + "left join m_address a on a.id = ca.address_id " + "inner join m_code_value gender on gender.id=c.gender_cv_id " + "left join m_code_value country on country.id=a.country_id " + "left join m_code_value state on state.id = a.state_province_id " + "left join m_client_identifier ci on c.id=ci.client_id " + "left join m_code_value kyc on kyc.id = ci.document_type_id ";
         }
 
         @Override
         public InteropKycData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-
             final String nationality = rs.getString("nationality");
             final String dateOfBirth = rs.getString("dateOfBirth");
             final String contactPhone = rs.getString("contactPhone");
@@ -187,9 +166,7 @@ public class InteropServiceImpl implements InteropService {
             final String middleName = rs.getString("middleName");
             final String lastName = rs.getString("lastName");
             final String displayName = rs.getString("displayName");
-
-            return InteropKycData.instance(nationality, dateOfBirth, contactPhone, gender, email, idType, idNo, description, country,
-                    addressLine1, addressLine2, city, stateProvince, postalCode, firstName, middleName, lastName, displayName);
+            return InteropKycData.instance(nationality, dateOfBirth, contactPhone, gender, email, idType, idNo, description, country, addressLine1, addressLine2, city, stateProvince, postalCode, firstName, middleName, lastName, displayName);
         }
     }
 
@@ -203,28 +180,22 @@ public class InteropServiceImpl implements InteropService {
     @NonNull
     @Override
     @Transactional
-    public InteropTransactionsData getAccountTransactions(@NonNull String accountId, boolean debit, boolean credit,
-            java.time.LocalDateTime transactionsFrom, java.time.LocalDateTime transactionsTo) {
+    public InteropTransactionsData getAccountTransactions(@NonNull String accountId, boolean debit, boolean credit, java.time.LocalDateTime transactionsFrom, java.time.LocalDateTime transactionsTo) {
         SavingsAccount savingsAccount = validateAndGetSavingAccount(accountId);
-
         Predicate<SavingsAccountTransaction> transFilter = t -> {
             SavingsAccountTransactionType transactionType = t.getTransactionType();
             if (debit != transactionType.isDebit() && credit != transactionType.isCredit()) {
                 return false;
             }
-
             if (transactionsFrom == null && transactionsTo == null) {
                 return true;
             }
-
             java.time.LocalDateTime transactionDate = t.getTransactionDate().atStartOfDay(ZoneId.systemDefault()).toLocalDateTime();
-            return (transactionsTo == null || transactionsTo.compareTo(transactionDate) > 0) && (transactionsFrom == null
-                    || transactionsFrom.compareTo(transactionDate.withHour(23).withMinute(59).withSecond(59)) <= 0);
+            return (transactionsTo == null || transactionsTo.compareTo(transactionDate) > 0) && (transactionsFrom == null || transactionsFrom.compareTo(transactionDate.withHour(23).withMinute(59).withSecond(59)) <= 0);
         };
         InteropTransactionsData interopTransactionsData = InteropTransactionsData.build(savingsAccount, transFilter);
         for (InteropTransactionData interopTransactionData : interopTransactionsData.getTransactions()) {
-            final List<Note> transactionNotes = noteRepository
-                    .findBySavingsTransactionId(Long.valueOf(interopTransactionData.getTransactionId()));
+            final List<Note> transactionNotes = noteRepository.findBySavingsTransactionId(Long.valueOf(interopTransactionData.getTransactionId()));
             StringBuilder sb = new StringBuilder();
             for (final Note note : transactionNotes) {
                 String s = note.getNote();
@@ -255,33 +226,25 @@ public class InteropServiceImpl implements InteropService {
     @NonNull
     @Transactional
     @Override
-    public InteropIdentifierAccountResponseData getAccountByIdentifier(@NonNull InteropIdentifierType idType, @NonNull String idValue,
-            String subIdOrType) {
+    public InteropIdentifierAccountResponseData getAccountByIdentifier(@NonNull InteropIdentifierType idType, @NonNull String idValue, String subIdOrType) {
         InteropIdentifier identifier = findIdentifier(idType, idValue, subIdOrType);
         if (identifier == null) {
             throw new InteropAccountNotFoundException(idType, idValue, subIdOrType);
         }
-
         return InteropIdentifierAccountResponseData.build(identifier.getId(), identifier.getAccount().getExternalId().getValue());
     }
 
     @NonNull
     @Transactional
     @Override
-    public InteropIdentifierAccountResponseData registerAccountIdentifier(@NonNull InteropIdentifierType idType, @NonNull String idValue,
-            String subIdOrType, @NonNull JsonCommand command) {
+    public InteropIdentifierAccountResponseData registerAccountIdentifier(@NonNull InteropIdentifierType idType, @NonNull String idValue, String subIdOrType, @NonNull JsonCommand command) {
         InteropIdentifierRequestData request = dataValidator.validateAndParseCreateIdentifier(idType, idValue, subIdOrType, command);
         // TODO: error handling
         SavingsAccount savingsAccount = validateAndGetSavingAccount(request.getAccountId());
-
         try {
             AppUser createdBy = securityContext.authenticatedUser();
-
-            InteropIdentifier identifier = new InteropIdentifier(savingsAccount, request.getIdType(), request.getIdValue(),
-                    request.getSubIdOrType(), createdBy.getUsername());
-
+            InteropIdentifier identifier = new InteropIdentifier(savingsAccount, request.getIdType(), request.getIdValue(), request.getSubIdOrType(), createdBy.getUsername());
             identifierRepository.saveAndFlush(identifier);
-
             return InteropIdentifierAccountResponseData.build(identifier.getId(), savingsAccount.getExternalId().getValue());
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleInteropDataIntegrityIssues(idType, request.getAccountId(), dve.getMostSpecificCause(), dve);
@@ -296,18 +259,14 @@ public class InteropServiceImpl implements InteropService {
     @NonNull
     @Transactional
     @Override
-    public InteropIdentifierAccountResponseData deleteAccountIdentifier(@NonNull InteropIdentifierType idType, @NonNull String idValue,
-            String subIdOrType) {
+    public InteropIdentifierAccountResponseData deleteAccountIdentifier(@NonNull InteropIdentifierType idType, @NonNull String idValue, String subIdOrType) {
         InteropIdentifier identifier = findIdentifier(idType, idValue, subIdOrType);
         if (identifier == null) {
             throw new InteropAccountNotFoundException(idType, idValue, subIdOrType);
         }
-
         String accountId = identifier.getAccount().getExternalId().getValue();
         Long id = identifier.getId();
-
         identifierRepository.delete(identifier);
-
         return InteropIdentifierAccountResponseData.build(id, accountId);
     }
 
@@ -324,12 +283,9 @@ public class InteropServiceImpl implements InteropService {
         // only when Payee request transaction from Payer, so here role must be
         // always Payer
         InteropTransactionRequestData request = dataValidator.validateAndParseCreateRequest(command);
-
         // TODO: error handling
         validateAndGetSavingAccount(request);
-
-        return InteropTransactionRequestResponseData.build(command.commandId(), request.getTransactionCode(), InteropActionState.ACCEPTED,
-                request.getExpiration(), request.getExtensionList(), request.getRequestCode());
+        return InteropTransactionRequestResponseData.build(command.commandId(), request.getTransactionCode(), InteropActionState.ACCEPTED, request.getExpiration(), request.getExtensionList(), request.getRequestCode());
     }
 
     @Override
@@ -342,24 +298,18 @@ public class InteropServiceImpl implements InteropService {
     @Transactional
     public InteropQuoteResponseData createQuote(@NonNull JsonCommand command) {
         InteropQuoteRequestData request = dataValidator.validateAndParseCreateQuote(command);
-
         SavingsAccount savingsAccount = validateAndGetSavingAccount(request);
         SavingsAccountTransactionType transactionType = request.getTransactionRole().getTransactionType();
-
         final BigDecimal fee;
         if (transactionType.isDebit()) {
             fee = savingsAccount.calculateWithdrawalFee(request.getAmount().getAmount());
             if (MathUtil.isLessThan(savingsAccount.getWithdrawableBalance(), request.getAmount().getAmount().add(fee))) {
-                throw new InsufficientAccountBalanceException(savingsAccount.getExternalId().getValue(),
-                        savingsAccount.getWithdrawableBalance(), fee, request.getAmount().getAmount());
+                throw new InsufficientAccountBalanceException(savingsAccount.getExternalId().getValue(), savingsAccount.getWithdrawableBalance(), fee, request.getAmount().getAmount());
             }
         } else {
             fee = BigDecimal.ZERO;
         }
-
-        return InteropQuoteResponseData.build(command.commandId(), request.getTransactionCode(), InteropActionState.ACCEPTED,
-                request.getExpiration(), request.getExtensionList(), request.getQuoteCode(),
-                MoneyData.build(fee, savingsAccount.getCurrency().getCode()), null);
+        return InteropQuoteResponseData.build(command.commandId(), request.getTransactionCode(), InteropActionState.ACCEPTED, request.getExpiration(), request.getExtensionList(), request.getQuoteCode(), MoneyData.build(fee, savingsAccount.getCurrency().getCode()), null);
     }
 
     @Override
@@ -374,40 +324,28 @@ public class InteropServiceImpl implements InteropService {
         InteropTransferRequestData request = dataValidator.validateAndParseTransferRequest(command);
         String transferCode = request.getTransferCode();
         LocalDate transactionDate = DateUtils.getBusinessLocalDate();
-
         // TODO validate request fee/comission and account quote amount
         // matching, at CREATE it is debited anyway
-
         SavingsAccountTransactionType transactionType = request.getTransactionRole().getTransactionType();
         if (transactionType.isDebit()) {
             SavingsAccount savingsAccount = validateAndGetSavingAccount(request);
             BigDecimal total = calculateTotalTransferAmount(request, savingsAccount);
-
             if (MathUtil.isLessThan(savingsAccount.getWithdrawableBalance(), total)) {
-                throw new InsufficientAccountBalanceException(savingsAccount.getExternalId().getValue(),
-                        savingsAccount.getWithdrawableBalance(), null, total);
+                throw new InsufficientAccountBalanceException(savingsAccount.getExternalId().getValue(), savingsAccount.getWithdrawableBalance(), null, total);
             }
             if (findTransaction(savingsAccount, transferCode, AMOUNT_HOLD.getValue()) != null) {
                 throw new InteropTransferAlreadyOnHoldException(savingsAccount.getExternalId().getValue(), transferCode);
             }
-
-            PaymentDetail paymentDetail = instance(findPaymentType(), savingsAccount.getExternalId().getValue(), null, getRoutingCode(),
-                    transferCode, null);
-            SavingsAccountTransaction holdTransaction = SavingsAccountTransaction.holdAmount(savingsAccount, savingsAccount.office(),
-                    paymentDetail, transactionDate, Money.of(savingsAccount.getCurrency(), total), false);
+            PaymentDetail paymentDetail = instance(findPaymentType(), savingsAccount.getExternalId().getValue(), null, getRoutingCode(), transferCode, null);
+            SavingsAccountTransaction holdTransaction = SavingsAccountTransaction.holdAmount(savingsAccount, savingsAccount.office(), paymentDetail, transactionDate, Money.of(savingsAccount.getCurrency(), total), false);
             MonetaryCurrency accountCurrency = savingsAccount.getCurrency().copy();
-            holdTransaction.setRunningBalance(
-                    Money.of(accountCurrency, savingsAccount.getWithdrawableBalance().subtract(holdTransaction.getAmount())));
+            holdTransaction.setRunningBalance(Money.of(accountCurrency, savingsAccount.getWithdrawableBalance().subtract(holdTransaction.getAmount())));
             holdTransaction.updateCumulativeBalanceAndDates(accountCurrency, transactionDate);
-
             savingsAccount.holdAmount(total);
             savingsAccount.addTransaction(holdTransaction);
-
             savingsAccountRepository.save(savingsAccount);
         }
-
-        return InteropTransferResponseData.build(command.commandId(), request.getTransactionCode(), InteropActionState.ACCEPTED,
-                request.getExpiration(), request.getExtensionList(), transferCode, DateUtils.getLocalDateTimeOfTenant());
+        return InteropTransferResponseData.build(command.commandId(), request.getTransactionCode(), InteropActionState.ACCEPTED, request.getExpiration(), request.getExtensionList(), transferCode, DateUtils.getLocalDateTimeOfTenant());
     }
 
     @Override
@@ -418,105 +356,79 @@ public class InteropServiceImpl implements InteropService {
         boolean isDebit = request.getTransactionRole().getTransactionType().isDebit();
         SavingsAccount savingsAccount = validateAndGetSavingAccount(request);
         String transferCode = request.getTransferCode();
-
         if (findTransaction(savingsAccount, transferCode, (isDebit ? WITHDRAWAL : DEPOSIT).getValue()) != null) {
             throw new InteropTransferAlreadyCommittedException(savingsAccount.getExternalId().getValue(), transferCode);
         }
-
         LocalDateTime transactionDateTime = DateUtils.getLocalDateTimeOfTenant();
         LocalDate transactionDate = DateUtils.getBusinessLocalDate();
         DateTimeFormatter fmt = getDateTimeFormatter(command);
         SavingsAccountTransaction transaction;
         final boolean backdatedTxnsAllowedTill = false;
-
         if (isDebit) {
             SavingsAccountTransaction holdTransaction = findTransaction(savingsAccount, transferCode, AMOUNT_HOLD.getValue());
             if (holdTransaction == null) {
                 throw new InteropTransferMissingException(savingsAccount.getExternalId().getValue(), transferCode);
             }
-
             BigDecimal totalTransferAmount = calculateTotalTransferAmount(request, savingsAccount);
             if (holdTransaction.getAmount().compareTo(totalTransferAmount) != 0) {
                 throw new InteropTransferMissingException(savingsAccount.getExternalId().getValue(), transferCode);
             }
-
             if (MathUtil.isLessThan(savingsAccount.getWithdrawableBalance().add(holdTransaction.getAmount()), totalTransferAmount)) {
-                throw new InsufficientAccountBalanceException(savingsAccount.getExternalId().getValue(),
-                        savingsAccount.getWithdrawableBalance(), null, totalTransferAmount);
+                throw new InsufficientAccountBalanceException(savingsAccount.getExternalId().getValue(), savingsAccount.getWithdrawableBalance(), null, totalTransferAmount);
             }
-
             if (holdTransaction.getReleaseIdOfHoldAmountTransaction() == null) {
-                SavingsAccountTransaction releaseTransaction = savingsAccountTransactionRepository
-                        .saveAndFlush(releaseAmount(holdTransaction, transactionDate));
+                SavingsAccountTransaction releaseTransaction = savingsAccountTransactionRepository.saveAndFlush(releaseAmount(holdTransaction, transactionDate));
                 holdTransaction.updateReleaseId(releaseTransaction.getId());
                 savingsAccount.releaseOnHoldAmount(holdTransaction.getAmount());
                 savingsAccount.addTransaction(releaseTransaction);
-
                 savingsAccountRepository.save(savingsAccount);
             }
-
             SavingsTransactionBooleanValues transactionValues = new SavingsTransactionBooleanValues(false, true, true, false, false);
-            transaction = savingsAccountService.handleWithdrawal(savingsAccount, fmt, transactionDate, request.getAmount().getAmount(),
-                    instance(findPaymentType(), savingsAccount.getExternalId().getValue(), null, getRoutingCode(), transferCode, null),
-                    transactionValues, backdatedTxnsAllowedTill);
+            transaction = savingsAccountService.handleWithdrawal(savingsAccount, fmt, transactionDate, request.getAmount().getAmount(), instance(findPaymentType(), savingsAccount.getExternalId().getValue(), null, getRoutingCode(), transferCode, null), transactionValues, backdatedTxnsAllowedTill);
         } else {
-            transaction = savingsAccountService.handleDeposit(savingsAccount, fmt, transactionDate, request.getAmount().getAmount(),
-                    instance(findPaymentType(), savingsAccount.getExternalId().getValue(), null, getRoutingCode(), transferCode, null),
-                    false, true, backdatedTxnsAllowedTill);
+            transaction = savingsAccountService.handleDeposit(savingsAccount, fmt, transactionDate, request.getAmount().getAmount(), instance(findPaymentType(), savingsAccount.getExternalId().getValue(), null, getRoutingCode(), transferCode, null), false, true, backdatedTxnsAllowedTill);
         }
-
         String note = request.getNote();
         if (!StringUtils.isBlank(note)) {
             noteRepository.save(Note.savingsTransactionNote(savingsAccount, transaction, note));
         }
-
-        return InteropTransferResponseData.build(command.commandId(), request.getTransactionCode(), InteropActionState.ACCEPTED,
-                request.getExpiration(), request.getExtensionList(), request.getTransferCode(), transactionDateTime);
+        return InteropTransferResponseData.build(command.commandId(), request.getTransactionCode(), InteropActionState.ACCEPTED, request.getExpiration(), request.getExtensionList(), request.getTransferCode(), transactionDateTime);
     }
 
     @Override
     @Transactional
-    public @NonNull InteropTransferResponseData releaseTransfer(@NonNull JsonCommand command) {
+    @NonNull
+    public InteropTransferResponseData releaseTransfer(@NonNull JsonCommand command) {
         InteropTransferRequestData request = dataValidator.validateAndParseTransferRequest(command);
         SavingsAccount savingsAccount = validateAndGetSavingAccount(request);
-
         LocalDateTime transactionDateTime = DateUtils.getLocalDateTimeOfTenant();
         LocalDate transactionDate = DateUtils.getBusinessLocalDate();
         SavingsAccountTransaction holdTransaction = findTransaction(savingsAccount, request.getTransferCode(), AMOUNT_HOLD.getValue());
-
         if (holdTransaction != null && holdTransaction.getReleaseIdOfHoldAmountTransaction() == null) {
             SavingsAccountTransaction releaseTransaction = releaseAmount(holdTransaction, transactionDate);
             MonetaryCurrency accountCurrency = savingsAccount.getCurrency().copy();
-            releaseTransaction
-                    .setRunningBalance(Money.of(accountCurrency, savingsAccount.getWithdrawableBalance().add(holdTransaction.getAmount())));
+            releaseTransaction.setRunningBalance(Money.of(accountCurrency, savingsAccount.getWithdrawableBalance().add(holdTransaction.getAmount())));
             releaseTransaction.updateCumulativeBalanceAndDates(accountCurrency, transactionDate);
             releaseTransaction = savingsAccountTransactionRepository.saveAndFlush(releaseTransaction);
             holdTransaction.updateReleaseId(releaseTransaction.getId());
-
             savingsAccount.releaseOnHoldAmount(holdTransaction.getAmount());
             savingsAccount.addTransaction(releaseTransaction);
-
             savingsAccountRepository.save(savingsAccount);
         } else {
             throw new InteropTransferMissingException(savingsAccount.getExternalId().getValue(), request.getTransferCode());
         }
-
-        return InteropTransferResponseData.build(command.commandId(), request.getTransactionCode(), InteropActionState.ACCEPTED,
-                request.getExpiration(), request.getExtensionList(), request.getTransferCode(), transactionDateTime);
+        return InteropTransferResponseData.build(command.commandId(), request.getTransactionCode(), InteropActionState.ACCEPTED, request.getExpiration(), request.getExtensionList(), request.getTransferCode(), transactionDateTime);
     }
 
     @Override
-    public @NonNull InteropKycResponseData getKyc(@NonNull String accountId) {
-
+    @NonNull
+    public InteropKycResponseData getKyc(@NonNull String accountId) {
         SavingsAccount savingsAccount = validateAndGetSavingAccount(accountId);
         Long clientId = savingsAccount.getClient().getId();
-
         try {
             final InteropServiceImpl.KycMapper rm = new InteropServiceImpl.KycMapper(sqlGenerator);
             final String sql = "select " + rm.schema() + " where c.id = ?";
-
-            final InteropKycData accountKyc = this.jdbcTemplate.queryForObject(sql, rm, new Object[] { clientId }); // NOSONAR
-
+            final InteropKycData accountKyc = this.jdbcTemplate.queryForObject(sql, rm, new Object[] {clientId}); // NOSONAR
             return InteropKycResponseData.build(accountKyc);
         } catch (final EmptyResultDataAccessException e) {
             throw new InteropKycDataNotFoundException(clientId, e);
@@ -524,28 +436,24 @@ public class InteropServiceImpl implements InteropService {
     }
 
     @Override
-    public @NonNull String disburseLoan(@NonNull String accountId, String apiRequestBodyAsJson) {
+    @NonNull
+    public String disburseLoan(@NonNull String accountId, String apiRequestBodyAsJson) {
         Loan loan = validateAndGetLoan(accountId);
         Long loanId = loan.getId();
-
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
-
         final CommandWrapper commandRequest = builder.disburseLoanApplication(loanId).build();
         CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 
     @Override
-    public @NonNull String loanRepayment(@NonNull String accountId, String apiRequestBodyAsJson) {
+    @NonNull
+    public String loanRepayment(@NonNull String accountId, String apiRequestBodyAsJson) {
         Loan loan = validateAndGetLoan(accountId);
         Long loanId = loan.getId();
-
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
-
         final CommandWrapper commandRequest = builder.loanRepaymentTransaction(loanId).build();
         CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 
@@ -569,19 +477,15 @@ public class InteropServiceImpl implements InteropService {
         // TODO: error handling
         SavingsAccount savingsAccount = validateAndGetSavingAccount(request.getAccountId());
         savingsAccount.setHelpers(savingsAccountTransactionSummaryWrapper, savingsHelper, configurationDomainService);
-
         ApplicationCurrency requestCurrency = currencyRepository.findOneByCode(request.getAmount().getCurrency());
         if (!savingsAccount.getCurrency().getCode().equals(requestCurrency.getCode())) {
             throw new DifferentCurrenciesException(savingsAccount.getCurrency().getCode(), requestCurrency.getCode());
         }
-
         SavingsAccountTransactionType transactionType = request.getTransactionRole().getTransactionType();
         if (!savingsAccount.isTransactionAllowed(transactionType, request.getExpirationLocalDate())) {
             throw new InteropAccountTransactionNotAllowedException(request.getAccountId());
         }
-
         request.normalizeAmounts(savingsAccount.getCurrency());
-
         return savingsAccount;
     }
 
@@ -615,7 +519,6 @@ public class InteropServiceImpl implements InteropService {
         if (StringUtils.isEmpty(dateFormat)) {
             dateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
         }
-
         return DateTimeFormatter.ofPattern(dateFormat).withLocale(locale);
     }
 
@@ -646,21 +549,37 @@ public class InteropServiceImpl implements InteropService {
     /*
      * Guaranteed to throw an exception no matter what the data integrity issue is.
      */
-    private void handleInteropDataIntegrityIssues(InteropIdentifierType idType, String accountId, final Throwable realCause,
-            final Exception dve) {
+    private void handleInteropDataIntegrityIssues(InteropIdentifierType idType, String accountId, final Throwable realCause, final Exception dve) {
         if (realCause.getMessage().contains("uk_interop_identifier_account")) {
-            throw new PlatformDataIntegrityException("error.msg.interop.duplicate.account.identifier",
-                    "Account identifier of type `" + idType.name() + "' already exists for account with externalId `" + accountId + "`",
-                    "idType", idType.name(), accountId);
+            throw new PlatformDataIntegrityException("error.msg.interop.duplicate.account.identifier", "Account identifier of type `" + idType.name() + "\' already exists for account with externalId `" + accountId + "`", "idType", idType.name(), accountId);
         }
-
         log.error("Error occured.", dve);
-        throw ErrorHandler.getMappable(dve, "error.msg.interop.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource: " + realCause.getMessage());
+        throw ErrorHandler.getMappable(dve, "error.msg.interop.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
     }
 
     @NonNull
     String getRoutingCode() {
         return DEFAULT_ROUTING_CODE;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InteropServiceImpl(final PlatformSecurityContext securityContext, final InteropDataValidator dataValidator, final SavingsAccountRepository savingsAccountRepository, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final ApplicationCurrencyRepository currencyRepository, final NoteRepository noteRepository, final PaymentTypeRepository paymentTypeRepository, final InteropIdentifierRepository identifierRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final SavingsHelper savingsHelper, final SavingsAccountTransactionSummaryWrapper savingsAccountTransactionSummaryWrapper, final SavingsAccountDomainService savingsAccountService, final ConfigurationDomainService configurationDomainService, final JdbcTemplate jdbcTemplate, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final DefaultToApiJsonSerializer<LoanAccountData> toApiJsonSerializer, final DatabaseSpecificSQLGenerator sqlGenerator) {
+        this.securityContext = securityContext;
+        this.dataValidator = dataValidator;
+        this.savingsAccountRepository = savingsAccountRepository;
+        this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
+        this.currencyRepository = currencyRepository;
+        this.noteRepository = noteRepository;
+        this.paymentTypeRepository = paymentTypeRepository;
+        this.identifierRepository = identifierRepository;
+        this.loanRepositoryWrapper = loanRepositoryWrapper;
+        this.savingsHelper = savingsHelper;
+        this.savingsAccountTransactionSummaryWrapper = savingsAccountTransactionSummaryWrapper;
+        this.savingsAccountService = savingsAccountService;
+        this.configurationDomainService = configurationDomainService;
+        this.jdbcTemplate = jdbcTemplate;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.sqlGenerator = sqlGenerator;
     }
 }

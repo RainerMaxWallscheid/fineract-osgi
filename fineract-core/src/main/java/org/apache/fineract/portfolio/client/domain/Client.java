@@ -35,8 +35,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -51,242 +49,168 @@ import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.useradministration.domain.AppUser;
-
+//
 @Entity
-@Getter
-@Setter
-@Table(name = "m_client", uniqueConstraints = { @UniqueConstraint(columnNames = { "account_no" }, name = "account_no_UNIQUE"), //
-        @UniqueConstraint(columnNames = { "mobile_no" }, name = "mobile_no_UNIQUE") })
+@Table(name = "m_client", uniqueConstraints = {@UniqueConstraint(columnNames = {"account_no"}, name = "account_no_UNIQUE"), @UniqueConstraint(columnNames = {"mobile_no"}, name = "mobile_no_UNIQUE")})
 public class Client extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @Column(name = "account_no", length = 20, unique = true, nullable = false)
     private String accountNumber;
-
     @ManyToOne
     @JoinColumn(name = "office_id", nullable = false)
     private Office office;
-
     @ManyToOne
     @JoinColumn(name = "transfer_to_office_id")
     private Office transferToOffice;
-
     @Column(name = "image_id")
     private Long imageId;
-
     @Column(name = "status_enum", nullable = false)
     private Integer status;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sub_status")
     private CodeValue subStatus;
-
     @Column(name = "activation_date")
     private LocalDate activationDate;
-
     @Column(name = "office_joining_date")
     private LocalDate officeJoiningDate;
-
     @Column(name = "firstname", length = 50)
     private String firstname;
-
     @Column(name = "middlename", length = 50)
     private String middlename;
-
     @Column(name = "lastname", length = 50)
     private String lastname;
-
     @Column(name = "fullname", length = 160)
     private String fullname;
-
     @Column(name = "display_name", length = 160, nullable = false)
     private String displayName;
-
     @Column(name = "mobile_no", length = 50, unique = true)
     private String mobileNo;
-
     @Column(name = "email_address", length = 50, unique = true)
     private String emailAddress;
-
     @Column(name = "is_staff", nullable = false)
     private boolean isStaff;
-
     @Column(name = "external_id", length = 100, unique = true)
     private ExternalId externalId;
-
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gender_cv_id")
     private CodeValue gender;
-
     @ManyToOne
     @JoinColumn(name = "staff_id")
     private Staff staff;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "m_group_client", joinColumns = @JoinColumn(name = "client_id"), inverseJoinColumns = @JoinColumn(name = "group_id"))
     private Set<Group> groups;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "closure_reason_cv_id")
     private CodeValue closureReason;
-
     @Column(name = "closedon_date")
     private LocalDate closureDate;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reject_reason_cv_id")
     private CodeValue rejectionReason;
-
     @Column(name = "rejectedon_date")
     private LocalDate rejectionDate;
-
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "rejectedon_userid")
     private AppUser rejectedBy;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "withdraw_reason_cv_id")
     private CodeValue withdrawalReason;
-
     @Column(name = "withdrawn_on_date")
     private LocalDate withdrawalDate;
-
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "withdraw_on_userid")
     private AppUser withdrawnBy;
-
     @Column(name = "reactivated_on_date")
     private LocalDate reactivateDate;
-
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "reactivated_on_userid")
     private AppUser reactivatedBy;
-
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "closedon_userid")
     private AppUser closedBy;
-
     @Column(name = "submittedon_date")
     private LocalDate submittedOnDate;
-
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "activatedon_userid")
     private AppUser activatedBy;
-
     @Column(name = "default_savings_product")
     private Long savingsProductId;
-
     @Column(name = "default_savings_account")
     private Long savingsAccountId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_type_cv_id")
     private CodeValue clientType;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_classification_cv_id")
     private CodeValue clientClassification;
-
     @Column(name = "legal_form_enum")
     private Integer legalForm;
-
     @Column(name = "reopened_on_date")
     private LocalDate reopenedDate;
-
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "reopened_by_userid")
     private AppUser reopenedBy;
-
     @Column(name = "proposed_transfer_date")
     private LocalDate proposedTransferDate;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "client", orphanRemoval = true, fetch = FetchType.LAZY)
     protected Set<ClientIdentifier> identifiers = new HashSet<>();
 
-    public static Client instance(final AppUser currentUser, final ClientStatus status, final Office office, final Group clientParentGroup,
-            final String accountNo, final String firstname, final String middlename, final String lastname, final String fullname,
-            final LocalDate activationDate, final LocalDate officeJoiningDate, final ExternalId externalId, final String mobileNo,
-            final String emailAddress, final Staff staff, final LocalDate submittedOnDate, final Long savingsProductId,
-            final Long savingsAccountId, final LocalDate dateOfBirth, final CodeValue gender, final CodeValue clientType,
-            final CodeValue clientClassification, final Integer legalForm, final Boolean isStaff) {
-        return new Client(currentUser, status, office, clientParentGroup, accountNo, firstname, middlename, lastname, fullname,
-                activationDate, officeJoiningDate, externalId, mobileNo, emailAddress, staff, submittedOnDate, savingsProductId,
-                savingsAccountId, dateOfBirth, gender, clientType, clientClassification, legalForm, isStaff);
+    public static Client instance(final AppUser currentUser, final ClientStatus status, final Office office, final Group clientParentGroup, final String accountNo, final String firstname, final String middlename, final String lastname, final String fullname, final LocalDate activationDate, final LocalDate officeJoiningDate, final ExternalId externalId, final String mobileNo, final String emailAddress, final Staff staff, final LocalDate submittedOnDate, final Long savingsProductId, final Long savingsAccountId, final LocalDate dateOfBirth, final CodeValue gender, final CodeValue clientType, final CodeValue clientClassification, final Integer legalForm, final Boolean isStaff) {
+        return new Client(currentUser, status, office, clientParentGroup, accountNo, firstname, middlename, lastname, fullname, activationDate, officeJoiningDate, externalId, mobileNo, emailAddress, staff, submittedOnDate, savingsProductId, savingsAccountId, dateOfBirth, gender, clientType, clientClassification, legalForm, isStaff);
     }
 
-    protected Client() {}
+    protected Client() {
+    }
 
-    private Client(final AppUser currentUser, final ClientStatus status, final Office office, final Group clientParentGroup,
-            final String accountNo, final String firstname, final String middlename, final String lastname, final String fullname,
-            final LocalDate activationDate, final LocalDate officeJoiningDate, final ExternalId externalId, final String mobileNo,
-            final String emailAddress, final Staff staff, final LocalDate submittedOnDate, final Long savingsProductId,
-            final Long savingsAccountId, final LocalDate dateOfBirth, final CodeValue gender, final CodeValue clientType,
-            final CodeValue clientClassification, final Integer legalForm, final Boolean isStaff) {
-
+    private Client(final AppUser currentUser, final ClientStatus status, final Office office, final Group clientParentGroup, final String accountNo, final String firstname, final String middlename, final String lastname, final String fullname, final LocalDate activationDate, final LocalDate officeJoiningDate, final ExternalId externalId, final String mobileNo, final String emailAddress, final Staff staff, final LocalDate submittedOnDate, final Long savingsProductId, final Long savingsAccountId, final LocalDate dateOfBirth, final CodeValue gender, final CodeValue clientType, final CodeValue clientClassification, final Integer legalForm, final Boolean isStaff) {
         if (StringUtils.isBlank(accountNo)) {
             this.accountNumber = new RandomPasswordGenerator(19).generate();
         } else {
             this.accountNumber = accountNo;
         }
-
         this.submittedOnDate = submittedOnDate;
-
         this.status = status.getValue();
         this.office = office;
         this.externalId = externalId;
-
         if (StringUtils.isNotBlank(mobileNo)) {
             this.mobileNo = mobileNo.trim();
         }
-
         if (StringUtils.isNotBlank(emailAddress)) {
             this.emailAddress = emailAddress.trim();
         }
-
         if (activationDate != null) {
             this.activationDate = activationDate;
             this.activatedBy = currentUser;
         }
-
         this.officeJoiningDate = officeJoiningDate;
-
         if (StringUtils.isNotBlank(firstname)) {
             this.firstname = firstname.trim();
         }
-
         if (StringUtils.isNotBlank(middlename)) {
             this.middlename = middlename.trim();
         }
-
         if (StringUtils.isNotBlank(lastname)) {
             this.lastname = lastname.trim();
         }
-
         if (StringUtils.isNotBlank(fullname)) {
             this.fullname = fullname.trim();
         }
-
         if (clientParentGroup != null) {
             this.groups = new HashSet<>();
             this.groups.add(clientParentGroup);
         }
-
         this.staff = staff;
         this.savingsProductId = savingsProductId;
         this.savingsAccountId = savingsAccountId;
-
         if (gender != null) {
             this.gender = gender;
         }
-
         this.dateOfBirth = dateOfBirth;
-
         this.clientType = clientType;
         this.clientClassification = clientClassification;
         this.setLegalForm(legalForm);
-
         deriveDisplayName();
         validate();
     }
@@ -295,11 +219,9 @@ public class Client extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         validateNameParts(dataValidationErrors);
         validateActivationDate(dataValidationErrors);
-
         if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
-
     }
 
     public void validateUpdate() {
@@ -309,11 +231,9 @@ public class Client extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         // when we change clientType from Individual to Organisation or
         // vice-cersa
         validateActivationDate(dataValidationErrors);
-
         if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
-
     }
 
     public boolean identifiedBy(final Long clientId) {
@@ -325,28 +245,21 @@ public class Client extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     }
 
     public void activate(final AppUser currentUser, final DateTimeFormatter formatter, final LocalDate activationLocalDate) {
-
         if (isActive()) {
             final String defaultUserMessage = "Cannot activate client. Client is already active.";
-            final ApiParameterError error = ApiParameterError.parameterError("error.msg.clients.already.active", defaultUserMessage,
-                    ClientApiConstants.activationDateParamName, activationLocalDate.format(formatter));
-
+            final ApiParameterError error = ApiParameterError.parameterError("error.msg.clients.already.active", defaultUserMessage, ClientApiConstants.activationDateParamName, activationLocalDate.format(formatter));
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
             dataValidationErrors.add(error);
-
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
-
         this.activationDate = activationLocalDate;
         this.activatedBy = currentUser;
         this.officeJoiningDate = this.activationDate;
         this.status = ClientStatus.ACTIVE.getValue();
-
         // in case a closed client is being re open
         this.closureDate = null;
         this.closureReason = null;
         this.closedBy = null;
-
         validate();
     }
 
@@ -392,63 +305,42 @@ public class Client extends AbstractAuditableWithUTCDateTimeCustom<Long> {
 
     private void validateNameParts(final List<ApiParameterError> dataValidationErrors) {
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("client");
-
         if (StringUtils.isNotBlank(this.fullname)) {
-
-            baseDataValidator.reset().parameter(ClientApiConstants.firstnameParamName).value(this.firstname)
-                    .mustBeBlankWhenParameterProvided(ClientApiConstants.fullnameParamName, this.fullname);
-
-            baseDataValidator.reset().parameter(ClientApiConstants.middlenameParamName).value(this.middlename)
-                    .mustBeBlankWhenParameterProvided(ClientApiConstants.fullnameParamName, this.fullname);
-
-            baseDataValidator.reset().parameter(ClientApiConstants.lastnameParamName).value(this.lastname)
-                    .mustBeBlankWhenParameterProvided(ClientApiConstants.fullnameParamName, this.fullname);
+            baseDataValidator.reset().parameter(ClientApiConstants.firstnameParamName).value(this.firstname).mustBeBlankWhenParameterProvided(ClientApiConstants.fullnameParamName, this.fullname);
+            baseDataValidator.reset().parameter(ClientApiConstants.middlenameParamName).value(this.middlename).mustBeBlankWhenParameterProvided(ClientApiConstants.fullnameParamName, this.fullname);
+            baseDataValidator.reset().parameter(ClientApiConstants.lastnameParamName).value(this.lastname).mustBeBlankWhenParameterProvided(ClientApiConstants.fullnameParamName, this.fullname);
         } else {
-
-            baseDataValidator.reset().parameter(ClientApiConstants.firstnameParamName).value(this.firstname).notBlank()
-                    .notExceedingLengthOf(50);
-            baseDataValidator.reset().parameter(ClientApiConstants.middlenameParamName).value(this.middlename).ignoreIfNull()
-                    .notExceedingLengthOf(50);
-            baseDataValidator.reset().parameter(ClientApiConstants.lastnameParamName).value(this.lastname).notBlank()
-                    .notExceedingLengthOf(50);
+            baseDataValidator.reset().parameter(ClientApiConstants.firstnameParamName).value(this.firstname).notBlank().notExceedingLengthOf(50);
+            baseDataValidator.reset().parameter(ClientApiConstants.middlenameParamName).value(this.middlename).ignoreIfNull().notExceedingLengthOf(50);
+            baseDataValidator.reset().parameter(ClientApiConstants.lastnameParamName).value(this.lastname).notBlank().notExceedingLengthOf(50);
         }
     }
 
     private void validateActivationDate(final List<ApiParameterError> dataValidationErrors) {
         if (getSubmittedOnDate() != null && DateUtils.isDateInTheFuture(getSubmittedOnDate())) {
             final String defaultUserMessage = "submitted date cannot be in the future.";
-            final ApiParameterError error = ApiParameterError.parameterError("error.msg.clients.submittedOnDate.in.the.future",
-                    defaultUserMessage, ClientApiConstants.submittedOnDateParamName, this.submittedOnDate);
-
+            final ApiParameterError error = ApiParameterError.parameterError("error.msg.clients.submittedOnDate.in.the.future", defaultUserMessage, ClientApiConstants.submittedOnDateParamName, this.submittedOnDate);
             dataValidationErrors.add(error);
         }
         if (getActivationDate() != null && DateUtils.isAfter(getSubmittedOnDate(), getActivationDate())) {
             final String defaultUserMessage = "submitted date cannot be after the activation date";
-            final ApiParameterError error = ApiParameterError.parameterError("error.msg.clients.submittedOnDate.after.activation.date",
-                    defaultUserMessage, ClientApiConstants.submittedOnDateParamName, this.submittedOnDate);
-
+            final ApiParameterError error = ApiParameterError.parameterError("error.msg.clients.submittedOnDate.after.activation.date", defaultUserMessage, ClientApiConstants.submittedOnDateParamName, this.submittedOnDate);
             dataValidationErrors.add(error);
         }
         if (getActivationDate() != null && DateUtils.isAfter(getReopenedDate(), getActivationDate())) {
             final String defaultUserMessage = "reopened date cannot be after the submittedon date";
-            final ApiParameterError error = ApiParameterError.parameterError("error.msg.clients.submittedOnDate.after.reopened.date",
-                    defaultUserMessage, ClientApiConstants.reopenedDateParamName, this.reopenedDate);
-
+            final ApiParameterError error = ApiParameterError.parameterError("error.msg.clients.submittedOnDate.after.reopened.date", defaultUserMessage, ClientApiConstants.reopenedDateParamName, this.reopenedDate);
             dataValidationErrors.add(error);
         }
         if (DateUtils.isDateInTheFuture(getActivationDate())) {
             final String defaultUserMessage = "Activation date cannot be in the future.";
-            final ApiParameterError error = ApiParameterError.parameterError("error.msg.clients.activationDate.in.the.future",
-                    defaultUserMessage, ClientApiConstants.activationDateParamName, getActivationDate());
-
+            final ApiParameterError error = ApiParameterError.parameterError("error.msg.clients.activationDate.in.the.future", defaultUserMessage, ClientApiConstants.activationDateParamName, getActivationDate());
             dataValidationErrors.add(error);
         }
         if (getActivationDate() != null) {
             if (this.office.isOpeningDateAfter(getActivationDate())) {
                 final String defaultUserMessage = "Client activation date cannot be a date before the office opening date.";
-                final ApiParameterError error = ApiParameterError.parameterError(
-                        "error.msg.clients.activationDate.cannot.be.before.office.activation.date", defaultUserMessage,
-                        ClientApiConstants.activationDateParamName, getActivationDate());
+                final ApiParameterError error = ApiParameterError.parameterError("error.msg.clients.activationDate.cannot.be.before.office.activation.date", defaultUserMessage, ClientApiConstants.activationDateParamName, getActivationDate());
                 dataValidationErrors.add(error);
             }
         }
@@ -663,7 +555,6 @@ public class Client extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         this.rejectionDate = rejectionDate;
         this.rejectedBy = currentUser;
         this.status = ClientStatus.REJECTED.getValue();
-
     }
 
     public void withdraw(AppUser currentUser, CodeValue withdrawalReason, LocalDate withdrawalDate) {
@@ -671,7 +562,6 @@ public class Client extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         this.withdrawalDate = withdrawalDate;
         this.withdrawnBy = currentUser;
         this.status = ClientStatus.WITHDRAWN.getValue();
-
     }
 
     public void reActivate(AppUser currentUser, LocalDate reactivateDate) {
@@ -712,5 +602,400 @@ public class Client extends AbstractAuditableWithUTCDateTimeCustom<Long> {
             setLastname(null);
             setDisplayName(null);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getAccountNumber() {
+        return this.accountNumber;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Office getOffice() {
+        return this.office;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Office getTransferToOffice() {
+        return this.transferToOffice;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getImageId() {
+        return this.imageId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getStatus() {
+        return this.status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getSubStatus() {
+        return this.subStatus;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getActivationDate() {
+        return this.activationDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getOfficeJoiningDate() {
+        return this.officeJoiningDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getFirstname() {
+        return this.firstname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getMiddlename() {
+        return this.middlename;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLastname() {
+        return this.lastname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getFullname() {
+        return this.fullname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDisplayName() {
+        return this.displayName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getMobileNo() {
+        return this.mobileNo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEmailAddress() {
+        return this.emailAddress;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalId getExternalId() {
+        return this.externalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getDateOfBirth() {
+        return this.dateOfBirth;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getGender() {
+        return this.gender;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Staff getStaff() {
+        return this.staff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Set<Group> getGroups() {
+        return this.groups;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getClosureReason() {
+        return this.closureReason;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getClosureDate() {
+        return this.closureDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getRejectionReason() {
+        return this.rejectionReason;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getRejectionDate() {
+        return this.rejectionDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AppUser getRejectedBy() {
+        return this.rejectedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getWithdrawalReason() {
+        return this.withdrawalReason;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getWithdrawalDate() {
+        return this.withdrawalDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AppUser getWithdrawnBy() {
+        return this.withdrawnBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getReactivateDate() {
+        return this.reactivateDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AppUser getReactivatedBy() {
+        return this.reactivatedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AppUser getClosedBy() {
+        return this.closedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getSubmittedOnDate() {
+        return this.submittedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AppUser getActivatedBy() {
+        return this.activatedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getSavingsProductId() {
+        return this.savingsProductId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getSavingsAccountId() {
+        return this.savingsAccountId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getClientType() {
+        return this.clientType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getClientClassification() {
+        return this.clientClassification;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getLegalForm() {
+        return this.legalForm;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getReopenedDate() {
+        return this.reopenedDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AppUser getReopenedBy() {
+        return this.reopenedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Set<ClientIdentifier> getIdentifiers() {
+        return this.identifiers;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAccountNumber(final String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setOffice(final Office office) {
+        this.office = office;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setTransferToOffice(final Office transferToOffice) {
+        this.transferToOffice = transferToOffice;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setImageId(final Long imageId) {
+        this.imageId = imageId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setStatus(final Integer status) {
+        this.status = status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setSubStatus(final CodeValue subStatus) {
+        this.subStatus = subStatus;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setActivationDate(final LocalDate activationDate) {
+        this.activationDate = activationDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setOfficeJoiningDate(final LocalDate officeJoiningDate) {
+        this.officeJoiningDate = officeJoiningDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setFirstname(final String firstname) {
+        this.firstname = firstname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMiddlename(final String middlename) {
+        this.middlename = middlename;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLastname(final String lastname) {
+        this.lastname = lastname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setFullname(final String fullname) {
+        this.fullname = fullname;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setStaff(final boolean isStaff) {
+        this.isStaff = isStaff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setExternalId(final ExternalId externalId) {
+        this.externalId = externalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDateOfBirth(final LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setGender(final CodeValue gender) {
+        this.gender = gender;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setGroups(final Set<Group> groups) {
+        this.groups = groups;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setClosureReason(final CodeValue closureReason) {
+        this.closureReason = closureReason;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setClosureDate(final LocalDate closureDate) {
+        this.closureDate = closureDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setRejectionReason(final CodeValue rejectionReason) {
+        this.rejectionReason = rejectionReason;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setRejectionDate(final LocalDate rejectionDate) {
+        this.rejectionDate = rejectionDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setRejectedBy(final AppUser rejectedBy) {
+        this.rejectedBy = rejectedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setWithdrawalReason(final CodeValue withdrawalReason) {
+        this.withdrawalReason = withdrawalReason;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setWithdrawalDate(final LocalDate withdrawalDate) {
+        this.withdrawalDate = withdrawalDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setWithdrawnBy(final AppUser withdrawnBy) {
+        this.withdrawnBy = withdrawnBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setReactivateDate(final LocalDate reactivateDate) {
+        this.reactivateDate = reactivateDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setReactivatedBy(final AppUser reactivatedBy) {
+        this.reactivatedBy = reactivatedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setClosedBy(final AppUser closedBy) {
+        this.closedBy = closedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setSubmittedOnDate(final LocalDate submittedOnDate) {
+        this.submittedOnDate = submittedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setActivatedBy(final AppUser activatedBy) {
+        this.activatedBy = activatedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setSavingsProductId(final Long savingsProductId) {
+        this.savingsProductId = savingsProductId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setSavingsAccountId(final Long savingsAccountId) {
+        this.savingsAccountId = savingsAccountId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setClientType(final CodeValue clientType) {
+        this.clientType = clientType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setClientClassification(final CodeValue clientClassification) {
+        this.clientClassification = clientClassification;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setReopenedDate(final LocalDate reopenedDate) {
+        this.reopenedDate = reopenedDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setReopenedBy(final AppUser reopenedBy) {
+        this.reopenedBy = reopenedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setProposedTransferDate(final LocalDate proposedTransferDate) {
+        this.proposedTransferDate = proposedTransferDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setIdentifiers(final Set<ClientIdentifier> identifiers) {
+        this.identifiers = identifiers;
     }
 }

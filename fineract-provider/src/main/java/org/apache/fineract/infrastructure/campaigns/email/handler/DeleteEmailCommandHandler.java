@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.campaigns.email.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.campaigns.email.service.EmailWritePlatformService;
@@ -29,15 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "EMAIL", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteEmailCommandHandler implements NewCommandSourceHandler {
-
     private final EmailWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.delete(command.entityId());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DeleteEmailCommandHandler(final EmailWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

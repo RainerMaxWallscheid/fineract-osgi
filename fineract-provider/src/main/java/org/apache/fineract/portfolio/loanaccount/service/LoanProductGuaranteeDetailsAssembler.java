@@ -19,24 +19,21 @@
 package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.math.BigDecimal;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductGuaranteeDetails;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class LoanProductGuaranteeDetailsAssembler {
-
     public LoanProductGuaranteeDetails createFrom(final JsonCommand command) {
-
         final BigDecimal mandatoryGuarantee = command.bigDecimalValueOfParameterNamed(LoanProductConstants.mandatoryGuaranteeParamName);
-        final BigDecimal minimumGuaranteeFromGuarantor = command
-                .bigDecimalValueOfParameterNamed(LoanProductConstants.minimumGuaranteeFromGuarantorParamName);
-        final BigDecimal minimumGuaranteeFromOwnFunds = command
-                .bigDecimalValueOfParameterNamed(LoanProductConstants.minimumGuaranteeFromOwnFundsParamName);
-
+        final BigDecimal minimumGuaranteeFromGuarantor = command.bigDecimalValueOfParameterNamed(LoanProductConstants.minimumGuaranteeFromGuarantorParamName);
+        final BigDecimal minimumGuaranteeFromOwnFunds = command.bigDecimalValueOfParameterNamed(LoanProductConstants.minimumGuaranteeFromOwnFundsParamName);
         return new LoanProductGuaranteeDetails(mandatoryGuarantee, minimumGuaranteeFromOwnFunds, minimumGuaranteeFromGuarantor);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanProductGuaranteeDetailsAssembler() {
     }
 }

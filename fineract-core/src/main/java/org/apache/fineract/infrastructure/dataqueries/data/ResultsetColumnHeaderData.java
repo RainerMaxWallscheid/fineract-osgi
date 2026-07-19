@@ -22,7 +22,6 @@ import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseType;
 import org.apache.fineract.infrastructure.core.service.database.JdbcJavaType;
@@ -30,9 +29,7 @@ import org.apache.fineract.infrastructure.core.service.database.JdbcJavaType;
 /**
  * Immutable data object representing a resultset column.
  */
-@Getter
 public final class ResultsetColumnHeaderData implements Serializable {
-
     private final String columnName;
     private JdbcJavaType columnType;
     private final Long columnLength;
@@ -52,20 +49,14 @@ public final class ResultsetColumnHeaderData implements Serializable {
         final String columnCode = null;
         final boolean columnIsUnique = false;
         final boolean columnIsIndexed = false;
-        return new ResultsetColumnHeaderData(columnName, columnType, columnLength, columnNullable, columnIsPrimaryKey, columnValues,
-                columnCode, columnIsUnique, columnIsIndexed, dialect);
+        return new ResultsetColumnHeaderData(columnName, columnType, columnLength, columnNullable, columnIsPrimaryKey, columnValues, columnCode, columnIsUnique, columnIsIndexed, dialect);
     }
 
-    public static ResultsetColumnHeaderData detailed(final String columnName, final String columnType, final Long columnLength,
-            final boolean columnNullable, final boolean columnIsPrimaryKey, final List<ResultsetColumnValueData> columnValues,
-            final String columnCode, final boolean columnIsUnique, final boolean columnIsIndexed, DatabaseType dialect) {
-        return new ResultsetColumnHeaderData(columnName, columnType, columnLength, columnNullable, columnIsPrimaryKey, columnValues,
-                columnCode, columnIsUnique, columnIsIndexed, dialect);
+    public static ResultsetColumnHeaderData detailed(final String columnName, final String columnType, final Long columnLength, final boolean columnNullable, final boolean columnIsPrimaryKey, final List<ResultsetColumnValueData> columnValues, final String columnCode, final boolean columnIsUnique, final boolean columnIsIndexed, DatabaseType dialect) {
+        return new ResultsetColumnHeaderData(columnName, columnType, columnLength, columnNullable, columnIsPrimaryKey, columnValues, columnCode, columnIsUnique, columnIsIndexed, dialect);
     }
 
-    private ResultsetColumnHeaderData(final String columnName, String columnType, final Long columnLength, final boolean columnNullable,
-            final boolean columnIsPrimaryKey, final List<ResultsetColumnValueData> columnValues, final String columnCode,
-            final boolean columnIsUnique, final boolean columnIsIndexed, DatabaseType dialect) {
+    private ResultsetColumnHeaderData(final String columnName, String columnType, final Long columnLength, final boolean columnNullable, final boolean columnIsPrimaryKey, final List<ResultsetColumnValueData> columnValues, final String columnCode, final boolean columnIsUnique, final boolean columnIsIndexed, DatabaseType dialect) {
         this.columnName = columnName;
         this.columnLength = columnLength;
         this.isColumnNullable = columnNullable;
@@ -74,10 +65,8 @@ public final class ResultsetColumnHeaderData implements Serializable {
         this.columnCode = columnCode;
         this.isColumnUnique = columnIsUnique;
         this.isColumnIndexed = columnIsIndexed;
-
         // Refer org.drizzle.jdbc.internal.mysql.MySQLType.java
         this.columnType = JdbcJavaType.getByTypeName(dialect, adjustColumnType(columnType), true);
-
         this.columnDisplayType = calcDisplayType();
     }
 
@@ -196,11 +185,9 @@ public final class ResultsetColumnHeaderData implements Serializable {
             } else if (columnType.isVarcharType()) {
                 displayType = DisplayType.CODEVALUE;
             }
-
         }
         if (displayType == null) {
-            throw new PlatformDataIntegrityException("error.msg.invalid.lookup.type",
-                    "Invalid Lookup Type:" + this.columnType + " - Column Name: " + this.columnName);
+            throw new PlatformDataIntegrityException("error.msg.invalid.lookup.type", "Invalid Lookup Type:" + this.columnType + " - Column Name: " + this.columnName);
         }
         return displayType;
     }
@@ -218,7 +205,8 @@ public final class ResultsetColumnHeaderData implements Serializable {
         if (columnType.isAnyFloatType()) {
             return DisplayType.FLOAT;
         }
-        if (columnType.isDecimalType()) { // Refer org.drizzle.jdbc.internal.mysql.MySQLType.java
+        if (columnType.isDecimalType()) {
+            // Refer org.drizzle.jdbc.internal.mysql.MySQLType.java
             return DisplayType.DECIMAL;
         }
         if (columnType.isDateType()) {
@@ -241,18 +229,48 @@ public final class ResultsetColumnHeaderData implements Serializable {
 
     // Enum representing the different ways a column can be displayed.
     public enum DisplayType {
-        TEXT, //
-        STRING, //
-        INTEGER, //
-        FLOAT, //
-        DECIMAL, //
-        DATE, //
-        TIME, //
-        DATETIME, //
-        BOOLEAN, //
-        BINARY, //
-        CODELOOKUP, //
-        CODEVALUE; //
+        TEXT,  //
+        STRING,  //
+        INTEGER,  //
+        FLOAT,  //
+        DECIMAL,  //
+        DATE,  //
+        TIME,  //
+        DATETIME,  //
+        BOOLEAN,  //
+        BINARY,  //
+        CODELOOKUP,  //
+        CODEVALUE;
+        //
     }
 
+    @java.lang.SuppressWarnings("all")
+        public String getColumnName() {
+        return this.columnName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JdbcJavaType getColumnType() {
+        return this.columnType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getColumnLength() {
+        return this.columnLength;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DisplayType getColumnDisplayType() {
+        return this.columnDisplayType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<ResultsetColumnValueData> getColumnValues() {
+        return this.columnValues;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getColumnCode() {
+        return this.columnCode;
+    }
 }

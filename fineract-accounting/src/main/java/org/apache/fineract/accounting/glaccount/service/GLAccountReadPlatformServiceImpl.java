@@ -22,7 +22,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.accounting.common.AccountingEnumerations;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
@@ -42,18 +41,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class GLAccountReadPlatformServiceImpl implements GLAccountReadPlatformService {
-
-    private static final String NAME_DECORATED_BASE_ON_HIERARCHY = "concat(substring('........................................', 1, ((LENGTH(hierarchy) - LENGTH(REPLACE(hierarchy, '.', '')) - 1) * 4)), name)";
-
+    private static final String NAME_DECORATED_BASE_ON_HIERARCHY = "concat(substring(\'........................................\', 1, ((LENGTH(hierarchy) - LENGTH(REPLACE(hierarchy, \'.\', \'\')) - 1) * 4)), name)";
     private final JdbcTemplate jdbcTemplate;
-
     private static final String SQL_AND = " and ";
 
-    private static final class GLAccountMapper implements RowMapper<GLAccountData> {
 
+    private static final class GLAccountMapper implements RowMapper<GLAccountData> {
         private final JournalEntryAssociationParametersData associationParametersData;
 
         GLAccountMapper(final JournalEntryAssociationParametersData associationParametersData) {
@@ -66,11 +61,7 @@ public class GLAccountReadPlatformServiceImpl implements GLAccountReadPlatformSe
 
         public String schema() {
             StringBuilder sb = new StringBuilder();
-            sb.append(
-                    " gl.id as id, name as name, parent_id as parentId, gl_code as glCode, disabled as disabled, manual_journal_entries_allowed as manualEntriesAllowed, ")
-                    .append("classification_enum as classification, account_usage as accountUsage, gl.description as description, ")
-                    .append(NAME_DECORATED_BASE_ON_HIERARCHY).append(" as nameDecorated, ")
-                    .append("cv.id as codeId, cv.code_value as codeValue ");
+            sb.append(" gl.id as id, name as name, parent_id as parentId, gl_code as glCode, disabled as disabled, manual_journal_entries_allowed as manualEntriesAllowed, ").append("classification_enum as classification, account_usage as accountUsage, gl.description as description, ").append(NAME_DECORATED_BASE_ON_HIERARCHY).append(" as nameDecorated, ").append("cv.id as codeId, cv.code_value as codeValue ");
             if (this.associationParametersData.isRunningBalanceRequired()) {
                 sb.append(",gl_j.organization_running_balance as organizationRunningBalance ");
             }
@@ -83,7 +74,6 @@ public class GLAccountReadPlatformServiceImpl implements GLAccountReadPlatformSe
 
         @Override
         public GLAccountData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-
             final Long id = rs.getLong("id");
             final String name = rs.getString("name");
             final Long parentId = JdbcSupport.getLong(rs, "parentId");
@@ -103,42 +93,31 @@ public class GLAccountReadPlatformServiceImpl implements GLAccountReadPlatformSe
             if (associationParametersData.isRunningBalanceRequired()) {
                 organizationRunningBalance = rs.getLong("organizationRunningBalance");
             }
-            return new GLAccountData().setId(id).setName(name).setParentId(parentId).setGlCode(glCode).setDisabled(disabled)
-                    .setManualEntriesAllowed(manualEntriesAllowed).setType(accountType).setUsage(usage).setDescription(description)
-                    .setNameDecorated(nameDecorated).setTagId(tagId).setOrganizationRunningBalance(organizationRunningBalance);
+            return new GLAccountData().setId(id).setName(name).setParentId(parentId).setGlCode(glCode).setDisabled(disabled).setManualEntriesAllowed(manualEntriesAllowed).setType(accountType).setUsage(usage).setDescription(description).setNameDecorated(nameDecorated).setTagId(tagId).setOrganizationRunningBalance(organizationRunningBalance);
         }
     }
 
     @Override
-    public List<GLAccountData> retrieveAllGLAccounts(final Integer accountClassification, final String searchParam, final Integer usage,
-            final Boolean manualTransactionsAllowed, final Boolean disabled,
-            JournalEntryAssociationParametersData associationParametersData) {
+    public List<GLAccountData> retrieveAllGLAccounts(final Integer accountClassification, final String searchParam, final Integer usage, final Boolean manualTransactionsAllowed, final Boolean disabled, JournalEntryAssociationParametersData associationParametersData) {
         if (accountClassification != null && !checkValidGLAccountType(accountClassification)) {
             throw new GLAccountInvalidClassificationException(accountClassification);
         }
-
         if (usage != null && !checkValidGLAccountUsage(usage)) {
             throw new GLAccountInvalidClassificationException(accountClassification);
         }
-
         final GLAccountMapper rm = new GLAccountMapper(associationParametersData);
         String sql = "select " + rm.schema();
         // append SQL statement for fetching account totals
         if (associationParametersData != null && associationParametersData.isRunningBalanceRequired()) {
-            sql = sql + " and gl_j.id in (select t1.id from (select t2.account_id, max(t2.id) as id from "
-                    + "(select id, max(entry_date) as entry_date, account_id from acc_gl_journal_entry where is_running_balance_calculated = true "
-                    + "group by account_id desc, id) t3 inner join acc_gl_journal_entry t2 on t2.account_id = t3.account_id and t2.entry_date = t3.entry_date "
-                    + "group by t2.account_id desc) t1)";
+            sql = sql + " and gl_j.id in (select t1.id from (select t2.account_id, max(t2.id) as id from " + "(select id, max(entry_date) as entry_date, account_id from acc_gl_journal_entry where is_running_balance_calculated = true " + "group by account_id desc, id) t3 inner join acc_gl_journal_entry t2 on t2.account_id = t3.account_id and t2.entry_date = t3.entry_date " + "group by t2.account_id desc) t1)";
         }
         final Object[] parameterArray = new Object[3];
         int arrayPos = 0;
         boolean filtersPresent = false;
-        if ((accountClassification != null) || StringUtils.isNotBlank(searchParam) || (usage != null) || (manualTransactionsAllowed != null)
-                || (disabled != null)) {
+        if ((accountClassification != null) || StringUtils.isNotBlank(searchParam) || (usage != null) || (manualTransactionsAllowed != null) || (disabled != null)) {
             filtersPresent = true;
             sql += " where";
         }
-
         if (filtersPresent) {
             boolean firstWhereConditionAdded = false;
             if (accountClassification != null) {
@@ -173,7 +152,6 @@ public class GLAccountReadPlatformServiceImpl implements GLAccountReadPlatformSe
                 if (firstWhereConditionAdded) {
                     sql += SQL_AND;
                 }
-
                 sql += " manual_journal_entries_allowed = " + manualTransactionsAllowed;
                 firstWhereConditionAdded = true;
             }
@@ -181,13 +159,10 @@ public class GLAccountReadPlatformServiceImpl implements GLAccountReadPlatformSe
                 if (firstWhereConditionAdded) {
                     sql += SQL_AND;
                 }
-
                 sql += " disabled = " + disabled;
             }
         }
-
         sql += " ORDER BY gl_code ASC";
-
         final Object[] finalObjectArray = Arrays.copyOf(parameterArray, arrayPos);
         return this.jdbcTemplate.query(sql, rm, finalObjectArray);
     }
@@ -200,11 +175,9 @@ public class GLAccountReadPlatformServiceImpl implements GLAccountReadPlatformSe
             sql.append("select ").append(rm.schema());
             sql.append(" where gl.id = ?");
             if (associationParametersData.isRunningBalanceRequired()) {
-                sql.append(" and gl_j.is_running_balance_calculated = true ")
-                        .append("  ORDER BY gl_j.entry_date DESC,gl_j.id DESC LIMIT 1");
+                sql.append(" and gl_j.is_running_balance_calculated = true ").append("  ORDER BY gl_j.entry_date DESC,gl_j.id DESC LIMIT 1");
             }
-
-            return this.jdbcTemplate.queryForObject(sql.toString(), rm, new Object[] { glAccountId });
+            return this.jdbcTemplate.queryForObject(sql.toString(), rm, new Object[] {glAccountId});
         } catch (final EmptyResultDataAccessException e) {
             throw new GLAccountNotFoundException(glAccountId, e);
         }
@@ -212,14 +185,12 @@ public class GLAccountReadPlatformServiceImpl implements GLAccountReadPlatformSe
 
     @Override
     public List<GLAccountData> retrieveAllEnabledDetailGLAccounts(final GLAccountType accountType) {
-        return retrieveAllGLAccounts(accountType.getValue(), null, GLAccountUsage.DETAIL.getValue(), null, false,
-                new JournalEntryAssociationParametersData());
+        return retrieveAllGLAccounts(accountType.getValue(), null, GLAccountUsage.DETAIL.getValue(), null, false, new JournalEntryAssociationParametersData());
     }
 
     @Override
     public List<GLAccountData> retrieveAllEnabledDetailGLAccounts() {
-        return retrieveAllGLAccounts(null, null, GLAccountUsage.DETAIL.getValue(), null, false,
-                new JournalEntryAssociationParametersData());
+        return retrieveAllGLAccounts(null, null, GLAccountUsage.DETAIL.getValue(), null, false, new JournalEntryAssociationParametersData());
     }
 
     private static boolean checkValidGLAccountType(final int type) {
@@ -247,8 +218,7 @@ public class GLAccountReadPlatformServiceImpl implements GLAccountReadPlatformSe
 
     @Override
     public List<GLAccountData> retrieveAllEnabledHeaderGLAccounts(final GLAccountType accountType) {
-        return retrieveAllGLAccounts(accountType.getValue(), null, GLAccountUsage.HEADER.getValue(), null, false,
-                new JournalEntryAssociationParametersData());
+        return retrieveAllGLAccounts(accountType.getValue(), null, GLAccountUsage.HEADER.getValue(), null, false, new JournalEntryAssociationParametersData());
     }
 
     @Override
@@ -258,8 +228,8 @@ public class GLAccountReadPlatformServiceImpl implements GLAccountReadPlatformSe
         return this.jdbcTemplate.query(sql, mapper, ruleId, transactionType);
     }
 
-    private static final class GLAccountDataLookUpMapper implements RowMapper<GLAccountDataForLookup> {
 
+    private static final class GLAccountDataLookUpMapper implements RowMapper<GLAccountDataForLookup> {
         private static final String LOOKUP_SCHEMA = " gl.id as id, gl.name as name, gl.gl_code as glCode from acc_accounting_rule rule join acc_rule_tags tags on tags.acc_rule_id = rule.id join acc_gl_account gl on gl.tag_id=tags.tag_id";
 
         @Override
@@ -267,8 +237,12 @@ public class GLAccountReadPlatformServiceImpl implements GLAccountReadPlatformSe
             final Long id = JdbcSupport.getLong(rs, "id");
             final String name = rs.getString("name");
             final String glCode = rs.getString("glCode");
-
             return new GLAccountDataForLookup().setId(id).setName(name).setGlCode(glCode);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GLAccountReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 }

@@ -18,16 +18,13 @@
  */
 package org.apache.fineract.cob.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.service.LoanAssembler;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class LoanReloadService implements ReloadService<Loan> {
-
     private final LoanAssembler loanAssembler;
 
     @Override
@@ -40,4 +37,8 @@ public class LoanReloadService implements ReloadService<Loan> {
         return loanAssembler.assembleFrom(input.getId());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanReloadService(final LoanAssembler loanAssembler) {
+        this.loanAssembler = loanAssembler;
+    }
 }

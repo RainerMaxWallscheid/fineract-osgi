@@ -19,44 +19,38 @@
 package org.apache.fineract.test.data.codevalue;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
-
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.GetCodeValuesDataResponse;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class CodeValueResolver {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CodeValueResolver.class);
     private final FineractFeignClient fineractClient;
 
-    @Cacheable(key = "#codeId + '-' + #codeValue", value = "codeValuesByName")
+    @Cacheable(key = "#codeId + \'-\' + #codeValue", value = "codeValuesByName")
     public long resolve(Long codeId, CodeValue codeValue) {
         String codeValueName = codeValue.getName();
-
         log.debug("Resolving code value by code id and name [{}]", codeValue);
         List<GetCodeValuesDataResponse> codeValuesResponses = ok(() -> fineractClient.codeValues().retrieveAllCodeValues(codeId, Map.of()));
-        GetCodeValuesDataResponse foundPtr = codeValuesResponses.stream().filter(ptr -> codeValueName.equals(ptr.getName())).findAny()
-                .orElseThrow(
-                        () -> new IllegalArgumentException("Code Value [%s] not found for Code [%s]".formatted(codeValueName, codeId)));
-
+        GetCodeValuesDataResponse foundPtr = codeValuesResponses.stream().filter(ptr -> codeValueName.equals(ptr.getName())).findAny().orElseThrow(() -> new IllegalArgumentException("Code Value [%s] not found for Code [%s]".formatted(codeValueName, codeId)));
         return foundPtr.getId();
     }
 
-    @Cacheable(key = "#codeName + '-' + #codeValue", value = "codeValuesByName")
+    @Cacheable(key = "#codeName + \'-\' + #codeValue", value = "codeValuesByName")
     public long resolve(String codeName, String codeValue) {
         log.debug("Resolving code value by code id and name [{}]", codeValue);
-        List<GetCodeValuesDataResponse> codeValuesResponses = ok(
-                () -> fineractClient.codeValues().retrieveAllCodeValuesByCodeName(codeName, Map.of()));
-        GetCodeValuesDataResponse foundPtr = codeValuesResponses.stream().filter(ptr -> codeValue.equals(ptr.getName())).findAny()
-                .orElseThrow(() -> new IllegalArgumentException("Code Value [%s] not found for Code [%s]".formatted(codeValue, codeName)));
-
+        List<GetCodeValuesDataResponse> codeValuesResponses = ok(() -> fineractClient.codeValues().retrieveAllCodeValuesByCodeName(codeName, Map.of()));
+        GetCodeValuesDataResponse foundPtr = codeValuesResponses.stream().filter(ptr -> codeValue.equals(ptr.getName())).findAny().orElseThrow(() -> new IllegalArgumentException("Code Value [%s] not found for Code [%s]".formatted(codeValue, codeName)));
         return foundPtr.getId();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValueResolver(final FineractFeignClient fineractClient) {
+        this.fineractClient = fineractClient;
     }
 }

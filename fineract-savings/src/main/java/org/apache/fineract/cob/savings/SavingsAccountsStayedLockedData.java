@@ -19,13 +19,18 @@
 package org.apache.fineract.cob.savings;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.fineract.cob.data.COBIdAndExternalIdAndAccountNo;
 
-@Getter
-@AllArgsConstructor
 public class SavingsAccountsStayedLockedData {
-
     private List<COBIdAndExternalIdAndAccountNo> savingsAccounts;
+
+    @java.lang.SuppressWarnings("all")
+        public List<COBIdAndExternalIdAndAccountNo> getSavingsAccounts() {
+        return this.savingsAccounts;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsAccountsStayedLockedData(final List<COBIdAndExternalIdAndAccountNo> savingsAccounts) {
+        this.savingsAccounts = savingsAccounts;
+    }
 }

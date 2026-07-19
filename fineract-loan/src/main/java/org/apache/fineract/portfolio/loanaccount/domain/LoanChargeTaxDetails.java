@@ -24,31 +24,58 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.tax.domain.TaxComponent;
 
-@AllArgsConstructor
-@Setter
-@Getter
 @Entity
 @Table(name = "m_loan_charge_tax_details")
 public class LoanChargeTaxDetails extends AbstractPersistableCustom<Long> {
-
     @ManyToOne
     @JoinColumn(name = "loan_charge_id", nullable = false)
     private LoanCharge loanCharge;
-
     @ManyToOne
     @JoinColumn(name = "tax_component_id", nullable = false)
     private TaxComponent taxComponent;
-
     @Column(name = "amount", scale = 6, precision = 19, nullable = false)
     private BigDecimal amount;
 
     public LoanChargeTaxDetails() {
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanChargeTaxDetails(final LoanCharge loanCharge, final TaxComponent taxComponent, final BigDecimal amount) {
+        this.loanCharge = loanCharge;
+        this.taxComponent = taxComponent;
+        this.amount = amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanCharge(final LoanCharge loanCharge) {
+        this.loanCharge = loanCharge;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setTaxComponent(final TaxComponent taxComponent) {
+        this.taxComponent = taxComponent;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAmount(final BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanCharge getLoanCharge() {
+        return this.loanCharge;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TaxComponent getTaxComponent() {
+        return this.taxComponent;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
     }
 }

@@ -22,8 +22,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
@@ -34,10 +32,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class PostDividentsForSharesTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PostDividentsForSharesTasklet.class);
     private final ShareAccountDividendReadPlatformService shareAccountDividendReadPlatformService;
     private final ShareAccountSchedularService shareAccountSchedularService;
 
@@ -61,19 +58,22 @@ public class PostDividentsForSharesTasklet implements Tasklet {
                 exceptions.add(e);
                 final List<ApiParameterError> errors = e.getErrors();
                 for (final ApiParameterError error : errors) {
-                    log.error(
-                            "Post Dividends to savings failed due to ApiParameterError for Divident detail Id: {} and savings Id: {} with message: {}",
-                            id, savingsId, error.getDeveloperMessage(), e);
+                    log.error("Post Dividends to savings failed due to ApiParameterError for Divident detail Id: {} and savings Id: {} with message: {}", id, savingsId, error.getDeveloperMessage(), e);
                 }
             } catch (final Exception e) {
                 log.error("Post Dividends to savings failed for Divident detail Id: {} and savings Id: {}", id, savingsId, e);
                 exceptions.add(e);
             }
         }
-
         if (!exceptions.isEmpty()) {
             throw new JobExecutionException(exceptions);
         }
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PostDividentsForSharesTasklet(final ShareAccountDividendReadPlatformService shareAccountDividendReadPlatformService, final ShareAccountSchedularService shareAccountSchedularService) {
+        this.shareAccountDividendReadPlatformService = shareAccountDividendReadPlatformService;
+        this.shareAccountSchedularService = shareAccountSchedularService;
     }
 }

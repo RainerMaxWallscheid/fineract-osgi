@@ -20,48 +20,44 @@ package org.apache.fineract.portfolio.calendar;
 
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Getter;
 
 public final class CalendarConstants {
-
     private CalendarConstants() {
-
     }
 
     public static final String CALENDAR_RESOURCE_NAME = "calendar";
 
-    @Getter
+
     public enum CalendarSupportedParameters {
-
-        CALENDAR_ID("id"), //
-        ENTITY_TYPE("entityType"), //
-        ENTITY_ID("entityId"), //
-        TITLE("title"), //
-        DESCRIPTION("description"), //
-        LOCATION("location"), //
-        START_DATE("startDate"), //
-        END_DATE("endDate"), //
-        CREATED_DATE("createdDate"), //
-        DURATION("duration"), //
-        TYPE_ID("typeId"), //
-        REPEATING("repeating"), //
-        REMIND_BY_ID("remindById"), //
-        FIRST_REMINDER("firstReminder"), //
-        SECOND_REMINDER("secondReminder"), //
-        LOCALE("locale"), //
-        DATE_FORMAT("dateFormat"), //
-        FREQUENCY("frequency"), //
-        INTERVAL("interval"), //
-        REPEATS_ON_DAY("repeatsOnDay"), //
-        RESCHEDULE_BASED_ON_MEETING_DATES("reschedulebasedOnMeetingDates"), //
-        PRESENT_MEETING_DATE("presentMeetingDate"), //
-        NEW_MEETING_DATE("newMeetingDate"), //
-        MEETING_TIME("meetingtime"), //
-        TIME_FORMAT("timeFormat"), //
-        REPEATS_ON_NTH_DAY_OF_MONTH("repeatsOnNthDayOfMonth"), //
-        REPEATS_ON_LAST_WEEKDAY_OF_MONTH("repeatsOnLastWeekdayOfMonth"), //
-        REPEATS_ON_DAY_OF_MONTH("repeatsOnDayOfMonth"); //
-
+        CALENDAR_ID("id"),  //
+        ENTITY_TYPE("entityType"),  //
+        ENTITY_ID("entityId"),  //
+        TITLE("title"),  //
+        DESCRIPTION("description"),  //
+        LOCATION("location"),  //
+        START_DATE("startDate"),  //
+        END_DATE("endDate"),  //
+        CREATED_DATE("createdDate"),  //
+        DURATION("duration"),  //
+        TYPE_ID("typeId"),  //
+        REPEATING("repeating"),  //
+        REMIND_BY_ID("remindById"),  //
+        FIRST_REMINDER("firstReminder"),  //
+        SECOND_REMINDER("secondReminder"),  //
+        LOCALE("locale"),  //
+        DATE_FORMAT("dateFormat"),  //
+        FREQUENCY("frequency"),  //
+        INTERVAL("interval"),  //
+        REPEATS_ON_DAY("repeatsOnDay"),  //
+        RESCHEDULE_BASED_ON_MEETING_DATES("reschedulebasedOnMeetingDates"),  //
+        PRESENT_MEETING_DATE("presentMeetingDate"),  //
+        NEW_MEETING_DATE("newMeetingDate"),  //
+        MEETING_TIME("meetingtime"),  //
+        TIME_FORMAT("timeFormat"),  //
+        REPEATS_ON_NTH_DAY_OF_MONTH("repeatsOnNthDayOfMonth"),  //
+        REPEATS_ON_LAST_WEEKDAY_OF_MONTH("repeatsOnLastWeekdayOfMonth"),  //
+        REPEATS_ON_DAY_OF_MONTH("repeatsOnDayOfMonth");
+        //
         private final String value;
 
         CalendarSupportedParameters(final String value) {
@@ -85,6 +81,9 @@ public final class CalendarConstants {
             return name().replace("_", " ");
         }
 
+        @java.lang.SuppressWarnings("all")
+                public String getValue() {
+            return this.value;
+        }
     }
-
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.springbatch;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.ActionContext;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.springframework.batch.integration.partition.StepExecutionRequest;
@@ -33,18 +32,17 @@ import org.springframework.messaging.support.GenericMessage;
  * Channel interceptor for Spring Batch message handling that ensures ThreadLocal context is properly initialized before
  * message handling and cleaned up afterwards
  */
-@Slf4j
 public class InputChannelInterceptor implements ExecutorChannelInterceptor {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InputChannelInterceptor.class);
 
     @Override
-    public Message<StepExecutionRequest> beforeHandle(@NonNull final Message<?> message, @NonNull final MessageChannel channel,
-            @NonNull final MessageHandler handler) {
+    public Message<StepExecutionRequest> beforeHandle(@NonNull final Message<?> message, @NonNull final MessageChannel channel, @NonNull final MessageHandler handler) {
         return beforeHandleMessage(message);
     }
 
     @Override
-    public void afterMessageHandled(@NonNull final Message<?> message, @NonNull final MessageChannel channel,
-            @NonNull final MessageHandler handler, final Exception ex) {
+    public void afterMessageHandled(@NonNull final Message<?> message, @NonNull final MessageChannel channel, @NonNull final MessageHandler handler, final Exception ex) {
         afterHandleMessage();
     }
 

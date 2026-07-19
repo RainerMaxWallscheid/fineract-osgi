@@ -20,20 +20,16 @@ package org.apache.fineract.portfolio.calendar.domain;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Getter;
 
-@Getter
 public enum CalendarEntityType {
-
-    INVALID(0, "calendarEntityType.invalid"), //
-    CLIENTS(1, "calendarEntityType.clients"), //
-    GROUPS(2, "calendarEntityType.groups"), //
-    LOANS(3, "calendarEntityType.loans"), //
-    CENTERS(4, "calendarEntityType.centers"), //
-    SAVINGS(5, "calendarEntityType.savings"), //
-    LOAN_RECALCULATION_REST_DETAIL(6, "calendarEntityType.loan.recalculation.rest.detail"), //
+    INVALID(0, "calendarEntityType.invalid"),  //
+    CLIENTS(1, "calendarEntityType.clients"),  //
+    GROUPS(2, "calendarEntityType.groups"),  //
+    LOANS(3, "calendarEntityType.loans"),  //
+    CENTERS(4, "calendarEntityType.centers"),  //
+    SAVINGS(5, "calendarEntityType.savings"),  //
+    LOAN_RECALCULATION_REST_DETAIL(6, "calendarEntityType.loan.recalculation.rest.detail"),  //
     LOAN_RECALCULATION_COMPOUNDING_DETAIL(7, "calendarEntityType.loan.recalculation.compounding.detail");
-
     private final Integer value;
     private final String code;
 
@@ -43,9 +39,7 @@ public enum CalendarEntityType {
     }
 
     private static final Map<Integer, CalendarEntityType> intToEnumMap = new HashMap<>();
-    @Getter
     private static int minValue;
-    @Getter
     private static int maxValue;
 
     static {
@@ -144,5 +138,25 @@ public enum CalendarEntityType {
 
     public static CalendarEntityType getEntityType(String entityType) {
         return entityNameToEnumMap.get(entityType.toLowerCase());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static int getMinValue() {
+        return CalendarEntityType.minValue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static int getMaxValue() {
+        return CalendarEntityType.maxValue;
     }
 }

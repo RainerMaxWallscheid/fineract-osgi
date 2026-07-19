@@ -29,7 +29,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.time.Instant;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.organisation.workingdays.command.WorkingDaysUpdateCommand;
@@ -42,53 +41,47 @@ import org.springframework.stereotype.Component;
 
 @Path("/v1/workingdays")
 @Component
-@Tag(name = "Working days", description = "The days of the week that are workdays.\n" + "\n"
-        + "Rescheduling of repayments when it falls on a non-working is turned on /off by enable/disable reschedule-future-repayments parameter in Global configurations\n"
-        + "\n"
-        + "Allow transactions on non-working days is configurable by enabling/disbaling the allow-transactions-on-non-workingday parameter in Global configurations.")
-@RequiredArgsConstructor
+@Tag(name = "Working days", description = "The days of the week that are workdays.\n" + "\n" + "Rescheduling of repayments when it falls on a non-working is turned on /off by enable/disable reschedule-future-repayments parameter in Global configurations\n" + "\n" + "Allow transactions on non-working days is configurable by enabling/disbaling the allow-transactions-on-non-workingday parameter in Global configurations.")
 public class WorkingDaysApiResource {
-
     private final WorkingDaysReadPlatformService workingDaysReadPlatformService;
     private final WorkingDaysUpdateRequestValidator workingDaysUpdateRequestValidator;
     private final CommandDispatcher dispatcher;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "List Working days", operationId = "retrieveAllWorkingDays", description = "Example Requests:\n" + "\n"
-            + "workingdays")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "List Working days", operationId = "retrieveAllWorkingDays", description = "Example Requests:\n" + "\n" + "workingdays")
     @AlternativeOperationId("retrieveAll_17")
     public WorkingDaysData retrieveAll() {
         return this.workingDaysReadPlatformService.retrieve();
     }
 
     @PUT
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Update a Working Day", operationId = "updateWorkingDay", description = "Mandatory Fields\n"
-            + "recurrence,repaymentRescheduleType,extendTermForDailyRepayments,locale")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Update a Working Day", operationId = "updateWorkingDay", description = "Mandatory Fields\n" + "recurrence,repaymentRescheduleType,extendTermForDailyRepayments,locale")
     @AlternativeOperationId("update_8")
     public WorkingDaysUpdateResponse update(@Valid WorkingDaysUpdateRequest request) {
-
         final var command = new WorkingDaysUpdateCommand();
-
         command.setCommandId(System.currentTimeMillis());
         command.setCreatedAt(Instant.now());
         command.setPayload(request);
-
         final Supplier<WorkingDaysUpdateResponse> response = dispatcher.dispatch(command);
-
         return response.get();
     }
 
     @GET
     @Path("/template")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Working Days Template", operationId = "retrieveTemplateWorkingDays", description = "This is a convenience resource. It can be useful when building maintenance user interface screens for working days.\n"
-            + "\n" + "Example Request:\n" + "\n" + "workingdays/template")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Working Days Template", operationId = "retrieveTemplateWorkingDays", description = "This is a convenience resource. It can be useful when building maintenance user interface screens for working days.\n" + "\n" + "Example Request:\n" + "\n" + "workingdays/template")
     @AlternativeOperationId("template_4")
     public WorkingDaysData template() {
         return this.workingDaysReadPlatformService.repaymentRescheduleType();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingDaysApiResource(final WorkingDaysReadPlatformService workingDaysReadPlatformService, final WorkingDaysUpdateRequestValidator workingDaysUpdateRequestValidator, final CommandDispatcher dispatcher) {
+        this.workingDaysReadPlatformService = workingDaysReadPlatformService;
+        this.workingDaysUpdateRequestValidator = workingDaysUpdateRequestValidator;
+        this.dispatcher = dispatcher;
+    }
 }

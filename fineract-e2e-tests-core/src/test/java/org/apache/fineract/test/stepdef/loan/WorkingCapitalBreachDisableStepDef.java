@@ -21,15 +21,12 @@ package org.apache.fineract.test.stepdef.loan;
 import static org.apache.fineract.client.feign.util.FeignCalls.fail;
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
 import static org.assertj.core.api.Assertions.assertThat;
-
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.PostWorkingCapitalLoansBreachActionRequest;
@@ -41,12 +38,10 @@ import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 import org.junit.jupiter.api.Assertions;
 
-@Slf4j
-@RequiredArgsConstructor
 public class WorkingCapitalBreachDisableStepDef extends AbstractStepDef {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalBreachDisableStepDef.class);
     private static final Set<String> DISABLE_ENABLE_ACTIONS = Set.of("DISABLE", "ENABLE");
-
     private final FineractFeignClient fineractClient;
     private final WorkingCapitalLoanRequestFactory workingCapitalLoanRequestFactory;
     private final FineractClientConfiguration fineractClientConfiguration;
@@ -95,13 +90,9 @@ public class WorkingCapitalBreachDisableStepDef extends AbstractStepDef {
         final Long loanId = extractLoanId();
         final PostWorkingCapitalLoansBreachActionRequest request = buildRequest("disable", startDate);
         final FineractFeignClient userClient = userClient();
-
-        final CallFailedRuntimeException exception = fail(
-                () -> userClient.workingCapitalLoanBreachActions().createBreachAction(loanId, request));
-
+        final CallFailedRuntimeException exception = fail(() -> userClient.workingCapitalLoanBreachActions().createBreachAction(loanId, request));
         assertThat(exception.getStatus()).as("HTTP status code should be 403").isEqualTo(403);
-        assertThat(exception.getDeveloperMessage()).as("Should contain authorization error message")
-                .contains("User has no authority to CREATE wc_breach_disables");
+        assertThat(exception.getDeveloperMessage()).as("Should contain authorization error message").contains("User has no authority to CREATE wc_breach_disables");
         log.info("Verified breach disable denied for user without CREATE_WC_BREACH_DISABLE permission on loan {}", loanId);
     }
 
@@ -109,12 +100,9 @@ public class WorkingCapitalBreachDisableStepDef extends AbstractStepDef {
     public void retrieveBreachActionsWithoutPermissionResultsAnError() {
         final Long loanId = extractLoanId();
         final FineractFeignClient userClient = userClient();
-
         final CallFailedRuntimeException exception = fail(() -> userClient.workingCapitalLoanBreachActions().retrieveBreachActions(loanId));
-
         assertThat(exception.getStatus()).as("HTTP status code should be 403").isEqualTo(403);
-        assertThat(exception.getDeveloperMessage()).as("Should contain authorization error message")
-                .contains("User has no authority to READ wc_breach_actions");
+        assertThat(exception.getDeveloperMessage()).as("Should contain authorization error message").contains("User has no authority to READ wc_breach_actions");
         log.info("Verified breach actions retrieval denied for user without READ_WC_BREACH_ACTION permission on loan {}", loanId);
     }
 
@@ -128,17 +116,14 @@ public class WorkingCapitalBreachDisableStepDef extends AbstractStepDef {
     @Then("Working Capital loan breach disable action by external ID has the following data:")
     public void verifyBreachDisableActionsByExternalId(final DataTable dataTable) {
         final String loanExternalId = extractLoanExternalId();
-        final List<WorkingCapitalLoanBreachActionData> actions = disableEnableActions(
-                ok(() -> fineractClient.workingCapitalLoanBreachActions().retrieveBreachActionsByExternalId(loanExternalId)));
+        final List<WorkingCapitalLoanBreachActionData> actions = disableEnableActions(ok(() -> fineractClient.workingCapitalLoanBreachActions().retrieveBreachActionsByExternalId(loanExternalId)));
         verifyWithTable(actions, dataTable);
     }
 
-    private void initiateBreachActionResultsAnError(final String action, final String startDate, final String endDate,
-            final DataTable table) {
+    private void initiateBreachActionResultsAnError(final String action, final String startDate, final String endDate, final DataTable table) {
         final Long loanId = extractLoanId();
         final PostWorkingCapitalLoansBreachActionRequest request = buildRequest(action, startDate).endDate(endDate);
-        final CallFailedRuntimeException exception = fail(
-                () -> fineractClient.workingCapitalLoanBreachActions().createBreachAction(loanId, request));
+        final CallFailedRuntimeException exception = fail(() -> fineractClient.workingCapitalLoanBreachActions().createBreachAction(loanId, request));
         verifyErrorWithTable(exception, table);
         log.info("Verified breach disable/enable initiation failed with expected error for loan {}", loanId);
     }
@@ -151,9 +136,7 @@ public class WorkingCapitalBreachDisableStepDef extends AbstractStepDef {
         final List<List<String>> rows = dataTable.asLists();
         final List<String> headers = rows.getFirst();
         final List<List<String>> expectedData = rows.subList(1, rows.size());
-
         assertThat(actualActions).as("Breach disable actions size should match expected data").hasSize(expectedData.size());
-
         for (int i = 0; i < expectedData.size(); i++) {
             final List<String> expectedRow = expectedData.get(i);
             final WorkingCapitalLoanBreachActionData actualAction = actualActions.get(i);
@@ -164,13 +147,11 @@ public class WorkingCapitalBreachDisableStepDef extends AbstractStepDef {
         log.info("Successfully verified {} breach disable action(s)", actualActions.size());
     }
 
-    private void verifyField(final WorkingCapitalLoanBreachActionData actual, final String fieldName, final String expectedValue,
-            final int rowNumber) {
+    private void verifyField(final WorkingCapitalLoanBreachActionData actual, final String fieldName, final String expectedValue, final int rowNumber) {
         Assertions.assertNotNull(actual.getAction());
         switch (fieldName) {
             case "action" -> assertThat(actual.getAction().name()).as("Action for row %d", rowNumber).isEqualTo(expectedValue);
-            case "startDate" ->
-                assertThat(actual.getStartDate()).as("Start date for row %d", rowNumber).isEqualTo(LocalDate.parse(expectedValue));
+            case "startDate" -> assertThat(actual.getStartDate()).as("Start date for row %d", rowNumber).isEqualTo(LocalDate.parse(expectedValue));
             case "endDate" -> {
                 if (expectedValue == null || expectedValue.isBlank()) {
                     assertThat(actual.getEndDate()).as("End date for row %d", rowNumber).isNull();
@@ -186,8 +167,7 @@ public class WorkingCapitalBreachDisableStepDef extends AbstractStepDef {
         final List<List<String>> data = table.asLists();
         final String expectedHttpCode = data.get(1).get(0);
         final String expectedErrorMessage = data.get(1).get(1);
-        assertThat(exception.getStatus()).as("HTTP status code should be " + expectedHttpCode)
-                .isEqualTo(Integer.parseInt(expectedHttpCode));
+        assertThat(exception.getStatus()).as("HTTP status code should be " + expectedHttpCode).isEqualTo(Integer.parseInt(expectedHttpCode));
         assertThat(exception.getMessage()).as("Should contain error message").contains(expectedErrorMessage);
     }
 
@@ -214,5 +194,12 @@ public class WorkingCapitalBreachDisableStepDef extends AbstractStepDef {
     private String extractLoanExternalId() {
         final Long loanId = extractLoanId();
         return ok(() -> fineractClient.workingCapitalLoans().retrieveWorkingCapitalLoanById(loanId)).getExternalId();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalBreachDisableStepDef(final FineractFeignClient fineractClient, final WorkingCapitalLoanRequestFactory workingCapitalLoanRequestFactory, final FineractClientConfiguration fineractClientConfiguration) {
+        this.fineractClient = fineractClient;
+        this.workingCapitalLoanRequestFactory = workingCapitalLoanRequestFactory;
+        this.fineractClientConfiguration = fineractClientConfiguration;
     }
 }

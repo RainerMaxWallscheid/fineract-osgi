@@ -19,11 +19,9 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import jakarta.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.command.CommandStrategyUtils;
@@ -40,9 +38,7 @@ import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class GetSavingsAccountByIdCommandStrategy implements CommandStrategy {
-
     private final SavingsAccountsApiResource savingsAccountsApiResource;
     private final DefaultToApiJsonSerializer<SavingsAccountData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -51,7 +47,6 @@ public class GetSavingsAccountByIdCommandStrategy implements CommandStrategy {
     public BatchResponse execute(BatchRequest batchRequest, UriInfo uriInfo) {
         final MutableUriInfo parameterizedUriInfo = new MutableUriInfo(uriInfo);
         final String relativeUrl = relativeUrlWithoutVersion(batchRequest);
-
         final long savingsAccountId;
         Map<String, String> queryParameters = new HashMap<>();
         if (relativeUrl.indexOf('?') > 0) {
@@ -61,7 +56,6 @@ public class GetSavingsAccountByIdCommandStrategy implements CommandStrategy {
         } else {
             savingsAccountId = Long.parseLong(StringUtils.substringAfter(relativeUrl, "/"));
         }
-
         String staffInSelectedOfficeOnly = null;
         String chargeStatus = null;
         String associations = null;
@@ -76,15 +70,16 @@ public class GetSavingsAccountByIdCommandStrategy implements CommandStrategy {
                 associations = queryParameters.get("associations");
             }
         }
-
-        SavingsAccountData savingsAccountData = savingsAccountsApiResource.retrieveOne(savingsAccountId,
-                Boolean.parseBoolean(staffInSelectedOfficeOnly), chargeStatus, associations, uriInfo);
-
+        SavingsAccountData savingsAccountData = savingsAccountsApiResource.retrieveOne(savingsAccountId, Boolean.parseBoolean(staffInSelectedOfficeOnly), chargeStatus, associations, uriInfo);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        final String responseBody = toApiJsonSerializer.serialize(settings, savingsAccountData,
-                SavingsApiSetConstants.SAVINGS_ACCOUNT_RESPONSE_DATA_PARAMETERS);
+        final String responseBody = toApiJsonSerializer.serialize(settings, savingsAccountData, SavingsApiSetConstants.SAVINGS_ACCOUNT_RESPONSE_DATA_PARAMETERS);
+        return new BatchResponse().setRequestId(batchRequest.getRequestId()).setStatusCode(HttpStatus.SC_OK).setBody(responseBody).setHeaders(batchRequest.getHeaders());
+    }
 
-        return new BatchResponse().setRequestId(batchRequest.getRequestId()).setStatusCode(HttpStatus.SC_OK).setBody(responseBody)
-                .setHeaders(batchRequest.getHeaders());
+    @java.lang.SuppressWarnings("all")
+        public GetSavingsAccountByIdCommandStrategy(final SavingsAccountsApiResource savingsAccountsApiResource, final DefaultToApiJsonSerializer<SavingsAccountData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper) {
+        this.savingsAccountsApiResource = savingsAccountsApiResource;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
     }
 }

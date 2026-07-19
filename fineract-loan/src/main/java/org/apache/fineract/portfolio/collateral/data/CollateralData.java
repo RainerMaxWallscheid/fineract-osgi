@@ -20,16 +20,13 @@ package org.apache.fineract.portfolio.collateral.data;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 
 /**
  * Immutable data object for Collateral data.
  */
-@Getter
 public final class CollateralData {
-
     private final Long id;
     private final CodeValueData type;
     private final BigDecimal value;
@@ -38,8 +35,7 @@ public final class CollateralData {
     private final Collection<CodeValueData> allowedCollateralTypes;
     private final CurrencyData currency;
 
-    public static CollateralData instance(final Long id, final CodeValueData type, final BigDecimal value, final String description,
-            final CurrencyData currencyData) {
+    public static CollateralData instance(final Long id, final CodeValueData type, final BigDecimal value, final String description, final CurrencyData currencyData) {
         return new CollateralData(id, type, value, description, currencyData);
     }
 
@@ -47,8 +43,7 @@ public final class CollateralData {
         return new CollateralData(null, null, null, null, null, codeValues);
     }
 
-    private CollateralData(final Long id, final CodeValueData type, final BigDecimal value, final String description,
-            final CurrencyData currencyData) {
+    private CollateralData(final Long id, final CodeValueData type, final BigDecimal value, final String description, final CurrencyData currencyData) {
         this.id = id;
         this.type = type;
         this.value = value;
@@ -57,8 +52,7 @@ public final class CollateralData {
         this.allowedCollateralTypes = null;
     }
 
-    private CollateralData(final Long id, final CodeValueData type, final BigDecimal value, final String description,
-            final CurrencyData currencyData, final Collection<CodeValueData> allowedCollateralTypes) {
+    private CollateralData(final Long id, final CodeValueData type, final BigDecimal value, final String description, final CurrencyData currencyData, final Collection<CodeValueData> allowedCollateralTypes) {
         this.id = id;
         this.type = type;
         this.value = value;
@@ -68,7 +62,36 @@ public final class CollateralData {
     }
 
     public CollateralData template(final CollateralData collateralData, final Collection<CodeValueData> codeValues) {
-        return new CollateralData(collateralData.id, collateralData.type, collateralData.value, collateralData.description,
-                collateralData.currency, codeValues);
+        return new CollateralData(collateralData.id, collateralData.type, collateralData.value, collateralData.description, collateralData.currency, codeValues);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValueData getType() {
+        return this.type;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<CodeValueData> getAllowedCollateralTypes() {
+        return this.allowedCollateralTypes;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CurrencyData getCurrency() {
+        return this.currency;
     }
 }

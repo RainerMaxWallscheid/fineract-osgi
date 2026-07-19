@@ -18,18 +18,20 @@
  */
 package org.apache.fineract.test.initializer.global;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.test.helper.WorkFlowJobHelper;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
 public class CobBusinessStepInitializerStep implements FineractGlobalInitializerStep {
-
     private final WorkFlowJobHelper workFlowJobHelper;
 
     @Override
     public void initialize() {
         workFlowJobHelper.setWorkflowJobs();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CobBusinessStepInitializerStep(final WorkFlowJobHelper workFlowJobHelper) {
+        this.workFlowJobHelper = workFlowJobHelper;
     }
 }

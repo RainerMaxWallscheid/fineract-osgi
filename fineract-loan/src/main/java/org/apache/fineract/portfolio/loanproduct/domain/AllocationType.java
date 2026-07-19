@@ -20,22 +20,27 @@ package org.apache.fineract.portfolio.loanproduct.domain;
 
 import java.util.Arrays;
 import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
-@RequiredArgsConstructor
-@Getter
 public enum AllocationType {
-
-    PENALTY("Penalty"), //
-    FEE("Fee"), //
-    PRINCIPAL("Principal"), //
-    INTEREST("Interest"); //
-
+    PENALTY("Penalty"),  //
+    FEE("Fee"),  //
+    PRINCIPAL("Principal"),  //
+    INTEREST("Interest");
+    //
     private final String humanReadableName;
 
     public static List<EnumOptionData> getValuesAsEnumOptionDataList() {
         return Arrays.stream(values()).map(v -> new EnumOptionData((long) (v.ordinal() + 1), v.name(), v.getHumanReadableName())).toList();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private AllocationType(final String humanReadableName) {
+        this.humanReadableName = humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
     }
 }

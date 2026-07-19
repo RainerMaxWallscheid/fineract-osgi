@@ -21,7 +21,6 @@ package org.apache.fineract.test.stepdef.loan;
 import static org.apache.fineract.client.feign.util.FeignCalls.fail;
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
 import static org.assertj.core.api.Assertions.assertThat;
-
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -33,8 +32,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.PostWorkingCapitalLoansBreachActionRequest;
@@ -46,13 +43,11 @@ import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 import org.junit.jupiter.api.Assertions;
 
-@Slf4j
-@RequiredArgsConstructor
 public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalBreachActionStepDef.class);
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd MMMM yyyy");
     private static final Long NON_EXISTENT_LOAN_ID = 999999999L;
-
     private final FineractFeignClient fineractClient;
     private final WorkingCapitalLoanRequestFactory workingCapitalLoanRequestFactory;
 
@@ -64,11 +59,9 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
     }
 
     @Then("Admin fails to create WC breach reschedule action with minimumPayment {int} {word} and frequency {int} {word} with error containing {string}")
-    public void failToCreateRescheduleActionWithMessage(final int minimumPayment, final String minimumPaymentType, final int frequency,
-            final String frequencyType, final String expectedMessage) {
+    public void failToCreateRescheduleActionWithMessage(final int minimumPayment, final String minimumPaymentType, final int frequency, final String frequencyType, final String expectedMessage) {
         final Long loanId = extractLoanId();
-        final PostWorkingCapitalLoansBreachActionRequest request = buildRescheduleRequest(new BigDecimal(minimumPayment),
-                minimumPaymentType, frequency, frequencyType);
+        final PostWorkingCapitalLoansBreachActionRequest request = buildRescheduleRequest(new BigDecimal(minimumPayment), minimumPaymentType, frequency, frequencyType);
         final CallFailedRuntimeException exception = fail(() -> createBreachAction(loanId, request));
         assertThat(exception.getStatus()).as("HTTP status code").isEqualTo(400);
         assertThat(exception.getDeveloperMessage()).as("Developer message").contains(expectedMessage);
@@ -78,7 +71,6 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
     public void failToCreateEmptyRescheduleAction(final String expectedMessage) {
         final Long loanId = extractLoanId();
         final PostWorkingCapitalLoansBreachActionRequest request = buildRescheduleRequest(Map.of());
-
         final CallFailedRuntimeException exception = fail(() -> createBreachAction(loanId, request));
         assertThat(exception.getStatus()).as("HTTP status code").isEqualTo(400);
         assertThat(exception.getDeveloperMessage()).as("Developer message").contains(expectedMessage);
@@ -100,11 +92,8 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
 
     @Then("Retrieving breach actions for a non-existent Working Capital loan results in a 404 error")
     public void retrieveBreachActionsForNonExistentLoanResultsInNotFound() {
-        final CallFailedRuntimeException exception = fail(
-                () -> fineractClient.workingCapitalLoanBreachActions().retrieveBreachActions(NON_EXISTENT_LOAN_ID));
-
+        final CallFailedRuntimeException exception = fail(() -> fineractClient.workingCapitalLoanBreachActions().retrieveBreachActions(NON_EXISTENT_LOAN_ID));
         assertThat(exception.getStatus()).as("HTTP status code should be 404").isEqualTo(404);
-
         log.info("Verified breach actions retrieval failed with 404 for non-existent loan {}", NON_EXISTENT_LOAN_ID);
     }
 
@@ -113,7 +102,6 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
         final Long loanId = extractLoanId();
         final PostWorkingCapitalLoansBreachActionRequest request = buildBreachActionRequest("pause", startDate, endDate);
         final PostWorkingCapitalLoansBreachActionResponse response = createBreachActionById(loanId, request);
-
         log.debug("Breach pause initiated for loan {} with startDate: {}, endDate: {}, response: {}", loanId, startDate, endDate, response);
     }
 
@@ -122,9 +110,7 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
         final String loanExternalId = extractLoanExternalId();
         final PostWorkingCapitalLoansBreachActionRequest request = buildBreachActionRequest("pause", startDate, endDate);
         final PostWorkingCapitalLoansBreachActionResponse response = createBreachActionByExternalId(loanExternalId, request);
-
-        log.debug("Breach pause initiated for loan externalId {} with startDate: {}, endDate: {}, response: {}", loanExternalId, startDate,
-                endDate, response);
+        log.debug("Breach pause initiated for loan externalId {} with startDate: {}, endDate: {}, response: {}", loanExternalId, startDate, endDate, response);
     }
 
     @When("Admin initiate a Working Capital loan breach resume with startDate {string}")
@@ -132,7 +118,6 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
         final Long loanId = extractLoanId();
         final PostWorkingCapitalLoansBreachActionRequest request = buildResumeRequest(startDate);
         final PostWorkingCapitalLoansBreachActionResponse response = createBreachActionById(loanId, request);
-
         log.debug("Breach resume initiated for loan {} with startDate: {}, response: {}", loanId, startDate, response);
     }
 
@@ -141,21 +126,15 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
         final String loanExternalId = extractLoanExternalId();
         final PostWorkingCapitalLoansBreachActionRequest request = buildResumeRequest(startDate);
         final PostWorkingCapitalLoansBreachActionResponse response = createBreachActionByExternalId(loanExternalId, request);
-
         log.debug("Breach resume initiated for loan externalId {} with startDate: {}, response: {}", loanExternalId, startDate, response);
     }
 
     @Then("Initiating a Working Capital loan breach resume with startDate {string} results an error with the following data:")
     public void initiateBreachResumeResultsAnError(final String startDate, final DataTable table) {
         final Long loanId = extractLoanId();
-
         final PostWorkingCapitalLoansBreachActionRequest request = buildResumeRequest(startDate);
-
-        final CallFailedRuntimeException exception = fail(
-                () -> fineractClient.workingCapitalLoanBreachActions().createBreachAction(loanId, request));
-
+        final CallFailedRuntimeException exception = fail(() -> fineractClient.workingCapitalLoanBreachActions().createBreachAction(loanId, request));
         verifyBreachActionErrorWithTable(exception, table);
-
         log.info("Verified breach resume initiation failed with expected error for loan {}", loanId);
     }
 
@@ -165,55 +144,36 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
     }
 
     @Then("Initiating a Working Capital loan breach action {string} with startDate {string} and endDate {string} results an error with the following data:")
-    public void initiateBreachActionResultsAnError(final String action, final String startDate, final String endDate,
-            final DataTable table) {
+    public void initiateBreachActionResultsAnError(final String action, final String startDate, final String endDate, final DataTable table) {
         final Long loanId = extractLoanId();
-
         final PostWorkingCapitalLoansBreachActionRequest request = buildBreachActionRequest(action, startDate, endDate);
-
-        final CallFailedRuntimeException exception = fail(
-                () -> fineractClient.workingCapitalLoanBreachActions().createBreachAction(loanId, request));
-
+        final CallFailedRuntimeException exception = fail(() -> fineractClient.workingCapitalLoanBreachActions().createBreachAction(loanId, request));
         verifyBreachActionErrorWithTable(exception, table);
-
         log.info("Verified breach action initiation failed with expected error for loan {}", loanId);
     }
 
     @Then("Initiating a Working Capital loan breach reschedule with minimumPayment {string} {string} results an error with the following data:")
-    public void initiateBreachRescheduleResultsAnError(final String minimumPayment, final String minimumPaymentType,
-            final DataTable table) {
+    public void initiateBreachRescheduleResultsAnError(final String minimumPayment, final String minimumPaymentType, final DataTable table) {
         final Long loanId = extractLoanId();
-
-        final PostWorkingCapitalLoansBreachActionRequest request = buildRescheduleRequest(
-                Map.of("minimumPayment", minimumPayment, "minimumPaymentType", minimumPaymentType));
-
-        final CallFailedRuntimeException exception = fail(
-                () -> fineractClient.workingCapitalLoanBreachActions().createBreachAction(loanId, request));
-
+        final PostWorkingCapitalLoansBreachActionRequest request = buildRescheduleRequest(Map.of("minimumPayment", minimumPayment, "minimumPaymentType", minimumPaymentType));
+        final CallFailedRuntimeException exception = fail(() -> fineractClient.workingCapitalLoanBreachActions().createBreachAction(loanId, request));
         verifyBreachActionErrorWithTable(exception, table);
-
         log.info("Verified breach reschedule initiation failed with expected error for loan {}", loanId);
     }
 
     @Then("Initiating a Working Capital loan breach action without {string} results an error with the following data:")
     public void initiateBreachActionWithoutFieldResultsAnError(final String omittedField, final DataTable table) {
         final Long loanId = extractLoanId();
-
-        final PostWorkingCapitalLoansBreachActionRequest request = workingCapitalLoanRequestFactory
-                .defaultWorkingCapitalLoansBreachActionRequest("pause");
+        final PostWorkingCapitalLoansBreachActionRequest request = workingCapitalLoanRequestFactory.defaultWorkingCapitalLoansBreachActionRequest("pause");
         switch (omittedField) {
             case "action" -> request.action(null);
             case "startDate" -> request.startDate(null);
             case "endDate" -> request.endDate(null);
             default -> throw new IllegalArgumentException("Unknown breach action field: " + omittedField);
         }
-
-        final CallFailedRuntimeException exception = fail(
-                () -> fineractClient.workingCapitalLoanBreachActions().createBreachAction(loanId, request));
-
+        final CallFailedRuntimeException exception = fail(() -> fineractClient.workingCapitalLoanBreachActions().createBreachAction(loanId, request));
         verifyBreachActionErrorWithTable(exception, table);
-
-        log.info("Verified breach action initiation without '{}' failed with expected error for loan {}", omittedField, loanId);
+        log.info("Verified breach action initiation without \'{}\' failed with expected error for loan {}", omittedField, loanId);
     }
 
     @Then("Working Capital loan breach action has the following data:")
@@ -243,8 +203,7 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
     @Then("Admin fails to create WC breach reset action with the following data:")
     public void failToCreateBreachResetActionWithTable(final DataTable table) {
         final Long loanId = extractLoanId();
-        final PostWorkingCapitalLoansBreachActionRequest request = workingCapitalLoanRequestFactory
-                .defaultWorkingCapitalLoansBreachActionRequest("reset");
+        final PostWorkingCapitalLoansBreachActionRequest request = workingCapitalLoanRequestFactory.defaultWorkingCapitalLoansBreachActionRequest("reset");
         final CallFailedRuntimeException exception = fail(() -> createBreachAction(loanId, request));
         verifyBreachActionErrorWithTable(exception, table);
     }
@@ -262,8 +221,7 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
     @Then("Admin fails to create WC breach {string} action with error containing {string}")
     public void failToCreateBreachActionByType(final String action, final String expectedMessage) {
         final Long loanId = extractLoanId();
-        final PostWorkingCapitalLoansBreachActionRequest request = workingCapitalLoanRequestFactory
-                .defaultWorkingCapitalLoansBreachActionRequest(action);
+        final PostWorkingCapitalLoansBreachActionRequest request = workingCapitalLoanRequestFactory.defaultWorkingCapitalLoansBreachActionRequest(action);
         final CallFailedRuntimeException exception = fail(() -> createBreachAction(loanId, request));
         assertThat(exception.getStatus()).as("HTTP status code").isEqualTo(400);
         assertThat(exception.getDeveloperMessage()).as("Developer message").contains(expectedMessage);
@@ -272,7 +230,6 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
     private void executeBreachAction(final PostWorkingCapitalLoansBreachActionRequest request) {
         final Long loanId = extractLoanId();
         log.debug("Creating breach action {} for WC loan {}", request.getAction(), loanId);
-
         final PostWorkingCapitalLoansBreachActionResponse result = ok(() -> createBreachAction(loanId, request));
         assertThat(result).isNotNull();
         assertThat(result.getResourceId()).isNotNull();
@@ -283,42 +240,34 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
         executeBreachAction(request);
     }
 
-    private PostWorkingCapitalLoansBreachActionResponse createBreachAction(final Long loanId,
-            final PostWorkingCapitalLoansBreachActionRequest request) {
+    private PostWorkingCapitalLoansBreachActionResponse createBreachAction(final Long loanId, final PostWorkingCapitalLoansBreachActionRequest request) {
         assert request.getAction() != null;
         return fineractClient.workingCapitalLoanBreachActions().createBreachAction(loanId, request);
     }
 
     private void verifyBreachActionsWithTable(final List<WorkingCapitalLoanBreachActionData> actualActions, final DataTable dataTable) {
         assertThat(actualActions).as("Breach actions should not be empty").isNotEmpty();
-
         final List<List<String>> rows = dataTable.asLists();
         final List<String> headers = rows.getFirst();
         final List<List<String>> expectedData = rows.subList(1, rows.size());
-
         assertThat(actualActions).as("Breach actions size should match expected data").hasSize(expectedData.size());
-
         for (int i = 0; i < expectedData.size(); i++) {
             final List<String> expectedRow = expectedData.get(i);
             final WorkingCapitalLoanBreachActionData actualAction = actualActions.get(i);
-
             for (int j = 0; j < headers.size(); j++) {
                 final String header = headers.get(j);
                 final String expectedValue = expectedRow.get(j);
                 verifyBreachActionField(actualAction, header, expectedValue, i + 1);
             }
         }
-
         log.info("Successfully verified {} breach action(s)", actualActions.size());
     }
 
-    private void verifyBreachActionField(final WorkingCapitalLoanBreachActionData actual, final String fieldName,
-            final String expectedValue, final int rowNumber) {
+    private void verifyBreachActionField(final WorkingCapitalLoanBreachActionData actual, final String fieldName, final String expectedValue, final int rowNumber) {
         Assertions.assertNotNull(actual.getAction());
         switch (fieldName) {
             case "action" -> assertThat(actual.getAction().name()).as("Action for row %d", rowNumber).isEqualTo(expectedValue);
-            case "startDate" ->
-                assertThat(actual.getStartDate()).as("Start date for row %d", rowNumber).isEqualTo(LocalDate.parse(expectedValue));
+            case "startDate" -> assertThat(actual.getStartDate()).as("Start date for row %d", rowNumber).isEqualTo(LocalDate.parse(expectedValue));
             case "endDate" -> {
                 if (expectedValue == null || expectedValue.isBlank()) {
                     assertThat(actual.getEndDate()).as("End date for row %d", rowNumber).isNull();
@@ -330,8 +279,7 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
         }
     }
 
-    private void verifyActionField(final WorkingCapitalLoanBreachActionData actual, final String field, final String expected,
-            final int rowNumber) {
+    private void verifyActionField(final WorkingCapitalLoanBreachActionData actual, final String field, final String expected, final int rowNumber) {
         final String label = "Action " + rowNumber + " " + field;
         switch (field) {
             case "action" -> {
@@ -339,18 +287,10 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
                 assertThat(actual.getAction().name()).as(label).isEqualTo(expected);
             }
             case "startDate" -> assertThat(actual.getStartDate()).as(label).isEqualTo(LocalDate.parse(expected, DATE_FORMAT));
-            case "minimumPayment" ->
-                verifyOptionalField(expected, v -> assertThat(actual.getMinimumPayment()).as(label).isEqualByComparingTo(new BigDecimal(v)),
-                        () -> assertThat(actual.getMinimumPayment()).as(label).isNull());
-            case "minimumPaymentType" ->
-                verifyOptionalField(expected, v -> assertThat(String.valueOf(actual.getMinimumPaymentType())).as(label).isEqualTo(v),
-                        () -> assertThat(actual.getMinimumPaymentType()).as(label).isNull());
-            case "frequency" ->
-                verifyOptionalField(expected, v -> assertThat(actual.getFrequency()).as(label).isEqualTo(Integer.parseInt(v)),
-                        () -> assertThat(actual.getFrequency()).as(label).isNull());
-            case "frequencyType" ->
-                verifyOptionalField(expected, v -> assertThat(String.valueOf(actual.getFrequencyType())).as(label).isEqualTo(v),
-                        () -> assertThat(actual.getFrequencyType()).as(label).isNull());
+            case "minimumPayment" -> verifyOptionalField(expected, v -> assertThat(actual.getMinimumPayment()).as(label).isEqualByComparingTo(new BigDecimal(v)), () -> assertThat(actual.getMinimumPayment()).as(label).isNull());
+            case "minimumPaymentType" -> verifyOptionalField(expected, v -> assertThat(String.valueOf(actual.getMinimumPaymentType())).as(label).isEqualTo(v), () -> assertThat(actual.getMinimumPaymentType()).as(label).isNull());
+            case "frequency" -> verifyOptionalField(expected, v -> assertThat(actual.getFrequency()).as(label).isEqualTo(Integer.parseInt(v)), () -> assertThat(actual.getFrequency()).as(label).isNull());
+            case "frequencyType" -> verifyOptionalField(expected, v -> assertThat(String.valueOf(actual.getFrequencyType())).as(label).isEqualTo(v), () -> assertThat(actual.getFrequencyType()).as(label).isNull());
             default -> throw new IllegalArgumentException("Unknown action field: " + field);
         }
     }
@@ -370,20 +310,16 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
         return ok(() -> fineractClient.workingCapitalLoans().retrieveWorkingCapitalLoanById(loanId)).getExternalId();
     }
 
-    private PostWorkingCapitalLoansBreachActionRequest buildBreachActionRequest(final String action, final String startDate,
-            final String endDate) {
+    private PostWorkingCapitalLoansBreachActionRequest buildBreachActionRequest(final String action, final String startDate, final String endDate) {
         return workingCapitalLoanRequestFactory.defaultWorkingCapitalLoansBreachActionRequest(action).startDate(startDate).endDate(endDate);
     }
 
-    private PostWorkingCapitalLoansBreachActionRequest buildRescheduleRequest(final BigDecimal minimumPayment,
-            final String minimumPaymentType, final int frequency, final String frequencyType) {
-        return buildRescheduleRequest(Map.of("minimumPayment", minimumPayment.toPlainString(), "minimumPaymentType", minimumPaymentType,
-                "frequency", String.valueOf(frequency), "frequencyType", frequencyType));
+    private PostWorkingCapitalLoansBreachActionRequest buildRescheduleRequest(final BigDecimal minimumPayment, final String minimumPaymentType, final int frequency, final String frequencyType) {
+        return buildRescheduleRequest(Map.of("minimumPayment", minimumPayment.toPlainString(), "minimumPaymentType", minimumPaymentType, "frequency", String.valueOf(frequency), "frequencyType", frequencyType));
     }
 
     private PostWorkingCapitalLoansBreachActionRequest buildRescheduleRequest(final Map<String, String> params) {
-        final PostWorkingCapitalLoansBreachActionRequest request = workingCapitalLoanRequestFactory
-                .defaultWorkingCapitalLoansBreachActionRequest("reschedule");
+        final PostWorkingCapitalLoansBreachActionRequest request = workingCapitalLoanRequestFactory.defaultWorkingCapitalLoansBreachActionRequest("reschedule");
         Optional.ofNullable(params.get("minimumPayment")).ifPresent(v -> request.setMinimumPayment(new BigDecimal(v)));
         Optional.ofNullable(params.get("minimumPaymentType")).ifPresent(request::setMinimumPaymentType);
         Optional.ofNullable(params.get("frequency")).ifPresent(v -> request.setFrequency(Integer.parseInt(v)));
@@ -395,26 +331,22 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
         return workingCapitalLoanRequestFactory.defaultWorkingCapitalLoansBreachActionRequest("resume").startDate(startDate).endDate(null);
     }
 
-    private PostWorkingCapitalLoansBreachActionResponse createBreachActionById(final Long loanId,
-            final PostWorkingCapitalLoansBreachActionRequest request) {
+    private PostWorkingCapitalLoansBreachActionResponse createBreachActionById(final Long loanId, final PostWorkingCapitalLoansBreachActionRequest request) {
         return ok(() -> fineractClient.workingCapitalLoanBreachActions().createBreachAction(loanId, request));
     }
 
-    private PostWorkingCapitalLoansBreachActionResponse createBreachActionByExternalId(final String loanExternalId,
-            final PostWorkingCapitalLoansBreachActionRequest request) {
+    private PostWorkingCapitalLoansBreachActionResponse createBreachActionByExternalId(final String loanExternalId, final PostWorkingCapitalLoansBreachActionRequest request) {
         return ok(() -> fineractClient.workingCapitalLoanBreachActions().createBreachActionByExternalId(loanExternalId, request));
     }
 
     private List<WorkingCapitalLoanBreachActionData> retrieveBreachActions(final Long loanId) {
-        final List<WorkingCapitalLoanBreachActionData> actions = ok(
-                () -> fineractClient.workingCapitalLoanBreachActions().retrieveBreachActions(loanId));
+        final List<WorkingCapitalLoanBreachActionData> actions = ok(() -> fineractClient.workingCapitalLoanBreachActions().retrieveBreachActions(loanId));
         log.debug("Breach actions for loan {}: {}", loanId, actions);
         return actions;
     }
 
     private List<WorkingCapitalLoanBreachActionData> retrieveBreachActionsByExternalId(final String loanExternalId) {
-        final List<WorkingCapitalLoanBreachActionData> actions = ok(
-                () -> fineractClient.workingCapitalLoanBreachActions().retrieveBreachActionsByExternalId(loanExternalId));
+        final List<WorkingCapitalLoanBreachActionData> actions = ok(() -> fineractClient.workingCapitalLoanBreachActions().retrieveBreachActionsByExternalId(loanExternalId));
         log.debug("Breach actions for loan externalId {}: {}", loanExternalId, actions);
         return actions;
     }
@@ -423,12 +355,14 @@ public class WorkingCapitalBreachActionStepDef extends AbstractStepDef {
         final List<List<String>> data = table.asLists();
         final String expectedHttpCode = data.get(1).get(0);
         final String expectedErrorMessage = data.get(1).get(1);
-
         log.info("Checking for Http code: {} and error message: \"{}\"", expectedHttpCode, expectedErrorMessage);
-
-        assertThat(exception.getStatus()).as("HTTP status code should be " + expectedHttpCode)
-                .isEqualTo(Integer.parseInt(expectedHttpCode));
+        assertThat(exception.getStatus()).as("HTTP status code should be " + expectedHttpCode).isEqualTo(Integer.parseInt(expectedHttpCode));
         assertThat(exception.getMessage()).as("Should contain error message").contains(expectedErrorMessage);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalBreachActionStepDef(final FineractFeignClient fineractClient, final WorkingCapitalLoanRequestFactory workingCapitalLoanRequestFactory) {
+        this.fineractClient = fineractClient;
+        this.workingCapitalLoanRequestFactory = workingCapitalLoanRequestFactory;
+    }
 }

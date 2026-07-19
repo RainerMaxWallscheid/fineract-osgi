@@ -26,7 +26,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.data.LoanAccountLockResponseDTO;
 import org.apache.fineract.cob.service.LoanAccountLockService;
 import org.springframework.stereotype.Component;
@@ -34,20 +33,21 @@ import org.springframework.stereotype.Component;
 @Path("/v1/loans")
 @Component
 @Tag(name = "Loan Account Lock", description = "")
-@RequiredArgsConstructor
 public class LoanAccountLockApiResource {
-
     private final LoanAccountLockService loanAccountLockService;
 
     @GET
     @Path("locked")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "List locked loan accounts", description = "Returns the locked loan IDs")
-    public LoanAccountLockResponseDTO retrieveLockedAccounts(@QueryParam("page") Integer pageParam,
-            @QueryParam("limit") Integer limitParam) {
+    public LoanAccountLockResponseDTO retrieveLockedAccounts(@QueryParam("page") Integer pageParam, @QueryParam("limit") Integer limitParam) {
         int page = Objects.requireNonNullElse(pageParam, 0);
         int limit = Objects.requireNonNullElse(limitParam, 50);
-
         return new LoanAccountLockResponseDTO(page, limit, loanAccountLockService.getLockedLoanAccountByPage(page, limit));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanAccountLockApiResource(final LoanAccountLockService loanAccountLockService) {
+        this.loanAccountLockService = loanAccountLockService;
     }
 }

@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.math.BigDecimal;
@@ -25,7 +24,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.accountdetails.data.LoanAccountSummaryData;
 import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPlatformService;
@@ -36,95 +34,68 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-@RequiredArgsConstructor
 public class GLIMAccountInfoReadPlatformServiceImpl implements GLIMAccountInfoReadPlatformService {
-
     private final JdbcTemplate jdbcTemplate;
     private final PlatformSecurityContext context;
     private final AccountDetailsReadPlatformService accountDetailsReadPlatforService;
 
-    private static final class GLIMFieldsMapper implements RowMapper<GroupLoanIndividualMonitoringAccountData> {
 
+    private static final class GLIMFieldsMapper implements RowMapper<GroupLoanIndividualMonitoringAccountData> {
         public String schema() {
-            return "glim.id as glimId,ln.group_id as groupId,glim.account_number as accountNumber, ln.account_no as childAccountNumber,ln.principal_amount as childPrincipalAmount,glim.principal_amount as parentPrincipalAmount,glim.child_accounts_count as childAccountsCount,"
-                    + "glim.loan_status_id as loanStatus from glim_accounts glim,m_loan ln where glim.id=ln.glim_id";
+            return "glim.id as glimId,ln.group_id as groupId,glim.account_number as accountNumber, ln.account_no as childAccountNumber,ln.principal_amount as childPrincipalAmount,glim.principal_amount as parentPrincipalAmount,glim.child_accounts_count as childAccountsCount," + "glim.loan_status_id as loanStatus from glim_accounts glim,m_loan ln where glim.id=ln.glim_id";
         }
 
         @Override
-        public GroupLoanIndividualMonitoringAccountData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum)
-                throws SQLException {
-
+        public GroupLoanIndividualMonitoringAccountData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
             final BigDecimal glimId = rs.getBigDecimal("glimId");
-
             final BigDecimal groupId = rs.getBigDecimal("groupId");
-
             final String accountNumber = rs.getString("accountNumber");
-
             final String childAccountNumber = rs.getString("childAccountNumber");
-
             final Long childAccountsCount = rs.getLong("childAccountsCount");
-
             final BigDecimal parentPrincipalAmount = rs.getBigDecimal("parentPrincipalAmount");
-
             final BigDecimal childPrincipalAmount = rs.getBigDecimal("childPrincipalAmount");
-
             final String loanStatus = LoanStatus.fromInt((int) rs.getLong("loanStatus")).toString();
-
-            return GroupLoanIndividualMonitoringAccountData.getInstance(glimId, groupId, accountNumber, childAccountNumber,
-                    childPrincipalAmount, parentPrincipalAmount, childAccountsCount, loanStatus);
-
+            return GroupLoanIndividualMonitoringAccountData.getInstance(glimId, groupId, accountNumber, childAccountNumber, childPrincipalAmount, parentPrincipalAmount, childAccountsCount, loanStatus);
         }
     }
 
     @Override
     public Collection<GroupLoanIndividualMonitoringAccountData> findGlimAccountsByGLIMId(final Long glimId) {
         this.context.authenticatedUser();
-
         final GLIMFieldsMapper rm = new GLIMFieldsMapper();
         final String sql = "select " + rm.schema() + " and glim.id=?";
-
         return this.jdbcTemplate.query(sql, rm, glimId); // NOSONAR
     }
 
     @Override
     public Collection<GroupLoanIndividualMonitoringAccountData> findGlimAccountsByGroupId(String groupId) {
         this.context.authenticatedUser();
-
         final GLIMFieldsMapper rm = new GLIMFieldsMapper();
         final String sql = "select " + rm.schema() + " and ln.group_id=?";
-
         return this.jdbcTemplate.query(sql, rm, Long.parseLong(groupId)); // NOSONAR
     }
 
     @Override
     public Collection<GroupLoanIndividualMonitoringAccountData> findGlimAccountByGroupId(String groupId) {
         this.context.authenticatedUser();
-
         GLIMMapper rm = new GLIMMapper();
-
         final String sql = "select " + rm.schema() + " where glim.group_id=?";
-
         return this.jdbcTemplate.query(sql, rm, Long.parseLong(groupId)); // NOSONAR
     }
 
     @Override
     public Collection<GroupLoanIndividualMonitoringAccountData> findGlimAccountByParentAccountId(String parentAccountIds) {
         this.context.authenticatedUser();
-
         final GLIMFieldsMapper rm = new GLIMFieldsMapper();
         final String sql = "select " + rm.schema() + " and glim.accountNumber=?";
-
         return this.jdbcTemplate.query(sql, rm, parentAccountIds); // NOSONAR
     }
 
     @Override
     public Collection<GroupLoanIndividualMonitoringAccountData> findGlimAccountByGroupIdandAccountNo(String groupId, String accountNo) {
         this.context.authenticatedUser();
-
         GLIMMapper rm = new GLIMMapper();
-
         final String sql = "select " + rm.schema() + " where glim.group_id=? and glim.account_number=?";
-
         return this.jdbcTemplate.query(sql, rm, groupId, accountNo); // NOSONAR
     }
 
@@ -132,20 +103,14 @@ public class GLIMAccountInfoReadPlatformServiceImpl implements GLIMAccountInfoRe
     public Collection<GLIMContainer> findGlimAccount(Long groupId) {
         this.context.authenticatedUser();
         Collection<GroupLoanIndividualMonitoringAccountData> glimInfo = findGlimAccountByGroupId(groupId + "");
-
         // List<LoanAccountSummaryData> glimAccounts =
         // retrieveLoanAccountDetails(loanWhereClauseForGroupAndLoanType, new
         // Object[] { groupId });
-
         List<GLIMContainer> glimAccounts = new ArrayList<GLIMContainer>();
         for (GroupLoanIndividualMonitoringAccountData glimAccount : glimInfo) {
-
-            List<LoanAccountSummaryData> childLoans = accountDetailsReadPlatforService
-                    .retrieveLoanAccountDetailsByGroupIdAndGlimAccountNumber(groupId, glimAccount.getAccountNumber());
-            glimAccounts.add(new GLIMContainer(glimAccount.getGlimId(), glimAccount.getGroupId(), glimAccount.getAccountNumber(),
-                    childLoans, glimAccount.getParentPrincipalAmount(), glimAccount.getLoanStatus()));
+            List<LoanAccountSummaryData> childLoans = accountDetailsReadPlatforService.retrieveLoanAccountDetailsByGroupIdAndGlimAccountNumber(groupId, glimAccount.getAccountNumber());
+            glimAccounts.add(new GLIMContainer(glimAccount.getGlimId(), glimAccount.getGroupId(), glimAccount.getAccountNumber(), childLoans, glimAccount.getParentPrincipalAmount(), glimAccount.getLoanStatus()));
         }
-
         return glimAccounts;
     }
 
@@ -153,95 +118,67 @@ public class GLIMAccountInfoReadPlatformServiceImpl implements GLIMAccountInfoRe
     public Collection<GLIMContainer> findGlimAccountbyGroupAndAccount(Long groupId, String accountNo) {
         this.context.authenticatedUser();
         Collection<GroupLoanIndividualMonitoringAccountData> glimInfo = findGlimAccountByGroupIdandAccountNo(groupId + "", accountNo + "");
-
         // List<LoanAccountSummaryData> glimAccounts =
         // retrieveLoanAccountDetails(loanWhereClauseForGroupAndLoanType, new
         // Object[] { groupId });
-
         List<GLIMContainer> glimAccounts = new ArrayList<GLIMContainer>();
         for (GroupLoanIndividualMonitoringAccountData glimAccount : glimInfo) {
-
-            List<LoanAccountSummaryData> childLoans = accountDetailsReadPlatforService
-                    .retrieveLoanAccountDetailsByGroupIdAndGlimAccountNumber(groupId, glimAccount.getAccountNumber());
-            glimAccounts.add(new GLIMContainer(glimAccount.getGlimId(), glimAccount.getGroupId(), glimAccount.getAccountNumber(),
-                    childLoans, glimAccount.getParentPrincipalAmount(), glimAccount.getLoanStatus()));
+            List<LoanAccountSummaryData> childLoans = accountDetailsReadPlatforService.retrieveLoanAccountDetailsByGroupIdAndGlimAccountNumber(groupId, glimAccount.getAccountNumber());
+            glimAccounts.add(new GLIMContainer(glimAccount.getGlimId(), glimAccount.getGroupId(), glimAccount.getAccountNumber(), childLoans, glimAccount.getParentPrincipalAmount(), glimAccount.getLoanStatus()));
         }
-
         return glimAccounts;
     }
 
     @Override
     public Collection<GlimRepaymentTemplate> findglimRepaymentTemplate(final Long glimId) {
         this.context.authenticatedUser();
-
         GLIMRepaymentMapper rm = new GLIMRepaymentMapper();
-
         final String sql = "select " + rm.schema() + " where glim.id=?";
-
         return this.jdbcTemplate.query(sql, rm, glimId); // NOSONAR
-
     }
 
-    private static final class GLIMMapper implements RowMapper<GroupLoanIndividualMonitoringAccountData> {
 
+    private static final class GLIMMapper implements RowMapper<GroupLoanIndividualMonitoringAccountData> {
         public String schema() {
-            return "glim.id as glimId,glim.group_id as groupId,glim.account_number as accountNumber,glim.principal_amount as principalAmount,glim.child_accounts_count as childAccountsCount,"
-                    + "glim.loan_status_id as loanStatus from glim_accounts glim";
+            return "glim.id as glimId,glim.group_id as groupId,glim.account_number as accountNumber,glim.principal_amount as principalAmount,glim.child_accounts_count as childAccountsCount," + "glim.loan_status_id as loanStatus from glim_accounts glim";
         }
 
         @Override
-        public GroupLoanIndividualMonitoringAccountData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum)
-                throws SQLException {
-
+        public GroupLoanIndividualMonitoringAccountData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
             final BigDecimal glimId = rs.getBigDecimal("glimId");
-
             final BigDecimal groupId = rs.getBigDecimal("groupId");
-
             final String accountNumber = rs.getString("accountNumber");
-
             final BigDecimal principalAmount = rs.getBigDecimal("principalAmount");
-
             final String loanStatus = LoanStatus.fromInt((int) rs.getLong("loanStatus")).toString();
-
             return GroupLoanIndividualMonitoringAccountData.getInstance1(glimId, groupId, accountNumber, principalAmount, loanStatus);
-
         }
     }
 
-    private static final class GLIMRepaymentMapper implements RowMapper<GlimRepaymentTemplate> {
 
+    private static final class GLIMRepaymentMapper implements RowMapper<GlimRepaymentTemplate> {
         public String schema() {
-            return "glim.id as glimId,loan.group_id as groupId,client.id as clientId,glim.account_number as parentLoanAccountNo,"
-                    + "glim.principal_amount as parentPrincipalAmount,loan.id as childLoanId,loan.account_no as childLoanAccountNo,loan.approved_principal as childPrincipalAmount,"
-                    + "client.display_name as clientName from glim_accounts glim left join m_loan loan on loan.glim_id=glim.id "
-                    + "left join m_client client on client.id=loan.client_id";
+            return "glim.id as glimId,loan.group_id as groupId,client.id as clientId,glim.account_number as parentLoanAccountNo," + "glim.principal_amount as parentPrincipalAmount,loan.id as childLoanId,loan.account_no as childLoanAccountNo,loan.approved_principal as childPrincipalAmount," + "client.display_name as clientName from glim_accounts glim left join m_loan loan on loan.glim_id=glim.id " + "left join m_client client on client.id=loan.client_id";
         }
 
         @Override
         public GlimRepaymentTemplate mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-
             final BigDecimal glimId = rs.getBigDecimal("glimId");
-
             final BigDecimal groupId = rs.getBigDecimal("groupId");
-
             final BigDecimal clientId = rs.getBigDecimal("clientId");
-
             final String clientName = rs.getString("clientName");
-
             final BigDecimal childLoanId = rs.getBigDecimal("childLoanId");
-
             final String parentLoanAccountNo = rs.getString("parentLoanAccountNo");
-
             final BigDecimal parentPrincipalAmount = rs.getBigDecimal("parentPrincipalAmount");
-
             final String childLoanAccountNo = rs.getString("childLoanAccountNo");
-
             final BigDecimal childPrincipalAmount = rs.getBigDecimal("childPrincipalAmount");
-
-            return GlimRepaymentTemplate.getInstance(glimId, groupId, clientId, clientName, childLoanId, parentLoanAccountNo,
-                    parentPrincipalAmount, childLoanAccountNo, childPrincipalAmount);
-
+            return GlimRepaymentTemplate.getInstance(glimId, groupId, clientId, clientName, childLoanId, parentLoanAccountNo, parentPrincipalAmount, childLoanAccountNo, childPrincipalAmount);
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public GLIMAccountInfoReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final PlatformSecurityContext context, final AccountDetailsReadPlatformService accountDetailsReadPlatforService) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.context = context;
+        this.accountDetailsReadPlatforService = accountDetailsReadPlatforService;
+    }
 }

@@ -20,8 +20,6 @@ package org.apache.fineract.infrastructure.springbatch.messagehandler.jms;
 
 import jakarta.jms.JMSException;
 import jakarta.jms.MessageListener;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.springbatch.ContextualMessage;
 import org.apache.fineract.infrastructure.springbatch.InputChannelInterceptor;
 import org.apache.fineract.infrastructure.springbatch.messagehandler.StepExecutionRequestHandler;
@@ -33,12 +31,11 @@ import org.springframework.jms.support.converter.MessagingMessageConverter;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 @Conditional(JmsWorkerCondition.class)
 public class JmsBatchWorkerMessageListener implements MessageListener, InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JmsBatchWorkerMessageListener.class);
     private final StepExecutionRequestHandler stepExecutionRequestHandler;
     private final InputChannelInterceptor inputInterceptor;
     private MessagingMessageConverter converter;
@@ -49,7 +46,7 @@ public class JmsBatchWorkerMessageListener implements MessageListener, Initializ
     }
 
     @Override
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public void onMessage(jakarta.jms.Message message) {
         try {
             Message<ContextualMessage> msg = (Message<ContextualMessage>) converter.fromMessage(message);
@@ -61,11 +58,16 @@ public class JmsBatchWorkerMessageListener implements MessageListener, Initializ
         } finally {
             inputInterceptor.afterHandleMessage();
         }
-
         try {
             message.acknowledge();
         } catch (JMSException e) {
             throw new RuntimeException("Unable to acknowledge message", e);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JmsBatchWorkerMessageListener(final StepExecutionRequestHandler stepExecutionRequestHandler, final InputChannelInterceptor inputInterceptor) {
+        this.stepExecutionRequestHandler = stepExecutionRequestHandler;
+        this.inputInterceptor = inputInterceptor;
     }
 }

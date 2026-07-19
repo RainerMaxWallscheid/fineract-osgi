@@ -19,43 +19,36 @@
 package org.apache.fineract.test.stepdef.hook;
 
 import static org.awaitility.Awaitility.await;
-
 import io.cucumber.java.Before;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.test.messaging.config.EventProperties;
 import org.apache.fineract.test.messaging.store.EventStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.config.JmsListenerEndpointRegistry;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
-@Slf4j
 public class MessagingHook {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MessagingHook.class);
     @Autowired
     private EventStore eventStore;
-
     @Autowired(required = false)
     private JmsListenerEndpointRegistry registry;
-
     @Autowired(required = false)
     private EventProperties eventProperties;
-
     private static final AtomicBoolean jmsStartupDelayCompleted = new AtomicBoolean(false);
     private static final Duration STARTUP_TIMEOUT = Duration.ofSeconds(20);
 
     @Before(order = 0)
     public void waitForJmsListenerStartup() {
-        if (jmsStartupDelayCompleted.compareAndSet(false, true) && eventProperties != null
-                && eventProperties.isEventVerificationEnabled()) {
+        if (jmsStartupDelayCompleted.compareAndSet(false, true) && eventProperties != null && eventProperties.isEventVerificationEnabled()) {
             if (registry == null) {
                 log.warn("=== JmsListenerEndpointRegistry not available - skipping JMS listener readiness check ===");
                 return;
             }
             log.info("=== FIRST SCENARIO - Waiting for JMS Listener to connect to ActiveMQ (max {}s) ===", STARTUP_TIMEOUT.toSeconds());
-            DefaultMessageListenerContainer container = (DefaultMessageListenerContainer) registry
-                    .getListenerContainer("eventStoreListener");
+            DefaultMessageListenerContainer container = (DefaultMessageListenerContainer) registry.getListenerContainer("eventStoreListener");
             await().atMost(STARTUP_TIMEOUT).pollInterval(Duration.ofMillis(200)).until(container::isRunning);
             log.info("=== JMS Listener is running - tests can proceed ===");
         }

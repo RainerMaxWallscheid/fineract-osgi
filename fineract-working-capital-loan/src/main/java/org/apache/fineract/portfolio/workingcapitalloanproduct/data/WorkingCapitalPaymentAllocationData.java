@@ -20,25 +20,50 @@ package org.apache.fineract.portfolio.workingcapitalloanproduct.data;
 
 import java.io.Serializable;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.fineract.portfolio.loanproduct.domain.PaymentAllocationTransactionType;
 
 /**
  * Data Transfer Object for Payment Allocation
  */
-@Getter
-@AllArgsConstructor
 public class WorkingCapitalPaymentAllocationData implements Serializable {
-
     private final PaymentAllocationTransactionType transactionType;
     private final List<PaymentAllocationOrder> paymentAllocationOrder;
 
-    @Getter
-    @AllArgsConstructor
-    public static class PaymentAllocationOrder implements Serializable {
 
+    public static class PaymentAllocationOrder implements Serializable {
         private final String paymentAllocationRule;
         private final Integer order;
+
+        @java.lang.SuppressWarnings("all")
+                public String getPaymentAllocationRule() {
+            return this.paymentAllocationRule;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public Integer getOrder() {
+            return this.order;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public PaymentAllocationOrder(final String paymentAllocationRule, final Integer order) {
+            this.paymentAllocationRule = paymentAllocationRule;
+            this.order = order;
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PaymentAllocationTransactionType getTransactionType() {
+        return this.transactionType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<PaymentAllocationOrder> getPaymentAllocationOrder() {
+        return this.paymentAllocationOrder;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalPaymentAllocationData(final PaymentAllocationTransactionType transactionType, final List<PaymentAllocationOrder> paymentAllocationOrder) {
+        this.transactionType = transactionType;
+        this.paymentAllocationOrder = paymentAllocationOrder;
     }
 }

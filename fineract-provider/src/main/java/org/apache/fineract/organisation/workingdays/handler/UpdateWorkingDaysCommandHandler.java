@@ -20,8 +20,6 @@ package org.apache.fineract.organisation.workingdays.handler;
 
 import java.util.Collections;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.organisation.workingdays.data.WorkingDaysUpdateRequest;
@@ -30,11 +28,10 @@ import org.apache.fineract.organisation.workingdays.service.WorkingDaysWritePlat
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class UpdateWorkingDaysCommandHandler implements CommandHandler<WorkingDaysUpdateRequest, WorkingDaysUpdateResponse> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UpdateWorkingDaysCommandHandler.class);
     private final WorkingDaysWritePlatformService workingDaysWritePlatformService;
 
     @Transactional
@@ -45,11 +42,11 @@ public class UpdateWorkingDaysCommandHandler implements CommandHandler<WorkingDa
         if (changes == null) {
             changes = Collections.emptyMap();
         }
-
-        return WorkingDaysUpdateResponse.builder().resourceId((Long) changes.get("resourceId")).changes(changes)
-                .recurrence(request.getRecurrence()).repaymentRescheduleType(request.getRepaymentRescheduleType())
-                .extendTermForDailyRepayments(request.getExtendTermForDailyRepayments())
-                .extendTermForRepaymentsOnHolidays(request.getExtendTermForRepaymentsOnHolidays()).build();
+        return WorkingDaysUpdateResponse.builder().resourceId((Long) changes.get("resourceId")).changes(changes).recurrence(request.getRecurrence()).repaymentRescheduleType(request.getRepaymentRescheduleType()).extendTermForDailyRepayments(request.getExtendTermForDailyRepayments()).extendTermForRepaymentsOnHolidays(request.getExtendTermForRepaymentsOnHolidays()).build();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public UpdateWorkingDaysCommandHandler(final WorkingDaysWritePlatformService workingDaysWritePlatformService) {
+        this.workingDaysWritePlatformService = workingDaysWritePlatformService;
+    }
 }

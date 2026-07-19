@@ -22,14 +22,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanInterestRecalcualtionAdditionalDetails;
 
-@Getter
-@AllArgsConstructor
 public final class InterestRecalculationAdditionalDetailData {
-
     private final LocalDate effectiveDate;
     private final BigDecimal amount;
 
@@ -50,5 +45,21 @@ public final class InterestRecalculationAdditionalDetailData {
             entities.add(data.toEntity());
         }
         return entities;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getEffectiveDate() {
+        return this.effectiveDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InterestRecalculationAdditionalDetailData(final LocalDate effectiveDate, final BigDecimal amount) {
+        this.effectiveDate = effectiveDate;
+        this.amount = amount;
     }
 }

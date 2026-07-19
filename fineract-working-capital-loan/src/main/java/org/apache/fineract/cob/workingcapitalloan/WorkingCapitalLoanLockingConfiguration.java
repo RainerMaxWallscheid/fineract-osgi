@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.cob.workingcapitalloan;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.domain.LockingService;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -27,9 +26,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
-@RequiredArgsConstructor
 public class WorkingCapitalLoanLockingConfiguration {
-
     private final JdbcTemplate jdbcTemplate;
     private final FineractProperties fineractProperties;
 
@@ -37,5 +34,11 @@ public class WorkingCapitalLoanLockingConfiguration {
     @ConditionalOnMissingBean(name = "workingCapitalLoanLockingService")
     public LockingService workingCapitalLoanLockingService() {
         return new WorkingCapitalLoanLockingServiceImpl(jdbcTemplate, fineractProperties);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanLockingConfiguration(final JdbcTemplate jdbcTemplate, final FineractProperties fineractProperties) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.fineractProperties = fineractProperties;
     }
 }

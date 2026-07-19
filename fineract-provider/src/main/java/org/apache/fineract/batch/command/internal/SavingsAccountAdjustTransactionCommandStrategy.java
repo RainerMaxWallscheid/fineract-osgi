@@ -19,12 +19,10 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.command.CommandStrategyUtils;
@@ -35,9 +33,7 @@ import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class SavingsAccountAdjustTransactionCommandStrategy implements CommandStrategy {
-
     private final SavingsAccountTransactionsApiResource savingsAccountTransactionsApiResource;
 
     @Override
@@ -53,13 +49,14 @@ public class SavingsAccountAdjustTransactionCommandStrategy implements CommandSt
         } else {
             pathParameters = Splitter.on('/').splitToList(relativeUrl);
         }
-
         Long savingsAccountId = Long.parseLong(pathParameters.get(1));
         Long transactionId = Long.parseLong(pathParameters.get(3));
-        final String responseBody = savingsAccountTransactionsApiResource.adjustTransaction(savingsAccountId, transactionId, command,
-                batchRequest.getBody());
+        final String responseBody = savingsAccountTransactionsApiResource.adjustTransaction(savingsAccountId, transactionId, command, batchRequest.getBody());
+        return new BatchResponse().setRequestId(batchRequest.getRequestId()).setStatusCode(HttpStatus.SC_OK).setBody(responseBody).setHeaders(batchRequest.getHeaders());
+    }
 
-        return new BatchResponse().setRequestId(batchRequest.getRequestId()).setStatusCode(HttpStatus.SC_OK).setBody(responseBody)
-                .setHeaders(batchRequest.getHeaders());
+    @java.lang.SuppressWarnings("all")
+        public SavingsAccountAdjustTransactionCommandStrategy(final SavingsAccountTransactionsApiResource savingsAccountTransactionsApiResource) {
+        this.savingsAccountTransactionsApiResource = savingsAccountTransactionsApiResource;
     }
 }

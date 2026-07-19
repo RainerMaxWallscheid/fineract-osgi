@@ -21,14 +21,9 @@ package org.apache.fineract.portfolio.shareaccounts.data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
-@Getter
-@RequiredArgsConstructor
 public class ShareAccountDividendData implements Serializable {
-
     private final Long id;
     private final LocalDate postedDate;
     private final ShareAccountData accountData;
@@ -45,13 +40,52 @@ public class ShareAccountDividendData implements Serializable {
         this.postedDate = null;
     }
 
-    public ShareAccountDividendData(final Long id, final ShareAccountData accountData, final BigDecimal amount, final EnumOptionData status,
-            final Long savingsTransactionId) {
+    public ShareAccountDividendData(final Long id, final ShareAccountData accountData, final BigDecimal amount, final EnumOptionData status, final Long savingsTransactionId) {
         this.id = id;
         this.accountData = accountData;
         this.amount = amount;
         this.status = status;
         this.savingsTransactionId = savingsTransactionId;
         this.postedDate = null;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getPostedDate() {
+        return this.postedDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ShareAccountData getAccountData() {
+        return this.accountData;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getStatus() {
+        return this.status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getSavingsTransactionId() {
+        return this.savingsTransactionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ShareAccountDividendData(final Long id, final LocalDate postedDate, final ShareAccountData accountData, final BigDecimal amount, final EnumOptionData status, final Long savingsTransactionId) {
+        this.id = id;
+        this.postedDate = postedDate;
+        this.accountData = accountData;
+        this.amount = amount;
+        this.status = status;
+        this.savingsTransactionId = savingsTransactionId;
     }
 }

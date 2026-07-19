@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -33,7 +32,6 @@ import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.util.CallFailedRuntimeException;
 import org.apache.fineract.integrationtests.common.CreditBureauConfigurationHelper;
 import org.apache.fineract.integrationtests.common.Utils;
@@ -44,9 +42,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-@Slf4j
 public class CreditBureauConfigurationValidationTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CreditBureauConfigurationValidationTest.class);
     // Prerequisites - ThitsaWorks credit bureau is seeded in DB with ID 1
     private static final Long VALID_CREDIT_BUREAU_ID = 1L;
     private Long validOrganisationCreditBureauId;
@@ -59,16 +57,13 @@ public class CreditBureauConfigurationValidationTest {
     }
 
     @ParameterizedTest(name = "Create configuration missing {0} should return 400")
-    @CsvSource({ "configkey, value, description", "value, configkey, description", "description, configkey, value" })
+    @CsvSource({"configkey, value, description", "value, configkey, description", "description, configkey, value"})
     void testCreateConfiguration_MissingMandatoryFields(String fieldToOmit, String field1, String field2) {
         final Map<String, Object> jsonMap = new HashMap<>();
         jsonMap.put(field1, "testValue1");
         jsonMap.put(field2, "testValue2");
         final String jsonBody = new Gson().toJson(jsonMap);
-
-        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class,
-                () -> CreditBureauConfigurationHelper.createCreditBureauConfigurationRaw(validOrganisationCreditBureauId, jsonBody));
-
+        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class, () -> CreditBureauConfigurationHelper.createCreditBureauConfigurationRaw(validOrganisationCreditBureauId, jsonBody));
         assertEquals(400, ex.getResponse().code());
         assertValidationErrorInMessage(ex.getMessage(), fieldToOmit);
     }
@@ -80,10 +75,7 @@ public class CreditBureauConfigurationValidationTest {
         jsonMap.put("value", "testValue");
         jsonMap.put("description", "testDescription");
         final String jsonBody = new Gson().toJson(jsonMap);
-
-        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class,
-                () -> CreditBureauConfigurationHelper.createCreditBureauConfigurationRaw(validOrganisationCreditBureauId, jsonBody));
-
+        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class, () -> CreditBureauConfigurationHelper.createCreditBureauConfigurationRaw(validOrganisationCreditBureauId, jsonBody));
         assertEquals(400, ex.getResponse().code());
         assertValidationErrorInMessage(ex.getMessage(), "configkey");
     }
@@ -96,10 +88,7 @@ public class CreditBureauConfigurationValidationTest {
         jsonMap.put("value", "testValue");
         jsonMap.put("description", "testDescription");
         final String jsonBody = new Gson().toJson(jsonMap);
-
-        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class,
-                () -> CreditBureauConfigurationHelper.createCreditBureauConfigurationRaw(validOrganisationCreditBureauId, jsonBody));
-
+        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class, () -> CreditBureauConfigurationHelper.createCreditBureauConfigurationRaw(validOrganisationCreditBureauId, jsonBody));
         assertEquals(400, ex.getResponse().code());
         assertValidationErrorInMessage(ex.getMessage(), "configkey");
     }
@@ -109,10 +98,7 @@ public class CreditBureauConfigurationValidationTest {
         final Map<String, Object> jsonMap = new HashMap<>();
         jsonMap.put("isActive", true);
         final String jsonBody = new Gson().toJson(jsonMap);
-
-        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class,
-                () -> CreditBureauConfigurationHelper.addOrganisationCreditBureauRaw(VALID_CREDIT_BUREAU_ID, jsonBody));
-
+        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class, () -> CreditBureauConfigurationHelper.addOrganisationCreditBureauRaw(VALID_CREDIT_BUREAU_ID, jsonBody));
         assertEquals(400, ex.getResponse().code());
         assertValidationErrorInMessage(ex.getMessage(), "alias");
     }
@@ -123,10 +109,7 @@ public class CreditBureauConfigurationValidationTest {
         jsonMap.put("alias", "");
         jsonMap.put("isActive", true);
         final String jsonBody = new Gson().toJson(jsonMap);
-
-        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class,
-                () -> CreditBureauConfigurationHelper.addOrganisationCreditBureauRaw(VALID_CREDIT_BUREAU_ID, jsonBody));
-
+        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class, () -> CreditBureauConfigurationHelper.addOrganisationCreditBureauRaw(VALID_CREDIT_BUREAU_ID, jsonBody));
         assertEquals(400, ex.getResponse().code());
         assertValidationErrorInMessage(ex.getMessage(), "alias");
     }
@@ -138,23 +121,17 @@ public class CreditBureauConfigurationValidationTest {
         jsonMap.put("alias", longAlias);
         jsonMap.put("isActive", true);
         final String jsonBody = new Gson().toJson(jsonMap);
-
-        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class,
-                () -> CreditBureauConfigurationHelper.addOrganisationCreditBureauRaw(VALID_CREDIT_BUREAU_ID, jsonBody));
-
+        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class, () -> CreditBureauConfigurationHelper.addOrganisationCreditBureauRaw(VALID_CREDIT_BUREAU_ID, jsonBody));
         assertEquals(400, ex.getResponse().code());
         assertValidationErrorInMessage(ex.getMessage(), "alias");
     }
 
     @ParameterizedTest(name = "Create mapping missing {0} should return 400")
-    @CsvSource({ "isCreditcheckMandatory", "skipCreditcheckInFailure", "stalePeriod" })
+    @CsvSource({"isCreditcheckMandatory", "skipCreditcheckInFailure", "stalePeriod"})
     void testCreateMapping_MissingMandatoryFields(String fieldToOmit) {
         final Map<String, Object> jsonMap = buildMappingJsonOmitting(fieldToOmit);
         final String jsonBody = new Gson().toJson(jsonMap);
-
-        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class,
-                () -> CreditBureauConfigurationHelper.createLoanProductMappingRaw(validOrganisationCreditBureauId, jsonBody));
-
+        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class, () -> CreditBureauConfigurationHelper.createLoanProductMappingRaw(validOrganisationCreditBureauId, jsonBody));
         assertEquals(400, ex.getResponse().code());
         assertValidationErrorInMessage(ex.getMessage(), fieldToOmit);
     }
@@ -163,17 +140,13 @@ public class CreditBureauConfigurationValidationTest {
     void testCreateMapping_MissingLoanProductId_ShouldFail400() {
         final Map<String, Object> jsonMap = buildMappingJsonOmitting("loanProductId");
         final String jsonBody = new Gson().toJson(jsonMap);
-
-        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class,
-                () -> CreditBureauConfigurationHelper.createLoanProductMappingRaw(validOrganisationCreditBureauId, jsonBody));
-
+        CallFailedRuntimeException ex = assertThrows(CallFailedRuntimeException.class, () -> CreditBureauConfigurationHelper.createLoanProductMappingRaw(validOrganisationCreditBureauId, jsonBody));
         assertEquals(400, ex.getResponse().code());
         assertValidationErrorInMessage(ex.getMessage(), "loanProductId");
     }
 
     private void ensureOrganisationCreditBureauExists() {
-        String response = CreditBureauConfigurationHelper.addOrganisationCreditBureau(VALID_CREDIT_BUREAU_ID,
-                "Test Credit Bureau " + System.currentTimeMillis(), true);
+        String response = CreditBureauConfigurationHelper.addOrganisationCreditBureau(VALID_CREDIT_BUREAU_ID, "Test Credit Bureau " + System.currentTimeMillis(), true);
         JsonObject json = JsonParser.parseString(response).getAsJsonObject();
         Integer resourceId = json.get("resourceId").getAsInt();
         assertNotNull(resourceId, "Organisation credit bureau creation should return resourceId");
@@ -187,9 +160,7 @@ public class CreditBureauConfigurationValidationTest {
         requestSpec.header("Authorization", "Basic " + Utils.loginIntoServerAndGetBase64EncodedAuthenticationKey());
         final ResponseSpecification responseSpec = new ResponseSpecBuilder().expectStatusCode(200).build();
         final LoanTransactionHelper loanTransactionHelper = new LoanTransactionHelper(requestSpec, responseSpec);
-        final String loanProductJSON = new LoanProductTestBuilder().withPrincipal("1000").withRepaymentAfterEvery("1")
-                .withRepaymentTypeAsMonth().withNumberOfRepayments("1").withInterestRateFrequencyTypeAsMonths()
-                .withinterestRatePerPeriod("0").withInterestTypeAsDecliningBalance().withAmortizationTypeAsEqualInstallments().build(null);
+        final String loanProductJSON = new LoanProductTestBuilder().withPrincipal("1000").withRepaymentAfterEvery("1").withRepaymentTypeAsMonth().withNumberOfRepayments("1").withInterestRateFrequencyTypeAsMonths().withinterestRatePerPeriod("0").withInterestTypeAsDecliningBalance().withAmortizationTypeAsEqualInstallments().build(null);
         return (long) loanTransactionHelper.getLoanProductId(loanProductJSON);
     }
 
@@ -213,8 +184,7 @@ public class CreditBureauConfigurationValidationTest {
 
     private void assertValidationErrorInMessage(String message, String expectedFieldInError) {
         assertNotNull(message, "Exception message should not be null");
-        assertTrue(message.contains(expectedFieldInError),
-                String.format("Expected validation error for field '%s' in message: %s", expectedFieldInError, message));
-        log.info("Received expected validation error for field '{}'", expectedFieldInError);
+        assertTrue(message.contains(expectedFieldInError), String.format("Expected validation error for field \'%s\' in message: %s", expectedFieldInError, message));
+        log.info("Received expected validation error for field \'{}\'", expectedFieldInError);
     }
 }

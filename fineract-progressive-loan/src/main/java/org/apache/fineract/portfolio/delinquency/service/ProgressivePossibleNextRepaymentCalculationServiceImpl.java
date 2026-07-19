@@ -23,7 +23,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.portfolio.loanaccount.domain.ChangedTransactionDetail;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -37,43 +36,38 @@ import org.apache.fineract.portfolio.loanproduct.calc.data.ProgressiveLoanIntere
 import org.apache.fineract.portfolio.loanproduct.calc.data.RepaymentPeriod;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ProgressivePossibleNextRepaymentCalculationServiceImpl extends AbstractPossibleNextRepaymentCalculationService {
-
     private final InterestScheduleModelRepositoryWrapper interestScheduleModelRepository;
     private final AdvancedPaymentScheduleTransactionProcessor advancedPaymentScheduleTransactionProcessor;
 
     @Override
-    public BigDecimal calculateInterestRecalculationFutureOutstandingValue(Loan loan, LocalDate nextPaymentDueDate,
-            LoanRepaymentScheduleInstallment nextInstallment) {
+    public BigDecimal calculateInterestRecalculationFutureOutstandingValue(Loan loan, LocalDate nextPaymentDueDate, LoanRepaymentScheduleInstallment nextInstallment) {
         MonetaryCurrency currency = loan.getCurrency();
         Optional<ProgressiveLoanModel> progressiveLoanModel = interestScheduleModelRepository.findOneByLoan(loan);
-        Optional<ProgressiveLoanInterestScheduleModel> optionalScheduleModel = interestScheduleModelRepository
-                .extractModel(progressiveLoanModel);
+        Optional<ProgressiveLoanInterestScheduleModel> optionalScheduleModel = interestScheduleModelRepository.extractModel(progressiveLoanModel);
         if (optionalScheduleModel.isEmpty()) {
             return BigDecimal.ZERO;
         }
         ProgressiveLoanInterestScheduleModel scheduleModel = optionalScheduleModel.get();
         List<LoanRepaymentScheduleInstallment> repaymentScheduleInstallments = loan.getRepaymentScheduleInstallments();
-        ProgressiveTransactionCtx ctx = new ProgressiveTransactionCtx(loan.getCurrency(), repaymentScheduleInstallments, Set.of(),
-                new MoneyHolder(loan.getTotalOverpaidAsMoney()), new ChangedTransactionDetail(), scheduleModel,
-                loan.getActiveLoanTermVariations());
+        ProgressiveTransactionCtx ctx = new ProgressiveTransactionCtx(loan.getCurrency(), repaymentScheduleInstallments, Set.of(), new MoneyHolder(loan.getTotalOverpaidAsMoney()), new ChangedTransactionDetail(), scheduleModel, loan.getActiveLoanTermVariations());
         ctx.setChargedOff(loan.isChargedOff());
         ctx.setWrittenOff(loan.isClosedWrittenOff());
         ctx.setContractTerminated(loan.isContractTermination());
         advancedPaymentScheduleTransactionProcessor.recalculateInterestForDate(nextPaymentDueDate, ctx, false);
-        RepaymentPeriod repaymentPeriod = scheduleModel
-                .findRepaymentPeriodByFromAndDueDate(nextInstallment.getFromDate(), nextInstallment.getDueDate())
-                .orElseGet(scheduleModel::getLastRepaymentPeriod);
-
-        return repaymentPeriod.getOutstandingPrincipal().add(repaymentPeriod.getOutstandingInterest())
-                .add(nextInstallment.getFeeChargesOutstanding(currency)).add(nextInstallment.getPenaltyChargesOutstanding(currency))
-                .getAmount();
+        RepaymentPeriod repaymentPeriod = scheduleModel.findRepaymentPeriodByFromAndDueDate(nextInstallment.getFromDate(), nextInstallment.getDueDate()).orElseGet(scheduleModel::getLastRepaymentPeriod);
+        return repaymentPeriod.getOutstandingPrincipal().add(repaymentPeriod.getOutstandingInterest()).add(nextInstallment.getFeeChargesOutstanding(currency)).add(nextInstallment.getPenaltyChargesOutstanding(currency)).getAmount();
     }
 
     @Override
     public boolean canAccept(Loan loan) {
         return loan.isProgressiveSchedule();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProgressivePossibleNextRepaymentCalculationServiceImpl(final InterestScheduleModelRepositoryWrapper interestScheduleModelRepository, final AdvancedPaymentScheduleTransactionProcessor advancedPaymentScheduleTransactionProcessor) {
+        this.interestScheduleModelRepository = interestScheduleModelRepository;
+        this.advancedPaymentScheduleTransactionProcessor = advancedPaymentScheduleTransactionProcessor;
     }
 }

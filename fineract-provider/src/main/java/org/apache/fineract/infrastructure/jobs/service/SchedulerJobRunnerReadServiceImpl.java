@@ -22,7 +22,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.api.IdTypeResolver;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.PaginationHelper;
@@ -42,21 +41,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Slf4j
 @Transactional(readOnly = true)
 public class SchedulerJobRunnerReadServiceImpl implements SchedulerJobRunnerReadService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SchedulerJobRunnerReadServiceImpl.class);
     private final JdbcTemplate jdbcTemplate;
     private final ColumnValidator columnValidator;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
     private final ScheduledJobDetailRepository jobDetailRepository;
-
     private final PaginationHelper paginationHelper;
 
     @Autowired
-    public SchedulerJobRunnerReadServiceImpl(final JdbcTemplate jdbcTemplate, final ColumnValidator columnValidator,
-            DatabaseSpecificSQLGenerator sqlGenerator, ScheduledJobDetailRepository jobDetailRepository,
-            PaginationHelper paginationHelper) {
+    public SchedulerJobRunnerReadServiceImpl(final JdbcTemplate jdbcTemplate, final ColumnValidator columnValidator, DatabaseSpecificSQLGenerator sqlGenerator, ScheduledJobDetailRepository jobDetailRepository, PaginationHelper paginationHelper) {
         this.jdbcTemplate = jdbcTemplate;
         this.columnValidator = columnValidator;
         this.sqlGenerator = sqlGenerator;
@@ -67,7 +63,6 @@ public class SchedulerJobRunnerReadServiceImpl implements SchedulerJobRunnerRead
     @Override
     public List<JobDetailData> findAllJobDetails() {
         return jobDetailRepository.getAllData();
-
     }
 
     @Override
@@ -84,14 +79,12 @@ public class SchedulerJobRunnerReadServiceImpl implements SchedulerJobRunnerRead
     }
 
     @Override
-    public Page<JobDetailHistoryData> retrieveJobHistory(@NonNull IdTypeResolver.IdType idType, String identifier,
-            SearchParameters searchParameters) {
+    public Page<JobDetailHistoryData> retrieveJobHistory(@NonNull IdTypeResolver.IdType idType, String identifier, SearchParameters searchParameters) {
         if (!isJobExist(idType, identifier)) {
             throw new JobNotFoundException(idType, identifier);
         }
         final JobHistoryMapper jobHistoryMapper = new JobHistoryMapper(sqlGenerator);
-        final StringBuilder sqlBuilder = new StringBuilder("select " + sqlGenerator.calcFoundRows() + " ").append(jobHistoryMapper.schema())
-                .append(" where job.");
+        final StringBuilder sqlBuilder = new StringBuilder("select " + sqlGenerator.calcFoundRows() + " ").append(jobHistoryMapper.schema()).append(" where job.");
         Object idParam;
         switch (idType) {
             case ID -> {
@@ -113,7 +106,6 @@ public class SchedulerJobRunnerReadServiceImpl implements SchedulerJobRunnerRead
                 this.columnValidator.validateSqlInjection(sqlBuilder.toString(), searchParameters.getSortOrder());
             }
         }
-
         if (searchParameters.hasLimit()) {
             sqlBuilder.append(" ");
             if (searchParameters.hasOffset()) {
@@ -122,8 +114,7 @@ public class SchedulerJobRunnerReadServiceImpl implements SchedulerJobRunnerRead
                 sqlBuilder.append(sqlGenerator.limit(searchParameters.getLimit()));
             }
         }
-
-        return this.paginationHelper.fetchPage(this.jdbcTemplate, sqlBuilder.toString(), new Object[] { idParam }, jobHistoryMapper);
+        return this.paginationHelper.fetchPage(this.jdbcTemplate, sqlBuilder.toString(), new Object[] {idParam}, jobHistoryMapper);
     }
 
     @Override
@@ -131,8 +122,7 @@ public class SchedulerJobRunnerReadServiceImpl implements SchedulerJobRunnerRead
     public Long retrieveId(@NonNull IdTypeResolver.IdType idType, String identifier) {
         return switch (idType) {
             case ID -> Long.valueOf(identifier);
-            case SHORT_NAME ->
-                jobDetailRepository.findIdByShortName(identifier).orElseThrow(() -> new JobNotFoundException(idType, identifier));
+            case SHORT_NAME -> jobDetailRepository.findIdByShortName(identifier).orElseThrow(() -> new JobNotFoundException(idType, identifier));
             default -> throw new JobNotFoundException(idType, identifier);
         };
     }
@@ -157,15 +147,12 @@ public class SchedulerJobRunnerReadServiceImpl implements SchedulerJobRunnerRead
         };
     }
 
-    private static final class JobHistoryMapper implements RowMapper<JobDetailHistoryData> {
 
+    private static final class JobHistoryMapper implements RowMapper<JobDetailHistoryData> {
         private final String sql;
 
         JobHistoryMapper(DatabaseSpecificSQLGenerator sqlGenerator) {
-            sql = " runHistory.id, runHistory.version, runHistory.start_time as runStartTime, runHistory.end_time as runEndTime, "
-                    + "runHistory." + sqlGenerator.escape("status")
-                    + ", runHistory.error_message as jobRunErrorMessage, runHistory.trigger_type as triggerType, runHistory.error_log as jobRunErrorLog "
-                    + "from job job join job_run_history runHistory ON job.id=runHistory.job_id";
+            sql = " runHistory.id, runHistory.version, runHistory.start_time as runStartTime, runHistory.end_time as runEndTime, " + "runHistory." + sqlGenerator.escape("status") + ", runHistory.error_message as jobRunErrorMessage, runHistory.trigger_type as triggerType, runHistory.error_log as jobRunErrorLog " + "from job job join job_run_history runHistory ON job.id=runHistory.job_id";
         }
 
         public String schema() {
@@ -182,9 +169,7 @@ public class SchedulerJobRunnerReadServiceImpl implements SchedulerJobRunnerRead
             final String jobRunErrorMessage = rs.getString("jobRunErrorMessage");
             final String triggerType = rs.getString("triggerType");
             final String jobRunErrorLog = rs.getString("jobRunErrorLog");
-            return new JobDetailHistoryData().setId(id).setVersion(version).setJobRunStartTime(jobRunStartTime)
-                    .setJobRunEndTime(jobRunEndTime).setStatus(status).setJobRunErrorMessage(jobRunErrorMessage).setTriggerType(triggerType)
-                    .setJobRunErrorLog(jobRunErrorLog);
+            return new JobDetailHistoryData().setId(id).setVersion(version).setJobRunStartTime(jobRunStartTime).setJobRunEndTime(jobRunEndTime).setStatus(status).setJobRunErrorMessage(jobRunErrorMessage).setTriggerType(triggerType).setJobRunErrorLog(jobRunErrorLog);
         }
     }
 }

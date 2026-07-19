@@ -21,12 +21,10 @@ package org.apache.fineract.infrastructure.core.exceptionmapper;
 import static org.apache.fineract.infrastructure.core.exception.AbstractIdempotentCommandException.IDEMPOTENT_CACHE_HEADER;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_OK;
-
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.exception.AbstractIdempotentCommandException;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.IdempotentCommandProcessFailedException;
@@ -42,8 +40,9 @@ import org.springframework.stereotype.Component;
 @Provider
 @Component
 @Scope("singleton")
-@Slf4j
 public class IdempotentCommandExceptionMapper implements FineractExceptionMapper, ExceptionMapper<AbstractIdempotentCommandException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IdempotentCommandExceptionMapper.class);
 
     @Override
     public Response toResponse(final AbstractIdempotentCommandException exception) {
@@ -61,8 +60,7 @@ public class IdempotentCommandExceptionMapper implements FineractExceptionMapper
         if (status == null) {
             status = SC_INTERNAL_SERVER_ERROR;
         }
-        return Response.status(status).entity(exception.getResponse()).header(IDEMPOTENT_CACHE_HEADER, "true")
-                .type(MediaType.APPLICATION_JSON).build();
+        return Response.status(status).entity(exception.getResponse()).header(IDEMPOTENT_CACHE_HEADER, "true").type(MediaType.APPLICATION_JSON).build();
     }
 
     @Override

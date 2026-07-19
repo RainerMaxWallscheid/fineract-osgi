@@ -23,8 +23,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.infrastructure.bulkimport.constants.StaffConstants;
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
@@ -45,11 +43,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.stereotype.Service;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 public class StaffImportHandler implements ImportHandler {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StaffImportHandler.class);
     private final CommandDispatcher dispatcher;
     private final StaffDataMapper staffDataMapper;
     private final StaffDateMapper staffDateMapper;
@@ -87,10 +84,7 @@ public class StaffImportHandler implements ImportHandler {
         LocalDate joinedOnDate = ImportHandlerUtils.readAsDate(StaffConstants.JOINED_ON_COL, row);
         String externalId = ImportHandlerUtils.readAsString(StaffConstants.EXTERNAL_ID_COL, row);
         Boolean isActive = ImportHandlerUtils.readAsBoolean(StaffConstants.IS_ACTIVE_COL, row);
-
-        return StaffData.builder().externalId(externalId).firstname(firstName).lastname(lastName).mobileNo(mobileNo).officeId(officeId)
-                .isLoanOfficer(isLoanOfficer).isActive(isActive).joiningDate(joinedOnDate).dateFormat(dateFormat).locale(locale)
-                .rowIndex(row.getRowNum()).build();
+        return StaffData.builder().externalId(externalId).firstname(firstName).lastname(lastName).mobileNo(mobileNo).officeId(officeId).isLoanOfficer(isLoanOfficer).isActive(isActive).joiningDate(joinedOnDate).dateFormat(dateFormat).locale(locale).rowIndex(row.getRowNum()).build();
     }
 
     private Count importEntity(final Workbook workbook, final List<StaffData> staffList, final String dateFormat) {
@@ -103,16 +97,11 @@ public class StaffImportHandler implements ImportHandler {
         for (var staff : staffList) {
             try {
                 final var command = new StaffCreateCommand();
-
                 var request = staffDataMapper.map(staff);
                 request.setJoiningDate(staffDateMapper.map(staff.getJoiningDate(), staff.getDateFormat()));
-
                 command.setPayload(request);
-
                 final Supplier<StaffCreateResponse> response = dispatcher.dispatch(command);
-
                 response.get();
-
                 successCount++;
                 Cell statusCell = staffSheet.getRow(staff.getRowIndex()).createCell(StaffConstants.STATUS_COL);
                 statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
@@ -125,9 +114,14 @@ public class StaffImportHandler implements ImportHandler {
             }
         }
         staffSheet.setColumnWidth(StaffConstants.STATUS_COL, TemplatePopulateImportConstants.SMALL_COL_SIZE);
-        ImportHandlerUtils.writeString(StaffConstants.STATUS_COL, staffSheet.getRow(0),
-                TemplatePopulateImportConstants.STATUS_COL_REPORT_HEADER);
+        ImportHandlerUtils.writeString(StaffConstants.STATUS_COL, staffSheet.getRow(0), TemplatePopulateImportConstants.STATUS_COL_REPORT_HEADER);
         return Count.instance(successCount, errorCount);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public StaffImportHandler(final CommandDispatcher dispatcher, final StaffDataMapper staffDataMapper, final StaffDateMapper staffDateMapper) {
+        this.dispatcher = dispatcher;
+        this.staffDataMapper = staffDataMapper;
+        this.staffDateMapper = staffDateMapper;
+    }
 }

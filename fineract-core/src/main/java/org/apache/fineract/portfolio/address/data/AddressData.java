@@ -22,67 +22,39 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collection;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 
-@Getter
 @SuppressWarnings("unused")
 public class AddressData implements Serializable {
-
     private final Long clientID;
-
     private final String addressType;
-
     private final Long addressId;
-
     private final Long addressTypeId;
-
     private final Boolean isActive;
-
     private final String street;
-
     private final String addressLine1;
-
     private final String addressLine2;
-
     private final String addressLine3;
-
     private final String townVillage;
-
     private final String city;
-
     private final String countyDistrict;
-
     private final Long stateProvinceId;
-
     private final String countryName;
-
     private final String stateName;
-
     private final Long countryId;
-
     private final String postalCode;
-
     private final BigDecimal latitude;
-
     private final BigDecimal longitude;
-
     private final String createdBy;
-
     private final LocalDate createdOn;
-
     private final String updatedBy;
-
     private final LocalDate updatedOn;
-
     // template holder
     private final Collection<CodeValueData> countryIdOptions;
     private final Collection<CodeValueData> stateProvinceIdOptions;
     private final Collection<CodeValueData> addressTypeIdOptions;
 
-    public AddressData(Long addressTypeId, String street, String addressLine1, String addressLine2, String addressLine3, String city,
-            String postalCode, Boolean isActive, Long stateProvinceId, Long countryId) {
-
+    public AddressData(Long addressTypeId, String street, String addressLine1, String addressLine2, String addressLine3, String city, String postalCode, Boolean isActive, Long stateProvinceId, Long countryId) {
         this.addressTypeId = addressTypeId;
         this.isActive = isActive;
         this.street = street;
@@ -111,13 +83,7 @@ public class AddressData implements Serializable {
         this.addressTypeIdOptions = null;
     }
 
-    private AddressData(final String addressType, final Long clientID, final Long addressId, final Long addressTypeId,
-            final Boolean is_active, final String street, final String addressLine1, final String addressLine2, final String addressLine3,
-            final String townVillage, final String city, final String countyDistrict, final Long stateProvinceId, final Long countryId,
-            final String stateName, final String countryName, final String postalCode, final BigDecimal latitude,
-            final BigDecimal longitude, final String createdBy, final LocalDate createdOn, final String updatedBy,
-            final LocalDate updatedOn, final Collection<CodeValueData> countryIdOptions,
-            final Collection<CodeValueData> stateProvinceIdOptions, final Collection<CodeValueData> addressTypeIdOptions) {
+    private AddressData(final String addressType, final Long clientID, final Long addressId, final Long addressTypeId, final Boolean is_active, final String street, final String addressLine1, final String addressLine2, final String addressLine3, final String townVillage, final String city, final String countyDistrict, final Long stateProvinceId, final Long countryId, final String stateName, final String countryName, final String postalCode, final BigDecimal latitude, final BigDecimal longitude, final String createdBy, final LocalDate createdOn, final String updatedBy, final LocalDate updatedOn, final Collection<CodeValueData> countryIdOptions, final Collection<CodeValueData> stateProvinceIdOptions, final Collection<CodeValueData> addressTypeIdOptions) {
         this.addressType = addressType;
         this.clientID = clientID;
         this.addressId = addressId;
@@ -146,73 +112,165 @@ public class AddressData implements Serializable {
         this.addressTypeIdOptions = addressTypeIdOptions;
     }
 
-    public static AddressData instance(final String addressType, final Long clientID, final Long addressId, final Long addressTypeId,
-            final Boolean is_active, final String street, final String addressLine1, final String addressLine2, final String addressLine3,
-            final String townVillage, final String city, final String countyDistrict, final Long stateProvinceId, final Long countryId,
-            final String stateName, final String countryName, final String postalCode, final BigDecimal latitude,
-            final BigDecimal longitude, final String createdBy, final LocalDate createdOn, final String updatedBy,
-            final LocalDate updatedOn) {
-
-        return new AddressData(addressType, clientID, addressId, addressTypeId, is_active, street, addressLine1, addressLine2, addressLine3,
-                townVillage, city, countyDistrict, stateProvinceId, countryId, stateName, countryName, postalCode, latitude, longitude,
-                createdBy, createdOn, updatedBy, updatedOn, null, null, null);
+    public static AddressData instance(final String addressType, final Long clientID, final Long addressId, final Long addressTypeId, final Boolean is_active, final String street, final String addressLine1, final String addressLine2, final String addressLine3, final String townVillage, final String city, final String countyDistrict, final Long stateProvinceId, final Long countryId, final String stateName, final String countryName, final String postalCode, final BigDecimal latitude, final BigDecimal longitude, final String createdBy, final LocalDate createdOn, final String updatedBy, final LocalDate updatedOn) {
+        return new AddressData(addressType, clientID, addressId, addressTypeId, is_active, street, addressLine1, addressLine2, addressLine3, townVillage, city, countyDistrict, stateProvinceId, countryId, stateName, countryName, postalCode, latitude, longitude, createdBy, createdOn, updatedBy, updatedOn, null, null, null);
     }
 
-    public static AddressData instance1(final Long addressId, final String street, final String addressLine1, final String addressLine2,
-            final String addressLine3, final String townVillage, final String city, final String countyDistrict, final Long stateProvinceId,
-            final Long countryId, final String postalCode, final BigDecimal latitude, final BigDecimal longitude, final String createdBy,
-            final LocalDate createdOn, final String updatedBy, final LocalDate updatedOn) {
-        return new AddressData(null, null, addressId, null, false, street, addressLine1, addressLine2, addressLine3, townVillage, city,
-                countyDistrict, stateProvinceId, countryId, null, null, postalCode, latitude, longitude, createdBy, createdOn, updatedBy,
-                updatedOn, null, null, null);
+    public static AddressData instance1(final Long addressId, final String street, final String addressLine1, final String addressLine2, final String addressLine3, final String townVillage, final String city, final String countyDistrict, final Long stateProvinceId, final Long countryId, final String postalCode, final BigDecimal latitude, final BigDecimal longitude, final String createdBy, final LocalDate createdOn, final String updatedBy, final LocalDate updatedOn) {
+        return new AddressData(null, null, addressId, null, false, street, addressLine1, addressLine2, addressLine3, townVillage, city, countyDistrict, stateProvinceId, countryId, null, null, postalCode, latitude, longitude, createdBy, createdOn, updatedBy, updatedOn, null, null, null);
     }
 
-    public static AddressData template(final Collection<CodeValueData> countryIdOptions,
-            final Collection<CodeValueData> stateProvinceIdOptions, final Collection<CodeValueData> addressTypeIdOptions) {
+    public static AddressData template(final Collection<CodeValueData> countryIdOptions, final Collection<CodeValueData> stateProvinceIdOptions, final Collection<CodeValueData> addressTypeIdOptions) {
         final Long client_idtemp = null;
-
         final Long addressIdtemp = null;
-
         final Long addressTypeIdtemp = null;
-
         final Boolean is_activetemp = null;
-
         final String streettemp = null;
-
         final String addressLine1temp = null;
-
         final String addressLine2temp = null;
-
         final String addressLine3temp = null;
-
         final String townVillagetemp = null;
-
         final String citytemp = null;
-
         final String countyDistricttemp = null;
-
         final Long stateProvinceIdtemp = null;
-
         final Long countryIdtemp = null;
-
         final String postalCodetemp = null;
-
         final BigDecimal latitudetemp = null;
-
         final BigDecimal longitudetemp = null;
-
         final String createdBytemp = null;
-
         final LocalDate createdOntemp = null;
-
         final String updatedBytemp = null;
-
         final LocalDate updatedOntemp = null;
-
-        return new AddressData(null, client_idtemp, addressIdtemp, addressTypeIdtemp, is_activetemp, streettemp, addressLine1temp,
-                addressLine2temp, addressLine3temp, townVillagetemp, citytemp, countyDistricttemp, stateProvinceIdtemp, countryIdtemp, null,
-                null, postalCodetemp, latitudetemp, longitudetemp, createdBytemp, createdOntemp, updatedBytemp, updatedOntemp,
-                countryIdOptions, stateProvinceIdOptions, addressTypeIdOptions);
+        return new AddressData(null, client_idtemp, addressIdtemp, addressTypeIdtemp, is_activetemp, streettemp, addressLine1temp, addressLine2temp, addressLine3temp, townVillagetemp, citytemp, countyDistricttemp, stateProvinceIdtemp, countryIdtemp, null, null, postalCodetemp, latitudetemp, longitudetemp, createdBytemp, createdOntemp, updatedBytemp, updatedOntemp, countryIdOptions, stateProvinceIdOptions, addressTypeIdOptions);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Long getClientID() {
+        return this.clientID;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getAddressType() {
+        return this.addressType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getAddressId() {
+        return this.addressId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getAddressTypeId() {
+        return this.addressTypeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Boolean getIsActive() {
+        return this.isActive;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getStreet() {
+        return this.street;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getAddressLine1() {
+        return this.addressLine1;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getAddressLine2() {
+        return this.addressLine2;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getAddressLine3() {
+        return this.addressLine3;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getTownVillage() {
+        return this.townVillage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCity() {
+        return this.city;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCountyDistrict() {
+        return this.countyDistrict;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getStateProvinceId() {
+        return this.stateProvinceId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCountryName() {
+        return this.countryName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getStateName() {
+        return this.stateName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getCountryId() {
+        return this.countryId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getPostalCode() {
+        return this.postalCode;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getLatitude() {
+        return this.latitude;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getLongitude() {
+        return this.longitude;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCreatedBy() {
+        return this.createdBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getCreatedOn() {
+        return this.createdOn;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getUpdatedBy() {
+        return this.updatedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getUpdatedOn() {
+        return this.updatedOn;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<CodeValueData> getCountryIdOptions() {
+        return this.countryIdOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<CodeValueData> getStateProvinceIdOptions() {
+        return this.stateProvinceIdOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<CodeValueData> getAddressTypeIdOptions() {
+        return this.addressTypeIdOptions;
+    }
 }

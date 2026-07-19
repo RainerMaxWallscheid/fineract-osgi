@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.event.external.service.serialization.serializer.recurringdeposit;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
 import org.apache.fineract.avro.recurringdeposit.v1.RecurringDepositAccountDataV1;
@@ -32,9 +31,7 @@ import org.apache.fineract.portfolio.savings.service.DepositAccountReadPlatformS
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class RecurringDepositAccountBusinessEventSerializer implements BusinessEventSerializer {
-
     private final DepositAccountReadPlatformService service;
     private final RecurringDepositAccountDataMapper mapper;
 
@@ -46,13 +43,18 @@ public class RecurringDepositAccountBusinessEventSerializer implements BusinessE
     @Override
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         RecurringDepositAccountBusinessEvent event = (RecurringDepositAccountBusinessEvent) rawEvent;
-        RecurringDepositAccountData data = (RecurringDepositAccountData) service.retrieveOne(DepositAccountType.RECURRING_DEPOSIT,
-                event.get().getId());
+        RecurringDepositAccountData data = (RecurringDepositAccountData) service.retrieveOne(DepositAccountType.RECURRING_DEPOSIT, event.get().getId());
         return mapper.map(data);
     }
 
     @Override
     public Class<? extends GenericContainer> getSupportedSchema() {
         return RecurringDepositAccountDataV1.class;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RecurringDepositAccountBusinessEventSerializer(final DepositAccountReadPlatformService service, final RecurringDepositAccountDataMapper mapper) {
+        this.service = service;
+        this.mapper = mapper;
     }
 }

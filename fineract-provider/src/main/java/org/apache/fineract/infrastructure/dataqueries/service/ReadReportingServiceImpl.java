@@ -39,8 +39,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
@@ -73,20 +71,19 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
-@RequiredArgsConstructor
 public class ReadReportingServiceImpl implements ReadReportingService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ReadReportingServiceImpl.class);
     /**
      * Server-controlled placeholders resolved from the authenticated session. These are never user-supplied and must be
      * substituted as plain strings before building the prepared statement. They must NOT become {@code ?} bind
      * variables.
      */
     private static final Set<String> SERVER_PARAMS = Set.of("currentUserHierarchy", "currentUserId", "currentDate");
-
-    /** Matches any {@code ${placeholderName}} token in a report SQL template. */
+    /**
+     * Matches any {@code ${placeholderName}} token in a report SQL template.
+     */
     private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{([^}]+)\\}");
-
     private final JdbcTemplate jdbcTemplate;
     private final PlatformSecurityContext context;
     private final GenericDataService genericDataService;
@@ -124,22 +121,15 @@ public class ReadReportingServiceImpl implements ReadReportingService {
 
     @Override
     public GenericResultsetData retrieveGenericResultset(final String name, final String type, final Map<String, String> queryParams) {
-
         final long startTime = System.currentTimeMillis();
         if (log.isDebugEnabled()) {
-            log.debug("STARTING REPORT: {}   Type: {}", LogParameterEscapeUtil.escapeLogParameter(name),
-                    LogParameterEscapeUtil.escapeLogParameter(type));
+            log.debug("STARTING REPORT: {}   Type: {}", LogParameterEscapeUtil.escapeLogParameter(name), LogParameterEscapeUtil.escapeLogParameter(type));
         }
-
         final PreparedQuery preparedQuery = getSQLtoRun(name, type, queryParams);
-
-        final GenericResultsetData result = this.genericDataService.fillGenericResultSet(preparedQuery.sql(),
-                preparedQuery.params().toArray());
-
+        final GenericResultsetData result = this.genericDataService.fillGenericResultSet(preparedQuery.sql(), preparedQuery.params().toArray());
         final long elapsed = System.currentTimeMillis() - startTime;
         if (log.isDebugEnabled()) {
-            log.debug("FINISHING Report/Request Name: {} - {}     Elapsed Time: {}", LogParameterEscapeUtil.escapeLogParameter(name),
-                    type.replaceAll("[\n\r\t]", "_"), elapsed);
+            log.debug("FINISHING Report/Request Name: {} - {}     Elapsed Time: {}", LogParameterEscapeUtil.escapeLogParameter(name), type.replaceAll("[\n\r\t]", "_"), elapsed);
         }
         return result;
     }
@@ -155,8 +145,7 @@ public class ReadReportingServiceImpl implements ReadReportingService {
                 }
                 return Long.parseLong(value);
             } catch (NumberFormatException e) {
-                throw new PlatformDataIntegrityException("error.msg.report.invalid.numeric.parameter",
-                        "Parameter value '" + value + "' is not a valid number", e);
+                throw new PlatformDataIntegrityException("error.msg.report.invalid.numeric.parameter", "Parameter value \'" + value + "\' is not a valid number", e);
             }
         }
         if ("DATE".equalsIgnoreCase(formatType)) {
@@ -165,12 +154,10 @@ public class ReadReportingServiceImpl implements ReadReportingService {
         return value;
     }
 
-    private PreparedQuery buildPreparedQuery(final String name, final Map<String, String> queryParams, final String sql,
-            final Map<String, String> paramFormatTypes) {
+    private PreparedQuery buildPreparedQuery(final String name, final Map<String, String> queryParams, final String sql, final Map<String, String> paramFormatTypes) {
         final List<Object> paramValues = new ArrayList<>();
         final Matcher matcher = PLACEHOLDER_PATTERN.matcher(sql);
         final StringBuilder preparedSql = new StringBuilder();
-
         while (matcher.find()) {
             final String paramName = matcher.group(1);
             if (SERVER_PARAMS.contains(paramName)) {
@@ -180,7 +167,7 @@ public class ReadReportingServiceImpl implements ReadReportingService {
                 paramValues.add(castParamValue(queryParams.get(paramName), paramFormatTypes.get(paramName)));
             } else {
                 matcher.appendReplacement(preparedSql, Matcher.quoteReplacement(matcher.group(0)));
-                log.warn("Report '{}' contains placeholder '{}' with no matching parameter", name, paramName);
+                log.warn("Report \'{}\' contains placeholder \'{}\' with no matching parameter", name, paramName);
             }
         }
         matcher.appendTail(preparedSql);
@@ -205,46 +192,35 @@ public class ReadReportingServiceImpl implements ReadReportingService {
      * </ol>
      */
     private PreparedQuery getSQLtoRun(final String name, final String type, final Map<String, String> queryParams) {
-
         final Map<String, String> paramFormatTypes = this.reportParameterTypeResolver.loadParamFormatTypes(name);
         String sql = getSql(name, type);
-
         // Step 1 — resolve server-controlled placeholders as plain strings (not user input)
         final AppUser currentUser = this.context.authenticatedUser();
         sql = this.genericDataService.replace(sql, "${currentUserHierarchy}", currentUser.getOffice().getHierarchy());
         sql = this.genericDataService.replace(sql, "${currentUserId}", currentUser.getId().toString());
         sql = this.genericDataService.replace(sql, "${currentDate}", sqlGenerator.currentBusinessDate());
-
         // Step 2 — replace SQL function aliases with tenant-aware equivalents (case-insensitive, literal match)
-        sql = Pattern.compile(Pattern.quote("NOW()"), Pattern.CASE_INSENSITIVE).matcher(sql)
-                .replaceAll(Matcher.quoteReplacement(sqlGenerator.currentTenantDateTime()));
-        sql = Pattern.compile(Pattern.quote("curdate()"), Pattern.CASE_INSENSITIVE).matcher(sql)
-                .replaceAll(Matcher.quoteReplacement(sqlGenerator.currentBusinessDate()));
-        sql = Pattern.compile(Pattern.quote("CURRENT_DATE"), Pattern.CASE_INSENSITIVE).matcher(sql)
-                .replaceAll(Matcher.quoteReplacement(sqlGenerator.currentBusinessDate()));
-
+        sql = Pattern.compile(Pattern.quote("NOW()"), Pattern.CASE_INSENSITIVE).matcher(sql).replaceAll(Matcher.quoteReplacement(sqlGenerator.currentTenantDateTime()));
+        sql = Pattern.compile(Pattern.quote("curdate()"), Pattern.CASE_INSENSITIVE).matcher(sql).replaceAll(Matcher.quoteReplacement(sqlGenerator.currentBusinessDate()));
+        sql = Pattern.compile(Pattern.quote("CURRENT_DATE"), Pattern.CASE_INSENSITIVE).matcher(sql).replaceAll(Matcher.quoteReplacement(sqlGenerator.currentBusinessDate()));
         // Step 2.5a — display-literal substitution for date/number params only
         // Substitute as plain string to preserve varchar return type expected by callers
         for (Map.Entry<String, String> entry : queryParams.entrySet()) {
             String paramName = entry.getKey().startsWith("${") ? entry.getKey().substring(2, entry.getKey().length() - 1) : entry.getKey();
             String formatType = paramFormatTypes.get(paramName);
-            String displayPattern = "'\\$\\{" + Pattern.quote(paramName) + "\\}'(\\s+AS\\s+)";
+            String displayPattern = "\'\\$\\{" + Pattern.quote(paramName) + "\\}\'(\\s+AS\\s+)";
             if (sql.matches("(?s).*" + displayPattern + ".*")) {
-                if (formatType == null || (!formatType.equalsIgnoreCase("number") && !formatType.equalsIgnoreCase("integer")
-                        && !formatType.equalsIgnoreCase("date"))) {
-                    throw new InputValidationException("Parameter '%s' of type '%s' cannot be used in display-literal position"
-                            .formatted(paramName, formatType != null ? formatType : "unregistered"));
+                if (formatType == null || (!formatType.equalsIgnoreCase("number") && !formatType.equalsIgnoreCase("integer") && !formatType.equalsIgnoreCase("date"))) {
+                    throw new InputValidationException("Parameter \'%s\' of type \'%s\' cannot be used in display-literal position".formatted(paramName, formatType != null ? formatType : "unregistered"));
                 }
                 // Substitute as string literal — preserves varchar return type
-                sql = sql.replaceAll(displayPattern, "'" + Matcher.quoteReplacement(entry.getValue()) + "'$1");
+                sql = sql.replaceAll(displayPattern, "\'" + Matcher.quoteReplacement(entry.getValue()) + "\'$1");
             }
         }
-
         // Step 2.5b — strip remaining quotes around filter placeholders
-        sql = sql.replaceAll("'(\\$\\{\\w+})'", "$1");
+        sql = sql.replaceAll("\'(\\$\\{\\w+})\'", "$1");
         sql = sql.replaceAll("\"(\\$\\{\\w+})\"", "$1");
         sql = sql.replaceAll("\"(-?\\d+)\"", "$1");
-
         // Step 3 — normalise queryParams keys from "${paramName}" to "paramName" for buildPreparedQuery
         final Map<String, String> normalisedParams = new HashMap<>();
         for (Map.Entry<String, String> entry : queryParams.entrySet()) {
@@ -254,7 +230,6 @@ public class ReadReportingServiceImpl implements ReadReportingService {
             }
             normalisedParams.put(key, entry.getValue());
         }
-
         return buildPreparedQuery(name, normalisedParams, sql, paramFormatTypes);
     }
 
@@ -262,26 +237,19 @@ public class ReadReportingServiceImpl implements ReadReportingService {
         if (name == null || type == null) {
             throw new IllegalArgumentException("Report name and type cannot be null");
         }
-
         // Validate report type against whitelist - this prevents SQL injection in table names
         if (!ReportType.isValidType(type)) {
             throw new IllegalArgumentException("Invalid report type provided");
         }
-
         final ReportType reportType = ReportType.fromValue(type);
         final String quotedTableName = getQuotedTableName(reportType);
         final String quotedColumnSqlName = getQuotedColumnName(reportType, "_sql");
         final String quotedColumnNameName = getQuotedColumnName(reportType, "_name");
-
         // Use parameterized query with validated and quoted identifiers to prevent SQL injection
-        final String inputSql = "SELECT " + quotedColumnSqlName + " AS the_sql FROM " + quotedTableName + " WHERE " + quotedColumnNameName
-                + " = ?";
-
+        final String inputSql = "SELECT " + quotedColumnSqlName + " AS the_sql FROM " + quotedTableName + " WHERE " + quotedColumnNameName + " = ?";
         final String inputSqlWrapped = this.genericDataService.wrapSQL(inputSql);
-
         // Use parameterized query - name parameter is safely handled by JDBC
         final SqlRowSet rs = this.jdbcTemplate.queryForRowSet(inputSqlWrapped, name);
-
         if (rs.next() && rs.getString("the_sql") != null) {
             return rs.getString("the_sql");
         }
@@ -318,13 +286,9 @@ public class ReadReportingServiceImpl implements ReadReportingService {
         if (isParameterType) {
             return "Table";
         }
-
-        final String sql = "SELECT coalesce(report_type,'') AS report_type FROM stretchy_report WHERE report_name = ?";
-
+        final String sql = "SELECT coalesce(report_type,\'\') AS report_type FROM stretchy_report WHERE report_name = ?";
         final String sqlWrapped = this.genericDataService.wrapSQL(sql);
-
         final SqlRowSet rs = this.jdbcTemplate.queryForRowSet(sqlWrapped, reportName);
-
         if (rs.next()) {
             return rs.getString("report_type");
         }
@@ -333,7 +297,6 @@ public class ReadReportingServiceImpl implements ReadReportingService {
 
     @Override
     public String retrieveReportPDF(final String reportName, final String type, final Map<String, String> queryParams) {
-
         final Path fileLocation = Path.of(fineractProperties.getContent().getFilesystem().getRootFolder());
         if (!Files.isDirectory(fileLocation)) {
             try {
@@ -342,21 +305,15 @@ public class ReadReportingServiceImpl implements ReadReportingService {
                 throw new UncheckedIOException(e);
             }
         }
-
         final Path generatePdf = fileLocation.resolve(reportName + ".pdf");
-
         try {
             final GenericResultsetData result = retrieveGenericResultset(reportName, type, queryParams);
-
             final List<ResultsetColumnHeaderData> columnHeaders = result.getColumnHeaders();
             final List<ResultsetRowData> data = result.getData();
             List<Object> row;
-
             log.debug("NO. of Columns: {}", columnHeaders.size());
             final Integer chSize = columnHeaders.size();
-
             final Document document = new Document(PageSize.B0.rotate());
-
             // Validate filename characters and use Path.of() for safe handling
             if (!reportName.matches("^[a-zA-Z0-9_.-]+$")) {
                 throw new IllegalArgumentException("Invalid report name format");
@@ -367,17 +324,12 @@ public class ReadReportingServiceImpl implements ReadReportingService {
             }
             PdfWriter.getInstance(document, Files.newOutputStream(validatedPath));
             document.open();
-
             final PdfPTable table = new PdfPTable(chSize);
             table.setWidthPercentage(100);
-
             for (int i = 0; i < chSize; i++) {
-
                 table.addCell(columnHeaders.get(i).getColumnName());
-
             }
             table.completeRow();
-
             Integer rSize;
             JdbcJavaType currColType;
             String currVal;
@@ -405,7 +357,6 @@ public class ReadReportingServiceImpl implements ReadReportingService {
     @Override
     public ReportData retrieveReport(final Long id) {
         final Collection<ReportData> reports = retrieveReports(id);
-
         for (final ReportData report : reports) {
             return report;
         }
@@ -418,21 +369,14 @@ public class ReadReportingServiceImpl implements ReadReportingService {
     }
 
     private Collection<ReportData> retrieveReports(final Long id) {
-
         final ReportParameterJoinMapper rm = new ReportParameterJoinMapper();
-
         final String sql = rm.schema(id);
-
-        final Collection<ReportParameterJoinData> rpJoins = this.jdbcTemplate.query(sql, rm,
-                id != null ? new Object[] { id } : new Object[] {});
-
+        final Collection<ReportParameterJoinData> rpJoins = this.jdbcTemplate.query(sql, rm, id != null ? new Object[] {id} : new Object[] {});
         final Collection<ReportData> reportList = new ArrayList<>();
         if (rpJoins == null || rpJoins.size() == 0) {
             return reportList;
         }
-
         Collection<ReportParameterData> reportParameters = null;
-
         Long reportId = null;
         String reportName = null;
         String reportType = null;
@@ -442,30 +386,23 @@ public class ReadReportingServiceImpl implements ReadReportingService {
         Boolean coreReport = null;
         Boolean useReport = null;
         String reportSql = null;
-
         Long prevReportId = (long) -1234;
         Boolean firstReport = true;
         for (final ReportParameterJoinData rpJoin : rpJoins) {
-
             if (rpJoin.getReportId().equals(prevReportId)) {
                 // more than one parameter for report
                 if (reportParameters == null) {
                     reportParameters = new ArrayList<>();
                 }
-                reportParameters.add(new ReportParameterData(rpJoin.getReportParameterId(), rpJoin.getParameterId(),
-                        rpJoin.getReportParameterName(), rpJoin.getParameterName()));
-
+                reportParameters.add(new ReportParameterData(rpJoin.getReportParameterId(), rpJoin.getParameterId(), rpJoin.getReportParameterName(), rpJoin.getParameterName()));
             } else {
                 if (firstReport) {
                     firstReport = false;
                 } else {
                     // write report entry
-                    reportList.add(new ReportData(reportId, reportName, reportType, reportSubType, reportCategory, description, reportSql,
-                            coreReport, useReport, reportParameters));
+                    reportList.add(new ReportData(reportId, reportName, reportType, reportSubType, reportCategory, description, reportSql, coreReport, useReport, reportParameters));
                 }
-
                 prevReportId = rpJoin.getReportId();
-
                 reportId = rpJoin.getReportId();
                 reportName = rpJoin.getReportName();
                 reportType = rpJoin.getReportType();
@@ -475,22 +412,17 @@ public class ReadReportingServiceImpl implements ReadReportingService {
                 reportSql = rpJoin.getReportSql();
                 coreReport = rpJoin.getCoreReport();
                 useReport = rpJoin.getUseReport();
-
                 if (rpJoin.getReportParameterId() != null) {
                     // report has at least one parameter
                     reportParameters = new ArrayList<>();
-                    reportParameters.add(new ReportParameterData(rpJoin.getReportParameterId(), rpJoin.getParameterId(),
-                            rpJoin.getReportParameterName(), rpJoin.getParameterName()));
+                    reportParameters.add(new ReportParameterData(rpJoin.getReportParameterId(), rpJoin.getParameterId(), rpJoin.getReportParameterName(), rpJoin.getParameterName()));
                 } else {
                     reportParameters = null;
                 }
             }
-
         }
         // write last report
-        reportList.add(new ReportData(reportId, reportName, reportType, reportSubType, reportCategory, description, reportSql, coreReport,
-                useReport, reportParameters));
-
+        reportList.add(new ReportData(reportId, reportName, reportType, reportSubType, reportCategory, description, reportSql, coreReport, useReport, reportParameters));
         return reportList;
     }
 
@@ -502,28 +434,20 @@ public class ReadReportingServiceImpl implements ReadReportingService {
         return parameters;
     }
 
+
     private static final class ReportParameterJoinMapper implements RowMapper<ReportParameterJoinData> {
-
         public String schema(final Long reportId) {
-
-            String sql = "select r.id as reportId, r.report_name as reportName, r.report_type as reportType, "
-                    + " r.report_subtype as reportSubType, r.report_category as reportCategory, r.description, r.core_report as coreReport, r.use_report as useReport, "
-                    + " rp.id as reportParameterId, rp.parameter_id as parameterId, rp.report_parameter_name as reportParameterName, p.parameter_name as parameterName";
-
+            String sql = "select r.id as reportId, r.report_name as reportName, r.report_type as reportType, " + " r.report_subtype as reportSubType, r.report_category as reportCategory, r.description, r.core_report as coreReport, r.use_report as useReport, " + " rp.id as reportParameterId, rp.parameter_id as parameterId, rp.report_parameter_name as reportParameterName, p.parameter_name as parameterName";
             if (reportId != null) {
                 sql += ", r.report_sql as reportSql ";
             }
-
-            sql += " from stretchy_report r" + " left join stretchy_report_parameter rp on rp.report_id = r.id"
-                    + " left join stretchy_parameter p on p.id = rp.parameter_id";
+            sql += " from stretchy_report r" + " left join stretchy_report_parameter rp on rp.report_id = r.id" + " left join stretchy_parameter p on p.id = rp.parameter_id";
             if (reportId != null) {
                 sql += " where r.id = ?";
             } else {
                 sql += " order by r.id, rp.parameter_id";
             }
-
             return sql;
-
             /*
              * used to only return reports that the use can run as done in report UI but not necessary as there is a
              * read_report permission which should give user access to look all reports + " where exists" +
@@ -544,7 +468,6 @@ public class ReadReportingServiceImpl implements ReadReportingService {
             final String description = rs.getString("description");
             final Boolean coreReport = rs.getBoolean("coreReport");
             final Boolean useReport = rs.getBoolean("useReport");
-
             String reportSql;
             // reportSql might not be on the select list of columns
             try {
@@ -552,29 +475,24 @@ public class ReadReportingServiceImpl implements ReadReportingService {
             } catch (final SQLException e) {
                 reportSql = null;
             }
-
             final Long reportParameterId = JdbcSupport.getLong(rs, "reportParameterId");
             final Long parameterId = JdbcSupport.getLong(rs, "parameterId");
             final String reportParameterName = rs.getString("reportParameterName");
             final String parameterName = rs.getString("parameterName");
-
-            return new ReportParameterJoinData(reportId, reportName, reportType, reportSubType, reportCategory, description, reportSql,
-                    coreReport, useReport, reportParameterId, parameterId, reportParameterName, parameterName);
+            return new ReportParameterJoinData(reportId, reportName, reportType, reportSubType, reportCategory, description, reportSql, coreReport, useReport, reportParameterId, parameterId, reportParameterName, parameterName);
         }
     }
 
-    private static final class ReportParameterMapper implements RowMapper<ReportParameterData> {
 
+    private static final class ReportParameterMapper implements RowMapper<ReportParameterData> {
         public String schema() {
-            return "select p.id as id, p.parameter_name as parameterName from stretchy_parameter p where coalesce(p.special,'') != 'Y' order by p.id";
+            return "select p.id as id, p.parameter_name as parameterName from stretchy_parameter p where coalesce(p.special,\'\') != \'Y\' order by p.id";
         }
 
         @Override
         public ReportParameterData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
-
             final Long id = rs.getLong("id");
             final String parameterName = rs.getString("parameterName");
-
             return new ReportParameterData(id, null, null, parameterName);
         }
     }
@@ -583,12 +501,8 @@ public class ReadReportingServiceImpl implements ReadReportingService {
     public GenericResultsetData retrieveGenericResultSetForSmsEmailCampaign(String name, String type, Map<String, String> queryParams) {
         final long startTime = System.currentTimeMillis();
         log.debug("STARTING REPORT: {}   Type: {}", name, type);
-
         final PreparedQuery preparedQuery = sqlToRunForSmsEmailCampaign(name, type, queryParams);
-
-        final GenericResultsetData result = this.genericDataService.fillGenericResultSet(preparedQuery.sql(),
-                preparedQuery.params().toArray());
-
+        final GenericResultsetData result = this.genericDataService.fillGenericResultSet(preparedQuery.sql(), preparedQuery.params().toArray());
         final long elapsed = System.currentTimeMillis() - startTime;
         log.debug("FINISHING Report/Request Name: {} - {}     Elapsed Time: {}", name, type, elapsed);
         return result;
@@ -602,17 +516,14 @@ public class ReadReportingServiceImpl implements ReadReportingService {
     private PreparedQuery sqlToRunForSmsEmailCampaign(final String name, final String type, final Map<String, String> queryParams) {
         final Map<String, String> paramFormatTypes = this.reportParameterTypeResolver.loadParamFormatTypes(name);
         String sql = getSql(name, type);
-
-        sql = sql.replaceAll("'(\\$\\{[^}]+\\})'", "$1");
+        sql = sql.replaceAll("\'(\\$\\{[^}]+\\})\'", "$1");
         sql = sql.replaceAll("\"(\\$\\{[^}]+\\})\"", "$1");
         sql = sql.replaceAll("\"(-?\\d+)\"", "$1");
-
         return buildPreparedQuery(name, queryParams, sql, paramFormatTypes);
     }
 
     @Override
-    public ByteArrayOutputStream generatePentahoReportAsOutputStream(final String reportName, final String outputTypeParam,
-            final Map<String, String> queryParams, final Locale locale, final AppUser runReportAsUser, final StringBuilder errorLog) {
+    public ByteArrayOutputStream generatePentahoReportAsOutputStream(final String reportName, final String outputTypeParam, final Map<String, String> queryParams, final Locale locale, final AppUser runReportAsUser, final StringBuilder errorLog) {
         // This complete implementation should be moved to Pentaho Report
         // Service
         /*
@@ -669,5 +580,16 @@ public class ReadReportingServiceImpl implements ReadReportingService {
          *
          */
         return null;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ReadReportingServiceImpl(final JdbcTemplate jdbcTemplate, final PlatformSecurityContext context, final GenericDataService genericDataService, final SqlInjectionPreventerService sqlInjectionPreventerService, final DatabaseSpecificSQLGenerator sqlGenerator, final FineractProperties fineractProperties, final ReportParameterTypeResolver reportParameterTypeResolver) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.context = context;
+        this.genericDataService = genericDataService;
+        this.sqlInjectionPreventerService = sqlInjectionPreventerService;
+        this.sqlGenerator = sqlGenerator;
+        this.fineractProperties = fineractProperties;
+        this.reportParameterTypeResolver = reportParameterTypeResolver;
     }
 }

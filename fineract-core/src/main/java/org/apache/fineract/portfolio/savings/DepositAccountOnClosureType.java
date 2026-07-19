@@ -19,20 +19,17 @@
 package org.apache.fineract.portfolio.savings;
 
 import java.util.Arrays;
-import lombok.Getter;
 
 /**
  * An enumeration of different options available on account closure
  */
-@Getter
 public enum DepositAccountOnClosureType {
-
-    INVALID(0, "depositAccountClosureType.invalid"), //
-    WITHDRAW_DEPOSIT(100, "depositAccountClosureType.withdrawDeposit"), //
-    TRANSFER_TO_SAVINGS(200, "depositAccountClosureType.transferToSavings"), //
-    REINVEST_PRINCIPAL_AND_INTEREST(300, "depositAccountClosureType.reinvestPrincipalAndInterest"), //
-    REINVEST_PRINCIPAL_ONLY(400, "depositAccountClosureType.reinvestPrincipalOnly"); //
-
+    INVALID(0, "depositAccountClosureType.invalid"),  //
+    WITHDRAW_DEPOSIT(100, "depositAccountClosureType.withdrawDeposit"),  //
+    TRANSFER_TO_SAVINGS(200, "depositAccountClosureType.transferToSavings"),  //
+    REINVEST_PRINCIPAL_AND_INTEREST(300, "depositAccountClosureType.reinvestPrincipalAndInterest"),  //
+    REINVEST_PRINCIPAL_ONLY(400, "depositAccountClosureType.reinvestPrincipalOnly");
+    //
     private final Integer value;
     private final String code;
 
@@ -45,7 +42,6 @@ public enum DepositAccountOnClosureType {
         if (v == null) {
             return INVALID;
         }
-
         return switch (v) {
             case 100 -> WITHDRAW_DEPOSIT;
             case 200 -> TRANSFER_TO_SAVINGS;
@@ -57,5 +53,15 @@ public enum DepositAccountOnClosureType {
 
     public static Integer[] integerValues() {
         return Arrays.stream(values()).filter(v -> v != INVALID).map(v -> v.value).toArray(Integer[]::new);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
     }
 }

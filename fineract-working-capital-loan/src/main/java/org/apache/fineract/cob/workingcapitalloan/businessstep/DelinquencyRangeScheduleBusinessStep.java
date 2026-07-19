@@ -20,39 +20,31 @@ package org.apache.fineract.cob.workingcapitalloan.businessstep;
 
 import java.time.LocalDate;
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanDisbursementDetails;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanDelinquencyRangeScheduleService;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class DelinquencyRangeScheduleBusinessStep extends WorkingCapitalLoanCOBBusinessStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DelinquencyRangeScheduleBusinessStep.class);
     private final WorkingCapitalLoanDelinquencyRangeScheduleService rangeScheduleService;
 
     @Override
     public WorkingCapitalLoan execute(WorkingCapitalLoan input) {
-        boolean isDisbursed = input.getDisbursementDetails().stream().map(WorkingCapitalLoanDisbursementDetails::getActualDisbursementDate)
-                .anyMatch(Objects::nonNull);
+        boolean isDisbursed = input.getDisbursementDetails().stream().map(WorkingCapitalLoanDisbursementDetails::getActualDisbursementDate).anyMatch(Objects::nonNull);
         if (!isDisbursed) {
             log.debug("Skipping delinquency range schedule for WC loan {} - not yet disbursed", input.getId());
             return input;
         }
-
         LocalDate businessDate = DateUtils.getBusinessLocalDate();
-
         if (!rangeScheduleService.hasSchedule(input.getId())) {
             rangeScheduleService.generateInitialPeriod(input);
         }
-
         rangeScheduleService.generateNextPeriodIfNeeded(input, businessDate);
         rangeScheduleService.evaluateExpiredPeriods(input, businessDate);
-
         return input;
     }
 
@@ -64,5 +56,10 @@ public class DelinquencyRangeScheduleBusinessStep extends WorkingCapitalLoanCOBB
     @Override
     public String getHumanReadableName() {
         return "WC Delinquency Range Schedule";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyRangeScheduleBusinessStep(final WorkingCapitalLoanDelinquencyRangeScheduleService rangeScheduleService) {
+        this.rangeScheduleService = rangeScheduleService;
     }
 }

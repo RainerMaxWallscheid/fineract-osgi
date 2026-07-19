@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.loanaccount.serialization;
 
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.charge.exception.LoanChargeCannotBeAddedException;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -32,16 +31,13 @@ import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeRefundExcep
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public final class LoanChargeValidator {
-
     private final LoanTransactionRepository loanTransactionRepository;
 
     public void validateLoanIsNotClosed(final Loan loan, final LoanCharge loanCharge) {
         if (loan.isClosed()) {
             final String defaultUserMessage = "This charge cannot be added as the loan is already closed.";
             throw new LoanChargeCannotBeAddedException("loanCharge", "loan.is.closed", defaultUserMessage, loan.getId(), loanCharge.name());
-
         }
     }
 
@@ -51,17 +47,14 @@ public final class LoanChargeValidator {
     public void validateLoanChargeIsNotWaived(final Loan loan, final LoanCharge loanCharge) {
         if (loanCharge.isWaived()) {
             final String defaultUserMessage = "This loan charge cannot be removed as the charge as already been waived.";
-            throw new LoanChargeCannotBeAddedException("loanCharge", "loanCharge.is.waived", defaultUserMessage, loan.getId(),
-                    loanCharge.name());
+            throw new LoanChargeCannotBeAddedException("loanCharge", "loanCharge.is.waived", defaultUserMessage, loan.getId(), loanCharge.name());
         }
     }
 
-    public void validateChargeHasValidSpecifiedDateIfApplicable(final Loan loan, final LoanCharge loanCharge,
-            final LocalDate disbursementDate) {
+    public void validateChargeHasValidSpecifiedDateIfApplicable(final Loan loan, final LoanCharge loanCharge, final LocalDate disbursementDate) {
         if (loanCharge.isSpecifiedDueDate() && DateUtils.isBefore(loanCharge.getDueLocalDate(), disbursementDate)) {
             final String defaultUserMessage = "This charge with specified due date cannot be added as the it is not in schedule range.";
-            throw new LoanChargeCannotBeAddedException("loanCharge", "specified.due.date.outside.range", defaultUserMessage,
-                    loan.getDisbursementDate(), loanCharge.name());
+            throw new LoanChargeCannotBeAddedException("loanCharge", "specified.due.date.outside.range", defaultUserMessage, loan.getDisbursementDate(), loanCharge.name());
         }
     }
 
@@ -78,20 +71,16 @@ public final class LoanChargeValidator {
             // payment of the charges (user has no choice in saying they were or
             // were not paid) - so its assumed they were paid.
             final String defaultUserMessage = "This charge which is due at disbursement cannot be added as the loan is already disbursed.";
-            throw new LoanChargeCannotBeAddedException("loanCharge", "due.at.disbursement.and.loan.is.disbursed", defaultUserMessage,
-                    loan.getId(), loanCharge.name());
+            throw new LoanChargeCannotBeAddedException("loanCharge", "due.at.disbursement.and.loan.is.disbursed", defaultUserMessage, loan.getId(), loanCharge.name());
         }
     }
 
-    public void validateRepaymentTypeTransactionNotBeforeAChargeRefund(final Loan loan, final LoanTransaction repaymentTransaction,
-            final String reversedOrCreated) {
+    public void validateRepaymentTypeTransactionNotBeforeAChargeRefund(final Loan loan, final LoanTransaction repaymentTransaction, final String reversedOrCreated) {
         if (repaymentTransaction.isRepaymentLikeType() && !repaymentTransaction.isChargeRefund()) {
-            final boolean existsChargeRefund = loanTransactionRepository.existsNonReversedByLoanAndTypeAndAfterDate(loan,
-                    LoanTransactionType.CHARGE_REFUND, repaymentTransaction.getTransactionDate());
+            final boolean existsChargeRefund = loanTransactionRepository.existsNonReversedByLoanAndTypeAndAfterDate(loan, LoanTransactionType.CHARGE_REFUND, repaymentTransaction.getTransactionDate());
             if (existsChargeRefund) {
                 final String errorMessage = "loan.transaction.cant.be." + reversedOrCreated + ".because.later.charge.refund.exists";
-                final String details = "Loan Transaction: " + loan.getId() + " Can't be " + reversedOrCreated
-                        + " because a Later Charge Refund Exists.";
+                final String details = "Loan Transaction: " + loan.getId() + " Can\'t be " + reversedOrCreated + " because a Later Charge Refund Exists.";
                 throw new LoanChargeRefundException(errorMessage, details);
             }
         }
@@ -100,8 +89,12 @@ public final class LoanChargeValidator {
     public void validateChargePaymentNotInFuture(final LoanTransaction paymentTransaction) {
         if (DateUtils.isDateInTheFuture(paymentTransaction.getTransactionDate())) {
             final String errorMessage = "The date on which a loan charge paid cannot be in the future.";
-            throw new InvalidLoanStateTransitionException("charge.payment", "cannot.be.a.future.date", errorMessage,
-                    paymentTransaction.getTransactionDate());
+            throw new InvalidLoanStateTransitionException("charge.payment", "cannot.be.a.future.date", errorMessage, paymentTransaction.getTransactionDate());
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanChargeValidator(final LoanTransactionRepository loanTransactionRepository) {
+        this.loanTransactionRepository = loanTransactionRepository;
     }
 }

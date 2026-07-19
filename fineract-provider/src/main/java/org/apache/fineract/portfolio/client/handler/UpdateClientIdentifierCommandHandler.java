@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.client.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "CLIENTIDENTIFIER", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateClientIdentifierCommandHandler implements NewCommandSourceHandler {
-
     private final ClientIdentifierWritePlatformService clientIdentifierWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.clientIdentifierWritePlatformService.updateClientIdentifier(command.getClientId(), command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateClientIdentifierCommandHandler(final ClientIdentifierWritePlatformService clientIdentifierWritePlatformService) {
+        this.clientIdentifierWritePlatformService = clientIdentifierWritePlatformService;
     }
 }

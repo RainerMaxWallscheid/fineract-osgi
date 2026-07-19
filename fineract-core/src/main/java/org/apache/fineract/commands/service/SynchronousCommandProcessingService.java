@@ -21,7 +21,6 @@ package org.apache.fineract.commands.service;
 import static org.apache.fineract.commands.domain.CommandProcessingResultType.ERROR;
 import static org.apache.fineract.commands.domain.CommandProcessingResultType.PROCESSED;
 import static org.apache.http.HttpStatus.SC_OK;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -29,8 +28,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.batch.exception.ErrorInfo;
 import org.apache.fineract.commands.configuration.RetryConfigurationAssembler;
 import org.apache.fineract.commands.domain.CommandProcessingResultType;
@@ -64,12 +61,10 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
-@Slf4j
-@RequiredArgsConstructor
 public class SynchronousCommandProcessingService implements CommandProcessingService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SynchronousCommandProcessingService.class);
     public static final String IDEMPOTENCY_KEY_STORE_FLAG = "idempotencyKeyStoreFlag";
-
     public static final String IDEMPOTENCY_KEY_ATTRIBUTE = "IdempotencyKeyAttribute";
     public static final String COMMAND_SOURCE_ID = "commandSourceId";
     private final PlatformSecurityContext context;
@@ -82,15 +77,13 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
     private final IdempotencyKeyResolver idempotencyKeyResolver;
     private final CommandSourceService commandSourceService;
     private final RetryConfigurationAssembler retryConfigurationAssembler;
-
     private final FineractRequestContextHolder fineractRequestContextHolder;
     private final Gson gson = GoogleGsonSerializerHelper.createSimpleGson();
 
     private CommandProcessingResult executeWithRetry(CommandExecutionContext executionContext) {
         try {
             if (!BatchRequestContextHolder.isEnclosingTransaction()) {
-                return retryConfigurationAssembler.getRetryConfigurationForExecuteCommand()
-                        .executeSupplier(() -> executeCommandAttempt(executionContext));
+                return retryConfigurationAssembler.getRetryConfigurationForExecuteCommand().executeSupplier(() -> executeCommandAttempt(executionContext));
             }
             return executeCommandAttempt(executionContext);
         } catch (RollbackTransactionNotApprovedException e) {
@@ -103,35 +96,32 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
     }
 
     @Override
-    public CommandProcessingResult executeCommand(final CommandWrapper wrapper, final JsonCommand command,
-            final boolean isApprovedByChecker) {
+    public CommandProcessingResult executeCommand(final CommandWrapper wrapper, final JsonCommand command, final boolean isApprovedByChecker) {
         return executeWithRetry(new CommandExecutionContext(wrapper, command, isApprovedByChecker));
     }
 
     private CommandProcessingResult executeCommandAttempt(CommandExecutionContext executionContext) {
         // Do not store the idempotency key because of the exception handling
         setIdempotencyKeyStoreFlag(false);
-
         CommandWrapper wrapper = executionContext.wrapper();
         JsonCommand command = executionContext.command();
         Long commandId = (Long) fineractRequestContextHolder.getAttribute(COMMAND_SOURCE_ID, null);
         boolean isRetry = commandId != null;
         boolean isEnclosingTransaction = BatchRequestContextHolder.isEnclosingTransaction();
         executionContext.setEnclosingTransaction(isEnclosingTransaction);
-
         CommandSource commandSource = null;
         String idempotencyKey;
         if (isRetry) {
             commandSource = commandSourceService.getCommandSource(commandId);
             idempotencyKey = commandSource.getIdempotencyKey();
-        } else if ((commandId = command.commandId()) != null) { // action on the command itself
+        } else if ((commandId = command.commandId()) != null) {
+            // action on the command itself
             commandSource = commandSourceService.getCommandSource(commandId);
             idempotencyKey = commandSource.getIdempotencyKey();
         } else {
             idempotencyKey = idempotencyKeyResolver.resolve(wrapper);
         }
         exceptionWhenTheRequestAlreadyProcessed(wrapper, idempotencyKey, isRetry);
-
         AppUser user = context.authenticatedUser(wrapper);
         if (commandSource == null) {
             if (isEnclosingTransaction) {
@@ -145,53 +135,42 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
         if (commandId != null) {
             storeCommandIdInContext(commandSource); // Store command id as a request attribute
         }
-
         setIdempotencyKeyStoreFlag(true);
-
         return executeCommandInTransaction(executionContext, commandSource, user, isEnclosingTransaction);
     }
 
-    private CommandProcessingResult executeCommandInTransaction(CommandExecutionContext executionContext, CommandSource commandSource,
-            AppUser user, boolean isEnclosingTransaction) {
-
+    private CommandProcessingResult executeCommandInTransaction(CommandExecutionContext executionContext, CommandSource commandSource, AppUser user, boolean isEnclosingTransaction) {
         final CommandSourceService.CommandExecutionResult commandExecutionResult;
         try {
-            commandExecutionResult = commandSourceService.processCommandAndSaveResult(findCommandHandler(executionContext.wrapper()),
-                    executionContext.command(), commandSource, user, executionContext.approvedByChecker(), this::updateSuccessfulResult);
+            commandExecutionResult = commandSourceService.processCommandAndSaveResult(findCommandHandler(executionContext.wrapper()), executionContext.command(), commandSource, user, executionContext.approvedByChecker(), this::updateSuccessfulResult);
         } catch (RollbackTransactionNotApprovedException e) {
             ErrorInfo errorInfo = commandSourceService.generateErrorInfo(e);
             commandSource.setResultStatusCode(errorInfo.getStatusCode());
             commandSource.setResult(errorInfo.getMessage());
-            if (!isEnclosingTransaction) { // TODO: temporary solution
+            if (!isEnclosingTransaction) {
+                // TODO: temporary solution
                 commandSourceService.saveResult(commandSource);
             }
             publishHookErrorEvent(executionContext.wrapper(), executionContext.command(), errorInfo);
             throw e;
         }
-
         CommandProcessingResult result = commandExecutionResult.result();
         storeCommandIdInContext(commandExecutionResult.commandSource());
-
         result.setRollbackTransaction(null);
-
         // When running inside an enclosing batch transaction, defer hook publication
         // until after the transaction commits. This prevents webhooks from firing for
         // commands that are subsequently rolled back when a later command in the batch
         // fails (e.g. a withdrawal succeeds but its fee charge fails, rolling back both).
         if (isEnclosingTransaction && TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-
                 @Override
                 public void afterCommit() {
-                    publishHookEvent(executionContext.wrapper().entityName(), executionContext.wrapper().actionName(),
-                            executionContext.command(), result);
+                    publishHookEvent(executionContext.wrapper().entityName(), executionContext.wrapper().actionName(), executionContext.command(), result);
                 }
             });
         } else {
-            publishHookEvent(executionContext.wrapper().entityName(), executionContext.wrapper().actionName(), executionContext.command(),
-                    result);
+            publishHookEvent(executionContext.wrapper().entityName(), executionContext.wrapper().actionName(), executionContext.command(), result);
         }
-
         return result;
     }
 
@@ -212,7 +191,6 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
         if (executionContext.enclosingTransaction()) {
             return;
         }
-
         Integer statusCode = errorInfo.getStatusCode();
         commandSource.setResultStatusCode(statusCode);
         commandSource.setResult(errorInfo.getMessage());
@@ -247,8 +225,7 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
         switch (status) {
             case UNDER_PROCESSING -> {
                 Class<?> lastExecutionExceptionClass = retryConfigurationAssembler.getLastException();
-                if (lastExecutionExceptionClass == null
-                        || IdempotentCommandProcessUnderProcessingException.class.isAssignableFrom(lastExecutionExceptionClass)) {
+                if (lastExecutionExceptionClass == null || IdempotentCommandProcessUnderProcessingException.class.isAssignableFrom(lastExecutionExceptionClass)) {
                     throw new IdempotentCommandProcessUnderProcessingException(wrapper, idempotencyKey);
                 }
             }
@@ -267,8 +244,8 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
         fineractRequestContextHolder.setAttribute(IDEMPOTENCY_KEY_STORE_FLAG, flag);
     }
 
-    private static final class CommandExecutionContext {
 
+    private static final class CommandExecutionContext {
         private final CommandWrapper wrapper;
         private final JsonCommand command;
         private final boolean approvedByChecker;
@@ -312,7 +289,6 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
 
     private NewCommandSourceHandler findCommandHandler(final CommandWrapper wrapper) {
         NewCommandSourceHandler handler;
-
         if (wrapper.isDatatableResource()) {
             if (wrapper.isCreateDatatable()) {
                 handler = applicationContext.getBean("createDatatableCommandHandler", NewCommandSourceHandler.class);
@@ -374,7 +350,6 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
         } else {
             handler = commandHandlerProvider.getHandler(wrapper.entityName(), wrapper.actionName());
         }
-
         return handler;
     }
 
@@ -388,68 +363,64 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
     protected void publishHookEvent(final String entityName, final String actionName, JsonCommand command, final Object result) {
         try {
             final AppUser appUser = context.authenticatedUser(CommandWrapper.wrap(actionName, entityName, null, null));
-
             final HookEventSource hookEventSource = new HookEventSource(entityName, actionName);
-
             // TODO: Add support for publishing array events
             if (command.json() != null) {
                 Type type = new TypeToken<Map<String, Object>>() {
-
                 }.getType();
-
                 Map<String, Object> myMap;
-
                 try {
                     myMap = gson.fromJson(command.json(), type);
                 } catch (Exception e) {
-                    throw new PlatformApiDataValidationException("error.msg.invalid.json", "The provided JSON is invalid.",
-                            new ArrayList<>(), e);
+                    throw new PlatformApiDataValidationException("error.msg.invalid.json", "The provided JSON is invalid.", new ArrayList<>(), e);
                 }
-
                 Map<String, Object> reqmap = new HashMap<>();
                 reqmap.put("entityName", entityName);
                 reqmap.put("actionName", actionName);
                 reqmap.put("createdBy", context.authenticatedUser().getId());
                 reqmap.put("createdByName", context.authenticatedUser().getUsername());
                 reqmap.put("createdByFullName", context.authenticatedUser().getDisplayName());
-
                 reqmap.put("request", myMap);
                 if (result instanceof CommandProcessingResult) {
-                    CommandProcessingResult resultCopy = CommandProcessingResult
-                            .fromCommandProcessingResult((CommandProcessingResult) result);
-
+                    CommandProcessingResult resultCopy = CommandProcessingResult.fromCommandProcessingResult((CommandProcessingResult) result);
                     reqmap.put("officeId", resultCopy.getOfficeId());
                     reqmap.put("clientId", resultCopy.getClientId());
                     resultCopy.setOfficeId(null);
                     reqmap.put("response", resultCopy);
                 } else if (result instanceof ErrorInfo ex) {
                     reqmap.put("status", "Exception");
-
                     Map<String, Object> errorMap = new HashMap<>();
-
                     try {
                         errorMap = gson.fromJson(ex.getMessage(), type);
                     } catch (Exception e) {
                         errorMap.put("errorMessage", ex.getMessage());
                     }
-
                     errorMap.put("errorCode", ex.getErrorCode());
                     errorMap.put("statusCode", ex.getStatusCode());
-
                     reqmap.put("response", errorMap);
                 }
-
                 reqmap.put("timestamp", Instant.now().toString());
-
                 final String serializedResult = toApiJsonSerializer.serialize(reqmap);
-
-                final HookEvent applicationEvent = new HookEvent(hookEventSource, serializedResult, appUser,
-                        ThreadLocalContextUtil.getContext());
-
+                final HookEvent applicationEvent = new HookEvent(hookEventSource, serializedResult, appUser, ThreadLocalContextUtil.getContext());
                 eventPublisher.publishEvent(applicationEvent);
             }
         } catch (Exception e) {
             log.error("Failed to publish hook event for entity: {}, action: {}", entityName, actionName, e);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SynchronousCommandProcessingService(final PlatformSecurityContext context, final ApplicationContext applicationContext, final TransactionBoundApplicationEventPublisher eventPublisher, final ToApiJsonSerializer<Map<String, Object>> toApiJsonSerializer, final ToApiJsonSerializer<CommandProcessingResult> toApiResultJsonSerializer, final ConfigurationDomainService configurationDomainService, final CommandHandlerProvider commandHandlerProvider, final IdempotencyKeyResolver idempotencyKeyResolver, final CommandSourceService commandSourceService, final RetryConfigurationAssembler retryConfigurationAssembler, final FineractRequestContextHolder fineractRequestContextHolder) {
+        this.context = context;
+        this.applicationContext = applicationContext;
+        this.eventPublisher = eventPublisher;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.toApiResultJsonSerializer = toApiResultJsonSerializer;
+        this.configurationDomainService = configurationDomainService;
+        this.commandHandlerProvider = commandHandlerProvider;
+        this.idempotencyKeyResolver = idempotencyKeyResolver;
+        this.commandSourceService = commandSourceService;
+        this.retryConfigurationAssembler = retryConfigurationAssembler;
+        this.fineractRequestContextHolder = fineractRequestContextHolder;
     }
 }

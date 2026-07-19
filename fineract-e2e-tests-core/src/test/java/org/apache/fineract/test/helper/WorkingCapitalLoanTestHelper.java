@@ -25,7 +25,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Objects;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.test.data.LoanStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -33,23 +32,22 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 
 @Component
-@Slf4j
 public class WorkingCapitalLoanTestHelper {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanTestHelper.class);
     private static final String TABLE_WC_LOAN = "m_wc_loan";
     private static final String TABLE_WC_LOAN_ACCOUNT_LOCKS = "m_wc_loan_account_locks";
     private static final int INITIAL_VERSION = 0;
     private static final long ADMIN_USER_ID = 1L;
     private static final BigDecimal DEFAULT_PRINCIPAL = new BigDecimal("1000.00");
-
     private final JdbcTemplate testJdbcTemplate;
     private final SimpleJdbcInsert wcLoanInsert;
 
     public WorkingCapitalLoanTestHelper(JdbcTemplate testJdbcTemplate) {
         this.testJdbcTemplate = testJdbcTemplate;
-        this.wcLoanInsert = new SimpleJdbcInsert(testJdbcTemplate)//
-                .withTableName(TABLE_WC_LOAN)//
-                .usingGeneratedKeyColumns("id");
+        this.wcLoanInsert = //
+        //
+        new SimpleJdbcInsert(testJdbcTemplate).withTableName(TABLE_WC_LOAN).usingGeneratedKeyColumns("id");
     }
 
     public Long insertActiveLoan(final Long clientId, final Long productId) {
@@ -66,29 +64,28 @@ public class WorkingCapitalLoanTestHelper {
 
     public Long insertLoan(final LoanStatus status, final LocalDate lastClosedBusinessDate, final Long clientId, final Long productId) {
         final Timestamp now = Timestamp.from(OffsetDateTime.now(ZoneOffset.UTC).toInstant());
-        final MapSqlParameterSource params = new MapSqlParameterSource()//
-                .addValue("account_no", generateAccountNumber())//
-                .addValue("external_id", generateUniqueExternalId())//
-                .addValue("version", INITIAL_VERSION)//
-                .addValue("created_by", ADMIN_USER_ID)//
-                .addValue("last_modified_by", ADMIN_USER_ID)//
-                .addValue("created_on_utc", now)//
-                .addValue("last_modified_on_utc", now)//
-                .addValue("loan_status_id", status.getValue())//
-                .addValue("last_closed_business_date", lastClosedBusinessDate)//
-                .addValue("client_id", clientId)//
-                .addValue("product_id", productId)//
-                .addValue("principal", DEFAULT_PRINCIPAL)//
-                .addValue("principal_amount_proposed", DEFAULT_PRINCIPAL)//
-                .addValue("approved_principal", DEFAULT_PRINCIPAL)//
-                .addValue("total_payment_volume", DEFAULT_PRINCIPAL);
+        final MapSqlParameterSource params = //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        new MapSqlParameterSource().addValue("account_no", generateAccountNumber()).addValue("external_id", generateUniqueExternalId()).addValue("version", INITIAL_VERSION).addValue("created_by", ADMIN_USER_ID).addValue("last_modified_by", ADMIN_USER_ID).addValue("created_on_utc", now).addValue("last_modified_on_utc", now).addValue("loan_status_id", status.getValue()).addValue("last_closed_business_date", lastClosedBusinessDate).addValue("client_id", clientId).addValue("product_id", productId).addValue("principal", DEFAULT_PRINCIPAL).addValue("principal_amount_proposed", DEFAULT_PRINCIPAL).addValue("approved_principal", DEFAULT_PRINCIPAL).addValue("total_payment_volume", DEFAULT_PRINCIPAL);
         final Number key = wcLoanInsert.executeAndReturnKey(params);
         return Objects.requireNonNull(key, "Generated key must not be null").longValue();
     }
 
     public LocalDate getLastClosedBusinessDate(Long loanId) {
-        return testJdbcTemplate.queryForObject("SELECT last_closed_business_date FROM " + TABLE_WC_LOAN + " WHERE id = ?", LocalDate.class,
-                loanId);
+        return testJdbcTemplate.queryForObject("SELECT last_closed_business_date FROM " + TABLE_WC_LOAN + " WHERE id = ?", LocalDate.class, loanId);
     }
 
     public int getVersion(Long loanId) {
@@ -96,8 +93,7 @@ public class WorkingCapitalLoanTestHelper {
     }
 
     public int countLocksByLoanId(Long loanId) {
-        return testJdbcTemplate.queryForObject("SELECT COUNT(*) FROM " + TABLE_WC_LOAN_ACCOUNT_LOCKS + " WHERE loan_id = ?", Integer.class,
-                loanId);
+        return testJdbcTemplate.queryForObject("SELECT COUNT(*) FROM " + TABLE_WC_LOAN_ACCOUNT_LOCKS + " WHERE loan_id = ?", Integer.class, loanId);
     }
 
     public void deleteById(Long loanId) {

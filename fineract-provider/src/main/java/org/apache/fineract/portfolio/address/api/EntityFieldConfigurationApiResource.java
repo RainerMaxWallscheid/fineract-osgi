@@ -27,7 +27,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.address.data.FieldConfigurationData;
 import org.apache.fineract.portfolio.address.service.FieldConfigurationReadPlatformService;
@@ -35,22 +34,23 @@ import org.springframework.stereotype.Component;
 
 @Path("/v1/fieldconfiguration/{entity}")
 @Component
-@Tag(name = "Entity Field Configuration", description = "Entity Field configuration API is a generic and extensible \n"
-        + "wherein various entities and subentities can be related.\n" + "Also it gives the user an ability to enable/disable fields,\n"
-        + "add regular expression for validation")
-@RequiredArgsConstructor
+@Tag(name = "Entity Field Configuration", description = "Entity Field configuration API is a generic and extensible \n" + "wherein various entities and subentities can be related.\n" + "Also it gives the user an ability to enable/disable fields,\n" + "add regular expression for validation")
 public class EntityFieldConfigurationApiResource {
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "Address";
     private final PlatformSecurityContext context;
     private final FieldConfigurationReadPlatformService readPlatformServicefld;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieves the Entity Field Configuration", description = "It retrieves all the Entity Field Configuration")
     public List<FieldConfigurationData> getAddresses(@PathParam("entity") @Parameter(description = "entity") final String entityname) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return this.readPlatformServicefld.retrieveFieldConfiguration(entityname);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public EntityFieldConfigurationApiResource(final PlatformSecurityContext context, final FieldConfigurationReadPlatformService readPlatformServicefld) {
+        this.context = context;
+        this.readPlatformServicefld = readPlatformServicefld;
+    }
 }

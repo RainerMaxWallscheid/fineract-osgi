@@ -29,7 +29,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.data.IsCatchUpRunningDTO;
 import org.apache.fineract.cob.data.OldestCOBProcessedLoanDTO;
 import org.apache.fineract.cob.service.COBCatchUpService;
@@ -41,38 +40,39 @@ import org.springframework.stereotype.Component;
 @Path("/v1/working-capital-loans")
 @Component
 @Tag(name = "Working Capital Loan COB Catch Up", description = "")
-@RequiredArgsConstructor
 public class WorkingCapitalLoanCOBCatchUpApiResource {
-
     private final Optional<WorkingCapitalLoanCOBCatchUpServiceImpl> loanCOBCatchUpServiceOp;
 
     @GET
     @Path("oldest-cob-closed")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieves the oldest COB processed Working Capital Loan", description = "Retrieves the COB business date and the oldest COB processed loan")
     public OldestCOBProcessedLoanDTO getOldestCOBProcessedLoan() {
-        return loanCOBCatchUpServiceOp.map(COBCatchUpService::getOldestCOBProcessedLoan)
-                .orElseThrow(() -> new JobIsNotFoundOrNotEnabledException(JobName.LOAN_COB.name()));
+        return loanCOBCatchUpServiceOp.map(COBCatchUpService::getOldestCOBProcessedLoan).orElseThrow(() -> new JobIsNotFoundOrNotEnabledException(JobName.LOAN_COB.name()));
     }
 
     @POST
     @Path("catch-up")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Executes Working Capital Loan COB Catch Up", description = "Executes the Working Capital Loan COB job on every day from the oldest Loan to the current COB business date")
     @ApiResponse(responseCode = "200", description = "All loans are up to date")
     @ApiResponse(responseCode = "202", description = "Catch Up has been started")
     @ApiResponse(responseCode = "400", description = "Catch Up is already running")
     public Response executeLoanCOBCatchUp() {
-        return loanCOBCatchUpServiceOp.map(COBCatchUpExecutorHelper::executeLoanCOBCatchUp)
-                .orElseThrow(() -> new JobIsNotFoundOrNotEnabledException(JobName.LOAN_COB.name()));
+        return loanCOBCatchUpServiceOp.map(COBCatchUpExecutorHelper::executeLoanCOBCatchUp).orElseThrow(() -> new JobIsNotFoundOrNotEnabledException(JobName.LOAN_COB.name()));
     }
 
     @GET
     @Path("is-catch-up-running")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieves whether Working Capital Loan COB catch up is running", description = "Retrieves whether Working Capital Loan COB catch up is running, and the current execution date if it is running.")
     public IsCatchUpRunningDTO isCatchUpRunning() {
         return loanCOBCatchUpServiceOp.map(COBCatchUpService::isCatchUpRunning).orElseGet(() -> new IsCatchUpRunningDTO(false, null));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanCOBCatchUpApiResource(final Optional<WorkingCapitalLoanCOBCatchUpServiceImpl> loanCOBCatchUpServiceOp) {
+        this.loanCOBCatchUpServiceOp = loanCOBCatchUpServiceOp;
     }
 }

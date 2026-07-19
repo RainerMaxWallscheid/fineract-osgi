@@ -24,38 +24,23 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "m_report_mailing_job_run_history")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class ReportMailingJobRunHistory extends AbstractPersistableCustom<Long> {
-
     private static final long serialVersionUID = -3757370929988421076L;
-
     @ManyToOne
     @JoinColumn(name = "job_id", nullable = false)
     private ReportMailingJob reportMailingJob;
-
     @Column(name = "start_datetime", nullable = false)
     private LocalDateTime startDateTime;
-
     @Column(name = "end_datetime", nullable = false)
     private LocalDateTime endDateTime;
-
     @Column(name = "status", nullable = false)
     private String status;
-
     @Column(name = "error_message", nullable = false)
     private String errorMessage;
-
     @Column(name = "error_log", nullable = false)
     private String errorLog;
 
@@ -63,10 +48,96 @@ public class ReportMailingJobRunHistory extends AbstractPersistableCustom<Long> 
      * Creates an instance of the ReportMailingJobRunHistory class
      *
      * @return ReportMailingJobRunHistory object
-     **/
-    public static ReportMailingJobRunHistory newInstance(final ReportMailingJob reportMailingJob, final LocalDateTime startDateTime,
-            final LocalDateTime endDateTime, final String status, final String errorMessage, final String errorLog) {
-        return new ReportMailingJobRunHistory().setReportMailingJob(reportMailingJob).setStartDateTime(startDateTime)
-                .setEndDateTime(endDateTime).setStatus(status).setErrorMessage(errorMessage).setErrorLog(errorLog);
+     */
+    public static ReportMailingJobRunHistory newInstance(final ReportMailingJob reportMailingJob, final LocalDateTime startDateTime, final LocalDateTime endDateTime, final String status, final String errorMessage, final String errorLog) {
+        return new ReportMailingJobRunHistory().setReportMailingJob(reportMailingJob).setStartDateTime(startDateTime).setEndDateTime(endDateTime).setStatus(status).setErrorMessage(errorMessage).setErrorLog(errorLog);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ReportMailingJob getReportMailingJob() {
+        return this.reportMailingJob;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDateTime getStartDateTime() {
+        return this.startDateTime;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDateTime getEndDateTime() {
+        return this.endDateTime;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getStatus() {
+        return this.status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getErrorMessage() {
+        return this.errorMessage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getErrorLog() {
+        return this.errorLog;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ReportMailingJobRunHistory setReportMailingJob(final ReportMailingJob reportMailingJob) {
+        this.reportMailingJob = reportMailingJob;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ReportMailingJobRunHistory setStartDateTime(final LocalDateTime startDateTime) {
+        this.startDateTime = startDateTime;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ReportMailingJobRunHistory setEndDateTime(final LocalDateTime endDateTime) {
+        this.endDateTime = endDateTime;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ReportMailingJobRunHistory setStatus(final String status) {
+        this.status = status;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ReportMailingJobRunHistory setErrorMessage(final String errorMessage) {
+        this.errorMessage = errorMessage;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ReportMailingJobRunHistory setErrorLog(final String errorLog) {
+        this.errorLog = errorLog;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ReportMailingJobRunHistory() {
     }
 }

@@ -35,7 +35,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -51,12 +50,8 @@ import org.springframework.stereotype.Component;
 
 @Path("/v1/externalservice")
 @Component
-@Tag(name = "External Services", description = "External Services Configuration related to set of supported configurations for third party services like Amazon S3 and SMTP:\n"
-        + "\n" + "S3 (Amazon S3):\n" + "s3_access_key -\n" + "s3_bucket_name -\n" + "s3_secret_key -\n" + "\n" + "\n"
-        + "SMTP (Email Service):\n" + "username -\n" + "password -\n" + "host -\n" + "port -\n" + "useTLS -")
-@RequiredArgsConstructor
+@Tag(name = "External Services", description = "External Services Configuration related to set of supported configurations for third party services like Amazon S3 and SMTP:\n" + "\n" + "S3 (Amazon S3):\n" + "s3_access_key -\n" + "s3_bucket_name -\n" + "s3_secret_key -\n" + "\n" + "\n" + "SMTP (Email Service):\n" + "username -\n" + "password -\n" + "host -\n" + "port -\n" + "useTLS -")
 public class ExternalServicesConfigurationApiResource {
-
     private final PlatformSecurityContext context;
     private final ExternalServicesPropertiesReadPlatformService externalServicePropertiesReadPlatformService;
     private final ToApiJsonSerializer<ExternalServicesPropertiesData> toApiJsonSerializer;
@@ -65,39 +60,39 @@ public class ExternalServicesConfigurationApiResource {
 
     @GET
     @Path("{servicename}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve External Services Configuration", operationId = "retrieveExternalServicesConfiguration", description = "Returns a external Service configurations based on the Service Name.\n"
-            + "\n" + "Service Names supported are S3 and SMTP.\n" + "\n" + "Example Requests:\n" + "\n" + "externalservice/SMTP")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve External Services Configuration", operationId = "retrieveExternalServicesConfiguration", description = "Returns a external Service configurations based on the Service Name.\n" + "\n" + "Service Names supported are S3 and SMTP.\n" + "\n" + "Example Requests:\n" + "\n" + "externalservice/SMTP")
     @AlternativeOperationId("retrieveOne_2")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ExternalServicesPropertiesData.class)))
-    public String retrieveOne(@PathParam("servicename") @Parameter(description = "servicename") final String serviceName,
-            @Context final UriInfo uriInfo) {
+    public String retrieveOne(@PathParam("servicename") @Parameter(description = "servicename") final String serviceName, @Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(ExternalServiceConfigurationApiConstant.EXTERNAL_SERVICE_RESOURCE_NAME);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        final Collection<ExternalServicesPropertiesData> externalServiceNVPs = this.externalServicePropertiesReadPlatformService
-                .retrieveOne(serviceName);
-        return this.toApiJsonSerializer.serialize(settings, externalServiceNVPs,
-                ExternalServiceConfigurationApiConstant.EXTERNAL_SERVICE_CONFIGURATION_DATA_PARAMETERS);
+        final Collection<ExternalServicesPropertiesData> externalServiceNVPs = this.externalServicePropertiesReadPlatformService.retrieveOne(serviceName);
+        return this.toApiJsonSerializer.serialize(settings, externalServiceNVPs, ExternalServiceConfigurationApiConstant.EXTERNAL_SERVICE_CONFIGURATION_DATA_PARAMETERS);
     }
 
     @PUT
     @Path("{servicename}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Update External Service", operationId = "updateExternalServicesConfiguration", description = "Updates the external Service Configuration for a Service Name.\n"
-            + "\n" + "Example: \n" + "\n" + "externalservice/S3")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Update External Service", operationId = "updateExternalServicesConfiguration", description = "Updates the external Service Configuration for a Service Name.\n" + "\n" + "Example: \n" + "\n" + "externalservice/S3")
     @AlternativeOperationId("updateExternalServiceProperties")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = ExternalServicesConfigurationApiResourceSwagger.PutExternalServiceRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK")
-    public String updateExternalServiceProperties(
-            @PathParam("servicename") @Parameter(description = "servicename") final String serviceName,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+    public String updateExternalServiceProperties(@PathParam("servicename") @Parameter(description = "servicename") final String serviceName, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
         // ExternalServicesData external =
         // this.externalServiceReadPlatformService.getExternalServiceDetailsByServiceName(serviceName);
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateExternalServiceProperties(serviceName)
-                .withJson(apiRequestBodyAsJson).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateExternalServiceProperties(serviceName).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public ExternalServicesConfigurationApiResource(final PlatformSecurityContext context, final ExternalServicesPropertiesReadPlatformService externalServicePropertiesReadPlatformService, final ToApiJsonSerializer<ExternalServicesPropertiesData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.context = context;
+        this.externalServicePropertiesReadPlatformService = externalServicePropertiesReadPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
     }
 }

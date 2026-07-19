@@ -41,7 +41,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -63,16 +62,10 @@ import org.springframework.stereotype.Component;
 
 @Path("/v1/clients/{clientId}/identifiers")
 @Component
-@Tag(name = "Client Identifier", description = "Client Identifiers refer to documents that are used to uniquely identify a customer\n"
-        + "Ex: Drivers License, Passport, Ration card etc ")
-@RequiredArgsConstructor
+@Tag(name = "Client Identifier", description = "Client Identifiers refer to documents that are used to uniquely identify a customer\n" + "Ex: Drivers License, Passport, Ration card etc ")
 public class ClientIdentifiersApiResource {
-
-    private static final Set<String> CLIENT_IDENTIFIER_DATA_PARAMETERS = new HashSet<>(
-            Arrays.asList("id", "clientId", "documentType", "documentKey", "description", "allowedDocumentTypes"));
-
+    private static final Set<String> CLIENT_IDENTIFIER_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "clientId", "documentType", "documentKey", "description", "allowedDocumentTypes"));
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "CLIENTIDENTIFIER";
-
     private final PlatformSecurityContext context;
     private final ClientReadPlatformService clientReadPlatformService;
     private final ClientIdentifierReadPlatformService clientIdentifierReadPlatformService;
@@ -82,56 +75,40 @@ public class ClientIdentifiersApiResource {
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "List all Identifiers for a Client", operationId = "retrieveAllClientIdentifiers", description = "Example Requests:\n"
-            + "clients/1/identifiers\n" + "\n" + "\n" + "clients/1/identifiers?fields=documentKey,documentType,description")
-    public List<ClientIdentifierData> retrieveAllClientIdentifiers(
-            @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
-
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "List all Identifiers for a Client", operationId = "retrieveAllClientIdentifiers", description = "Example Requests:\n" + "clients/1/identifiers\n" + "\n" + "\n" + "clients/1/identifiers?fields=documentKey,documentType,description")
+    public List<ClientIdentifierData> retrieveAllClientIdentifiers(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
         return this.clientIdentifierReadPlatformService.retrieveClientIdentifiers(clientId);
     }
 
     @GET
     @Path("template")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve Client Identifier Details Template", operationId = "retrieveTemplateClientIdentifier", description = "This is a convenience resource useful for building maintenance user interface screens for client applications. The template data returned consists of any or all of:\n"
-            + "\n" + " Field Defaults\n" + " Allowed description Lists\n" + "\n\nExample Request:\n" + "clients/1/identifiers/template")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve Client Identifier Details Template", operationId = "retrieveTemplateClientIdentifier", description = "This is a convenience resource useful for building maintenance user interface screens for client applications. The template data returned consists of any or all of:\n" + "\n" + " Field Defaults\n" + " Allowed description Lists\n" + "\n\nExample Request:\n" + "clients/1/identifiers/template")
     @AlternativeOperationId("newClientIdentifierDetails")
-    public ClientIdentifierData newClientIdentifierDetails(
-            @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
-
+    public ClientIdentifierData newClientIdentifierDetails(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
         final List<CodeValueData> codeValues = this.codeValueReadPlatformService.retrieveCodeValuesByCode("Customer Identifier");
-
         return ClientIdentifierData.template(codeValues);
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Create an Identifier for a Client", operationId = "createClientIdentifier", description = "Mandatory Fields\n"
-            + "documentKey, documentTypeId ")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Create an Identifier for a Client", operationId = "createClientIdentifier", description = "Mandatory Fields\n" + "documentKey, documentTypeId ")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = ClientIdentifiersApiResourceSwagger.PostClientsClientIdIdentifiersRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ClientIdentifiersApiResourceSwagger.PostClientsClientIdIdentifiersResponse.class)))
-    public CommandProcessingResult createClientIdentifier(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId,
-            @Parameter(hidden = true) final ClientIdentifierRequest clientIdentifierRequest) {
-
+    public CommandProcessingResult createClientIdentifier(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId, @Parameter(hidden = true) final ClientIdentifierRequest clientIdentifierRequest) {
         try {
-            final CommandWrapper commandRequest = new CommandWrapperBuilder().createClientIdentifier(clientId)
-                    .withJson(toApiJsonSerializer.serialize(clientIdentifierRequest)).build();
-
+            final CommandWrapper commandRequest = new CommandWrapperBuilder().createClientIdentifier(clientId).withJson(toApiJsonSerializer.serialize(clientIdentifierRequest)).build();
             return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         } catch (final DuplicateClientIdentifierException e) {
             DuplicateClientIdentifierException rethrowas = e;
             if (e.getDocumentTypeId() != null) {
                 // need to fetch client info
-                final ClientData clientInfo = this.clientReadPlatformService.retrieveClientByIdentifier(e.getDocumentTypeId(),
-                        e.getIdentifierKey());
-                rethrowas = new DuplicateClientIdentifierException(clientInfo.getDisplayName(), clientInfo.getOfficeName(),
-                        e.getIdentifierType(), e.getIdentifierKey());
+                final ClientData clientInfo = this.clientReadPlatformService.retrieveClientByIdentifier(e.getDocumentTypeId(), e.getIdentifierKey());
+                rethrowas = new DuplicateClientIdentifierException(clientInfo.getDisplayName(), clientInfo.getOfficeName(), e.getIdentifierType(), e.getIdentifierKey());
             }
             throw rethrowas;
         }
@@ -139,55 +116,38 @@ public class ClientIdentifiersApiResource {
 
     @GET
     @Path("{identifierId}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve a Client Identifier", operationId = "retrieveOneClientIdentifier", description = "Example Requests:\n"
-            + "clients/1/identifier/2\n" + "\n" + "\n" + "clients/1/identifier/2?template=true\n" + "\n"
-            + "clients/1/identifiers/2?fields=documentKey,documentType,description")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve a Client Identifier", operationId = "retrieveOneClientIdentifier", description = "Example Requests:\n" + "clients/1/identifier/2\n" + "\n" + "\n" + "clients/1/identifier/2?template=true\n" + "\n" + "clients/1/identifiers/2?fields=documentKey,documentType,description")
     @AlternativeOperationId("retrieveClientIdentifiers")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ClientIdentifiersApiResourceSwagger.GetClientsClientIdIdentifiersResponse.class)))
-    public String retrieveClientIdentifiers(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId,
-            @PathParam("identifierId") @Parameter(description = "identifierId") final Long clientIdentifierId,
-            @Context final UriInfo uriInfo) {
-
+    public String retrieveClientIdentifiers(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId, @PathParam("identifierId") @Parameter(description = "identifierId") final Long clientIdentifierId, @Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-
-        ClientIdentifierData clientIdentifierData = this.clientIdentifierReadPlatformService.retrieveClientIdentifier(clientId,
-                clientIdentifierId);
+        ClientIdentifierData clientIdentifierData = this.clientIdentifierReadPlatformService.retrieveClientIdentifier(clientId, clientIdentifierId);
         if (settings.isTemplate()) {
             final Collection<CodeValueData> codeValues = this.codeValueReadPlatformService.retrieveCodeValuesByCode("Customer Identifier");
             clientIdentifierData = ClientIdentifierData.template(clientIdentifierData, codeValues);
         }
-
         return this.toApiJsonSerializer.serialize(settings, clientIdentifierData, CLIENT_IDENTIFIER_DATA_PARAMETERS);
     }
 
     @PUT
     @Path("{identifierId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a Client Identifier", operationId = "updateClientIdentifier", description = "Updates a Client Identifier")
     @AlternativeOperationId("updateClientIdentifer")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = ClientIdentifierRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ClientIdentifiersApiResourceSwagger.PutClientsClientIdIdentifiersIdentifierIdResponse.class)))
-    public CommandProcessingResult updateClientIdentifer(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId,
-            @PathParam("identifierId") @Parameter(description = "identifierId") final Long clientIdentifierId,
-            @Parameter(hidden = true) final ClientIdentifierRequest clientIdentifierRequest) {
-
+    public CommandProcessingResult updateClientIdentifer(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId, @PathParam("identifierId") @Parameter(description = "identifierId") final Long clientIdentifierId, @Parameter(hidden = true) final ClientIdentifierRequest clientIdentifierRequest) {
         try {
-            final CommandWrapper commandRequest = new CommandWrapperBuilder().updateClientIdentifier(clientId, clientIdentifierId)
-                    .withJson(toApiJsonSerializer.serialize(clientIdentifierRequest)).build();
-
+            final CommandWrapper commandRequest = new CommandWrapperBuilder().updateClientIdentifier(clientId, clientIdentifierId).withJson(toApiJsonSerializer.serialize(clientIdentifierRequest)).build();
             return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         } catch (final DuplicateClientIdentifierException e) {
             DuplicateClientIdentifierException reThrowAs = e;
             if (e.getDocumentTypeId() != null) {
-                final ClientData clientInfo = this.clientReadPlatformService.retrieveClientByIdentifier(e.getDocumentTypeId(),
-                        e.getIdentifierKey());
-                reThrowAs = new DuplicateClientIdentifierException(clientInfo.getDisplayName(), clientInfo.getOfficeName(),
-                        e.getIdentifierType(), e.getIdentifierKey());
+                final ClientData clientInfo = this.clientReadPlatformService.retrieveClientByIdentifier(e.getDocumentTypeId(), e.getIdentifierKey());
+                reThrowAs = new DuplicateClientIdentifierException(clientInfo.getDisplayName(), clientInfo.getOfficeName(), e.getIdentifierType(), e.getIdentifierKey());
             }
             throw reThrowAs;
         }
@@ -195,14 +155,22 @@ public class ClientIdentifiersApiResource {
 
     @DELETE
     @Path("{identifierId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete a Client Identifier", operationId = "deleteClientIdentifier", description = "Deletes a Client Identifier")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ClientIdentifiersApiResourceSwagger.DeleteClientsClientIdIdentifiersIdentifierIdResponse.class)))
-    public CommandProcessingResult deleteClientIdentifier(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId,
-            @PathParam("identifierId") @Parameter(description = "identifierId") final Long clientIdentifierId) {
-
+    public CommandProcessingResult deleteClientIdentifier(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId, @PathParam("identifierId") @Parameter(description = "identifierId") final Long clientIdentifierId) {
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteClientIdentifier(clientId, clientIdentifierId).build();
-
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ClientIdentifiersApiResource(final PlatformSecurityContext context, final ClientReadPlatformService clientReadPlatformService, final ClientIdentifierReadPlatformService clientIdentifierReadPlatformService, final CodeValueReadPlatformService codeValueReadPlatformService, final DefaultToApiJsonSerializer<ClientIdentifierData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.context = context;
+        this.clientReadPlatformService = clientReadPlatformService;
+        this.clientIdentifierReadPlatformService = clientIdentifierReadPlatformService;
+        this.codeValueReadPlatformService = codeValueReadPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
     }
 }

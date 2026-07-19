@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.workingcapitalloan.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -27,14 +26,17 @@ import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLo
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "WORKINGCAPITALLOAN", action = "DISCOUNTFEEADJUSTMENT")
 public class WorkingCapitalLoanDiscountFeeAdjustmentCommandHandler implements NewCommandSourceHandler {
-
     private final WorkingCapitalLoanWritePlatformService writePlatformService;
 
     @Override
     public CommandProcessingResult processCommand(JsonCommand command) {
         return writePlatformService.makeDiscountFeeAdjustment(command.getResourceId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanDiscountFeeAdjustmentCommandHandler(final WorkingCapitalLoanWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

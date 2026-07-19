@@ -25,7 +25,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.codes.service.CodeValueReadPlatformService;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
@@ -46,9 +45,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 
-@RequiredArgsConstructor
 public class InterestRateChartReadServiceImpl implements InterestRateChartReadService {
-
     private final JdbcTemplate jdbcTemplate;
     private static final InterestRateChartMapper CHART_ROW_MAPPER = new InterestRateChartMapper();
     private final InterestRateChartExtractor chartExtractor;
@@ -69,30 +66,16 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
     @Override
     public Collection<InterestRateChartData> retrieveAllWithSlabs(Long productId) {
         String sql = "select " + chartExtractor.schema() + """
-                 where sp.id = ? order by irc.id, \
-                CASE \
-                WHEN irc.is_primary_grouping_by_amount then ircd.amount_range_from \
-                WHEN irc.is_primary_grouping_by_amount then ircd.amount_range_to \
-                END,\
-                ircd.from_period, ircd.to_period,\
-                CASE \
-                WHEN NOT irc.is_primary_grouping_by_amount then ircd.amount_range_from \
-                WHEN NOT irc.is_primary_grouping_by_amount then ircd.amount_range_to \
-                END""";
-
-        return jdbcTemplate.query(con -> con.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE),
-                ps -> ps.setLong(1, productId), chartExtractor);
-
+             where sp.id = ? order by irc.id, CASE WHEN irc.is_primary_grouping_by_amount then ircd.amount_range_from WHEN irc.is_primary_grouping_by_amount then ircd.amount_range_to END,ircd.from_period, ircd.to_period,CASE WHEN NOT irc.is_primary_grouping_by_amount then ircd.amount_range_from WHEN NOT irc.is_primary_grouping_by_amount then ircd.amount_range_to END""";
+        return jdbcTemplate.query(con -> con.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE), ps -> ps.setLong(1, productId), chartExtractor);
     }
 
     @Override
     public Collection<InterestRateChartData> retrieveAllWithSlabsWithTemplate(Long productId) {
         Collection<InterestRateChartData> chartDatas = new ArrayList<>();
-
         for (InterestRateChartData chartData : retrieveAllWithSlabs(productId)) {
             chartDatas.add(retrieveWithTemplate(chartData));
         }
-
         return chartDatas;
     }
 
@@ -105,56 +88,33 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
     @Override
     public InterestRateChartData retrieveOneWithSlabs(Long chartId) {
         final String sql = "select " + chartExtractor.schema() + " where irc.id = ? order by ircd.id asc";
-        Collection<InterestRateChartData> chartDatas = jdbcTemplate.query(sql, chartExtractor, new Object[] { chartId }); // NOSONAR
+        Collection<InterestRateChartData> chartDatas = jdbcTemplate.query(sql, chartExtractor, new Object[] {chartId}); // NOSONAR
         if (chartDatas == null || chartDatas.isEmpty()) {
             throw new InterestRateChartNotFoundException(chartId);
         }
-
         return chartDatas.iterator().next();
     }
 
     @Override
     public InterestRateChartData retrieveWithTemplate(InterestRateChartData chartData) {
-
-        final List<CodeValueData> genderOptions = new ArrayList<>(
-                codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.GENDER));
-
-        final List<CodeValueData> clientTypeOptions = new ArrayList<>(
-                codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_TYPE));
-
-        final List<CodeValueData> clientClassificationOptions = new ArrayList<>(
-                codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_CLASSIFICATION));
-        return InterestRateChartData.withTemplate(chartData, chartDropdownReadPlatformService.retrievePeriodTypeOptions(),
-                interestIncentiveDropdownReadService.retrieveEntityTypeOptions(),
-                interestIncentiveDropdownReadService.retrieveAttributeNameOptions(),
-                interestIncentiveDropdownReadService.retrieveConditionTypeOptions(),
-                interestIncentiveDropdownReadService.retrieveIncentiveTypeOptions(), genderOptions, clientTypeOptions,
-                clientClassificationOptions);
+        final List<CodeValueData> genderOptions = new ArrayList<>(codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.GENDER));
+        final List<CodeValueData> clientTypeOptions = new ArrayList<>(codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_TYPE));
+        final List<CodeValueData> clientClassificationOptions = new ArrayList<>(codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_CLASSIFICATION));
+        return InterestRateChartData.withTemplate(chartData, chartDropdownReadPlatformService.retrievePeriodTypeOptions(), interestIncentiveDropdownReadService.retrieveEntityTypeOptions(), interestIncentiveDropdownReadService.retrieveAttributeNameOptions(), interestIncentiveDropdownReadService.retrieveConditionTypeOptions(), interestIncentiveDropdownReadService.retrieveIncentiveTypeOptions(), genderOptions, clientTypeOptions, clientClassificationOptions);
     }
 
     @Override
     public InterestRateChartData template() {
-        final List<CodeValueData> genderOptions = new ArrayList<>(
-                codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.GENDER));
-
-        final List<CodeValueData> clientTypeOptions = new ArrayList<>(
-                codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_TYPE));
-
-        final List<CodeValueData> clientClassificationOptions = new ArrayList<>(
-                codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_CLASSIFICATION));
-        return InterestRateChartData.template(chartDropdownReadPlatformService.retrievePeriodTypeOptions(),
-                interestIncentiveDropdownReadService.retrieveEntityTypeOptions(),
-                interestIncentiveDropdownReadService.retrieveAttributeNameOptions(),
-                interestIncentiveDropdownReadService.retrieveConditionTypeOptions(),
-                interestIncentiveDropdownReadService.retrieveIncentiveTypeOptions(), genderOptions, clientTypeOptions,
-                clientClassificationOptions);
+        final List<CodeValueData> genderOptions = new ArrayList<>(codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.GENDER));
+        final List<CodeValueData> clientTypeOptions = new ArrayList<>(codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_TYPE));
+        final List<CodeValueData> clientClassificationOptions = new ArrayList<>(codeValueReadPlatformService.retrieveCodeValuesByCode(ClientApiConstants.CLIENT_CLASSIFICATION));
+        return InterestRateChartData.template(chartDropdownReadPlatformService.retrievePeriodTypeOptions(), interestIncentiveDropdownReadService.retrieveEntityTypeOptions(), interestIncentiveDropdownReadService.retrieveAttributeNameOptions(), interestIncentiveDropdownReadService.retrieveConditionTypeOptions(), interestIncentiveDropdownReadService.retrieveIncentiveTypeOptions(), genderOptions, clientTypeOptions, clientClassificationOptions);
     }
 
-    public static final class InterestRateChartExtractor implements ResultSetExtractor<Collection<InterestRateChartData>> {
 
+    public static final class InterestRateChartExtractor implements ResultSetExtractor<Collection<InterestRateChartData>> {
         InterestRateChartMapper chartMapper = new InterestRateChartMapper();
         InterestRateChartSlabExtractor chartSlabsMapper;
-
         private final String schemaSql;
 
         public String schema() {
@@ -164,49 +124,23 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
         public InterestRateChartExtractor(DatabaseSpecificSQLGenerator sqlGenerator) {
             chartSlabsMapper = new InterestRateChartSlabExtractor(sqlGenerator);
             this.schemaSql = """
-                    irc.id as ircId, irc.name as ircName, irc.description as ircDescription,\
-                    irc.from_date as ircFromDate, irc.end_date as ircEndDate, \
-                    irc.is_primary_grouping_by_amount as isPrimaryGroupingByAmount, \
-                    ircd.id as ircdId, ircd.description as ircdDescription, ircd.period_type_enum ircdPeriodTypeId, \
-                    ircd.from_period as ircdFromPeriod, ircd.to_period as ircdToPeriod, ircd.amount_range_from as ircdAmountRangeFrom, \
-                    ircd.amount_range_to as ircdAmountRangeTo, ircd.annual_interest_rate as ircdAnnualInterestRate, \
-                    curr.code as currencyCode, curr.name as currencyName, curr.internationalized_name_code as currencyNameCode, \
-                    curr.display_symbol as currencyDisplaySymbol, curr.decimal_places as currencyDigits, curr.currency_multiplesof as inMultiplesOf, \
-                    sp.id as savingsProductId, sp.name as savingsProductName, iri.id as iriId, \
-                    iri.entiry_type as entityType, iri.attribute_name as attributeName ,\
-                    iri.condition_type as conditionType, iri.attribute_value as attributeValue, \
-                    iri.incentive_type as incentiveType, iri.amount as amount, code.code_value as attributeValueDesc \
-                    from \
-                    m_interest_rate_chart irc left join m_interest_rate_slab ircd on irc.id=ircd.interest_rate_chart_id \
-                    left join m_interest_incentives iri on iri.interest_rate_slab_id = ircd.id \
-                    left join m_code_value code on \
-                    """
-                    + sqlGenerator.castChar("code.id") + """
-                             = iri.attribute_value \
-                            left join m_currency curr on ircd.currency_code= curr.code \
-                            left join m_deposit_product_interest_rate_chart dpirc on irc.id=dpirc.interest_rate_chart_id \
-                            left join m_savings_product sp on sp.id=dpirc.deposit_product_id \
-                            """;
+                irc.id as ircId, irc.name as ircName, irc.description as ircDescription,irc.from_date as ircFromDate, irc.end_date as ircEndDate, irc.is_primary_grouping_by_amount as isPrimaryGroupingByAmount, ircd.id as ircdId, ircd.description as ircdDescription, ircd.period_type_enum ircdPeriodTypeId, ircd.from_period as ircdFromPeriod, ircd.to_period as ircdToPeriod, ircd.amount_range_from as ircdAmountRangeFrom, ircd.amount_range_to as ircdAmountRangeTo, ircd.annual_interest_rate as ircdAnnualInterestRate, curr.code as currencyCode, curr.name as currencyName, curr.internationalized_name_code as currencyNameCode, curr.display_symbol as currencyDisplaySymbol, curr.decimal_places as currencyDigits, curr.currency_multiplesof as inMultiplesOf, sp.id as savingsProductId, sp.name as savingsProductName, iri.id as iriId, iri.entiry_type as entityType, iri.attribute_name as attributeName ,iri.condition_type as conditionType, iri.attribute_value as attributeValue, iri.incentive_type as incentiveType, iri.amount as amount, code.code_value as attributeValueDesc from m_interest_rate_chart irc left join m_interest_rate_slab ircd on irc.id=ircd.interest_rate_chart_id left join m_interest_incentives iri on iri.interest_rate_slab_id = ircd.id left join m_code_value code on """ + sqlGenerator.castChar("code.id") + """
+                 = iri.attribute_value left join m_currency curr on ircd.currency_code= curr.code left join m_deposit_product_interest_rate_chart dpirc on irc.id=dpirc.interest_rate_chart_id left join m_savings_product sp on sp.id=dpirc.deposit_product_id """;
         }
 
         @Override
         public List<InterestRateChartData> extractData(ResultSet rs) throws SQLException, DataAccessException {
-
             List<InterestRateChartData> chartDataList = new ArrayList<>();
-
             InterestRateChartData chartData = null;
             Long interestRateChartId = null;
             int ircIndex = 0;// Interest rate chart index
-
             while (rs.next()) {
                 Long tempIrcId = rs.getLong("ircId");
                 // first row or when interest rate chart id changes
                 if (chartData == null || (interestRateChartId != null && !interestRateChartId.equals(tempIrcId))) {
-
                     interestRateChartId = tempIrcId;
                     chartData = chartMapper.mapRow(rs, ircIndex++);
                     chartDataList.add(chartData);
-
                 }
                 final InterestRateChartSlabData chartSlabsData = chartSlabsMapper.extractData(rs);
                 if (chartSlabsData != null) {
@@ -215,11 +149,10 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
             }
             return chartDataList;
         }
-
     }
 
-    public static final class InterestRateChartMapper implements RowMapper<InterestRateChartData> {
 
+    public static final class InterestRateChartMapper implements RowMapper<InterestRateChartData> {
         private final String schemaSql;
 
         public String schema() {
@@ -228,15 +161,7 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
 
         private InterestRateChartMapper() {
             this.schemaSql = """
-                    irc.id as ircId, irc.name as ircName, irc.description as ircDescription, \
-                    irc.from_date as ircFromDate, irc.end_date as ircEndDate, \
-                    irc.is_primary_grouping_by_amount as isPrimaryGroupingByAmount, \
-                    sp.id as savingsProductId, sp.name as savingsProductName \
-                    from \
-                    m_interest_rate_chart irc \
-                    left join m_deposit_product_interest_rate_chart dpirc on irc.id=dpirc.interest_rate_chart_id \
-                    left join m_savings_product sp on sp.id=dpirc.deposit_product_id \
-                    """;
+                irc.id as ircId, irc.name as ircName, irc.description as ircDescription, irc.from_date as ircFromDate, irc.end_date as ircEndDate, irc.is_primary_grouping_by_amount as isPrimaryGroupingByAmount, sp.id as savingsProductId, sp.name as savingsProductName from m_interest_rate_chart irc left join m_deposit_product_interest_rate_chart dpirc on irc.id=dpirc.interest_rate_chart_id left join m_savings_product sp on sp.id=dpirc.deposit_product_id """;
         }
 
         @Override
@@ -249,15 +174,12 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
             final boolean isPrimaryGroupingByAmount = rs.getBoolean("isPrimaryGroupingByAmount");
             final Long savingsProductId = JdbcSupport.getLongDefaultToNullIfZero(rs, "savingsProductId");
             final String savingsProductName = rs.getString("savingsProductName");
-
-            return InterestRateChartData.instance(id, name, description, fromDate, endDate, isPrimaryGroupingByAmount, savingsProductId,
-                    savingsProductName);
+            return InterestRateChartData.instance(id, name, description, fromDate, endDate, isPrimaryGroupingByAmount, savingsProductId, savingsProductName);
         }
-
     }
 
-    private static final class InterestRateChartSlabsMapper implements RowMapper<InterestRateChartSlabData> {
 
+    private static final class InterestRateChartSlabsMapper implements RowMapper<InterestRateChartSlabData> {
         private final String schemaSql;
 
         public String schema() {
@@ -266,23 +188,8 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
 
         private InterestRateChartSlabsMapper(DatabaseSpecificSQLGenerator sqlGenerator) {
             this.schemaSql = """
-                    ircd.id as ircdId, ircd.description as ircdDescription, ircd.period_type_enum ircdPeriodTypeId, \
-                    ircd.from_period as ircdFromPeriod, ircd.to_period as ircdToPeriod, ircd.amount_range_from as ircdAmountRangeFrom, \
-                    ircd.amount_range_to as ircdAmountRangeTo, ircd.annual_interest_rate as ircdAnnualInterestRate, \
-                    curr.code as currencyCode, curr.name as currencyName, curr.internationalized_name_code as currencyNameCode, \
-                    curr.display_symbol as currencyDisplaySymbol, curr.decimal_places as currencyDigits, curr.currency_multiplesof as inMultiplesOf, \
-                    iri.id as iriId, iri.entiry_type as entityType, iri.attribute_name as attributeName ,\
-                    iri.condition_type as conditionType, iri.attribute_value as attributeValue, \
-                    iri.incentive_type as incentiveType, iri.amount as amount, code.code_value as attributeValueDesc \
-                    from \
-                    m_interest_rate_slab ircd \
-                    left join m_interest_incentives iri on iri.interest_rate_slab_id = ircd.id \
-                    left join m_code_value code on \
-                    """
-                    + sqlGenerator.castChar("code.id") + """
-                             = iri.attribute_value \
-                            left join m_currency curr on ircd.currency_code= curr.code \
-                            """;
+                ircd.id as ircdId, ircd.description as ircdDescription, ircd.period_type_enum ircdPeriodTypeId, ircd.from_period as ircdFromPeriod, ircd.to_period as ircdToPeriod, ircd.amount_range_from as ircdAmountRangeFrom, ircd.amount_range_to as ircdAmountRangeTo, ircd.annual_interest_rate as ircdAnnualInterestRate, curr.code as currencyCode, curr.name as currencyName, curr.internationalized_name_code as currencyNameCode, curr.display_symbol as currencyDisplaySymbol, curr.decimal_places as currencyDigits, curr.currency_multiplesof as inMultiplesOf, iri.id as iriId, iri.entiry_type as entityType, iri.attribute_name as attributeName ,iri.condition_type as conditionType, iri.attribute_value as attributeValue, iri.incentive_type as incentiveType, iri.amount as amount, code.code_value as attributeValueDesc from m_interest_rate_slab ircd left join m_interest_incentives iri on iri.interest_rate_slab_id = ircd.id left join m_code_value code on """ + sqlGenerator.castChar("code.id") + """
+                 = iri.attribute_value left join m_currency curr on ircd.currency_code= curr.code """;
         }
 
         @Override
@@ -293,7 +200,6 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
             if (id == null) {
                 return null;
             }
-
             final String description = rs.getString("ircdDescription");
             final Integer fromPeriod = JdbcSupport.getInteger(rs, "ircdFromPeriod");
             final Integer toPeriod = JdbcSupport.getInteger(rs, "ircdToPeriod");
@@ -305,7 +211,6 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
             final BigDecimal amountRangeFrom = rs.getBigDecimal("ircdAmountRangeFrom");
             final BigDecimal amountRangeTo = rs.getBigDecimal("ircdAmountRangeTo");
             final BigDecimal annualInterestRate = rs.getBigDecimal("ircdAnnualInterestRate");
-
             // currency Slabs
             final String currencyCode = rs.getString("currencyCode");
             final String currencyName = rs.getString("currencyName");
@@ -314,20 +219,15 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
             final Integer currencyDigits = JdbcSupport.getInteger(rs, "currencyDigits");
             final Integer inMultiplesOf = JdbcSupport.getInteger(rs, "inMultiplesOf");
             // currency
-            final CurrencyData currency = new CurrencyData(currencyCode, currencyName, currencyDigits, inMultiplesOf, currencyDisplaySymbol,
-                    currencyNameCode);
-
-            return InterestRateChartSlabData.instance(id, description, periodType, fromPeriod, toPeriod, amountRangeFrom, amountRangeTo,
-                    annualInterestRate, currency);
+            final CurrencyData currency = new CurrencyData(currencyCode, currencyName, currencyDigits, inMultiplesOf, currencyDisplaySymbol, currencyNameCode);
+            return InterestRateChartSlabData.instance(id, description, periodType, fromPeriod, toPeriod, amountRangeFrom, amountRangeTo, annualInterestRate, currency);
         }
-
     }
 
-    private static final class InterestRateChartSlabExtractor implements ResultSetExtractor<InterestRateChartSlabData> {
 
+    private static final class InterestRateChartSlabExtractor implements ResultSetExtractor<InterestRateChartSlabData> {
         InterestRateChartSlabsMapper chartSlabsMapper;
         InterestIncentiveMapper incentiveMapper = new InterestIncentiveMapper();
-
         private final String schemaSql;
 
         @SuppressWarnings("unused")
@@ -342,7 +242,6 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
 
         @Override
         public InterestRateChartSlabData extractData(ResultSet rs) throws SQLException, DataAccessException {
-
             InterestRateChartSlabData chartSlabData = null;
             Long interestRateChartSlabId = null;
             int ircIndex = 0;// Interest rate chart index
@@ -363,13 +262,12 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
                     rs.previous();
                     break;
                 }
-
             }
             return chartSlabData;
         }
 
-        private static final class InterestIncentiveMapper implements RowMapper<InterestIncentiveData> {
 
+        private static final class InterestIncentiveMapper implements RowMapper<InterestIncentiveData> {
             @Override
             public InterestIncentiveData mapRow(ResultSet rs, @SuppressWarnings("unused") int rowNum) throws SQLException {
                 final Long id = JdbcSupport.getLongDefaultToNullIfZero(rs, "iriId");
@@ -378,13 +276,10 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
                 if (id == null) {
                     return null;
                 }
-
                 final String attributeValue = rs.getString("attributeValue");
                 String attributeValueDesc = null;
                 final Integer entityType = JdbcSupport.getInteger(rs, "entityType");
-
                 final EnumOptionData entityTypeData = InterestIncentivesEnumerations.entityType(entityType);
-
                 final Integer attributeName = JdbcSupport.getInteger(rs, "attributeName");
                 if (InterestIncentiveAttributeName.isCodeValueAttribute(InterestIncentiveAttributeName.fromInt(attributeName))) {
                     attributeValueDesc = rs.getString("attributeValueDesc");
@@ -395,12 +290,17 @@ public class InterestRateChartReadServiceImpl implements InterestRateChartReadSe
                 final Integer incentiveType = JdbcSupport.getInteger(rs, "incentiveType");
                 final EnumOptionData incentiveTypeData = InterestIncentivesEnumerations.incentiveType(incentiveType);
                 final BigDecimal amount = rs.getBigDecimal("amount");
-
-                return InterestIncentiveData.instance(id, entityTypeData, attributeNameData, conditionTypeData, attributeValue,
-                        attributeValueDesc, incentiveTypeData, amount);
-
+                return InterestIncentiveData.instance(id, entityTypeData, attributeNameData, conditionTypeData, attributeValue, attributeValueDesc, incentiveTypeData, amount);
             }
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public InterestRateChartReadServiceImpl(final JdbcTemplate jdbcTemplate, final InterestRateChartExtractor chartExtractor, final InterestRateChartDropdownReadService chartDropdownReadPlatformService, final InterestIncentiveDropdownReadService interestIncentiveDropdownReadService, final CodeValueReadPlatformService codeValueReadPlatformService) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.chartExtractor = chartExtractor;
+        this.chartDropdownReadPlatformService = chartDropdownReadPlatformService;
+        this.interestIncentiveDropdownReadService = interestIncentiveDropdownReadService;
+        this.codeValueReadPlatformService = codeValueReadPlatformService;
+    }
 }

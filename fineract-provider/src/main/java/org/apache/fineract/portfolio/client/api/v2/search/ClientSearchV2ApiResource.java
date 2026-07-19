@@ -26,7 +26,6 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.core.service.PagedRequest;
 import org.apache.fineract.portfolio.client.service.search.domain.ClientSearchData;
@@ -37,19 +36,22 @@ import org.springframework.stereotype.Component;
 @Path("/v2/clients")
 @Component
 @Tag(name = "ClientSearchV2")
-@RequiredArgsConstructor
 public class ClientSearchV2ApiResource implements ClientSearchV2Api {
-
     private final ClientSearchV2ApiDelegate delegate;
 
     @Override
     @POST
     @Path("search")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Search Clients by text", operationId = "searchClientsByText")
     @AlternativeOperationId("searchByText")
     public Page<ClientSearchData> searchByText(@Parameter PagedRequest<ClientTextSearch> request) {
         return delegate.searchByText(request);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ClientSearchV2ApiResource(final ClientSearchV2ApiDelegate delegate) {
+        this.delegate = delegate;
     }
 }

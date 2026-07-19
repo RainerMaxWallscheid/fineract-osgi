@@ -26,7 +26,6 @@ import static org.apache.fineract.organisation.holiday.api.HolidayApiConstants.r
 import static org.apache.fineract.organisation.holiday.api.HolidayApiConstants.toDateParamName;
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.dateFormatParamName;
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.localeParamName;
-
 import com.google.gson.JsonArray;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,10 +42,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -57,37 +52,24 @@ import org.apache.fineract.organisation.holiday.api.HolidayApiConstants;
 import org.apache.fineract.organisation.office.domain.Office;
 
 @Entity
-@Table(name = "m_holiday", uniqueConstraints = { @UniqueConstraint(columnNames = { "name" }, name = "holiday_name") })
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
+@Table(name = "m_holiday", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"}, name = "holiday_name")})
 public class Holiday extends AbstractPersistableCustom<Long> {
-
     @Column(name = "name", unique = true, nullable = false, length = 100)
     private String name;
-
     @Column(name = "from_date", nullable = false)
     private LocalDate fromDate;
-
     @Column(name = "to_date", nullable = false)
     private LocalDate toDate;
-
     @Column(name = "repayments_rescheduled_to", nullable = true)
     private LocalDate repaymentsRescheduledTo;
-
     @Column(name = "rescheduling_type", nullable = false)
     private int reschedulingType;
-
     @Column(name = "status_enum", nullable = false)
     private Integer status;
-
     @Column(name = "processed", nullable = false)
     private boolean processed;
-
     @Column(name = "description", length = 100)
     private String description;
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "m_holiday_office", joinColumns = @JoinColumn(name = "holiday_id"), inverseJoinColumns = @JoinColumn(name = "office_id"))
     private Set<Office> offices;
@@ -106,37 +88,28 @@ public class Holiday extends AbstractPersistableCustom<Long> {
         }
         final Integer status = HolidayStatusType.PENDING_FOR_ACTIVATION.getValue();
         final boolean processed = false;// default it to false. Only batch job
-                                        // should update this field.
+        // should update this field.
         final String description = command.stringValueOfParameterNamed(HolidayApiConstants.descriptionParamName);
-
-        return new Holiday().setName(StringUtils.trim(name)).setFromDate(fromDate).setToDate(toDate)
-                .setRepaymentsRescheduledTo(repaymentsRescheduledTo).setStatus(status).setProcessed(processed)
-                .setDescription(StringUtils.trim(description)).setOffices(offices).setReschedulingType(reschedulingType);
+        return new Holiday().setName(StringUtils.trim(name)).setFromDate(fromDate).setToDate(toDate).setRepaymentsRescheduledTo(repaymentsRescheduledTo).setStatus(status).setProcessed(processed).setDescription(StringUtils.trim(description)).setOffices(offices).setReschedulingType(reschedulingType);
     }
 
     public Map<String, Object> update(final JsonCommand command) {
         final Map<String, Object> actualChanges = new LinkedHashMap<>(7);
-
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("holiday" + ".update");
-
         final HolidayStatusType currentStatus = HolidayStatusType.fromInt(this.status);
-
         final String dateFormatAsInput = command.dateFormat();
         final String localeAsInput = command.locale();
-
         if (command.isChangeInStringParameterNamed(nameParamName, this.name)) {
             final String newValue = command.stringValueOfParameterNamed(nameParamName);
             actualChanges.put(nameParamName, newValue);
             this.name = StringUtils.defaultIfEmpty(newValue, null);
         }
-
         if (command.isChangeInStringParameterNamed(descriptionParamName, this.description)) {
             final String newValue = command.stringValueOfParameterNamed(descriptionParamName);
             actualChanges.put(descriptionParamName, newValue);
             this.description = StringUtils.defaultIfEmpty(newValue, null);
         }
-
         if (command.isChangeInIntegerParameterNamed(HolidayApiConstants.reschedulingType, this.reschedulingType)) {
             final Integer newValue = command.integerValueOfParameterNamed(HolidayApiConstants.reschedulingType);
             actualChanges.put(HolidayApiConstants.reschedulingType, newValue);
@@ -145,7 +118,6 @@ public class Holiday extends AbstractPersistableCustom<Long> {
                 this.repaymentsRescheduledTo = null;
             }
         }
-
         if (currentStatus.isPendingActivation()) {
             if (command.isChangeInLocalDateParameterNamed(fromDateParamName, getFromDate())) {
                 final String valueAsInput = command.stringValueOfParameterNamed(fromDateParamName);
@@ -154,25 +126,20 @@ public class Holiday extends AbstractPersistableCustom<Long> {
                 actualChanges.put(localeParamName, localeAsInput);
                 this.fromDate = command.localDateValueOfParameterNamed(fromDateParamName);
             }
-
             if (command.isChangeInLocalDateParameterNamed(toDateParamName, getToDate())) {
                 final String valueAsInput = command.stringValueOfParameterNamed(toDateParamName);
                 actualChanges.put(toDateParamName, valueAsInput);
                 actualChanges.put(dateFormatParamName, dateFormatAsInput);
                 actualChanges.put(localeParamName, localeAsInput);
-
                 this.toDate = command.localDateValueOfParameterNamed(toDateParamName);
             }
-
             if (command.isChangeInLocalDateParameterNamed(repaymentsRescheduledToParamName, getRepaymentsRescheduledTo())) {
                 final String valueAsInput = command.stringValueOfParameterNamed(repaymentsRescheduledToParamName);
                 actualChanges.put(repaymentsRescheduledToParamName, valueAsInput);
                 actualChanges.put(dateFormatParamName, dateFormatAsInput);
                 actualChanges.put(localeParamName, localeAsInput);
-
                 this.repaymentsRescheduledTo = command.localDateValueOfParameterNamed(repaymentsRescheduledToParamName);
             }
-
             if (command.hasParameter(officesParamName)) {
                 final JsonArray jsonArray = command.arrayOfParameterNamed(officesParamName);
                 if (jsonArray != null) {
@@ -183,24 +150,19 @@ public class Holiday extends AbstractPersistableCustom<Long> {
             if (command.isChangeInLocalDateParameterNamed(fromDateParamName, getFromDate())) {
                 baseDataValidator.reset().parameter(fromDateParamName).failWithCode("cannot.edit.holiday.in.active.state");
             }
-
             if (command.isChangeInLocalDateParameterNamed(toDateParamName, getToDate())) {
                 baseDataValidator.reset().parameter(toDateParamName).failWithCode("cannot.edit.holiday.in.active.state");
             }
-
             if (command.isChangeInLocalDateParameterNamed(repaymentsRescheduledToParamName, getRepaymentsRescheduledTo())) {
                 baseDataValidator.reset().parameter(repaymentsRescheduledToParamName).failWithCode("cannot.edit.holiday.in.active.state");
             }
-
             if (command.hasParameter(officesParamName)) {
                 baseDataValidator.reset().parameter(repaymentsRescheduledToParamName).failWithCode("cannot.edit.holiday.in.active.state");
             }
-
             if (!dataValidationErrors.isEmpty()) {
                 throw new PlatformApiDataValidationException(dataValidationErrors);
             }
         }
-
         return actualChanges;
     }
 
@@ -208,12 +170,10 @@ public class Holiday extends AbstractPersistableCustom<Long> {
         if (newOffices == null) {
             return false;
         }
-
         boolean updated = false;
         if (this.offices != null) {
             final Set<Office> currentSetOfOffices = new HashSet<>(this.offices);
             final Set<Office> newSetOfOffices = new HashSet<>(newOffices);
-
             if (!currentSetOfOffices.equals(newSetOfOffices)) {
                 updated = true;
                 this.offices = newOffices;
@@ -228,7 +188,6 @@ public class Holiday extends AbstractPersistableCustom<Long> {
     public void activate() {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("holiday" + ".activate");
-
         final HolidayStatusType currentStatus = HolidayStatusType.fromInt(this.status);
         if (!currentStatus.isPendingActivation()) {
             baseDataValidator.reset().failWithCodeNoParameterAddedToErrorCode("not.in.pending.for.activation.state");
@@ -236,14 +195,12 @@ public class Holiday extends AbstractPersistableCustom<Long> {
                 throw new PlatformApiDataValidationException(dataValidationErrors);
             }
         }
-
         this.status = HolidayStatusType.ACTIVE.getValue();
     }
 
     public void delete() {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("holiday" + ".delete");
-
         final HolidayStatusType currentStatus = HolidayStatusType.fromInt(this.status);
         if (currentStatus.isDeleted()) {
             baseDataValidator.reset().failWithCodeNoParameterAddedToErrorCode("already.in.deleted.state");
@@ -256,5 +213,135 @@ public class Holiday extends AbstractPersistableCustom<Long> {
 
     public RescheduleType getReScheduleType() {
         return RescheduleType.fromInt(this.reschedulingType);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getFromDate() {
+        return this.fromDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getToDate() {
+        return this.toDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getRepaymentsRescheduledTo() {
+        return this.repaymentsRescheduledTo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public int getReschedulingType() {
+        return this.reschedulingType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getStatus() {
+        return this.status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isProcessed() {
+        return this.processed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Set<Office> getOffices() {
+        return this.offices;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Holiday setName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Holiday setFromDate(final LocalDate fromDate) {
+        this.fromDate = fromDate;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Holiday setToDate(final LocalDate toDate) {
+        this.toDate = toDate;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Holiday setRepaymentsRescheduledTo(final LocalDate repaymentsRescheduledTo) {
+        this.repaymentsRescheduledTo = repaymentsRescheduledTo;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Holiday setReschedulingType(final int reschedulingType) {
+        this.reschedulingType = reschedulingType;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Holiday setStatus(final Integer status) {
+        this.status = status;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Holiday setProcessed(final boolean processed) {
+        this.processed = processed;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Holiday setDescription(final String description) {
+        this.description = description;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public Holiday setOffices(final Set<Office> offices) {
+        this.offices = offices;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Holiday() {
     }
 }

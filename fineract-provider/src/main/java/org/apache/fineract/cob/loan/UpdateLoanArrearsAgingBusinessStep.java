@@ -19,15 +19,12 @@
 package org.apache.fineract.cob.loan;
 
 import java.util.Arrays;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.jobs.updateloanarrearsageing.LoanArrearsAgeingUpdateHandler;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class UpdateLoanArrearsAgingBusinessStep implements LoanCOBBusinessStep {
-
     private final LoanArrearsAgeingUpdateHandler loanArrearsAgeingUpdateHandler;
 
     @Override
@@ -45,5 +42,10 @@ public class UpdateLoanArrearsAgingBusinessStep implements LoanCOBBusinessStep {
     @Override
     public String getHumanReadableName() {
         return "Update loan arrears aging";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateLoanArrearsAgingBusinessStep(final LoanArrearsAgeingUpdateHandler loanArrearsAgeingUpdateHandler) {
+        this.loanArrearsAgeingUpdateHandler = loanArrearsAgeingUpdateHandler;
     }
 }

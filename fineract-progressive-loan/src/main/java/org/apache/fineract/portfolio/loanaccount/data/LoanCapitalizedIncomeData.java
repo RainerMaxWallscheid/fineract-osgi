@@ -19,19 +19,32 @@
 package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
-@Getter
-@Setter
 public class LoanCapitalizedIncomeData {
-
     private List<CapitalizedIncomeDetails> capitalizedIncomeData;
 
+    @java.lang.SuppressWarnings("all")
+        public LoanCapitalizedIncomeData(final List<CapitalizedIncomeDetails> capitalizedIncomeData) {
+        this.capitalizedIncomeData = capitalizedIncomeData;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanCapitalizedIncomeData() {
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "LoanCapitalizedIncomeData(capitalizedIncomeData=" + this.getCapitalizedIncomeData() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<CapitalizedIncomeDetails> getCapitalizedIncomeData() {
+        return this.capitalizedIncomeData;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setCapitalizedIncomeData(final List<CapitalizedIncomeDetails> capitalizedIncomeData) {
+        this.capitalizedIncomeData = capitalizedIncomeData;
+    }
 }

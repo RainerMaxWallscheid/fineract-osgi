@@ -22,26 +22,57 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
 @Entity
 @Table(name = "m_journal_entry_aggregation_tracking")
-@Getter
-@Setter
 public class JournalEntryAggregationTracking extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @Column(name = "aggregated_on_date_from", nullable = false)
     private LocalDate aggregatedOnDateFrom;
-
     @Column(name = "aggregated_on_date_to", nullable = false)
     private LocalDate aggregatedOnDateTo;
-
     @Column(name = "submitted_on_date", nullable = false)
     private LocalDate submittedOnDate;
-
     @Column(name = "job_execution_id", nullable = false)
     private Long jobExecutionId;
 
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getAggregatedOnDateFrom() {
+        return this.aggregatedOnDateFrom;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getAggregatedOnDateTo() {
+        return this.aggregatedOnDateTo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getSubmittedOnDate() {
+        return this.submittedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getJobExecutionId() {
+        return this.jobExecutionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAggregatedOnDateFrom(final LocalDate aggregatedOnDateFrom) {
+        this.aggregatedOnDateFrom = aggregatedOnDateFrom;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAggregatedOnDateTo(final LocalDate aggregatedOnDateTo) {
+        this.aggregatedOnDateTo = aggregatedOnDateTo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setSubmittedOnDate(final LocalDate submittedOnDate) {
+        this.submittedOnDate = submittedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setJobExecutionId(final Long jobExecutionId) {
+        this.jobExecutionId = jobExecutionId;
+    }
 }

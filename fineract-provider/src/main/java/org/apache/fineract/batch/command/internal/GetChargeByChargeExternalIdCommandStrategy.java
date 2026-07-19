@@ -19,12 +19,10 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.command.CommandStrategyUtils;
@@ -45,9 +43,7 @@ import org.springframework.stereotype.Component;
  * @see BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class GetChargeByChargeExternalIdCommandStrategy implements CommandStrategy {
-
     /**
      * Loan charges api resource {@link LoanChargesApiResource}.
      */
@@ -56,15 +52,11 @@ public class GetChargeByChargeExternalIdCommandStrategy implements CommandStrate
     @Override
     public BatchResponse execute(final BatchRequest request, final UriInfo uriInfo) {
         final MutableUriInfo parameterizedUriInfo = new MutableUriInfo(uriInfo);
-
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final String relativeUrl = relativeUrlWithoutVersion(request);
-
         // Expected pattern - loans\/external-id\/[\w\d_-]+\/charges\/external-id\/[\w\d_-]+
         // Get the loan and charge external ids for use in loanChargesApiResource
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrl);
@@ -75,19 +67,25 @@ public class GetChargeByChargeExternalIdCommandStrategy implements CommandStrate
         } else {
             chargeExternalId = pathParameters.get(5);
         }
-
         Map<String, String> queryParameters;
         if (relativeUrl.indexOf('?') > 0) {
             queryParameters = CommandStrategyUtils.getQueryParameters(relativeUrl);
-
             // Add the query parameters sent in the relative URL to UriInfo
             CommandStrategyUtils.addQueryParametersToUriInfo(parameterizedUriInfo, queryParameters);
         }
-
         responseBody = loanChargesApiResource.retrieveLoanCharge(loanExternalId, chargeExternalId, parameterizedUriInfo);
         response.setStatusCode(HttpStatus.SC_OK);
         response.setBody(responseBody);
-
         return response;
+    }
+
+    /**
+     * Creates a new {@code GetChargeByChargeExternalIdCommandStrategy} instance.
+     *
+     * @param loanChargesApiResource Loan charges api resource {@link LoanChargesApiResource}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GetChargeByChargeExternalIdCommandStrategy(final LoanChargesApiResource loanChargesApiResource) {
+        this.loanChargesApiResource = loanChargesApiResource;
     }
 }

@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.infrastructure.core.filters;
 
 import jakarta.servlet.FilterChain;
@@ -24,37 +23,30 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.service.MDCWrapper;
 import org.apache.fineract.infrastructure.security.utils.LogParameterEscapeUtil;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@RequiredArgsConstructor
-@Slf4j
 public class CorrelationHeaderFilter extends OncePerRequestFilter {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CorrelationHeaderFilter.class);
     public static final String CORRELATION_ID_KEY = "correlationId";
-
     private final FineractProperties fineractProperties;
     private final MDCWrapper mdcWrapper;
 
     @Override
-    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain)
-            throws IOException, ServletException {
+    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws IOException, ServletException {
         FineractProperties.FineractCorrelationProperties correlationProperties = fineractProperties.getCorrelation();
         if (correlationProperties.isEnabled()) {
             handleCorrelations(request, response, filterChain, correlationProperties);
         } else {
             filterChain.doFilter(request, response);
         }
-
     }
 
-    private void handleCorrelations(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain,
-            FineractProperties.FineractCorrelationProperties correlationProperties) throws IOException, ServletException {
+    private void handleCorrelations(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, FineractProperties.FineractCorrelationProperties correlationProperties) throws IOException, ServletException {
         try {
             String correlationHeaderName = correlationProperties.getHeaderName();
             String correlationId = request.getHeader(correlationHeaderName);
@@ -79,4 +71,9 @@ public class CorrelationHeaderFilter extends OncePerRequestFilter {
         return false;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public CorrelationHeaderFilter(final FineractProperties fineractProperties, final MDCWrapper mdcWrapper) {
+        this.fineractProperties = fineractProperties;
+        this.mdcWrapper = mdcWrapper;
+    }
 }

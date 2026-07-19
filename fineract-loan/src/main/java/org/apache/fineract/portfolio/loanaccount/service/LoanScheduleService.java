@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.loanaccount.service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.loanaccount.data.ScheduleGeneratorDTO;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -33,9 +32,7 @@ import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanSchedul
 import org.apache.fineract.portfolio.loanaccount.mapper.LoanMapper;
 import org.apache.fineract.portfolio.loanaccount.service.schedule.LoanScheduleComponent;
 
-@RequiredArgsConstructor
 public class LoanScheduleService {
-
     private final LoanChargeService loanChargeService;
     private final ReprocessLoanTransactionsService reprocessLoanTransactionsService;
     private final LoanMapper loanMapper;
@@ -70,13 +67,11 @@ public class LoanScheduleService {
         reprocessLoanTransactionsService.reprocessTransactions(loan);
     }
 
-    public void recalculateScheduleFromLastTransaction(final Loan loan, final ScheduleGeneratorDTO generatorDTO,
-            final List<Long> existingTransactionIds, final List<Long> existingReversedTransactionIds) {
+    public void recalculateScheduleFromLastTransaction(final Loan loan, final ScheduleGeneratorDTO generatorDTO, final List<Long> existingTransactionIds, final List<Long> existingReversedTransactionIds) {
         recalculateScheduleFromLastTransaction(loan, generatorDTO, existingTransactionIds, existingReversedTransactionIds, false);
     }
 
-    public void recalculateScheduleFromLastTransaction(final Loan loan, final ScheduleGeneratorDTO generatorDTO,
-            final List<Long> existingTransactionIds, final List<Long> existingReversedTransactionIds, boolean skipTransactionIdCollecting) {
+    public void recalculateScheduleFromLastTransaction(final Loan loan, final ScheduleGeneratorDTO generatorDTO, final List<Long> existingTransactionIds, final List<Long> existingReversedTransactionIds, boolean skipTransactionIdCollecting) {
         if (!skipTransactionIdCollecting) {
             existingTransactionIds.addAll(loanTransactionRepository.findTransactionIdsByLoan(loan));
             existingReversedTransactionIds.addAll(loanTransactionRepository.findReversedTransactionIdsByLoan(loan));
@@ -91,7 +86,6 @@ public class LoanScheduleService {
         } else {
             reprocessLoanTransactionsService.updateModel(loan);
         }
-
     }
 
     public void regenerateRepaymentScheduleWithInterestRecalculation(final Loan loan, final ScheduleGeneratorDTO generatorDTO) {
@@ -112,10 +106,8 @@ public class LoanScheduleService {
         for (final LoanCharge loanCharge : charges) {
             if (!loanCharge.isDueAtDisbursement()) {
                 loanChargeService.updateOverdueScheduleInstallment(loan, loanCharge);
-                if (loanCharge.getDueLocalDate() == null || (!DateUtils.isBefore(lastRepaymentDate, loanCharge.getDueLocalDate())
-                        || loan.getLoanProductRelatedDetail().getLoanScheduleType().equals(LoanScheduleType.PROGRESSIVE))) {
-                    if ((loanCharge.isInstalmentFee() || !loanCharge.isWaived()) && (loanCharge.getDueLocalDate() == null
-                            || !DateUtils.isAfter(lastTransactionDate, loanCharge.getDueLocalDate()))) {
+                if (loanCharge.getDueLocalDate() == null || (!DateUtils.isBefore(lastRepaymentDate, loanCharge.getDueLocalDate()) || loan.getLoanProductRelatedDetail().getLoanScheduleType().equals(LoanScheduleType.PROGRESSIVE))) {
+                    if ((loanCharge.isInstalmentFee() || !loanCharge.isWaived()) && (loanCharge.getDueLocalDate() == null || !DateUtils.isAfter(lastTransactionDate, loanCharge.getDueLocalDate()))) {
                         loanChargeService.recalculateLoanCharge(loan, loanCharge, generatorDTO.getPenaltyWaitPeriod());
                         loanCharge.updateWaivedAmount(loan.getCurrency());
                     }
@@ -139,5 +131,16 @@ public class LoanScheduleService {
     public void regenerateRepaymentSchedule(final Loan loan) {
         ScheduleGeneratorDTO generatorDTO = loanUtilService.buildScheduleGeneratorDTO(loan, null);
         regenerateRepaymentSchedule(loan, generatorDTO);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanScheduleService(final LoanChargeService loanChargeService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanMapper loanMapper, final LoanTransactionProcessingService loanTransactionProcessingService, final LoanScheduleComponent loanSchedule, final LoanTransactionRepository loanTransactionRepository, final ILoanUtilService loanUtilService) {
+        this.loanChargeService = loanChargeService;
+        this.reprocessLoanTransactionsService = reprocessLoanTransactionsService;
+        this.loanMapper = loanMapper;
+        this.loanTransactionProcessingService = loanTransactionProcessingService;
+        this.loanSchedule = loanSchedule;
+        this.loanTransactionRepository = loanTransactionRepository;
+        this.loanUtilService = loanUtilService;
     }
 }

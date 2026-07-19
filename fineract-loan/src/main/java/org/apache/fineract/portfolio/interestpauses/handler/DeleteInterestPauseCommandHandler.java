@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.interestpauses.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -28,9 +27,7 @@ import org.apache.fineract.portfolio.interestpauses.service.InterestPauseWritePl
 import org.springframework.stereotype.Component;
 
 @Component("deleteInterestPauseCommandHandler")
-@RequiredArgsConstructor
 public class DeleteInterestPauseCommandHandler implements NewCommandSourceHandler {
-
     private final InterestPauseWritePlatformService interestPauseService;
 
     @Override
@@ -38,14 +35,17 @@ public class DeleteInterestPauseCommandHandler implements NewCommandSourceHandle
         final Long loanId = command.getLoanId();
         final ExternalId loanExternalId = command.getLoanExternalId();
         final Long termVariationId = command.getResourceId();
-
         if (loanId != null) {
             return interestPauseService.deleteInterestPause(loanId, termVariationId);
         } else if (loanExternalId != null) {
             return interestPauseService.deleteInterestPause(loanExternalId, termVariationId);
         } else {
-            throw new PlatformApiDataValidationException("validation.msg.missing.loan.id.or.external.id",
-                    "Either loanId or loanExternalId must be provided.", "loanId");
+            throw new PlatformApiDataValidationException("validation.msg.missing.loan.id.or.external.id", "Either loanId or loanExternalId must be provided.", "loanId");
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DeleteInterestPauseCommandHandler(final InterestPauseWritePlatformService interestPauseService) {
+        this.interestPauseService = interestPauseService;
     }
 }

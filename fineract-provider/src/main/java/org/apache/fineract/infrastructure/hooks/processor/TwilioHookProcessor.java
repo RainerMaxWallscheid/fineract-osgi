@@ -21,7 +21,6 @@ package org.apache.fineract.infrastructure.hooks.processor;
 import static org.apache.fineract.commands.domain.CommandWrapperConstants.ACTION_SEND;
 import static org.apache.fineract.commands.domain.CommandWrapperConstants.ENTITY_SMS;
 import static org.apache.fineract.infrastructure.hooks.api.HookApiConstants.apiKeyName;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -29,7 +28,6 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.FineractContext;
 import org.apache.fineract.infrastructure.hooks.data.HookSmsProviderData;
 import org.apache.fineract.infrastructure.hooks.domain.Hook;
@@ -43,9 +41,7 @@ import org.springframework.stereotype.Service;
 import retrofit2.Callback;
 
 @Service
-@RequiredArgsConstructor
 public class TwilioHookProcessor implements HookProcessor {
-
     private final HookConfigurationRepository hookConfigurationRepository;
     private final TemplateMergeService templateMergeService;
     private final ClientRepositoryWrapper clientRepositoryWrapper;
@@ -53,23 +49,16 @@ public class TwilioHookProcessor implements HookProcessor {
     private final TemplateMapper templateMapper;
 
     @Override
-    public void process(final Hook hook, final String payload, final String entityName, final String actionName,
-            final FineractContext context) throws IOException {
-
+    public void process(final Hook hook, final String payload, final String entityName, final String actionName, final FineractContext context) throws IOException {
         final HookSmsProviderData smsProviderData = new HookSmsProviderData(hook.getConfig());
-
         sendRequest(smsProviderData, payload, entityName, actionName, hook, context);
     }
 
     @SuppressWarnings("unchecked")
-    private void sendRequest(final HookSmsProviderData smsProviderData, final String payload, String entityName, String actionName,
-            final Hook hook, final FineractContext context) throws IOException {
-
+    private void sendRequest(final HookSmsProviderData smsProviderData, final String payload, String entityName, String actionName, final Hook hook, final FineractContext context) throws IOException {
         final WebHookService service = processorHelper.createWebHookService(smsProviderData.getUrl());
-
         @SuppressWarnings("rawtypes")
         final Callback callback = processorHelper.createCallback(smsProviderData.getUrl());
-
         String apiKey = this.hookConfigurationRepository.findOneByHookIdAndFieldName(hook.getId(), apiKeyName);
         if (apiKey == null) {
             smsProviderData.setUrl(null);
@@ -80,7 +69,6 @@ public class TwilioHookProcessor implements HookProcessor {
             final HookConfiguration apiKeyEntry = HookConfiguration.createNew(hook, "string", apiKeyName, apiKey);
             this.hookConfigurationRepository.save(apiKeyEntry);
         }
-
         if (apiKey != null && !apiKey.equals("")) {
             JsonObject json;
             if (hook.getUgdTemplate() != null) {
@@ -93,8 +81,7 @@ public class TwilioHookProcessor implements HookProcessor {
             } else {
                 json = JsonParser.parseString(payload).getAsJsonObject();
             }
-            service.sendSmsBridgeRequest(entityName, actionName, context.getTenantContext().getTenantIdentifier(), apiKey, json)
-                    .enqueue(callback);
+            service.sendSmsBridgeRequest(entityName, actionName, context.getTenantContext().getTenantIdentifier(), apiKey, json).enqueue(callback);
         }
     }
 
@@ -108,8 +95,7 @@ public class TwilioHookProcessor implements HookProcessor {
             final Client client = this.clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
             final String mobileNo = client.mobileNo();
             if (mobileNo != null && !mobileNo.isEmpty()) {
-                final String compiledMessage = this.templateMergeService.compile(templateMapper.map(hook.getUgdTemplate()), map)
-                        .replace("<p>", "").replace("</p>", "");
+                final String compiledMessage = this.templateMergeService.compile(templateMapper.map(hook.getUgdTemplate()), map).replace("<p>", "").replace("</p>", "");
                 final Map<String, String> jsonMap = new HashMap<>();
                 jsonMap.put("mobileNo", mobileNo);
                 jsonMap.put("message", compiledMessage);
@@ -120,4 +106,12 @@ public class TwilioHookProcessor implements HookProcessor {
         return json;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public TwilioHookProcessor(final HookConfigurationRepository hookConfigurationRepository, final TemplateMergeService templateMergeService, final ClientRepositoryWrapper clientRepositoryWrapper, final ProcessorHelper processorHelper, final TemplateMapper templateMapper) {
+        this.hookConfigurationRepository = hookConfigurationRepository;
+        this.templateMergeService = templateMergeService;
+        this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.processorHelper = processorHelper;
+        this.templateMapper = templateMapper;
+    }
 }

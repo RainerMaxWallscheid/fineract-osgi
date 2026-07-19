@@ -19,14 +19,11 @@
 package org.apache.fineract.infrastructure.event.external.service.serialization.serializer;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.event.business.domain.BusinessEvent;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class BusinessEventSerializerFactory {
-
     private final List<BusinessEventSerializer> serializers;
 
     public <T> BusinessEventSerializer create(BusinessEvent<T> event) {
@@ -35,7 +32,11 @@ public class BusinessEventSerializerFactory {
                 return serializer;
             }
         }
-        throw new IllegalStateException("There's no serializer that's capable of serializing a " + event.getClass().getSimpleName());
+        throw new IllegalStateException("There\'s no serializer that\'s capable of serializing a " + event.getClass().getSimpleName());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public BusinessEventSerializerFactory(final List<BusinessEventSerializer> serializers) {
+        this.serializers = serializers;
+    }
 }

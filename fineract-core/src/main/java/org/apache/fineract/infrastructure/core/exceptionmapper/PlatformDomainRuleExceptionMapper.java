@@ -23,7 +23,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
@@ -40,14 +39,14 @@ import org.springframework.stereotype.Component;
 @Provider
 @Component
 @Scope("singleton")
-@Slf4j
 public class PlatformDomainRuleExceptionMapper implements FineractExceptionMapper, ExceptionMapper<AbstractPlatformDomainRuleException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PlatformDomainRuleExceptionMapper.class);
 
     @Override
     public Response toResponse(final AbstractPlatformDomainRuleException exception) {
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-        final ApiGlobalErrorResponse notFoundErrorResponse = ApiGlobalErrorResponse.domainRuleViolation(
-                exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(), exception.getDefaultUserMessageArgs());
+        final ApiGlobalErrorResponse notFoundErrorResponse = ApiGlobalErrorResponse.domainRuleViolation(exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(), exception.getDefaultUserMessageArgs());
         // request understood but not carried out due to it violating some
         // domain/business logic
         return Response.status(Status.FORBIDDEN).entity(notFoundErrorResponse).type(MediaType.APPLICATION_JSON).build();

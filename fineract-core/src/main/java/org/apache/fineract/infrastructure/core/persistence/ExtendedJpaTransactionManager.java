@@ -24,7 +24,6 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-import lombok.Getter;
 import org.springframework.jdbc.datasource.ConnectionHandle;
 import org.springframework.jdbc.datasource.JdbcTransactionObjectSupport;
 import org.springframework.orm.jpa.EntityManagerHolder;
@@ -36,10 +35,7 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 public class ExtendedJpaTransactionManager extends JpaTransactionManager {
-
     private final List<TransactionLifecycleCallback> lifecycleCallbacks = new CopyOnWriteArrayList<>();
-
-    @Getter
     private final boolean readOnly;
 
     public ExtendedJpaTransactionManager(boolean readOnly) {
@@ -68,20 +64,15 @@ public class ExtendedJpaTransactionManager extends JpaTransactionManager {
         // manager ("jdbcTransactionManager"), which applies isolation per-connection without touching the shared
         // session.
         if (definition.getIsolationLevel() != TransactionDefinition.ISOLATION_DEFAULT) {
-            throw new InvalidIsolationLevelException("Custom isolation level " + definition.getIsolationLevel()
-                    + " is not supported by the JPA transaction manager; use the JDBC transaction manager (\"jdbcTransactionManager\") "
-                    + "for transactions that require a specific isolation level");
+            throw new InvalidIsolationLevelException("Custom isolation level " + definition.getIsolationLevel() + " is not supported by the JPA transaction manager; use the JDBC transaction manager (\"jdbcTransactionManager\") " + "for transactions that require a specific isolation level");
         }
-
         super.doBegin(transaction, definition);
-
         if (definition.isReadOnly() || isReadOnlyTx(transaction) || isReadOnly()) {
             EntityManager entityManager = getCurrentEntityManager();
             if (entityManager != null) {
                 entityManager.setFlushMode(FlushModeType.COMMIT);
             }
         }
-
         invokeLifecycleCallbacks(TransactionLifecycleCallback::afterBegin);
     }
 
@@ -93,7 +84,6 @@ public class ExtendedJpaTransactionManager extends JpaTransactionManager {
                 entityManager.clear();
             }
         }
-
         super.doCommit(status);
         invokeLifecycleCallbacks(TransactionLifecycleCallback::afterCommit);
     }
@@ -125,8 +115,8 @@ public class ExtendedJpaTransactionManager extends JpaTransactionManager {
         this.lifecycleCallbacks.addAll(lifecycleCallbacks);
     }
 
-    private static final class LockFreeEclipseLinkJpaDialect extends EclipseLinkJpaDialect {
 
+    private static final class LockFreeEclipseLinkJpaDialect extends EclipseLinkJpaDialect {
         LockFreeEclipseLinkJpaDialect() {
             // EclipseLinkConnectionHandle.getConnection() acquires the singleton transactionIsolationLock
             // before calling entityManager.unwrap(Connection.class). When the pool is exhausted,
@@ -142,8 +132,8 @@ public class ExtendedJpaTransactionManager extends JpaTransactionManager {
             return new LockFreeConnectionHandle(em);
         }
 
-        private static final class LockFreeConnectionHandle implements ConnectionHandle {
 
+        private static final class LockFreeConnectionHandle implements ConnectionHandle {
             private final EntityManager em;
             private Connection connection;
 
@@ -159,5 +149,10 @@ public class ExtendedJpaTransactionManager extends JpaTransactionManager {
                 return connection;
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isReadOnly() {
+        return this.readOnly;
     }
 }

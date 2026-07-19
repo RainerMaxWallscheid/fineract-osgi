@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.floatingrates.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "FLOATINGRATE", action = "CREATE")
-@RequiredArgsConstructor
 public class CreateFloatingRateCommandHandler implements NewCommandSourceHandler {
-
     private final FloatingRateWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.createFloatingRate(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateFloatingRateCommandHandler(final FloatingRateWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

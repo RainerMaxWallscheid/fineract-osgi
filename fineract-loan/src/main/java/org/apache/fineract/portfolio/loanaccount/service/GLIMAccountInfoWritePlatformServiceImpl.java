@@ -16,27 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.math.BigDecimal;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.loanaccount.domain.GLIMAccountInfoRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.GroupLoanIndividualMonitoringAccount;
 
-@RequiredArgsConstructor
 public class GLIMAccountInfoWritePlatformServiceImpl implements GLIMAccountInfoWritePlatformService {
-
     private final GLIMAccountInfoRepository glimAccountRepository;
 
     @Override
-    public GroupLoanIndividualMonitoringAccount createGLIMAccount(String accountNumber, Group group, BigDecimal principalAmount,
-            Long childAccountsCount, Boolean isAcceptingChild, Integer loanStatus, BigDecimal applicationId) {
-
-        GroupLoanIndividualMonitoringAccount glimAccountInfo = GroupLoanIndividualMonitoringAccount.getInstance(accountNumber, group,
-                principalAmount, childAccountsCount, isAcceptingChild, loanStatus, applicationId);
-
+    public GroupLoanIndividualMonitoringAccount createGLIMAccount(String accountNumber, Group group, BigDecimal principalAmount, Long childAccountsCount, Boolean isAcceptingChild, Integer loanStatus, BigDecimal applicationId) {
+        GroupLoanIndividualMonitoringAccount glimAccountInfo = GroupLoanIndividualMonitoringAccount.getInstance(accountNumber, group, principalAmount, childAccountsCount, isAcceptingChild, loanStatus, applicationId);
         return this.glimAccountRepository.save(glimAccountInfo);
     }
 
@@ -44,14 +36,12 @@ public class GLIMAccountInfoWritePlatformServiceImpl implements GLIMAccountInfoW
     public void setIsAcceptingChild(GroupLoanIndividualMonitoringAccount glimAccount) {
         glimAccount.setIsAcceptingChild(true);
         glimAccountRepository.save(glimAccount);
-
     }
 
     @Override
     public void resetIsAcceptingChild(GroupLoanIndividualMonitoringAccount glimAccount) {
         glimAccount.setIsAcceptingChild(false);
         glimAccountRepository.save(glimAccount);
-
     }
 
     @Override
@@ -59,7 +49,10 @@ public class GLIMAccountInfoWritePlatformServiceImpl implements GLIMAccountInfoW
         long count = glimAccount.getChildAccountsCount();
         glimAccount.setChildAccountsCount(count + 1);
         glimAccountRepository.save(glimAccount);
-
     }
 
+    @java.lang.SuppressWarnings("all")
+        public GLIMAccountInfoWritePlatformServiceImpl(final GLIMAccountInfoRepository glimAccountRepository) {
+        this.glimAccountRepository = glimAccountRepository;
+    }
 }

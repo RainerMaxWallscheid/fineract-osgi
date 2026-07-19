@@ -22,30 +22,27 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.dataqueries.service.DatatableExportTargetParameter;
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class CsvDatatableReportExportServiceImpl implements DatatableReportExportService {
-
     private final ReadReportingService readExtraDataAndReportingService;
 
     @Override
-    public ResponseHolder export(String reportName, MultivaluedMap<String, String> queryParams, Map<String, String> reportParams,
-            String parameterTypeValue) {
-        final StreamingOutput result = this.readExtraDataAndReportingService.retrieveReportCSV(reportName, parameterTypeValue,
-                reportParams);
-        return new ResponseHolder(Response.Status.OK).contentType("text/csv")
-                .addHeader("Content-Disposition",
-                        "attachment;filename=" + DatatableExportUtil.generatePlainExportFileName(255, "csv", reportName, reportParams))
-                .entity(result);
+    public ResponseHolder export(String reportName, MultivaluedMap<String, String> queryParams, Map<String, String> reportParams, String parameterTypeValue) {
+        final StreamingOutput result = this.readExtraDataAndReportingService.retrieveReportCSV(reportName, parameterTypeValue, reportParams);
+        return new ResponseHolder(Response.Status.OK).contentType("text/csv").addHeader("Content-Disposition", "attachment;filename=" + DatatableExportUtil.generatePlainExportFileName(255, "csv", reportName, reportParams)).entity(result);
     }
 
     @Override
     public boolean supports(DatatableExportTargetParameter exportType) {
         return exportType == DatatableExportTargetParameter.CSV;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CsvDatatableReportExportServiceImpl(final ReadReportingService readExtraDataAndReportingService) {
+        this.readExtraDataAndReportingService = readExtraDataAndReportingService;
     }
 }

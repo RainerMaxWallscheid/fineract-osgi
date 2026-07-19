@@ -23,8 +23,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.security.data.FineractOidcUser;
 import org.springframework.security.core.Authentication;
@@ -32,31 +30,24 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.web.util.UriComponentsBuilder;
 
-@Slf4j
-@RequiredArgsConstructor
 public class OidcLogoutSuccessHandler implements LogoutSuccessHandler {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(OidcLogoutSuccessHandler.class);
     private static final String FALLBACK_URL = "/login?logout";
-
     private final FineractProperties fineractProperties;
 
     @Override
-    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
-            throws IOException, ServletException {
-
+    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         if (authentication != null && authentication.getPrincipal() instanceof FineractOidcUser oidcUser) {
-            log.debug("OIDC logout initiated for user '{}' (tenant: '{}')", oidcUser.getName(), oidcUser.getTenantId());
-
+            log.debug("OIDC logout initiated for user \'{}\' (tenant: \'{}\')", oidcUser.getName(), oidcUser.getTenantId());
             String provider = fineractProperties.getSecurity().getOidcFederation().getProvider().getCode();
             String logoutUrl = buildLogoutUrl(provider, oidcUser, request);
-
             if (logoutUrl != null) {
                 log.debug("Redirecting to IdP logout URL: {}", logoutUrl);
                 response.sendRedirect(logoutUrl);
                 return;
             }
         }
-
         // Fallback: no IdP logout — redirect locally
         fallbackHandler().onLogoutSuccess(request, response, authentication);
     }
@@ -65,21 +56,11 @@ public class OidcLogoutSuccessHandler implements LogoutSuccessHandler {
         String idToken = oidcUser.getIdToken().getTokenValue();
         String issuer = oidcUser.getIdToken().getIssuer().toString();
         String postLogoutUri = resolvePostLogoutUri(request);
-
         return switch (provider) {
-            case "keycloak" ->
-                UriComponentsBuilder.fromUriString(issuer).path("/protocol/openid-connect/logout").queryParam("id_token_hint", idToken)
-                        .queryParam("post_logout_redirect_uri", postLogoutUri).encode(StandardCharsets.UTF_8).toUriString();
-
-            case "azure_ad" -> UriComponentsBuilder.fromUriString(issuer).path("/oauth2/v2.0/logout")
-                    .queryParam("post_logout_redirect_uri", postLogoutUri).encode(StandardCharsets.UTF_8).toUriString();
-
-            case "okta" -> UriComponentsBuilder.fromUriString(issuer).path("/v1/logout").queryParam("id_token_hint", idToken)
-                    .queryParam("post_logout_redirect_uri", postLogoutUri).encode(StandardCharsets.UTF_8).toUriString();
-
-            case "auth0" -> UriComponentsBuilder.fromUriString(issuer).path("/v2/logout").queryParam("returnTo", postLogoutUri)
-                    .encode(StandardCharsets.UTF_8).toUriString();
-
+            case "keycloak" -> UriComponentsBuilder.fromUriString(issuer).path("/protocol/openid-connect/logout").queryParam("id_token_hint", idToken).queryParam("post_logout_redirect_uri", postLogoutUri).encode(StandardCharsets.UTF_8).toUriString();
+            case "azure_ad" -> UriComponentsBuilder.fromUriString(issuer).path("/oauth2/v2.0/logout").queryParam("post_logout_redirect_uri", postLogoutUri).encode(StandardCharsets.UTF_8).toUriString();
+            case "okta" -> UriComponentsBuilder.fromUriString(issuer).path("/v1/logout").queryParam("id_token_hint", idToken).queryParam("post_logout_redirect_uri", postLogoutUri).encode(StandardCharsets.UTF_8).toUriString();
+            case "auth0" -> UriComponentsBuilder.fromUriString(issuer).path("/v2/logout").queryParam("returnTo", postLogoutUri).encode(StandardCharsets.UTF_8).toUriString();
             // "generic" and any unknown value: let Spring discover end_session_endpoint
             default -> null;
         };
@@ -105,5 +86,10 @@ public class OidcLogoutSuccessHandler implements LogoutSuccessHandler {
             base.append(":").append(port);
         }
         return base.append(FALLBACK_URL).toString();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OidcLogoutSuccessHandler(final FineractProperties fineractProperties) {
+        this.fineractProperties = fineractProperties;
     }
 }

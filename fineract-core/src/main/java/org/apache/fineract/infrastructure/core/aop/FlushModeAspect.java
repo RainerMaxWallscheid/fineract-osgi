@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.core.aop;
 
 import jakarta.persistence.FlushModeType;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.annotation.WithFlushMode;
 import org.apache.fineract.infrastructure.core.persistence.FlushModeHandler;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -43,9 +42,7 @@ import org.springframework.util.ClassUtils;
 @Aspect
 @Component
 @Order
-@RequiredArgsConstructor
 public class FlushModeAspect {
-
     private static final Logger logger = LoggerFactory.getLogger(FlushModeAspect.class);
     private final FlushModeHandler flushModeHandler;
 
@@ -56,25 +53,18 @@ public class FlushModeAspect {
         if (effectiveAnnotation == null) {
             return jointPointProceed(joinPoint);
         }
-
         FlushModeType flushMode = effectiveAnnotation.value();
-
         // Check if we're in an active transaction
         boolean hasActiveTransaction = TransactionSynchronizationManager.isActualTransactionActive();
-
         if (!hasActiveTransaction) {
             if (logger.isDebugEnabled()) {
-                logger.warn("No active transaction found for @WithFlushMode on {}.{}", joinPoint.getSignature().getDeclaringTypeName(),
-                        joinPoint.getSignature().getName());
+                logger.warn("No active transaction found for @WithFlushMode on {}.{}", joinPoint.getSignature().getDeclaringTypeName(), joinPoint.getSignature().getName());
             }
             return jointPointProceed(joinPoint);
         }
-
         if (logger.isDebugEnabled()) {
-            logger.debug("Setting flush mode to {} for {}.{}", flushMode, joinPoint.getSignature().getDeclaringTypeName(),
-                    joinPoint.getSignature().getName());
+            logger.debug("Setting flush mode to {} for {}.{}", flushMode, joinPoint.getSignature().getDeclaringTypeName(), joinPoint.getSignature().getName());
         }
-
         // Use FlushModeHandler to manage the flush mode around method execution
         return flushModeHandler.withFlushMode(flushMode, () -> jointPointProceed(joinPoint));
     }
@@ -94,9 +84,13 @@ public class FlushModeAspect {
         if (annotation != null && joinPoint.getSignature() instanceof MethodSignature) {
             return annotation;
         }
-
         // Otherwise, try to get the class-level annotation
         Class<?> targetClass = ClassUtils.getUserClass(joinPoint.getTarget().getClass());
         return AnnotationUtils.findAnnotation(targetClass, WithFlushMode.class);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FlushModeAspect(final FlushModeHandler flushModeHandler) {
+        this.flushModeHandler = flushModeHandler;
     }
 }

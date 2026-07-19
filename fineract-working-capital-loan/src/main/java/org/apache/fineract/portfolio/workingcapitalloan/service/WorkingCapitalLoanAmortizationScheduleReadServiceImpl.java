@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.workingcapitalloan.service;
 
 import java.math.MathContext;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.portfolio.workingcapitalloan.calc.ProjectedAmortizationScheduleModel;
@@ -33,10 +32,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class WorkingCapitalLoanAmortizationScheduleReadServiceImpl implements WorkingCapitalLoanAmortizationScheduleReadService {
-
     private final WorkingCapitalLoanRepository loanRepository;
     private final ProjectedAmortizationScheduleRepositoryWrapper scheduleRepositoryWrapper;
     private final ProjectedAmortizationScheduleMapper mapper;
@@ -44,12 +41,16 @@ public class WorkingCapitalLoanAmortizationScheduleReadServiceImpl implements Wo
     @Override
     public ProjectedAmortizationScheduleData retrieveAmortizationSchedule(final Long loanId) {
         final WorkingCapitalLoan loan = loanRepository.findById(loanId).orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
-
         final MathContext mc = MoneyHelper.getMathContext();
         final CurrencyData currency = WorkingCapitalLoanCurrencyResolver.resolveCurrency(loan);
-        final ProjectedAmortizationScheduleModel model = scheduleRepositoryWrapper.readModel(loanId, mc, currency)
-                .orElseThrow(() -> new ProjectedAmortizationScheduleNotFoundException(loanId));
-
+        final ProjectedAmortizationScheduleModel model = scheduleRepositoryWrapper.readModel(loanId, mc, currency).orElseThrow(() -> new ProjectedAmortizationScheduleNotFoundException(loanId));
         return mapper.toData(model);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanAmortizationScheduleReadServiceImpl(final WorkingCapitalLoanRepository loanRepository, final ProjectedAmortizationScheduleRepositoryWrapper scheduleRepositoryWrapper, final ProjectedAmortizationScheduleMapper mapper) {
+        this.loanRepository = loanRepository;
+        this.scheduleRepositoryWrapper = scheduleRepositoryWrapper;
+        this.mapper = mapper;
     }
 }

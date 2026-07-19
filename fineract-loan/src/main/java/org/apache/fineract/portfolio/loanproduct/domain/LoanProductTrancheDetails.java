@@ -21,23 +21,15 @@ package org.apache.fineract.portfolio.loanproduct.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
 @Embeddable
 public class LoanProductTrancheDetails {
-
     @Column(name = "allow_multiple_disbursals")
     private boolean multiDisburseLoan;
-
     @Column(name = "max_disbursals")
     private Integer maxTrancheCount;
-
     @Column(name = "max_outstanding_loan_balance", scale = 6, precision = 19)
     private BigDecimal outstandingLoanBalance;
-
     @Column(name = "allow_full_term_for_tranche")
     private boolean allowFullTermForTranche;
 
@@ -45,12 +37,50 @@ public class LoanProductTrancheDetails {
         // TODO Auto-generated constructor stub
     }
 
-    public LoanProductTrancheDetails(final boolean multiDisburseLoan, final Integer maxTrancheCount,
-            final BigDecimal outstandingLoanBalance, final boolean allowFullTermForTranche) {
+    public LoanProductTrancheDetails(final boolean multiDisburseLoan, final Integer maxTrancheCount, final BigDecimal outstandingLoanBalance, final boolean allowFullTermForTranche) {
         this.multiDisburseLoan = multiDisburseLoan;
         this.maxTrancheCount = maxTrancheCount;
         this.outstandingLoanBalance = outstandingLoanBalance;
         this.allowFullTermForTranche = allowFullTermForTranche;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public boolean isMultiDisburseLoan() {
+        return this.multiDisburseLoan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getMaxTrancheCount() {
+        return this.maxTrancheCount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getOutstandingLoanBalance() {
+        return this.outstandingLoanBalance;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isAllowFullTermForTranche() {
+        return this.allowFullTermForTranche;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMultiDisburseLoan(final boolean multiDisburseLoan) {
+        this.multiDisburseLoan = multiDisburseLoan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMaxTrancheCount(final Integer maxTrancheCount) {
+        this.maxTrancheCount = maxTrancheCount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setOutstandingLoanBalance(final BigDecimal outstandingLoanBalance) {
+        this.outstandingLoanBalance = outstandingLoanBalance;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAllowFullTermForTranche(final boolean allowFullTermForTranche) {
+        this.allowFullTermForTranche = allowFullTermForTranche;
+    }
 }

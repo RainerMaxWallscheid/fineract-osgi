@@ -18,18 +18,13 @@
  */
 package org.apache.fineract.portfolio.savings;
 
-import lombok.Getter;
-
 /**
  * An enumeration of on hold transactions that can occur on SavingsAccount.
  */
-@Getter
 public enum DepositAccountOnHoldTransactionType {
-
-    INVALID(0, "deposutAccountOnHoldTransactionType.invalid"), //
-    HOLD(1, "deposutAccountOnHoldTransactionType.hold"), //
+    INVALID(0, "deposutAccountOnHoldTransactionType.invalid"),  //
+    HOLD(1, "deposutAccountOnHoldTransactionType.hold"),  //
     RELEASE(2, "deposutAccountOnHoldTransactionType.release");
-
     private final Integer value;
     private final String code;
 
@@ -42,7 +37,6 @@ public enum DepositAccountOnHoldTransactionType {
         if (v == null) {
             return INVALID;
         }
-
         return switch (v) {
             case 1 -> HOLD;
             case 2 -> RELEASE;
@@ -58,5 +52,15 @@ public enum DepositAccountOnHoldTransactionType {
     // TODO: why not just use the enum values... just more boilerplate code here!!
     public boolean isRelease() {
         return this.equals(RELEASE);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
     }
 }

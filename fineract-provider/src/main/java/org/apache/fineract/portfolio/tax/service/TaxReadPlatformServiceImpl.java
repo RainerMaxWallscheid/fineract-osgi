@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.tax.service;
 
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.common.AccountingDropdownReadPlatformService;
 import org.apache.fineract.portfolio.tax.data.TaxComponentData;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
@@ -31,9 +30,7 @@ import org.apache.fineract.portfolio.tax.domain.TaxGroupRepositoryWrapper;
 import org.apache.fineract.portfolio.tax.mapper.TaxComponentMapper;
 import org.apache.fineract.portfolio.tax.mapper.TaxGroupMapper;
 
-@RequiredArgsConstructor
 public class TaxReadPlatformServiceImpl implements TaxReadPlatformService {
-
     private final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService;
     private final TaxComponentRepository taxComponentRepository;
     private final TaxComponentRepositoryWrapper taxComponentRepositoryWrapper;
@@ -54,8 +51,7 @@ public class TaxReadPlatformServiceImpl implements TaxReadPlatformService {
 
     @Override
     public TaxComponentData retrieveTaxComponentTemplate() {
-        return TaxComponentData.template(this.accountingDropdownReadPlatformService.retrieveAccountMappingOptions(),
-                this.accountingDropdownReadPlatformService.retrieveGLAccountTypeOptions());
+        return TaxComponentData.template(this.accountingDropdownReadPlatformService.retrieveAccountMappingOptions(), this.accountingDropdownReadPlatformService.retrieveGLAccountTypeOptions());
     }
 
     @Override
@@ -89,4 +85,14 @@ public class TaxReadPlatformServiceImpl implements TaxReadPlatformService {
         return taxGroupMapper.map(taxGroupRepository.findAll());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public TaxReadPlatformServiceImpl(final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService, final TaxComponentRepository taxComponentRepository, final TaxComponentRepositoryWrapper taxComponentRepositoryWrapper, final TaxComponentMapper taxComponentMapper, final TaxGroupRepository taxGroupRepository, final TaxGroupRepositoryWrapper taxGroupRepositoryWrapper, final TaxGroupMapper taxGroupMapper) {
+        this.accountingDropdownReadPlatformService = accountingDropdownReadPlatformService;
+        this.taxComponentRepository = taxComponentRepository;
+        this.taxComponentRepositoryWrapper = taxComponentRepositoryWrapper;
+        this.taxComponentMapper = taxComponentMapper;
+        this.taxGroupRepository = taxGroupRepository;
+        this.taxGroupRepositoryWrapper = taxGroupRepositoryWrapper;
+        this.taxGroupMapper = taxGroupMapper;
+    }
 }

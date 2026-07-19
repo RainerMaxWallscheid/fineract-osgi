@@ -21,28 +21,68 @@ package org.apache.fineract.infrastructure.campaigns.sms.data.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SmsCampaignHandlerDto implements Serializable {
-
     public static final String ACTIVATE_COMMAND = "activate";
     public static final String CLOSE_COMMAND = "close";
     public static final String REACTIVATE_COMMAND = "reactivate";
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private String locale;
     private String dateFormat;
     private String activationDate;
     private String closureDate;
 
+    @java.lang.SuppressWarnings("all")
+        public String getLocale() {
+        return this.locale;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDateFormat() {
+        return this.dateFormat;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getActivationDate() {
+        return this.activationDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getClosureDate() {
+        return this.closureDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLocale(final String locale) {
+        this.locale = locale;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDateFormat(final String dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setActivationDate(final String activationDate) {
+        this.activationDate = activationDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setClosureDate(final String closureDate) {
+        this.closureDate = closureDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SmsCampaignHandlerDto() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SmsCampaignHandlerDto(final String locale, final String dateFormat, final String activationDate, final String closureDate) {
+        this.locale = locale;
+        this.dateFormat = dateFormat;
+        this.activationDate = activationDate;
+        this.closureDate = closureDate;
+    }
 }

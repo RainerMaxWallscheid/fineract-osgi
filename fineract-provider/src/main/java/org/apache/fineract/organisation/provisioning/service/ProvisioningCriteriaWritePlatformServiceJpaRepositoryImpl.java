@@ -26,8 +26,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepository;
@@ -52,10 +50,9 @@ import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 
-@Slf4j
-@RequiredArgsConstructor
 public class ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl implements ProvisioningCriteriaWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl.class);
     private final ProvisioningCriteriaDefinitionJsonDeserializer fromApiJsonDeserializer;
     private final ProvisioningCriteriaAssembler provisioningCriteriaAssembler;
     private final ProvisioningCriteriaRepository provisioningCriteriaRepository;
@@ -69,10 +66,10 @@ public class ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl implement
             this.fromApiJsonDeserializer.validateForCreate(command.json());
             ProvisioningCriteria provisioningCriteria = provisioningCriteriaAssembler.fromParsedJson(command.parsedJson());
             this.provisioningCriteriaRepository.saveAndFlush(provisioningCriteria);
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(provisioningCriteria.getId()) //
-                    .build();
+            return  //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(provisioningCriteria.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
@@ -90,9 +87,9 @@ public class ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl implement
             throw new ProvisioningCriteriaCannotBeDeletedException(criteriaId);
         }
         this.provisioningCriteriaRepository.deleteById(criteriaId);
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(criteriaId) //
-                .build();
+        return  //
+        //
+        new CommandProcessingResultBuilder().withEntityId(criteriaId).build();
     }
 
     @Override
@@ -109,10 +106,10 @@ public class ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl implement
                 updateProvisioningCriteriaDefinitions(provisioningCriteria, command);
                 provisioningCriteriaRepository.saveAndFlush(provisioningCriteria);
             }
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(provisioningCriteria.getId()) //
-                    .build();
+            return  //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(provisioningCriteria.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
@@ -125,8 +122,7 @@ public class ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl implement
 
     private void updateProvisioningCriteriaDefinitions(ProvisioningCriteria provisioningCriteria, JsonCommand command) {
         final Locale locale = this.fromApiJsonHelper.extractLocaleParameter(command.parsedJson().getAsJsonObject());
-        JsonArray jsonProvisioningCriteria = this.fromApiJsonHelper
-                .extractJsonArrayNamed(ProvisioningCriteriaConstants.JSON_PROVISIONING_DEFINITIONS_PARAM, command.parsedJson());
+        JsonArray jsonProvisioningCriteria = this.fromApiJsonHelper.extractJsonArrayNamed(ProvisioningCriteriaConstants.JSON_PROVISIONING_DEFINITIONS_PARAM, command.parsedJson());
         // Index the existing definitions by their natural key (categoryId) once, then resolve each incoming definition
         // with a direct lookup. The payload carries no per-definition surrogate id to match on.
         final Map<Long, ProvisioningCriteriaDefinition> existingByCategoryId = provisioningCriteria.getDefinitionsByCategoryId();
@@ -135,21 +131,14 @@ public class ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl implement
             Long categoryId = this.fromApiJsonHelper.extractLongNamed(ProvisioningCriteriaConstants.JSON_CATEOGRYID_PARAM, jsonObject);
             Long minimumAge = this.fromApiJsonHelper.extractLongNamed(ProvisioningCriteriaConstants.JSON_MINIMUM_AGE_PARAM, jsonObject);
             Long maximumAge = this.fromApiJsonHelper.extractLongNamed(ProvisioningCriteriaConstants.JSON_MAXIMUM_AGE_PARAM, jsonObject);
-            BigDecimal provisioningpercentage = this.fromApiJsonHelper
-                    .extractBigDecimalNamed(ProvisioningCriteriaConstants.JSON_PROVISIONING_PERCENTAGE_PARAM, jsonObject, locale);
-            Long liabilityAccountId = this.fromApiJsonHelper.extractLongNamed(ProvisioningCriteriaConstants.JSON_LIABILITY_ACCOUNT_PARAM,
-                    jsonObject);
-            Long expenseAccountId = this.fromApiJsonHelper.extractLongNamed(ProvisioningCriteriaConstants.JSON_EXPENSE_ACCOUNT_PARAM,
-                    jsonObject);
+            BigDecimal provisioningpercentage = this.fromApiJsonHelper.extractBigDecimalNamed(ProvisioningCriteriaConstants.JSON_PROVISIONING_PERCENTAGE_PARAM, jsonObject, locale);
+            Long liabilityAccountId = this.fromApiJsonHelper.extractLongNamed(ProvisioningCriteriaConstants.JSON_LIABILITY_ACCOUNT_PARAM, jsonObject);
+            Long expenseAccountId = this.fromApiJsonHelper.extractLongNamed(ProvisioningCriteriaConstants.JSON_EXPENSE_ACCOUNT_PARAM, jsonObject);
             GLAccount liabilityAccount = glAccountRepository.findById(liabilityAccountId).orElse(null);
             GLAccount expenseAccount = glAccountRepository.findById(expenseAccountId).orElse(null);
-
             final ProvisioningCriteriaDefinition definition = existingByCategoryId.get(categoryId);
             if (definition == null) {
-                throw new PlatformApiDataValidationException(
-                        List.of(ApiParameterError.parameterError("error.msg.provisioningcriteria.definition.category.not.found",
-                                "Provisioning criteria has no definition for the given category",
-                                ProvisioningCriteriaConstants.JSON_CATEOGRYID_PARAM, categoryId)));
+                throw new PlatformApiDataValidationException(List.of(ApiParameterError.parameterError("error.msg.provisioningcriteria.definition.category.not.found", "Provisioning criteria has no definition for the given category", ProvisioningCriteriaConstants.JSON_CATEOGRYID_PARAM, categoryId)));
             }
             definition.update(minimumAge, maximumAge, provisioningpercentage, liabilityAccount, expenseAccount);
         }
@@ -161,14 +150,21 @@ public class ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl implement
     private void handleDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final Exception dve) {
         if (realCause.getMessage().contains("criteria_name")) {
             final String name = command.stringValueOfParameterNamed("criteria_name");
-            throw new PlatformDataIntegrityException("error.msg.provisioning.duplicate.criterianame",
-                    "Provisioning Criteria with name `" + name + "` already exists", "category name", name);
+            throw new PlatformDataIntegrityException("error.msg.provisioning.duplicate.criterianame", "Provisioning Criteria with name `" + name + "` already exists", "category name", name);
         } else if (realCause.getMessage().contains("product_id")) {
-            throw new PlatformDataIntegrityException("error.msg.provisioning.product.id(s).already.associated.existing.criteria",
-                    "The selected products already associated with another Provisioning Criteria");
+            throw new PlatformDataIntegrityException("error.msg.provisioning.product.id(s).already.associated.existing.criteria", "The selected products already associated with another Provisioning Criteria");
         }
         log.error("Error occured.", dve);
-        throw ErrorHandler.getMappable(dve, "error.msg.provisioning.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource: " + realCause.getMessage());
+        throw ErrorHandler.getMappable(dve, "error.msg.provisioning.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProvisioningCriteriaWritePlatformServiceJpaRepositoryImpl(final ProvisioningCriteriaDefinitionJsonDeserializer fromApiJsonDeserializer, final ProvisioningCriteriaAssembler provisioningCriteriaAssembler, final ProvisioningCriteriaRepository provisioningCriteriaRepository, final FromJsonHelper fromApiJsonHelper, final GLAccountRepository glAccountRepository, final ProvisioningEntriesReadPlatformService provisioningEntriesReadPlatformService) {
+        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
+        this.provisioningCriteriaAssembler = provisioningCriteriaAssembler;
+        this.provisioningCriteriaRepository = provisioningCriteriaRepository;
+        this.fromApiJsonHelper = fromApiJsonHelper;
+        this.glAccountRepository = glAccountRepository;
+        this.provisioningEntriesReadPlatformService = provisioningEntriesReadPlatformService;
     }
 }

@@ -23,11 +23,9 @@ import static org.apache.fineract.client.models.ExternalTransferData.StatusEnum.
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.PageExternalTransferData;
 import org.apache.fineract.client.models.PagedRequestExternalAssetOwnerSearchRequest;
 import org.apache.fineract.client.models.PostInitiateTransferResponse;
@@ -35,73 +33,41 @@ import org.apache.fineract.infrastructure.configuration.api.GlobalConfigurationC
 import org.apache.fineract.integrationtests.common.Utils;
 import org.junit.jupiter.api.Test;
 
-@Slf4j
 public class SearchExternalAssetOwnerTransferTest extends ExternalAssetOwnerTransferTest {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SearchExternalAssetOwnerTransferTest.class);
 
     @Test
     public void saleActiveLoanToExternalAssetOwnerWithSearching() {
         final String baseDate = "2020-02-29";
         LocalDate baseLocalDate = Utils.getDateAsLocalDate("29 February 2020");
-
         try {
             globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, true);
             setInitialBusinessDate(LocalDate.of(2020, 2, 29));
             Integer clientID = createClient();
             Integer loanID = createLoanForClient(clientID, "29 February 2020");
             addPenaltyForLoan(loanID, "10");
-
             PostInitiateTransferResponse saleTransferResponse = createSaleTransfer(loanID, baseDate);
             validateResponse(saleTransferResponse, loanID);
-
             // LookUp by ExternalId
             String externalId = saleTransferResponse.getResourceExternalId();
-            PagedRequestExternalAssetOwnerSearchRequest searchRequest = EXTERNAL_ASSET_OWNER_HELPER
-                    .buildExternalAssetOwnerSearchRequest(externalId, "", null, null, null, null);
+            PagedRequestExternalAssetOwnerSearchRequest searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(externalId, "", null, null, null, null);
             PageExternalTransferData response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
-
-            validateExternalAssetOwnerTransfer(response,
-                    ExpectedExternalTransferData.expected(PENDING, saleTransferResponse.getResourceExternalId(), baseDate, baseDate,
-                            "9999-12-31", false, new BigDecimal("15767.420000"), new BigDecimal("15000.000000"),
-                            new BigDecimal("757.420000"), new BigDecimal("10.000000"), new BigDecimal("0.000000"),
-                            new BigDecimal("0.000000")));
+            validateExternalAssetOwnerTransfer(response, ExpectedExternalTransferData.expected(PENDING, saleTransferResponse.getResourceExternalId(), baseDate, baseDate, "9999-12-31", false, new BigDecimal("15767.420000"), new BigDecimal("15000.000000"), new BigDecimal("757.420000"), new BigDecimal("10.000000"), new BigDecimal("0.000000"), new BigDecimal("0.000000")));
             // LookUp by Effective Date
-            searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest("", "settlement", baseLocalDate, null, null,
-                    null);
+            searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest("", "settlement", baseLocalDate, null, null, null);
             response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
-
-            validateExternalAssetOwnerTransfer(response,
-                    ExpectedExternalTransferData.expected(PENDING, saleTransferResponse.getResourceExternalId(), baseDate, baseDate,
-                            "9999-12-31", false, new BigDecimal("15767.420000"), new BigDecimal("15000.000000"),
-                            new BigDecimal("757.420000"), new BigDecimal("10.000000"), new BigDecimal("0.000000"),
-                            new BigDecimal("0.000000")));
-
+            validateExternalAssetOwnerTransfer(response, ExpectedExternalTransferData.expected(PENDING, saleTransferResponse.getResourceExternalId(), baseDate, baseDate, "9999-12-31", false, new BigDecimal("15767.420000"), new BigDecimal("15000.000000"), new BigDecimal("757.420000"), new BigDecimal("10.000000"), new BigDecimal("0.000000"), new BigDecimal("0.000000")));
             // Cancel the External Asset Transfer
             EXTERNAL_ASSET_OWNER_HELPER.cancelTransferByTransferExternalId(saleTransferResponse.getResourceExternalId());
             searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(externalId, "", null, null, null, null);
             response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
-
-            validateExternalAssetOwnerTransfer(response,
-                    ExpectedExternalTransferData.expected(PENDING, saleTransferResponse.getResourceExternalId(), baseDate, baseDate,
-                            baseDate, false, new BigDecimal("15767.420000"), new BigDecimal("15000.000000"), new BigDecimal("757.420000"),
-                            new BigDecimal("10.000000"), new BigDecimal("0.000000"), new BigDecimal("0.000000")),
-                    ExpectedExternalTransferData.expected(CANCELLED, saleTransferResponse.getResourceExternalId(), baseDate, baseDate,
-                            baseDate, false, new BigDecimal("15767.420000"), new BigDecimal("15000.000000"), new BigDecimal("757.420000"),
-                            new BigDecimal("10.000000"), new BigDecimal("0.000000"), new BigDecimal("0.000000")));
-
+            validateExternalAssetOwnerTransfer(response, ExpectedExternalTransferData.expected(PENDING, saleTransferResponse.getResourceExternalId(), baseDate, baseDate, baseDate, false, new BigDecimal("15767.420000"), new BigDecimal("15000.000000"), new BigDecimal("757.420000"), new BigDecimal("10.000000"), new BigDecimal("0.000000"), new BigDecimal("0.000000")), ExpectedExternalTransferData.expected(CANCELLED, saleTransferResponse.getResourceExternalId(), baseDate, baseDate, baseDate, false, new BigDecimal("15767.420000"), new BigDecimal("15000.000000"), new BigDecimal("757.420000"), new BigDecimal("10.000000"), new BigDecimal("0.000000"), new BigDecimal("0.000000")));
             // LookUp by Effective Date
             // LookUp by Effective Date
-            searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest("", "effective", baseLocalDate, baseLocalDate,
-                    null, null);
+            searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest("", "effective", baseLocalDate, baseLocalDate, null, null);
             response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
-
-            validateExternalAssetOwnerTransfer(response,
-                    ExpectedExternalTransferData.expected(PENDING, saleTransferResponse.getResourceExternalId(), baseDate, baseDate,
-                            baseDate, false, new BigDecimal("15767.420000"), new BigDecimal("15000.000000"), new BigDecimal("757.420000"),
-                            new BigDecimal("10.000000"), new BigDecimal("0.000000"), new BigDecimal("0.000000")),
-                    ExpectedExternalTransferData.expected(CANCELLED, saleTransferResponse.getResourceExternalId(), baseDate, baseDate,
-                            baseDate, false, new BigDecimal("15767.420000"), new BigDecimal("15000.000000"), new BigDecimal("757.420000"),
-                            new BigDecimal("10.000000"), new BigDecimal("0.000000"), new BigDecimal("0.000000")));
-
+            validateExternalAssetOwnerTransfer(response, ExpectedExternalTransferData.expected(PENDING, saleTransferResponse.getResourceExternalId(), baseDate, baseDate, baseDate, false, new BigDecimal("15767.420000"), new BigDecimal("15000.000000"), new BigDecimal("757.420000"), new BigDecimal("10.000000"), new BigDecimal("0.000000"), new BigDecimal("0.000000")), ExpectedExternalTransferData.expected(CANCELLED, saleTransferResponse.getResourceExternalId(), baseDate, baseDate, baseDate, false, new BigDecimal("15767.420000"), new BigDecimal("15000.000000"), new BigDecimal("757.420000"), new BigDecimal("10.000000"), new BigDecimal("0.000000"), new BigDecimal("0.000000")));
         } finally {
             cleanUpAndRestoreBusinessDate();
         }
@@ -111,19 +77,16 @@ public class SearchExternalAssetOwnerTransferTest extends ExternalAssetOwnerTran
     public void initialSearchExternalAssetOwnerTransferUsingTextTest() {
         saleActiveLoanToExternalAssetOwnerWithSearching();
         String textToSearch = UUID.randomUUID().toString();
-        PagedRequestExternalAssetOwnerSearchRequest searchRequest = EXTERNAL_ASSET_OWNER_HELPER
-                .buildExternalAssetOwnerSearchRequest(textToSearch, "", null, null, 0, 10);
+        PagedRequestExternalAssetOwnerSearchRequest searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(textToSearch, "", null, null, 0, 10);
         PageExternalTransferData response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
         assertNotNull(response);
         assertEquals(0, response.getContent().size(), "Expecting none result");
-
         // Search over the current Asset Transfers and get just the first five
         textToSearch = "";
         searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(textToSearch, "", null, null, 0, 1);
         response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
         assertNotNull(response);
         assertEquals(1, response.getContent().size(), "Expecting first result");
-
         textToSearch = response.getContent().iterator().next().getOwner().getExternalId();
         searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(textToSearch, "", null, null, 0, 5);
         response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
@@ -138,11 +101,9 @@ public class SearchExternalAssetOwnerTransferTest extends ExternalAssetOwnerTran
         final String attribute = "effective";
         LocalDate fromDate = Utils.getDateAsLocalDate("01 March 2023");
         LocalDate toDate = fromDate.plusMonths(3);
-        PagedRequestExternalAssetOwnerSearchRequest searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(null,
-                attribute, fromDate, toDate, 0, null);
+        PagedRequestExternalAssetOwnerSearchRequest searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(null, attribute, fromDate, toDate, 0, null);
         PageExternalTransferData response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
         validateResponse(response, 0);
-
         fromDate = Utils.getDateAsLocalDate("01 January 2020");
         toDate = fromDate.plusMonths(6);
         searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(null, attribute, fromDate, toDate, 0, null);
@@ -156,11 +117,9 @@ public class SearchExternalAssetOwnerTransferTest extends ExternalAssetOwnerTran
         final String attribute = "settlement";
         LocalDate fromDate = Utils.getDateAsLocalDate("01 March 2023");
         LocalDate toDate = fromDate.plusMonths(3);
-        PagedRequestExternalAssetOwnerSearchRequest searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(null,
-                attribute, fromDate, toDate, 0, null);
+        PagedRequestExternalAssetOwnerSearchRequest searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(null, attribute, fromDate, toDate, 0, null);
         PageExternalTransferData response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
         validateResponse(response, 0);
-
         fromDate = Utils.getDateAsLocalDate("01 February 2020");
         toDate = fromDate.plusMonths(3);
         searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(null, attribute, fromDate, toDate, 0, null);
@@ -175,15 +134,12 @@ public class SearchExternalAssetOwnerTransferTest extends ExternalAssetOwnerTran
         final String attribute = "settlement";
         LocalDate fromDate = Utils.getDateAsLocalDate("01 March 2023");
         LocalDate toDate = fromDate.plusMonths(3);
-        PagedRequestExternalAssetOwnerSearchRequest searchRequest = EXTERNAL_ASSET_OWNER_HELPER
-                .buildExternalAssetOwnerSearchRequest(textToSearch, attribute, fromDate, toDate, 0, null);
+        PagedRequestExternalAssetOwnerSearchRequest searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(textToSearch, attribute, fromDate, toDate, 0, null);
         PageExternalTransferData response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
         validateResponse(response, 0);
-
         fromDate = Utils.getDateAsLocalDate("01 February 2020");
         toDate = fromDate.plusMonths(3);
-        searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(textToSearch, attribute, fromDate, toDate, 0,
-                null);
+        searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(textToSearch, attribute, fromDate, toDate, 0, null);
         response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
         validateResponse(response, 0);
     }
@@ -202,5 +158,4 @@ public class SearchExternalAssetOwnerTransferTest extends ExternalAssetOwnerTran
         }
         assertEquals(true, response.getFirst());
     }
-
 }

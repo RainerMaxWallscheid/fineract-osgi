@@ -20,8 +20,6 @@ package org.apache.fineract.cob.workingcapitalloan;
 
 import static org.apache.fineract.cob.workingcapitalloan.WorkingCapitalLoanCOBConstant.WORKING_CAPITAL_JOB_NAME;
 import static org.apache.fineract.cob.workingcapitalloan.WorkingCapitalLoanCOBConstant.WORKING_CAPITAL_LOAN_COB_WORKER_STEP;
-
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.COBBusinessStepService;
 import org.apache.fineract.cob.common.InitialisationTasklet;
 import org.apache.fineract.cob.common.ResetContextTasklet;
@@ -52,9 +50,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 @Configuration
 @Conditional(BatchWorkerCondition.class)
-@RequiredArgsConstructor
 public class WorkingCapitalLoanCOBWorkerConfiguration {
-
     private final JobRepository jobRepository;
     private final RemotePartitioningWorkerStepBuilderFactory stepBuilderFactory;
     private final MessageChannel inboundRequests;
@@ -76,26 +72,21 @@ public class WorkingCapitalLoanCOBWorkerConfiguration {
 
     @Bean(WORKING_CAPITAL_LOAN_COB_WORKER_STEP)
     public Step workingCapitalLoanCOBWorkerStep(final COBBusinessStepService cobBusinessStepService) {
-        final SimpleStepBuilder<WorkingCapitalLoan, WorkingCapitalLoan> stepBuilder = stepBuilderFactory
-                .get(WORKING_CAPITAL_LOAN_COB_WORKER_STEP).inputChannel(inboundRequests)
-                .<WorkingCapitalLoan, WorkingCapitalLoan>chunk(propertyService.getChunkSize(JobName.LOAN_COB.name()), transactionManager) //
-                .reader(new WorkingCapitalLoanCOBWorkerItemReader(workingCapitalLoanRepository,
-                        new BeforeStepLockingItemReaderHelper(retrieveIdService, wpcLoanLockingService))) //
-                .processor(new WorkingCapitalLoanCOBWorkerItemProcessor(cobBusinessStepService)) //
-                .writer(new WorkingCapitalLoanCOBWorkerItemWriter(wpcLoanLockingService, workingCapitalLoanRepository)) //
-                .faultTolerant() //
-                .retry(Exception.class) //
-                .retryLimit(propertyService.getRetryLimit(WORKING_CAPITAL_JOB_NAME)) //
-                .skip(Exception.class) //
-                .skipLimit(propertyService.getChunkSize(WORKING_CAPITAL_JOB_NAME) + 1) //
-                .listener(workingCapitalLoanItemListener()) //
-                .listener(workingCapitalCobWorkerStepListener()) //
-                .transactionManager(transactionManager);
-
+        final SimpleStepBuilder<WorkingCapitalLoan, WorkingCapitalLoan> stepBuilder =  //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        stepBuilderFactory.get(WORKING_CAPITAL_LOAN_COB_WORKER_STEP).inputChannel(inboundRequests).<WorkingCapitalLoan, WorkingCapitalLoan>chunk(propertyService.getChunkSize(JobName.LOAN_COB.name()), transactionManager).reader(new WorkingCapitalLoanCOBWorkerItemReader(workingCapitalLoanRepository, new BeforeStepLockingItemReaderHelper(retrieveIdService, wpcLoanLockingService))).processor(new WorkingCapitalLoanCOBWorkerItemProcessor(cobBusinessStepService)).writer(new WorkingCapitalLoanCOBWorkerItemWriter(wpcLoanLockingService, workingCapitalLoanRepository)).faultTolerant().retry(Exception.class).retryLimit(propertyService.getRetryLimit(WORKING_CAPITAL_JOB_NAME)).skip(Exception.class).skipLimit(propertyService.getChunkSize(WORKING_CAPITAL_JOB_NAME) + 1).listener(workingCapitalLoanItemListener()).listener(workingCapitalCobWorkerStepListener()).transactionManager(transactionManager);
         if (propertyService.getThreadPoolMaxPoolSize(WORKING_CAPITAL_JOB_NAME) > 1) {
             stepBuilder.taskExecutor(workingCapitalCobTaskExecutor());
         }
-
         return stepBuilder.build();
     }
 
@@ -127,7 +118,23 @@ public class WorkingCapitalLoanCOBWorkerConfiguration {
 
     @Bean
     public ApplyWorkingCapitalLoanLockTasklet applyWorkingCapitalLoanLock() {
-        return new ApplyWorkingCapitalLoanLockTasklet(fineractProperties, wpcLoanLockingService, retrieveIdService,
-                requiresNewTransactionJdbcTemplate);
+        return new ApplyWorkingCapitalLoanLockTasklet(fineractProperties, wpcLoanLockingService, retrieveIdService, requiresNewTransactionJdbcTemplate);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanCOBWorkerConfiguration(final JobRepository jobRepository, final RemotePartitioningWorkerStepBuilderFactory stepBuilderFactory, final MessageChannel inboundRequests, final PropertyService propertyService, final PlatformTransactionManager transactionManager, @Qualifier("jdbcTransactionManager") final PlatformTransactionManager jdbcTransactionManager, @Qualifier("requiresNewTransactionJdbcTemplate") final TransactionTemplate requiresNewTransactionJdbcTemplate, @Qualifier("workingCapitalLoanLockingService") final LockingService wpcLoanLockingService, final FineractProperties fineractProperties, final WorkingCapitalLoanRetrieveIdService retrieveIdService, final WorkingCapitalLoanRepository workingCapitalLoanRepository, @Qualifier("initialiseContext") final InitialisationTasklet initialisationTasklet, @Qualifier("resetContext") final ResetContextTasklet resetContextTasklet) {
+        this.jobRepository = jobRepository;
+        this.stepBuilderFactory = stepBuilderFactory;
+        this.inboundRequests = inboundRequests;
+        this.propertyService = propertyService;
+        this.transactionManager = transactionManager;
+        this.jdbcTransactionManager = jdbcTransactionManager;
+        this.requiresNewTransactionJdbcTemplate = requiresNewTransactionJdbcTemplate;
+        this.wpcLoanLockingService = wpcLoanLockingService;
+        this.fineractProperties = fineractProperties;
+        this.retrieveIdService = retrieveIdService;
+        this.workingCapitalLoanRepository = workingCapitalLoanRepository;
+        this.initialisationTasklet = initialisationTasklet;
+        this.resetContextTasklet = resetContextTasklet;
     }
 }

@@ -25,8 +25,6 @@ import com.lmax.disruptor.util.DaemonThreadFactory;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.command.disruptor.implementation.DisruptorCommandDispatcher;
 import org.apache.fineract.command.implementation.DefaultCommandHandlerManager;
@@ -40,51 +38,44 @@ import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
-
-@Slf4j
 // @BenchmarkMode(Mode.Throughput) // Measures operations per second
 // @State(Scope.Benchmark) // Benchmark state for each thread
 // @OutputTimeUnit(TimeUnit.SECONDS) // Output results in seconds
-@SuppressWarnings({ "rawtypes" })
+@SuppressWarnings({"rawtypes"})
 public class DisruptorCommandDispatcherBenchmark {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DisruptorCommandDispatcherBenchmark.class);
     private Disruptor<DisruptorCommandDispatcher.CommandEvent> disruptor;
-
     private CommandDispatcher dispatcher;
 
     @Setup(Level.Iteration)
     public void setUp() {
         // create hook manager
         var hookManager = new DefaultCommandHookManager(List.of(), List.of(), List.of());
-
         // create handler manager
         var handlerManager = new DefaultCommandHandlerManager(List.of(new DummyCommandHandler(new DefaultDummyService())));
-
         // create the disruptor
-        this.disruptor = new Disruptor<>(DisruptorCommandDispatcher.CommandEvent::new, 2048, DaemonThreadFactory.INSTANCE,
-                ProducerType.MULTI, new YieldingWaitStrategy());
-
+        this.disruptor = new Disruptor<>(DisruptorCommandDispatcher.CommandEvent::new, 2048, DaemonThreadFactory.INSTANCE, ProducerType.MULTI, new YieldingWaitStrategy());
         disruptor.handleEventsWith(new DisruptorCommandDispatcher.CompleteableCommandEventHandler(hookManager, handlerManager));
-
         // start the disruptor
         disruptor.start();
-
         dispatcher = new DisruptorCommandDispatcher(disruptor);
     }
 
     @TearDown(Level.Iteration)
-    @SneakyThrows
     public void tearDown() {
-        disruptor.shutdown(1, TimeUnit.SECONDS);
+        try {
+            disruptor.shutdown(1, TimeUnit.SECONDS);
+        } catch (final java.lang.Throwable $ex) {
+            throw new java.lang.RuntimeException($ex);
+        }
     }
 
     @Benchmark
     public void processCommand() {
         var command = new DummyCommand();
         command.setPayload(DummyRequest.builder().content("hello").build());
-
         Supplier<DummyResponse> result = dispatcher.dispatch(command);
-
         // NOTE: force yield
         result.get();
     }

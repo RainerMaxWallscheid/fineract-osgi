@@ -16,24 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.delinquency.domain;
 
 import java.util.Arrays;
 import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.StringEnumOptionData;
 
-@Getter
-@RequiredArgsConstructor
 public enum DelinquencyFrequencyType {
-
-    DAYS(0L, "delinquencyFrequencyType.days", "Days frequency"), //
-    WEEKS(1L, "delinquencyFrequencyType.weeks", "Week frequency"), //
-    MONTHS(2L, "delinquencyFrequencyType.months", "Month frequency"), //
+    DAYS(0L, "delinquencyFrequencyType.days", "Days frequency"),  //
+    WEEKS(1L, "delinquencyFrequencyType.weeks", "Week frequency"),  //
+    MONTHS(2L, "delinquencyFrequencyType.months", "Month frequency"),  //
     YEARS(3L, "delinquencyFrequencyType.years", "Year frequency");
-
     private final Long id;
     private final String code;
     private final String description;
@@ -44,5 +37,27 @@ public enum DelinquencyFrequencyType {
 
     public StringEnumOptionData toData() {
         return new StringEnumOptionData(name(), getCode(), getDescription());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private DelinquencyFrequencyType(final Long id, final String code, final String description) {
+        this.id = id;
+        this.code = code;
+        this.description = description;
     }
 }

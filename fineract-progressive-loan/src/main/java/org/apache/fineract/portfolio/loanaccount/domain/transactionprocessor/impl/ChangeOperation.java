@@ -22,16 +22,13 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Optional;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTermVariationsData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.springframework.lang.NonNull;
 
-@Getter
 public class ChangeOperation implements Comparable<ChangeOperation> {
-
     private final Optional<LoanTermVariationsData> loanTermVariationsData;
     private final Optional<LoanCharge> loanCharge;
     private final Optional<LoanTransaction> loanTransaction;
@@ -75,8 +72,7 @@ public class ChangeOperation implements Comparable<ChangeOperation> {
     }
 
     private boolean isBackdatedCharge() {
-        return isCharge() && loanCharge.isPresent() && loanCharge.get().getDueDate() != null
-                && DateUtils.isBefore(loanCharge.get().getDueDate(), loanCharge.get().getSubmittedOnDate());
+        return isCharge() && loanCharge.isPresent() && loanCharge.get().getDueDate() != null && DateUtils.isBefore(loanCharge.get().getDueDate(), loanCharge.get().getSubmittedOnDate());
     }
 
     private LocalDate getEffectiveDate() {
@@ -126,17 +122,14 @@ public class ChangeOperation implements Comparable<ChangeOperation> {
     public int compareTo(@NonNull ChangeOperation o) {
         int datePortion = DateUtils.compareWithNullsLast(this.getEffectiveDate(), o.getEffectiveDate());
         if (datePortion == 0) {
-            boolean thisIsDisb = this.isTransaction() && this.getLoanTransaction().isPresent()
-                    && this.getLoanTransaction().get().isDisbursement();
+            boolean thisIsDisb = this.isTransaction() && this.getLoanTransaction().isPresent() && this.getLoanTransaction().get().isDisbursement();
             boolean otherIsDisb = o.isTransaction() && o.getLoanTransaction().isPresent() && o.getLoanTransaction().get().isDisbursement();
-
             if (thisIsDisb && o.isCharge() && o.isInstallmentFee()) {
                 return -1;
             }
             if (this.isCharge() && this.isInstallmentFee() && otherIsDisb) {
                 return 1;
             }
-
             final boolean isAccrual = isAccrualActivity();
             if (isAccrual != o.isAccrualActivity()) {
                 return isAccrual ? 1 : -1;
@@ -150,4 +143,18 @@ public class ChangeOperation implements Comparable<ChangeOperation> {
         return datePortion;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Optional<LoanTermVariationsData> getLoanTermVariationsData() {
+        return this.loanTermVariationsData;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Optional<LoanCharge> getLoanCharge() {
+        return this.loanCharge;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Optional<LoanTransaction> getLoanTransaction() {
+        return this.loanTransaction;
+    }
 }

@@ -18,34 +18,31 @@
  */
 package org.apache.fineract.accounting.journalentry.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.journalentry.data.SavingsDTO;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class AccountingProcessorForSavingsFactory {
-
     private final ApplicationContext applicationContext;
 
-    /***
+    /**
      * Looks like overkill for now, but wanted to keep the savings side of accounting identical to that of Loans (would
      * we need an Accrual based accounting in the future?)
-     ***/
+     * *
+     */
     public AccountingProcessorForSavings determineProcessor(final SavingsDTO savingsDTO) {
-
         AccountingProcessorForSavings accountingProcessorForSavings = null;
-
         if (savingsDTO.isCashBasedAccountingEnabled()) {
-            accountingProcessorForSavings = this.applicationContext.getBean("cashBasedAccountingProcessorForSavings",
-                    AccountingProcessorForSavings.class);
+            accountingProcessorForSavings = this.applicationContext.getBean("cashBasedAccountingProcessorForSavings", AccountingProcessorForSavings.class);
         } else if (savingsDTO.isAccrualBasedAccountingEnabled()) {
-            accountingProcessorForSavings = this.applicationContext.getBean("accrualBasedAccountingProcessorForSavings",
-                    AccountingProcessorForSavings.class);
+            accountingProcessorForSavings = this.applicationContext.getBean("accrualBasedAccountingProcessorForSavings", AccountingProcessorForSavings.class);
         }
-
         return accountingProcessorForSavings;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public AccountingProcessorForSavingsFactory(final ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 }

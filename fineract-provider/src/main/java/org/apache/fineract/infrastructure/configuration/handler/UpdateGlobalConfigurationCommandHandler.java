@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.configuration.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.configuration.service.GlobalConfigurationWritePlatformService;
@@ -29,15 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "CONFIGURATION", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateGlobalConfigurationCommandHandler implements NewCommandSourceHandler {
-
     private final GlobalConfigurationWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.update(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateGlobalConfigurationCommandHandler(final GlobalConfigurationWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

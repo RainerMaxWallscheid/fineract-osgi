@@ -19,16 +19,13 @@
 package org.apache.fineract.investor.service;
 
 import java.math.BigDecimal;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.investor.data.ExternalTransferStatus;
 import org.apache.fineract.investor.data.ExternalTransferSubStatus;
 import org.apache.fineract.investor.domain.ExternalAssetOwnerTransfer;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 
-@RequiredArgsConstructor
 public class LoanTransferabilityServiceImpl implements LoanTransferabilityService {
-
     private final DelayedSettlementAttributeService delayedSettlementAttributeService;
 
     @Override
@@ -36,7 +33,6 @@ public class LoanTransferabilityServiceImpl implements LoanTransferabilityServic
         if (shouldValidateTransferable(loan, externalAssetOwnerTransfer)) {
             return MathUtil.nullToDefault(loan.getSummary().getTotalOutstanding(), BigDecimal.ZERO).compareTo(BigDecimal.ZERO) > 0;
         }
-
         return true;
     }
 
@@ -45,7 +41,6 @@ public class LoanTransferabilityServiceImpl implements LoanTransferabilityServic
         if (MathUtil.nullToDefault(loan.getTotalOverpaid(), BigDecimal.ZERO).compareTo(BigDecimal.ZERO) > 0) {
             return ExternalTransferSubStatus.BALANCE_NEGATIVE;
         }
-
         return ExternalTransferSubStatus.BALANCE_ZERO;
     }
 
@@ -54,10 +49,13 @@ public class LoanTransferabilityServiceImpl implements LoanTransferabilityServic
             // When delayed settlement is disabled, asset is directly sold to investor. Need to validate.
             return true;
         }
-
         // When delayed settlement is enabled and asset is sold to intermediate. Need to validate.
         return ExternalTransferStatus.PENDING_INTERMEDIATE == externalAssetOwnerTransfer.getStatus();
-
         // When delayed settlement is enabled and asset is sold from intermediate to investor. No need to validate.
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransferabilityServiceImpl(final DelayedSettlementAttributeService delayedSettlementAttributeService) {
+        this.delayedSettlementAttributeService = delayedSettlementAttributeService;
     }
 }

@@ -22,8 +22,6 @@ import com.google.gson.Gson;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.fineract.infrastructure.campaigns.helper.SmsConfigUtils;
 import org.apache.fineract.infrastructure.core.service.Page;
@@ -42,10 +40,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-@Slf4j
-@RequiredArgsConstructor
 public class GetDeliveryReportsFromSmsGatewayTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GetDeliveryReportsFromSmsGatewayTasklet.class);
     private final SmsReadPlatformService smsReadPlatformService;
     private final SmsConfigUtils smsConfigUtils;
     private final SmsMessageRepository smsMessageRepository;
@@ -60,18 +57,15 @@ public class GetDeliveryReportsFromSmsGatewayTasklet implements Tasklet {
             Page<Long> smsMessageInternalIds = smsReadPlatformService.retrieveAllWaitingForDeliveryReport(limit);
             try {
                 if (!CollectionUtils.isEmpty(smsMessageInternalIds.getPageItems())) {
-                    Map<String, Object> hostConfig = smsConfigUtils.getMessageGateWayRequestURI("sms/report",
-                            new Gson().toJson(smsMessageInternalIds.getPageItems()));
+                    Map<String, Object> hostConfig = smsConfigUtils.getMessageGateWayRequestURI("sms/report", new Gson().toJson(smsMessageInternalIds.getPageItems()));
                     URI uri = (URI) hostConfig.get("uri");
                     HttpEntity<?> entity = (HttpEntity<?>) hostConfig.get("entity");
-                    ResponseEntity<Collection<SmsMessageDeliveryReportData>> responseOne = restTemplate.exchange(uri, HttpMethod.POST,
-                            entity, new ParameterizedTypeReference<>() {});
-
+                    ResponseEntity<Collection<SmsMessageDeliveryReportData>> responseOne = restTemplate.exchange(uri, HttpMethod.POST, entity, new ParameterizedTypeReference<>() {
+                    });
                     Collection<SmsMessageDeliveryReportData> smsMessageDeliveryReportDataCollection = responseOne.getBody();
                     if (!CollectionUtils.isEmpty(smsMessageDeliveryReportDataCollection)) {
                         for (SmsMessageDeliveryReportData smsMessageDeliveryReportData : smsMessageDeliveryReportDataCollection) {
                             Integer deliveryStatus = smsMessageDeliveryReportData.getDeliveryStatus();
-
                             if (!smsMessageDeliveryReportData.getHasError() && deliveryStatus != 100) {
                                 SmsMessage smsMessage = smsMessageRepository.findById(smsMessageDeliveryReportData.getId()).orElse(null);
                                 Integer statusType = switch (deliveryStatus) {
@@ -82,12 +76,10 @@ public class GetDeliveryReportsFromSmsGatewayTasklet implements Tasklet {
                                     case 400 -> SmsMessageStatusType.FAILED.getValue();
                                     default -> smsMessage.getStatusType();
                                 };
-
                                 boolean statusChanged = !statusType.equals(smsMessage.getStatusType());
                                 smsMessage.setStatusType(statusType);
                                 smsMessage.setExternalId(smsMessageDeliveryReportData.getExternalId());
                                 smsMessageRepository.save(smsMessage);
-
                                 if (statusChanged) {
                                     log.debug("Status of SMS message id: {} successfully changed to {}", smsMessage.getId(), statusType);
                                 }
@@ -95,18 +87,22 @@ public class GetDeliveryReportsFromSmsGatewayTasklet implements Tasklet {
                         }
                     }
                     if (!CollectionUtils.isEmpty(smsMessageDeliveryReportDataCollection)) {
-                        log.debug("{} delivery report(s) successfully received from the intermediate gateway - sms",
-                                smsMessageDeliveryReportDataCollection.size());
+                        log.debug("{} delivery report(s) successfully received from the intermediate gateway - sms", smsMessageDeliveryReportDataCollection.size());
                     }
                 }
-            }
-
-            catch (Exception e) {
+            } catch (Exception e) {
                 log.error("Error occurred.", e);
             }
             page++;
             totalRecords = smsMessageInternalIds.getTotalFilteredRecords();
         } while (page < totalRecords);
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GetDeliveryReportsFromSmsGatewayTasklet(final SmsReadPlatformService smsReadPlatformService, final SmsConfigUtils smsConfigUtils, final SmsMessageRepository smsMessageRepository) {
+        this.smsReadPlatformService = smsReadPlatformService;
+        this.smsConfigUtils = smsConfigUtils;
+        this.smsMessageRepository = smsMessageRepository;
     }
 }

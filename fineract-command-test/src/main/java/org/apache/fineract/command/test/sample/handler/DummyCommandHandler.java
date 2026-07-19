@@ -19,8 +19,6 @@
 package org.apache.fineract.command.test.sample.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.command.test.sample.data.DummyRequest;
@@ -28,11 +26,10 @@ import org.apache.fineract.command.test.sample.data.DummyResponse;
 import org.apache.fineract.command.test.sample.service.DummyService;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class DummyCommandHandler implements CommandHandler<DummyRequest, DummyResponse> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DummyCommandHandler.class);
     private final DummyService dummyService;
 
     @Retry(name = "commandDummy", fallbackMethod = "fallback")
@@ -45,5 +42,10 @@ public class DummyCommandHandler implements CommandHandler<DummyRequest, DummyRe
     public DummyResponse fallback(Command<DummyRequest> command, Throwable t) {
         // NOTE: fallback method needs to be in the same class
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DummyCommandHandler(final DummyService dummyService) {
+        this.dummyService = dummyService;
     }
 }

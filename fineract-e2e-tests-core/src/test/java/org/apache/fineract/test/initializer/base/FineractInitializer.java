@@ -20,19 +20,15 @@ package org.apache.fineract.test.initializer.base;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.test.initializer.global.FineractGlobalInitializerStep;
 import org.apache.fineract.test.initializer.scenario.FineractScenarioInitializerStep;
 import org.apache.fineract.test.initializer.suite.FineractSuiteInitializerStep;
 import org.springframework.beans.factory.InitializingBean;
 
-@Slf4j
-@RequiredArgsConstructor
 public class FineractInitializer implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FineractInitializer.class);
     public static final String DATE_FORMAT = "dd MMMM yyyy";
-
     private final List<FineractGlobalInitializerStep> globalInitializerSteps;
     private final List<FineractSuiteInitializerStep> suiteInitializerSteps;
     private final List<FineractScenarioInitializerStep> scenarioInitializerSteps;
@@ -43,24 +39,19 @@ public class FineractInitializer implements InitializingBean {
         log.debug("Global initializers count: {}", globalInitializerSteps.size());
         log.debug("Suite initializers count: {}", suiteInitializerSteps.size());
         log.debug("Scenario initializers count: {}", scenarioInitializerSteps.size());
-
         if (log.isDebugEnabled()) {
-            String globalInitializers = globalInitializerSteps.stream().map(Object::getClass).map(Class::getName)
-                    .collect(Collectors.joining(", "));
-            String suiteInitializers = suiteInitializerSteps.stream().map(Object::getClass).map(Class::getName)
-                    .collect(Collectors.joining(", "));
-            String scenarioInitializers = scenarioInitializerSteps.stream().map(Object::getClass).map(Class::getName)
-                    .collect(Collectors.joining(", "));
+            String globalInitializers = globalInitializerSteps.stream().map(Object::getClass).map(Class::getName).collect(Collectors.joining(", "));
+            String suiteInitializers = suiteInitializerSteps.stream().map(Object::getClass).map(Class::getName).collect(Collectors.joining(", "));
+            String scenarioInitializers = scenarioInitializerSteps.stream().map(Object::getClass).map(Class::getName).collect(Collectors.joining(", "));
             log.debug("""
-                    The following initializers have been configured:
-                    Global initializers: [{}]
-                    Suite initializers: [{}]
-                    Scenario initializers: [{}]
-                    """, globalInitializers, suiteInitializers, scenarioInitializers);
+                The following initializers have been configured:
+                Global initializers: [{}]
+                Suite initializers: [{}]
+                Scenario initializers: [{}]
+                """, globalInitializers, suiteInitializers, scenarioInitializers);
         } else {
             // Always log the suite initializers at INFO since this is critical
-            String suiteInitializers = suiteInitializerSteps.stream().map(Object::getClass).map(Class::getName)
-                    .collect(Collectors.joining(", "));
+            String suiteInitializers = suiteInitializerSteps.stream().map(Object::getClass).map(Class::getName).collect(Collectors.joining(", "));
             log.debug("Suite initializers: [{}]", suiteInitializers);
         }
     }
@@ -95,5 +86,12 @@ public class FineractInitializer implements InitializingBean {
         for (FineractScenarioInitializerStep initializerStep : scenarioInitializerSteps) {
             initializerStep.resetAfterScenario();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FineractInitializer(final List<FineractGlobalInitializerStep> globalInitializerSteps, final List<FineractSuiteInitializerStep> suiteInitializerSteps, final List<FineractScenarioInitializerStep> scenarioInitializerSteps) {
+        this.globalInitializerSteps = globalInitializerSteps;
+        this.suiteInitializerSteps = suiteInitializerSteps;
+        this.scenarioInitializerSteps = scenarioInitializerSteps;
     }
 }

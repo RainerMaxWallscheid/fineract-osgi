@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.infrastructure.campaigns.sms.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -34,8 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.campaigns.sms.constants.SmsCampaignTriggerType;
 import org.apache.fineract.infrastructure.campaigns.sms.domain.SmsCampaign;
 import org.apache.fineract.infrastructure.campaigns.sms.domain.SmsCampaignRepository;
@@ -71,17 +68,15 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
-@RequiredArgsConstructor
 public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SmsCampaignDomainServiceImpl.class);
     private final SmsCampaignRepository smsCampaignRepository;
     private final SmsMessageRepository smsMessageRepository;
     private final OfficeRepository officeRepository;
     private final BusinessEventNotifierService businessEventNotifierService;
     private final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler;
     private final GroupRepository groupRepository;
-
     private final SmsMessageScheduledJobService smsMessageScheduledJobService;
     private final SmsCampaignValidator smsCampaignValidator;
 
@@ -89,17 +84,13 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
     public void addListeners() {
         businessEventNotifierService.addPostBusinessEventListener(LoanApprovedBusinessEvent.class, new SendSmsOnLoanApproved());
         businessEventNotifierService.addPostBusinessEventListener(LoanRejectedBusinessEvent.class, new SendSmsOnLoanRejected());
-        businessEventNotifierService.addPostBusinessEventListener(LoanTransactionMakeRepaymentPostBusinessEvent.class,
-                new SendSmsOnLoanRepayment());
+        businessEventNotifierService.addPostBusinessEventListener(LoanTransactionMakeRepaymentPostBusinessEvent.class, new SendSmsOnLoanRepayment());
         businessEventNotifierService.addPostBusinessEventListener(ClientActivateBusinessEvent.class, new ClientActivatedListener());
         businessEventNotifierService.addPostBusinessEventListener(ClientRejectBusinessEvent.class, new ClientRejectedListener());
-        businessEventNotifierService.addPostBusinessEventListener(SavingsActivateBusinessEvent.class,
-                new SavingsAccountActivatedListener());
+        businessEventNotifierService.addPostBusinessEventListener(SavingsActivateBusinessEvent.class, new SavingsAccountActivatedListener());
         businessEventNotifierService.addPostBusinessEventListener(SavingsRejectBusinessEvent.class, new SavingsAccountRejectedListener());
-        businessEventNotifierService.addPostBusinessEventListener(SavingsDepositBusinessEvent.class,
-                new DepositSavingsAccountTransactionListener());
-        businessEventNotifierService.addPostBusinessEventListener(SavingsWithdrawalBusinessEvent.class,
-                new NonDepositSavingsAccountTransactionListener());
+        businessEventNotifierService.addPostBusinessEventListener(SavingsDepositBusinessEvent.class, new DepositSavingsAccountTransactionListener());
+        businessEventNotifierService.addPostBusinessEventListener(SavingsWithdrawalBusinessEvent.class, new NonDepositSavingsAccountTransactionListener());
     }
 
     private void notifyRejectedLoanOwner(Loan loan) {
@@ -107,8 +98,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         if (!smsCampaigns.isEmpty()) {
             for (SmsCampaign campaign : smsCampaigns) {
                 if (campaign.isActive()) {
-                    SmsCampaignDomainServiceImpl.this.smsCampaignWritePlatformCommandHandler.insertDirectCampaignIntoSmsOutboundTable(loan,
-                            campaign);
+                    SmsCampaignDomainServiceImpl.this.smsCampaignWritePlatformCommandHandler.insertDirectCampaignIntoSmsOutboundTable(loan, campaign);
                 }
             }
         }
@@ -130,7 +120,6 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                 this.smsCampaignWritePlatformCommandHandler.insertDirectCampaignIntoSmsOutboundTable(client, campaign);
             }
         }
-
     }
 
     private void notifyClientRejected(final Client client) {
@@ -140,7 +129,6 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                 this.smsCampaignWritePlatformCommandHandler.insertDirectCampaignIntoSmsOutboundTable(client, campaign);
             }
         }
-
     }
 
     private void notifySavingsAccountActivated(final SavingsAccount savingsAccount) {
@@ -150,7 +138,6 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                 this.smsCampaignWritePlatformCommandHandler.insertDirectCampaignIntoSmsOutboundTable(savingsAccount, campaign);
             }
         }
-
     }
 
     private void notifySavingsAccountRejected(final SavingsAccount savingsAccount) {
@@ -160,7 +147,6 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                 this.smsCampaignWritePlatformCommandHandler.insertDirectCampaignIntoSmsOutboundTable(savingsAccount, campaign);
             }
         }
-
     }
 
     private void sendSmsForLoanRepayment(LoanTransaction loanTransaction) {
@@ -174,17 +160,13 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                         throw new InvalidLoanTypeException("Loan Type cannot be Invalid for the Triggered Sms Campaign");
                     }
                     if (loan.isGroupLoan()) {
-                        Group group = this.groupRepository.findById(loan.getGroupId())
-                                .orElseThrow(() -> new GroupNotFoundException(loan.getGroupId()));
+                        Group group = this.groupRepository.findById(loan.getGroupId()).orElseThrow(() -> new GroupNotFoundException(loan.getGroupId()));
                         groupClients.addAll(group.getClientMembers());
                     } else {
                         groupClients.add(loan.client());
                     }
-                    HashMap<String, String> campaignParams = new ObjectMapper().readValue(smsCampaign.getParamValue(),
-                            new TypeReference<>() {
-
-                            });
-
+                    HashMap<String, String> campaignParams = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<>() {
+                    });
                     if (!groupClients.isEmpty()) {
                         for (Client client : groupClients) {
                             HashMap<String, Object> smsParams = processRepaymentDataForSms(loanTransaction, client);
@@ -198,8 +180,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                                 if (spkeycheck && !(value.equals("-1") || spvalue.equals(value))) {
                                     if (entry.getKey().equals("officeId")) {
                                         Long officeId = Long.valueOf(value);
-                                        Office campaignOffice = this.officeRepository.findById(Long.valueOf(value))
-                                                .orElseThrow(() -> new OfficeNotFoundException(officeId));
+                                        Office campaignOffice = this.officeRepository.findById(Long.valueOf(value)).orElseThrow(() -> new OfficeNotFoundException(officeId));
                                         if (campaignOffice.doesNotHaveAnOfficeInHierarchyWithId(client.getOffice().getId())) {
                                             throw new SmsRuntimeException("error.msg.no.office", "Office not found for the id");
                                         }
@@ -208,16 +189,14 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                                     }
                                 }
                             }
-                            String message = this.smsCampaignWritePlatformCommandHandler.compileSmsTemplate(smsCampaign.getMessage(),
-                                    smsCampaign.getCampaignName(), smsParams);
+                            String message = this.smsCampaignWritePlatformCommandHandler.compileSmsTemplate(smsCampaign.getMessage(), smsCampaign.getCampaignName(), smsParams);
                             Object mobileNo = smsParams.get("mobileNo");
                             if (this.smsCampaignValidator.isValidNotificationOrSms(client, smsCampaign, mobileNo)) {
                                 String mobileNumber = null;
                                 if (mobileNo != null) {
                                     mobileNumber = mobileNo.toString();
                                 }
-                                SmsMessage smsMessage = SmsMessage.pendingSms(null, null, client, null, message, mobileNumber, smsCampaign,
-                                        smsCampaign.isNotification());
+                                SmsMessage smsMessage = SmsMessage.pendingSms(null, null, client, null, message, mobileNumber, smsCampaign, smsCampaign.isNotification());
                                 Map<SmsCampaign, Collection<SmsMessage>> smsDataMap = new HashMap<>();
                                 smsDataMap.put(smsCampaign, Collections.singletonList(smsMessage));
                                 this.smsMessageScheduledJobService.sendTriggeredMessages(smsDataMap);
@@ -227,7 +206,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                 } catch (final IOException e) {
                     log.error("smsParams does not contain the key: ", e);
                 } catch (final RuntimeException e) {
-                    log.debug("Client Office Id and SMS Campaign Office id doesn't match ", e);
+                    log.debug("Client Office Id and SMS Campaign Office id doesn\'t match ", e);
                 }
             }
         }
@@ -241,10 +220,8 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                 try {
                     final SavingsAccount savingsAccount = savingsTransaction.getSavingsAccount();
                     final Client client = savingsAccount.getClient();
-                    HashMap<String, String> campaignParams = new ObjectMapper().readValue(smsCampaign.getParamValue(),
-                            new TypeReference<>() {
-
-                            });
+                    HashMap<String, String> campaignParams = new ObjectMapper().readValue(smsCampaign.getParamValue(), new TypeReference<>() {
+                    });
                     HashMap<String, Object> smsParams = processSavingsTransactionDataForSms(savingsTransaction, client);
                     for (Map.Entry<String, String> entry : campaignParams.entrySet()) {
                         String value = entry.getValue();
@@ -256,8 +233,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                         if (spkeycheck && !(value.equals("-1") || spvalue.equals(value))) {
                             if (entry.getKey().equals("officeId")) {
                                 Long officeId = Long.valueOf(value);
-                                Office campaignOffice = this.officeRepository.findById(officeId)
-                                        .orElseThrow(() -> new OfficeNotFoundException(officeId));
+                                Office campaignOffice = this.officeRepository.findById(officeId).orElseThrow(() -> new OfficeNotFoundException(officeId));
                                 if (campaignOffice.doesNotHaveAnOfficeInHierarchyWithId(client.getOffice().getId())) {
                                     throw new SmsRuntimeException("error.msg.no.office", "Office not found for the id");
                                 }
@@ -266,16 +242,14 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                             }
                         }
                     }
-                    String message = this.smsCampaignWritePlatformCommandHandler.compileSmsTemplate(smsCampaign.getMessage(),
-                            smsCampaign.getCampaignName(), smsParams);
+                    String message = this.smsCampaignWritePlatformCommandHandler.compileSmsTemplate(smsCampaign.getMessage(), smsCampaign.getCampaignName(), smsParams);
                     Object mobileNo = smsParams.get("mobileNo");
                     if (this.smsCampaignValidator.isValidNotificationOrSms(client, smsCampaign, mobileNo)) {
                         String mobileNumber = null;
                         if (mobileNo != null) {
                             mobileNumber = mobileNo.toString();
                         }
-                        SmsMessage smsMessage = SmsMessage.pendingSms(null, null, client, null, message, mobileNumber, smsCampaign,
-                                smsCampaign.isNotification());
+                        SmsMessage smsMessage = SmsMessage.pendingSms(null, null, client, null, message, mobileNumber, smsCampaign, smsCampaign.isNotification());
                         this.smsMessageRepository.save(smsMessage);
                         Collection<SmsMessage> messages = new ArrayList<>();
                         messages.add(smsMessage);
@@ -286,7 +260,7 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
                 } catch (final IOException e) {
                     log.error("smsParams does not contain the key: ", e);
                 } catch (final RuntimeException e) {
-                    log.debug("Client Office Id and SMS Campaign Office id doesn't match ", e);
+                    log.debug("Client Office Id and SMS Campaign Office id doesn\'t match ", e);
                 }
             }
         }
@@ -297,7 +271,6 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
     }
 
     private HashMap<String, Object> processRepaymentDataForSms(final LoanTransaction loanTransaction, Client groupClient) {
-
         HashMap<String, Object> smsParams = new HashMap<String, Object>();
         Loan loan = loanTransaction.getLoan();
         final Client client;
@@ -308,10 +281,8 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         } else {
             throw new InvalidParameterException("");
         }
-
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM:d:yyyy");
-
         smsParams.put("id", loanTransaction.getLoan().getClientId());
         smsParams.put("firstname", client.getFirstname());
         smsParams.put("middlename", client.getMiddlename());
@@ -323,18 +294,15 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         smsParams.put("loanId", loan.getId());
         smsParams.put("LoanAccountId", loan.getAccountNumber());
         smsParams.put("officeId", client.getOffice().getId());
-
         if (client.getStaff() != null) {
             smsParams.put("loanOfficerId", client.getStaff().getId());
         } else {
             smsParams.put("loanOfficerId", -1);
         }
-
         OffsetDateTime creationDate = loanTransaction.getCreatedDate().orElse(DateUtils.getAuditOffsetDateTime());
         smsParams.put("repaymentAmount", loanTransaction.getAmount(loan.getCurrency()));
         smsParams.put("RepaymentDate", creationDate.toLocalDate().format(dateFormatter));
         smsParams.put("RepaymentTime", creationDate.toLocalTime().format(timeFormatter));
-
         if (loanTransaction.getPaymentDetail() != null) {
             smsParams.put("receiptNumber", loanTransaction.getPaymentDetail().getReceiptNumber());
         } else {
@@ -343,13 +311,10 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         return smsParams;
     }
 
-    private HashMap<String, Object> processSavingsTransactionDataForSms(final SavingsAccountTransaction savingsAccountTransaction,
-            Client client) {
-
+    private HashMap<String, Object> processSavingsTransactionDataForSms(final SavingsAccountTransaction savingsAccountTransaction, Client client) {
         // {{savingsId}} {{id}} {{firstname}} {{middlename}} {{lastname}}
         // {{FullName}} {{mobileNo}} {{savingsAccountId}} {{depositAmount}}
         // {{balance}}
-
         // transactionDate
         HashMap<String, Object> smsParams = new HashMap<>();
         SavingsAccount savingsAccount = savingsAccountTransaction.getSavingsAccount();
@@ -368,13 +333,11 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         smsParams.put("officeId", client.getOffice().getId());
         smsParams.put("transactionDate", savingsAccountTransaction.getTransactionDate().format(dateFormatter));
         smsParams.put("savingsTransactionId", savingsAccountTransaction.getId());
-
         if (client.getStaff() != null) {
             smsParams.put("loanOfficerId", client.getStaff().getId());
         } else {
             smsParams.put("loanOfficerId", -1);
         }
-
         if (savingsAccountTransaction.getPaymentDetail() != null) {
             smsParams.put("receiptNumber", savingsAccountTransaction.getPaymentDetail().getReceiptNumber());
         } else {
@@ -383,8 +346,8 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         return smsParams;
     }
 
-    private final class SendSmsOnLoanApproved implements BusinessEventListener<LoanApprovedBusinessEvent> {
 
+    private final class SendSmsOnLoanApproved implements BusinessEventListener<LoanApprovedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanApprovedBusinessEvent event) {
             Loan loan = event.get();
@@ -392,8 +355,8 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         }
     }
 
-    private final class SendSmsOnLoanRejected implements BusinessEventListener<LoanRejectedBusinessEvent> {
 
+    private final class SendSmsOnLoanRejected implements BusinessEventListener<LoanRejectedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanRejectedBusinessEvent event) {
             Loan loan = event.get();
@@ -401,59 +364,71 @@ public class SmsCampaignDomainServiceImpl implements SmsCampaignDomainService {
         }
     }
 
-    private final class SendSmsOnLoanRepayment implements BusinessEventListener<LoanTransactionMakeRepaymentPostBusinessEvent> {
 
+    private final class SendSmsOnLoanRepayment implements BusinessEventListener<LoanTransactionMakeRepaymentPostBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanTransactionMakeRepaymentPostBusinessEvent event) {
             sendSmsForLoanRepayment(event.get());
         }
     }
 
-    private final class ClientActivatedListener implements BusinessEventListener<ClientActivateBusinessEvent> {
 
+    private final class ClientActivatedListener implements BusinessEventListener<ClientActivateBusinessEvent> {
         @Override
         public void onBusinessEvent(ClientActivateBusinessEvent event) {
             notifyClientActivated(event.get());
         }
     }
 
-    private final class ClientRejectedListener implements BusinessEventListener<ClientRejectBusinessEvent> {
 
+    private final class ClientRejectedListener implements BusinessEventListener<ClientRejectBusinessEvent> {
         @Override
         public void onBusinessEvent(ClientRejectBusinessEvent event) {
             notifyClientRejected(event.get());
         }
     }
 
-    private final class SavingsAccountActivatedListener implements BusinessEventListener<SavingsActivateBusinessEvent> {
 
+    private final class SavingsAccountActivatedListener implements BusinessEventListener<SavingsActivateBusinessEvent> {
         @Override
         public void onBusinessEvent(SavingsActivateBusinessEvent event) {
             notifySavingsAccountActivated(event.get());
         }
     }
 
-    private final class SavingsAccountRejectedListener implements BusinessEventListener<SavingsRejectBusinessEvent> {
 
+    private final class SavingsAccountRejectedListener implements BusinessEventListener<SavingsRejectBusinessEvent> {
         @Override
         public void onBusinessEvent(SavingsRejectBusinessEvent event) {
             notifySavingsAccountRejected(event.get());
         }
     }
 
-    private final class DepositSavingsAccountTransactionListener implements BusinessEventListener<SavingsDepositBusinessEvent> {
 
+    private final class DepositSavingsAccountTransactionListener implements BusinessEventListener<SavingsDepositBusinessEvent> {
         @Override
         public void onBusinessEvent(SavingsDepositBusinessEvent event) {
             sendSmsForSavingsTransaction(event.get(), true);
         }
     }
 
-    private final class NonDepositSavingsAccountTransactionListener implements BusinessEventListener<SavingsWithdrawalBusinessEvent> {
 
+    private final class NonDepositSavingsAccountTransactionListener implements BusinessEventListener<SavingsWithdrawalBusinessEvent> {
         @Override
         public void onBusinessEvent(SavingsWithdrawalBusinessEvent event) {
             sendSmsForSavingsTransaction(event.get(), false);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SmsCampaignDomainServiceImpl(final SmsCampaignRepository smsCampaignRepository, final SmsMessageRepository smsMessageRepository, final OfficeRepository officeRepository, final BusinessEventNotifierService businessEventNotifierService, final SmsCampaignWritePlatformService smsCampaignWritePlatformCommandHandler, final GroupRepository groupRepository, final SmsMessageScheduledJobService smsMessageScheduledJobService, final SmsCampaignValidator smsCampaignValidator) {
+        this.smsCampaignRepository = smsCampaignRepository;
+        this.smsMessageRepository = smsMessageRepository;
+        this.officeRepository = officeRepository;
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.smsCampaignWritePlatformCommandHandler = smsCampaignWritePlatformCommandHandler;
+        this.groupRepository = groupRepository;
+        this.smsMessageScheduledJobService = smsMessageScheduledJobService;
+        this.smsCampaignValidator = smsCampaignValidator;
     }
 }

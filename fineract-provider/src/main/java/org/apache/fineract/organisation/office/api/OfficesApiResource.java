@@ -45,7 +45,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -72,17 +71,12 @@ import org.springframework.stereotype.Component;
 @Path("/v1/offices")
 @Component
 @Tag(name = "Offices", description = "Offices are used to model an MFIs structure. A hierarchical representation of offices is supported. There will always be at least one office (which represents the MFI or an MFIs head office). All subsequent offices added must have a parent office.")
-@RequiredArgsConstructor
 public class OfficesApiResource {
-
     /**
      * The set of parameters that are supported in response for {@link OfficeData}.
      */
-    private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(
-            List.of("id", "name", "nameDecorated", "externalId", "openingDate", "hierarchy", "parentId", "parentName", "allowedParents"));
-
+    private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(List.of("id", "name", "nameDecorated", "externalId", "openingDate", "hierarchy", "parentId", "parentName", "allowedParents"));
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "OFFICE";
-
     private final OfficeSwaggerMapper officeSwaggerMapper;
     private final PlatformSecurityContext context;
     private final OfficeReadPlatformService readPlatformService;
@@ -92,24 +86,18 @@ public class OfficesApiResource {
     private final BulkImportWorkbookService bulkImportWorkbookService;
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
     private final SqlValidator sqlValidator;
-
     private final Gson gson = GoogleGsonSerializerHelper.createSimpleGson();
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "List Offices", operationId = "retrieveAllOffices", description = "Example Requests:\n" + "\n" + "offices\n" + "\n"
-            + "\n" + "offices?fields=id,name,openingDate")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "List Offices", operationId = "retrieveAllOffices", description = "Example Requests:\n" + "\n" + "offices\n" + "\n" + "\n" + "offices?fields=id,name,openingDate")
     @AlternativeOperationId("retrieveOffices")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = OfficesApiResourceSwagger.GetOfficesResponse.class))))
-    public String retrieveOffices(@Context final UriInfo uriInfo,
-            @DefaultValue("false") @QueryParam("includeAllOffices") @Parameter(description = "includeAllOffices") final boolean onlyManualEntries,
-            @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy,
-            @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder) {
+    public String retrieveOffices(@Context final UriInfo uriInfo, @DefaultValue("false") @QueryParam("includeAllOffices") @Parameter(description = "includeAllOffices") final boolean onlyManualEntries, @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy, @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder) {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
-        final SearchParameters searchParameters = SearchParameters.builder().orphansOnly(false).orderBy(orderBy).sortOrder(sortOrder)
-                .build();
+        final SearchParameters searchParameters = SearchParameters.builder().orphansOnly(false).orderBy(orderBy).sortOrder(sortOrder).build();
         final Collection<OfficeData> offices = readPlatformService.retrieveAllOffices(onlyManualEntries, searchParameters);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, offices, RESPONSE_DATA_PARAMETERS);
@@ -117,9 +105,8 @@ public class OfficesApiResource {
 
     @GET
     @Path("template")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve Office Details Template", operationId = "retrieveTemplateOffice", description = "This is a convenience resource. It can be useful when building maintenance user interface screens for client applications. The template data returned consists of any or all of:\n"
-            + "\n" + "Field Defaults\n" + "Allowed description Lists\n" + "Example Request:\n" + "\n" + "offices/template")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve Office Details Template", operationId = "retrieveTemplateOffice", description = "This is a convenience resource. It can be useful when building maintenance user interface screens for client applications. The template data returned consists of any or all of:\n" + "\n" + "Field Defaults\n" + "Allowed description Lists\n" + "Example Request:\n" + "\n" + "offices/template")
     @AlternativeOperationId("retrieveOfficeTemplate_1")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = OfficesApiResourceSwagger.GetOfficesTemplateResponse.class)))
     public String retrieveOfficeTemplate(@Context final UriInfo uriInfo) {
@@ -132,30 +119,27 @@ public class OfficesApiResource {
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Create an Office", operationId = "createOffice", description = "Mandatory Fields\n"
-            + "name, openingDate, parentId")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Create an Office", operationId = "createOffice", description = "Mandatory Fields\n" + "name, openingDate, parentId")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = OfficesApiResourceSwagger.PostOfficesRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = OfficesApiResourceSwagger.PostOfficesResponse.class)))
     public String createOffice(@Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-                .createOffice() //
-                .withJson(apiRequestBodyAsJson) //
-                .build();
+        final CommandWrapper commandRequest =  //
+        //
+        //
+        new CommandWrapperBuilder().createOffice().withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return toApiJsonSerializer.serialize(result);
     }
 
     @GET
     @Path("{officeId}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve an Office", operationId = "retrieveOneOffice", description = "Example Requests:\n" + "\n" + "offices/1\n"
-            + "\n" + "\n" + "offices/1?template=true\n" + "\n" + "\n" + "offices/1?fields=id,name,parentName")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve an Office", operationId = "retrieveOneOffice", description = "Example Requests:\n" + "\n" + "offices/1\n" + "\n" + "\n" + "offices/1?template=true\n" + "\n" + "\n" + "offices/1?fields=id,name,parentName")
     @AlternativeOperationId("retrieveOffice")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = OfficesApiResourceSwagger.GetOfficesResponse.class)))
-    public String retrieveOffice(@PathParam("officeId") @Parameter(description = "officeId") final Long officeId,
-            @Context final UriInfo uriInfo) {
+    public String retrieveOffice(@PathParam("officeId") @Parameter(description = "officeId") final Long officeId, @Context final UriInfo uriInfo) {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         OfficeData office = readPlatformService.retrieveOffice(officeId);
@@ -168,13 +152,10 @@ public class OfficesApiResource {
 
     @GET
     @Path("/external-id/{externalId}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve an Office using external id", operationId = "retrieveOneOfficeByExternalId", description = "Example Requests:\n"
-            + "\n" + "offices/external-id/asd123\n" + "\n" + "\n" + "offices/external-id/asd123?template=true\n" + "\n" + "\n"
-            + "offices/external-id/asd123?fields=id,name,parentName")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve an Office using external id", operationId = "retrieveOneOfficeByExternalId", description = "Example Requests:\n" + "\n" + "offices/external-id/asd123\n" + "\n" + "\n" + "offices/external-id/asd123?template=true\n" + "\n" + "\n" + "offices/external-id/asd123?fields=id,name,parentName")
     @AlternativeOperationId("retrieveOfficeByExternalId")
-    public OfficesApiResourceSwagger.GetOfficesResponse retrieveOfficeByExternalId(
-            @PathParam("externalId") @Parameter(description = "externalId") final String externalId, @Context final UriInfo uriInfo) {
+    public OfficesApiResourceSwagger.GetOfficesResponse retrieveOfficeByExternalId(@PathParam("externalId") @Parameter(description = "externalId") final String externalId, @Context final UriInfo uriInfo) {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         OfficeData office = readPlatformService.retrieveOfficeWithExternalId(ExternalIdFactory.produce(externalId));
@@ -187,36 +168,33 @@ public class OfficesApiResource {
 
     @PUT
     @Path("{officeId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update Office", operationId = "updateOffice", description = "")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = OfficesApiResourceSwagger.PutOfficesOfficeIdRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = OfficesApiResourceSwagger.PutOfficesOfficeIdResponse.class)))
-    public String updateOffice(@PathParam("officeId") @Parameter(description = "officeId") final Long officeId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-                .updateOffice(officeId) //
-                .withJson(apiRequestBodyAsJson) //
-                .build();
+    public String updateOffice(@PathParam("officeId") @Parameter(description = "officeId") final Long officeId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+        final CommandWrapper commandRequest =  //
+        //
+        //
+        new CommandWrapperBuilder().updateOffice(officeId).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return toApiJsonSerializer.serialize(result);
     }
 
     @PUT
     @Path("/external-id/{externalId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update Office", operationId = "updateOfficeByExternalId", description = "")
     @AlternativeOperationId("updateOfficeWithExternalId")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = OfficesApiResourceSwagger.PutOfficesOfficeIdRequest.class)))
-    public OfficesApiResourceSwagger.PutOfficesOfficeIdResponse updateOfficeWithExternalId(
-            @Parameter(description = "externalId") @PathParam("externalId") final String externalId,
-            final OfficesApiResourceSwagger.PutOfficesOfficeIdRequest apiRequestBody) {
+    public OfficesApiResourceSwagger.PutOfficesOfficeIdResponse updateOfficeWithExternalId(@Parameter(description = "externalId") @PathParam("externalId") final String externalId, final OfficesApiResourceSwagger.PutOfficesOfficeIdRequest apiRequestBody) {
         OfficeData office = readPlatformService.retrieveOfficeWithExternalId(ExternalIdFactory.produce(externalId));
-        final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-                .updateOffice(office.getId()) //
-                .withJson(gson.toJson(apiRequestBody)) //
-                .build();
+        final CommandWrapper commandRequest =  //
+        //
+        //
+        new CommandWrapperBuilder().updateOffice(office.getId()).withJson(gson.toJson(apiRequestBody)).build();
         final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return officeSwaggerMapper.toPutOfficesOfficeIdResponse(result);
     }
@@ -231,13 +209,22 @@ public class OfficesApiResource {
     @POST
     @Path("uploadtemplate")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @RequestBody(description = "Upload office template", content = {
-            @Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = UploadRequest.class)) })
-    public String postOfficeTemplate(@FormDataParam("file") InputStream uploadedInputStream,
-            @FormDataParam("file") FormDataContentDisposition fileDetail, @FormDataParam("locale") final String locale,
-            @FormDataParam("dateFormat") final String dateFormat) {
-        final Long importDocumentId = bulkImportWorkbookService.importWorkbook(GlobalEntityType.OFFICES.toString(), uploadedInputStream,
-                fileDetail, locale, dateFormat);
+    @RequestBody(description = "Upload office template", content = {@Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = UploadRequest.class))})
+    public String postOfficeTemplate(@FormDataParam("file") InputStream uploadedInputStream, @FormDataParam("file") FormDataContentDisposition fileDetail, @FormDataParam("locale") final String locale, @FormDataParam("dateFormat") final String dateFormat) {
+        final Long importDocumentId = bulkImportWorkbookService.importWorkbook(GlobalEntityType.OFFICES.toString(), uploadedInputStream, fileDetail, locale, dateFormat);
         return toApiJsonSerializer.serialize(importDocumentId);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OfficesApiResource(final OfficeSwaggerMapper officeSwaggerMapper, final PlatformSecurityContext context, final OfficeReadPlatformService readPlatformService, final DefaultToApiJsonSerializer<OfficeData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final BulkImportWorkbookService bulkImportWorkbookService, final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService, final SqlValidator sqlValidator) {
+        this.officeSwaggerMapper = officeSwaggerMapper;
+        this.context = context;
+        this.readPlatformService = readPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.bulkImportWorkbookService = bulkImportWorkbookService;
+        this.bulkImportWorkbookPopulatorService = bulkImportWorkbookPopulatorService;
+        this.sqlValidator = sqlValidator;
     }
 }

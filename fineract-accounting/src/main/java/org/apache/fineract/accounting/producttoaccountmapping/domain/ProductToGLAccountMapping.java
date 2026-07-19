@@ -24,68 +24,188 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 @Entity
-@Table(name = "acc_product_mapping", uniqueConstraints = { @UniqueConstraint(columnNames = { "product_id", "product_type",
-        "financial_account_type", "payment_type" }, name = "financial_action") })
+@Table(name = "acc_product_mapping", uniqueConstraints = {@UniqueConstraint(columnNames = {"product_id", "product_type", "financial_account_type", "payment_type"}, name = "financial_action")})
 public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
-
     @ManyToOne(optional = true)
     @JoinColumn(name = "gl_account_id")
     private GLAccount glAccount;
-
     @Column(name = "product_id", nullable = true)
     private Long productId;
-
     @ManyToOne
     @JoinColumn(name = "payment_type", nullable = true)
     private PaymentType paymentType;
-
     @ManyToOne
     @JoinColumn(name = "charge_id", nullable = true)
     private Charge charge;
-
     @Column(name = "product_type", nullable = true)
     private int productType;
-
     @Column(name = "financial_account_type", nullable = true)
     private int financialAccountType;
-
     @ManyToOne
     @JoinColumn(name = "charge_off_reason_id", nullable = true)
     private CodeValue chargeOffReason;
-
     @ManyToOne
     @JoinColumn(name = "write_off_reason_id", nullable = true)
     private CodeValue writeOffReason;
-
     @ManyToOne
     @JoinColumn(name = "capitalized_income_classification_id", nullable = true)
     private CodeValue capitalizedIncomeClassification;
-
     @ManyToOne
     @JoinColumn(name = "buydown_fee_classification_id", nullable = true)
     private CodeValue buydownFeeClassification;
 
-    public static ProductToGLAccountMapping createNew(final GLAccount glAccount, final Long productId, final int productType,
-            final int financialAccountType, final CodeValue chargeOffReason, final CodeValue capitalizedIncomeClassification,
-            final CodeValue buydownFeeClassification) {
+    public static ProductToGLAccountMapping createNew(final GLAccount glAccount, final Long productId, final int productType, final int financialAccountType, final CodeValue chargeOffReason, final CodeValue capitalizedIncomeClassification, final CodeValue buydownFeeClassification) {
+        return new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(productType).setFinancialAccountType(financialAccountType).setChargeOffReason(chargeOffReason).setCapitalizedIncomeClassification(capitalizedIncomeClassification).setBuydownFeeClassification(buydownFeeClassification);
+    }
 
-        return new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(productType)
-                .setFinancialAccountType(financialAccountType).setChargeOffReason(chargeOffReason)
-                .setCapitalizedIncomeClassification(capitalizedIncomeClassification).setBuydownFeeClassification(buydownFeeClassification);
+    @java.lang.SuppressWarnings("all")
+        public GLAccount getGlAccount() {
+        return this.glAccount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getProductId() {
+        return this.productId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PaymentType getPaymentType() {
+        return this.paymentType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Charge getCharge() {
+        return this.charge;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public int getProductType() {
+        return this.productType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public int getFinancialAccountType() {
+        return this.financialAccountType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getChargeOffReason() {
+        return this.chargeOffReason;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getWriteOffReason() {
+        return this.writeOffReason;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getCapitalizedIncomeClassification() {
+        return this.capitalizedIncomeClassification;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getBuydownFeeClassification() {
+        return this.buydownFeeClassification;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ProductToGLAccountMapping setGlAccount(final GLAccount glAccount) {
+        this.glAccount = glAccount;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ProductToGLAccountMapping setProductId(final Long productId) {
+        this.productId = productId;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ProductToGLAccountMapping setPaymentType(final PaymentType paymentType) {
+        this.paymentType = paymentType;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ProductToGLAccountMapping setCharge(final Charge charge) {
+        this.charge = charge;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ProductToGLAccountMapping setProductType(final int productType) {
+        this.productType = productType;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ProductToGLAccountMapping setFinancialAccountType(final int financialAccountType) {
+        this.financialAccountType = financialAccountType;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ProductToGLAccountMapping setChargeOffReason(final CodeValue chargeOffReason) {
+        this.chargeOffReason = chargeOffReason;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ProductToGLAccountMapping setWriteOffReason(final CodeValue writeOffReason) {
+        this.writeOffReason = writeOffReason;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ProductToGLAccountMapping setCapitalizedIncomeClassification(final CodeValue capitalizedIncomeClassification) {
+        this.capitalizedIncomeClassification = capitalizedIncomeClassification;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ProductToGLAccountMapping setBuydownFeeClassification(final CodeValue buydownFeeClassification) {
+        this.buydownFeeClassification = buydownFeeClassification;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProductToGLAccountMapping() {
     }
 }

@@ -21,14 +21,16 @@ package org.apache.fineract.infrastructure.core.diagnostics.performance.sampling
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-import lombok.Getter;
 
-@Getter
 public class SamplingData {
-
     private final Map<String, List<Duration>> timings;
 
     public SamplingData(Map<String, List<Duration>> timings) {
         this.timings = Map.copyOf(timings);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Map<String, List<Duration>> getTimings() {
+        return this.timings;
     }
 }

@@ -24,8 +24,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.config.FineractProperties.FineractSecurityProperties.FineractSecurityOidcFederationProperties.OidcIssuerProperties;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
@@ -51,30 +49,27 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * If no tenant can be resolved the filter does not block the request — downstream authentication will fail with an
  * appropriate error if the tenant context is required.
  */
-@Slf4j
-@RequiredArgsConstructor
 public class OidcTenantAwareFilter extends OncePerRequestFilter {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(OidcTenantAwareFilter.class);
     private static final String TENANT_HEADER = "Fineract-Platform-TenantId";
     private static final String TENANT_PARAM = "tenantIdentifier";
-
     private final BearerTokenResolver bearerTokenResolver;
     private final AuthTenantDetailsService tenantDetailsService;
     private final FineractProperties fineractProperties;
     private final TenantOidcConfigService tenantOidcConfigService;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         try {
             String tenantId = resolveTenantId(request);
             if (tenantId != null) {
                 ThreadLocalContextUtil.setTenant(tenantDetailsService.loadTenantById(tenantId, false));
-                log.debug("OIDC tenant context set to '{}' for {}", tenantId, request.getRequestURI());
+                log.debug("OIDC tenant context set to \'{}\' for {}", tenantId, request.getRequestURI());
             }
             filterChain.doFilter(request, response);
         } catch (Exception e) {
-            log.warn("OIDC tenant resolution failed for '{}', request will continue without tenant context", request.getRequestURI(), e);
+            log.warn("OIDC tenant resolution failed for \'{}\', request will continue without tenant context", request.getRequestURI(), e);
             filterChain.doFilter(request, response);
         } finally {
             ThreadLocalContextUtil.reset();
@@ -88,12 +83,10 @@ public class OidcTenantAwareFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             log.debug("Could not extract Bearer token for tenant resolution", e);
         }
-
         if (token != null) {
             try {
                 var claims = JWTParser.parse(token).getJWTClaimsSet();
                 String issuer = (String) claims.getClaim("iss");
-
                 // Priority 1: iss → master DB (m_tenant_oidc_config)
                 if (issuer != null) {
                     var dbConfig = tenantOidcConfigService.findByIssuerUri(issuer);
@@ -101,19 +94,16 @@ public class OidcTenantAwareFilter extends OncePerRequestFilter {
                         return dbConfig.get().getTenantId();
                     }
                 }
-
                 // Priority 2: iss → YAML issuers[] static config
                 if (issuer != null) {
                     var yamlIssuers = fineractProperties.getSecurity().getOidcFederation().getIssuers();
                     if (yamlIssuers != null) {
-                        var match = yamlIssuers.stream().filter(i -> issuer.equals(i.getIssuerUri())).map(OidcIssuerProperties::getTenantId)
-                                .findFirst();
+                        var match = yamlIssuers.stream().filter(i -> issuer.equals(i.getIssuerUri())).map(OidcIssuerProperties::getTenantId).findFirst();
                         if (match.isPresent()) {
                             return match.get();
                         }
                     }
                 }
-
                 // Priority 3: configurable custom claim (e.g. fineract_tenant) — legacy/single-realm
                 String claimName = fineractProperties.getSecurity().getOidcFederation().getTenantClaimName();
                 if (claimName != null) {
@@ -126,13 +116,11 @@ public class OidcTenantAwareFilter extends OncePerRequestFilter {
                 log.debug("Failed to parse JWT for tenant resolution, falling through to header/param", e);
             }
         }
-
         // Priority 4: HTTP header
         String fromHeader = request.getHeader(TENANT_HEADER);
         if (fromHeader != null) {
             return fromHeader;
         }
-
         // Priority 5: query parameter
         return request.getParameter(TENANT_PARAM);
     }
@@ -141,5 +129,13 @@ public class OidcTenantAwareFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         return path.startsWith("/swagger-ui") || path.startsWith("/actuator") || path.equals("/login") || path.equals("/error");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OidcTenantAwareFilter(final BearerTokenResolver bearerTokenResolver, final AuthTenantDetailsService tenantDetailsService, final FineractProperties fineractProperties, final TenantOidcConfigService tenantOidcConfigService) {
+        this.bearerTokenResolver = bearerTokenResolver;
+        this.tenantDetailsService = tenantDetailsService;
+        this.fineractProperties = fineractProperties;
+        this.tenantOidcConfigService = tenantOidcConfigService;
     }
 }

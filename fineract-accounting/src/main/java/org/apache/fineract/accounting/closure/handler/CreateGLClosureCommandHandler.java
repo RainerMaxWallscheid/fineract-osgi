@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.accounting.closure.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.closure.service.GLClosureWritePlatformService;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
@@ -29,15 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "GLCLOSURE", action = "CREATE")
-@RequiredArgsConstructor
 public class CreateGLClosureCommandHandler implements NewCommandSourceHandler {
-
     private final GLClosureWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.createGLClosure(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateGLClosureCommandHandler(final GLClosureWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

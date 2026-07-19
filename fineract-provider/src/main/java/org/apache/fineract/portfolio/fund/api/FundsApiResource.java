@@ -37,7 +37,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -53,23 +52,19 @@ import org.springframework.stereotype.Component;
 @Path("/v1/funds")
 @Component
 @Tag(name = "Funds", description = "")
-@RequiredArgsConstructor
 public class FundsApiResource {
-
     /**
      * The set of parameters that are supported in response for {@link CodeData}
      */
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "name", "externalId"));
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "FUND";
-
     private final PlatformSecurityContext context;
     private final FundReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<FundData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Funds", description = "Returns the list of funds.\n" + "\n" + "Example Requests:\n" + "\n" + "funds")
     public List<FundData> retrieveFunds() {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
@@ -77,22 +72,20 @@ public class FundsApiResource {
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create a Fund", description = "Creates a Fund")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = FundRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = FundsApiResourceSwagger.PostFundsResponse.class)))
     public CommandProcessingResult createFund(@Parameter(hidden = true) final FundRequest fundRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createFund().withJson(toApiJsonSerializer.serialize(fundRequest))
-                .build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createFund().withJson(toApiJsonSerializer.serialize(fundRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @GET
     @Path("{fundId}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve a Fund", description = "Returns the details of a Fund.\n" + "\n" + "Example Requests:\n" + "\n"
-            + "funds/1")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve a Fund", description = "Returns the details of a Fund.\n" + "\n" + "Example Requests:\n" + "\n" + "funds/1")
     public FundData retrieveFund(@PathParam("fundId") @Parameter(description = "fundId") final Long fundId) {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveFund(fundId);
@@ -100,16 +93,22 @@ public class FundsApiResource {
 
     @PUT
     @Path("{fundId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a Fund", description = "Updates the details of a fund.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = FundRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = FundsApiResourceSwagger.PutFundsFundIdResponse.class)))
-    public String updateFund(@PathParam("fundId") @Parameter(description = "fundId") final Long fundId,
-            @Parameter(hidden = true) final FundRequest fundRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateFund(fundId)
-                .withJson(toApiJsonSerializer.serialize(fundRequest)).build();
+    public String updateFund(@PathParam("fundId") @Parameter(description = "fundId") final Long fundId, @Parameter(hidden = true) final FundRequest fundRequest) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateFund(fundId).withJson(toApiJsonSerializer.serialize(fundRequest)).build();
         final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return toApiJsonSerializer.serialize(result);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FundsApiResource(final PlatformSecurityContext context, final FundReadPlatformService readPlatformService, final DefaultToApiJsonSerializer<FundData> toApiJsonSerializer, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.context = context;
+        this.readPlatformService = readPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
     }
 }

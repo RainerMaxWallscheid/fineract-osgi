@@ -24,22 +24,18 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.security.service.AuthTenantDetailsService;
 import org.springframework.lang.NonNull;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@RequiredArgsConstructor
 public class TenantAwareAuthenticationFilter extends OncePerRequestFilter {
-
     private final BearerTokenResolver resolver;
     private final AuthTenantDetailsService tenantDetailsService;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         try {
             String token = resolver.resolve(request);
             String tenantId;
@@ -57,5 +53,11 @@ public class TenantAwareAuthenticationFilter extends OncePerRequestFilter {
         } finally {
             ThreadLocalContextUtil.reset();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TenantAwareAuthenticationFilter(final BearerTokenResolver resolver, final AuthTenantDetailsService tenantDetailsService) {
+        this.resolver = resolver;
+        this.tenantDetailsService = tenantDetailsService;
     }
 }

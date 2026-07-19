@@ -16,11 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.interestratechart.service;
 
 import java.util.Collection;
-import lombok.NoArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.common.domain.ConditionType;
 import org.apache.fineract.portfolio.common.service.CommonEnumerations;
@@ -28,9 +26,7 @@ import org.apache.fineract.portfolio.interestratechart.incentive.InterestIncenti
 import org.apache.fineract.portfolio.interestratechart.incentive.InterestIncentiveEntityType;
 import org.apache.fineract.portfolio.interestratechart.incentive.InterestIncentiveType;
 
-@NoArgsConstructor
 public class InterestIncentivesDropdownReadServiceImpl implements InterestIncentiveDropdownReadService {
-
     @Override
     public Collection<EnumOptionData> retrieveEntityTypeOptions() {
         return InterestIncentivesEnumerations.entityType(InterestIncentiveEntityType.values());
@@ -51,4 +47,7 @@ public class InterestIncentivesDropdownReadServiceImpl implements InterestIncent
         return InterestIncentivesEnumerations.incentiveType(InterestIncentiveType.values());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public InterestIncentivesDropdownReadServiceImpl() {
+    }
 }

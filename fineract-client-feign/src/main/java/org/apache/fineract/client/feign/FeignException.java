@@ -23,24 +23,18 @@ import java.io.Serial;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Map;
-import lombok.Getter;
 
 /**
  * Base exception class for Feign client exceptions.
  */
 public class FeignException extends RuntimeException {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private final int status;
     private final Request request;
     private final byte[] responseBody;
-    @Getter
     private final String developerMessage;
-    @Getter
     private final String userMessage;
-    @Getter
     private final String userMessageGlobalisationCode;
     private final Map<String, Collection<String>> headers;
 
@@ -78,8 +72,7 @@ public class FeignException extends RuntimeException {
         this(status, message, request, responseBody, developerMessage, userMessage, null, Map.of());
     }
 
-    public FeignException(final int status, final String message, final Request request, final byte[] responseBody,
-            final String developerMessage, final String userMessage, final String userMessageGlobalisationCode) {
+    public FeignException(final int status, final String message, final Request request, final byte[] responseBody, final String developerMessage, final String userMessage, final String userMessageGlobalisationCode) {
         this(status, message, request, responseBody, developerMessage, userMessage, userMessageGlobalisationCode, Map.of());
     }
 
@@ -89,9 +82,7 @@ public class FeignException extends RuntimeException {
      *            {@link FineractErrorDecoder}; other construction paths (e.g. transport-level failures with no HTTP
      *            response at all) have none, hence the other constructors default this to an empty map.
      */
-    public FeignException(final int status, final String message, final Request request, final byte[] responseBody,
-            final String developerMessage, final String userMessage, final String userMessageGlobalisationCode,
-            final Map<String, Collection<String>> headers) {
+    public FeignException(final int status, final String message, final Request request, final byte[] responseBody, final String developerMessage, final String userMessage, final String userMessageGlobalisationCode, final Map<String, Collection<String>> headers) {
         super(message);
         this.status = status;
         this.request = request;
@@ -130,19 +121,30 @@ public class FeignException extends RuntimeException {
     public String getMessage() {
         StringBuilder sb = new StringBuilder();
         sb.append("status ").append(status);
-
         if (userMessage != null) {
             sb.append(": ").append(userMessage);
         }
-
         if (developerMessage != null) {
             sb.append(" (").append(developerMessage).append(")");
         }
-
         if (super.getMessage() != null && userMessage == null && developerMessage == null) {
             sb.append(": ").append(super.getMessage());
         }
-
         return sb.toString();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDeveloperMessage() {
+        return this.developerMessage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getUserMessage() {
+        return this.userMessage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getUserMessageGlobalisationCode() {
+        return this.userMessageGlobalisationCode;
     }
 }

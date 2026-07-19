@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler.loan.reamortization;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.DataIntegrityErrorHandler;
@@ -30,10 +29,8 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN", action = "REAMORTIZE")
 public class LoanReAmortizationCommandHandler implements NewCommandSourceHandler {
-
     private final LoanReAmortizationService loanReAmortizationService;
     private final DataIntegrityErrorHandler dataIntegrityErrorHandler;
 
@@ -42,9 +39,14 @@ public class LoanReAmortizationCommandHandler implements NewCommandSourceHandler
         try {
             return loanReAmortizationService.reAmortize(command.getLoanId(), command);
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.reAmortize",
-                    "Error while handling re-amortizing");
+            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.reAmortize", "Error while handling re-amortizing");
             return CommandProcessingResult.empty();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanReAmortizationCommandHandler(final LoanReAmortizationService loanReAmortizationService, final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
+        this.loanReAmortizationService = loanReAmortizationService;
+        this.dataIntegrityErrorHandler = dataIntegrityErrorHandler;
     }
 }

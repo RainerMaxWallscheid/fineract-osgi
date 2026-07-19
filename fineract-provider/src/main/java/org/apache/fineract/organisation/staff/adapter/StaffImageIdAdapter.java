@@ -19,23 +19,18 @@
 package org.apache.fineract.organisation.staff.adapter;
 
 import static java.util.Objects.nonNull;
-
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.documentmanagement.adapter.EntityImageIdAdapter;
 import org.apache.fineract.organisation.staff.domain.StaffRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @Deprecated
 class StaffImageIdAdapter implements EntityImageIdAdapter {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StaffImageIdAdapter.class);
     private static final String ENTITY_TYPE = "staff";
-
     private final StaffRepository repository;
 
     @Override
@@ -46,21 +41,23 @@ class StaffImageIdAdapter implements EntityImageIdAdapter {
     @Override
     @Transactional(readOnly = true)
     public Optional<ImageIdResult> get(Long entityId) {
-        return repository.findById(entityId).filter(staff -> nonNull(staff.getImageId()))
-                .map(staff -> ImageIdResult.builder().id(staff.getImageId()).displayName(staff.getDisplayName()).build());
+        return repository.findById(entityId).filter(staff -> nonNull(staff.getImageId())).map(staff -> ImageIdResult.builder().id(staff.getImageId()).displayName(staff.getDisplayName()).build());
     }
 
     @Override
     @Transactional
     public Optional<ImageIdResult> set(Long entityId, Long imageId) {
         final var result = get(entityId);
-
         if (imageId == null) {
             repository.removeImageId(entityId);
         } else {
             repository.updateByIdAndImageId(entityId, imageId);
         }
-
         return result;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public StaffImageIdAdapter(final StaffRepository repository) {
+        this.repository = repository;
     }
 }

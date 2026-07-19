@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanorigination.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,14 +28,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 @CommandType(entity = "LOAN_ORIGINATOR", action = "CREATE")
-@RequiredArgsConstructor
 @ConditionalOnProperty(value = "fineract.module.loan-origination.enabled", havingValue = "true")
 public class CreateLoanOriginatorCommandHandler implements NewCommandSourceHandler {
-
     private final LoanOriginatorWritePlatformService writePlatformService;
 
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.create(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateLoanOriginatorCommandHandler(final LoanOriginatorWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

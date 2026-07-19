@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.event.external.service.serialization.serializer.share;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
 import org.apache.fineract.avro.share.v1.ShareProductDataV1;
@@ -31,9 +30,7 @@ import org.apache.fineract.portfolio.shareproducts.data.ShareProductData;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class ShareProductDividentsCreateBusinessEventSerializer implements BusinessEventSerializer {
-
     private final ShareProductReadPlatformService service;
     private final ShareProductDataMapper mapper;
 
@@ -52,5 +49,11 @@ public class ShareProductDividentsCreateBusinessEventSerializer implements Busin
     @Override
     public Class<? extends GenericContainer> getSupportedSchema() {
         return ShareProductDataV1.class;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ShareProductDividentsCreateBusinessEventSerializer(final ShareProductReadPlatformService service, final ShareProductDataMapper mapper) {
+        this.service = service;
+        this.mapper = mapper;
     }
 }

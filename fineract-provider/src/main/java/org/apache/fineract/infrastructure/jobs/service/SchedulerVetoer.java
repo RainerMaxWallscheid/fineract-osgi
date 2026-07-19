@@ -20,8 +20,6 @@ package org.apache.fineract.infrastructure.jobs.service;
 
 import java.time.LocalDate;
 import java.util.HashMap;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
@@ -30,11 +28,10 @@ import org.quartz.JobKey;
 import org.quartz.Trigger;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class SchedulerVetoer {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SchedulerVetoer.class);
     private final SchedularWritePlatformService schedularService;
     private final BusinessDateReadPlatformService businessDateReadPlatformService;
 
@@ -55,10 +52,14 @@ public class SchedulerVetoer {
         }
         boolean vetoJob = schedularService.processJobDetailForExecution(jobKey, triggerType);
         if (vetoJob) {
-            log.warn(
-                    "vetoJobExecution() WILL veto the execution (returning vetoJob == true; the job's execute method will NOT be called); tenant={}, jobKey={}, triggerType={}, trigger={}, context={}",
-                    tenantIdentifier, jobKey, triggerType, trigger, context);
+            log.warn("vetoJobExecution() WILL veto the execution (returning vetoJob == true; the job\'s execute method will NOT be called); tenant={}, jobKey={}, triggerType={}, trigger={}, context={}", tenantIdentifier, jobKey, triggerType, trigger, context);
         }
         return vetoJob;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SchedulerVetoer(final SchedularWritePlatformService schedularService, final BusinessDateReadPlatformService businessDateReadPlatformService) {
+        this.schedularService = schedularService;
+        this.businessDateReadPlatformService = businessDateReadPlatformService;
     }
 }

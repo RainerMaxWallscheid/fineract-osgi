@@ -20,17 +20,23 @@ package org.apache.fineract.portfolio.collateral.data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
 public class LoansLoanIdCollateralsRequest implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private Long collateralTypeId;
+
+    @java.lang.SuppressWarnings("all")
+        public Long getCollateralTypeId() {
+        return this.collateralTypeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setCollateralTypeId(final Long collateralTypeId) {
+        this.collateralTypeId = collateralTypeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoansLoanIdCollateralsRequest() {
+    }
 }

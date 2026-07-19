@@ -20,8 +20,6 @@ package org.apache.fineract.cob.workingcapitalloan;
 
 import static org.apache.fineract.cob.COBConstant.BUSINESS_DATE_PARAMETER_NAME;
 import static org.apache.fineract.cob.COBConstant.IS_CATCH_UP_PARAMETER_NAME;
-
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.common.CustomJobParameterResolver;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -29,16 +27,18 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.lang.Nullable;
 
-@RequiredArgsConstructor
 public class WorkingCapitalLoanCOBCustomJobParametersResolverTasklet implements Tasklet {
-
     private final CustomJobParameterResolver customJobParameterResolver;
 
     @Nullable
     @Override
     public RepeatStatus execute(final StepContribution contribution, final ChunkContext chunkContext) throws Exception {
-        customJobParameterResolver.resolveToJobExecutionContext(contribution, chunkContext, new String[] { BUSINESS_DATE_PARAMETER_NAME },
-                new String[] { IS_CATCH_UP_PARAMETER_NAME });
+        customJobParameterResolver.resolveToJobExecutionContext(contribution, chunkContext, new String[] {BUSINESS_DATE_PARAMETER_NAME}, new String[] {IS_CATCH_UP_PARAMETER_NAME});
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanCOBCustomJobParametersResolverTasklet(final CustomJobParameterResolver customJobParameterResolver) {
+        this.customJobParameterResolver = customJobParameterResolver;
     }
 }

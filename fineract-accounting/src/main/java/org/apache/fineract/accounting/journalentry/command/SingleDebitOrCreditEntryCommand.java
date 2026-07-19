@@ -20,20 +20,14 @@ package org.apache.fineract.accounting.journalentry.command;
 
 import java.math.BigDecimal;
 import java.util.Set;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Immutable command for adding a "Credit" entry to the Journal
  */
-@Getter
-@RequiredArgsConstructor
 public class SingleDebitOrCreditEntryCommand {
-
     private final Long glAccountId;
     private final BigDecimal amount;
     private final String comments;
-
     private final Set<String> parametersPassedInRequest;
 
     public boolean isGlAccountIdChanged() {
@@ -46,5 +40,33 @@ public class SingleDebitOrCreditEntryCommand {
 
     public boolean isCommentsChanged() {
         return this.parametersPassedInRequest.contains("comments");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getGlAccountId() {
+        return this.glAccountId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getComments() {
+        return this.comments;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Set<String> getParametersPassedInRequest() {
+        return this.parametersPassedInRequest;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SingleDebitOrCreditEntryCommand(final Long glAccountId, final BigDecimal amount, final String comments, final Set<String> parametersPassedInRequest) {
+        this.glAccountId = glAccountId;
+        this.amount = amount;
+        this.comments = comments;
+        this.parametersPassedInRequest = parametersPassedInRequest;
     }
 }

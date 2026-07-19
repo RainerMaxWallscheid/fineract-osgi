@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.core.exception;
 
 import static org.springframework.core.ResolvableType.forClassWithGenerics;
-
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import jakarta.persistence.PersistenceException;
@@ -34,8 +33,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.naming.AuthenticationException;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.validate.ValidationException;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -62,18 +59,16 @@ import org.springframework.stereotype.Component;
  * @see org.apache.fineract.batch.command.CommandStrategy
  */
 @Component
-@Slf4j
-@AllArgsConstructor
 public final class ErrorHandler {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ErrorHandler.class);
     private static final Gson JSON_HELPER = GoogleGsonSerializerHelper.createGsonBuilder().create();
 
+
     private enum PessimisticLockingFailureCode {
-
-        ROLLBACK("40"), // Transaction rollback
-        DEADLOCK("60"), // Oracle: deadlock
+        ROLLBACK("40"),  // Transaction rollback
+        DEADLOCK("60"),  // Oracle: deadlock
         HY00("HY", "Lock wait timeout exceeded", "Record has changed since last read");
-
         private final String code;
         private final ImmutableList<String> messages;
 
@@ -90,16 +85,12 @@ public final class ErrorHandler {
         private boolean matches(SQLException e) {
             String sqlState = e.getSQLState();
             String message = e.getMessage();
-
-            return sqlState != null && sqlState.startsWith(code)
-                    && (messages.isEmpty() || (message != null && messages.stream().anyMatch(message::contains)));
+            return sqlState != null && sqlState.startsWith(code) && (messages.isEmpty() || (message != null && messages.stream().anyMatch(message::contains)));
         }
-
     }
 
     @Autowired
     private final ApplicationContext ctx;
-
     @Autowired
     private final DefaultExceptionMapper defaultExceptionMapper;
 
@@ -131,10 +122,8 @@ public final class ErrorHandler {
         ExceptionMapper<RuntimeException> exceptionMapper = findMostSpecificExceptionHandler(exception);
         Response response = exceptionMapper.toResponse(exception);
         MultivaluedMap<String, Object> headers = response.getHeaders();
-        Set<Header> batchHeaders = headers == null ? null
-                : headers.keySet().stream().map(e -> new Header(e, response.getHeaderString(e))).collect(Collectors.toSet());
-        Integer errorCode = exceptionMapper instanceof FineractExceptionMapper ? ((FineractExceptionMapper) exceptionMapper).errorCode()
-                : null;
+        Set<Header> batchHeaders = headers == null ? null : headers.keySet().stream().map(e -> new Header(e, response.getHeaderString(e))).collect(Collectors.toSet());
+        Integer errorCode = exceptionMapper instanceof FineractExceptionMapper ? ((FineractExceptionMapper) exceptionMapper).errorCode() : null;
         Object msg = response.getEntity();
         return new ErrorInfo(response.getStatus(), errorCode, msg instanceof String ? (String) msg : JSON_HELPER.toJson(msg), batchHeaders);
     }
@@ -147,12 +136,10 @@ public final class ErrorHandler {
         return getMappable(thr, msgCode, defaultMsg, null);
     }
 
-    public static RuntimeException getMappable(@NotNull Throwable t, String msgCode, String defaultMsg, String param,
-            final Object... defaultMsgArgs) {
+    public static RuntimeException getMappable(@NotNull Throwable t, String msgCode, String defaultMsg, String param, final Object... defaultMsgArgs) {
         String msg = defaultMsg == null ? t.getMessage() : defaultMsg;
         String codePfx = "error.msg" + (param == null ? "" : ("." + param));
-        Object[] args = defaultMsgArgs == null ? new Object[] { t } : defaultMsgArgs;
-
+        Object[] args = defaultMsgArgs == null ? new Object[] {t} : defaultMsgArgs;
         Throwable cause;
         if ((cause = PessimisticLockingFailureCode.match(t)) != null) {
             return new PessimisticLockingFailureException(msg, cause); // deadlock
@@ -207,5 +194,11 @@ public final class ErrorHandler {
             mostSpecificException = mostSpecificException.getCause();
         }
         return mostSpecificException;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ErrorHandler(final ApplicationContext ctx, final DefaultExceptionMapper defaultExceptionMapper) {
+        this.ctx = ctx;
+        this.defaultExceptionMapper = defaultExceptionMapper;
     }
 }

@@ -26,49 +26,32 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.util.Date;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "job_run_history")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class ScheduledJobRunHistory extends AbstractPersistableCustom<Long> {
-
     @ManyToOne
     @JoinColumn(name = "job_id")
     private ScheduledJobDetail scheduledJobDetail;
-
     @Column(name = "version")
     private Long version;
-
     @Column(name = "start_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date startTime;
-
     @Column(name = "end_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date endTime;
-
     @Column(name = "status")
     private String status;
-
     @Column(name = "error_message")
     private String errorMessage;
-
     @Column(name = "trigger_type")
     private String triggerType;
-
     @Column(name = "error_log")
     private String errorLog;
 
-    public ScheduledJobRunHistory(final ScheduledJobDetail scheduledJobDetail, final Long version, final Date startTime, final Date endTime,
-            final String status, final String errorMessage, final String triggerType, final String errorLog) {
+    public ScheduledJobRunHistory(final ScheduledJobDetail scheduledJobDetail, final Long version, final Date startTime, final Date endTime, final String status, final String errorMessage, final String triggerType, final String errorLog) {
         this.scheduledJobDetail = scheduledJobDetail;
         this.version = version;
         this.startTime = startTime;
@@ -79,4 +62,119 @@ public class ScheduledJobRunHistory extends AbstractPersistableCustom<Long> {
         this.errorLog = errorLog;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ScheduledJobDetail getScheduledJobDetail() {
+        return this.scheduledJobDetail;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getVersion() {
+        return this.version;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Date getStartTime() {
+        return this.startTime;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Date getEndTime() {
+        return this.endTime;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getStatus() {
+        return this.status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getErrorMessage() {
+        return this.errorMessage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getTriggerType() {
+        return this.triggerType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getErrorLog() {
+        return this.errorLog;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ScheduledJobRunHistory setScheduledJobDetail(final ScheduledJobDetail scheduledJobDetail) {
+        this.scheduledJobDetail = scheduledJobDetail;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ScheduledJobRunHistory setVersion(final Long version) {
+        this.version = version;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ScheduledJobRunHistory setStartTime(final Date startTime) {
+        this.startTime = startTime;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ScheduledJobRunHistory setEndTime(final Date endTime) {
+        this.endTime = endTime;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ScheduledJobRunHistory setStatus(final String status) {
+        this.status = status;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ScheduledJobRunHistory setErrorMessage(final String errorMessage) {
+        this.errorMessage = errorMessage;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ScheduledJobRunHistory setTriggerType(final String triggerType) {
+        this.triggerType = triggerType;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ScheduledJobRunHistory setErrorLog(final String errorLog) {
+        this.errorLog = errorLog;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ScheduledJobRunHistory() {
+    }
 }

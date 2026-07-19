@@ -23,7 +23,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.security.exception.InvalidInstanceTypeMethodException;
@@ -35,8 +34,9 @@ import org.springframework.stereotype.Component;
  */
 @Provider
 @Component
-@Slf4j
 public class InvalidInstanceTypeMethodExceptionMapper implements ExceptionMapper<InvalidInstanceTypeMethodException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InvalidInstanceTypeMethodExceptionMapper.class);
 
     @Override
     public Response toResponse(final InvalidInstanceTypeMethodException exception) {

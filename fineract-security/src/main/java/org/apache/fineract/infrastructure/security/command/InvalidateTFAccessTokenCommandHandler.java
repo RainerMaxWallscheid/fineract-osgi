@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
@@ -50,9 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "TWOFACTOR_ACCESSTOKEN", action = "INVALIDATE")
 @ConditionalOnProperty("fineract.security.2fa.enabled")
-@RequiredArgsConstructor
 public class InvalidateTFAccessTokenCommandHandler implements NewCommandSourceHandler {
-
     private final TwoFactorService twoFactorService;
     private final PlatformSecurityContext securityContext;
     private final FromJsonHelper fromJsonHelper;
@@ -61,35 +58,35 @@ public class InvalidateTFAccessTokenCommandHandler implements NewCommandSourceHa
     @Override
     public CommandProcessingResult processCommand(JsonCommand command) {
         validateJson(command.json());
-
         final AppUser user = securityContext.authenticatedUser();
-
         final TFAccessToken accessToken = twoFactorService.invalidateAccessToken(user, command);
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withResourceIdAsString(accessToken.getToken()) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withResourceIdAsString(accessToken.getToken()).build();
     }
 
     private void validateJson(String json) {
         if (StringUtils.isBlank(json)) {
             throw new InvalidJsonException();
         }
-
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+        }.getType();
         this.fromJsonHelper.checkForUnsupportedParameters(typeOfMap, json, new HashSet<>(Collections.singletonList("token")));
         final JsonElement element = this.fromJsonHelper.parse(json);
-
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
-                .resource(TwoFactorConstants.ACCESSTOKEN_RESOURCE_NAME);
-
+        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(TwoFactorConstants.ACCESSTOKEN_RESOURCE_NAME);
         final String token = this.fromJsonHelper.extractStringNamed("token", element);
         baseDataValidator.reset().parameter("token").value(token).notNull().notBlank();
-
         if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InvalidateTFAccessTokenCommandHandler(final TwoFactorService twoFactorService, final PlatformSecurityContext securityContext, final FromJsonHelper fromJsonHelper) {
+        this.twoFactorService = twoFactorService;
+        this.securityContext = securityContext;
+        this.fromJsonHelper = fromJsonHelper;
     }
 }

@@ -21,13 +21,10 @@ package org.apache.fineract.infrastructure.contentstore.processor;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-@Getter
 public final class ContentProcessorContext {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ContentProcessorContext.class);
     private final InputStream inputStream;
     private final Map<String, Object> parameters;
     private final Map<String, Object> results;
@@ -52,7 +49,6 @@ public final class ContentProcessorContext {
 
     public <R> R getParameter(String key, Class<R> type, R defaultValue) {
         final var val = parameters.get(key);
-
         return type != null && val != null ? type.cast(val) : defaultValue;
     }
 
@@ -66,11 +62,25 @@ public final class ContentProcessorContext {
 
     public <R> R getResult(String key, Class<R> type, R defaultValue) {
         final var val = results.get(key);
-
         return type != null && val != null ? type.cast(val) : defaultValue;
     }
 
     public ContentProcessorContext clone(InputStream inputStream) {
         return new ContentProcessorContext(inputStream, this.parameters, this.results);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InputStream getInputStream() {
+        return this.inputStream;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Map<String, Object> getParameters() {
+        return this.parameters;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Map<String, Object> getResults() {
+        return this.results;
     }
 }

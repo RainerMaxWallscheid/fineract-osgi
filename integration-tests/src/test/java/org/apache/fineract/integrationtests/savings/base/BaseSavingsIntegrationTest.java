@@ -31,9 +31,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-import lombok.AllArgsConstructor;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.BusinessDateUpdateRequest;
 import org.apache.fineract.client.models.PostSavingsAccountTransactionsRequest;
 import org.apache.fineract.client.models.PostSavingsAccountTransactionsResponse;
@@ -59,9 +56,9 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 
-@Slf4j
 public class BaseSavingsIntegrationTest extends IntegrationTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BaseSavingsIntegrationTest.class);
     protected static final String DATETIME_PATTERN = "dd MMMM yyyy";
 
     static {
@@ -71,7 +68,6 @@ public class BaseSavingsIntegrationTest extends IntegrationTest {
     protected final ResponseSpecification responseSpec = createResponseSpecification(Matchers.is(200));
     private final String fullAdminAuthKey = getFullAdminAuthKey();
     protected final RequestSpecification requestSpec = createRequestSpecification(fullAdminAuthKey);
-
     protected BusinessDateHelper businessDateHelper = new BusinessDateHelper();
     protected DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
     protected GlobalConfigurationHelper globalConfigurationHelper = new GlobalConfigurationHelper();
@@ -84,7 +80,6 @@ public class BaseSavingsIntegrationTest extends IntegrationTest {
         DateTimeFormatter format = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
         LocalDate startDate = LocalDate.parse(fromDate, format);
         LocalDate endDate = LocalDate.parse(toDate, format);
-
         LocalDate currentDate = startDate;
         while (currentDate.isBefore(endDate) || currentDate.isEqual(endDate)) {
             runAt(format.format(currentDate), runnable);
@@ -94,39 +89,35 @@ public class BaseSavingsIntegrationTest extends IntegrationTest {
 
     @Override
     protected void runAt(String date, Runnable runnable) {
-        runAt(date, (d) -> runnable.run());
+        runAt(date, d -> runnable.run());
     }
 
     protected void runAt(String date, Consumer<String> runnable) {
         try {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date(date).dateFormat(DATETIME_PATTERN).locale("en"));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
+            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date(date).dateFormat(DATETIME_PATTERN).locale("en"));
             runnable.accept(date);
         } finally {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
     protected PostSavingsProductsRequest dailyInterestPostingProduct() {
-        return new PostSavingsProductsRequest().locale("en").name(Utils.uniqueRandomStringGenerator("DAILY_INTEREST", 6))//
-                .shortName(Utils.uniqueRandomStringGenerator("", 4))//
-                .description("Daily interest posting product") //
-                .nominalAnnualInterestRate(10.0) //
-                .digitsAfterDecimal(0) //
-                .inMultiplesOf(0) //
-                .currencyCode("EUR") //
-                .accountingRule(1) // none
-                .interestCalculationDaysInYearType(DaysInYearType.DAYS_365).interestCompoundingPeriodType(InterestPeriodType.DAILY)
-                .interestCalculationType(InterestCalculationType.AVERAGE_DAILY_BALANCE) //
-                .interestPostingPeriodType(InterestPeriodType.DAILY) //
-                .withdrawalFeeForTransfers(false) //
-                .enforceMinRequiredBalance(false) //
-                .allowOverdraft(false) //
-                .withHoldTax(false) //
-                .isDormancyTrackingActive(false); //
+        return //
+        //
+        //
+        //
+        //
+        //
+        //
+        // none
+        //
+        //
+        //
+        //
+        //
+        //
+        new PostSavingsProductsRequest().locale("en").name(Utils.uniqueRandomStringGenerator("DAILY_INTEREST", 6)).shortName(Utils.uniqueRandomStringGenerator("", 4)).description("Daily interest posting product").nominalAnnualInterestRate(10.0).digitsAfterDecimal(0).inMultiplesOf(0).currencyCode("EUR").accountingRule(1).interestCalculationDaysInYearType(DaysInYearType.DAYS_365).interestCompoundingPeriodType(InterestPeriodType.DAILY).interestCalculationType(InterestCalculationType.AVERAGE_DAILY_BALANCE).interestPostingPeriodType(InterestPeriodType.DAILY).withdrawalFeeForTransfers(false).enforceMinRequiredBalance(false).allowOverdraft(false).withHoldTax(false).isDormancyTrackingActive(false); //
     }
 
     protected PostSavingsProductsResponse createProduct(PostSavingsProductsRequest productsRequest) {
@@ -134,8 +125,7 @@ public class BaseSavingsIntegrationTest extends IntegrationTest {
     }
 
     protected PostSavingsAccountsRequest applySavingsRequest(Long clientId, Long productId, String submittedDate) {
-        return new PostSavingsAccountsRequest().clientId(clientId).productId(productId).dateFormat(DATETIME_PATTERN).locale("en")
-                .submittedOnDate(submittedDate);
+        return new PostSavingsAccountsRequest().clientId(clientId).productId(productId).dateFormat(DATETIME_PATTERN).locale("en").submittedOnDate(submittedDate);
     }
 
     protected PostSavingsAccountsResponse applySavingsAccount(PostSavingsAccountsRequest request) {
@@ -143,23 +133,21 @@ public class BaseSavingsIntegrationTest extends IntegrationTest {
     }
 
     protected PostSavingsAccountsAccountIdResponse approveSavingsAccount(Long savingsId, String date) {
-        PostSavingsAccountsAccountIdRequest request = new PostSavingsAccountsAccountIdRequest().dateFormat(DATETIME_PATTERN).locale("en")
-                .approvedOnDate(date);
+        PostSavingsAccountsAccountIdRequest request = new PostSavingsAccountsAccountIdRequest().dateFormat(DATETIME_PATTERN).locale("en").approvedOnDate(date);
         return ok(fineractClient().savingsAccounts.handleCommandsSavingsAccount(savingsId, request, "approve"));
     }
 
     protected PostSavingsAccountsAccountIdResponse activateSavingsAccount(Long savingsId, String date) {
-        PostSavingsAccountsAccountIdRequest request = new PostSavingsAccountsAccountIdRequest().dateFormat(DATETIME_PATTERN).locale("en")
-                .activatedOnDate(date);
+        PostSavingsAccountsAccountIdRequest request = new PostSavingsAccountsAccountIdRequest().dateFormat(DATETIME_PATTERN).locale("en").activatedOnDate(date);
         return ok(fineractClient().savingsAccounts.handleCommandsSavingsAccount(savingsId, request, "activate"));
     }
 
     protected PostSavingsAccountTransactionsResponse deposit(Long savingsId, String date, BigDecimal amount) {
-        PostSavingsAccountTransactionsRequest request = new PostSavingsAccountTransactionsRequest() //
-                .dateFormat(DATETIME_PATTERN) //
-                .locale("en") //
-                .paymentTypeId(1).transactionAmount(amount) //
-                .transactionDate(date); //
+        PostSavingsAccountTransactionsRequest request =  //
+        //
+        //
+        //
+        new PostSavingsAccountTransactionsRequest().dateFormat(DATETIME_PATTERN).locale("en").paymentTypeId(1).transactionAmount(amount).transactionDate(date); //
         return ok(fineractClient().savingsTransactions.createSavingsAccountTransaction(savingsId, request, "deposit"));
     }
 
@@ -176,25 +164,19 @@ public class BaseSavingsIntegrationTest extends IntegrationTest {
     }
 
     protected void verifyTransactions(Long savingsId, Transaction... transactions) {
-        SavingsAccountData savingsDetails = ok(
-                fineractClient().savingsAccounts.retrieveSavingsAccount(savingsId, false, null, "transactions"));
+        SavingsAccountData savingsDetails = ok(fineractClient().savingsAccounts.retrieveSavingsAccount(savingsId, false, null, "transactions"));
         if (transactions == null || transactions.length == 0) {
             Assertions.assertTrue(savingsDetails.getTransactions().isEmpty(), "No transaction is expected on savings account " + savingsId);
         } else {
             Assertions.assertEquals(transactions.length, savingsDetails.getTransactions().size());
             Arrays.stream(transactions).forEach(tr -> {
-                Optional<SavingsAccountTransactionData> optTx = savingsDetails.getTransactions().stream()
-                        .filter(item -> Objects.requireNonNull(item.getAmount()).compareTo(BigDecimal.valueOf(tr.amount)) == 0 //
-                                && Objects.equals(item.getTransactionType().getValue(), tr.type) //
-                                && Objects.equals(item.getDate(), LocalDate.parse(tr.date, dateTimeFormatter)))
-                        .findFirst();
+                Optional<SavingsAccountTransactionData> optTx =  //
+                //
+                savingsDetails.getTransactions().stream().filter(item -> Objects.requireNonNull(item.getAmount()).compareTo(BigDecimal.valueOf(tr.amount)) == 0 && Objects.equals(item.getTransactionType().getValue(), tr.type) && Objects.equals(item.getDate(), LocalDate.parse(tr.date, dateTimeFormatter))).findFirst();
                 Assertions.assertTrue(optTx.isPresent(), "Required transaction  not found: " + tr + " on savings account " + savingsId);
-
                 SavingsAccountTransactionData tx = optTx.get();
-
                 if (tr.reversed != null) {
-                    Assertions.assertEquals(tr.reversed, tx.getReversed(),
-                            "Transaction is not reversed: " + tr + " on savings account " + savingsId);
+                    Assertions.assertEquals(tr.reversed, tx.getReversed(), "Transaction is not reversed: " + tr + " on savings account " + savingsId);
                 }
             });
         }
@@ -215,37 +197,49 @@ public class BaseSavingsIntegrationTest extends IntegrationTest {
         return Utils.loginIntoServerAndGetBase64EncodedAuthenticationKey();
     }
 
-    @ToString
-    @AllArgsConstructor
-    public static class Transaction {
 
+    public static class Transaction {
         Double amount;
         String type;
         String date;
         Boolean reversed;
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "BaseSavingsIntegrationTest.Transaction(amount=" + this.amount + ", type=" + this.type + ", date=" + this.date + ", reversed=" + this.reversed + ")";
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public Transaction(final Double amount, final String type, final String date, final Boolean reversed) {
+            this.amount = amount;
+            this.type = type;
+            this.date = date;
+            this.reversed = reversed;
+        }
     }
 
-    public static class InterestPeriodType {
 
+    public static class InterestPeriodType {
         public static final int DAILY = 1;
         public static final int MONTHLY = 4;
         public static final int QUATERLY = 5;
         public static final int BIANNUAL = 6;
     }
 
-    public static class InterestCalculationType {
 
+    public static class InterestCalculationType {
         public static final int DAILY_BALANCE = 1;
         public static final int AVERAGE_DAILY_BALANCE = 2;
     }
 
-    public static class InterestRecalculationCompoundingMethod {
 
+    public static class InterestRecalculationCompoundingMethod {
         public static final Integer NONE = 0;
     }
 
-    public static class DaysInYearType {
 
+    public static class DaysInYearType {
         public static final Integer INVALID = 0;
         public static final Integer ACTUAL = 1;
         public static final Integer DAYS_360 = 360;

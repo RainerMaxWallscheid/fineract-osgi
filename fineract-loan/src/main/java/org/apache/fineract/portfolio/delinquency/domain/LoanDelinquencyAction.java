@@ -26,30 +26,20 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "m_loan_delinquency_action")
 public class LoanDelinquencyAction extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "action", nullable = false)
     private DelinquencyAction action;
-
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
-
     @Column(name = "end_date", nullable = true)
     private LocalDate endDate;
 
@@ -58,5 +48,49 @@ public class LoanDelinquencyAction extends AbstractAuditableWithUTCDateTimeCusto
         this.action = action;
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Loan getLoan() {
+        return this.loan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyAction getAction() {
+        return this.action;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getStartDate() {
+        return this.startDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getEndDate() {
+        return this.endDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoan(final Loan loan) {
+        this.loan = loan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAction(final DelinquencyAction action) {
+        this.action = action;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setStartDate(final LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setEndDate(final LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanDelinquencyAction() {
     }
 }

@@ -20,8 +20,6 @@ package org.apache.fineract.infrastructure.security.service;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.TenantOidcConfig;
 import org.springframework.stereotype.Service;
 
@@ -30,14 +28,12 @@ import org.springframework.stereotype.Service;
  * issuerUri to avoid a DB round-trip on every JWT validation. The cache is explicitly invalidated on save/delete, so
  * entries reflect the current DB state.
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class TenantOidcConfigService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TenantOidcConfigService.class);
     private final TenantOidcConfigRepository repository;
     private final PasswordEncryptor passwordEncryptor;
-
     // In-process cache: issuerUri → config. Invalidated explicitly on write operations.
     private final ConcurrentHashMap<String, TenantOidcConfig> issuerCache = new ConcurrentHashMap<>();
 
@@ -88,8 +84,16 @@ public class TenantOidcConfigService {
         });
     }
 
-    /** Removes all cached entries — useful after bulk changes or on application events. */
+    /**
+     * Removes all cached entries — useful after bulk changes or on application events.
+     */
     public void evictAll() {
         issuerCache.clear();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TenantOidcConfigService(final TenantOidcConfigRepository repository, final PasswordEncryptor passwordEncryptor) {
+        this.repository = repository;
+        this.passwordEncryptor = passwordEncryptor;
     }
 }

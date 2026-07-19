@@ -19,19 +19,21 @@
 package org.apache.fineract.command.test.sample.service;
 
 import java.util.Locale;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.test.sample.data.DummyRequest;
 import org.apache.fineract.command.test.sample.data.DummyResponse;
 import org.springframework.stereotype.Service;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 public class DefaultDummyService implements DummyService {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DefaultDummyService.class);
 
     @Override
     public DummyResponse process(DummyRequest request) {
         return DummyResponse.builder().content(request.getContent().toUpperCase(Locale.ROOT)).build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DefaultDummyService() {
     }
 }

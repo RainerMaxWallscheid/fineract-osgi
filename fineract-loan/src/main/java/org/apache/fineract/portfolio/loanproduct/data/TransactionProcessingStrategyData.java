@@ -19,18 +19,35 @@
 package org.apache.fineract.portfolio.loanproduct.data;
 
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Immutable data object representing a transaction strategy option for a loan.
  */
-@RequiredArgsConstructor
-@Getter
 public final class TransactionProcessingStrategyData implements Serializable {
-
     private final Long id;
     @SuppressWarnings("unused")
     private final String code;
     private final String name;
+
+    @java.lang.SuppressWarnings("all")
+        public TransactionProcessingStrategyData(final Long id, final String code, final String name) {
+        this.id = id;
+        this.code = code;
+        this.name = name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
 }

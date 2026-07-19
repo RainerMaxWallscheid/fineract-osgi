@@ -18,7 +18,6 @@
  */
 package com.acme.fineract.portfolio.note.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.portfolio.note.data.NoteCreateRequest;
 import org.apache.fineract.portfolio.note.data.NoteCreateResponse;
 import org.apache.fineract.portfolio.note.data.NoteDeleteRequest;
@@ -30,14 +29,15 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 @ConditionalOnProperty("acme.note.enabled")
 public class AcmeNoteWritePlatformService implements NoteWritePlatformService, InitializingBean {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AcmeNoteWritePlatformService.class);
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        log.warn("Note Write Service: '{}'", getClass().getCanonicalName());
+        log.warn("Note Write Service: \'{}\'", getClass().getCanonicalName());
     }
 
     @Override

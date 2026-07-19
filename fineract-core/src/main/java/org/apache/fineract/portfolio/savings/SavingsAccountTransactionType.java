@@ -24,42 +24,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import lombok.Getter;
 import org.apache.fineract.portfolio.TransactionEntryType;
 
 /**
  * An enumeration of different transactions that can occur on a SavingsAccount.
  */
 public enum SavingsAccountTransactionType {
-
-    INVALID(0, "savingsAccountTransactionType.invalid"), //
-    DEPOSIT(1, "savingsAccountTransactionType.deposit", TransactionEntryType.CREDIT), //
-    WITHDRAWAL(2, "savingsAccountTransactionType.withdrawal", TransactionEntryType.DEBIT), //
-    INTEREST_POSTING(3, "savingsAccountTransactionType.interestPosting", TransactionEntryType.CREDIT), //
-    WITHDRAWAL_FEE(4, "savingsAccountTransactionType.withdrawalFee", TransactionEntryType.DEBIT), //
-    ANNUAL_FEE(5, "savingsAccountTransactionType.annualFee", TransactionEntryType.DEBIT), //
-    WAIVE_CHARGES(6, "savingsAccountTransactionType.waiveCharge"), //
-    PAY_CHARGE(7, "savingsAccountTransactionType.payCharge", TransactionEntryType.DEBIT), //
-    DIVIDEND_PAYOUT(8, "savingsAccountTransactionType.dividendPayout", TransactionEntryType.CREDIT), //
-    ACCRUAL(10, "savingsAccountTransactionType.accrual"), //
-    INITIATE_TRANSFER(12, "savingsAccountTransactionType.initiateTransfer"), //
-    APPROVE_TRANSFER(13, "savingsAccountTransactionType.approveTransfer"), //
-    WITHDRAW_TRANSFER(14, "savingsAccountTransactionType.withdrawTransfer"), //
-    REJECT_TRANSFER(15, "savingsAccountTransactionType.rejectTransfer"), //
-    WRITTEN_OFF(16, "savingsAccountTransactionType.writtenoff"), //
-    OVERDRAFT_INTEREST(17, "savingsAccountTransactionType.overdraftInterest", TransactionEntryType.DEBIT), //
-    WITHHOLD_TAX(18, "savingsAccountTransactionType.withholdTax", TransactionEntryType.DEBIT), //
-    ESCHEAT(19, "savingsAccountTransactionType.escheat", TransactionEntryType.DEBIT), //
-    AMOUNT_HOLD(20, "savingsAccountTransactionType.onHold", TransactionEntryType.DEBIT), //
-    AMOUNT_RELEASE(21, "savingsAccountTransactionType.release", TransactionEntryType.CREDIT); //
-
-    private static final Map<Integer, SavingsAccountTransactionType> BY_ID = Arrays.stream(values())
-            .collect(Collectors.toMap(SavingsAccountTransactionType::getValue, v -> v));
-
+    INVALID(0, "savingsAccountTransactionType.invalid"),  //
+    DEPOSIT(1, "savingsAccountTransactionType.deposit", TransactionEntryType.CREDIT),  //
+    WITHDRAWAL(2, "savingsAccountTransactionType.withdrawal", TransactionEntryType.DEBIT),  //
+    INTEREST_POSTING(3, "savingsAccountTransactionType.interestPosting", TransactionEntryType.CREDIT),  //
+    WITHDRAWAL_FEE(4, "savingsAccountTransactionType.withdrawalFee", TransactionEntryType.DEBIT),  //
+    ANNUAL_FEE(5, "savingsAccountTransactionType.annualFee", TransactionEntryType.DEBIT),  //
+    WAIVE_CHARGES(6, "savingsAccountTransactionType.waiveCharge"),  //
+    PAY_CHARGE(7, "savingsAccountTransactionType.payCharge", TransactionEntryType.DEBIT),  //
+    DIVIDEND_PAYOUT(8, "savingsAccountTransactionType.dividendPayout", TransactionEntryType.CREDIT),  //
+    ACCRUAL(10, "savingsAccountTransactionType.accrual"),  //
+    INITIATE_TRANSFER(12, "savingsAccountTransactionType.initiateTransfer"),  //
+    APPROVE_TRANSFER(13, "savingsAccountTransactionType.approveTransfer"),  //
+    WITHDRAW_TRANSFER(14, "savingsAccountTransactionType.withdrawTransfer"),  //
+    REJECT_TRANSFER(15, "savingsAccountTransactionType.rejectTransfer"),  //
+    WRITTEN_OFF(16, "savingsAccountTransactionType.writtenoff"),  //
+    OVERDRAFT_INTEREST(17, "savingsAccountTransactionType.overdraftInterest", TransactionEntryType.DEBIT),  //
+    WITHHOLD_TAX(18, "savingsAccountTransactionType.withholdTax", TransactionEntryType.DEBIT),  //
+    ESCHEAT(19, "savingsAccountTransactionType.escheat", TransactionEntryType.DEBIT),  //
+    AMOUNT_HOLD(20, "savingsAccountTransactionType.onHold", TransactionEntryType.DEBIT),  //
+    AMOUNT_RELEASE(21, "savingsAccountTransactionType.release", TransactionEntryType.CREDIT);
+    //
+    private static final Map<Integer, SavingsAccountTransactionType> BY_ID = Arrays.stream(values()).collect(Collectors.toMap(SavingsAccountTransactionType::getValue, v -> v));
     private final int value;
-    @Getter
     private final String code;
-    @Getter
     private final TransactionEntryType entryType;
 
     SavingsAccountTransactionType(final Integer value, final String code, TransactionEntryType entryType) {
@@ -190,5 +184,15 @@ public enum SavingsAccountTransactionType {
     @NotNull
     public static List<SavingsAccountTransactionType> getFiltered(Predicate<SavingsAccountTransactionType> filter) {
         return Arrays.stream(values()).filter(filter).toList();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TransactionEntryType getEntryType() {
+        return this.entryType;
     }
 }

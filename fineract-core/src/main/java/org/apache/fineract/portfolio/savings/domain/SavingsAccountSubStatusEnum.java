@@ -18,27 +18,22 @@
  */
 package org.apache.fineract.portfolio.savings.domain;
 
-import lombok.Getter;
-
 /**
  * Enum representation of SavingsAccount sub-status states.
  */
-@Getter
 public enum SavingsAccountSubStatusEnum {
-
-    NONE(0, "SavingsAccountSubStatusEnum.none"), //
-    INACTIVE(100, "SavingsAccountSubStatusEnum.inactive"), //
-    DORMANT(200, "SavingsAccountSubStatusEnum.dormant"), //
-    ESCHEAT(300, "SavingsAccountSubStatusEnum.escheat"), //
-    BLOCK(400, "SavingsAccountSubStatusEnum.block"), //
-    BLOCK_CREDIT(500, "SavingsAccountSubStatusEnum.blockCredit"), //
-    BLOCK_DEBIT(600, "SavingsAccountSubStatusEnum.blockDebit"); //
-
+    NONE(0, "SavingsAccountSubStatusEnum.none"),  //
+    INACTIVE(100, "SavingsAccountSubStatusEnum.inactive"),  //
+    DORMANT(200, "SavingsAccountSubStatusEnum.dormant"),  //
+    ESCHEAT(300, "SavingsAccountSubStatusEnum.escheat"),  //
+    BLOCK(400, "SavingsAccountSubStatusEnum.block"),  //
+    BLOCK_CREDIT(500, "SavingsAccountSubStatusEnum.blockCredit"),  //
+    BLOCK_DEBIT(600, "SavingsAccountSubStatusEnum.blockDebit");
+    //
     private final Integer value;
     private final String code;
 
     public static SavingsAccountSubStatusEnum fromInt(final Integer type) {
-
         SavingsAccountSubStatusEnum enumeration = SavingsAccountSubStatusEnum.NONE;
         if (null != type) {
             enumeration = switch (type) {
@@ -89,5 +84,15 @@ public enum SavingsAccountSubStatusEnum {
 
     public boolean isSubStatusDebitBlocked() {
         return this.value.equals(SavingsAccountSubStatusEnum.BLOCK_DEBIT.getValue());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
     }
 }

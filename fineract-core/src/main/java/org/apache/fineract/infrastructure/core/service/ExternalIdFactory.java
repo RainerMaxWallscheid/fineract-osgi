@@ -20,7 +20,6 @@ package org.apache.fineract.infrastructure.core.service;
 
 import java.util.List;
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,9 +27,7 @@ import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class ExternalIdFactory {
-
     private final ConfigurationDomainService configurationDomainService;
 
     public static ExternalId produce(String value) {
@@ -63,5 +60,10 @@ public class ExternalIdFactory {
 
     public ExternalId create() {
         return create(null);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalIdFactory(final ConfigurationDomainService configurationDomainService) {
+        this.configurationDomainService = configurationDomainService;
     }
 }

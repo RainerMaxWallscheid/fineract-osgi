@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.jobs.service.increasedateby1day.increasecobdateby1day;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateWritePlatformService;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
@@ -33,9 +32,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@RequiredArgsConstructor
 public class IncreaseCobDateBy1DayConfig {
-
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
     private final BusinessDateWritePlatformService businessDateWritePlatformService;
@@ -43,18 +40,24 @@ public class IncreaseCobDateBy1DayConfig {
 
     @Bean
     protected Step increaseCobDateBy1DayStep() {
-        return new StepBuilder(JobName.INCREASE_COB_DATE_BY_1_DAY.name(), jobRepository)
-                .tasklet(increaseCobDateBy1DayTasklet(), transactionManager).build();
+        return new StepBuilder(JobName.INCREASE_COB_DATE_BY_1_DAY.name(), jobRepository).tasklet(increaseCobDateBy1DayTasklet(), transactionManager).build();
     }
 
     @Bean
     public Job increaseCobDateBy1DayJob() {
-        return new JobBuilder(JobName.INCREASE_COB_DATE_BY_1_DAY.name(), jobRepository).start(increaseCobDateBy1DayStep())
-                .incrementer(new RunIdIncrementer()).build();
+        return new JobBuilder(JobName.INCREASE_COB_DATE_BY_1_DAY.name(), jobRepository).start(increaseCobDateBy1DayStep()).incrementer(new RunIdIncrementer()).build();
     }
 
     @Bean
     public IncreaseCobDateBy1DayTasklet increaseCobDateBy1DayTasklet() {
         return new IncreaseCobDateBy1DayTasklet(businessDateWritePlatformService, configurationDomainService);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public IncreaseCobDateBy1DayConfig(final JobRepository jobRepository, final PlatformTransactionManager transactionManager, final BusinessDateWritePlatformService businessDateWritePlatformService, final ConfigurationDomainService configurationDomainService) {
+        this.jobRepository = jobRepository;
+        this.transactionManager = transactionManager;
+        this.businessDateWritePlatformService = businessDateWritePlatformService;
+        this.configurationDomainService = configurationDomainService;
     }
 }

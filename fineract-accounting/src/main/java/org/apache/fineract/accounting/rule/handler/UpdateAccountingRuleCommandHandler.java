@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.accounting.rule.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.rule.service.AccountingRuleWritePlatformService;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "ACCOUNTINGRULE", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateAccountingRuleCommandHandler implements NewCommandSourceHandler {
-
     private final AccountingRuleWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.updateAccountingRule(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateAccountingRuleCommandHandler(final AccountingRuleWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

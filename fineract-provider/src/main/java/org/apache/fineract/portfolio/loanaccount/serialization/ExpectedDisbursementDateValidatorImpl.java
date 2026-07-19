@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.loanaccount.serialization;
 
 import java.time.LocalDate;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.organisation.holiday.domain.Holiday;
 import org.apache.fineract.organisation.holiday.domain.HolidayRepositoryWrapper;
@@ -36,9 +35,7 @@ import org.springframework.stereotype.Component;
  * Validates expected disbursement date: not on a non-working day or holiday when configuration disallows it.
  */
 @Component
-@RequiredArgsConstructor
 public class ExpectedDisbursementDateValidatorImpl implements ExpectedDisbursementDateValidator {
-
     private final WorkingDaysRepositoryWrapper workingDaysRepository;
     private final HolidayRepositoryWrapper holidayRepository;
     private final ConfigurationDomainService configurationDomainService;
@@ -70,5 +67,12 @@ public class ExpectedDisbursementDateValidatorImpl implements ExpectedDisburseme
             final String errorMessage = "Expected disbursement date cannot be on a holiday";
             throw new LoanApplicationDateException("disbursement.date.on.holiday", errorMessage, expectedDisbursementDate);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExpectedDisbursementDateValidatorImpl(final WorkingDaysRepositoryWrapper workingDaysRepository, final HolidayRepositoryWrapper holidayRepository, final ConfigurationDomainService configurationDomainService) {
+        this.workingDaysRepository = workingDaysRepository;
+        this.holidayRepository = holidayRepository;
+        this.configurationDomainService = configurationDomainService;
     }
 }

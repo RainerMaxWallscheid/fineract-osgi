@@ -19,14 +19,16 @@
 package org.apache.fineract.infrastructure.event.external.service.message.domain;
 
 import java.util.Objects;
-import lombok.Getter;
 
-@Getter
 public class MessageType {
-
     private final String type;
 
     public MessageType(String type) {
         this.type = Objects.requireNonNull(type, "type cannot be null");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getType() {
+        return this.type;
     }
 }

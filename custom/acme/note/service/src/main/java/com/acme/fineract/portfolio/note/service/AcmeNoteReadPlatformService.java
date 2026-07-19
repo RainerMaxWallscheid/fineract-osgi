@@ -20,21 +20,21 @@ package com.acme.fineract.portfolio.note.service;
 
 import java.util.Collections;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.portfolio.note.data.NoteData;
 import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 @ConditionalOnProperty("acme.note.enabled")
 public class AcmeNoteReadPlatformService implements NoteReadPlatformService, InitializingBean {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AcmeNoteReadPlatformService.class);
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        log.warn("Note Read Service: '{}'", getClass().getCanonicalName());
+        log.warn("Note Read Service: \'{}\'", getClass().getCanonicalName());
     }
 
     @Override

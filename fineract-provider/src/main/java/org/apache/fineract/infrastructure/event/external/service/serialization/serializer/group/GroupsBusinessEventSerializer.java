@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.event.external.service.serialization.serializer.group;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
 import org.apache.fineract.avro.generic.v1.CommandProcessingResultV1;
@@ -29,9 +28,7 @@ import org.apache.fineract.infrastructure.event.external.service.serialization.s
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class GroupsBusinessEventSerializer implements BusinessEventSerializer {
-
     private final CommandProcessingResultMapper mapper;
 
     @Override
@@ -48,5 +45,10 @@ public class GroupsBusinessEventSerializer implements BusinessEventSerializer {
     @Override
     public Class<? extends GenericContainer> getSupportedSchema() {
         return CommandProcessingResultV1.class;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GroupsBusinessEventSerializer(final CommandProcessingResultMapper mapper) {
+        this.mapper = mapper;
     }
 }

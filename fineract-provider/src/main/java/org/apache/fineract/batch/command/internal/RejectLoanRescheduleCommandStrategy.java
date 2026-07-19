@@ -19,11 +19,9 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
@@ -32,28 +30,25 @@ import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class RejectLoanRescheduleCommandStrategy implements CommandStrategy {
-
     private final RescheduleLoansApiResource rescheduleLoansApiResource;
 
     @Override
     public BatchResponse execute(BatchRequest request, final UriInfo uriInfo) {
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrlWithoutVersion(request));
         final Long scheduleId = Long.parseLong(pathParameters.get(1).substring(0, pathParameters.get(1).indexOf("?")));
-
         responseBody = rescheduleLoansApiResource.updateLoanRescheduleRequest(scheduleId, "reject", request.getBody());
-
         response.setStatusCode(HttpStatus.SC_OK);
         response.setBody(responseBody);
-
         return response;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public RejectLoanRescheduleCommandStrategy(final RescheduleLoansApiResource rescheduleLoansApiResource) {
+        this.rescheduleLoansApiResource = rescheduleLoansApiResource;
+    }
 }

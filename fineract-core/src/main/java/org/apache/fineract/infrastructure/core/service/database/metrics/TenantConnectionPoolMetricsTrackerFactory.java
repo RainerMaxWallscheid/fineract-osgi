@@ -22,16 +22,19 @@ import com.zaxxer.hikari.metrics.IMetricsTracker;
 import com.zaxxer.hikari.metrics.MetricsTrackerFactory;
 import com.zaxxer.hikari.metrics.PoolStats;
 import io.micrometer.core.instrument.MeterRegistry;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public class TenantConnectionPoolMetricsTrackerFactory implements MetricsTrackerFactory {
-
     private final String tenantIdentifier;
     private final MeterRegistry registry;
 
     @Override
     public IMetricsTracker create(String poolName, PoolStats poolStats) {
         return new TenantConnectionPoolMetricsTracker(tenantIdentifier, poolName, poolStats, registry);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TenantConnectionPoolMetricsTrackerFactory(final String tenantIdentifier, final MeterRegistry registry) {
+        this.tenantIdentifier = tenantIdentifier;
+        this.registry = registry;
     }
 }

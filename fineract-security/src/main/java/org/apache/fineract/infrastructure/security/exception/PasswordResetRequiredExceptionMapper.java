@@ -23,8 +23,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.infrastructure.security.data.AuthenticatedUserData;
@@ -42,16 +40,19 @@ import org.springframework.stereotype.Component;
 @Provider
 @Component
 @Scope("singleton")
-@Slf4j
-@RequiredArgsConstructor
 public class PasswordResetRequiredExceptionMapper implements ExceptionMapper<PasswordResetRequiredException> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PasswordResetRequiredExceptionMapper.class);
     private final ToApiJsonSerializer<AuthenticatedUserData> apiJsonSerializer;
 
     @Override
     public Response toResponse(final PasswordResetRequiredException exception) {
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-        return Response.status(Status.FORBIDDEN).entity(apiJsonSerializer.serialize(exception.getAuthenticatedUserData()))
-                .type(MediaType.APPLICATION_JSON).build();
+        return Response.status(Status.FORBIDDEN).entity(apiJsonSerializer.serialize(exception.getAuthenticatedUserData())).type(MediaType.APPLICATION_JSON).build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PasswordResetRequiredExceptionMapper(final ToApiJsonSerializer<AuthenticatedUserData> apiJsonSerializer) {
+        this.apiJsonSerializer = apiJsonSerializer;
     }
 }

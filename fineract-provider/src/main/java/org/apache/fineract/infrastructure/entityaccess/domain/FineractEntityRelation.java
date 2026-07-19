@@ -25,29 +25,17 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "m_entity_relation")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class FineractEntityRelation extends AbstractPersistableCustom<Long> {
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "relationId", orphanRemoval = true)
     private Set<FineractEntityToEntityMapping> fineractEntityToEntityMapping = new HashSet<>();
-
     @Column(name = "from_entity_type", nullable = false, length = 10)
     private String fromEntityType;
-
     @Column(name = "to_entity_type", nullable = false, length = 10)
     private String toEntityType;
-
     @Column(name = "code_name", nullable = false, length = 50)
     private String codeName;
 
@@ -55,7 +43,6 @@ public class FineractEntityRelation extends AbstractPersistableCustom<Long> {
      * private FineractEntityRelation(final String fromEntityType, final String toEntityType, final String codeName) {
      * this.fromEntityType = fromEntityType; this.toEntityType = toEntityType; this.codeName = codeName; }
      */
-
     public Set<FineractEntityToEntityMapping> getFineractEntityToEntityMapping() {
         return this.fineractEntityToEntityMapping;
     }
@@ -64,4 +51,49 @@ public class FineractEntityRelation extends AbstractPersistableCustom<Long> {
         this.fineractEntityToEntityMapping = fineractEntityToEntityMapping;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public String getFromEntityType() {
+        return this.fromEntityType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getToEntityType() {
+        return this.toEntityType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCodeName() {
+        return this.codeName;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public FineractEntityRelation setFromEntityType(final String fromEntityType) {
+        this.fromEntityType = fromEntityType;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public FineractEntityRelation setToEntityType(final String toEntityType) {
+        this.toEntityType = toEntityType;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public FineractEntityRelation setCodeName(final String codeName) {
+        this.codeName = codeName;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FineractEntityRelation() {
+    }
 }

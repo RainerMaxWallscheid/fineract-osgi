@@ -20,21 +20,18 @@ package org.apache.fineract.portfolio.calendar.domain;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Getter;
 import org.springframework.util.StringUtils;
 
-@Getter
 public enum CalendarWeekDaysType {
-
-    INVALID(0, "calendarWeekDaysType.invalid"), //
-    MO(1, "calendarWeekDaysType.monday"), //
-    TU(2, "calendarWeekDaysType.tuesday"), //
-    WE(3, "calendarWeekDaysType.wednesday"), //
-    TH(4, "calendarWeekDaysType.thursday"), //
-    FR(5, "calendarWeekDaysType.friday"), //
-    SA(6, "calendarWeekDaysType.saturday"), //
-    SU(7, "calendarWeekDaysType.sunday"); //
-
+    INVALID(0, "calendarWeekDaysType.invalid"),  //
+    MO(1, "calendarWeekDaysType.monday"),  //
+    TU(2, "calendarWeekDaysType.tuesday"),  //
+    WE(3, "calendarWeekDaysType.wednesday"),  //
+    TH(4, "calendarWeekDaysType.thursday"),  //
+    FR(5, "calendarWeekDaysType.friday"),  //
+    SA(6, "calendarWeekDaysType.saturday"),  //
+    SU(7, "calendarWeekDaysType.sunday");
+    //
     private final Integer value;
     private final String code;
 
@@ -44,9 +41,7 @@ public enum CalendarWeekDaysType {
     }
 
     private static final Map<Integer, CalendarWeekDaysType> intToEnumMap = new HashMap<>();
-    @Getter
     private static int minValue = CalendarWeekDaysType.MO.value;
-    @Getter
     private static int maxValue = CalendarWeekDaysType.SU.value;
 
     static {
@@ -66,11 +61,9 @@ public enum CalendarWeekDaysType {
 
     public static CalendarWeekDaysType fromString(final String weekDayString) {
         CalendarWeekDaysType weekDay = CalendarWeekDaysType.INVALID;
-
         if (!StringUtils.hasText(weekDayString)) {
             return weekDay;
         }
-
         if (weekDayString.equalsIgnoreCase(CalendarWeekDaysType.MO.toString())) {
             weekDay = CalendarWeekDaysType.MO;
         } else if (weekDayString.equalsIgnoreCase(CalendarWeekDaysType.TU.toString())) {
@@ -86,7 +79,26 @@ public enum CalendarWeekDaysType {
         } else if (weekDayString.equalsIgnoreCase(CalendarWeekDaysType.SU.toString())) {
             weekDay = CalendarWeekDaysType.SU;
         }
-
         return weekDay;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static int getMinValue() {
+        return CalendarWeekDaysType.minValue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static int getMaxValue() {
+        return CalendarWeekDaysType.maxValue;
     }
 }

@@ -19,13 +19,9 @@
 package org.apache.fineract.cob.processor;
 
 import static org.apache.fineract.cob.data.BusinessStepNameAndOrder.getBusinessStepMap;
-
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.TreeMap;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.cob.COBBusinessStepService;
 import org.apache.fineract.cob.data.BusinessStepNameAndOrder;
 import org.apache.fineract.cob.resolver.BusinessDateResolver;
@@ -37,18 +33,12 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.lang.NonNull;
 
-@RequiredArgsConstructor
 public abstract class AbstractItemProcessor<I extends AbstractPersistableCustom<Long>> implements ItemProcessor<I, I> {
-
     private final COBBusinessStepService cobBusinessStepService;
-
-    @Setter
     private ExecutionContext executionContext;
-
-    @Getter
     private LocalDate businessDate;
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     @Override
     public I process(@NonNull I item) throws Exception {
         Set<BusinessStepNameAndOrder> businessSteps = (Set<BusinessStepNameAndOrder>) executionContext.get("businessSteps");
@@ -56,7 +46,6 @@ public abstract class AbstractItemProcessor<I extends AbstractPersistableCustom<
             throw new IllegalStateException("No business steps found in the execution context");
         }
         TreeMap<Long, String> businessStepMap = getBusinessStepMap(businessSteps);
-
         I alreadyProcessedLoan = cobBusinessStepService.run(businessStepMap, item);
         setLastRun(alreadyProcessedLoan);
         return alreadyProcessedLoan;
@@ -72,4 +61,19 @@ public abstract class AbstractItemProcessor<I extends AbstractPersistableCustom<
     }
 
     public abstract void setLastRun(I processedLoan);
+
+    @java.lang.SuppressWarnings("all")
+        public AbstractItemProcessor(final COBBusinessStepService cobBusinessStepService) {
+        this.cobBusinessStepService = cobBusinessStepService;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setExecutionContext(final ExecutionContext executionContext) {
+        this.executionContext = executionContext;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getBusinessDate() {
+        return this.businessDate;
+    }
 }

@@ -21,7 +21,6 @@ package org.apache.fineract.infrastructure.jobs.service;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
 import org.apache.fineract.infrastructure.core.domain.ActionContext;
@@ -42,10 +41,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @ConditionalOnProperty(value = "fineract.mode.batch-manager-enabled", havingValue = "true")
 public class StuckJobListener implements ApplicationListener<ContextRefreshedEvent> {
-
     private final JobExecutionRepository jobExecutionRepository;
     private final JdbcTemplateFactory jdbcTemplateFactory;
     private final TenantDetailsService tenantDetailsService;
@@ -70,8 +67,7 @@ public class StuckJobListener implements ApplicationListener<ContextRefreshedEve
                         ThreadLocalContextUtil.setActionContext(ActionContext.DEFAULT);
                         ThreadLocalContextUtil.setBusinessDates(businessDates);
                         final AppUser user = userRepository.fetchSystemUser();
-                        final UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, user.getPassword(),
-                                user.getAuthorities());
+                        final UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
                         SecurityContextHolder.getContext().setAuthentication(auth);
                         stuckJobNames.forEach(stuckJobExecutorService::resumeStuckJob);
                     } finally {
@@ -82,5 +78,16 @@ public class StuckJobListener implements ApplicationListener<ContextRefreshedEve
                 ThreadLocalContextUtil.reset();
             }
         });
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public StuckJobListener(final JobExecutionRepository jobExecutionRepository, final JdbcTemplateFactory jdbcTemplateFactory, final TenantDetailsService tenantDetailsService, final JobRegistry jobRegistry, final BusinessDateReadPlatformService businessDateReadPlatformService, final StuckJobExecutorService stuckJobExecutorService, final AppUserRepositoryWrapper userRepository) {
+        this.jobExecutionRepository = jobExecutionRepository;
+        this.jdbcTemplateFactory = jdbcTemplateFactory;
+        this.tenantDetailsService = tenantDetailsService;
+        this.jobRegistry = jobRegistry;
+        this.businessDateReadPlatformService = businessDateReadPlatformService;
+        this.stuckJobExecutorService = stuckJobExecutorService;
+        this.userRepository = userRepository;
     }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -30,15 +29,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "RECURRINGDEPOSITACCOUNT", action = "APPROVE")
-@RequiredArgsConstructor
 public class RecurringDepositAccountApplicationApprovalCommandHandler implements NewCommandSourceHandler {
-
     private final DepositApplicationProcessWritePlatformService depositAccountWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-        return this.depositAccountWritePlatformService.approveApplication(command.entityId(), command,
-                DepositAccountType.RECURRING_DEPOSIT);
+        return this.depositAccountWritePlatformService.approveApplication(command.entityId(), command, DepositAccountType.RECURRING_DEPOSIT);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RecurringDepositAccountApplicationApprovalCommandHandler(final DepositApplicationProcessWritePlatformService depositAccountWritePlatformService) {
+        this.depositAccountWritePlatformService = depositAccountWritePlatformService;
     }
 }

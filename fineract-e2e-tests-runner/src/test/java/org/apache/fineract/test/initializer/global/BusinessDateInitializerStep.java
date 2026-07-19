@@ -19,19 +19,15 @@
 package org.apache.fineract.test.initializer.global;
 
 import static org.apache.fineract.test.initializer.global.GlobalConfigurationGlobalInitializerStep.CONFIG_KEY_ENABLE_BUSINESS_DATE;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.test.helper.BusinessDateHelper;
 import org.apache.fineract.test.helper.GlobalConfigurationHelper;
 import org.apache.fineract.test.initializer.scenario.FineractScenarioInitializerStep;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class BusinessDateInitializerStep implements FineractScenarioInitializerStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BusinessDateInitializerStep.class);
     private final BusinessDateHelper businessDateHelper;
     private final GlobalConfigurationHelper configurationHelper;
 
@@ -46,5 +42,11 @@ public class BusinessDateInitializerStep implements FineractScenarioInitializerS
         configurationHelper.enableGlobalConfiguration(CONFIG_KEY_ENABLE_BUSINESS_DATE, 0L);
         businessDateHelper.setBusinessDateToday();
         configurationHelper.disableGlobalConfiguration(CONFIG_KEY_ENABLE_BUSINESS_DATE, 0L);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BusinessDateInitializerStep(final BusinessDateHelper businessDateHelper, final GlobalConfigurationHelper configurationHelper) {
+        this.businessDateHelper = businessDateHelper;
+        this.configurationHelper = configurationHelper;
     }
 }

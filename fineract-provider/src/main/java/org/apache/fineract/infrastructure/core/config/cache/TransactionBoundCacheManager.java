@@ -19,14 +19,11 @@
 package org.apache.fineract.infrastructure.core.config.cache;
 
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.persistence.TransactionLifecycleCallback;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 
-@RequiredArgsConstructor
 public class TransactionBoundCacheManager implements TransactionLifecycleCallback, CacheManager {
-
     private final CacheManager delegate;
 
     @Override
@@ -57,5 +54,10 @@ public class TransactionBoundCacheManager implements TransactionLifecycleCallbac
     @Override
     public Collection<String> getCacheNames() {
         return delegate.getCacheNames();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TransactionBoundCacheManager(final CacheManager delegate) {
+        this.delegate = delegate;
     }
 }

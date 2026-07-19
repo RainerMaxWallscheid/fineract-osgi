@@ -21,7 +21,6 @@ package org.apache.fineract.investor.service;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.investor.data.ExternalTransferLoanProductAttributesData;
@@ -37,28 +36,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ExternalAssetOwnerLoanProductAttributesReadServiceImpl implements ExternalAssetOwnerLoanProductAttributesReadService {
-
     private final ExternalAssetOwnerLoanProductAttributesRepository externalAssetOwnerLoanProductAttributesRepository;
     private final LoanProductRepository loanProductRepository;
     private final ExternalAssetOwnerLoanProductAttributesMapper mapper;
 
     @Override
     @Cacheable(cacheNames = "externalAssetOwnerLoanProductAttributes", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(#loanProductId.toString() + #attributeKey)", unless = "#attributeKey == null")
-    public Page<ExternalTransferLoanProductAttributesData> retrieveAllLoanProductAttributesByLoanProductId(final Long loanProductId,
-            final String attributeKey) {
+    public Page<ExternalTransferLoanProductAttributesData> retrieveAllLoanProductAttributesByLoanProductId(final Long loanProductId, final String attributeKey) {
         validateLoanProduct(loanProductId);
-
         PageRequest pageRequest = PageRequest.of(0, 100, Sort.by("id"));
-
-        org.springframework.data.domain.Page<ExternalAssetOwnerLoanProductAttributes> pageOfAttributeData = externalAssetOwnerLoanProductAttributesRepository
-                .findAll(retrieveLoanProductAttributesByLoanProductIdAndAttributeKeySpecification(loanProductId, attributeKey),
-                        pageRequest);
-
-        return new Page<>(pageOfAttributeData.getContent().stream().map(mapper::mapLoanProductAttributes).toList(),
-                pageOfAttributeData.getNumberOfElements());
+        org.springframework.data.domain.Page<ExternalAssetOwnerLoanProductAttributes> pageOfAttributeData = externalAssetOwnerLoanProductAttributesRepository.findAll(retrieveLoanProductAttributesByLoanProductIdAndAttributeKeySpecification(loanProductId, attributeKey), pageRequest);
+        return new Page<>(pageOfAttributeData.getContent().stream().map(mapper::mapLoanProductAttributes).toList(), pageOfAttributeData.getNumberOfElements());
     }
 
     private void validateLoanProduct(final Long loanProductId) {
@@ -70,17 +60,21 @@ public class ExternalAssetOwnerLoanProductAttributesReadServiceImpl implements E
         }
     }
 
-    public static Specification<ExternalAssetOwnerLoanProductAttributes> retrieveLoanProductAttributesByLoanProductIdAndAttributeKeySpecification(
-            final Long loanProductId, final String attributeKey) {
+    public static Specification<ExternalAssetOwnerLoanProductAttributes> retrieveLoanProductAttributesByLoanProductIdAndAttributeKeySpecification(final Long loanProductId, final String attributeKey) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("loanProductId"), loanProductId));
-
             if (StringUtils.isNotBlank(attributeKey)) {
                 predicates.add(cb.equal(root.get("attributeKey"), attributeKey));
             }
-
             return cb.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnerLoanProductAttributesReadServiceImpl(final ExternalAssetOwnerLoanProductAttributesRepository externalAssetOwnerLoanProductAttributesRepository, final LoanProductRepository loanProductRepository, final ExternalAssetOwnerLoanProductAttributesMapper mapper) {
+        this.externalAssetOwnerLoanProductAttributesRepository = externalAssetOwnerLoanProductAttributesRepository;
+        this.loanProductRepository = loanProductRepository;
+        this.mapper = mapper;
     }
 }

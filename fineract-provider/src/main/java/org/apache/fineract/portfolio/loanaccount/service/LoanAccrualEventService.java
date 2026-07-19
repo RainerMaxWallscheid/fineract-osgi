@@ -19,8 +19,6 @@
 package org.apache.fineract.portfolio.loanaccount.service;
 
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.event.business.BusinessEventListener;
 import org.apache.fineract.infrastructure.event.business.domain.loan.LoanBalanceChangedBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.loan.LoanCloseBusinessEvent;
@@ -28,10 +26,9 @@ import org.apache.fineract.infrastructure.event.business.service.BusinessEventNo
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class LoanAccrualEventService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanAccrualEventService.class);
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanAccrualsProcessingService loanAccrualsProcessingService;
     private final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService;
@@ -42,8 +39,8 @@ public class LoanAccrualEventService {
         businessEventNotifierService.addPostBusinessEventListener(LoanBalanceChangedBusinessEvent.class, new LoanBalanceChangedListener());
     }
 
-    private final class LoanCloseListener implements BusinessEventListener<LoanCloseBusinessEvent> {
 
+    private final class LoanCloseListener implements BusinessEventListener<LoanCloseBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanCloseBusinessEvent event) {
             final Loan loan = event.get();
@@ -56,8 +53,8 @@ public class LoanAccrualEventService {
         }
     }
 
-    private final class LoanBalanceChangedListener implements BusinessEventListener<LoanBalanceChangedBusinessEvent> {
 
+    private final class LoanBalanceChangedListener implements BusinessEventListener<LoanBalanceChangedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanBalanceChangedBusinessEvent event) {
             final Loan loan = event.get();
@@ -68,5 +65,12 @@ public class LoanAccrualEventService {
                 loanAccrualActivityProcessingService.processAccrualActivityForLoanClosure(loan);
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanAccrualEventService(final BusinessEventNotifierService businessEventNotifierService, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanAccrualActivityProcessingService loanAccrualActivityProcessingService) {
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.loanAccrualsProcessingService = loanAccrualsProcessingService;
+        this.loanAccrualActivityProcessingService = loanAccrualActivityProcessingService;
     }
 }

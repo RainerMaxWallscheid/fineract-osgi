@@ -19,7 +19,6 @@
 package org.apache.fineract.cob.loan;
 
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.OverdueLoanScheduleData;
 import org.apache.fineract.portfolio.loanaccount.service.LoanChargeWritePlatformService;
@@ -27,16 +26,13 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class ApplyChargeToOverdueLoansBusinessStep implements LoanCOBBusinessStep {
-
     private final LoanReadPlatformService loanReadPlatformService;
     private final LoanChargeWritePlatformService loanChargeWritePlatformService;
 
     @Override
     public Loan execute(Loan loan) {
-        final Collection<OverdueLoanScheduleData> overdueLoanScheduleDataList = loanReadPlatformService
-                .retrieveAllOverdueInstallmentsForLoan(loan);
+        final Collection<OverdueLoanScheduleData> overdueLoanScheduleDataList = loanReadPlatformService.retrieveAllOverdueInstallmentsForLoan(loan);
         if (!overdueLoanScheduleDataList.isEmpty()) {
             loanChargeWritePlatformService.applyOverdueChargesForLoan(loan.getId(), overdueLoanScheduleDataList);
         }
@@ -51,5 +47,11 @@ public class ApplyChargeToOverdueLoansBusinessStep implements LoanCOBBusinessSte
     @Override
     public String getHumanReadableName() {
         return "Apply charge to overdue loans";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ApplyChargeToOverdueLoansBusinessStep(final LoanReadPlatformService loanReadPlatformService, final LoanChargeWritePlatformService loanChargeWritePlatformService) {
+        this.loanReadPlatformService = loanReadPlatformService;
+        this.loanChargeWritePlatformService = loanChargeWritePlatformService;
     }
 }

@@ -18,18 +18,14 @@
  */
 package org.apache.fineract.portfolio;
 
-import lombok.Getter;
-
-@Getter
 public enum PortfolioProductType {
-
-    LOAN(1, "productType.loan"), //
-    SAVING(2, "productType.saving"), //
-    CLIENT(5, "productType.client"), //
-    PROVISIONING(3, "productType.provisioning"), //
-    SHARES(4, "productType.shares"), //
-    WORKING_CAPITAL_LOAN(6, "productType.workingCapitalLoan"); //
-
+    LOAN(1, "productType.loan"),  //
+    SAVING(2, "productType.saving"),  //
+    CLIENT(5, "productType.client"),  //
+    PROVISIONING(3, "productType.provisioning"),  //
+    SHARES(4, "productType.shares"),  //
+    WORKING_CAPITAL_LOAN(6, "productType.workingCapitalLoan");
+    //
     private final Integer value;
     private final String code;
 
@@ -47,7 +43,6 @@ public enum PortfolioProductType {
         if (v == null) {
             return null;
         }
-
         return switch (v) {
             case 1 -> LOAN;
             case 2 -> SAVING;
@@ -79,4 +74,13 @@ public enum PortfolioProductType {
         return this.equals(WORKING_CAPITAL_LOAN);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
 }

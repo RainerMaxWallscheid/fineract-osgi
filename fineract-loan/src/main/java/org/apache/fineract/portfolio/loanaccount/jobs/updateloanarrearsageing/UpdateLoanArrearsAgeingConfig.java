@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.jobs.updateloanarrearsageing;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -31,28 +30,30 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@RequiredArgsConstructor
 public class UpdateLoanArrearsAgeingConfig {
-
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
-
     private final LoanArrearsAgeingUpdateHandler updateLoanArrearsAgingService;
 
     @Bean
     protected Step updateLoanArrearsAgeingStep() {
-        return new StepBuilder(JobName.UPDATE_LOAN_ARREARS_AGEING.name(), jobRepository)
-                .tasklet(updateLoanArrearsAgeingTasklet(), transactionManager).build();
+        return new StepBuilder(JobName.UPDATE_LOAN_ARREARS_AGEING.name(), jobRepository).tasklet(updateLoanArrearsAgeingTasklet(), transactionManager).build();
     }
 
     @Bean
     public Job updateLoanArrearsAgeingJob() {
-        return new JobBuilder(JobName.UPDATE_LOAN_ARREARS_AGEING.name(), jobRepository).start(updateLoanArrearsAgeingStep())
-                .incrementer(new RunIdIncrementer()).build();
+        return new JobBuilder(JobName.UPDATE_LOAN_ARREARS_AGEING.name(), jobRepository).start(updateLoanArrearsAgeingStep()).incrementer(new RunIdIncrementer()).build();
     }
 
     @Bean
     public UpdateLoanArrearsAgeingTasklet updateLoanArrearsAgeingTasklet() {
         return new UpdateLoanArrearsAgeingTasklet(updateLoanArrearsAgingService);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateLoanArrearsAgeingConfig(final JobRepository jobRepository, final PlatformTransactionManager transactionManager, final LoanArrearsAgeingUpdateHandler updateLoanArrearsAgingService) {
+        this.jobRepository = jobRepository;
+        this.transactionManager = transactionManager;
+        this.updateLoanArrearsAgingService = updateLoanArrearsAgingService;
     }
 }

@@ -19,26 +19,21 @@
 package org.apache.fineract.test.stepdef.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.PostOfficesResponse;
 import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-@RequiredArgsConstructor
 public class AnnualSummaryStepDef extends AbstractStepDef {
-
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
     private static final String OFFICE_ID_CONFIG = "office-id";
-
     private final JdbcTemplate testJdbcTemplate;
     private final FineractFeignClient fineractClient;
 
@@ -54,7 +49,7 @@ public class AnnualSummaryStepDef extends AbstractStepDef {
         // that scenario's loans - this is what isolates repeated runs from each other. office-id is a numeric
         // config, so it is set through the internal configuration API.
         final PostOfficesResponse office = testContext().get(TestContextKey.OFFICE_CREATE_RESPONSE);
-        assertThat(office).as("No office was created. Use 'Admin creates a new office' step first.").isNotNull();
+        assertThat(office).as("No office was created. Use \'Admin creates a new office\' step first.").isNotNull();
         fineractClient.defaultApi().updateInternalGlobalConfiguration(OFFICE_ID_CONFIG, office.getOfficeId());
     }
 
@@ -62,13 +57,14 @@ public class AnnualSummaryStepDef extends AbstractStepDef {
     public void annualSummaryTableContainsRows(final int expectedCount, final String glCode, final String yearEndDateStr) {
         final LocalDate yearEndDate = LocalDate.parse(yearEndDateStr, FORMATTER);
         final PostOfficesResponse office = testContext().get(TestContextKey.OFFICE_CREATE_RESPONSE);
-        assertThat(office).as("No office was created. Use 'Admin creates a new office' step first.").isNotNull();
-        final Integer actualCount = testJdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM acc_gl_journal_entry_annual_summary WHERE gl_code = ? AND year_end_date = ? AND office_id = ?",
-                Integer.class, glCode, yearEndDate, office.getOfficeId());
-        assertThat(actualCount)
-                .as("acc_gl_journal_entry_annual_summary: expected %d row(s) for gl_code '%s', year_end_date %s, office %s but found %d",
-                        expectedCount, glCode, yearEndDate, office.getOfficeId(), actualCount)
-                .isEqualTo(expectedCount);
+        assertThat(office).as("No office was created. Use \'Admin creates a new office\' step first.").isNotNull();
+        final Integer actualCount = testJdbcTemplate.queryForObject("SELECT COUNT(*) FROM acc_gl_journal_entry_annual_summary WHERE gl_code = ? AND year_end_date = ? AND office_id = ?", Integer.class, glCode, yearEndDate, office.getOfficeId());
+        assertThat(actualCount).as("acc_gl_journal_entry_annual_summary: expected %d row(s) for gl_code \'%s\', year_end_date %s, office %s but found %d", expectedCount, glCode, yearEndDate, office.getOfficeId(), actualCount).isEqualTo(expectedCount);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AnnualSummaryStepDef(final JdbcTemplate testJdbcTemplate, final FineractFeignClient fineractClient) {
+        this.testJdbcTemplate = testJdbcTemplate;
+        this.fineractClient = fineractClient;
     }
 }

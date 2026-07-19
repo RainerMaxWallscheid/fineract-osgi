@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.security.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.AppUserRepository;
@@ -35,12 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Component
-@RequiredArgsConstructor
 public class LoginAttemptEventListener {
-
     private static final String USERS_CACHE = "users";
     private static final String USERS_BY_USERNAME_CACHE = "usersByUsername";
-
     private final ConfigurationDomainService configurationDomainService;
     private final AppUserRepository appUserRepository;
     private final CacheManager cacheManager;
@@ -55,22 +51,18 @@ public class LoginAttemptEventListener {
         if (maxRetries == null || maxRetries <= 0) {
             return;
         }
-
         Authentication authentication = event.getAuthentication();
         if (authentication == null || !StringUtils.hasText(authentication.getName())) {
             return;
         }
-
         AuthenticationException exception = event.getException();
         if (exception instanceof LockedException) {
             return;
         }
-
         AppUser user = appUserRepository.findAppUserByName(authentication.getName());
         if (user == null || !user.isAccountNonLocked() || !user.isLoginRetryLimitEnabled()) {
             return;
         }
-
         user.registerFailedLoginAttempt(maxRetries);
         appUserRepository.saveAndFlush(user);
         evictUserCaches();
@@ -83,11 +75,9 @@ public class LoginAttemptEventListener {
         if (authentication == null || !(authentication.getPrincipal() instanceof AppUser user)) {
             return;
         }
-
         if (user.getFailedLoginAttempts() <= 0) {
             return;
         }
-
         user.resetFailedLoginAttempts();
         appUserRepository.saveAndFlush(user);
         evictUserCaches();
@@ -102,5 +92,12 @@ public class LoginAttemptEventListener {
         if (usersByUsernameCache != null) {
             usersByUsernameCache.clear();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoginAttemptEventListener(final ConfigurationDomainService configurationDomainService, final AppUserRepository appUserRepository, final CacheManager cacheManager) {
+        this.configurationDomainService = configurationDomainService;
+        this.appUserRepository = appUserRepository;
+        this.cacheManager = cacheManager;
     }
 }

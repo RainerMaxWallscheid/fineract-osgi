@@ -36,7 +36,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -52,12 +51,8 @@ import org.springframework.stereotype.Component;
 
 @Path("/v1/" + PasswordPreferencesApiConstants.RESOURCE_NAME)
 @Component
-@Tag(name = "Password preferences", description = "This API enables management of password policy for user administration.\n" + "\n"
-        + "There is no Apache Fineract functionality for creating a validation policy. The validation policies come pre-installed.\n" + "\n"
-        + "Validation policies may be updated")
-@RequiredArgsConstructor
+@Tag(name = "Password preferences", description = "This API enables management of password policy for user administration.\n" + "\n" + "There is no Apache Fineract functionality for creating a validation policy. The validation policies come pre-installed.\n" + "\n" + "Validation policies may be updated")
 public class PasswordPreferencesApiResource {
-
     private final PlatformSecurityContext context;
     private final PasswordValidationPolicyReadPlatformService passwordValidationPolicyReadPlatformService;
     private final DefaultToApiJsonSerializer<PasswordValidationPolicyData> toApiJsonSerializer;
@@ -65,59 +60,52 @@ public class PasswordPreferencesApiResource {
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = PasswordPreferencesApiResourceSwagger.GetPasswordPreferencesTemplateResponse.class))) })
-    @Operation(summary = "List Password Preferences", operationId = "retrieveAllPasswordPreferences", description = "Returns the password policies and their current status (active/inactive).", tags = {
-            "Password preferences" })
+    @Produces({MediaType.APPLICATION_JSON})
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = PasswordPreferencesApiResourceSwagger.GetPasswordPreferencesTemplateResponse.class)))})
+    @Operation(summary = "List Password Preferences", operationId = "retrieveAllPasswordPreferences", description = "Returns the password policies and their current status (active/inactive).", tags = {"Password preferences"})
     @AlternativeOperationId("retrieve_1")
     public String retrieve(@Context final UriInfo uriInfo) {
-
         this.context.authenticatedUser().validateHasReadPermission(PasswordPreferencesApiConstants.ENTITY_NAME);
-
-        final PasswordValidationPolicyData passwordValidationPolicyData = this.passwordValidationPolicyReadPlatformService
-                .retrieveActiveValidationPolicy();
-
+        final PasswordValidationPolicyData passwordValidationPolicyData = this.passwordValidationPolicyReadPlatformService.retrieveActiveValidationPolicy();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.toApiJsonSerializer.serialize(settings, passwordValidationPolicyData,
-                PasswordPreferencesApiConstants.RESPONSE_DATA_PARAMETERS);
+        return this.toApiJsonSerializer.serialize(settings, passwordValidationPolicyData, PasswordPreferencesApiConstants.RESPONSE_DATA_PARAMETERS);
     }
 
     @PUT
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Update password preferences", operationId = "updatePasswordPreferences", tags = {
-            "Password preferences" }, description = "")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Update password preferences", operationId = "updatePasswordPreferences", tags = {"Password preferences"}, description = "")
     @AlternativeOperationId("update_25")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = PasswordPreferencesApiResourceSwagger.PutPasswordPreferencesTemplateRequest.class)))
-    @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK") })
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK")})
     public String update(@Parameter(hidden = true) final String apiRequestBodyAsJson) {
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-                .updatePasswordPreferences() //
-                .withJson(apiRequestBodyAsJson) //
-                .build();
-
+        final CommandWrapper commandRequest =  //
+        //
+        //
+        new CommandWrapperBuilder().updatePasswordPreferences().withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 
     @GET
     @Path("/template")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "List Application Password validation policies", operationId = "retrieveTemplatePasswordPreferences", tags = {
-            "Password preferences" }, description = "ARGUMENTS\n" + "Example Requests:\n" + "\n" + "passwordpreferences")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "List Application Password validation policies", operationId = "retrieveTemplatePasswordPreferences", tags = {"Password preferences"}, description = "ARGUMENTS\n" + "Example Requests:\n" + "\n" + "passwordpreferences")
     @AlternativeOperationId("template_21")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PasswordPreferencesApiResourceSwagger.GetPasswordPreferencesTemplateResponse.class)))) })
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PasswordPreferencesApiResourceSwagger.GetPasswordPreferencesTemplateResponse.class))))})
     public String template(@Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(PasswordPreferencesApiConstants.ENTITY_NAME);
-
         final Collection<PasswordValidationPolicyData> validationPolicies = this.passwordValidationPolicyReadPlatformService.retrieveAll();
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, validationPolicies, PasswordPreferencesApiConstants.RESPONSE_DATA_PARAMETERS);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public PasswordPreferencesApiResource(final PlatformSecurityContext context, final PasswordValidationPolicyReadPlatformService passwordValidationPolicyReadPlatformService, final DefaultToApiJsonSerializer<PasswordValidationPolicyData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.context = context;
+        this.passwordValidationPolicyReadPlatformService = passwordValidationPolicyReadPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+    }
 }

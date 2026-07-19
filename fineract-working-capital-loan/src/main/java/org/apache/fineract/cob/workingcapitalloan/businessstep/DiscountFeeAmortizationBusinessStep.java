@@ -20,19 +20,16 @@ package org.apache.fineract.cob.workingcapitalloan.businessstep;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoan;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanDiscountFeeAmortizationService;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class DiscountFeeAmortizationBusinessStep extends WorkingCapitalLoanCOBBusinessStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DiscountFeeAmortizationBusinessStep.class);
     private final WorkingCapitalLoanDiscountFeeAmortizationService discountFeeAmortizationService;
 
     @Override
@@ -47,15 +44,11 @@ public class DiscountFeeAmortizationBusinessStep extends WorkingCapitalLoanCOBBu
         final BigDecimal discount = input.getLoanProductRelatedDetails().getDiscount();
         final BigDecimal recognizedIncome = input.getBalance() == null ? null : input.getBalance().getRealizedIncomeFromDiscountFee();
         if (!MathUtil.isGreaterThanZero(discount) && !MathUtil.isGreaterThanZero(recognizedIncome)) {
-            log.debug("Skipping discount fee amortization for WC loan {} - no discount fee and no recognized income to reconcile",
-                    input.getId());
+            log.debug("Skipping discount fee amortization for WC loan {} - no discount fee and no recognized income to reconcile", input.getId());
             return input;
         }
-
         final LocalDate businessDate = DateUtils.getBusinessLocalDate();
-
         discountFeeAmortizationService.processDiscountFeeAmortization(input, businessDate);
-
         return input;
     }
 
@@ -67,5 +60,10 @@ public class DiscountFeeAmortizationBusinessStep extends WorkingCapitalLoanCOBBu
     @Override
     public String getHumanReadableName() {
         return "WC Discount Fee Amortization";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DiscountFeeAmortizationBusinessStep(final WorkingCapitalLoanDiscountFeeAmortizationService discountFeeAmortizationService) {
+        this.discountFeeAmortizationService = discountFeeAmortizationService;
     }
 }

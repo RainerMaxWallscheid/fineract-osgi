@@ -19,20 +19,111 @@
 package org.apache.fineract.portfolio.loanproduct.calc.data;
 
 import java.time.LocalDate;
-import lombok.Builder;
-import lombok.Getter;
 
-@Getter
-@Builder
 public final class RepaymentScheduleInstallmentData {
-
     private final LocalDate fromDate;
     private final LocalDate dueDate;
     private final boolean downPayment;
     private final boolean additional;
 
     public static RepaymentScheduleInstallmentData of(LocalDate fromDate, LocalDate dueDate, boolean downPayment, boolean additional) {
-        return RepaymentScheduleInstallmentData.builder().fromDate(fromDate).dueDate(dueDate).downPayment(downPayment)
-                .additional(additional).build();
+        return RepaymentScheduleInstallmentData.builder().fromDate(fromDate).dueDate(dueDate).downPayment(downPayment).additional(additional).build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        RepaymentScheduleInstallmentData(final LocalDate fromDate, final LocalDate dueDate, final boolean downPayment, final boolean additional) {
+        this.fromDate = fromDate;
+        this.dueDate = dueDate;
+        this.downPayment = downPayment;
+        this.additional = additional;
+    }
+
+
+    @java.lang.SuppressWarnings("all")
+        public static class RepaymentScheduleInstallmentDataBuilder {
+        @java.lang.SuppressWarnings("all")
+                private LocalDate fromDate;
+        @java.lang.SuppressWarnings("all")
+                private LocalDate dueDate;
+        @java.lang.SuppressWarnings("all")
+                private boolean downPayment;
+        @java.lang.SuppressWarnings("all")
+                private boolean additional;
+
+        @java.lang.SuppressWarnings("all")
+                RepaymentScheduleInstallmentDataBuilder() {
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public RepaymentScheduleInstallmentData.RepaymentScheduleInstallmentDataBuilder fromDate(final LocalDate fromDate) {
+            this.fromDate = fromDate;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public RepaymentScheduleInstallmentData.RepaymentScheduleInstallmentDataBuilder dueDate(final LocalDate dueDate) {
+            this.dueDate = dueDate;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public RepaymentScheduleInstallmentData.RepaymentScheduleInstallmentDataBuilder downPayment(final boolean downPayment) {
+            this.downPayment = downPayment;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public RepaymentScheduleInstallmentData.RepaymentScheduleInstallmentDataBuilder additional(final boolean additional) {
+            this.additional = additional;
+            return this;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public RepaymentScheduleInstallmentData build() {
+            return new RepaymentScheduleInstallmentData(this.fromDate, this.dueDate, this.downPayment, this.additional);
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "RepaymentScheduleInstallmentData.RepaymentScheduleInstallmentDataBuilder(fromDate=" + this.fromDate + ", dueDate=" + this.dueDate + ", downPayment=" + this.downPayment + ", additional=" + this.additional + ")";
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static RepaymentScheduleInstallmentData.RepaymentScheduleInstallmentDataBuilder builder() {
+        return new RepaymentScheduleInstallmentData.RepaymentScheduleInstallmentDataBuilder();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getFromDate() {
+        return this.fromDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getDueDate() {
+        return this.dueDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isDownPayment() {
+        return this.downPayment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isAdditional() {
+        return this.additional;
     }
 }

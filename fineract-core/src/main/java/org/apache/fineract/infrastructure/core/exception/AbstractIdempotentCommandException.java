@@ -18,19 +18,11 @@
  */
 package org.apache.fineract.infrastructure.core.exception;
 
-import lombok.Getter;
-
 public abstract class AbstractIdempotentCommandException extends AbstractPlatformException {
-
     public static final String IDEMPOTENT_CACHE_HEADER = "x-served-from-cache";
-    @Getter
     private final String action;
-
-    @Getter
     private final String entity;
-    @Getter
     private final String idempotencyKey;
-    @Getter
     private final String response;
 
     protected AbstractIdempotentCommandException(String action, String entity, String idempotencyKey, String response) {
@@ -39,5 +31,25 @@ public abstract class AbstractIdempotentCommandException extends AbstractPlatfor
         this.entity = entity;
         this.idempotencyKey = idempotencyKey;
         this.response = response;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getAction() {
+        return this.action;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEntity() {
+        return this.entity;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getIdempotencyKey() {
+        return this.idempotencyKey;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getResponse() {
+        return this.response;
     }
 }

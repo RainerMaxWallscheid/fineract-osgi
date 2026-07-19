@@ -21,7 +21,6 @@ package org.apache.fineract.integrationtests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
@@ -30,7 +29,6 @@ import io.restassured.specification.ResponseSpecification;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.DeleteClientsClientIdResponse;
 import org.apache.fineract.client.models.GetClientsClientIdAccountsResponse;
 import org.apache.fineract.client.models.GetClientsClientIdResponse;
@@ -48,9 +46,9 @@ import org.apache.fineract.portfolio.client.domain.ClientStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@Slf4j
 public class ClientExternalIdTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ClientExternalIdTest.class);
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
     private GlobalConfigurationHelper globalConfigurationHelper;
@@ -69,8 +67,7 @@ public class ClientExternalIdTest {
         // given
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, false);
         // when
-        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID,
-                ClientHelper.LEGALFORM_ID_PERSON, null);
+        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID, ClientHelper.LEGALFORM_ID_PERSON, null);
         // then
         assertNotNull(clientResponse);
         assertNull(clientResponse.getResourceExternalId());
@@ -81,13 +78,11 @@ public class ClientExternalIdTest {
         // given
         final String externalId = UUID.randomUUID().toString();
         // when
-        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID,
-                ClientHelper.LEGALFORM_ID_PERSON, externalId);
+        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID, ClientHelper.LEGALFORM_ID_PERSON, externalId);
         // then
         assertNotNull(clientResponse);
         assertNotNull(clientResponse.getResourceExternalId());
         assertEquals(externalId, clientResponse.getResourceExternalId());
-
         fetchClientByExternalId(clientResponse.getResourceExternalId());
     }
 
@@ -96,15 +91,12 @@ public class ClientExternalIdTest {
         // given
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, true);
         // when
-        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID,
-                ClientHelper.LEGALFORM_ID_PERSON, null);
+        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID, ClientHelper.LEGALFORM_ID_PERSON, null);
         // then
         assertNotNull(clientResponse);
         assertNotNull(clientResponse.getResourceExternalId());
         assertEquals(36, clientResponse.getResourceExternalId().length());
-
         fetchClientByExternalId(clientResponse.getResourceExternalId());
-
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, false);
     }
 
@@ -114,48 +106,39 @@ public class ClientExternalIdTest {
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, true);
         final String externalId = UUID.randomUUID().toString();
         // when
-        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID,
-                ClientHelper.LEGALFORM_ID_PERSON, externalId);
+        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID, ClientHelper.LEGALFORM_ID_PERSON, externalId);
         // then
         assertNotNull(clientResponse);
         assertNotNull(clientResponse.getResourceExternalId());
         assertEquals(externalId, clientResponse.getResourceExternalId());
-
         fetchClientByExternalId(clientResponse.getResourceExternalId());
-
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, false);
     }
 
     @Test
     public void testClientStatusUsingExternalId() {
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, true);
-        final PostClientsResponse addClientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID,
-                ClientHelper.LEGALFORM_ID_PERSON, null);
+        final PostClientsResponse addClientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID, ClientHelper.LEGALFORM_ID_PERSON, null);
         final String clientExternalId = addClientResponse.getResourceExternalId();
         final Long clientId = addClientResponse.getClientId();
         assertNotNull(clientExternalId);
         log.info("Client data id {} and external Id {}", clientId, clientExternalId);
-
         GetClientsClientIdResponse clientResponse = ClientHelper.getClientByExternalId(clientExternalId);
         ClientStatusChecker.verifyClientStatus(ClientStatus.ACTIVE, clientResponse);
         log.info("Client data id {} and status {}", clientExternalId, clientResponse.getStatus().getCode());
-
         // Close Client action
         String codeName = "ClientClosureReason";
         HashMap<String, Object> code = CodeHelper.getCodeByName(requestSpec, responseSpec, codeName);
-        Integer closureReasonId = (Integer) CodeHelper.retrieveOrCreateCodeValue((Integer) code.get("id"), requestSpec, responseSpec)
-                .get("id");
+        Integer closureReasonId = (Integer) CodeHelper.retrieveOrCreateCodeValue((Integer) code.get("id"), requestSpec, responseSpec).get("id");
         PostClientsClientIdResponse commandResponse = ClientHelper.closeClient(clientExternalId, closureReasonId);
         assertNotNull(commandResponse);
         assertNotNull(commandResponse.getResourceExternalId());
         assertEquals(clientExternalId, commandResponse.getResourceExternalId());
         log.info("Client data id {} and external Id {}", commandResponse.getResourceId(), clientExternalId);
         assertEquals(clientId.intValue(), commandResponse.getResourceId());
-
         clientResponse = ClientHelper.getClientByExternalId(clientExternalId);
         ClientStatusChecker.verifyClientStatus(ClientStatus.CLOSED, clientResponse);
         log.info("Client data id {} and status {}", clientExternalId, clientResponse.getStatus().getCode());
-
         // Reactivate Client action
         commandResponse = ClientHelper.reactivateClient(clientExternalId);
         assertNotNull(commandResponse);
@@ -163,27 +146,22 @@ public class ClientExternalIdTest {
         assertEquals(clientExternalId, commandResponse.getResourceExternalId());
         log.info("Client data id {} and external Id {}", commandResponse.getResourceId(), clientExternalId);
         assertEquals(clientId.intValue(), commandResponse.getResourceId());
-
         clientResponse = ClientHelper.getClientByExternalId(clientExternalId);
         ClientStatusChecker.verifyClientStatus(ClientStatus.PENDING, clientResponse);
         log.info("Client data id {} and status {}", clientExternalId, clientResponse.getStatus().getCode());
-
         // Reject Client action
         codeName = "ClientRejectReason";
         code = CodeHelper.getCodeByName(requestSpec, responseSpec, codeName);
-        Integer rejectionReasonId = (Integer) CodeHelper.retrieveOrCreateCodeValue((Integer) code.get("id"), requestSpec, responseSpec)
-                .get("id");
+        Integer rejectionReasonId = (Integer) CodeHelper.retrieveOrCreateCodeValue((Integer) code.get("id"), requestSpec, responseSpec).get("id");
         commandResponse = ClientHelper.rejectClient(clientExternalId, rejectionReasonId);
         assertNotNull(commandResponse);
         assertNotNull(commandResponse.getResourceExternalId());
         assertEquals(clientExternalId, commandResponse.getResourceExternalId());
         log.info("Client data id {} and external Id {}", commandResponse.getResourceId(), clientExternalId);
         assertEquals(clientId.intValue(), commandResponse.getResourceId());
-
         clientResponse = ClientHelper.getClientByExternalId(clientExternalId);
         ClientStatusChecker.verifyClientStatus(ClientStatus.REJECTED, clientResponse);
         log.info("Client data id {} and status {}", clientExternalId, clientResponse.getStatus().getCode());
-
         // Activate Client action
         commandResponse = ClientHelper.activateClient(clientExternalId, ClientHelper.DEFAULT_DATE);
         assertNotNull(commandResponse);
@@ -191,11 +169,9 @@ public class ClientExternalIdTest {
         assertEquals(clientExternalId, commandResponse.getResourceExternalId());
         log.info("Client data id {} and external Id {}", commandResponse.getResourceId(), clientExternalId);
         assertEquals(clientId.intValue(), commandResponse.getResourceId());
-
         clientResponse = ClientHelper.getClientByExternalId(clientExternalId);
         ClientStatusChecker.verifyClientStatus(ClientStatus.ACTIVE, clientResponse);
         log.info("Client data id {} and status {}", clientExternalId, clientResponse.getStatus().getCode());
-
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, false);
     }
 
@@ -204,8 +180,7 @@ public class ClientExternalIdTest {
         // given
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, true);
         // when
-        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID,
-                ClientHelper.LEGALFORM_ID_PERSON, null);
+        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID, ClientHelper.LEGALFORM_ID_PERSON, null);
         final String clientExternalId = clientResponse.getResourceExternalId();
         PutClientsClientIdRequest updateRequest = new PutClientsClientIdRequest().externalId(clientExternalId);
         final PutClientsClientIdResponse clientUpdateResponse = ClientHelper.updateClientByExternalId(clientExternalId, updateRequest);
@@ -213,7 +188,6 @@ public class ClientExternalIdTest {
         assertNotNull(clientUpdateResponse);
         assertNotNull(clientUpdateResponse.getResourceExternalId());
         assertEquals(clientExternalId, clientUpdateResponse.getResourceExternalId());
-
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, false);
     }
 
@@ -222,21 +196,17 @@ public class ClientExternalIdTest {
         // given
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, true);
         // when
-        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID,
-                ClientHelper.LEGALFORM_ID_PERSON, null);
+        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID, ClientHelper.LEGALFORM_ID_PERSON, null);
         final String clientExternalId = clientResponse.getResourceExternalId();
         String codeName = "ClientClosureReason";
         HashMap<String, Object> code = CodeHelper.getCodeByName(requestSpec, responseSpec, codeName);
-        Integer closureReasonId = (Integer) CodeHelper.retrieveOrCreateCodeValue((Integer) code.get("id"), requestSpec, responseSpec)
-                .get("id");
+        Integer closureReasonId = (Integer) CodeHelper.retrieveOrCreateCodeValue((Integer) code.get("id"), requestSpec, responseSpec).get("id");
         ClientHelper.closeClient(clientExternalId, closureReasonId);
         ClientHelper.reactivateClient(clientExternalId);
-
         final DeleteClientsClientIdResponse clientDeleteResponse = ClientHelper.deleteClientByExternalId(clientExternalId);
         assertNotNull(clientDeleteResponse);
         assertNotNull(clientDeleteResponse.getResourceExternalId());
         assertEquals(clientExternalId, clientDeleteResponse.getResourceExternalId());
-
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, false);
     }
 
@@ -245,15 +215,11 @@ public class ClientExternalIdTest {
         // given
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, true);
         // when
-        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID,
-                ClientHelper.LEGALFORM_ID_PERSON, null);
+        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID, ClientHelper.LEGALFORM_ID_PERSON, null);
         final String clientExternalId = clientResponse.getResourceExternalId();
-
         GetClientsClientIdAccountsResponse clientAccountsResponse = ClientHelper.getClientAccounts(clientExternalId);
-
         // then
         assertNotNull(clientAccountsResponse);
-
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, false);
     }
 
@@ -261,15 +227,11 @@ public class ClientExternalIdTest {
     public void testGetClientTransferProposalDate() {
         // given
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, true);
-        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID,
-                ClientHelper.LEGALFORM_ID_PERSON, null);
-
+        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID, ClientHelper.LEGALFORM_ID_PERSON, null);
         // when
         final String clientExternalId = clientResponse.getResourceExternalId();
         ClientHelper.getProposedTransferDate(clientExternalId);
-
         fetchClientByExternalId(clientResponse.getResourceExternalId());
-
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, false);
     }
 
@@ -278,16 +240,12 @@ public class ClientExternalIdTest {
         // given
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, true);
         // when
-        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID,
-                ClientHelper.LEGALFORM_ID_PERSON, null);
+        final PostClientsResponse clientResponse = ClientHelper.addClientAsPerson(ClientHelper.DEFAULT_OFFICE_ID, ClientHelper.LEGALFORM_ID_PERSON, null);
         final String clientExternalId = clientResponse.getResourceExternalId();
         final List<GetObligeeData> obligeeDataResponse = ClientHelper.getObligeeData(clientExternalId);
-
         // then
         assertNotNull(obligeeDataResponse);
-
         fetchClientByExternalId(clientResponse.getResourceExternalId());
-
         globalConfigurationHelper.manageConfigurations(GlobalConfigurationConstants.ENABLE_AUTO_GENERATED_EXTERNAL_ID, false);
     }
 

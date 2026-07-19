@@ -19,8 +19,6 @@
 package org.apache.fineract.portfolio.collateralmanagement.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.portfolio.collateralmanagement.data.ClientCollateralCreateRequest;
@@ -29,11 +27,10 @@ import org.apache.fineract.portfolio.collateralmanagement.service.ClientCollater
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class ClientCollateralCreateCommandHandler implements CommandHandler<ClientCollateralCreateRequest, ClientCollateralCreateResponse> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ClientCollateralCreateCommandHandler.class);
     private final ClientCollateralManagementWriteService writeService;
 
     @Retry(name = "commandClientCollateralCreate", fallbackMethod = "fallback")
@@ -46,5 +43,10 @@ public class ClientCollateralCreateCommandHandler implements CommandHandler<Clie
     @Override
     public ClientCollateralCreateResponse fallback(Command<ClientCollateralCreateRequest> command, Throwable t) {
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ClientCollateralCreateCommandHandler(final ClientCollateralManagementWriteService writeService) {
+        this.writeService = writeService;
     }
 }

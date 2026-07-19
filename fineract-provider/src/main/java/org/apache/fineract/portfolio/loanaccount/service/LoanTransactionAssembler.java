@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.loanaccount.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
@@ -37,9 +36,7 @@ import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.springframework.lang.NonNull;
 
-@RequiredArgsConstructor
 public class LoanTransactionAssembler {
-
     private final ExternalIdFactory externalIdFactory;
     private final PaymentDetailWritePlatformService paymentDetailWritePlatformService;
 
@@ -51,35 +48,32 @@ public class LoanTransactionAssembler {
         changes.put("locale", command.locale());
         changes.put("dateFormat", command.dateFormat());
         changes.put("paymentTypeId", command.longValueOfParameterNamed("paymentTypeId"));
-
         if (StringUtils.isNotBlank(noteText)) {
             changes.put("note", noteText);
         }
         if (!txnExternalId.isEmpty()) {
             changes.put(LoanApiConstants.externalIdParameterName, txnExternalId);
         }
-
         final PaymentDetail paymentDetail = paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
         final LoanTransactionType repaymentTransactionType = LoanTransactionType.INTEREST_PAYMENT_WAIVER;
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
-
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed("transactionAmount");
         final Money repaymentAmount = Money.of(loan.getCurrency(), transactionAmount);
-        return LoanTransaction.repaymentType(repaymentTransactionType, loan.getOffice(), repaymentAmount, paymentDetail, transactionDate,
-                txnExternalId, null);
+        return LoanTransaction.repaymentType(repaymentTransactionType, loan.getOffice(), repaymentAmount, paymentDetail, transactionDate, txnExternalId, null);
     }
 
-    public LoanTransaction assembleAccrualActivityTransaction(@NonNull Loan loan, @NonNull LoanRepaymentScheduleInstallment installment,
-            @NonNull LocalDate transactionDate) {
+    public LoanTransaction assembleAccrualActivityTransaction(@NonNull Loan loan, @NonNull LoanRepaymentScheduleInstallment installment, @NonNull LocalDate transactionDate) {
         ExternalId externalId = externalIdFactory.create();
-
         BigDecimal interestPortion = installment.getInterestCharged();
         BigDecimal feeChargesPortion = installment.getFeeChargesCharged();
         BigDecimal penaltyChargesPortion = installment.getPenaltyCharges();
         BigDecimal transactionAmount = MathUtil.add(interestPortion, feeChargesPortion, penaltyChargesPortion);
-        return MathUtil.isGreaterThanZero(transactionAmount)
-                ? new LoanTransaction(loan, loan.getOffice(), LoanTransactionType.ACCRUAL_ACTIVITY, transactionDate, transactionAmount,
-                        null, interestPortion, feeChargesPortion, penaltyChargesPortion, null, false, null, externalId)
-                : null;
+        return MathUtil.isGreaterThanZero(transactionAmount) ? new LoanTransaction(loan, loan.getOffice(), LoanTransactionType.ACCRUAL_ACTIVITY, transactionDate, transactionAmount, null, interestPortion, feeChargesPortion, penaltyChargesPortion, null, false, null, externalId) : null;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionAssembler(final ExternalIdFactory externalIdFactory, final PaymentDetailWritePlatformService paymentDetailWritePlatformService) {
+        this.externalIdFactory = externalIdFactory;
+        this.paymentDetailWritePlatformService = paymentDetailWritePlatformService;
     }
 }

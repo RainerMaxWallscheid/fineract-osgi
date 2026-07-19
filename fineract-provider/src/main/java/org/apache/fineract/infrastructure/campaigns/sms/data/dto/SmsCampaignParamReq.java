@@ -20,20 +20,56 @@ package org.apache.fineract.infrastructure.campaigns.sms.data.dto;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
 public class SmsCampaignParamReq implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private Integer officeId;
     private Integer loanOfficerId;
     private Integer transactionId;
     private String reportName;
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getOfficeId() {
+        return this.officeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getLoanOfficerId() {
+        return this.loanOfficerId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getTransactionId() {
+        return this.transactionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getReportName() {
+        return this.reportName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setOfficeId(final Integer officeId) {
+        this.officeId = officeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanOfficerId(final Integer loanOfficerId) {
+        this.loanOfficerId = loanOfficerId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setTransactionId(final Integer transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setReportName(final String reportName) {
+        this.reportName = reportName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SmsCampaignParamReq() {
+    }
 }

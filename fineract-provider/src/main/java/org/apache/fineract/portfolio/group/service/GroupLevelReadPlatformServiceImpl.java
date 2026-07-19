@@ -21,41 +21,32 @@ package org.apache.fineract.portfolio.group.service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.group.data.GroupLevelData;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-@RequiredArgsConstructor
 public class GroupLevelReadPlatformServiceImpl implements GroupLevelReadPlatformService {
-
     private final PlatformSecurityContext context;
     private final JdbcTemplate jdbcTemplate;
 
     @Override
     public List<GroupLevelData> retrieveAllLevels() {
         this.context.authenticatedUser();
-
         final GroupLevelDataMapper rm = new GroupLevelDataMapper();
         final String sql = "select " + rm.groupLevelSchema();
         return this.jdbcTemplate.query(sql, rm); // NOSONAR
-
     }
 
-    private static final class GroupLevelDataMapper implements RowMapper<GroupLevelData> {
 
+    private static final class GroupLevelDataMapper implements RowMapper<GroupLevelData> {
         public String groupLevelSchema() {
-            return "gl.id as id, gl.level_name as levelName , gl.parent_id as parentLevelId , pgl.level_name as parentName , "
-                    + "cgl.id as childLevelId,cgl.level_name as childLevelName,gl.super_parent as superParent ,"
-                    + " gl.recursable as recursable , gl.can_have_clients as canHaveClients from m_group_level gl "
-                    + " left join m_group_level pgl on pgl.id = gl.parent_id left join m_group_level cgl on gl.id = cgl.parent_id";
+            return "gl.id as id, gl.level_name as levelName , gl.parent_id as parentLevelId , pgl.level_name as parentName , " + "cgl.id as childLevelId,cgl.level_name as childLevelName,gl.super_parent as superParent ," + " gl.recursable as recursable , gl.can_have_clients as canHaveClients from m_group_level gl " + " left join m_group_level pgl on pgl.id = gl.parent_id left join m_group_level cgl on gl.id = cgl.parent_id";
         }
 
         @Override
         public GroupLevelData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-
             final Long levelId = rs.getLong("id");
             final String levelName = rs.getString("levelName");
             final Long parentLevelId = JdbcSupport.getLong(rs, "parentLevelId");
@@ -65,11 +56,13 @@ public class GroupLevelReadPlatformServiceImpl implements GroupLevelReadPlatform
             final boolean superParent = rs.getBoolean("superParent");
             final boolean recursable = rs.getBoolean("recursable");
             final boolean canHaveClients = rs.getBoolean("canHaveClients");
-
-            return new GroupLevelData(levelId, levelName, parentLevelId, parentLevelName, childLevelId, childLevelName, superParent,
-                    recursable, canHaveClients);
+            return new GroupLevelData(levelId, levelName, parentLevelId, parentLevelName, childLevelId, childLevelName, superParent, recursable, canHaveClients);
         }
-
     }
 
+    @java.lang.SuppressWarnings("all")
+        public GroupLevelReadPlatformServiceImpl(final PlatformSecurityContext context, final JdbcTemplate jdbcTemplate) {
+        this.context = context;
+        this.jdbcTemplate = jdbcTemplate;
+    }
 }

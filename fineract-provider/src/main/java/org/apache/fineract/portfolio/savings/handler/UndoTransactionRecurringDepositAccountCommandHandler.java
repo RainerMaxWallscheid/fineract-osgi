@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "RECURRINGDEPOSITACCOUNT", action = "UNDOTRANSACTION")
-@RequiredArgsConstructor
 public class UndoTransactionRecurringDepositAccountCommandHandler implements NewCommandSourceHandler {
-
     private final DepositAccountWritePlatformService depositAccountWritePlatformService;
 
     @Transactional
@@ -39,5 +36,10 @@ public class UndoTransactionRecurringDepositAccountCommandHandler implements New
     public CommandProcessingResult processCommand(final JsonCommand command) {
         final Long transactionId = Long.valueOf(command.getTransactionId());
         return this.depositAccountWritePlatformService.undoRDTransaction(command.entityId(), transactionId, false);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UndoTransactionRecurringDepositAccountCommandHandler(final DepositAccountWritePlatformService depositAccountWritePlatformService) {
+        this.depositAccountWritePlatformService = depositAccountWritePlatformService;
     }
 }

@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.COBConstant;
 import org.apache.fineract.cob.data.BusinessStepNameAndOrder;
 import org.apache.fineract.cob.data.COBParameter;
@@ -40,10 +38,9 @@ import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.StopWatch;
 
-@Slf4j
-@RequiredArgsConstructor
 public abstract class CommonPartitioner {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CommonPartitioner.class);
     private final JobOperator jobOperator;
     private final StepExecution stepExecution;
     private final Long numberOfDays;
@@ -58,27 +55,21 @@ public abstract class CommonPartitioner {
         boolean isCatchUp = CatchUpFlagResolver.resolve(stepExecution);
         StopWatch sw = new StopWatch();
         sw.start();
-        List<COBPartition> partitions = new ArrayList<>(
-                retrieveIdService.retrieveLoanCOBPartitions(numberOfDays, businessDate, isCatchUp, partitionSize));
+        List<COBPartition> partitions = new ArrayList<>(retrieveIdService.retrieveLoanCOBPartitions(numberOfDays, businessDate, isCatchUp, partitionSize));
         sw.stop();
         // if there is no loan to be closed, we still would like to create at least one partition
-
         if (partitions.isEmpty()) {
             partitions.add(new COBPartition(0L, 0L, 1L, 0L));
         }
-        log.info(
-                "{}} found {} loans to be processed as part of COB. {} partitions were created using partition size {}. RetrieveLoanCOBPartitions was executed in {} ms.",
-                getClass().getName(), getLoanCount(partitions), partitions.size(), partitionSize, sw.getTotalTimeMillis());
-        return partitions.stream().collect(Collectors.toMap(l -> COBConstant.PARTITION_PREFIX + l.getPageNo(),
-                l -> createExecutionContextForPartition(cobBusinessSteps, l, businessDate, isCatchUp)));
+        log.info("{}} found {} loans to be processed as part of COB. {} partitions were created using partition size {}. RetrieveLoanCOBPartitions was executed in {} ms.", getClass().getName(), getLoanCount(partitions), partitions.size(), partitionSize, sw.getTotalTimeMillis());
+        return partitions.stream().collect(Collectors.toMap(l -> COBConstant.PARTITION_PREFIX + l.getPageNo(), l -> createExecutionContextForPartition(cobBusinessSteps, l, businessDate, isCatchUp)));
     }
 
     private long getLoanCount(List<COBPartition> loanCOBPartitions) {
         return loanCOBPartitions.stream().map(COBPartition::getCount).reduce(0L, Long::sum);
     }
 
-    private ExecutionContext createExecutionContextForPartition(Set<BusinessStepNameAndOrder> cobBusinessSteps,
-            COBPartition loanCOBPartition, LocalDate businessDate, boolean isCatchUp) {
+    private ExecutionContext createExecutionContextForPartition(Set<BusinessStepNameAndOrder> cobBusinessSteps, COBPartition loanCOBPartition, LocalDate businessDate, boolean isCatchUp) {
         ExecutionContext executionContext = new ExecutionContext();
         executionContext.put(COBConstant.BUSINESS_STEPS, cobBusinessSteps);
         executionContext.put(COBConstant.COB_PARAMETER, new COBParameter(loanCOBPartition.getMinId(), loanCOBPartition.getMaxId()));
@@ -96,6 +87,13 @@ public abstract class CommonPartitioner {
             log.error("There is no running execution for the given execution ID. Execution ID: {}", jobId);
             throw new RuntimeException(e);
         }
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public CommonPartitioner(final JobOperator jobOperator, final StepExecution stepExecution, final Long numberOfDays, final RetrieveIdService retrieveIdService) {
+        this.jobOperator = jobOperator;
+        this.stepExecution = stepExecution;
+        this.numberOfDays = numberOfDays;
+        this.retrieveIdService = retrieveIdService;
     }
 }

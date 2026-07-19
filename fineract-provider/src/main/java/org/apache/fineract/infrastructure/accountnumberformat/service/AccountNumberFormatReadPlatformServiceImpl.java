@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.accountnumberformat.data.AccountNumberFormatData;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatEnumerations;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatEnumerations.AccountNumberPrefixType;
@@ -42,23 +41,20 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class AccountNumberFormatReadPlatformServiceImpl implements AccountNumberFormatReadPlatformService {
-
     private static final Logger LOG = LoggerFactory.getLogger(AccountNumberFormatReadPlatformServiceImpl.class);
-
     private final JdbcTemplate jdbcTemplate;
-
     // data mapper
     private final AccountNumberFormatMapper accountNumberFormatMapper = new AccountNumberFormatMapper();
 
+
     private static final class AccountNumberFormatMapper implements RowMapper<AccountNumberFormatData> {
-
         private static final String ACCOUNT_NUMBER_FORMAT_SCHEMA = """
-                anf.id as id, anf.account_type_enum as accountTypeEnum, anf.prefix_type_enum as prefixTypeEnum, anf.prefix_character as prefixCharacter
-                from c_account_number_format anf\s""";
+            anf.id as id, anf.account_type_enum as accountTypeEnum, anf.prefix_type_enum as prefixTypeEnum, anf.prefix_character as prefixCharacter
+            from c_account_number_format anf """;
 
-        AccountNumberFormatMapper() {}
+        AccountNumberFormatMapper() {
+        }
 
         public String schema() {
             return ACCOUNT_NUMBER_FORMAT_SCHEMA;
@@ -66,12 +62,10 @@ public class AccountNumberFormatReadPlatformServiceImpl implements AccountNumber
 
         @Override
         public AccountNumberFormatData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-
             final Long id = rs.getLong("id");
             final Integer accountTypeEnum = rs.getInt("accountTypeEnum");
             final Integer prefixTypeEnum = JdbcSupport.getInteger(rs, "prefixTypeEnum");
             final String prefixCharacter = rs.getString("prefixCharacter");
-
             final EnumOptionData accountNumberType = AccountNumberFormatEnumerations.entityAccountType(accountTypeEnum);
             EnumOptionData prefixType = null;
             if (prefixTypeEnum != null) {
@@ -91,9 +85,8 @@ public class AccountNumberFormatReadPlatformServiceImpl implements AccountNumber
     public AccountNumberFormatData getAccountNumberFormat(Long id) {
         try {
             final String sql = "select " + this.accountNumberFormatMapper.schema() + " where anf.id = ?";
-
-            final AccountNumberFormatData accountNumberFormatData = this.jdbcTemplate.queryForObject(sql, this.accountNumberFormatMapper, // NOSONAR
-                    new Object[] { id });
+            final AccountNumberFormatData accountNumberFormatData = this.jdbcTemplate.queryForObject(sql, this.accountNumberFormatMapper,  // NOSONAR
+            new Object[] {id});
             return accountNumberFormatData;
         } catch (final EmptyResultDataAccessException e) {
             throw new AccountNumberFormatNotFoundException(id, e);
@@ -103,54 +96,49 @@ public class AccountNumberFormatReadPlatformServiceImpl implements AccountNumber
     @Override
     public AccountNumberFormatData retrieveTemplate(EntityAccountType entityAccountTypeForTemplate) {
         final List<EnumOptionData> entityAccountTypeOptions = AccountNumberFormatEnumerations.entityAccountType(EntityAccountType.values());
-
         Map<String, List<EnumOptionData>> accountNumberPrefixTypeOptions = new HashMap<>();
-        /***
-         * If an Account type is passed in, return prefixes only for the passed in account type, else return all allowed
-         * prefixes keyed by all possible entity type
-         **/
         if (entityAccountTypeForTemplate != null) {
             determinePrefixTypesForAccounts(accountNumberPrefixTypeOptions, entityAccountTypeForTemplate);
         } else {
             for (EntityAccountType entityAccountType : EntityAccountType.values()) {
                 determinePrefixTypesForAccounts(accountNumberPrefixTypeOptions, entityAccountType);
-
             }
         }
         return new AccountNumberFormatData(entityAccountTypeOptions, accountNumberPrefixTypeOptions);
     }
 
-    public void determinePrefixTypesForAccounts(Map<String, List<EnumOptionData>> accountNumberPrefixTypeOptions,
-            EntityAccountType entityAccountType) {
+    public void determinePrefixTypesForAccounts(Map<String, List<EnumOptionData>> accountNumberPrefixTypeOptions, EntityAccountType entityAccountType) {
         Set<AccountNumberPrefixType> accountNumberPrefixTypesSet = new HashSet<>();
         switch (entityAccountType) {
-            case CLIENT:
-                accountNumberPrefixTypesSet = AccountNumberFormatEnumerations.accountNumberPrefixesForClientAccounts;
+        case CLIENT: 
+            accountNumberPrefixTypesSet = AccountNumberFormatEnumerations.accountNumberPrefixesForClientAccounts;
             break;
-            case LOAN:
-                accountNumberPrefixTypesSet = AccountNumberFormatEnumerations.accountNumberPrefixesForLoanAccounts;
+        case LOAN: 
+            accountNumberPrefixTypesSet = AccountNumberFormatEnumerations.accountNumberPrefixesForLoanAccounts;
             break;
-            case SAVINGS:
-                accountNumberPrefixTypesSet = AccountNumberFormatEnumerations.accountNumberPrefixesForSavingsAccounts;
+        case SAVINGS: 
+            accountNumberPrefixTypesSet = AccountNumberFormatEnumerations.accountNumberPrefixesForSavingsAccounts;
             break;
-            case CENTER:
-                accountNumberPrefixTypesSet = AccountNumberFormatEnumerations.accountNumberPrefixesForCenters;
+        case CENTER: 
+            accountNumberPrefixTypesSet = AccountNumberFormatEnumerations.accountNumberPrefixesForCenters;
             break;
-            case GROUP:
-                accountNumberPrefixTypesSet = AccountNumberFormatEnumerations.accountNumberPrefixesForGroups;
+        case GROUP: 
+            accountNumberPrefixTypesSet = AccountNumberFormatEnumerations.accountNumberPrefixesForGroups;
             break;
-            case SHARES:
+        case SHARES: 
             // SHARES has no prefix
             break;
-            case WORKING_CAPITAL_LOAN:
-                accountNumberPrefixTypesSet = AccountNumberFormatEnumerations.accountNumberPrefixesForWorkingCapitalLoanAccounts;
+        case WORKING_CAPITAL_LOAN: 
+            accountNumberPrefixTypesSet = AccountNumberFormatEnumerations.accountNumberPrefixesForWorkingCapitalLoanAccounts;
             break;
         }
-
         Object[] array = accountNumberPrefixTypesSet.toArray();
         AccountNumberPrefixType[] accountNumberPrefixTypes = Arrays.copyOf(array, array.length, AccountNumberPrefixType[].class);
+        accountNumberPrefixTypeOptions.put(entityAccountType.getCode(), AccountNumberFormatEnumerations.accountNumberPrefixType(accountNumberPrefixTypes));
+    }
 
-        accountNumberPrefixTypeOptions.put(entityAccountType.getCode(),
-                AccountNumberFormatEnumerations.accountNumberPrefixType(accountNumberPrefixTypes));
+    @java.lang.SuppressWarnings("all")
+        public AccountNumberFormatReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 }

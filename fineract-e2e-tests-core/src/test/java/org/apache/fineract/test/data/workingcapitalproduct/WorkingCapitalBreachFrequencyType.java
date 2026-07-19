@@ -16,21 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.test.data.workingcapitalproduct;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@Getter
-@RequiredArgsConstructor
 public enum WorkingCapitalBreachFrequencyType {
-
-    DAYS(0L, "DAYS", "Days"), //
-    MONTHS(1L, "MONTHS", "Months"), //
+    DAYS(0L, "DAYS", "Days"),  //
+    MONTHS(1L, "MONTHS", "Months"),  //
     YEARS(2L, "YEARS", "Years");
-
     private final Long id;
     private final String code;
     private final String value;
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private WorkingCapitalBreachFrequencyType(final Long id, final String code, final String value) {
+        this.id = id;
+        this.code = code;
+        this.value = value;
+    }
 }

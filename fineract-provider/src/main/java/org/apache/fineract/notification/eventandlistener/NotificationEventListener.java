@@ -18,19 +18,20 @@
  */
 package org.apache.fineract.notification.eventandlistener;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.notification.data.NotificationData;
 import org.apache.fineract.notification.service.UserNotificationService;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class NotificationEventListener {
-
     private final UserNotificationService userNotificationService;
 
     public void receive(NotificationData notificationData) {
         userNotificationService.notifyUsers(notificationData);
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public NotificationEventListener(final UserNotificationService userNotificationService) {
+        this.userNotificationService = userNotificationService;
     }
 }

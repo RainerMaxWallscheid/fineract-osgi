@@ -30,8 +30,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.campaigns.email.data.EmailMessageWithAttachmentData;
 import org.apache.fineract.infrastructure.campaigns.email.domain.EmailCampaign;
 import org.apache.fineract.infrastructure.campaigns.email.domain.EmailCampaignRepository;
@@ -56,10 +54,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class ExecuteEmailTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExecuteEmailTasklet.class);
     private final EmailMessageRepository emailMessageRepository;
     private final EmailCampaignRepository emailCampaignRepository;
     private final LoanRepository loanRepository;
@@ -75,26 +72,21 @@ public class ExecuteEmailTasklet implements Tasklet {
             final List<EmailMessage> emailMessages = emailMessageRepository.findByStatusType(EmailMessageStatusType.PENDING.getValue());
             for (final EmailMessage emailMessage : emailMessages) {
                 if (isValidEmail(emailMessage.getEmailAddress())) {
-                    final EmailCampaign emailCampaign = emailCampaignRepository.findById(emailMessage.getEmailCampaign().getId())
-                            .orElse(null); //
+                    final EmailCampaign emailCampaign = emailCampaignRepository.findById(emailMessage.getEmailCampaign().getId()).orElse(null); //
                     ScheduledEmailAttachmentFileFormat emailAttachmentFileFormat = null;
                     if (emailCampaign.getEmailAttachmentFileFormat() != null) {
-                        emailAttachmentFileFormat = ScheduledEmailAttachmentFileFormat
-                                .instance(emailCampaign.getEmailAttachmentFileFormat());
+                        emailAttachmentFileFormat = ScheduledEmailAttachmentFileFormat.instance(emailCampaign.getEmailAttachmentFileFormat());
                     }
                     final List<File> attachmentList = new ArrayList<>();
                     final StringBuilder errorLog = new StringBuilder();
-                    if (emailAttachmentFileFormat != null && Arrays.asList(ScheduledEmailAttachmentFileFormat.validValues())
-                            .contains(emailAttachmentFileFormat.getId())) {
+                    if (emailAttachmentFileFormat != null && Arrays.asList(ScheduledEmailAttachmentFileFormat.validValues()).contains(emailAttachmentFileFormat.getId())) {
                         final Report stretchyReport = emailCampaign.getStretchyReport();
                         final String reportName = (stretchyReport != null) ? stretchyReport.getReportName() : null;
-                        final HashMap<String, String> reportStretchyParams = reportMailingJobValidator
-                                .validateStretchyReportParamMap(emailCampaign.getStretchyReportParamMap());
+                        final HashMap<String, String> reportStretchyParams = reportMailingJobValidator.validateStretchyReportParamMap(emailCampaign.getStretchyReportParamMap());
                         if (reportStretchyParams.containsKey("selectLoan") || reportStretchyParams.containsKey("loanId")) {
                             if (emailMessage.getClient() != null) {
                                 final List<Loan> loans = loanRepository.findLoanByClientId(emailMessage.getClient().getId());
-                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams,
-                                        emailMessage.getClient());
+                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, emailMessage.getClient());
                                 for (final Loan loan : loans) {
                                     if (loan.isOpen()) {
                                         if (reportStretchyParams.containsKey("selectLoan")) {
@@ -102,8 +94,7 @@ public class ExecuteEmailTasklet implements Tasklet {
                                         } else if (reportStretchyParams.containsKey("loanId")) {
                                             reportParams.put("loanId", loan.getId().toString());
                                         }
-                                        File file = generateAttachments(emailCampaign, emailAttachmentFileFormat, reportParams, reportName,
-                                                errorLog);
+                                        File file = generateAttachments(emailCampaign, emailAttachmentFileFormat, reportParams, reportName, errorLog);
                                         if (file != null) {
                                             attachmentList.add(file);
                                         } else {
@@ -114,15 +105,12 @@ public class ExecuteEmailTasklet implements Tasklet {
                             }
                         } else if (reportStretchyParams.containsKey("savingId")) {
                             if (emailMessage.getClient() != null) {
-                                final List<SavingsAccount> savingsAccounts = savingsAccountRepository
-                                        .findSavingAccountByClientId(emailMessage.getClient().getId());
-                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams,
-                                        emailMessage.getClient());
+                                final List<SavingsAccount> savingsAccounts = savingsAccountRepository.findSavingAccountByClientId(emailMessage.getClient().getId());
+                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, emailMessage.getClient());
                                 for (final SavingsAccount savingsAccount : savingsAccounts) {
                                     if (savingsAccount.isActive()) {
                                         reportParams.put("savingId", savingsAccount.getId().toString());
-                                        File file = generateAttachments(emailCampaign, emailAttachmentFileFormat, reportParams, reportName,
-                                                errorLog);
+                                        File file = generateAttachments(emailCampaign, emailAttachmentFileFormat, reportParams, reportName, errorLog);
                                         if (file != null) {
                                             attachmentList.add(file);
                                         } else {
@@ -133,10 +121,8 @@ public class ExecuteEmailTasklet implements Tasklet {
                             }
                         } else {
                             if (emailMessage.getClient() != null) {
-                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams,
-                                        emailMessage.getClient());
-                                File file = generateAttachments(emailCampaign, emailAttachmentFileFormat, reportParams, reportName,
-                                        errorLog);
+                                HashMap<String, String> reportParams = replaceStretchyParamsWithActualClientParams(reportStretchyParams, emailMessage.getClient());
+                                File file = generateAttachments(emailCampaign, emailAttachmentFileFormat, reportParams, reportName, errorLog);
                                 if (file != null) {
                                     attachmentList.add(file);
                                 } else {
@@ -145,8 +131,7 @@ public class ExecuteEmailTasklet implements Tasklet {
                             }
                         }
                     }
-                    final EmailMessageWithAttachmentData emailMessageWithAttachmentData = EmailMessageWithAttachmentData.createNew(
-                            emailMessage.getEmailAddress(), emailMessage.getMessage(), emailMessage.getEmailSubject(), attachmentList);
+                    final EmailMessageWithAttachmentData emailMessageWithAttachmentData = EmailMessageWithAttachmentData.createNew(emailMessage.getEmailAddress(), emailMessage.getMessage(), emailMessage.getEmailSubject(), attachmentList);
                     try {
                         emailMessageJobEmailService.sendEmailWithAttachment(emailMessageWithAttachmentData);
                         emailMessage.setStatusType(EmailMessageStatusType.SENT.getValue());
@@ -173,42 +158,39 @@ public class ExecuteEmailTasklet implements Tasklet {
         return isValid;
     }
 
-    private HashMap<String, String> replaceStretchyParamsWithActualClientParams(final HashMap<String, String> stretchyParams,
-            final Client client) {
+    private HashMap<String, String> replaceStretchyParamsWithActualClientParams(final HashMap<String, String> stretchyParams, final Client client) {
         HashMap<String, String> actualParams = new HashMap<>();
         for (Map.Entry<String, String> entry : stretchyParams.entrySet()) {
             switch (entry.getKey()) {
-                case "selectOffice":
-                    if (client.getStaff() != null) {
-                        actualParams.put(entry.getKey(), client.getStaff().getOffice().getId().toString());
-                    } else {
-                        actualParams.put(entry.getKey(), client.getOffice().getId().toString());
-                    }
+            case "selectOffice": 
+                if (client.getStaff() != null) {
+                    actualParams.put(entry.getKey(), client.getStaff().getOffice().getId().toString());
+                } else {
+                    actualParams.put(entry.getKey(), client.getOffice().getId().toString());
+                }
                 break;
-                case "selectClient":
-                    actualParams.put(entry.getKey(), client.getId().toString());
+            case "selectClient": 
+                actualParams.put(entry.getKey(), client.getId().toString());
                 break;
-                case "selectLoanofficer":
-                    actualParams.put(entry.getKey(), client.getStaff().getId().toString());
+            case "selectLoanofficer": 
+                actualParams.put(entry.getKey(), client.getStaff().getId().toString());
                 break;
-                case "environementUrl":
-                    actualParams.put(entry.getKey(), entry.getKey());
+            case "environementUrl": 
+                actualParams.put(entry.getKey(), entry.getKey());
                 break;
-                default:
-                    log.warn("Query parameter could not be mapped: {}", entry.getKey());
+            default: 
+                log.warn("Query parameter could not be mapped: {}", entry.getKey());
             }
         }
         return actualParams;
     }
 
-    private File generateAttachments(final EmailCampaign emailCampaign, final ScheduledEmailAttachmentFileFormat emailAttachmentFileFormat,
-            final Map<String, String> reportParams, final String reportName, final StringBuilder errorLog) {
+    private File generateAttachments(final EmailCampaign emailCampaign, final ScheduledEmailAttachmentFileFormat emailAttachmentFileFormat, final Map<String, String> reportParams, final String reportName, final StringBuilder errorLog) {
         if (reportName == null) {
             return null;
         }
         try {
-            final ByteArrayOutputStream byteArrayOutputStream = readReportingService.generatePentahoReportAsOutputStream(reportName,
-                    emailAttachmentFileFormat.getValue(), reportParams, null, emailCampaign.getApprovedBy(), errorLog);
+            final ByteArrayOutputStream byteArrayOutputStream = readReportingService.generatePentahoReportAsOutputStream(reportName, emailAttachmentFileFormat.getValue(), reportParams, null, emailCampaign.getApprovedBy(), errorLog);
             final Path fileLocation = Path.of(fineractProperties.getContent().getFilesystem().getRootFolder());
             final Path fileNameWithoutExtension = fileLocation.resolve(reportName);
             if (!Files.isDirectory(fileLocation)) {
@@ -218,7 +200,6 @@ public class ExecuteEmailTasklet implements Tasklet {
                 errorLog.append("Pentaho report processing failed, empty output stream created");
             } else if (errorLog.length() == 0 && (byteArrayOutputStream.size() > 0)) {
                 final Path fileName = fileNameWithoutExtension.resolveSibling(reportName + "." + emailAttachmentFileFormat.getValue());
-
                 final File file = fileName.toFile();
                 try (var outputStream = Files.newOutputStream(fileName)) {
                     byteArrayOutputStream.writeTo(outputStream);
@@ -226,9 +207,20 @@ public class ExecuteEmailTasklet implements Tasklet {
                 return file;
             }
         } catch (IOException | PlatformDataIntegrityException e) {
-            errorLog.append("The ReportMailingJobWritePlatformServiceImpl.executeReportMailingJobs threw an IOException " + "exception: ")
-                    .append(e.getMessage()).append(" ---------- ");
+            errorLog.append("The ReportMailingJobWritePlatformServiceImpl.executeReportMailingJobs threw an IOException " + "exception: ").append(e.getMessage()).append(" ---------- ");
         }
         return null;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExecuteEmailTasklet(final EmailMessageRepository emailMessageRepository, final EmailCampaignRepository emailCampaignRepository, final LoanRepository loanRepository, final SavingsAccountRepository savingsAccountRepository, final EmailMessageJobEmailService emailMessageJobEmailService, final ReadReportingService readReportingService, final ReportMailingJobValidator reportMailingJobValidator, final FineractProperties fineractProperties) {
+        this.emailMessageRepository = emailMessageRepository;
+        this.emailCampaignRepository = emailCampaignRepository;
+        this.loanRepository = loanRepository;
+        this.savingsAccountRepository = savingsAccountRepository;
+        this.emailMessageJobEmailService = emailMessageJobEmailService;
+        this.readReportingService = readReportingService;
+        this.reportMailingJobValidator = reportMailingJobValidator;
+        this.fineractProperties = fineractProperties;
     }
 }

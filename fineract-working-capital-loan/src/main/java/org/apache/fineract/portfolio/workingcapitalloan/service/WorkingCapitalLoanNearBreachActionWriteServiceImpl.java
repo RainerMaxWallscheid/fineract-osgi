@@ -20,8 +20,6 @@ package org.apache.fineract.portfolio.workingcapitalloan.service;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -38,11 +36,10 @@ import org.apache.fineract.portfolio.workingcapitalloan.serialization.WorkingCap
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class WorkingCapitalLoanNearBreachActionWriteServiceImpl implements WorkingCapitalLoanNearBreachActionWriteService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanNearBreachActionWriteServiceImpl.class);
     private final WorkingCapitalLoanRepository loanRepository;
     private final WorkingCapitalLoanNearBreachActionRepository actionRepository;
     private final WorkingCapitalLoanDataValidator validator;
@@ -52,35 +49,30 @@ public class WorkingCapitalLoanNearBreachActionWriteServiceImpl implements Worki
     @Override
     public CommandProcessingResult createNearBreachAction(final Long loanId, final JsonCommand command) {
         final WorkingCapitalLoan loan = loanRepository.findById(loanId).orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
-
         validator.validateNearBreachAction(command.json(), loan);
-
-        final String actionStr = fromApiJsonHelper.extractStringNamed(WorkingCapitalLoanConstants.nearBreachActionParamName,
-                command.parsedJson());
+        final String actionStr = fromApiJsonHelper.extractStringNamed(WorkingCapitalLoanConstants.nearBreachActionParamName, command.parsedJson());
         final NearBreachActionType actionType = NearBreachActionType.valueOf(actionStr);
-
-        final BigDecimal threshold = fromApiJsonHelper.extractBigDecimalNamed(WorkingCapitalLoanConstants.nearBreachThresholdParamName,
-                command.parsedJson(), new HashSet<>());
-        final Integer frequency = fromApiJsonHelper.extractIntegerNamed(WorkingCapitalLoanConstants.nearBreachFrequencyParamName,
-                command.parsedJson(), new HashSet<>());
-        final String frequencyTypeStr = fromApiJsonHelper.extractStringNamed(WorkingCapitalLoanConstants.nearBreachFrequencyTypeParamName,
-                command.parsedJson());
-        final WorkingCapitalLoanPeriodFrequencyType frequencyType = frequencyTypeStr != null
-                ? WorkingCapitalLoanPeriodFrequencyType.fromString(frequencyTypeStr)
-                : null;
-
-        final WorkingCapitalLoanNearBreachAction action = WorkingCapitalLoanNearBreachAction.create(loan, actionType, threshold, frequency,
-                frequencyType);
+        final BigDecimal threshold = fromApiJsonHelper.extractBigDecimalNamed(WorkingCapitalLoanConstants.nearBreachThresholdParamName, command.parsedJson(), new HashSet<>());
+        final Integer frequency = fromApiJsonHelper.extractIntegerNamed(WorkingCapitalLoanConstants.nearBreachFrequencyParamName, command.parsedJson(), new HashSet<>());
+        final String frequencyTypeStr = fromApiJsonHelper.extractStringNamed(WorkingCapitalLoanConstants.nearBreachFrequencyTypeParamName, command.parsedJson());
+        final WorkingCapitalLoanPeriodFrequencyType frequencyType = frequencyTypeStr != null ? WorkingCapitalLoanPeriodFrequencyType.fromString(frequencyTypeStr) : null;
+        final WorkingCapitalLoanNearBreachAction action = WorkingCapitalLoanNearBreachAction.create(loan, actionType, threshold, frequency, frequencyType);
         final WorkingCapitalLoanNearBreachAction saved = actionRepository.saveAndFlush(action);
-
         log.debug("Created near breach action {} ({}) for WC loan {}", saved.getId(), actionType, loanId);
+        return  //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(saved.getId()).withLoanId(loanId).withOfficeId(loan.getOfficeId()).withClientId(loan.getClientId()).build();
+    }
 
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(saved.getId()) //
-                .withLoanId(loanId) //
-                .withOfficeId(loan.getOfficeId()) //
-                .withClientId(loan.getClientId()) //
-                .build();
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanNearBreachActionWriteServiceImpl(final WorkingCapitalLoanRepository loanRepository, final WorkingCapitalLoanNearBreachActionRepository actionRepository, final WorkingCapitalLoanDataValidator validator, final FromJsonHelper fromApiJsonHelper) {
+        this.loanRepository = loanRepository;
+        this.actionRepository = actionRepository;
+        this.validator = validator;
+        this.fromApiJsonHelper = fromApiJsonHelper;
     }
 }

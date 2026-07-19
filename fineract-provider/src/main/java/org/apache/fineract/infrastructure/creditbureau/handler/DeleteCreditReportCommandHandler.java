@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.creditbureau.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,15 +27,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 @CommandType(entity = "CREDITREPORT", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteCreditReportCommandHandler implements NewCommandSourceHandler {
-
     private final CreditReportWritePlatformService writePlatformService;
 
     @Override
     public CommandProcessingResult processCommand(JsonCommand command) {
-
         return this.writePlatformService.deleteCreditReport(command.entityId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DeleteCreditReportCommandHandler(final CreditReportWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
+    }
 }

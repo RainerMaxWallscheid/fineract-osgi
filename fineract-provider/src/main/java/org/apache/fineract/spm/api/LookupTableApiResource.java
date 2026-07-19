@@ -34,7 +34,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.Collections;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.spm.data.LookupTableData;
 import org.apache.fineract.spm.domain.LookupTable;
@@ -50,66 +49,51 @@ import org.springframework.transaction.annotation.Transactional;
 @Path("/v1/surveys/{surveyId}/lookuptables")
 @Component
 @Tag(name = "SPM API - LookUp Table", description = "The Apache Fineract SPM API provides the ability to create custom surveys to collect social performance measurentment data or any additional questionnaire a financial institute want to collect.")
-@RequiredArgsConstructor
 public class LookupTableApiResource {
-
     private final PlatformSecurityContext securityContext;
     private final SpmService spmService;
     private final LookupTableService lookupTableService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Transactional
     @Operation(summary = "List all Lookup Table entries", description = "List all Lookup Table entries for a survey.")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = LookupTableData.class))))
     public List<LookupTableData> fetchLookupTables(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId) {
         this.securityContext.authenticatedUser();
-
         final Survey survey = findSurvey(surveyId);
-
         final List<LookupTable> lookupTables = this.lookupTableService.findBySurvey(survey);
-
         if (lookupTables != null) {
             return LookupTableMapper.map(lookupTables);
         }
-
         return Collections.emptyList();
     }
 
     @GET
     @Path("/{key}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Transactional
     @Operation(summary = "Retrieve a Lookup Table entry", description = "Retrieve a Lookup Table entry for a survey.")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LookupTableData.class)))
-    public LookupTableData findLookupTable(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId,
-            @PathParam("key") @Parameter(description = "Enter key") final String key) {
+    public LookupTableData findLookupTable(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId, @PathParam("key") @Parameter(description = "Enter key") final String key) {
         this.securityContext.authenticatedUser();
-
         findSurvey(surveyId);
-
         final List<LookupTable> lookupTables = this.lookupTableService.findByKey(key);
-
         if (lookupTables == null || lookupTables.isEmpty()) {
             throw new LookupTableNotFoundException(key);
         }
-
         return LookupTableMapper.map(lookupTables).get(0);
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Transactional
-    @Operation(summary = "Create a Lookup Table entry", description = "Add a new entry to a survey.\n" + "\n" + "Mandatory Fields\n"
-            + "key, score, validFrom, validTo")
+    @Operation(summary = "Create a Lookup Table entry", description = "Add a new entry to a survey.\n" + "\n" + "Mandatory Fields\n" + "key, score, validFrom, validTo")
     @ApiResponse(responseCode = "200", description = "OK")
-    public void createLookupTable(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId,
-            final LookupTableData lookupTableData) {
+    public void createLookupTable(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId, final LookupTableData lookupTableData) {
         this.securityContext.authenticatedUser();
-
         final Survey survey = findSurvey(surveyId);
-
         this.lookupTableService.createLookupTable(LookupTableMapper.map(lookupTableData, survey));
     }
 
@@ -119,5 +103,12 @@ public class LookupTableApiResource {
             throw new SurveyNotFoundException(surveyId);
         }
         return survey;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LookupTableApiResource(final PlatformSecurityContext securityContext, final SpmService spmService, final LookupTableService lookupTableService) {
+        this.securityContext = securityContext;
+        this.spmService = spmService;
+        this.lookupTableService = lookupTableService;
     }
 }

@@ -18,18 +18,79 @@
  */
 package org.apache.fineract.infrastructure.campaigns.email.data;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-
-@Data
-@NoArgsConstructor
-@Accessors(chain = true)
 public class PreviewCampaignMessage {
-
     @SuppressWarnings("unused")
     private String campaignMessage;
-
     private Integer totalNumberOfMessages;
 
+    @java.lang.SuppressWarnings("all")
+        public String getCampaignMessage() {
+        return this.campaignMessage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getTotalNumberOfMessages() {
+        return this.totalNumberOfMessages;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public PreviewCampaignMessage setCampaignMessage(final String campaignMessage) {
+        this.campaignMessage = campaignMessage;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public PreviewCampaignMessage setTotalNumberOfMessages(final Integer totalNumberOfMessages) {
+        this.totalNumberOfMessages = totalNumberOfMessages;
+        return this;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof PreviewCampaignMessage)) return false;
+        final PreviewCampaignMessage other = (PreviewCampaignMessage) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$totalNumberOfMessages = this.getTotalNumberOfMessages();
+        final java.lang.Object other$totalNumberOfMessages = other.getTotalNumberOfMessages();
+        if (this$totalNumberOfMessages == null ? other$totalNumberOfMessages != null : !this$totalNumberOfMessages.equals(other$totalNumberOfMessages)) return false;
+        final java.lang.Object this$campaignMessage = this.getCampaignMessage();
+        final java.lang.Object other$campaignMessage = other.getCampaignMessage();
+        if (this$campaignMessage == null ? other$campaignMessage != null : !this$campaignMessage.equals(other$campaignMessage)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof PreviewCampaignMessage;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $totalNumberOfMessages = this.getTotalNumberOfMessages();
+        result = result * PRIME + ($totalNumberOfMessages == null ? 43 : $totalNumberOfMessages.hashCode());
+        final java.lang.Object $campaignMessage = this.getCampaignMessage();
+        result = result * PRIME + ($campaignMessage == null ? 43 : $campaignMessage.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "PreviewCampaignMessage(campaignMessage=" + this.getCampaignMessage() + ", totalNumberOfMessages=" + this.getTotalNumberOfMessages() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PreviewCampaignMessage() {
+    }
 }

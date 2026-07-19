@@ -21,25 +21,49 @@ package org.apache.fineract.cob.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "m_batch_business_steps")
-@NoArgsConstructor
-@Getter
-@Setter
 public class BatchBusinessStep extends AbstractPersistableCustom<Long> {
-
     @Column(name = "job_name", nullable = false)
     private String jobName;
-
     @Column(name = "step_name", nullable = false)
     private String stepName;
-
     @Column(name = "step_order", nullable = false)
     private Long stepOrder;
 
+    @java.lang.SuppressWarnings("all")
+        public BatchBusinessStep() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getJobName() {
+        return this.jobName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getStepName() {
+        return this.stepName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getStepOrder() {
+        return this.stepOrder;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setJobName(final String jobName) {
+        this.jobName = jobName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setStepName(final String stepName) {
+        this.stepName = stepName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setStepOrder(final Long stepOrder) {
+        this.stepOrder = stepOrder;
+    }
 }

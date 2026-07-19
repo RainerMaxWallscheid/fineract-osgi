@@ -19,11 +19,8 @@
 package org.apache.fineract.infrastructure.core.diagnostics.performance.sampling.output;
 
 import static java.util.stream.Collectors.toMap;
-
 import java.time.Duration;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.diagnostics.performance.sampling.core.SamplingConfiguration;
 import org.apache.fineract.infrastructure.core.diagnostics.performance.sampling.core.SamplingData;
 import org.apache.fineract.infrastructure.core.diagnostics.performance.sampling.core.SamplingService;
@@ -35,18 +32,17 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
 @Conditional(SamplingEnabledCondition.class)
-@Slf4j
 public class SamplingScheduler implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SamplingScheduler.class);
     private final SamplingServiceFactory samplingServiceFactory;
     private final SamplingDataPrinter printer;
     private final TaskScheduler taskScheduler;
     private final SamplingConfiguration samplingConfiguration;
 
-    @SuppressWarnings({ "FutureReturnValueIgnored" })
+    @SuppressWarnings({"FutureReturnValueIgnored"})
     @Override
     public void afterPropertiesSet() throws Exception {
         long resetPeriodInSec = samplingConfiguration.getResetPeriod().toSeconds();
@@ -61,12 +57,20 @@ public class SamplingScheduler implements InitializingBean {
     }
 
     private void printAndResetPeriodically() {
-        samplingServiceFactory.doWithAll((serviceMap) -> {
-            Map<Class<?>, SamplingData> samplingDataMap = serviceMap.entrySet() //
-                    .stream() //
-                    .collect(toMap(Map.Entry::getKey, e -> e.getValue().getSamplingData())); //
+        samplingServiceFactory.doWithAll(serviceMap -> {
+            Map<Class<?>, SamplingData> samplingDataMap =  //
+            //
+            serviceMap.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> e.getValue().getSamplingData())); //
             printer.print(samplingDataMap);
             serviceMap.values().forEach(SamplingService::reset);
         });
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SamplingScheduler(final SamplingServiceFactory samplingServiceFactory, final SamplingDataPrinter printer, final TaskScheduler taskScheduler, final SamplingConfiguration samplingConfiguration) {
+        this.samplingServiceFactory = samplingServiceFactory;
+        this.printer = printer;
+        this.taskScheduler = taskScheduler;
+        this.samplingConfiguration = samplingConfiguration;
     }
 }

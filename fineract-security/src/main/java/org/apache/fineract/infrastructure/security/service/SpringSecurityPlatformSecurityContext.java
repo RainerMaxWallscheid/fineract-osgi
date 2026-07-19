@@ -21,7 +21,6 @@ package org.apache.fineract.infrastructure.security.service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
@@ -38,22 +37,15 @@ import org.springframework.stereotype.Service;
 /**
  * Wrapper around spring security's {@link SecurityContext} for extracted the current authenticated {@link AppUser}.
  */
-
 @Service
-@RequiredArgsConstructor
 public class SpringSecurityPlatformSecurityContext implements PlatformSecurityContext {
-
     // private static final Logger LOG =
     // LoggerFactory.getLogger(SpringSecurityPlatformSecurityContext.class);
-
     private final ConfigurationDomainService configurationDomainService;
-
-    protected static final List<CommandWrapper> EXEMPT_FROM_PASSWORD_RESET_CHECK = new ArrayList<CommandWrapper>(
-            List.of(new CommandWrapperBuilder().changeUserPassword(null).build()));
+    protected static final List<CommandWrapper> EXEMPT_FROM_PASSWORD_RESET_CHECK = new ArrayList<CommandWrapper>(List.of(new CommandWrapperBuilder().changeUserPassword(null).build()));
 
     @Override
     public AppUser authenticatedUser() {
-
         AppUser currentUser = null;
         final SecurityContext context = SecurityContextHolder.getContext();
         if (context != null) {
@@ -65,15 +57,12 @@ public class SpringSecurityPlatformSecurityContext implements PlatformSecurityCo
                 }
             }
         }
-
         if (currentUser == null) {
             throw new UnAuthenticatedUserException();
         }
-
         if (this.doesPasswordHasToBeRenewed(currentUser)) {
             throw new ResetPasswordException(currentUser.getId());
         }
-
         return currentUser;
     }
 
@@ -84,7 +73,6 @@ public class SpringSecurityPlatformSecurityContext implements PlatformSecurityCo
 
     @Override
     public AppUser getAuthenticatedUserIfPresent() {
-
         AppUser currentUser = null;
         final SecurityContext context = SecurityContextHolder.getContext();
         if (context != null) {
@@ -93,21 +81,17 @@ public class SpringSecurityPlatformSecurityContext implements PlatformSecurityCo
                 currentUser = (AppUser) auth.getPrincipal();
             }
         }
-
         if (currentUser == null) {
             return null;
         }
-
         if (this.doesPasswordHasToBeRenewed(currentUser)) {
             throw new ResetPasswordException(currentUser.getId());
         }
-
         return currentUser;
     }
 
     @Override
     public AppUser authenticatedUser(CommandWrapper commandWrapper) {
-
         AppUser currentUser = null;
         final SecurityContext context = SecurityContextHolder.getContext();
         if (context != null) {
@@ -116,29 +100,22 @@ public class SpringSecurityPlatformSecurityContext implements PlatformSecurityCo
                 currentUser = (AppUser) auth.getPrincipal();
             }
         }
-
         if (currentUser == null) {
             throw new UnAuthenticatedUserException();
         }
-
         if (this.shouldCheckForPasswordForceReset(commandWrapper, currentUser) && this.doesPasswordHasToBeRenewed(currentUser)) {
             throw new ResetPasswordException(currentUser.getId());
         }
-
         return currentUser;
-
     }
 
     @Override
     public void validateAccessRights(final String resourceOfficeHierarchy) {
-
         final AppUser user = authenticatedUser();
         final String userOfficeHierarchy = user.getOffice().getHierarchy();
-
         if (!resourceOfficeHierarchy.startsWith(userOfficeHierarchy)) {
-            throw new NoAuthorizationException("The user doesn't have enough permissions to access the resource.");
+            throw new NoAuthorizationException("The user doesn\'t have enough permissions to access the resource.");
         }
-
     }
 
     @Override
@@ -148,34 +125,31 @@ public class SpringSecurityPlatformSecurityContext implements PlatformSecurityCo
 
     @Override
     public boolean doesPasswordHasToBeRenewed(AppUser currentUser) {
-
         if (currentUser.isPasswordResetRequired()) {
             return true;
         }
-
         if (this.configurationDomainService.isPasswordForcedResetEnable() && !currentUser.getPasswordNeverExpires()) {
-
             Long passwordDurationDays = this.configurationDomainService.retrievePasswordLiveTime();
             final LocalDate passWordLastUpdateDate = currentUser.getLastTimePasswordUpdated();
-
             final LocalDate passwordExpirationDate = passWordLastUpdateDate.plusDays(passwordDurationDays);
-
             if (DateUtils.isBeforeTenantDate(passwordExpirationDate)) {
                 return true;
             }
         }
         return false;
-
     }
 
     private boolean shouldCheckForPasswordForceReset(CommandWrapper commandWrapper, AppUser currentUser) {
         for (CommandWrapper commandItem : EXEMPT_FROM_PASSWORD_RESET_CHECK) {
-            if (commandItem.actionName().equals(commandWrapper.actionName())
-                    && commandItem.getEntityName().equals(commandWrapper.getEntityName())) {
+            if (commandItem.actionName().equals(commandWrapper.actionName()) && commandItem.getEntityName().equals(commandWrapper.getEntityName())) {
                 return commandWrapper.getEntityId() == null || !commandWrapper.getEntityId().equals(currentUser.getId());
             }
         }
         return true;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public SpringSecurityPlatformSecurityContext(final ConfigurationDomainService configurationDomainService) {
+        this.configurationDomainService = configurationDomainService;
+    }
 }

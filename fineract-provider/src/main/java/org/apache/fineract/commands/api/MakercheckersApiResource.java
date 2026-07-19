@@ -37,7 +37,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.commands.data.AuditData;
 import org.apache.fineract.commands.data.AuditSearchData;
@@ -54,48 +53,37 @@ import org.springframework.stereotype.Component;
 @Path("/v1/makercheckers")
 @Component
 @Tag(name = "Maker Checker (or 4-eye) functionality")
-@RequiredArgsConstructor
 public class MakercheckersApiResource {
-
     private static final String COMMAND_APPROVE = "approve";
     private static final String COMMAND_REJECT = "reject";
-
     private final AuditReadPlatformService readPlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService writePlatformService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "List Maker Checker Entries", description = "Get a list of entries that can be checked by the requestor that match the criteria supplied.\n"
-            + "\n" + "Example Requests:\n" + "\n" + "makercheckers\n" + "\n" + "makercheckers?fields=madeOnDate,maker,processingResult\n"
-            + "\n" + "makercheckers?makerDateTimeFrom=2013-03-25 08:00:00&makerDateTimeTo=2013-04-04 18:00:00\n" + "\n"
-            + "makercheckers?officeId=1\n" + "\n" + "makercheckers?officeId=1&includeJson=true")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "List Maker Checker Entries", description = "Get a list of entries that can be checked by the requestor that match the criteria supplied.\n" + "\n" + "Example Requests:\n" + "\n" + "makercheckers\n" + "\n" + "makercheckers?fields=madeOnDate,maker,processingResult\n" + "\n" + "makercheckers?makerDateTimeFrom=2013-03-25 08:00:00&makerDateTimeTo=2013-04-04 18:00:00\n" + "\n" + "makercheckers?officeId=1\n" + "\n" + "makercheckers?officeId=1&includeJson=true")
     public List<AuditData> retrieveCommands(@Context final UriInfo uriInfo, @BeanParam MakerCheckerRequest makerCheckerRequest) {
         final SQLBuilder extraCriteria = getExtraCriteria(makerCheckerRequest);
-
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return readPlatformService.retrieveAllEntriesToBeChecked(extraCriteria, settings.isIncludeJson());
-
     }
 
     @GET
     @Path("/searchtemplate")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Maker Checker Search Template", description = "This is a convenience resource. It can be useful when building a Checker Inbox UI. \"appUsers\" are data scoped to the office/branch the requestor is associated with. \"actionNames\" and \"entityNames\" returned are those that the requestor has Checker approval permissions for.\n"
-            + "\n" + "Example Requests:\n" + "\n" + "makercheckers/searchtemplate\n" + "makercheckers/searchtemplate?fields=entityNames")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Maker Checker Search Template", description = "This is a convenience resource. It can be useful when building a Checker Inbox UI. \"appUsers\" are data scoped to the office/branch the requestor is associated with. \"actionNames\" and \"entityNames\" returned are those that the requestor has Checker approval permissions for.\n" + "\n" + "Example Requests:\n" + "\n" + "makercheckers/searchtemplate\n" + "makercheckers/searchtemplate?fields=entityNames")
     public AuditSearchData retrieveAuditSearchTemplate() {
         return readPlatformService.retrieveSearchTemplate("makerchecker");
     }
 
     @POST
     @Path("{auditId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Approve Maker Checker Entry | Reject Maker Checker Entry")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = MakercheckersApiResourceSwagger.PostMakerCheckersResponse.class)))
-    public CommandProcessingResult approveMakerCheckerEntry(@PathParam("auditId") @Parameter(description = "auditId") final Long auditId,
-            @QueryParam("command") @Parameter(description = "command") final String commandParam) {
-
+    public CommandProcessingResult approveMakerCheckerEntry(@PathParam("auditId") @Parameter(description = "auditId") final Long auditId, @QueryParam("command") @Parameter(description = "command") final String commandParam) {
         CommandProcessingResult result = null;
         if (is(commandParam, COMMAND_APPROVE)) {
             result = writePlatformService.approveEntry(auditId);
@@ -114,7 +102,7 @@ public class MakercheckersApiResource {
 
     @DELETE
     @Path("{auditId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete Maker Checker Entry")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = MakercheckersApiResourceSwagger.PostMakerCheckersResponse.class)))
     public CommandProcessingResult deleteMakerCheckerEntry(@PathParam("auditId") @Parameter(description = "auditId") final Long auditId) {
@@ -123,7 +111,6 @@ public class MakercheckersApiResource {
     }
 
     private SQLBuilder getExtraCriteria(MakerCheckerRequest makerCheckerRequest) {
-
         SQLBuilder extraCriteria = new SQLBuilder();
         extraCriteria.addNonNullCriteria("aud.action_name = ", makerCheckerRequest.getActionName());
         if (makerCheckerRequest.getEntityName() != null) {
@@ -138,7 +125,13 @@ public class MakercheckersApiResource {
         extraCriteria.addNonNullCriteria("aud.client_id = ", makerCheckerRequest.getClientId());
         extraCriteria.addNonNullCriteria("aud.loan_id = ", makerCheckerRequest.getLoanId());
         extraCriteria.addNonNullCriteria("aud.savings_account_id = ", makerCheckerRequest.getSavingsAccountId());
-
         return extraCriteria;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MakercheckersApiResource(final AuditReadPlatformService readPlatformService, final ApiRequestParameterHelper apiRequestParameterHelper, final PortfolioCommandSourceWritePlatformService writePlatformService) {
+        this.readPlatformService = readPlatformService;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.writePlatformService = writePlatformService;
     }
 }

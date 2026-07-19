@@ -20,7 +20,6 @@ package org.apache.fineract.infrastructure.sms.api;
 
 import static org.apache.fineract.infrastructure.core.api.DateParam.FROM_DATE_PARAM;
 import static org.apache.fineract.infrastructure.core.api.DateParam.TO_DATE_PARAM;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.BeanParam;
@@ -36,7 +35,6 @@ import jakarta.ws.rs.core.MediaType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -55,14 +53,11 @@ import org.apache.fineract.infrastructure.sms.service.SmsReadPlatformService;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/sms")
-@Produces({ MediaType.APPLICATION_JSON })
+@Produces({MediaType.APPLICATION_JSON})
 @Component
 @Tag(name = "SMS", description = "")
-@RequiredArgsConstructor
 public class SmsApiResource {
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "SMS";
-
     private final PlatformSecurityContext context;
     private final SmsReadPlatformService readPlatformService;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
@@ -77,12 +72,11 @@ public class SmsApiResource {
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create a SMS message", operationId = "createSms")
     @AlternativeOperationId("create_2")
     public CommandProcessingResult create(final SmsCreationRequest smsCreationRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createSms()
-                .withJson(apiJsonSerializer.serialize(smsCreationRequest)).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createSms().withJson(apiJsonSerializer.serialize(smsCreationRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
@@ -97,31 +91,22 @@ public class SmsApiResource {
     @GET
     @Path("{campaignId}/messageByStatus")
     @Operation(summary = "Retrieve SMS messages by status", operationId = "retrieveAllSmsByStatus")
-    public Page<SmsData> retrieveAllSmsByStatus(@PathParam("campaignId") final Long campaignId,
-            @BeanParam SmsRequestParam smsRequestParam) {
+    public Page<SmsData> retrieveAllSmsByStatus(@PathParam("campaignId") final Long campaignId, @BeanParam SmsRequestParam smsRequestParam) {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-        final SearchParameters searchParameters = SearchParameters.builder().limit(smsRequestParam.getLimit())
-                .offset(smsRequestParam.getOffset()).orderBy(smsRequestParam.getOrderBy()).sortOrder(smsRequestParam.getSortOrder())
-                .build();
-
+        final SearchParameters searchParameters = SearchParameters.builder().limit(smsRequestParam.getLimit()).offset(smsRequestParam.getOffset()).orderBy(smsRequestParam.getOrderBy()).sortOrder(smsRequestParam.getSortOrder()).build();
         final DateFormat dateFormat = Optional.ofNullable(smsRequestParam.getRawDateFormat()).map(DateFormat::new).orElse(null);
-        final LocalDate fromDate = Optional.ofNullable(smsRequestParam.getFromDate())
-                .map(fromDateParam -> fromDateParam.getDate(FROM_DATE_PARAM, dateFormat, smsRequestParam.getLocale())).orElse(null);
-        final LocalDate toDate = Optional.ofNullable(smsRequestParam.getToDate())
-                .map(toDateParam -> toDateParam.getDate(TO_DATE_PARAM, dateFormat, smsRequestParam.getLocale())).orElse(null);
-
-        return readPlatformService.retrieveSmsByStatus(campaignId, searchParameters, smsRequestParam.getStatus().intValue(), fromDate,
-                toDate);
+        final LocalDate fromDate = Optional.ofNullable(smsRequestParam.getFromDate()).map(fromDateParam -> fromDateParam.getDate(FROM_DATE_PARAM, dateFormat, smsRequestParam.getLocale())).orElse(null);
+        final LocalDate toDate = Optional.ofNullable(smsRequestParam.getToDate()).map(toDateParam -> toDateParam.getDate(TO_DATE_PARAM, dateFormat, smsRequestParam.getLocale())).orElse(null);
+        return readPlatformService.retrieveSmsByStatus(campaignId, searchParameters, smsRequestParam.getStatus().intValue(), fromDate, toDate);
     }
 
     @PUT
     @Path("{resourceId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a SMS message", operationId = "updateSms")
     @AlternativeOperationId("update_3")
     public CommandProcessingResult update(@PathParam("resourceId") final Long resourceId, final SmsUpdateRequest smsUpdateRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateSms(resourceId)
-                .withJson(apiJsonSerializer.serialize(smsUpdateRequest)).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateSms(resourceId).withJson(apiJsonSerializer.serialize(smsUpdateRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
@@ -132,5 +117,13 @@ public class SmsApiResource {
     public CommandProcessingResult delete(@PathParam("resourceId") final Long resourceId) {
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteSms(resourceId).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SmsApiResource(final PlatformSecurityContext context, final SmsReadPlatformService readPlatformService, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final DefaultToApiJsonSerializer<String> apiJsonSerializer) {
+        this.context = context;
+        this.readPlatformService = readPlatformService;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.apiJsonSerializer = apiJsonSerializer;
     }
 }

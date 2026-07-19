@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.delinquency.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,15 +27,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "DELINQUENCY_RANGE", action = "CREATE")
 public class CreateDelinquencyRangeCommandHandler implements NewCommandSourceHandler {
-
     private final DelinquencyWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.createDelinquencyRange(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateDelinquencyRangeCommandHandler(final DelinquencyWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

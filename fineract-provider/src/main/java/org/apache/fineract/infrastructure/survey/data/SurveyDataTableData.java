@@ -18,26 +18,47 @@
  */
 package org.apache.fineract.infrastructure.survey.data;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.dataqueries.data.DatatableData;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public final class SurveyDataTableData {
-
     @SuppressWarnings("unused")
     private DatatableData datatableData;
-
     @SuppressWarnings("unused")
     private boolean enabled;
 
     public static SurveyDataTableData create(final DatatableData datatableData, final boolean enabled) {
-
         return new SurveyDataTableData().setDatatableData(datatableData).setEnabled(enabled);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DatatableData getDatatableData() {
+        return this.datatableData;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isEnabled() {
+        return this.enabled;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public SurveyDataTableData setDatatableData(final DatatableData datatableData) {
+        this.datatableData = datatableData;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public SurveyDataTableData setEnabled(final boolean enabled) {
+        this.enabled = enabled;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SurveyDataTableData() {
     }
 }

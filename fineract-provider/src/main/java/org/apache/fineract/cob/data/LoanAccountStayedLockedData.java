@@ -18,15 +18,32 @@
  */
 package org.apache.fineract.cob.data;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 
-@Getter
-@AllArgsConstructor
 public class LoanAccountStayedLockedData {
-
     private Long id;
     private ExternalId externalId;
     private String accountNo;
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalId getExternalId() {
+        return this.externalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getAccountNo() {
+        return this.accountNo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanAccountStayedLockedData(final Long id, final ExternalId externalId, final String accountNo) {
+        this.id = id;
+        this.externalId = externalId;
+        this.accountNo = accountNo;
+    }
 }

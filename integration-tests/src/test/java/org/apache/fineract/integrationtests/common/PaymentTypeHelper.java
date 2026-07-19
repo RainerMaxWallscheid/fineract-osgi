@@ -16,15 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.integrationtests.common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.PaymentTypeCreateRequest;
 import org.apache.fineract.client.models.PaymentTypeCreateResponse;
 import org.apache.fineract.client.models.PaymentTypeData;
@@ -33,11 +30,13 @@ import org.apache.fineract.client.models.PaymentTypeUpdateRequest;
 import org.apache.fineract.client.models.PaymentTypeUpdateResponse;
 import org.apache.fineract.client.util.Calls;
 
-@Slf4j
 @SuppressWarnings("HideUtilityClassConstructor")
 public final class PaymentTypeHelper {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PaymentTypeHelper.class);
 
-    public PaymentTypeHelper() {}
+    public PaymentTypeHelper() {
+    }
 
     public static List<PaymentTypeData> getAllPaymentTypes(final Boolean onlyWithCode) {
         log.info("-------------------------------GETTING ALL PAYMENT TYPES-------------------------------------------");
@@ -51,8 +50,7 @@ public final class PaymentTypeHelper {
 
     public static void verifyPaymentTypeCreatedOnServer(final Long generatedPaymentTypeID) {
         log.info("-------------------------------CHECK PAYMENT DETAILS-------------------------------------------");
-        PaymentTypeData response = Calls
-                .ok(FineractClientHelper.getFineractClient().paymentTypes.retrieveOnePaymentType(generatedPaymentTypeID));
+        PaymentTypeData response = Calls.ok(FineractClientHelper.getFineractClient().paymentTypes.retrieveOnePaymentType(generatedPaymentTypeID));
         assertEquals(generatedPaymentTypeID, response.getId(), "ERROR IN CREATING THE PAYMENT TYPE");
     }
 

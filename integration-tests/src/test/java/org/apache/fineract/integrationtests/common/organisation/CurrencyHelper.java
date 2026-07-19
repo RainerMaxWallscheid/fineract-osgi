@@ -19,17 +19,17 @@
 package org.apache.fineract.integrationtests.common.organisation;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
-
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.CurrencyData;
 import org.apache.fineract.client.models.CurrencyUpdateRequest;
 import org.apache.fineract.integrationtests.common.FineractFeignClientHelper;
 
-@Slf4j
 public final class CurrencyHelper {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CurrencyHelper.class);
 
-    private CurrencyHelper() {}
+    private CurrencyHelper() {
+    }
 
     public static List<CurrencyData> getPermittedCurrencies() {
         log.info("--------------------------------- GET PERMITTED CURRENCY OPTIONS -------------------------------");
@@ -43,7 +43,6 @@ public final class CurrencyHelper {
 
     public static List<String> updateCurrencies(final List<String> currencies) {
         log.info("--------------------------------- UPDATE CURRENCY OPTIONS -------------------------------");
-        return ok(() -> FineractFeignClientHelper.getFineractFeignClient().currency()
-                .updateCurrencies(new CurrencyUpdateRequest().currencies(currencies))).getCurrencies();
+        return ok(() -> FineractFeignClientHelper.getFineractFeignClient().currency().updateCurrencies(new CurrencyUpdateRequest().currencies(currencies))).getCurrencies();
     }
 }

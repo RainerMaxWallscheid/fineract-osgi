@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.organisation.provisioning.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "PROVISIONCRITERIA", action = "CREATE")
-@RequiredArgsConstructor
 public class CreateProvisioningCriteriaRequestCommandHandler implements NewCommandSourceHandler {
-
     private final ProvisioningCriteriaWritePlatformService provisioningCriteriaWritePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class CreateProvisioningCriteriaRequestCommandHandler implements NewComma
         return this.provisioningCriteriaWritePlatformService.createProvisioningCriteria(jsonCommand);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public CreateProvisioningCriteriaRequestCommandHandler(final ProvisioningCriteriaWritePlatformService provisioningCriteriaWritePlatformService) {
+        this.provisioningCriteriaWritePlatformService = provisioningCriteriaWritePlatformService;
+    }
 }

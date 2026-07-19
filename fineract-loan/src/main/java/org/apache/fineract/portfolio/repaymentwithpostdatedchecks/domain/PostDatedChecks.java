@@ -27,8 +27,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -36,14 +34,10 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleIns
 
 @Entity
 @Table(name = "m_repayment_with_post_dated_checks")
-@Getter
 public class PostDatedChecks extends AbstractPersistableCustom<Long> {
-
-    @Setter
     @ManyToOne(optional = false)
     @JoinColumn(name = "loan_id", referencedColumnName = "id", nullable = false)
     private Loan loan;
-    @Setter
     @ManyToOne(optional = false)
     @JoinColumn(name = "repayment_id", referencedColumnName = "id", nullable = false)
     private LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment;
@@ -55,17 +49,15 @@ public class PostDatedChecks extends AbstractPersistableCustom<Long> {
     private BigDecimal amount;
     @Column(name = "repayment_date", nullable = false)
     private LocalDate repaymentDate;
-    @Setter
     @Column(name = "status", columnDefinition = "0")
     private Integer status;
     @Column(name = "check_no", nullable = false, unique = true)
     private Long checkNo;
 
-    public PostDatedChecks() {}
+    public PostDatedChecks() {
+    }
 
-    private PostDatedChecks(final Long accountNo, final String bankName, final BigDecimal amount,
-            final LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment, final LocalDate date, final Loan loan,
-            final Long checkNo) {
+    private PostDatedChecks(final Long accountNo, final String bankName, final BigDecimal amount, final LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment, final LocalDate date, final Loan loan, final Long checkNo) {
         this.bankName = bankName;
         this.accountNo = accountNo;
         this.amount = amount;
@@ -75,39 +67,87 @@ public class PostDatedChecks extends AbstractPersistableCustom<Long> {
         this.checkNo = checkNo;
     }
 
-    public static PostDatedChecks instanceOf(final Long accountNo, final String bankName, final BigDecimal amount,
-            final LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment, final Loan loan, final Long checkNo) {
-        return new PostDatedChecks(accountNo, bankName, amount, loanRepaymentScheduleInstallment,
-                loanRepaymentScheduleInstallment.getDueDate(), loan, checkNo);
+    public static PostDatedChecks instanceOf(final Long accountNo, final String bankName, final BigDecimal amount, final LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment, final Loan loan, final Long checkNo) {
+        return new PostDatedChecks(accountNo, bankName, amount, loanRepaymentScheduleInstallment, loanRepaymentScheduleInstallment.getDueDate(), loan, checkNo);
     }
 
     public Map<String, Object> updatePostDatedChecks(JsonCommand command) {
         final Map<String, Object> changes = new HashMap<>();
-
         if (command.isChangeInBigDecimalParameterNamed("amount", this.amount)) {
             final BigDecimal newAmount = command.bigDecimalValueOfParameterNamed("amount");
             this.amount = newAmount;
             changes.put("amount", newAmount);
         }
-
         if (command.isChangeInStringParameterNamed("name", this.bankName)) {
             final String newName = command.stringValueOfParameterNamed("name");
             this.bankName = newName;
             changes.put("bankName", newName);
         }
-
         if (command.isChangeInLongParameterNamed("accountNo", this.accountNo)) {
             final Long newAccountNo = command.longValueOfParameterNamed("accountNo");
             this.accountNo = newAccountNo;
             changes.put("accountNo", newAccountNo);
         }
-
         if (command.isChangeInLongParameterNamed("checkNo", this.accountNo)) {
             final Long newCheckNo = command.longValueOfParameterNamed("checkNo");
             this.checkNo = newCheckNo;
             changes.put("checkNo", newCheckNo);
         }
-
         return changes;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Loan getLoan() {
+        return this.loan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanRepaymentScheduleInstallment getLoanRepaymentScheduleInstallment() {
+        return this.loanRepaymentScheduleInstallment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getAccountNo() {
+        return this.accountNo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getBankName() {
+        return this.bankName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getRepaymentDate() {
+        return this.repaymentDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getStatus() {
+        return this.status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getCheckNo() {
+        return this.checkNo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoan(final Loan loan) {
+        this.loan = loan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanRepaymentScheduleInstallment(final LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment) {
+        this.loanRepaymentScheduleInstallment = loanRepaymentScheduleInstallment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setStatus(final Integer status) {
+        this.status = status;
     }
 }

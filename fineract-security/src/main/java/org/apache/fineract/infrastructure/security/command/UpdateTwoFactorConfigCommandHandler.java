@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.security.command;
 
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -34,9 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @CommandType(entity = "TWOFACTOR_CONFIGURATION", action = "UPDATE")
 @ConditionalOnProperty("fineract.security.2fa.enabled")
-@RequiredArgsConstructor
 public class UpdateTwoFactorConfigCommandHandler implements NewCommandSourceHandler {
-
     private final TwoFactorConfigurationService configurationService;
     private final TwoFactorConfigurationValidator dataValidator;
 
@@ -45,9 +42,15 @@ public class UpdateTwoFactorConfigCommandHandler implements NewCommandSourceHand
     public CommandProcessingResult processCommand(final JsonCommand command) {
         this.dataValidator.validateForUpdate(command.json());
         final Map<String, Object> changes = configurationService.update(command);
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).with(changes).build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateTwoFactorConfigCommandHandler(final TwoFactorConfigurationService configurationService, final TwoFactorConfigurationValidator dataValidator) {
+        this.configurationService = configurationService;
+        this.dataValidator = dataValidator;
     }
 }

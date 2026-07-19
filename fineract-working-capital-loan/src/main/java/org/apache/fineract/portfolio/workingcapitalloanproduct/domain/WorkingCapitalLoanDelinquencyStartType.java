@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.portfolio.workingcapitalloanproduct.domain;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.ApiFacingEnum;
 import org.apache.fineract.infrastructure.core.data.StringEnumOptionData;
 import org.springframework.util.StringUtils;
@@ -27,14 +25,10 @@ import org.springframework.util.StringUtils;
 /**
  * Delinquency start types for Working Capital Loan Product.
  */
-@Getter
-@RequiredArgsConstructor
 public enum WorkingCapitalLoanDelinquencyStartType implements ApiFacingEnum<WorkingCapitalLoanDelinquencyStartType> {
-
-    LOAN_CREATION(1, "LOAN_CREATION", "Loan Creation"), //
+    LOAN_CREATION(1, "LOAN_CREATION", "Loan Creation"),  //
     DISBURSEMENT(2, "DISBURSEMENT", "Disbursement") //
     ;
-
     private final Integer value;
     private final String code;
     private final String humanReadableName;
@@ -46,18 +40,38 @@ public enum WorkingCapitalLoanDelinquencyStartType implements ApiFacingEnum<Work
         if (!StringUtils.hasText(delinquencyStartTypeValue)) {
             return null;
         }
-
         if (delinquencyStartTypeValue.trim().equalsIgnoreCase(LOAN_CREATION.name())) {
             return LOAN_CREATION;
         }
         if (delinquencyStartTypeValue.trim().equalsIgnoreCase(DISBURSEMENT.name())) {
             return DISBURSEMENT;
         }
-
         return null;
     }
 
     public StringEnumOptionData toStringEnumOptionData() {
         return new StringEnumOptionData(getValue().toString(), getCode(), getHumanReadableName());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private WorkingCapitalLoanDelinquencyStartType(final Integer value, final String code, final String humanReadableName) {
+        this.value = value;
+        this.code = code;
+        this.humanReadableName = humanReadableName;
     }
 }

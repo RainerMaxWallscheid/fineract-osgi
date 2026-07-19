@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.campaigns.email.service;
 
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.campaigns.email.data.EmailDataValidator;
 import org.apache.fineract.infrastructure.campaigns.email.domain.EmailMessage;
 import org.apache.fineract.infrastructure.campaigns.email.domain.EmailMessageAssembler;
@@ -38,11 +37,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class EmailWritePlatformServiceJpaRepositoryImpl implements EmailWritePlatformService {
-
     private static final Logger LOG = LoggerFactory.getLogger(EmailWritePlatformServiceJpaRepositoryImpl.class);
-
     private final EmailMessageAssembler assembler;
     private final EmailMessageRepository repository;
     private final EmailDataValidator validator;
@@ -50,23 +46,19 @@ public class EmailWritePlatformServiceJpaRepositoryImpl implements EmailWritePla
     @Transactional
     @Override
     public CommandProcessingResult create(final JsonCommand command) {
-
         try {
             this.validator.validateCreateRequest(command);
-
             final EmailMessage message = this.assembler.assembleFromJson(command);
-
             // TODO: at this point we also want to fire off request using third
             // party service to send Email.
             // TODO: decision to be made on wheter we 'wait' for response or use
             // 'future/promise' to capture response and update the EmailMessage
             // table
             this.repository.saveAndFlush(message);
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(message.getId()) //
-                    .build();
+            return  //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(message.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleDataIntegrityIssues(command, throwable, dve);
@@ -77,21 +69,18 @@ public class EmailWritePlatformServiceJpaRepositoryImpl implements EmailWritePla
     @Transactional
     @Override
     public CommandProcessingResult update(final Long resourceId, final JsonCommand command) {
-
         try {
             this.validator.validateUpdateRequest(command);
-
             final EmailMessage message = this.assembler.assembleFromResourceId(resourceId);
             final Map<String, Object> changes = message.update(command);
             if (!changes.isEmpty()) {
                 this.repository.save(message);
             }
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(resourceId) //
-                    .with(changes) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(resourceId).with(changes).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleDataIntegrityIssues(command, throwable, dve);
@@ -102,7 +91,6 @@ public class EmailWritePlatformServiceJpaRepositoryImpl implements EmailWritePla
     @Transactional
     @Override
     public CommandProcessingResult delete(final Long resourceId) {
-
         try {
             final EmailMessage message = this.assembler.assembleFromResourceId(resourceId);
             this.repository.delete(message);
@@ -112,23 +100,26 @@ public class EmailWritePlatformServiceJpaRepositoryImpl implements EmailWritePla
             handleDataIntegrityIssues(null, throwable, dve);
             return CommandProcessingResult.empty();
         }
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(resourceId) //
-                .build();
+        return  //
+        //
+        new CommandProcessingResultBuilder().withEntityId(resourceId).build();
     }
 
     /*
      * Guaranteed to throw an exception no matter what the data integrity issue is.
      */
-    private void handleDataIntegrityIssues(@SuppressWarnings("unused") final JsonCommand command, final Throwable realCause,
-            final NonTransientDataAccessException dve) {
+    private void handleDataIntegrityIssues(@SuppressWarnings("unused") final JsonCommand command, final Throwable realCause, final NonTransientDataAccessException dve) {
         if (realCause.getMessage().contains("email_address")) {
-            throw new PlatformDataIntegrityException("error.msg.email.no.email.address.exists",
-                    "The group, client or staff provided has no email address.", "id");
+            throw new PlatformDataIntegrityException("error.msg.email.no.email.address.exists", "The group, client or staff provided has no email address.", "id");
         }
-
         LOG.error("Error occured.", dve);
-        throw ErrorHandler.getMappable(dve, "error.msg.email.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource: " + realCause.getMessage());
+        throw ErrorHandler.getMappable(dve, "error.msg.email.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EmailWritePlatformServiceJpaRepositoryImpl(final EmailMessageAssembler assembler, final EmailMessageRepository repository, final EmailDataValidator validator) {
+        this.assembler = assembler;
+        this.repository = repository;
+        this.validator = validator;
     }
 }

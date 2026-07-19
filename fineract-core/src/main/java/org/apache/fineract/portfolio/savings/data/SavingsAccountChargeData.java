@@ -23,7 +23,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.MonthDay;
 import java.util.Collection;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.jersey.serializer.legacy.JsonLocalDateArrayFormat;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
@@ -33,10 +32,8 @@ import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 /**
  * Immutable data object for Savings Account charge data.
  */
-@Getter
 @JsonLocalDateArrayFormat
 public class SavingsAccountChargeData implements Serializable {
-
     private final Long id;
     private final Long chargeId;
     private final Long accountId;
@@ -147,42 +144,19 @@ public class SavingsAccountChargeData implements Serializable {
         final Integer freeWithdrawalChargeFrequency = null;
         final Integer restartFrequency = null;
         final Integer restartFrequencyEnum = null;
-
         final LocalDate inactivationDate = null;
-
-        return new SavingsAccountChargeData(id, chargeId, accountId, name, chargeTimeType, dueAsOfDate, chargeCalculationType, percentage,
-                amountPercentageAppliedTo, currency, amount, amountPaid, amountWaived, amountWrittenOff, amountOutstanding, chargeOptions,
-                penalty, feeOnMonthDay, feeInterval, isActive, isFreeWithdrawal, freeWithdrawalChargeFrequency, restartFrequency,
-                restartFrequencyEnum, inactivationDate);
+        return new SavingsAccountChargeData(id, chargeId, accountId, name, chargeTimeType, dueAsOfDate, chargeCalculationType, percentage, amountPercentageAppliedTo, currency, amount, amountPaid, amountWaived, amountWrittenOff, amountOutstanding, chargeOptions, penalty, feeOnMonthDay, feeInterval, isActive, isFreeWithdrawal, freeWithdrawalChargeFrequency, restartFrequency, restartFrequencyEnum, inactivationDate);
     }
 
-    public static SavingsAccountChargeData instance(final Long id, final Long chargeId, final Long accountId, final String name,
-            final CurrencyData currency, final BigDecimal amount, final BigDecimal amountPaid, final BigDecimal amountWaived,
-            final BigDecimal amountWrittenOff, final BigDecimal amountOutstanding, final EnumOptionData chargeTimeType,
-            final LocalDate dueAsOfDate, final EnumOptionData chargeCalculationType, final BigDecimal percentage,
-            final BigDecimal amountPercentageAppliedTo, final Collection<ChargeData> chargeOptions, final boolean penalty,
-            final MonthDay feeOnMonthDay, final Integer feeInterval, final Boolean isActive, final Boolean isFreeWithdrawal,
-            final Integer freeWithdrawalChargeFrequency, final Integer restartFrequency, final Integer restartFrequencyEnum,
-            final LocalDate inactivationDate) {
-
-        return new SavingsAccountChargeData(id, chargeId, accountId, name, chargeTimeType, dueAsOfDate, chargeCalculationType, percentage,
-                amountPercentageAppliedTo, currency, amount, amountPaid, amountWaived, amountWrittenOff, amountOutstanding, chargeOptions,
-                penalty, feeOnMonthDay, feeInterval, isActive, isFreeWithdrawal, freeWithdrawalChargeFrequency, restartFrequency,
-                restartFrequencyEnum, inactivationDate);
+    public static SavingsAccountChargeData instance(final Long id, final Long chargeId, final Long accountId, final String name, final CurrencyData currency, final BigDecimal amount, final BigDecimal amountPaid, final BigDecimal amountWaived, final BigDecimal amountWrittenOff, final BigDecimal amountOutstanding, final EnumOptionData chargeTimeType, final LocalDate dueAsOfDate, final EnumOptionData chargeCalculationType, final BigDecimal percentage, final BigDecimal amountPercentageAppliedTo, final Collection<ChargeData> chargeOptions, final boolean penalty, final MonthDay feeOnMonthDay, final Integer feeInterval, final Boolean isActive, final Boolean isFreeWithdrawal, final Integer freeWithdrawalChargeFrequency, final Integer restartFrequency, final Integer restartFrequencyEnum, final LocalDate inactivationDate) {
+        return new SavingsAccountChargeData(id, chargeId, accountId, name, chargeTimeType, dueAsOfDate, chargeCalculationType, percentage, amountPercentageAppliedTo, currency, amount, amountPaid, amountWaived, amountWrittenOff, amountOutstanding, chargeOptions, penalty, feeOnMonthDay, feeInterval, isActive, isFreeWithdrawal, freeWithdrawalChargeFrequency, restartFrequency, restartFrequencyEnum, inactivationDate);
     }
 
     public boolean isFeeCharge() {
         return !this.penalty;
     }
 
-    private SavingsAccountChargeData(final Long id, final Long chargeId, final Long accountId, final String name,
-            final EnumOptionData chargeTimeType, final LocalDate dueAsOfDate, final EnumOptionData chargeCalculationType,
-            final BigDecimal percentage, final BigDecimal amountPercentageAppliedTo, final CurrencyData currency, final BigDecimal amount,
-            final BigDecimal amountPaid, final BigDecimal amountWaived, final BigDecimal amountWrittenOff,
-            final BigDecimal amountOutstanding, final Collection<ChargeData> chargeOptions, final boolean penalty,
-            final MonthDay feeOnMonthDay, final Integer feeInterval, final Boolean isActive, final Boolean isFreeWithdrawal,
-            final Integer freeWithdrawalChargeFrequency, final Integer restartFrequency, final Integer restartFrequencyEnum,
-            final LocalDate inactivationDate) {
+    private SavingsAccountChargeData(final Long id, final Long chargeId, final Long accountId, final String name, final EnumOptionData chargeTimeType, final LocalDate dueAsOfDate, final EnumOptionData chargeCalculationType, final BigDecimal percentage, final BigDecimal amountPercentageAppliedTo, final CurrencyData currency, final BigDecimal amount, final BigDecimal amountPaid, final BigDecimal amountWaived, final BigDecimal amountWrittenOff, final BigDecimal amountOutstanding, final Collection<ChargeData> chargeOptions, final boolean penalty, final MonthDay feeOnMonthDay, final Integer feeInterval, final Boolean isActive, final Boolean isFreeWithdrawal, final Integer freeWithdrawalChargeFrequency, final Integer restartFrequency, final Integer restartFrequencyEnum, final LocalDate inactivationDate) {
         this.id = id;
         this.chargeId = chargeId;
         this.accountId = accountId;
@@ -227,4 +201,138 @@ public class SavingsAccountChargeData implements Serializable {
         return ChargeTimeType.fromInt(this.chargeTimeType.getId().intValue()).isSavingsActivation();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getChargeId() {
+        return this.chargeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getAccountId() {
+        return this.accountId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getChargeTimeType() {
+        return this.chargeTimeType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getDueDate() {
+        return this.dueDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MonthDay getFeeOnMonthDay() {
+        return this.feeOnMonthDay;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getFeeInterval() {
+        return this.feeInterval;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getChargeCalculationType() {
+        return this.chargeCalculationType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPercentage() {
+        return this.percentage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountPercentageAppliedTo() {
+        return this.amountPercentageAppliedTo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CurrencyData getCurrency() {
+        return this.currency;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountPaid() {
+        return this.amountPaid;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountWaived() {
+        return this.amountWaived;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountWrittenOff() {
+        return this.amountWrittenOff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountOutstanding() {
+        return this.amountOutstanding;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountOrPercentage() {
+        return this.amountOrPercentage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isPenalty() {
+        return this.penalty;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Boolean getIsActive() {
+        return this.isActive;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Boolean getIsFreeWithdrawal() {
+        return this.isFreeWithdrawal;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getFreeWithdrawalChargeFrequency() {
+        return this.freeWithdrawalChargeFrequency;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getRestartFrequency() {
+        return this.restartFrequency;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getRestartFrequencyEnum() {
+        return this.restartFrequencyEnum;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getInactivationDate() {
+        return this.inactivationDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<ChargeData> getChargeOptions() {
+        return this.chargeOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ChargeData getChargeData() {
+        return this.chargeData;
+    }
 }

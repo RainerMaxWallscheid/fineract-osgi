@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,13 +27,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 @CommandType(entity = "FIXEDDEPOSITPRODUCT", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateFixedDepositProductCommandHandler implements NewCommandSourceHandler {
-
     private final FixedDepositProductWritePlatformService writePlatformService;
 
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.update(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateFixedDepositProductCommandHandler(final FixedDepositProductWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

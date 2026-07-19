@@ -19,19 +19,15 @@
 package org.apache.fineract.infrastructure.contentstore.policy;
 
 import java.util.regex.Pattern;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.contentstore.exception.ContentPolicyException;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class TraversalContentPolicy implements ContentPolicy {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TraversalContentPolicy.class);
     private final Pattern overwriteSiblingsPattern = Pattern.compile(".*((\\.)?\\./+)+(/+)?.*");
-
     private final FineractProperties properties;
 
     @Override
@@ -39,5 +35,10 @@ public class TraversalContentPolicy implements ContentPolicy {
         if (overwriteSiblingsPattern.matcher(ctx.getPath()).matches()) {
             throw new ContentPolicyException(String.format("Trying to overwrite a sibling file: %s", ctx.getPath()));
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TraversalContentPolicy(final FineractProperties properties) {
+        this.properties = properties;
     }
 }

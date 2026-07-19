@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.DataIntegrityErrorHandler;
@@ -30,10 +29,8 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN", action = "DISBURSEWITHOUTAUTODOWNPAYMENT")
 public class DisburseLoanWithoutAutoPaymentHandler implements NewCommandSourceHandler {
-
     private final LoanWritePlatformService writePlatformService;
     private final DataIntegrityErrorHandler dataIntegrityErrorHandler;
 
@@ -42,9 +39,14 @@ public class DisburseLoanWithoutAutoPaymentHandler implements NewCommandSourceHa
         try {
             return writePlatformService.disburseLoan(command.entityId(), command, false, true);
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.disbursement",
-                    "Disbursement");
+            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.disbursement", "Disbursement");
             return CommandProcessingResult.empty();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DisburseLoanWithoutAutoPaymentHandler(final LoanWritePlatformService writePlatformService, final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
+        this.writePlatformService = writePlatformService;
+        this.dataIntegrityErrorHandler = dataIntegrityErrorHandler;
     }
 }

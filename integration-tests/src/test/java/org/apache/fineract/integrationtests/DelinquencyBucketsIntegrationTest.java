@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import com.google.gson.Gson;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
@@ -40,7 +39,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.BusinessDateResponse;
 import org.apache.fineract.client.models.DeleteDelinquencyBucketResponse;
 import org.apache.fineract.client.models.DeleteDelinquencyRangeResponse;
@@ -91,10 +89,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-@Slf4j
 @ExtendWith(LoanTestLifecycleExtension.class)
 public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DelinquencyBucketsIntegrationTest.class);
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
     private BusinessDateHelper businessDateHelper;
@@ -103,7 +101,6 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
     @BeforeEach
     public void setup() {
         Utils.initializeRESTAssured();
-
         requestSpec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
         requestSpec.header("Authorization", "Basic " + Utils.loginIntoServerAndGetBase64EncodedAuthenticationKey());
         responseSpec = new ResponseSpecBuilder().expectStatusCode(200).build();
@@ -113,17 +110,13 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testCreateDelinquencyRanges() {
         // given
-        final PostDelinquencyRangeResponse delinquencyRangeResponse01 = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                .minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        final PostDelinquencyRangeResponse delinquencyRangeResponse01 = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         final List<DelinquencyRangeResponse> ranges = DelinquencyRangesHelper.getRanges();
-
         // then
         assertNotNull(delinquencyRangeResponse01);
         assertNotNull(ranges);
         assertFalse(ranges.isEmpty());
-        DelinquencyRangeResponse range = ranges.stream().filter(r -> r.getId().equals(delinquencyRangeResponse01.getResourceId()))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("Range with id " + delinquencyRangeResponse01.getResourceId() + " not found"));
+        DelinquencyRangeResponse range = ranges.stream().filter(r -> r.getId().equals(delinquencyRangeResponse01.getResourceId())).findFirst().orElseThrow(() -> new AssertionError("Range with id " + delinquencyRangeResponse01.getResourceId() + " not found"));
         assertEquals(1, range.getMinimumAgeDays(), "Expected Min Age Days to 1");
         assertEquals(3, range.getMaximumAgeDays(), "Expected Max Age Days to 3");
     }
@@ -131,16 +124,11 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testUpdateDelinquencyRanges() {
         // given
-        final PostDelinquencyRangeResponse delinquencyRangeResponse01 = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                .minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        final PostDelinquencyRangeResponse delinquencyRangeResponse01 = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         // when
-        final PutDelinquencyRangeResponse delinquencyRangeResponse02 = DelinquencyRangesHelper
-                .updateRange(delinquencyRangeResponse01.getResourceId(), new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(7)
-                        .locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        final PutDelinquencyRangeResponse delinquencyRangeResponse02 = DelinquencyRangesHelper.updateRange(delinquencyRangeResponse01.getResourceId(), new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(7).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         final DelinquencyRangeResponse range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse01.getResourceId());
-        final DeleteDelinquencyRangeResponse deleteDelinquencyRangeResponse = DelinquencyRangesHelper
-                .deleteRange(delinquencyRangeResponse01.getResourceId());
-
+        final DeleteDelinquencyRangeResponse deleteDelinquencyRangeResponse = DelinquencyRangesHelper.deleteRange(delinquencyRangeResponse01.getResourceId());
         // then
         assertNotNull(delinquencyRangeResponse02);
         assertNotNull(deleteDelinquencyRangeResponse);
@@ -154,30 +142,20 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
     public void testDelinquencyBuckets() {
         // given
         ArrayList<Long> rangeIds = new ArrayList<>();
-        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                .minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         rangeIds.add(delinquencyRangeResponse.getResourceId());
-        delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(30)
-                .locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(30).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         rangeIds.add(delinquencyRangeResponse.getResourceId());
-
-        PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper
-                .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+        PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
         // Update
         rangeIds.add(delinquencyRangeResponse.getResourceId());
-
-        PutDelinquencyBucketResponse updateDelinquencyBucketResponse = DelinquencyBucketsHelper.updateBucket(
-                delinquencyBucketResponse.getResourceId(),
-                new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
-        delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(31).maximumAgeDays(60)
-                .locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        PutDelinquencyBucketResponse updateDelinquencyBucketResponse = DelinquencyBucketsHelper.updateBucket(delinquencyBucketResponse.getResourceId(), new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+        delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(31).maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         rangeIds.add(delinquencyRangeResponse.getResourceId());
         // Read
         final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketResponse.getResourceId());
-
         // when
         final List<DelinquencyBucketResponse> bucketList = DelinquencyBucketsHelper.getBuckets();
-
         // then
         assertNotNull(bucketList);
         assertNotNull(delinquencyBucket);
@@ -190,19 +168,13 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
     public void testDelinquencyBucketDelete() {
         // given
         ArrayList<Long> rangeIds = new ArrayList<>();
-        final PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                .minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        final PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         rangeIds.add(delinquencyRangeResponse.getResourceId());
-
-        PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper
-                .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+        PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
         // Delete
-        DeleteDelinquencyBucketResponse deleteDelinquencyBucketResponse = DelinquencyBucketsHelper
-                .deleteBucket(delinquencyBucketResponse.getResourceId());
-
+        DeleteDelinquencyBucketResponse deleteDelinquencyBucketResponse = DelinquencyBucketsHelper.deleteBucket(delinquencyBucketResponse.getResourceId());
         // when
         final List<DelinquencyBucketResponse> bucketList = DelinquencyBucketsHelper.getBuckets();
-
         // then
         assertNotNull(bucketList);
         assertNotNull(delinquencyBucketResponse);
@@ -213,33 +185,26 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
     public void testDelinquencyBucketsRangeAgeOverlaped() {
         // Given
         ArrayList<Long> rangeIds = new ArrayList<>();
-        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                .minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         rangeIds.add(delinquencyRangeResponse.getResourceId());
-        delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(3).maximumAgeDays(30)
-                .locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(3).maximumAgeDays(30).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         rangeIds.add(delinquencyRangeResponse.getResourceId());
-
         // When
         CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class, () -> {
-            DelinquencyBucketsHelper
-                    .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+            DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
         });
         assertEquals(403, exception.getResponse().code());
-
     }
 
     @Test
     public void testDelinquencyBucketsNameDuplication() {
         // Given
         ArrayList<Long> rangeIds = new ArrayList<>();
-        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                .minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         // When
         String bucketName = Utils.randomStringGenerator("DLQ_B_", 10);
         rangeIds.add(delinquencyRangeResponse.getResourceId());
         DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(bucketName).ranges(rangeIds));
-
         // When
         CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class, () -> {
             DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(bucketName).ranges(rangeIds));
@@ -251,40 +216,29 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
     public void testLoanProductCreationWithAndWithoutDelinquencyBucket() {
         // Given
         final LoanTransactionHelper loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
-
         ArrayList<Long> rangeIds = new ArrayList<>();
         // First Range
-        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                .minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         rangeIds.add(delinquencyRangeResponse.getResourceId());
-
         DelinquencyRangeResponse range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
-
         // Second Range
-        delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(60)
-                .locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         rangeIds.add(delinquencyRangeResponse.getResourceId());
-
         range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
         final String classificationExpected = range.getClassification();
         log.info("Expected Delinquency Range classification after Disbursement {}", classificationExpected);
-
-        PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper
-                .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+        PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
         assertNotNull(delinquencyBucketResponse);
         final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketResponse.getResourceId());
-
         // Loan product creation without Delinquency bucket
         GetLoanProductsProductIdResponse getLoanProductResponse = createLoanProduct(loanTransactionHelper, null, null);
         assertNotNull(getLoanProductResponse);
         assertNull(getLoanProductResponse.getDelinquencyBucket().getId());
-
         // Loan product creation with Delinquency bucket
         getLoanProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucket.getId(), null);
         assertNotNull(getLoanProductResponse);
         log.info("Loan Product Bucket Name: {}", getLoanProductResponse.getDelinquencyBucket().getName());
         assertEquals(getLoanProductResponse.getDelinquencyBucket().getName(), delinquencyBucket.getName());
-
         // Update Loan product to remove the Delinquency bucket
         final Long loanProductId = getLoanProductResponse.getId();
         loanTransactionHelper.updateLoanProduct(loanProductId, "{delinquencyBucketId: null}");
@@ -298,83 +252,60 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
         try {
             // Given
             final LoanTransactionHelper loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             final LocalDate bussinesLocalDate = Utils.getDateAsLocalDate("01 March 2012");
             log.info("Current date {}", bussinesLocalDate);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, bussinesLocalDate);
-            final BusinessDateResponse businessDateResponse = this.businessDateHelper
-                    .getBusinessDate(BusinessDateType.BUSINESS_DATE.name());
-
+            final BusinessDateResponse businessDateResponse = this.businessDateHelper.getBusinessDate(BusinessDateType.BUSINESS_DATE.name());
             ArrayList<Long> rangeIds = new ArrayList<>();
             // First Range
-            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                    .minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
             rangeIds.add(delinquencyRangeResponse.getResourceId());
-
             DelinquencyRangeResponse range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
-
             // Second Range
-            delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4)
-                    .maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+            delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
             rangeIds.add(delinquencyRangeResponse.getResourceId());
-
             range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
             final String classificationExpected = range.getClassification();
             log.info("Expected Delinquency Range classification after Disbursement {}", classificationExpected);
-
-            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper
-                    .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
             assertNotNull(delinquencyBucketResponse);
-            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper
-                    .getBucket(delinquencyBucketResponse.getResourceId());
-
+            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketResponse.getResourceId());
             // Client and Loan account creation
             final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
-            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper,
-                    delinquencyBucket.getId(), null);
+            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucket.getId(), null);
             assertNotNull(getLoanProductsProductResponse);
             log.info("Loan Product Bucket Name: {}", getLoanProductsProductResponse.getDelinquencyBucket().getName());
             assertEquals(getLoanProductsProductResponse.getDelinquencyBucket().getName(), delinquencyBucket.getName());
-
             // Older date to have more than one overdue installment
             final LocalDate transactionDate = bussinesLocalDate.minusDays(50);
             String operationDate = Utils.dateFormatter.format(transactionDate);
-
             // Create Loan Account
-            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(),
-                    getLoanProductsProductResponse.getId().toString(), operationDate, null);
-
+            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(), getLoanProductsProductResponse.getId().toString(), operationDate, null);
             GetLoansLoanIdResponse getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             assertNotNull(getLoansLoanIdResponse);
             assertNotNull(getLoansLoanIdResponse.getDelinquencyRange());
             log.info("Loan Delinquency Range after Disbursement {}", getLoansLoanIdResponse.getDelinquencyRange().getClassification());
             // First Loan Delinquency Classification after Disbursement command
             assertEquals(getLoansLoanIdResponse.getDelinquencyRange().getClassification(), classificationExpected);
-
             loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
-
             // Apply a partial repayment
             operationDate = Utils.dateFormatter.format(bussinesLocalDate);
-            loanTransactionHelper.makeLoanRepayment(operationDate, 100.0f, loanId);
-
+            loanTransactionHelper.makeLoanRepayment(operationDate, 100.0F, loanId);
             getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             log.info("Loan Delinquency Range after Repayment {}", getLoansLoanIdResponse.getDelinquencyRange());
             assertNotNull(getLoansLoanIdResponse.getDelinquencyRange());
             // First Loan Delinquency Classification remains after Repayment because the installment is not fully paid
             assertEquals(getLoansLoanIdResponse.getDelinquencyRange().getClassification(), classificationExpected);
-
             // Apply a repayment to get a full paid installment
-            loanTransactionHelper.makeLoanRepayment(operationDate, 1000.0f, loanId);
+            loanTransactionHelper.makeLoanRepayment(operationDate, 1000.0F, loanId);
             getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             log.info("Loan Delinquency Range after Repayment {}", getLoansLoanIdResponse.getDelinquencyRange());
             assertNotNull(getLoansLoanIdResponse);
             // The Loan Delinquency Classification after Repayment command must be null
             assertNull(getLoansLoanIdResponse.getDelinquencyRange());
             // Get the Delinquency Tags
-            ArrayList<GetDelinquencyTagHistoryResponse> getDelinquencyTagsHistory = loanTransactionHelper
-                    .getLoanDelinquencyTags(requestSpec, responseSpec, loanId);
+            ArrayList<GetDelinquencyTagHistoryResponse> getDelinquencyTagsHistory = loanTransactionHelper.getLoanDelinquencyTags(requestSpec, responseSpec, loanId);
             assertNotNull(getDelinquencyTagsHistory);
             log.info("Delinquency Tag History items {}", getDelinquencyTagsHistory.size());
             assertEquals(1, getDelinquencyTagsHistory.size());
@@ -384,158 +315,113 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
             assertEquals(getDelinquencyTagsHistory.get(0).getDelinquencyRange().getClassification(), classificationExpected);
             log.info("Delinquency Tag Item with Lifted On {}", getDelinquencyTagsHistory.get(0).getLiftedOnDate());
         } finally {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
     @Test
     public void testLoanClassificationRealtimeWithCharges() {
         try {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             final LocalDate bussinesLocalDate = Utils.getDateAsLocalDate("01 April 2012");
             log.info("Current date {}", bussinesLocalDate);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, bussinesLocalDate);
-
             // Given
             final LoanTransactionHelper loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
-
             ArrayList<Long> rangeIds = new ArrayList<>();
             // First Range
-            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                    .minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
             rangeIds.add(delinquencyRangeResponse.getResourceId());
-
             DelinquencyRangeResponse range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
-
             // Second Range
-            delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4)
-                    .maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+            delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
             rangeIds.add(delinquencyRangeResponse.getResourceId());
-
             range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
             final String classificationExpected = range.getClassification();
             log.info("Expected Delinquency Range classification after Disbursement {}", classificationExpected);
-
-            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper
-                    .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
             assertNotNull(delinquencyBucketResponse);
-            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper
-                    .getBucket(delinquencyBucketResponse.getResourceId());
-
+            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketResponse.getResourceId());
             // Client and Loan account creation
             final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
-            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper,
-                    delinquencyBucket.getId(), null);
+            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucket.getId(), null);
             assertNotNull(getLoanProductsProductResponse);
             log.info("Loan Product Bucket Name: {}", getLoanProductsProductResponse.getDelinquencyBucket().getName());
             assertEquals(getLoanProductsProductResponse.getDelinquencyBucket().getName(), delinquencyBucket.getName());
-
             // Older date to have more than one overdue installment
             LocalDate transactionDate = bussinesLocalDate.minusMonths(2).minusDays(5);
             String operationDate = Utils.dateFormatter.format(transactionDate);
-
             // Create Loan Account
-            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(),
-                    getLoanProductsProductResponse.getId().toString(), operationDate, null);
-
+            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(), getLoanProductsProductResponse.getId().toString(), operationDate, null);
             GetLoansLoanIdResponse getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             log.info("Loan Delinquency Range after Disbursement {}", getLoansLoanIdResponse.getDelinquencyRange().getClassification());
             assertNotNull(getLoansLoanIdResponse);
             // First Loan Delinquency Classification after Disbursement command
             assertEquals(getLoansLoanIdResponse.getDelinquencyRange().getClassification(), classificationExpected);
             loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
-
             // Apply a repayment to get a full paid installment
             operationDate = Utils.dateFormatter.format(bussinesLocalDate);
-            loanTransactionHelper.makeLoanRepayment(operationDate, 2049.99f, loanId);
-
+            loanTransactionHelper.makeLoanRepayment(operationDate, 2049.99F, loanId);
             getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             assertNotNull(getLoansLoanIdResponse);
             // The Loan Delinquency Classification after Repayment command must be null
             log.info("Loan Delinquency Range after Repayment {}", getLoansLoanIdResponse.getDelinquencyRange());
             assertNull(getLoansLoanIdResponse.getDelinquencyRange());
             loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
-
             transactionDate = bussinesLocalDate.minusDays(18);
             operationDate = Utils.dateFormatter.format(transactionDate);
-
             // Create and apply Charge for Specific Due Date
-            final Integer chargeId = ChargesHelper.createCharges(requestSpec, responseSpec,
-                    ChargesHelper.getLoanSpecifiedDueDateJSON(1, "30", false));
+            final Integer chargeId = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper.getLoanSpecifiedDueDateJSON(1, "30", false));
             assertNotNull(chargeId);
-            final Integer loanChargeId = loanTransactionHelper.addChargesForLoan(loanId, getChargeApplyJSON(chargeId, operationDate),
-                    responseSpec);
+            final Integer loanChargeId = loanTransactionHelper.addChargesForLoan(loanId, getChargeApplyJSON(chargeId, operationDate), responseSpec);
             assertNotNull(loanChargeId);
-
             getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
-
             log.info("Loan Delinquency Range after add Loan Charge {}", getLoansLoanIdResponse.getDelinquencyRange());
             assertNotNull(getLoansLoanIdResponse.getDelinquencyRange());
             // Evaluate a Delinquency Tag set after add charge to the Loan
             assertEquals(getLoansLoanIdResponse.getDelinquencyRange().getClassification(), classificationExpected);
         } finally {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
     @Test
     public void testLoanClassificationRealtimeOlderLoan() {
-
         // Given
         final LoanTransactionHelper loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
-
         ArrayList<Long> rangeIds = new ArrayList<>();
         // First Range
-        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                .minimumAgeDays(4).maximumAgeDays(30).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(30).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         rangeIds.add(delinquencyRangeResponse.getResourceId());
         DelinquencyRangeResponse range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
         final String classificationExpected02 = range.getClassification();
         log.info("Expected Delinquency Range classification after first repayment {}", classificationExpected02);
-
         // Second Range
-        delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(31).maximumAgeDays(60)
-                .locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(31).maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         rangeIds.add(delinquencyRangeResponse.getResourceId());
-
         range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
         final String classificationExpected01 = range.getClassification();
         log.info("Expected Delinquency Range classification after Disbursement {}", classificationExpected01);
-
         // Third Range
-        delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(61).maximumAgeDays(90)
-                .locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(61).maximumAgeDays(90).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         rangeIds.add(delinquencyRangeResponse.getResourceId());
-
         range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
-
-        PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper
-                .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+        PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
         assertNotNull(delinquencyBucketResponse);
         final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketResponse.getResourceId());
-
         // Client and Loan account creation
         final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
-        final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper,
-                delinquencyBucket.getId(), null);
+        final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucket.getId(), null);
         assertNotNull(getLoanProductsProductResponse);
         log.info("Loan Product Bucket Name: {}", getLoanProductsProductResponse.getDelinquencyBucket().getName());
         assertEquals(getLoanProductsProductResponse.getDelinquencyBucket().getName(), delinquencyBucket.getName());
-
         final LocalDate todaysDate = Utils.getLocalDateOfTenant();
         // Older date to have more than one overdue installment
         LocalDate transactionDate = todaysDate.minusDays(85);
         String operationDate = Utils.dateFormatter.format(transactionDate);
-
         // Create Loan Account
-        final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(),
-                getLoanProductsProductResponse.getId().toString(), operationDate, null);
-
+        final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(), getLoanProductsProductResponse.getId().toString(), operationDate, null);
         GetLoansLoanIdResponse getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
         assertNotNull(getLoansLoanIdResponse);
         log.info("Loan Delinquency Range after Disbursement in null? {}", (getLoansLoanIdResponse.getDelinquencyRange() == null));
@@ -543,14 +429,11 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
         log.info("Loan Delinquency Range after Disbursement {}", getLoansLoanIdResponse.getDelinquencyRange());
         // First Loan Delinquency Classification after Disbursement command
         assertEquals(getLoansLoanIdResponse.getDelinquencyRange().getClassification(), classificationExpected01);
-
         loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
-
         // Apply a repayment to get a first full paid installment
         transactionDate = todaysDate.minusDays(1);
         operationDate = Utils.dateFormatter.format(transactionDate);
-        PostLoansLoanIdTransactionsResponse loansLoanIdTransactions = loanTransactionHelper.makeLoanRepayment(operationDate, 1050.0f,
-                loanId);
+        PostLoansLoanIdTransactionsResponse loansLoanIdTransactions = loanTransactionHelper.makeLoanRepayment(operationDate, 1050.0F, loanId);
         assertNotNull(loansLoanIdTransactions);
         log.info("Loan repayment transaction id {}", loansLoanIdTransactions.getResourceId());
         getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
@@ -558,9 +441,7 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
         assertNotNull(getLoansLoanIdResponse.getDelinquencyRange());
         // First Loan Delinquency Classification remains after Repayment because the installment is not fully paid
         assertEquals(getLoansLoanIdResponse.getDelinquencyRange().getClassification(), classificationExpected02);
-
-        ArrayList<GetDelinquencyTagHistoryResponse> getDelinquencyTagsHistory = loanTransactionHelper.getLoanDelinquencyTags(requestSpec,
-                responseSpec, loanId);
+        ArrayList<GetDelinquencyTagHistoryResponse> getDelinquencyTagsHistory = loanTransactionHelper.getLoanDelinquencyTags(requestSpec, responseSpec, loanId);
         assertNotNull(getDelinquencyTagsHistory);
         log.info("Delinquency Tag History items {}", getDelinquencyTagsHistory.size());
         log.info("Delinquency Tag Item with Lifted On {}", getDelinquencyTagsHistory.get(0).getLiftedOnDate());
@@ -568,9 +449,8 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
         assertEquals(getDelinquencyTagsHistory.get(0).getLiftedOnDate(), Utils.getLocalDateOfTenant());
         assertEquals(getDelinquencyTagsHistory.get(0).getDelinquencyRange().getClassification(), classificationExpected01);
         log.info("Loan Id {} with Loan status {}", getLoansLoanIdResponse.getId(), getLoansLoanIdResponse.getStatus().getCode());
-
         // Apply a repayment to get a second full paid installment
-        loansLoanIdTransactions = loanTransactionHelper.makeLoanRepayment(operationDate, 1020.0f, loanId);
+        loansLoanIdTransactions = loanTransactionHelper.makeLoanRepayment(operationDate, 1020.0F, loanId);
         assertNotNull(loansLoanIdTransactions);
         log.info("Loan repayment transaction id {}", loansLoanIdTransactions.getResourceId());
         getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
@@ -578,7 +458,6 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
         assertNotNull(getLoansLoanIdResponse);
         // The Loan Delinquency Classification after Repayment command must be null
         assertNull(getLoansLoanIdResponse.getDelinquencyRange());
-
         getDelinquencyTagsHistory = loanTransactionHelper.getLoanDelinquencyTags(requestSpec, responseSpec, loanId);
         assertNotNull(getDelinquencyTagsHistory);
         log.info("Delinquency Tag History items {}", getDelinquencyTagsHistory.size());
@@ -593,66 +472,49 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
     public void testLoanClassificationRealtimeWithReversedRepayment() {
         // Given
         final LoanTransactionHelper loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
-
         ArrayList<Long> rangeIds = new ArrayList<>();
         // First Range
-        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                .minimumAgeDays(4).maximumAgeDays(30).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(30).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         rangeIds.add(delinquencyRangeResponse.getResourceId());
         DelinquencyRangeResponse range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
         final String classificationExpected = range.getClassification();
         log.info("Expected Delinquency Range classification after first repayment {}", classificationExpected);
-
-        PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper
-                .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+        PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
         assertNotNull(delinquencyBucketResponse);
         final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketResponse.getResourceId());
-
         // Client and Loan account creation
         final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
-        final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper,
-                delinquencyBucket.getId(), null);
+        final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucket.getId(), null);
         assertNotNull(getLoanProductsProductResponse);
         log.info("Loan Product Bucket Name: {}", getLoanProductsProductResponse.getDelinquencyBucket().getName());
         assertEquals(getLoanProductsProductResponse.getDelinquencyBucket().getName(), delinquencyBucket.getName());
-
         final LocalDate todaysDate = Utils.getLocalDateOfTenant();
         log.info("Local date of Tenant: {}", todaysDate);
-
         // Older date to have more than one overdue installment
         final LocalDate transactionDate = todaysDate.minusDays(50);
         String operationDate = Utils.dateFormatter.format(transactionDate);
-
         // Create Loan Account
-        final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(),
-                getLoanProductsProductResponse.getId().toString(), operationDate, null);
-
+        final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(), getLoanProductsProductResponse.getId().toString(), operationDate, null);
         GetLoansLoanIdResponse getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
         loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
         loanTransactionHelper.printDelinquencyData(getLoansLoanIdResponse);
-
         log.info("Loan Delinquency Range after Disbursement in null? {}", (getLoansLoanIdResponse.getDelinquencyRange() == null));
         assertNotNull(getLoansLoanIdResponse);
         assertNotNull(getLoansLoanIdResponse.getDelinquencyRange());
         log.info("Loan Delinquency Range after Disbursement {}", getLoansLoanIdResponse.getDelinquencyRange());
         // First Loan Delinquency Classification after Disbursement command
         assertEquals(getLoansLoanIdResponse.getDelinquencyRange().getClassification(), classificationExpected);
-
         loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
-
         // Apply a repayment to get a full paid installment
         operationDate = Utils.dateFormatter.format(todaysDate);
-        PostLoansLoanIdTransactionsResponse loansLoanIdTransactions = loanTransactionHelper.makeLoanRepayment(operationDate, 1050.0f,
-                loanId);
+        PostLoansLoanIdTransactionsResponse loansLoanIdTransactions = loanTransactionHelper.makeLoanRepayment(operationDate, 1050.0F, loanId);
         assertNotNull(loansLoanIdTransactions);
         log.info("Loan repayment transaction id {}", loansLoanIdTransactions.getResourceId());
         getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
         log.info("Loan Delinquency Range after Repayment {}", getLoansLoanIdResponse.getDelinquencyRange());
         // Loan Delinquency Classification removed after Repayment because the installment is fully paid
         assertNull(getLoansLoanIdResponse.getDelinquencyRange());
-
-        ArrayList<GetDelinquencyTagHistoryResponse> getDelinquencyTagsHistory = loanTransactionHelper.getLoanDelinquencyTags(requestSpec,
-                responseSpec, loanId);
+        ArrayList<GetDelinquencyTagHistoryResponse> getDelinquencyTagsHistory = loanTransactionHelper.getLoanDelinquencyTags(requestSpec, responseSpec, loanId);
         assertNotNull(getDelinquencyTagsHistory);
         log.info("Delinquency Tag History items {}", getDelinquencyTagsHistory.size());
         log.info("Delinquency Tag Item with Lifted On {}", getDelinquencyTagsHistory.get(0).getLiftedOnDate());
@@ -660,17 +522,14 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
         assertEquals(getDelinquencyTagsHistory.get(0).getLiftedOnDate(), Utils.getLocalDateOfTenant());
         assertEquals(getDelinquencyTagsHistory.get(0).getDelinquencyRange().getClassification(), classificationExpected);
         log.info("Loan Id {} with Loan status {}", getLoansLoanIdResponse.getId(), getLoansLoanIdResponse.getStatus().getCode());
-
         // Reverse the Previous Loan Repayment
-        PostLoansLoanIdTransactionsResponse loansLoanIdReverseTransactions = loanTransactionHelper.reverseLoanTransaction(loanId,
-                loansLoanIdTransactions.getResourceId(), operationDate, responseSpec);
+        PostLoansLoanIdTransactionsResponse loansLoanIdReverseTransactions = loanTransactionHelper.reverseLoanTransaction(loanId, loansLoanIdTransactions.getResourceId(), operationDate, responseSpec);
         assertNotNull(loansLoanIdReverseTransactions);
         log.info("Loan repayment reverse transaction id {}", loansLoanIdReverseTransactions.getResourceId());
         getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
         log.info("Loan Delinquency Range after Reverse Repayment {}", getLoansLoanIdResponse.getDelinquencyRange());
         // Loan Delinquency Classification goes back after Repayment because the installment is not paid
         assertEquals(getLoansLoanIdResponse.getDelinquencyRange().getClassification(), classificationExpected);
-
         getDelinquencyTagsHistory = loanTransactionHelper.getLoanDelinquencyTags(requestSpec, responseSpec, loanId);
         assertNotNull(getDelinquencyTagsHistory);
         log.info("Delinquency Tag History items {}", getDelinquencyTagsHistory.size());
@@ -685,158 +544,112 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testLoanClassificationJob() {
         try {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             LocalDate businessDate = Utils.getLocalDateOfTenant();
             businessDate = businessDate.minusDays(37);
             log.info("Current date {}", businessDate);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, businessDate);
-
             final LoanTransactionHelper loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
             final SchedulerJobHelper schedulerJobHelper = new SchedulerJobHelper(requestSpec);
-
             ArrayList<Long> rangeIds = new ArrayList<>();
             // First Range
-            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                    .minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
             rangeIds.add(delinquencyRangeResponse.getResourceId());
-
             DelinquencyRangeResponse range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
-
             // Second Range
-            delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4)
-                    .maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+            delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
             rangeIds.add(delinquencyRangeResponse.getResourceId());
-
             range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
             final String classificationExpected = range.getClassification();
             log.info("Expected Delinquency Range classification {}", classificationExpected);
-
-            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper
-                    .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
-            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper
-                    .getBucket(delinquencyBucketResponse.getResourceId());
-
+            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketResponse.getResourceId());
             // Client and Loan account creation
             final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
-            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper,
-                    delinquencyBucket.getId(), null);
+            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucket.getId(), null);
             assertNotNull(getLoanProductsProductResponse);
             log.info("Loan Product Bucket Name: {}", getLoanProductsProductResponse.getDelinquencyBucket().getName());
             assertEquals(getLoanProductsProductResponse.getDelinquencyBucket().getName(), delinquencyBucket.getName());
-
             final LocalDate todaysDate = Utils.getLocalDateOfTenant();
             // Older date to have more than one overdue installment
             final LocalDate transactionDate = todaysDate.minusDays(57);
             String operationDate = Utils.dateFormatter.format(transactionDate);
-
             // Create Loan Account
-            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(),
-                    getLoanProductsProductResponse.getId().toString(), operationDate, null);
-
+            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(), getLoanProductsProductResponse.getId().toString(), operationDate, null);
             // Run first time the Job
             final String jobName = "Loan Delinquency Classification";
             schedulerJobHelper.executeAndAwaitJob(jobName);
-
             // Get loan details expecting to have not a delinquency classification
             GetLoansLoanIdResponse getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             loanTransactionHelper.printDelinquencyData(getLoansLoanIdResponse);
             final DelinquencyRangeData firstTestCase = getLoansLoanIdResponse.getDelinquencyRange();
             log.info("Loan Delinquency Range is null {}", (firstTestCase == null));
             loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
-
             // Move the Business date to get older the loan and to have an overdue loan
             businessDate = businessDate.plusMonths(1);
             log.info("Current date {}", businessDate);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, businessDate);
             // Run Second time the Job
             schedulerJobHelper.executeAndAwaitJob(jobName);
-
             // Get loan details expecting to have a delinquency classification
             getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
             loanTransactionHelper.printDelinquencyData(getLoansLoanIdResponse);
-
             final DelinquencyRangeData secondTestCase = getLoansLoanIdResponse.getDelinquencyRange();
             assertNotNull(secondTestCase);
             log.info("Loan Delinquency Range is {}", secondTestCase.getClassification());
-
             // Then
             assertNotNull(delinquencyBucketResponse);
             assertNotNull(getLoanProductsProductResponse);
             assertNull(firstTestCase);
             assertEquals(getLoanProductsProductResponse.getDelinquencyBucket().getName(), delinquencyBucket.getName());
             assertEquals(secondTestCase.getClassification(), classificationExpected);
-
         } finally {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
     @Test
     public void testLoanClassificationStepAsPartOfCOB() {
         try {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             LocalDate bussinesLocalDate = Utils.getDateAsLocalDate("01 April 2012");
             log.info("Current date {}", bussinesLocalDate);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, bussinesLocalDate);
-
             // Given
             final LoanTransactionHelper loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
             final SchedulerJobHelper schedulerJobHelper = new SchedulerJobHelper(requestSpec);
-
             ArrayList<Long> rangeIds = new ArrayList<>();
             // First Range
-            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                    .minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
             rangeIds.add(delinquencyRangeResponse.getResourceId());
-
             DelinquencyRangeResponse range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
             final String classificationExpected = range.getClassification();
             // Second Range
-            delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4)
-                    .maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+            delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
             rangeIds.add(delinquencyRangeResponse.getResourceId());
-
             range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
-
-            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper
-                    .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
-            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper
-                    .getBucket(delinquencyBucketResponse.getResourceId());
-
+            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketResponse.getResourceId());
             // Client and Loan account creation
             final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
-            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper,
-                    delinquencyBucket.getId(), null);
+            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucket.getId(), null);
             assertNotNull(getLoanProductsProductResponse);
             log.info("Loan Product Bucket Name: {}", getLoanProductsProductResponse.getDelinquencyBucket().getName());
             assertEquals(getLoanProductsProductResponse.getDelinquencyBucket().getName(), delinquencyBucket.getName());
-
             // Older date to have more than one overdue installment
             final LocalDate transactionDate = bussinesLocalDate.minusDays(31);
             String operationDate = Utils.dateFormatter.format(transactionDate);
-
             // Create Loan Account
-            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(),
-                    getLoanProductsProductResponse.getId().toString(), operationDate, null);
-
+            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(), getLoanProductsProductResponse.getId().toString(), operationDate, null);
             // COB Step Validation
-            final JobBusinessStepConfigData jobBusinessStepConfigData = BusinessStepConfigurationHelper
-                    .getConfiguredBusinessStepsByJobName(requestSpec, responseSpec, BusinessConfigurationApiTest.LOAN_JOB_NAME);
+            final JobBusinessStepConfigData jobBusinessStepConfigData = BusinessStepConfigurationHelper.getConfiguredBusinessStepsByJobName(requestSpec, responseSpec, BusinessConfigurationApiTest.LOAN_JOB_NAME);
             assertNotNull(jobBusinessStepConfigData);
             assertEquals(BusinessConfigurationApiTest.LOAN_JOB_NAME, jobBusinessStepConfigData.getJobName());
             assertTrue(jobBusinessStepConfigData.getBusinessSteps().size() > 0);
-            assertTrue(jobBusinessStepConfigData.getBusinessSteps().stream().anyMatch(
-                    businessStep -> BusinessConfigurationApiTest.LOAN_DELINQUENCY_CLASSIFICATION.equals(businessStep.getStepName())));
-
+            assertTrue(jobBusinessStepConfigData.getBusinessSteps().stream().anyMatch(businessStep -> BusinessConfigurationApiTest.LOAN_DELINQUENCY_CLASSIFICATION.equals(businessStep.getStepName())));
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
-
             // Get loan details expecting to have not a delinquency classification
             GetLoansLoanIdResponse getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             final DelinquencyRangeData firstTestCase = getLoansLoanIdResponse.getDelinquencyRange();
@@ -845,25 +658,20 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
             if (getLoanRepaymentSchedule != null) {
                 log.info("Loan with {} periods", getLoanRepaymentSchedule.getPeriods().size());
                 for (GetLoansLoanIdRepaymentPeriod period : getLoanRepaymentSchedule.getPeriods()) {
-                    log.info("Period number {} for due date {} and outstanding {}", period.getPeriod(), period.getDueDate(),
-                            period.getTotalOutstandingForPeriod());
+                    log.info("Period number {} for due date {} and outstanding {}", period.getPeriod(), period.getDueDate(), period.getTotalOutstandingForPeriod());
                 }
             }
-
             // Move the Business date to get older the loan and to have an overdue loan
             bussinesLocalDate = bussinesLocalDate.plusDays(3);
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, bussinesLocalDate);
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
-
             // Get loan details expecting to have a delinquency classification
             getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
             final DelinquencyRangeData secondTestCase = getLoansLoanIdResponse.getDelinquencyRange();
             assertNotNull(secondTestCase);
             log.info("Loan Delinquency Range is {}", secondTestCase.getClassification());
-
             // Then
             assertNotNull(delinquencyBucketResponse);
             assertNotNull(getLoanProductsProductResponse);
@@ -871,138 +679,95 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
             assertEquals(getLoanProductsProductResponse.getDelinquencyBucket().getName(), delinquencyBucket.getName());
             assertEquals(secondTestCase.getClassification(), classificationExpected);
         } finally {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
     @Test
     public void testLoanClassificationToValidateNegatives() {
         try {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             LocalDate bussinesLocalDate = Utils.getDateAsLocalDate("01 January 2012");
             log.info("Current date {}", bussinesLocalDate);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, bussinesLocalDate);
-
             // Given
             final LoanTransactionHelper loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
             final SchedulerJobHelper schedulerJobHelper = new SchedulerJobHelper(requestSpec);
-
             ArrayList<Long> rangeIds = new ArrayList<>();
             // First Range
-            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                    .minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
             rangeIds.add(delinquencyRangeResponse.getResourceId());
-
             DelinquencyRangeResponse range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
-
             // Second Range
-            delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4)
-                    .maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+            delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
             rangeIds.add(delinquencyRangeResponse.getResourceId());
-
             range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
-
-            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper
-                    .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
-            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper
-                    .getBucket(delinquencyBucketResponse.getResourceId());
-
+            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketResponse.getResourceId());
             // Client and Loan account creation
             final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
-            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper,
-                    delinquencyBucket.getId(), "3");
+            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucket.getId(), "3");
             assertNotNull(getLoanProductsProductResponse);
             log.info("Loan Product Bucket Name: {}", getLoanProductsProductResponse.getDelinquencyBucket().getName());
             assertEquals(getLoanProductsProductResponse.getDelinquencyBucket().getName(), delinquencyBucket.getName());
-
             // Older date to have more than one overdue installment
             final LocalDate transactionDate = bussinesLocalDate;
             String operationDate = Utils.dateFormatter.format(transactionDate);
-
             // Create Loan Account
-            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(),
-                    getLoanProductsProductResponse.getId().toString(), operationDate, null);
-
+            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(), getLoanProductsProductResponse.getId().toString(), operationDate, null);
             // Get loan details expecting to have a delinquency classification
             GetLoansLoanIdResponse getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             final DelinquencyRangeData firstTestCase = getLoansLoanIdResponse.getDelinquencyRange();
             log.info("Loan Delinquency Range is null {}", (firstTestCase == null));
             loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
-
             bussinesLocalDate = Utils.getDateAsLocalDate("31 January 2012");
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, bussinesLocalDate);
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
-
             // Get loan details expecting to have a delinquency classification
             getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             loanTransactionHelper.printDelinquencyData(getLoansLoanIdResponse);
-
             GetLoansLoanIdDelinquencySummary getLoansLoanIdCollectionData = getLoansLoanIdResponse.getDelinquent();
             assertNotNull(getLoansLoanIdCollectionData);
             assertEquals(0, getLoansLoanIdCollectionData.getDelinquentDays());
             assertEquals(0, getLoansLoanIdCollectionData.getPastDueDays());
-
         } finally {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
     @Test
     public void testLoanClassificationUsingAgeingArrears() {
         try {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             LocalDate bussinesLocalDate = Utils.getDateAsLocalDate("01 January 2012");
             log.info("Current date {}", bussinesLocalDate);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, bussinesLocalDate);
-
             // Given
             final LoanTransactionHelper loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
             final SchedulerJobHelper schedulerJobHelper = new SchedulerJobHelper(requestSpec);
-
             ArrayList<Long> rangeIds = new ArrayList<>();
             // First Range
-            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                    .minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(1).maximumAgeDays(3).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
             rangeIds.add(delinquencyRangeResponse.getResourceId());
-
             DelinquencyRangeResponse range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
-
             // Second Range
-            delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4)
-                    .maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+            delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(60).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
             rangeIds.add(delinquencyRangeResponse.getResourceId());
-
             range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
-
-            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper
-                    .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
-            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper
-                    .getBucket(delinquencyBucketResponse.getResourceId());
-
+            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketResponse.getResourceId());
             // Client and Loan account creation
             final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
-            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper,
-                    delinquencyBucket.getId(), "3");
+            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucket.getId(), "3");
             assertNotNull(getLoanProductsProductResponse);
             log.info("Loan Product Arrears: {}", getLoanProductsProductResponse.getInArrearsTolerance());
             assertEquals(3, getLoanProductsProductResponse.getInArrearsTolerance());
-
             // Older date to have more than one overdue installment
             final LocalDate transactionDate = bussinesLocalDate;
             String operationDate = Utils.dateFormatter.format(transactionDate);
-
             // Create Loan Account
-            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(),
-                    getLoanProductsProductResponse.getId().toString(), operationDate, "3");
-
+            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(), getLoanProductsProductResponse.getId().toString(), operationDate, "3");
             // Get loan details expecting to have a delinquency classification
             GetLoansLoanIdResponse getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             final DelinquencyRangeData firstTestCase = getLoansLoanIdResponse.getDelinquencyRange();
@@ -1010,33 +775,25 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
             loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
             log.info("Loan Account Arrears {}", getLoansLoanIdResponse.getInArrearsTolerance());
             assertEquals(3, getLoansLoanIdResponse.getInArrearsTolerance());
-
             // Update the Loan Product
             updateLoanProduct(loanTransactionHelper, getLoanProductsProductResponse.getId(), 0);
-            GetLoanProductsProductIdResponse loanProductsProductIdResponseUpd = loanTransactionHelper
-                    .getLoanProduct(getLoanProductsProductResponse.getId().intValue());
+            GetLoanProductsProductIdResponse loanProductsProductIdResponseUpd = loanTransactionHelper.getLoanProduct(getLoanProductsProductResponse.getId().intValue());
             assertNotNull(loanProductsProductIdResponseUpd);
             log.info("Loan Product Arrears: {}", loanProductsProductIdResponseUpd.getInArrearsTolerance());
             assertEquals(0, loanProductsProductIdResponseUpd.getInArrearsTolerance());
-
             bussinesLocalDate = Utils.getDateAsLocalDate("31 January 2012");
-
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, bussinesLocalDate);
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
-
             // Get loan details expecting to have a delinquency classification
             getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             loanTransactionHelper.printDelinquencyData(getLoansLoanIdResponse);
-
             GetLoansLoanIdDelinquencySummary getLoansLoanIdCollectionData = getLoansLoanIdResponse.getDelinquent();
             assertNotNull(getLoansLoanIdCollectionData);
             assertEquals(0, getLoansLoanIdCollectionData.getDelinquentDays());
             assertEquals(0, getLoansLoanIdCollectionData.getPastDueDays());
-
         } finally {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
@@ -1044,42 +801,30 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
     public void testDelinquencyWithPauseLettingPauseExpire() {
         runAt("01 January 2012", () -> {
             Long delinquencyBucketId = DelinquencyBucketsHelper.createDefaultBucket();
-
             LocalDate bussinesLocalDate = Utils.getDateAsLocalDate("01 January 2012");
-
             final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
-            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper,
-                    delinquencyBucketId, "3");
+            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucketId, "3");
             assertNotNull(getLoanProductsProductResponse);
             log.info("Loan Product Arrears: {}", getLoanProductsProductResponse.getInArrearsTolerance());
             assertEquals(3, getLoanProductsProductResponse.getInArrearsTolerance());
-
             final LocalDate transactionDate = bussinesLocalDate;
             String operationDate = Utils.dateFormatter.format(transactionDate);
-
-            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(),
-                    getLoanProductsProductResponse.getId().toString(), operationDate, "3");
-
+            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(), getLoanProductsProductResponse.getId().toString(), operationDate, "3");
             GetLoansLoanIdResponse getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             final DelinquencyRangeData firstTestCase = getLoansLoanIdResponse.getDelinquencyRange();
             log.info("Loan Delinquency Range is null {}", (firstTestCase == null));
             loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
             log.info("Loan Account Arrears {}", getLoansLoanIdResponse.getInArrearsTolerance());
             assertEquals(3, getLoansLoanIdResponse.getInArrearsTolerance());
-
             updateBusinessDate("06 February 2012");
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
             verifyDelinquency(loanId, "01 February 2012", 1033.33, 5);
-
-            PostLoansDelinquencyActionResponse pauseDelinquencyResponse = loanTransactionHelper
-                    .createLoanDelinquencyAction(loanId.longValue(), PAUSE, "06 February 2012", "10 February 2012");
-
+            PostLoansDelinquencyActionResponse pauseDelinquencyResponse = loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), PAUSE, "06 February 2012", "10 February 2012");
             updateBusinessDate("09 February 2012");
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
             verifyDelinquency(loanId, "01 February 2012", 1033.33, 5);
-
             updateBusinessDate("12 March 2012");
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
@@ -1092,44 +837,32 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
         runAt("01 January 2012", () -> {
             Long delinquencyBucketId = DelinquencyBucketsHelper.createDefaultBucket();
             LocalDate bussinesLocalDate = Utils.getDateAsLocalDate("01 January 2012");
-
             final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
-            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper,
-                    delinquencyBucketId, "3");
+            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucketId, "3");
             assertNotNull(getLoanProductsProductResponse);
             log.info("Loan Product Arrears: {}", getLoanProductsProductResponse.getInArrearsTolerance());
             assertEquals(3, getLoanProductsProductResponse.getInArrearsTolerance());
-
             final LocalDate transactionDate = bussinesLocalDate;
             String operationDate = Utils.dateFormatter.format(transactionDate);
-
-            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(),
-                    getLoanProductsProductResponse.getId().toString(), operationDate, "3");
-
+            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(), getLoanProductsProductResponse.getId().toString(), operationDate, "3");
             GetLoansLoanIdResponse getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             final DelinquencyRangeData firstTestCase = getLoansLoanIdResponse.getDelinquencyRange();
             log.info("Loan Delinquency Range is null {}", (firstTestCase == null));
             loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
             log.info("Loan Account Arrears {}", getLoansLoanIdResponse.getInArrearsTolerance());
             assertEquals(3, getLoansLoanIdResponse.getInArrearsTolerance());
-
             updateBusinessDate("06 February 2012");
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
             verifyDelinquency(loanId, "01 February 2012", 1033.33, 5);
-
-            PostLoansDelinquencyActionResponse pauseDelinquencyResponse = loanTransactionHelper
-                    .createLoanDelinquencyAction(loanId.longValue(), PAUSE, "06 February 2012", "10 March 2012");
-
+            PostLoansDelinquencyActionResponse pauseDelinquencyResponse = loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), PAUSE, "06 February 2012", "10 March 2012");
             updateBusinessDate("09 February 2012");
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
             verifyDelinquency(loanId, "01 February 2012", 1033.33, 5);
-
             bussinesLocalDate = Utils.getDateAsLocalDate("10 February 2012");
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, bussinesLocalDate);
             loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), RESUME, "10 February 2012");
-
             updateBusinessDate("12 March 2012");
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
@@ -1140,61 +873,45 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testDelinquencyWithMultiplePausePeriods() {
         runAt("01 January 2012", () -> {
-
             Long delinquencyBucketId = DelinquencyBucketsHelper.createDefaultBucket();
-
             final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
-            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper,
-                    delinquencyBucketId, "3");
+            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucketId, "3");
             assertNotNull(getLoanProductsProductResponse);
             log.info("Loan Product Arrears: {}", getLoanProductsProductResponse.getInArrearsTolerance());
             assertEquals(3, getLoanProductsProductResponse.getInArrearsTolerance());
-
-            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(),
-                    getLoanProductsProductResponse.getId().toString(), "01 January 2012", "3");
-
+            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(), getLoanProductsProductResponse.getId().toString(), "01 January 2012", "3");
             GetLoansLoanIdResponse getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             final DelinquencyRangeData firstTestCase = getLoansLoanIdResponse.getDelinquencyRange();
             log.info("Loan Delinquency Range is null {}", (firstTestCase == null));
             loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
             log.info("Loan Account Arrears {}", getLoansLoanIdResponse.getInArrearsTolerance());
             assertEquals(3, getLoansLoanIdResponse.getInArrearsTolerance());
-
             // delinquent days: 5
             updateBusinessDate("06 February 2012");
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
             verifyDelinquency(loanId, "01 February 2012", 1033.33, 5);
-
             // Add delinquency pause on 06 February 2012
-            PostLoansDelinquencyActionResponse pauseDelinquencyResponse = loanTransactionHelper
-                    .createLoanDelinquencyAction(loanId.longValue(), PAUSE, "06 February 2012", "10 March 2012");
+            PostLoansDelinquencyActionResponse pauseDelinquencyResponse = loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), PAUSE, "06 February 2012", "10 March 2012");
             updateBusinessDate("09 February 2012");
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
             verifyDelinquency(loanId, "01 February 2012", 1033.33, 5);
-
             // Add delinquency resume on 10 February 2012
             updateBusinessDate("10 February 2012");
             loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), RESUME, "10 February 2012");
-
             updateBusinessDate("13 February 2012");
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
             verifyDelinquency(loanId, "01 February 2012", 1033.33, 8);
-
             // Add new pause on 13 February 2012
-            pauseDelinquencyResponse = loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), PAUSE, "13 February 2012",
-                    "18 February 2012");
-
+            pauseDelinquencyResponse = loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), PAUSE, "13 February 2012", "18 February 2012");
             updateBusinessDate("23 February 2012");
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
             verifyDelinquency(loanId, "01 February 2012", 1033.33, 13);
-
             // Add new pause on 23 February 2012
-            pauseDelinquencyResponse = loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), PAUSE, "23 February 2012",
-                    "28 February 2012");
+            pauseDelinquencyResponse = loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), PAUSE, "23 February 2012", "28 February 2012");
             updateBusinessDate("25 February 2012");
             loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), RESUME, "25 February 2012");
             updateBusinessDate("12 March 2012");
@@ -1219,130 +936,94 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
     public void testDelinquencyWithMultiplePausePeriodsWithInstallmentLevelDelinquency() {
         runAt("01 January 2012", () -> {
             Long delinquencyBucketId = DelinquencyBucketsHelper.createDefaultBucket();
-
             final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
-            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProductWithInstallmentLevelDelinquency(
-                    loanTransactionHelper, delinquencyBucketId, "3");
+            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProductWithInstallmentLevelDelinquency(loanTransactionHelper, delinquencyBucketId, "3");
             assertNotNull(getLoanProductsProductResponse);
             log.info("Loan Product Arrears: {}", getLoanProductsProductResponse.getInArrearsTolerance());
             assertEquals(3, getLoanProductsProductResponse.getInArrearsTolerance());
-
-            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(),
-                    getLoanProductsProductResponse.getId().toString(), "01 January 2012", "3");
-
+            final Integer loanId = createLoanAccount(loanTransactionHelper, clientId.toString(), getLoanProductsProductResponse.getId().toString(), "01 January 2012", "3");
             GetLoansLoanIdResponse getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             final DelinquencyRangeData firstTestCase = getLoansLoanIdResponse.getDelinquencyRange();
             log.info("Loan Delinquency Range is null {}", (firstTestCase == null));
             loanTransactionHelper.printRepaymentSchedule(getLoansLoanIdResponse);
             log.info("Loan Account Arrears {}", getLoansLoanIdResponse.getInArrearsTolerance());
             assertEquals(3, getLoansLoanIdResponse.getInArrearsTolerance());
-
             // delinquent days: 5
             updateBusinessDate("06 February 2012");
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
             verifyDelinquency(loanId, "01 February 2012", 1033.33, 5);
-
-            PostLoansDelinquencyActionResponse pauseDelinquencyResponse = loanTransactionHelper
-                    .createLoanDelinquencyAction(loanId.longValue(), PAUSE, "06 February 2012", "10 March 2012");
-
+            PostLoansDelinquencyActionResponse pauseDelinquencyResponse = loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), PAUSE, "06 February 2012", "10 March 2012");
             updateBusinessDate("09 February 2012");
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
             verifyDelinquency(loanId, "01 February 2012", 1033.33, 5);
-
             updateBusinessDate("10 February 2012");
             loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), RESUME, "10 February 2012");
-
             updateBusinessDate("13 February 2012");
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
             verifyDelinquency(loanId, "01 February 2012", 1033.33, 8);
-
-            pauseDelinquencyResponse = loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), PAUSE, "13 February 2012",
-                    "18 February 2012");
-
+            pauseDelinquencyResponse = loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), PAUSE, "13 February 2012", "18 February 2012");
             updateBusinessDate("23 February 2012");
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
             verifyDelinquency(loanId, "01 February 2012", 1033.33, 13);
-
-            pauseDelinquencyResponse = loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), PAUSE, "23 February 2012",
-                    "28 February 2012");
-
+            pauseDelinquencyResponse = loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), PAUSE, "23 February 2012", "28 February 2012");
             updateBusinessDate("25 February 2012");
             loanTransactionHelper.createLoanDelinquencyAction(loanId.longValue(), RESUME, "25 February 2012");
-
             updateBusinessDate("14 March 2012");
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
-
             getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             loanTransactionHelper.printDelinquencyData(getLoansLoanIdResponse);
             GetLoansLoanIdDelinquencySummary delinquent = getLoansLoanIdResponse.getDelinquent();
-
             SoftAssertions softly = new SoftAssertions();
             softly.assertThat(Utils.getDoubleValue(delinquent.getDelinquentAmount())).as("Total delinquent amount").isEqualTo(2049.99);
             softly.assertThat(delinquent.getDelinquentDate()).as("Delinquent date").isEqualTo(LocalDate.of(2012, 2, 1));
             softly.assertThat(delinquent.getDelinquentDays()).as("Delinquent days").isEqualTo(31);
-
             // Installment-level delinquency is aggregated by range
             // Both installments (31 days and 13 days) fall into Range 2 (4-60 days)
             // So we expect 1 aggregated entry with total amount 2049.99
             softly.assertThat(delinquent.getInstallmentLevelDelinquency()).as("Installment level delinquency size").hasSize(1);
-
             if (delinquent.getInstallmentLevelDelinquency().size() >= 1) {
                 GetLoansLoanIdLoanInstallmentLevelDelinquency rangeDelinquency = delinquent.getInstallmentLevelDelinquency().get(0);
                 // This is the aggregated amount for all installments in Range 2 (4-60 days)
-                softly.assertThat(rangeDelinquency.getDelinquentAmount().stripTrailingZeros())
-                        .as("Range 2 (4-60 days) aggregated delinquent amount").isEqualByComparingTo(BigDecimal.valueOf(2049.99));
+                softly.assertThat(rangeDelinquency.getDelinquentAmount().stripTrailingZeros()).as("Range 2 (4-60 days) aggregated delinquent amount").isEqualByComparingTo(BigDecimal.valueOf(2049.99));
                 softly.assertThat(rangeDelinquency.getMinimumAgeDays()).as("Range minimum days").isEqualTo(4);
                 softly.assertThat(rangeDelinquency.getMaximumAgeDays()).as("Range maximum days").isEqualTo(60);
             }
-
             softly.assertAll();
         });
     }
 
     @Test
     public void testLoanClassificationOnlyForActiveLoan() {
-
         // Given
         final LoanTransactionHelper loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
-
         ArrayList<Long> rangeIds = new ArrayList<>();
         // First Range
-        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                .minimumAgeDays(4).maximumAgeDays(30).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(30).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         rangeIds.add(delinquencyRangeResponse.getResourceId());
-
-        PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper
-                .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+        PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
         assertNotNull(delinquencyBucketResponse);
         final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketResponse.getResourceId());
-
         // Client and Loan account creation
         final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 2012");
-        final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper,
-                delinquencyBucket.getId(), null);
+        final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucket.getId(), null);
         assertNotNull(getLoanProductsProductResponse);
-
         final LocalDate todaysDate = Utils.getLocalDateOfTenant();
         // Older date to have more than one overdue installment
         LocalDate transactionDate = todaysDate.minusDays(37);
         String operationDate = Utils.dateFormatter.format(transactionDate);
-
         // Create Loan Application
-        final Integer loanId = createLoanApplication(loanTransactionHelper, clientId.toString(),
-                getLoanProductsProductResponse.getId().toString(), operationDate, null);
-
+        final Integer loanId = createLoanApplication(loanTransactionHelper, clientId.toString(), getLoanProductsProductResponse.getId().toString(), operationDate, null);
         // Evaluate default delinquent values in No Active Loan
         GetLoansLoanIdResponse getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
         assertNotNull(getLoansLoanIdResponse);
         assertNotNull(getLoansLoanIdResponse.getDelinquent());
         assertEquals(0, getLoansLoanIdResponse.getDelinquent().getDelinquentDays());
         assertEquals(0.0, Utils.getDoubleValue(getLoansLoanIdResponse.getDelinquent().getDelinquentAmount()));
-
         // Loan Disbursement
         disburseLoanAccount(loanTransactionHelper, loanId, operationDate);
         // Evaluate default delinquent values in No Active Loan
@@ -1356,46 +1037,32 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
     @Test
     public void testLoanClassificationOnlyForActiveLoanWithCOB() {
         try {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             final String operationDate = "01 January 2012";
-
             LocalDate bussinesLocalDate = Utils.getDateAsLocalDate(operationDate);
             log.info("Current date {}", bussinesLocalDate);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, bussinesLocalDate);
-
             // Given
             final LoanTransactionHelper loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
             final SchedulerJobHelper schedulerJobHelper = new SchedulerJobHelper(requestSpec);
-
             ArrayList<Long> rangeIds = new ArrayList<>();
             // First Range
-            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                    .minimumAgeDays(4).maximumAgeDays(30).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+            PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(30).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
             rangeIds.add(delinquencyRangeResponse.getResourceId());
-
-            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper
-                    .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+            PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
             assertNotNull(delinquencyBucketResponse);
-            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper
-                    .getBucket(delinquencyBucketResponse.getResourceId());
-
+            final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketResponse.getResourceId());
             // Client creation
             final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec, operationDate);
-            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper,
-                    delinquencyBucket.getId(), null);
+            final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucket.getId(), null);
             assertNotNull(getLoanProductsProductResponse);
-
             // Create Loan Application
-            final Integer loanId = createLoanApplication(loanTransactionHelper, clientId.toString(),
-                    getLoanProductsProductResponse.getId().toString(), operationDate, null);
-
+            final Integer loanId = createLoanApplication(loanTransactionHelper, clientId.toString(), getLoanProductsProductResponse.getId().toString(), operationDate, null);
             // run cob for business date 01 January 2012
             bussinesLocalDate = Utils.getDateAsLocalDate(operationDate);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, bussinesLocalDate);
             // Run the Loan inline COB Job
             inlineLoanCOBHelper.executeInlineCOB(Long.valueOf(loanId));
-
             // Loan delinquency data
             GetLoansLoanIdResponse getLoansLoanIdResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId);
             loanTransactionHelper.printDelinquencyData(getLoansLoanIdResponse);
@@ -1404,10 +1071,8 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
             assertNotNull(delinquent);
             assertEquals(0, delinquent.getDelinquentDays());
             assertEquals(0.0, Utils.getDoubleValue(delinquent.getDelinquentAmount()));
-
         } finally {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
@@ -1415,86 +1080,60 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
     public void testLoanDelinquencyDataWithAmountPerPortions() {
         // Given
         final LoanTransactionHelper loanTransactionHelper = new LoanTransactionHelper(this.requestSpec, this.responseSpec);
-
         ArrayList<Long> rangeIds = new ArrayList<>();
         // First Range
-        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                .minimumAgeDays(4).maximumAgeDays(30).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
+        PostDelinquencyRangeResponse delinquencyRangeResponse = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().minimumAgeDays(4).maximumAgeDays(30).locale("en").classification(Utils.randomStringGenerator("DLQ_R_", 10)));
         rangeIds.add(delinquencyRangeResponse.getResourceId());
         DelinquencyRangeResponse range = DelinquencyRangesHelper.getRange(delinquencyRangeResponse.getResourceId());
-
-        PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper
-                .createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
+        PostDelinquencyBucketResponse delinquencyBucketResponse = DelinquencyBucketsHelper.createBucket(new DelinquencyBucketRequest().name(Utils.randomStringGenerator("DLQ_B_", 10)).ranges(rangeIds));
         assertNotNull(delinquencyBucketResponse);
         final DelinquencyBucketResponse delinquencyBucket = DelinquencyBucketsHelper.getBucket(delinquencyBucketResponse.getResourceId());
-
         // Client and Loan account creation
         final Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-
-        final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper,
-                delinquencyBucket.getId(), null);
+        final GetLoanProductsProductIdResponse getLoanProductsProductResponse = createLoanProduct(loanTransactionHelper, delinquencyBucket.getId(), null);
         assertNotNull(getLoanProductsProductResponse);
         log.info("Loan Product Bucket Name: {}", getLoanProductsProductResponse.getDelinquencyBucket().getName());
         assertEquals(getLoanProductsProductResponse.getDelinquencyBucket().getName(), delinquencyBucket.getName());
-
         final LocalDate todaysDate = Utils.getLocalDateOfTenant();
         log.info("Local date of Tenant: {}", todaysDate);
-
         // Older date to have more than one overdue installment
         final LocalDate transactionDate = todaysDate.minusDays(50);
         final String operationDate = Utils.dateFormatter.format(transactionDate);
-
         final Double amount = 2000.0;
         PostLoansRequest applicationRequest = applyLoanRequest(clientId, getLoanProductsProductResponse.getId(), operationDate, amount, 4);
-
-        applicationRequest = applicationRequest.numberOfRepayments(5).loanTermFrequency(5).loanTermFrequencyType(2)
-                .interestRatePerPeriod(BigDecimal.valueOf(12.3)).interestCalculationPeriodType(DAYS).repaymentEvery(1)
-                .repaymentFrequencyType(2);
-
+        applicationRequest = applicationRequest.numberOfRepayments(5).loanTermFrequency(5).loanTermFrequencyType(2).interestRatePerPeriod(BigDecimal.valueOf(12.3)).interestCalculationPeriodType(DAYS).repaymentEvery(1).repaymentFrequencyType(2);
         PostLoansResponse loanResponse = loanTransactionHelper.applyLoan(applicationRequest);
         final Long loanId = loanResponse.getResourceId();
-
-        loanTransactionHelper.approveLoan(loanId, new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(amount))
-                .dateFormat(DATETIME_PATTERN).approvedOnDate(operationDate).locale("en"));
-
-        loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate(operationDate)
-                .dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(amount)).locale("en"));
-
+        loanTransactionHelper.approveLoan(loanId, new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(amount)).dateFormat(DATETIME_PATTERN).approvedOnDate(operationDate).locale("en"));
+        loanTransactionHelper.disburseLoan(loanId, new PostLoansLoanIdRequest().actualDisbursementDate(operationDate).dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(amount)).locale("en"));
         GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails(loanId);
         log.info("Loan Delinquency Range after Disbursement {}", loanDetails.getDelinquencyRange().getClassification());
         assertNotNull(loanDetails.getDelinquent());
-        log.info("Loan Delinquency Data {} {}", loanDetails.getDelinquent().getDelinquentPrincipal(),
-                loanDetails.getDelinquent().getDelinquentInterest());
+        log.info("Loan Delinquency Data {} {}", loanDetails.getDelinquent().getDelinquentPrincipal(), loanDetails.getDelinquent().getDelinquentInterest());
         assertNotNull(loanDetails.getDelinquent().getDelinquentPrincipal());
         assertEquals(new BigDecimal("312.95"), loanDetails.getDelinquent().getDelinquentPrincipal().stripTrailingZeros());
         assertNotNull(loanDetails.getDelinquent().getDelinquentInterest());
         assertEquals(new BigDecimal("246"), loanDetails.getDelinquent().getDelinquentInterest().stripTrailingZeros());
-
         // Apply a partial repayment to move only the interest
-        PostLoansLoanIdTransactionsResponse loansLoanIdTransactions = loanTransactionHelper.makeLoanRepayment(operationDate, 120f,
-                loanId.intValue());
+        PostLoansLoanIdTransactionsResponse loansLoanIdTransactions = loanTransactionHelper.makeLoanRepayment(operationDate, 120.0F, loanId.intValue());
         assertNotNull(loansLoanIdTransactions);
         log.info("Loan repayment transaction id {}", loansLoanIdTransactions.getResourceId());
-
         loanDetails = loanTransactionHelper.getLoanDetails(loanId);
         assertNotNull(loanDetails.getDelinquent());
         assertNotNull(loanDetails.getDelinquencyRange().getClassification());
         assertEquals(new BigDecimal("312.95"), loanDetails.getDelinquent().getDelinquentPrincipal().stripTrailingZeros());
         assertEquals(new BigDecimal("126"), loanDetails.getDelinquent().getDelinquentInterest().stripTrailingZeros());
-
         // Apply a repayment to cover interest and part of the principal
-        loansLoanIdTransactions = loanTransactionHelper.makeLoanRepayment(operationDate, 330.72f, loanId.intValue());
+        loansLoanIdTransactions = loanTransactionHelper.makeLoanRepayment(operationDate, 330.72F, loanId.intValue());
         assertNotNull(loansLoanIdTransactions);
         log.info("Loan repayment transaction id {}", loansLoanIdTransactions.getResourceId());
-
         loanDetails = loanTransactionHelper.getLoanDetails(loanId);
         assertNotNull(loanDetails.getDelinquent());
         assertNotNull(loanDetails.getDelinquencyRange().getClassification());
         assertEquals(new BigDecimal("108.23"), loanDetails.getDelinquent().getDelinquentPrincipal().stripTrailingZeros());
         assertEquals(BigDecimal.ZERO, loanDetails.getDelinquent().getDelinquentInterest().stripTrailingZeros());
-
         // Apply a repayment to cover the remain principal
-        loansLoanIdTransactions = loanTransactionHelper.makeLoanRepayment(operationDate, 108.23f, loanId.intValue());
+        loansLoanIdTransactions = loanTransactionHelper.makeLoanRepayment(operationDate, 108.23F, loanId.intValue());
         assertNotNull(loansLoanIdTransactions);
         log.info("Loan repayment transaction id {}", loansLoanIdTransactions.getResourceId());
         // Loan without Delinquency Classification
@@ -1503,11 +1142,8 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
         assertNull(loanDetails.getDelinquencyRange());
         assertEquals(BigDecimal.ZERO, loanDetails.getDelinquent().getDelinquentPrincipal().stripTrailingZeros());
         assertEquals(BigDecimal.ZERO, loanDetails.getDelinquent().getDelinquentInterest().stripTrailingZeros());
-
         // Undo the last repayment transaction we must to have pending the principal
-        PostLoansLoanIdTransactionsResponse reverseRepayment = loanTransactionHelper.reverseLoanTransaction(loanId,
-                loansLoanIdTransactions.getResourceId(), new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("dd MMMM yyyy")
-                        .transactionDate(operationDate).transactionAmount(0.0).locale("en"));
+        PostLoansLoanIdTransactionsResponse reverseRepayment = loanTransactionHelper.reverseLoanTransaction(loanId, loansLoanIdTransactions.getResourceId(), new PostLoansLoanIdTransactionsTransactionIdRequest().dateFormat("dd MMMM yyyy").transactionDate(operationDate).transactionAmount(0.0).locale("en"));
         assertNotNull(reverseRepayment);
         loanDetails = loanTransactionHelper.getLoanDetails(loanId);
         assertNotNull(loanDetails.getDelinquent());
@@ -1516,41 +1152,32 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
         assertEquals(BigDecimal.ZERO, loanDetails.getDelinquent().getDelinquentInterest().stripTrailingZeros());
     }
 
-    private GetLoanProductsProductIdResponse createLoanProduct(final LoanTransactionHelper loanTransactionHelper,
-            final Long delinquencyBucketId, final String inArrearsTolerance) {
-        final HashMap<String, Object> loanProductMap = new LoanProductTestBuilder().withDaysInMonth("30").withDaysInYear("360")
-                .withInArrearsTolerance(inArrearsTolerance).build(null, delinquencyBucketId);
+    private GetLoanProductsProductIdResponse createLoanProduct(final LoanTransactionHelper loanTransactionHelper, final Long delinquencyBucketId, final String inArrearsTolerance) {
+        final HashMap<String, Object> loanProductMap = new LoanProductTestBuilder().withDaysInMonth("30").withDaysInYear("360").withInArrearsTolerance(inArrearsTolerance).build(null, delinquencyBucketId);
         final Integer loanProductId = loanTransactionHelper.getLoanProductId(Utils.convertToJson(loanProductMap));
         return loanTransactionHelper.getLoanProduct(loanProductId);
     }
 
-    private GetLoanProductsProductIdResponse createLoanProductWithInstallmentLevelDelinquency(
-            final LoanTransactionHelper loanTransactionHelper, final Long delinquencyBucketId, final String inArrearsTolerance) {
-        final HashMap<String, Object> loanProductMap = new LoanProductTestBuilder().withInArrearsTolerance(inArrearsTolerance).build(null,
-                delinquencyBucketId);
+    private GetLoanProductsProductIdResponse createLoanProductWithInstallmentLevelDelinquency(final LoanTransactionHelper loanTransactionHelper, final Long delinquencyBucketId, final String inArrearsTolerance) {
+        final HashMap<String, Object> loanProductMap = new LoanProductTestBuilder().withInArrearsTolerance(inArrearsTolerance).build(null, delinquencyBucketId);
         loanProductMap.put("enableInstallmentLevelDelinquency", true);
         final Integer loanProductId = loanTransactionHelper.getLoanProductId(Utils.convertToJson(loanProductMap));
         return loanTransactionHelper.getLoanProduct(loanProductId);
     }
 
-    private PutLoanProductsProductIdResponse updateLoanProduct(LoanTransactionHelper loanTransactionHelper, Long id,
-            final Integer inArrearsTolerance) {
-        final PutLoanProductsProductIdRequest requestModifyLoan = new PutLoanProductsProductIdRequest()
-                .inArrearsTolerance(inArrearsTolerance);
+    private PutLoanProductsProductIdResponse updateLoanProduct(LoanTransactionHelper loanTransactionHelper, Long id, final Integer inArrearsTolerance) {
+        final PutLoanProductsProductIdRequest requestModifyLoan = new PutLoanProductsProductIdRequest().inArrearsTolerance(inArrearsTolerance);
         return loanTransactionHelper.updateLoanProduct(id, requestModifyLoan);
     }
 
-    private Integer createLoanApplication(final LoanTransactionHelper loanTransactionHelper, final String clientId,
-            final String loanProductId, final String operationDate, final String inArrearsTolerance) {
-        final String loanApplicationJSON = new LoanApplicationTestBuilder().withPrincipal(principalAmount).withLoanTermFrequency("12")
-                .withLoanTermFrequencyAsMonths().withNumberOfRepayments("12").withRepaymentEveryAfter("1")
-                .withRepaymentFrequencyTypeAsMonths() //
-                .withInterestRatePerPeriod("2") //
-                .withExpectedDisbursementDate(operationDate) //
-                .withInterestTypeAsDecliningBalance() //
-                .withSubmittedOnDate(operationDate) //
-                .withInArrearsTolerance(inArrearsTolerance) //
-                .build(clientId, loanProductId, null);
+    private Integer createLoanApplication(final LoanTransactionHelper loanTransactionHelper, final String clientId, final String loanProductId, final String operationDate, final String inArrearsTolerance) {
+        final String loanApplicationJSON =  //
+        //
+        //
+        //
+        //
+        //
+        new LoanApplicationTestBuilder().withPrincipal(principalAmount).withLoanTermFrequency("12").withLoanTermFrequencyAsMonths().withNumberOfRepayments("12").withRepaymentEveryAfter("1").withRepaymentFrequencyTypeAsMonths().withInterestRatePerPeriod("2").withExpectedDisbursementDate(operationDate).withInterestTypeAsDecliningBalance().withSubmittedOnDate(operationDate).withInArrearsTolerance(inArrearsTolerance).build(clientId, loanProductId, null);
         final Integer loanId = loanTransactionHelper.getLoanId(loanApplicationJSON);
         loanTransactionHelper.approveLoan(operationDate, principalAmount, loanId, null);
         return loanId;
@@ -1560,8 +1187,7 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
         loanTransactionHelper.disburseLoanWithNetDisbursalAmount(operationDate, loanId, principalAmount);
     }
 
-    private Integer createLoanAccount(final LoanTransactionHelper loanTransactionHelper, final String clientId, final String loanProductId,
-            final String operationDate, final String inArrearsTolerance) {
+    private Integer createLoanAccount(final LoanTransactionHelper loanTransactionHelper, final String clientId, final String loanProductId, final String operationDate, final String inArrearsTolerance) {
         final Integer loanId = createLoanApplication(loanTransactionHelper, clientId, loanProductId, operationDate, inArrearsTolerance);
         disburseLoanAccount(loanTransactionHelper, loanId, operationDate);
         return loanId;
@@ -1570,7 +1196,7 @@ public class DelinquencyBucketsIntegrationTest extends BaseLoanIntegrationTest {
     private String getChargeApplyJSON(final Integer chargeId, final String dueDate) {
         final HashMap<String, Object> map = new HashMap<>();
         map.put("chargeId", chargeId);
-        map.put("amount", 12.0f);
+        map.put("amount", 12.0F);
         map.put("dueDate", dueDate);
         map.put("dateFormat", Utils.DATE_FORMAT);
         map.put("locale", CommonConstants.LOCALE);

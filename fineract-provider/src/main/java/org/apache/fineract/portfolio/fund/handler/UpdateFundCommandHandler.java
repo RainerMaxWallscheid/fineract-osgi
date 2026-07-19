@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.fund.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,15 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "FUND", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateFundCommandHandler implements NewCommandSourceHandler {
-
     private final FundWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.updateFund(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateFundCommandHandler(final FundWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

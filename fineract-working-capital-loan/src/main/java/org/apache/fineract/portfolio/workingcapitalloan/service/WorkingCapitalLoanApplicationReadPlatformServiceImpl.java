@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.ApiFacingEnum;
 import org.apache.fineract.infrastructure.core.data.StringEnumOptionData;
@@ -71,10 +70,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements WorkingCapitalLoanApplicationReadPlatformService {
-
     private final WorkingCapitalLoanRepository repository;
     private final WorkingCapitalLoanMapper mapper;
     private final WorkingCapitalLoanProductReadPlatformService productReadPlatformService;
@@ -96,54 +93,48 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
     public WorkingCapitalLoanTemplateData retrieveTemplate(final Long productId, final Long clientId) {
         final List<WorkingCapitalLoanProductData> productOptions = this.productReadPlatformService.retrieveAllWorkingCapitalLoanProducts();
         final WorkingCapitalLoanProductData productTemplate = this.productReadPlatformService.retrieveNewWorkingCapitalLoanProductDetails();
-        final Collection<DelinquencyBucketData> delinquencyBucketOptions = this.delinquencyReadPlatformService
-                .retrieveAllDelinquencyBuckets();
-        final List<StringEnumOptionData> periodFrequencyTypeOptions = ApiFacingEnum
-                .getValuesAsStringEnumOptionDataList(WorkingCapitalLoanPeriodFrequencyType.class);
+        final Collection<DelinquencyBucketData> delinquencyBucketOptions = this.delinquencyReadPlatformService.retrieveAllDelinquencyBuckets();
+        final List<StringEnumOptionData> periodFrequencyTypeOptions = ApiFacingEnum.getValuesAsStringEnumOptionDataList(WorkingCapitalLoanPeriodFrequencyType.class);
         final List<WorkingCapitalBreachData> breachOptions = breachReadPlatformService.retrieveAll();
         final List<WorkingCapitalNearBreachData> nearBreachOptions = nearBreachReadPlatformService.retrieveAll();
-        final List<StringEnumOptionData> delinquencyStartTypeOptions = ApiFacingEnum
-                .getValuesAsStringEnumOptionDataList(WorkingCapitalLoanDelinquencyStartType.class);
-        final List<StringEnumOptionData> delinquencyMinimumPaymentTypeOptions = ApiFacingEnum
-                .getValuesAsStringEnumOptionDataList(DelinquencyMinimumPaymentType.class);
+        final List<StringEnumOptionData> delinquencyStartTypeOptions = ApiFacingEnum.getValuesAsStringEnumOptionDataList(WorkingCapitalLoanDelinquencyStartType.class);
+        final List<StringEnumOptionData> delinquencyMinimumPaymentTypeOptions = ApiFacingEnum.getValuesAsStringEnumOptionDataList(DelinquencyMinimumPaymentType.class);
         final WorkingCapitalLoanData.WorkingCapitalLoanDataBuilder builder = WorkingCapitalLoanData.builder();
         if (productId != null) {
             final WorkingCapitalLoanProductData product = this.productReadPlatformService.retrieveWorkingCapitalLoanProduct(productId);
             if (product != null) {
-                builder.product(product) //
-                        .fundId(product.getFundId()) //
-                        .fundName(product.getFundName()) //
-                        .currency(product.getCurrency()) //
-                        .paymentRate(product.getPeriodPaymentRate()) //
-                        .repaymentEvery(product.getRepaymentEvery()) //
-                        .repaymentFrequencyType(product.getRepaymentFrequencyType()) //
-                        .discountFee(product.getDiscount()) //
-                        .paymentAllocation(product.getPaymentAllocation()) //
-                        .breach(product.getBreach()) //
-                        .nearBreach(product.getNearBreach()) //
-                        .breachGraceDays(product.getBreachGraceDays()); //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                builder.product(product).fundId(product.getFundId()).fundName(product.getFundName()).currency(product.getCurrency()).paymentRate(product.getPeriodPaymentRate()).repaymentEvery(product.getRepaymentEvery()).repaymentFrequencyType(product.getRepaymentFrequencyType()).discountFee(product.getDiscount()).paymentAllocation(product.getPaymentAllocation()).breach(product.getBreach()).nearBreach(product.getNearBreach()).breachGraceDays(product.getBreachGraceDays()); //
             }
         }
         if (clientId != null) {
             builder.client(clientReadPlatformService.retrieveOne(clientId));
         }
         final WorkingCapitalLoanData loanData = builder.build();
-
-        return WorkingCapitalLoanTemplateData.builder()//
-                .loanData(loanData)//
-                .productOptions(productOptions)//
-                .fundOptions(productTemplate.getFundOptions())//
-                .delinquencyBucketOptions(delinquencyBucketOptions)//
-                .periodFrequencyTypeOptions(periodFrequencyTypeOptions)//
-                .breachOptions(breachOptions)//
-                .nearBreachOptions(nearBreachOptions)//
-                .delinquencyStartTypeOptions(delinquencyStartTypeOptions)//
-                .delinquencyMinimumPaymentTypeOptions(delinquencyMinimumPaymentTypeOptions).build();
+        return //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        WorkingCapitalLoanTemplateData.builder().loanData(loanData).productOptions(productOptions).fundOptions(productTemplate.getFundOptions()).delinquencyBucketOptions(delinquencyBucketOptions).periodFrequencyTypeOptions(periodFrequencyTypeOptions).breachOptions(breachOptions).nearBreachOptions(nearBreachOptions).delinquencyStartTypeOptions(delinquencyStartTypeOptions).delinquencyMinimumPaymentTypeOptions(delinquencyMinimumPaymentTypeOptions).build();
     }
 
     @Override
-    public Page<WorkingCapitalLoanData> retrieveAllPaged(final Pageable pageable, final Long clientId, final String externalId,
-            final String status, final String accountNo) {
+    public Page<WorkingCapitalLoanData> retrieveAllPaged(final Pageable pageable, final Long clientId, final String externalId, final String status, final String accountNo) {
         final Specification<WorkingCapitalLoan> spec = (root, query, cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             if (clientId != null) {
@@ -166,8 +157,7 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
             return new PageImpl<>(List.of(), pageable, loanPage.getTotalElements());
         }
         final List<WorkingCapitalLoan> loansWithDetails = this.repository.findByIdInWithFullDetails(loanIds);
-        final Map<Long, WorkingCapitalLoan> loansById = loansWithDetails.stream()
-                .collect(Collectors.toMap(WorkingCapitalLoan::getId, loan -> loan));
+        final Map<Long, WorkingCapitalLoan> loansById = loansWithDetails.stream().collect(Collectors.toMap(WorkingCapitalLoan::getId, loan -> loan));
         final List<WorkingCapitalLoan> loansInPageOrder = loanIds.stream().map(loansById::get).filter(Objects::nonNull).toList();
         final List<WorkingCapitalLoanData> content = this.mapper.toDataList(loansInPageOrder);
         return new PageImpl<>(content, pageable, loanPage.getTotalElements());
@@ -175,11 +165,9 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
 
     @Override
     public WorkingCapitalLoanData retrieveOne(final Long loanId) {
-        final WorkingCapitalLoan loan = this.repository.findByIdWithFullDetails(loanId)
-                .orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
+        final WorkingCapitalLoan loan = this.repository.findByIdWithFullDetails(loanId).orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
         WorkingCapitalLoanData data = this.mapper.toData(loan);
-        WorkingCapitalLoanCollectionData collectionData = workingCapitalLoanDelinquencyReadPlatformService.getCollectionData(loanId,
-                ThreadLocalContextUtil.getBusinessDate());
+        WorkingCapitalLoanCollectionData collectionData = workingCapitalLoanDelinquencyReadPlatformService.getCollectionData(loanId, ThreadLocalContextUtil.getBusinessDate());
         data.setDelinquent(collectionData);
         data.setCharges(chargeReadPlatformService.retrieveLoanCharges(loanId));
         enrichWithFullCurrency(data);
@@ -201,8 +189,7 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
             return;
         }
         final CurrencyData appCurrency = applicationCurrencyRepositoryWrapper.findOneWithNotFoundDetection(currency.getCode()).toData();
-        final CurrencyData fullCurrency = new CurrencyData(currency.getCode(), appCurrency.getName(), currency.getDecimalPlaces(),
-                currency.getInMultiplesOf(), appCurrency.getDisplaySymbol(), appCurrency.getNameCode());
+        final CurrencyData fullCurrency = new CurrencyData(currency.getCode(), appCurrency.getName(), currency.getDecimalPlaces(), currency.getInMultiplesOf(), appCurrency.getDisplaySymbol(), appCurrency.getNameCode());
         data.setCurrency(fullCurrency);
         Optional.ofNullable(data.getSummary()).ifPresent(summary -> summary.setCurrency(fullCurrency));
     }
@@ -237,17 +224,14 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
         // breachStartDate: fromDate of the earliest breached period. The breach schedule already offsets its first
         // period
         // by breachGraceDays, so the grace period is implicitly reflected in the fromDate.
-        breachScheduleRepository.findTopByLoanIdAndBreachTrueOrderByFromDateAsc(loan.getId())
-                .ifPresent(period -> data.setBreachStartDate(period.getFromDate()));
-
+        breachScheduleRepository.findTopByLoanIdAndBreachTrueOrderByFromDateAsc(loan.getId()).ifPresent(period -> data.setBreachStartDate(period.getFromDate()));
         // delinquencyStartDate: fromDate of the earliest delinquent period plus delinquencyGraceDays. The delinquency
         // range
         // schedule does not apply the grace days when generating periods, so they are added here.
-        delinquencyRangeScheduleRepository.findTopByLoanIdAndMinPaymentCriteriaMetFalseOrderByFromDateAsc(loan.getId())
-                .ifPresent(period -> {
-                    final int graceDays = data.getDelinquencyGraceDays() != null ? data.getDelinquencyGraceDays() : 0;
-                    data.setDelinquencyStartDate(period.getFromDate().plusDays(graceDays));
-                });
+        delinquencyRangeScheduleRepository.findTopByLoanIdAndMinPaymentCriteriaMetFalseOrderByFromDateAsc(loan.getId()).ifPresent(period -> {
+            final int graceDays = data.getDelinquencyGraceDays() != null ? data.getDelinquencyGraceDays() : 0;
+            data.setDelinquencyStartDate(period.getFromDate().plusDays(graceDays));
+        });
     }
 
     private void enrichWithOriginators(final Long loanId, final WorkingCapitalLoanData data) {
@@ -270,5 +254,25 @@ public class WorkingCapitalLoanApplicationReadPlatformServiceImpl implements Wor
     @Override
     public boolean existsByLoanId(Long loanId) {
         return this.repository.existsById(loanId);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanApplicationReadPlatformServiceImpl(final WorkingCapitalLoanRepository repository, final WorkingCapitalLoanMapper mapper, final WorkingCapitalLoanProductReadPlatformService productReadPlatformService, final ClientReadPlatformService clientReadPlatformService, final DelinquencyReadPlatformService delinquencyReadPlatformService, final WorkingCapitalLoanSummaryMapper workingCapitalLoanSummaryMapper, final WorkingCapitalBreachReadPlatformService breachReadPlatformService, final WorkingCapitalLoanDelinquencyReadPlatformService workingCapitalLoanDelinquencyReadPlatformService, final WorkingCapitalNearBreachReadPlatformService nearBreachReadPlatformService, final ProjectedAmortizationScheduleRepositoryWrapper scheduleRepositoryWrapper, final WorkingCapitalLoanBreachScheduleRepository breachScheduleRepository, final WorkingCapitalLoanDelinquencyRangeScheduleRepository delinquencyRangeScheduleRepository, final Optional<WorkingCapitalLoanOriginatorReadPlatformService> originatorReadService, final WorkingCapitalLoanChargeReadPlatformService chargeReadPlatformService, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper, final AppUserRepository appUserRepository) {
+        this.repository = repository;
+        this.mapper = mapper;
+        this.productReadPlatformService = productReadPlatformService;
+        this.clientReadPlatformService = clientReadPlatformService;
+        this.delinquencyReadPlatformService = delinquencyReadPlatformService;
+        this.workingCapitalLoanSummaryMapper = workingCapitalLoanSummaryMapper;
+        this.breachReadPlatformService = breachReadPlatformService;
+        this.workingCapitalLoanDelinquencyReadPlatformService = workingCapitalLoanDelinquencyReadPlatformService;
+        this.nearBreachReadPlatformService = nearBreachReadPlatformService;
+        this.scheduleRepositoryWrapper = scheduleRepositoryWrapper;
+        this.breachScheduleRepository = breachScheduleRepository;
+        this.delinquencyRangeScheduleRepository = delinquencyRangeScheduleRepository;
+        this.originatorReadService = originatorReadService;
+        this.chargeReadPlatformService = chargeReadPlatformService;
+        this.applicationCurrencyRepositoryWrapper = applicationCurrencyRepositoryWrapper;
+        this.appUserRepository = appUserRepository;
     }
 }

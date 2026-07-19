@@ -25,37 +25,36 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.boot.FineractProfiles;
 import org.apache.fineract.infrastructure.event.external.data.ExternalEventResponse;
 import org.apache.fineract.infrastructure.event.external.service.InternalExternalEventService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
-@Slf4j
 // TODO: can't we test this differently without creating boilerplate code that's only available during testing?
 @Profile(FineractProfiles.TEST)
 @Component
 @Path("/v1/internal/externalevents")
-@RequiredArgsConstructor
 public class InternalExternalEventsApiResource {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InternalExternalEventsApiResource.class);
     private final InternalExternalEventService internalExternalEventService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    public List<ExternalEventResponse> getAllExternalEvents(@QueryParam("idempotencyKey") final String idempotencyKey,
-            @QueryParam("type") final String type, @QueryParam("category") final String category,
-            @QueryParam("aggregateRootId") final Long aggregateRootId) {
+    @Produces({MediaType.APPLICATION_JSON})
+    public List<ExternalEventResponse> getAllExternalEvents(@QueryParam("idempotencyKey") final String idempotencyKey, @QueryParam("type") final String type, @QueryParam("category") final String category, @QueryParam("aggregateRootId") final Long aggregateRootId) {
         // TODO: authorization constraints?
         return internalExternalEventService.getAllExternalEvents(idempotencyKey, type, category, aggregateRootId);
     }
 
     @DELETE
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     public void deleteAllExternalEvents() {
         // TODO: authorization constraints?
         internalExternalEventService.deleteAllExternalEvents();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InternalExternalEventsApiResource(final InternalExternalEventService internalExternalEventService) {
+        this.internalExternalEventService = internalExternalEventService;
     }
 }

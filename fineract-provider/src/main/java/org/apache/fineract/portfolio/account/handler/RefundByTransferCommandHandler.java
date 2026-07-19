@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.account.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,16 +27,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "ACCOUNTTRANSFER", action = "REFUNDBYTRANSFER")
 public class RefundByTransferCommandHandler implements NewCommandSourceHandler {
-
     private final AccountTransfersWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.refundByTransfer(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RefundByTransferCommandHandler(final AccountTransfersWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

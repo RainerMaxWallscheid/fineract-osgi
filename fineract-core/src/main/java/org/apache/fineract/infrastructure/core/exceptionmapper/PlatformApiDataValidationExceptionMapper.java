@@ -23,7 +23,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
@@ -40,16 +39,14 @@ import org.springframework.stereotype.Component;
 @Provider
 @Component
 @Scope("singleton")
-@Slf4j
-public class PlatformApiDataValidationExceptionMapper
-        implements FineractExceptionMapper, ExceptionMapper<PlatformApiDataValidationException> {
+public class PlatformApiDataValidationExceptionMapper implements FineractExceptionMapper, ExceptionMapper<PlatformApiDataValidationException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PlatformApiDataValidationExceptionMapper.class);
 
     @Override
     public Response toResponse(final PlatformApiDataValidationException exception) {
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-        final ApiGlobalErrorResponse dataValidationErrorResponse = ApiGlobalErrorResponse
-                .badClientRequest(exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(), exception.getErrors());
-
+        final ApiGlobalErrorResponse dataValidationErrorResponse = ApiGlobalErrorResponse.badClientRequest(exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(), exception.getErrors());
         return Response.status(Status.BAD_REQUEST).entity(dataValidationErrorResponse).type(MediaType.APPLICATION_JSON).build();
     }
 

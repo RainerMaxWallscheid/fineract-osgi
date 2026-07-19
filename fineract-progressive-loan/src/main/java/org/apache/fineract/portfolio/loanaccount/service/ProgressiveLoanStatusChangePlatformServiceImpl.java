@@ -19,8 +19,6 @@
 package org.apache.fineract.portfolio.loanaccount.service;
 
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.event.business.BusinessEventListener;
 import org.apache.fineract.infrastructure.event.business.domain.loan.LoanStatusChangedBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
@@ -28,10 +26,9 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.springframework.stereotype.Component;
 
 @Component("progressiveLoanStatusChangePlatformService")
-@Slf4j
-@RequiredArgsConstructor
 public class ProgressiveLoanStatusChangePlatformServiceImpl {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProgressiveLoanStatusChangePlatformServiceImpl.class);
     private final BusinessEventNotifierService businessEventNotifierService;
     private final CapitalizedIncomePlatformService capitalizedIncomeWritePlatformService;
 
@@ -40,8 +37,8 @@ public class ProgressiveLoanStatusChangePlatformServiceImpl {
         businessEventNotifierService.addPostBusinessEventListener(LoanStatusChangedBusinessEvent.class, new LoanStatusChangedListener());
     }
 
-    private final class LoanStatusChangedListener implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
 
+    private final class LoanStatusChangedListener implements BusinessEventListener<LoanStatusChangedBusinessEvent> {
         @Override
         public void onBusinessEvent(LoanStatusChangedBusinessEvent event) {
             final Loan loan = event.get();
@@ -50,5 +47,11 @@ public class ProgressiveLoanStatusChangePlatformServiceImpl {
                 capitalizedIncomeWritePlatformService.resetBalance(loan.getId());
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProgressiveLoanStatusChangePlatformServiceImpl(final BusinessEventNotifierService businessEventNotifierService, final CapitalizedIncomePlatformService capitalizedIncomeWritePlatformService) {
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.capitalizedIncomeWritePlatformService = capitalizedIncomeWritePlatformService;
     }
 }

@@ -23,7 +23,6 @@ import static org.apache.fineract.portfolio.loanproduct.calc.data.LoanInterestSc
 import static org.apache.fineract.portfolio.loanproduct.calc.data.LoanInterestScheduleModelModifiers.EMI_RECALCULATION;
 import static org.apache.fineract.portfolio.loanproduct.calc.data.LoanInterestScheduleModelModifiers.INTEREST_PAUSE_FOR_EMI_CALCULATION;
 import static org.apache.fineract.portfolio.loanproduct.calc.data.LoanInterestScheduleModelModifiers.INTEREST_RECALCULATION_ENABLED;
-
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -40,21 +39,13 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.serialization.gson.JsonExclude;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.loanproduct.domain.ILoanConfigurationDetails;
 
-@Data
-@Accessors(fluent = true)
-@AllArgsConstructor
 public class ProgressiveLoanInterestScheduleModel {
-
     private static final String modelVersion = "2";
     private final List<RepaymentPeriod> repaymentPeriods;
     private final TreeSet<InterestRate> interestRates;
@@ -66,41 +57,29 @@ public class ProgressiveLoanInterestScheduleModel {
     @JsonExclude
     private final Money zero;
     private final Map<LoanInterestScheduleModelModifiers, Boolean> modifiers;
-
-    @Setter
     private LocalDate lastOverdueBalanceChange;
     private List<OverdueBalanceCorrection> overdueCorrections = new ArrayList<>();
 
-    public ProgressiveLoanInterestScheduleModel(final List<RepaymentPeriod> repaymentPeriods,
-            final ILoanConfigurationDetails loanProductRelatedDetail, final Integer installmentAmountInMultiplesOf, final MathContext mc) {
+    public ProgressiveLoanInterestScheduleModel(final List<RepaymentPeriod> repaymentPeriods, final ILoanConfigurationDetails loanProductRelatedDetail, final Integer installmentAmountInMultiplesOf, final MathContext mc) {
         this.repaymentPeriods = new ArrayList<>(repaymentPeriods);
         this.interestRates = new TreeSet<>(Collections.reverseOrder());
         this.loanProductRelatedDetail = loanProductRelatedDetail;
         this.installmentAmountInMultiplesOf = installmentAmountInMultiplesOf;
         this.mc = mc;
         this.zero = Money.zero(loanProductRelatedDetail.getCurrencyData(), mc);
-        final boolean interestPauseForEmiCalculation = loanProductRelatedDetail.getGraceOnInterestPayment() != null
-                && loanProductRelatedDetail.getGraceOnInterestPayment() > 0;
-        modifiers = new HashMap<>(Map.of(EMI_RECALCULATION, true, COPY, false, INTEREST_RECALCULATION_ENABLED,
-                loanProductRelatedDetail.isInterestRecalculationEnabled(), INTEREST_PAUSE_FOR_EMI_CALCULATION,
-                interestPauseForEmiCalculation));
+        final boolean interestPauseForEmiCalculation = loanProductRelatedDetail.getGraceOnInterestPayment() != null && loanProductRelatedDetail.getGraceOnInterestPayment() > 0;
+        modifiers = new HashMap<>(Map.of(EMI_RECALCULATION, true, COPY, false, INTEREST_RECALCULATION_ENABLED, loanProductRelatedDetail.isInterestRecalculationEnabled(), INTEREST_PAUSE_FOR_EMI_CALCULATION, interestPauseForEmiCalculation));
     }
 
-    private ProgressiveLoanInterestScheduleModel(final List<RepaymentPeriod> repaymentPeriods, final TreeSet<InterestRate> interestRates,
-            final ILoanConfigurationDetails loanProductRelatedDetail, final Integer installmentAmountInMultiplesOf, final MathContext mc,
-            final boolean isCopiedForCalculation) {
+    private ProgressiveLoanInterestScheduleModel(final List<RepaymentPeriod> repaymentPeriods, final TreeSet<InterestRate> interestRates, final ILoanConfigurationDetails loanProductRelatedDetail, final Integer installmentAmountInMultiplesOf, final MathContext mc, final boolean isCopiedForCalculation) {
         this.mc = mc;
-        this.repaymentPeriods = copyRepaymentPeriods(repaymentPeriods,
-                (previousPeriod, repaymentPeriod) -> RepaymentPeriod.copy(previousPeriod, repaymentPeriod, mc));
+        this.repaymentPeriods = copyRepaymentPeriods(repaymentPeriods, (previousPeriod, repaymentPeriod) -> RepaymentPeriod.copy(previousPeriod, repaymentPeriod, mc));
         this.interestRates = new TreeSet<>(interestRates);
         this.loanProductRelatedDetail = loanProductRelatedDetail;
         this.installmentAmountInMultiplesOf = installmentAmountInMultiplesOf;
         this.zero = Money.zero(loanProductRelatedDetail.getCurrencyData(), mc);
-        final boolean interestPauseForEmiCalculation = loanProductRelatedDetail.getGraceOnInterestPayment() != null
-                && loanProductRelatedDetail.getGraceOnInterestPayment() > 0;
-        modifiers = new HashMap<>(Map.of(EMI_RECALCULATION, true, COPY, isCopiedForCalculation, INTEREST_RECALCULATION_ENABLED,
-                loanProductRelatedDetail.isInterestRecalculationEnabled(), INTEREST_PAUSE_FOR_EMI_CALCULATION,
-                interestPauseForEmiCalculation));
+        final boolean interestPauseForEmiCalculation = loanProductRelatedDetail.getGraceOnInterestPayment() != null && loanProductRelatedDetail.getGraceOnInterestPayment() > 0;
+        modifiers = new HashMap<>(Map.of(EMI_RECALCULATION, true, COPY, isCopiedForCalculation, INTEREST_RECALCULATION_ENABLED, loanProductRelatedDetail.isInterestRecalculationEnabled(), INTEREST_PAUSE_FOR_EMI_CALCULATION, interestPauseForEmiCalculation));
     }
 
     public void recordOverdueCorrection(final LocalDate correctionDate, final Money amount, final LocalDate affectedRpDueDate) {
@@ -128,21 +107,17 @@ public class ProgressiveLoanInterestScheduleModel {
     }
 
     public ProgressiveLoanInterestScheduleModel deepCopy(final MathContext mc) {
-        final ProgressiveLoanInterestScheduleModel copy = new ProgressiveLoanInterestScheduleModel(repaymentPeriods, interestRates,
-                loanProductRelatedDetail, installmentAmountInMultiplesOf, mc, false);
+        final ProgressiveLoanInterestScheduleModel copy = new ProgressiveLoanInterestScheduleModel(repaymentPeriods, interestRates, loanProductRelatedDetail, installmentAmountInMultiplesOf, mc, false);
         copy.overdueCorrections = new ArrayList<>(this.overdueCorrections);
         return copy;
     }
 
     public ProgressiveLoanInterestScheduleModel copyWithoutPaidAmounts() {
-        final List<RepaymentPeriod> repaymentPeriodCopies = copyRepaymentPeriods(repaymentPeriods,
-                (previousPeriod, repaymentPeriod) -> RepaymentPeriod.copyWithoutPaidAmounts(previousPeriod, repaymentPeriod, mc));
-        return new ProgressiveLoanInterestScheduleModel(repaymentPeriodCopies, interestRates, loanProductRelatedDetail,
-                installmentAmountInMultiplesOf, mc, true);
+        final List<RepaymentPeriod> repaymentPeriodCopies = copyRepaymentPeriods(repaymentPeriods, (previousPeriod, repaymentPeriod) -> RepaymentPeriod.copyWithoutPaidAmounts(previousPeriod, repaymentPeriod, mc));
+        return new ProgressiveLoanInterestScheduleModel(repaymentPeriodCopies, interestRates, loanProductRelatedDetail, installmentAmountInMultiplesOf, mc, true);
     }
 
-    private List<RepaymentPeriod> copyRepaymentPeriods(final List<RepaymentPeriod> repaymentPeriods,
-            final BiFunction<RepaymentPeriod, RepaymentPeriod, RepaymentPeriod> repaymentCopyFunction) {
+    private List<RepaymentPeriod> copyRepaymentPeriods(final List<RepaymentPeriod> repaymentPeriods, final BiFunction<RepaymentPeriod, RepaymentPeriod, RepaymentPeriod> repaymentCopyFunction) {
         final List<RepaymentPeriod> repaymentCopies = new ArrayList<>(repaymentPeriods.size());
         RepaymentPeriod previousPeriod = null;
         for (RepaymentPeriod repaymentPeriod : repaymentPeriods) {
@@ -158,32 +133,27 @@ public class ProgressiveLoanInterestScheduleModel {
     }
 
     private BigDecimal findInterestRate(final LocalDate effectiveDate) {
-        return interestRates.stream() //
-                .filter(ir -> !DateUtils.isAfter(ir.effectiveFrom(), effectiveDate)) //
-                .map(InterestRate::interestRate) //
-                .findFirst() //
-                .orElse(loanProductRelatedDetail.getAnnualNominalInterestRate()); //
+        return  //
+        //
+        //
+        //
+        interestRates.stream().filter(ir -> !DateUtils.isAfter(ir.effectiveFrom(), effectiveDate)).map(InterestRate::interestRate).findFirst().orElse(loanProductRelatedDetail.getAnnualNominalInterestRate()); //
     }
 
     public void addInterestRate(final LocalDate newInterestEffectiveDate, final BigDecimal newInterestRate) {
         interestRates.add(new InterestRate(newInterestEffectiveDate, newInterestRate));
     }
 
-    public Optional<RepaymentPeriod> findRepaymentPeriodByFromAndDueDate(final LocalDate repaymentPeriodFromDate,
-            final LocalDate repaymentPeriodDueDate) {
+    public Optional<RepaymentPeriod> findRepaymentPeriodByFromAndDueDate(final LocalDate repaymentPeriodFromDate, final LocalDate repaymentPeriodDueDate) {
         if (repaymentPeriodDueDate == null) {
             return Optional.empty();
         }
         // Exact match first
-        Optional<RepaymentPeriod> result = repaymentPeriods.stream()
-                .filter(rp -> DateUtils.isEqual(rp.getFromDate(), repaymentPeriodFromDate)
-                        && DateUtils.isEqual(rp.getDueDate(), repaymentPeriodDueDate))
-                .findFirst();
+        Optional<RepaymentPeriod> result = repaymentPeriods.stream().filter(rp -> DateUtils.isEqual(rp.getFromDate(), repaymentPeriodFromDate) && DateUtils.isEqual(rp.getDueDate(), repaymentPeriodDueDate)).findFirst();
         if (result.isEmpty()) {
             // Fallback: find a period that encompasses the requested date range
             // This handles collapsed stub periods where multiple periods were merged into one
-            result = repaymentPeriods.stream().filter(rp -> !DateUtils.isAfter(rp.getFromDate(), repaymentPeriodFromDate)
-                    && !DateUtils.isBefore(rp.getDueDate(), repaymentPeriodDueDate)).findFirst();
+            result = repaymentPeriods.stream().filter(rp -> !DateUtils.isAfter(rp.getFromDate(), repaymentPeriodFromDate) && !DateUtils.isBefore(rp.getDueDate(), repaymentPeriodDueDate)).findFirst();
         }
         return result;
     }
@@ -192,9 +162,9 @@ public class ProgressiveLoanInterestScheduleModel {
         if (calculateFromRepaymentPeriodDueDate == null) {
             return repaymentPeriods;
         }
-        return repaymentPeriods.stream()//
-                .filter(period -> !DateUtils.isBefore(period.getDueDate(), calculateFromRepaymentPeriodDueDate))//
-                .toList();//
+        return //
+        //
+        repaymentPeriods.stream().filter(period -> !DateUtils.isBefore(period.getDueDate(), calculateFromRepaymentPeriodDueDate)).toList();//
     }
 
     public int getLoanTermInDays() {
@@ -214,24 +184,20 @@ public class ProgressiveLoanInterestScheduleModel {
         return !repaymentPeriods.isEmpty() ? getLastRepaymentPeriod().getDueDate() : null;
     }
 
-    public Optional<RepaymentPeriod> changeOutstandingBalanceAndUpdateInterestPeriods(final LocalDate balanceChangeDate,
-            final Money disbursedAmount, final Money correctionAmount, final Money capitalizedIncomePrincipal) {
-        return findRepaymentPeriodForBalanceChange(balanceChangeDate).stream()//
-                .peek(updateInterestPeriodOnRepaymentPeriod(balanceChangeDate, disbursedAmount, correctionAmount,
-                        capitalizedIncomePrincipal))//
-                .findFirst();//
+    public Optional<RepaymentPeriod> changeOutstandingBalanceAndUpdateInterestPeriods(final LocalDate balanceChangeDate, final Money disbursedAmount, final Money correctionAmount, final Money capitalizedIncomePrincipal) {
+        return //
+        //
+        findRepaymentPeriodForBalanceChange(balanceChangeDate).stream().peek(updateInterestPeriodOnRepaymentPeriod(balanceChangeDate, disbursedAmount, correctionAmount, capitalizedIncomePrincipal)).findFirst();//
     }
 
     public Optional<RepaymentPeriod> updateInterestPeriodsForInterestPause(final LocalDate fromDate, final LocalDate endDate) {
         if (fromDate == null || endDate == null) {
             return Optional.empty();
         }
-
-        final List<RepaymentPeriod> affectedPeriods = repaymentPeriods.stream()//
-                .filter(period -> period.getFromDate().isBefore(endDate) && !period.getDueDate().isBefore(fromDate))//
-                .toList();
+        final List<RepaymentPeriod> affectedPeriods = //
+        //
+        repaymentPeriods.stream().filter(period -> period.getFromDate().isBefore(endDate) && !period.getDueDate().isBefore(fromDate)).toList();
         affectedPeriods.forEach(period -> insertInterestPausePeriods(period, fromDate, endDate));
-
         return affectedPeriods.stream().findFirst();
     }
 
@@ -239,18 +205,15 @@ public class ProgressiveLoanInterestScheduleModel {
         if (balanceChangeDate == null) {
             return Optional.empty();
         }
-        return repaymentPeriods.stream()//
-                .filter(period -> isInPeriod(balanceChangeDate, period.getFromDate(), period.getDueDate(), period.isFirstRepaymentPeriod()))//
-                .findFirst();
+        return //
+        //
+        repaymentPeriods.stream().filter(period -> isInPeriod(balanceChangeDate, period.getFromDate(), period.getDueDate(), period.isFirstRepaymentPeriod())).findFirst();
     }
 
-    private Consumer<RepaymentPeriod> updateInterestPeriodOnRepaymentPeriod(final LocalDate balanceChangeDate, final Money disbursedAmount,
-            final Money correctionAmount, final Money capitalizedIncomePrincipal) {
+    private Consumer<RepaymentPeriod> updateInterestPeriodOnRepaymentPeriod(final LocalDate balanceChangeDate, final Money disbursedAmount, final Money correctionAmount, final Money capitalizedIncomePrincipal) {
         return repaymentPeriod -> {
-            final boolean isChangeOnMaturityDate = isLastRepaymentPeriod(repaymentPeriod)
-                    && balanceChangeDate.isEqual(repaymentPeriod.getDueDate());
-            final Optional<InterestPeriod> interestPeriodOptional = findInterestPeriodForBalanceChange(repaymentPeriod, balanceChangeDate,
-                    isChangeOnMaturityDate);
+            final boolean isChangeOnMaturityDate = isLastRepaymentPeriod(repaymentPeriod) && balanceChangeDate.isEqual(repaymentPeriod.getDueDate());
+            final Optional<InterestPeriod> interestPeriodOptional = findInterestPeriodForBalanceChange(repaymentPeriod, balanceChangeDate, isChangeOnMaturityDate);
             if (interestPeriodOptional.isPresent()) {
                 interestPeriodOptional.get().addDisbursementAmount(disbursedAmount);
                 interestPeriodOptional.get().addCapitalizedIncomePrincipalAmount(capitalizedIncomePrincipal);
@@ -261,8 +224,7 @@ public class ProgressiveLoanInterestScheduleModel {
         };
     }
 
-    private Optional<InterestPeriod> findInterestPeriodForBalanceChange(final RepaymentPeriod repaymentPeriod,
-            final LocalDate balanceChangeDate, final boolean isChangeOnMaturityDate) {
+    private Optional<InterestPeriod> findInterestPeriodForBalanceChange(final RepaymentPeriod repaymentPeriod, final LocalDate balanceChangeDate, final boolean isChangeOnMaturityDate) {
         if (repaymentPeriod == null || balanceChangeDate == null) {
             return Optional.empty();
         }
@@ -272,61 +234,47 @@ public class ProgressiveLoanInterestScheduleModel {
             var lastInterestPeriod = repaymentPeriod.getLastInterestPeriod();
             return lastInterestPeriod.getLength() == 0 ? Optional.of(lastInterestPeriod) : Optional.empty();
         }
-        return repaymentPeriod.getInterestPeriods().stream()//
-                .filter(interestPeriod -> balanceChangeDate.isEqual(interestPeriod.getDueDate()))//
-                .findFirst();
+        return //
+        //
+        repaymentPeriod.getInterestPeriods().stream().filter(interestPeriod -> balanceChangeDate.isEqual(interestPeriod.getDueDate())).findFirst();
     }
 
-    void insertInterestPeriod(final RepaymentPeriod repaymentPeriod, final LocalDate balanceChangeDate, final Money disbursedAmount,
-            final Money correctionAmount, Money capitalizedIncomePrincipal) {
+    void insertInterestPeriod(final RepaymentPeriod repaymentPeriod, final LocalDate balanceChangeDate, final Money disbursedAmount, final Money correctionAmount, Money capitalizedIncomePrincipal) {
         final InterestPeriod previousInterestPeriod = findPreviousInterestPeriod(repaymentPeriod, balanceChangeDate);
         final LocalDate originalDueDate = previousInterestPeriod.getDueDate();
         final LocalDate newDueDate = calculateNewDueDate(previousInterestPeriod, balanceChangeDate);
         final boolean isPaused = previousInterestPeriod.isPaused();
-
         previousInterestPeriod.setDueDate(newDueDate);
         previousInterestPeriod.addDisbursementAmount(disbursedAmount);
         previousInterestPeriod.addCapitalizedIncomePrincipalAmount(capitalizedIncomePrincipal);
         previousInterestPeriod.addBalanceCorrectionAmount(correctionAmount);
-
         final InterestPeriod interestPeriod = InterestPeriod.withEmptyAmounts(repaymentPeriod, newDueDate, originalDueDate, isPaused);
         final List<InterestPeriod> interestPeriods = repaymentPeriod.getInterestPeriods();
         final int previousIndex = interestPeriods.indexOf(previousInterestPeriod);
         interestPeriods.add(previousIndex + 1, interestPeriod);
     }
 
-    private void insertInterestPausePeriodsByAdjustedDates(final RepaymentPeriod repaymentPeriod, final LocalDate pauseStart,
-            final LocalDate pauseEnd) {
-        boolean hasStartInterestPeriod = repaymentPeriod.getInterestPeriods().stream().filter(ip -> ip.getFromDate().isEqual(pauseStart))
-                .findFirst().isPresent();
+    private void insertInterestPausePeriodsByAdjustedDates(final RepaymentPeriod repaymentPeriod, final LocalDate pauseStart, final LocalDate pauseEnd) {
+        boolean hasStartInterestPeriod = repaymentPeriod.getInterestPeriods().stream().filter(ip -> ip.getFromDate().isEqual(pauseStart)).findFirst().isPresent();
         if (!hasStartInterestPeriod) {
-            insertInterestPeriod(repaymentPeriod, pauseStart, repaymentPeriod.getZero(), repaymentPeriod.getZero(),
-                    repaymentPeriod.getZero());
+            insertInterestPeriod(repaymentPeriod, pauseStart, repaymentPeriod.getZero(), repaymentPeriod.getZero(), repaymentPeriod.getZero());
         }
-        boolean hasEndInterestPeriod = repaymentPeriod.getInterestPeriods().stream().filter(ip -> ip.getDueDate().isEqual(pauseEnd))
-                .findFirst().isPresent();
+        boolean hasEndInterestPeriod = repaymentPeriod.getInterestPeriods().stream().filter(ip -> ip.getDueDate().isEqual(pauseEnd)).findFirst().isPresent();
         if (!hasEndInterestPeriod) {
-            insertInterestPeriod(repaymentPeriod, pauseEnd, repaymentPeriod.getZero(), repaymentPeriod.getZero(),
-                    repaymentPeriod.getZero());
+            insertInterestPeriod(repaymentPeriod, pauseEnd, repaymentPeriod.getZero(), repaymentPeriod.getZero(), repaymentPeriod.getZero());
         }
-        repaymentPeriod.getInterestPeriods().stream()
-                .filter(ip -> !ip.getFromDate().isBefore(pauseStart) && !ip.getDueDate().isAfter(pauseEnd))
-                .forEach(ip -> ip.setPaused(true));
+        repaymentPeriod.getInterestPeriods().stream().filter(ip -> !ip.getFromDate().isBefore(pauseStart) && !ip.getDueDate().isAfter(pauseEnd)).forEach(ip -> ip.setPaused(true));
     }
 
     private void insertInterestPausePeriods(final RepaymentPeriod repaymentPeriod, final LocalDate pauseStart, final LocalDate pauseEnd) {
         final LocalDate effectivePauseStart = pauseStart.minusDays(1);
-
-        final LocalDate finalPauseStart = effectivePauseStart.isBefore(repaymentPeriod.getFromDate()) ? repaymentPeriod.getFromDate()
-                : effectivePauseStart;
+        final LocalDate finalPauseStart = effectivePauseStart.isBefore(repaymentPeriod.getFromDate()) ? repaymentPeriod.getFromDate() : effectivePauseStart;
         final LocalDate finalPauseEnd = pauseEnd.isAfter(repaymentPeriod.getDueDate()) ? repaymentPeriod.getDueDate() : pauseEnd;
-
         insertInterestPausePeriodsByAdjustedDates(repaymentPeriod, finalPauseStart, finalPauseEnd);
     }
 
     private InterestPeriod findPreviousInterestPeriod(final RepaymentPeriod repaymentPeriod, final LocalDate date) {
-        return repaymentPeriod.getInterestPeriods().stream().filter(ip -> date.isAfter(ip.getFromDate()) && !date.isAfter(ip.getDueDate()))
-                .reduce((first, second) -> second).orElse(repaymentPeriod.getInterestPeriods().getFirst());
+        return repaymentPeriod.getInterestPeriods().stream().filter(ip -> date.isAfter(ip.getFromDate()) && !date.isAfter(ip.getDueDate())).reduce((first, second) -> second).orElse(repaymentPeriod.getInterestPeriods().getFirst());
     }
 
     /**
@@ -372,8 +320,7 @@ public class ProgressiveLoanInterestScheduleModel {
      * @return
      */
     public Money getTotalCreditedPrincipal() {
-        return MathUtil.negativeToZero(repaymentPeriods().stream().map(RepaymentPeriod::getCreditedPrincipal).reduce(zero, Money::plus),
-                mc);
+        return MathUtil.negativeToZero(repaymentPeriods().stream().map(RepaymentPeriod::getCreditedPrincipal).reduce(zero, Money::plus), mc);
     }
 
     public Money getTotalOutstandingPrincipal() {
@@ -381,9 +328,9 @@ public class ProgressiveLoanInterestScheduleModel {
     }
 
     public Optional<RepaymentPeriod> findRepaymentPeriod(@NotNull LocalDate transactionDate) {
-        return repaymentPeriods.stream() //
-                .filter(period -> isInPeriod(transactionDate, period.getFromDate(), period.getDueDate(), period.isFirstRepaymentPeriod()))//
-                .findFirst();
+        return  //
+        //
+        repaymentPeriods.stream().filter(period -> isInPeriod(transactionDate, period.getFromDate(), period.getDueDate(), period.isFirstRepaymentPeriod())).findFirst();
     }
 
     /**
@@ -392,10 +339,10 @@ public class ProgressiveLoanInterestScheduleModel {
      * @return
      */
     public boolean isEmpty() {
-        return repaymentPeriods.stream() //
-                .filter(rp -> !rp.getEmi().isZero()) //
-                .findFirst() //
-                .isEmpty(); //
+        return  //
+        //
+        //
+        repaymentPeriods.stream().filter(rp -> !rp.getEmi().isZero()).findFirst().isEmpty(); //
     }
 
     @NotNull
@@ -417,8 +364,7 @@ public class ProgressiveLoanInterestScheduleModel {
      * @param copyConsumer
      *            Consumer to copy attributes. Params: (from, to)
      */
-    public void copyPeriodsFrom(final LocalDate periodFromDueDate, List<RepaymentPeriod> copyFromPeriods,
-            BiConsumer<RepaymentPeriod, RepaymentPeriod> copyConsumer) {
+    public void copyPeriodsFrom(final LocalDate periodFromDueDate, List<RepaymentPeriod> copyFromPeriods, BiConsumer<RepaymentPeriod, RepaymentPeriod> copyConsumer) {
         if (copyFromPeriods.isEmpty()) {
             return;
         }
@@ -437,8 +383,7 @@ public class ProgressiveLoanInterestScheduleModel {
     }
 
     private LocalDate calculateNewDueDate(final InterestPeriod previousInterestPeriod, final LocalDate date) {
-        return date.isBefore(previousInterestPeriod.getFromDate()) ? previousInterestPeriod.getFromDate()
-                : date.isAfter(previousInterestPeriod.getDueDate()) ? previousInterestPeriod.getDueDate() : date;
+        return date.isBefore(previousInterestPeriod.getFromDate()) ? previousInterestPeriod.getFromDate() : date.isAfter(previousInterestPeriod.getDueDate()) ? previousInterestPeriod.getDueDate() : date;
     }
 
     public void disableEMIRecalculation() {
@@ -470,4 +415,153 @@ public class ProgressiveLoanInterestScheduleModel {
         return modelVersion;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public List<RepaymentPeriod> repaymentPeriods() {
+        return this.repaymentPeriods;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TreeSet<InterestRate> interestRates() {
+        return this.interestRates;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ILoanConfigurationDetails loanProductRelatedDetail() {
+        return this.loanProductRelatedDetail;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer installmentAmountInMultiplesOf() {
+        return this.installmentAmountInMultiplesOf;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MathContext mc() {
+        return this.mc;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Money zero() {
+        return this.zero;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Map<LoanInterestScheduleModelModifiers, Boolean> modifiers() {
+        return this.modifiers;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate lastOverdueBalanceChange() {
+        return this.lastOverdueBalanceChange;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<OverdueBalanceCorrection> overdueCorrections() {
+        return this.overdueCorrections;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ProgressiveLoanInterestScheduleModel overdueCorrections(final List<OverdueBalanceCorrection> overdueCorrections) {
+        this.overdueCorrections = overdueCorrections;
+        return this;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof ProgressiveLoanInterestScheduleModel)) return false;
+        final ProgressiveLoanInterestScheduleModel other = (ProgressiveLoanInterestScheduleModel) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$installmentAmountInMultiplesOf = this.installmentAmountInMultiplesOf();
+        final java.lang.Object other$installmentAmountInMultiplesOf = other.installmentAmountInMultiplesOf();
+        if (this$installmentAmountInMultiplesOf == null ? other$installmentAmountInMultiplesOf != null : !this$installmentAmountInMultiplesOf.equals(other$installmentAmountInMultiplesOf)) return false;
+        final java.lang.Object this$repaymentPeriods = this.repaymentPeriods();
+        final java.lang.Object other$repaymentPeriods = other.repaymentPeriods();
+        if (this$repaymentPeriods == null ? other$repaymentPeriods != null : !this$repaymentPeriods.equals(other$repaymentPeriods)) return false;
+        final java.lang.Object this$interestRates = this.interestRates();
+        final java.lang.Object other$interestRates = other.interestRates();
+        if (this$interestRates == null ? other$interestRates != null : !this$interestRates.equals(other$interestRates)) return false;
+        final java.lang.Object this$loanProductRelatedDetail = this.loanProductRelatedDetail();
+        final java.lang.Object other$loanProductRelatedDetail = other.loanProductRelatedDetail();
+        if (this$loanProductRelatedDetail == null ? other$loanProductRelatedDetail != null : !this$loanProductRelatedDetail.equals(other$loanProductRelatedDetail)) return false;
+        final java.lang.Object this$mc = this.mc();
+        final java.lang.Object other$mc = other.mc();
+        if (this$mc == null ? other$mc != null : !this$mc.equals(other$mc)) return false;
+        final java.lang.Object this$zero = this.zero();
+        final java.lang.Object other$zero = other.zero();
+        if (this$zero == null ? other$zero != null : !this$zero.equals(other$zero)) return false;
+        final java.lang.Object this$modifiers = this.modifiers();
+        final java.lang.Object other$modifiers = other.modifiers();
+        if (this$modifiers == null ? other$modifiers != null : !this$modifiers.equals(other$modifiers)) return false;
+        final java.lang.Object this$lastOverdueBalanceChange = this.lastOverdueBalanceChange();
+        final java.lang.Object other$lastOverdueBalanceChange = other.lastOverdueBalanceChange();
+        if (this$lastOverdueBalanceChange == null ? other$lastOverdueBalanceChange != null : !this$lastOverdueBalanceChange.equals(other$lastOverdueBalanceChange)) return false;
+        final java.lang.Object this$overdueCorrections = this.overdueCorrections();
+        final java.lang.Object other$overdueCorrections = other.overdueCorrections();
+        if (this$overdueCorrections == null ? other$overdueCorrections != null : !this$overdueCorrections.equals(other$overdueCorrections)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof ProgressiveLoanInterestScheduleModel;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $installmentAmountInMultiplesOf = this.installmentAmountInMultiplesOf();
+        result = result * PRIME + ($installmentAmountInMultiplesOf == null ? 43 : $installmentAmountInMultiplesOf.hashCode());
+        final java.lang.Object $repaymentPeriods = this.repaymentPeriods();
+        result = result * PRIME + ($repaymentPeriods == null ? 43 : $repaymentPeriods.hashCode());
+        final java.lang.Object $interestRates = this.interestRates();
+        result = result * PRIME + ($interestRates == null ? 43 : $interestRates.hashCode());
+        final java.lang.Object $loanProductRelatedDetail = this.loanProductRelatedDetail();
+        result = result * PRIME + ($loanProductRelatedDetail == null ? 43 : $loanProductRelatedDetail.hashCode());
+        final java.lang.Object $mc = this.mc();
+        result = result * PRIME + ($mc == null ? 43 : $mc.hashCode());
+        final java.lang.Object $zero = this.zero();
+        result = result * PRIME + ($zero == null ? 43 : $zero.hashCode());
+        final java.lang.Object $modifiers = this.modifiers();
+        result = result * PRIME + ($modifiers == null ? 43 : $modifiers.hashCode());
+        final java.lang.Object $lastOverdueBalanceChange = this.lastOverdueBalanceChange();
+        result = result * PRIME + ($lastOverdueBalanceChange == null ? 43 : $lastOverdueBalanceChange.hashCode());
+        final java.lang.Object $overdueCorrections = this.overdueCorrections();
+        result = result * PRIME + ($overdueCorrections == null ? 43 : $overdueCorrections.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "ProgressiveLoanInterestScheduleModel(repaymentPeriods=" + this.repaymentPeriods() + ", interestRates=" + this.interestRates() + ", loanProductRelatedDetail=" + this.loanProductRelatedDetail() + ", installmentAmountInMultiplesOf=" + this.installmentAmountInMultiplesOf() + ", mc=" + this.mc() + ", zero=" + this.zero() + ", modifiers=" + this.modifiers() + ", lastOverdueBalanceChange=" + this.lastOverdueBalanceChange() + ", overdueCorrections=" + this.overdueCorrections() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProgressiveLoanInterestScheduleModel(final List<RepaymentPeriod> repaymentPeriods, final TreeSet<InterestRate> interestRates, final ILoanConfigurationDetails loanProductRelatedDetail, final Integer installmentAmountInMultiplesOf, final MathContext mc, final Money zero, final Map<LoanInterestScheduleModelModifiers, Boolean> modifiers, final LocalDate lastOverdueBalanceChange, final List<OverdueBalanceCorrection> overdueCorrections) {
+        this.repaymentPeriods = repaymentPeriods;
+        this.interestRates = interestRates;
+        this.loanProductRelatedDetail = loanProductRelatedDetail;
+        this.installmentAmountInMultiplesOf = installmentAmountInMultiplesOf;
+        this.mc = mc;
+        this.zero = zero;
+        this.modifiers = modifiers;
+        this.lastOverdueBalanceChange = lastOverdueBalanceChange;
+        this.overdueCorrections = overdueCorrections;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ProgressiveLoanInterestScheduleModel lastOverdueBalanceChange(final LocalDate lastOverdueBalanceChange) {
+        this.lastOverdueBalanceChange = lastOverdueBalanceChange;
+        return this;
+    }
 }

@@ -18,24 +18,25 @@
  */
 package org.apache.fineract.cob.loan;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.common.CustomJobParameterResolver;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class ResolveLoanCOBCustomJobParametersTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ResolveLoanCOBCustomJobParametersTasklet.class);
     private final CustomJobParameterResolver customJobParameterResolver;
 
     @Override
     public RepeatStatus execute(final StepContribution contribution, final ChunkContext chunkContext) throws Exception {
-        customJobParameterResolver.resolveToJobExecutionContext(contribution, chunkContext,
-                new String[] { LoanCOBConstant.BUSINESS_DATE_PARAMETER_NAME }, new String[] { LoanCOBConstant.IS_CATCH_UP_PARAMETER_NAME });
+        customJobParameterResolver.resolveToJobExecutionContext(contribution, chunkContext, new String[] {LoanCOBConstant.BUSINESS_DATE_PARAMETER_NAME}, new String[] {LoanCOBConstant.IS_CATCH_UP_PARAMETER_NAME});
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ResolveLoanCOBCustomJobParametersTasklet(final CustomJobParameterResolver customJobParameterResolver) {
+        this.customJobParameterResolver = customJobParameterResolver;
     }
 }

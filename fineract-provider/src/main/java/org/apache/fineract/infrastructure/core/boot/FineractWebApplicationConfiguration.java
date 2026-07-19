@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.core.boot;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.condition.FineractWebApplicationCondition;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.beans.factory.InitializingBean;
@@ -37,24 +36,21 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
+// The class needs to be abstract for some reason, otherwise the tests start to fail...
 /**
  * Base Spring Configuration. Excludes autoconfiguration for those things we want to manually configure.
  */
-
 @Configuration
-@EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class,
-        DataSourceTransactionManagerAutoConfiguration.class, GsonAutoConfiguration.class, JdbcTemplateAutoConfiguration.class,
-        LiquibaseAutoConfiguration.class })
+@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class, GsonAutoConfiguration.class, JdbcTemplateAutoConfiguration.class, LiquibaseAutoConfiguration.class})
 @EnableTransactionManagement
 @EnableWebSecurity
-@EnableConfigurationProperties({ FineractProperties.class, LiquibaseProperties.class })
+@EnableConfigurationProperties({FineractProperties.class, LiquibaseProperties.class})
 @ComponentScan(basePackages = "org.apache.fineract.**")
 @IntegrationComponentScan(basePackages = "org.apache.fineract.**")
 @Conditional(FineractWebApplicationCondition.class)
-@Slf4j
-// The class needs to be abstract for some reason, otherwise the tests start to fail...
 public abstract class FineractWebApplicationConfiguration implements InitializingBean {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FineractWebApplicationConfiguration.class);
 
     @Override
     public void afterPropertiesSet() throws Exception {

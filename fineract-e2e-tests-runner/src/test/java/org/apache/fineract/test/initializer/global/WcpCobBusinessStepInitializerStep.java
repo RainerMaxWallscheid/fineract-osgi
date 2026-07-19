@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.test.initializer.global;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.JobBusinessStepConfigData;
 import org.apache.fineract.test.helper.WorkFlowJobHelper;
@@ -27,14 +25,12 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class WcpCobBusinessStepInitializerStep implements FineractGlobalInitializerStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WcpCobBusinessStepInitializerStep.class);
     private static final String WCP_COB_JOB_NAME = "WORKING_CAPITAL_LOAN_CLOSE_OF_BUSINESS";
-
     private final WorkFlowJobHelper workFlowJobHelper;
 
     @Override
@@ -46,5 +42,10 @@ public class WcpCobBusinessStepInitializerStep implements FineractGlobalInitiali
             log.warn("WCP COB business steps retrieval failed (expected if WCP COB not deployed): {}", e.getMessage());
             log.debug("Full stack trace:", e);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WcpCobBusinessStepInitializerStep(final WorkFlowJobHelper workFlowJobHelper) {
+        this.workFlowJobHelper = workFlowJobHelper;
     }
 }

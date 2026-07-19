@@ -21,31 +21,20 @@ package org.apache.fineract.infrastructure.dataqueries.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
 @Entity
 @Table(name = "m_entity_datatable_check")
 public class EntityDatatableChecks extends AbstractPersistableCustom<Long> {
-
     @Column(name = "application_table_name", nullable = false)
     private String entity;
-
     @Column(name = "x_registered_table_name", nullable = false)
     private String datatableName;
-
     @Column(name = "status_enum", nullable = false)
     private Integer status;
-
     @Column(name = "system_defined")
     private boolean systemDefined = false;
-
     @Column(name = "product_id", nullable = true)
     private Long productId;
 
@@ -53,7 +42,6 @@ public class EntityDatatableChecks extends AbstractPersistableCustom<Long> {
         final String entity = command.stringValueOfParameterNamed("entity");
         final Integer status = command.integerValueSansLocaleOfParameterNamed("status");
         final String datatableName = command.stringValueOfParameterNamed("datatableName");
-
         boolean systemDefined = command.booleanPrimitiveValueOfParameterNamed("systemDefined");
         Long productId = null;
         if (command.parameterExists("productId")) {
@@ -64,5 +52,38 @@ public class EntityDatatableChecks extends AbstractPersistableCustom<Long> {
 
     public boolean isSystemDefined() {
         return this.systemDefined;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EntityDatatableChecks(final String entity, final String datatableName, final Integer status, final boolean systemDefined, final Long productId) {
+        this.entity = entity;
+        this.datatableName = datatableName;
+        this.status = status;
+        this.systemDefined = systemDefined;
+        this.productId = productId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EntityDatatableChecks() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEntity() {
+        return this.entity;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDatatableName() {
+        return this.datatableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getStatus() {
+        return this.status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getProductId() {
+        return this.productId;
     }
 }

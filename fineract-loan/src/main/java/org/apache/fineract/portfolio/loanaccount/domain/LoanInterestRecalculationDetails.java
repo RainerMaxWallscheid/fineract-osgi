@@ -25,7 +25,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.loanproduct.domain.InterestRecalculationCompoundingMethod;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanPreCloseInterestCalculationStrategy;
@@ -38,73 +37,49 @@ import org.apache.fineract.portfolio.loanproduct.domain.RecalculationFrequencyTy
  *
  * @author conflux
  */
-
 @Entity
 @Table(name = "m_loan_recalculation_details")
 public class LoanInterestRecalculationDetails extends AbstractPersistableCustom<Long> {
-
     @OneToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
-
     /**
      * {@link InterestRecalculationCompoundingMethod}
      */
     @Column(name = "compound_type_enum", nullable = false)
     private Integer interestRecalculationCompoundingMethod;
-
     /**
      * {@link LoanRescheduleStrategyMethod}
      */
     @Column(name = "reschedule_strategy_enum", nullable = false)
     private Integer rescheduleStrategyMethod;
-
     @Column(name = "rest_frequency_type_enum", nullable = false)
     private Integer restFrequencyType;
-
-    @Getter
     @Column(name = "rest_frequency_interval", nullable = false)
     private Integer restInterval;
-
-    @Getter
     @Column(name = "rest_frequency_nth_day_enum")
     private Integer restFrequencyNthDay;
-
-    @Getter
     @Column(name = "rest_frequency_weekday_enum")
     private Integer restFrequencyWeekday;
-
-    @Getter
     @Column(name = "rest_frequency_on_day")
     private Integer restFrequencyOnDay;
-
     @Column(name = "compounding_frequency_type_enum")
     private Integer compoundingFrequencyType;
-
-    @Getter
     @Column(name = "compounding_frequency_interval")
     private Integer compoundingInterval;
-
-    @Getter
     @Column(name = "compounding_frequency_nth_day_enum")
     private Integer compoundingFrequencyNthDay;
-    @Getter
     @Column(name = "compounding_frequency_weekday_enum")
     private Integer compoundingFrequencyWeekday;
-    @Getter
     @Column(name = "compounding_frequency_on_day")
     private Integer compoundingFrequencyOnDay;
-
     @Column(name = "is_compounding_to_be_posted_as_transaction")
     private Boolean isCompoundingToBePostedAsTransaction;
     @Column(name = "allow_compounding_on_eod")
     private Boolean allowCompoundingOnEod;
-
-    @Getter
     @Column(name = "pre_close_interest_calculation_strategy")
     @Enumerated(EnumType.ORDINAL)
     private LoanPreCloseInterestCalculationStrategy preCloseInterestCalculationStrategy;
-
     @Column(name = "disallow_interest_calc_on_past_due")
     private Boolean disallowInterestCalculationOnPastDue;
 
@@ -112,12 +87,7 @@ public class LoanInterestRecalculationDetails extends AbstractPersistableCustom<
         // Default constructor for jpa repository
     }
 
-    private LoanInterestRecalculationDetails(final Integer interestRecalculationCompoundingMethod, final Integer rescheduleStrategyMethod,
-            final Integer restFrequencyType, final Integer restInterval, final Integer restFrequencyNthDay, Integer restFrequencyWeekday,
-            Integer restFrequencyOnDay, Integer compoundingFrequencyType, Integer compoundingInterval, Integer compoundingFrequencyNthDay,
-            Integer compoundingFrequencyWeekday, Integer compoundingFrequencyOnDay, final boolean isCompoundingToBePostedAsTransaction,
-            final boolean allowCompoundingOnEod, final boolean disallowInterestCalculationOnPastDue,
-            final LoanPreCloseInterestCalculationStrategy preCloseInterestCalculationStrategy) {
+    private LoanInterestRecalculationDetails(final Integer interestRecalculationCompoundingMethod, final Integer rescheduleStrategyMethod, final Integer restFrequencyType, final Integer restInterval, final Integer restFrequencyNthDay, Integer restFrequencyWeekday, Integer restFrequencyOnDay, Integer compoundingFrequencyType, Integer compoundingInterval, Integer compoundingFrequencyNthDay, Integer compoundingFrequencyWeekday, Integer compoundingFrequencyOnDay, final boolean isCompoundingToBePostedAsTransaction, final boolean allowCompoundingOnEod, final boolean disallowInterestCalculationOnPastDue, final LoanPreCloseInterestCalculationStrategy preCloseInterestCalculationStrategy) {
         this.interestRecalculationCompoundingMethod = interestRecalculationCompoundingMethod;
         this.rescheduleStrategyMethod = rescheduleStrategyMethod;
         this.restFrequencyNthDay = restFrequencyNthDay;
@@ -136,23 +106,8 @@ public class LoanInterestRecalculationDetails extends AbstractPersistableCustom<
         this.preCloseInterestCalculationStrategy = preCloseInterestCalculationStrategy;
     }
 
-    public static LoanInterestRecalculationDetails createFrom(
-            final LoanProductInterestRecalculationDetails loanProductInterestRecalculationDetails) {
-        return new LoanInterestRecalculationDetails(loanProductInterestRecalculationDetails.getInterestRecalculationCompoundingMethod(),
-                loanProductInterestRecalculationDetails.getRescheduleStrategyMethod(),
-                loanProductInterestRecalculationDetails.getRestFrequencyType().getValue(),
-                loanProductInterestRecalculationDetails.getRestInterval(), loanProductInterestRecalculationDetails.getRestFrequencyNthDay(),
-                loanProductInterestRecalculationDetails.getRestFrequencyWeekday(),
-                loanProductInterestRecalculationDetails.getRestFrequencyOnDay(),
-                loanProductInterestRecalculationDetails.getCompoundingFrequencyType().getValue(),
-                loanProductInterestRecalculationDetails.getCompoundingInterval(),
-                loanProductInterestRecalculationDetails.getCompoundingFrequencyNthDay(),
-                loanProductInterestRecalculationDetails.getCompoundingFrequencyWeekday(),
-                loanProductInterestRecalculationDetails.getCompoundingFrequencyOnDay(),
-                loanProductInterestRecalculationDetails.getIsCompoundingToBePostedAsTransaction(),
-                loanProductInterestRecalculationDetails.getAllowCompoundingOnEod(),
-                loanProductInterestRecalculationDetails.getDisallowInterestCalculationOnPastDue(),
-                loanProductInterestRecalculationDetails.getPreCloseInterestCalculationStrategy());
+    public static LoanInterestRecalculationDetails createFrom(final LoanProductInterestRecalculationDetails loanProductInterestRecalculationDetails) {
+        return new LoanInterestRecalculationDetails(loanProductInterestRecalculationDetails.getInterestRecalculationCompoundingMethod(), loanProductInterestRecalculationDetails.getRescheduleStrategyMethod(), loanProductInterestRecalculationDetails.getRestFrequencyType().getValue(), loanProductInterestRecalculationDetails.getRestInterval(), loanProductInterestRecalculationDetails.getRestFrequencyNthDay(), loanProductInterestRecalculationDetails.getRestFrequencyWeekday(), loanProductInterestRecalculationDetails.getRestFrequencyOnDay(), loanProductInterestRecalculationDetails.getCompoundingFrequencyType().getValue(), loanProductInterestRecalculationDetails.getCompoundingInterval(), loanProductInterestRecalculationDetails.getCompoundingFrequencyNthDay(), loanProductInterestRecalculationDetails.getCompoundingFrequencyWeekday(), loanProductInterestRecalculationDetails.getCompoundingFrequencyOnDay(), loanProductInterestRecalculationDetails.getIsCompoundingToBePostedAsTransaction(), loanProductInterestRecalculationDetails.getAllowCompoundingOnEod(), loanProductInterestRecalculationDetails.getDisallowInterestCalculationOnPastDue(), loanProductInterestRecalculationDetails.getPreCloseInterestCalculationStrategy());
     }
 
     public void updateLoan(final Loan loan) {
@@ -187,4 +142,48 @@ public class LoanInterestRecalculationDetails extends AbstractPersistableCustom<
         return disallowInterestCalculationOnPastDue;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Integer getRestInterval() {
+        return this.restInterval;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getRestFrequencyNthDay() {
+        return this.restFrequencyNthDay;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getRestFrequencyWeekday() {
+        return this.restFrequencyWeekday;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getRestFrequencyOnDay() {
+        return this.restFrequencyOnDay;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getCompoundingInterval() {
+        return this.compoundingInterval;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getCompoundingFrequencyNthDay() {
+        return this.compoundingFrequencyNthDay;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getCompoundingFrequencyWeekday() {
+        return this.compoundingFrequencyWeekday;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getCompoundingFrequencyOnDay() {
+        return this.compoundingFrequencyOnDay;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanPreCloseInterestCalculationStrategy getPreCloseInterestCalculationStrategy() {
+        return this.preCloseInterestCalculationStrategy;
+    }
 }

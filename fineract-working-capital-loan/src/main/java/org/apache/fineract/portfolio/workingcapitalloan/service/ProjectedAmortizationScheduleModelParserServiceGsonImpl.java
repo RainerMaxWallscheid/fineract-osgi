@@ -27,7 +27,6 @@ import com.google.gson.JsonSerializer;
 import com.google.gson.ToNumberPolicy;
 import java.math.MathContext;
 import java.time.LocalDate;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.serialization.gson.JsonExcludeAnnotationBasedExclusionStrategy;
 import org.apache.fineract.infrastructure.core.serialization.gson.LocalDateAdapter;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
@@ -37,34 +36,31 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 public class ProjectedAmortizationScheduleModelParserServiceGsonImpl implements ProjectedAmortizationScheduleModelParserService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProjectedAmortizationScheduleModelParserServiceGsonImpl.class);
     private final Gson serializer = createSerializer();
 
     private static Gson createSerializer() {
-        return new GsonBuilder() //
-                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter().nullSafe()) //
-                .registerTypeAdapter(Money.class, (JsonSerializer<Money>) (src, typeOfSrc, context) -> new JsonPrimitive(src.getAmount())) //
-                .setNumberToNumberStrategy(ToNumberPolicy.BIG_DECIMAL) //
-                .addSerializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy()) //
-                .addDeserializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy()) //
-                .create();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateAdapter().nullSafe()).registerTypeAdapter(Money.class, (JsonSerializer<Money>) (src, typeOfSrc, context) -> new JsonPrimitive(src.getAmount())).setNumberToNumberStrategy(ToNumberPolicy.BIG_DECIMAL).addSerializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy()).addDeserializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy()).create();
     }
 
     private static Gson createDeserializer(final MathContext mc, final CurrencyData currency) {
-        return new GsonBuilder() //
-                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter().nullSafe()) //
-                .registerTypeAdapter(Money.class,
-                        (JsonDeserializer<Money>) (json, typeOfT, context) -> Money.of(currency, json.getAsBigDecimal(), mc)) //
-                .setNumberToNumberStrategy(ToNumberPolicy.BIG_DECIMAL) //
-                .registerTypeAdapter(ProjectedAmortizationScheduleModel.class,
-                        (InstanceCreator<ProjectedAmortizationScheduleModel>) type -> ProjectedAmortizationScheduleModel
-                                .forDeserialization(mc, currency)) //
-                .addSerializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy()) //
-                .addDeserializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy()) //
-                .create();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        //
+        new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateAdapter().nullSafe()).registerTypeAdapter(Money.class, (JsonDeserializer<Money>) (json, typeOfT, context) -> Money.of(currency, json.getAsBigDecimal(), mc)).setNumberToNumberStrategy(ToNumberPolicy.BIG_DECIMAL).registerTypeAdapter(ProjectedAmortizationScheduleModel.class, (InstanceCreator<ProjectedAmortizationScheduleModel>) type -> ProjectedAmortizationScheduleModel.forDeserialization(mc, currency)).addSerializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy()).addDeserializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy()).create();
     }
 
     @Override
@@ -74,8 +70,7 @@ public class ProjectedAmortizationScheduleModelParserServiceGsonImpl implements 
 
     @Override
     @Nullable
-    public ProjectedAmortizationScheduleModel fromJson(@Nullable final String json, @NonNull final MathContext mc,
-            @NonNull final CurrencyData currency) {
+    public ProjectedAmortizationScheduleModel fromJson(@Nullable final String json, @NonNull final MathContext mc, @NonNull final CurrencyData currency) {
         if (json == null) {
             return null;
         }

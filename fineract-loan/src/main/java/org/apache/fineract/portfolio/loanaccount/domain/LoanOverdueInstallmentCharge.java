@@ -23,31 +23,24 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
-@Getter
 @Table(name = "m_loan_overdue_installment_charge")
 public class LoanOverdueInstallmentCharge extends AbstractPersistableCustom<Long> {
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "loan_charge_id", referencedColumnName = "id", nullable = false)
     private LoanCharge loancharge;
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "loan_schedule_id", referencedColumnName = "id", nullable = false)
     private LoanRepaymentScheduleInstallment installment;
-
     @Column(name = "frequency_number")
     private Integer frequencyNumber;
 
     public LoanOverdueInstallmentCharge() {
-
     }
 
-    public LoanOverdueInstallmentCharge(final LoanCharge loancharge, final LoanRepaymentScheduleInstallment installment,
-            final Integer frequencyNumber) {
+    public LoanOverdueInstallmentCharge(final LoanCharge loancharge, final LoanRepaymentScheduleInstallment installment, final Integer frequencyNumber) {
         this.loancharge = loancharge;
         this.installment = installment;
         this.frequencyNumber = frequencyNumber;
@@ -55,5 +48,20 @@ public class LoanOverdueInstallmentCharge extends AbstractPersistableCustom<Long
 
     public void updateLoanRepaymentScheduleInstallment(LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment) {
         this.installment = loanRepaymentScheduleInstallment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanCharge getLoancharge() {
+        return this.loancharge;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanRepaymentScheduleInstallment getInstallment() {
+        return this.installment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getFrequencyNumber() {
+        return this.frequencyNumber;
     }
 }

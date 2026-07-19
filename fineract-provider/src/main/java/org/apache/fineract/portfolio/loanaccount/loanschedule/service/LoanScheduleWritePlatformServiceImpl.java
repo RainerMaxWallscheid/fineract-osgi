@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -44,9 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class LoanScheduleWritePlatformServiceImpl implements LoanScheduleWritePlatformService {
-
     private final LoanAssembler loanAssembler;
     private final LoanScheduleAssembler loanScheduleAssembler;
     private final LoanUtilService loanUtilService;
@@ -63,7 +60,6 @@ public class LoanScheduleWritePlatformServiceImpl implements LoanScheduleWritePl
             loanTermVariations.put(termVariations.getId(), termVariations);
         }
         loanScheduleAssembler.assempleVariableScheduleFrom(loan, command.json());
-
         loanAccountService.saveLoanWithDataIntegrityViolationChecks(loan);
         final Map<String, Object> changes = new HashMap<>();
         List<LoanTermVariationsData> newVariationsData = new ArrayList<>();
@@ -80,11 +76,11 @@ public class LoanScheduleWritePlatformServiceImpl implements LoanScheduleWritePl
         }
         changes.put("loanTermVariations", newVariationsData);
         businessEventNotifierService.notifyPostBusinessEvent(new LoanScheduleVariationsAddedBusinessEvent(loan));
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withLoanId(loanId) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withLoanId(loanId).with(changes).build();
     }
 
     @Override
@@ -104,10 +100,20 @@ public class LoanScheduleWritePlatformServiceImpl implements LoanScheduleWritePl
         loanAccrualsProcessingService.reprocessExistingAccruals(loan, false);
         loanAccountService.saveLoanWithDataIntegrityViolationChecks(loan);
         businessEventNotifierService.notifyPostBusinessEvent(new LoanScheduleVariationsDeletedBusinessEvent(loan));
-        return new CommandProcessingResultBuilder() //
-                .withLoanId(loanId) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withLoanId(loanId).with(changes).build();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanScheduleWritePlatformServiceImpl(final LoanAssembler loanAssembler, final LoanScheduleAssembler loanScheduleAssembler, final LoanUtilService loanUtilService, final BusinessEventNotifierService businessEventNotifierService, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanScheduleService loanScheduleService, final LoanAccountService loanAccountService) {
+        this.loanAssembler = loanAssembler;
+        this.loanScheduleAssembler = loanScheduleAssembler;
+        this.loanUtilService = loanUtilService;
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.loanAccrualsProcessingService = loanAccrualsProcessingService;
+        this.loanScheduleService = loanScheduleService;
+        this.loanAccountService = loanAccountService;
+    }
 }

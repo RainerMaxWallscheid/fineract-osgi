@@ -19,19 +19,11 @@
 package org.apache.fineract.organisation.provisioning.data;
 
 import java.io.Serializable;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 /**
  * Immutable object representing organization's provision category data
  */
-
-@Data
-@NoArgsConstructor
-@Accessors(chain = true)
 public class ProvisioningCategoryData implements Comparable<ProvisioningCategoryData>, Serializable {
-
     private static final long serialVersionUID = 1L;
     private Long id;
     private String categoryName;
@@ -57,5 +49,57 @@ public class ProvisioningCategoryData implements Comparable<ProvisioningCategory
             return -1;
         }
         return obj.id.compareTo(this.id);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCategoryName() {
+        return this.categoryName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCategoryDescription() {
+        return this.categoryDescription;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ProvisioningCategoryData setId(final Long id) {
+        this.id = id;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ProvisioningCategoryData setCategoryName(final String categoryName) {
+        this.categoryName = categoryName;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ProvisioningCategoryData setCategoryDescription(final String categoryDescription) {
+        this.categoryDescription = categoryDescription;
+        return this;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "ProvisioningCategoryData(id=" + this.getId() + ", categoryName=" + this.getCategoryName() + ", categoryDescription=" + this.getCategoryDescription() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProvisioningCategoryData() {
     }
 }

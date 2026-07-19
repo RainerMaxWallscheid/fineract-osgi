@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -42,77 +41,49 @@ import org.apache.fineract.portfolio.loanaccount.guarantor.GuarantorConstants.Gu
 @Entity
 @Table(name = "m_guarantor")
 public class Guarantor extends AbstractPersistableCustom<Long> {
-
-    @Getter
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
-
-    @Getter
     @ManyToOne
     @JoinColumn(name = "client_reln_cv_id", nullable = false)
     private CodeValue clientRelationshipType;
-
-    @Getter
     @Column(name = "type_enum", nullable = false)
     private Integer gurantorType;
-
-    @Getter
     @Column(name = "entity_id")
     private Long entityId;
-
     @Column(name = "firstname", length = 50)
     private String firstname;
-
     @Column(name = "lastname", length = 50)
     private String lastname;
-
     @Column(name = "dob")
     private LocalDate dateOfBirth;
-
     @Column(name = "address_line_1", length = 500)
     private String addressLine1;
-
     @Column(name = "address_line_2", length = 500)
     private String addressLine2;
-
     @Column(name = "city", length = 50)
     private String city;
-
     @Column(name = "state", length = 50)
     private String state;
-
     @Column(name = "country", length = 50)
     private String country;
-
     @Column(name = "zip", length = 20)
     private String zip;
-
     @Column(name = "house_phone_number", length = 20)
     private String housePhoneNumber;
-
     @Column(name = "mobile_number", length = 20)
     private String mobilePhoneNumber;
-
     @Column(name = "comment", length = 500)
     private String comment;
-
     @Column(name = "is_active", nullable = false)
     private boolean active;
-
-    @Getter
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "guarantor", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<GuarantorFundingDetails> guarantorFundDetails = new ArrayList<>();
 
     protected Guarantor() {
-
     }
 
-    private Guarantor(final Loan loan, final CodeValue clientRelationshipType, final Integer gurantorType, final Long entityId,
-            final String firstname, final String lastname, final LocalDate dateOfBirth, final String addressLine1,
-            final String addressLine2, final String city, final String state, final String country, final String zip,
-            final String housePhoneNumber, final String mobilePhoneNumber, final String comment, final boolean active,
-            final List<GuarantorFundingDetails> guarantorFundDetails) {
+    private Guarantor(final Loan loan, final CodeValue clientRelationshipType, final Integer gurantorType, final Long entityId, final String firstname, final String lastname, final LocalDate dateOfBirth, final String addressLine1, final String addressLine2, final String city, final String state, final String country, final String zip, final String housePhoneNumber, final String mobilePhoneNumber, final String comment, final boolean active, final List<GuarantorFundingDetails> guarantorFundDetails) {
         this.loan = loan;
         this.clientRelationshipType = clientRelationshipType;
         this.gurantorType = gurantorType;
@@ -133,8 +104,7 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
         this.guarantorFundDetails.addAll(guarantorFundDetails);
     }
 
-    public static Guarantor fromJson(final Loan loan, final CodeValue clientRelationshipType, final JsonCommand command,
-            final List<GuarantorFundingDetails> fundingDetails) {
+    public static Guarantor fromJson(final Loan loan, final CodeValue clientRelationshipType, final JsonCommand command, final List<GuarantorFundingDetails> fundingDetails) {
         final Integer gurantorType = command.integerValueSansLocaleOfParameterNamed(GuarantorJSONinputParams.GUARANTOR_TYPE_ID.getValue());
         final Long entityId = command.longValueOfParameterNamed(GuarantorJSONinputParams.ENTITY_ID.getValue());
         final boolean active = true;
@@ -151,22 +121,14 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
             final String housePhoneNumber = command.stringValueOfParameterNamed(GuarantorJSONinputParams.PHONE_NUMBER.getValue());
             final String mobilePhoneNumber = command.stringValueOfParameterNamed(GuarantorJSONinputParams.MOBILE_NUMBER.getValue());
             final String comment = command.stringValueOfParameterNamed(GuarantorJSONinputParams.COMMENT.getValue());
-
-            return new Guarantor(loan, clientRelationshipType, gurantorType, entityId, firstname, lastname, dateOfBirth, addressLine1,
-                    addressLine2, city, state, country, zip, housePhoneNumber, mobilePhoneNumber, comment, active, fundingDetails);
+            return new Guarantor(loan, clientRelationshipType, gurantorType, entityId, firstname, lastname, dateOfBirth, addressLine1, addressLine2, city, state, country, zip, housePhoneNumber, mobilePhoneNumber, comment, active, fundingDetails);
         }
-
-        return new Guarantor(loan, clientRelationshipType, gurantorType, entityId, null, null, null, null, null, null, null, null, null,
-                null, null, null, active, fundingDetails);
-
+        return new Guarantor(loan, clientRelationshipType, gurantorType, entityId, null, null, null, null, null, null, null, null, null, null, null, null, active, fundingDetails);
     }
 
     public Map<String, Object> update(final JsonCommand command) {
-
         final Map<String, Object> actualChanges = new LinkedHashMap<>();
-
         handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.CLIENT_RELATIONSHIP_TYPE_ID.getValue(), 0, true);
-
         if (isExternalGuarantor()) {
             handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.FIRSTNAME.getValue(), this.firstname);
             handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.LASTNAME.getValue(), this.lastname);
@@ -182,7 +144,6 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
             handlePropertyUpdate(command, actualChanges, GuarantorJSONinputParams.COMMENT.getValue(), this.comment);
             updateExistingEntityToNull();
         }
-
         return actualChanges;
     }
 
@@ -202,8 +163,7 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
         return GuarantorType.EXTERNAL.getValue().equals(this.gurantorType);
     }
 
-    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName,
-            Integer propertyToBeUpdated, final boolean sansLocale) {
+    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName, Integer propertyToBeUpdated, final boolean sansLocale) {
         if (command.isChangeInIntegerParameterNamed(paramName, propertyToBeUpdated)) {
             Integer newValue = null;
             if (sansLocale) {
@@ -212,7 +172,6 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
                 newValue = command.integerValueOfParameterNamed(paramName);
             }
             actualChanges.put(paramName, newValue);
-
             // now update actual property
             if (paramName.equals(GuarantorJSONinputParams.GUARANTOR_TYPE_ID.getValue())) {
                 this.gurantorType = newValue;
@@ -220,12 +179,10 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
         }
     }
 
-    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName,
-            String propertyToBeUpdated) {
+    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName, String propertyToBeUpdated) {
         if (command.isChangeInStringParameterNamed(paramName, propertyToBeUpdated)) {
             final String newValue = command.stringValueOfParameterNamed(paramName);
             actualChanges.put(paramName, newValue);
-
             // now update actual property
             if (paramName.equals(GuarantorJSONinputParams.FIRSTNAME.getValue())) {
                 this.firstname = newValue;
@@ -253,12 +210,10 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
         }
     }
 
-    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName,
-            LocalDate propertyToBeUpdated) {
+    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName, LocalDate propertyToBeUpdated) {
         if (command.isChangeInDateParameterNamed(paramName, propertyToBeUpdated)) {
             final LocalDate newValue = command.localDateValueOfParameterNamed(paramName);
             actualChanges.put(paramName, newValue);
-
             // now update actual property
             if (paramName.equals(GuarantorJSONinputParams.DATE_OF_BIRTH.getValue())) {
                 this.dateOfBirth = newValue;
@@ -331,8 +286,7 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
         }
         boolean hasGuarantee = false;
         for (GuarantorFundingDetails guarantorFundingDetails : this.guarantorFundDetails) {
-            if (guarantorFundingDetails.getStatus().isActive()
-                    && savingsId.equals(guarantorFundingDetails.getLinkedSavingsAccount().getId())) {
+            if (guarantorFundingDetails.getStatus().isActive() && savingsId.equals(guarantorFundingDetails.getLinkedSavingsAccount().getId())) {
                 hasGuarantee = true;
                 break;
             }
@@ -342,5 +296,30 @@ public class Guarantor extends AbstractPersistableCustom<Long> {
 
     public boolean isSelfGuarantee() {
         return isExistingCustomer() && getEntityId().equals(getClientId());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Loan getLoan() {
+        return this.loan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getClientRelationshipType() {
+        return this.clientRelationshipType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getGurantorType() {
+        return this.gurantorType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getEntityId() {
+        return this.entityId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<GuarantorFundingDetails> getGuarantorFundDetails() {
+        return this.guarantorFundDetails;
     }
 }

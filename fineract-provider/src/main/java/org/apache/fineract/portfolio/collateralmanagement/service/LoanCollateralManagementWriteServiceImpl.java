@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.collateralmanagement.service;
 
 import java.math.BigDecimal;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.collateralmanagement.data.LoanCollateralDeleteRequest;
 import org.apache.fineract.portfolio.collateralmanagement.data.LoanCollateralDeleteResponse;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
@@ -28,9 +27,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagement
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagementRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 public class LoanCollateralManagementWriteServiceImpl implements LoanCollateralManagementWriteService {
-
     private final LoanCollateralManagementRepository loanCollateralManagementRepository;
     private final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper;
 
@@ -46,5 +43,11 @@ public class LoanCollateralManagementWriteServiceImpl implements LoanCollateralM
         this.clientCollateralManagementRepositoryWrapper.saveAndFlush(clientCollateralManagement);
         this.loanCollateralManagementRepository.deleteById(id);
         return LoanCollateralDeleteResponse.builder().resourceId(id).loanId(request.getLoanId()).build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanCollateralManagementWriteServiceImpl(final LoanCollateralManagementRepository loanCollateralManagementRepository, final ClientCollateralManagementRepositoryWrapper clientCollateralManagementRepositoryWrapper) {
+        this.loanCollateralManagementRepository = loanCollateralManagementRepository;
+        this.clientCollateralManagementRepositoryWrapper = clientCollateralManagementRepositoryWrapper;
     }
 }

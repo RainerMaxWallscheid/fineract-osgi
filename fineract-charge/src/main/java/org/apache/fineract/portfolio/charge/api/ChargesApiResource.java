@@ -38,7 +38,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -56,16 +55,13 @@ import org.springframework.stereotype.Component;
 @Path("/v1/charges")
 @Component
 @Tag(name = "Charges", description = """
-        Its typical for MFIs to add extra costs for their financial products. These are typically Fees or Penalties.
-
-        A Charge on fineract platform is what we use to model both Fees and Penalties.
-
-        At present we support defining charges for use with Client accounts and both loan and saving products.""")
-@RequiredArgsConstructor
+    Its typical for MFIs to add extra costs for their financial products. These are typically Fees or Penalties.
+    
+    A Charge on fineract platform is what we use to model both Fees and Penalties.
+    
+    At present we support defining charges for use with Client accounts and both loan and saving products.""")
 public class ChargesApiResource {
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "CHARGE";
-
     private final PlatformSecurityContext context;
     private final ChargeReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<ChargeData> toApiJsonSerializer;
@@ -73,13 +69,13 @@ public class ChargesApiResource {
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Charges", operationId = "retrieveAllCharges", description = """
-            Returns the list of defined charges.
-
-            Example Requests:
-
-            charges""")
+        Returns the list of defined charges.
+        
+        Example Requests:
+        
+        charges""")
     public List<ChargeData> retrieveAllCharges() {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveAllCharges();
@@ -87,25 +83,21 @@ public class ChargesApiResource {
 
     @GET
     @Path("{chargeId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve a Charge", operationId = "retrieveOneCharge", description = """
-            Returns the details of a defined Charge.
-
-            Example Requests:
-
-            charges/1""")
+        Returns the details of a defined Charge.
+        
+        Example Requests:
+        
+        charges/1""")
     @AlternativeOperationId("retrieveCharge")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ChargesApiResourceSwagger.GetChargesResponse.class)))
-    public ChargeData retrieveCharge(@PathParam("chargeId") @Parameter(description = "chargeId") final Long chargeId,
-            @Context final UriInfo uriInfo) {
+    public ChargeData retrieveCharge(@PathParam("chargeId") @Parameter(description = "chargeId") final Long chargeId, @Context final UriInfo uriInfo) {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-
         ChargeData charge = readPlatformService.retrieveCharge(chargeId);
         if (settings.isTemplate()) {
-            final ChargeData templateData = readPlatformService.retrieveNewChargeDetails(charge.getChargeAppliesTo().getId(),
-                    charge.getChargeTimeType().getId());
+            final ChargeData templateData = readPlatformService.retrieveNewChargeDetails(charge.getChargeAppliesTo().getId(), charge.getChargeTimeType().getId());
             charge = ChargeData.withTemplate(charge, templateData);
         }
         return charge;
@@ -113,56 +105,61 @@ public class ChargesApiResource {
 
     @GET
     @Path("template")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Charge Template", operationId = "retrieveTemplateCharge", description = """
-            This is a convenience resource. It can be useful when building maintenance user interface screens for client applications. The template data returned consists of any or all of:
-
-            Field Defaults
-            Allowed description Lists
-            Example Request:
-
-            charges/template
-            """)
+        This is a convenience resource. It can be useful when building maintenance user interface screens for client applications. The template data returned consists of any or all of:
+        
+        Field Defaults
+        Allowed description Lists
+        Example Request:
+        
+        charges/template
+        """)
     @AlternativeOperationId("retrieveNewChargeDetails")
-    public ChargeData retrieveNewChargeDetails(@QueryParam("chargeAppliesTo") Long chargeAppliesTo,
-            @QueryParam("chargeTimeType") Long chargeTimeType) {
+    public ChargeData retrieveNewChargeDetails(@QueryParam("chargeAppliesTo") Long chargeAppliesTo, @QueryParam("chargeTimeType") Long chargeTimeType) {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readPlatformService.retrieveNewChargeDetails(chargeAppliesTo, chargeTimeType);
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create/Define a Charge", operationId = "createCharge", description = "Define a new charge that can later be associated with loans and savings through their respective product definitions or directly on each account instance.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = ChargeRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ChargesApiResourceSwagger.PostChargesResponse.class)))
     public CommandProcessingResult createCharge(@Parameter(hidden = true) ChargeRequest chargeRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createCharge()
-                .withJson(toApiJsonSerializer.serialize(chargeRequest)).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createCharge().withJson(toApiJsonSerializer.serialize(chargeRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @PUT
     @Path("{chargeId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a Charge", operationId = "updateCharge", description = "Updates the details of a Charge.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = ChargeRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ChargesApiResourceSwagger.PutChargesChargeIdResponse.class)))
-    public CommandProcessingResult updateCharge(@PathParam("chargeId") @Parameter(description = "chargeId") final Long chargeId,
-            @Parameter(hidden = true) ChargeRequest chargeRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateCharge(chargeId)
-                .withJson(toApiJsonSerializer.serialize(chargeRequest)).build();
+    public CommandProcessingResult updateCharge(@PathParam("chargeId") @Parameter(description = "chargeId") final Long chargeId, @Parameter(hidden = true) ChargeRequest chargeRequest) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateCharge(chargeId).withJson(toApiJsonSerializer.serialize(chargeRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @DELETE
     @Path("{chargeId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete a Charge", operationId = "deleteCharge", description = "Deletes a Charge.")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ChargesApiResourceSwagger.DeleteChargesChargeIdResponse.class)))
     public CommandProcessingResult deleteCharge(@PathParam("chargeId") @Parameter(description = "chargeId") final Long chargeId) {
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteCharge(chargeId).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ChargesApiResource(final PlatformSecurityContext context, final ChargeReadPlatformService readPlatformService, final DefaultToApiJsonSerializer<ChargeData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.context = context;
+        this.readPlatformService = readPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
     }
 }

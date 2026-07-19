@@ -19,7 +19,6 @@
 package org.apache.fineract.investor.service;
 
 import java.math.BigDecimal;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
@@ -35,10 +34,8 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 @Conditional(InvestorModuleIsEnabledCondition.class)
 public class ExternalAssetOwnerTransferOutstandingInterestCalculation {
-
     private final LoanSummaryProviderDelegate loanSummaryDataProvider;
     private final ConfigurationDomainService configurationDomainService;
     private final LoanReadPlatformService loanReadPlatformService;
@@ -53,24 +50,25 @@ public class ExternalAssetOwnerTransferOutstandingInterestCalculation {
         if (!loan.isOpen()) {
             return BigDecimal.ZERO;
         }
-
         String outstandingInterestCalculationStrategy = configurationDomainService.getAssetOwnerTransferOustandingInterestStrategy();
         return switch (outstandingInterestCalculationStrategy) {
             case "TOTAL_OUTSTANDING_INTEREST" -> loan.getSummary().getTotalInterestOutstanding();
             case "PAYABLE_OUTSTANDING_INTEREST" -> {
                 LoanAccountData data = loanReadPlatformService.retrieveOne(loan.getId());
                 data = loanReadPlatformService.fetchRepaymentScheduleData(data);
-                Money duePayableAmount = loan
-                        .getRepaymentScheduleInstallments(i -> !i.getDueDate().isAfter(DateUtils.getBusinessLocalDate())).stream()
-                        .map(i -> i.getInterestOutstanding(loan.getCurrency())).reduce(Money.zero(loan.getCurrency()), MathUtil::plus);
-                BigDecimal notDuePayableAmount = fetchLoanSummaryDataProvider(loan)
-                        .computeTotalUnpaidPayableNotDueInterestAmountOnActualPeriod(loan, data.getRepaymentSchedule().getPeriods(),
-                                DateUtils.getBusinessLocalDate(), currencyMapper.map(loan.getCurrency()), duePayableAmount.getAmount());
-
+                Money duePayableAmount = loan.getRepaymentScheduleInstallments(i -> !i.getDueDate().isAfter(DateUtils.getBusinessLocalDate())).stream().map(i -> i.getInterestOutstanding(loan.getCurrency())).reduce(Money.zero(loan.getCurrency()), MathUtil::plus);
+                BigDecimal notDuePayableAmount = fetchLoanSummaryDataProvider(loan).computeTotalUnpaidPayableNotDueInterestAmountOnActualPeriod(loan, data.getRepaymentSchedule().getPeriods(), DateUtils.getBusinessLocalDate(), currencyMapper.map(loan.getCurrency()), duePayableAmount.getAmount());
                 yield MathUtil.add(duePayableAmount.getAmount(), notDuePayableAmount);
             }
-            default -> throw new UnsupportedOperationException(
-                    "Unknown outstanding interest calculation: " + outstandingInterestCalculationStrategy);
+            default -> throw new UnsupportedOperationException("Unknown outstanding interest calculation: " + outstandingInterestCalculationStrategy);
         };
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnerTransferOutstandingInterestCalculation(final LoanSummaryProviderDelegate loanSummaryDataProvider, final ConfigurationDomainService configurationDomainService, final LoanReadPlatformService loanReadPlatformService, final CurrencyMapper currencyMapper) {
+        this.loanSummaryDataProvider = loanSummaryDataProvider;
+        this.configurationDomainService = configurationDomainService;
+        this.loanReadPlatformService = loanReadPlatformService;
+        this.currencyMapper = currencyMapper;
     }
 }

@@ -30,7 +30,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -44,15 +43,13 @@ import org.springframework.stereotype.Component;
 @Path("/v1/provisioningcategory")
 @Component
 @Tag(name = "Provisioning Category", description = "")
-@RequiredArgsConstructor
 public class ProvisioningCategoryApiResource {
-
     private final PlatformSecurityContext platformSecurityContext;
     private final ProvisioningCategoryReadPlatformService provisioningCategoryReadPlatformService;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "retrieveAll_8")
     @AlternativeOperationId("retrieveAll_15")
     public List<ProvisioningCategoryData> retrieveAll() {
@@ -61,8 +58,8 @@ public class ProvisioningCategoryApiResource {
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     public CommandProcessingResult createProvisioningCategory(final String apiRequestBodyAsJson) {
         platformSecurityContext.authenticatedUser();
         CommandWrapper commandWrapper = new CommandWrapperBuilder().createProvisioningCategory().withJson(apiRequestBodyAsJson).build();
@@ -71,22 +68,27 @@ public class ProvisioningCategoryApiResource {
 
     @PUT
     @Path("{categoryId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    public CommandProcessingResult updateProvisioningCategory(@PathParam("categoryId") final Long categoryId,
-            final String apiRequestBodyAsJson) {
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    public CommandProcessingResult updateProvisioningCategory(@PathParam("categoryId") final Long categoryId, final String apiRequestBodyAsJson) {
         platformSecurityContext.authenticatedUser();
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateProvisioningCategory(categoryId)
-                .withJson(apiRequestBodyAsJson).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateProvisioningCategory(categoryId).withJson(apiRequestBodyAsJson).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @DELETE
     @Path("{categoryId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     public CommandProcessingResult deleteProvisioningCategory(@PathParam("categoryId") final Long categoryId) {
         platformSecurityContext.authenticatedUser();
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteProvisioningCategory(categoryId).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProvisioningCategoryApiResource(final PlatformSecurityContext platformSecurityContext, final ProvisioningCategoryReadPlatformService provisioningCategoryReadPlatformService, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.platformSecurityContext = platformSecurityContext;
+        this.provisioningCategoryReadPlatformService = provisioningCategoryReadPlatformService;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
     }
 }

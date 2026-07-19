@@ -18,14 +18,17 @@
  */
 package org.apache.fineract.integrationtests.datatable;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
-@Getter
 public enum DatatableEntity {
-
     LOAN("m_loan");
-
     private final String referencedTableName;
+
+    @java.lang.SuppressWarnings("all")
+        private DatatableEntity(final String referencedTableName) {
+        this.referencedTableName = referencedTableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getReferencedTableName() {
+        return this.referencedTableName;
+    }
 }

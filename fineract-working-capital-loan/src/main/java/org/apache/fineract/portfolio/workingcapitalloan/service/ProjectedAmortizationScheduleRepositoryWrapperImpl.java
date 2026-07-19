@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.workingcapitalloan.service;
 
 import java.math.MathContext;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
@@ -33,18 +32,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class ProjectedAmortizationScheduleRepositoryWrapperImpl implements ProjectedAmortizationScheduleRepositoryWrapper {
-
     private final ProjectedAmortizationLoanModelRepository repository;
     private final ProjectedAmortizationScheduleModelParserService parserService;
 
     @Override
-    public Optional<ProjectedAmortizationScheduleModel> readModel(final Long loanId, @NonNull final MathContext mc,
-            @NonNull final CurrencyData currency) {
-        return repository.findByLoanId(loanId) //
-                .map(ProjectedAmortizationLoanModel::getJsonModel) //
-                .map(json -> parserService.fromJson(json, mc, currency));
+    public Optional<ProjectedAmortizationScheduleModel> readModel(final Long loanId, @NonNull final MathContext mc, @NonNull final CurrencyData currency) {
+        return  //
+        //
+        repository.findByLoanId(loanId).map(ProjectedAmortizationLoanModel::getJsonModel).map(json -> parserService.fromJson(json, mc, currency));
     }
 
     @Override
@@ -67,4 +63,9 @@ public class ProjectedAmortizationScheduleRepositoryWrapperImpl implements Proje
         });
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ProjectedAmortizationScheduleRepositoryWrapperImpl(final ProjectedAmortizationLoanModelRepository repository, final ProjectedAmortizationScheduleModelParserService parserService) {
+        this.repository = repository;
+        this.parserService = parserService;
+    }
 }

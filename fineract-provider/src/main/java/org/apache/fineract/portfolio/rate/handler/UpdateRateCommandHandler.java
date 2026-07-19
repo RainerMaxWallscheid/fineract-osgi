@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.rate.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -32,15 +31,17 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @CommandType(entity = "RATE", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateRateCommandHandler implements NewCommandSourceHandler {
-
     private final RateWriteService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.updateRate(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateRateCommandHandler(final RateWriteService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

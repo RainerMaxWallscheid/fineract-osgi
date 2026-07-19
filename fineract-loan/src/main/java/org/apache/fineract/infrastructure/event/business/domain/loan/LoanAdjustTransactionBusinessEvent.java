@@ -18,14 +18,10 @@
  */
 package org.apache.fineract.infrastructure.event.business.domain.loan;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.event.business.domain.AbstractBusinessEvent;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 
 public class LoanAdjustTransactionBusinessEvent extends AbstractBusinessEvent<LoanAdjustTransactionBusinessEvent.Data> {
-
     private static final String TYPE = "LoanAdjustTransactionBusinessEvent";
     private static final String CATEGORY = "Loan";
 
@@ -48,12 +44,29 @@ public class LoanAdjustTransactionBusinessEvent extends AbstractBusinessEvent<Lo
         return get().getTransactionToAdjust().getLoan().getId();
     }
 
-    @RequiredArgsConstructor
-    @Getter
-    public static class Data {
 
+    public static class Data {
         private final LoanTransaction transactionToAdjust;
-        @Setter
         private LoanTransaction newTransactionDetail;
+
+        @java.lang.SuppressWarnings("all")
+                public Data(final LoanTransaction transactionToAdjust) {
+            this.transactionToAdjust = transactionToAdjust;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public LoanTransaction getTransactionToAdjust() {
+            return this.transactionToAdjust;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public LoanTransaction getNewTransactionDetail() {
+            return this.newTransactionDetail;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public void setNewTransactionDetail(final LoanTransaction newTransactionDetail) {
+            this.newTransactionDetail = newTransactionDetail;
+        }
     }
 }

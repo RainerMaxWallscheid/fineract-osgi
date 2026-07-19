@@ -30,30 +30,19 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
 import java.util.List;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
-@Table(name = "m_delinquency_bucket", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_delinquency_bucket_name", columnNames = { "name" }) })
+@Table(name = "m_delinquency_bucket", uniqueConstraints = {@UniqueConstraint(name = "uq_delinquency_bucket_name", columnNames = {"name"})})
 public class DelinquencyBucket extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @Column(name = "name", nullable = false)
     private String name;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "m_delinquency_bucket_mappings", joinColumns = @JoinColumn(name = "delinquency_bucket_id"), inverseJoinColumns = @JoinColumn(name = "delinquency_range_id"))
     private List<DelinquencyRange> ranges;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "bucket_type")
     private DelinquencyBucketType bucketType;
-
     @Version
     private Long version;
 
@@ -61,4 +50,47 @@ public class DelinquencyBucket extends AbstractAuditableWithUTCDateTimeCustom<Lo
         this.name = name;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<DelinquencyRange> getRanges() {
+        return this.ranges;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyBucketType getBucketType() {
+        return this.bucketType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getVersion() {
+        return this.version;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setName(final String name) {
+        this.name = name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setRanges(final List<DelinquencyRange> ranges) {
+        this.ranges = ranges;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setBucketType(final DelinquencyBucketType bucketType) {
+        this.bucketType = bucketType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setVersion(final Long version) {
+        this.version = version;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyBucket() {
+    }
 }

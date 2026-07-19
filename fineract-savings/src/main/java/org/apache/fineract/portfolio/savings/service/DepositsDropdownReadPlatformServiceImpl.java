@@ -20,14 +20,11 @@ package org.apache.fineract.portfolio.savings.service;
 
 import java.util.Arrays;
 import java.util.Collection;
-import lombok.NoArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.savings.DepositAccountOnClosureType;
 import org.apache.fineract.portfolio.savings.PreClosurePenalInterestOnType;
 
-@NoArgsConstructor
 public class DepositsDropdownReadPlatformServiceImpl implements DepositsDropdownReadPlatformService {
-
     @Override
     public Collection<EnumOptionData> retrievePreClosurePenalInterestOnTypeOptions() {
         return SavingsEnumerations.preClosurePenaltyInterestOnType(PreClosurePenalInterestOnType.values());
@@ -43,13 +40,12 @@ public class DepositsDropdownReadPlatformServiceImpl implements DepositsDropdown
      * @Override public Collection<EnumOptionData> retrieveInMultiplesOfDepositTermTypeOptions() { return
      * SavingsEnumerations .recurringDepositFrequencyType(SavingsPeriodFrequencyType.values()); }
      */
-
     @Override
     public Collection<EnumOptionData> maturityInstructionOptions() {
-        return Arrays.asList(SavingsEnumerations.depositAccountOnClosureType(DepositAccountOnClosureType.WITHDRAW_DEPOSIT),
-                SavingsEnumerations.depositAccountOnClosureType(DepositAccountOnClosureType.TRANSFER_TO_SAVINGS),
-                SavingsEnumerations.depositAccountOnClosureType(DepositAccountOnClosureType.REINVEST_PRINCIPAL_AND_INTEREST),
-                SavingsEnumerations.depositAccountOnClosureType(DepositAccountOnClosureType.REINVEST_PRINCIPAL_ONLY));
+        return Arrays.asList(SavingsEnumerations.depositAccountOnClosureType(DepositAccountOnClosureType.WITHDRAW_DEPOSIT), SavingsEnumerations.depositAccountOnClosureType(DepositAccountOnClosureType.TRANSFER_TO_SAVINGS), SavingsEnumerations.depositAccountOnClosureType(DepositAccountOnClosureType.REINVEST_PRINCIPAL_AND_INTEREST), SavingsEnumerations.depositAccountOnClosureType(DepositAccountOnClosureType.REINVEST_PRINCIPAL_ONLY));
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public DepositsDropdownReadPlatformServiceImpl() {
     }
 }

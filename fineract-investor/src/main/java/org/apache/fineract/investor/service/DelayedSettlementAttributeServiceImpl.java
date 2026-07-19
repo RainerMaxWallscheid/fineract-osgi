@@ -19,24 +19,23 @@
 package org.apache.fineract.investor.service;
 
 import static org.apache.fineract.investor.data.attribute.SettlementModelExternalAssetOwnerLoanProductAttribute.DELAYED_SETTLEMENT;
-
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.investor.data.ExternalTransferLoanProductAttributesData;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class DelayedSettlementAttributeServiceImpl implements DelayedSettlementAttributeService {
-
     private final ExternalAssetOwnerLoanProductAttributesReadService externalAssetOwnerLoanProductAttributesReadService;
 
     @Override
     public boolean isEnabled(final Long loanProductId) {
-        Page<ExternalTransferLoanProductAttributesData> attributesDataPage = externalAssetOwnerLoanProductAttributesReadService
-                .retrieveAllLoanProductAttributesByLoanProductId(loanProductId, DELAYED_SETTLEMENT.getAttributeKey());
-        String attributeValue = attributesDataPage.getPageItems().stream().findFirst()
-                .map(ExternalTransferLoanProductAttributesData::getAttributeValue).orElse(null);
+        Page<ExternalTransferLoanProductAttributesData> attributesDataPage = externalAssetOwnerLoanProductAttributesReadService.retrieveAllLoanProductAttributesByLoanProductId(loanProductId, DELAYED_SETTLEMENT.getAttributeKey());
+        String attributeValue = attributesDataPage.getPageItems().stream().findFirst().map(ExternalTransferLoanProductAttributesData::getAttributeValue).orElse(null);
         return DELAYED_SETTLEMENT.getAttributeValue().equals(attributeValue);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DelayedSettlementAttributeServiceImpl(final ExternalAssetOwnerLoanProductAttributesReadService externalAssetOwnerLoanProductAttributesReadService) {
+        this.externalAssetOwnerLoanProductAttributesReadService = externalAssetOwnerLoanProductAttributesReadService;
     }
 }

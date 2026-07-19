@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.loanaccount.service.schedule;
 
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleInstallment;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.InterestRecalculationAdditionalDetailData;
@@ -30,25 +29,16 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanBalanceService;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class LoanScheduleComponent {
-
     private final LoanBalanceService loanBalanceService;
 
     public void updateLoanSchedule(Loan loan, final LoanScheduleModel modifiedLoanSchedule) {
         final List<LoanScheduleModelPeriod> periods = modifiedLoanSchedule.getPeriods();
         for (final LoanScheduleModelPeriod scheduledLoanInstallment : modifiedLoanSchedule.getPeriods()) {
             if (scheduledLoanInstallment.isRepaymentPeriod() || scheduledLoanInstallment.isDownPaymentPeriod()) {
-                LoanRepaymentScheduleInstallment existingInstallment = findByInstallmentNumber(loan.getRepaymentScheduleInstallments(),
-                        scheduledLoanInstallment.periodNumber());
+                LoanRepaymentScheduleInstallment existingInstallment = findByInstallmentNumber(loan.getRepaymentScheduleInstallments(), scheduledLoanInstallment.periodNumber());
                 if (existingInstallment == null) {
-                    final LoanRepaymentScheduleInstallment installment = new LoanRepaymentScheduleInstallment(loan,
-                            scheduledLoanInstallment.periodNumber(), scheduledLoanInstallment.periodFromDate(),
-                            scheduledLoanInstallment.periodDueDate(), scheduledLoanInstallment.principalDue(),
-                            scheduledLoanInstallment.interestDue(), scheduledLoanInstallment.feeChargesDue(),
-                            scheduledLoanInstallment.penaltyChargesDue(), scheduledLoanInstallment.isRecalculatedInterestComponent(),
-                            InterestRecalculationAdditionalDetailData.toEntities(scheduledLoanInstallment.getLoanCompoundingDetails()),
-                            scheduledLoanInstallment.rescheduleInterestPortion(), scheduledLoanInstallment.isDownPaymentPeriod());
+                    final LoanRepaymentScheduleInstallment installment = new LoanRepaymentScheduleInstallment(loan, scheduledLoanInstallment.periodNumber(), scheduledLoanInstallment.periodFromDate(), scheduledLoanInstallment.periodDueDate(), scheduledLoanInstallment.principalDue(), scheduledLoanInstallment.interestDue(), scheduledLoanInstallment.feeChargesDue(), scheduledLoanInstallment.penaltyChargesDue(), scheduledLoanInstallment.isRecalculatedInterestComponent(), InterestRecalculationAdditionalDetailData.toEntities(scheduledLoanInstallment.getLoanCompoundingDetails()), scheduledLoanInstallment.rescheduleInterestPortion(), scheduledLoanInstallment.isDownPaymentPeriod());
                     loan.addLoanRepaymentScheduleInstallment(installment);
                 } else {
                     existingInstallment.copyFrom(scheduledLoanInstallment);
@@ -57,15 +47,13 @@ public class LoanScheduleComponent {
         }
         // Review Installments removed
         loan.getRepaymentScheduleInstallments().removeIf(i -> !existInstallment(periods, i.getInstallmentNumber()));
-
         loan.updateLoanScheduleDependentDerivedFields();
         loanBalanceService.updateLoanSummaryDerivedFields(loan);
     }
 
     public void updateLoanSchedule(Loan loan, final List<LoanRepaymentScheduleInstallment> installments) {
         for (final LoanRepaymentScheduleInstallment installment : installments) {
-            LoanRepaymentScheduleInstallment existingInstallment = findByInstallmentNumber(loan.getRepaymentScheduleInstallments(),
-                    installment.getInstallmentNumber());
+            LoanRepaymentScheduleInstallment existingInstallment = findByInstallmentNumber(loan.getRepaymentScheduleInstallments(), installment.getInstallmentNumber());
             if (existingInstallment != null) {
                 existingInstallment.copyFrom(installment);
             } else {
@@ -74,13 +62,11 @@ public class LoanScheduleComponent {
         }
         // Review Installments removed
         loan.getRepaymentScheduleInstallments().removeIf(i -> !existInstallment(installments, i.getInstallmentNumber()));
-
         loan.updateLoanScheduleDependentDerivedFields();
         loanBalanceService.updateLoanSummaryDerivedFields(loan);
     }
 
-    private LoanRepaymentScheduleInstallment findByInstallmentNumber(final Collection<LoanRepaymentScheduleInstallment> installments,
-            final Integer installmentNumber) {
+    private LoanRepaymentScheduleInstallment findByInstallmentNumber(final Collection<LoanRepaymentScheduleInstallment> installments, final Integer installmentNumber) {
         return installments.stream().filter(i -> installmentNumber.compareTo(i.getInstallmentNumber()) == 0).findFirst().orElse(null);
     }
 
@@ -92,4 +78,8 @@ public class LoanScheduleComponent {
         return periods.stream().anyMatch(p -> p.periodNumber() != null && installmentNumber.compareTo(p.periodNumber()) == 0);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanScheduleComponent(final LoanBalanceService loanBalanceService) {
+        this.loanBalanceService = loanBalanceService;
+    }
 }

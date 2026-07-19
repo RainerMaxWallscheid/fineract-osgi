@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler.loan.reaging;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.DataIntegrityErrorHandler;
@@ -30,10 +29,8 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN", action = "UNDO_REAGE")
 public class LoanUndoReAgingCommandHandler implements NewCommandSourceHandler {
-
     private final LoanReAgingService loanReAgingService;
     private final DataIntegrityErrorHandler dataIntegrityErrorHandler;
 
@@ -42,9 +39,14 @@ public class LoanUndoReAgingCommandHandler implements NewCommandSourceHandler {
         try {
             return loanReAgingService.undoReAge(command.getLoanId(), command);
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.undoReAge",
-                    "Error while handling undo re-age");
+            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.undoReAge", "Error while handling undo re-age");
             return CommandProcessingResult.empty();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanUndoReAgingCommandHandler(final LoanReAgingService loanReAgingService, final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
+        this.loanReAgingService = loanReAgingService;
+        this.dataIntegrityErrorHandler = dataIntegrityErrorHandler;
     }
 }

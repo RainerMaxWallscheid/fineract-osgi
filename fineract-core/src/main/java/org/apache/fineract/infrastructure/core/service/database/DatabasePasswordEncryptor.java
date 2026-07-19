@@ -21,7 +21,6 @@ package org.apache.fineract.infrastructure.core.service.database;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.security.service.PasswordEncryptor;
 import org.apache.fineract.infrastructure.security.utils.EncryptionUtil;
@@ -29,18 +28,14 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class DatabasePasswordEncryptor implements PasswordEncryptor {
-
     public static final String DEFAULT_ENCRYPTION = "AES/CBC/PKCS5Padding";
-
     private final FineractProperties fineractProperties;
 
     @SuppressWarnings("checkstyle:regexpsinglelinejava")
     public static void main(String[] args) {
         if (args.length < 2) {
-            System.out.println(
-                    "Usage: java -cp fineract-provider.jar -Dloader.main=org.apache.fineract.infrastructure.core.service.database.DatabasePasswordEncryptor org.springframework.boot.loader.launch.PropertiesLauncher <masterPassword> <plainPassword>");
+            System.out.println("Usage: java -cp fineract-provider.jar -Dloader.main=org.apache.fineract.infrastructure.core.service.database.DatabasePasswordEncryptor org.springframework.boot.loader.launch.PropertiesLauncher <masterPassword> <plainPassword>");
             System.exit(1);
         }
         String masterPassword = args[0];
@@ -52,29 +47,23 @@ public class DatabasePasswordEncryptor implements PasswordEncryptor {
 
     @Override
     public String encrypt(String plainPassword) {
-        String masterPassword = Optional.ofNullable(fineractProperties.getTenant())
-                .map(FineractProperties.FineractTenantProperties::getMasterPassword)
-                .orElse(fineractProperties.getDatabase().getDefaultMasterPassword());
-        String encryption = Optional.ofNullable(fineractProperties.getTenant())
-                .map(FineractProperties.FineractTenantProperties::getEncryption).orElse(DEFAULT_ENCRYPTION);
+        String masterPassword = Optional.ofNullable(fineractProperties.getTenant()).map(FineractProperties.FineractTenantProperties::getMasterPassword).orElse(fineractProperties.getDatabase().getDefaultMasterPassword());
+        String encryption = Optional.ofNullable(fineractProperties.getTenant()).map(FineractProperties.FineractTenantProperties::getEncryption).orElse(DEFAULT_ENCRYPTION);
         return EncryptionUtil.encryptToBase64(encryption, masterPassword, plainPassword);
     }
 
     @Override
     public String decrypt(String encryptedPassword) {
-        String masterPassword = Optional.ofNullable(fineractProperties.getTenant())
-                .map(FineractProperties.FineractTenantProperties::getMasterPassword)
-                .orElse(fineractProperties.getDatabase().getDefaultMasterPassword());
-        String encryption = Optional.ofNullable(fineractProperties.getTenant())
-                .map(FineractProperties.FineractTenantProperties::getEncryption).orElse(DEFAULT_ENCRYPTION);
+        String masterPassword = Optional.ofNullable(fineractProperties.getTenant()).map(FineractProperties.FineractTenantProperties::getMasterPassword).orElse(fineractProperties.getDatabase().getDefaultMasterPassword());
+        String encryption = Optional.ofNullable(fineractProperties.getTenant()).map(FineractProperties.FineractTenantProperties::getEncryption).orElse(DEFAULT_ENCRYPTION);
         return EncryptionUtil.decryptFromBase64(encryption, masterPassword, encryptedPassword);
     }
 
     public String getMasterPasswordHash() {
-        String masterPassword = Optional.ofNullable(fineractProperties) //
-                .map(FineractProperties::getTenant) //
-                .map(FineractProperties.FineractTenantProperties::getMasterPassword) //
-                .orElse(fineractProperties.getDatabase().getDefaultMasterPassword());
+        String masterPassword =  //
+        //
+        //
+        Optional.ofNullable(fineractProperties).map(FineractProperties::getTenant).map(FineractProperties.FineractTenantProperties::getMasterPassword).orElse(fineractProperties.getDatabase().getDefaultMasterPassword());
         return getPasswordHash(masterPassword);
     }
 
@@ -83,10 +72,15 @@ public class DatabasePasswordEncryptor implements PasswordEncryptor {
     }
 
     public boolean isMasterPasswordHashValid(String hashed) {
-        String masterPassword = Optional.ofNullable(fineractProperties) //
-                .map(FineractProperties::getTenant) //
-                .map(FineractProperties.FineractTenantProperties::getMasterPassword) //
-                .orElse(fineractProperties.getDatabase().getDefaultMasterPassword());
+        String masterPassword =  //
+        //
+        //
+        Optional.ofNullable(fineractProperties).map(FineractProperties::getTenant).map(FineractProperties.FineractTenantProperties::getMasterPassword).orElse(fineractProperties.getDatabase().getDefaultMasterPassword());
         return BCrypt.checkpw(masterPassword, hashed);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DatabasePasswordEncryptor(final FineractProperties fineractProperties) {
+        this.fineractProperties = fineractProperties;
     }
 }

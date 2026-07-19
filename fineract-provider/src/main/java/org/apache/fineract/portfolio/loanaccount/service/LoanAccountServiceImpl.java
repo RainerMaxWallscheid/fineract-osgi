@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
@@ -32,9 +31,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepositor
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 
-@RequiredArgsConstructor
 public class LoanAccountServiceImpl implements LoanAccountService {
-
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final LoanTransactionRepository loanTransactionRepository;
 
@@ -72,14 +69,17 @@ public class LoanAccountServiceImpl implements LoanAccountService {
         final Throwable realCause = e.getCause();
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loan.transaction");
-        if (realCause.getMessage().toLowerCase().contains("external_id_unique") || realCause.getMessage()
-                .contains("duplicate key value violates unique constraint \"m_loan_transaction_external_id_key\"")) {
+        if (realCause.getMessage().toLowerCase().contains("external_id_unique") || realCause.getMessage().contains("duplicate key value violates unique constraint \"m_loan_transaction_external_id_key\"")) {
             baseDataValidator.reset().parameter("externalId").failWithCode("value.must.be.unique");
         }
         if (!dataValidationErrors.isEmpty()) {
-            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
-                    dataValidationErrors, e);
+            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.", dataValidationErrors, e);
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanAccountServiceImpl(final LoanRepositoryWrapper loanRepositoryWrapper, final LoanTransactionRepository loanTransactionRepository) {
+        this.loanRepositoryWrapper = loanRepositoryWrapper;
+        this.loanTransactionRepository = loanTransactionRepository;
+    }
 }

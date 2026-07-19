@@ -19,27 +19,28 @@
 package org.apache.fineract.command.hook;
 
 import static org.apache.fineract.command.core.CommandConstants.COMMAND_HOOK_ORDER_TIMESTAMP;
-
 import java.time.Instant;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHookBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @Order(COMMAND_HOOK_ORDER_TIMESTAMP)
 @ConditionalOnProperty(value = "fineract.command.hooks.timestamp-pre", havingValue = "true")
 final class TimestampCommandHook implements CommandHookBefore<Object> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TimestampCommandHook.class);
 
     @Override
     public void onBefore(Command<Object> command) {
         if (command.getCreatedAt() == null) {
             command.setCreatedAt(Instant.now());
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TimestampCommandHook() {
     }
 }

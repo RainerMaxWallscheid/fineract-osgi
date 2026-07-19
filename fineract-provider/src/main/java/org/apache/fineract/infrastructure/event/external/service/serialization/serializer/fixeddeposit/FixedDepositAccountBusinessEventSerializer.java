@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.event.external.service.serialization.serializer.fixeddeposit;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.fineract.avro.fixeddeposit.v1.FixedDepositAccountDataV1;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
@@ -32,9 +31,7 @@ import org.apache.fineract.portfolio.savings.service.DepositAccountReadPlatformS
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class FixedDepositAccountBusinessEventSerializer implements BusinessEventSerializer {
-
     private final DepositAccountReadPlatformService service;
     private final FixedDepositAccountDataMapper mapper;
 
@@ -53,5 +50,11 @@ public class FixedDepositAccountBusinessEventSerializer implements BusinessEvent
     @Override
     public Class<? extends GenericContainer> getSupportedSchema() {
         return FixedDepositAccountDataV1.class;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FixedDepositAccountBusinessEventSerializer(final DepositAccountReadPlatformService service, final FixedDepositAccountDataMapper mapper) {
+        this.service = service;
+        this.mapper = mapper;
     }
 }

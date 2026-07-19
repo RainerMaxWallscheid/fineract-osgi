@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.cob.listener;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -35,14 +33,11 @@ import org.springframework.lang.NonNull;
  * {@link org.springframework.batch.core.job.SimpleStepHandler}, which persists the job execution context after every
  * sub-step and causes lock contention on {@code BATCH_JOB_EXECUTION_CONTEXT} during remote partitioning.
  */
-@Slf4j
-@RequiredArgsConstructor
 public class CobWorkerStepListener implements StepExecutionListener {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CobWorkerStepListener.class);
     private final Tasklet initialisationTasklet;
-
     private final Tasklet applyLockTasklet;
-
     private final Tasklet resetContextTasklet;
 
     @Override
@@ -51,7 +46,7 @@ public class CobWorkerStepListener implements StepExecutionListener {
         try {
             runTasklet(applyLockTasklet, stepExecution);
         } catch (Exception e) {
-            log.error("Failed to apply lock in beforeStep for '{}'; resetting thread-local context.", stepExecution.getStepName(), e);
+            log.error("Failed to apply lock in beforeStep for \'{}\'; resetting thread-local context.", stepExecution.getStepName(), e);
             runTasklet(resetContextTasklet, stepExecution);
             throw e;
         }
@@ -77,5 +72,12 @@ public class CobWorkerStepListener implements StepExecutionListener {
                 throw new IllegalStateException("COB worker step listener failed for step " + stepExecution.getStepName(), exception);
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CobWorkerStepListener(final Tasklet initialisationTasklet, final Tasklet applyLockTasklet, final Tasklet resetContextTasklet) {
+        this.initialisationTasklet = initialisationTasklet;
+        this.applyLockTasklet = applyLockTasklet;
+        this.resetContextTasklet = resetContextTasklet;
     }
 }

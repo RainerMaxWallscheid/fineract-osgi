@@ -18,13 +18,10 @@
  */
 package org.apache.fineract.investor.domain;
 
-import lombok.Getter;
 import org.apache.fineract.infrastructure.event.business.domain.AbstractBusinessEvent;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 
-@Getter
 public abstract class InvestorBusinessEvent extends AbstractBusinessEvent<ExternalAssetOwnerTransfer> {
-
     private final Loan loan;
     private static final String CATEGORY = "Investor";
 
@@ -41,5 +38,10 @@ public abstract class InvestorBusinessEvent extends AbstractBusinessEvent<Extern
     @Override
     public Long getAggregateRootId() {
         return loan.getId();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Loan getLoan() {
+        return this.loan;
     }
 }

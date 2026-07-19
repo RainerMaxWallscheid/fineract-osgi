@@ -23,8 +23,6 @@ import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -56,10 +54,9 @@ import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 public class BuyDownFeeWritePlatformServiceImpl implements BuyDownFeePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BuyDownFeeWritePlatformServiceImpl.class);
     private final ProgressiveLoanTransactionValidator loanTransactionValidator;
     private final LoanAssembler loanAssembler;
     private final LoanTransactionRepository loanTransactionRepository;
@@ -74,58 +71,42 @@ public class BuyDownFeeWritePlatformServiceImpl implements BuyDownFeePlatformSer
     @Transactional
     @Override
     public CommandProcessingResult makeLoanBuyDownFee(final Long loanId, final JsonCommand command) {
-
         this.loanTransactionValidator.validateBuyDownFee(command, loanId);
-
         final Loan loan = this.loanAssembler.assembleFrom(loanId);
         checkClientOrGroupActive(loan);
-
         final Map<String, Object> changes = new LinkedHashMap<>();
-
         // Create payment details
         final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
-
         // Extract transaction details
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed("transactionAmount");
         final ExternalId txnExternalId = externalIdFactory.createFromCommand(command, "externalId");
-
         // Create buy down fee transaction
         final Money buyDownFeeAmount = Money.of(loan.getCurrency(), transactionAmount); // FLAT calculation
-        final LoanTransaction buyDownFeeTransaction = LoanTransaction.buyDownFee(loan, buyDownFeeAmount, paymentDetail, transactionDate,
-                txnExternalId);
-
+        final LoanTransaction buyDownFeeTransaction = LoanTransaction.buyDownFee(loan, buyDownFeeAmount, paymentDetail, transactionDate, txnExternalId);
         // Add to loan (NO schedule recalculation as per requirements)
         loan.addLoanTransaction(buyDownFeeTransaction);
-
         // Add Loan Transaction classification
         addClassificationCodeToTransaction(command, LoanTransactionApiConstants.BUY_DOWN_FEE_CLASSIFICATION_CODE, buyDownFeeTransaction);
-
         // Save transaction
         loanTransactionRepository.saveAndFlush(buyDownFeeTransaction);
-
         // Create Buy Down Fee balance
         createBuyDownFeeBalance(buyDownFeeTransaction);
-
         // Add note if provided
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
-            eventPublisher.publishEvent(NoteCreateRequest.builder().type(NoteType.LOAN_TRANSACTION)
-                    .resourceId(buyDownFeeTransaction.getId()).note(noteText).build());
+            eventPublisher.publishEvent(NoteCreateRequest.builder().type(NoteType.LOAN_TRANSACTION).resourceId(buyDownFeeTransaction.getId()).note(noteText).build());
         }
-
         loanJournalEntryPoster.postJournalEntriesForLoanTransaction(buyDownFeeTransaction, false, false);
-
         // Notify business events
         businessEventNotifierService.notifyPostBusinessEvent(new LoanBuyDownFeeTransactionCreatedBusinessEvent(buyDownFeeTransaction));
-
-        return new CommandProcessingResultBuilder() //
-                .withClientId(loan.getClientId()) //
-                .withOfficeId(loan.getOfficeId()) //
-                .withLoanId(loan.getId()) //
-                .withEntityId(buyDownFeeTransaction.getId()) //
-                .withEntityExternalId(buyDownFeeTransaction.getExternalId()) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withClientId(loan.getClientId()).withOfficeId(loan.getOfficeId()).withLoanId(loan.getId()).withEntityId(buyDownFeeTransaction.getId()).withEntityExternalId(buyDownFeeTransaction.getExternalId()).build();
     }
 
     @Override
@@ -134,69 +115,50 @@ public class BuyDownFeeWritePlatformServiceImpl implements BuyDownFeePlatformSer
         this.loanTransactionValidator.validateBuyDownFeeAdjustment(command, loanId, buyDownFeeTransactionId);
         final Loan loan = this.loanAssembler.assembleFrom(loanId);
         checkClientOrGroupActive(loan);
-
         final Map<String, Object> changes = new LinkedHashMap<>();
-
         // Create payment details
         final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
-
         // Extract transaction details
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed("transactionAmount");
         final ExternalId txnExternalId = externalIdFactory.createFromCommand(command, "externalId");
-
         // Find and validate original buy down fee transaction
         Optional<LoanTransaction> originalBuyDownFee = loanTransactionRepository.findById(buyDownFeeTransactionId);
         if (originalBuyDownFee.isEmpty() || !originalBuyDownFee.get().isBuyDownFee()) {
             throw new IllegalArgumentException("Original transaction must be a valid Buy Down Fee transaction");
         }
-
         // Create buy down fee adjustment transaction
-        LoanTransaction buyDownFeeAdjustment = LoanTransaction.buyDownFeeAdjustment(loan, Money.of(loan.getCurrency(), transactionAmount),
-                paymentDetail, transactionDate, txnExternalId);
-
+        LoanTransaction buyDownFeeAdjustment = LoanTransaction.buyDownFeeAdjustment(loan, Money.of(loan.getCurrency(), transactionAmount), paymentDetail, transactionDate, txnExternalId);
         // Link to original transaction
-        buyDownFeeAdjustment.getLoanTransactionRelations().add(LoanTransactionRelation.linkToTransaction(buyDownFeeAdjustment,
-                originalBuyDownFee.get(), LoanTransactionRelationTypeEnum.ADJUSTMENT));
-
+        buyDownFeeAdjustment.getLoanTransactionRelations().add(LoanTransactionRelation.linkToTransaction(buyDownFeeAdjustment, originalBuyDownFee.get(), LoanTransactionRelationTypeEnum.ADJUSTMENT));
         // Inherit from the target transaction the classification
         buyDownFeeAdjustment.setClassification(originalBuyDownFee.get().getClassification());
         // Add transaction to loan
         loan.addLoanTransaction(buyDownFeeAdjustment);
-
         // Save transaction
         LoanTransaction savedBuyDownFeeAdjustment = loanTransactionRepository.saveAndFlush(buyDownFeeAdjustment);
-
         // Update buy down fee balance
-        LoanBuyDownFeeBalance buydownFeeBalance = loanBuyDownFeeBalanceRepository
-                .findByLoanIdAndLoanTransactionIdAndDeletedFalseAndClosedFalse(loanId, buyDownFeeTransactionId);
+        LoanBuyDownFeeBalance buydownFeeBalance = loanBuyDownFeeBalanceRepository.findByLoanIdAndLoanTransactionIdAndDeletedFalseAndClosedFalse(loanId, buyDownFeeTransactionId);
         if (buydownFeeBalance != null) {
             buydownFeeBalance.setAmountAdjustment(MathUtil.nullToZero(buydownFeeBalance.getAmountAdjustment()).add(transactionAmount));
-            buydownFeeBalance
-                    .setUnrecognizedAmount(MathUtil.negativeToZero(buydownFeeBalance.getUnrecognizedAmount().subtract(transactionAmount)));
+            buydownFeeBalance.setUnrecognizedAmount(MathUtil.negativeToZero(buydownFeeBalance.getUnrecognizedAmount().subtract(transactionAmount)));
             loanBuyDownFeeBalanceRepository.save(buydownFeeBalance);
         }
-
         // Create a note if provided
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
-            eventPublisher.publishEvent(NoteCreateRequest.builder().type(NoteType.LOAN_TRANSACTION)
-                    .resourceId(savedBuyDownFeeAdjustment.getId()).note(noteText).build());
+            eventPublisher.publishEvent(NoteCreateRequest.builder().type(NoteType.LOAN_TRANSACTION).resourceId(savedBuyDownFeeAdjustment.getId()).note(noteText).build());
         }
-
         loanJournalEntryPoster.postJournalEntriesForLoanTransaction(savedBuyDownFeeAdjustment, false, false);
-
         // Notify business events
-        businessEventNotifierService
-                .notifyPostBusinessEvent(new LoanBuyDownFeeAdjustmentTransactionCreatedBusinessEvent(savedBuyDownFeeAdjustment));
-
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(savedBuyDownFeeAdjustment.getId()) //
-                .withEntityExternalId(savedBuyDownFeeAdjustment.getExternalId()) //
-                .withOfficeId(loan.getOfficeId()) //
-                .withClientId(loan.getClientId()) //
-                .withLoanId(loan.getId()) //
-                .build();
+        businessEventNotifierService.notifyPostBusinessEvent(new LoanBuyDownFeeAdjustmentTransactionCreatedBusinessEvent(savedBuyDownFeeAdjustment));
+        return  //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withEntityId(savedBuyDownFeeAdjustment.getId()).withEntityExternalId(savedBuyDownFeeAdjustment.getExternalId()).withOfficeId(loan.getOfficeId()).withClientId(loan.getClientId()).withLoanId(loan.getId()).build();
     }
 
     private void checkClientOrGroupActive(final Loan loan) {
@@ -221,10 +183,23 @@ public class BuyDownFeeWritePlatformServiceImpl implements BuyDownFeePlatformSer
     }
 
     private void addClassificationCodeToTransaction(final JsonCommand command, final String codeName, LoanTransaction loanTransaction) {
-        final Long transactionClassificationId = command
-                .longValueOfParameterNamed(LoanTransactionApiConstants.TRANSACTION_CLASSIFICATIONID_PARAMNAME);
+        final Long transactionClassificationId = command.longValueOfParameterNamed(LoanTransactionApiConstants.TRANSACTION_CLASSIFICATIONID_PARAMNAME);
         if (transactionClassificationId != null) {
             loanTransaction.setClassification(codeValueRepository.findByCodeNameAndId(codeName, transactionClassificationId));
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BuyDownFeeWritePlatformServiceImpl(final ProgressiveLoanTransactionValidator loanTransactionValidator, final LoanAssembler loanAssembler, final LoanTransactionRepository loanTransactionRepository, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final LoanJournalEntryPoster loanJournalEntryPoster, final ExternalIdFactory externalIdFactory, final LoanBuyDownFeeBalanceRepository loanBuyDownFeeBalanceRepository, final BusinessEventNotifierService businessEventNotifierService, final CodeValueRepository codeValueRepository, final TransactionBoundApplicationEventPublisher eventPublisher) {
+        this.loanTransactionValidator = loanTransactionValidator;
+        this.loanAssembler = loanAssembler;
+        this.loanTransactionRepository = loanTransactionRepository;
+        this.paymentDetailWritePlatformService = paymentDetailWritePlatformService;
+        this.loanJournalEntryPoster = loanJournalEntryPoster;
+        this.externalIdFactory = externalIdFactory;
+        this.loanBuyDownFeeBalanceRepository = loanBuyDownFeeBalanceRepository;
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.codeValueRepository = codeValueRepository;
+        this.eventPublisher = eventPublisher;
     }
 }

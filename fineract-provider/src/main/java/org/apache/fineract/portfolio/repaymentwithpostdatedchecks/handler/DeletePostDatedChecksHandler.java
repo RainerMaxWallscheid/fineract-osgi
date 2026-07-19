@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.repaymentwithpostdatedchecks.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "REPAYMENT_WITH_POSTDATEDCHECKS", action = "DELETE")
-@RequiredArgsConstructor
 public class DeletePostDatedChecksHandler implements NewCommandSourceHandler {
-
     private final RepaymentWithPostDatedChecksWritePlatformService repaymentWithPostDatedChecksWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.repaymentWithPostDatedChecksWritePlatformService.deletePostDatedChecks(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DeletePostDatedChecksHandler(final RepaymentWithPostDatedChecksWritePlatformService repaymentWithPostDatedChecksWritePlatformService) {
+        this.repaymentWithPostDatedChecksWritePlatformService = repaymentWithPostDatedChecksWritePlatformService;
     }
 }

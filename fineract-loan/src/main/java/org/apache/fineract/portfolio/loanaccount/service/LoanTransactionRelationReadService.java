@@ -30,7 +30,6 @@ import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionRelationData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelation;
@@ -40,12 +39,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class LoanTransactionRelationReadService {
-
     @PersistenceContext
     private EntityManager entityManager;
-
     private final LoanTransactionRelationMapper loanTransactionRelationMapper;
 
     public List<LoanTransactionRelationData> fetchLoanTransactionRelationDataFrom(final Long transactionId) {
@@ -58,22 +54,21 @@ public class LoanTransactionRelationReadService {
     }
 
     public List<LoanTransactionRelation> fetchLoanTransactionRelationFrom(final List<Long> transactionIds) {
-
         final CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         final CriteriaQuery<LoanTransactionRelation> query = cb.createQuery(LoanTransactionRelation.class);
-
         final Root<LoanTransactionRelation> root = query.from(LoanTransactionRelation.class);
         root.fetch("fromTransaction", JoinType.INNER);
         final Path<LoanTransaction> fromTransaction = root.join("fromTransaction", JoinType.INNER);
-
         query.select(root).where(fromTransaction.get("id").in(transactionIds));
-
         final List<Order> orders = new ArrayList<>();
         orders.add(cb.desc(root.get("id")));
         query.orderBy(orders);
-
         final TypedQuery<LoanTransactionRelation> queryToExecute = entityManager.createQuery(query);
         return queryToExecute.getResultList();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionRelationReadService(final LoanTransactionRelationMapper loanTransactionRelationMapper) {
+        this.loanTransactionRelationMapper = loanTransactionRelationMapper;
+    }
 }

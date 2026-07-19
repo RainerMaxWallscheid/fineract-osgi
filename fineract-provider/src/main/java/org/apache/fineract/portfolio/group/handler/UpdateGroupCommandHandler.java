@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.group.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,15 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "GROUP", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateGroupCommandHandler implements NewCommandSourceHandler {
-
     private final GroupingTypesWritePlatformService groupWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.groupWritePlatformService.updateGroup(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateGroupCommandHandler(final GroupingTypesWritePlatformService groupWritePlatformService) {
+        this.groupWritePlatformService = groupWritePlatformService;
     }
 }

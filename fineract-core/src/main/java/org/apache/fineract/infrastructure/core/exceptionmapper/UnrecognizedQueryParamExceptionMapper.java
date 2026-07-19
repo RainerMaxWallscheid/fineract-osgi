@@ -25,7 +25,6 @@ import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
@@ -43,30 +42,24 @@ import org.springframework.stereotype.Component;
 @Provider
 @Component
 @Scope("singleton")
-@Slf4j
 public class UnrecognizedQueryParamExceptionMapper implements ExceptionMapper<UnrecognizedQueryParamException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UnrecognizedQueryParamExceptionMapper.class);
 
     @Override
     public Response toResponse(final UnrecognizedQueryParamException exception) {
         final String parameterName = exception.getQueryParamKey();
         final String parameterValue = exception.getQueryParamValue();
-
         final StringBuilder validationErrorCode = new StringBuilder("error.msg.query.parameter.value.unsupported");
-        final StringBuilder defaultEnglishMessage = new StringBuilder("The query parameter ") //
-                .append(parameterName) //
-                .append(" has an unsupported value of: ") //
-                .append(parameterValue);
+        final StringBuilder defaultEnglishMessage =  //
+        //
+        //
+        new StringBuilder("The query parameter ").append(parameterName).append(" has an unsupported value of: ").append(parameterValue);
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-
-        final ApiParameterError error = ApiParameterError.parameterError(validationErrorCode.toString(), defaultEnglishMessage.toString(),
-                parameterName, parameterName, parameterValue, exception.getSupportedParams());
-
+        final ApiParameterError error = ApiParameterError.parameterError(validationErrorCode.toString(), defaultEnglishMessage.toString(), parameterName, parameterName, parameterValue, exception.getSupportedParams());
         final List<ApiParameterError> errors = new ArrayList<>();
         errors.add(error);
-
-        final ApiGlobalErrorResponse invalidParameterError = ApiGlobalErrorResponse
-                .badClientRequest("validation.msg.validation.errors.exist", "Validation errors exist.", errors);
-
+        final ApiGlobalErrorResponse invalidParameterError = ApiGlobalErrorResponse.badClientRequest("validation.msg.validation.errors.exist", "Validation errors exist.", errors);
         return Response.status(Status.BAD_REQUEST).entity(invalidParameterError).type(MediaType.APPLICATION_JSON).build();
     }
 }

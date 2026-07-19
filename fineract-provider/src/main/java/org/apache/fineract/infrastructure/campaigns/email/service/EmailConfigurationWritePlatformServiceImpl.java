@@ -21,7 +21,6 @@ package org.apache.fineract.infrastructure.campaigns.email.service;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.campaigns.email.data.EmailConfigurationValidator;
 import org.apache.fineract.infrastructure.campaigns.email.domain.EmailConfiguration;
 import org.apache.fineract.infrastructure.campaigns.email.domain.EmailConfigurationRepository;
@@ -33,9 +32,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class EmailConfigurationWritePlatformServiceImpl implements EmailConfigurationWritePlatformService {
-
     private final PlatformSecurityContext context;
     private final EmailConfigurationRepository repository;
     private final EmailConfigurationValidator emailConfigurationValidator;
@@ -45,20 +42,13 @@ public class EmailConfigurationWritePlatformServiceImpl implements EmailConfigur
         // TODO: leaving function call for backward compatibility... but security configuration should be done somewhere
         // else
         this.context.authenticatedUser();
-
         this.emailConfigurationValidator.validateUpdateConfiguration(command.json());
         final String smtpUsername = command.stringValueOfParameterNamed("SMTP_USERNAME");
-
         if (!this.emailConfigurationValidator.isValidEmail(smtpUsername)) {
             throw new EmailConfigurationSMTPUsernameNotValid(smtpUsername);
         }
-
         final Map<String, Object> changes = new HashMap<>(4);
-
         Collection<EmailConfiguration> configurations = this.repository.findAll();
-        /**
-         * Default SMTP configuration added to flyway
-         */
         for (EmailConfiguration config : configurations) {
             if (config.getName() != null) {
                 String value = command.stringValueOfParameterNamed(config.getName());
@@ -67,11 +57,15 @@ public class EmailConfigurationWritePlatformServiceImpl implements EmailConfigur
                 this.repository.saveAndFlush(config);
             }
         }
-
-        return new CommandProcessingResultBuilder() //
-                .with(changes) //
-                .build();
-
+        return  //
+        //
+        new CommandProcessingResultBuilder().with(changes).build();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public EmailConfigurationWritePlatformServiceImpl(final PlatformSecurityContext context, final EmailConfigurationRepository repository, final EmailConfigurationValidator emailConfigurationValidator) {
+        this.context = context;
+        this.repository = repository;
+        this.emailConfigurationValidator = emailConfigurationValidator;
+    }
 }

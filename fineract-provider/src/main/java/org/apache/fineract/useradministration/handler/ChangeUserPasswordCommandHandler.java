@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.useradministration.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "USER", action = "CHANGEPWD")
-@RequiredArgsConstructor
 public class ChangeUserPasswordCommandHandler implements NewCommandSourceHandler {
-
     private final AppUserWritePlatformService writePlatformService;
 
     @Transactional
@@ -39,5 +36,10 @@ public class ChangeUserPasswordCommandHandler implements NewCommandSourceHandler
     public CommandProcessingResult processCommand(final JsonCommand command) {
         final Long userId = command.entityId();
         return this.writePlatformService.changeUserPassword(userId, command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ChangeUserPasswordCommandHandler(final AppUserWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

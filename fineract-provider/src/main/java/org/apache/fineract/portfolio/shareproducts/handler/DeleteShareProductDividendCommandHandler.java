@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.shareproducts.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "SHAREPRODUCT", action = "DELETE_DIVIDEND")
-@RequiredArgsConstructor
 public class DeleteShareProductDividendCommandHandler implements NewCommandSourceHandler {
-
     private final ShareProductWritePlatformService shareProductWritePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class DeleteShareProductDividendCommandHandler implements NewCommandSourc
         return this.shareProductWritePlatformService.deleteShareProductDividend(jsonCommand.entityId());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DeleteShareProductDividendCommandHandler(final ShareProductWritePlatformService shareProductWritePlatformService) {
+        this.shareProductWritePlatformService = shareProductWritePlatformService;
+    }
 }

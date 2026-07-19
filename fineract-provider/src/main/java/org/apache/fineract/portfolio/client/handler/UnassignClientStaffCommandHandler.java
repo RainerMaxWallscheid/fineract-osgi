@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.client.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "CLIENT", action = "UNASSIGNSTAFF")
-@RequiredArgsConstructor
 public class UnassignClientStaffCommandHandler implements NewCommandSourceHandler {
-
     private final ClientWritePlatformService clientWritePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class UnassignClientStaffCommandHandler implements NewCommandSourceHandle
         return this.clientWritePlatformService.unassignClientStaff(command.entityId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public UnassignClientStaffCommandHandler(final ClientWritePlatformService clientWritePlatformService) {
+        this.clientWritePlatformService = clientWritePlatformService;
+    }
 }

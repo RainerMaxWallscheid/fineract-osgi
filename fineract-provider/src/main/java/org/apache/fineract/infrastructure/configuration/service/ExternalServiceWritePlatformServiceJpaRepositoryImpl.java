@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.configuration.data.ExternalServicesData;
 import org.apache.fineract.infrastructure.configuration.domain.ExternalServicesProperties;
 import org.apache.fineract.infrastructure.configuration.domain.ExternalServicesPropertiesRepository;
@@ -38,12 +37,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class ExternalServiceWritePlatformServiceJpaRepositoryImpl implements ExternalServiceWritePlatformService {
-
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(ExternalServiceWritePlatformServiceJpaRepositoryImpl.class);
-
     private final PlatformSecurityContext context;
     private final ExternalServicesPropertiesRepositoryWrapper repositoryWrapper;
     private final ExternalServicesPropertiesRepository repository;
@@ -63,21 +59,27 @@ public class ExternalServiceWritePlatformServiceJpaRepositoryImpl implements Ext
         Map<String, Object> changesList = new LinkedHashMap<>();
         while (it.hasNext()) {
             String name = it.next();
-            final ExternalServicesProperties externalServicesProperties = this.repositoryWrapper.findOneByIdAndName(externalServiceId, name,
-                    externalServiceName);
+            final ExternalServicesProperties externalServicesProperties = this.repositoryWrapper.findOneByIdAndName(externalServiceId, name, externalServiceName);
             final Map<String, Object> changes = externalServicesProperties.update(command, name);
             changesList.putAll(changes);
             if (!changes.isEmpty()) {
                 this.repository.saveAndFlush(externalServicesProperties);
             }
         }
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(externalServiceId) //
-                .with(changesList) //
-                .build();
+        return  //
         //
-
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(externalServiceId).with(changesList).build();
+        //
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ExternalServiceWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final ExternalServicesPropertiesRepositoryWrapper repositoryWrapper, final ExternalServicesPropertiesRepository repository, final ExternalServicesPropertiesCommandFromApiJsonDeserializer fromApiJsonDeserializer, final ExternalServicesReadPlatformService readPlatformService) {
+        this.context = context;
+        this.repositoryWrapper = repositoryWrapper;
+        this.repository = repository;
+        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
+        this.readPlatformService = readPlatformService;
+    }
 }

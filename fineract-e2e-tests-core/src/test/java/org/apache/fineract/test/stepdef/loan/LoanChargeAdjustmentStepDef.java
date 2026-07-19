@@ -20,7 +20,6 @@ package org.apache.fineract.test.stepdef.loan;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
 import static org.assertj.core.api.Assertions.assertThat;
-
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.io.IOException;
@@ -29,7 +28,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FeignException;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.BusinessDateResponse;
@@ -51,14 +49,12 @@ import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Slf4j
 public class LoanChargeAdjustmentStepDef extends AbstractStepDef {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanChargeAdjustmentStepDef.class);
     public static final String DATE_FORMAT = "dd MMMM yyyy";
-
     @Autowired
     private FineractFeignClient fineractClient;
-
     @Autowired
     private EventCheckHelper eventCheckHelper;
     @Autowired
@@ -69,14 +65,10 @@ public class LoanChargeAdjustmentStepDef extends AbstractStepDef {
     private LoanRequestFactory loanRequestFactory;
 
     @When("Admin makes a charge adjustment for the last {string} type charge which is due on {string} with {double} EUR transaction amount and externalId {string}")
-    public void makeLoanChargeAdjustment(String chargeTypeEnum, String date, Double transactionAmount, String externalId)
-            throws IOException {
+    public void makeLoanChargeAdjustment(String chargeTypeEnum, String date, Double transactionAmount, String externalId) throws IOException {
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         long loanId = loanResponse.getLoanId();
-
-        GetLoansLoanIdResponse loanDetailsResponse = ok(
-                () -> fineractClient.loans().retrieveOneLoan(loanId, Map.of("associations", "charges")));
-
+        GetLoansLoanIdResponse loanDetailsResponse = ok(() -> fineractClient.loans().retrieveOneLoan(loanId, Map.of("associations", "charges")));
         Long transactionId = getTransactionIdForLastChargeMetConditions(chargeTypeEnum, date, loanDetailsResponse);
         makeChargeAdjustmentCall(loanId, transactionId, externalId, transactionAmount);
     }
@@ -85,33 +77,20 @@ public class LoanChargeAdjustmentStepDef extends AbstractStepDef {
     public void loanChargeAdjustmentFailedOnWrongAmount(String chargeTypeEnum, String date, double amount) throws IOException {
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         long loanId = loanResponse.getLoanId();
-
-        GetLoansLoanIdResponse loanDetailsResponse = ok(
-                () -> fineractClient.loans().retrieveOneLoan(loanId, Map.of("associations", "charges")));
-
+        GetLoansLoanIdResponse loanDetailsResponse = ok(() -> fineractClient.loans().retrieveOneLoan(loanId, Map.of("associations", "charges")));
         Long transactionId = getTransactionIdForLastChargeMetConditions(chargeTypeEnum, date, loanDetailsResponse);
-        PostLoansLoanIdChargesChargeIdRequest chargeAdjustmentRequest = loanRequestFactory.defaultChargeAdjustmentRequest().amount(amount)
-                .externalId("");
-
+        PostLoansLoanIdChargesChargeIdRequest chargeAdjustmentRequest = loanRequestFactory.defaultChargeAdjustmentRequest().amount(amount).externalId("");
         Integer httpStatusCodeExpected = 403;
         String developerMessageExpected = "Transaction amount cannot be higher than the available charge amount for adjustment: 7.000000";
-
         try {
-            fineractClient.loanCharges().executeLoanChargeOnExistingCharge(loanId, transactionId, chargeAdjustmentRequest,
-                    Map.<String, Object>of("command", "adjustment"));
+            fineractClient.loanCharges().executeLoanChargeOnExistingCharge(loanId, transactionId, chargeAdjustmentRequest, Map.<String, Object>of("command", "adjustment"));
             throw new AssertionError("Expected FeignException but request succeeded");
         } catch (FeignException e) {
             ErrorResponse errorResponse = ErrorResponse.fromFeignException(e);
             Integer httpStatusCodeActual = errorResponse.getHttpStatusCode();
             String developerMessageActual = errorResponse.getErrors().get(0).getDeveloperMessage();
-
-            assertThat(httpStatusCodeActual)
-                    .as(ErrorMessageHelper.wrongErrorCodeInFailedChargeAdjustment(httpStatusCodeActual, httpStatusCodeExpected))
-                    .isEqualTo(httpStatusCodeExpected);
-            assertThat(developerMessageActual)
-                    .as(ErrorMessageHelper.wrongErrorMessageInFailedChargeAdjustment(developerMessageActual, developerMessageExpected))
-                    .isEqualTo(developerMessageExpected);
-
+            assertThat(httpStatusCodeActual).as(ErrorMessageHelper.wrongErrorCodeInFailedChargeAdjustment(httpStatusCodeActual, httpStatusCodeExpected)).isEqualTo(httpStatusCodeExpected);
+            assertThat(developerMessageActual).as(ErrorMessageHelper.wrongErrorMessageInFailedChargeAdjustment(developerMessageActual, developerMessageExpected)).isEqualTo(developerMessageExpected);
             log.debug("Error code: {}", httpStatusCodeActual);
             log.debug("Error message: {}", developerMessageActual);
         }
@@ -121,23 +100,14 @@ public class LoanChargeAdjustmentStepDef extends AbstractStepDef {
     public void loanChargeAdjustmentUndo(String transactionDate, double transactionAmount) throws IOException {
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         long loanId = loanResponse.getLoanId();
-
-        GetLoansLoanIdResponse loanDetailsResponse = ok(
-                () -> fineractClient.loans().retrieveOneLoan(loanId, Map.of("associations", "transactions")));
-
+        GetLoansLoanIdResponse loanDetailsResponse = ok(() -> fineractClient.loans().retrieveOneLoan(loanId, Map.of("associations", "transactions")));
         Long transactionId = getTransactionIdForTransactionMetConditions(transactionDate, transactionAmount, loanDetailsResponse);
-
-        BusinessDateResponse businessDateResponse = ok(
-                () -> fineractClient.businessDateManagement().getBusinessDate("BUSINESS_DATE", Map.of()));
+        BusinessDateResponse businessDateResponse = ok(() -> fineractClient.businessDateManagement().getBusinessDate("BUSINESS_DATE", Map.of()));
         LocalDate businessDate = businessDateResponse.getDate();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         String businessDateActual = formatter.format(businessDate);
-
-        PostLoansLoanIdTransactionsTransactionIdRequest chargeAdjustmentUndoRequest = loanRequestFactory
-                .defaultChargeAdjustmentTransactionUndoRequest().transactionDate(businessDateActual);
-
-        ok(() -> fineractClient.loanTransactions().adjustLoanTransaction(loanId, transactionId, chargeAdjustmentUndoRequest,
-                Map.<String, Object>of()));
+        PostLoansLoanIdTransactionsTransactionIdRequest chargeAdjustmentUndoRequest = loanRequestFactory.defaultChargeAdjustmentTransactionUndoRequest().transactionDate(businessDateActual);
+        ok(() -> fineractClient.loanTransactions().adjustLoanTransaction(loanId, transactionId, chargeAdjustmentUndoRequest, Map.<String, Object>of()));
     }
 
     @Then("Charge adjustment response has the subResourceExternalId")
@@ -146,17 +116,14 @@ public class LoanChargeAdjustmentStepDef extends AbstractStepDef {
         assertThat(response.getSubResourceExternalId()).isNotNull();
     }
 
-    private Long getTransactionIdForTransactionMetConditions(String transactionDate, double transactionAmount,
-            GetLoansLoanIdResponse loanDetailsResponse) {
+    private Long getTransactionIdForTransactionMetConditions(String transactionDate, double transactionAmount, GetLoansLoanIdResponse loanDetailsResponse) {
         List<GetLoansLoanIdTransactions> transactions = loanDetailsResponse.getTransactions();
         GetLoansLoanIdTransactions transactionMetConditions = new GetLoansLoanIdTransactions();
         for (int i = 0; i < transactions.size(); i++) {
             LocalDate date = transactions.get(i).getDate();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
             String dateActual = formatter.format(date);
-
             Double amountActual = transactions.get(i).getAmount().doubleValue();
-
             if (dateActual.equals(transactionDate) && amountActual.equals(transactionAmount)) {
                 transactionMetConditions = transactions.get(i);
                 break;
@@ -167,36 +134,26 @@ public class LoanChargeAdjustmentStepDef extends AbstractStepDef {
 
     private void makeChargeAdjustmentCall(Long loanId, Long transactionId, String externalId, double transactionAmount) throws IOException {
         eventStore.reset();
-        PostLoansLoanIdChargesChargeIdRequest chargeAdjustmentRequest = loanRequestFactory.defaultChargeAdjustmentRequest()
-                .amount(transactionAmount).externalId(externalId);
-
-        PostLoansLoanIdChargesChargeIdResponse chargeAdjustmentResponse = ok(
-                () -> fineractClient.loanCharges().executeLoanChargeOnExistingCharge(loanId, transactionId, chargeAdjustmentRequest,
-                        Map.<String, Object>of("command", "adjustment")));
+        PostLoansLoanIdChargesChargeIdRequest chargeAdjustmentRequest = loanRequestFactory.defaultChargeAdjustmentRequest().amount(transactionAmount).externalId(externalId);
+        PostLoansLoanIdChargesChargeIdResponse chargeAdjustmentResponse = ok(() -> fineractClient.loanCharges().executeLoanChargeOnExistingCharge(loanId, transactionId, chargeAdjustmentRequest, Map.<String, Object>of("command", "adjustment")));
         testContext().set(TestContextKey.LOAN_CHARGE_ADJUSTMENT_RESPONSE, chargeAdjustmentResponse);
         eventCheckHelper.loanBalanceChangedEventCheck(loanId);
     }
 
-    private Long getTransactionIdForLastChargeMetConditions(String chargeTypeEnum, String date,
-            GetLoansLoanIdResponse loanDetailsResponse) {
+    private Long getTransactionIdForLastChargeMetConditions(String chargeTypeEnum, String date, GetLoansLoanIdResponse loanDetailsResponse) {
         List<GetLoansLoanIdLoanChargeData> charges = loanDetailsResponse.getCharges();
-
         ChargeProductType chargeType = ChargeProductType.valueOf(chargeTypeEnum);
         Long chargeProductId = chargeProductResolver.resolve(chargeType);
-
         List<GetLoansLoanIdLoanChargeData> resultList = new ArrayList<>();
         charges.forEach(charge -> {
             Long chargeId = charge.getChargeId();
             LocalDate dueDate = charge.getDueDate();
-
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
             String chargeDueDate = formatter.format(dueDate);
-
             if (chargeId.equals(chargeProductId) && chargeDueDate.equals(date)) {
                 resultList.add(charge);
             }
         });
-
         GetLoansLoanIdLoanChargeData lastChargeResult = resultList.get(resultList.size() - 1);
         return lastChargeResult.getId();
     }

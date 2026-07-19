@@ -23,8 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.security.exception.OidcUserNotFoundException;
 import org.apache.fineract.organisation.office.domain.Office;
@@ -40,86 +38,76 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class OidcAppUserResolutionServiceImpl implements OidcAppUserResolutionService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(OidcAppUserResolutionServiceImpl.class);
     private final AppUserRepository appUserRepository;
     private final RoleRepository roleRepository;
     private final OfficeRepository officeRepository;
     private final FineractProperties fineractProperties;
-
     // Stateless encoder — safe to create once per class
     private static final PasswordEncoder PASSWORD_ENCODER = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     @Override
     @Transactional
     public AppUser resolveOrCreate(String username, String email, String firstName, String lastName, Set<String> requestedRoles) {
-
         // 1. Lookup by username
         AppUser user = appUserRepository.findAppUserByName(username);
         if (user != null) {
-            log.debug("OIDC user resolved by username: '{}'", username);
+            log.debug("OIDC user resolved by username: \'{}\'", username);
             return user;
         }
-
         // 2. Fallback: lookup by email
         if (email != null) {
             user = appUserRepository.findActiveUserByEmail(email);
             if (user != null) {
-                log.debug("OIDC user resolved by email: '{}'", email);
+                log.debug("OIDC user resolved by email: \'{}\'", email);
                 return user;
             }
         }
-
         // 3. Auto-create when enabled
-        FineractProperties.FineractSecurityProperties.FineractSecurityOidcFederationProperties oidcConfig = fineractProperties.getSecurity()
-                .getOidcFederation();
-
+        FineractProperties.FineractSecurityProperties.FineractSecurityOidcFederationProperties oidcConfig = fineractProperties.getSecurity().getOidcFederation();
         if (!oidcConfig.isAutoCreateUser()) {
-            log.warn("OIDC user '{}' not found in Fineract and auto-create is disabled", username);
+            log.warn("OIDC user \'{}\' not found in Fineract and auto-create is disabled", username);
             throw new OidcUserNotFoundException(username);
         }
-
-        log.info("Auto-creating Fineract user for OIDC subject '{}'", username);
+        log.info("Auto-creating Fineract user for OIDC subject \'{}\'", username);
         return createUser(username, email, firstName, lastName, requestedRoles, oidcConfig);
     }
 
-    private AppUser createUser(String username, String email, String firstName, String lastName, Set<String> requestedRoles,
-            FineractProperties.FineractSecurityProperties.FineractSecurityOidcFederationProperties oidcConfig) {
-
-        final Office headOffice = officeRepository.findById(fineractProperties.getDefaults().getOfficeId())
-                .orElseThrow(() -> new IllegalStateException("Head office (id=1) not found — cannot auto-create OIDC user"));
-
+    private AppUser createUser(String username, String email, String firstName, String lastName, Set<String> requestedRoles, FineractProperties.FineractSecurityProperties.FineractSecurityOidcFederationProperties oidcConfig) {
+        final Office headOffice = officeRepository.findById(fineractProperties.getDefaults().getOfficeId()).orElseThrow(() -> new IllegalStateException("Head office (id=1) not found — cannot auto-create OIDC user"));
         String encodedPassword = PASSWORD_ENCODER.encode(new RandomPasswordGenerator(20).generate());
-
         User springUser = new User(username, encodedPassword, true, true, true, true, List.of(new SimpleGrantedAuthority("ROLE_USER")));
-
         Set<Role> roles = resolveRoles(oidcConfig.getDefaultRoles(), requestedRoles);
-
         String resolvedEmail = email != null ? email : username + "@oidc.placeholder";
         String resolvedFirstName = firstName != null ? firstName : username;
         String resolvedLastName = lastName != null ? lastName : "";
-
         AppUser appUser = new AppUser(headOffice, springUser, roles, resolvedEmail, resolvedFirstName, resolvedLastName, null, true, false);
-
         AppUser saved = appUserRepository.saveAndFlush(appUser);
-        log.info("Auto-created Fineract user '{}' (id={}) from OIDC identity", username, saved.getId());
+        log.info("Auto-created Fineract user \'{}\' (id={}) from OIDC identity", username, saved.getId());
         return saved;
     }
 
     private Set<Role> resolveRoles(String defaultRolesConfig, Set<String> requestedRoles) {
         Set<Role> result = new HashSet<>();
-        Stream.concat(Arrays.stream(defaultRolesConfig.split(",")), requestedRoles.stream()).map(String::trim)
-                .filter(name -> !name.isEmpty()).forEach(name -> {
-                    Role role = roleRepository.getRoleByName(name);
-                    if (role != null) {
-                        result.add(role);
-                    } else {
-                        log.warn("OIDC role mapping: role '{}' not found in Fineract — skipping", name);
-                    }
-                });
+        Stream.concat(Arrays.stream(defaultRolesConfig.split(",")), requestedRoles.stream()).map(String::trim).filter(name -> !name.isEmpty()).forEach(name -> {
+            Role role = roleRepository.getRoleByName(name);
+            if (role != null) {
+                result.add(role);
+            } else {
+                log.warn("OIDC role mapping: role \'{}\' not found in Fineract — skipping", name);
+            }
+        });
         return result;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OidcAppUserResolutionServiceImpl(final AppUserRepository appUserRepository, final RoleRepository roleRepository, final OfficeRepository officeRepository, final FineractProperties fineractProperties) {
+        this.appUserRepository = appUserRepository;
+        this.roleRepository = roleRepository;
+        this.officeRepository = officeRepository;
+        this.fineractProperties = fineractProperties;
     }
 }

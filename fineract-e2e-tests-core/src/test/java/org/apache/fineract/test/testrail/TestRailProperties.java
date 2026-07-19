@@ -18,14 +18,11 @@
  */
 package org.apache.fineract.test.testrail;
 
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-@Getter
 public class TestRailProperties {
-
     @Value("${fineract-test.testrail.enabled}")
     private boolean enabled;
     @Value("${fineract-test.testrail.base-url}")
@@ -36,4 +33,29 @@ public class TestRailProperties {
     private String password;
     @Value("${fineract-test.testrail.run-id}")
     private int runId;
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isEnabled() {
+        return this.enabled;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getBaseUrl() {
+        return this.baseUrl;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getUsername() {
+        return this.username;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getPassword() {
+        return this.password;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public int getRunId() {
+        return this.runId;
+    }
 }

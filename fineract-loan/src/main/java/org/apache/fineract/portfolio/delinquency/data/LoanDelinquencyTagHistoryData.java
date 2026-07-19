@@ -20,21 +20,76 @@ package org.apache.fineract.portfolio.delinquency.data;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
-@ToString
-@AllArgsConstructor
-@Getter
-@Setter
 public class LoanDelinquencyTagHistoryData implements Serializable {
-
     private Long id;
     private Long loanId;
     private DelinquencyRangeData delinquencyRange;
     private LocalDate addedOnDate;
     private LocalDate liftedOnDate;
 
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "LoanDelinquencyTagHistoryData(id=" + this.getId() + ", loanId=" + this.getLoanId() + ", delinquencyRange=" + this.getDelinquencyRange() + ", addedOnDate=" + this.getAddedOnDate() + ", liftedOnDate=" + this.getLiftedOnDate() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanDelinquencyTagHistoryData(final Long id, final Long loanId, final DelinquencyRangeData delinquencyRange, final LocalDate addedOnDate, final LocalDate liftedOnDate) {
+        this.id = id;
+        this.loanId = loanId;
+        this.delinquencyRange = delinquencyRange;
+        this.addedOnDate = addedOnDate;
+        this.liftedOnDate = liftedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanId() {
+        return this.loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyRangeData getDelinquencyRange() {
+        return this.delinquencyRange;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getAddedOnDate() {
+        return this.addedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getLiftedOnDate() {
+        return this.liftedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setId(final Long id) {
+        this.id = id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanId(final Long loanId) {
+        this.loanId = loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDelinquencyRange(final DelinquencyRangeData delinquencyRange) {
+        this.delinquencyRange = delinquencyRange;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAddedOnDate(final LocalDate addedOnDate) {
+        this.addedOnDate = addedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLiftedOnDate(final LocalDate liftedOnDate) {
+        this.liftedOnDate = liftedOnDate;
+    }
 }

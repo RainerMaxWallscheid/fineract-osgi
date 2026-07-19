@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.COBConstant;
 import org.apache.fineract.cob.data.COBIdAndExternalIdAndAccountNo;
 import org.apache.fineract.cob.data.COBIdAndLastClosedBusinessDate;
@@ -37,13 +36,8 @@ import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapita
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-@RequiredArgsConstructor
 public class WorkingCapitalLoanRetrieveIdServiceImpl implements WorkingCapitalLoanRetrieveIdService {
-
-    private static final Collection<LoanStatus> NON_CLOSED_LOAN_STATUSES = new ArrayList<>(
-            Arrays.asList(LoanStatus.SUBMITTED_AND_PENDING_APPROVAL, LoanStatus.APPROVED, LoanStatus.ACTIVE,
-                    LoanStatus.TRANSFER_IN_PROGRESS, LoanStatus.TRANSFER_ON_HOLD));
-
+    private static final Collection<LoanStatus> NON_CLOSED_LOAN_STATUSES = new ArrayList<>(Arrays.asList(LoanStatus.SUBMITTED_AND_PENDING_APPROVAL, LoanStatus.APPROVED, LoanStatus.ACTIVE, LoanStatus.TRANSFER_IN_PROGRESS, LoanStatus.TRANSFER_ON_HOLD));
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final WorkingCapitalLoanRepository loanRepository;
 
@@ -61,7 +55,6 @@ public class WorkingCapitalLoanRetrieveIdServiceImpl implements WorkingCapitalLo
         sql.append("order by id) t) t2 ");
         sql.append("group by page ");
         sql.append("order by page");
-
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("pageSize", partitionSize);
         parameters.addValue("statusIds", List.of(100, 200, 300, 303, 304));
@@ -85,18 +78,11 @@ public class WorkingCapitalLoanRetrieveIdServiceImpl implements WorkingCapitalLo
     }
 
     @Override
-    public List<Long> retrieveAllNonClosedLoansByLastClosedBusinessDateAndMinAndMaxLoanId(COBParameter loanCOBParameter,
-            boolean isCatchUp) {
+    public List<Long> retrieveAllNonClosedLoansByLastClosedBusinessDateAndMinAndMaxLoanId(COBParameter loanCOBParameter, boolean isCatchUp) {
         if (isCatchUp) {
-            return loanRepository.findAllLoansByLastClosedBusinessDateNotNullAndMinAndMaxLoanIdAndStatuses(
-                    loanCOBParameter.getMinAccountId(), loanCOBParameter.getMaxAccountId(),
-                    ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE).minusDays(COBConstant.NUMBER_OF_DAYS_BEHIND),
-                    NON_CLOSED_LOAN_STATUSES);
+            return loanRepository.findAllLoansByLastClosedBusinessDateNotNullAndMinAndMaxLoanIdAndStatuses(loanCOBParameter.getMinAccountId(), loanCOBParameter.getMaxAccountId(), ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE).minusDays(COBConstant.NUMBER_OF_DAYS_BEHIND), NON_CLOSED_LOAN_STATUSES);
         } else {
-            return loanRepository.findAllLoansByLastClosedBusinessDateAndMinAndMaxLoanIdAndStatuses(loanCOBParameter.getMinAccountId(),
-                    loanCOBParameter.getMaxAccountId(),
-                    ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE).minusDays(COBConstant.NUMBER_OF_DAYS_BEHIND),
-                    NON_CLOSED_LOAN_STATUSES);
+            return loanRepository.findAllLoansByLastClosedBusinessDateAndMinAndMaxLoanIdAndStatuses(loanCOBParameter.getMinAccountId(), loanCOBParameter.getMaxAccountId(), ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE).minusDays(COBConstant.NUMBER_OF_DAYS_BEHIND), NON_CLOSED_LOAN_STATUSES);
         }
     }
 
@@ -108,5 +94,11 @@ public class WorkingCapitalLoanRetrieveIdServiceImpl implements WorkingCapitalLo
     @Override
     public List<COBIdAndLastClosedBusinessDate> retrieveLoanBehindOnDisbursementDate(LocalDate businessDate, List<Long> loanIds) {
         return loanRepository.findAllLoansBehindOnDisbursementDate(businessDate, loanIds, NON_CLOSED_LOAN_STATUSES);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanRetrieveIdServiceImpl(final NamedParameterJdbcTemplate namedParameterJdbcTemplate, final WorkingCapitalLoanRepository loanRepository) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.loanRepository = loanRepository;
     }
 }

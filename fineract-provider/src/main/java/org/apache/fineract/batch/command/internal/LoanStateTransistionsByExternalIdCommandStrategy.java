@@ -19,13 +19,11 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
@@ -44,9 +42,7 @@ import org.springframework.stereotype.Component;
  * @see BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class LoanStateTransistionsByExternalIdCommandStrategy implements CommandStrategy {
-
     /**
      * Loans api resource {@link LoansApiResource}.
      */
@@ -54,42 +50,41 @@ public class LoanStateTransistionsByExternalIdCommandStrategy implements Command
 
     @Override
     public BatchResponse execute(final BatchRequest request, @SuppressWarnings("unused") final UriInfo uriInfo) {
-
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         // Expected pattern - loans\/external-id\/[\w\d_-]+\?command=***
         final String relativeUrl = relativeUrlWithoutVersion(request);
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrl);
         final String loanExternalIdPathParameter = pathParameters.get(2);
-
         final Pattern commandPattern = Pattern.compile("^?command=[a-zA-Z]+");
         final Matcher commandMatcher = commandPattern.matcher(loanExternalIdPathParameter);
-
         if (!commandMatcher.find()) {
             // This would only occur if the CommandStrategyProvider is incorrectly configured.
             response.setRequestId(request.getRequestId());
             response.setStatusCode(HttpStatus.SC_NOT_IMPLEMENTED);
-            response.setBody(
-                    "Resource with method " + request.getMethod() + " and relativeUrl " + request.getRelativeUrl() + " doesn't exist");
+            response.setBody("Resource with method " + request.getMethod() + " and relativeUrl " + request.getRelativeUrl() + " doesn\'t exist");
             return response;
         }
         final String commandQueryParam = commandMatcher.group(0);
         final String command = commandQueryParam.substring(commandQueryParam.indexOf("=") + 1);
-
         final String loanExternalId = StringUtils.substringBefore(loanExternalIdPathParameter, "?");
-
         // Calls 'approve'/'disburse' function from 'LoansApiResource' to approve/disburse loan
         responseBody = loansApiResource.stateTransitions(loanExternalId, command, request.getBody());
-
         response.setStatusCode(HttpStatus.SC_OK);
         // Sets the body of the response after the successful approval of a loan
         response.setBody(responseBody);
-
         return response;
     }
 
+    /**
+     * Creates a new {@code LoanStateTransistionsByExternalIdCommandStrategy} instance.
+     *
+     * @param loansApiResource Loans api resource {@link LoansApiResource}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public LoanStateTransistionsByExternalIdCommandStrategy(final LoansApiResource loansApiResource) {
+        this.loansApiResource = loansApiResource;
+    }
 }

@@ -20,11 +20,8 @@ package org.apache.fineract.infrastructure.core.component;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public class FetcherRule<P, R> {
-
     private final Predicate<P> condition;
     private final Function<P, R> action;
 
@@ -34,5 +31,11 @@ public class FetcherRule<P, R> {
 
     public R execute(P params) {
         return action.apply(params);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FetcherRule(final Predicate<P> condition, final Function<P, R> action) {
+        this.condition = condition;
+        this.action = action;
     }
 }

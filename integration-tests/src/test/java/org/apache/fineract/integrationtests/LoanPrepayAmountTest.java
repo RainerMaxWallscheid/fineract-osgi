@@ -19,11 +19,9 @@
 package org.apache.fineract.integrationtests;
 
 import static org.apache.fineract.integrationtests.client.feign.modules.LoanTestData.DATETIME_PATTERN;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.GetLoansLoanIdResponse;
 import org.apache.fineract.client.models.GetLoansLoanIdTransactionsTemplateResponse;
 import org.apache.fineract.integrationtests.client.feign.FeignLoanTestBase;
@@ -32,9 +30,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@Slf4j
 public class LoanPrepayAmountTest extends FeignLoanTestBase {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanPrepayAmountTest.class);
     Long clientId;
     Long loanId;
 
@@ -47,8 +45,7 @@ public class LoanPrepayAmountTest extends FeignLoanTestBase {
     public void testLoanPrepayAmountProgressive() {
         runAt("1 January 2024", () -> {
             final Long loanProductId = createLoanProduct(create4IProgressive());
-            Long loanIdLocal = applyForLoan(
-                    applyLP2ProgressiveLoanRequest(clientId, loanProductId, "01 January 2024", 1000.0, 9.99, 6, null));
+            Long loanIdLocal = applyForLoan(applyLP2ProgressiveLoanRequest(clientId, loanProductId, "01 January 2024", 1000.0, 9.99, 6, null));
             loanId = loanIdLocal;
             approveLoan(loanId, LoanRequestBuilders.approveLoan(1000.0, "01 January 2024"));
             disburseLoan(loanId, BigDecimal.valueOf(250.0), "01 January 2024");
@@ -61,8 +58,7 @@ public class LoanPrepayAmountTest extends FeignLoanTestBase {
             runAt(i + " January 2024", () -> {
                 GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
                 GetLoansLoanIdTransactionsTemplateResponse prepayAmountResponse = getPrepaymentAmount(loanId, null, DATETIME_PATTERN);
-                Assertions.assertEquals(BigDecimal.valueOf(prepayAmountResponse.getInterestPortion()).stripTrailingZeros(),
-                        loanDetails.getSummary().getTotalUnpaidPayableNotDueInterest().stripTrailingZeros());
+                Assertions.assertEquals(BigDecimal.valueOf(prepayAmountResponse.getInterestPortion()).stripTrailingZeros(), loanDetails.getSummary().getTotalUnpaidPayableNotDueInterest().stripTrailingZeros());
             });
         }
     }
@@ -70,10 +66,8 @@ public class LoanPrepayAmountTest extends FeignLoanTestBase {
     @Test
     public void testLoanPrepayAmountProgressivePartialRepayment() {
         runAt("15 March 2025", () -> {
-            final Long loanProductId = createLoanProduct(
-                    create4IProgressive().interestRatePerPeriod(35.99).numberOfRepayments(12).isInterestRecalculationEnabled(true));
-            Long loanIdLocal = applyForLoan(
-                    applyLP2ProgressiveLoanRequest(clientId, loanProductId, "15 March 2025", 296.79, 35.99, 12, null));
+            final Long loanProductId = createLoanProduct(create4IProgressive().interestRatePerPeriod(35.99).numberOfRepayments(12).isInterestRecalculationEnabled(true));
+            Long loanIdLocal = applyForLoan(applyLP2ProgressiveLoanRequest(clientId, loanProductId, "15 March 2025", 296.79, 35.99, 12, null));
             loanId = loanIdLocal;
             approveLoan(loanId, LoanRequestBuilders.approveLoan(296.79, "15 March 2025"));
             disburseLoan(loanId, BigDecimal.valueOf(296.79), "15 March 2025");
@@ -83,10 +77,8 @@ public class LoanPrepayAmountTest extends FeignLoanTestBase {
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             Assertions.assertEquals(BigDecimal.ZERO, loanDetails.getSummary().getTotalUnpaidPayableDueInterest().stripTrailingZeros());
             Assertions.assertEquals(BigDecimal.ZERO, loanDetails.getSummary().getTotalUnpaidPayableNotDueInterest().stripTrailingZeros());
-            GetLoansLoanIdTransactionsTemplateResponse prepayAmountResponse = getPrepaymentAmount(loanId, "16 March 2025",
-                    DATETIME_PATTERN);
-            Assertions.assertEquals(BigDecimal.valueOf(prepayAmountResponse.getInterestPortion()).stripTrailingZeros(),
-                    loanDetails.getSummary().getTotalUnpaidPayableNotDueInterest());
+            GetLoansLoanIdTransactionsTemplateResponse prepayAmountResponse = getPrepaymentAmount(loanId, "16 March 2025", DATETIME_PATTERN);
+            Assertions.assertEquals(BigDecimal.valueOf(prepayAmountResponse.getInterestPortion()).stripTrailingZeros(), loanDetails.getSummary().getTotalUnpaidPayableNotDueInterest());
         });
         for (int i = 1; i < 4; i++) {
             executeInlineCOB(loanId);
@@ -94,10 +86,8 @@ public class LoanPrepayAmountTest extends FeignLoanTestBase {
             String formattedDate = DateTimeFormatter.ofPattern(DATETIME_PATTERN).format(date);
             runAt(formattedDate, () -> {
                 GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
-                GetLoansLoanIdTransactionsTemplateResponse prepayAmountResponse = getPrepaymentAmount(loanId, formattedDate,
-                        DATETIME_PATTERN);
-                Assertions.assertEquals(loanDetails.getSummary().getTotalUnpaidPayableNotDueInterest().stripTrailingZeros(),
-                        BigDecimal.valueOf(prepayAmountResponse.getInterestPortion()).stripTrailingZeros());
+                GetLoansLoanIdTransactionsTemplateResponse prepayAmountResponse = getPrepaymentAmount(loanId, formattedDate, DATETIME_PATTERN);
+                Assertions.assertEquals(loanDetails.getSummary().getTotalUnpaidPayableNotDueInterest().stripTrailingZeros(), BigDecimal.valueOf(prepayAmountResponse.getInterestPortion()).stripTrailingZeros());
             });
         }
     }
@@ -105,10 +95,8 @@ public class LoanPrepayAmountTest extends FeignLoanTestBase {
     @Test
     public void testLoanPrepayAmountProgressivePartialRepaymentNoInterestRecalculation() {
         runAt("15 March 2025", () -> {
-            final Long loanProductId = createLoanProduct(
-                    create4IProgressive().interestRatePerPeriod(35.99).numberOfRepayments(12).isInterestRecalculationEnabled(false));
-            Long loanIdLocal = applyForLoan(
-                    applyLP2ProgressiveLoanRequest(clientId, loanProductId, "15 March 2025", 296.79, 35.99, 12, null));
+            final Long loanProductId = createLoanProduct(create4IProgressive().interestRatePerPeriod(35.99).numberOfRepayments(12).isInterestRecalculationEnabled(false));
+            Long loanIdLocal = applyForLoan(applyLP2ProgressiveLoanRequest(clientId, loanProductId, "15 March 2025", 296.79, 35.99, 12, null));
             loanId = loanIdLocal;
             approveLoan(loanId, LoanRequestBuilders.approveLoan(296.79, "15 March 2025"));
             disburseLoan(loanId, BigDecimal.valueOf(296.79), "15 March 2025");
@@ -119,10 +107,8 @@ public class LoanPrepayAmountTest extends FeignLoanTestBase {
             GetLoansLoanIdResponse loanDetails = getLoanDetails(loanId);
             Assertions.assertEquals(BigDecimal.ZERO, loanDetails.getSummary().getTotalUnpaidPayableDueInterest().stripTrailingZeros());
             Assertions.assertEquals(BigDecimal.ZERO, loanDetails.getSummary().getTotalUnpaidPayableNotDueInterest().stripTrailingZeros());
-            GetLoansLoanIdTransactionsTemplateResponse prepayAmountResponse = getPrepaymentAmount(loanId, "16 March 2025",
-                    DATETIME_PATTERN);
-            Assertions.assertEquals(BigDecimal.valueOf(44.43).stripTrailingZeros(),
-                    BigDecimal.valueOf(prepayAmountResponse.getInterestPortion()).stripTrailingZeros());
+            GetLoansLoanIdTransactionsTemplateResponse prepayAmountResponse = getPrepaymentAmount(loanId, "16 March 2025", DATETIME_PATTERN);
+            Assertions.assertEquals(BigDecimal.valueOf(44.43).stripTrailingZeros(), BigDecimal.valueOf(prepayAmountResponse.getInterestPortion()).stripTrailingZeros());
         });
     }
 }

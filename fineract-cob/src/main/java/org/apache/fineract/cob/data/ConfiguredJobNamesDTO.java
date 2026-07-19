@@ -19,12 +19,56 @@
 package org.apache.fineract.cob.data;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
-@Data
-@AllArgsConstructor
 public class ConfiguredJobNamesDTO {
-
     private List<String> businessJobs;
+
+    @java.lang.SuppressWarnings("all")
+        public List<String> getBusinessJobs() {
+        return this.businessJobs;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setBusinessJobs(final List<String> businessJobs) {
+        this.businessJobs = businessJobs;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof ConfiguredJobNamesDTO)) return false;
+        final ConfiguredJobNamesDTO other = (ConfiguredJobNamesDTO) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$businessJobs = this.getBusinessJobs();
+        final java.lang.Object other$businessJobs = other.getBusinessJobs();
+        if (this$businessJobs == null ? other$businessJobs != null : !this$businessJobs.equals(other$businessJobs)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof ConfiguredJobNamesDTO;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $businessJobs = this.getBusinessJobs();
+        result = result * PRIME + ($businessJobs == null ? 43 : $businessJobs.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "ConfiguredJobNamesDTO(businessJobs=" + this.getBusinessJobs() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ConfiguredJobNamesDTO(final List<String> businessJobs) {
+        this.businessJobs = businessJobs;
+    }
 }

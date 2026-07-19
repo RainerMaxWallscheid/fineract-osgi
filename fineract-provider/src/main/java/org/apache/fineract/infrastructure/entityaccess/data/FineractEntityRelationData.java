@@ -19,15 +19,8 @@
 package org.apache.fineract.infrastructure.entityaccess.data;
 
 import java.io.Serializable;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
-@Data
-@NoArgsConstructor
-@Accessors(chain = true)
 public class FineractEntityRelationData implements Serializable {
-
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
     private Long id;
@@ -41,7 +34,115 @@ public class FineractEntityRelationData implements Serializable {
     public static FineractEntityRelationData getMappingTypes(final Long id, final String mappingTypes) {
         Integer fromEntityType = null;
         final Integer toEntityType = null;
-        return new FineractEntityRelationData().setId(id).setFromEntityType(fromEntityType).setToEntityType(toEntityType)
-                .setMappingTypes(mappingTypes);
+        return new FineractEntityRelationData().setId(id).setFromEntityType(fromEntityType).setToEntityType(toEntityType).setMappingTypes(mappingTypes);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getFromEntityType() {
+        return this.fromEntityType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getToEntityType() {
+        return this.toEntityType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getMappingTypes() {
+        return this.mappingTypes;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public FineractEntityRelationData setId(final Long id) {
+        this.id = id;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public FineractEntityRelationData setFromEntityType(final Integer fromEntityType) {
+        this.fromEntityType = fromEntityType;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public FineractEntityRelationData setToEntityType(final Integer toEntityType) {
+        this.toEntityType = toEntityType;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public FineractEntityRelationData setMappingTypes(final String mappingTypes) {
+        this.mappingTypes = mappingTypes;
+        return this;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof FineractEntityRelationData)) return false;
+        final FineractEntityRelationData other = (FineractEntityRelationData) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$id = this.getId();
+        final java.lang.Object other$id = other.getId();
+        if (this$id == null ? other$id != null : !this$id.equals(other$id)) return false;
+        final java.lang.Object this$fromEntityType = this.getFromEntityType();
+        final java.lang.Object other$fromEntityType = other.getFromEntityType();
+        if (this$fromEntityType == null ? other$fromEntityType != null : !this$fromEntityType.equals(other$fromEntityType)) return false;
+        final java.lang.Object this$toEntityType = this.getToEntityType();
+        final java.lang.Object other$toEntityType = other.getToEntityType();
+        if (this$toEntityType == null ? other$toEntityType != null : !this$toEntityType.equals(other$toEntityType)) return false;
+        final java.lang.Object this$mappingTypes = this.getMappingTypes();
+        final java.lang.Object other$mappingTypes = other.getMappingTypes();
+        if (this$mappingTypes == null ? other$mappingTypes != null : !this$mappingTypes.equals(other$mappingTypes)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof FineractEntityRelationData;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $id = this.getId();
+        result = result * PRIME + ($id == null ? 43 : $id.hashCode());
+        final java.lang.Object $fromEntityType = this.getFromEntityType();
+        result = result * PRIME + ($fromEntityType == null ? 43 : $fromEntityType.hashCode());
+        final java.lang.Object $toEntityType = this.getToEntityType();
+        result = result * PRIME + ($toEntityType == null ? 43 : $toEntityType.hashCode());
+        final java.lang.Object $mappingTypes = this.getMappingTypes();
+        result = result * PRIME + ($mappingTypes == null ? 43 : $mappingTypes.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "FineractEntityRelationData(id=" + this.getId() + ", fromEntityType=" + this.getFromEntityType() + ", toEntityType=" + this.getToEntityType() + ", mappingTypes=" + this.getMappingTypes() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FineractEntityRelationData() {
     }
 }

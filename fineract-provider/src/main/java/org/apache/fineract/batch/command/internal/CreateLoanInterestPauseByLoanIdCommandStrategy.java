@@ -19,11 +19,9 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
@@ -41,31 +39,28 @@ import org.springframework.stereotype.Component;
  * BatchResponse.
  */
 @Component
-@RequiredArgsConstructor
 public class CreateLoanInterestPauseByLoanIdCommandStrategy implements CommandStrategy {
-
     private final LoanInterestPauseApiResource loanInterestPauseApiResource;
-
     private final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer;
 
     @Override
     public BatchResponse execute(final BatchRequest request, @SuppressWarnings("unused") final UriInfo uriInfo) {
         final BatchResponse response = new BatchResponse();
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         // Expected pattern - loans\/\d+\/interest-pauses
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrlWithoutVersion(request));
         final Long loanId = Long.parseLong(pathParameters.get(1));
-
         final InterestPauseRequestDto interestPauseRequestDto = InterestPauseRequestDto.fromJson(request.getBody());
-        final CommandProcessingResult commandProcessingResult = loanInterestPauseApiResource.createInterestPause(loanId,
-                interestPauseRequestDto);
-
+        final CommandProcessingResult commandProcessingResult = loanInterestPauseApiResource.createInterestPause(loanId, interestPauseRequestDto);
         response.setStatusCode(HttpStatus.SC_OK);
         response.setBody(toApiJsonSerializer.serialize(commandProcessingResult));
-
         return response;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateLoanInterestPauseByLoanIdCommandStrategy(final LoanInterestPauseApiResource loanInterestPauseApiResource, final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer) {
+        this.loanInterestPauseApiResource = loanInterestPauseApiResource;
+        this.toApiJsonSerializer = toApiJsonSerializer;
     }
 }

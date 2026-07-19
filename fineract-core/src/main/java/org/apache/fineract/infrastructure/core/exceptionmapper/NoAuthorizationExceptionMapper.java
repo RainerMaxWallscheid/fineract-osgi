@@ -23,7 +23,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.security.exception.NoAuthorizationException;
@@ -40,8 +39,9 @@ import org.springframework.stereotype.Component;
 @Provider
 @Component
 @Scope("singleton")
-@Slf4j
 public class NoAuthorizationExceptionMapper implements ExceptionMapper<NoAuthorizationException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NoAuthorizationExceptionMapper.class);
 
     @Override
     public Response toResponse(final NoAuthorizationException exception) {
@@ -49,7 +49,6 @@ public class NoAuthorizationExceptionMapper implements ExceptionMapper<NoAuthori
         // "Authenticated - but not authorized":
         final String defaultUserMessage = exception.getMessage();
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-        return Response.status(Status.FORBIDDEN).entity(ApiGlobalErrorResponse.unAuthorized(defaultUserMessage))
-                .type(MediaType.APPLICATION_JSON).build();
+        return Response.status(Status.FORBIDDEN).entity(ApiGlobalErrorResponse.unAuthorized(defaultUserMessage)).type(MediaType.APPLICATION_JSON).build();
     }
 }

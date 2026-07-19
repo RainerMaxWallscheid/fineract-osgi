@@ -19,13 +19,11 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.command.CommandStrategy;
@@ -42,9 +40,7 @@ import org.springframework.stereotype.Component;
  * {@link LoansApiResource} and map those errors to appropriate status codes in BatchResponse.
  */
 @Component
-@RequiredArgsConstructor
 public class GetLoanByExternalIdCommandStrategy implements CommandStrategy {
-
     /**
      * Loans api resource {@link LoansApiResource}.
      */
@@ -53,20 +49,15 @@ public class GetLoanByExternalIdCommandStrategy implements CommandStrategy {
     @Override
     public BatchResponse execute(final BatchRequest request, final UriInfo uriInfo) {
         final MutableUriInfo parameterizedUriInfo = new MutableUriInfo(uriInfo);
-
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         // Expected pattern - loans\/external-id\/[\w\d_-]+\?associations=transactions
         final String relativeUrl = relativeUrlWithoutVersion(request);
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrl);
         final String loanExternalIdPathParameter = pathParameters.get(2);
-
         String loanExternalId;
-
         // uriInfo will contain the query parameter value(s) that are sent in the actual batch uri.
         // for example: batches?enclosingTransaction=true
         // But the query parameters that are sent in the batch relative url has to be sent to
@@ -81,13 +72,11 @@ public class GetLoanByExternalIdCommandStrategy implements CommandStrategy {
         if (loanExternalIdPathParameter.indexOf('?') > 0) {
             loanExternalId = StringUtils.substringBefore(loanExternalIdPathParameter, "?");
             queryParameters = getQueryParameters(relativeUrl);
-
             // Add the query parameters sent in the relative URL to UriInfo
             addQueryParametersToUriInfo(parameterizedUriInfo, queryParameters);
         } else {
             loanExternalId = loanExternalIdPathParameter;
         }
-
         // Calls 'retrieveLoan' function from 'LoansApiResource' to
         // get the loan details based on the loan external id
         boolean staffInSelectedOfficeOnly = false;
@@ -108,15 +97,10 @@ public class GetLoanByExternalIdCommandStrategy implements CommandStrategy {
                 staffInSelectedOfficeOnly = BooleanUtils.toBoolean(queryParameters.get("staffInSelectedOfficeOnly"));
             }
         }
-
-        responseBody = loansApiResource.retrieveLoan(loanExternalId, staffInSelectedOfficeOnly, associations, exclude, fields,
-                parameterizedUriInfo);
-
+        responseBody = loansApiResource.retrieveLoan(loanExternalId, staffInSelectedOfficeOnly, associations, exclude, fields, parameterizedUriInfo);
         response.setStatusCode(HttpStatus.SC_OK);
-
         // Sets the response after retrieving the loan
         response.setBody(responseBody);
-
         return response;
     }
 
@@ -150,5 +134,15 @@ public class GetLoanByExternalIdCommandStrategy implements CommandStrategy {
         for (Map.Entry<String, String> entry : queryParameters.entrySet()) {
             uriInfo.addAdditionalQueryParameter(entry.getKey(), entry.getValue());
         }
+    }
+
+    /**
+     * Creates a new {@code GetLoanByExternalIdCommandStrategy} instance.
+     *
+     * @param loansApiResource Loans api resource {@link LoansApiResource}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GetLoanByExternalIdCommandStrategy(final LoansApiResource loansApiResource) {
+        this.loansApiResource = loansApiResource;
     }
 }

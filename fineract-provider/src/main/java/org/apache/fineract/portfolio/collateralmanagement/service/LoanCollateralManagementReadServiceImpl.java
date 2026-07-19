@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.collateralmanagement.data.LoanCollateralResponseData;
 import org.apache.fineract.portfolio.collateralmanagement.domain.CollateralManagementDomain;
 import org.apache.fineract.portfolio.collateralmanagement.exception.LoanCollateralManagementNotFoundException;
@@ -33,10 +32,8 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class LoanCollateralManagementReadServiceImpl implements LoanCollateralManagementReadService {
-
     private final LoanCollateralManagementRepository loanCollateralManagementRepository;
     private final LoanRepository loanRepository;
 
@@ -48,10 +45,8 @@ public class LoanCollateralManagementReadServiceImpl implements LoanCollateralMa
 
     @Override
     public LoanCollateralResponseData getLoanCollateralResponseData(Long collateralId) {
-        LoanCollateralManagement loanCollateralManagement = this.loanCollateralManagementRepository.findById(collateralId)
-                .orElseThrow(() -> new LoanCollateralManagementNotFoundException(collateralId));
-        final CollateralManagementDomain collateralManagementDomain = loanCollateralManagement.getClientCollateralManagement()
-                .getCollaterals();
+        LoanCollateralManagement loanCollateralManagement = this.loanCollateralManagementRepository.findById(collateralId).orElseThrow(() -> new LoanCollateralManagementNotFoundException(collateralId));
+        final CollateralManagementDomain collateralManagementDomain = loanCollateralManagement.getClientCollateralManagement().getCollaterals();
         BigDecimal quantity = loanCollateralManagement.getQuantity();
         BigDecimal total = quantity.multiply(collateralManagementDomain.getBasePrice());
         BigDecimal totalCollateral = total.multiply(collateralManagementDomain.getPctToBase()).divide(BigDecimal.valueOf(100));
@@ -64,14 +59,18 @@ public class LoanCollateralManagementReadServiceImpl implements LoanCollateralMa
         List<LoanCollateralResponseData> loanCollateralResponseDataCollection = new ArrayList<>();
         Set<LoanCollateralManagement> loanCollateralManagements = loan.getLoanCollateralManagements();
         for (LoanCollateralManagement loanCollateralManagement : loanCollateralManagements) {
-            final CollateralManagementDomain collateralManagementDomain = loanCollateralManagement.getClientCollateralManagement()
-                    .getCollaterals();
+            final CollateralManagementDomain collateralManagementDomain = loanCollateralManagement.getClientCollateralManagement().getCollaterals();
             BigDecimal quantity = loanCollateralManagement.getQuantity();
             BigDecimal total = quantity.multiply(collateralManagementDomain.getBasePrice());
             BigDecimal totalCollateral = total.multiply(collateralManagementDomain.getPctToBase()).divide(BigDecimal.valueOf(100));
-            loanCollateralResponseDataCollection
-                    .add(LoanCollateralResponseData.instanceOf(loanCollateralManagement, total, totalCollateral));
+            loanCollateralResponseDataCollection.add(LoanCollateralResponseData.instanceOf(loanCollateralManagement, total, totalCollateral));
         }
         return loanCollateralResponseDataCollection;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanCollateralManagementReadServiceImpl(final LoanCollateralManagementRepository loanCollateralManagementRepository, final LoanRepository loanRepository) {
+        this.loanCollateralManagementRepository = loanCollateralManagementRepository;
+        this.loanRepository = loanRepository;
     }
 }

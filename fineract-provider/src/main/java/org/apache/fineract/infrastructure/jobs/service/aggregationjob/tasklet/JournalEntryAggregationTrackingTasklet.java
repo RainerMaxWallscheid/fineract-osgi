@@ -20,8 +20,6 @@ package org.apache.fineract.infrastructure.jobs.service.aggregationjob.tasklet;
 
 import java.time.LocalDate;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.jobs.service.aggregationjob.JournalEntryAggregationJobConstant;
 import org.apache.fineract.infrastructure.jobs.service.aggregationjob.data.JournalEntryAggregationTrackingData;
@@ -35,34 +33,30 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
-@Slf4j
 public class JournalEntryAggregationTrackingTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JournalEntryAggregationTrackingTasklet.class);
     private final JournalEntryAggregationWriterService journalEntryAggregationWriterService;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, @NonNull ChunkContext chunkContext) throws Exception {
         // If no record is persisted in summary table then skip persisting data in tracking as well
-        Optional<StepExecution> jobSummaryStepExecution = contribution.getStepExecution().getJobExecution().getStepExecutions().stream()
-                .filter(stepExecution -> stepExecution.getStepName().equals(JournalEntryAggregationJobConstant.JOB_SUMMARY_STEP_NAME))
-                .findFirst();
+        Optional<StepExecution> jobSummaryStepExecution = contribution.getStepExecution().getJobExecution().getStepExecutions().stream().filter(stepExecution -> stepExecution.getStepName().equals(JournalEntryAggregationJobConstant.JOB_SUMMARY_STEP_NAME)).findFirst();
         long writeCount = jobSummaryStepExecution.map(StepExecution::getWriteCount).orElse(0L);
-
         log.info("Starting journal entry aggregation tasklet to insert into tracking table writeCount={}", writeCount);
         if (writeCount > 0) {
             final JobExecution jobExecutionContext = chunkContext.getStepContext().getStepExecution().getJobExecution();
-            final LocalDate aggregatedOnDateFrom = (LocalDate) jobExecutionContext.getExecutionContext()
-                    .get(JournalEntryAggregationJobConstant.AGGREGATED_ON_DATE_FROM);
-            final LocalDate aggregatedOnDateTo = (LocalDate) jobExecutionContext.getExecutionContext()
-                    .get(JournalEntryAggregationJobConstant.AGGREGATED_ON_DATE_TO);
-            JournalEntryAggregationTrackingData journalEntrySummaryTrackingDTO = JournalEntryAggregationTrackingData.builder()
-                    .submittedOnDate(ThreadLocalContextUtil.getBusinessDate()).aggregatedOnDateFrom(aggregatedOnDateFrom)
-                    .aggregatedOnDateTo(aggregatedOnDateTo).jobExecutionId(contribution.getStepExecution().getJobExecution().getId())
-                    .build();
+            final LocalDate aggregatedOnDateFrom = (LocalDate) jobExecutionContext.getExecutionContext().get(JournalEntryAggregationJobConstant.AGGREGATED_ON_DATE_FROM);
+            final LocalDate aggregatedOnDateTo = (LocalDate) jobExecutionContext.getExecutionContext().get(JournalEntryAggregationJobConstant.AGGREGATED_ON_DATE_TO);
+            JournalEntryAggregationTrackingData journalEntrySummaryTrackingDTO = JournalEntryAggregationTrackingData.builder().submittedOnDate(ThreadLocalContextUtil.getBusinessDate()).aggregatedOnDateFrom(aggregatedOnDateFrom).aggregatedOnDateTo(aggregatedOnDateTo).jobExecutionId(contribution.getStepExecution().getJobExecution().getId()).build();
             journalEntryAggregationWriterService.insertJournalEntryTracking(journalEntrySummaryTrackingDTO);
         }
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JournalEntryAggregationTrackingTasklet(final JournalEntryAggregationWriterService journalEntryAggregationWriterService) {
+        this.journalEntryAggregationWriterService = journalEntryAggregationWriterService;
     }
 }

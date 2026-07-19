@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -39,9 +38,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class CriteriaQueryFactory {
-
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -70,19 +67,16 @@ public class CriteriaQueryFactory {
     }
 
     public <S, U> Page<S> readPage(TypedQuery<S> query, Class<U> domainClass, Pageable pageable, Specification<U> spec) {
-
         if (pageable.isPaged()) {
             query.setFirstResult((int) pageable.getOffset());
             query.setMaxResults(pageable.getPageSize());
         }
-
         return PageableExecutionUtils.getPage(query.getResultList(), pageable, () -> executeCountQuery(getCountQuery(spec, domainClass)));
     }
 
     private static long executeCountQuery(TypedQuery<Long> query) {
         List<Long> totals = query.getResultList();
         long total = 0L;
-
         for (Long element : totals) {
             total += element == null ? 0 : element;
         }
@@ -92,32 +86,28 @@ public class CriteriaQueryFactory {
     private <S> TypedQuery<Long> getCountQuery(Specification<S> spec, Class<S> domainClass) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> query = builder.createQuery(Long.class);
-
         Root<S> root = query.from(domainClass);
-
         applySpecificationToCriteria(root, spec, query);
-
         if (query.isDistinct()) {
             query.select(builder.countDistinct(root));
         } else {
             query.select(builder.count(root));
         }
-
         // Remove all Orders the Specifications might have applied
         query.orderBy(Collections.emptyList());
-
         return entityManager.createQuery(query);
     }
 
     public <S, U> Root<U> applySpecificationToCriteria(Root<U> root, Specification<U> spec, CriteriaQuery<S> query) {
-
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         Predicate predicate = spec.toPredicate(root, query, builder);
-
         if (predicate != null) {
             query.where(predicate);
         }
-
         return root;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CriteriaQueryFactory() {
     }
 }

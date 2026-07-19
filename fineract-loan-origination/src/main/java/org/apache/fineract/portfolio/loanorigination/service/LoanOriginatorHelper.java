@@ -21,9 +21,6 @@ package org.apache.fineract.portfolio.loanorigination.service;
 import static org.apache.fineract.infrastructure.configuration.api.GlobalConfigurationConstants.ENABLE_ORIGINATOR_CREATION_DURING_LOAN_APPLICATION;
 import static org.apache.fineract.portfolio.loanorigination.api.LoanOriginatorApiConstants.CHANNEL_TYPE_CODE_NAME;
 import static org.apache.fineract.portfolio.loanorigination.api.LoanOriginatorApiConstants.ORIGINATOR_TYPE_CODE_NAME;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepositoryWrapper;
 import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationProperty;
@@ -40,11 +37,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class LoanOriginatorHelper {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanOriginatorHelper.class);
     private final LoanOriginatorRepository loanOriginatorRepository;
     private final GlobalConfigurationRepositoryWrapper globalConfigurationRepository;
     private final CodeValueRepositoryWrapper codeValueRepositoryWrapper;
@@ -74,24 +70,19 @@ public class LoanOriginatorHelper {
 
     private boolean isOriginatorCreationDuringLoanApplicationEnabled() {
         try {
-            final GlobalConfigurationProperty config = globalConfigurationRepository
-                    .findOneByNameWithNotFoundDetection(ENABLE_ORIGINATOR_CREATION_DURING_LOAN_APPLICATION);
+            final GlobalConfigurationProperty config = globalConfigurationRepository.findOneByNameWithNotFoundDetection(ENABLE_ORIGINATOR_CREATION_DURING_LOAN_APPLICATION);
             return config.isEnabled();
         } catch (final GlobalConfigurationPropertyNotFoundException e) {
-            log.warn("Global configuration '{}' not found, defaulting to disabled", ENABLE_ORIGINATOR_CREATION_DURING_LOAN_APPLICATION);
+            log.warn("Global configuration \'{}\' not found, defaulting to disabled", ENABLE_ORIGINATOR_CREATION_DURING_LOAN_APPLICATION);
             return false;
         }
     }
 
     private LoanOriginator createNewOriginator(final LoanApplicationOriginatorData data, final ExternalId externalId) {
         log.info("Creating new originator with externalId: {} during loan application", data.getExternalId());
-
         final CodeValue originatorType = resolveCodeValue(data.getTypeId(), ORIGINATOR_TYPE_CODE_NAME);
         final CodeValue channelType = resolveCodeValue(data.getChannelTypeId(), CHANNEL_TYPE_CODE_NAME);
-
-        final LoanOriginator originator = LoanOriginator.create(externalId, data.getName(), LoanOriginatorStatus.ACTIVE, originatorType,
-                channelType);
-
+        final LoanOriginator originator = LoanOriginator.create(externalId, data.getName(), LoanOriginatorStatus.ACTIVE, originatorType, channelType);
         return loanOriginatorRepository.saveAndFlush(originator);
     }
 
@@ -100,5 +91,12 @@ public class LoanOriginatorHelper {
             return null;
         }
         return codeValueRepositoryWrapper.findOneByCodeNameAndIdWithNotFoundDetection(codeName, codeValueId);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanOriginatorHelper(final LoanOriginatorRepository loanOriginatorRepository, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository, final CodeValueRepositoryWrapper codeValueRepositoryWrapper) {
+        this.loanOriginatorRepository = loanOriginatorRepository;
+        this.globalConfigurationRepository = globalConfigurationRepository;
+        this.codeValueRepositoryWrapper = codeValueRepositoryWrapper;
     }
 }

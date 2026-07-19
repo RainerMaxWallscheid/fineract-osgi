@@ -33,7 +33,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanDelinquencyRangeScheduleData;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanDelinquencyRangeScheduleService;
@@ -42,24 +41,24 @@ import org.springframework.stereotype.Component;
 @Path("/v1/working-capital-loans/{loanId}/delinquency-range-schedule")
 @Component
 @Tag(name = "Working Capital Loan Delinquency Range Schedule", description = "Manages delinquency range schedule periods for Working Capital loans")
-@RequiredArgsConstructor
 public class WorkingCapitalLoanDelinquencyRangeScheduleApiResource {
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "WORKINGCAPITALLOAN";
-
     private final PlatformSecurityContext context;
     private final WorkingCapitalLoanDelinquencyRangeScheduleService rangeScheduleService;
 
     @GET
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Delinquency Range Schedule", description = "Retrieves the delinquency range schedule periods for a Working Capital loan")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyRangeScheduleData.class)))) })
-    public List<WorkingCapitalLoanDelinquencyRangeScheduleData> retrieveDelinquencyRangeSchedule(
-            @PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = WorkingCapitalLoanDelinquencyRangeScheduleData.class))))})
+    public List<WorkingCapitalLoanDelinquencyRangeScheduleData> retrieveDelinquencyRangeSchedule(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return rangeScheduleService.retrieveRangeSchedule(loanId);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanDelinquencyRangeScheduleApiResource(final PlatformSecurityContext context, final WorkingCapitalLoanDelinquencyRangeScheduleService rangeScheduleService) {
+        this.context = context;
+        this.rangeScheduleService = rangeScheduleService;
+    }
 }

@@ -19,8 +19,6 @@
 package org.apache.fineract.portfolio.workingcapitalloan.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -35,11 +33,10 @@ import org.apache.fineract.portfolio.workingcapitalloan.validator.WorkingCapital
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class WorkingCapitalLoanDelinquencyActionWriteServiceImpl implements WorkingCapitalLoanDelinquencyActionWriteService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanDelinquencyActionWriteServiceImpl.class);
     private final WorkingCapitalLoanRepository loanRepository;
     private final WorkingCapitalLoanDelinquencyActionRepository actionRepository;
     private final WorkingCapitalLoanDelinquencyActionParseAndValidator validator;
@@ -48,35 +45,34 @@ public class WorkingCapitalLoanDelinquencyActionWriteServiceImpl implements Work
     @Transactional
     @Override
     public CommandProcessingResult createDelinquencyAction(final Long workingCapitalLoanId, final JsonCommand command) {
-        final WorkingCapitalLoan workingCapitalLoan = loanRepository.findById(workingCapitalLoanId)
-                .orElseThrow(() -> new WorkingCapitalLoanNotFoundException(workingCapitalLoanId));
-
-        final List<WorkingCapitalLoanDelinquencyAction> existing = actionRepository
-                .findByWorkingCapitalLoanIdOrderById(workingCapitalLoanId);
-
+        final WorkingCapitalLoan workingCapitalLoan = loanRepository.findById(workingCapitalLoanId).orElseThrow(() -> new WorkingCapitalLoanNotFoundException(workingCapitalLoanId));
+        final List<WorkingCapitalLoanDelinquencyAction> existing = actionRepository.findByWorkingCapitalLoanIdOrderById(workingCapitalLoanId);
         final WorkingCapitalLoanDelinquencyAction action = validator.validateAndParse(command, workingCapitalLoan, existing);
-
         final WorkingCapitalLoanDelinquencyAction saved = actionRepository.saveAndFlush(action);
         log.debug("Created WC loan delinquency action {} for loan {}", action.getAction(), workingCapitalLoanId);
-
         if (DelinquencyAction.PAUSE.equals(action.getAction())) {
             rangeScheduleService.extendPeriodsForPause(workingCapitalLoan, action.getStartDate(), action.getEndDate());
         } else if (DelinquencyAction.RESCHEDULE.equals(action.getAction())) {
             rangeScheduleService.rescheduleMinimumPayment(workingCapitalLoan);
             rangeScheduleService.reprocessDelinquencySchedule(workingCapitalLoan);
         } else if (DelinquencyAction.RESUME.equals(action.getAction())) {
-            final WorkingCapitalLoanDelinquencyAction activePause = validator.findActivePauseForResume(existing,
-                    DateUtils.getBusinessLocalDate());
+            final WorkingCapitalLoanDelinquencyAction activePause = validator.findActivePauseForResume(existing, DateUtils.getBusinessLocalDate());
             rangeScheduleService.resumeActivePause(workingCapitalLoan, activePause, action);
         }
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(saved.getId()) //
-                .withLoanId(workingCapitalLoanId) //
-                .withOfficeId(workingCapitalLoan.getOfficeId()) //
-                .withClientId(workingCapitalLoan.getClientId()) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(saved.getId()).withLoanId(workingCapitalLoanId).withOfficeId(workingCapitalLoan.getOfficeId()).withClientId(workingCapitalLoan.getClientId()).build();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanDelinquencyActionWriteServiceImpl(final WorkingCapitalLoanRepository loanRepository, final WorkingCapitalLoanDelinquencyActionRepository actionRepository, final WorkingCapitalLoanDelinquencyActionParseAndValidator validator, final WorkingCapitalLoanDelinquencyRangeScheduleService rangeScheduleService) {
+        this.loanRepository = loanRepository;
+        this.actionRepository = actionRepository;
+        this.validator = validator;
+        this.rangeScheduleService = rangeScheduleService;
+    }
 }

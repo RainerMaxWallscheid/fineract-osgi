@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.calendar.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "CALENDAR", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteCalendarCommandHandler implements NewCommandSourceHandler {
-
     private final CalendarWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.deleteCalendar(command.entityId());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DeleteCalendarCommandHandler(final CalendarWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

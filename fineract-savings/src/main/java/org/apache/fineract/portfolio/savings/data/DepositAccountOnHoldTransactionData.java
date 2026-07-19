@@ -22,15 +22,11 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
-@Getter
 public final class DepositAccountOnHoldTransactionData implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @SuppressWarnings("unused")
     private final Long id;
     @SuppressWarnings("unused")
@@ -54,9 +50,7 @@ public final class DepositAccountOnHoldTransactionData implements Serializable {
     @SuppressWarnings("unused")
     private final String loanClientName;
 
-    private DepositAccountOnHoldTransactionData(final Long id, final BigDecimal amount, final EnumOptionData transactionType,
-            final LocalDate transactionDate, final boolean reversed, final Long savingsId, final String savingsAccNo,
-            final String savingsClientName, final Long loanId, final String loanAccNo, final String loanClientName) {
+    private DepositAccountOnHoldTransactionData(final Long id, final BigDecimal amount, final EnumOptionData transactionType, final LocalDate transactionDate, final boolean reversed, final Long savingsId, final String savingsAccNo, final String savingsClientName, final Long loanId, final String loanAccNo, final String loanClientName) {
         this.id = id;
         this.amount = amount;
         this.transactionType = transactionType;
@@ -70,8 +64,7 @@ public final class DepositAccountOnHoldTransactionData implements Serializable {
         this.loanClientName = loanClientName;
     }
 
-    private DepositAccountOnHoldTransactionData(final Long id, final BigDecimal amount, final EnumOptionData transactionType,
-            final LocalDate transactionDate, final boolean reversed) {
+    private DepositAccountOnHoldTransactionData(final Long id, final BigDecimal amount, final EnumOptionData transactionType, final LocalDate transactionDate, final boolean reversed) {
         this.id = id;
         this.amount = amount;
         this.transactionType = transactionType;
@@ -85,15 +78,66 @@ public final class DepositAccountOnHoldTransactionData implements Serializable {
         this.loanClientName = null;
     }
 
-    public static DepositAccountOnHoldTransactionData instance(final Long id, final BigDecimal amount, final EnumOptionData transactionType,
-            final LocalDate transactionDate, final boolean reversed, final Long savingsId, final String savingsAccountNo,
-            final String savingsClientName, final Long loanId, final String loanAccountNo, final String loanClientName) {
-        return new DepositAccountOnHoldTransactionData(id, amount, transactionType, transactionDate, reversed, savingsId, savingsAccountNo,
-                savingsClientName, loanId, loanAccountNo, loanClientName);
+    public static DepositAccountOnHoldTransactionData instance(final Long id, final BigDecimal amount, final EnumOptionData transactionType, final LocalDate transactionDate, final boolean reversed, final Long savingsId, final String savingsAccountNo, final String savingsClientName, final Long loanId, final String loanAccountNo, final String loanClientName) {
+        return new DepositAccountOnHoldTransactionData(id, amount, transactionType, transactionDate, reversed, savingsId, savingsAccountNo, savingsClientName, loanId, loanAccountNo, loanClientName);
     }
 
-    public static DepositAccountOnHoldTransactionData instance(Long transactionId, BigDecimal amount, EnumOptionData transactionType,
-            LocalDate date, boolean transactionReversed) {
+    public static DepositAccountOnHoldTransactionData instance(Long transactionId, BigDecimal amount, EnumOptionData transactionType, LocalDate date, boolean transactionReversed) {
         return new DepositAccountOnHoldTransactionData(transactionId, amount, transactionType, date, transactionReversed);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getTransactionType() {
+        return this.transactionType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getTransactionDate() {
+        return this.transactionDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isReversed() {
+        return this.reversed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getSavingsId() {
+        return this.savingsId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getSavingsAccountNo() {
+        return this.savingsAccountNo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getSavingsClientName() {
+        return this.savingsClientName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanId() {
+        return this.loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLoanAccountNo() {
+        return this.loanAccountNo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLoanClientName() {
+        return this.loanClientName;
     }
 }

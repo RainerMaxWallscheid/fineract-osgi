@@ -20,37 +20,34 @@ package org.apache.fineract.cob.domain;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@RequiredArgsConstructor
 public class CustomWorkingCapitalLoanAccountLockRepositoryImpl implements CustomLoanAccountLockRepository<WorkingCapitalLoanAccountLock> {
-
     @PersistenceContext
     private EntityManager entityManager;
-
     private final DatabaseSpecificSQLGenerator databaseSpecificSQLGenerator;
 
     @Override
     public void updateLoanFromAccountLocks() {
-        String sql = "UPDATE m_wc_loan SET last_closed_business_date = (select "
-                + databaseSpecificSQLGenerator.subDate("lck.lock_placed_on_cob_business_date", "1", "DAY")
-                + """
-                                                             from m_wc_loan_account_locks lck
-                                                             where lck.loan_id = id
-                                                               and lck.lock_placed_on_cob_business_date is not null
-                                                               and lck.error is not null
-                                                               and lck.lock_owner in ('LOAN_COB_CHUNK_PROCESSING','LOAN_INLINE_COB_PROCESSING'))
-                        where last_closed_business_date is null and exists  (select lck.loan_id
-                                      from m_wc_loan_account_locks lck  where lck.loan_id = id
-                                        and lck.lock_placed_on_cob_business_date is not null and lck.error is not null
-                                        and lck.lock_owner in ('LOAN_COB_CHUNK_PROCESSING','LOAN_INLINE_COB_PROCESSING'))
-                            """;
-
+        String sql = "UPDATE m_wc_loan SET last_closed_business_date = (select " + databaseSpecificSQLGenerator.subDate("lck.lock_placed_on_cob_business_date", "1", "DAY") + """
+                                                 from m_wc_loan_account_locks lck
+                                                 where lck.loan_id = id
+                                                   and lck.lock_placed_on_cob_business_date is not null
+                                                   and lck.error is not null
+                                                   and lck.lock_owner in (\'LOAN_COB_CHUNK_PROCESSING\',\'LOAN_INLINE_COB_PROCESSING\'))
+            where last_closed_business_date is null and exists  (select lck.loan_id
+                          from m_wc_loan_account_locks lck  where lck.loan_id = id
+                            and lck.lock_placed_on_cob_business_date is not null and lck.error is not null
+                            and lck.lock_owner in (\'LOAN_COB_CHUNK_PROCESSING\',\'LOAN_INLINE_COB_PROCESSING\'))
+            """;
         entityManager.createNativeQuery(sql).executeUpdate();
         entityManager.flush();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public CustomWorkingCapitalLoanAccountLockRepositoryImpl(final DatabaseSpecificSQLGenerator databaseSpecificSQLGenerator) {
+        this.databaseSpecificSQLGenerator = databaseSpecificSQLGenerator;
+    }
 }

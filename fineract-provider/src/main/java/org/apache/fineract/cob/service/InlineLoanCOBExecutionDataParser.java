@@ -22,7 +22,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.Arrays;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.exception.InvalidJsonException;
@@ -30,9 +29,7 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class InlineLoanCOBExecutionDataParser {
-
     private final FromJsonHelper jsonHelper;
 
     public List<Long> parseExecution(JsonCommand command) {
@@ -46,8 +43,12 @@ public class InlineLoanCOBExecutionDataParser {
         if (StringUtils.isBlank(json)) {
             throw new InvalidJsonException();
         }
-
         final JsonElement element = jsonHelper.parse(json);
         return element.getAsJsonObject();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InlineLoanCOBExecutionDataParser(final FromJsonHelper jsonHelper) {
+        this.jsonHelper = jsonHelper;
     }
 }

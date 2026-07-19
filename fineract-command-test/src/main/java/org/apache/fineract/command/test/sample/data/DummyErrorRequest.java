@@ -21,22 +21,105 @@ package org.apache.fineract.command.test.sample.data;
 import jakarta.validation.constraints.NotBlank;
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.FieldNameConstants;
 
-@Builder
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@FieldNameConstants
 public class DummyErrorRequest implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @NotBlank(message = "{org.apache.fineract.dummy.request.content.not-empty}")
     private String content;
+
+
+    @java.lang.SuppressWarnings("all")
+        public static class DummyErrorRequestBuilder {
+        @java.lang.SuppressWarnings("all")
+                private String content;
+
+        @java.lang.SuppressWarnings("all")
+                DummyErrorRequestBuilder() {
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public DummyErrorRequest.DummyErrorRequestBuilder content(final String content) {
+            this.content = content;
+            return this;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public DummyErrorRequest build() {
+            return new DummyErrorRequest(this.content);
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "DummyErrorRequest.DummyErrorRequestBuilder(content=" + this.content + ")";
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static DummyErrorRequest.DummyErrorRequestBuilder builder() {
+        return new DummyErrorRequest.DummyErrorRequestBuilder();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getContent() {
+        return this.content;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setContent(final String content) {
+        this.content = content;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof DummyErrorRequest)) return false;
+        final DummyErrorRequest other = (DummyErrorRequest) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$content = this.getContent();
+        final java.lang.Object other$content = other.getContent();
+        if (this$content == null ? other$content != null : !this$content.equals(other$content)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof DummyErrorRequest;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $content = this.getContent();
+        result = result * PRIME + ($content == null ? 43 : $content.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "DummyErrorRequest(content=" + this.getContent() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DummyErrorRequest() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DummyErrorRequest(final String content) {
+        this.content = content;
+    }
+
+
+    @java.lang.SuppressWarnings("all")
+        public static final class Fields {
+        public static final java.lang.String content = "content";
+    }
 }

@@ -20,43 +20,115 @@ package org.apache.fineract.mix.domain;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("mix_taxonomy")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public final class MixTaxonomy implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id
     @Column("id")
     private Long id;
-
     @Column("name")
     private String name;
-
     @Column("namespace_id")
     private Long namespaceId;
-
     @Column("dimension")
     private String dimension;
-
     @Column("type")
     private Integer type;
-
     @Column("description")
     private String description;
 
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getNamespaceId() {
+        return this.namespaceId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDimension() {
+        return this.dimension;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getType() {
+        return this.type;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomy setId(final Long id) {
+        this.id = id;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomy setName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomy setNamespaceId(final Long namespaceId) {
+        this.namespaceId = namespaceId;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomy setDimension(final String dimension) {
+        this.dimension = dimension;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomy setType(final Integer type) {
+        this.type = type;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomy setDescription(final String description) {
+        this.description = description;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomy() {
+    }
     // TODO: this is never used, but creates an error on MySQL (tinyint vs boolean mapping)
     // @Column("need_mapping")
     // private Boolean needMapping;

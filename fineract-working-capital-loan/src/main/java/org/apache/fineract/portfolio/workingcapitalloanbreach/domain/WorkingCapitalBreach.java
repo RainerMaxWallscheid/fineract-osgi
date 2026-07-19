@@ -25,35 +25,77 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanPeriodFrequencyType;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.domain.WorkingCapitalBreachAmountCalculationType;
 
 @Entity
-@Table(name = "m_wc_breach_configuration", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_m_wc_breach_configuration_name", columnNames = { "name" }) })
-@Getter
-@Setter
-@NoArgsConstructor
+@Table(name = "m_wc_breach_configuration", uniqueConstraints = {@UniqueConstraint(name = "uq_m_wc_breach_configuration_name", columnNames = {"name"})})
 public class WorkingCapitalBreach extends AbstractPersistableCustom<Long> {
-
     @Column(name = "name", nullable = false, length = 100)
     private String name;
-
     @Column(name = "breach_frequency")
     private Integer breachFrequency;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "breach_frequency_type")
     private WorkingCapitalLoanPeriodFrequencyType breachFrequencyType;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "breach_amount_calculation_type")
     private WorkingCapitalBreachAmountCalculationType breachAmountCalculationType;
-
     @Column(name = "breach_amount", scale = 6, precision = 19)
     private BigDecimal breachAmount;
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getBreachFrequency() {
+        return this.breachFrequency;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanPeriodFrequencyType getBreachFrequencyType() {
+        return this.breachFrequencyType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalBreachAmountCalculationType getBreachAmountCalculationType() {
+        return this.breachAmountCalculationType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getBreachAmount() {
+        return this.breachAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setName(final String name) {
+        this.name = name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setBreachFrequency(final Integer breachFrequency) {
+        this.breachFrequency = breachFrequency;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setBreachFrequencyType(final WorkingCapitalLoanPeriodFrequencyType breachFrequencyType) {
+        this.breachFrequencyType = breachFrequencyType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setBreachAmountCalculationType(final WorkingCapitalBreachAmountCalculationType breachAmountCalculationType) {
+        this.breachAmountCalculationType = breachAmountCalculationType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setBreachAmount(final BigDecimal breachAmount) {
+        this.breachAmount = breachAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalBreach() {
+    }
 }

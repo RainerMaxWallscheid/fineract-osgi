@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.event.business.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.event.business.domain.BusinessEvent;
 import org.apache.fineract.infrastructure.event.external.repository.ExternalEventConfigurationRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Default implementation for {@link ExternalBusinessEventConfigurationService}, configured by
  * {@link org.apache.fineract.infrastructure.event.external.config.ExternalBusinessEventConfiguration}
  */
-@RequiredArgsConstructor
 public class ExternalBusinessEventConfigurationServiceImpl implements ExternalBusinessEventConfigurationService {
-
     private final ExternalEventConfigurationRepository eventConfigurationRepository;
 
     @Override
@@ -39,5 +36,10 @@ public class ExternalBusinessEventConfigurationServiceImpl implements ExternalBu
             return false;
         }
         return eventConfigurationRepository.findExternalEventConfigurationByTypeWithNotFoundDetection(businessEvent.getType()).isEnabled();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalBusinessEventConfigurationServiceImpl(final ExternalEventConfigurationRepository eventConfigurationRepository) {
+        this.eventConfigurationRepository = eventConfigurationRepository;
     }
 }

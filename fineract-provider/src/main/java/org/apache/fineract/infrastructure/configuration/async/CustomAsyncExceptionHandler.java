@@ -19,15 +19,14 @@
 package org.apache.fineract.infrastructure.configuration.async;
 
 import java.lang.reflect.Method;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 
-@Slf4j
 public class CustomAsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CustomAsyncExceptionHandler.class);
 
     @Override
     public void handleUncaughtException(Throwable throwable, Method method, Object... obj) {
-
         log.error("Exception", throwable);
         log.error("Method name - {}", method.getName());
         for (Object param : obj) {

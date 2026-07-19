@@ -37,7 +37,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -56,12 +55,10 @@ import org.apache.fineract.portfolio.delinquency.mapper.DelinquencyResponseMappe
 import org.apache.fineract.portfolio.delinquency.service.DelinquencyReadPlatformService;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Path("/v1/delinquency")
 @Component
 @Tag(name = "Delinquency Range and Buckets Management", description = "Delinquency Range and Buckets management enables you to set up, fetch and adjust Delinquency overdue ranges")
 public class DelinquencyApiResource {
-
     private final PlatformSecurityContext securityContext;
     private final DefaultToApiJsonSerializer<String> jsonSerializer;
     private final DelinquencyReadPlatformService readPlatformService;
@@ -84,57 +81,48 @@ public class DelinquencyApiResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Retrieve a specific Delinquency Range based on the Id", description = "", operationId = "getRange")
     @AlternativeOperationId("getDelinquencyRange")
-    public DelinquencyRangeResponse getDelinquencyRange(
-            @PathParam("delinquencyRangeId") @Parameter(description = "delinquencyRangeId") final Long delinquencyRangeId) {
+    public DelinquencyRangeResponse getDelinquencyRange(@PathParam("delinquencyRangeId") @Parameter(description = "delinquencyRangeId") final Long delinquencyRangeId) {
         securityContext.authenticatedUser().validateHasReadPermission(DELINQUENCY_BUCKET);
         return delinquencyResponseMapper.mapRange(this.readPlatformService.retrieveDelinquencyRange(delinquencyRangeId));
     }
 
     @POST
     @Path("ranges")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create Delinquency Range", description = "", operationId = "createRange")
     @AlternativeOperationId("createDelinquencyRange")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = DelinquencyRangeRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DelinquencyApiResourceSwagger.PostDelinquencyRangeResponse.class)))
     public CommandProcessingResult createDelinquencyRange(final DelinquencyRangeRequest delinquencyRangeRequest) {
         securityContext.authenticatedUser().validateHasCreatePermission(DELINQUENCY_BUCKET);
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createDelinquencyRange()
-                .withJson(jsonSerializer.serialize(delinquencyRangeRequest)).build();
-
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createDelinquencyRange().withJson(jsonSerializer.serialize(delinquencyRangeRequest)).build();
         return commandWritePlatformService.logCommandSource(commandRequest);
     }
 
     @PUT
     @Path("ranges/{delinquencyRangeId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update Delinquency Range based on the Id", description = "", operationId = "updateRange")
     @AlternativeOperationId("updateDelinquencyRange")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = DelinquencyRangeRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DelinquencyApiResourceSwagger.PutDelinquencyRangeResponse.class)))
-    public CommandProcessingResult updateDelinquencyRange(
-            @PathParam("delinquencyRangeId") @Parameter(description = "delinquencyRangeId") final Long delinquencyRangeId,
-            final DelinquencyRangeRequest delinquencyRangeRequest) {
+    public CommandProcessingResult updateDelinquencyRange(@PathParam("delinquencyRangeId") @Parameter(description = "delinquencyRangeId") final Long delinquencyRangeId, final DelinquencyRangeRequest delinquencyRangeRequest) {
         securityContext.authenticatedUser().validateHasUpdatePermission(DELINQUENCY_BUCKET);
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateDelinquencyRange(delinquencyRangeId)
-                .withJson(jsonSerializer.serialize(delinquencyRangeRequest)).build();
-
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateDelinquencyRange(delinquencyRangeId).withJson(jsonSerializer.serialize(delinquencyRangeRequest)).build();
         return commandWritePlatformService.logCommandSource(commandRequest);
     }
 
     @DELETE
     @Path("ranges/{delinquencyRangeId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update Delinquency Range based on the Id", description = "", operationId = "deleteRange")
     @AlternativeOperationId("deleteDelinquencyRange")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DelinquencyApiResourceSwagger.DeleteDelinquencyRangeResponse.class)))
-    public CommandProcessingResult deleteDelinquencyRange(
-            @PathParam("delinquencyRangeId") @Parameter(description = "delinquencyRangeId") final Long delinquencyRangeId) {
+    public CommandProcessingResult deleteDelinquencyRange(@PathParam("delinquencyRangeId") @Parameter(description = "delinquencyRangeId") final Long delinquencyRangeId) {
         securityContext.authenticatedUser().validateHasDeletePermission(DELINQUENCY_BUCKET);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteDelinquencyRange(delinquencyRangeId).build();
-
         return commandWritePlatformService.logCommandSource(commandRequest);
     }
 
@@ -162,73 +150,65 @@ public class DelinquencyApiResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Retrieve a specific Delinquency Bucket based on the Id", description = "", operationId = "getBucket")
     @AlternativeOperationId("getDelinquencyBucket")
-    public DelinquencyBucketResponse getDelinquencyBucket(
-            @PathParam("delinquencyBucketId") @Parameter(description = "delinquencyBucketId") final Long delinquencyBucketId,
-            @Context final UriInfo uriInfo) {
+    public DelinquencyBucketResponse getDelinquencyBucket(@PathParam("delinquencyBucketId") @Parameter(description = "delinquencyBucketId") final Long delinquencyBucketId, @Context final UriInfo uriInfo) {
         securityContext.authenticatedUser().validateHasReadPermission(DELINQUENCY_BUCKET);
         return delinquencyResponseMapper.mapBucket(this.readPlatformService.retrieveDelinquencyBucket(delinquencyBucketId));
     }
 
     private DelinquencyBucketTemplateResponse handleTemplate() {
-
         List<DelinquencyRangeResponse> ranges = delinquencyResponseMapper.mapRange(this.readPlatformService.retrieveAllDelinquencyRanges());
         List<StringEnumOptionData> delinquencyBucketTypes = DelinquencyBucketType.toStringEnumOptions();
         List<StringEnumOptionData> delinquencyFrequencyTypes = DelinquencyFrequencyType.toStringEnumOptions();
         List<StringEnumOptionData> delinquencyMinimumPaymentTypes = DelinquencyMinimumPaymentType.toStringEnumOptions();
-
-        return new DelinquencyBucketTemplateResponse(ranges, delinquencyBucketTypes, delinquencyFrequencyTypes,
-                delinquencyMinimumPaymentTypes);
+        return new DelinquencyBucketTemplateResponse(ranges, delinquencyBucketTypes, delinquencyFrequencyTypes, delinquencyMinimumPaymentTypes);
     }
 
     @POST
     @Path("buckets")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create Delinquency Bucket", description = "", operationId = "createBucket")
     @AlternativeOperationId("createDelinquencyBucket")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = DelinquencyBucketRequest.class)))
-
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DelinquencyApiResourceSwagger.PostDelinquencyBucketResponse.class)))
     public CommandProcessingResult createDelinquencyBucket(final DelinquencyBucketRequest delinquencyBucketRequest) {
         securityContext.authenticatedUser().validateHasCreatePermission(DELINQUENCY_BUCKET);
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createDelinquencyBucket()
-                .withJson(jsonSerializer.serialize(delinquencyBucketRequest)).build();
-
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createDelinquencyBucket().withJson(jsonSerializer.serialize(delinquencyBucketRequest)).build();
         return commandWritePlatformService.logCommandSource(commandRequest);
     }
 
     @PUT
     @Path("buckets/{delinquencyBucketId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update Delinquency Bucket based on the Id", description = "", operationId = "updateBucket")
     @AlternativeOperationId("updateDelinquencyBucket")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = DelinquencyBucketRequest.class)))
-
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DelinquencyApiResourceSwagger.PutDelinquencyBucketResponse.class)))
-    public CommandProcessingResult updateDelinquencyBucket(
-            @PathParam("delinquencyBucketId") @Parameter(description = "delinquencyBucketId") final Long delinquencyBucketId,
-            final DelinquencyBucketRequest delinquencyBucketRequest) {
+    public CommandProcessingResult updateDelinquencyBucket(@PathParam("delinquencyBucketId") @Parameter(description = "delinquencyBucketId") final Long delinquencyBucketId, final DelinquencyBucketRequest delinquencyBucketRequest) {
         securityContext.authenticatedUser().validateHasUpdatePermission(DELINQUENCY_BUCKET);
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateDelinquencyBucket(delinquencyBucketId)
-                .withJson(jsonSerializer.serialize(delinquencyBucketRequest)).build();
-
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateDelinquencyBucket(delinquencyBucketId).withJson(jsonSerializer.serialize(delinquencyBucketRequest)).build();
         return commandWritePlatformService.logCommandSource(commandRequest);
     }
 
     @DELETE
     @Path("buckets/{delinquencyBucketId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete Delinquency Bucket based on the Id", description = "", operationId = "deleteBucket")
     @AlternativeOperationId("deleteDelinquencyBucket")
-
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DelinquencyApiResourceSwagger.DeleteDelinquencyBucketResponse.class)))
-    public CommandProcessingResult deleteDelinquencyBucket(
-            @PathParam("delinquencyBucketId") @Parameter(description = "delinquencyBucketId") final Long delinquencyBucketId) {
+    public CommandProcessingResult deleteDelinquencyBucket(@PathParam("delinquencyBucketId") @Parameter(description = "delinquencyBucketId") final Long delinquencyBucketId) {
         securityContext.authenticatedUser().validateHasDeletePermission(DELINQUENCY_BUCKET);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteDelinquencyBucket(delinquencyBucketId).build();
-
         return commandWritePlatformService.logCommandSource(commandRequest);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyApiResource(final PlatformSecurityContext securityContext, final DefaultToApiJsonSerializer<String> jsonSerializer, final DelinquencyReadPlatformService readPlatformService, final PortfolioCommandSourceWritePlatformService commandWritePlatformService, final DelinquencyResponseMapper delinquencyResponseMapper) {
+        this.securityContext = securityContext;
+        this.jsonSerializer = jsonSerializer;
+        this.readPlatformService = readPlatformService;
+        this.commandWritePlatformService = commandWritePlatformService;
+        this.delinquencyResponseMapper = delinquencyResponseMapper;
+    }
 }

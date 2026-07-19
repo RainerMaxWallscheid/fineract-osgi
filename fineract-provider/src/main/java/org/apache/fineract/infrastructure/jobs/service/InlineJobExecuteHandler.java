@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.jobs.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,11 +27,9 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
 @Service
 @CommandType(entity = "INLINE_JOB", action = "EXECUTE")
 public class InlineJobExecuteHandler implements NewCommandSourceHandler {
-
     private final ApplicationContext applicationContext;
 
     @Override
@@ -44,5 +41,10 @@ public class InlineJobExecuteHandler implements NewCommandSourceHandler {
         } catch (NoSuchBeanDefinitionException e) {
             throw new JobIsNotFoundOrNotEnabledException(e, inlineJobType.getInlineJobName());
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InlineJobExecuteHandler(final ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 }

@@ -23,25 +23,40 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
-@Getter
-@Setter
 @Table(name = "m_external_asset_owner_journal_entry_mapping")
-@NoArgsConstructor
 @Entity
 public class ExternalAssetOwnerJournalEntryMapping extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @OneToOne
     @JoinColumn(name = "journal_entry_id", nullable = false)
     private JournalEntry journalEntry;
-
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private ExternalAssetOwner owner;
 
+    @java.lang.SuppressWarnings("all")
+        public JournalEntry getJournalEntry() {
+        return this.journalEntry;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwner getOwner() {
+        return this.owner;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setJournalEntry(final JournalEntry journalEntry) {
+        this.journalEntry = journalEntry;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setOwner(final ExternalAssetOwner owner) {
+        this.owner = owner;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnerJournalEntryMapping() {
+    }
 }

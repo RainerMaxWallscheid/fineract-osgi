@@ -20,7 +20,6 @@ package org.apache.fineract.infrastructure.core.service.migration;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,8 +33,6 @@ import liquibase.ThreadLocalScopeManager;
 import liquibase.change.custom.CustomTaskChange;
 import liquibase.exception.LiquibaseException;
 import liquibase.integration.spring.SpringLiquibase;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.boot.FineractProfiles;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
@@ -51,15 +48,13 @@ import org.springframework.stereotype.Service;
  * A service that picks up on tenants that are configured to auto-update their specific schema on application startup.
  */
 @Service
-@Slf4j
-@RequiredArgsConstructor
 public class TenantDatabaseUpgradeService implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TenantDatabaseUpgradeService.class);
     public static final String TENANT_STORE_DB_CONTEXT = "tenant_store_db";
     public static final String INITIAL_SWITCH_CONTEXT = "initial_switch";
     public static final String TENANT_DB_CONTEXT = "tenant_db";
     public static final String CUSTOM_CHANGELOG_CONTEXT = "custom_changelog";
-
     private final TenantDetailsService tenantDetailsService;
     @Qualifier("hikariTenantDataSource")
     private final DataSource tenantDataSource;
@@ -68,7 +63,6 @@ public class TenantDatabaseUpgradeService implements InitializingBean {
     private final ExtendedSpringLiquibaseFactory liquibaseFactory;
     private final TenantDataSourceFactory tenantDataSourceFactory;
     private final Environment environment;
-
     // DO NOT REMOVE! Required for liquibase custom task initialization
     private final List<CustomTaskChange> customTaskChangesForDependencyInjection;
 
@@ -106,8 +100,7 @@ public class TenantDatabaseUpgradeService implements InitializingBean {
         logTenantStoreDetails();
         if (databaseStateVerifier.isFirstLiquibaseMigration(tenantDataSource)) {
             ExtendedSpringLiquibase liquibase = liquibaseFactory.create(tenantDataSource, TENANT_STORE_DB_CONTEXT, INITIAL_SWITCH_CONTEXT);
-            applyInitialLiquibase(tenantDataSource, liquibase, "tenant store",
-                    (ds) -> !databaseStateVerifier.isTenantStoreOnLatestUpgradableVersion(ds));
+            applyInitialLiquibase(tenantDataSource, liquibase, "tenant store", ds -> !databaseStateVerifier.isTenantStoreOnLatestUpgradableVersion(ds));
         }
         SpringLiquibase liquibase = liquibaseFactory.create(tenantDataSource, TENANT_STORE_DB_CONTEXT);
         liquibase.afterPropertiesSet();
@@ -124,7 +117,6 @@ public class TenantDatabaseUpgradeService implements InitializingBean {
         log.info("- fineract.tenant.identifier: {}", tenant.getIdentifier());
         log.info("- fineract.tenant.name: {}", tenant.getName());
         log.info("- liquibase.analytics.enabled: {}", System.getProperty("liquibase.analytics.enabled"));
-
         String readOnlyUsername = tenant.getReadOnlyUsername();
         if (isNotBlank(readOnlyUsername)) {
             log.info("- fineract.tenant.readonly.username: {}", readOnlyUsername);
@@ -132,7 +124,6 @@ public class TenantDatabaseUpgradeService implements InitializingBean {
             log.info("- fineract.tenant.readonly.parameters: {}", tenant.getReadOnlyParameters());
             log.info("- fineract.tenant.readonly.name: {}", tenant.getReadOnlyName());
         }
-
     }
 
     private void upgradeIndividualTenants() {
@@ -148,7 +139,6 @@ public class TenantDatabaseUpgradeService implements InitializingBean {
                 }));
             }
         }
-
         List<Exception> exceptions = new ArrayList<>();
         try {
             for (Future<String> future : futures) {
@@ -159,7 +149,6 @@ public class TenantDatabaseUpgradeService implements InitializingBean {
         } finally {
             tenantUpgradeThreadPoolTaskExecutor.shutdown();
         }
-
         if (exceptions.isEmpty()) {
             log.info("Tenant upgrades have successfully finished");
         } else {
@@ -195,13 +184,10 @@ public class TenantDatabaseUpgradeService implements InitializingBean {
                 // configuration
                 // settings, and we should not use them to control the script order
                 if (databaseStateVerifier.isFirstLiquibaseMigration(tenantDataSource)) {
-                    ExtendedSpringLiquibase liquibase = liquibaseFactory.create(tenantDataSource, TENANT_DB_CONTEXT,
-                            CUSTOM_CHANGELOG_CONTEXT, INITIAL_SWITCH_CONTEXT, tenant.getTenantIdentifier());
-                    applyInitialLiquibase(tenantDataSource, liquibase, tenant.getTenantIdentifier(),
-                            (ds) -> !databaseStateVerifier.isTenantOnLatestUpgradableVersion(ds));
+                    ExtendedSpringLiquibase liquibase = liquibaseFactory.create(tenantDataSource, TENANT_DB_CONTEXT, CUSTOM_CHANGELOG_CONTEXT, INITIAL_SWITCH_CONTEXT, tenant.getTenantIdentifier());
+                    applyInitialLiquibase(tenantDataSource, liquibase, tenant.getTenantIdentifier(), ds -> !databaseStateVerifier.isTenantOnLatestUpgradableVersion(ds));
                 }
-                SpringLiquibase tenantLiquibase = liquibaseFactory.create(tenantDataSource, TENANT_DB_CONTEXT, CUSTOM_CHANGELOG_CONTEXT,
-                        tenant.getTenantIdentifier());
+                SpringLiquibase tenantLiquibase = liquibaseFactory.create(tenantDataSource, TENANT_DB_CONTEXT, CUSTOM_CHANGELOG_CONTEXT, tenant.getTenantIdentifier());
                 tenantLiquibase.afterPropertiesSet();
                 log.info("Upgrade for tenant {} has finished", tenant.getTenantIdentifier());
             } catch (Exception e) {
@@ -212,19 +198,30 @@ public class TenantDatabaseUpgradeService implements InitializingBean {
         }
     }
 
-    private void applyInitialLiquibase(DataSource dataSource, ExtendedSpringLiquibase liquibase, String id,
-            Function<DataSource, Boolean> isUpgradableFn) throws LiquibaseException {
+    private void applyInitialLiquibase(DataSource dataSource, ExtendedSpringLiquibase liquibase, String id, Function<DataSource, Boolean> isUpgradableFn) throws LiquibaseException {
         if (databaseStateVerifier.isFlywayPresent(dataSource)) {
             if (isUpgradableFn.apply(dataSource)) {
                 log.error("Cannot proceed with upgrading database {}", id);
-                log.error("It seems the database doesn't have the latest schema changes applied until the 1.6 release");
+                log.error("It seems the database doesn\'t have the latest schema changes applied until the 1.6 release");
                 throw new SchemaUpgradeNeededException("Make sure to upgrade to Fineract 1.6 first and then to a newer version");
             }
-            log.info("This is the first Liquibase migration for {}. We'll sync the changelog for you and then apply everything else", id);
+            log.info("This is the first Liquibase migration for {}. We\'ll sync the changelog for you and then apply everything else", id);
             liquibase.changeLogSync();
             log.info("Liquibase changelog sync is complete");
         } else {
             liquibase.afterPropertiesSet();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TenantDatabaseUpgradeService(final TenantDetailsService tenantDetailsService, @Qualifier("hikariTenantDataSource") final DataSource tenantDataSource, final FineractProperties fineractProperties, final TenantDatabaseStateVerifier databaseStateVerifier, final ExtendedSpringLiquibaseFactory liquibaseFactory, final TenantDataSourceFactory tenantDataSourceFactory, final Environment environment, final List<CustomTaskChange> customTaskChangesForDependencyInjection) {
+        this.tenantDetailsService = tenantDetailsService;
+        this.tenantDataSource = tenantDataSource;
+        this.fineractProperties = fineractProperties;
+        this.databaseStateVerifier = databaseStateVerifier;
+        this.liquibaseFactory = liquibaseFactory;
+        this.tenantDataSourceFactory = tenantDataSourceFactory;
+        this.environment = environment;
+        this.customTaskChangesForDependencyInjection = customTaskChangesForDependencyInjection;
     }
 }

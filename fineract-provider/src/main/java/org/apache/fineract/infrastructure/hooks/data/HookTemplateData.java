@@ -21,25 +21,12 @@ package org.apache.fineract.infrastructure.hooks.data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
-@Builder
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Accessors(chain = true)
 public final class HookTemplateData implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private Long id;
     private String name;
-
     // associations
     private List<HookFieldData> schema;
 
@@ -47,4 +34,152 @@ public final class HookTemplateData implements Serializable {
         return new HookTemplateData().setId(id).setName(name).setSchema(schema);
     }
 
+
+    @java.lang.SuppressWarnings("all")
+        public static class HookTemplateDataBuilder {
+        @java.lang.SuppressWarnings("all")
+                private Long id;
+        @java.lang.SuppressWarnings("all")
+                private String name;
+        @java.lang.SuppressWarnings("all")
+                private List<HookFieldData> schema;
+
+        @java.lang.SuppressWarnings("all")
+                HookTemplateDataBuilder() {
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public HookTemplateData.HookTemplateDataBuilder id(final Long id) {
+            this.id = id;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public HookTemplateData.HookTemplateDataBuilder name(final String name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public HookTemplateData.HookTemplateDataBuilder schema(final List<HookFieldData> schema) {
+            this.schema = schema;
+            return this;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public HookTemplateData build() {
+            return new HookTemplateData(this.id, this.name, this.schema);
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "HookTemplateData.HookTemplateDataBuilder(id=" + this.id + ", name=" + this.name + ", schema=" + this.schema + ")";
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static HookTemplateData.HookTemplateDataBuilder builder() {
+        return new HookTemplateData.HookTemplateDataBuilder();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<HookFieldData> getSchema() {
+        return this.schema;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookTemplateData setId(final Long id) {
+        this.id = id;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookTemplateData setName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookTemplateData setSchema(final List<HookFieldData> schema) {
+        this.schema = schema;
+        return this;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof HookTemplateData)) return false;
+        final HookTemplateData other = (HookTemplateData) o;
+        final java.lang.Object this$id = this.getId();
+        final java.lang.Object other$id = other.getId();
+        if (this$id == null ? other$id != null : !this$id.equals(other$id)) return false;
+        final java.lang.Object this$name = this.getName();
+        final java.lang.Object other$name = other.getName();
+        if (this$name == null ? other$name != null : !this$name.equals(other$name)) return false;
+        final java.lang.Object this$schema = this.getSchema();
+        final java.lang.Object other$schema = other.getSchema();
+        if (this$schema == null ? other$schema != null : !this$schema.equals(other$schema)) return false;
+        return true;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $id = this.getId();
+        result = result * PRIME + ($id == null ? 43 : $id.hashCode());
+        final java.lang.Object $name = this.getName();
+        result = result * PRIME + ($name == null ? 43 : $name.hashCode());
+        final java.lang.Object $schema = this.getSchema();
+        result = result * PRIME + ($schema == null ? 43 : $schema.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "HookTemplateData(id=" + this.getId() + ", name=" + this.getName() + ", schema=" + this.getSchema() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public HookTemplateData() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public HookTemplateData(final Long id, final String name, final List<HookFieldData> schema) {
+        this.id = id;
+        this.name = name;
+        this.schema = schema;
+    }
 }

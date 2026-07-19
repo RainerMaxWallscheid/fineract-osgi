@@ -21,7 +21,6 @@ package org.apache.fineract.infrastructure.core.exception;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.exceptionmapper.FineractExceptionMapper;
 import org.apache.fineract.portfolio.loanaccount.exception.MultiDisbursementDataRequiredException;
@@ -30,15 +29,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("singleton")
-@Slf4j
-public class MultiDisbursementDataRequiredExceptionMapper
-        implements FineractExceptionMapper, ExceptionMapper<MultiDisbursementDataRequiredException> {
+public class MultiDisbursementDataRequiredExceptionMapper implements FineractExceptionMapper, ExceptionMapper<MultiDisbursementDataRequiredException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MultiDisbursementDataRequiredExceptionMapper.class);
 
     @Override
     public Response toResponse(MultiDisbursementDataRequiredException exception) {
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-        final ApiGlobalErrorResponse notFoundErrorResponse = ApiGlobalErrorResponse.domainRuleViolation(
-                exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(), exception.getDefaultUserMessageArgs());
+        final ApiGlobalErrorResponse notFoundErrorResponse = ApiGlobalErrorResponse.domainRuleViolation(exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(), exception.getDefaultUserMessageArgs());
         // request understood but not carried out due to it violating some
         // domain/business logic
         return Response.status(Response.Status.FORBIDDEN).entity(notFoundErrorResponse).type(MediaType.APPLICATION_JSON).build();

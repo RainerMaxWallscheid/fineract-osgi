@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.event.external.producer.kafka;
 
 import static org.apache.fineract.infrastructure.core.diagnostics.performance.MeasuringUtil.measure;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,8 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.event.external.exception.AcknowledgementTimeoutException;
 import org.apache.fineract.infrastructure.event.external.producer.ExternalEventProducer;
@@ -39,21 +36,18 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 
 @Component
-@Slf4j
 @ConditionalOnProperty(value = "fineract.events.external.producer.kafka.enabled", havingValue = "true")
-@AllArgsConstructor
 public class KafkaExternalEventProducer implements ExternalEventProducer {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(KafkaExternalEventProducer.class);
     @Autowired
     private KafkaTemplate<Long, byte[]> externalEventsKafkaTemplate;
-
     @Autowired
     private FineractProperties fineractProperties;
 
     @Override
     public void sendEvents(Map<Long, List<byte[]>> partitions) throws AcknowledgementTimeoutException {
-        FineractProperties.FineractExternalEventsProducerKafkaProperties kafkaProperties = fineractProperties.getEvents().getExternal()
-                .getProducer().getKafka();
+        FineractProperties.FineractExternalEventsProducerKafkaProperties kafkaProperties = fineractProperties.getEvents().getExternal().getProducer().getKafka();
         String topicName = kafkaProperties.getTopic().getName();
         List<CompletableFuture<SendResult<Long, byte[]>>> sendResults = new ArrayList<>();
         measure(() -> {
@@ -63,7 +57,6 @@ public class KafkaExternalEventProducer implements ExternalEventProducer {
                     sendResults.add(externalEventsKafkaTemplate.send(topicName, entry.getKey(), message));
                 }
             }
-
             try {
                 CompletableFuture<Void> allOf = CompletableFuture.allOf(sendResults.toArray(new CompletableFuture[0]));
                 allOf.get(kafkaProperties.getTimeoutInSeconds(), TimeUnit.SECONDS);
@@ -77,5 +70,11 @@ public class KafkaExternalEventProducer implements ExternalEventProducer {
                 log.debug("Sent messages with {} msg/s", msgPerSec);
             }
         });
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public KafkaExternalEventProducer(final KafkaTemplate<Long, byte[]> externalEventsKafkaTemplate, final FineractProperties fineractProperties) {
+        this.externalEventsKafkaTemplate = externalEventsKafkaTemplate;
+        this.fineractProperties = fineractProperties;
     }
 }

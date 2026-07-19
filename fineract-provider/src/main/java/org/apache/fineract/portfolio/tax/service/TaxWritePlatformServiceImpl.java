@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.tax.service;
 
 import java.util.Map;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -33,9 +32,7 @@ import org.apache.fineract.portfolio.tax.domain.TaxGroupRepository;
 import org.apache.fineract.portfolio.tax.domain.TaxGroupRepositoryWrapper;
 import org.apache.fineract.portfolio.tax.serialization.TaxValidator;
 
-@RequiredArgsConstructor
 public class TaxWritePlatformServiceImpl implements TaxWritePlatformService {
-
     private final TaxValidator validator;
     private final TaxAssembler taxAssembler;
     private final TaxComponentRepository taxComponentRepository;
@@ -48,10 +45,10 @@ public class TaxWritePlatformServiceImpl implements TaxWritePlatformService {
         this.validator.validateForTaxComponentCreate(command.json());
         TaxComponent taxComponent = this.taxAssembler.assembleTaxComponentFrom(command);
         this.taxComponentRepository.saveAndFlush(taxComponent);
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(taxComponent.getId()) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(taxComponent.getId()).build();
     }
 
     @Override
@@ -62,10 +59,10 @@ public class TaxWritePlatformServiceImpl implements TaxWritePlatformService {
         Map<String, Object> changes = taxComponent.update(command);
         this.validator.validateTaxComponentForUpdate(taxComponent);
         this.taxComponentRepository.saveAndFlush(taxComponent);
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(id) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withEntityId(id).with(changes).build();
     }
 
     @Override
@@ -74,10 +71,10 @@ public class TaxWritePlatformServiceImpl implements TaxWritePlatformService {
         final TaxGroup taxGroup = this.taxAssembler.assembleTaxGroupFrom(command);
         this.validator.validateTaxGroup(taxGroup);
         this.taxGroupRepository.saveAndFlush(taxGroup);
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(taxGroup.getId()) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(taxGroup.getId()).build();
     }
 
     @Override
@@ -90,10 +87,19 @@ public class TaxWritePlatformServiceImpl implements TaxWritePlatformService {
         Map<String, Object> changes = taxGroup.update(command, groupMappings);
         this.validator.validateTaxGroup(taxGroup);
         this.taxGroupRepository.saveAndFlush(taxGroup);
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(id) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withEntityId(id).with(changes).build();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public TaxWritePlatformServiceImpl(final TaxValidator validator, final TaxAssembler taxAssembler, final TaxComponentRepository taxComponentRepository, final TaxComponentRepositoryWrapper taxComponentRepositoryWrapper, final TaxGroupRepository taxGroupRepository, final TaxGroupRepositoryWrapper taxGroupRepositoryWrapper) {
+        this.validator = validator;
+        this.taxAssembler = taxAssembler;
+        this.taxComponentRepository = taxComponentRepository;
+        this.taxComponentRepositoryWrapper = taxComponentRepositoryWrapper;
+        this.taxGroupRepository = taxGroupRepository;
+        this.taxGroupRepositoryWrapper = taxGroupRepositoryWrapper;
+    }
 }

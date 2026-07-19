@@ -18,31 +18,30 @@
  */
 package org.apache.fineract.infrastructure.contentstore.policy;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
 import org.apache.fineract.infrastructure.contentstore.detector.ContentDetectorContext;
 import org.apache.fineract.infrastructure.contentstore.detector.ContentDetectorManager;
 import org.apache.fineract.infrastructure.contentstore.exception.ContentPolicyException;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class MimeContentPolicy implements ContentPolicy {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MimeContentPolicy.class);
     private final ContentDetectorManager contentDetectorManager;
 
     @Override
     public void check(ContentPolicyContext ctx) {
         if (ctx.getInputStream() != null) {
-            var result = contentDetectorManager
-                    .detect(ContentDetectorContext.builder().inputStream(ctx.getInputStream()).inputStreamEnabled(true).build());
-
+            var result = contentDetectorManager.detect(ContentDetectorContext.builder().inputStream(ctx.getInputStream()).inputStreamEnabled(true).build());
             if (!Strings.CI.equals(result.getMimeType(), ctx.getMimeType())) {
-                throw new ContentPolicyException(String.format("Detected file type (%s), but mime type (%s) was provided. Mismatch!",
-                        result.getMimeType(), ctx.getMimeType()));
+                throw new ContentPolicyException(String.format("Detected file type (%s), but mime type (%s) was provided. Mismatch!", result.getMimeType(), ctx.getMimeType()));
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MimeContentPolicy(final ContentDetectorManager contentDetectorManager) {
+        this.contentDetectorManager = contentDetectorManager;
     }
 }

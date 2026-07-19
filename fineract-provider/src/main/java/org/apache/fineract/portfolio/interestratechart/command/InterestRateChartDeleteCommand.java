@@ -16,14 +16,42 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.interestratechart.command;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.portfolio.interestratechart.data.InterestRateChartDeleteRequest;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class InterestRateChartDeleteCommand extends Command<InterestRateChartDeleteRequest> {}
+public class InterestRateChartDeleteCommand extends Command<InterestRateChartDeleteRequest> {
+	@java.lang.SuppressWarnings("all")
+		public InterestRateChartDeleteCommand() {
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public java.lang.String toString() {
+		return "InterestRateChartDeleteCommand()";
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public boolean equals(final java.lang.Object o) {
+		if (o == this) return true;
+		if (!(o instanceof InterestRateChartDeleteCommand)) return false;
+		final InterestRateChartDeleteCommand other = (InterestRateChartDeleteCommand) o;
+		if (!other.canEqual((java.lang.Object) this)) return false;
+		if (!super.equals(o)) return false;
+		return true;
+	}
+
+	@java.lang.SuppressWarnings("all")
+		protected boolean canEqual(final java.lang.Object other) {
+		return other instanceof InterestRateChartDeleteCommand;
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public int hashCode() {
+		final int result = super.hashCode();
+		return result;
+	}
+}

@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.loanaccount.loanschedule.domain;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
-import lombok.Getter;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.InterestRecalculationAdditionalDetailData;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanSchedulePeriodData;
@@ -29,9 +28,7 @@ import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanScheduleP
 /**
  * Domain representation of a Loan Schedule Disbursement Period (not used for persistence)
  */
-@Getter
 public final class LoanScheduleModelDisbursementPeriod implements LoanScheduleModelPeriod {
-
     @SuppressWarnings("unused")
     private final Integer periodNumber;
     private final LocalDate disbursementDate;
@@ -39,13 +36,11 @@ public final class LoanScheduleModelDisbursementPeriod implements LoanScheduleMo
     private BigDecimal chargesDueAtTimeOfDisbursement;
     private boolean isEMIFixedSpecificToInstallment = false;
 
-    public static LoanScheduleModelDisbursementPeriod disbursement(final LocalDate disbursementDate, final Money principalDisbursed,
-            final BigDecimal chargesDueAtTimeOfDisbursement) {
+    public static LoanScheduleModelDisbursementPeriod disbursement(final LocalDate disbursementDate, final Money principalDisbursed, final BigDecimal chargesDueAtTimeOfDisbursement) {
         return new LoanScheduleModelDisbursementPeriod(null, disbursementDate, principalDisbursed, chargesDueAtTimeOfDisbursement);
     }
 
-    private LoanScheduleModelDisbursementPeriod(final Integer periodNumber, final LocalDate disbursementDate,
-            final Money principalDisbursed, final BigDecimal chargesDueAtTimeOfDisbursement) {
+    private LoanScheduleModelDisbursementPeriod(final Integer periodNumber, final LocalDate disbursementDate, final Money principalDisbursed, final BigDecimal chargesDueAtTimeOfDisbursement) {
         this.periodNumber = periodNumber;
         this.disbursementDate = disbursementDate;
         this.principalDisbursed = principalDisbursed;
@@ -54,8 +49,7 @@ public final class LoanScheduleModelDisbursementPeriod implements LoanScheduleMo
 
     @Override
     public LoanSchedulePeriodData toData() {
-        return LoanSchedulePeriodData.disbursementOnlyPeriod(this.disbursementDate, this.principalDisbursed.getAmount(),
-                this.chargesDueAtTimeOfDisbursement, false);
+        return LoanSchedulePeriodData.disbursementOnlyPeriod(this.disbursementDate, this.principalDisbursed.getAmount(), this.chargesDueAtTimeOfDisbursement, false);
     }
 
     @Override
@@ -146,5 +140,25 @@ public final class LoanScheduleModelDisbursementPeriod implements LoanScheduleMo
     @Override
     public void setRescheduleInterestPortion(BigDecimal rescheduleInterestPortion) {
         return;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getPeriodNumber() {
+        return this.periodNumber;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getDisbursementDate() {
+        return this.disbursementDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Money getPrincipalDisbursed() {
+        return this.principalDisbursed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getChargesDueAtTimeOfDisbursement() {
+        return this.chargesDueAtTimeOfDisbursement;
     }
 }

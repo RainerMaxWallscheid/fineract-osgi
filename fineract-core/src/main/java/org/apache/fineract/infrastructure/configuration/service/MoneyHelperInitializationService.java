@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.infrastructure.configuration.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.configuration.api.GlobalConfigurationConstants;
 import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationProperty;
 import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationRepositoryWrapper;
@@ -38,10 +36,9 @@ import org.springframework.stereotype.Service;
  * restart to take effect.
  */
 @Service
-@Slf4j
-@RequiredArgsConstructor
 public class MoneyHelperInitializationService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MoneyHelperInitializationService.class);
     // TODO: this is preventing the circular dependency...
     @Lazy
     @Autowired
@@ -58,21 +55,17 @@ public class MoneyHelperInitializationService {
         if (tenant == null) {
             throw new IllegalArgumentException("Tenant cannot be null");
         }
-
         String tenantIdentifier = tenant.getTenantIdentifier();
-
         FineractPlatformTenant originalTenant = ThreadLocalContextUtil.getTenant();
         try {
             // Set tenant context to read configuration
             ThreadLocalContextUtil.setTenant(tenant);
-
             // Get rounding mode from configuration with fallback to default
             int roundingModeValue = getRoundingModeFromConfiguration();
-
             // Initialize MoneyHelper for this tenant
             MoneyHelper.initializeTenantRoundingMode(tenantIdentifier, roundingModeValue);
         } catch (Exception e) {
-            log.error("Failed to initialize MoneyHelper for tenant '{}'", tenantIdentifier, e);
+            log.error("Failed to initialize MoneyHelper for tenant \'{}\'", tenantIdentifier, e);
             throw new RuntimeException("Failed to initialize MoneyHelper for tenant: " + tenantIdentifier, e);
         } finally {
             ThreadLocalContextUtil.setTenant(originalTenant);
@@ -100,8 +93,11 @@ public class MoneyHelperInitializationService {
      * @return the rounding mode value
      */
     private int getRoundingModeFromConfiguration() {
-        GlobalConfigurationProperty roundingModeProperty = globalConfigurationRepository
-                .findOneByNameWithNotFoundDetection(GlobalConfigurationConstants.ROUNDING_MODE);
+        GlobalConfigurationProperty roundingModeProperty = globalConfigurationRepository.findOneByNameWithNotFoundDetection(GlobalConfigurationConstants.ROUNDING_MODE);
         return roundingModeProperty.getValue().intValue();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MoneyHelperInitializationService() {
     }
 }

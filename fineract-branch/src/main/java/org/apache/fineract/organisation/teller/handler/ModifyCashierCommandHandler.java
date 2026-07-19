@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.organisation.teller.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -31,13 +30,16 @@ import org.apache.fineract.organisation.teller.service.CashierWritePlatformServi
  * @see org.apache.fineract.organisation.teller.service.CashierWritePlatformService
  * @since 2.0.0
  */
-@RequiredArgsConstructor
 public class ModifyCashierCommandHandler implements NewCommandSourceHandler {
-
     private final CashierWritePlatformService writePlatformService;
 
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.modifyCashier(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ModifyCashierCommandHandler(final CashierWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

@@ -21,26 +21,61 @@ package org.apache.fineract.infrastructure.jobs.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "scheduler_detail")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class SchedulerDetail extends AbstractPersistableCustom<Long> {
-
     @Column(name = "execute_misfired_jobs")
     private boolean executeInstructionForMisfiredJobs;
-
     @Column(name = "is_suspended")
     private boolean suspended;
-
     @Column(name = "reset_scheduler_on_bootup")
     private boolean resetSchedulerOnBootup;
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isExecuteInstructionForMisfiredJobs() {
+        return this.executeInstructionForMisfiredJobs;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isSuspended() {
+        return this.suspended;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isResetSchedulerOnBootup() {
+        return this.resetSchedulerOnBootup;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public SchedulerDetail setExecuteInstructionForMisfiredJobs(final boolean executeInstructionForMisfiredJobs) {
+        this.executeInstructionForMisfiredJobs = executeInstructionForMisfiredJobs;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public SchedulerDetail setSuspended(final boolean suspended) {
+        this.suspended = suspended;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public SchedulerDetail setResetSchedulerOnBootup(final boolean resetSchedulerOnBootup) {
+        this.resetSchedulerOnBootup = resetSchedulerOnBootup;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SchedulerDetail() {
+    }
 }

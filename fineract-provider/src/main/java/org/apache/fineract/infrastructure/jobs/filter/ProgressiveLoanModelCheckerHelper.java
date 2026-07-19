@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.domain.BatchRequest;
@@ -43,24 +42,17 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 @Component
 public class ProgressiveLoanModelCheckerHelper extends COBFilterApiMatcher implements InitializingBean {
-
     private final GLIMAccountInfoRepository glimAccountInfoRepository;
     private final LoanRepository loanRepository;
-
     private final LoanRescheduleRequestRepository loanRescheduleRequestRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
-
     private static final List<HttpMethod> HTTP_METHODS = List.of(HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE);
-
     public static final Pattern IGNORE_LOAN_PATH_PATTERN = Pattern.compile("/v[1-9][0-9]*/loans/catch-up");
     public static final Pattern LOAN_PATH_PATTERN = Pattern.compile("/v[1-9][0-9]*/(?:reschedule)?loans/(?:external-id/)?([^/?]+).*");
-
     public static final Pattern LOAN_GLIMACCOUNT_PATH_PATTERN = Pattern.compile("/v[1-9][0-9]*/loans/glimAccount/(\\d+).*");
-    private static final Predicate<String> URL_FUNCTION = s -> LOAN_PATH_PATTERN.matcher(s).find()
-            || LOAN_GLIMACCOUNT_PATH_PATTERN.matcher(s).find();
+    private static final Predicate<String> URL_FUNCTION = s -> LOAN_PATH_PATTERN.matcher(s).find() || LOAN_GLIMACCOUNT_PATH_PATTERN.matcher(s).find();
 
     private Long getLoanId(boolean isGlim, String pathInfo) {
         if (!isGlim) {
@@ -90,8 +82,7 @@ public class ProgressiveLoanModelCheckerHelper extends COBFilterApiMatcher imple
 
     @Override
     protected boolean isApiMatching(String method, String pathInfo) {
-        return HTTP_METHODS.contains(HttpMethod.valueOf(method)) && !IGNORE_LOAN_PATH_PATTERN.matcher(pathInfo).find()
-                && URL_FUNCTION.test(pathInfo);
+        return HTTP_METHODS.contains(HttpMethod.valueOf(method)) && !IGNORE_LOAN_PATH_PATTERN.matcher(pathInfo).find() && URL_FUNCTION.test(pathInfo);
     }
 
     private boolean isGlim(String pathInfo) {
@@ -123,7 +114,6 @@ public class ProgressiveLoanModelCheckerHelper extends COBFilterApiMatcher imple
                 // first, so skipping it
                 loanIds.addAll(getLoanIdsFromApi(relativeUrl));
             }
-
             // check the body for Loan ID
             Long loanId = getTopLevelLoanIdFromBatchRequest(batchRequest);
             if (loanId != null) {
@@ -181,4 +171,10 @@ public class ProgressiveLoanModelCheckerHelper extends COBFilterApiMatcher imple
         throw new NotImplementedException();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ProgressiveLoanModelCheckerHelper(final GLIMAccountInfoRepository glimAccountInfoRepository, final LoanRepository loanRepository, final LoanRescheduleRequestRepository loanRescheduleRequestRepository) {
+        this.glimAccountInfoRepository = glimAccountInfoRepository;
+        this.loanRepository = loanRepository;
+        this.loanRescheduleRequestRepository = loanRescheduleRequestRepository;
+    }
 }

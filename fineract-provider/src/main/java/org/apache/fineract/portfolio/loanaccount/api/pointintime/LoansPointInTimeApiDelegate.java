@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.loanaccount.api.pointintime;
 
 import java.time.LocalDate;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.DateParam;
 import org.apache.fineract.infrastructure.core.data.DateFormat;
@@ -35,11 +34,8 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class LoansPointInTimeApiDelegate implements LoansPointInTimeApi {
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "LOAN";
-
     private final LoanPointInTimeService loanPointInTimeService;
     private final LoanReadPlatformService loanReadPlatformService;
     private final PlatformSecurityContext context;
@@ -51,12 +47,10 @@ public class LoansPointInTimeApiDelegate implements LoansPointInTimeApi {
     }
 
     @Override
-    public LoanPointInTimeData retrieveLoanPointInTimeByExternalId(String loanExternalIdStr, DateParam dateParam, String dateFormat,
-            String locale) {
+    public LoanPointInTimeData retrieveLoanPointInTimeByExternalId(String loanExternalIdStr, DateParam dateParam, String dateFormat, String locale) {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         Long resolvedLoanId = loanReadPlatformService.getResolvedLoanId(loanExternalId);
-
         return getLoanPointInTime(resolvedLoanId, dateParam, dateFormat, locale);
     }
 
@@ -67,7 +61,6 @@ public class LoansPointInTimeApiDelegate implements LoansPointInTimeApi {
         DateParam dateParam = request.getDate();
         String dateFormat = request.getDateFormat();
         String locale = request.getLocale();
-
         return getLoansPointInTime(loanIds, dateParam, dateFormat, locale);
     }
 
@@ -78,10 +71,8 @@ public class LoansPointInTimeApiDelegate implements LoansPointInTimeApi {
         DateParam dateParam = request.getDate();
         String dateFormat = request.getDateFormat();
         String locale = request.getLocale();
-
         List<ExternalId> externalIds = ExternalIdFactory.produce(loanExternalIds);
         List<Long> loanIds = resolveExternalIds(externalIds);
-
         return getLoansPointInTime(loanIds, dateParam, dateFormat, locale);
     }
 
@@ -102,4 +93,10 @@ public class LoansPointInTimeApiDelegate implements LoansPointInTimeApi {
         return loanReadPlatformService.retrieveLoanIdsByExternalIds(loanExternalIds);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoansPointInTimeApiDelegate(final LoanPointInTimeService loanPointInTimeService, final LoanReadPlatformService loanReadPlatformService, final PlatformSecurityContext context) {
+        this.loanPointInTimeService = loanPointInTimeService;
+        this.loanReadPlatformService = loanReadPlatformService;
+        this.context = context;
+    }
 }

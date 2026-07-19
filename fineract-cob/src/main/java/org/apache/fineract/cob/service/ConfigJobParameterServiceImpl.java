@@ -21,7 +21,6 @@ package org.apache.fineract.cob.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.COBBusinessStep;
 import org.apache.fineract.cob.data.BusinessStep;
 import org.apache.fineract.cob.data.BusinessStepDetail;
@@ -39,9 +38,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class ConfigJobParameterServiceImpl implements ConfigJobParameterService, InitializingBean {
-
     private final BatchBusinessStepRepository batchBusinessStepRepository;
     private final BusinessStepConfigDataParser dataParser;
     private final BusinessStepCategoryService businessStepCategoryService;
@@ -64,16 +61,13 @@ public class ConfigJobParameterServiceImpl implements ConfigJobParameterService,
     }
 
     @Override
-    public CommandProcessingResult updateStepConfigByJobName(JsonCommand command, String jobName)
-            throws BusinessStepNotBelongsToJobException {
+    public CommandProcessingResult updateStepConfigByJobName(JsonCommand command, String jobName) throws BusinessStepNotBelongsToJobException {
         List<BusinessStep> businessSteps = dataParser.parseUpdate(command);
         if (businessSteps.isEmpty()) {
             throw new BusinessStepException("A job needs to have 1 business step at least.");
         }
-        List<String> availableBusinessStepNames = availableBusinessStepsForLoan.getAvailableBusinessSteps().stream()
-                .map(BusinessStepDetail::getStepName).toList();
-        List<String> notValidBusinessStepNames = businessSteps.stream().map(BusinessStep::getStepName)
-                .filter(businessStepName -> !availableBusinessStepNames.contains(businessStepName)).toList();
+        List<String> availableBusinessStepNames = availableBusinessStepsForLoan.getAvailableBusinessSteps().stream().map(BusinessStepDetail::getStepName).toList();
+        List<String> notValidBusinessStepNames = businessSteps.stream().map(BusinessStep::getStepName).filter(businessStepName -> !availableBusinessStepNames.contains(businessStepName)).toList();
         if (notValidBusinessStepNames.isEmpty()) {
             batchBusinessStepRepository.deleteAllByJobName(jobName);
             businessSteps.forEach(newBusinessStepConfig -> {
@@ -86,9 +80,9 @@ public class ConfigJobParameterServiceImpl implements ConfigJobParameterService,
         } else {
             throw new BusinessStepException(notValidBusinessStepNames + " Business steps are not configurable for this job.");
         }
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .build();
+        return  //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).build();
     }
 
     @Override
@@ -115,5 +109,14 @@ public class ConfigJobParameterServiceImpl implements ConfigJobParameterService,
     @Override
     public List<String> getAllConfiguredJobNames() {
         return batchBusinessStepRepository.findConfiguredJobNames();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ConfigJobParameterServiceImpl(final BatchBusinessStepRepository batchBusinessStepRepository, final BusinessStepConfigDataParser dataParser, final BusinessStepCategoryService businessStepCategoryService, final ApplicationContext applicationContext, final BusinessStepMapper mapper) {
+        this.batchBusinessStepRepository = batchBusinessStepRepository;
+        this.dataParser = dataParser;
+        this.businessStepCategoryService = businessStepCategoryService;
+        this.applicationContext = applicationContext;
+        this.mapper = mapper;
     }
 }

@@ -20,19 +20,14 @@ package org.apache.fineract.infrastructure.cache.domain;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Getter;
 
-@Getter
 public enum CacheType {
-
-    INVALID(0, "cacheType.invalid"), //
-    NO_CACHE(1, "cacheType.noCache"), //
-    SINGLE_NODE(2, "cacheType.singleNode"), //
+    INVALID(0, "cacheType.invalid"),  //
+    NO_CACHE(1, "cacheType.noCache"),  //
+    SINGLE_NODE(2, "cacheType.singleNode"),  //
     MULTI_NODE(3, "cacheType.multiNode");
-
     private final Integer value;
     private final String code;
-
     private static final Map<Integer, CacheType> intToEnumMap = new HashMap<>();
 
     static {
@@ -69,5 +64,15 @@ public enum CacheType {
 
     public boolean isDistributedCache() {
         return MULTI_NODE.getValue().equals(this.value);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
     }
 }

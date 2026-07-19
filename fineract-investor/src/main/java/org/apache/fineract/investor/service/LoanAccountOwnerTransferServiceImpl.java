@@ -31,12 +31,9 @@ import static org.apache.fineract.investor.data.ExternalTransferSubStatus.BALANC
 import static org.apache.fineract.investor.data.ExternalTransferSubStatus.BALANCE_ZERO;
 import static org.apache.fineract.investor.data.ExternalTransferSubStatus.SAMEDAY_TRANSFERS;
 import static org.apache.fineract.investor.data.ExternalTransferSubStatus.UNSOLD;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.infrastructure.event.business.domain.loan.LoanAccountSnapshotBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
@@ -53,11 +50,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@RequiredArgsConstructor
 @Transactional
-@Slf4j
 public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTransferService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanAccountOwnerTransferServiceImpl.class);
     public static final LocalDate FUTURE_DATE_9999_12_31 = LocalDate.of(9999, 12, 31);
     private final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository;
     private final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository;
@@ -69,7 +65,6 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
     public void handleLoanClosedOrOverpaid(Loan loan) {
         Long loanId = loan.getId();
         List<ExternalAssetOwnerTransfer> transferDataList = findAllPendingOrBuybackOrIntermediateTransfers(loanId);
-
         if (transferDataList.size() > 1) {
             if (isSameDayTransfers(transferDataList)) {
                 transferDataList.forEach(externalAssetOwnerTransfer -> cancelTransfer(loan, externalAssetOwnerTransfer, SAMEDAY_TRANSFERS));
@@ -91,14 +86,12 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
     private void cancelTransfer(Loan loan, ExternalAssetOwnerTransfer pendingTransfer, ExternalTransferSubStatus subStatus) {
         updatePendingTransfer(pendingTransfer);
         ExternalAssetOwnerTransfer cancelledTransfer = createCancelledTransfer(pendingTransfer, subStatus);
-
         businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(cancelledTransfer, loan));
     }
 
     private void declineTransfer(Loan loan, ExternalAssetOwnerTransfer pendingTransfer) {
         ExternalAssetOwnerTransfer declinedSaleTransfer = createDeclinedTransfer(pendingTransfer, loan);
         updatePendingTransfer(pendingTransfer);
-
         businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(declinedSaleTransfer, loan));
     }
 
@@ -106,16 +99,13 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
         ExternalAssetOwnerTransfer activeTransfer = findActiveOrActiveIntermediateTransfer(loan, buybackTransfer);
         updateActiveTransfer(activeTransfer);
         buybackTransfer = updatePendingBuybackTransfer(loan, buybackTransfer);
-
         externalAssetOwnerTransferLoanMappingRepository.deleteByLoanIdAndOwnerTransfer(loan.getId(), activeTransfer);
         loanJournalEntryPoster.postJournalEntriesForExternalOwnerTransfer(loan, buybackTransfer, null);
-
         businessEventNotifierService.notifyPostBusinessEvent(new LoanOwnershipTransferBusinessEvent(buybackTransfer, loan));
         businessEventNotifierService.notifyPostBusinessEvent(new LoanAccountSnapshotBusinessEvent(loan));
     }
 
-    private ExternalAssetOwnerTransfer createCancelledTransfer(ExternalAssetOwnerTransfer pendingTransfer,
-            ExternalTransferSubStatus subStatus) {
+    private ExternalAssetOwnerTransfer createCancelledTransfer(ExternalAssetOwnerTransfer pendingTransfer, ExternalTransferSubStatus subStatus) {
         ExternalAssetOwnerTransfer cancelledTransfer = new ExternalAssetOwnerTransfer();
         cancelledTransfer.setOwner(pendingTransfer.getOwner());
         cancelledTransfer.setExternalId(pendingTransfer.getExternalId());
@@ -163,8 +153,7 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
         externalAssetOwnerTransferRepository.save(activeTransfer);
     }
 
-    private ExternalAssetOwnerTransferDetails createAssetOwnerTransferDetails(Loan loan,
-            ExternalAssetOwnerTransfer externalAssetOwnerTransfer) {
+    private ExternalAssetOwnerTransferDetails createAssetOwnerTransferDetails(Loan loan, ExternalAssetOwnerTransfer externalAssetOwnerTransfer) {
         ExternalAssetOwnerTransferDetails details = new ExternalAssetOwnerTransferDetails();
         details.setExternalAssetOwnerTransfer(externalAssetOwnerTransfer);
         details.setTotalPrincipalOutstanding(loan.getSummary().getTotalPrincipalOutstanding());
@@ -178,21 +167,11 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
     }
 
     private ExternalAssetOwnerTransfer findActiveOrActiveIntermediateTransfer(Loan loan, ExternalAssetOwnerTransfer buybackTransfer) {
-        return externalAssetOwnerTransferRepository
-                .findOne((root, query, criteriaBuilder) -> criteriaBuilder.and(criteriaBuilder.equal(root.get("loanId"), loan.getId()),
-                        criteriaBuilder.equal(root.get("owner"), buybackTransfer.getOwner()),
-                        root.get("status").in(List.of(ACTIVE, ACTIVE_INTERMEDIATE)),
-                        criteriaBuilder.equal(root.get("effectiveDateTo"), FUTURE_DATE_9999_12_31)))
-                .orElseThrow();
+        return externalAssetOwnerTransferRepository.findOne((root, query, criteriaBuilder) -> criteriaBuilder.and(criteriaBuilder.equal(root.get("loanId"), loan.getId()), criteriaBuilder.equal(root.get("owner"), buybackTransfer.getOwner()), root.get("status").in(List.of(ACTIVE, ACTIVE_INTERMEDIATE)), criteriaBuilder.equal(root.get("effectiveDateTo"), FUTURE_DATE_9999_12_31))).orElseThrow();
     }
 
     private List<ExternalAssetOwnerTransfer> findAllPendingOrBuybackOrIntermediateTransfers(Long loanId) {
-        return externalAssetOwnerTransferRepository
-                .findAll(
-                        (root, query, criteriaBuilder) -> criteriaBuilder.and(criteriaBuilder.equal(root.get("loanId"), loanId),
-                                root.get("status").in(List.of(PENDING, BUYBACK, PENDING_INTERMEDIATE, BUYBACK_INTERMEDIATE)),
-                                criteriaBuilder.equal(root.get("effectiveDateTo"), FUTURE_DATE_9999_12_31)),
-                        Sort.by(Sort.Direction.ASC, "id"));
+        return externalAssetOwnerTransferRepository.findAll((root, query, criteriaBuilder) -> criteriaBuilder.and(criteriaBuilder.equal(root.get("loanId"), loanId), root.get("status").in(List.of(PENDING, BUYBACK, PENDING_INTERMEDIATE, BUYBACK_INTERMEDIATE)), criteriaBuilder.equal(root.get("effectiveDateTo"), FUTURE_DATE_9999_12_31)), Sort.by(Sort.Direction.ASC, "id"));
     }
 
     private boolean isBiggerThanZero(BigDecimal loanTotalOverpaid) {
@@ -201,5 +180,14 @@ public class LoanAccountOwnerTransferServiceImpl implements LoanAccountOwnerTran
 
     private static boolean isSameDayTransfers(List<ExternalAssetOwnerTransfer> transferDataList) {
         return (transferDataList.stream().map(ExternalAssetOwnerTransfer::getSettlementDate).distinct().count() == 1);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanAccountOwnerTransferServiceImpl(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalAssetOwnerTransferLoanMappingRepository externalAssetOwnerTransferLoanMappingRepository, final LoanJournalEntryPoster loanJournalEntryPoster, final BusinessEventNotifierService businessEventNotifierService, final ExternalAssetOwnerTransferOutstandingInterestCalculation externalAssetOwnerTransferOutstandingInterestCalculation) {
+        this.externalAssetOwnerTransferRepository = externalAssetOwnerTransferRepository;
+        this.externalAssetOwnerTransferLoanMappingRepository = externalAssetOwnerTransferLoanMappingRepository;
+        this.loanJournalEntryPoster = loanJournalEntryPoster;
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.externalAssetOwnerTransferOutstandingInterestCalculation = externalAssetOwnerTransferOutstandingInterestCalculation;
     }
 }

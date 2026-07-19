@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.adhocquery.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.adhocquery.service.AdHocWritePlatformService;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
@@ -29,16 +28,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "ADHOC", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateAdHocCommandHandler implements NewCommandSourceHandler {
-
     private final AdHocWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         final Long adHocId = command.entityId();
         return this.writePlatformService.updateAdHocQuery(adHocId, command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateAdHocCommandHandler(final AdHocWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

@@ -22,14 +22,11 @@ import static org.apache.fineract.portfolio.savings.DepositsApiConstants.RECURRI
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.accountingRuleParamName;
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.chargesParamName;
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.taxGroupIdParamName;
-
 import jakarta.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.accounting.producttoaccountmapping.service.ProductToGLAccountMappingWritePlatformService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -53,10 +50,9 @@ import org.apache.fineract.portfolio.tax.domain.TaxGroup;
 import org.springframework.dao.DataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 public class RecurringDepositProductWritePlatformServiceJpaRepositoryImpl implements RecurringDepositProductWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RecurringDepositProductWritePlatformServiceJpaRepositoryImpl.class);
     private final PlatformSecurityContext context;
     private final RecurringDepositProductRepository recurringDepositProductRepository;
     private final DepositProductDataValidator fromApiJsonDataValidator;
@@ -67,21 +63,15 @@ public class RecurringDepositProductWritePlatformServiceJpaRepositoryImpl implem
     @Transactional
     @Override
     public CommandProcessingResult create(final JsonCommand command) {
-
         try {
             this.fromApiJsonDataValidator.validateForRecurringDepositCreate(command.json());
-
             final RecurringDepositProduct product = this.depositProductAssembler.assembleRecurringDepositProduct(command);
-
             this.recurringDepositProductRepository.saveAndFlush(product);
-
             // save accounting mappings
-            this.accountMappingWritePlatformService.createSavingProductToGLAccountMapping(product.getId(), command,
-                    DepositAccountType.RECURRING_DEPOSIT);
-
-            return new CommandProcessingResultBuilder() //
-                    .withEntityId(product.getId()) //
-                    .build();
+            this.accountMappingWritePlatformService.createSavingProductToGLAccountMapping(product.getId(), command, DepositAccountType.RECURRING_DEPOSIT);
+            return  //
+            //
+            new CommandProcessingResultBuilder().withEntityId(product.getId()).build();
         } catch (final DataAccessException e) {
             handleDataIntegrityIssues(command, e.getMostSpecificCause(), e);
             return CommandProcessingResult.empty();
@@ -94,52 +84,40 @@ public class RecurringDepositProductWritePlatformServiceJpaRepositoryImpl implem
     @Transactional
     @Override
     public CommandProcessingResult update(final Long productId, final JsonCommand command) {
-
         try {
             this.context.authenticatedUser();
             this.fromApiJsonDataValidator.validateForRecurringDepositUpdate(command.json());
-
-            final RecurringDepositProduct product = this.recurringDepositProductRepository.findById(productId)
-                    .orElseThrow(() -> new RecurringDepositProductNotFoundException(productId));
+            final RecurringDepositProduct product = this.recurringDepositProductRepository.findById(productId).orElseThrow(() -> new RecurringDepositProductNotFoundException(productId));
             final Map<String, Object> changes = product.update(command);
-
             if (changes.containsKey(chargesParamName)) {
-                final Set<Charge> savingsProductCharges = this.depositProductAssembler.assembleListOfSavingsProductCharges(command,
-                        product.currency().getCode());
+                final Set<Charge> savingsProductCharges = this.depositProductAssembler.assembleListOfSavingsProductCharges(command, product.currency().getCode());
                 final boolean updated = product.update(savingsProductCharges);
                 if (!updated) {
                     changes.remove(chargesParamName);
                 }
             }
-
             if (changes.containsKey(taxGroupIdParamName)) {
                 final TaxGroup taxGroup = this.depositProductAssembler.assembleTaxGroup(command);
                 product.setTaxGroup(taxGroup);
                 if (product.withHoldTax() && product.getTaxGroup() == null) {
                     final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-                    final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
-                            .resource(RECURRING_DEPOSIT_PRODUCT_RESOURCE_NAME);
+                    final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(RECURRING_DEPOSIT_PRODUCT_RESOURCE_NAME);
                     final Long taxGroupId = null;
                     baseDataValidator.reset().parameter(taxGroupIdParamName).value(taxGroupId).notBlank();
                     throw new PlatformApiDataValidationException(dataValidationErrors);
                 }
             }
-
             // accounting related changes
             final boolean accountingTypeChanged = changes.containsKey(accountingRuleParamName);
-            final Map<String, Object> accountingMappingChanges = this.accountMappingWritePlatformService
-                    .updateSavingsProductToGLAccountMapping(product.getId(), command, accountingTypeChanged, product.getAccountingType(),
-                            DepositAccountType.RECURRING_DEPOSIT);
+            final Map<String, Object> accountingMappingChanges = this.accountMappingWritePlatformService.updateSavingsProductToGLAccountMapping(product.getId(), command, accountingTypeChanged, product.getAccountingType(), DepositAccountType.RECURRING_DEPOSIT);
             changes.putAll(accountingMappingChanges);
-
             if (!changes.isEmpty()) {
                 this.recurringDepositProductRepository.saveAndFlush(product);
             }
-
-            return new CommandProcessingResultBuilder() //
-                    .withEntityId(product.getId()) //
-                    .with(changes) //
-                    .build();
+            return  //
+            //
+            //
+            new CommandProcessingResultBuilder().withEntityId(product.getId()).with(changes).build();
         } catch (final DataAccessException e) {
             handleDataIntegrityIssues(command, e.getMostSpecificCause(), e);
             return CommandProcessingResult.empty();
@@ -152,16 +130,12 @@ public class RecurringDepositProductWritePlatformServiceJpaRepositoryImpl implem
     @Transactional
     @Override
     public CommandProcessingResult delete(final Long productId) {
-
         this.context.authenticatedUser();
-        final RecurringDepositProduct product = this.recurringDepositProductRepository.findById(productId)
-                .orElseThrow(() -> new RecurringDepositProductNotFoundException(productId));
-
+        final RecurringDepositProduct product = this.recurringDepositProductRepository.findById(productId).orElseThrow(() -> new RecurringDepositProductNotFoundException(productId));
         this.recurringDepositProductRepository.delete(product);
-
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(product.getId()) //
-                .build();
+        return  //
+        //
+        new CommandProcessingResultBuilder().withEntityId(product.getId()).build();
     }
 
     /*
@@ -178,18 +152,28 @@ public class RecurringDepositProductWritePlatformServiceJpaRepositoryImpl implem
             msgCode += ".duplicate.name";
             msg = "Recurring Deposit product with name `" + name + "` already exists";
             param = "name";
-            msgArgs = new Object[] { name, dae };
+            msgArgs = new Object[] {name, dae};
         } else if (checkEx.getMessage().contains("sp_unq_short_name")) {
             final String shortName = command.stringValueOfParameterNamed("shortName");
             msgCode += ".duplicate.short.name";
             msg = "Recurring Deposit product with short name `" + shortName + "` already exists";
             param = "shortName";
-            msgArgs = new Object[] { shortName, dae };
+            msgArgs = new Object[] {shortName, dae};
         } else {
             msgCode += ".unknown.data.integrity.issue";
-            msgArgs = new Object[] { dae };
+            msgArgs = new Object[] {dae};
         }
         log.error("Error occured.", dae);
         throw ErrorHandler.getMappable(dae, msgCode, msg, param, msgArgs);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RecurringDepositProductWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final RecurringDepositProductRepository recurringDepositProductRepository, final DepositProductDataValidator fromApiJsonDataValidator, final DepositProductAssembler depositProductAssembler, final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService, final InterestRateChartAssembler chartAssembler) {
+        this.context = context;
+        this.recurringDepositProductRepository = recurringDepositProductRepository;
+        this.fromApiJsonDataValidator = fromApiJsonDataValidator;
+        this.depositProductAssembler = depositProductAssembler;
+        this.accountMappingWritePlatformService = accountMappingWritePlatformService;
+        this.chartAssembler = chartAssembler;
     }
 }

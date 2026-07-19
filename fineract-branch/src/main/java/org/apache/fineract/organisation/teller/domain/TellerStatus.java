@@ -18,40 +18,33 @@
  */
 package org.apache.fineract.organisation.teller.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 /**
  * Enum representation of teller status states.
  */
-@Getter
-@AllArgsConstructor
 public enum TellerStatus {
-
-    INVALID(0, "tellerStatusType.invalid"), //
-    PENDING(100, "tellerStatusType.pending"), //
-    ACTIVE(300, "tellerStatusType.active"), //
-    INACTIVE(400, "tellerStatusType.inactive"), //
-    CLOSED(600, "tellerStatusType.closed"); //
-
+    INVALID(0, "tellerStatusType.invalid"),  //
+    PENDING(100, "tellerStatusType.pending"),  //
+    ACTIVE(300, "tellerStatusType.active"),  //
+    INACTIVE(400, "tellerStatusType.inactive"),  //
+    CLOSED(600, "tellerStatusType.closed");
+    //
     private final Integer value;
     private final String code;
 
     public static TellerStatus fromInt(final Integer statusValue) {
-
         TellerStatus status = TellerStatus.INVALID;
         switch (statusValue) {
-            case 100:
-                status = TellerStatus.PENDING;
+        case 100: 
+            status = TellerStatus.PENDING;
             break;
-            case 300:
-                status = TellerStatus.ACTIVE;
+        case 300: 
+            status = TellerStatus.ACTIVE;
             break;
-            case 400:
-                status = TellerStatus.INACTIVE;
+        case 400: 
+            status = TellerStatus.INACTIVE;
             break;
-            case 600:
-                status = TellerStatus.CLOSED;
+        case 600: 
+            status = TellerStatus.CLOSED;
             break;
         }
         return status;
@@ -77,4 +70,19 @@ public enum TellerStatus {
         return this.value.equals(TellerStatus.INACTIVE.getValue());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private TellerStatus(final Integer value, final String code) {
+        this.value = value;
+        this.code = code;
+    }
 }

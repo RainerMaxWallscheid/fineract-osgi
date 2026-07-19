@@ -23,7 +23,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
@@ -32,15 +31,16 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.util.Assert;
 
-@Slf4j
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CustomAuthenticationFailureHandler.class);
     private String defaultFailureUrl;
     private boolean forwardToDestination = false;
     private boolean allowSessionCreation = true;
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
-    public CustomAuthenticationFailureHandler() {}
+    public CustomAuthenticationFailureHandler() {
+    }
 
     /**
      * Performs the redirect or forward to the {@code defaultFailureUrl} if set, otherwise returns a 401 error code.
@@ -49,23 +49,17 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
      * view.
      */
     @Override
-    public void onAuthenticationFailure(final HttpServletRequest request, final HttpServletResponse response,
-            final AuthenticationException exception) throws IOException, ServletException {
-
+    public void onAuthenticationFailure(final HttpServletRequest request, final HttpServletResponse response, final AuthenticationException exception) throws IOException, ServletException {
         if (this.defaultFailureUrl == null) {
             log.debug("No failure URL set, sending 401 Unauthorized error");
-
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication Failed: " + exception.getMessage());
         } else {
             saveException(request, exception);
-
             if (this.forwardToDestination) {
                 log.debug("Forwarding to {}", this.defaultFailureUrl);
-
                 request.getRequestDispatcher(this.defaultFailureUrl).forward(request, response);
             } else {
                 log.debug("Redirecting to {}", this.defaultFailureUrl);
-
                 final String oauthToken = request.getParameter("oauth_token");
                 request.setAttribute("oauth_token", oauthToken);
                 final String url = this.defaultFailureUrl + "?oauth_token=" + oauthToken;
@@ -86,7 +80,6 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
             request.setAttribute(WebAttributes.AUTHENTICATION_EXCEPTION, exception);
         } else {
             final HttpSession session = request.getSession(false);
-
             if (session != null || this.allowSessionCreation) {
                 request.getSession().setAttribute(WebAttributes.AUTHENTICATION_EXCEPTION, exception);
             }
@@ -100,7 +93,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
      *            the failure URL, for example "/loginFailed.jsp".
      */
     public void setDefaultFailureUrl(final String defaultFailureUrl) {
-        Assert.isTrue(UrlUtils.isValidRedirectUrl(defaultFailureUrl), "'" + defaultFailureUrl + "' is not a valid redirect URL");
+        Assert.isTrue(UrlUtils.isValidRedirectUrl(defaultFailureUrl), "\'" + defaultFailureUrl + "\' is not a valid redirect URL");
         this.defaultFailureUrl = defaultFailureUrl;
     }
 

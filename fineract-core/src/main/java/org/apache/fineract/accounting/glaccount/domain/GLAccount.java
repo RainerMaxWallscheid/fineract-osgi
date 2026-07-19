@@ -30,55 +30,36 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.accounting.glaccount.api.GLAccountJsonInputParams;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
-@Table(name = "acc_gl_account", uniqueConstraints = { @UniqueConstraint(columnNames = { "gl_code" }, name = "acc_gl_code") })
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
+@Table(name = "acc_gl_account", uniqueConstraints = {@UniqueConstraint(columnNames = {"gl_code"}, name = "acc_gl_code")})
 public class GLAccount extends AbstractPersistableCustom<Long> {
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private GLAccount parent;
-
     @Column(name = "hierarchy", nullable = true, length = 50)
     private String hierarchy;
-
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private List<GLAccount> children = new ArrayList<>();
-
     @Column(name = "name", nullable = false, length = 45)
     private String name;
-
     @Column(name = "gl_code", nullable = false, length = 100)
     private String glCode;
-
     @Column(name = "disabled", nullable = false)
     private boolean disabled;
-
     @Column(name = "manual_journal_entries_allowed", nullable = false)
     private boolean manualEntriesAllowed = true;
-
     @Column(name = "classification_enum", nullable = false)
     private Integer type;
-
     @Column(name = "account_usage", nullable = false)
     private Integer usage;
-
     @Column(name = "description", nullable = true, length = 500)
     private String description;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id")
     private CodeValue tagId;
@@ -87,14 +68,11 @@ public class GLAccount extends AbstractPersistableCustom<Long> {
         final String name = command.stringValueOfParameterNamed(GLAccountJsonInputParams.NAME.getValue());
         final String glCode = command.stringValueOfParameterNamed(GLAccountJsonInputParams.GL_CODE.getValue());
         final boolean disabled = command.booleanPrimitiveValueOfParameterNamed(GLAccountJsonInputParams.DISABLED.getValue());
-        final boolean manualEntriesAllowed = command
-                .booleanPrimitiveValueOfParameterNamed(GLAccountJsonInputParams.MANUAL_ENTRIES_ALLOWED.getValue());
+        final boolean manualEntriesAllowed = command.booleanPrimitiveValueOfParameterNamed(GLAccountJsonInputParams.MANUAL_ENTRIES_ALLOWED.getValue());
         final Integer usage = command.integerValueSansLocaleOfParameterNamed(GLAccountJsonInputParams.USAGE.getValue());
         final Integer type = command.integerValueSansLocaleOfParameterNamed(GLAccountJsonInputParams.TYPE.getValue());
         final String description = command.stringValueOfParameterNamed(GLAccountJsonInputParams.DESCRIPTION.getValue());
-        return new GLAccount().setParent(parent).setName(name).setGlCode(glCode).setDisabled(disabled)
-                .setManualEntriesAllowed(manualEntriesAllowed).setType(type).setUsage(usage).setDescription(description)
-                .setTagId(glAccountTagType);
+        return new GLAccount().setParent(parent).setName(name).setGlCode(glCode).setDisabled(disabled).setManualEntriesAllowed(manualEntriesAllowed).setType(type).setUsage(usage).setDescription(description).setTagId(glAccountTagType);
     }
 
     public Map<String, Object> update(final JsonCommand command) {
@@ -107,13 +85,11 @@ public class GLAccount extends AbstractPersistableCustom<Long> {
         handlePropertyUpdate(command, actualChanges, GLAccountJsonInputParams.PARENT_ID.getValue(), 0L);
         handlePropertyUpdate(command, actualChanges, GLAccountJsonInputParams.TYPE.getValue(), this.type, true);
         handlePropertyUpdate(command, actualChanges, GLAccountJsonInputParams.USAGE.getValue(), this.usage, true);
-        handlePropertyUpdate(command, actualChanges, GLAccountJsonInputParams.TAGID.getValue(),
-                this.tagId == null ? 0L : this.tagId.getId());
+        handlePropertyUpdate(command, actualChanges, GLAccountJsonInputParams.TAGID.getValue(), this.tagId == null ? 0L : this.tagId.getId());
         return actualChanges;
     }
 
-    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName,
-            final Integer propertyToBeUpdated, final boolean sansLocale) {
+    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName, final Integer propertyToBeUpdated, final boolean sansLocale) {
         boolean changeDetected = false;
         if (sansLocale) {
             changeDetected = command.isChangeInIntegerSansLocaleParameterNamed(paramName, propertyToBeUpdated);
@@ -137,8 +113,7 @@ public class GLAccount extends AbstractPersistableCustom<Long> {
         }
     }
 
-    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName,
-            final String propertyToBeUpdated) {
+    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName, final String propertyToBeUpdated) {
         if (command.isChangeInStringParameterNamed(paramName, propertyToBeUpdated)) {
             final String newValue = command.stringValueOfParameterNamed(paramName);
             actualChanges.put(paramName, newValue);
@@ -153,20 +128,18 @@ public class GLAccount extends AbstractPersistableCustom<Long> {
         }
     }
 
-    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName,
-            final Long propertyToBeUpdated) {
+    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName, final Long propertyToBeUpdated) {
         if (command.isChangeInLongParameterNamed(paramName, propertyToBeUpdated)) {
             final Long newValue = command.longValueOfParameterNamed(paramName);
             actualChanges.put(paramName, newValue);
             // now update actual property
             if (paramName.equals(GLAccountJsonInputParams.PARENT_ID.getValue())) {
-                // do nothing as this is a nested property
             }
         }
+        // do nothing as this is a nested property
     }
 
-    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName,
-            final boolean propertyToBeUpdated) {
+    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName, final boolean propertyToBeUpdated) {
         if (command.isChangeInBooleanParameterNamed(paramName, propertyToBeUpdated)) {
             final Boolean newValue = command.booleanObjectValueOfParameterNamed(paramName);
             actualChanges.put(paramName, newValue);
@@ -184,7 +157,6 @@ public class GLAccount extends AbstractPersistableCustom<Long> {
     }
 
     public void generateHierarchy() {
-
         if (this.parent != null) {
             this.hierarchy = this.parent.hierarchyOf(getId());
         } else {
@@ -198,5 +170,163 @@ public class GLAccount extends AbstractPersistableCustom<Long> {
 
     public boolean isDetailAccount() {
         return GLAccountUsage.DETAIL.getValue().equals(this.usage);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GLAccount getParent() {
+        return this.parent;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHierarchy() {
+        return this.hierarchy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<GLAccount> getChildren() {
+        return this.children;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getGlCode() {
+        return this.glCode;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isDisabled() {
+        return this.disabled;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isManualEntriesAllowed() {
+        return this.manualEntriesAllowed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getType() {
+        return this.type;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getUsage() {
+        return this.usage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValue getTagId() {
+        return this.tagId;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GLAccount setParent(final GLAccount parent) {
+        this.parent = parent;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GLAccount setHierarchy(final String hierarchy) {
+        this.hierarchy = hierarchy;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GLAccount setChildren(final List<GLAccount> children) {
+        this.children = children;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GLAccount setName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GLAccount setGlCode(final String glCode) {
+        this.glCode = glCode;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GLAccount setDisabled(final boolean disabled) {
+        this.disabled = disabled;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GLAccount setManualEntriesAllowed(final boolean manualEntriesAllowed) {
+        this.manualEntriesAllowed = manualEntriesAllowed;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GLAccount setType(final Integer type) {
+        this.type = type;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GLAccount setUsage(final Integer usage) {
+        this.usage = usage;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GLAccount setDescription(final String description) {
+        this.description = description;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GLAccount setTagId(final CodeValue tagId) {
+        this.tagId = tagId;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GLAccount() {
     }
 }

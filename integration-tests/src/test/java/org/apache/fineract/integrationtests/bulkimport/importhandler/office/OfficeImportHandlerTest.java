@@ -35,7 +35,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.bulkimport.constants.OfficeConstants;
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import org.apache.fineract.integrationtests.bulkimport.importhandler.BulkImportOutputTemplateHelper;
@@ -48,11 +47,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@Slf4j
 public class OfficeImportHandlerTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(OfficeImportHandlerTest.class);
     private static final String OFFICE_URL = "/fineract-provider/api/v1/offices";
-
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
 
@@ -67,21 +65,16 @@ public class OfficeImportHandlerTest {
     @Test
     public void testOfficeImport() throws IOException, InterruptedException, NoSuchFieldException, ParseException {
         Workbook workbook = getOfficeWorkBook("dd MMMM yyyy");
-
         // insert dummy data into excel
         Sheet sheet = workbook.getSheet(TemplatePopulateImportConstants.OFFICE_SHEET_NAME);
         Row firstOfficeRow = sheet.getRow(1);
         firstOfficeRow.createCell(OfficeConstants.OFFICE_NAME_COL).setCellValue(Utils.uniqueRandomStringGenerator("Test_Off_", 6));
-        firstOfficeRow.createCell(OfficeConstants.PARENT_OFFICE_NAME_COL)
-                .setCellValue(firstOfficeRow.getCell(OfficeConstants.LOOKUP_OFFICE_COL).getStringCellValue());
-        firstOfficeRow.createCell(OfficeConstants.PARENT_OFFICE_ID_COL)
-                .setCellValue(firstOfficeRow.getCell(OfficeConstants.LOOKUP_OFFICE_ID_COL).getNumericCellValue());
+        firstOfficeRow.createCell(OfficeConstants.PARENT_OFFICE_NAME_COL).setCellValue(firstOfficeRow.getCell(OfficeConstants.LOOKUP_OFFICE_COL).getStringCellValue());
+        firstOfficeRow.createCell(OfficeConstants.PARENT_OFFICE_ID_COL).setCellValue(firstOfficeRow.getCell(OfficeConstants.LOOKUP_OFFICE_ID_COL).getNumericCellValue());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         Date date = simpleDateFormat.parse("14 May 2001");
         firstOfficeRow.createCell(OfficeConstants.OPENED_ON_COL).setCellValue(date);
-
-        Path directory = Path.of("").toAbsolutePath().resolve("src").resolve("integrationTest").resolve("resources").resolve("bulkimport")
-                .resolve("importhandler").resolve("office");
+        Path directory = Path.of("").toAbsolutePath().resolve("src").resolve("integrationTest").resolve("resources").resolve("bulkimport").resolve("importhandler").resolve("office");
         if (!directory.toFile().exists()) {
             directory.toFile().mkdirs();
         }
@@ -89,43 +82,34 @@ public class OfficeImportHandlerTest {
         try (OutputStream outputStream = Files.newOutputStream(file.toPath())) {
             workbook.write(outputStream);
         }
-
         String importDocumentId = importOfficeTemplate(file);
         file.delete();
         Assertions.assertNotNull(importDocumentId);
-
         // Wait for the creation of output excel
         Thread.sleep(1000);
-
         // check status column of output excel
-        try (Workbook outputWorkbook = BulkImportOutputTemplateHelper.waitForWorkbook(() -> downloadOutputTemplate(importDocumentId),
-                TemplatePopulateImportConstants.OFFICE_SHEET_NAME, 1, OfficeConstants.STATUS_COL)) {
+        try (Workbook outputWorkbook = BulkImportOutputTemplateHelper.waitForWorkbook(() -> downloadOutputTemplate(importDocumentId), TemplatePopulateImportConstants.OFFICE_SHEET_NAME, 1, OfficeConstants.STATUS_COL)) {
             Sheet officeSheet = outputWorkbook.getSheet(TemplatePopulateImportConstants.OFFICE_SHEET_NAME);
             Row row = officeSheet.getRow(1);
-
             log.info("Failure reason column: {}", row.getCell(OfficeConstants.STATUS_COL).getStringCellValue());
-
             Assertions.assertEquals("Imported", row.getCell(OfficeConstants.STATUS_COL).getStringCellValue());
         }
     }
 
     private Workbook getOfficeWorkBook(final String dateFormat) throws IOException {
         requestSpec.header(HttpHeaders.CONTENT_TYPE, "application/vnd.ms-excel");
-        byte[] byteArray = Utils.performGetBinaryResponse(requestSpec, responseSpec,
-                OFFICE_URL + "/downloadtemplate" + "?" + Utils.TENANT_IDENTIFIER + "&dateFormat=" + dateFormat);
+        byte[] byteArray = Utils.performGetBinaryResponse(requestSpec, responseSpec, OFFICE_URL + "/downloadtemplate" + "?" + Utils.TENANT_IDENTIFIER + "&dateFormat=" + dateFormat);
         InputStream inputStream = new ByteArrayInputStream(byteArray);
         return new HSSFWorkbook(inputStream);
     }
 
     private String importOfficeTemplate(File file) {
         requestSpec.header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA);
-        return Utils.performServerTemplatePost(requestSpec, responseSpec, OFFICE_URL + "/uploadtemplate" + "?" + Utils.TENANT_IDENTIFIER,
-                null, file, "en", "dd MMMM yyyy");
+        return Utils.performServerTemplatePost(requestSpec, responseSpec, OFFICE_URL + "/uploadtemplate" + "?" + Utils.TENANT_IDENTIFIER, null, file, "en", "dd MMMM yyyy");
     }
 
     private byte[] downloadOutputTemplate(final String importDocumentId) {
         requestSpec.header(HttpHeaders.CONTENT_TYPE, "application/vnd.ms-excel");
-        return Utils.performServerOutputTemplateDownloadGet(requestSpec, responseSpec,
-                "/fineract-provider/api/v1/imports/downloadOutputTemplate" + "?" + Utils.TENANT_IDENTIFIER, importDocumentId);
+        return Utils.performServerOutputTemplateDownloadGet(requestSpec, responseSpec, "/fineract-provider/api/v1/imports/downloadOutputTemplate" + "?" + Utils.TENANT_IDENTIFIER, importDocumentId);
     }
 }

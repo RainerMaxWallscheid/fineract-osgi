@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.loanaccount.data.AmortizationAllocationBaseTransactionDTO;
 import org.apache.fineract.portfolio.loanaccount.data.AmortizationAllocationMappingDTO;
 import org.apache.fineract.portfolio.loanaccount.data.LoanAmortizationAllocationData;
@@ -37,34 +36,26 @@ import org.apache.fineract.portfolio.loanaccount.repository.LoanBuyDownFeeBalanc
 import org.apache.fineract.portfolio.loanaccount.repository.LoanCapitalizedIncomeBalanceRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-@RequiredArgsConstructor
 public class LoanAmortizationAllocationServiceImpl implements LoanAmortizationAllocationService {
-
     private final LoanAmortizationAllocationMappingRepository loanAmortizationAllocationMappingRepository;
     private final LoanTransactionRepository loanTransactionRepository;
     private final LoanCapitalizedIncomeBalanceRepository capitalizedIncomeBalanceRepository;
     private final LoanBuyDownFeeBalanceRepository buyDownFeeBalanceRepository;
 
     @Override
-    public LoanAmortizationAllocationData retrieveLoanAmortizationAllocationsForBuyDownFeeTransaction(final Long loanTransactionId,
-            final Long loanId) {
-        final LoanTransaction loanTransaction = this.loanTransactionRepository.findByIdAndLoanId(loanTransactionId, loanId)
-                .orElseThrow(() -> new LoanTransactionNotFoundException(loanTransactionId));
+    public LoanAmortizationAllocationData retrieveLoanAmortizationAllocationsForBuyDownFeeTransaction(final Long loanTransactionId, final Long loanId) {
+        final LoanTransaction loanTransaction = this.loanTransactionRepository.findByIdAndLoanId(loanTransactionId, loanId).orElseThrow(() -> new LoanTransactionNotFoundException(loanTransactionId));
         if (!LoanTransactionType.BUY_DOWN_FEE.equals(loanTransaction.getTypeOf())) {
-            throw new InvalidLoanTransactionTypeException("transaction", "is.not.a.buydown.fee.transaction",
-                    "Transaction with ID " + loanTransactionId + " is not a Buy Down Fee transaction");
+            throw new InvalidLoanTransactionTypeException("transaction", "is.not.a.buydown.fee.transaction", "Transaction with ID " + loanTransactionId + " is not a Buy Down Fee transaction");
         }
         return retrieveLoanAmortizationAllocationData(loanTransaction, loanId);
     }
 
     @Override
-    public LoanAmortizationAllocationData retrieveLoanAmortizationAllocationsForCapitalizedIncomeTransaction(final Long loanTransactionId,
-            final Long loanId) {
-        final LoanTransaction loanTransaction = this.loanTransactionRepository.findByIdAndLoanId(loanTransactionId, loanId)
-                .orElseThrow(() -> new LoanTransactionNotFoundException(loanTransactionId));
+    public LoanAmortizationAllocationData retrieveLoanAmortizationAllocationsForCapitalizedIncomeTransaction(final Long loanTransactionId, final Long loanId) {
+        final LoanTransaction loanTransaction = this.loanTransactionRepository.findByIdAndLoanId(loanTransactionId, loanId).orElseThrow(() -> new LoanTransactionNotFoundException(loanTransactionId));
         if (!LoanTransactionType.CAPITALIZED_INCOME.equals(loanTransaction.getTypeOf())) {
-            throw new InvalidLoanTransactionTypeException("transaction", "is.not.a.capitalized.income.transaction",
-                    "Transaction with ID " + loanTransactionId + " is not a Capitalized Income transaction");
+            throw new InvalidLoanTransactionTypeException("transaction", "is.not.a.capitalized.income.transaction", "Transaction with ID " + loanTransactionId + " is not a Capitalized Income transaction");
         }
         return retrieveLoanAmortizationAllocationData(loanTransaction, loanId);
     }
@@ -79,28 +70,16 @@ public class LoanAmortizationAllocationServiceImpl implements LoanAmortizationAl
         return loanAmortizationAllocationMappingRepository.calculateGrossAmortizedAmount(loanTransactionId, loanId);
     }
 
-    private LoanAmortizationAllocationData retrieveLoanAmortizationAllocationData(final LoanTransaction loanTransaction,
-            final Long loanId) {
+    private LoanAmortizationAllocationData retrieveLoanAmortizationAllocationData(final LoanTransaction loanTransaction, final Long loanId) {
         try {
             final Long loanTransactionId = loanTransaction.getId();
             final AmortizationAllocationBaseTransactionDTO baseTransactionInfo = getBaseTransactionInfo(loanTransaction, loanId);
             if (baseTransactionInfo == null) {
                 throw new LoanTransactionNotFoundException(loanTransactionId);
             }
-
-            final List<AmortizationAllocationMappingDTO> amortizationMappings = loanAmortizationAllocationMappingRepository
-                    .findAmortizationMappingsByBaseTransactionAndLoan(loanTransactionId, loanId);
-
-            final List<AmortizationMappingData> mappings = amortizationMappings.stream()
-                    .map(dto -> AmortizationMappingData.builder().amortizationLoanTransactionId(dto.getAmortizationLoanTransactionId())
-                            .amortizationLoanTransactionExternalId(dto.getAmortizationLoanTransactionExternalId())
-                            .date(dto.getAmortizationDate()).type(dto.getAmortizationType()).amount(dto.getAmount()).build())
-                    .toList();
-
-            return new LoanAmortizationAllocationData(baseTransactionInfo.getLoanId(), baseTransactionInfo.getLoanExternalId(),
-                    baseTransactionInfo.getBaseLoanTransactionId(), baseTransactionInfo.getBaseLoanTransactionDate(),
-                    baseTransactionInfo.getBaseLoanTransactionAmount(), baseTransactionInfo.getUnrecognizedAmount(),
-                    baseTransactionInfo.getChargedOffAmount(), baseTransactionInfo.getAdjustmentAmount(), mappings);
+            final List<AmortizationAllocationMappingDTO> amortizationMappings = loanAmortizationAllocationMappingRepository.findAmortizationMappingsByBaseTransactionAndLoan(loanTransactionId, loanId);
+            final List<AmortizationMappingData> mappings = amortizationMappings.stream().map(dto -> AmortizationMappingData.builder().amortizationLoanTransactionId(dto.getAmortizationLoanTransactionId()).amortizationLoanTransactionExternalId(dto.getAmortizationLoanTransactionExternalId()).date(dto.getAmortizationDate()).type(dto.getAmortizationType()).amount(dto.getAmount()).build()).toList();
+            return new LoanAmortizationAllocationData(baseTransactionInfo.getLoanId(), baseTransactionInfo.getLoanExternalId(), baseTransactionInfo.getBaseLoanTransactionId(), baseTransactionInfo.getBaseLoanTransactionDate(), baseTransactionInfo.getBaseLoanTransactionAmount(), baseTransactionInfo.getUnrecognizedAmount(), baseTransactionInfo.getChargedOffAmount(), baseTransactionInfo.getAdjustmentAmount(), mappings);
         } catch (final EmptyResultDataAccessException e) {
             throw new LoanTransactionNotFoundException(loanTransaction.getId(), e);
         }
@@ -115,20 +94,21 @@ public class LoanAmortizationAllocationServiceImpl implements LoanAmortizationAl
     }
 
     @Override
-    public LoanAmortizationAllocationMapping createAmortizationAllocationMappingWithBaseLoanTransaction(
-            final LoanTransaction loanTransaction, final BigDecimal amount, final AmortizationType amortizationType) {
-        return new LoanAmortizationAllocationMapping(loanTransaction.getLoan().getId(), loanTransaction.getId(), null, null,
-                amortizationType, amount);
+    public LoanAmortizationAllocationMapping createAmortizationAllocationMappingWithBaseLoanTransaction(final LoanTransaction loanTransaction, final BigDecimal amount, final AmortizationType amortizationType) {
+        return new LoanAmortizationAllocationMapping(loanTransaction.getLoan().getId(), loanTransaction.getId(), null, null, amortizationType, amount);
     }
 
     @Override
-    public void setAmortizationTransactionDataAndSaveAmortizationAllocationMapping(
-            final LoanAmortizationAllocationMapping amortizationAllocationMapping, final LoanTransaction amortizationTransaction) {
-        final LoanAmortizationAllocationMapping updatedMapping = new LoanAmortizationAllocationMapping(
-                amortizationAllocationMapping.getLoanId(), amortizationAllocationMapping.getBaseLoanTransactionId(),
-                amortizationTransaction.getTransactionDate(), amortizationTransaction.getId(),
-                amortizationAllocationMapping.getAmortizationType(), amortizationAllocationMapping.getAmount());
+    public void setAmortizationTransactionDataAndSaveAmortizationAllocationMapping(final LoanAmortizationAllocationMapping amortizationAllocationMapping, final LoanTransaction amortizationTransaction) {
+        final LoanAmortizationAllocationMapping updatedMapping = new LoanAmortizationAllocationMapping(amortizationAllocationMapping.getLoanId(), amortizationAllocationMapping.getBaseLoanTransactionId(), amortizationTransaction.getTransactionDate(), amortizationTransaction.getId(), amortizationAllocationMapping.getAmortizationType(), amortizationAllocationMapping.getAmount());
         loanAmortizationAllocationMappingRepository.save(updatedMapping);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanAmortizationAllocationServiceImpl(final LoanAmortizationAllocationMappingRepository loanAmortizationAllocationMappingRepository, final LoanTransactionRepository loanTransactionRepository, final LoanCapitalizedIncomeBalanceRepository capitalizedIncomeBalanceRepository, final LoanBuyDownFeeBalanceRepository buyDownFeeBalanceRepository) {
+        this.loanAmortizationAllocationMappingRepository = loanAmortizationAllocationMappingRepository;
+        this.loanTransactionRepository = loanTransactionRepository;
+        this.capitalizedIncomeBalanceRepository = capitalizedIncomeBalanceRepository;
+        this.buyDownFeeBalanceRepository = buyDownFeeBalanceRepository;
+    }
 }

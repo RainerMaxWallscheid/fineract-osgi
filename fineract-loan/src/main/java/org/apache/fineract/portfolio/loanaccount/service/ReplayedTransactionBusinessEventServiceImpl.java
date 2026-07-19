@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.event.business.domain.loan.LoanAdjustTransactionBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.portfolio.loanaccount.data.TransactionChangeData;
@@ -26,9 +25,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.ChangedTransactionDetail
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
 
-@RequiredArgsConstructor
 public class ReplayedTransactionBusinessEventServiceImpl implements ReplayedTransactionBusinessEventService {
-
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanTransactionRepository loanTransactionRepository;
 
@@ -40,11 +37,9 @@ public class ReplayedTransactionBusinessEventServiceImpl implements ReplayedTran
         // Extra safety net to avoid event leaking
         try {
             businessEventNotifierService.startExternalEventRecording();
-
             for (TransactionChangeData change : changedTransactionDetail.getTransactionChanges()) {
                 final LoanTransaction newTransaction = change.getNewTransaction();
                 final LoanTransaction oldTransaction = change.getOldTransaction();
-
                 if (oldTransaction != null) {
                     final LoanAdjustTransactionBusinessEvent.Data data = new LoanAdjustTransactionBusinessEvent.Data(oldTransaction);
                     if (newTransaction.isNotReversed()) {
@@ -58,5 +53,11 @@ public class ReplayedTransactionBusinessEventServiceImpl implements ReplayedTran
             businessEventNotifierService.resetEventRecording();
             throw e;
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ReplayedTransactionBusinessEventServiceImpl(final BusinessEventNotifierService businessEventNotifierService, final LoanTransactionRepository loanTransactionRepository) {
+        this.businessEventNotifierService = businessEventNotifierService;
+        this.loanTransactionRepository = loanTransactionRepository;
     }
 }

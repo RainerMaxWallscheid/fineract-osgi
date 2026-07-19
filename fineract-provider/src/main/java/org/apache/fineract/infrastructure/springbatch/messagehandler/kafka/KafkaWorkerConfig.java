@@ -24,10 +24,8 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
 import static org.springframework.kafka.support.serializer.JsonDeserializer.TRUSTED_PACKAGES;
-
 import java.util.HashMap;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.config.FineractProperties.FineractRemoteJobMessageHandlerKafkaProperties;
 import org.apache.fineract.infrastructure.springbatch.messagehandler.conditions.kafka.KafkaWorkerCondition;
@@ -45,12 +43,11 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 @Configuration
 @Conditional(KafkaWorkerCondition.class)
-@Slf4j
 public class KafkaWorkerConfig {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(KafkaWorkerConfig.class);
     @Autowired
     private QueueChannel inboundRequests;
-
     @Autowired
     private FineractProperties fineractProperties;
 
@@ -68,12 +65,10 @@ public class KafkaWorkerConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<Integer, Object> kafkaListenerContainerFactory(
-            ConsumerFactory<Integer, Object> consumerFactory) {
+    public ConcurrentKafkaListenerContainerFactory<Integer, Object> kafkaListenerContainerFactory(ConsumerFactory<Integer, Object> consumerFactory) {
         ConcurrentKafkaListenerContainerFactory<Integer, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
     }
-
 }

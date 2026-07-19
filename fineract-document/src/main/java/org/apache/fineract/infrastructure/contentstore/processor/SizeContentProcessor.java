@@ -20,17 +20,13 @@ package org.apache.fineract.infrastructure.contentstore.processor;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class SizeContentProcessor implements ContentProcessor {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SizeContentProcessor.class);
     private static final String SIZE_PREFIX = "size.";
-
     public static final String SIZE_RESULT_VALUE = SIZE_PREFIX + "result.value";
 
     @Override
@@ -38,8 +34,8 @@ public class SizeContentProcessor implements ContentProcessor {
         return ctx.clone(new ByteCountingInputStream(ctx));
     }
 
-    private static final class ByteCountingInputStream extends FilterInputStream {
 
+    private static final class ByteCountingInputStream extends FilterInputStream {
         private final ContentProcessorContext ctx;
         private long byteCount = 0;
 
@@ -51,30 +47,29 @@ public class SizeContentProcessor implements ContentProcessor {
         @Override
         public int read() throws IOException {
             int data = in.read();
-
             if (data != -1) {
                 byteCount++;
             }
-
             return data;
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
             int count = in.read(b, off, len);
-
             if (count != -1) {
                 byteCount += count;
             }
-
             return count;
         }
 
         @Override
         public void close() throws IOException {
             ctx.setResult(SIZE_RESULT_VALUE, byteCount);
-
             super.close();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SizeContentProcessor() {
     }
 }

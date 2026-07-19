@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -49,15 +48,9 @@ import org.springframework.stereotype.Component;
 
 @Path("/v1/officetransactions")
 @Component
-@RequiredArgsConstructor
 public class OfficeTransactionsApiResource {
-
-    private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(
-            Arrays.asList("id", "transactionDate", "fromOfficeId", "fromOfficeName", "toOfficeId", "toOfficeIdName", "currencyCode",
-                    "digitsAfterDecimal", "inMultiplesOf", "transactionAmount", "description", "allowedOffices", "currencyOptions"));
-
+    private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "transactionDate", "fromOfficeId", "fromOfficeName", "toOfficeId", "toOfficeIdName", "currencyCode", "digitsAfterDecimal", "inMultiplesOf", "transactionAmount", "description", "allowedOffices", "currencyOptions"));
     private static final String RESOURCE_NAME_FOR_READ_PERMISSIONS = "OFFICE";
-
     private final PlatformSecurityContext context;
     private final OfficeReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<OfficeTransactionData> toApiJsonSerializer;
@@ -65,53 +58,50 @@ public class OfficeTransactionsApiResource {
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     public String retrieveOfficeTransactions(@Context final UriInfo uriInfo) {
-
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_READ_PERMISSIONS);
-
         final Collection<OfficeTransactionData> officeTransactions = this.readPlatformService.retrieveAllOfficeTransactions();
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, officeTransactions, RESPONSE_DATA_PARAMETERS);
     }
 
     @GET
     @Path("template")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     public String newOfficeTransactionDetails(@Context final UriInfo uriInfo) {
-
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_READ_PERMISSIONS);
-
         final OfficeTransactionData officeTransactionData = this.readPlatformService.retrieveNewOfficeTransactionDetails();
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, officeTransactionData, RESPONSE_DATA_PARAMETERS);
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     public String transferMoneyFrom(final String apiRequestBodyAsJson) {
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createOfficeTransaction().withJson(apiRequestBodyAsJson).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 
     @DELETE
     @Path("{transactionId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "delete_2")
     @AlternativeOperationId("delete_7")
     public String delete(@PathParam("transactionId") final Long transactionId) {
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteOfficeTransaction(transactionId).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OfficeTransactionsApiResource(final PlatformSecurityContext context, final OfficeReadPlatformService readPlatformService, final DefaultToApiJsonSerializer<OfficeTransactionData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.context = context;
+        this.readPlatformService = readPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
     }
 }

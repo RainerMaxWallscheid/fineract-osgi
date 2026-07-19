@@ -18,12 +18,7 @@
  */
 package org.apache.fineract.test.support;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class TestContextKey {
-
     public static final String CLIENT_CREATE_RESPONSE = "clientCreateResponse";
     public static final String CLIENT_CREATE_SECOND_CLIENT_RESPONSE = "clientCreateSecondClientResponse";
     public static final String LOAN_CREATE_REQUEST = "loanCreateRequest";
@@ -393,4 +388,8 @@ public abstract class TestContextKey {
     public static final String WORKING_CAPITAL_LOAN_DISCOUNT_FEE_RESPONSE_BATCH = "workingCapitalLoanDiscountFeeResponseBatch";
     public static final String WORKING_CAPITAL_LOAN_GET_DETAILS_RESPONSE = "workingCapitalLoanGetDetailsResponse";
     public static final String WORKING_CAPITAL_LOAN_GET_TRANSACTIONS_RESPONSE = "workingCapitalLoanGetTransactionsResponse";
+
+    @java.lang.SuppressWarnings("all")
+        private TestContextKey() {
+    }
 }

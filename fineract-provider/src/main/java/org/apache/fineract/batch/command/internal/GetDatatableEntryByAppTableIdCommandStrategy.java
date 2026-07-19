@@ -19,10 +19,8 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import jakarta.ws.rs.core.UriInfo;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.command.CommandStrategyUtils;
@@ -39,9 +37,7 @@ import org.springframework.stereotype.Component;
  * raised by {@link DatatablesApiResource} and map those errors to appropriate status codes in BatchResponse.
  */
 @Component
-@RequiredArgsConstructor
 public class GetDatatableEntryByAppTableIdCommandStrategy implements CommandStrategy {
-
     /**
      * Data table api resource {@link DatatablesApiResource}.
      */
@@ -52,13 +48,10 @@ public class GetDatatableEntryByAppTableIdCommandStrategy implements CommandStra
         final MutableUriInfo parameterizedUriInfo = new MutableUriInfo(uriInfo);
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final String relativeUrl = relativeUrlWithoutVersion(request);
         final String relativeUrlSubString = StringUtils.substringAfter(relativeUrl, "/");
-
         // uriInfo will contain the query parameter value(s) that are sent in the actual batch uri.
         // for example: batches?enclosingTransaction=true
         // But the query parameters that are sent in the batch relative url has to be sent to
@@ -72,24 +65,28 @@ public class GetDatatableEntryByAppTableIdCommandStrategy implements CommandStra
         if (relativeUrl.indexOf('?') > 0) {
             appTableId = Long.parseLong(StringUtils.substringBetween(relativeUrlSubString, "/", "?"));
             Map<String, String> queryParameters = CommandStrategyUtils.getQueryParameters(relativeUrl);
-
             // Add the query parameters sent in the relative URL to MutableUriInfo
             CommandStrategyUtils.addQueryParametersToUriInfo(parameterizedUriInfo, queryParameters);
         } else {
             appTableId = Long.parseLong(StringUtils.substringAfter(relativeUrlSubString, "/"));
         }
-
         String dataTableName = relativeUrlSubString.substring(0, relativeUrlSubString.indexOf("/"));
-
         // Calls 'getDatatable' function from 'DatatablesApiResource' to
         // get the datatable details based on the appTableId
         responseBody = dataTablesApiResource.getDatatable(dataTableName, appTableId, null, parameterizedUriInfo);
-
         response.setStatusCode(HttpStatus.SC_OK);
-
         // Sets the response after retrieving the datatable
         response.setBody(responseBody);
-
         return response;
+    }
+
+    /**
+     * Creates a new {@code GetDatatableEntryByAppTableIdCommandStrategy} instance.
+     *
+     * @param dataTablesApiResource Data table api resource {@link DatatablesApiResource}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GetDatatableEntryByAppTableIdCommandStrategy(final DatatablesApiResource dataTablesApiResource) {
+        this.dataTablesApiResource = dataTablesApiResource;
     }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.client.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,9 +27,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @CommandType(entity = "ADDRESS", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateClientAddressCommandHandler implements NewCommandSourceHandler {
-
     private final AddressWritePlatformService writePlatformService;
 
     @Override
@@ -40,7 +37,10 @@ public class UpdateClientAddressCommandHandler implements NewCommandSourceHandle
          * command.getStatus(), command);
          */
         return this.writePlatformService.updateClientAddress(command.getClientId(), command);
-
     }
 
+    @java.lang.SuppressWarnings("all")
+        public UpdateClientAddressCommandHandler(final AddressWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
+    }
 }

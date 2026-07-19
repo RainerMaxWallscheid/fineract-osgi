@@ -19,11 +19,8 @@
 package org.apache.fineract.portfolio.rate.service;
 
 import static org.apache.fineract.portfolio.rate.api.RateApiConstants.approveUserIdParamName;
-
 import jakarta.persistence.PersistenceException;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -45,10 +42,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Bowpi GT Created by Jose on 19/07/2017.
  */
-@RequiredArgsConstructor
-@Slf4j
 public class RateWriteServiceImpl implements RateWriteService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RateWriteServiceImpl.class);
     private final RateRepository rateRepository;
     private final AppUserRepository appUserRepository;
     private final PlatformSecurityContext context;
@@ -59,21 +55,17 @@ public class RateWriteServiceImpl implements RateWriteService {
         try {
             this.context.authenticatedUser();
             this.fromApiJsonDeserializer.validateForCreate(command.json());
-
             final Long approveUserId = command.longValueOfParameterNamed(approveUserIdParamName);
             AppUser approveUser = null;
             if (approveUserId != null) {
                 approveUser = this.appUserRepository.findById(approveUserId).orElseThrow(() -> new UserNotFoundException(approveUserId));
             }
             final Rate rate = Rate.fromJson(command, approveUser);
-
             this.rateRepository.saveAndFlush(rate);
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(rate.getId()) //
-                    .build();
-
+            return  //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(rate.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleRateDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
@@ -89,32 +81,25 @@ public class RateWriteServiceImpl implements RateWriteService {
     public CommandProcessingResult updateRate(final Long rateId, final JsonCommand command) {
         try {
             this.context.authenticatedUser();
-
             final Rate rateToUpdate = this.rateRepository.findById(rateId).orElseThrow(() -> new RateNotFoundException(rateId));
-
             final Map<String, Object> changes = rateToUpdate.update(command);
-
             this.fromApiJsonDeserializer.validateForUpdate(command.json());
-
             if (changes.containsKey(approveUserIdParamName)) {
                 final Long newApproveUserId = (Long) changes.get(approveUserIdParamName);
                 AppUser newApproveUser = null;
                 if (newApproveUserId != null) {
-                    newApproveUser = this.appUserRepository.findById(newApproveUserId)
-                            .orElseThrow(() -> new UserNotFoundException(newApproveUserId));
+                    newApproveUser = this.appUserRepository.findById(newApproveUserId).orElseThrow(() -> new UserNotFoundException(newApproveUserId));
                 }
                 rateToUpdate.setApproveUser(newApproveUser);
             }
             if (!changes.isEmpty()) {
                 this.rateRepository.saveAndFlush(rateToUpdate);
             }
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(rateId) //
-                    .with(changes) //
-                    .build();
-
+            return  //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(rateId).with(changes).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleRateDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.resourceResult(-1L);
@@ -131,12 +116,17 @@ public class RateWriteServiceImpl implements RateWriteService {
     private void handleRateDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final Exception dve) {
         if (realCause.getMessage().contains("rate_name_org")) {
             final String name = command.stringValueOfParameterNamed("name");
-            throw new PlatformDataIntegrityException("error.msg.fund.duplicate.externalId",
-                    "A rate with name '" + name + "' already exists", "name", name);
+            throw new PlatformDataIntegrityException("error.msg.fund.duplicate.externalId", "A rate with name \'" + name + "\' already exists", "name", name);
         }
-
         log.error("Error due to Exception", dve);
-        throw ErrorHandler.getMappable(dve, "error.msg.fund.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource: " + realCause.getMessage());
+        throw ErrorHandler.getMappable(dve, "error.msg.fund.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RateWriteServiceImpl(final RateRepository rateRepository, final AppUserRepository appUserRepository, final PlatformSecurityContext context, final RateDefinitionCommandFromApiJsonDeserializer fromApiJsonDeserializer) {
+        this.rateRepository = rateRepository;
+        this.appUserRepository = appUserRepository;
+        this.context = context;
+        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
     }
 }

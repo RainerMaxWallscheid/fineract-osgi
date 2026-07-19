@@ -18,15 +18,7 @@
  */
 package org.apache.fineract.infrastructure.campaigns.sms.data;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
 public class SmsProviderData {
-
     private Long id;
     private String tenantId;
     private String phoneNo;
@@ -34,4 +26,47 @@ public class SmsProviderData {
     private String providerName;
     private String providerDescription;
 
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getTenantId() {
+        return this.tenantId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getPhoneNo() {
+        return this.phoneNo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getProviderAppKey() {
+        return this.providerAppKey;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getProviderName() {
+        return this.providerName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getProviderDescription() {
+        return this.providerDescription;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SmsProviderData(final Long id, final String tenantId, final String phoneNo, final String providerAppKey, final String providerName, final String providerDescription) {
+        this.id = id;
+        this.tenantId = tenantId;
+        this.phoneNo = phoneNo;
+        this.providerAppKey = providerAppKey;
+        this.providerName = providerName;
+        this.providerDescription = providerDescription;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SmsProviderData() {
+    }
 }

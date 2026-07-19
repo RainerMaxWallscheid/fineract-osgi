@@ -18,15 +18,10 @@
  */
 package org.apache.fineract.accounting.journalentry.data;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.note.data.NoteData;
 import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 
-@RequiredArgsConstructor
-@Getter
 public class TransactionDetailData {
-
     private final Long transactionId;
     private final PaymentDetailData paymentDetails;
     private final NoteData noteData;
@@ -37,5 +32,33 @@ public class TransactionDetailData {
         this.paymentDetails = paymentDetails;
         this.noteData = noteData;
         this.transactionType = null;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TransactionDetailData(final Long transactionId, final PaymentDetailData paymentDetails, final NoteData noteData, final TransactionTypeEnumData transactionType) {
+        this.transactionId = transactionId;
+        this.paymentDetails = paymentDetails;
+        this.noteData = noteData;
+        this.transactionType = transactionType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getTransactionId() {
+        return this.transactionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PaymentDetailData getPaymentDetails() {
+        return this.paymentDetails;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public NoteData getNoteData() {
+        return this.noteData;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TransactionTypeEnumData getTransactionType() {
+        return this.transactionType;
     }
 }

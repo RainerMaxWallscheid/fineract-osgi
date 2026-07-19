@@ -21,12 +21,10 @@ package org.apache.fineract.portfolio.delinquency.validator;
 import static org.apache.fineract.portfolio.delinquency.validator.DelinquencyActionParameters.ACTION;
 import static org.apache.fineract.portfolio.delinquency.validator.DelinquencyActionParameters.END_DATE;
 import static org.apache.fineract.portfolio.delinquency.validator.DelinquencyActionParameters.START_DATE;
-
 import com.google.gson.JsonElement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -42,20 +40,15 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
 public class DelinquencyActionParseAndValidator extends ParseAndValidator {
-
     private static final String VALIDATION_RESOURCE = "loanDelinquencyAction";
-
     private final FromJsonHelper jsonHelper;
     private final DelinquencyEffectivePauseHelper delinquencyEffectivePauseHelper;
 
-    public LoanDelinquencyAction validateAndParseUpdate(@NonNull final JsonCommand command, Loan loan,
-            List<LoanDelinquencyAction> savedDelinquencyActions, LocalDate businessDate) {
+    public LoanDelinquencyAction validateAndParseUpdate(@NonNull final JsonCommand command, Loan loan, List<LoanDelinquencyAction> savedDelinquencyActions, LocalDate businessDate) {
         final DataValidatorBuilder dataValidator = createValidator();
-        final List<LoanDelinquencyActionData> effectiveDelinquencyList = delinquencyEffectivePauseHelper
-                .calculateEffectiveDelinquencyList(savedDelinquencyActions);
+        final List<LoanDelinquencyActionData> effectiveDelinquencyList = delinquencyEffectivePauseHelper.calculateEffectiveDelinquencyList(savedDelinquencyActions);
         final LoanDelinquencyAction parsedDelinquencyAction = parseCommand(command, dataValidator);
         validateLoanIsActive(loan, dataValidator);
         throwExceptionIfValidationWarningsExist(dataValidator);
@@ -68,8 +61,7 @@ public class DelinquencyActionParseAndValidator extends ParseAndValidator {
         return parsedDelinquencyAction;
     }
 
-    private void validatePause(final LoanDelinquencyAction parsedDelinquencyAction, final Loan loan,
-            final List<LoanDelinquencyActionData> effectiveDelinquencyList, final DataValidatorBuilder dataValidator) {
+    private void validatePause(final LoanDelinquencyAction parsedDelinquencyAction, final Loan loan, final List<LoanDelinquencyActionData> effectiveDelinquencyList, final DataValidatorBuilder dataValidator) {
         validateBothStartAndEndDatesAreProvided(parsedDelinquencyAction, dataValidator);
         throwExceptionIfValidationWarningsExist(dataValidator);
         validatePauseStartAndEndDate(parsedDelinquencyAction, dataValidator);
@@ -79,9 +71,7 @@ public class DelinquencyActionParseAndValidator extends ParseAndValidator {
         validatePauseShallNotOverlap(parsedDelinquencyAction, effectiveDelinquencyList, dataValidator);
     }
 
-    private void validateResume(final LoanDelinquencyAction parsedDelinquencyAction,
-            final List<LoanDelinquencyAction> savedDelinquencyActions, final List<LoanDelinquencyActionData> effectiveDelinquencyList,
-            final LocalDate businessDate, final DataValidatorBuilder dataValidator) {
+    private void validateResume(final LoanDelinquencyAction parsedDelinquencyAction, final List<LoanDelinquencyAction> savedDelinquencyActions, final List<LoanDelinquencyActionData> effectiveDelinquencyList, final LocalDate businessDate, final DataValidatorBuilder dataValidator) {
         validateResumeStartDate(parsedDelinquencyAction, businessDate, dataValidator);
         throwExceptionIfValidationWarningsExist(dataValidator);
         validateResumeNoEndDate(parsedDelinquencyAction, dataValidator);
@@ -91,28 +81,22 @@ public class DelinquencyActionParseAndValidator extends ParseAndValidator {
         validateResumeShouldBeOnActivePause(parsedDelinquencyAction, effectiveDelinquencyList, dataValidator);
     }
 
-    private void validateBothStartAndEndDatesAreProvided(final LoanDelinquencyAction parsedDelinquencyAction,
-            final DataValidatorBuilder dataValidator) {
+    private void validateBothStartAndEndDatesAreProvided(final LoanDelinquencyAction parsedDelinquencyAction, final DataValidatorBuilder dataValidator) {
         dataValidator.reset().parameter(START_DATE).value(parsedDelinquencyAction.getStartDate()).notNull();
         dataValidator.reset().parameter(END_DATE).value(parsedDelinquencyAction.getEndDate()).notNull();
     }
 
-    private void validateResumeShouldBeOnActivePause(final LoanDelinquencyAction parsedDelinquencyAction,
-            final List<LoanDelinquencyActionData> savedDelinquencyActions, final DataValidatorBuilder dataValidator) {
-        final boolean match = savedDelinquencyActions.stream()
-                .anyMatch(lda -> !DateUtils.isBefore(parsedDelinquencyAction.getStartDate(), lda.getStartDate())
-                        && !DateUtils.isAfter(parsedDelinquencyAction.getStartDate(), lda.getEndDate()));
+    private void validateResumeShouldBeOnActivePause(final LoanDelinquencyAction parsedDelinquencyAction, final List<LoanDelinquencyActionData> savedDelinquencyActions, final DataValidatorBuilder dataValidator) {
+        final boolean match = savedDelinquencyActions.stream().anyMatch(lda -> !DateUtils.isBefore(parsedDelinquencyAction.getStartDate(), lda.getStartDate()) && !DateUtils.isAfter(parsedDelinquencyAction.getStartDate(), lda.getEndDate()));
         if (!match) {
-            failGeneralValidation(dataValidator, "resume.should.be.on.pause",
-                    "Resume Delinquency Action can only be created during an active pause");
+            failGeneralValidation(dataValidator, "resume.should.be.on.pause", "Resume Delinquency Action can only be created during an active pause");
         }
     }
 
-    private void validateResumeDoesNotExist(final LoanDelinquencyAction parsedDelinquencyAction,
-            final List<LoanDelinquencyAction> savedDelinquencyActions, final DataValidatorBuilder dataValidator) {
-        final boolean match = savedDelinquencyActions.stream() //
-                .filter(action -> DelinquencyAction.RESUME.equals(action.getAction())) //
-                .anyMatch(action -> parsedDelinquencyAction.getStartDate().isEqual(action.getStartDate()));
+    private void validateResumeDoesNotExist(final LoanDelinquencyAction parsedDelinquencyAction, final List<LoanDelinquencyAction> savedDelinquencyActions, final DataValidatorBuilder dataValidator) {
+        final boolean match =  //
+        //
+        savedDelinquencyActions.stream().filter(action -> DelinquencyAction.RESUME.equals(action.getAction())).anyMatch(action -> parsedDelinquencyAction.getStartDate().isEqual(action.getStartDate()));
         if (match) {
             failGeneralValidation(dataValidator, "resume.should.be.unique", "There is an existing Resume Delinquency Action on this date");
         }
@@ -120,36 +104,29 @@ public class DelinquencyActionParseAndValidator extends ParseAndValidator {
 
     private void validateResumeNoEndDate(final LoanDelinquencyAction parsedDelinquencyAction, final DataValidatorBuilder dataValidator) {
         if (parsedDelinquencyAction.getEndDate() != null) {
-            failParameterValidation(dataValidator, END_DATE, "resume.should.have.no.end.date",
-                    "Resume Delinquency action can not have end date");
+            failParameterValidation(dataValidator, END_DATE, "resume.should.have.no.end.date", "Resume Delinquency action can not have end date");
         }
     }
 
-    private void validateResumeStartDate(final LoanDelinquencyAction parsedDelinquencyAction, final LocalDate businessDate,
-            final DataValidatorBuilder dataValidator) {
+    private void validateResumeStartDate(final LoanDelinquencyAction parsedDelinquencyAction, final LocalDate businessDate, final DataValidatorBuilder dataValidator) {
         dataValidator.reset().parameter(START_DATE).value(parsedDelinquencyAction.getStartDate()).notNull();
         if (parsedDelinquencyAction.getStartDate() != null && !parsedDelinquencyAction.getStartDate().equals(businessDate)) {
-            failParameterValidation(dataValidator, START_DATE, "resume.invalid.start.date",
-                    "Start date of the Resume Delinquency action must be the current business date");
+            failParameterValidation(dataValidator, START_DATE, "resume.invalid.start.date", "Start date of the Resume Delinquency action must be the current business date");
         }
     }
 
-    private void validatePauseStartAndEndDate(final LoanDelinquencyAction parsedDelinquencyAction,
-            final DataValidatorBuilder dataValidator) {
+    private void validatePauseStartAndEndDate(final LoanDelinquencyAction parsedDelinquencyAction, final DataValidatorBuilder dataValidator) {
         if (parsedDelinquencyAction.getStartDate().equals(parsedDelinquencyAction.getEndDate())) {
-            failGeneralValidation(dataValidator, "pause.period.must.be.at.least.one.day",
-                    "Delinquency pause period must be at least one day");
+            failGeneralValidation(dataValidator, "pause.period.must.be.at.least.one.day", "Delinquency pause period must be at least one day");
         }
     }
 
-    private void validatePauseStartDateNotBeforeDisbursementDate(final LoanDelinquencyAction parsedDelinquencyAction,
-            final LocalDate firstDisbursalDate, final DataValidatorBuilder dataValidator) {
+    private void validatePauseStartDateNotBeforeDisbursementDate(final LoanDelinquencyAction parsedDelinquencyAction, final LocalDate firstDisbursalDate, final DataValidatorBuilder dataValidator) {
         if (firstDisbursalDate == null) {
             return;
         }
         if (firstDisbursalDate.isAfter(parsedDelinquencyAction.getStartDate())) {
-            failParameterValidation(dataValidator, START_DATE, "before.disbursement",
-                    "Start date of pause period must be after first disbursal date");
+            failParameterValidation(dataValidator, START_DATE, "before.disbursement", "Start date of pause period must be after first disbursal date");
         }
     }
 
@@ -159,10 +136,8 @@ public class DelinquencyActionParseAndValidator extends ParseAndValidator {
         }
     }
 
-    private void validatePauseShallNotOverlap(final LoanDelinquencyAction parsedDelinquencyAction,
-            final List<LoanDelinquencyActionData> delinquencyActions, final DataValidatorBuilder dataValidator) {
-        if (delinquencyActions.stream().filter(lda -> lda.getAction().equals(DelinquencyAction.PAUSE))
-                .anyMatch(lda -> isOverlapping(parsedDelinquencyAction, lda))) {
+    private void validatePauseShallNotOverlap(final LoanDelinquencyAction parsedDelinquencyAction, final List<LoanDelinquencyActionData> delinquencyActions, final DataValidatorBuilder dataValidator) {
+        if (delinquencyActions.stream().filter(lda -> lda.getAction().equals(DelinquencyAction.PAUSE)).anyMatch(lda -> isOverlapping(parsedDelinquencyAction, lda))) {
             failGeneralValidation(dataValidator, "overlapping", "Delinquency pause period cannot overlap with another pause period");
         }
     }
@@ -197,9 +172,7 @@ public class DelinquencyActionParseAndValidator extends ParseAndValidator {
      * @return
      */
     private boolean isOverlapping(final LoanDelinquencyAction parsed, final LoanDelinquencyActionData existing) {
-        return (parsed.getEndDate().isAfter(existing.getStartDate()) && parsed.getEndDate().isBefore(existing.getEndDate()))
-                || (parsed.getStartDate().isAfter(existing.getStartDate()) && parsed.getStartDate().isBefore(existing.getEndDate()))
-                || (parsed.getStartDate().isEqual(existing.getStartDate()) && parsed.getEndDate().isEqual(existing.getEndDate()));
+        return (parsed.getEndDate().isAfter(existing.getStartDate()) && parsed.getEndDate().isBefore(existing.getEndDate())) || (parsed.getStartDate().isAfter(existing.getStartDate()) && parsed.getStartDate().isBefore(existing.getEndDate())) || (parsed.getStartDate().isEqual(existing.getStartDate()) && parsed.getEndDate().isEqual(existing.getEndDate()));
     }
 
     @NonNull
@@ -235,23 +208,24 @@ public class DelinquencyActionParseAndValidator extends ParseAndValidator {
     private LocalDate extractEndDate(final JsonElement json) {
         final String dateFormat = jsonHelper.extractStringNamed(DelinquencyActionParameters.DATE_FORMAT, json);
         final String locale = jsonHelper.extractStringNamed(DelinquencyActionParameters.LOCALE, json);
-        return jsonHelper.extractLocalDateNamed(DelinquencyActionParameters.END_DATE, json, dateFormat,
-                JsonParserHelper.localeFromString(locale));
+        return jsonHelper.extractLocalDateNamed(DelinquencyActionParameters.END_DATE, json, dateFormat, JsonParserHelper.localeFromString(locale));
     }
 
     private DataValidatorBuilder createValidator() {
         return new DataValidatorBuilder(new ArrayList<>()).resource(VALIDATION_RESOURCE);
     }
 
-    private void failParameterValidation(final DataValidatorBuilder dataValidator, final String parameter, final String errorCode,
-            final String message) {
-        dataValidator.getDataValidationErrors().add(ApiParameterError
-                .parameterError("validation.msg." + VALIDATION_RESOURCE + "." + parameter + "." + errorCode, message, parameter));
+    private void failParameterValidation(final DataValidatorBuilder dataValidator, final String parameter, final String errorCode, final String message) {
+        dataValidator.getDataValidationErrors().add(ApiParameterError.parameterError("validation.msg." + VALIDATION_RESOURCE + "." + parameter + "." + errorCode, message, parameter));
     }
 
     private void failGeneralValidation(final DataValidatorBuilder dataValidator, final String errorCode, final String message) {
-        dataValidator.getDataValidationErrors()
-                .add(ApiParameterError.generalError("validation.msg." + VALIDATION_RESOURCE + "." + errorCode, message));
+        dataValidator.getDataValidationErrors().add(ApiParameterError.generalError("validation.msg." + VALIDATION_RESOURCE + "." + errorCode, message));
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyActionParseAndValidator(final FromJsonHelper jsonHelper, final DelinquencyEffectivePauseHelper delinquencyEffectivePauseHelper) {
+        this.jsonHelper = jsonHelper;
+        this.delinquencyEffectivePauseHelper = delinquencyEffectivePauseHelper;
+    }
 }

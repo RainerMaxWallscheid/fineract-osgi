@@ -23,8 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
@@ -37,44 +35,26 @@ import org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.Mon
 import org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.TransactionCtx;
 import org.apache.fineract.portfolio.loanproduct.calc.data.ProgressiveLoanInterestScheduleModel;
 
-@Getter
 public class ProgressiveTransactionCtx extends TransactionCtx {
-
     private final ProgressiveLoanInterestScheduleModel model;
     private final List<LoanTransaction> alreadyProcessedTransactions = new ArrayList<>();
-    @Setter
     private Money sumOfInterestRefundAmount;
-    @Setter
     private boolean isChargedOff = false;
-    @Setter
     private boolean isWrittenOff = false;
-    @Setter
     private boolean isContractTerminated = false;
-    @Setter
     private boolean isPrepayAttempt = false;
     private final List<LoanRepaymentScheduleInstallment> skipRepaymentScheduleInstallments = new ArrayList<>();
     private final List<Long> processedLoanChargeIds;
 
-    public ProgressiveTransactionCtx(MonetaryCurrency currency, List<LoanRepaymentScheduleInstallment> installments,
-            Set<LoanCharge> charges, MoneyHolder overpaymentHolder, ChangedTransactionDetail changedTransactionDetail,
-            ProgressiveLoanInterestScheduleModel model, List<LoanTermVariations> activeLoanTermVariations) {
-        this(currency, installments, charges, overpaymentHolder, changedTransactionDetail, model, Money.zero(currency),
-                activeLoanTermVariations);
+    public ProgressiveTransactionCtx(MonetaryCurrency currency, List<LoanRepaymentScheduleInstallment> installments, Set<LoanCharge> charges, MoneyHolder overpaymentHolder, ChangedTransactionDetail changedTransactionDetail, ProgressiveLoanInterestScheduleModel model, List<LoanTermVariations> activeLoanTermVariations) {
+        this(currency, installments, charges, overpaymentHolder, changedTransactionDetail, model, Money.zero(currency), activeLoanTermVariations);
     }
 
-    public ProgressiveTransactionCtx(MonetaryCurrency currency, List<LoanRepaymentScheduleInstallment> installments,
-            Set<LoanCharge> charges, MoneyHolder overpaymentHolder, ChangedTransactionDetail changedTransactionDetail,
-            ProgressiveLoanInterestScheduleModel model, Money sumOfInterestRefundAmount,
-            List<LoanTermVariations> activeLoanTermVariations) {
-        this(currency, installments, charges, overpaymentHolder, changedTransactionDetail, model, sumOfInterestRefundAmount,
-                activeLoanTermVariations,
-                charges == null ? new ArrayList<>() : charges.stream().map(AbstractPersistableCustom::getId).toList());
+    public ProgressiveTransactionCtx(MonetaryCurrency currency, List<LoanRepaymentScheduleInstallment> installments, Set<LoanCharge> charges, MoneyHolder overpaymentHolder, ChangedTransactionDetail changedTransactionDetail, ProgressiveLoanInterestScheduleModel model, Money sumOfInterestRefundAmount, List<LoanTermVariations> activeLoanTermVariations) {
+        this(currency, installments, charges, overpaymentHolder, changedTransactionDetail, model, sumOfInterestRefundAmount, activeLoanTermVariations, charges == null ? new ArrayList<>() : charges.stream().map(AbstractPersistableCustom::getId).toList());
     }
 
-    public ProgressiveTransactionCtx(MonetaryCurrency currency, List<LoanRepaymentScheduleInstallment> installments,
-            Set<LoanCharge> charges, MoneyHolder overpaymentHolder, ChangedTransactionDetail changedTransactionDetail,
-            ProgressiveLoanInterestScheduleModel model, Money sumOfInterestRefundAmount, List<LoanTermVariations> activeLoanTermVariations,
-            List<Long> processedLoanChargeIds) {
+    public ProgressiveTransactionCtx(MonetaryCurrency currency, List<LoanRepaymentScheduleInstallment> installments, Set<LoanCharge> charges, MoneyHolder overpaymentHolder, ChangedTransactionDetail changedTransactionDetail, ProgressiveLoanInterestScheduleModel model, Money sumOfInterestRefundAmount, List<LoanTermVariations> activeLoanTermVariations, List<Long> processedLoanChargeIds) {
         super(currency, installments, charges, overpaymentHolder, changedTransactionDetail, activeLoanTermVariations);
         this.sumOfInterestRefundAmount = sumOfInterestRefundAmount;
         this.model = model;
@@ -95,4 +75,73 @@ public class ProgressiveTransactionCtx extends TransactionCtx {
         return getProcessedLoanChargeIds().contains(loanCharge.getId());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ProgressiveLoanInterestScheduleModel getModel() {
+        return this.model;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<LoanTransaction> getAlreadyProcessedTransactions() {
+        return this.alreadyProcessedTransactions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Money getSumOfInterestRefundAmount() {
+        return this.sumOfInterestRefundAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isChargedOff() {
+        return this.isChargedOff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isWrittenOff() {
+        return this.isWrittenOff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isContractTerminated() {
+        return this.isContractTerminated;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isPrepayAttempt() {
+        return this.isPrepayAttempt;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<LoanRepaymentScheduleInstallment> getSkipRepaymentScheduleInstallments() {
+        return this.skipRepaymentScheduleInstallments;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<Long> getProcessedLoanChargeIds() {
+        return this.processedLoanChargeIds;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setSumOfInterestRefundAmount(final Money sumOfInterestRefundAmount) {
+        this.sumOfInterestRefundAmount = sumOfInterestRefundAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setChargedOff(final boolean isChargedOff) {
+        this.isChargedOff = isChargedOff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setWrittenOff(final boolean isWrittenOff) {
+        this.isWrittenOff = isWrittenOff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setContractTerminated(final boolean isContractTerminated) {
+        this.isContractTerminated = isContractTerminated;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setPrepayAttempt(final boolean isPrepayAttempt) {
+        this.isPrepayAttempt = isPrepayAttempt;
+    }
 }

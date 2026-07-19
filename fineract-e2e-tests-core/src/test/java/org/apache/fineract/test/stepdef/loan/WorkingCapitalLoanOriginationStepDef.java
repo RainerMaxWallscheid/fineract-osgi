@@ -23,7 +23,6 @@ import static org.apache.fineract.client.feign.util.FeignCalls.fail;
 import static org.apache.fineract.client.feign.util.FeignCalls.failVoid;
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
 import static org.assertj.core.api.Assertions.assertThat;
-
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -34,7 +33,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.GetWorkingCapitalLoansLoanIdOriginatorData;
@@ -52,11 +50,8 @@ import org.apache.fineract.test.helper.ErrorMessageHelper;
 import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 
-@RequiredArgsConstructor
 public class WorkingCapitalLoanOriginationStepDef extends AbstractStepDef {
-
     private static final long NON_EXISTENT_ID = Long.MAX_VALUE;
-
     private final FineractFeignClient fineractClient;
     private final WorkingCapitalLoanRequestFactory workingCapitalLoanRequestFactory;
     private final WorkingCapitalLoanProductResolver workingCapitalLoanProductResolver;
@@ -88,44 +83,38 @@ public class WorkingCapitalLoanOriginationStepDef extends AbstractStepDef {
     public void createWorkingCapitalLoanWithTwoOriginatorsInline(final DataTable table) {
         final long firstOriginatorId = getOriginatorId(TestContextKey.ORIGINATOR_CREATE_RESPONSE);
         final long secondOriginatorId = getOriginatorId(TestContextKey.ORIGINATOR_SECOND_CREATE_RESPONSE);
-        submitInlineAndStore(buildInlineRequest(table, List.of(new PostWorkingCapitalLoansOriginatorData().id(firstOriginatorId),
-                new PostWorkingCapitalLoansOriginatorData().id(secondOriginatorId))));
+        submitInlineAndStore(buildInlineRequest(table, List.of(new PostWorkingCapitalLoansOriginatorData().id(firstOriginatorId), new PostWorkingCapitalLoansOriginatorData().id(secondOriginatorId))));
     }
 
     @When("Admin creates a working capital loan with the same originator listed twice inline and the following data:")
     public void createWorkingCapitalLoanWithDuplicateInlineOriginator(final DataTable table) {
         final long originatorId = getOriginatorId(TestContextKey.ORIGINATOR_CREATE_RESPONSE);
-        submitInlineAndStore(buildInlineRequest(table, List.of(new PostWorkingCapitalLoansOriginatorData().id(originatorId),
-                new PostWorkingCapitalLoansOriginatorData().id(originatorId))));
+        submitInlineAndStore(buildInlineRequest(table, List.of(new PostWorkingCapitalLoansOriginatorData().id(originatorId), new PostWorkingCapitalLoansOriginatorData().id(originatorId))));
     }
 
     @When("Admin creates a working capital loan with an inline originator created by a new external id and name {string} and the following data:")
     public void createWorkingCapitalLoanWithInlineOriginatorByNewExternalId(final String originatorName, final DataTable table) {
         final String originatorExternalId = UUID.randomUUID().toString();
         testContext().set(TestContextKey.ORIGINATOR_EXTERNAL_ID, originatorExternalId);
-        submitInlineAndStore(buildInlineRequest(table,
-                List.of(new PostWorkingCapitalLoansOriginatorData().externalId(originatorExternalId).name(originatorName))));
+        submitInlineAndStore(buildInlineRequest(table, List.of(new PostWorkingCapitalLoansOriginatorData().externalId(originatorExternalId).name(originatorName))));
     }
 
     @When("Admin creates a working capital loan with an inline originator referenced by the existing originator external id and the following data:")
     public void createWorkingCapitalLoanWithInlineOriginatorByExistingExternalId(final DataTable table) {
         final String originatorExternalId = getExternalId(TestContextKey.ORIGINATOR_EXTERNAL_ID);
-        submitInlineAndStore(
-                buildInlineRequest(table, List.of(new PostWorkingCapitalLoansOriginatorData().externalId(originatorExternalId))));
+        submitInlineAndStore(buildInlineRequest(table, List.of(new PostWorkingCapitalLoansOriginatorData().externalId(originatorExternalId))));
     }
 
     @Then("Creating a working capital loan with the inline originator should fail with status {int} and the following data:")
     public void createWorkingCapitalLoanWithInlineOriginatorShouldFail(final int expectedStatus, final DataTable table) {
         final long originatorId = getOriginatorId(TestContextKey.ORIGINATOR_CREATE_RESPONSE);
-        final PostWorkingCapitalLoansRequest request = buildInlineRequest(table,
-                List.of(new PostWorkingCapitalLoansOriginatorData().id(originatorId)));
+        final PostWorkingCapitalLoansRequest request = buildInlineRequest(table, List.of(new PostWorkingCapitalLoansOriginatorData().id(originatorId)));
         assertCallFails(() -> fineractClient.workingCapitalLoans().submitWorkingCapitalLoanApplication(request), expectedStatus);
     }
 
     @Then("Creating a working capital loan with a non-existent inline originator should fail with status {int} and the following data:")
     public void createWorkingCapitalLoanWithNonExistentInlineOriginatorShouldFail(final int expectedStatus, final DataTable table) {
-        final PostWorkingCapitalLoansRequest request = buildInlineRequest(table,
-                List.of(new PostWorkingCapitalLoansOriginatorData().id(NON_EXISTENT_ID)));
+        final PostWorkingCapitalLoansRequest request = buildInlineRequest(table, List.of(new PostWorkingCapitalLoansOriginatorData().id(NON_EXISTENT_ID)));
         assertCallFails(() -> fineractClient.workingCapitalLoans().submitWorkingCapitalLoanApplication(request), expectedStatus);
     }
 
@@ -153,16 +142,14 @@ public class WorkingCapitalLoanOriginationStepDef extends AbstractStepDef {
     @Then("Retrieving working capital loan originators returns {int} originator(s)")
     public void retrieveByLoanId(final int expectedCount) {
         final long loanId = getLoanId();
-        final LoanOriginatorsResponse response = ok(
-                () -> fineractClient.workingCapitalLoanOriginators().retrieveOriginatorsByWorkingCapitalLoanId(loanId));
+        final LoanOriginatorsResponse response = ok(() -> fineractClient.workingCapitalLoanOriginators().retrieveOriginatorsByWorkingCapitalLoanId(loanId));
         assertThat(response.getOriginators()).as("Originators from WC originators API").hasSize(expectedCount);
     }
 
     @Then("Retrieving working capital loan originators by external id returns {int} originator(s)")
     public void retrieveByLoanExternalId(final int expectedCount) {
         final String loanExternalId = retrieveLoanDetails().getExternalId();
-        final LoanOriginatorsResponse response = ok(
-                () -> fineractClient.workingCapitalLoanOriginators().retrieveOriginatorsByWorkingCapitalLoanExternalId(loanExternalId));
+        final LoanOriginatorsResponse response = ok(() -> fineractClient.workingCapitalLoanOriginators().retrieveOriginatorsByWorkingCapitalLoanExternalId(loanExternalId));
         assertThat(response.getOriginators()).as("Originators from WC originators API by external id").hasSize(expectedCount);
     }
 
@@ -170,107 +157,89 @@ public class WorkingCapitalLoanOriginationStepDef extends AbstractStepDef {
     public void attachShouldFail(final int expectedStatus) {
         final long loanId = getLoanId();
         final long originatorId = getOriginatorId(TestContextKey.ORIGINATOR_CREATE_RESPONSE);
-        assertVoidCallFails(() -> fineractClient.workingCapitalLoanOriginators().attachOriginatorToWorkingCapitalLoan(loanId, originatorId),
-                expectedStatus);
+        assertVoidCallFails(() -> fineractClient.workingCapitalLoanOriginators().attachOriginatorToWorkingCapitalLoan(loanId, originatorId), expectedStatus);
     }
 
     @Then("Detaching the originator from the working capital loan should fail with status {int}")
     public void detachShouldFail(final int expectedStatus) {
         final long loanId = getLoanId();
         final long originatorId = getOriginatorId(TestContextKey.ORIGINATOR_CREATE_RESPONSE);
-        assertVoidCallFails(
-                () -> fineractClient.workingCapitalLoanOriginators().detachOriginatorFromWorkingCapitalLoan(loanId, originatorId),
-                expectedStatus);
+        assertVoidCallFails(() -> fineractClient.workingCapitalLoanOriginators().detachOriginatorFromWorkingCapitalLoan(loanId, originatorId), expectedStatus);
     }
 
     @Then("Attaching non-existent originator to the working capital loan should fail with status {int}")
     public void attachNonExistentOriginatorShouldFail(final int expectedStatus) {
         final long loanId = getLoanId();
-        assertVoidCallFails(
-                () -> fineractClient.workingCapitalLoanOriginators().attachOriginatorToWorkingCapitalLoan(loanId, NON_EXISTENT_ID),
-                expectedStatus);
+        assertVoidCallFails(() -> fineractClient.workingCapitalLoanOriginators().attachOriginatorToWorkingCapitalLoan(loanId, NON_EXISTENT_ID), expectedStatus);
     }
 
     @Then("Attaching the originator to non-existent working capital loan should fail with status {int}")
     public void attachToNonExistentLoanShouldFail(final int expectedStatus) {
-        assertVoidCallFails(
-                () -> fineractClient.workingCapitalLoanOriginators().attachOriginatorToWorkingCapitalLoan(NON_EXISTENT_ID, NON_EXISTENT_ID),
-                expectedStatus);
+        assertVoidCallFails(() -> fineractClient.workingCapitalLoanOriginators().attachOriginatorToWorkingCapitalLoan(NON_EXISTENT_ID, NON_EXISTENT_ID), expectedStatus);
     }
 
     @Then("Detaching the originator from a non-existent working capital loan should fail with status {int}")
     public void detachFromNonExistentLoanShouldFail(final int expectedStatus) {
-        assertVoidCallFails(() -> fineractClient.workingCapitalLoanOriginators().detachOriginatorFromWorkingCapitalLoan(NON_EXISTENT_ID,
-                NON_EXISTENT_ID), expectedStatus);
+        assertVoidCallFails(() -> fineractClient.workingCapitalLoanOriginators().detachOriginatorFromWorkingCapitalLoan(NON_EXISTENT_ID, NON_EXISTENT_ID), expectedStatus);
     }
 
     @Then("Detaching a non-existent originator from the working capital loan should fail with status {int}")
     public void detachNonExistentOriginatorShouldFail(final int expectedStatus) {
         final long loanId = getLoanId();
-        assertVoidCallFails(
-                () -> fineractClient.workingCapitalLoanOriginators().detachOriginatorFromWorkingCapitalLoan(loanId, NON_EXISTENT_ID),
-                expectedStatus);
+        assertVoidCallFails(() -> fineractClient.workingCapitalLoanOriginators().detachOriginatorFromWorkingCapitalLoan(loanId, NON_EXISTENT_ID), expectedStatus);
     }
 
     @Then("Retrieving working capital loan originators for a non-existent loan should fail with status {int}")
     public void retrieveByNonExistentLoanShouldFail(final int expectedStatus) {
-        assertCallFails(() -> fineractClient.workingCapitalLoanOriginators().retrieveOriginatorsByWorkingCapitalLoanId(NON_EXISTENT_ID),
-                expectedStatus);
+        assertCallFails(() -> fineractClient.workingCapitalLoanOriginators().retrieveOriginatorsByWorkingCapitalLoanId(NON_EXISTENT_ID), expectedStatus);
     }
 
     @Then("Retrieving working capital loan originators by a non-existent external id should fail with status {int}")
     public void retrieveByNonExistentExternalIdShouldFail(final int expectedStatus) {
         final String nonExistentExternalId = UUID.randomUUID().toString();
-        assertCallFails(() -> fineractClient.workingCapitalLoanOriginators()
-                .retrieveOriginatorsByWorkingCapitalLoanExternalId(nonExistentExternalId), expectedStatus);
+        assertCallFails(() -> fineractClient.workingCapitalLoanOriginators().retrieveOriginatorsByWorkingCapitalLoanExternalId(nonExistentExternalId), expectedStatus);
     }
 
     @When("Admin attaches the originator to the working capital loan by originator external id")
     public void attachOriginatorByOriginatorExternalId() {
         final long loanId = getLoanId();
         final String originatorExternalId = getExternalId(TestContextKey.ORIGINATOR_EXTERNAL_ID);
-        executeVoid(() -> fineractClient.workingCapitalLoanOriginators().attachOriginatorToWorkingCapitalLoanByOriginatorExternalId(loanId,
-                originatorExternalId));
+        executeVoid(() -> fineractClient.workingCapitalLoanOriginators().attachOriginatorToWorkingCapitalLoanByOriginatorExternalId(loanId, originatorExternalId));
     }
 
     @When("Admin attaches the originator to the working capital loan by loan external id")
     public void attachOriginatorByLoanExternalId() {
         final String loanExternalId = retrieveLoanDetails().getExternalId();
         final long originatorId = getOriginatorId(TestContextKey.ORIGINATOR_CREATE_RESPONSE);
-        executeVoid(() -> fineractClient.workingCapitalLoanOriginators()
-                .attachOriginatorToWorkingCapitalLoanByLoanExternalId(loanExternalId, originatorId));
+        executeVoid(() -> fineractClient.workingCapitalLoanOriginators().attachOriginatorToWorkingCapitalLoanByLoanExternalId(loanExternalId, originatorId));
     }
 
     @When("Admin attaches the originator to the working capital loan by both external ids")
     public void attachOriginatorByBothExternalIds() {
         final String loanExternalId = retrieveLoanDetails().getExternalId();
         final String originatorExternalId = getExternalId(TestContextKey.ORIGINATOR_EXTERNAL_ID);
-        executeVoid(() -> fineractClient.workingCapitalLoanOriginators()
-                .attachOriginatorToWorkingCapitalLoanByBothExternalIds(loanExternalId, originatorExternalId));
+        executeVoid(() -> fineractClient.workingCapitalLoanOriginators().attachOriginatorToWorkingCapitalLoanByBothExternalIds(loanExternalId, originatorExternalId));
     }
 
     @When("Admin detaches the originator from the working capital loan by originator external id")
     public void detachOriginatorByOriginatorExternalId() {
         final long loanId = getLoanId();
         final String originatorExternalId = getExternalId(TestContextKey.ORIGINATOR_EXTERNAL_ID);
-        executeVoid(() -> fineractClient.workingCapitalLoanOriginators()
-                .detachOriginatorFromWorkingCapitalLoanByOriginatorExternalId(loanId, originatorExternalId));
+        executeVoid(() -> fineractClient.workingCapitalLoanOriginators().detachOriginatorFromWorkingCapitalLoanByOriginatorExternalId(loanId, originatorExternalId));
     }
 
     @When("Admin detaches the originator from the working capital loan by loan external id")
     public void detachOriginatorByLoanExternalId() {
         final String loanExternalId = retrieveLoanDetails().getExternalId();
         final long originatorId = getOriginatorId(TestContextKey.ORIGINATOR_CREATE_RESPONSE);
-        executeVoid(() -> fineractClient.workingCapitalLoanOriginators()
-                .detachOriginatorFromWorkingCapitalLoanByLoanExternalId(loanExternalId, originatorId));
+        executeVoid(() -> fineractClient.workingCapitalLoanOriginators().detachOriginatorFromWorkingCapitalLoanByLoanExternalId(loanExternalId, originatorId));
     }
 
     @When("Admin detaches the originator from the working capital loan by both external ids")
     public void detachOriginatorByBothExternalIds() {
         final String loanExternalId = retrieveLoanDetails().getExternalId();
         final String originatorExternalId = getExternalId(TestContextKey.ORIGINATOR_EXTERNAL_ID);
-        executeVoid(() -> fineractClient.workingCapitalLoanOriginators()
-                .detachOriginatorFromWorkingCapitalLoanByBothExternalIds(loanExternalId, originatorExternalId));
+        executeVoid(() -> fineractClient.workingCapitalLoanOriginators().detachOriginatorFromWorkingCapitalLoanByBothExternalIds(loanExternalId, originatorExternalId));
     }
 
     @Then("Working capital loan details has the originator with all fields attached")
@@ -278,20 +247,15 @@ public class WorkingCapitalLoanOriginationStepDef extends AbstractStepDef {
         final String expectedExternalId = getExternalId(TestContextKey.ORIGINATOR_EXTERNAL_ID);
         final String expectedOriginatorTypeName = testContext().get(TestContextKey.ORIGINATOR_TYPE_NAME);
         final String expectedChannelTypeName = testContext().get(TestContextKey.ORIGINATOR_CHANNEL_TYPE_NAME);
-
         final List<GetWorkingCapitalLoansLoanIdOriginatorData> originators = retrieveLoanDetails().getOriginators();
         assertThat(originators).as("Originators in WC loan details").isNotNull().isNotEmpty();
-        final GetWorkingCapitalLoansLoanIdOriginatorData originator = originators.stream()
-                .filter(candidate -> expectedExternalId.equals(candidate.getExternalId())).findFirst().orElseThrow(
-                        () -> new AssertionError("Originator with externalId " + expectedExternalId + " not found in WC loan details"));
-
+        final GetWorkingCapitalLoansLoanIdOriginatorData originator = originators.stream().filter(candidate -> expectedExternalId.equals(candidate.getExternalId())).findFirst().orElseThrow(() -> new AssertionError("Originator with externalId " + expectedExternalId + " not found in WC loan details"));
         assertThat(originator.getId()).as("Originator id in WC loan details").isNotNull();
         assertThat(originator.getExternalId()).as("Originator externalId in WC loan details").isEqualTo(expectedExternalId);
         assertThat(originator.getName()).as("Originator name in WC loan details").isNotNull();
         assertThat(originator.getStatus()).as("Originator status in WC loan details").isEqualTo("ACTIVE");
         assertThat(originator.getOriginatorType()).as("Originator type in WC loan details").isNotNull();
-        assertThat(originator.getOriginatorType().getName()).as("Originator type name in WC loan details")
-                .isEqualTo(expectedOriginatorTypeName);
+        assertThat(originator.getOriginatorType().getName()).as("Originator type name in WC loan details").isEqualTo(expectedOriginatorTypeName);
         assertThat(originator.getChannelType()).as("Channel type in WC loan details").isNotNull();
         assertThat(originator.getChannelType().getName()).as("Channel type name in WC loan details").isEqualTo(expectedChannelTypeName);
     }
@@ -306,8 +270,7 @@ public class WorkingCapitalLoanOriginationStepDef extends AbstractStepDef {
         assertOriginatorAbsent(getExternalId(TestContextKey.ORIGINATOR_EXTERNAL_ID));
     }
 
-    private PostWorkingCapitalLoansRequest buildInlineRequest(final DataTable table,
-            final List<PostWorkingCapitalLoansOriginatorData> originators) {
+    private PostWorkingCapitalLoansRequest buildInlineRequest(final DataTable table, final List<PostWorkingCapitalLoansOriginatorData> originators) {
         final Map<String, String> row = table.asMaps().getFirst();
         final String loanProductName = row.get("LoanProduct");
         final String submittedOnDate = row.get("submittedOnDate");
@@ -316,21 +279,13 @@ public class WorkingCapitalLoanOriginationStepDef extends AbstractStepDef {
         final String totalPaymentVolume = row.get("totalPaymentVolume");
         final String periodPaymentRate = row.get("periodPaymentRate");
         final String discount = row.get("discount");
-
         final Long clientId = ((PostClientsResponse) testContext().get(TestContextKey.CLIENT_CREATE_RESPONSE)).getClientId();
         final long productId = workingCapitalLoanProductResolver.resolve(DefaultWorkingCapitalLoanProduct.valueOf(loanProductName));
-
-        return workingCapitalLoanRequestFactory.defaultWorkingCapitalLoansRequest(clientId).productId(productId)
-                .submittedOnDate(submittedOnDate).expectedDisbursementDate(expectedDisbursementDate)
-                .principalAmount(new BigDecimal(principal)).totalPaymentVolume(new BigDecimal(totalPaymentVolume))
-                .periodPaymentRate(new BigDecimal(periodPaymentRate))
-                .discount(Optional.ofNullable(discount).filter(value -> !value.isEmpty()).map(BigDecimal::new).orElse(null))
-                .originators(originators);
+        return workingCapitalLoanRequestFactory.defaultWorkingCapitalLoansRequest(clientId).productId(productId).submittedOnDate(submittedOnDate).expectedDisbursementDate(expectedDisbursementDate).principalAmount(new BigDecimal(principal)).totalPaymentVolume(new BigDecimal(totalPaymentVolume)).periodPaymentRate(new BigDecimal(periodPaymentRate)).discount(Optional.ofNullable(discount).filter(value -> !value.isEmpty()).map(BigDecimal::new).orElse(null)).originators(originators);
     }
 
     private void submitInlineAndStore(final PostWorkingCapitalLoansRequest request) {
-        final PostWorkingCapitalLoansResponse response = ok(
-                () -> fineractClient.workingCapitalLoans().submitWorkingCapitalLoanApplication(request));
+        final PostWorkingCapitalLoansResponse response = ok(() -> fineractClient.workingCapitalLoans().submitWorkingCapitalLoanApplication(request));
         testContext().set(TestContextKey.LOAN_CREATE_RESPONSE, response);
         testContext().set(TestContextKey.WORKING_CAPITAL_LOAN_CREATE_RESPONSE, response);
     }
@@ -358,13 +313,11 @@ public class WorkingCapitalLoanOriginationStepDef extends AbstractStepDef {
 
     private void assertOriginatorAbsent(final String expectedExternalId) {
         final List<GetWorkingCapitalLoansLoanIdOriginatorData> originators = retrieveLoanDetails().getOriginators();
-        final boolean found = originators != null
-                && originators.stream().anyMatch(originator -> expectedExternalId.equals(originator.getExternalId()));
+        final boolean found = originators != null && originators.stream().anyMatch(originator -> expectedExternalId.equals(originator.getExternalId()));
         assertThat(found).as("Originator with externalId %s should not be present in WC loan details", expectedExternalId).isFalse();
     }
 
-    private void assertOriginatorPresentBy(final Function<GetWorkingCapitalLoansLoanIdOriginatorData, String> fieldExtractor,
-            final String expectedValue, final String fieldDescription) {
+    private void assertOriginatorPresentBy(final Function<GetWorkingCapitalLoansLoanIdOriginatorData, String> fieldExtractor, final String expectedValue, final String fieldDescription) {
         final List<GetWorkingCapitalLoansLoanIdOriginatorData> originators = retrieveLoanDetails().getOriginators();
         assertThat(originators).as("Originators in WC loan details").isNotNull().isNotEmpty();
         final boolean found = originators.stream().anyMatch(originator -> expectedValue.equals(fieldExtractor.apply(originator)));
@@ -387,5 +340,12 @@ public class WorkingCapitalLoanOriginationStepDef extends AbstractStepDef {
 
     private void assertExpectedStatus(final CallFailedRuntimeException ex, final int expectedStatus) {
         assertThat(ex.getStatus()).as(ErrorMessageHelper.wrongErrorCode(ex.getStatus(), expectedStatus)).isEqualTo(expectedStatus);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanOriginationStepDef(final FineractFeignClient fineractClient, final WorkingCapitalLoanRequestFactory workingCapitalLoanRequestFactory, final WorkingCapitalLoanProductResolver workingCapitalLoanProductResolver) {
+        this.fineractClient = fineractClient;
+        this.workingCapitalLoanRequestFactory = workingCapitalLoanRequestFactory;
+        this.workingCapitalLoanProductResolver = workingCapitalLoanProductResolver;
     }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.dataqueries.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -27,17 +26,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class UpdateOneToManyDatatableEntryCommandHandler implements NewCommandSourceHandler {
-
     private final DatatableWriteService datatableWriteService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-        return this.datatableWriteService.updateDatatableEntryOneToMany(command.getEntityName(), command.entityId(), command.subentityId(),
-                command);
-
+        return this.datatableWriteService.updateDatatableEntryOneToMany(command.getEntityName(), command.entityId(), command.subentityId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public UpdateOneToManyDatatableEntryCommandHandler(final DatatableWriteService datatableWriteService) {
+        this.datatableWriteService = datatableWriteService;
+    }
 }

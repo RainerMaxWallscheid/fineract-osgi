@@ -32,7 +32,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
@@ -52,9 +51,7 @@ import org.springframework.stereotype.Component;
 @Path("/v1/paymenttypes")
 @Component
 @Tag(name = "Payment Type", description = "This defines the payment type")
-@RequiredArgsConstructor
 public class PaymentTypeApiResource {
-
     private final PaymentTypeReadService readPlatformService;
     private final CommandDispatcher dispatcher;
     private final DefaultToApiJsonSerializer<PaymentTypeData> jsonSerializer;
@@ -75,51 +72,45 @@ public class PaymentTypeApiResource {
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create a Payment Type", description = "Creates a new Payment type")
     public PaymentTypeCreateResponse createPaymentType(PaymentTypeCreateRequest request) {
         final var command = new PaymentTypeCreateCommand();
-
         command.setPayload(request);
-
         final Supplier<PaymentTypeCreateResponse> response = dispatcher.dispatch(command);
-
         return response.get();
     }
 
     @PUT
     @Path("{paymentTypeId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a Payment Type", description = "Updates a Payment Type")
-    public PaymentTypeUpdateResponse updatePaymentType(@PathParam("paymentTypeId") final Long paymentTypeId,
-            final PaymentTypeUpdateRequest request) {
-
+    public PaymentTypeUpdateResponse updatePaymentType(@PathParam("paymentTypeId") final Long paymentTypeId, final PaymentTypeUpdateRequest request) {
         request.setId(paymentTypeId);
-
         final var command = new PaymentTypeUpdateCommand();
-
         command.setPayload(request);
-
         final Supplier<PaymentTypeUpdateResponse> response = dispatcher.dispatch(command);
-
         return response.get();
     }
 
     @DELETE
     @Path("{paymentTypeId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete a Payment Type", operationId = "deleteCodePaymentType", description = "Deletes payment type")
     @AlternativeOperationId("deleteCode_1")
     public PaymentTypeDeleteResponse deleteCode(@PathParam("paymentTypeId") final Long paymentTypeId) {
-
         final var command = new PaymentTypeDeleteCommand();
-
         command.setPayload(PaymentTypeDeleteRequest.builder().id(paymentTypeId).build());
-
         final Supplier<PaymentTypeDeleteResponse> response = dispatcher.dispatch(command);
-
         return response.get();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PaymentTypeApiResource(final PaymentTypeReadService readPlatformService, final CommandDispatcher dispatcher, final DefaultToApiJsonSerializer<PaymentTypeData> jsonSerializer) {
+        this.readPlatformService = readPlatformService;
+        this.dispatcher = dispatcher;
+        this.jsonSerializer = jsonSerializer;
     }
 }

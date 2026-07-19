@@ -18,13 +18,7 @@
  */
 package org.apache.fineract.batch.exception;
 
-import static lombok.AccessLevel.PROTECTED;
-
 import java.util.Set;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.batch.domain.Header;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 
@@ -35,14 +29,61 @@ import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
  *
  * @see ErrorHandler
  */
-@Getter
-@Setter(PROTECTED)
-@NoArgsConstructor(access = PROTECTED)
-@AllArgsConstructor
 public final class ErrorInfo {
-
     private Integer statusCode;
     private Integer errorCode;
     private String message;
     private Set<Header> headers;
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getStatusCode() {
+        return this.statusCode;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getErrorCode() {
+        return this.errorCode;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getMessage() {
+        return this.message;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Set<Header> getHeaders() {
+        return this.headers;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected void setStatusCode(final Integer statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected void setErrorCode(final Integer errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected void setMessage(final String message) {
+        this.message = message;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected void setHeaders(final Set<Header> headers) {
+        this.headers = headers;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected ErrorInfo() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ErrorInfo(final Integer statusCode, final Integer errorCode, final String message, final Set<Header> headers) {
+        this.statusCode = statusCode;
+        this.errorCode = errorCode;
+        this.message = message;
+        this.headers = headers;
+    }
 }

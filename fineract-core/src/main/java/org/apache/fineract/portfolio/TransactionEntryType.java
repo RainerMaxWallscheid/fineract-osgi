@@ -18,17 +18,13 @@
  */
 package org.apache.fineract.portfolio;
 
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.data.StringEnumOptionData;
 
-@Getter
 public enum TransactionEntryType {
-
-    CREDIT(1, "transactionEntryType.credit", "Credit transaction"), //
-    DEBIT(2, "transactionEntryType.debit", "Debit transaction"), //
-    ;
-
+    CREDIT(1, "transactionEntryType.credit", "Credit transaction"),  //
+    DEBIT(2, "transactionEntryType.debit", "Debit transaction");
+    //
     private final Integer value;
     private final String code;
     private final String description;
@@ -57,5 +53,20 @@ public enum TransactionEntryType {
 
     public StringEnumOptionData toStringEnumOptionData() {
         return new StringEnumOptionData(name(), getCode(), getDescription());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
     }
 }

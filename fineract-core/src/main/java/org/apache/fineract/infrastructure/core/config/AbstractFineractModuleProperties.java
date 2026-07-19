@@ -18,12 +18,16 @@
  */
 package org.apache.fineract.infrastructure.core.config;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
 public class AbstractFineractModuleProperties {
-
     private boolean enabled;
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isEnabled() {
+        return this.enabled;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setEnabled(final boolean enabled) {
+        this.enabled = enabled;
+    }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.event.external.service.serialization.serializer.savings;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
 import org.apache.fineract.avro.savings.v1.SavingsAccountTransactionDataV1;
@@ -32,9 +31,7 @@ import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformS
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class SavingsAccountTransactionBusinessEventSerializer implements BusinessEventSerializer {
-
     private final SavingsAccountReadPlatformService service;
     private final SavingsAccountTransactionDataMapper mapper;
 
@@ -47,13 +44,18 @@ public class SavingsAccountTransactionBusinessEventSerializer implements Busines
     public <T> ByteBufferSerializable toAvroDTO(BusinessEvent<T> rawEvent) {
         SavingsAccountTransactionBusinessEvent event = (SavingsAccountTransactionBusinessEvent) rawEvent;
         SavingsAccountTransaction tx = event.get();
-        SavingsAccountTransactionData data = service.retrieveSavingsTransaction(tx.getSavingsAccount().getId(), tx.getId(),
-                tx.getSavingsAccount().depositAccountType());
+        SavingsAccountTransactionData data = service.retrieveSavingsTransaction(tx.getSavingsAccount().getId(), tx.getId(), tx.getSavingsAccount().depositAccountType());
         return mapper.map(data);
     }
 
     @Override
     public Class<? extends GenericContainer> getSupportedSchema() {
         return SavingsAccountTransactionDataV1.class;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsAccountTransactionBusinessEventSerializer(final SavingsAccountReadPlatformService service, final SavingsAccountTransactionDataMapper mapper) {
+        this.service = service;
+        this.mapper = mapper;
     }
 }

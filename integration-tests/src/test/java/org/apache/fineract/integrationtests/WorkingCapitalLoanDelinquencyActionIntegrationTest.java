@@ -22,13 +22,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.feign.util.FeignCalls;
 import org.apache.fineract.client.models.DelinquencyRangeRequest;
@@ -50,11 +48,10 @@ import org.apache.fineract.integrationtests.common.workingcapitalloanproduct.Wor
 import org.apache.fineract.integrationtests.common.workingcapitalloanproduct.WorkingCapitalLoanProductTestBuilder;
 import org.junit.jupiter.api.Test;
 
-@Slf4j
 public class WorkingCapitalLoanDelinquencyActionIntegrationTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanDelinquencyActionIntegrationTest.class);
     private static final int PERIOD_FREQUENCY_DAYS = 30;
-
     private final WorkingCapitalLoanHelper applicationHelper = new WorkingCapitalLoanHelper();
     private final WorkingCapitalLoanProductHelper productHelper = new WorkingCapitalLoanProductHelper();
 
@@ -69,37 +66,27 @@ public class WorkingCapitalLoanDelinquencyActionIntegrationTest {
         final Long productId = createProduct(bucketId);
         final Long clientId = createClient();
         final Long loanId = submitAndApproveLoan(clientId, productId);
-
         final LocalDate disbursementDate = LocalDate.now(ZoneId.systemDefault()).minusDays(5);
         WorkingCapitalLoanDelinquencyActionHelper.activateLoan(loanId, disbursementDate);
-
         // verify initial period was generated
         final List<WorkingCapitalLoanDelinquencyRangeScheduleData> periodsAfterActivation = getRangeSchedule(loanId);
         assertEquals(1, periodsAfterActivation.size(), "Expected 1 initial period after activation");
-
         final LocalDate expectedPeriodToDate = periodsAfterActivation.getFirst().getToDate();
         log.info("Initial period toDate: {}", expectedPeriodToDate);
-
         // when - create a 10-day pause starting from disbursement date
         final LocalDate pauseStart = disbursementDate;
         final LocalDate pauseEnd = disbursementDate.plusDays(10);
-        final PostWorkingCapitalLoansDelinquencyActionResponse createResult = WorkingCapitalLoanDelinquencyActionHelper
-                .createDelinquencyAction(loanId, "pause", pauseStart, pauseEnd);
+        final PostWorkingCapitalLoansDelinquencyActionResponse createResult = WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, "pause", pauseStart, pauseEnd);
         assertNotNull(createResult);
         log.info("Create pause response resourceId={}", createResult.getResourceId());
-
         // then - range schedule periods should be shifted by 11 days (inclusive pause length)
         final List<WorkingCapitalLoanDelinquencyRangeScheduleData> periodsAfterPause = getRangeSchedule(loanId);
         assertEquals(1, periodsAfterPause.size());
-
         final LocalDate newToDate = periodsAfterPause.getFirst().getToDate();
         assert expectedPeriodToDate != null;
-        assertEquals(expectedPeriodToDate.plusDays(11), newToDate,
-                "Period toDate should be extended by 11 days (the inclusive pause duration)");
-
+        assertEquals(expectedPeriodToDate.plusDays(11), newToDate, "Period toDate should be extended by 11 days (the inclusive pause duration)");
         // and - GET returns the saved action
-        final List<WorkingCapitalLoanDelinquencyActionData> actions = WorkingCapitalLoanDelinquencyActionHelper
-                .retrieveDelinquencyActions(loanId);
+        final List<WorkingCapitalLoanDelinquencyActionData> actions = WorkingCapitalLoanDelinquencyActionHelper.retrieveDelinquencyActions(loanId);
         assertEquals(1, actions.size());
         assertEquals(WorkingCapitalLoanDelinquencyActionData.ActionEnum.PAUSE, actions.getFirst().getAction());
         assertEquals(pauseStart, actions.getFirst().getStartDate());
@@ -118,45 +105,33 @@ public class WorkingCapitalLoanDelinquencyActionIntegrationTest {
         final Long productId = createProduct(bucketId);
         final Long clientId = createClient();
         final Long loanId = submitAndApproveLoan(clientId, productId);
-
         // 20 days ago with 15-day frequency: period 1 [d0-d14], period 2 [d15-d29], period 2 toDate is still in future
         final LocalDate disbursementDate = LocalDate.now(ZoneId.systemDefault()).minusDays(20);
         WorkingCapitalLoanDelinquencyActionHelper.activateLoan(loanId, disbursementDate);
-
         // Generate next period(s) using the internal endpoint (simulates COB)
         WorkingCapitalLoanDelinquencyActionHelper.generateNextDelinquencyPeriod(loanId, LocalDate.now(ZoneId.systemDefault()));
-
         final List<WorkingCapitalLoanDelinquencyRangeScheduleData> periods = getRangeSchedule(loanId);
         assertNotNull(periods);
         assertEquals(2, periods.size(), "Expected 2 periods after generation with 20 days history and 15-day frequency");
-
         final LocalDate firstPeriodOriginalFromDate = periods.get(0).getFromDate();
         final LocalDate firstPeriodOriginalToDate = periods.get(0).getToDate();
         final LocalDate secondPeriodOriginalFromDate = periods.get(1).getFromDate();
         final LocalDate secondPeriodOriginalToDate = periods.get(1).getToDate();
-
         // when - create a 7-day pause starting from disbursement date
         final LocalDate pauseStart = disbursementDate;
         final LocalDate pauseEnd = disbursementDate.plusDays(7);
         WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, "pause", pauseStart, pauseEnd);
-
         // then - both periods are extended
         final List<WorkingCapitalLoanDelinquencyRangeScheduleData> periodsAfterPause = getRangeSchedule(loanId);
         assertEquals(2, periodsAfterPause.size());
-
         // First period: fromDate unchanged (contains pauseStart), toDate extended by 8 (inclusive)
-        assertEquals(firstPeriodOriginalFromDate, periodsAfterPause.getFirst().getFromDate(),
-                "First period fromDate should stay unchanged");
+        assertEquals(firstPeriodOriginalFromDate, periodsAfterPause.getFirst().getFromDate(), "First period fromDate should stay unchanged");
         assert firstPeriodOriginalToDate != null;
-        assertEquals(firstPeriodOriginalToDate.plusDays(8), periodsAfterPause.get(0).getToDate(),
-                "First period toDate should be extended by 8 days");
-
+        assertEquals(firstPeriodOriginalToDate.plusDays(8), periodsAfterPause.get(0).getToDate(), "First period toDate should be extended by 8 days");
         // Second period: both fromDate and toDate shifted by 8 (starts after pauseStart)
         assert secondPeriodOriginalFromDate != null;
-        assertEquals(secondPeriodOriginalFromDate.plusDays(8), periodsAfterPause.get(1).getFromDate(),
-                "Second period fromDate should shift by 8 days");
-        assertEquals(secondPeriodOriginalToDate.plusDays(8), periodsAfterPause.get(1).getToDate(),
-                "Second period toDate should shift by 8 days");
+        assertEquals(secondPeriodOriginalFromDate.plusDays(8), periodsAfterPause.get(1).getFromDate(), "Second period fromDate should shift by 8 days");
+        assertEquals(secondPeriodOriginalToDate.plusDays(8), periodsAfterPause.get(1).getToDate(), "Second period toDate should shift by 8 days");
     }
 
     /**
@@ -169,22 +144,17 @@ public class WorkingCapitalLoanDelinquencyActionIntegrationTest {
         final Long productId = createProduct(bucketId);
         final Long clientId = createClient();
         final Long loanId = submitAndApproveLoan(clientId, productId);
-
         final LocalDate disbursementDate = LocalDate.now(ZoneId.systemDefault()).minusDays(5);
         WorkingCapitalLoanDelinquencyActionHelper.activateLoan(loanId, disbursementDate);
-
         // Create first pause
         final LocalDate pause1Start = disbursementDate;
         final LocalDate pause1End = disbursementDate.plusDays(10);
         WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, "pause", pause1Start, pause1End);
-
         // when - try to create an overlapping pause (starts during the first pause)
         final LocalDate pause2Start = disbursementDate.plusDays(5);
         final LocalDate pause2End = disbursementDate.plusDays(15);
-
         // then - should fail with 400
-        CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class,
-                () -> WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, "pause", pause2Start, pause2End));
+        CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class, () -> WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, "pause", pause2Start, pause2End));
         assertEquals(400, exception.getStatus());
         log.info("Expected 400 for overlapping pause: {}", exception.getMessage());
     }
@@ -199,14 +169,11 @@ public class WorkingCapitalLoanDelinquencyActionIntegrationTest {
         final Long productId = createProduct(bucketId);
         final Long clientId = createClient();
         final Long loanId = submitAndApproveLoan(clientId, productId);
-
         // when - try to create a pause on an approved (not active) loan
         final LocalDate pauseStart = LocalDate.now(ZoneId.systemDefault());
         final LocalDate pauseEnd = LocalDate.now(ZoneId.systemDefault()).plusDays(10);
-
         // then - should fail with 400
-        CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class,
-                () -> WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, "pause", pauseStart, pauseEnd));
+        CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class, () -> WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, "pause", pauseStart, pauseEnd));
         assertEquals(400, exception.getStatus());
         log.info("Expected 400 for pause on non-active loan: {}", exception.getMessage());
     }
@@ -221,17 +188,12 @@ public class WorkingCapitalLoanDelinquencyActionIntegrationTest {
         final Long productId = createProduct(bucketId);
         final Long clientId = createClient();
         final Long loanId = submitAndApproveLoan(clientId, productId);
-
         final LocalDate disbursementDate = LocalDate.now(ZoneId.systemDefault()).minusDays(5);
         WorkingCapitalLoanDelinquencyActionHelper.activateLoan(loanId, disbursementDate);
-
         // when - send pause without endDate
-        final PostWorkingCapitalLoansDelinquencyActionRequest request = WorkingCapitalLoanDelinquencyActionHelper
-                .buildActionRequest("pause", disbursementDate, null);
-
+        final PostWorkingCapitalLoansDelinquencyActionRequest request = WorkingCapitalLoanDelinquencyActionHelper.buildActionRequest("pause", disbursementDate, null);
         // then - should fail with 400
-        CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class,
-                () -> WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, request));
+        CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class, () -> WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, request));
         assertEquals(400, exception.getStatus());
         log.info("Expected 400 for missing endDate: {}", exception.getMessage());
     }
@@ -246,17 +208,13 @@ public class WorkingCapitalLoanDelinquencyActionIntegrationTest {
         final Long productId = createProduct(bucketId);
         final Long clientId = createClient();
         final Long loanId = submitAndApproveLoan(clientId, productId);
-
         final LocalDate disbursementDate = LocalDate.now(ZoneId.systemDefault()).minusDays(5);
         WorkingCapitalLoanDelinquencyActionHelper.activateLoan(loanId, disbursementDate);
-
         // when - send unsupported action type
         // then - should fail with 400
-        CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class,
-                () -> WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, "invalid", disbursementDate,
-                        disbursementDate.plusDays(10)));
+        CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class, () -> WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, "invalid", disbursementDate, disbursementDate.plusDays(10)));
         assertEquals(400, exception.getStatus());
-        log.info("Expected 400 for unsupported action 'invalid': {}", exception.getMessage());
+        log.info("Expected 400 for unsupported action \'invalid\': {}", exception.getMessage());
     }
 
     /**
@@ -269,15 +227,11 @@ public class WorkingCapitalLoanDelinquencyActionIntegrationTest {
         final Long productId = createProduct(bucketId);
         final Long clientId = createClient();
         final Long loanId = submitAndApproveLoan(clientId, productId);
-
         final LocalDate disbursementDate = LocalDate.now(ZoneId.systemDefault()).minusDays(5);
         WorkingCapitalLoanDelinquencyActionHelper.activateLoan(loanId, disbursementDate);
-
         // when - startDate is after endDate
         // then - should fail with 400
-        CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class,
-                () -> WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, "pause", disbursementDate.plusDays(5),
-                        disbursementDate));
+        CallFailedRuntimeException exception = assertThrows(CallFailedRuntimeException.class, () -> WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, "pause", disbursementDate.plusDays(5), disbursementDate));
         assertEquals(400, exception.getStatus());
         log.info("Expected 400 for startDate after endDate: {}", exception.getMessage());
     }
@@ -292,22 +246,17 @@ public class WorkingCapitalLoanDelinquencyActionIntegrationTest {
         final Long productId = createProduct(bucketId);
         final Long clientId = createClient();
         final Long loanId = submitAndApproveLoan(clientId, productId);
-
         final LocalDate disbursementDate = LocalDate.now(ZoneId.systemDefault()).minusDays(5);
         WorkingCapitalLoanDelinquencyActionHelper.activateLoan(loanId, disbursementDate);
-
         final LocalDate pause1Start = disbursementDate;
         final LocalDate pause1End = disbursementDate.plusDays(9);
         WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, "pause", pause1Start, pause1End);
-
         // when - second pause starts the day after the first pause ends
         final LocalDate pause2Start = pause1End.plusDays(1);
         final LocalDate pause2End = pause2Start.plusDays(5);
         WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, "pause", pause2Start, pause2End);
-
         // then - both actions saved
-        final List<WorkingCapitalLoanDelinquencyActionData> actions = WorkingCapitalLoanDelinquencyActionHelper
-                .retrieveDelinquencyActions(loanId);
+        final List<WorkingCapitalLoanDelinquencyActionData> actions = WorkingCapitalLoanDelinquencyActionHelper.retrieveDelinquencyActions(loanId);
         assertEquals(2, actions.size(), "Both consecutive pauses should be saved");
     }
 
@@ -321,16 +270,12 @@ public class WorkingCapitalLoanDelinquencyActionIntegrationTest {
         final Long productId = createProduct(bucketId);
         final Long clientId = createClient();
         final Long loanId = submitAndApproveLoan(clientId, productId);
-
         final LocalDate disbursementDate = LocalDate.now(ZoneId.systemDefault()).minusDays(5);
         WorkingCapitalLoanDelinquencyActionHelper.activateLoan(loanId, disbursementDate);
-
         // when - pause starts exactly on disbursement date
         final LocalDate pauseStart = disbursementDate;
         final LocalDate pauseEnd = disbursementDate.plusDays(3);
-        final PostWorkingCapitalLoansDelinquencyActionResponse result = WorkingCapitalLoanDelinquencyActionHelper
-                .createDelinquencyAction(loanId, "pause", pauseStart, pauseEnd);
-
+        final PostWorkingCapitalLoansDelinquencyActionResponse result = WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyAction(loanId, "pause", pauseStart, pauseEnd);
         // then
         assertNotNull(result, "Pause starting at disbursement date should be accepted");
     }
@@ -345,14 +290,10 @@ public class WorkingCapitalLoanDelinquencyActionIntegrationTest {
         final Long productId = createProduct(bucketId);
         final Long clientId = createClient();
         final Long loanId = submitAndApproveLoan(clientId, productId);
-
         final LocalDate disbursementDate = LocalDate.now(ZoneId.systemDefault()).minusDays(5);
         WorkingCapitalLoanDelinquencyActionHelper.activateLoan(loanId, disbursementDate);
-
         // when
-        final List<WorkingCapitalLoanDelinquencyActionData> actions = WorkingCapitalLoanDelinquencyActionHelper
-                .retrieveDelinquencyActions(loanId);
-
+        final List<WorkingCapitalLoanDelinquencyActionData> actions = WorkingCapitalLoanDelinquencyActionHelper.retrieveDelinquencyActions(loanId);
         // then
         assertNotNull(actions);
         assertTrue(actions.isEmpty(), "No actions should exist for a fresh loan");
@@ -369,29 +310,22 @@ public class WorkingCapitalLoanDelinquencyActionIntegrationTest {
         final Long clientId = createClient();
         final String externalId = Utils.randomStringGenerator("WCL_EXT_", 12);
         final Long loanId = submitAndApproveLoanWithExternalId(clientId, productId, externalId);
-
         final LocalDate disbursementDate = LocalDate.now(ZoneId.systemDefault()).minusDays(5);
         WorkingCapitalLoanDelinquencyActionHelper.activateLoan(loanId, disbursementDate);
-
         // when - create pause via external ID
         final LocalDate pauseStart = disbursementDate;
         final LocalDate pauseEnd = disbursementDate.plusDays(10);
-        final PostWorkingCapitalLoansDelinquencyActionResponse createResult = WorkingCapitalLoanDelinquencyActionHelper
-                .createDelinquencyActionByExternalId(externalId, "pause", pauseStart, pauseEnd);
+        final PostWorkingCapitalLoansDelinquencyActionResponse createResult = WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyActionByExternalId(externalId, "pause", pauseStart, pauseEnd);
         assertNotNull(createResult);
         assertNotNull(createResult.getResourceId());
-
         // then - retrieve via external ID should return the action
-        final List<WorkingCapitalLoanDelinquencyActionData> actions = WorkingCapitalLoanDelinquencyActionHelper
-                .retrieveDelinquencyActionsByExternalId(externalId);
+        final List<WorkingCapitalLoanDelinquencyActionData> actions = WorkingCapitalLoanDelinquencyActionHelper.retrieveDelinquencyActionsByExternalId(externalId);
         assertEquals(1, actions.size());
         assertEquals(WorkingCapitalLoanDelinquencyActionData.ActionEnum.PAUSE, actions.getFirst().getAction());
         assertEquals(pauseStart, actions.getFirst().getStartDate());
         assertEquals(pauseEnd, actions.getFirst().getEndDate());
-
         // and - retrieve via loanId should return the same action (cross-check)
-        final List<WorkingCapitalLoanDelinquencyActionData> actionsById = WorkingCapitalLoanDelinquencyActionHelper
-                .retrieveDelinquencyActions(loanId);
+        final List<WorkingCapitalLoanDelinquencyActionData> actionsById = WorkingCapitalLoanDelinquencyActionHelper.retrieveDelinquencyActions(loanId);
         assertEquals(1, actionsById.size());
         assertEquals(actions.getFirst().getId(), actionsById.getFirst().getId());
     }
@@ -402,32 +336,21 @@ public class WorkingCapitalLoanDelinquencyActionIntegrationTest {
     @Test
     public void testDelinquencyActionWithNonExistentExternalIdReturns404() {
         final String nonExistentExternalId = Utils.randomStringGenerator("NON_EXISTENT_", 12);
-
         // POST with non-existent external ID
-        CallFailedRuntimeException postException = assertThrows(CallFailedRuntimeException.class,
-                () -> WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyActionByExternalId(nonExistentExternalId, "pause",
-                        LocalDate.now(ZoneId.systemDefault()), LocalDate.now(ZoneId.systemDefault()).plusDays(5)));
+        CallFailedRuntimeException postException = assertThrows(CallFailedRuntimeException.class, () -> WorkingCapitalLoanDelinquencyActionHelper.createDelinquencyActionByExternalId(nonExistentExternalId, "pause", LocalDate.now(ZoneId.systemDefault()), LocalDate.now(ZoneId.systemDefault()).plusDays(5)));
         assertEquals(404, postException.getStatus());
-
         // GET with non-existent external ID
-        CallFailedRuntimeException getException = assertThrows(CallFailedRuntimeException.class,
-                () -> WorkingCapitalLoanDelinquencyActionHelper.retrieveDelinquencyActionsByExternalId(nonExistentExternalId));
+        CallFailedRuntimeException getException = assertThrows(CallFailedRuntimeException.class, () -> WorkingCapitalLoanDelinquencyActionHelper.retrieveDelinquencyActionsByExternalId(nonExistentExternalId));
         assertEquals(404, getException.getStatus());
     }
 
     // ===================== Helper Methods =====================
-
     private Long createWorkingCapitalLoanDelinquencyBucket(final int frequencyDays) {
-        final PostDelinquencyRangeResponse range1 = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest()
-                .classification(Utils.randomStringGenerator("DLQ_R_", 10)).minimumAgeDays(1).maximumAgeDays(30).locale("en"));
+        final PostDelinquencyRangeResponse range1 = DelinquencyRangesHelper.createRange(new DelinquencyRangeRequest().classification(Utils.randomStringGenerator("DLQ_R_", 10)).minimumAgeDays(1).maximumAgeDays(30).locale("en"));
         assertNotNull(range1);
-
         final List<Integer> rangeIds = new ArrayList<>();
         rangeIds.add(Math.toIntExact(range1.getResourceId()));
-
-        final PostDelinquencyBucketResponse bucket = WorkingCapitalLoanDelinquencyRangeScheduleHelper
-                .createWorkingCapitalLoanDelinquencyBucket(rangeIds.stream().map(Long::valueOf).toList(), frequencyDays, 0,
-                        new BigDecimal("3"), 1);
+        final PostDelinquencyBucketResponse bucket = WorkingCapitalLoanDelinquencyRangeScheduleHelper.createWorkingCapitalLoanDelinquencyBucket(rangeIds.stream().map(Long::valueOf).toList(), frequencyDays, 0, new BigDecimal("3"), 1);
         assertNotNull(bucket);
         log.info("Created WC delinquency bucket id={}", bucket.getResourceId());
         return bucket.getResourceId();
@@ -436,8 +359,7 @@ public class WorkingCapitalLoanDelinquencyActionIntegrationTest {
     private Long createProduct(final Long delinquencyBucketId) {
         final String uniqueName = "WCL Product " + Utils.randomStringGenerator("", 8);
         final String uniqueShortName = Utils.uniqueRandomStringGenerator("", 4);
-        return productHelper.createWorkingCapitalLoanProduct(new WorkingCapitalLoanProductTestBuilder().withName(uniqueName)
-                .withShortName(uniqueShortName).withDelinquencyBucketId(delinquencyBucketId).build()).getResourceId();
+        return productHelper.createWorkingCapitalLoanProduct(new WorkingCapitalLoanProductTestBuilder().withName(uniqueName).withShortName(uniqueShortName).withDelinquencyBucketId(delinquencyBucketId).build()).getResourceId();
     }
 
     private Long createClient() {
@@ -449,18 +371,12 @@ public class WorkingCapitalLoanDelinquencyActionIntegrationTest {
     }
 
     private Long submitAndApproveLoanWithExternalId(final Long clientId, final Long productId, final String externalId) {
-        final WorkingCapitalLoanApplicationTestBuilder builder = new WorkingCapitalLoanApplicationTestBuilder().withClientId(clientId)
-                .withProductId(productId).withPrincipal(BigDecimal.valueOf(10000))
-                .withPeriodPaymentRate(WorkingCapitalLoanProductTestBuilder.DEFAULT_PERIOD_PAYMENT_RATE_PERCENT)
-                .withTotalPaymentVolume(BigDecimal.valueOf(100000));
+        final WorkingCapitalLoanApplicationTestBuilder builder = new WorkingCapitalLoanApplicationTestBuilder().withClientId(clientId).withProductId(productId).withPrincipal(BigDecimal.valueOf(10000)).withPeriodPaymentRate(WorkingCapitalLoanProductTestBuilder.DEFAULT_PERIOD_PAYMENT_RATE_PERCENT).withTotalPaymentVolume(BigDecimal.valueOf(100000));
         if (externalId != null) {
             builder.withExternalId(externalId);
         }
         final Long loanId = applicationHelper.submit(builder.buildSubmitRequest());
-
-        final LocalDate submittedOnDate = FeignCalls
-                .ok(() -> FineractFeignClientHelper.getFineractFeignClient().workingCapitalLoans().retrieveWorkingCapitalLoanById(loanId))
-                .getTimeline().getSubmittedOnDate();
+        final LocalDate submittedOnDate = FeignCalls.ok(() -> FineractFeignClientHelper.getFineractFeignClient().workingCapitalLoans().retrieveWorkingCapitalLoanById(loanId)).getTimeline().getSubmittedOnDate();
         applicationHelper.approveById(loanId, WorkingCapitalLoanApplicationTestBuilder.buildApproveRequest(submittedOnDate));
         return loanId;
     }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.investor.enricher;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.avro.loan.v1.LoanAccountDataV1;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.DataEnricher;
@@ -28,9 +27,7 @@ import org.apache.fineract.investor.domain.ExternalAssetOwnerTransferRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class LoanAccountDataV1Enricher implements DataEnricher<LoanAccountDataV1> {
-
     private final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository;
     private final ExternalIdMapper externalIdMapper;
     private final AvroDateTimeMapper avroDateTimeMapper;
@@ -51,5 +48,12 @@ public class LoanAccountDataV1Enricher implements DataEnricher<LoanAccountDataV1
                 data.getCharges().forEach(charge -> charge.setExternalOwnerId(externalIdMapper.mapExternalId(transferOwnerExternalId)));
             }
         });
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanAccountDataV1Enricher(final ExternalAssetOwnerTransferRepository externalAssetOwnerTransferRepository, final ExternalIdMapper externalIdMapper, final AvroDateTimeMapper avroDateTimeMapper) {
+        this.externalAssetOwnerTransferRepository = externalAssetOwnerTransferRepository;
+        this.externalIdMapper = externalIdMapper;
+        this.avroDateTimeMapper = avroDateTimeMapper;
     }
 }

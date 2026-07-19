@@ -31,48 +31,31 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.springframework.data.domain.Persistable;
 
-@Getter
-@Setter
 @MappedSuperclass
-@NoArgsConstructor
 public abstract class AccountLock implements Persistable<Long>, Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id
     @Column(name = "loan_id", nullable = false)
     private Long loanId;
-
     @Version
     @Column(name = "version")
     private Long version;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "lock_owner", nullable = false)
     private LockOwner lockOwner;
-
     @Column(name = "lock_placed_on", nullable = false)
     private OffsetDateTime lockPlacedOn;
-
     @Column(name = "error")
     private String error;
-
     @Column(name = "stacktrace")
     private String stacktrace;
-
     @Column(name = "lock_placed_on_cob_business_date")
     private LocalDate lockPlacedOnCobBusinessDate;
-
     @Transient
-    @Setter(value = AccessLevel.NONE)
     private boolean isNew = true;
 
     @PrePersist
@@ -101,5 +84,84 @@ public abstract class AccountLock implements Persistable<Long>, Serializable {
     public void setNewLockOwner(LockOwner newLockOwner) {
         this.lockOwner = newLockOwner;
         this.lockPlacedOn = DateUtils.getAuditOffsetDateTime();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanId() {
+        return this.loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getVersion() {
+        return this.version;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LockOwner getLockOwner() {
+        return this.lockOwner;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OffsetDateTime getLockPlacedOn() {
+        return this.lockPlacedOn;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getError() {
+        return this.error;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getStacktrace() {
+        return this.stacktrace;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getLockPlacedOnCobBusinessDate() {
+        return this.lockPlacedOnCobBusinessDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isNew() {
+        return this.isNew;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanId(final Long loanId) {
+        this.loanId = loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setVersion(final Long version) {
+        this.version = version;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLockOwner(final LockOwner lockOwner) {
+        this.lockOwner = lockOwner;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLockPlacedOn(final OffsetDateTime lockPlacedOn) {
+        this.lockPlacedOn = lockPlacedOn;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setError(final String error) {
+        this.error = error;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setStacktrace(final String stacktrace) {
+        this.stacktrace = stacktrace;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLockPlacedOnCobBusinessDate(final LocalDate lockPlacedOnCobBusinessDate) {
+        this.lockPlacedOnCobBusinessDate = lockPlacedOnCobBusinessDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AccountLock() {
     }
 }

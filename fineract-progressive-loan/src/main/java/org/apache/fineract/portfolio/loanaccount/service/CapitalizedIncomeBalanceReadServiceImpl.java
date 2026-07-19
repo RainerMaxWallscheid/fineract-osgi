@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.loanaccount.service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.exception.GeneralPlatformDomainRuleException;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.portfolio.loanaccount.data.CapitalizedIncomeDetails;
@@ -32,60 +31,51 @@ import org.apache.fineract.portfolio.loanaccount.repository.LoanCapitalizedIncom
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
-@RequiredArgsConstructor
 public class CapitalizedIncomeBalanceReadServiceImpl implements CapitalizedIncomeBalanceReadService {
-
     private final LoanRepositoryWrapper loanRepository;
     private final LoanCapitalizedIncomeBalanceRepository capitalizedIncomeBalanceRepository;
 
     @Override
     public LoanCapitalizedIncomeData fetchLoanCapitalizedIncomeData(final Long loanId) {
         if (loanRepository.isEnabledCapitalizedIncome(loanId)) {
-
             List<CapitalizedIncomeDetails> capitalizedIncomeData = new ArrayList<>();
-            List<LoanCapitalizedIncomeBalance> capitalizedIncomeBalances = capitalizedIncomeBalanceRepository
-                    .findAllByLoanIdAndDeletedFalseAndClosedFalse(loanId);
+            List<LoanCapitalizedIncomeBalance> capitalizedIncomeBalances = capitalizedIncomeBalanceRepository.findAllByLoanIdAndDeletedFalseAndClosedFalse(loanId);
             for (final LoanCapitalizedIncomeBalance capitalizedIncomeBalance : capitalizedIncomeBalances) {
-                final BigDecimal amortizedAmount = capitalizedIncomeBalance.getAmount() //
-                        .subtract(MathUtil.nullToZero(capitalizedIncomeBalance.getUnrecognizedAmount())) //
-                        .subtract(MathUtil.nullToZero(capitalizedIncomeBalance.getAmountAdjustment())) //
-                        .subtract(MathUtil.nullToZero(capitalizedIncomeBalance.getChargedOffAmount()));
-
-                capitalizedIncomeData.add(new CapitalizedIncomeDetails(capitalizedIncomeBalance.getAmount(), amortizedAmount,
-                        capitalizedIncomeBalance.getUnrecognizedAmount(), //
-                        capitalizedIncomeBalance.getAmountAdjustment(), //
-                        capitalizedIncomeBalance.getChargedOffAmount()));
+                final BigDecimal amortizedAmount =  //
+                //
+                //
+                capitalizedIncomeBalance.getAmount().subtract(MathUtil.nullToZero(capitalizedIncomeBalance.getUnrecognizedAmount())).subtract(MathUtil.nullToZero(capitalizedIncomeBalance.getAmountAdjustment())).subtract(MathUtil.nullToZero(capitalizedIncomeBalance.getChargedOffAmount()));
+                capitalizedIncomeData.add(new CapitalizedIncomeDetails(capitalizedIncomeBalance.getAmount(), amortizedAmount, capitalizedIncomeBalance.getUnrecognizedAmount(),  //
+                capitalizedIncomeBalance.getAmountAdjustment(),  //
+                capitalizedIncomeBalance.getChargedOffAmount()));
             }
-
             return new LoanCapitalizedIncomeData(capitalizedIncomeData);
         }
-        throw new GeneralPlatformDomainRuleException("error.msg.loan.is.not.enabled.capitalized.income",
-                "Loan: " + loanId + " is not enabled Capitalized Income feature", loanId);
+        throw new GeneralPlatformDomainRuleException("error.msg.loan.is.not.enabled.capitalized.income", "Loan: " + loanId + " is not enabled Capitalized Income feature", loanId);
     }
 
     @Override
     public List<CapitalizedIncomeDetails> fetchLoanCapitalizedIncomeDetails(final Long loanId) {
         if (loanRepository.isEnabledCapitalizedIncome(loanId)) {
-
             List<CapitalizedIncomeDetails> capitalizedIncomeData = new ArrayList<>();
-            List<LoanCapitalizedIncomeBalance> capitalizedIncomeBalances = capitalizedIncomeBalanceRepository
-                    .findAllByLoanIdAndDeletedFalseAndClosedFalse(loanId);
+            List<LoanCapitalizedIncomeBalance> capitalizedIncomeBalances = capitalizedIncomeBalanceRepository.findAllByLoanIdAndDeletedFalseAndClosedFalse(loanId);
             for (final LoanCapitalizedIncomeBalance capitalizedIncomeBalance : capitalizedIncomeBalances) {
-                final BigDecimal amortizedAmount = capitalizedIncomeBalance.getAmount() //
-                        .subtract(MathUtil.nullToZero(capitalizedIncomeBalance.getUnrecognizedAmount())) //
-                        .subtract(MathUtil.nullToZero(capitalizedIncomeBalance.getAmountAdjustment())) //
-                        .subtract(MathUtil.nullToZero(capitalizedIncomeBalance.getChargedOffAmount()));
-
-                capitalizedIncomeData.add(new CapitalizedIncomeDetails(capitalizedIncomeBalance.getAmount(), amortizedAmount,
-                        capitalizedIncomeBalance.getUnrecognizedAmount(), //
-                        capitalizedIncomeBalance.getAmountAdjustment(), //
-                        capitalizedIncomeBalance.getChargedOffAmount()));
+                final BigDecimal amortizedAmount =  //
+                //
+                //
+                capitalizedIncomeBalance.getAmount().subtract(MathUtil.nullToZero(capitalizedIncomeBalance.getUnrecognizedAmount())).subtract(MathUtil.nullToZero(capitalizedIncomeBalance.getAmountAdjustment())).subtract(MathUtil.nullToZero(capitalizedIncomeBalance.getChargedOffAmount()));
+                capitalizedIncomeData.add(new CapitalizedIncomeDetails(capitalizedIncomeBalance.getAmount(), amortizedAmount, capitalizedIncomeBalance.getUnrecognizedAmount(),  //
+                capitalizedIncomeBalance.getAmountAdjustment(),  //
+                capitalizedIncomeBalance.getChargedOffAmount()));
             }
-
             return capitalizedIncomeData;
         }
-        throw new GeneralPlatformDomainRuleException("error.msg.loan.is.not.enabled.capitalized.income",
-                "Loan: " + loanId + " is not enabled Capitalized Income feature", loanId);
+        throw new GeneralPlatformDomainRuleException("error.msg.loan.is.not.enabled.capitalized.income", "Loan: " + loanId + " is not enabled Capitalized Income feature", loanId);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public CapitalizedIncomeBalanceReadServiceImpl(final LoanRepositoryWrapper loanRepository, final LoanCapitalizedIncomeBalanceRepository capitalizedIncomeBalanceRepository) {
+        this.loanRepository = loanRepository;
+        this.capitalizedIncomeBalanceRepository = capitalizedIncomeBalanceRepository;
+    }
 }

@@ -18,16 +18,10 @@
  */
 package org.apache.fineract.infrastructure.jobs.data.partitionedjobs;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.loan.LoanCOBConstant;
 
-@RequiredArgsConstructor
 public enum PartitionedJob {
-
     LOAN_COB(LoanCOBConstant.LOAN_COB_PARTITIONER_STEP);
-
-    @Getter
     private final String partitionerStepName;
 
     public static boolean existsByJobName(String jobName) {
@@ -38,5 +32,15 @@ public enum PartitionedJob {
             }
         }
         return partitionedJob != null;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private PartitionedJob(final String partitionerStepName) {
+        this.partitionerStepName = partitionerStepName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getPartitionerStepName() {
+        return this.partitionerStepName;
     }
 }

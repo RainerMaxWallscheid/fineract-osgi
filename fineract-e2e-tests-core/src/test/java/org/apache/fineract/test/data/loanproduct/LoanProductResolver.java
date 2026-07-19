@@ -19,29 +19,28 @@
 package org.apache.fineract.test.data.loanproduct;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
-
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.GetLoanProductsResponse;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class LoanProductResolver {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanProductResolver.class);
     private final FineractFeignClient fineractClient;
 
     public long resolve(LoanProduct loanProduct) {
         String loanProductName = loanProduct.getName();
         log.debug("Resolving loan product by name [{}]", loanProductName);
         List<GetLoanProductsResponse> loanProductsResponses = ok(() -> fineractClient.loanProducts().retrieveAllLoanProducts(Map.of()));
-
-        GetLoanProductsResponse foundLpr = loanProductsResponses.stream().filter(lpr -> loanProductName.equals(lpr.getName())).findAny()
-                .orElseThrow(() -> new IllegalArgumentException("Loan product [%s] not found".formatted(loanProductName)));
+        GetLoanProductsResponse foundLpr = loanProductsResponses.stream().filter(lpr -> loanProductName.equals(lpr.getName())).findAny().orElseThrow(() -> new IllegalArgumentException("Loan product [%s] not found".formatted(loanProductName)));
         return foundLpr.getId();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanProductResolver(final FineractFeignClient fineractClient) {
+        this.fineractClient = fineractClient;
     }
 }

@@ -18,21 +18,30 @@
  */
 package org.apache.fineract.test.messaging.config;
 
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-@Getter
 public class JobPollingProperties {
-
     @Value("${fineract-test.job.interval-in-ms}")
     private long intervalInMillis;
-
     @Value("${fineract-test.job.delay-in-ms}")
     private long delayInMillis;
-
     @Value("${fineract-test.job.wait-timeout-in-ms}")
     private long timeoutInMillis;
 
+    @java.lang.SuppressWarnings("all")
+        public long getIntervalInMillis() {
+        return this.intervalInMillis;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public long getDelayInMillis() {
+        return this.delayInMillis;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public long getTimeoutInMillis() {
+        return this.timeoutInMillis;
+    }
 }

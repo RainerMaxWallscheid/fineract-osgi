@@ -26,13 +26,11 @@ import static org.apache.fineract.investor.data.ExternalTransferStatus.BUYBACK_I
 import static org.apache.fineract.investor.data.ExternalTransferStatus.CANCELLED;
 import static org.apache.fineract.investor.data.ExternalTransferStatus.DECLINED;
 import static org.apache.fineract.investor.data.ExternalTransferStatus.PENDING_INTERMEDIATE;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
 import org.apache.fineract.avro.generic.v1.CurrencyDataV1;
@@ -52,19 +50,14 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class InvestorBusinessEventSerializer extends AbstractBusinessEventWithCustomDataSerializer<InvestorBusinessEvent> {
-
-    private static final Set<ExternalTransferStatus> EXECUTED_TRANSFER_STATUSES = Set.of(ACTIVE, ACTIVE_INTERMEDIATE, BUYBACK,
-            BUYBACK_INTERMEDIATE);
-
+    private static final Set<ExternalTransferStatus> EXECUTED_TRANSFER_STATUSES = Set.of(ACTIVE, ACTIVE_INTERMEDIATE, BUYBACK, BUYBACK_INTERMEDIATE);
     private final ExternalAssetOwnersReadService externalAssetOwnersReadService;
     private final List<ExternalEventCustomDataSerializer<InvestorBusinessEvent>> externalEventCustomDataSerializers;
 
     private static CurrencyDataV1 getCurrencyFromEvent(InvestorBusinessEvent event) {
         MonetaryCurrency loanCurrency = event.getLoan().getCurrency();
-        return CurrencyDataV1.newBuilder().setCode(loanCurrency.getCode()).setDecimalPlaces(loanCurrency.getDigitsAfterDecimal())
-                .setInMultiplesOf(loanCurrency.getInMultiplesOf()).build();
+        return CurrencyDataV1.newBuilder().setCode(loanCurrency.getCode()).setDecimalPlaces(loanCurrency.getDigitsAfterDecimal()).setInMultiplesOf(loanCurrency.getInMultiplesOf()).build();
     }
 
     @Override
@@ -88,32 +81,13 @@ public class InvestorBusinessEventSerializer extends AbstractBusinessEventWithCu
         ExternalTransferData transferData = externalAssetOwnersReadService.retrieveTransferData(event.get().getId());
         String transferType = getType(transferData.getStatus());
         if (ExternalTransferStatus.DECLINED.equals(transferData.getStatus()) || CANCELLED.equals(transferData.getStatus())) {
-            ExternalTransferData originalTransferData = externalAssetOwnersReadService
-                    .retrieveFirstTransferByExternalId(event.get().getExternalId());
+            ExternalTransferData originalTransferData = externalAssetOwnersReadService.retrieveFirstTransferByExternalId(event.get().getExternalId());
             transferType = getType(originalTransferData.getStatus());
         }
-
-        LoanOwnershipTransferDataV1.Builder builder = LoanOwnershipTransferDataV1.newBuilder().setLoanId(transferData.getLoan().getLoanId())
-                .setLoanExternalId(transferData.getLoan().getExternalId()).setTransferExternalId(transferData.getTransferExternalId())
-                .setAssetOwnerExternalId(transferData.getOwner().getExternalId())
-                .setPreviousOwnerExternalId(
-                        transferData.getPreviousOwner() != null ? transferData.getPreviousOwner().getExternalId() : null)
-                .setTransferExternalGroupId(transferData.getTransferExternalGroupId())
-                .setPurchasePriceRatio(transferData.getPurchasePriceRatio()).setCurrency(getCurrencyFromEvent(event))
-                .setSettlementDate(transferData.getSettlementDate().format(DEFAULT_DATE_FORMATTER))
-                .setSubmittedDate(transferData.getSettlementDate().format(DEFAULT_DATE_FORMATTER)).setType(transferType)
-                .setTransferStatus(getStatus(transferData.getStatus()))
-                .setTransferStatusReason(getTransferStatusReason(transferData.getSubStatus())).setCustomData(collectCustomData(event));
-
+        LoanOwnershipTransferDataV1.Builder builder = LoanOwnershipTransferDataV1.newBuilder().setLoanId(transferData.getLoan().getLoanId()).setLoanExternalId(transferData.getLoan().getExternalId()).setTransferExternalId(transferData.getTransferExternalId()).setAssetOwnerExternalId(transferData.getOwner().getExternalId()).setPreviousOwnerExternalId(transferData.getPreviousOwner() != null ? transferData.getPreviousOwner().getExternalId() : null).setTransferExternalGroupId(transferData.getTransferExternalGroupId()).setPurchasePriceRatio(transferData.getPurchasePriceRatio()).setCurrency(getCurrencyFromEvent(event)).setSettlementDate(transferData.getSettlementDate().format(DEFAULT_DATE_FORMATTER)).setSubmittedDate(transferData.getSettlementDate().format(DEFAULT_DATE_FORMATTER)).setType(transferType).setTransferStatus(getStatus(transferData.getStatus())).setTransferStatusReason(getTransferStatusReason(transferData.getSubStatus())).setCustomData(collectCustomData(event));
         if (transferData.getDetails() != null) {
-            builder.setTotalOutstandingBalanceAmount(transferData.getDetails().getTotalOutstanding())
-                    .setOutstandingPrincipalPortion(transferData.getDetails().getTotalPrincipalOutstanding())
-                    .setOutstandingInterestPortion(transferData.getDetails().getTotalInterestOutstanding())
-                    .setOutstandingFeePortion(transferData.getDetails().getTotalFeeChargesOutstanding())
-                    .setOutstandingPenaltyPortion(transferData.getDetails().getTotalPenaltyChargesOutstanding())
-                    .setUnpaidChargeData(getUnpaidChargeData(event)).setOverPaymentPortion(transferData.getDetails().getTotalOverpaid());
+            builder.setTotalOutstandingBalanceAmount(transferData.getDetails().getTotalOutstanding()).setOutstandingPrincipalPortion(transferData.getDetails().getTotalPrincipalOutstanding()).setOutstandingInterestPortion(transferData.getDetails().getTotalInterestOutstanding()).setOutstandingFeePortion(transferData.getDetails().getTotalFeeChargesOutstanding()).setOutstandingPenaltyPortion(transferData.getDetails().getTotalPenaltyChargesOutstanding()).setUnpaidChargeData(getUnpaidChargeData(event)).setOverPaymentPortion(transferData.getDetails().getTotalOverpaid());
         }
-
         return builder.build();
     }
 
@@ -122,11 +96,9 @@ public class InvestorBusinessEventSerializer extends AbstractBusinessEventWithCu
         if (transferStatus == BUYBACK || transferStatus == BUYBACK_INTERMEDIATE) {
             return "BUYBACK";
         }
-
         if (transferStatus == ACTIVE_INTERMEDIATE || transferStatus == PENDING_INTERMEDIATE) {
             return "INTERMEDIARYSALE";
         }
-
         return "SALE";
     }
 
@@ -138,8 +110,7 @@ public class InvestorBusinessEventSerializer extends AbstractBusinessEventWithCu
 
     private void addToMap(Map<Long, UnpaidChargeDataV1> map, LoanCharge loanCharge) {
         if (loanCharge.amountOutstanding().compareTo(BigDecimal.ZERO) > 0) {
-            UnpaidChargeDataV1 toAdd = new UnpaidChargeDataV1(loanCharge.getCharge().getId(), loanCharge.name(),
-                    loanCharge.amountOutstanding());
+            UnpaidChargeDataV1 toAdd = new UnpaidChargeDataV1(loanCharge.getCharge().getId(), loanCharge.name(), loanCharge.amountOutstanding());
             UnpaidChargeDataV1 unpaidChargeDataV1 = map.get(loanCharge.getCharge().getId());
             if (unpaidChargeDataV1 == null) {
                 map.put(toAdd.getChargeId(), toAdd);
@@ -165,5 +136,11 @@ public class InvestorBusinessEventSerializer extends AbstractBusinessEventWithCu
         } else {
             return null;
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InvestorBusinessEventSerializer(final ExternalAssetOwnersReadService externalAssetOwnersReadService, final List<ExternalEventCustomDataSerializer<InvestorBusinessEvent>> externalEventCustomDataSerializers) {
+        this.externalAssetOwnersReadService = externalAssetOwnersReadService;
+        this.externalEventCustomDataSerializers = externalEventCustomDataSerializers;
     }
 }

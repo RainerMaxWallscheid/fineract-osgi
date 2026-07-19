@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.cob.loan;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.ActionContext;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
@@ -27,26 +25,20 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.service.LoanWritePlatformService;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class LoanInterestRecalculationCOBBusinessStep implements LoanCOBBusinessStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanInterestRecalculationCOBBusinessStep.class);
     private final LoanWritePlatformService loanWritePlatformService;
 
     @Override
     public Loan execute(Loan loan) {
         try {
             ThreadLocalContextUtil.setActionContext(ActionContext.DEFAULT);
-            if (!loan.getStatus().isActive() || loan.isNpa() || loan.isChargedOff()
-                    || !loan.isInterestBearingAndInterestRecalculationEnabled()
-                    || loan.getLoanInterestRecalculationDetails().disallowInterestCalculationOnPastDue() || !hasOverdueInstallment(loan)) {
-                log.debug(
-                        "Skip processing loan interest recalculation [{}] - Possible reasons: Loan is not an interest bearing loan, Loan is not active, Interest recalculation on past due is disabled on this loan",
-                        loan.getId());
+            if (!loan.getStatus().isActive() || loan.isNpa() || loan.isChargedOff() || !loan.isInterestBearingAndInterestRecalculationEnabled() || loan.getLoanInterestRecalculationDetails().disallowInterestCalculationOnPastDue() || !hasOverdueInstallment(loan)) {
+                log.debug("Skip processing loan interest recalculation [{}] - Possible reasons: Loan is not an interest bearing loan, Loan is not active, Interest recalculation on past due is disabled on this loan", loan.getId());
                 return loan;
             }
-
             log.debug("Start processing loan interest recalculation [{}]", loan.getId());
             loan = loanWritePlatformService.recalculateInterest(loan);
             log.debug("End processing loan interest recalculation [{}]", loan.getId());
@@ -57,8 +49,7 @@ public class LoanInterestRecalculationCOBBusinessStep implements LoanCOBBusiness
     }
 
     private boolean hasOverdueInstallment(Loan loan) {
-        return loan.getRepaymentScheduleInstallments().stream()
-                .anyMatch(installment -> DateUtils.isBeforeBusinessDate(installment.getDueDate()) && !installment.isObligationsMet());
+        return loan.getRepaymentScheduleInstallments().stream().anyMatch(installment -> DateUtils.isBeforeBusinessDate(installment.getDueDate()) && !installment.isObligationsMet());
     }
 
     @Override
@@ -71,4 +62,8 @@ public class LoanInterestRecalculationCOBBusinessStep implements LoanCOBBusiness
         return "Loan Interest Recalculation";
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanInterestRecalculationCOBBusinessStep(final LoanWritePlatformService loanWritePlatformService) {
+        this.loanWritePlatformService = loanWritePlatformService;
+    }
 }

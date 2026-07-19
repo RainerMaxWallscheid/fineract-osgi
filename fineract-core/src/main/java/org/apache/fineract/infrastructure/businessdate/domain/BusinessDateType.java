@@ -18,16 +18,10 @@
  */
 package org.apache.fineract.infrastructure.businessdate.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@AllArgsConstructor
-@Getter
 public enum BusinessDateType {
-
-    BUSINESS_DATE(1, "Business Date"), //
-    COB_DATE(2, "Close of Business Date"); //
-
+    BUSINESS_DATE(1, "Business Date"),  //
+    COB_DATE(2, "Close of Business Date");
+    //
     private final Integer id;
     private final String description;
 
@@ -35,4 +29,19 @@ public enum BusinessDateType {
         return name();
     }
 
+    @java.lang.SuppressWarnings("all")
+        private BusinessDateType(final Integer id, final String description) {
+        this.id = id;
+        this.description = description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
 }

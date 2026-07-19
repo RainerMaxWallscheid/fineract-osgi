@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.campaigns.helper.SmsConfigUtils;
 import org.apache.fineract.infrastructure.campaigns.sms.constants.SmsCampaignConstants;
 import org.apache.fineract.infrastructure.campaigns.sms.domain.SmsCampaign;
@@ -52,12 +50,11 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * Scheduled job services that send SMS messages and get delivery reports for the sent SMS messages
- **/
+ */
 @Service
-@Slf4j
-@RequiredArgsConstructor
 public class SmsMessageScheduledJobServiceImpl implements SmsMessageScheduledJobService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SmsMessageScheduledJobServiceImpl.class);
     private final SmsMessageRepository smsMessageRepository;
     private final RestTemplate restTemplate = new RestTemplate();
     private final SmsConfigUtils smsConfigUtils;
@@ -67,12 +64,10 @@ public class SmsMessageScheduledJobServiceImpl implements SmsMessageScheduledJob
 
     @SuppressFBWarnings("SLF4J_SIGN_ONLY_FORMAT")
     private void connectAndSendToIntermediateServer(Collection<SmsMessageApiQueueResourceData> apiQueueResourceDatas) {
-        Map<String, Object> hostConfig = this.smsConfigUtils.getMessageGateWayRequestURI("sms",
-                SmsMessageApiQueueResourceData.toJsonString(apiQueueResourceDatas));
+        Map<String, Object> hostConfig = this.smsConfigUtils.getMessageGateWayRequestURI("sms", SmsMessageApiQueueResourceData.toJsonString(apiQueueResourceDatas));
         URI uri = (URI) hostConfig.get("uri");
         HttpEntity<?> entity = (HttpEntity<?>) hostConfig.get("entity");
         ResponseEntity<String> responseOne = restTemplate.exchange(uri, HttpMethod.POST, entity, new ParameterizedTypeReference<String>() {
-
         });
         if (responseOne != null) {
             // String smsResponse = responseOne.getBody();
@@ -89,7 +84,6 @@ public class SmsMessageScheduledJobServiceImpl implements SmsMessageScheduledJob
             if (!smsDataMap.isEmpty()) {
                 List<SmsMessage> toSaveMessages = new ArrayList<>();
                 List<SmsMessage> toSendNotificationMessages = new ArrayList<>();
-
                 for (Map.Entry<SmsCampaign, Collection<SmsMessage>> entry : smsDataMap.entrySet()) {
                     for (SmsMessage smsMessage : entry.getValue()) {
                         if (smsMessage.isNotification()) {
@@ -104,14 +98,11 @@ public class SmsMessageScheduledJobServiceImpl implements SmsMessageScheduledJob
                 if (!toSaveMessages.isEmpty()) {
                     this.smsMessageRepository.saveAll(toSaveMessages);
                     this.smsMessageRepository.flush();
-
                     for (Map.Entry<SmsCampaign, Collection<SmsMessage>> entry : smsDataMap.entrySet()) {
                         Collection<SmsMessageApiQueueResourceData> apiQueueResourceDatas = new ArrayList<>();
                         for (SmsMessage smsMessage : entry.getValue()) {
                             if (!smsMessage.isNotification()) {
-                                SmsMessageApiQueueResourceData apiQueueResourceData = SmsMessageApiQueueResourceData.instance(
-                                        smsMessage.getId(), null, null, null, smsMessage.getMobileNo(), smsMessage.getMessage(),
-                                        entry.getKey().getProviderId());
+                                SmsMessageApiQueueResourceData apiQueueResourceData = SmsMessageApiQueueResourceData.instance(smsMessage.getId(), null, null, null, smsMessage.getMobileNo(), smsMessage.getMessage(), entry.getKey().getProviderId());
                                 apiQueueResourceDatas.add(apiQueueResourceData);
                             }
                         }
@@ -120,7 +111,6 @@ public class SmsMessageScheduledJobServiceImpl implements SmsMessageScheduledJob
                         }
                     }
                 }
-
                 if (!toSendNotificationMessages.isEmpty()) {
                     this.notificationSenderService.sendNotification(toSendNotificationMessages);
                 }
@@ -136,8 +126,7 @@ public class SmsMessageScheduledJobServiceImpl implements SmsMessageScheduledJob
             Collection<SmsMessageApiQueueResourceData> apiQueueResourceDatas = new ArrayList<>();
             StringBuilder request = new StringBuilder();
             for (SmsMessage smsMessage : smsMessages) {
-                SmsMessageApiQueueResourceData apiQueueResourceData = SmsMessageApiQueueResourceData.instance(smsMessage.getId(), null,
-                        null, null, smsMessage.getMobileNo(), smsMessage.getMessage(), providerId);
+                SmsMessageApiQueueResourceData apiQueueResourceData = SmsMessageApiQueueResourceData.instance(smsMessage.getId(), null, null, null, smsMessage.getMobileNo(), smsMessage.getMessage(), providerId);
                 apiQueueResourceDatas.add(apiQueueResourceData);
                 smsMessage.setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue());
             }
@@ -150,8 +139,8 @@ public class SmsMessageScheduledJobServiceImpl implements SmsMessageScheduledJob
         }
     }
 
-    class SmsTask implements Runnable, ApplicationListener<ContextClosedEvent> {
 
+    class SmsTask implements Runnable, ApplicationListener<ContextClosedEvent> {
         private final FineractContext context;
         private final Collection<SmsMessageApiQueueResourceData> apiQueueResourceDatas;
 
@@ -175,5 +164,13 @@ public class SmsMessageScheduledJobServiceImpl implements SmsMessageScheduledJob
             taskExecutor.shutdown();
             log.info("Shutting down the ExecutorService");
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SmsMessageScheduledJobServiceImpl(final SmsMessageRepository smsMessageRepository, final SmsConfigUtils smsConfigUtils, final NotificationSenderService notificationSenderService, @Qualifier(TaskExecutorConstant.DEFAULT_TASK_EXECUTOR_BEAN_NAME) final ThreadPoolTaskExecutor taskExecutor) {
+        this.smsMessageRepository = smsMessageRepository;
+        this.smsConfigUtils = smsConfigUtils;
+        this.notificationSenderService = notificationSenderService;
+        this.taskExecutor = taskExecutor;
     }
 }

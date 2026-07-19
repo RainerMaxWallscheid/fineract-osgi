@@ -24,8 +24,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.runner.Result;
@@ -33,34 +31,30 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 @Conditional(TestRailEnabledCondition.class)
 public class TestRailClient implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TestRailClient.class);
     public static final Pattern TESTRAIL_TAG_PATTERN = Pattern.compile("@TestRailId:C([0-9]+)");
     private static final String SUCCESS_COMMENT = "Test passed";
     private static final String FAILED_COMMENT = "Test failed";
-
     private final TestRailProperties testRailProperties;
     private final TestRailApiClient apiClient;
 
     @Override
     public void afterPropertiesSet() {
-        log.warn("Configured TestRail Run ID: '{}'", testRailProperties.getRunId());
+        log.warn("Configured TestRail Run ID: \'{}\'", testRailProperties.getRunId());
     }
 
     public void saveScenarioResult(Scenario scenario) {
         Integer caseId = getScenarioCaseId(scenario);
-
         AddResultForCaseRequest request;
         if (scenario.isFailed()) {
             request = createFailedRequest(scenario);
         } else {
             request = createSuccessRequest(scenario);
         }
-
         if (caseId != null) {
             try {
                 apiClient.addResultForCase(testRailProperties.getRunId(), caseId, request);
@@ -84,13 +78,11 @@ public class TestRailClient implements InitializingBean {
     }
 
     private AddResultForCaseRequest createFailedRequest(Scenario scenario) {
-        return new AddResultForCaseRequest.AddResultForCaseRequestBuilder().statusId(TestRailStatus.FAILED)
-                .comment(createFailedComment(scenario)).build();
+        return new AddResultForCaseRequest.AddResultForCaseRequestBuilder().statusId(TestRailStatus.FAILED).comment(createFailedComment(scenario)).build();
     }
 
     private AddResultForCaseRequest createSuccessRequest(Scenario scenario) {
-        return new AddResultForCaseRequest.AddResultForCaseRequestBuilder().statusId(TestRailStatus.PASSED)
-                .comment(createSuccessComment(scenario)).build();
+        return new AddResultForCaseRequest.AddResultForCaseRequestBuilder().statusId(TestRailStatus.PASSED).comment(createSuccessComment(scenario)).build();
     }
 
     private String createSuccessComment(Scenario scenario) {
@@ -102,13 +94,10 @@ public class TestRailClient implements InitializingBean {
             Class c = ClassUtils.getClass("cucumber.runtime.java.JavaHookDefinition$ScenarioAdaptor");
             Field fieldScenario = FieldUtils.getField(c, "scenario", true);
             if (fieldScenario != null) {
-
                 fieldScenario.setAccessible(true);
                 Object objectScenario = fieldScenario.get(scenario);
-
                 Field fieldStepResults = objectScenario.getClass().getDeclaredField("stepResults");
                 fieldStepResults.setAccessible(true);
-
                 ArrayList<Result> results = (ArrayList<Result>) fieldStepResults.get(objectScenario);
                 for (Result result : results) {
                     if (result.getFailures() != null) {
@@ -116,11 +105,15 @@ public class TestRailClient implements InitializingBean {
                     }
                 }
             }
-
             return FAILED_COMMENT;
-
         } catch (IllegalAccessException | NoSuchFieldException | ClassNotFoundException e) {
             return FAILED_COMMENT;
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TestRailClient(final TestRailProperties testRailProperties, final TestRailApiClient apiClient) {
+        this.testRailProperties = testRailProperties;
+        this.apiClient = apiClient;
     }
 }

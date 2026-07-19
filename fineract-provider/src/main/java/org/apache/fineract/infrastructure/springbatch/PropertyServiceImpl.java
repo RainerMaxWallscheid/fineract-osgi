@@ -20,14 +20,11 @@ package org.apache.fineract.infrastructure.springbatch;
 
 import java.util.List;
 import java.util.function.Function;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class PropertyServiceImpl implements PropertyService {
-
     private final FineractProperties fineractProperties;
 
     @Override
@@ -66,12 +63,16 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     private Integer getProperty(String jobName, Function<? super FineractProperties.PartitionedJobProperty, Integer> function) {
-        List<FineractProperties.PartitionedJobProperty> jobProperties = fineractProperties.getPartitionedJob()
-                .getPartitionedJobProperties();
-        return jobProperties.stream() //
-                .filter(jobProperty -> jobName.equals(jobProperty.getJobName())) //
-                .findFirst() //
-                .map(function) //
-                .orElse(1);
+        List<FineractProperties.PartitionedJobProperty> jobProperties = fineractProperties.getPartitionedJob().getPartitionedJobProperties();
+        return  //
+        //
+        //
+        //
+        jobProperties.stream().filter(jobProperty -> jobName.equals(jobProperty.getJobName())).findFirst().map(function).orElse(1);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PropertyServiceImpl(final FineractProperties fineractProperties) {
+        this.fineractProperties = fineractProperties;
     }
 }

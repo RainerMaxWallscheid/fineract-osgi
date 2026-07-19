@@ -24,7 +24,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
@@ -39,10 +38,8 @@ import org.apache.fineract.portfolio.workingcapitalloannearbreach.service.Workin
 import org.apache.fineract.portfolio.workingcapitalloanproduct.WorkingCapitalLoanProductConstants;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
 public class WorkingCapitalNearBreachParseAndValidator extends ParseAndValidator {
-
     private final FromJsonHelper jsonHelper;
     private final WorkingCapitalBreachReadPlatformService workingCapitalBreachReadPlatformService;
     private final WorkingCapitalNearBreachReadPlatformService workingCapitalNearBreachReadPlatformService;
@@ -55,50 +52,40 @@ public class WorkingCapitalNearBreachParseAndValidator extends ParseAndValidator
         return result;
     }
 
-    private WorkingCapitalNearBreachRequest validateAndParse(final DataValidatorBuilder dataValidator, final JsonObject element,
-            final FromJsonHelper jsonHelper) {
+    private WorkingCapitalNearBreachRequest validateAndParse(final DataValidatorBuilder dataValidator, final JsonObject element, final FromJsonHelper jsonHelper) {
         if (element == null) {
             return null;
         }
-        jsonHelper.checkForUnsupportedParameters(element, List.of(WorkingCapitalLoanProductConstants.nearBreachNameParamName, //
-                WorkingCapitalLoanProductConstants.nearBreachFrequencyParamName, //
-                WorkingCapitalLoanProductConstants.nearBreachFrequencyTypeParamName, //
-                WorkingCapitalLoanProductConstants.nearBreachThresholdParamName));
-
+        jsonHelper.checkForUnsupportedParameters(element, List.of(WorkingCapitalLoanProductConstants.nearBreachNameParamName,  //
+        WorkingCapitalLoanProductConstants.nearBreachFrequencyParamName,  //
+        WorkingCapitalLoanProductConstants.nearBreachFrequencyTypeParamName,  //
+        WorkingCapitalLoanProductConstants.nearBreachThresholdParamName));
         final String nearBreachName = jsonHelper.extractStringNamed(WorkingCapitalLoanProductConstants.nearBreachNameParamName, element);
         dataValidator.reset().parameter(WorkingCapitalLoanProductConstants.nearBreachNameParamName).value(nearBreachName).notNull();
-
-        final Integer nearBreachFrequency = jsonHelper.extractIntegerNamed(WorkingCapitalLoanProductConstants.nearBreachFrequencyParamName,
-                element);
-        dataValidator.reset().parameter(WorkingCapitalLoanProductConstants.nearBreachFrequencyParamName).value(nearBreachFrequency)
-                .notNull().integerGreaterThanZero();
-
-        final String nearBreachFrequencyTypeValue = jsonHelper
-                .extractStringNamed(WorkingCapitalLoanProductConstants.nearBreachFrequencyTypeParamName, element);
-        dataValidator.reset().parameter(WorkingCapitalLoanProductConstants.nearBreachFrequencyTypeParamName)
-                .value(nearBreachFrequencyTypeValue).notNull().isOneOfEnumValues(WorkingCapitalLoanPeriodFrequencyType.class);
-
-        final BigDecimal nearBreachThreshold = jsonHelper
-                .extractBigDecimalNamed(WorkingCapitalLoanProductConstants.nearBreachThresholdParamName, element, new HashSet<>());
-        dataValidator.reset().parameter(WorkingCapitalLoanProductConstants.nearBreachThresholdParamName).value(nearBreachThreshold)
-                .notNull().percentage();
-
-        return dataValidator.hasError() ? null
-                : new WorkingCapitalNearBreachRequest(nearBreachName, nearBreachFrequency, nearBreachFrequencyTypeValue,
-                        nearBreachThreshold);
+        final Integer nearBreachFrequency = jsonHelper.extractIntegerNamed(WorkingCapitalLoanProductConstants.nearBreachFrequencyParamName, element);
+        dataValidator.reset().parameter(WorkingCapitalLoanProductConstants.nearBreachFrequencyParamName).value(nearBreachFrequency).notNull().integerGreaterThanZero();
+        final String nearBreachFrequencyTypeValue = jsonHelper.extractStringNamed(WorkingCapitalLoanProductConstants.nearBreachFrequencyTypeParamName, element);
+        dataValidator.reset().parameter(WorkingCapitalLoanProductConstants.nearBreachFrequencyTypeParamName).value(nearBreachFrequencyTypeValue).notNull().isOneOfEnumValues(WorkingCapitalLoanPeriodFrequencyType.class);
+        final BigDecimal nearBreachThreshold = jsonHelper.extractBigDecimalNamed(WorkingCapitalLoanProductConstants.nearBreachThresholdParamName, element, new HashSet<>());
+        dataValidator.reset().parameter(WorkingCapitalLoanProductConstants.nearBreachThresholdParamName).value(nearBreachThreshold).notNull().percentage();
+        return dataValidator.hasError() ? null : new WorkingCapitalNearBreachRequest(nearBreachName, nearBreachFrequency, nearBreachFrequencyTypeValue, nearBreachThreshold);
     }
 
-    public void validateNearBreachAgainstBreach(final DataValidatorBuilder baseDataValidator, final Long breachId,
-            final Long nearBreachId) {
+    public void validateNearBreachAgainstBreach(final DataValidatorBuilder baseDataValidator, final Long breachId, final Long nearBreachId) {
         if (nearBreachId != null) {
             final WorkingCapitalBreachData breachData = workingCapitalBreachReadPlatformService.retrieveOne(breachId);
             final WorkingCapitalNearBreachData nearBreachData = workingCapitalNearBreachReadPlatformService.retrieveOne(nearBreachId);
-            if (FrequencyTypeUtil.compareFrequencies(nearBreachData.getFrequency(), nearBreachData.getFrequencyType().getCode(),
-                    breachData.getBreachFrequency(), breachData.getBreachFrequencyType().getCode()) >= 0) {
-                baseDataValidator.reset().parameter(WorkingCapitalLoanProductConstants.nearBreachIdParamName)
-                        .failWithCode("near.breach.frequency.must.be.lower.than.breach.frequency");
+            if (FrequencyTypeUtil.compareFrequencies(nearBreachData.getFrequency(), nearBreachData.getFrequencyType().getCode(), breachData.getBreachFrequency(), breachData.getBreachFrequencyType().getCode()) >= 0) {
+                baseDataValidator.reset().parameter(WorkingCapitalLoanProductConstants.nearBreachIdParamName).failWithCode("near.breach.frequency.must.be.lower.than.breach.frequency");
                 return;
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalNearBreachParseAndValidator(final FromJsonHelper jsonHelper, final WorkingCapitalBreachReadPlatformService workingCapitalBreachReadPlatformService, final WorkingCapitalNearBreachReadPlatformService workingCapitalNearBreachReadPlatformService) {
+        this.jsonHelper = jsonHelper;
+        this.workingCapitalBreachReadPlatformService = workingCapitalBreachReadPlatformService;
+        this.workingCapitalNearBreachReadPlatformService = workingCapitalNearBreachReadPlatformService;
     }
 }

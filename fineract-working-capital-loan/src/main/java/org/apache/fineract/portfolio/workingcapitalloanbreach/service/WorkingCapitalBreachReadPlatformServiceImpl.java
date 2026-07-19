@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.workingcapitalloanbreach.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.ApiFacingEnum;
 import org.apache.fineract.infrastructure.core.data.StringEnumOptionData;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanPeriodFrequencyType;
@@ -34,17 +33,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class WorkingCapitalBreachReadPlatformServiceImpl implements WorkingCapitalBreachReadPlatformService {
-
     private final WorkingCapitalBreachRepository repository;
 
     @Override
     public WorkingCapitalBreachTemplateResponse retrieveTemplate() {
-        final List<StringEnumOptionData> breachFrequencyTypeOptions = ApiFacingEnum
-                .getValuesAsStringEnumOptionDataList(WorkingCapitalLoanPeriodFrequencyType.class);
-        final List<StringEnumOptionData> breachAmountCalculationTypeOptions = WorkingCapitalBreachAmountCalculationType
-                .toStringEnumOptions();
+        final List<StringEnumOptionData> breachFrequencyTypeOptions = ApiFacingEnum.getValuesAsStringEnumOptionDataList(WorkingCapitalLoanPeriodFrequencyType.class);
+        final List<StringEnumOptionData> breachAmountCalculationTypeOptions = WorkingCapitalBreachAmountCalculationType.toStringEnumOptions();
         return new WorkingCapitalBreachTemplateResponse(breachFrequencyTypeOptions, breachAmountCalculationTypeOptions);
     }
 
@@ -59,11 +54,11 @@ public class WorkingCapitalBreachReadPlatformServiceImpl implements WorkingCapit
     }
 
     private WorkingCapitalBreachData map(final WorkingCapitalBreach item) {
-        return WorkingCapitalBreachData.builder().id(item.getId()).name(item.getName()).breachFrequency(item.getBreachFrequency())
-                .breachFrequencyType(item.getBreachFrequencyType() != null ? item.getBreachFrequencyType().toStringEnumOptionData() : null)
-                .breachAmountCalculationType(item.getBreachAmountCalculationType() != null
-                        ? item.getBreachAmountCalculationType().getValueAsStringEnumOptionData()
-                        : null)
-                .breachAmount(item.getBreachAmount()).build();
+        return WorkingCapitalBreachData.builder().id(item.getId()).name(item.getName()).breachFrequency(item.getBreachFrequency()).breachFrequencyType(item.getBreachFrequencyType() != null ? item.getBreachFrequencyType().toStringEnumOptionData() : null).breachAmountCalculationType(item.getBreachAmountCalculationType() != null ? item.getBreachAmountCalculationType().getValueAsStringEnumOptionData() : null).breachAmount(item.getBreachAmount()).build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalBreachReadPlatformServiceImpl(final WorkingCapitalBreachRepository repository) {
+        this.repository = repository;
     }
 }

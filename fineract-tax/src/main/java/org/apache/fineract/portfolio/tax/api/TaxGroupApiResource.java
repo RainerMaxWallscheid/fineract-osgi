@@ -37,7 +37,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -55,11 +54,8 @@ import org.springframework.stereotype.Component;
 @Path("/v1/taxes/group")
 @Component
 @Tag(name = "Tax Group", description = "This defines the Tax Group")
-@RequiredArgsConstructor
 public class TaxGroupApiResource {
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "TAXGROUP";
-
     private final PlatformSecurityContext context;
     private final TaxReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<String> toApiJsonSerializer;
@@ -67,7 +63,7 @@ public class TaxGroupApiResource {
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "List Tax Group", operationId = "retrieveAllTaxGroups", description = "List Tax Group")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TaxGroupApiResourceSwagger.GetTaxesGroupResponse.class))))
     public List<TaxGroupData> retrieveAllTaxGroups() {
@@ -77,21 +73,19 @@ public class TaxGroupApiResource {
 
     @GET
     @Path("{taxGroupId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Tax Group", operationId = "retrieveOneTaxGroup", description = "Retrieve Tax Group")
     @AlternativeOperationId("retrieveTaxGroup")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TaxGroupApiResourceSwagger.GetTaxesGroupResponse.class)))
-    public TaxGroupData retrieveTaxGroup(@PathParam("taxGroupId") @Parameter(description = "taxGroupId") final Long taxGroupId,
-            @Context final UriInfo uriInfo) {
+    public TaxGroupData retrieveTaxGroup(@PathParam("taxGroupId") @Parameter(description = "taxGroupId") final Long taxGroupId, @Context final UriInfo uriInfo) {
         context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return settings.isTemplate() ? readPlatformService.retrieveTaxGroupWithTemplate(taxGroupId)
-                : readPlatformService.retrieveTaxGroupData(taxGroupId);
+        return settings.isTemplate() ? readPlatformService.retrieveTaxGroupWithTemplate(taxGroupId) : readPlatformService.retrieveTaxGroupData(taxGroupId);
     }
 
     @GET
     @Path("template")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Tax Group Template", operationId = "retrieveTemplateTaxGroup")
     @AlternativeOperationId("retrieveTemplate_22")
     public TaxGroupData retrieveTemplate() {
@@ -100,31 +94,34 @@ public class TaxGroupApiResource {
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Create a new Tax Group", operationId = "createTaxGroup", description = "Create a new Tax Group\n"
-            + "Mandatory Fields: name and taxComponents\n" + "Mandatory Fields in taxComponents: taxComponentId\n"
-            + "Optional Fields in taxComponents: id, startDate and endDate")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Create a new Tax Group", operationId = "createTaxGroup", description = "Create a new Tax Group\n" + "Mandatory Fields: name and taxComponents\n" + "Mandatory Fields in taxComponents: taxComponentId\n" + "Optional Fields in taxComponents: id, startDate and endDate")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = TaxGroupApiResourceSwagger.PostTaxesGroupRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TaxGroupApiResourceSwagger.PostTaxesGroupResponse.class)))
     public CommandProcessingResult createTaxGroup(@Parameter(hidden = true) TaxGroupRequest taxGroupRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createTaxGroup()
-                .withJson(toApiJsonSerializer.serialize(taxGroupRequest)).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createTaxGroup().withJson(toApiJsonSerializer.serialize(taxGroupRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @PUT
     @Path("{taxGroupId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update Tax Group", operationId = "updateTaxGroup", description = "Updates Tax Group. Only end date can be up-datable and can insert new tax components.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = TaxGroupApiResourceSwagger.PutTaxesGroupTaxGroupIdRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TaxGroupApiResourceSwagger.PutTaxesGroupTaxGroupIdResponse.class)))
-    public CommandProcessingResult updateTaxGroup(@PathParam("taxGroupId") @Parameter(description = "taxGroupId") final Long taxGroupId,
-            @Parameter(hidden = true) TaxGroupRequest taxGroupRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateTaxGroup(taxGroupId)
-                .withJson(toApiJsonSerializer.serialize(taxGroupRequest)).build();
+    public CommandProcessingResult updateTaxGroup(@PathParam("taxGroupId") @Parameter(description = "taxGroupId") final Long taxGroupId, @Parameter(hidden = true) TaxGroupRequest taxGroupRequest) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateTaxGroup(taxGroupId).withJson(toApiJsonSerializer.serialize(taxGroupRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public TaxGroupApiResource(final PlatformSecurityContext context, final TaxReadPlatformService readPlatformService, final DefaultToApiJsonSerializer<String> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.context = context;
+        this.readPlatformService = readPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+    }
 }

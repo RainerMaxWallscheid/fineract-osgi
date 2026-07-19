@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.cob.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.conditions.LoanCOBEnabledCondition;
 import org.apache.fineract.cob.loan.LoanCOBConstant;
 import org.apache.fineract.infrastructure.core.config.TaskExecutorConstant;
@@ -30,13 +29,13 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 @Conditional(LoanCOBEnabledCondition.class)
 public class AsyncLoanCOBExecutorServiceImpl extends AsyncCommonCOBExecutorService implements AsyncLoanCOBExecutorService {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AsyncLoanCOBExecutorServiceImpl.class);
 
-    public AsyncLoanCOBExecutorServiceImpl(JobLocator jobLocator, ScheduledJobDetailRepository scheduledJobDetailRepository,
-            JobStarter jobStarter, RetrieveLoanIdService retrieveIdService) {
+    public AsyncLoanCOBExecutorServiceImpl(JobLocator jobLocator, ScheduledJobDetailRepository scheduledJobDetailRepository, JobStarter jobStarter, RetrieveLoanIdService retrieveIdService) {
         super(jobLocator, scheduledJobDetailRepository, jobStarter, retrieveIdService);
     }
 

@@ -19,8 +19,6 @@
 package org.apache.fineract.infrastructure.hooks.listener;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.FineractContext;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.hooks.domain.Hook;
@@ -33,10 +31,9 @@ import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class FineractHookListener implements HookListener {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FineractHookListener.class);
     private final HookProcessorProvider hookProcessorProvider;
     private final HookReadPlatformService hookReadPlatformService;
 
@@ -44,31 +41,29 @@ public class FineractHookListener implements HookListener {
     public void onApplicationEvent(final HookEvent event) {
         try {
             ThreadLocalContextUtil.init(event.getContext());
-
             final AppUser appUser = event.getAppUser();
-
             final HookEventSource hookEventSource = (HookEventSource) event.getSource();
             final FineractContext fineractContext = event.getContext();
             final String entityName = hookEventSource.getEntityName();
             final String actionName = hookEventSource.getActionName();
             final String payload = event.getPayload();
-
-            final List<Hook> hooks = hookReadPlatformService.retrieveHooksByEvent(hookEventSource.getEntityName(),
-                    hookEventSource.getActionName());
-
+            final List<Hook> hooks = hookReadPlatformService.retrieveHooksByEvent(hookEventSource.getEntityName(), hookEventSource.getActionName());
             for (final Hook hook : hooks) {
                 final HookProcessor processor = hookProcessorProvider.getProcessor(hook);
                 try {
                     processor.process(hook, payload, entityName, actionName, fineractContext);
                 } catch (Throwable e) {
-                    log.error(
-                            "Hook {} failed in HookProcessor {} for tenantIdentifier/user {}/{}, entityName: {}, actionName: {}, payload {} ",
-                            hook.getId(), processor.getClass().getSimpleName(), fineractContext.getTenantContext().getTenantIdentifier(),
-                            appUser.getDisplayName(), entityName, actionName, payload, e);
+                    log.error("Hook {} failed in HookProcessor {} for tenantIdentifier/user {}/{}, entityName: {}, actionName: {}, payload {} ", hook.getId(), processor.getClass().getSimpleName(), fineractContext.getTenantContext().getTenantIdentifier(), appUser.getDisplayName(), entityName, actionName, payload, e);
                 }
             }
         } finally {
             ThreadLocalContextUtil.reset();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FineractHookListener(final HookProcessorProvider hookProcessorProvider, final HookReadPlatformService hookReadPlatformService) {
+        this.hookProcessorProvider = hookProcessorProvider;
+        this.hookReadPlatformService = hookReadPlatformService;
     }
 }

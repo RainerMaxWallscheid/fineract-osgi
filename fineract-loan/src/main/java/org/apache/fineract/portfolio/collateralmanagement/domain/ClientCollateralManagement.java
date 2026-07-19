@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.client.domain.Client;
@@ -41,24 +40,18 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanCollateralManagement
 @Entity
 @Table(name = "m_client_collateral_management")
 public class ClientCollateralManagement extends AbstractPersistableCustom<Long> {
-
     @Column(name = "quantity", nullable = false, scale = 5, precision = 20)
     private BigDecimal quantity;
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "collateral_id", nullable = false)
     private CollateralManagementDomain collateral;
-
-    @Getter
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "clientCollateralManagement", fetch = FetchType.LAZY)
     private Set<LoanCollateralManagement> loanCollateralManagementSet = new HashSet<>();
 
     public ClientCollateralManagement() {
-
     }
 
     public ClientCollateralManagement(final BigDecimal quantity, final Client client) {
@@ -70,8 +63,7 @@ public class ClientCollateralManagement extends AbstractPersistableCustom<Long> 
         this.quantity = quantity;
     }
 
-    private ClientCollateralManagement(final BigDecimal quantity, final Client client,
-            final CollateralManagementDomain collateralManagementData) {
+    private ClientCollateralManagement(final BigDecimal quantity, final Client client, final CollateralManagementDomain collateralManagementData) {
         this.quantity = quantity;
         this.client = client;
         this.collateral = collateralManagementData;
@@ -82,8 +74,7 @@ public class ClientCollateralManagement extends AbstractPersistableCustom<Long> 
         return new ClientCollateralManagement(quantity);
     }
 
-    public static ClientCollateralManagement createNew(final BigDecimal quantity, final Client client,
-            final CollateralManagementDomain collateral) {
+    public static ClientCollateralManagement createNew(final BigDecimal quantity, final Client client, final CollateralManagementDomain collateral) {
         return new ClientCollateralManagement(quantity, client, collateral);
     }
 
@@ -130,5 +121,10 @@ public class ClientCollateralManagement extends AbstractPersistableCustom<Long> 
 
     public CollateralManagementDomain getCollaterals() {
         return this.collateral;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Set<LoanCollateralManagement> getLoanCollateralManagementSet() {
+        return this.loanCollateralManagementSet;
     }
 }

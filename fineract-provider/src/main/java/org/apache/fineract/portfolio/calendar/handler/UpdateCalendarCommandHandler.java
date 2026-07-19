@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.calendar.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,16 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "CALENDAR", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateCalendarCommandHandler implements NewCommandSourceHandler {
-
     private final CalendarWritePlatformService calendarWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.calendarWritePlatformService.updateCalendar(command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public UpdateCalendarCommandHandler(final CalendarWritePlatformService calendarWritePlatformService) {
+        this.calendarWritePlatformService = calendarWritePlatformService;
+    }
 }

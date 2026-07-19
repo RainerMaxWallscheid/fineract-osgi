@@ -18,23 +18,20 @@
  */
 package org.apache.fineract.cob.workingcapitalloan;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.domain.AbstractLockingService;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-@Slf4j
 public class WorkingCapitalLoanLockingServiceImpl extends AbstractLockingService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanLockingServiceImpl.class);
     private static final String TABLE_NAME = "m_wc_loan_account_locks";
-
     private static final String BATCH_LOAN_LOCK_INSERT = """
-                INSERT INTO m_wc_loan_account_locks (loan_id, version, lock_owner, lock_placed_on, lock_placed_on_cob_business_date) VALUES (?,?,?,?,?)
-            """;
-
+            INSERT INTO m_wc_loan_account_locks (loan_id, version, lock_owner, lock_placed_on, lock_placed_on_cob_business_date) VALUES (?,?,?,?,?)
+        """;
     private static final String BATCH_LOAN_LOCK_UPGRADE = """
-                UPDATE m_wc_loan_account_locks SET version= version + 1, lock_owner = ?, lock_placed_on = ? WHERE loan_id = ?
-            """;
+            UPDATE m_wc_loan_account_locks SET version= version + 1, lock_owner = ?, lock_placed_on = ? WHERE loan_id = ?
+        """;
 
     public WorkingCapitalLoanLockingServiceImpl(JdbcTemplate jdbcTemplate, FineractProperties fineractProperties) {
         super(jdbcTemplate, fineractProperties);

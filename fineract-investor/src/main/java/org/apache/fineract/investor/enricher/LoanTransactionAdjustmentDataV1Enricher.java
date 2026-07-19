@@ -18,15 +18,12 @@
  */
 package org.apache.fineract.investor.enricher;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.avro.loan.v1.LoanTransactionAdjustmentDataV1;
 import org.apache.fineract.infrastructure.core.service.DataEnricher;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class LoanTransactionAdjustmentDataV1Enricher implements DataEnricher<LoanTransactionAdjustmentDataV1> {
-
     private final LoanTransactionDataV1Enricher loanTransactionDataV1Enricher;
 
     @Override
@@ -42,5 +39,10 @@ public class LoanTransactionAdjustmentDataV1Enricher implements DataEnricher<Loa
         if (data.getNewTransactionDetail() != null) {
             loanTransactionDataV1Enricher.enrich(data.getNewTransactionDetail());
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionAdjustmentDataV1Enricher(final LoanTransactionDataV1Enricher loanTransactionDataV1Enricher) {
+        this.loanTransactionDataV1Enricher = loanTransactionDataV1Enricher;
     }
 }

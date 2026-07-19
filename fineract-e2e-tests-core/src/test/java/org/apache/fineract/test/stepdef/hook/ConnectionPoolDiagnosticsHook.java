@@ -20,7 +20,6 @@ package org.apache.fineract.test.stepdef.hook;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
@@ -40,26 +39,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.test.api.ApiProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Slf4j
 public class ConnectionPoolDiagnosticsHook {
-
-    private static final Pattern PROMETHEUS_SAMPLE = Pattern
-            .compile("^([a-zA-Z_:][a-zA-Z0-9_:]*)(?:\\{[^}]*})?\\s+([+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?)$");
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ConnectionPoolDiagnosticsHook.class);
+    private static final Pattern PROMETHEUS_SAMPLE = Pattern.compile("^([a-zA-Z_:][a-zA-Z0-9_:]*)(?:\\{[^}]*})?\\s+([+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?)$");
     private static final String TENANT_PREFIX = "fineract_tenants_";
     private static final String TENANT_HIKARI = "_hikaricp_connections";
     private static final String MASTER_HIKARI = "hikaricp_connections";
     private static final Duration POLL_INTERVAL = Duration.ofSeconds(1);
-
     @Autowired
     private ApiProperties apiProperties;
-
     private final HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
     private final AtomicReference<ConnectionPoolMetrics> latest = new AtomicReference<>();
     private ScheduledExecutorService executor;
@@ -75,7 +67,6 @@ public class ConnectionPoolDiagnosticsHook {
         // be applied to scenarios running against a fully provisioned environment where
         // the actuator endpoint is guaranteed to be available.
         assertThat(baseline.hasTenantMetrics()).as("No tenant Hikari metrics were found at %s", prometheusUri()).isTrue();
-
         peaks = new ConnectionPoolPeaks(baseline);
         latest.set(baseline);
         executor = Executors.newSingleThreadScheduledExecutor(r -> {
@@ -84,7 +75,6 @@ public class ConnectionPoolDiagnosticsHook {
             return thread;
         });
         samplingTask = executor.scheduleAtFixedRate(this::sampleMetrics, 0, POLL_INTERVAL.toMillis(), TimeUnit.MILLISECONDS);
-
         logSnapshot(scenario, "Connection pool diagnostics baseline", baseline);
     }
 
@@ -96,21 +86,17 @@ public class ConnectionPoolDiagnosticsHook {
         if (executor != null) {
             executor.shutdownNow();
         }
-
         int recoveryTimeoutSeconds = Integer.getInteger("fineract-test.connection-pool.recovery-timeout-seconds", 30);
         await().atMost(Duration.ofSeconds(recoveryTimeoutSeconds)).pollInterval(POLL_INTERVAL).untilAsserted(() -> {
             ConnectionPoolMetrics current = fetchMetrics();
             latest.set(current);
             assertThat(current.tenantPending()).as("Tenant Hikari pending connections after scenario").isZero();
             assertThat(current.masterPending()).as("Master Hikari pending connections after scenario").isZero();
-            assertThat(current.tenantActive()).as("Tenant Hikari active connections after scenario")
-                    .isLessThanOrEqualTo(baseline.tenantActive());
+            assertThat(current.tenantActive()).as("Tenant Hikari active connections after scenario").isLessThanOrEqualTo(baseline.tenantActive());
         });
-
         ConnectionPoolMetrics current = latest.get();
         logSnapshot(scenario, "Connection pool diagnostics final", current);
         scenario.log("Connection pool diagnostics peaks: " + peaks);
-
         assertThat(current.tenantTimeouts()).as("Tenant Hikari connection timeouts increased").isEqualTo(baseline.tenantTimeouts());
         assertThat(current.masterTimeouts()).as("Master Hikari connection timeouts increased").isEqualTo(baseline.masterTimeouts());
     }
@@ -130,7 +116,6 @@ public class ConnectionPoolDiagnosticsHook {
         if ("https".equalsIgnoreCase(uri.getScheme())) {
             return ConnectionPoolMetrics.parse(fetchMetricsWithCurl(uri));
         }
-
         HttpRequest request = HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(10)).GET().build();
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -147,8 +132,7 @@ public class ConnectionPoolDiagnosticsHook {
     private String fetchMetricsWithCurl(URI uri) {
         // -k disables certificate verification; acceptable here because test environments
         // typically use self-signed certificates on the HTTPS endpoint.
-        ProcessBuilder processBuilder = new ProcessBuilder("curl", "-k", "--fail", "--silent", "--show-error", "--max-time", "10",
-                uri.toString());
+        ProcessBuilder processBuilder = new ProcessBuilder("curl", "-k", "--fail", "--silent", "--show-error", "--max-time", "10", uri.toString());
         try {
             Process process = processBuilder.start();
             String stdout = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
@@ -173,17 +157,13 @@ public class ConnectionPoolDiagnosticsHook {
     }
 
     private void logSnapshot(Scenario scenario, String label, ConnectionPoolMetrics metrics) {
-        String message = "%s: tenant(active=%s, pending=%s, timeouts=%s, total=%s, idle=%s, max=%s), master(active=%s, pending=%s, timeouts=%s, total=%s, idle=%s, max=%s)"
-                .formatted(label, metrics.tenantActive(), metrics.tenantPending(), metrics.tenantTimeouts(), metrics.tenantTotal(),
-                        metrics.tenantIdle(), metrics.tenantMax(), metrics.masterActive(), metrics.masterPending(),
-                        metrics.masterTimeouts(), metrics.masterTotal(), metrics.masterIdle(), metrics.masterMax());
+        String message = "%s: tenant(active=%s, pending=%s, timeouts=%s, total=%s, idle=%s, max=%s), master(active=%s, pending=%s, timeouts=%s, total=%s, idle=%s, max=%s)".formatted(label, metrics.tenantActive(), metrics.tenantPending(), metrics.tenantTimeouts(), metrics.tenantTotal(), metrics.tenantIdle(), metrics.tenantMax(), metrics.masterActive(), metrics.masterPending(), metrics.masterTimeouts(), metrics.masterTotal(), metrics.masterIdle(), metrics.masterMax());
         scenario.log(message);
         log.info(message);
     }
 
-    @RequiredArgsConstructor
-    private static final class ConnectionPoolMetrics {
 
+    private static final class ConnectionPoolMetrics {
         private final Map<String, Double> metrics;
 
         static ConnectionPoolMetrics parse(String prometheusBody) {
@@ -253,20 +233,21 @@ public class ConnectionPoolDiagnosticsHook {
         }
 
         private long tenantSum(String suffix) {
-            return Math.round(metrics.entrySet().stream()
-                    .filter(entry -> entry.getKey().startsWith(TENANT_PREFIX) && entry.getKey().endsWith(TENANT_HIKARI + suffix))
-                    .mapToDouble(Map.Entry::getValue).sum());
+            return Math.round(metrics.entrySet().stream().filter(entry -> entry.getKey().startsWith(TENANT_PREFIX) && entry.getKey().endsWith(TENANT_HIKARI + suffix)).mapToDouble(Map.Entry::getValue).sum());
         }
 
         private long metric(String name) {
-            return Math.round(metrics.getOrDefault(name, 0D));
+            return Math.round(metrics.getOrDefault(name, 0.0));
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public ConnectionPoolMetrics(final Map<String, Double> metrics) {
+            this.metrics = metrics;
         }
     }
 
-    @Getter
-    @ToString
-    private static final class ConnectionPoolPeaks {
 
+    private static final class ConnectionPoolPeaks {
         private long maxTenantActive;
         private long maxTenantPending;
         private long maxMasterActive;
@@ -281,6 +262,32 @@ public class ConnectionPoolDiagnosticsHook {
             maxTenantPending = Math.max(maxTenantPending, metrics.tenantPending());
             maxMasterActive = Math.max(maxMasterActive, metrics.masterActive());
             maxMasterPending = Math.max(maxMasterPending, metrics.masterPending());
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public long getMaxTenantActive() {
+            return this.maxTenantActive;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public long getMaxTenantPending() {
+            return this.maxTenantPending;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public long getMaxMasterActive() {
+            return this.maxMasterActive;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public long getMaxMasterPending() {
+            return this.maxMasterPending;
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "ConnectionPoolDiagnosticsHook.ConnectionPoolPeaks(maxTenantActive=" + this.getMaxTenantActive() + ", maxTenantPending=" + this.getMaxTenantPending() + ", maxMasterActive=" + this.getMaxMasterActive() + ", maxMasterPending=" + this.getMaxMasterPending() + ")";
         }
     }
 }

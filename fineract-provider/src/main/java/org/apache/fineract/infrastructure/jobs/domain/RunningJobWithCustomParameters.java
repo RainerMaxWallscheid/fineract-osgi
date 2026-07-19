@@ -18,11 +18,70 @@
  */
 package org.apache.fineract.infrastructure.jobs.domain;
 
-import lombok.Data;
-
-@Data
 public class RunningJobWithCustomParameters {
-
     private Long executionId;
     private String parameter;
+
+    @java.lang.SuppressWarnings("all")
+        public RunningJobWithCustomParameters() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getExecutionId() {
+        return this.executionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getParameter() {
+        return this.parameter;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setExecutionId(final Long executionId) {
+        this.executionId = executionId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setParameter(final String parameter) {
+        this.parameter = parameter;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof RunningJobWithCustomParameters)) return false;
+        final RunningJobWithCustomParameters other = (RunningJobWithCustomParameters) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$executionId = this.getExecutionId();
+        final java.lang.Object other$executionId = other.getExecutionId();
+        if (this$executionId == null ? other$executionId != null : !this$executionId.equals(other$executionId)) return false;
+        final java.lang.Object this$parameter = this.getParameter();
+        final java.lang.Object other$parameter = other.getParameter();
+        if (this$parameter == null ? other$parameter != null : !this$parameter.equals(other$parameter)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof RunningJobWithCustomParameters;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $executionId = this.getExecutionId();
+        result = result * PRIME + ($executionId == null ? 43 : $executionId.hashCode());
+        final java.lang.Object $parameter = this.getParameter();
+        result = result * PRIME + ($parameter == null ? 43 : $parameter.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "RunningJobWithCustomParameters(executionId=" + this.getExecutionId() + ", parameter=" + this.getParameter() + ")";
+    }
 }

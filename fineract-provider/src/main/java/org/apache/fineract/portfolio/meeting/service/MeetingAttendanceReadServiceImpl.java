@@ -20,8 +20,6 @@ package org.apache.fineract.portfolio.meeting.service;
 
 import java.sql.ResultSet;
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.portfolio.meeting.data.MeetingAttendanceData;
 import org.apache.fineract.portfolio.meeting.data.MeetingAttendanceEnumerations;
 import org.apache.fineract.portfolio.meeting.data.MeetingAttendanceType;
@@ -29,35 +27,35 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 @ConditionalOnMissingBean(value = MeetingAttendanceReadService.class, ignored = MeetingAttendanceReadServiceImpl.class)
 public class MeetingAttendanceReadServiceImpl implements MeetingAttendanceReadService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MeetingAttendanceReadServiceImpl.class);
     private final JdbcTemplate jdbcTemplate;
 
     @Override
     public Collection<MeetingAttendanceData> retrieveClientAttendanceByMeetingId(final Long meetingId) {
-        return jdbcTemplate.query(
-                """
-                                SELECT
-                                    ca.id as id,
-                                    ca.client_id as clientId,
-                                    ca.attendance_type_enum as attendanceTypeId,
-                                    c.display_name as clientName
-                                FROM m_meeting m INNER JOIN m_client_attendance ca ON m.id = ca.meeting_id INNER JOIN m_client c on ca.client_id=c.id
-                                WHERE m.id = ?
-                        """,
-                (ResultSet rs, int rowNum) -> {
-                    var id = rs.getLong("id");
-                    var clientId = rs.getLong("clientId");
-                    var attendanceTypeId = rs.getInt("attendanceTypeId");
-                    var clientName = rs.getString("clientName");
-                    var attendanceType = MeetingAttendanceEnumerations.attendanceType(MeetingAttendanceType.fromInt(attendanceTypeId));
+        return jdbcTemplate.query("""
+                    SELECT
+                        ca.id as id,
+                        ca.client_id as clientId,
+                        ca.attendance_type_enum as attendanceTypeId,
+                        c.display_name as clientName
+                    FROM m_meeting m INNER JOIN m_client_attendance ca ON m.id = ca.meeting_id INNER JOIN m_client c on ca.client_id=c.id
+                    WHERE m.id = ?
+            """, (ResultSet rs, int rowNum) -> {
+            var id = rs.getLong("id");
+            var clientId = rs.getLong("clientId");
+            var attendanceTypeId = rs.getInt("attendanceTypeId");
+            var clientName = rs.getString("clientName");
+            var attendanceType = MeetingAttendanceEnumerations.attendanceType(MeetingAttendanceType.fromInt(attendanceTypeId));
+            return MeetingAttendanceData.builder().id(id).clientId(clientId).clientName(clientName).attendanceType(attendanceType).build();
+        }, meetingId);
+    }
 
-                    return MeetingAttendanceData.builder().id(id).clientId(clientId).clientName(clientName).attendanceType(attendanceType)
-                            .build();
-                }, meetingId);
+    @java.lang.SuppressWarnings("all")
+        public MeetingAttendanceReadServiceImpl(final JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 }

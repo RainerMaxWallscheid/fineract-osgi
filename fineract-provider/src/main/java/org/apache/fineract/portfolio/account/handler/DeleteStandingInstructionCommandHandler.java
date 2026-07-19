@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.account.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,9 +27,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @CommandType(entity = "STANDINGINSTRUCTION", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteStandingInstructionCommandHandler implements NewCommandSourceHandler {
-
     private final StandingInstructionWritePlatformService standingInstructionWritePlatformService;
 
     @Override
@@ -38,4 +35,8 @@ public class DeleteStandingInstructionCommandHandler implements NewCommandSource
         return this.standingInstructionWritePlatformService.delete(command.entityId());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DeleteStandingInstructionCommandHandler(final StandingInstructionWritePlatformService standingInstructionWritePlatformService) {
+        this.standingInstructionWritePlatformService = standingInstructionWritePlatformService;
+    }
 }

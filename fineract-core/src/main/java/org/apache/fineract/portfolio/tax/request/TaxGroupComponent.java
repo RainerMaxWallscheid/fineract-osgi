@@ -20,18 +20,34 @@ package org.apache.fineract.portfolio.tax.request;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Setter
-@Getter
-@NoArgsConstructor
 public class TaxGroupComponent implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private Long taxComponentId;
     private String startDate;
+
+    @java.lang.SuppressWarnings("all")
+        public void setTaxComponentId(final Long taxComponentId) {
+        this.taxComponentId = taxComponentId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setStartDate(final String startDate) {
+        this.startDate = startDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getTaxComponentId() {
+        return this.taxComponentId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getStartDate() {
+        return this.startDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TaxGroupComponent() {
+    }
 }

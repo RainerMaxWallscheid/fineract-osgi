@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.ApiParameterHelper;
 import org.apache.fineract.infrastructure.core.exception.GeneralPlatformDomainRuleException;
@@ -39,29 +38,25 @@ import org.apache.fineract.util.StreamUtil;
 import org.springframework.stereotype.Service;
 
 @Service
-@ReportService(type = { "Table", "Chart", "SMS" })
-@Slf4j
+@ReportService(type = {"Table", "Chart", "SMS"})
 public class DatatableReportingProcessService extends AbstractReportingProcessService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DatatableReportingProcessService.class);
     private final List<DatatableReportExportService> exportServices;
 
-    public DatatableReportingProcessService(List<DatatableReportExportService> exportServices, InputValidator inputValidator,
-            ReportParameterTypeResolver reportParameterTypeResolver) {
+    public DatatableReportingProcessService(List<DatatableReportExportService> exportServices, InputValidator inputValidator, ReportParameterTypeResolver reportParameterTypeResolver) {
         super(inputValidator, reportParameterTypeResolver);
-
         this.exportServices = exportServices;
     }
 
     @Override
     public Response processRequest(String reportName, MultivaluedMap<String, String> queryParams) {
-
         DatatableExportTargetParameter exportMode = DatatableExportTargetParameter.resolverExportTarget(queryParams);
         final String parameterTypeValue = ApiParameterHelper.parameterType(queryParams) ? "parameter" : "report";
         final Map<String, String> reportParams = getReportParams(reportName, queryParams);
-        ResponseHolder response = findReportExportService(exportMode) //
-                .orElseThrow(() -> new GeneralPlatformDomainRuleException("error.msg.report.export.mode.unavailable",
-                        "Export mode %s unavailable".formatted(exportMode.name()))) //
-                .export(reportName, queryParams, reportParams, parameterTypeValue);
+        ResponseHolder response =  //
+        //
+        findReportExportService(exportMode).orElseThrow(() -> new GeneralPlatformDomainRuleException("error.msg.report.export.mode.unavailable", "Export mode %s unavailable".formatted(exportMode.name()))).export(reportName, queryParams, reportParams, parameterTypeValue);
         Response.ResponseBuilder builder = Response.status(response.status().getStatusCode());
         if (StringUtils.isNotBlank(response.contentType())) {
             builder = builder.type(response.contentType());
@@ -80,15 +75,14 @@ public class DatatableReportingProcessService extends AbstractReportingProcessSe
 
     @Override
     public List<ReportExportType> getAvailableExportTargets() {
-        return Arrays //
-                .stream(DatatableExportTargetParameter.values()) //
-                .filter(target -> findReportExportService(target).isPresent()) //
-                .map(target -> new ReportExportType(target.name(), target.getValue())) //
-                .toList();
+        return  //
+        //
+        //
+        //
+        Arrays.stream(DatatableExportTargetParameter.values()).filter(target -> findReportExportService(target).isPresent()).map(target -> new ReportExportType(target.name(), target.getValue())).toList();
     }
 
     private Optional<DatatableReportExportService> findReportExportService(DatatableExportTargetParameter target) {
         return exportServices.stream().filter(service -> service.supports(target)).findFirst();
     }
-
 }

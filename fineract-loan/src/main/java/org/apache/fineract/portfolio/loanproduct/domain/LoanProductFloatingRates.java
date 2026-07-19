@@ -26,49 +26,35 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Collection;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
 import org.apache.fineract.portfolio.floatingrates.domain.FloatingRate;
 
-@Setter
-@Getter
 @Entity
 @Table(name = "m_product_loan_floating_rates")
 public class LoanProductFloatingRates extends AbstractPersistableCustom<Long> {
-
     @OneToOne
     @JoinColumn(name = "loan_product_id", nullable = false)
     private LoanProduct loanProduct;
-
     @ManyToOne
     @JoinColumn(name = "floating_rates_id", nullable = false)
     private FloatingRate floatingRate;
-
     @Column(name = "interest_rate_differential", nullable = false)
     private BigDecimal interestRateDifferential;
-
     @Column(name = "min_differential_lending_rate", nullable = false)
     private BigDecimal minDifferentialLendingRate;
-
     @Column(name = "default_differential_lending_rate", nullable = false)
     private BigDecimal defaultDifferentialLendingRate;
-
     @Column(name = "max_differential_lending_rate", nullable = false)
     private BigDecimal maxDifferentialLendingRate;
-
     @Column(name = "is_floating_interest_rate_calculation_allowed", nullable = false)
     private boolean isFloatingInterestRateCalculationAllowed;
 
     public LoanProductFloatingRates() {
-
     }
 
-    public LoanProductFloatingRates(FloatingRate floatingRate, LoanProduct loanProduct, BigDecimal interestRateDifferential,
-            BigDecimal minDifferentialLendingRate, BigDecimal maxDifferentialLendingRate, BigDecimal defaultDifferentialLendingRate,
-            boolean isFloatingInterestRateCalculationAllowed) {
+    public LoanProductFloatingRates(FloatingRate floatingRate, LoanProduct loanProduct, BigDecimal interestRateDifferential, BigDecimal minDifferentialLendingRate, BigDecimal maxDifferentialLendingRate, BigDecimal defaultDifferentialLendingRate, boolean isFloatingInterestRateCalculationAllowed) {
         this.floatingRate = floatingRate;
         this.loanProduct = loanProduct;
         this.interestRateDifferential = interestRateDifferential;
@@ -81,7 +67,75 @@ public class LoanProductFloatingRates extends AbstractPersistableCustom<Long> {
     public Collection<FloatingRatePeriodData> fetchInterestRates(final FloatingRateDTO floatingRateDTO) {
         floatingRateDTO.addInterestRateDiff(this.interestRateDifferential);
         return floatingRate.fetchInterestRates(floatingRateDTO);
-
     }
 
+    @java.lang.SuppressWarnings("all")
+        public void setLoanProduct(final LoanProduct loanProduct) {
+        this.loanProduct = loanProduct;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setFloatingRate(final FloatingRate floatingRate) {
+        this.floatingRate = floatingRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setInterestRateDifferential(final BigDecimal interestRateDifferential) {
+        this.interestRateDifferential = interestRateDifferential;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMinDifferentialLendingRate(final BigDecimal minDifferentialLendingRate) {
+        this.minDifferentialLendingRate = minDifferentialLendingRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDefaultDifferentialLendingRate(final BigDecimal defaultDifferentialLendingRate) {
+        this.defaultDifferentialLendingRate = defaultDifferentialLendingRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMaxDifferentialLendingRate(final BigDecimal maxDifferentialLendingRate) {
+        this.maxDifferentialLendingRate = maxDifferentialLendingRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setFloatingInterestRateCalculationAllowed(final boolean isFloatingInterestRateCalculationAllowed) {
+        this.isFloatingInterestRateCalculationAllowed = isFloatingInterestRateCalculationAllowed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanProduct getLoanProduct() {
+        return this.loanProduct;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FloatingRate getFloatingRate() {
+        return this.floatingRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getInterestRateDifferential() {
+        return this.interestRateDifferential;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getMinDifferentialLendingRate() {
+        return this.minDifferentialLendingRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getDefaultDifferentialLendingRate() {
+        return this.defaultDifferentialLendingRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getMaxDifferentialLendingRate() {
+        return this.maxDifferentialLendingRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isFloatingInterestRateCalculationAllowed() {
+        return this.isFloatingInterestRateCalculationAllowed;
+    }
 }

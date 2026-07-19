@@ -19,17 +19,19 @@
 package org.apache.fineract.portfolio.delinquency.service;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.springframework.stereotype.Service;
 
-@AllArgsConstructor
 @Service
 public class PossibleNextRepaymentCalculationServiceDiscovery {
-
     private final List<PossibleNextRepaymentCalculationService> services;
 
     public PossibleNextRepaymentCalculationService getService(final Loan loan) {
         return services.stream().filter(s -> s.canAccept(loan)).findAny().orElse(null);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PossibleNextRepaymentCalculationServiceDiscovery(final List<PossibleNextRepaymentCalculationService> services) {
+        this.services = services;
     }
 }

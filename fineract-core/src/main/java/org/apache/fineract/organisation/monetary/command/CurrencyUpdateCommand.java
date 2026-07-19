@@ -18,11 +18,40 @@
  */
 package org.apache.fineract.organisation.monetary.command;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.organisation.monetary.data.CurrencyUpdateRequest;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class CurrencyUpdateCommand extends Command<CurrencyUpdateRequest> {}
+public class CurrencyUpdateCommand extends Command<CurrencyUpdateRequest> {
+	@java.lang.SuppressWarnings("all")
+		public CurrencyUpdateCommand() {
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public java.lang.String toString() {
+		return "CurrencyUpdateCommand()";
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public boolean equals(final java.lang.Object o) {
+		if (o == this) return true;
+		if (!(o instanceof CurrencyUpdateCommand)) return false;
+		final CurrencyUpdateCommand other = (CurrencyUpdateCommand) o;
+		if (!other.canEqual((java.lang.Object) this)) return false;
+		if (!super.equals(o)) return false;
+		return true;
+	}
+
+	@java.lang.SuppressWarnings("all")
+		protected boolean canEqual(final java.lang.Object other) {
+		return other instanceof CurrencyUpdateCommand;
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public int hashCode() {
+		final int result = super.hashCode();
+		return result;
+	}
+}

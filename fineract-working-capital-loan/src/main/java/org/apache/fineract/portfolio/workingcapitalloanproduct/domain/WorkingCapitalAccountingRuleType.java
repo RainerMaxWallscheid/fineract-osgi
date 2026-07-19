@@ -20,17 +20,11 @@ package org.apache.fineract.portfolio.workingcapitalloanproduct.domain;
 
 import java.util.Arrays;
 import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.StringEnumOptionData;
 
-@Getter
-@RequiredArgsConstructor
 public enum WorkingCapitalAccountingRuleType {
-
-    NONE("wcAccountingRuleType.none", "No accounting"), //
+    NONE("wcAccountingRuleType.none", "No accounting"),  //
     ACC_DEF_REV_AM("wcAccountingRuleType.accrual.def.rev.am", "Accrual with deferred revenue amortization");
-
     private final String code;
     private final String description;
 
@@ -44,5 +38,21 @@ public enum WorkingCapitalAccountingRuleType {
 
     public boolean isAccrualWithDeferredRevenueAmortization() {
         return this == ACC_DEF_REV_AM;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private WorkingCapitalAccountingRuleType(final String code, final String description) {
+        this.code = code;
+        this.description = description;
     }
 }

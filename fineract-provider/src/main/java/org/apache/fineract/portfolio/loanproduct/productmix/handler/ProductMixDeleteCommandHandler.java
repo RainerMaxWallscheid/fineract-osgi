@@ -19,8 +19,6 @@
 package org.apache.fineract.portfolio.loanproduct.productmix.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.portfolio.loanproduct.productmix.data.ProductMixDeleteRequest;
@@ -29,11 +27,10 @@ import org.apache.fineract.portfolio.loanproduct.productmix.service.ProductMixWr
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class ProductMixDeleteCommandHandler implements CommandHandler<ProductMixDeleteRequest, ProductMixDeleteResponse> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProductMixDeleteCommandHandler.class);
     private final ProductMixWritePlatformService writePlatformService;
 
     @Retry(name = "commandProductMixDelete", fallbackMethod = "fallback")
@@ -46,5 +43,10 @@ public class ProductMixDeleteCommandHandler implements CommandHandler<ProductMix
     @Override
     public ProductMixDeleteResponse fallback(Command<ProductMixDeleteRequest> command, Throwable t) {
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProductMixDeleteCommandHandler(final ProductMixWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

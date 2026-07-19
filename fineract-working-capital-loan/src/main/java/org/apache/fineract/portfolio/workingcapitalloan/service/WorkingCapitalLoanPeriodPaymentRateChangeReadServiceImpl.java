@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.workingcapitalloan.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanPeriodPaymentRateChangeData;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanPeriodPaymentRateChange;
 import org.apache.fineract.portfolio.workingcapitalloan.exception.WorkingCapitalLoanNotFoundException;
@@ -29,10 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class WorkingCapitalLoanPeriodPaymentRateChangeReadServiceImpl implements WorkingCapitalLoanPeriodPaymentRateChangeReadService {
-
     private final WorkingCapitalLoanPeriodPaymentRateChangeRepository repository;
     private final WorkingCapitalLoanRepository loanRepository;
 
@@ -44,10 +41,13 @@ public class WorkingCapitalLoanPeriodPaymentRateChangeReadServiceImpl implements
         return repository.findByWorkingCapitalLoanIdOrderByIdDesc(loanId).stream().map(e -> toData(e, loanId)).toList();
     }
 
-    private WorkingCapitalLoanPeriodPaymentRateChangeData toData(final WorkingCapitalLoanPeriodPaymentRateChange entity,
-            final Long loanId) {
-        return new WorkingCapitalLoanPeriodPaymentRateChangeData(entity.getId(), loanId, entity.getEffectiveDate(),
-                entity.getPreviousRate(), entity.getNewRate(), entity.isReversed(), entity.getReversedOnDate(),
-                entity.getCreatedDate().orElse(null));
+    private WorkingCapitalLoanPeriodPaymentRateChangeData toData(final WorkingCapitalLoanPeriodPaymentRateChange entity, final Long loanId) {
+        return new WorkingCapitalLoanPeriodPaymentRateChangeData(entity.getId(), loanId, entity.getEffectiveDate(), entity.getPreviousRate(), entity.getNewRate(), entity.isReversed(), entity.getReversedOnDate(), entity.getCreatedDate().orElse(null));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanPeriodPaymentRateChangeReadServiceImpl(final WorkingCapitalLoanPeriodPaymentRateChangeRepository repository, final WorkingCapitalLoanRepository loanRepository) {
+        this.repository = repository;
+        this.loanRepository = loanRepository;
     }
 }

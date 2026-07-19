@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.infrastructure.core.filters;
 
 import jakarta.servlet.FilterChain;
@@ -24,18 +23,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@RequiredArgsConstructor
-@Slf4j
 public class CallerIpTrackingFilter extends OncePerRequestFilter {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CallerIpTrackingFilter.class);
     private final FineractProperties fineractProperties;
-
     /**
      * Common headers used to get client IP from different proxies.
      *
@@ -46,10 +41,7 @@ public class CallerIpTrackingFilter extends OncePerRequestFilter {
      * "HTTP_FORWARDED", // Standardized header (RFC 7239) that can include client IP, proxy info, and protocol
      * "HTTP_VIA", // Shows intermediate proxies "REMOTE_ADDR" // Server's perceived client IP
      */
-
-    private static final String[] IP_HEADER_CANDIDATES = { "X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP",
-            "HTTP_X_FORWARDED_FOR", "HTTP_X_FORWARDED", "HTTP_X_CLUSTER_CLIENT_IP", "HTTP_CLIENT_IP", "HTTP_FORWARDED_FOR",
-            "HTTP_FORWARDED", "HTTP_VIA", "REMOTE_ADDR" };
+    private static final String[] IP_HEADER_CANDIDATES = {"X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_X_FORWARDED_FOR", "HTTP_X_FORWARDED", "HTTP_X_CLUSTER_CLIENT_IP", "HTTP_CLIENT_IP", "HTTP_FORWARDED_FOR", "HTTP_FORWARDED", "HTTP_VIA", "REMOTE_ADDR"};
 
     public String getClientIpAddress(HttpServletRequest request) {
         for (String header : IP_HEADER_CANDIDATES) {
@@ -64,18 +56,15 @@ public class CallerIpTrackingFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain)
-            throws IOException, ServletException {
+    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws IOException, ServletException {
         if (fineractProperties.getIpTracking().isEnabled()) {
             handleClientIp(request, response, filterChain);
         } else {
             filterChain.doFilter(request, response);
         }
-
     }
 
-    private void handleClientIp(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws IOException, ServletException {
+    private void handleClientIp(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         try {
             String clientIpAddress = getClientIpAddress(request);
             if (StringUtils.isNotBlank(clientIpAddress)) {
@@ -98,4 +87,8 @@ public class CallerIpTrackingFilter extends OncePerRequestFilter {
         return false;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public CallerIpTrackingFilter(final FineractProperties fineractProperties) {
+        this.fineractProperties = fineractProperties;
+    }
 }

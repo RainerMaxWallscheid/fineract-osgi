@@ -22,7 +22,6 @@ import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.ObjectMessage;
 import jakarta.jms.Session;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.condition.EnableFineractEventListenerCondition;
 import org.apache.fineract.notification.data.NotificationData;
 import org.springframework.context.annotation.Conditional;
@@ -33,9 +32,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Profile("activeMqEnabled")
 @Conditional(EnableFineractEventListenerCondition.class)
-@RequiredArgsConstructor
 public class ActiveMQNotificationEventListener implements SessionAwareMessageListener {
-
     private final NotificationEventListener notificationEventListener;
 
     @Override
@@ -44,5 +41,10 @@ public class ActiveMQNotificationEventListener implements SessionAwareMessageLis
             NotificationData notificationData = (NotificationData) ((ObjectMessage) message).getObject();
             notificationEventListener.receive(notificationData);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ActiveMQNotificationEventListener(final NotificationEventListener notificationEventListener) {
+        this.notificationEventListener = notificationEventListener;
     }
 }

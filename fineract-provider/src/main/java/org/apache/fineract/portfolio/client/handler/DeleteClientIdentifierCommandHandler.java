@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.client.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,16 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "CLIENTIDENTIFIER", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteClientIdentifierCommandHandler implements NewCommandSourceHandler {
-
     private final ClientIdentifierWritePlatformService clientIdentifierWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
+        return this.clientIdentifierWritePlatformService.deleteClientIdentifier(command.getClientId(), command.entityId(), command.commandId());
+    }
 
-        return this.clientIdentifierWritePlatformService.deleteClientIdentifier(command.getClientId(), command.entityId(),
-                command.commandId());
+    @java.lang.SuppressWarnings("all")
+        public DeleteClientIdentifierCommandHandler(final ClientIdentifierWritePlatformService clientIdentifierWritePlatformService) {
+        this.clientIdentifierWritePlatformService = clientIdentifierWritePlatformService;
     }
 }

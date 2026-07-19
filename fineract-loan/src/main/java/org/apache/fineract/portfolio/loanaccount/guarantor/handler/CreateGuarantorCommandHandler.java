@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.guarantor.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,15 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "GUARANTOR", action = "CREATE")
-@RequiredArgsConstructor
 public class CreateGuarantorCommandHandler implements NewCommandSourceHandler {
-
     private final GuarantorWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.createGuarantor(command.getLoanId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateGuarantorCommandHandler(final GuarantorWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

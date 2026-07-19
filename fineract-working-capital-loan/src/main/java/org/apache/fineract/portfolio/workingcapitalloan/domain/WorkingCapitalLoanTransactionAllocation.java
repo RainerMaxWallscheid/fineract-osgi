@@ -27,41 +27,29 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 
 @Entity
-@Table(name = "m_wc_loan_transaction_allocation", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "wc_loan_transaction_id" }, name = "uq_m_wc_loan_transaction_allocation_transaction_id") })
-@Getter
+@Table(name = "m_wc_loan_transaction_allocation", uniqueConstraints = {@UniqueConstraint(columnNames = {"wc_loan_transaction_id"}, name = "uq_m_wc_loan_transaction_allocation_transaction_id")})
 public class WorkingCapitalLoanTransactionAllocation extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "wc_loan_transaction_id", nullable = false, unique = true)
     private WorkingCapitalLoanTransaction wcLoanTransaction;
-
     @Column(name = "principal_portion", scale = 6, precision = 19)
-    @Setter
     private BigDecimal principalPortion;
-
     @Column(name = "fee_charges_portion", scale = 6, precision = 19)
-    @Setter
     private BigDecimal feeChargesPortion;
-
     @Column(name = "penalty_charges_portion", scale = 6, precision = 19)
-    @Setter
     private BigDecimal penaltyChargesPortion;
-
     @Version
     @Column(name = "version")
     private Integer version;
 
-    protected WorkingCapitalLoanTransactionAllocation() {}
+    protected WorkingCapitalLoanTransactionAllocation() {
+    }
 
-    public static WorkingCapitalLoanTransactionAllocation forPrincipalAllocation(final WorkingCapitalLoanTransaction transaction,
-            final BigDecimal principalAmount) {
+    public static WorkingCapitalLoanTransactionAllocation forPrincipalAllocation(final WorkingCapitalLoanTransaction transaction, final BigDecimal principalAmount) {
         final WorkingCapitalLoanTransactionAllocation allocation = new WorkingCapitalLoanTransactionAllocation();
         allocation.wcLoanTransaction = transaction;
         allocation.principalPortion = principalAmount != null ? principalAmount : BigDecimal.ZERO;
@@ -70,8 +58,7 @@ public class WorkingCapitalLoanTransactionAllocation extends AbstractAuditableWi
         return allocation;
     }
 
-    public static WorkingCapitalLoanTransactionAllocation forPortions(final WorkingCapitalLoanTransaction transaction,
-            final BigDecimal principalAmount, final BigDecimal feeAmount, final BigDecimal penaltyAmount) {
+    public static WorkingCapitalLoanTransactionAllocation forPortions(final WorkingCapitalLoanTransaction transaction, final BigDecimal principalAmount, final BigDecimal feeAmount, final BigDecimal penaltyAmount) {
         final WorkingCapitalLoanTransactionAllocation allocation = new WorkingCapitalLoanTransactionAllocation();
         allocation.wcLoanTransaction = transaction;
         allocation.principalPortion = MathUtil.nullToZero(principalAmount);
@@ -80,8 +67,7 @@ public class WorkingCapitalLoanTransactionAllocation extends AbstractAuditableWi
         return allocation;
     }
 
-    public static WorkingCapitalLoanTransactionAllocation forDisbursementDiscount(final WorkingCapitalLoanTransaction transaction,
-            final BigDecimal principalAmount) {
+    public static WorkingCapitalLoanTransactionAllocation forDisbursementDiscount(final WorkingCapitalLoanTransaction transaction, final BigDecimal principalAmount) {
         final WorkingCapitalLoanTransactionAllocation allocation = new WorkingCapitalLoanTransactionAllocation();
         allocation.wcLoanTransaction = transaction;
         allocation.principalPortion = MathUtil.nullToZero(principalAmount);
@@ -90,8 +76,7 @@ public class WorkingCapitalLoanTransactionAllocation extends AbstractAuditableWi
         return allocation;
     }
 
-    public static WorkingCapitalLoanTransactionAllocation forDiscountFeeAdjustment(final WorkingCapitalLoanTransaction transaction,
-            final BigDecimal principalAmount) {
+    public static WorkingCapitalLoanTransactionAllocation forDiscountFeeAdjustment(final WorkingCapitalLoanTransaction transaction, final BigDecimal principalAmount) {
         final WorkingCapitalLoanTransactionAllocation allocation = new WorkingCapitalLoanTransactionAllocation();
         allocation.wcLoanTransaction = transaction;
         allocation.principalPortion = MathUtil.nullToZero(principalAmount);
@@ -100,4 +85,43 @@ public class WorkingCapitalLoanTransactionAllocation extends AbstractAuditableWi
         return allocation;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanTransaction getWcLoanTransaction() {
+        return this.wcLoanTransaction;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPrincipalPortion() {
+        return this.principalPortion;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getFeeChargesPortion() {
+        return this.feeChargesPortion;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPenaltyChargesPortion() {
+        return this.penaltyChargesPortion;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getVersion() {
+        return this.version;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setPrincipalPortion(final BigDecimal principalPortion) {
+        this.principalPortion = principalPortion;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setFeeChargesPortion(final BigDecimal feeChargesPortion) {
+        this.feeChargesPortion = feeChargesPortion;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setPenaltyChargesPortion(final BigDecimal penaltyChargesPortion) {
+        this.penaltyChargesPortion = penaltyChargesPortion;
+    }
 }

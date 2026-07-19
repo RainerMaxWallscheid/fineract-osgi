@@ -20,8 +20,6 @@ package org.apache.fineract.infrastructure.campaigns.jobs.updatesmsoutboundwithc
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.fineract.infrastructure.campaigns.sms.constants.SmsCampaignStatus;
 import org.apache.fineract.infrastructure.campaigns.sms.constants.SmsCampaignTriggerType;
@@ -37,24 +35,20 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class UpdateSmsOutboundWithCampaignMessageTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UpdateSmsOutboundWithCampaignMessageTasklet.class);
     private final SmsCampaignRepository smsCampaignRepository;
     private final SmsCampaignWritePlatformService smsCampaignWritePlatformService;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        final Collection<SmsCampaign> smsCampaignDataCollection = smsCampaignRepository
-                .findByTriggerTypeAndStatus(SmsCampaignTriggerType.SCHEDULE.getValue(), SmsCampaignStatus.ACTIVE.getValue());
+        final Collection<SmsCampaign> smsCampaignDataCollection = smsCampaignRepository.findByTriggerTypeAndStatus(SmsCampaignTriggerType.SCHEDULE.getValue(), SmsCampaignStatus.ACTIVE.getValue());
         if (!CollectionUtils.isEmpty(smsCampaignDataCollection)) {
             for (SmsCampaign smsCampaign : smsCampaignDataCollection) {
                 LocalDateTime tenantDateNow = DateUtils.getLocalDateTimeOfTenant();
                 LocalDateTime nextTriggerDate = smsCampaign.getNextTriggerDate();
-
-                log.debug("tenant time {} trigger time {} {}", tenantDateNow, nextTriggerDate,
-                        JobName.UPDATE_SMS_OUTBOUND_WITH_CAMPAIGN_MESSAGE.name());
+                log.debug("tenant time {} trigger time {} {}", tenantDateNow, nextTriggerDate, JobName.UPDATE_SMS_OUTBOUND_WITH_CAMPAIGN_MESSAGE.name());
                 if (DateUtils.isBefore(nextTriggerDate, tenantDateNow)) {
                     smsCampaignWritePlatformService.insertDirectCampaignIntoSmsOutboundTable(smsCampaign);
                     updateTriggerDates(smsCampaign.getId());
@@ -65,8 +59,7 @@ public class UpdateSmsOutboundWithCampaignMessageTasklet implements Tasklet {
     }
 
     private void updateTriggerDates(Long campaignId) {
-        final SmsCampaign smsCampaign = this.smsCampaignRepository.findById(campaignId)
-                .orElseThrow(() -> new SmsCampaignNotFound(campaignId));
+        final SmsCampaign smsCampaign = this.smsCampaignRepository.findById(campaignId).orElseThrow(() -> new SmsCampaignNotFound(campaignId));
         LocalDateTime nextTriggerDate = smsCampaign.getNextTriggerDate();
         smsCampaign.setLastTriggerDate(nextTriggerDate);
         LocalDateTime nextRuntime = CalendarUtils.getNextRecurringDate(smsCampaign.getRecurrence(), nextTriggerDate, nextTriggerDate);
@@ -74,8 +67,13 @@ public class UpdateSmsOutboundWithCampaignMessageTasklet implements Tasklet {
         if (DateUtils.isBefore(nextRuntime, tenantDateTime)) {
             nextRuntime = CalendarUtils.getNextRecurringDate(smsCampaign.getRecurrence(), nextTriggerDate, tenantDateTime);
         }
-
         smsCampaign.setNextTriggerDate(nextRuntime);
         this.smsCampaignRepository.saveAndFlush(smsCampaign);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateSmsOutboundWithCampaignMessageTasklet(final SmsCampaignRepository smsCampaignRepository, final SmsCampaignWritePlatformService smsCampaignWritePlatformService) {
+        this.smsCampaignRepository = smsCampaignRepository;
+        this.smsCampaignWritePlatformService = smsCampaignWritePlatformService;
     }
 }

@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.infrastructure.jobs.service.increasedateby1day.increasecobdateby1day;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateWritePlatformService;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
@@ -29,10 +27,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class IncreaseCobDateBy1DayTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IncreaseCobDateBy1DayTasklet.class);
     private final BusinessDateWritePlatformService businessDateWritePlatformService;
     private final ConfigurationDomainService configurationDomainService;
 
@@ -44,5 +41,11 @@ public class IncreaseCobDateBy1DayTasklet implements Tasklet {
             contribution.setExitStatus(ExitStatus.NOOP);
         }
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public IncreaseCobDateBy1DayTasklet(final BusinessDateWritePlatformService businessDateWritePlatformService, final ConfigurationDomainService configurationDomainService) {
+        this.businessDateWritePlatformService = businessDateWritePlatformService;
+        this.configurationDomainService = configurationDomainService;
     }
 }

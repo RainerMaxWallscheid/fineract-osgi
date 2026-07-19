@@ -19,25 +19,18 @@
 package org.apache.fineract.infrastructure.core.serialization;
 
 import java.util.Set;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * A class to encapsulate settings we allow on API that affect how JSON is to be serialized for the response to api
  * call.
  */
-@Getter
-@RequiredArgsConstructor
 public class ApiRequestJsonSerializationSettings {
-
     private final Set<String> parametersForPartialResponse;
     private final boolean template;
     private final boolean makerCheckerable;
     private final boolean includeJson;
 
-    public static ApiRequestJsonSerializationSettings from(final Set<String> parametersForPartialResponse, final boolean template,
-            final boolean makerCheckerable, final boolean includeJson) {
-
+    public static ApiRequestJsonSerializationSettings from(final Set<String> parametersForPartialResponse, final boolean template, final boolean makerCheckerable, final boolean includeJson) {
         // FIXME - KW - rather than always creating new objects for this could
         // just send by common ones like, prettyprint=false, empty response
         // parameters
@@ -46,5 +39,33 @@ public class ApiRequestJsonSerializationSettings {
 
     public boolean isPartialResponseRequired() {
         return !this.parametersForPartialResponse.isEmpty();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Set<String> getParametersForPartialResponse() {
+        return this.parametersForPartialResponse;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isTemplate() {
+        return this.template;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isMakerCheckerable() {
+        return this.makerCheckerable;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isIncludeJson() {
+        return this.includeJson;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ApiRequestJsonSerializationSettings(final Set<String> parametersForPartialResponse, final boolean template, final boolean makerCheckerable, final boolean includeJson) {
+        this.parametersForPartialResponse = parametersForPartialResponse;
+        this.template = template;
+        this.makerCheckerable = makerCheckerable;
+        this.includeJson = includeJson;
     }
 }

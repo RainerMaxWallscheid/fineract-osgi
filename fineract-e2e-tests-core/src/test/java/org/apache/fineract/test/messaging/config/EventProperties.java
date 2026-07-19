@@ -18,27 +18,41 @@
  */
 package org.apache.fineract.test.messaging.config;
 
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-@Getter
 public class EventProperties {
-
     @Value("${fineract-test.event.wait-timeout-in-ms}")
     private long waitTimeoutInMillis;
-
     @Value("${fineract-test.event.interval-in-ms}")
     private long intervalInMillis;
-
     @Value("${fineract-test.event.delay-in-ms}")
     private long delayInMillis;
-
     @Value("${fineract-test.event.verification-enabled}")
     private boolean eventVerificationEnabled;
 
     public boolean isEventVerificationDisabled() {
         return !isEventVerificationEnabled();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public long getWaitTimeoutInMillis() {
+        return this.waitTimeoutInMillis;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public long getIntervalInMillis() {
+        return this.intervalInMillis;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public long getDelayInMillis() {
+        return this.delayInMillis;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isEventVerificationEnabled() {
+        return this.eventVerificationEnabled;
     }
 }

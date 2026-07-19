@@ -20,8 +20,6 @@ package org.apache.fineract.infrastructure.contentstore.policy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.TestConfiguration;
 import org.apache.fineract.infrastructure.contentstore.exception.ContentPolicyException;
 import org.junit.jupiter.api.Test;
@@ -29,11 +27,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
-@Slf4j
 @SpringBootTest
 @ContextConfiguration(classes = TestConfiguration.class)
 class MimeContentPolicyTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MimeContentPolicyTest.class);
     @Autowired
     private MimeContentPolicy mimeContentPolicy;
 
@@ -41,16 +39,11 @@ class MimeContentPolicyTest {
     void mimeTypeMismatch() {
         var path = "tmp/test-gif.png";
         var mime = "image/png";
-
-        var ctx = ContentPolicyContext.builder().path(path).mimeType(mime)
-                .inputStream(MimeContentPolicyTest.class.getClassLoader().getResourceAsStream("test-gif.png")).build();
-
+        var ctx = ContentPolicyContext.builder().path(path).mimeType(mime).inputStream(MimeContentPolicyTest.class.getClassLoader().getResourceAsStream("test-gif.png")).build();
         var exception = assertThrows(ContentPolicyException.class, () -> {
             mimeContentPolicy.check(ctx);
         });
-
         assertThat(exception).isNotNull();
-
         log.info("Error message: {}", exception.getMessage());
     }
 }

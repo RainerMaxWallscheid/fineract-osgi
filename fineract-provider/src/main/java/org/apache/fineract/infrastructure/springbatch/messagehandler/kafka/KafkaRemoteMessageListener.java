@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.springbatch.messagehandler.kafka;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.springbatch.ContextualMessage;
 import org.apache.fineract.infrastructure.springbatch.InputChannelInterceptor;
 import org.apache.fineract.infrastructure.springbatch.messagehandler.StepExecutionRequestHandler;
@@ -32,13 +31,12 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 @Component
-@Slf4j
 @Conditional(KafkaWorkerCondition.class)
 public class KafkaRemoteMessageListener {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(KafkaRemoteMessageListener.class);
     @Autowired
     private StepExecutionRequestHandler stepExecutionRequestHandler;
-
     @Autowired
     private InputChannelInterceptor inputInterceptor;
 

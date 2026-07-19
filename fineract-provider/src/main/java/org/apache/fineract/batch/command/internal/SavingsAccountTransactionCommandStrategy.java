@@ -19,12 +19,10 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.command.CommandStrategyUtils;
 import org.apache.fineract.batch.domain.BatchRequest;
@@ -34,9 +32,7 @@ import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class SavingsAccountTransactionCommandStrategy implements CommandStrategy {
-
     private final SavingsAccountTransactionsApiResource savingsAccountTransactionsApiResource;
 
     @Override
@@ -48,11 +44,13 @@ public class SavingsAccountTransactionCommandStrategy implements CommandStrategy
             final Map<String, String> queryParameters = CommandStrategyUtils.getQueryParameters(relativeUrl);
             command = queryParameters.get("command");
         }
-
         Long savingsAccountId = Long.parseLong(pathParameters.get(1));
         final String responseBody = savingsAccountTransactionsApiResource.transaction(savingsAccountId, command, batchRequest.getBody());
+        return new BatchResponse().setRequestId(batchRequest.getRequestId()).setStatusCode(HttpStatus.SC_OK).setBody(responseBody).setHeaders(batchRequest.getHeaders());
+    }
 
-        return new BatchResponse().setRequestId(batchRequest.getRequestId()).setStatusCode(HttpStatus.SC_OK).setBody(responseBody)
-                .setHeaders(batchRequest.getHeaders());
+    @java.lang.SuppressWarnings("all")
+        public SavingsAccountTransactionCommandStrategy(final SavingsAccountTransactionsApiResource savingsAccountTransactionsApiResource) {
+        this.savingsAccountTransactionsApiResource = savingsAccountTransactionsApiResource;
     }
 }

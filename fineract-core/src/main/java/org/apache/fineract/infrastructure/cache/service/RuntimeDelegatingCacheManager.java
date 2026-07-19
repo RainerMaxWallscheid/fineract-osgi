@@ -24,8 +24,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.cache.CacheApiConstants;
 import org.apache.fineract.infrastructure.cache.CacheEnumerations;
 import org.apache.fineract.infrastructure.cache.data.CacheData;
@@ -44,11 +42,10 @@ import org.springframework.stereotype.Component;
  * By default it is {@link NoOpCacheManager} but we can change that by checking some persisted configuration in the
  * database on startup and allow user to switch implementation through UI/API
  */
-@Component(value = "runtimeDelegatingCacheManager")
-@RequiredArgsConstructor
-@Slf4j
+@Component("runtimeDelegatingCacheManager")
 public class RuntimeDelegatingCacheManager implements CacheManager, InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RuntimeDelegatingCacheManager.class);
     @Qualifier("ehCacheManager")
     private final CacheManager ehCacheManager;
     @Qualifier("defaultCacheManager")
@@ -71,25 +68,18 @@ public class RuntimeDelegatingCacheManager implements CacheManager, Initializing
     }
 
     public Collection<CacheData> retrieveAll() {
-
         final boolean noCacheEnabled = currentCacheManager == defaultCacheManager;
         final boolean ehCacheEnabled = currentCacheManager == ehCacheManager;
-
         final EnumOptionData noCacheType = CacheEnumerations.cacheType(CacheType.NO_CACHE);
         final EnumOptionData singleNodeCacheType = CacheEnumerations.cacheType(CacheType.SINGLE_NODE);
-
         final CacheData noCache = CacheData.builder().cacheType(noCacheType).enabled(noCacheEnabled).build();
         final CacheData singleNodeCache = CacheData.builder().cacheType(singleNodeCacheType).enabled(ehCacheEnabled).build();
-
         return Arrays.asList(noCache, singleNodeCache);
     }
 
     public Map<String, Object> switchToCache(final boolean ehcacheEnabled, final CacheType toCacheType) {
-
         final Map<String, Object> changes = new HashMap<>();
-
         final boolean noCacheEnabled = !ehcacheEnabled;
-
         switch (toCacheType) {
             case INVALID -> {
                 log.warn("Invalid cache type used");
@@ -106,14 +96,12 @@ public class RuntimeDelegatingCacheManager implements CacheManager, Initializing
                     clearEhCache();
                 }
                 currentCacheManager = ehCacheManager;
-
                 if (currentCacheManager.getCacheNames().isEmpty()) {
                     log.error("No caches configured for activated CacheManager {}", currentCacheManager);
                 }
             }
             case MULTI_NODE -> throw new UnsupportedOperationException("Multi node cache is not supported");
         }
-
         return changes;
     }
 
@@ -129,5 +117,11 @@ public class RuntimeDelegatingCacheManager implements CacheManager, Initializing
                 log.warn("NullPointerException occurred", npe);
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RuntimeDelegatingCacheManager(@Qualifier("ehCacheManager") final CacheManager ehCacheManager, @Qualifier("defaultCacheManager") final CacheManager defaultCacheManager) {
+        this.ehCacheManager = ehCacheManager;
+        this.defaultCacheManager = defaultCacheManager;
     }
 }

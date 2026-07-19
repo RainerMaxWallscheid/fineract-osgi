@@ -27,27 +27,16 @@ import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 @Entity
-@Table(name = "m_business_date", uniqueConstraints = { @UniqueConstraint(name = "uq_business_date_type", columnNames = { "type" }) })
+@Table(name = "m_business_date", uniqueConstraints = {@UniqueConstraint(name = "uq_business_date_type", columnNames = {"type"})})
 public class BusinessDate extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private BusinessDateType type;
-
     @Column(name = "date", columnDefinition = "DATE")
     private LocalDate date;
-
     @Version
     private Long version;
 
@@ -55,4 +44,49 @@ public class BusinessDate extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         return new BusinessDate().setType(businessDateType).setDate(date);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public BusinessDateType getType() {
+        return this.type;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getDate() {
+        return this.date;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getVersion() {
+        return this.version;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public BusinessDate setType(final BusinessDateType type) {
+        this.type = type;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public BusinessDate setDate(final LocalDate date) {
+        this.date = date;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public BusinessDate setVersion(final Long version) {
+        this.version = version;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BusinessDate() {
+    }
 }

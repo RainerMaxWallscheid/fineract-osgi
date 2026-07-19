@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -30,15 +29,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "FIXEDDEPOSITACCOUNT", action = "WITHDRAW")
-@RequiredArgsConstructor
 public class FixedDepositAccountApplicationWithdrawnByApplicantCommandHandler implements NewCommandSourceHandler {
-
     private final DepositApplicationProcessWritePlatformService depositAccountWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-        return this.depositAccountWritePlatformService.applicantWithdrawsFromApplication(command.entityId(), command,
-                DepositAccountType.FIXED_DEPOSIT);
+        return this.depositAccountWritePlatformService.applicantWithdrawsFromApplication(command.entityId(), command, DepositAccountType.FIXED_DEPOSIT);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FixedDepositAccountApplicationWithdrawnByApplicantCommandHandler(final DepositApplicationProcessWritePlatformService depositAccountWritePlatformService) {
+        this.depositAccountWritePlatformService = depositAccountWritePlatformService;
     }
 }

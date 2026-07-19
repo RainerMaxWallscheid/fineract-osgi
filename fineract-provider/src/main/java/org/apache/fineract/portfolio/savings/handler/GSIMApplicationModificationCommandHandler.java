@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "GSIMACCOUNT", action = "UPDATE")
-@RequiredArgsConstructor
 public class GSIMApplicationModificationCommandHandler implements NewCommandSourceHandler {
-
     private final SavingsApplicationProcessWritePlatformService savingAccountWritePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class GSIMApplicationModificationCommandHandler implements NewCommandSour
         return this.savingAccountWritePlatformService.modifyGSIMApplication(command.entityId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public GSIMApplicationModificationCommandHandler(final SavingsApplicationProcessWritePlatformService savingAccountWritePlatformService) {
+        this.savingAccountWritePlatformService = savingAccountWritePlatformService;
+    }
 }

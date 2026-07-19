@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.documentmanagement.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.documentmanagement.data.DocumentContent;
 import org.apache.fineract.infrastructure.documentmanagement.data.DocumentData;
@@ -29,9 +28,7 @@ import org.apache.fineract.infrastructure.documentmanagement.mapping.DocumentMap
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class DocumentReadPlatformServiceImpl implements DocumentReadPlatformService {
-
     private final ContentStoreService storeService;
     private final DocumentRepository documentRepository;
     private final DocumentMapper documentMapper;
@@ -39,7 +36,6 @@ public class DocumentReadPlatformServiceImpl implements DocumentReadPlatformServ
     @Override
     public List<DocumentData> retrieveAllDocuments(final String entityType, final Long entityId) {
         final var docs = documentRepository.findAllByParentEntityTypeAndParentEntityId(entityType, entityId);
-
         return docs.stream().map(documentMapper::map).toList();
     }
 
@@ -50,18 +46,21 @@ public class DocumentReadPlatformServiceImpl implements DocumentReadPlatformServ
 
     @Override
     public DocumentContent retrieveDocumentContent(final String entityType, final Long entityId, final Long documentId) {
-        final var doc = documentRepository.findByIdAndParentEntityTypeAndParentEntityId(documentId, entityType, entityId)
-                .orElseThrow(() -> new DocumentNotFoundException(entityType, entityId, documentId));
+        final var doc = documentRepository.findByIdAndParentEntityTypeAndParentEntityId(documentId, entityType, entityId).orElseThrow(() -> new DocumentNotFoundException(entityType, entityId, documentId));
         final var is = storeService.download(doc.getLocation());
-
         return documentMapper.map(doc, is);
     }
 
     @Override
     public DocumentData retrieveDocument(final String entityType, final Long entityId, final Long documentId) {
-        final var doc = documentRepository.findByIdAndParentEntityTypeAndParentEntityId(documentId, entityType, entityId)
-                .orElseThrow(() -> new DocumentNotFoundException(entityType, entityId, documentId));
-
+        final var doc = documentRepository.findByIdAndParentEntityTypeAndParentEntityId(documentId, entityType, entityId).orElseThrow(() -> new DocumentNotFoundException(entityType, entityId, documentId));
         return documentMapper.map(doc);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DocumentReadPlatformServiceImpl(final ContentStoreService storeService, final DocumentRepository documentRepository, final DocumentMapper documentMapper) {
+        this.storeService = storeService;
+        this.documentRepository = documentRepository;
+        this.documentMapper = documentMapper;
     }
 }

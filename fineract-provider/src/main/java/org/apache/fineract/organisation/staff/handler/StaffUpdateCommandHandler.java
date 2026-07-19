@@ -16,12 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.organisation.staff.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.organisation.staff.data.StaffUpdateRequest;
@@ -30,11 +27,10 @@ import org.apache.fineract.organisation.staff.service.StaffWriteService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class StaffUpdateCommandHandler implements CommandHandler<StaffUpdateRequest, StaffUpdateResponse> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StaffUpdateCommandHandler.class);
     private final StaffWriteService writePlatformService;
 
     @Retry(name = "commandStaffUpdate", fallbackMethod = "fallback")
@@ -48,5 +44,10 @@ public class StaffUpdateCommandHandler implements CommandHandler<StaffUpdateRequ
     public StaffUpdateResponse fallback(Command<StaffUpdateRequest> command, Throwable t) {
         // NOTE: fallback method needs to be in the same class
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public StaffUpdateCommandHandler(final StaffWriteService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

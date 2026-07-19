@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.workingcapitalloan.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.codes.service.CodeValueReadPlatformService;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadService;
@@ -42,10 +41,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class WorkingCapitalLoanTransactionReadPlatformServiceImpl implements WorkingCapitalLoanTransactionReadPlatformService {
-
     private final WorkingCapitalLoanTransactionRepository transactionRepository;
     private final WorkingCapitalLoanRepository workingCapitalLoanRepository;
     private final PaymentTypeReadService paymentTypeReadPlatformService;
@@ -55,51 +52,20 @@ public class WorkingCapitalLoanTransactionReadPlatformServiceImpl implements Wor
     @Override
     public WorkingCapitalLoanCommandTemplateData retrieveLoanTransactionTemplate(final Long loanId, final String command) {
         final WorkingCapitalLoan wcLoan = retrieveWorkingCapitalLoan(loanId);
-
         final LocalDate expectedDisbursementDate = wcLoan.getDisbursementDetails().getFirst().getExpectedDisbursementDate();
         if (WorkingCapitalLoanConstants.APPROVE_LOAN_COMMAND.equals(command)) {
-            return WorkingCapitalLoanCommandTemplateData.builder().approvalAmount(wcLoan.getProposedPrincipal())
-                    .approvalDate(expectedDisbursementDate).expectedDisbursementDate(expectedDisbursementDate)
-                    .discountAmount(wcLoan.getLoanProductRelatedDetails().getDiscountProposed())
-                    .overrideDiscountDisabled(!wcLoan.getLoanProduct().getConfigurableAttributes().isDiscountDefaultOverridable())
-                    .currency(wcLoan.getLoanProduct().getCurrency().toData()).build();
+            return WorkingCapitalLoanCommandTemplateData.builder().approvalAmount(wcLoan.getProposedPrincipal()).approvalDate(expectedDisbursementDate).expectedDisbursementDate(expectedDisbursementDate).discountAmount(wcLoan.getLoanProductRelatedDetails().getDiscountProposed()).overrideDiscountDisabled(!wcLoan.getLoanProduct().getConfigurableAttributes().isDiscountDefaultOverridable()).currency(wcLoan.getLoanProduct().getCurrency().toData()).build();
         } else if (WorkingCapitalLoanConstants.DISBURSE_LOAN_COMMAND.equals(command)) {
-            return WorkingCapitalLoanCommandTemplateData.builder().expectedAmount(wcLoan.getApprovedPrincipal())
-                    .expectedDisbursementDate(expectedDisbursementDate).currency(wcLoan.getLoanProduct().getCurrency().toData())
-                    .discountAmount(wcLoan.getLoanProductRelatedDetails().getDiscountApproved())
-                    .overrideDiscountDisabled(!wcLoan.getLoanProduct().getConfigurableAttributes().isDiscountDefaultOverridable())
-                    .paymentTypeOptions(paymentTypeReadPlatformService.retrieveAllPaymentTypes())
-                    .classificationOptions(codeValueReadPlatformService
-                            .retrieveCodeValuesByCode(WorkingCapitalLoanConstants.DISBURSEMENT_CLASSIFICATION_CODE_NAME))
-                    .build();
-        } else if (WorkingCapitalLoanConstants.REPAYMENT_LOAN_COMMAND.equals(command)
-                || WorkingCapitalLoanConstants.GOODWILL_CREDIT_LOAN_COMMAND.equals(command)) {
-            return WorkingCapitalLoanCommandTemplateData.builder()
-                    .expectedAmount(wcLoan.getBalance() != null ? wcLoan.getBalance().getPrincipalOutstanding() : null)
-                    .currency(wcLoan.getLoanProduct().getCurrency().toData())
-                    .paymentTypeOptions(paymentTypeReadPlatformService.retrieveAllPaymentTypes())
-                    .classificationOptions(codeValueReadPlatformService
-                            .retrieveCodeValuesByCode(WorkingCapitalLoanConstants.REPAYMENT_CLASSIFICATION_CODE_NAME))
-                    .build();
+            return WorkingCapitalLoanCommandTemplateData.builder().expectedAmount(wcLoan.getApprovedPrincipal()).expectedDisbursementDate(expectedDisbursementDate).currency(wcLoan.getLoanProduct().getCurrency().toData()).discountAmount(wcLoan.getLoanProductRelatedDetails().getDiscountApproved()).overrideDiscountDisabled(!wcLoan.getLoanProduct().getConfigurableAttributes().isDiscountDefaultOverridable()).paymentTypeOptions(paymentTypeReadPlatformService.retrieveAllPaymentTypes()).classificationOptions(codeValueReadPlatformService.retrieveCodeValuesByCode(WorkingCapitalLoanConstants.DISBURSEMENT_CLASSIFICATION_CODE_NAME)).build();
+        } else if (WorkingCapitalLoanConstants.REPAYMENT_LOAN_COMMAND.equals(command) || WorkingCapitalLoanConstants.GOODWILL_CREDIT_LOAN_COMMAND.equals(command)) {
+            return WorkingCapitalLoanCommandTemplateData.builder().expectedAmount(wcLoan.getBalance() != null ? wcLoan.getBalance().getPrincipalOutstanding() : null).currency(wcLoan.getLoanProduct().getCurrency().toData()).paymentTypeOptions(paymentTypeReadPlatformService.retrieveAllPaymentTypes()).classificationOptions(codeValueReadPlatformService.retrieveCodeValuesByCode(WorkingCapitalLoanConstants.REPAYMENT_CLASSIFICATION_CODE_NAME)).build();
         } else if (WorkingCapitalLoanConstants.CREDIT_BALANCE_REFUND_COMMAND.equals(command)) {
             final BigDecimal overpaymentAmount = wcLoan.getBalance() != null ? wcLoan.getBalance().getOverpaymentAmount() : null;
-            return WorkingCapitalLoanCommandTemplateData.builder()
-                    .expectedAmount(overpaymentAmount != null ? overpaymentAmount : BigDecimal.ZERO)
-                    .currency(wcLoan.getLoanProduct().getCurrency().toData())
-                    .paymentTypeOptions(paymentTypeReadPlatformService.retrieveAllPaymentTypes())
-                    .classificationOptions(codeValueReadPlatformService
-                            .retrieveCodeValuesByCode(WorkingCapitalLoanConstants.CREDIT_BALANCE_REFUND_CLASSIFICATION_CODE_NAME))
-                    .build();
+            return WorkingCapitalLoanCommandTemplateData.builder().expectedAmount(overpaymentAmount != null ? overpaymentAmount : BigDecimal.ZERO).currency(wcLoan.getLoanProduct().getCurrency().toData()).paymentTypeOptions(paymentTypeReadPlatformService.retrieveAllPaymentTypes()).classificationOptions(codeValueReadPlatformService.retrieveCodeValuesByCode(WorkingCapitalLoanConstants.CREDIT_BALANCE_REFUND_CLASSIFICATION_CODE_NAME)).build();
         } else if (WorkingCapitalLoanConstants.DISCOUNT_FEE_LOAN_COMMAND.equals(command)) {
-            return WorkingCapitalLoanCommandTemplateData.builder().currency(wcLoan.getLoanProduct().getCurrency().toData())
-                    .classificationOptions(codeValueReadPlatformService
-                            .retrieveCodeValuesByCode(WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME))
-                    .build();
+            return WorkingCapitalLoanCommandTemplateData.builder().currency(wcLoan.getLoanProduct().getCurrency().toData()).classificationOptions(codeValueReadPlatformService.retrieveCodeValuesByCode(WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME)).build();
         } else if (WorkingCapitalLoanConstants.DISCOUNT_FEE_ADJUSTMENT_LOAN_COMMAND.equals(command)) {
-            return WorkingCapitalLoanCommandTemplateData.builder().currency(wcLoan.getLoanProduct().getCurrency().toData())
-                    .classificationOptions(codeValueReadPlatformService
-                            .retrieveCodeValuesByCode(WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME))
-                    .build();
+            return WorkingCapitalLoanCommandTemplateData.builder().currency(wcLoan.getLoanProduct().getCurrency().toData()).classificationOptions(codeValueReadPlatformService.retrieveCodeValuesByCode(WorkingCapitalLoanConstants.DISCOUNT_FEE_CLASSIFICATION_CODE_NAME)).build();
         }
         return null;
     }
@@ -107,8 +73,7 @@ public class WorkingCapitalLoanTransactionReadPlatformServiceImpl implements Wor
     @Override
     public Page<WorkingCapitalLoanTransactionData> retrieveTransactions(final Long loanId, final Pageable pageable) {
         ensureLoanExists(loanId);
-        final Page<WorkingCapitalLoanTransaction> page = this.transactionRepository.findByWcLoan_IdOrderByTransactionDateAscIdAsc(loanId,
-                pageable);
+        final Page<WorkingCapitalLoanTransaction> page = this.transactionRepository.findByWcLoan_IdOrderByTransactionDateAscIdAsc(loanId, pageable);
         final List<WorkingCapitalLoanTransactionData> content = page.getContent().stream().map(this.transactionMapper::toData).toList();
         return new PageImpl<>(content, page.getPageable(), page.getTotalElements());
     }
@@ -125,8 +90,7 @@ public class WorkingCapitalLoanTransactionReadPlatformServiceImpl implements Wor
     @Override
     public WorkingCapitalLoanTransactionData retrieveTransaction(final Long loanId, final Long transactionId) {
         ensureLoanExists(loanId);
-        final WorkingCapitalLoanTransaction txn = this.transactionRepository.findByIdAndWcLoan_Id(transactionId, loanId)
-                .orElseThrow(() -> new WorkingCapitalLoanTransactionNotFoundException(transactionId, loanId));
+        final WorkingCapitalLoanTransaction txn = this.transactionRepository.findByIdAndWcLoan_Id(transactionId, loanId).orElseThrow(() -> new WorkingCapitalLoanTransactionNotFoundException(transactionId, loanId));
         return this.transactionMapper.toData(txn);
     }
 
@@ -142,8 +106,7 @@ public class WorkingCapitalLoanTransactionReadPlatformServiceImpl implements Wor
     @Override
     public WorkingCapitalLoanTransactionData retrieveTransaction(final Long loanId, final ExternalId transactionExternalId) {
         ensureLoanExists(loanId);
-        final WorkingCapitalLoanTransaction txn = this.transactionRepository.findByWcLoan_IdAndExternalId(loanId, transactionExternalId)
-                .orElseThrow(() -> new WorkingCapitalLoanTransactionNotFoundException(transactionExternalId));
+        final WorkingCapitalLoanTransaction txn = this.transactionRepository.findByWcLoan_IdAndExternalId(loanId, transactionExternalId).orElseThrow(() -> new WorkingCapitalLoanTransactionNotFoundException(transactionExternalId));
         return this.transactionMapper.toData(txn);
     }
 
@@ -167,7 +130,15 @@ public class WorkingCapitalLoanTransactionReadPlatformServiceImpl implements Wor
     }
 
     private WorkingCapitalLoan retrieveWorkingCapitalLoan(final Long loanId) {
-        return workingCapitalLoanRepository.findByIdWithFullDetails(loanId)
-                .orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
+        return workingCapitalLoanRepository.findByIdWithFullDetails(loanId).orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanTransactionReadPlatformServiceImpl(final WorkingCapitalLoanTransactionRepository transactionRepository, final WorkingCapitalLoanRepository workingCapitalLoanRepository, final PaymentTypeReadService paymentTypeReadPlatformService, final CodeValueReadPlatformService codeValueReadPlatformService, final WorkingCapitalLoanTransactionMapper transactionMapper) {
+        this.transactionRepository = transactionRepository;
+        this.workingCapitalLoanRepository = workingCapitalLoanRepository;
+        this.paymentTypeReadPlatformService = paymentTypeReadPlatformService;
+        this.codeValueReadPlatformService = codeValueReadPlatformService;
+        this.transactionMapper = transactionMapper;
     }
 }

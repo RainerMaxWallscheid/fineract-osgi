@@ -19,11 +19,8 @@
 package org.apache.fineract.test.initializer.global;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.executeVoid;
-
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.PostColumnHeaderData;
 import org.apache.fineract.client.models.PostDataTablesRequest;
@@ -32,12 +29,11 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class DatatablesGlobalInitializerStep implements FineractGlobalInitializerStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DatatablesGlobalInitializerStep.class);
     public static final String DATA_TABLE_1_NAME = "dt_autopay_details";
     public static final String DATA_TABLE_1_APP_NAME = "m_loan";
     public static final String DATA_TABLE_1_COLUMN_1_NAME = "financial_instruments";
@@ -75,41 +71,11 @@ public class DatatablesGlobalInitializerStep implements FineractGlobalInitialize
     public static final String DATA_TABLE_3_COLUMN_5_NAME = "active_duty_tag";
     public static final String DATA_TABLE_3_COLUMN_5_TYPE = "Dropdown";
     public static final String DATA_TABLE_3_COLUMN_5_CODE = "active_duty_tag";
-
     private final FineractFeignClient fineractClient;
 
     @Override
     public void initialize() {
-        List<Runnable> items = List.of(() -> createDatatableIdempotent(new PostDataTablesRequest().datatableName(DATA_TABLE_1_NAME)
-                .apptableName(DATA_TABLE_1_APP_NAME).multiRow(true)
-                .columns(List.of(
-                        new PostColumnHeaderData().name(DATA_TABLE_1_COLUMN_1_NAME).type(DATA_TABLE_1_COLUMN_1_TYPE)
-                                .code(DATA_TABLE_1_COLUMN_1_CODE).mandatory(false),
-                        new PostColumnHeaderData().name(DATA_TABLE_1_COLUMN_2_NAME).type(DATA_TABLE_1_COLUMN_2_TYPE).mandatory(false)))),
-                () -> createDatatableIdempotent(
-                        new PostDataTablesRequest().datatableName(DATA_TABLE_2_NAME).apptableName(DATA_TABLE_2_APP_NAME).multiRow(true)
-                                .columns(List.of(
-                                        new PostColumnHeaderData().name(DATA_TABLE_2_COLUMN_1_NAME).type(DATA_TABLE_2_COLUMN_1_TYPE)
-                                                .length(DATA_TABLE_2_COLUMN_1_LENGTH).mandatory(false),
-                                        new PostColumnHeaderData().name(DATA_TABLE_2_COLUMN_2_NAME).type(DATA_TABLE_2_COLUMN_2_TYPE)
-                                                .mandatory(false),
-                                        new PostColumnHeaderData().name(DATA_TABLE_2_COLUMN_3_NAME).type(DATA_TABLE_2_COLUMN_3_TYPE)
-                                                .mandatory(false),
-                                        new PostColumnHeaderData().name(DATA_TABLE_2_COLUMN_4_NAME).type(DATA_TABLE_2_COLUMN_4_TYPE)
-                                                .code(DATA_TABLE_2_COLUMN_4_CODE).mandatory(false)))),
-                () -> createDatatableIdempotent(new PostDataTablesRequest().datatableName(DATA_TABLE_3_NAME)
-                        .apptableName(DATA_TABLE_3_APP_NAME).entitySubType(DATA_TABLE_3_ENTITY_SUBTYPE).multiRow(false)
-                        .columns(List.of(
-                                new PostColumnHeaderData().name(DATA_TABLE_3_COLUMN_1_NAME).type(DATA_TABLE_3_COLUMN_1_TYPE)
-                                        .code(DATA_TABLE_3_COLUMN_1_CODE).mandatory(false),
-                                new PostColumnHeaderData().name(DATA_TABLE_3_COLUMN_2_NAME).type(DATA_TABLE_3_COLUMN_2_TYPE)
-                                        .code(DATA_TABLE_3_COLUMN_2_CODE).mandatory(false),
-                                new PostColumnHeaderData().name(DATA_TABLE_3_COLUMN_3_NAME).type(DATA_TABLE_3_COLUMN_3_TYPE)
-                                        .code(DATA_TABLE_3_COLUMN_3_CODE).mandatory(false),
-                                new PostColumnHeaderData().name(DATA_TABLE_3_COLUMN_4_NAME).type(DATA_TABLE_3_COLUMN_4_TYPE)
-                                        .code(DATA_TABLE_3_COLUMN_4_CODE).mandatory(false),
-                                new PostColumnHeaderData().name(DATA_TABLE_3_COLUMN_5_NAME).type(DATA_TABLE_3_COLUMN_5_TYPE)
-                                        .code(DATA_TABLE_3_COLUMN_5_CODE).mandatory(false)))));
+        List<Runnable> items = List.of(() -> createDatatableIdempotent(new PostDataTablesRequest().datatableName(DATA_TABLE_1_NAME).apptableName(DATA_TABLE_1_APP_NAME).multiRow(true).columns(List.of(new PostColumnHeaderData().name(DATA_TABLE_1_COLUMN_1_NAME).type(DATA_TABLE_1_COLUMN_1_TYPE).code(DATA_TABLE_1_COLUMN_1_CODE).mandatory(false), new PostColumnHeaderData().name(DATA_TABLE_1_COLUMN_2_NAME).type(DATA_TABLE_1_COLUMN_2_TYPE).mandatory(false)))), () -> createDatatableIdempotent(new PostDataTablesRequest().datatableName(DATA_TABLE_2_NAME).apptableName(DATA_TABLE_2_APP_NAME).multiRow(true).columns(List.of(new PostColumnHeaderData().name(DATA_TABLE_2_COLUMN_1_NAME).type(DATA_TABLE_2_COLUMN_1_TYPE).length(DATA_TABLE_2_COLUMN_1_LENGTH).mandatory(false), new PostColumnHeaderData().name(DATA_TABLE_2_COLUMN_2_NAME).type(DATA_TABLE_2_COLUMN_2_TYPE).mandatory(false), new PostColumnHeaderData().name(DATA_TABLE_2_COLUMN_3_NAME).type(DATA_TABLE_2_COLUMN_3_TYPE).mandatory(false), new PostColumnHeaderData().name(DATA_TABLE_2_COLUMN_4_NAME).type(DATA_TABLE_2_COLUMN_4_TYPE).code(DATA_TABLE_2_COLUMN_4_CODE).mandatory(false)))), () -> createDatatableIdempotent(new PostDataTablesRequest().datatableName(DATA_TABLE_3_NAME).apptableName(DATA_TABLE_3_APP_NAME).entitySubType(DATA_TABLE_3_ENTITY_SUBTYPE).multiRow(false).columns(List.of(new PostColumnHeaderData().name(DATA_TABLE_3_COLUMN_1_NAME).type(DATA_TABLE_3_COLUMN_1_TYPE).code(DATA_TABLE_3_COLUMN_1_CODE).mandatory(false), new PostColumnHeaderData().name(DATA_TABLE_3_COLUMN_2_NAME).type(DATA_TABLE_3_COLUMN_2_TYPE).code(DATA_TABLE_3_COLUMN_2_CODE).mandatory(false), new PostColumnHeaderData().name(DATA_TABLE_3_COLUMN_3_NAME).type(DATA_TABLE_3_COLUMN_3_TYPE).code(DATA_TABLE_3_COLUMN_3_CODE).mandatory(false), new PostColumnHeaderData().name(DATA_TABLE_3_COLUMN_4_NAME).type(DATA_TABLE_3_COLUMN_4_TYPE).code(DATA_TABLE_3_COLUMN_4_CODE).mandatory(false), new PostColumnHeaderData().name(DATA_TABLE_3_COLUMN_5_NAME).type(DATA_TABLE_3_COLUMN_5_TYPE).code(DATA_TABLE_3_COLUMN_5_CODE).mandatory(false)))));
         ParallelExecutionHelper.runInParallel(items);
     }
 
@@ -118,8 +84,13 @@ public class DatatablesGlobalInitializerStep implements FineractGlobalInitialize
         try {
             fineractClient.dataTables().getDatatable(datatableName, Map.of());
         } catch (Exception e) {
-            log.debug("Datatable '{}' does not exist yet, will create it", datatableName);
+            log.debug("Datatable \'{}\' does not exist yet, will create it", datatableName);
             executeVoid(() -> fineractClient.dataTables().createDatatable(datatableRequest, Map.of()));
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DatatablesGlobalInitializerStep(final FineractFeignClient fineractClient) {
+        this.fineractClient = fineractClient;
     }
 }

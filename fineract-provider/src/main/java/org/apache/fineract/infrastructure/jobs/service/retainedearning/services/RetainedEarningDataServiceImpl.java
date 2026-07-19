@@ -20,7 +20,6 @@ package org.apache.fineract.infrastructure.jobs.service.retainedearning.services
 
 import static org.apache.fineract.infrastructure.jobs.service.retainedearning.RetainedEarningJobConstant.END_DATE_QUERY_PARAM;
 import static org.apache.fineract.infrastructure.jobs.service.retainedearning.RetainedEarningJobConstant.OFFICE_ID_QUERY_PARAM;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
@@ -35,8 +34,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.fineract.accounting.retainedearning.domain.AccountGLJournalEntryAnnualSummary;
 import org.apache.fineract.accounting.retainedearning.domain.AccountGLJournalEntryAnnualSummaryRepository;
@@ -55,19 +52,15 @@ import org.springframework.stereotype.Component;
  * Retained earning data service implementation. Handles data fetching, processing, and persistence.
  */
 @Component
-@AllArgsConstructor
-@Slf4j
 public class RetainedEarningDataServiceImpl implements RetainedEarningDataService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RetainedEarningDataServiceImpl.class);
     private final ReportingProcessService reportingProcessService;
-
     private final DataParser dataParser;
-
     private final AccountGLJournalEntryAnnualSummaryRepository retainedEarningSummaryRepository;
-
     private final LoanProductRepository loanProductRepository;
-
     private final RetainedEarningConfigurationService retainedEarningConfigurationService;
+
 
     private record ProductOwnerKey(String productName, ExternalId ownerExternalId) {
     }
@@ -78,8 +71,7 @@ public class RetainedEarningDataServiceImpl implements RetainedEarningDataServic
             log.warn("No retained earning summaries provided for insertion, skipping batch save.");
             return;
         }
-        List<AccountGLJournalEntryAnnualSummary> entities = retainedEarningSummaries.stream().map(this::convertToRetainedEarningSummary)
-                .toList();
+        List<AccountGLJournalEntryAnnualSummary> entities = retainedEarningSummaries.stream().map(this::convertToRetainedEarningSummary).toList();
         retainedEarningSummaryRepository.saveAll(entities);
     }
 
@@ -115,61 +107,33 @@ public class RetainedEarningDataServiceImpl implements RetainedEarningDataServic
     }
 
     @Override
-    public List<AccountGLJournalEntryAnnualSummaryData> processTrialBalanceData(List<AccountGLJournalEntryAnnualSummaryData> rawData,
-            LocalDate lastDayOfPreviousFiscalYear) {
-
+    public List<AccountGLJournalEntryAnnualSummaryData> processTrialBalanceData(List<AccountGLJournalEntryAnnualSummaryData> rawData, LocalDate lastDayOfPreviousFiscalYear) {
         if (rawData == null || rawData.isEmpty()) {
             log.warn("No data to process");
             return Collections.emptyList();
         }
-
         final String incomeAndExpenseGlAccounts = retainedEarningConfigurationService.getIncomeExpenseGlAccounts();
         final Predicate<String> glAccountMatcher = buildGlAccountMatcher(incomeAndExpenseGlAccounts);
-
-        final List<AccountGLJournalEntryAnnualSummaryData> incomeExpenseRecords = rawData.stream().filter(
-                r -> r != null && r.getGlAccountCode() != null && r.getOwnerExternalId() != null && !r.getOwnerExternalId().isEmpty())
-                .filter(r -> glAccountMatcher.test(r.getGlAccountCode())).collect(Collectors.toList());
-
-        final Set<String> distinctGlCodes = incomeExpenseRecords.stream().map(r -> String.valueOf(r.getGlAccountCode()))
-                .collect(Collectors.toSet());
-        final Set<ExternalId> distinctOwners = incomeExpenseRecords.stream().map(AccountGLJournalEntryAnnualSummaryData::getOwnerExternalId)
-                .collect(Collectors.toSet());
-
-        log.info(
-                "Retained earning validation: totalTrialBalanceRecords={}, matchedIncomeExpenseRecords={}, distinctGlAccounts={}, distinctAssetOwners={}, fiscalYearEnd={}",
-                rawData.size(), incomeExpenseRecords.size(), distinctGlCodes.size(), distinctOwners.size(), lastDayOfPreviousFiscalYear);
-
+        final List<AccountGLJournalEntryAnnualSummaryData> incomeExpenseRecords = rawData.stream().filter(r -> r != null && r.getGlAccountCode() != null && r.getOwnerExternalId() != null && !r.getOwnerExternalId().isEmpty()).filter(r -> glAccountMatcher.test(r.getGlAccountCode())).collect(Collectors.toList());
+        final Set<String> distinctGlCodes = incomeExpenseRecords.stream().map(r -> String.valueOf(r.getGlAccountCode())).collect(Collectors.toSet());
+        final Set<ExternalId> distinctOwners = incomeExpenseRecords.stream().map(AccountGLJournalEntryAnnualSummaryData::getOwnerExternalId).collect(Collectors.toSet());
+        log.info("Retained earning validation: totalTrialBalanceRecords={}, matchedIncomeExpenseRecords={}, distinctGlAccounts={}, distinctAssetOwners={}, fiscalYearEnd={}", rawData.size(), incomeExpenseRecords.size(), distinctGlCodes.size(), distinctOwners.size(), lastDayOfPreviousFiscalYear);
         if (incomeExpenseRecords.isEmpty()) {
             log.info("No income/expense account records found hence skipping retained earning creation");
             return Collections.emptyList();
         }
-
-        final Set<String> distinctProductNamesLower = incomeExpenseRecords.stream()
-                .map(AccountGLJournalEntryAnnualSummaryData::getProductName).filter(name -> name != null && !name.isBlank())
-                .map(String::toLowerCase).collect(Collectors.toSet());
-        final Map<String, LoanProduct> productByName = loanProductRepository.findAllByNameIgnoreCase(distinctProductNamesLower).stream()
-                .collect(Collectors.toMap(p -> p.getName().toLowerCase(), p -> p, (a, b) -> a));
-
-        final Map<ProductOwnerKey, BigDecimal> retainedByProductAndOwner = incomeExpenseRecords.stream()
-                .collect(Collectors.toMap(r -> new ProductOwnerKey(r.getProductName(), r.getOwnerExternalId()),
-                        r -> Optional.ofNullable(r.getEndingBalanceAmount()).orElse(BigDecimal.ZERO), BigDecimal::add));
-
-        final List<AccountGLJournalEntryAnnualSummaryData> retainedEarningRecords = createRetainedEarningRecords(retainedByProductAndOwner,
-                incomeExpenseRecords, lastDayOfPreviousFiscalYear);
-
-        final List<AccountGLJournalEntryAnnualSummaryData> allRecords = Stream
-                .concat(incomeExpenseRecords.stream(), retainedEarningRecords.stream()).map(data -> {
-                    LoanProduct loanProduct = data.getProductName() != null ? productByName.get(data.getProductName().toLowerCase()) : null;
-                    if (loanProduct == null) {
-                        return data;
-                    }
-                    return data.toBuilder().productId(loanProduct.getId()).currencyCode(loanProduct.getCurrency().getCode()).build();
-                }).collect(Collectors.toList());
-
-        log.info(
-                "Retained earning processing complete: incomeExpenseOffsetRecords={}, retainedEarningRecords={}, totalRecordsToWrite={}, assetOwners={}",
-                incomeExpenseRecords.size(), retainedEarningRecords.size(), allRecords.size(), distinctOwners);
-
+        final Set<String> distinctProductNamesLower = incomeExpenseRecords.stream().map(AccountGLJournalEntryAnnualSummaryData::getProductName).filter(name -> name != null && !name.isBlank()).map(String::toLowerCase).collect(Collectors.toSet());
+        final Map<String, LoanProduct> productByName = loanProductRepository.findAllByNameIgnoreCase(distinctProductNamesLower).stream().collect(Collectors.toMap(p -> p.getName().toLowerCase(), p -> p, (a, b) -> a));
+        final Map<ProductOwnerKey, BigDecimal> retainedByProductAndOwner = incomeExpenseRecords.stream().collect(Collectors.toMap(r -> new ProductOwnerKey(r.getProductName(), r.getOwnerExternalId()), r -> Optional.ofNullable(r.getEndingBalanceAmount()).orElse(BigDecimal.ZERO), BigDecimal::add));
+        final List<AccountGLJournalEntryAnnualSummaryData> retainedEarningRecords = createRetainedEarningRecords(retainedByProductAndOwner, incomeExpenseRecords, lastDayOfPreviousFiscalYear);
+        final List<AccountGLJournalEntryAnnualSummaryData> allRecords = Stream.concat(incomeExpenseRecords.stream(), retainedEarningRecords.stream()).map(data -> {
+            LoanProduct loanProduct = data.getProductName() != null ? productByName.get(data.getProductName().toLowerCase()) : null;
+            if (loanProduct == null) {
+                return data;
+            }
+            return data.toBuilder().productId(loanProduct.getId()).currencyCode(loanProduct.getCurrency().getCode()).build();
+        }).collect(Collectors.toList());
+        log.info("Retained earning processing complete: incomeExpenseOffsetRecords={}, retainedEarningRecords={}, totalRecordsToWrite={}, assetOwners={}", incomeExpenseRecords.size(), retainedEarningRecords.size(), allRecords.size(), distinctOwners);
         return allRecords;
     }
 
@@ -203,40 +167,31 @@ public class RetainedEarningDataServiceImpl implements RetainedEarningDataServic
         }
     }
 
-    private List<AccountGLJournalEntryAnnualSummaryData> createRetainedEarningRecords(
-            Map<ProductOwnerKey, BigDecimal> retainedByProductAndOwner, List<AccountGLJournalEntryAnnualSummaryData> originalData,
-            LocalDate lastDayOfPreviousFiscalYear) {
-
+    private List<AccountGLJournalEntryAnnualSummaryData> createRetainedEarningRecords(Map<ProductOwnerKey, BigDecimal> retainedByProductAndOwner, List<AccountGLJournalEntryAnnualSummaryData> originalData, LocalDate lastDayOfPreviousFiscalYear) {
         final String retainedEarningGlAccountCode = retainedEarningConfigurationService.getRetainedEarningGlAccount();
-
-        final Map<ProductOwnerKey, AccountGLJournalEntryAnnualSummaryData> firstRecordByProductAndOwner = originalData.stream()
-                .filter(r -> r.getOwnerExternalId() != null && !r.getOwnerExternalId().isEmpty() && r.getProductName() != null)
-                .collect(Collectors.toMap(r -> new ProductOwnerKey(r.getProductName(), r.getOwnerExternalId()), r -> r,
-                        (first, second) -> first));
-
+        final Map<ProductOwnerKey, AccountGLJournalEntryAnnualSummaryData> firstRecordByProductAndOwner = originalData.stream().filter(r -> r.getOwnerExternalId() != null && !r.getOwnerExternalId().isEmpty() && r.getProductName() != null).collect(Collectors.toMap(r -> new ProductOwnerKey(r.getProductName(), r.getOwnerExternalId()), r -> r, (first, second) -> first));
         Long defaultOfficeId = retainedEarningConfigurationService.getOfficeId();
         return retainedByProductAndOwner.entrySet().stream().filter(e -> e.getValue().compareTo(BigDecimal.ZERO) != 0).map(e -> {
             final ProductOwnerKey key = e.getKey();
             AccountGLJournalEntryAnnualSummaryData template = firstRecordByProductAndOwner.get(key);
-            return AccountGLJournalEntryAnnualSummaryData.builder().productName(key.productName())
-                    .glAccountCode(retainedEarningGlAccountCode).officeId(template != null ? template.getOfficeId() : defaultOfficeId)
-                    .ownerExternalId(key.ownerExternalId()).openingBalanceAmount(e.getValue()).endingBalanceAmount(e.getValue())
-                    .yearEndDate(lastDayOfPreviousFiscalYear).manualEntry(false).build();
+            return AccountGLJournalEntryAnnualSummaryData.builder().productName(key.productName()).glAccountCode(retainedEarningGlAccountCode).officeId(template != null ? template.getOfficeId() : defaultOfficeId).ownerExternalId(key.ownerExternalId()).openingBalanceAmount(e.getValue()).endingBalanceAmount(e.getValue()).yearEndDate(lastDayOfPreviousFiscalYear).manualEntry(false).build();
         }).collect(Collectors.toList());
     }
 
     private List<AccountGLJournalEntryAnnualSummaryData> parseJsonResponse(String jsonResponse) {
         try {
-            return dataParser.parse(jsonResponse).stream()
-                    .map(record -> AccountGLJournalEntryAnnualSummaryData.builder().glAccountCode(record.getGlAcct())
-                            .productName(record.getProduct()).officeId(retainedEarningConfigurationService.getOfficeId())
-                            .ownerExternalId(record.getAssetOwner()).openingBalanceAmount(record.getEndingBalance().negate())
-                            .endingBalanceAmount(record.getEndingBalance()).yearEndDate(LocalDate.parse(record.getPostingDate()))
-                            .manualEntry(false).build())
-                    .collect(Collectors.toList());
+            return dataParser.parse(jsonResponse).stream().map(record -> AccountGLJournalEntryAnnualSummaryData.builder().glAccountCode(record.getGlAcct()).productName(record.getProduct()).officeId(retainedEarningConfigurationService.getOfficeId()).ownerExternalId(record.getAssetOwner()).openingBalanceAmount(record.getEndingBalance().negate()).endingBalanceAmount(record.getEndingBalance()).yearEndDate(LocalDate.parse(record.getPostingDate())).manualEntry(false).build()).collect(Collectors.toList());
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to parse trial balance data: " + e.getMessage(), e);
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public RetainedEarningDataServiceImpl(final ReportingProcessService reportingProcessService, final DataParser dataParser, final AccountGLJournalEntryAnnualSummaryRepository retainedEarningSummaryRepository, final LoanProductRepository loanProductRepository, final RetainedEarningConfigurationService retainedEarningConfigurationService) {
+        this.reportingProcessService = reportingProcessService;
+        this.dataParser = dataParser;
+        this.retainedEarningSummaryRepository = retainedEarningSummaryRepository;
+        this.loanProductRepository = loanProductRepository;
+        this.retainedEarningConfigurationService = retainedEarningConfigurationService;
+    }
 }

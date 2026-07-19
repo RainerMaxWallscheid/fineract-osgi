@@ -20,10 +20,7 @@ package org.apache.fineract.command.audit.hook;
 
 import static org.apache.fineract.command.audit.AuditCommandConstants.COMMAND_HOOK_AUDIT_BEFORE;
 import static org.apache.fineract.command.core.CommandState.UNDER_PROCESSING;
-
 import java.time.Instant;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHookBefore;
 import org.apache.fineract.command.core.CommandStore;
@@ -31,23 +28,25 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @Order(COMMAND_HOOK_AUDIT_BEFORE)
 @ConditionalOnProperty(value = "fineract.command.hooks.audit-pre", havingValue = "true")
 final class AuditCommandHookBefore implements CommandHookBefore<Object> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuditCommandHookBefore.class);
     private final CommandStore store;
 
     @Override
     public void onBefore(Command<Object> command) {
         final var now = Instant.now();
-
         command.setExecutedByUsername(command.getInitiatedByUsername());
         command.setUpdatedAt(now);
         command.setExecutedAt(now);
-
         store.store(command, null, UNDER_PROCESSING);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AuditCommandHookBefore(final CommandStore store) {
+        this.store = store;
     }
 }

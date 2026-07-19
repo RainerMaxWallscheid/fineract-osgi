@@ -20,22 +20,17 @@ package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.Getter;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 
 /**
  * Immutable data object represent loan status enumerations.
  */
-@Getter
 public class LoanTransactionEnumData implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private final Long id;
     private final String code;
     private final String value;
-
     private final boolean disbursement;
     private final boolean repaymentAtDisbursement;
     private final boolean repayment;
@@ -115,21 +110,233 @@ public class LoanTransactionEnumData implements Serializable {
         this.capitalizedIncome = Long.valueOf(LoanTransactionType.CAPITALIZED_INCOME.getValue()).equals(this.id);
         this.capitalizedIncomeAmortization = Long.valueOf(LoanTransactionType.CAPITALIZED_INCOME_AMORTIZATION.getValue()).equals(this.id);
         this.capitalizedIncomeAdjustment = Long.valueOf(LoanTransactionType.CAPITALIZED_INCOME_ADJUSTMENT.getValue()).equals(this.id);
-        this.capitalizedIncomeAmortizationAdjustment = Long
-                .valueOf(LoanTransactionType.CAPITALIZED_INCOME_AMORTIZATION_ADJUSTMENT.getValue()).equals(this.id);
+        this.capitalizedIncomeAmortizationAdjustment = Long.valueOf(LoanTransactionType.CAPITALIZED_INCOME_AMORTIZATION_ADJUSTMENT.getValue()).equals(this.id);
         this.contractTermination = Long.valueOf(LoanTransactionType.CONTRACT_TERMINATION.getValue()).equals(this.id);
         this.buyDownFee = Long.valueOf(LoanTransactionType.BUY_DOWN_FEE.getValue()).equals(this.id);
         this.buyDownFeeAdjustment = Long.valueOf(LoanTransactionType.BUY_DOWN_FEE_ADJUSTMENT.getValue()).equals(this.id);
         this.buyDownFeeAmortization = Long.valueOf(LoanTransactionType.BUY_DOWN_FEE_AMORTIZATION.getValue()).equals(this.id);
-        this.buyDownFeeAmortizationAdjustment = Long.valueOf(LoanTransactionType.BUY_DOWN_FEE_AMORTIZATION_ADJUSTMENT.getValue())
-                .equals(this.id);
+        this.buyDownFeeAmortizationAdjustment = Long.valueOf(LoanTransactionType.BUY_DOWN_FEE_AMORTIZATION_ADJUSTMENT.getValue()).equals(this.id);
     }
 
     public boolean isRepaymentType() {
-        if (isRepayment() || isMerchantIssuedRefund() || isPayoutRefund() || isGoodwillCredit() || isChargeRefund() || isChargeAdjustment()
-                || isDownPayment()) {
+        if (isRepayment() || isMerchantIssuedRefund() || isPayoutRefund() || isGoodwillCredit() || isChargeRefund() || isChargeAdjustment() || isDownPayment()) {
             return true;
         }
         return false;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isDisbursement() {
+        return this.disbursement;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isRepaymentAtDisbursement() {
+        return this.repaymentAtDisbursement;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isRepayment() {
+        return this.repayment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isMerchantIssuedRefund() {
+        return this.merchantIssuedRefund;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isPayoutRefund() {
+        return this.payoutRefund;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isGoodwillCredit() {
+        return this.goodwillCredit;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isInterestPaymentWaiver() {
+        return this.interestPaymentWaiver;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isChargeRefund() {
+        return this.chargeRefund;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isContra() {
+        return this.contra;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isWaiveInterest() {
+        return this.waiveInterest;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isWaiveCharges() {
+        return this.waiveCharges;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isAccrual() {
+        return this.accrual;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isWriteOff() {
+        return this.writeOff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isRecoveryRepayment() {
+        return this.recoveryRepayment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isInitiateTransfer() {
+        return this.initiateTransfer;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isApproveTransfer() {
+        return this.approveTransfer;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isWithdrawTransfer() {
+        return this.withdrawTransfer;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isRejectTransfer() {
+        return this.rejectTransfer;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isChargePayment() {
+        return this.chargePayment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isRefund() {
+        return this.refund;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isRefundForActiveLoans() {
+        return this.refundForActiveLoans;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isCreditBalanceRefund() {
+        return this.creditBalanceRefund;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isChargeAdjustment() {
+        return this.chargeAdjustment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isChargeback() {
+        return this.chargeback;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isChargeoff() {
+        return this.chargeoff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isDownPayment() {
+        return this.downPayment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isReAge() {
+        return this.reAge;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isReAmortize() {
+        return this.reAmortize;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isAccrualActivity() {
+        return this.accrualActivity;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isInterestRefund() {
+        return this.interestRefund;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isAccrualAdjustment() {
+        return this.accrualAdjustment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isCapitalizedIncome() {
+        return this.capitalizedIncome;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isCapitalizedIncomeAmortization() {
+        return this.capitalizedIncomeAmortization;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isCapitalizedIncomeAdjustment() {
+        return this.capitalizedIncomeAdjustment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isCapitalizedIncomeAmortizationAdjustment() {
+        return this.capitalizedIncomeAmortizationAdjustment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isContractTermination() {
+        return this.contractTermination;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isBuyDownFee() {
+        return this.buyDownFee;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isBuyDownFeeAdjustment() {
+        return this.buyDownFeeAdjustment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isBuyDownFeeAmortization() {
+        return this.buyDownFeeAmortization;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isBuyDownFeeAmortizationAdjustment() {
+        return this.buyDownFeeAmortizationAdjustment;
     }
 }

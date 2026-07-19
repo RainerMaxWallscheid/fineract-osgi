@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.accounting.common.AccountingConstants;
 import org.apache.fineract.client.models.AdvancedPaymentData;
 import org.apache.fineract.client.models.GetFinancialActivityAccountsResponse;
@@ -54,10 +53,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-@Slf4j
 @ExtendWith(LoanTestLifecycleExtension.class)
 public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanProductWithAdvancedPaymentAllocationIntegrationTests.class);
     private static ResponseSpecification RESPONSE_SPEC;
     private static RequestSpecification REQUEST_SPEC;
     private static Account ASSET_ACCOUNT;
@@ -78,14 +77,12 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         AccountHelper accountHelper = new AccountHelper(REQUEST_SPEC, RESPONSE_SPEC);
         FINANCIAL_ACTIVITY_ACCOUNT_HELPER = new FinancialActivityAccountHelper(REQUEST_SPEC);
         LOAN_TRANSACTION_HELPER = new LoanTransactionHelper(REQUEST_SPEC, RESPONSE_SPEC);
-
         ASSET_ACCOUNT = accountHelper.createAssetAccount();
         FEE_PENALTY_ACCOUNT = accountHelper.createAssetAccount();
         TRANSFER_ACCOUNT = accountHelper.createAssetAccount();
         EXPENSE_ACCOUNT = accountHelper.createExpenseAccount();
         INCOME_ACCOUNT = accountHelper.createIncomeAccount();
         OVERPAYMENT_ACCOUNT = accountHelper.createLiabilityAccount();
-
         setProperFinancialActivity(TRANSFER_ACCOUNT);
     }
 
@@ -94,23 +91,17 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         // given
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData repaymentPaymentAllocation = createRepaymentPaymentAllocation();
-
         // when
-        Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductTestBuilder(
-                customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation)));
+        Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation)));
         Assertions.assertNotNull(loanProductId);
         GetLoanProductsProductIdResponse loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
-
         // then
         Assertions.assertNotNull(loanProduct.getPaymentAllocation());
         Assertions.assertEquals(2, loanProduct.getPaymentAllocation().size());
-        Optional<AdvancedPaymentData> first = loanProduct.getPaymentAllocation().stream()
-                .filter(advancedPaymentData -> "DEFAULT".equals(advancedPaymentData.getTransactionType())).findFirst();
+        Optional<AdvancedPaymentData> first = loanProduct.getPaymentAllocation().stream().filter(advancedPaymentData -> "DEFAULT".equals(advancedPaymentData.getTransactionType())).findFirst();
         Assertions.assertTrue(first.isPresent());
         Assertions.assertEquals(defaultAllocation, first.get());
-
-        Optional<AdvancedPaymentData> second = loanProduct.getPaymentAllocation().stream()
-                .filter(advancedPaymentData -> "REPAYMENT".equals(advancedPaymentData.getTransactionType())).findFirst();
+        Optional<AdvancedPaymentData> second = loanProduct.getPaymentAllocation().stream().filter(advancedPaymentData -> "REPAYMENT".equals(advancedPaymentData.getTransactionType())).findFirst();
         Assertions.assertTrue(second.isPresent());
         Assertions.assertEquals(repaymentPaymentAllocation, second.get());
     }
@@ -120,16 +111,13 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         // given a loan with two allocations
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData repaymentPaymentAllocation = createRepaymentPaymentAllocation();
-        Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductTestBuilder(
-                customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation)));
+        Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation)));
         Assertions.assertNotNull(loanProductId);
         GetLoanProductsProductIdResponse loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
         Assertions.assertNotNull(loanProduct.getPaymentAllocation());
         Assertions.assertEquals(2, loanProduct.getPaymentAllocation().size());
-
         // when an allocation is removed
         LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(), updateLoanProductRequest(defaultAllocation));
-
         // then it shall be removed.
         loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
         Assertions.assertNotNull(loanProduct.getPaymentAllocation());
@@ -142,28 +130,21 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         // given a loan with one allocation
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData repaymentPaymentAllocation = createRepaymentPaymentAllocation();
-        Integer loanProductId = LOAN_TRANSACTION_HELPER
-                .getLoanProductId(loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(defaultAllocation)));
+        Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(defaultAllocation)));
         Assertions.assertNotNull(loanProductId);
         GetLoanProductsProductIdResponse loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
         Assertions.assertNotNull(loanProduct.getPaymentAllocation());
         Assertions.assertEquals(1, loanProduct.getPaymentAllocation().size());
-
         // when a new allocation is added
-        LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(),
-                updateLoanProductRequest(defaultAllocation, repaymentPaymentAllocation));
-
+        LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(), updateLoanProductRequest(defaultAllocation, repaymentPaymentAllocation));
         // then it shall be added.
         loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
         Assertions.assertNotNull(loanProduct.getPaymentAllocation());
         Assertions.assertEquals(2, loanProduct.getPaymentAllocation().size());
-        Optional<AdvancedPaymentData> first = loanProduct.getPaymentAllocation().stream()
-                .filter(advancedPaymentData -> "DEFAULT".equals(advancedPaymentData.getTransactionType())).findFirst();
+        Optional<AdvancedPaymentData> first = loanProduct.getPaymentAllocation().stream().filter(advancedPaymentData -> "DEFAULT".equals(advancedPaymentData.getTransactionType())).findFirst();
         Assertions.assertTrue(first.isPresent());
         Assertions.assertEquals(defaultAllocation, first.get());
-
-        Optional<AdvancedPaymentData> second = loanProduct.getPaymentAllocation().stream()
-                .filter(advancedPaymentData -> "REPAYMENT".equals(advancedPaymentData.getTransactionType())).findFirst();
+        Optional<AdvancedPaymentData> second = loanProduct.getPaymentAllocation().stream().filter(advancedPaymentData -> "REPAYMENT".equals(advancedPaymentData.getTransactionType())).findFirst();
         Assertions.assertTrue(second.isPresent());
         Assertions.assertEquals(repaymentPaymentAllocation, second.get());
     }
@@ -173,20 +154,14 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         // given a loan with two allocations
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData repaymentPaymentAllocation = createRepaymentPaymentAllocation();
-        Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductTestBuilder(
-                customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation)));
+        Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation)));
         Assertions.assertNotNull(loanProductId);
         GetLoanProductsProductIdResponse loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
         Assertions.assertNotNull(loanProduct.getPaymentAllocation());
         Assertions.assertEquals(2, loanProduct.getPaymentAllocation().size());
-
         // when an allocation is removed
-        CallFailedRuntimeException callFailedRuntimeException = Assertions.assertThrows(CallFailedRuntimeException.class,
-                () -> LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(),
-                        updateLoanProductRequest(repaymentPaymentAllocation)));
-
-        Assertions.assertTrue(callFailedRuntimeException.getMessage()
-                .contains("Advanced-payment-allocation-strategy was selected but no DEFAULT payment allocation was provided"));
+        CallFailedRuntimeException callFailedRuntimeException = Assertions.assertThrows(CallFailedRuntimeException.class, () -> LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(), updateLoanProductRequest(repaymentPaymentAllocation)));
+        Assertions.assertTrue(callFailedRuntimeException.getMessage().contains("Advanced-payment-allocation-strategy was selected but no DEFAULT payment allocation was provided"));
     }
 
     @Test
@@ -194,20 +169,14 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         // given a loan with two allocations
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData repaymentPaymentAllocation = createRepaymentPaymentAllocation();
-        Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductTestBuilder(
-                customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation)));
+        Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation)));
         Assertions.assertNotNull(loanProductId);
         GetLoanProductsProductIdResponse loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
         Assertions.assertNotNull(loanProduct.getPaymentAllocation());
         Assertions.assertEquals(2, loanProduct.getPaymentAllocation().size());
-
         // when an allocation is removed
-        CallFailedRuntimeException callFailedRuntimeException = Assertions.assertThrows(CallFailedRuntimeException.class,
-                () -> LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(),
-                        updateLoanProductRequest("mifos-standard-strategy")));
-
-        Assertions.assertTrue(callFailedRuntimeException.getMessage()
-                .contains("In case 'mifos-standard-strategy' payment strategy, payment_allocation must not be provided"));
+        CallFailedRuntimeException callFailedRuntimeException = Assertions.assertThrows(CallFailedRuntimeException.class, () -> LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(), updateLoanProductRequest("mifos-standard-strategy")));
+        Assertions.assertTrue(callFailedRuntimeException.getMessage().contains("In case \'mifos-standard-strategy\' payment strategy, payment_allocation must not be provided"));
     }
 
     @Test
@@ -215,17 +184,10 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         // given
         ResponseSpecification errorResponse = new ResponseSpecBuilder().expectStatusCode(400).build();
         LoanTransactionHelper validationErrorHelper = new LoanTransactionHelper(REQUEST_SPEC, errorResponse);
-
-        String loanProduct = new LoanProductTestBuilder().withPrincipal("15,000.00").withNumberOfRepayments("4")
-                .withRepaymentAfterEvery("1").withRepaymentTypeAsMonth().withinterestRatePerPeriod("1")
-                .withAccountingRulePeriodicAccrual(new Account[] { ASSET_ACCOUNT, EXPENSE_ACCOUNT, INCOME_ACCOUNT, OVERPAYMENT_ACCOUNT })
-                .withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance()
-                .withFeeAndPenaltyAssetAccount(FEE_PENALTY_ACCOUNT).withRepaymentStrategy("advanced-payment-allocation-strategy").build();
-
+        String loanProduct = new LoanProductTestBuilder().withPrincipal("15,000.00").withNumberOfRepayments("4").withRepaymentAfterEvery("1").withRepaymentTypeAsMonth().withinterestRatePerPeriod("1").withAccountingRulePeriodicAccrual(new Account[] {ASSET_ACCOUNT, EXPENSE_ACCOUNT, INCOME_ACCOUNT, OVERPAYMENT_ACCOUNT}).withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().withFeeAndPenaltyAssetAccount(FEE_PENALTY_ACCOUNT).withRepaymentStrategy("advanced-payment-allocation-strategy").build();
         // when
         List<Map<String, String>> loanProductError = validationErrorHelper.getLoanProductError(loanProduct, "errors");
-        Assertions.assertEquals("Advanced-payment-allocation-strategy was selected but no DEFAULT payment allocation was provided",
-                loanProductError.get(0).get("defaultUserMessage"));
+        Assertions.assertEquals("Advanced-payment-allocation-strategy was selected but no DEFAULT payment allocation was provided", loanProductError.get(0).get("defaultUserMessage"));
     }
 
     @Test
@@ -234,12 +196,9 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         AdvancedPaymentData repaymentPaymentAllocation = createRepaymentPaymentAllocation();
         ResponseSpecification errorResponse = new ResponseSpecBuilder().expectStatusCode(400).build();
         LoanTransactionHelper validationErrorHelper = new LoanTransactionHelper(REQUEST_SPEC, errorResponse);
-
         // when
-        List<Map<String, String>> loanProductError = validationErrorHelper.getLoanProductError(
-                loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(repaymentPaymentAllocation)), "errors");
-        Assertions.assertEquals("Advanced-payment-allocation-strategy was selected but no DEFAULT payment allocation was provided",
-                loanProductError.get(0).get("defaultUserMessage"));
+        List<Map<String, String>> loanProductError = validationErrorHelper.getLoanProductError(loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(repaymentPaymentAllocation)), "errors");
+        Assertions.assertEquals("Advanced-payment-allocation-strategy was selected but no DEFAULT payment allocation was provided", loanProductError.get(0).get("defaultUserMessage"));
     }
 
     @Test
@@ -247,23 +206,17 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         // given
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData interestPaymentWaiverAllocation = createInterestPaymentWaiverAllocation();
-
         // when
-        Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductTestBuilder(
-                customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, interestPaymentWaiverAllocation)));
+        Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, interestPaymentWaiverAllocation)));
         Assertions.assertNotNull(loanProductId);
         GetLoanProductsProductIdResponse loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
-
         // then
         Assertions.assertNotNull(loanProduct.getPaymentAllocation());
         Assertions.assertEquals(2, loanProduct.getPaymentAllocation().size());
-        Optional<AdvancedPaymentData> first = loanProduct.getPaymentAllocation().stream()
-                .filter(advancedPaymentData -> "DEFAULT".equals(advancedPaymentData.getTransactionType())).findFirst();
+        Optional<AdvancedPaymentData> first = loanProduct.getPaymentAllocation().stream().filter(advancedPaymentData -> "DEFAULT".equals(advancedPaymentData.getTransactionType())).findFirst();
         Assertions.assertTrue(first.isPresent());
         Assertions.assertEquals(defaultAllocation, first.get());
-
-        Optional<AdvancedPaymentData> second = loanProduct.getPaymentAllocation().stream()
-                .filter(advancedPaymentData -> "INTEREST_PAYMENT_WAIVER".equals(advancedPaymentData.getTransactionType())).findFirst();
+        Optional<AdvancedPaymentData> second = loanProduct.getPaymentAllocation().stream().filter(advancedPaymentData -> "INTEREST_PAYMENT_WAIVER".equals(advancedPaymentData.getTransactionType())).findFirst();
         Assertions.assertTrue(second.isPresent());
         Assertions.assertEquals(interestPaymentWaiverAllocation, second.get());
     }
@@ -273,28 +226,21 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         // given a loan with one allocation
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData interestPaymentWaiverAllocation = createInterestPaymentWaiverAllocation();
-        Integer loanProductId = LOAN_TRANSACTION_HELPER
-                .getLoanProductId(loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(defaultAllocation)));
+        Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(defaultAllocation)));
         Assertions.assertNotNull(loanProductId);
         GetLoanProductsProductIdResponse loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
         Assertions.assertNotNull(loanProduct.getPaymentAllocation());
         Assertions.assertEquals(1, loanProduct.getPaymentAllocation().size());
-
         // when a new allocation is added
-        LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(),
-                updateLoanProductRequest(defaultAllocation, interestPaymentWaiverAllocation));
-
+        LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(), updateLoanProductRequest(defaultAllocation, interestPaymentWaiverAllocation));
         // then it shall be added.
         loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
         Assertions.assertNotNull(loanProduct.getPaymentAllocation());
         Assertions.assertEquals(2, loanProduct.getPaymentAllocation().size());
-        Optional<AdvancedPaymentData> first = loanProduct.getPaymentAllocation().stream()
-                .filter(advancedPaymentData -> "DEFAULT".equals(advancedPaymentData.getTransactionType())).findFirst();
+        Optional<AdvancedPaymentData> first = loanProduct.getPaymentAllocation().stream().filter(advancedPaymentData -> "DEFAULT".equals(advancedPaymentData.getTransactionType())).findFirst();
         Assertions.assertTrue(first.isPresent());
         Assertions.assertEquals(defaultAllocation, first.get());
-
-        Optional<AdvancedPaymentData> second = loanProduct.getPaymentAllocation().stream()
-                .filter(advancedPaymentData -> "INTEREST_PAYMENT_WAIVER".equals(advancedPaymentData.getTransactionType())).findFirst();
+        Optional<AdvancedPaymentData> second = loanProduct.getPaymentAllocation().stream().filter(advancedPaymentData -> "INTEREST_PAYMENT_WAIVER".equals(advancedPaymentData.getTransactionType())).findFirst();
         Assertions.assertTrue(second.isPresent());
         Assertions.assertEquals(interestPaymentWaiverAllocation, second.get());
     }
@@ -304,47 +250,33 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         // given
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData repaymentPaymentAllocation = createRepaymentPaymentAllocation();
-
         // when
-        String loanProductRequest = loanProductTestBuilder(
-                customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation));
-
+        String loanProductRequest = loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation));
         Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductRequest);
         Assertions.assertNotNull(loanProductId);
         GetLoanProductsProductIdResponse loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
-
         // then
         Assertions.assertNotNull(loanProduct.getSupportedInterestRefundTypes());
         Assertions.assertEquals(0, loanProduct.getSupportedInterestRefundTypes().size());
-
         // when a new interest refund transaction was added
-        LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(),
-                new PutLoanProductsProductIdRequest().supportedInterestRefundTypes(List.of("MERCHANT_ISSUED_REFUND")));
-
+        LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(), new PutLoanProductsProductIdRequest().supportedInterestRefundTypes(List.of("MERCHANT_ISSUED_REFUND")));
         loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
-
         // then
         Assertions.assertNotNull(loanProduct.getSupportedInterestRefundTypes());
         Assertions.assertEquals(1, loanProduct.getSupportedInterestRefundTypes().size());
         Assertions.assertEquals("MERCHANT_ISSUED_REFUND", loanProduct.getSupportedInterestRefundTypes().get(0).getId());
-
         // Set both of them at creation
-        String loanProductRequest2 = loanProductTestBuilder(
-                customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation)
-                        .withSupportedInterestRefundTypes("PAYOUT_REFUND", "MERCHANT_ISSUED_REFUND"));
+        String loanProductRequest2 = loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation).withSupportedInterestRefundTypes("PAYOUT_REFUND", "MERCHANT_ISSUED_REFUND"));
         Integer loanProductId2 = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductRequest2);
         Assertions.assertNotNull(loanProductId2);
         GetLoanProductsProductIdResponse loanProduct2 = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId2);
-
         // then
         Assertions.assertNotNull(loanProduct2.getSupportedInterestRefundTypes());
         Assertions.assertEquals(2, loanProduct2.getSupportedInterestRefundTypes().size());
         Assertions.assertEquals("PAYOUT_REFUND", loanProduct2.getSupportedInterestRefundTypes().get(0).getId());
         Assertions.assertEquals("MERCHANT_ISSUED_REFUND", loanProduct2.getSupportedInterestRefundTypes().get(1).getId());
-
         // Remove the previously configured transactions
-        LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId2.longValue(),
-                new PutLoanProductsProductIdRequest().supportedInterestRefundTypes(List.of()));
+        LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId2.longValue(), new PutLoanProductsProductIdRequest().supportedInterestRefundTypes(List.of()));
         loanProduct2 = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId2);
         // then
         Assertions.assertNotNull(loanProduct2.getSupportedInterestRefundTypes());
@@ -355,14 +287,10 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
     public void testCreateCumulativeLoanProductWithInterestRefund() {
         // given
         // when
-        String loanProductRequest = loanProductTestBuilder(customization -> customization.withSupportedInterestRefundTypes("PAYOUT_REFUND")
-                .withLoanScheduleType(LoanScheduleType.CUMULATIVE).withRepaymentStrategy("mifos-standard-strategy"));
-        LoanTransactionHelper loanTransactionHelperBadRequest = new LoanTransactionHelper(REQUEST_SPEC,
-                new ResponseSpecBuilder().expectStatusCode(400).build());
+        String loanProductRequest = loanProductTestBuilder(customization -> customization.withSupportedInterestRefundTypes("PAYOUT_REFUND").withLoanScheduleType(LoanScheduleType.CUMULATIVE).withRepaymentStrategy("mifos-standard-strategy"));
+        LoanTransactionHelper loanTransactionHelperBadRequest = new LoanTransactionHelper(REQUEST_SPEC, new ResponseSpecBuilder().expectStatusCode(400).build());
         List<Map<String, String>> loanProductError = loanTransactionHelperBadRequest.getLoanProductError(loanProductRequest, "errors");
-        Assertions.assertEquals(
-                "validation.msg.loanproduct.supportedInterestRefundTypes.supported.only.for.progressive.loan.schedule.handling",
-                loanProductError.get(0).get("userMessageGlobalisationCode"));
+        Assertions.assertEquals("validation.msg.loanproduct.supportedInterestRefundTypes.supported.only.for.progressive.loan.schedule.handling", loanProductError.get(0).get("userMessageGlobalisationCode"));
     }
 
     @Test
@@ -372,19 +300,11 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         LoanTransactionHelper validationErrorHelper = new LoanTransactionHelper(REQUEST_SPEC, errorResponse);
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData repaymentPaymentAllocation = createRepaymentPaymentAllocation();
-
         // when
-        String loanProduct = loanProductTestBuilder(customization -> customization
-                .addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation).withPrincipal("15,000.00")
-                .withNumberOfRepayments(null).withRepaymentAfterEvery("1").withRepaymentTypeAsMonth().withinterestRatePerPeriod("1")
-                .withAccountingRulePeriodicAccrual(new Account[] { ASSET_ACCOUNT, EXPENSE_ACCOUNT, INCOME_ACCOUNT, OVERPAYMENT_ACCOUNT })
-                .withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance()
-                .withFeeAndPenaltyAssetAccount(FEE_PENALTY_ACCOUNT).build());
-
+        String loanProduct = loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation).withPrincipal("15,000.00").withNumberOfRepayments(null).withRepaymentAfterEvery("1").withRepaymentTypeAsMonth().withinterestRatePerPeriod("1").withAccountingRulePeriodicAccrual(new Account[] {ASSET_ACCOUNT, EXPENSE_ACCOUNT, INCOME_ACCOUNT, OVERPAYMENT_ACCOUNT}).withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().withFeeAndPenaltyAssetAccount(FEE_PENALTY_ACCOUNT).build());
         // when
         List<Map<String, String>> loanProductError = validationErrorHelper.getLoanProductError(loanProduct, "errors");
-        Assertions.assertEquals("The parameter  numberOfRepayments  is mandatory.",
-                loanProductError.get(0).get("defaultUserMessage").replace('`', ' '));
+        Assertions.assertEquals("The parameter  numberOfRepayments  is mandatory.", loanProductError.get(0).get("defaultUserMessage").replace('`', ' '));
     }
 
     @Test
@@ -394,19 +314,11 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         LoanTransactionHelper validationErrorHelper = new LoanTransactionHelper(REQUEST_SPEC, errorResponse);
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData repaymentPaymentAllocation = createRepaymentPaymentAllocation();
-
         // when
-        String loanProduct = loanProductTestBuilder(customization -> customization
-                .addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation).withPrincipal("15,000.00")
-                .withNumberOfRepayments("4").withRepaymentAfterEvery("1").withRepaymentTypeAsMonth().withinterestRatePerPeriod(null)
-                .withAccountingRulePeriodicAccrual(new Account[] { ASSET_ACCOUNT, EXPENSE_ACCOUNT, INCOME_ACCOUNT, OVERPAYMENT_ACCOUNT })
-                .withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance()
-                .withFeeAndPenaltyAssetAccount(FEE_PENALTY_ACCOUNT).build());
-
+        String loanProduct = loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation).withPrincipal("15,000.00").withNumberOfRepayments("4").withRepaymentAfterEvery("1").withRepaymentTypeAsMonth().withinterestRatePerPeriod(null).withAccountingRulePeriodicAccrual(new Account[] {ASSET_ACCOUNT, EXPENSE_ACCOUNT, INCOME_ACCOUNT, OVERPAYMENT_ACCOUNT}).withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().withFeeAndPenaltyAssetAccount(FEE_PENALTY_ACCOUNT).build());
         // when
         List<Map<String, String>> loanProductError = validationErrorHelper.getLoanProductError(loanProduct, "errors");
-        Assertions.assertEquals("The parameter  interestRatePerPeriod  is mandatory.",
-                loanProductError.get(0).get("defaultUserMessage").replace('`', ' '));
+        Assertions.assertEquals("The parameter  interestRatePerPeriod  is mandatory.", loanProductError.get(0).get("defaultUserMessage").replace('`', ' '));
     }
 
     @Test
@@ -414,26 +326,17 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         // given
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData repaymentPaymentAllocation = createRepaymentPaymentAllocation();
-
         // when
-        String loanProductRequest = loanProductTestBuilder(
-                customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation)
-                        .withChargeOffBehaviour(LoanChargeOffBehaviour.ZERO_INTEREST));
-
+        String loanProductRequest = loanProductTestBuilder(customization -> customization.addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation).withChargeOffBehaviour(LoanChargeOffBehaviour.ZERO_INTEREST));
         Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductRequest);
         Assertions.assertNotNull(loanProductId);
         GetLoanProductsProductIdResponse loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
-
         // then
         Assertions.assertNotNull(loanProduct.getChargeOffBehaviour());
         Assertions.assertEquals(LoanChargeOffBehaviour.ZERO_INTEREST.name(), loanProduct.getChargeOffBehaviour().getId());
-
         // when a new interest refund transaction was added
-        LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(),
-                new PutLoanProductsProductIdRequest().chargeOffBehaviour(LoanChargeOffBehaviour.REGULAR.name()));
-
+        LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(), new PutLoanProductsProductIdRequest().chargeOffBehaviour(LoanChargeOffBehaviour.REGULAR.name()));
         loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
-
         // then
         Assertions.assertNotNull(loanProduct.getChargeOffBehaviour());
         Assertions.assertEquals(LoanChargeOffBehaviour.REGULAR.name(), loanProduct.getChargeOffBehaviour().getId());
@@ -443,23 +346,14 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
     public void testCreateCumulativeLoanProductWithChargeOff() {
         // given
         // when
-        String loanProductRequest = loanProductTestBuilder(
-                customization -> customization.withChargeOffBehaviour(LoanChargeOffBehaviour.ZERO_INTEREST)
-                        .withLoanScheduleType(LoanScheduleType.CUMULATIVE).withRepaymentStrategy("mifos-standard-strategy"));
-        LoanTransactionHelper loanTransactionHelperBadRequest = new LoanTransactionHelper(REQUEST_SPEC,
-                new ResponseSpecBuilder().expectStatusCode(400).build());
+        String loanProductRequest = loanProductTestBuilder(customization -> customization.withChargeOffBehaviour(LoanChargeOffBehaviour.ZERO_INTEREST).withLoanScheduleType(LoanScheduleType.CUMULATIVE).withRepaymentStrategy("mifos-standard-strategy"));
+        LoanTransactionHelper loanTransactionHelperBadRequest = new LoanTransactionHelper(REQUEST_SPEC, new ResponseSpecBuilder().expectStatusCode(400).build());
         List<Map<String, String>> loanProductError = loanTransactionHelperBadRequest.getLoanProductError(loanProductRequest, "errors");
-        Assertions.assertEquals("validation.msg.loanproduct.chargeOffBehaviour.supported.only.for.progressive.loan.charge.off.behaviour",
-                loanProductError.get(0).get("userMessageGlobalisationCode"));
+        Assertions.assertEquals("validation.msg.loanproduct.chargeOffBehaviour.supported.only.for.progressive.loan.charge.off.behaviour", loanProductError.get(0).get("userMessageGlobalisationCode"));
     }
 
     private String loanProductTestBuilder(Consumer<LoanProductTestBuilder> customization) {
-        LoanProductTestBuilder builder = new LoanProductTestBuilder().withPrincipal("15,000.00").withNumberOfRepayments("4")
-                .withRepaymentAfterEvery("1").withRepaymentTypeAsMonth().withinterestRatePerPeriod("1")
-                .withAccountingRulePeriodicAccrual(new Account[] { ASSET_ACCOUNT, EXPENSE_ACCOUNT, INCOME_ACCOUNT, OVERPAYMENT_ACCOUNT })
-                .withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance()
-                .withFeeAndPenaltyAssetAccount(FEE_PENALTY_ACCOUNT).withLoanScheduleType(LoanScheduleType.PROGRESSIVE)
-                .withLoanScheduleProcessingType(LoanScheduleProcessingType.HORIZONTAL);
+        LoanProductTestBuilder builder = new LoanProductTestBuilder().withPrincipal("15,000.00").withNumberOfRepayments("4").withRepaymentAfterEvery("1").withRepaymentTypeAsMonth().withinterestRatePerPeriod("1").withAccountingRulePeriodicAccrual(new Account[] {ASSET_ACCOUNT, EXPENSE_ACCOUNT, INCOME_ACCOUNT, OVERPAYMENT_ACCOUNT}).withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().withFeeAndPenaltyAssetAccount(FEE_PENALTY_ACCOUNT).withLoanScheduleType(LoanScheduleType.PROGRESSIVE).withLoanScheduleProcessingType(LoanScheduleProcessingType.HORIZONTAL);
         customization.accept(builder);
         return builder.build();
     }
@@ -480,12 +374,7 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         AdvancedPaymentData advancedPaymentData = new AdvancedPaymentData();
         advancedPaymentData.setTransactionType("REPAYMENT");
         advancedPaymentData.setFutureInstallmentAllocationRule("NEXT_INSTALLMENT");
-
-        List<PaymentAllocationOrder> paymentAllocationOrders = getPaymentAllocationOrder(PaymentAllocationType.PAST_DUE_PENALTY,
-                PaymentAllocationType.PAST_DUE_FEE, PaymentAllocationType.PAST_DUE_INTEREST, PaymentAllocationType.PAST_DUE_PRINCIPAL,
-                PaymentAllocationType.DUE_PENALTY, PaymentAllocationType.DUE_FEE, PaymentAllocationType.DUE_INTEREST,
-                PaymentAllocationType.DUE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_PENALTY, PaymentAllocationType.IN_ADVANCE_FEE,
-                PaymentAllocationType.IN_ADVANCE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_INTEREST);
+        List<PaymentAllocationOrder> paymentAllocationOrders = getPaymentAllocationOrder(PaymentAllocationType.PAST_DUE_PENALTY, PaymentAllocationType.PAST_DUE_FEE, PaymentAllocationType.PAST_DUE_INTEREST, PaymentAllocationType.PAST_DUE_PRINCIPAL, PaymentAllocationType.DUE_PENALTY, PaymentAllocationType.DUE_FEE, PaymentAllocationType.DUE_INTEREST, PaymentAllocationType.DUE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_PENALTY, PaymentAllocationType.IN_ADVANCE_FEE, PaymentAllocationType.IN_ADVANCE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_INTEREST);
         advancedPaymentData.setPaymentAllocationOrder(paymentAllocationOrders);
         return advancedPaymentData;
     }
@@ -494,12 +383,7 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         AdvancedPaymentData advancedPaymentData = new AdvancedPaymentData();
         advancedPaymentData.setTransactionType("INTEREST_PAYMENT_WAIVER");
         advancedPaymentData.setFutureInstallmentAllocationRule("NEXT_INSTALLMENT");
-
-        List<PaymentAllocationOrder> paymentAllocationOrders = getPaymentAllocationOrder(PaymentAllocationType.PAST_DUE_FEE,
-                PaymentAllocationType.PAST_DUE_PENALTY, PaymentAllocationType.PAST_DUE_INTEREST, PaymentAllocationType.PAST_DUE_PRINCIPAL,
-                PaymentAllocationType.DUE_PENALTY, PaymentAllocationType.DUE_FEE, PaymentAllocationType.DUE_INTEREST,
-                PaymentAllocationType.DUE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_PENALTY, PaymentAllocationType.IN_ADVANCE_FEE,
-                PaymentAllocationType.IN_ADVANCE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_INTEREST);
+        List<PaymentAllocationOrder> paymentAllocationOrders = getPaymentAllocationOrder(PaymentAllocationType.PAST_DUE_FEE, PaymentAllocationType.PAST_DUE_PENALTY, PaymentAllocationType.PAST_DUE_INTEREST, PaymentAllocationType.PAST_DUE_PRINCIPAL, PaymentAllocationType.DUE_PENALTY, PaymentAllocationType.DUE_FEE, PaymentAllocationType.DUE_INTEREST, PaymentAllocationType.DUE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_PENALTY, PaymentAllocationType.IN_ADVANCE_FEE, PaymentAllocationType.IN_ADVANCE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_INTEREST);
         advancedPaymentData.setPaymentAllocationOrder(paymentAllocationOrders);
         return advancedPaymentData;
     }
@@ -508,13 +392,7 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
         AdvancedPaymentData advancedPaymentData = new AdvancedPaymentData();
         advancedPaymentData.setTransactionType("DEFAULT");
         advancedPaymentData.setFutureInstallmentAllocationRule("NEXT_INSTALLMENT");
-
-        List<PaymentAllocationOrder> paymentAllocationOrders = getPaymentAllocationOrder(PaymentAllocationType.PAST_DUE_PENALTY,
-                PaymentAllocationType.PAST_DUE_FEE, PaymentAllocationType.PAST_DUE_PRINCIPAL, PaymentAllocationType.PAST_DUE_INTEREST,
-                PaymentAllocationType.DUE_PENALTY, PaymentAllocationType.DUE_FEE, PaymentAllocationType.DUE_PRINCIPAL,
-                PaymentAllocationType.DUE_INTEREST, PaymentAllocationType.IN_ADVANCE_PENALTY, PaymentAllocationType.IN_ADVANCE_FEE,
-                PaymentAllocationType.IN_ADVANCE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_INTEREST);
-
+        List<PaymentAllocationOrder> paymentAllocationOrders = getPaymentAllocationOrder(PaymentAllocationType.PAST_DUE_PENALTY, PaymentAllocationType.PAST_DUE_FEE, PaymentAllocationType.PAST_DUE_PRINCIPAL, PaymentAllocationType.PAST_DUE_INTEREST, PaymentAllocationType.DUE_PENALTY, PaymentAllocationType.DUE_FEE, PaymentAllocationType.DUE_PRINCIPAL, PaymentAllocationType.DUE_INTEREST, PaymentAllocationType.IN_ADVANCE_PENALTY, PaymentAllocationType.IN_ADVANCE_FEE, PaymentAllocationType.IN_ADVANCE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_INTEREST);
         advancedPaymentData.setPaymentAllocationOrder(paymentAllocationOrders);
         return advancedPaymentData;
     }
@@ -532,9 +410,6 @@ public class LoanProductWithAdvancedPaymentAllocationIntegrationTests {
     private static void setProperFinancialActivity(Account transferAccount) {
         List<GetFinancialActivityAccountsResponse> financialMappings = FINANCIAL_ACTIVITY_ACCOUNT_HELPER.getAllFinancialActivityAccounts();
         financialMappings.forEach(mapping -> FINANCIAL_ACTIVITY_ACCOUNT_HELPER.deleteFinancialActivityAccount(mapping.getId()));
-        FINANCIAL_ACTIVITY_ACCOUNT_HELPER.createFinancialActivityAccount(new PostFinancialActivityAccountsRequest()
-                .financialActivityId((long) AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue())
-                .glAccountId((long) transferAccount.getAccountID()));
+        FINANCIAL_ACTIVITY_ACCOUNT_HELPER.createFinancialActivityAccount(new PostFinancialActivityAccountsRequest().financialActivityId((long) AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue()).glAccountId((long) transferAccount.getAccountID()));
     }
-
 }

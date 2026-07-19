@@ -16,11 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.workingcapitalloan.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.charge.exception.LoanChargeNotFoundException;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanChargeData;
 import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapitalLoanChargeRepository;
@@ -28,9 +26,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class WorkingCapitalLoanChargeReadPlatformServiceImpl implements WorkingCapitalLoanChargeReadPlatformService {
-
     private final WorkingCapitalLoanChargeRepository loanChargeRepository;
 
     @Override
@@ -47,4 +43,8 @@ public class WorkingCapitalLoanChargeReadPlatformServiceImpl implements WorkingC
         return loanChargeRepository.retrieveLoanCharges(loanId);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanChargeReadPlatformServiceImpl(final WorkingCapitalLoanChargeRepository loanChargeRepository) {
+        this.loanChargeRepository = loanChargeRepository;
+    }
 }

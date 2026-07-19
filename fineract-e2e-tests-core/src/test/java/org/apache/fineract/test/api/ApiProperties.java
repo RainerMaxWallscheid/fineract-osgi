@@ -18,14 +18,11 @@
  */
 package org.apache.fineract.test.api;
 
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-@Getter
 public class ApiProperties {
-
     @Value("${fineract-test.api.base-url}")
     private String baseUrl;
     @Value("${fineract-test.api.username}")
@@ -38,4 +35,34 @@ public class ApiProperties {
     private String tenantId;
     @Value("${fineract-test.client-read-timeout}")
     private long readTimeout;
+
+    @java.lang.SuppressWarnings("all")
+        public String getBaseUrl() {
+        return this.baseUrl;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getUsername() {
+        return this.username;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getPassword() {
+        return this.password;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getStrongPassword() {
+        return this.strongPassword;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getTenantId() {
+        return this.tenantId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public long getReadTimeout() {
+        return this.readTimeout;
+    }
 }

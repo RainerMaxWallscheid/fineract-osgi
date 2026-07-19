@@ -23,8 +23,6 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Date;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.adhocquery.data.AdHocData;
 import org.apache.fineract.adhocquery.domain.ReportRunFrequency;
 import org.apache.fineract.adhocquery.service.AdHocReadPlatformService;
@@ -36,10 +34,9 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-@Slf4j
-@RequiredArgsConstructor
 public class GenerateAdhocClientScheduleTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GenerateAdhocClientScheduleTasklet.class);
     private final AdHocReadPlatformService adHocReadPlatformService;
     private final JdbcTemplate jdbcTemplate;
 
@@ -78,26 +75,27 @@ public class GenerateAdhocClientScheduleTasklet implements Tasklet {
                         }
                     }
                 }
-
                 if (run) {
                     final StringBuilder insertSqlBuilder = new StringBuilder(900);
-                    insertSqlBuilder.append("INSERT INTO ").append(adhoc.getTableName()).append("(").append(adhoc.getTableFields())
-                            .append(") ").append(adhoc.getQuery());
+                    insertSqlBuilder.append("INSERT INTO ").append(adhoc.getTableName()).append("(").append(adhoc.getTableFields()).append(") ").append(adhoc.getQuery());
                     if (!insertSqlBuilder.isEmpty()) {
                         final int result = jdbcTemplate.update(insertSqlBuilder.toString());
-                        log.debug("{}: Records affected by generateClientSchedule: {}", ThreadLocalContextUtil.getTenant().getName(),
-                                result);
-
+                        log.debug("{}: Records affected by generateClientSchedule: {}", ThreadLocalContextUtil.getTenant().getName(), result);
                         jdbcTemplate.update("UPDATE m_adhoc SET last_run=? WHERE id=?", new Date(), adhoc.getId());
                     }
                 } else {
-                    log.debug("{}: Skipping execution of {}, scheduled for execution on {}", ThreadLocalContextUtil.getTenant().getName(),
-                            adhoc.getName(), next);
+                    log.debug("{}: Skipping execution of {}, scheduled for execution on {}", ThreadLocalContextUtil.getTenant().getName(), adhoc.getName(), next);
                 }
             });
         } else {
             log.debug("{}: Nothing to update by generateClientSchedule", ThreadLocalContextUtil.getTenant().getName());
         }
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GenerateAdhocClientScheduleTasklet(final AdHocReadPlatformService adHocReadPlatformService, final JdbcTemplate jdbcTemplate) {
+        this.adHocReadPlatformService = adHocReadPlatformService;
+        this.jdbcTemplate = jdbcTemplate;
     }
 }

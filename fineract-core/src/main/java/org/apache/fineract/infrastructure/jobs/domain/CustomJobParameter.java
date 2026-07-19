@@ -21,18 +21,25 @@ package org.apache.fineract.infrastructure.jobs.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "batch_custom_job_parameters")
-@NoArgsConstructor
-@Getter
-@Setter
 public class CustomJobParameter extends AbstractPersistableCustom<Long> {
-
     @Column(name = "parameter_json", nullable = false, columnDefinition = "json")
     private String parameterJson;
+
+    @java.lang.SuppressWarnings("all")
+        public CustomJobParameter() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getParameterJson() {
+        return this.parameterJson;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setParameterJson(final String parameterJson) {
+        this.parameterJson = parameterJson;
+    }
 }

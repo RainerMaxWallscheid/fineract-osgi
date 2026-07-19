@@ -24,8 +24,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
@@ -33,43 +31,28 @@ import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.loanaccount.data.LoanInstallmentChargeData;
 
 @Entity
-@Getter
 @Table(name = "m_loan_installment_charge")
 public class LoanInstallmentCharge extends AbstractPersistableCustom<Long> implements Comparable<LoanInstallmentCharge> {
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "loan_charge_id", referencedColumnName = "id", nullable = false)
     private LoanCharge loancharge;
-
-    @Setter
     @ManyToOne
     @JoinColumn(name = "loan_schedule_id", nullable = false)
     private LoanRepaymentScheduleInstallment installment;
-
     @Column(name = "amount", scale = 6, precision = 19, nullable = false)
     private BigDecimal amount;
-
     @Column(name = "amount_paid_derived", scale = 6, precision = 19, nullable = true)
     private BigDecimal amountPaid;
-
-    @Setter
     @Column(name = "amount_waived_derived", scale = 6, precision = 19, nullable = true)
     private BigDecimal amountWaived;
-
     @Column(name = "amount_writtenoff_derived", scale = 6, precision = 19, nullable = true)
     private BigDecimal amountWrittenOff;
-
     @Column(name = "amount_outstanding_derived", scale = 6, precision = 19, nullable = false)
     private BigDecimal amountOutstanding;
-
     @Column(name = "amount_through_charge_payment", scale = 6, precision = 19, nullable = true)
     private BigDecimal amountThroughChargePayment;
-
-    @Setter
     @Column(name = "is_paid_derived", nullable = false)
     private boolean paid = false;
-
-    @Setter
     @Column(name = "waived", nullable = false)
     private boolean waived = false;
 
@@ -141,19 +124,15 @@ public class LoanInstallmentCharge extends AbstractPersistableCustom<Long> imple
         if (this.amountPaid != null) {
             amountPaidLocal = this.amountPaid;
         }
-
         BigDecimal amountWaivedLocal = BigDecimal.ZERO;
         if (this.amountWaived != null) {
             amountWaivedLocal = this.amountWaived;
         }
-
         BigDecimal amountWrittenOffLocal = BigDecimal.ZERO;
         if (this.amountWrittenOff != null) {
             amountWrittenOffLocal = this.amountWrittenOff;
         }
-
         final BigDecimal totalAccountedFor = amountPaidLocal.add(amountWaivedLocal).add(amountWrittenOffLocal);
-
         return this.amount.subtract(totalAccountedFor);
     }
 
@@ -184,7 +163,6 @@ public class LoanInstallmentCharge extends AbstractPersistableCustom<Long> imple
     }
 
     public Money updatePaidAmountBy(final Money incrementBy, final Money feeAmount) {
-
         Money amountPaidToDate = Money.of(incrementBy.getCurrency(), this.amountPaid);
         final Money amountOutstanding = Money.of(incrementBy.getCurrency(), this.amountOutstanding);
         Money amountPaidPreviously = amountPaidToDate;
@@ -215,7 +193,6 @@ public class LoanInstallmentCharge extends AbstractPersistableCustom<Long> imple
                 this.paid = true;
             }
         }
-
         return amountPaidOnThisCharge;
     }
 
@@ -245,7 +222,6 @@ public class LoanInstallmentCharge extends AbstractPersistableCustom<Long> imple
         this.amountOutstanding = calculateAmountOutstanding(currency);
         this.paid = false;
         this.waived = false;
-
     }
 
     public Money getAmountThroughChargePayment(final MonetaryCurrency currency) {
@@ -289,9 +265,7 @@ public class LoanInstallmentCharge extends AbstractPersistableCustom<Long> imple
     }
 
     public Money undoPaidAmountBy(final Money incrementBy, final Money feeAmount) {
-
         Money amountPaidToDate = Money.of(incrementBy.getCurrency(), this.amountPaid);
-
         Money amountToDeductOnThisCharge;
         if (incrementBy.isGreaterThanOrEqualTo(amountPaidToDate)) {
             amountToDeductOnThisCharge = amountPaidToDate;
@@ -306,7 +280,6 @@ public class LoanInstallmentCharge extends AbstractPersistableCustom<Long> imple
         }
         this.amountThroughChargePayment = feeAmount.getAmount();
         this.paid = determineIfFullyPaid();
-
         return amountToDeductOnThisCharge;
     }
 
@@ -315,7 +288,71 @@ public class LoanInstallmentCharge extends AbstractPersistableCustom<Long> imple
     }
 
     public LoanInstallmentChargeData toData() {
-        return LoanInstallmentChargeData.builder().installmentNumber(installment.getInstallmentNumber()).dueDate(installment.getDueDate())
-                .amount(amount).amountOutstanding(amountOutstanding).amountWaived(amountWaived).paid(paid).waived(waived).build();
+        return LoanInstallmentChargeData.builder().installmentNumber(installment.getInstallmentNumber()).dueDate(installment.getDueDate()).amount(amount).amountOutstanding(amountOutstanding).amountWaived(amountWaived).paid(paid).waived(waived).build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanRepaymentScheduleInstallment getInstallment() {
+        return this.installment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountPaid() {
+        return this.amountPaid;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountWaived() {
+        return this.amountWaived;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountWrittenOff() {
+        return this.amountWrittenOff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountOutstanding() {
+        return this.amountOutstanding;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountThroughChargePayment() {
+        return this.amountThroughChargePayment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isPaid() {
+        return this.paid;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isWaived() {
+        return this.waived;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setInstallment(final LoanRepaymentScheduleInstallment installment) {
+        this.installment = installment;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAmountWaived(final BigDecimal amountWaived) {
+        this.amountWaived = amountWaived;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setPaid(final boolean paid) {
+        this.paid = paid;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setWaived(final boolean waived) {
+        this.waived = waived;
     }
 }

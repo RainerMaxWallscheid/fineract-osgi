@@ -19,10 +19,6 @@
 package org.apache.fineract.cob.workingcapitalloan;
 
 import java.util.concurrent.LinkedBlockingQueue;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.exceptions.LockedReadException;
 import org.apache.fineract.cob.service.BeforeStepLockingItemReaderHelper;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
@@ -34,14 +30,11 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
-@Slf4j
-@RequiredArgsConstructor
 public class WorkingCapitalLoanCOBWorkerItemReader implements ItemReader<WorkingCapitalLoan> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanCOBWorkerItemReader.class);
     private final WorkingCapitalLoanRepository repository;
     private final BeforeStepLockingItemReaderHelper itemReaderHelper;
-
-    @Setter(AccessLevel.PROTECTED)
     private LinkedBlockingQueue<Long> remainingData;
 
     @Nullable
@@ -59,9 +52,19 @@ public class WorkingCapitalLoanCOBWorkerItemReader implements ItemReader<Working
     }
 
     @BeforeStep
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public void beforeStep(@NonNull StepExecution stepExecution) {
         setRemainingData(itemReaderHelper.filterRemainingData(stepExecution));
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanCOBWorkerItemReader(final WorkingCapitalLoanRepository repository, final BeforeStepLockingItemReaderHelper itemReaderHelper) {
+        this.repository = repository;
+        this.itemReaderHelper = itemReaderHelper;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected void setRemainingData(final LinkedBlockingQueue<Long> remainingData) {
+        this.remainingData = remainingData;
+    }
 }

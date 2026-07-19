@@ -27,31 +27,26 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.tax.api.TaxApiConstants;
 
 @Entity
-@Getter
 @Table(name = "m_tax_group_mappings")
 public class TaxGroupMappings extends AbstractAuditableCustom {
-
     @ManyToOne
     @JoinColumn(name = "tax_group_id", nullable = false)
     private TaxGroup taxGroup;
-
     @ManyToOne
     @JoinColumn(name = "tax_component_id", nullable = false)
     private TaxComponent taxComponent;
-
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
-
     @Column(name = "end_date", nullable = true)
     private LocalDate endDate;
 
-    protected TaxGroupMappings() {}
+    protected TaxGroupMappings() {
+    }
 
     private TaxGroupMappings(final TaxComponent taxComponent, final LocalDate startDate, final LocalDate endDate) {
         this.taxComponent = taxComponent;
@@ -62,7 +57,6 @@ public class TaxGroupMappings extends AbstractAuditableCustom {
     public static TaxGroupMappings createTaxGroupMappings(final TaxComponent taxComponent, final LocalDate startDate) {
         final LocalDate endDate = null;
         return new TaxGroupMappings(taxComponent, startDate, endDate);
-
     }
 
     public static TaxGroupMappings createTaxGroupMappings(final Long id, final TaxComponent taxComponent, final LocalDate endDate) {
@@ -70,7 +64,6 @@ public class TaxGroupMappings extends AbstractAuditableCustom {
         TaxGroupMappings groupMappings = new TaxGroupMappings(taxComponent, startDate, endDate);
         groupMappings.setId(id);
         return groupMappings;
-
     }
 
     public void update(final LocalDate endDate, final List<Map<String, Object>> changes) {
@@ -109,5 +102,10 @@ public class TaxGroupMappings extends AbstractAuditableCustom {
 
     public void setTaxGroup(TaxGroup taxGroup) {
         this.taxGroup = taxGroup;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getStartDate() {
+        return this.startDate;
     }
 }

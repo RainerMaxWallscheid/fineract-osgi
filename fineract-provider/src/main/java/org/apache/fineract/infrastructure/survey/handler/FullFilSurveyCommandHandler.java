@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.survey.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -29,17 +28,18 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Created by Cieyou on 3/12/14.
  */
-
 @Service
-@RequiredArgsConstructor
 public class FullFilSurveyCommandHandler implements NewCommandSourceHandler {
-
     private final WriteSurveyService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.fullFillSurvey(command.getEntityName(), command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FullFilSurveyCommandHandler(final WriteSurveyService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

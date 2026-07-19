@@ -21,18 +21,15 @@ package org.apache.fineract.infrastructure.core.diagnostics.performance.sampling
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class SamplingServiceFactory {
-
     private final Map<Class<?>, SamplingService> services = new ConcurrentHashMap<>();
     private final SamplingConfiguration samplingConfiguration;
 
     public SamplingService forClass(Class<?> contextClass) {
-        return services.computeIfAbsent(contextClass, (cc) -> {
+        return services.computeIfAbsent(contextClass, cc -> {
             if (samplingConfiguration.isSamplingEnabled() && samplingConfiguration.isSamplingConfiguredForClass(contextClass)) {
                 return new InMemorySamplingService(samplingConfiguration.getSamplingRate());
             } else {
@@ -43,5 +40,10 @@ public class SamplingServiceFactory {
 
     public void doWithAll(Consumer<Map<Class<?>, SamplingService>> c) {
         c.accept(Map.copyOf(services));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SamplingServiceFactory(final SamplingConfiguration samplingConfiguration) {
+        this.samplingConfiguration = samplingConfiguration;
     }
 }

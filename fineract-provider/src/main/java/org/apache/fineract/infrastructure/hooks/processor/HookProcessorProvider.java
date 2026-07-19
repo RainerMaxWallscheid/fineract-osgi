@@ -22,16 +22,12 @@ import static org.apache.fineract.infrastructure.hooks.api.HookApiConstants.elas
 import static org.apache.fineract.infrastructure.hooks.api.HookApiConstants.httpSMSTemplateName;
 import static org.apache.fineract.infrastructure.hooks.api.HookApiConstants.smsTemplateName;
 import static org.apache.fineract.infrastructure.hooks.api.HookApiConstants.webTemplateName;
-
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.hooks.domain.Hook;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class HookProcessorProvider {
-
     private final ApplicationContext applicationContext;
 
     public HookProcessor getProcessor(final Hook hook) {
@@ -51,4 +47,8 @@ public class HookProcessorProvider {
         return processor;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public HookProcessorProvider(final ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 }

@@ -21,7 +21,6 @@ package org.apache.fineract.test.stepdef.common;
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
 import static org.apache.fineract.test.stepdef.datatable.DatatablesStepDef.DATATABLE_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
-
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -39,7 +38,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.fineract.avro.loan.v1.LoanSchedulePeriodDataV1;
 import org.apache.fineract.client.feign.FineractFeignClient;
@@ -81,11 +79,10 @@ import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Slf4j
 public class BatchApiStepDef extends AbstractStepDef {
-
-    private static final com.fasterxml.jackson.databind.ObjectMapper OBJECT_MAPPER = org.apache.fineract.client.feign.ObjectMapperFactory
-            .getShared();
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BatchApiStepDef.class);
+    private static final com.fasterxml.jackson.databind.ObjectMapper OBJECT_MAPPER = org.apache.fineract.client.feign.ObjectMapperFactory.getShared();
     private static final String DATE_FORMAT = "dd MMMM yyyy";
     private static final String DEFAULT_LOCALE = "en";
     private static final Long BATCH_API_SAMPLE_REQUEST_ID_1 = 1L;
@@ -122,19 +119,14 @@ public class BatchApiStepDef extends AbstractStepDef {
     private static final String IDEMPOTENCY_KEY = "Idempotency-Key";
     private static final String CLIENT_ID_REGEX = "\"clientId\":1";
     private static final String CLIENT_ID_REPLACEMENT = "\"clientId\":\"$.clientId\"";
-
     @Autowired
     private FineractFeignClient fineractFeignClient;
-
     @Autowired
     private ClientRequestFactory clientRequestFactory;
-
     @Autowired
     private EventAssertion eventAssertion;
-
     @Autowired
     private LoanRequestFactory loanRequestFactory;
-
     @Autowired
     private ChargeProductResolver chargeProductResolver;
 
@@ -155,23 +147,19 @@ public class BatchApiStepDef extends AbstractStepDef {
         List<BatchRequest> requestList = new ArrayList<>();
         Set<Header> headers = new HashSet<>();
         headers.add(HEADER);
-
         // request 1 - create client
         PostClientsRequest clientsRequest = clientRequestFactory.defaultClientCreationRequest();
         String bodyClientsRequest = toJson(clientsRequest);
-
         BatchRequest batchRequest1 = new BatchRequest();
         batchRequest1.requestId(BATCH_API_SAMPLE_REQUEST_ID_1);
         batchRequest1.relativeUrl(BATCH_API_SAMPLE_RELATIVE_URL_CLIENTS);
         batchRequest1.method(BATCH_API_METHOD_POST);
         batchRequest1.headers(headers);
         batchRequest1.body(bodyClientsRequest);
-
         // request 2 - create Loan
         PostLoansRequest loansRequest = loanRequestFactory.defaultLoansRequest(1L);
         String bodyLoansRequest = toJson(loansRequest);
         String bodyLoansRequestMod = bodyLoansRequest.replace(CLIENT_ID_REGEX, CLIENT_ID_REPLACEMENT);
-
         BatchRequest batchRequest2 = new BatchRequest();
         batchRequest2.requestId(BATCH_API_SAMPLE_REQUEST_ID_2);
         batchRequest2.relativeUrl(BATCH_API_SAMPLE_RELATIVE_URL_LOANS);
@@ -179,19 +167,16 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest2.headers(headers);
         batchRequest2.reference(BATCH_API_SAMPLE_REQUEST_ID_1);
         batchRequest2.body(bodyLoansRequestMod);
-
         // request 3 - charge Loan
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         String dateOfCharge = formatter.format(Utils.now().minusMonths(1L).plusDays(1L));
-
         PostLoansLoanIdChargesRequest loanIdChargesRequest = new PostLoansLoanIdChargesRequest();
         loanIdChargesRequest.chargeId(chargeProductResolver.resolve(ChargeProductType.LOAN_NSF_FEE));
-        loanIdChargesRequest.amount(25D);
+        loanIdChargesRequest.amount(25.0);
         loanIdChargesRequest.dueDate(dateOfCharge);
         loanIdChargesRequest.dateFormat(DATE_FORMAT);
         loanIdChargesRequest.locale(DEFAULT_LOCALE);
         String bodyLoanIdChargesRequest = toJson(loanIdChargesRequest);
-
         BatchRequest batchRequest3 = new BatchRequest();
         batchRequest3.requestId(BATCH_API_SAMPLE_REQUEST_ID_3);
         batchRequest3.relativeUrl(BATCH_API_SAMPLE_RELATIVE_URL_LOANS_CHARGES);
@@ -199,7 +184,6 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest3.headers(headers);
         batchRequest3.reference(BATCH_API_SAMPLE_REQUEST_ID_2);
         batchRequest3.body(bodyLoanIdChargesRequest);
-
         // request 4 - get charge data
         BatchRequest batchRequest4 = new BatchRequest();
         batchRequest4.requestId(BATCH_API_SAMPLE_REQUEST_ID_4);
@@ -208,7 +192,6 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest4.headers(headers);
         batchRequest4.reference(BATCH_API_SAMPLE_REQUEST_ID_2);
         batchRequest4.body(BODY_GET_REQUEST);
-
         // build Batch Api request
         requestList.add(batchRequest1);
         requestList.add(batchRequest2);
@@ -225,23 +208,19 @@ public class BatchApiStepDef extends AbstractStepDef {
         List<BatchRequest> requestList = new ArrayList<>();
         Set<Header> headers = new HashSet<>();
         headers.add(HEADER);
-
         // request 1 - create client
         PostClientsRequest clientsRequest = clientRequestFactory.defaultClientCreationRequest();
         String bodyClientsRequest = toJson(clientsRequest);
-
         BatchRequest batchRequest1 = new BatchRequest();
         batchRequest1.requestId(BATCH_API_SAMPLE_REQUEST_ID_1);
         batchRequest1.relativeUrl(BATCH_API_SAMPLE_RELATIVE_URL_CLIENTS);
         batchRequest1.method(BATCH_API_METHOD_POST);
         batchRequest1.headers(headers);
         batchRequest1.body(bodyClientsRequest);
-
         // request 2 - create Loan
         PostLoansRequest loansRequest = loanRequestFactory.defaultLoansRequest(1L);
         String bodyLoansRequest = toJson(loansRequest);
         String bodyLoansRequestMod = bodyLoansRequest.replace(CLIENT_ID_REGEX, CLIENT_ID_REPLACEMENT);
-
         BatchRequest batchRequest2 = new BatchRequest();
         batchRequest2.requestId(BATCH_API_SAMPLE_REQUEST_ID_2);
         batchRequest2.relativeUrl(BATCH_API_SAMPLE_RELATIVE_URL_LOANS);
@@ -249,11 +228,9 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest2.headers(headers);
         batchRequest2.reference(BATCH_API_SAMPLE_REQUEST_ID_1);
         batchRequest2.body(bodyLoansRequestMod);
-
         // request 3 - approve Loan
         PostLoansLoanIdRequest loanApproveRequest = loanRequestFactory.defaultLoanApproveRequest();
         String bodyLoanApproveRequest = toJson(loanApproveRequest);
-
         BatchRequest batchRequest3 = new BatchRequest();
         batchRequest3.requestId(BATCH_API_SAMPLE_REQUEST_ID_3);
         batchRequest3.relativeUrl(BATCH_API_SAMPLE_RELATIVE_URL_LOANS_APPROVE);
@@ -261,11 +238,9 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest3.reference(BATCH_API_SAMPLE_REQUEST_ID_2);
         batchRequest3.headers(headers);
         batchRequest3.body(bodyLoanApproveRequest);
-
         // request 4 - disburse Loan
         PostLoansLoanIdRequest loanDisburseRequest = loanRequestFactory.defaultLoanDisburseRequest();
         String bodyLoanDisburseRequest = toJson(loanDisburseRequest);
-
         BatchRequest batchRequest4 = new BatchRequest();
         batchRequest4.requestId(BATCH_API_SAMPLE_REQUEST_ID_4);
         batchRequest4.relativeUrl(BATCH_API_SAMPLE_RELATIVE_URL_LOANS_DISBURSE);
@@ -273,14 +248,11 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest4.reference(BATCH_API_SAMPLE_REQUEST_ID_2);
         batchRequest4.headers(headers);
         batchRequest4.body(bodyLoanDisburseRequest);
-
         // request 5 - repayment with idempotency key
         PostLoansLoanIdTransactionsRequest loanRepaymentRequest1 = loanRequestFactory.defaultRepaymentRequest();
         String bodyLoanRepaymentRequest1 = toJson(loanRepaymentRequest1);
-
         String idempotencyKey = UUID.randomUUID().toString();
         headers.add(new Header().name(IDEMPOTENCY_KEY).value(idempotencyKey));
-
         BatchRequest batchRequest5 = new BatchRequest();
         batchRequest5.requestId(BATCH_API_SAMPLE_REQUEST_ID_5);
         batchRequest5.relativeUrl(BATCH_API_SAMPLE_RELATIVE_URL_LOANS_REPAYMENT);
@@ -288,11 +260,9 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest5.reference(BATCH_API_SAMPLE_REQUEST_ID_2);
         batchRequest5.headers(headers);
         batchRequest5.body(bodyLoanRepaymentRequest1);
-
         // request 6 - repayment with same idempotency key
         PostLoansLoanIdTransactionsRequest loanRepaymentRequest2 = loanRequestFactory.defaultRepaymentRequest();
         String bodyLoanRepaymentRequest2 = toJson(loanRepaymentRequest2);
-
         BatchRequest batchRequest6 = new BatchRequest();
         batchRequest6.requestId(BATCH_API_SAMPLE_REQUEST_ID_6);
         batchRequest6.relativeUrl(BATCH_API_SAMPLE_RELATIVE_URL_LOANS_REPAYMENT);
@@ -300,7 +270,6 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest6.reference(BATCH_API_SAMPLE_REQUEST_ID_2);
         batchRequest6.headers(headers);
         batchRequest6.body(bodyLoanRepaymentRequest2);
-
         // build Batch Api request
         requestList.add(batchRequest1);
         requestList.add(batchRequest2);
@@ -319,14 +288,11 @@ public class BatchApiStepDef extends AbstractStepDef {
         String idempotencyKey = UUID.randomUUID().toString();
         String clientExternalId = UUID.randomUUID().toString();
         String loanExternalId = UUID.randomUUID().toString();
-
         List<BatchRequest> requestList = new ArrayList<>();
-
         requestList.add(createClient(1L, idempotencyKey, clientExternalId));
         requestList.add(createLoan(2L, 1L, idempotencyKey, loanExternalId));
         requestList.add(approveLoanByExternalId(3L, 2L, idempotencyKey));
         requestList.add(getLoanDetailsByExternalId(4L, 2L, idempotencyKey));
-
         Boolean isEnclosingTransaction = Boolean.valueOf(enclosingTransaction);
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put(ENCLOSING_TRANSACTION, isEnclosingTransaction);
@@ -342,14 +308,11 @@ public class BatchApiStepDef extends AbstractStepDef {
         String idempotencyKey = UUID.randomUUID().toString();
         String clientExternalId = UUID.randomUUID().toString();
         String loanExternalId = UUID.randomUUID().toString();
-
         List<BatchRequest> requestList = new ArrayList<>();
-
         requestList.add(createClient(1L, idempotencyKey, clientExternalId));
         requestList.add(createLoan(2L, 1L, idempotencyKey, loanExternalId));
         requestList.add(approveLoanByExternalIdFail(3L, 2L, idempotencyKey, "approve-fail"));
         requestList.add(getLoanDetailsByExternalId(4L, 2L, idempotencyKey));
-
         Boolean isEnclosingTransaction = Boolean.valueOf(enclosingTransaction);
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put(ENCLOSING_TRANSACTION, isEnclosingTransaction);
@@ -368,9 +331,7 @@ public class BatchApiStepDef extends AbstractStepDef {
         String idempotencyKey2 = UUID.randomUUID().toString();
         String clientExternalId2 = UUID.randomUUID().toString();
         String loanExternalId2 = UUID.randomUUID().toString();
-
         List<BatchRequest> requestList = new ArrayList<>();
-
         requestList.add(createClient(1L, idempotencyKey, clientExternalId));
         requestList.add(createLoan(2L, 1L, idempotencyKey, loanExternalId));
         requestList.add(approveLoanByExternalId(3L, 2L, idempotencyKey));
@@ -379,7 +340,6 @@ public class BatchApiStepDef extends AbstractStepDef {
         requestList.add(createLoan(6L, 5L, idempotencyKey2, loanExternalId2));
         requestList.add(approveLoanByExternalId(7L, 6L, idempotencyKey2));
         requestList.add(getLoanDetailsByExternalId(8L, 6L, idempotencyKey2));
-
         Boolean isEnclosingTransaction = Boolean.valueOf(enclosingTransaction);
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put(ENCLOSING_TRANSACTION, isEnclosingTransaction);
@@ -401,9 +361,7 @@ public class BatchApiStepDef extends AbstractStepDef {
         String idempotencyKey2 = UUID.randomUUID().toString();
         String clientExternalId2 = UUID.randomUUID().toString();
         String loanExternalId2 = UUID.randomUUID().toString();
-
         List<BatchRequest> requestList = new ArrayList<>();
-
         requestList.add(createClient(1L, idempotencyKey, clientExternalId));
         requestList.add(createLoan(2L, 1L, idempotencyKey, loanExternalId));
         requestList.add(approveLoanByExternalId(3L, 2L, idempotencyKey));
@@ -412,12 +370,10 @@ public class BatchApiStepDef extends AbstractStepDef {
         requestList.add(createLoan(6L, 5L, idempotencyKey2, loanExternalId2));
         requestList.add(approveLoanByExternalIdFail(7L, 6L, idempotencyKey2, "approve-fail"));
         requestList.add(getLoanDetailsByExternalId(8L, 6L, idempotencyKey2));
-
         Boolean isEnclosingTransaction = Boolean.valueOf(enclosingTransaction);
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put(ENCLOSING_TRANSACTION, isEnclosingTransaction);
         List<BatchResponse> batchResponseList = batchApiApi().handleBatchRequests(requestList, queryParams);
-
         testContext().set(TestContextKey.BATCH_API_CALL_RESPONSE, batchResponseList);
         testContext().set(TestContextKey.BATCH_API_CALL_IDEMPOTENCY_KEY, idempotencyKey);
         testContext().set(TestContextKey.BATCH_API_CALL_CLIENT_EXTERNAL_ID, clientExternalId);
@@ -432,15 +388,12 @@ public class BatchApiStepDef extends AbstractStepDef {
         String idempotencyKey = UUID.randomUUID().toString();
         String clientExternalId = UUID.randomUUID().toString();
         String loanExternalId = UUID.randomUUID().toString();
-
         List<BatchRequest> requestList = new ArrayList<>();
-
         requestList.add(createClient(1L, idempotencyKey, clientExternalId));
         requestList.add(createLoan(2L, 1L, idempotencyKey, loanExternalId));
         requestList.add(approveLoanByExternalId(3L, 2L, idempotencyKey));
         requestList.add(approveLoanByExternalId(4L, 2L, idempotencyKey));
         requestList.add(getLoanDetailsByExternalId(5L, 2L, idempotencyKey));
-
         Boolean isEnclosingTransaction = Boolean.valueOf(enclosingTransaction);
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put(ENCLOSING_TRANSACTION, isEnclosingTransaction);
@@ -452,18 +405,14 @@ public class BatchApiStepDef extends AbstractStepDef {
     }
 
     @When("Batch API call with steps: rescheduleLoan from {string} to {string} submitted on date: {string}, approveReschedule on date: {string} runs with enclosingTransaction: {string}")
-    public void runBatchApiCreateAndApproveLoanReschedule(String fromDateStr, String toDateStr, String submittedOnDate,
-            String approvedOnDate, String enclosingTransaction) throws IOException {
+    public void runBatchApiCreateAndApproveLoanReschedule(String fromDateStr, String toDateStr, String submittedOnDate, String approvedOnDate, String enclosingTransaction) throws IOException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         String idempotencyKey = UUID.randomUUID().toString();
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         Long loanId = loanResponse.getLoanId();
-
         List<BatchRequest> requestList = new ArrayList<>();
-
         requestList.add(createLoanReschedule(1L, loanId, fromDateStr, toDateStr, submittedOnDate, idempotencyKey, null));
         requestList.add(approveLoanReschedule(2L, idempotencyKey, approvedOnDate, 1L));
-
         Boolean isEnclosingTransaction = Boolean.valueOf(enclosingTransaction);
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put(ENCLOSING_TRANSACTION, isEnclosingTransaction);
@@ -471,8 +420,7 @@ public class BatchApiStepDef extends AbstractStepDef {
         testContext().set(TestContextKey.BATCH_API_CALL_RESPONSE, batchResponseList);
         testContext().set(TestContextKey.BATCH_API_CALL_IDEMPOTENCY_KEY, idempotencyKey);
         eventAssertion.assertEvent(LoanRescheduledDueAdjustScheduleEvent.class, loanId).extractingData(loanAccountDataV1 -> {
-            LoanSchedulePeriodDataV1 period = loanAccountDataV1.getRepaymentSchedule().getPeriods().stream()
-                    .filter(p -> formatter.format(LocalDate.parse(p.getDueDate())).equals(toDateStr)).findFirst().orElse(null);
+            LoanSchedulePeriodDataV1 period = loanAccountDataV1.getRepaymentSchedule().getPeriods().stream().filter(p -> formatter.format(LocalDate.parse(p.getDueDate())).equals(toDateStr)).findFirst().orElse(null);
             String dueDate = "";
             if (period != null) {
                 dueDate = formatter.format(LocalDate.parse(period.getDueDate()));
@@ -483,18 +431,14 @@ public class BatchApiStepDef extends AbstractStepDef {
     }
 
     @When("Batch API call with created user and with steps: rescheduleLoan from {string} to {string} submitted on date: {string}, approveReschedule on date: {string} runs with enclosingTransaction: {string}")
-    public void runBatchApiCreateAndApproveLoanRescheduleWithGivenUser(String fromDateStr, String toDateStr, String submittedOnDate,
-            String approvedOnDate, String enclosingTransaction) throws IOException {
+    public void runBatchApiCreateAndApproveLoanRescheduleWithGivenUser(String fromDateStr, String toDateStr, String submittedOnDate, String approvedOnDate, String enclosingTransaction) throws IOException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         String idempotencyKey = UUID.randomUUID().toString();
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         Long loanId = loanResponse.getLoanId();
-
         List<BatchRequest> requestList = new ArrayList<>();
-
         requestList.add(createLoanReschedule(1L, loanId, fromDateStr, toDateStr, submittedOnDate, idempotencyKey, null));
         requestList.add(approveLoanReschedule(2L, idempotencyKey, approvedOnDate, 1L));
-
         Boolean isEnclosingTransaction = Boolean.valueOf(enclosingTransaction);
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put(ENCLOSING_TRANSACTION, isEnclosingTransaction);
@@ -502,12 +446,10 @@ public class BatchApiStepDef extends AbstractStepDef {
         // List<BatchResponse> batchResponseList = batchApiApi().handleBatchRequests(requestList, queryParams,
         // headerMap);
         List<BatchResponse> batchResponseList = batchApiApi().handleBatchRequests(requestList, queryParams);
-
         // Feign throws exceptions on errors, no errorBody()
         if (batchResponseList != null) {
             log.debug("Body: {}", batchResponseList);
         }
-
         testContext().set(TestContextKey.BATCH_API_CALL_RESPONSE, batchResponseList);
         testContext().set(TestContextKey.BATCH_API_CALL_IDEMPOTENCY_KEY, idempotencyKey);
         if (Boolean.TRUE.equals(isEnclosingTransaction)) {
@@ -515,8 +457,7 @@ public class BatchApiStepDef extends AbstractStepDef {
             ok(() -> fineractFeignClient.inlineJob().executeInlineJob("LOAN_COB", inlineJobRequest));
         }
         eventAssertion.assertEvent(LoanRescheduledDueAdjustScheduleEvent.class, loanId).extractingData(loanAccountDataV1 -> {
-            Optional<LoanSchedulePeriodDataV1> period = loanAccountDataV1.getRepaymentSchedule().getPeriods().stream()
-                    .filter(p -> formatter.format(LocalDate.parse(p.getDueDate())).equals(toDateStr)).findFirst();
+            Optional<LoanSchedulePeriodDataV1> period = loanAccountDataV1.getRepaymentSchedule().getPeriods().stream().filter(p -> formatter.format(LocalDate.parse(p.getDueDate())).equals(toDateStr)).findFirst();
             String dueDate = "";
             if (period.isPresent()) {
                 dueDate = formatter.format(LocalDate.parse(period.get().getDueDate()));
@@ -527,15 +468,12 @@ public class BatchApiStepDef extends AbstractStepDef {
     }
 
     @When("Batch API call with created user and the following data results a {int} error and a {string} error message:")
-    public void runBatchApiCreateAndApproveLoanRescheduleWithGivenUserLockedByCobError(int errorCodeExpected, String errorMessageType,
-            DataTable table) throws IOException {
+    public void runBatchApiCreateAndApproveLoanRescheduleWithGivenUserLockedByCobError(int errorCodeExpected, String errorMessageType, DataTable table) throws IOException {
         String idempotencyKey = UUID.randomUUID().toString();
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         Long loanId = loanResponse.getLoanId();
-
         LoanRescheduleErrorMessage loanRescheduleErrorMessage = LoanRescheduleErrorMessage.valueOf(errorMessageType);
         String errorMessageExpected = loanRescheduleErrorMessage.getValue(loanId);
-
         List<List<String>> data = table.asLists();
         List<String> transferData = data.get(1);
         String fromDateStr = transferData.get(0);
@@ -543,51 +481,40 @@ public class BatchApiStepDef extends AbstractStepDef {
         String toDateStr = transferData.get(2);
         String approvedOnDate = transferData.get(3);
         String enclosingTransaction = transferData.get(4);
-
         List<BatchRequest> requestList = new ArrayList<>();
         requestList.add(createLoanReschedule(1L, loanId, fromDateStr, toDateStr, submittedOnDate, idempotencyKey, null));
         requestList.add(approveLoanReschedule(2L, idempotencyKey, approvedOnDate, 1L));
-
         Boolean isEnclosingTransaction = Boolean.valueOf(enclosingTransaction);
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put(ENCLOSING_TRANSACTION, isEnclosingTransaction);
-
         // Feign throws exceptions on errors instead of returning error in response body
         ErrorResponse errorResponse = null;
         Map<String, String> headerMap = new HashMap<>();
-
         // Create new user which cannot bypass loan COB execution
         PostUsersResponse createUserResponse = testContext().get(TestContextKey.CREATED_SIMPLE_USER_RESPONSE);
         Long createdUserId = createUserResponse.getResourceId();
         GetUsersUserIdResponse user = fineractFeignClient.users().retrieveOneUser(createdUserId);
         String authorizationString = user.getUsername() + ":" + PWD_USER_WITH_ROLE;
         Base64 base64 = new Base64();
-        headerMap.put("Authorization",
-                "Basic " + new String(base64.encode(authorizationString.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
+        headerMap.put("Authorization", "Basic " + new String(base64.encode(authorizationString.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
         try {
             batchApiApi().handleBatchRequests(requestList, queryParams, headerMap);
         } catch (org.apache.fineract.client.feign.FeignException e) {
             errorResponse = fromJson(e.responseBodyAsString(), ErrorResponse.class);
         }
-
         String errorMessageActual = errorResponse.getDeveloperMessage();
         Integer errorCodeActual = errorResponse.getHttpStatusCode();
-
         assertThat(errorCodeActual).as(ErrorMessageHelper.wrongErrorCode(errorCodeActual, errorCodeExpected)).isEqualTo(errorCodeExpected);
-        assertThat(errorMessageActual).as(ErrorMessageHelper.wrongErrorMessage(errorMessageActual, errorMessageExpected))
-                .isEqualTo(errorMessageExpected);
-
+        assertThat(errorMessageActual).as(ErrorMessageHelper.wrongErrorMessage(errorMessageActual, errorMessageExpected)).isEqualTo(errorMessageExpected);
         log.debug("ERROR CODE: {}", errorCodeActual);
         log.debug("ERROR MESSAGE: {}", errorMessageActual);
     }
 
     @When("Batch API call with created user and the following data results a {int} statuscode WITHOUT error message:")
-    public void runBatchApiCreateAndApproveLoanRescheduleWithGivenUserLockedByCobWithoutError(int httpCodeExpected, DataTable table)
-            throws IOException {
+    public void runBatchApiCreateAndApproveLoanRescheduleWithGivenUserLockedByCobWithoutError(int httpCodeExpected, DataTable table) throws IOException {
         String idempotencyKey = UUID.randomUUID().toString();
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         Long loanId = loanResponse.getLoanId();
-
         List<List<String>> data = table.asLists();
         List<String> transferData = data.get(1);
         String fromDateStr = transferData.get(0);
@@ -595,11 +522,9 @@ public class BatchApiStepDef extends AbstractStepDef {
         String toDateStr = transferData.get(2);
         String approvedOnDate = transferData.get(3);
         String enclosingTransaction = transferData.get(4);
-
         List<BatchRequest> requestList = new ArrayList<>();
         requestList.add(createLoanReschedule(1L, loanId, fromDateStr, toDateStr, submittedOnDate, idempotencyKey, null));
         requestList.add(approveLoanReschedule(2L, idempotencyKey, approvedOnDate, 1L));
-
         Boolean isEnclosingTransaction = Boolean.valueOf(enclosingTransaction);
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put(ENCLOSING_TRANSACTION, isEnclosingTransaction);
@@ -614,10 +539,8 @@ public class BatchApiStepDef extends AbstractStepDef {
     public void runBatchApiQueryDatatableUpdateDatatable() throws IOException {
         String idempotencyKey = UUID.randomUUID().toString();
         List<BatchRequest> requestList = new ArrayList<>();
-
         requestList.add(queryDatatable(1L));
         requestList.add(updateDatatable(2L, 1L));
-
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put(ENCLOSING_TRANSACTION, false);
         List<BatchResponse> batchResponseList = batchApiApi().handleBatchRequests(requestList, queryParams);
@@ -625,13 +548,10 @@ public class BatchApiStepDef extends AbstractStepDef {
         testContext().set(TestContextKey.BATCH_API_CALL_IDEMPOTENCY_KEY, idempotencyKey);
     }
 
-    private BatchRequest createLoanReschedule(Long requestId, Long loanId, String fromDateStr, String toDateStr, String submittedOnDate,
-            String idempotencyKey, Long referenceId) {
-        PostCreateRescheduleLoansRequest rescheduleLoansRequest = loanRequestFactory.defaultLoanRescheduleCreateRequest(loanId, fromDateStr,
-                toDateStr);
+    private BatchRequest createLoanReschedule(Long requestId, Long loanId, String fromDateStr, String toDateStr, String submittedOnDate, String idempotencyKey, Long referenceId) {
+        PostCreateRescheduleLoansRequest rescheduleLoansRequest = loanRequestFactory.defaultLoanRescheduleCreateRequest(loanId, fromDateStr, toDateStr);
         rescheduleLoansRequest.setSubmittedOnDate(submittedOnDate);
         String bodyLoanRescheduleRequest = toJson(rescheduleLoansRequest);
-
         Set<Header> headers = new HashSet<>();
         headers.add(HEADER);
         if (idempotencyKey != null) {
@@ -644,7 +564,6 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest.headers(headers);
         batchRequest.reference(referenceId);
         batchRequest.body(bodyLoanRescheduleRequest);
-
         return batchRequest;
     }
 
@@ -652,7 +571,6 @@ public class BatchApiStepDef extends AbstractStepDef {
         PostUpdateRescheduleLoansRequest rescheduleLoansRequest = loanRequestFactory.defaultLoanRescheduleUpdateRequest();
         rescheduleLoansRequest.setApprovedOnDate(approvedOnDate);
         String bodyLoanRescheduleRequest = toJson(rescheduleLoansRequest);
-
         Set<Header> headers = new HashSet<>();
         headers.add(HEADER);
         if (idempotencyKey != null) {
@@ -665,7 +583,6 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest.headers(headers);
         batchRequest.reference(referenceId);
         batchRequest.body(bodyLoanRescheduleRequest);
-
         return batchRequest;
     }
 
@@ -681,32 +598,22 @@ public class BatchApiStepDef extends AbstractStepDef {
     @Then("Verify that step Nr. {int} results {int}")
     public void checkGivenStepResult(int nr, int resultStatusCode) {
         List<BatchResponse> batchResponseList = testContext().get(TestContextKey.BATCH_API_CALL_RESPONSE);
-        BatchResponse stepResponse = batchResponseList.stream().filter(r -> r.getRequestId() == nr).findAny()
-                .orElseThrow(() -> new IllegalStateException(String.format("Request id %s not found", nr)));
-
-        assertThat(stepResponse.getStatusCode()).as(ErrorMessageHelper.wrongStatusCode(stepResponse.getStatusCode(), resultStatusCode))
-                .isEqualTo(resultStatusCode);
+        BatchResponse stepResponse = batchResponseList.stream().filter(r -> r.getRequestId() == nr).findAny().orElseThrow(() -> new IllegalStateException(String.format("Request id %s not found", nr)));
+        assertThat(stepResponse.getStatusCode()).as(ErrorMessageHelper.wrongStatusCode(stepResponse.getStatusCode(), resultStatusCode)).isEqualTo(resultStatusCode);
     }
 
     @Then("Verify that step {int} throws an error with error code {int}")
     public void errorCodeInStep(int step, int errorCode) {
         List<BatchResponse> batchResponseList = testContext().get(TestContextKey.BATCH_API_CALL_RESPONSE);
-        BatchResponse response = batchResponseList.stream().filter(r -> r.getRequestId() == step).findAny()
-                .orElseThrow(() -> new IllegalStateException(String.format("Step %s is not found", step)));
+        BatchResponse response = batchResponseList.stream().filter(r -> r.getRequestId() == step).findAny().orElseThrow(() -> new IllegalStateException(String.format("Step %s is not found", step)));
         ErrorResponse errorResponse = fromJson(response.getBody(), ErrorResponse.class);
-
         String developerMessageActual = errorResponse.getDeveloperMessage();
         Integer httpStatusCodeActual = errorResponse.getHttpStatusCode();
-
         String developerMessageExpected = ERROR_DEVELOPER_MESSAGE;
         Integer httpStatusCodeExpected = ERROR_HTTP_404;
-
-        assertThat(response.getStatusCode()).as(ErrorMessageHelper.wrongStatusCode(response.getStatusCode(), errorCode))
-                .isEqualTo(errorCode);
-        assertThat(developerMessageActual).as(ErrorMessageHelper.wrongErrorMessage(developerMessageActual, developerMessageExpected))
-                .isEqualTo(developerMessageExpected);
-        assertThat(httpStatusCodeActual).as(ErrorMessageHelper.wrongStatusCode(httpStatusCodeActual, httpStatusCodeExpected))
-                .isEqualTo(httpStatusCodeExpected);
+        assertThat(response.getStatusCode()).as(ErrorMessageHelper.wrongStatusCode(response.getStatusCode(), errorCode)).isEqualTo(errorCode);
+        assertThat(developerMessageActual).as(ErrorMessageHelper.wrongErrorMessage(developerMessageActual, developerMessageExpected)).isEqualTo(developerMessageExpected);
+        assertThat(httpStatusCodeActual).as(ErrorMessageHelper.wrongStatusCode(httpStatusCodeActual, httpStatusCodeExpected)).isEqualTo(httpStatusCodeExpected);
     }
 
     @Then("Admin checks that all steps result 200OK for Batch API idempotency request")
@@ -722,21 +629,16 @@ public class BatchApiStepDef extends AbstractStepDef {
     public void batchAPITransactionHeaderCheckBoolean(String headerKeyExpected, String headerValueExpected, int requestId) {
         List<BatchResponse> batchResponseList = testContext().get(TestContextKey.BATCH_API_CALL_RESPONSE);
         BatchResponse batchResponse = batchResponseList.get(requestId - 1);
-
         Set<Header> headers = batchResponse.getHeaders();
         List<Header> headersList = new ArrayList<>(Objects.requireNonNull(headers));
         String headerValueActual = getHeaderValueByHeaderKey(headersList, headerKeyExpected);
-
-        assertThat(headerValueActual)
-                .as(ErrorMessageHelper.wrongValueInResponseHeader(headerKeyExpected, headerValueActual, headerValueExpected))
-                .isEqualTo(headerValueExpected);
+        assertThat(headerValueActual).as(ErrorMessageHelper.wrongValueInResponseHeader(headerKeyExpected, headerValueActual, headerValueExpected)).isEqualTo(headerValueExpected);
     }
 
     @Then("Batch API response has no {string} field in segment with requestId {int}")
     public void batchAPITransactionHeaderCheckNoField(String headerKeyExpected, int requestId) {
         List<BatchResponse> batchResponseList = testContext().get(TestContextKey.BATCH_API_CALL_RESPONSE);
         BatchResponse batchResponse = batchResponseList.get(requestId - 1);
-
         Set<Header> headers = batchResponse.getHeaders();
         List<Header> headersList = new ArrayList<>(Objects.requireNonNull(headers));
         boolean hasHeaderKey = false;
@@ -745,7 +647,6 @@ public class BatchApiStepDef extends AbstractStepDef {
                 hasHeaderKey = true;
             }
         }
-
         assertThat(hasHeaderKey).isFalse();
     }
 
@@ -753,15 +654,9 @@ public class BatchApiStepDef extends AbstractStepDef {
     public void batchAPITransactionAmountCheck(double transactionAmountExpected, int requestId) {
         List<BatchResponse> batchResponseList = testContext().get(TestContextKey.BATCH_API_CALL_RESPONSE);
         BatchResponse batchResponse = batchResponseList.get(requestId - 1);
-
-        PostLoansLoanIdTransactionsResponse loanTransactionResponse = fromJson(batchResponse.getBody(),
-                PostLoansLoanIdTransactionsResponse.class);
-        Double transactionAmountActual = Double
-                .valueOf(Objects.requireNonNull(Objects.requireNonNull(loanTransactionResponse.getChanges()).getTransactionAmount()));
-
-        assertThat(transactionAmountActual)
-                .as(ErrorMessageHelper.wrongAmountInTransactionsAmount(transactionAmountActual, transactionAmountExpected))
-                .isEqualTo(transactionAmountExpected);
+        PostLoansLoanIdTransactionsResponse loanTransactionResponse = fromJson(batchResponse.getBody(), PostLoansLoanIdTransactionsResponse.class);
+        Double transactionAmountActual = Double.valueOf(Objects.requireNonNull(Objects.requireNonNull(loanTransactionResponse.getChanges()).getTransactionAmount()));
+        assertThat(transactionAmountActual).as(ErrorMessageHelper.wrongAmountInTransactionsAmount(transactionAmountActual, transactionAmountExpected)).isEqualTo(transactionAmountExpected);
     }
 
     @Then("Batch API response has the same clientId and loanId in segment with requestId {int} as in segment with requestId {int}")
@@ -769,24 +664,14 @@ public class BatchApiStepDef extends AbstractStepDef {
         List<BatchResponse> batchResponseList = testContext().get(TestContextKey.BATCH_API_CALL_RESPONSE);
         BatchResponse batchResponseFirstTransaction = batchResponseList.get(requestIdFirstTransaction - 1);
         BatchResponse batchResponseSecondTransaction = batchResponseList.get(requestIdSecondTransaction - 1);
-
-        PostLoansLoanIdTransactionsResponse loanTransactionResponseFirst = fromJson(batchResponseFirstTransaction.getBody(),
-                PostLoansLoanIdTransactionsResponse.class);
-        PostLoansLoanIdTransactionsResponse loanTransactionResponseSecond = fromJson(batchResponseSecondTransaction.getBody(),
-                PostLoansLoanIdTransactionsResponse.class);
-
+        PostLoansLoanIdTransactionsResponse loanTransactionResponseFirst = fromJson(batchResponseFirstTransaction.getBody(), PostLoansLoanIdTransactionsResponse.class);
+        PostLoansLoanIdTransactionsResponse loanTransactionResponseSecond = fromJson(batchResponseSecondTransaction.getBody(), PostLoansLoanIdTransactionsResponse.class);
         Long clientIdFirstTransaction = loanTransactionResponseFirst.getClientId();
         Long clientIdSecondTransaction = loanTransactionResponseSecond.getClientId();
-
         Long loanIdFirstTransaction = loanTransactionResponseFirst.getLoanId();
         Long loanIdSecondTransaction = loanTransactionResponseSecond.getLoanId();
-
-        assertThat(clientIdSecondTransaction)
-                .as(ErrorMessageHelper.wrongClientIdInTransactionResponse(clientIdSecondTransaction, clientIdFirstTransaction))
-                .isEqualTo(clientIdFirstTransaction);
-        assertThat(loanIdSecondTransaction)
-                .as(ErrorMessageHelper.wrongLoanIdInTransactionResponse(loanIdSecondTransaction, loanIdFirstTransaction))
-                .isEqualTo(loanIdFirstTransaction);
+        assertThat(clientIdSecondTransaction).as(ErrorMessageHelper.wrongClientIdInTransactionResponse(clientIdSecondTransaction, clientIdFirstTransaction)).isEqualTo(clientIdFirstTransaction);
+        assertThat(loanIdSecondTransaction).as(ErrorMessageHelper.wrongLoanIdInTransactionResponse(loanIdSecondTransaction, loanIdFirstTransaction)).isEqualTo(loanIdFirstTransaction);
     }
 
     @Then("Batch API response has the same idempotency key in segment with requestId {int} as in segment with requestId {int}")
@@ -794,52 +679,38 @@ public class BatchApiStepDef extends AbstractStepDef {
         List<BatchResponse> batchResponseList = testContext().get(TestContextKey.BATCH_API_CALL_RESPONSE);
         BatchResponse batchResponseFirstTransaction = batchResponseList.get(requestIdFirstTransaction - 1);
         BatchResponse batchResponseSecondTransaction = batchResponseList.get(requestIdSecondTransaction - 1);
-
         Set<Header> headersFirstTransaction = batchResponseFirstTransaction.getHeaders();
         List<Header> headersListFirstTransaction = new ArrayList<>(Objects.requireNonNull(headersFirstTransaction));
         Set<Header> headersSecondTransaction = batchResponseSecondTransaction.getHeaders();
         List<Header> headersListSecondTransaction = new ArrayList<>(Objects.requireNonNull(headersSecondTransaction));
-
         String idempotencyValueFirstTransaction = getHeaderValueByHeaderKey(headersListFirstTransaction, IDEMPOTENCY_KEY);
         String idempotencyValueSecondTransaction = getHeaderValueByHeaderKey(headersListSecondTransaction, IDEMPOTENCY_KEY);
-
-        assertThat(idempotencyValueSecondTransaction)
-                .as(ErrorMessageHelper.idempotencyKeyNoMatch(idempotencyValueSecondTransaction, idempotencyValueFirstTransaction))
-                .isEqualTo(idempotencyValueFirstTransaction);
+        assertThat(idempotencyValueSecondTransaction).as(ErrorMessageHelper.idempotencyKeyNoMatch(idempotencyValueSecondTransaction, idempotencyValueFirstTransaction)).isEqualTo(idempotencyValueFirstTransaction);
     }
 
     @Then("Loan has {int} {string} transactions on Transactions tab after Batch API run")
     public void checkNrOfTransactionsBatchApi(int nrOfTransactionsExpected, String transactionTypeInput) throws IOException {
         TransactionType transactionType = TransactionType.valueOf(transactionTypeInput);
         String transactionTypeValue = transactionType.getValue();
-
         List<BatchResponse> batchResponseList = testContext().get(TestContextKey.BATCH_API_CALL_RESPONSE);
         BatchResponse lastBatchResponse = batchResponseList.get(batchResponseList.size() - 1);
-        PostLoansLoanIdTransactionsResponse loanTransactionResponse = fromJson(lastBatchResponse.getBody(),
-                PostLoansLoanIdTransactionsResponse.class);
+        PostLoansLoanIdTransactionsResponse loanTransactionResponse = fromJson(lastBatchResponse.getBody(), PostLoansLoanIdTransactionsResponse.class);
         Long loanId = loanTransactionResponse.getLoanId();
-
         Map<String, Object> loanQueryParams = new HashMap<>();
         loanQueryParams.put("staffInSelectedOfficeOnly", false);
         loanQueryParams.put("associations", "transactions");
         GetLoansLoanIdResponse loanDetails = loansApi().retrieveOneLoan(loanId, loanQueryParams);
-
         List<GetLoansLoanIdTransactions> transactions = loanDetails.getTransactions();
         List<String> transactionsMatched = new ArrayList<>();
-
         transactions.forEach(t -> {
             String transactionTypeValueActual = t.getType().getCode();
             String transactionTypeValueExpected = "loanTransactionType." + transactionTypeValue;
-
             if (transactionTypeValueActual.equals(transactionTypeValueExpected)) {
                 transactionsMatched.add(transactionTypeValueActual);
             }
         });
-
         int nrOfTransactionsActual = transactionsMatched.size();
-        assertThat(nrOfTransactionsActual)
-                .as(ErrorMessageHelper.wrongNrOfTransactions(transactionTypeInput, nrOfTransactionsActual, nrOfTransactionsExpected))
-                .isEqualTo(nrOfTransactionsExpected);
+        assertThat(nrOfTransactionsActual).as(ErrorMessageHelper.wrongNrOfTransactions(transactionTypeInput, nrOfTransactionsActual, nrOfTransactionsExpected)).isEqualTo(nrOfTransactionsExpected);
     }
 
     @Then("Nr. {int} Client was created")
@@ -852,7 +723,6 @@ public class BatchApiStepDef extends AbstractStepDef {
         } else {
             throw new IllegalStateException(String.format("Nr. %s client external ID not found", nr));
         }
-
         Map<String, Object> clientQueryParams = new HashMap<>();
         clientQueryParams.put("staffInSelectedOfficeOnly", false);
         GetClientsClientIdResponse response = clientApi().retrieveOneClientByExternalId(clientExternalId, clientQueryParams);
@@ -869,7 +739,6 @@ public class BatchApiStepDef extends AbstractStepDef {
         } else {
             throw new IllegalStateException(String.format("Nr. %s loan external ID not found", nr));
         }
-
         Map<String, Object> loanQueryParams = new HashMap<>();
         loanQueryParams.put("staffInSelectedOfficeOnly", false);
         GetLoansLoanIdResponse response = loansApi().retrieveOneLoanByExternalId(loanExternalId, loanQueryParams);
@@ -886,18 +755,14 @@ public class BatchApiStepDef extends AbstractStepDef {
         } else {
             throw new IllegalStateException(String.format("Nr. %s loan external ID not found", nr));
         }
-
         Map<String, Object> loanQueryParams = new HashMap<>();
         loanQueryParams.put("staffInSelectedOfficeOnly", false);
         GetLoansLoanIdResponse response = loansApi().retrieveOneLoanByExternalId(loanExternalId, loanQueryParams);
         GetLoansLoanIdStatus status = response.getStatus();
         Long statusIdActual = status.getId();
         Long statusIdExpected = LoanStatus.APPROVED.value.longValue();
-
         String resourceId = String.valueOf(response.getId());
-        assertThat(statusIdActual)
-                .as(ErrorMessageHelper.wrongLoanStatus(resourceId, statusIdActual.intValue(), statusIdExpected.intValue()))
-                .isEqualTo(statusIdExpected);
+        assertThat(statusIdActual).as(ErrorMessageHelper.wrongLoanStatus(resourceId, statusIdActual.intValue(), statusIdExpected.intValue())).isEqualTo(statusIdExpected);
     }
 
     @Then("Nr. {int} Client creation was rolled back")
@@ -910,7 +775,6 @@ public class BatchApiStepDef extends AbstractStepDef {
         } else {
             throw new IllegalStateException(String.format("Nr. %s client external id mot found", nr));
         }
-
         // Feign throws exceptions on errors instead of returning error in response body
         ErrorResponse errorResponse = null;
         try {
@@ -924,18 +788,12 @@ public class BatchApiStepDef extends AbstractStepDef {
         String developerMessageActual = errorResponse.getDeveloperMessage();
         Integer httpStatusCodeActual = errorResponse.getHttpStatusCode();
         String errorsDeveloperMessageActual = errorResponse.getErrors().get(0).getDeveloperMessage();
-
         String developerMessageExpected = ERROR_DEVELOPER_MESSAGE;
         Integer httpStatusCodeExpected = ERROR_HTTP_404;
         String errorsDeveloperMessageExpected = ERROR_DEVELOPER_MESSAGE_CLIENT.replace("{externalId}", clientExternalId);
-
-        assertThat(developerMessageActual).as(ErrorMessageHelper.wrongErrorMessage(developerMessageActual, developerMessageExpected))
-                .isEqualTo(developerMessageExpected);
-        assertThat(httpStatusCodeActual).as(ErrorMessageHelper.wrongStatusCode(httpStatusCodeActual, httpStatusCodeExpected))
-                .isEqualTo(httpStatusCodeExpected);
-        assertThat(errorsDeveloperMessageActual)
-                .as(ErrorMessageHelper.wrongErrorMessage(errorsDeveloperMessageActual, errorsDeveloperMessageExpected))
-                .isEqualTo(errorsDeveloperMessageExpected);
+        assertThat(developerMessageActual).as(ErrorMessageHelper.wrongErrorMessage(developerMessageActual, developerMessageExpected)).isEqualTo(developerMessageExpected);
+        assertThat(httpStatusCodeActual).as(ErrorMessageHelper.wrongStatusCode(httpStatusCodeActual, httpStatusCodeExpected)).isEqualTo(httpStatusCodeExpected);
+        assertThat(errorsDeveloperMessageActual).as(ErrorMessageHelper.wrongErrorMessage(errorsDeveloperMessageActual, errorsDeveloperMessageExpected)).isEqualTo(errorsDeveloperMessageExpected);
     }
 
     @Then("Nr. {int} Loan creation was rolled back")
@@ -948,10 +806,8 @@ public class BatchApiStepDef extends AbstractStepDef {
         } else {
             throw new IllegalStateException(String.format("Nr. %s loan external id mot found", nr));
         }
-
         Map<String, Object> loanQueryParams = new HashMap<>();
         loanQueryParams.put("staffInSelectedOfficeOnly", false);
-
         // Feign throws exceptions on errors instead of returning error in response body
         ErrorResponse errorResponse = null;
         try {
@@ -963,18 +819,12 @@ public class BatchApiStepDef extends AbstractStepDef {
         String developerMessageActual = errorResponse.getDeveloperMessage();
         Integer httpStatusCodeActual = errorResponse.getHttpStatusCode();
         String errorsDeveloperMessageActual = errorResponse.getErrors().get(0).getDeveloperMessage();
-
         String developerMessageExpected = ERROR_DEVELOPER_MESSAGE;
         Integer httpStatusCodeExpected = ERROR_HTTP_404;
         String errorsDeveloperMessageExpected = ERROR_DEVELOPER_MESSAGE_LOAN_EXTERNAL.replace("{externalId}", loanExternalId);
-
-        assertThat(developerMessageActual).as(ErrorMessageHelper.wrongErrorMessage(developerMessageActual, developerMessageExpected))
-                .isEqualTo(developerMessageExpected);
-        assertThat(httpStatusCodeActual).as(ErrorMessageHelper.wrongStatusCode(httpStatusCodeActual, httpStatusCodeExpected))
-                .isEqualTo(httpStatusCodeExpected);
-        assertThat(errorsDeveloperMessageActual)
-                .as(ErrorMessageHelper.wrongErrorMessage(errorsDeveloperMessageActual, errorsDeveloperMessageExpected))
-                .isEqualTo(errorsDeveloperMessageExpected);
+        assertThat(developerMessageActual).as(ErrorMessageHelper.wrongErrorMessage(developerMessageActual, developerMessageExpected)).isEqualTo(developerMessageExpected);
+        assertThat(httpStatusCodeActual).as(ErrorMessageHelper.wrongStatusCode(httpStatusCodeActual, httpStatusCodeExpected)).isEqualTo(httpStatusCodeExpected);
+        assertThat(errorsDeveloperMessageActual).as(ErrorMessageHelper.wrongErrorMessage(errorsDeveloperMessageActual, errorsDeveloperMessageExpected)).isEqualTo(errorsDeveloperMessageExpected);
     }
 
     @When("Admin runs Batch API call with chargeOff command on {string}")
@@ -982,17 +832,13 @@ public class BatchApiStepDef extends AbstractStepDef {
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         long loanId = loanResponse.getLoanId();
         String idempotencyKey = UUID.randomUUID().toString();
-
         List<BatchRequest> requestList = new ArrayList<>();
-
         requestList.add(createChargeOffRequest(1L, loanId, idempotencyKey, chargeOffDate));
-
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put(ENCLOSING_TRANSACTION, false);
         List<BatchResponse> batchResponseList = batchApiApi().handleBatchRequests(requestList, queryParams);
         testContext().set(TestContextKey.BATCH_API_CALL_RESPONSE, batchResponseList);
         testContext().set(TestContextKey.BATCH_API_CALL_IDEMPOTENCY_KEY, idempotencyKey);
-
         if (batchResponseList != null && !batchResponseList.isEmpty()) {
             BatchResponse response = batchResponseList.get(0);
             log.debug("Batch charge-off API status code: {}", response.getStatusCode());
@@ -1007,18 +853,13 @@ public class BatchApiStepDef extends AbstractStepDef {
         String idempotencyKey = UUID.randomUUID().toString();
         String clientExternalId = UUID.randomUUID().toString();
         String loanExternalId = UUID.randomUUID().toString();
-
         List<BatchRequest> requestList = new ArrayList<>();
-
         // Create client
         requestList.add(createClient(1L, idempotencyKey, clientExternalId));
-
         // Create loan
         requestList.add(createProgressiveLoan(2L, 1L, idempotencyKey, loanExternalId));
-
         // Approve loan
         requestList.add(approveLoanByExternalId(3L, 2L, idempotencyKey));
-
         // Disburse loan
         PostLoansLoanIdRequest loanDisburseRequest = loanRequestFactory.defaultLoanDisburseRequest();
         String bodyLoanDisburseRequest = toJson(loanDisburseRequest);
@@ -1030,12 +871,10 @@ public class BatchApiStepDef extends AbstractStepDef {
         disburseRequest.headers(setHeaders(idempotencyKey));
         disburseRequest.body(bodyLoanDisburseRequest);
         requestList.add(disburseRequest);
-
         // Apply interest pause (1 day starting from tomorrow)
         String startDate = DateTimeFormatter.ofPattern(DATE_FORMAT).format(Utils.now().minusMonths(1).plusDays(1));
         String endDate = DateTimeFormatter.ofPattern(DATE_FORMAT).format(Utils.now().minusMonths(1).plusDays(2));
         requestList.add(applyInterestPauseByExternalId(5L, 2L, idempotencyKey, startDate, endDate));
-
         // Execute batch request
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put(ENCLOSING_TRANSACTION, true);
@@ -1044,7 +883,6 @@ public class BatchApiStepDef extends AbstractStepDef {
         testContext().set(TestContextKey.BATCH_API_CALL_IDEMPOTENCY_KEY, idempotencyKey);
         testContext().set(TestContextKey.BATCH_API_CALL_CLIENT_EXTERNAL_ID, clientExternalId);
         testContext().set(TestContextKey.BATCH_API_CALL_LOAN_EXTERNAL_ID, loanExternalId);
-
         // Log response for debugging
         if (batchResponseList != null && !batchResponseList.isEmpty()) {
             for (int i = 0; i < batchResponseList.size(); i++) {
@@ -1062,18 +900,13 @@ public class BatchApiStepDef extends AbstractStepDef {
         String idempotencyKey = UUID.randomUUID().toString();
         String clientExternalId = UUID.randomUUID().toString();
         String loanExternalId = UUID.randomUUID().toString();
-
         List<BatchRequest> requestList = new ArrayList<>();
-
         // Create client
         requestList.add(createClient(1L, idempotencyKey, clientExternalId));
-
         // Create loan
         requestList.add(createProgressiveLoan(2L, 1L, idempotencyKey, loanExternalId));
-
         // Approve loan
         requestList.add(approveLoanByExternalId(3L, 2L, idempotencyKey));
-
         // Disburse loan
         PostLoansLoanIdRequest loanDisburseRequest = loanRequestFactory.defaultLoanDisburseRequest();
         String bodyLoanDisburseRequest = toJson(loanDisburseRequest);
@@ -1085,12 +918,10 @@ public class BatchApiStepDef extends AbstractStepDef {
         disburseRequest.headers(setHeaders(idempotencyKey));
         disburseRequest.body(bodyLoanDisburseRequest);
         requestList.add(disburseRequest);
-
         // Apply interest pause (1 day starting from tomorrow)
         String startDate = DateTimeFormatter.ofPattern(DATE_FORMAT).format(Utils.now().minusMonths(1).plusDays(1));
         String endDate = DateTimeFormatter.ofPattern(DATE_FORMAT).format(Utils.now().minusMonths(1).plusDays(2));
         requestList.add(applyInterestPause(5L, 2L, idempotencyKey, startDate, endDate));
-
         // Execute batch request
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put(ENCLOSING_TRANSACTION, true);
@@ -1099,7 +930,6 @@ public class BatchApiStepDef extends AbstractStepDef {
         testContext().set(TestContextKey.BATCH_API_CALL_IDEMPOTENCY_KEY, idempotencyKey);
         testContext().set(TestContextKey.BATCH_API_CALL_CLIENT_EXTERNAL_ID, clientExternalId);
         testContext().set(TestContextKey.BATCH_API_CALL_LOAN_EXTERNAL_ID, loanExternalId);
-
         // Log response for debugging
         if (batchResponseList != null && !batchResponseList.isEmpty()) {
             for (int i = 0; i < batchResponseList.size(); i++) {
@@ -1119,22 +949,18 @@ public class BatchApiStepDef extends AbstractStepDef {
         requestMap.put("dateFormat", DATE_FORMAT);
         requestMap.put("locale", DEFAULT_LOCALE);
         requestMap.put("note", "Charge-off due to delinquency");
-
         String bodyChargeOffRequest = toJson(requestMap);
-
         Set<Header> headers = new HashSet<>();
         headers.add(HEADER);
         if (idempotencyKey != null) {
             headers.add(new Header().name(IDEMPOTENCY_KEY).value(idempotencyKey));
         }
-
         BatchRequest batchRequest = new BatchRequest();
         batchRequest.requestId(requestId);
         batchRequest.relativeUrl("loans/" + loanId + "/transactions?command=charge-off");
         batchRequest.method(BATCH_API_METHOD_POST);
         batchRequest.headers(headers);
         batchRequest.body(bodyChargeOffRequest);
-
         return batchRequest;
     }
 
@@ -1142,16 +968,13 @@ public class BatchApiStepDef extends AbstractStepDef {
     public void checkLoanChargedOff(String chargeOffDate) throws IOException {
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         long loanId = loanResponse.getLoanId();
-
         Map<String, Object> loanQueryParams = new HashMap<>();
         loanQueryParams.put("staffInSelectedOfficeOnly", false);
         loanQueryParams.put("associations", "all");
         GetLoansLoanIdResponse loanDetails = loansApi().retrieveOneLoan(loanId, loanQueryParams);
         // Check loan has a CHARGE_OFF transaction on the specified date
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
-        boolean hasChargeOffTransaction = loanDetails.getTransactions().stream().anyMatch(
-                t -> t.getType().getCode().equals("loanTransactionType.chargeOff") && formatter.format(t.getDate()).equals(chargeOffDate));
-
+        boolean hasChargeOffTransaction = loanDetails.getTransactions().stream().anyMatch(t -> t.getType().getCode().equals("loanTransactionType.chargeOff") && formatter.format(t.getDate()).equals(chargeOffDate));
         assertThat(hasChargeOffTransaction).as("Loan should have a CHARGE_OFF transaction on " + chargeOffDate).isTrue();
     }
 
@@ -1165,32 +988,26 @@ public class BatchApiStepDef extends AbstractStepDef {
     }
 
     private BatchRequest createClient(Long requestId, String idempotencyKey, String clientExternalId) {
-        PostClientsRequest clientsRequest = clientExternalId == null ? clientRequestFactory.defaultClientCreationRequest()
-                : clientRequestFactory.defaultClientCreationRequest().externalId(clientExternalId);
+        PostClientsRequest clientsRequest = clientExternalId == null ? clientRequestFactory.defaultClientCreationRequest() : clientRequestFactory.defaultClientCreationRequest().externalId(clientExternalId);
         String bodyClientsRequest = toJson(clientsRequest);
-
         Set<Header> headers = new HashSet<>();
         headers.add(HEADER);
         if (idempotencyKey != null) {
             headers.add(new Header().name(IDEMPOTENCY_KEY).value(idempotencyKey));
         }
-
         BatchRequest batchRequest = new BatchRequest();
         batchRequest.requestId(requestId);
         batchRequest.relativeUrl(BATCH_API_SAMPLE_RELATIVE_URL_CLIENTS);
         batchRequest.method(BATCH_API_METHOD_POST);
         batchRequest.headers(headers);
         batchRequest.body(bodyClientsRequest);
-
         return batchRequest;
     }
 
     private BatchRequest createLoan(Long requestId, Long referenceId, String idempotencyKey, String loanExternalId) {
-        PostLoansRequest loansRequest = loanExternalId == null ? loanRequestFactory.defaultLoansRequest(1L)
-                : loanRequestFactory.defaultLoansRequest(1L).externalId(loanExternalId);
+        PostLoansRequest loansRequest = loanExternalId == null ? loanRequestFactory.defaultLoansRequest(1L) : loanRequestFactory.defaultLoansRequest(1L).externalId(loanExternalId);
         String bodyLoansRequest = toJson(loansRequest);
         String bodyLoansRequestMod = bodyLoansRequest.replace(CLIENT_ID_REGEX, CLIENT_ID_REPLACEMENT);
-
         BatchRequest batchRequest = new BatchRequest();
         batchRequest.requestId(requestId);
         batchRequest.relativeUrl(BATCH_API_SAMPLE_RELATIVE_URL_LOANS);
@@ -1198,17 +1015,14 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest.headers(setHeaders(idempotencyKey));
         batchRequest.reference(referenceId);
         batchRequest.body(bodyLoansRequestMod);
-
         return batchRequest;
     }
 
     private BatchRequest createProgressiveLoan(Long requestId, Long referenceId, String idempotencyKey, String loanExternalId) {
-        PostLoansRequest loansRequest = loanExternalId == null ? loanRequestFactory.defaultProgressiveLoansRequest(1L)
-                : loanRequestFactory.defaultProgressiveLoansRequest(1L).externalId(loanExternalId);
+        PostLoansRequest loansRequest = loanExternalId == null ? loanRequestFactory.defaultProgressiveLoansRequest(1L) : loanRequestFactory.defaultProgressiveLoansRequest(1L).externalId(loanExternalId);
         loansRequest.setInterestRatePerPeriod(BigDecimal.ONE);
         String bodyLoansRequest = toJson(loansRequest);
         String bodyLoansRequestMod = bodyLoansRequest.replace(CLIENT_ID_REGEX, CLIENT_ID_REPLACEMENT);
-
         BatchRequest batchRequest = new BatchRequest();
         batchRequest.requestId(requestId);
         batchRequest.relativeUrl(BATCH_API_SAMPLE_RELATIVE_URL_LOANS);
@@ -1216,42 +1030,35 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest.headers(setHeaders(idempotencyKey));
         batchRequest.reference(referenceId);
         batchRequest.body(bodyLoansRequestMod);
-
         return batchRequest;
     }
 
     private BatchRequest queryDatatable(Long requestId) {
         String datatableName = testContext().get(DATATABLE_NAME);
-
         BatchRequest batchRequest = new BatchRequest();
         batchRequest.requestId(requestId);
         batchRequest.relativeUrl(BATCH_API_SAMPLE_RELATIVE_URL_DATATABLES + datatableName + BATCH_API_SAMPLE_RELATIVE_URL_DATATABLES_QUERY);
         batchRequest.method(BATCH_API_METHOD_GET);
         batchRequest.headers(Set.of(HEADER_JSON));
         batchRequest.body("{}");
-
         return batchRequest;
     }
 
     private BatchRequest updateDatatable(Long requestId, Long referenceId) {
         String datatableName = testContext().get(DATATABLE_NAME);
-
         BatchRequest batchRequest = new BatchRequest();
         batchRequest.requestId(requestId);
-        batchRequest
-                .relativeUrl(BATCH_API_SAMPLE_RELATIVE_URL_DATATABLES + datatableName + BATCH_API_SAMPLE_RELATIVE_URL_DATATABLES_UPDATE);
+        batchRequest.relativeUrl(BATCH_API_SAMPLE_RELATIVE_URL_DATATABLES + datatableName + BATCH_API_SAMPLE_RELATIVE_URL_DATATABLES_UPDATE);
         batchRequest.method(BATCH_API_METHOD_PUT);
         batchRequest.headers(Set.of(HEADER_JSON));
         batchRequest.reference(referenceId);
         batchRequest.body("{\"loan_id\": \"345\"}");
-
         return batchRequest;
     }
 
     private BatchRequest approveLoanByExternalId(Long requestId, Long referenceId, String idempotencyKey) {
         PostLoansLoanIdRequest loanApproveRequest = loanRequestFactory.defaultLoanApproveRequest();
         String bodyLoanApproveRequest = toJson(loanApproveRequest);
-
         BatchRequest batchRequest = new BatchRequest();
         batchRequest.requestId(requestId);
         batchRequest.relativeUrl(BATCH_API_RELATIVE_URL_LOANS_APPLY_EXTERNAL_ID);
@@ -1259,14 +1066,12 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest.reference(referenceId);
         batchRequest.headers(setHeaders(idempotencyKey));
         batchRequest.body(bodyLoanApproveRequest);
-
         return batchRequest;
     }
 
     private BatchRequest approveLoanByExternalIdFail(Long requestId, Long referenceId, String idempotencyKey, String loanExternalId) {
         PostLoansLoanIdRequest loanApproveRequest = loanRequestFactory.defaultLoanApproveRequest();
         String bodyLoanApproveRequest = toJson(loanApproveRequest);
-
         BatchRequest batchRequest = new BatchRequest();
         batchRequest.requestId(requestId);
         batchRequest.relativeUrl(BATCH_API_RELATIVE_URL_LOANS_APPLY_EXTERNAL_ID.replace("$.resourceExternalId", loanExternalId));
@@ -1274,7 +1079,6 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest.reference(referenceId);
         batchRequest.headers(setHeaders(idempotencyKey));
         batchRequest.body(bodyLoanApproveRequest);
-
         return batchRequest;
     }
 
@@ -1286,7 +1090,6 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest.headers(setHeaders(idempotencyKey));
         batchRequest.reference(referenceId);
         batchRequest.body(BODY_GET_REQUEST);
-
         return batchRequest;
     }
 
@@ -1297,27 +1100,20 @@ public class BatchApiStepDef extends AbstractStepDef {
         batchRequest.method(BATCH_API_METHOD_POST);
         batchRequest.reference(referenceId);
         batchRequest.headers(setHeaders(idempotencyKey));
-
-        String interestPauseRequest = String
-                .format("{\"dateFormat\":\"dd MMMM yyyy\",\"locale\":\"en\",\"startDate\":\"%s\",\"endDate\":\"%s\"}", startDate, endDate);
+        String interestPauseRequest = String.format("{\"dateFormat\":\"dd MMMM yyyy\",\"locale\":\"en\",\"startDate\":\"%s\",\"endDate\":\"%s\"}", startDate, endDate);
         batchRequest.body(interestPauseRequest);
-
         return batchRequest;
     }
 
-    private BatchRequest applyInterestPauseByExternalId(Long requestId, Long referenceId, String idempotencyKey, String startDate,
-            String endDate) {
+    private BatchRequest applyInterestPauseByExternalId(Long requestId, Long referenceId, String idempotencyKey, String startDate, String endDate) {
         BatchRequest batchRequest = new BatchRequest();
         batchRequest.requestId(requestId);
         batchRequest.relativeUrl("loans/external-id/$.resourceExternalId/interest-pauses");
         batchRequest.method(BATCH_API_METHOD_POST);
         batchRequest.reference(referenceId);
         batchRequest.headers(setHeaders(idempotencyKey));
-
-        String interestPauseRequest = String
-                .format("{\"dateFormat\":\"dd MMMM yyyy\",\"locale\":\"en\",\"startDate\":\"%s\",\"endDate\":\"%s\"}", startDate, endDate);
+        String interestPauseRequest = String.format("{\"dateFormat\":\"dd MMMM yyyy\",\"locale\":\"en\",\"startDate\":\"%s\",\"endDate\":\"%s\"}", startDate, endDate);
         batchRequest.body(interestPauseRequest);
-
         return batchRequest;
     }
 
@@ -1327,7 +1123,6 @@ public class BatchApiStepDef extends AbstractStepDef {
         if (idempotencyKey != null) {
             headers.add(new Header().name(IDEMPOTENCY_KEY).value(idempotencyKey));
         }
-
         return headers;
     }
 
@@ -1337,16 +1132,13 @@ public class BatchApiStepDef extends AbstractStepDef {
         List<BatchResponse> batchResponseList = testContext().get(TestContextKey.BATCH_API_CALL_RESPONSE);
         assertThat(batchResponseList != null).isTrue();
         assertThat(batchResponseList).isNotNull();
-
         // The loan creation response is the second response in the batch (index 1)
         BatchResponse loanCreateResponse = batchResponseList.get(1);
         assertThat(loanCreateResponse.getStatusCode()).isEqualTo(200);
-
         // Parse the loan ID from the response
         String loanCreateResponseBody = loanCreateResponse.getBody();
         com.fasterxml.jackson.databind.JsonNode loanCreateJson = readTree(loanCreateResponseBody);
         long loanId = loanCreateJson.get("loanId").asLong();
-
         // Get the loan details
         Map<String, Object> loanQueryParams = new HashMap<>();
         loanQueryParams.put("staffInSelectedOfficeOnly", false);
@@ -1354,22 +1146,18 @@ public class BatchApiStepDef extends AbstractStepDef {
         GetLoansLoanIdResponse loanResponse = loansApi().retrieveOneLoan(loanId, loanQueryParams);
         assertThat(loanResponse != null).isTrue();
         assertThat(loanResponse).isNotNull();
-
         // Verify the interest pause period
         GetLoansLoanIdResponse loan = loanResponse;
         assertThat(loan.getLoanTermVariations().get(0).getTermType().getValue().equals("interestPause")).isTrue();
-
         // Verify the start date is the specified day of the previous month
         LocalDate today = Utils.now();
         LocalDate expectedStartDate = today.minusMonths(1).plusDays(startDay);
         LocalDate actualStartDate = loan.getLoanTermVariations().get(0).getTermVariationApplicableFrom();
         assertThat(actualStartDate).isEqualTo(expectedStartDate);
-
         // Verify the end date is the specified day of the previous month
         LocalDate expectedEndDate = today.minusMonths(1).plusDays(endDay);
         LocalDate actualEndDate = loan.getLoanTermVariations().get(0).getDateValue();
         assertThat(actualEndDate).isEqualTo(expectedEndDate);
-
         log.debug("Verified interest pause period from {} to {}", actualStartDate, actualEndDate);
     }
 

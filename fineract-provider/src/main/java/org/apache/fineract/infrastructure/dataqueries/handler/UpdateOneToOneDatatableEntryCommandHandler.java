@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.dataqueries.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -28,27 +27,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class UpdateOneToOneDatatableEntryCommandHandler implements NewCommandSourceHandler {
-
     private final DatatableWriteService datatableWriteService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-        final CommandProcessingResult commandProcessingResult = this.datatableWriteService
-                .updateDatatableEntryOneToOne(command.getEntityName(), command.entityId(), command);
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(command.entityId()) //
-                .withOfficeId(commandProcessingResult.getOfficeId()) //
-                .withGroupId(commandProcessingResult.getGroupId()) //
-                .withClientId(commandProcessingResult.getClientId()) //
-                .withSavingsId(commandProcessingResult.getSavingsId()) //
-                .withLoanId(commandProcessingResult.getLoanId()) //
-                .with(commandProcessingResult.getChanges()) //
-                .build();
+        final CommandProcessingResult commandProcessingResult = this.datatableWriteService.updateDatatableEntryOneToOne(command.getEntityName(), command.entityId(), command);
+        return  //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(command.entityId()).withOfficeId(commandProcessingResult.getOfficeId()).withGroupId(commandProcessingResult.getGroupId()).withClientId(commandProcessingResult.getClientId()).withSavingsId(commandProcessingResult.getSavingsId()).withLoanId(commandProcessingResult.getLoanId()).with(commandProcessingResult.getChanges()).build();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public UpdateOneToOneDatatableEntryCommandHandler(final DatatableWriteService datatableWriteService) {
+        this.datatableWriteService = datatableWriteService;
+    }
 }

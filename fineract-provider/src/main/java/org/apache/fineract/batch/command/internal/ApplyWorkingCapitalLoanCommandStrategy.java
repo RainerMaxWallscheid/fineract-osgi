@@ -19,7 +19,6 @@
 package org.apache.fineract.batch.command.internal;
 
 import jakarta.ws.rs.core.UriInfo;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
@@ -30,25 +29,24 @@ import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class ApplyWorkingCapitalLoanCommandStrategy implements CommandStrategy {
-
     private final WorkingCapitalLoanApiResource workingCapitalLoanApiResource;
     private final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer;
 
     @Override
     public BatchResponse execute(BatchRequest request, @SuppressWarnings("unused") UriInfo uriInfo) {
-
         final BatchResponse response = new BatchResponse();
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final CommandProcessingResult commandProcessingResult = workingCapitalLoanApiResource.submitLoanApplication(request.getBody());
-
         response.setStatusCode(HttpStatus.SC_OK);
         response.setBody(toApiJsonSerializer.serialize(commandProcessingResult));
-
         return response;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ApplyWorkingCapitalLoanCommandStrategy(final WorkingCapitalLoanApiResource workingCapitalLoanApiResource, final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer) {
+        this.workingCapitalLoanApiResource = workingCapitalLoanApiResource;
+        this.toApiJsonSerializer = toApiJsonSerializer;
     }
 }

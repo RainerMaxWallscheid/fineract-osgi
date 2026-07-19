@@ -19,11 +19,9 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
@@ -45,33 +43,29 @@ import org.springframework.stereotype.Component;
  * @see org.apache.fineract.batch.domain.BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class ActivateClientCommandStrategy implements CommandStrategy {
-
     private final ClientsApiResource clientsApiResource;
 
     @Override
     public BatchResponse execute(final BatchRequest request, @SuppressWarnings("unused") UriInfo uriInfo) {
-
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrlWithoutVersion(request));
         final Long clientId = Long.parseLong(pathParameters.get(1).substring(0, pathParameters.get(1).indexOf("?")));
-
         // Calls 'activate' function from 'ClientsApiResource' to activate a
         // client
         responseBody = clientsApiResource.activate(clientId, "activate", request.getBody());
-
         response.setStatusCode(HttpStatus.SC_OK);
         // Sets the body of the response after the successful activation of
         // the client
         response.setBody(responseBody);
-
         return response;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ActivateClientCommandStrategy(final ClientsApiResource clientsApiResource) {
+        this.clientsApiResource = clientsApiResource;
+    }
 }

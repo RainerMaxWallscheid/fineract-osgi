@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.exception.JobIsNotFoundOrNotEnabledException;
@@ -64,37 +63,27 @@ import org.springframework.stereotype.Service;
  * ,{@link MethodInvokingJobDetailFactoryBean} and {@link CronTriggerFactoryBean}
  */
 @Service
-@Slf4j
 public class JobRegisterServiceImpl implements JobRegisterService, ApplicationListener<ContextClosedEvent> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JobRegisterServiceImpl.class);
     private static final String JOB_EXECUTION_FAILED_MESSAGE = "Job execution failed for job with name: ";
-
     @Autowired
     private SchedularWritePlatformService schedularWritePlatformService;
-
     @Autowired
     private SchedulerJobListener schedulerJobListener;
-
     @Autowired
     private SchedulerTriggerListener globalSchedulerTriggerListener;
-
     private static final HashMap<String, Scheduler> SCHEDULERS = new HashMap<>(4);
-
     @Autowired
     private FineractProperties fineractProperties;
-
     @Autowired
     private JobLocator jobLocator;
-
     @Autowired
     private JobStarter jobStarter;
-
     @Autowired
     private JobParameterDataParser dataParser;
-
     @Autowired
     private JobNameService jobNameService;
-
     private static final String JOB_STARTER_METHOD_NAME = "run";
 
     @SuppressFBWarnings("SLF4J_SIGN_ONLY_FORMAT")
@@ -131,7 +120,6 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
             log.error("{}", msg, e);
             throw new PlatformInternalServerException("error.msg.scheduler.job.execution.failed", msg, scheduledJobDetail.getId(), e);
         }
-
     }
 
     public void rescheduleJob(final ScheduledJobDetail scheduledJobDetail) {
@@ -168,8 +156,7 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
             schedulerDetail.setSuspended(false);
             this.schedularWritePlatformService.updateSchedulerDetail(schedulerDetail);
             if (schedulerDetail.isExecuteInstructionForMisfiredJobs()) {
-                final List<ScheduledJobDetail> scheduledJobDetails = this.schedularWritePlatformService
-                        .retrieveAllJobs(fineractProperties.getNodeId());
+                final List<ScheduledJobDetail> scheduledJobDetails = this.schedularWritePlatformService.retrieveAllJobs(fineractProperties.getNodeId());
                 for (final ScheduledJobDetail jobDetail : scheduledJobDetails) {
                     if (jobDetail.isTriggerMisfired()) {
                         if (jobDetail.isActiveSchedular()) {
@@ -221,7 +208,6 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
             throw new JobNotFoundException(String.valueOf(jobId));
         }
         final String nodeIdStored = scheduledJobDetail.getNodeId().toString();
-
         if (nodeIdStored.equals(fineractProperties.getNodeId()) || nodeIdStored.equals("0")) {
             executeJob(scheduledJobDetail, null, jobParameterDTOSet);
         } else {
@@ -256,7 +242,6 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
                 scheduledJobDetails.setCurrentlyRunning(false);
                 return;
             }
-
             final Trigger trigger = createTrigger(scheduledJobDetails, jobDetail);
             final Scheduler scheduler = getScheduler(scheduledJobDetails);
             scheduler.scheduleJob(jobDetail, trigger);
@@ -320,7 +305,7 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
         final SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
         schedulerFactoryBean.setSchedulerName(name);
         schedulerFactoryBean.setGlobalJobListeners(jobListeners);
-        final TriggerListener[] globalTriggerListeners = { globalSchedulerTriggerListener };
+        final TriggerListener[] globalTriggerListeners = {globalSchedulerTriggerListener};
         schedulerFactoryBean.setGlobalTriggerListeners(globalTriggerListeners);
         final Properties quartzProperties = new Properties();
         quartzProperties.put(SchedulerFactoryBean.PROP_THREAD_COUNT, Integer.toString(noOfThreads));
@@ -330,10 +315,8 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
         return schedulerFactoryBean.getScheduler();
     }
 
-    private JobDetail createJobDetail(final ScheduledJobDetail scheduledJobDetail, Set<JobParameterDTO> jobParameterDTOSet)
-            throws Exception {
+    private JobDetail createJobDetail(final ScheduledJobDetail scheduledJobDetail, Set<JobParameterDTO> jobParameterDTOSet) throws Exception {
         final FineractPlatformTenant tenant = ThreadLocalContextUtil.getTenant();
-
         JobNameData jobName = jobNameService.getJobByHumanReadableName(scheduledJobDetail.getJobName());
         Job job;
         try {
@@ -341,14 +324,12 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
         } catch (NoSuchJobException e) {
             throw new JobIsNotFoundOrNotEnabledException(e, jobName.getEnumStyleName());
         }
-
         final MethodInvokingJobDetailFactoryBean jobDetailFactoryBean = new MethodInvokingJobDetailFactoryBean();
         jobDetailFactoryBean.setName(scheduledJobDetail.getJobName() + "JobDetail" + tenant.getId());
         jobDetailFactoryBean.setTargetObject(jobStarter);
         jobDetailFactoryBean.setTargetMethod(JOB_STARTER_METHOD_NAME);
         jobDetailFactoryBean.setGroup(scheduledJobDetail.getGroupName());
         jobDetailFactoryBean.setConcurrent(false);
-
         jobDetailFactoryBean.setArguments(job, scheduledJobDetail, jobParameterDTOSet, tenant.getTenantIdentifier());
         jobDetailFactoryBean.afterPropertiesSet();
         return jobDetailFactoryBean.getObject();
@@ -375,8 +356,7 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
         final StackTraceElement[] stackTraceElements = throwable.getStackTrace();
         final StringBuilder sb = new StringBuilder(throwable.toString());
         for (final StackTraceElement element : stackTraceElements) {
-            sb.append("\n \t at ").append(element.getClassName()).append(".").append(element.getMethodName()).append("(")
-                    .append(element.getLineNumber()).append(")");
+            sb.append("\n \t at ").append(element.getClassName()).append(".").append(element.getMethodName()).append("(").append(element.getLineNumber()).append(")");
         }
         return sb.toString();
     }

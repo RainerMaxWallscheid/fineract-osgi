@@ -18,7 +18,6 @@
  */
 package com.acme.fineract.loan.job;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -30,9 +29,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@RequiredArgsConstructor
 public class AcmeNoopJobConfiguration {
-
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
     private final AcmeNoopJobTasklet tasklet;
@@ -44,8 +41,13 @@ public class AcmeNoopJobConfiguration {
 
     @Bean
     public Job acmeNoopJob() {
-        return new JobBuilder(AcmeJobName.ACME_NOOP_JOB.name(), jobRepository).start(acmeNoopJobStep()).incrementer(new RunIdIncrementer())
-                .build();
+        return new JobBuilder(AcmeJobName.ACME_NOOP_JOB.name(), jobRepository).start(acmeNoopJobStep()).incrementer(new RunIdIncrementer()).build();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public AcmeNoopJobConfiguration(final JobRepository jobRepository, final PlatformTransactionManager transactionManager, final AcmeNoopJobTasklet tasklet) {
+        this.jobRepository = jobRepository;
+        this.transactionManager = transactionManager;
+        this.tasklet = tasklet;
+    }
 }

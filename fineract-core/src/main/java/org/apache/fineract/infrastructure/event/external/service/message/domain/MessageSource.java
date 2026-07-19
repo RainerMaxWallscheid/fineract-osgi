@@ -19,14 +19,16 @@
 package org.apache.fineract.infrastructure.event.external.service.message.domain;
 
 import java.util.Objects;
-import lombok.Getter;
 
-@Getter
 public class MessageSource {
-
     private final String source;
 
     public MessageSource(String source) {
         this.source = Objects.requireNonNull(source, "source cannot be null");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getSource() {
+        return this.source;
     }
 }

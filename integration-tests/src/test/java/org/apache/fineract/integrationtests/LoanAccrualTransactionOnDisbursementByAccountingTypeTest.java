@@ -20,11 +20,9 @@ package org.apache.fineract.integrationtests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Consumer;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.GetLoansLoanIdTransactions;
 import org.apache.fineract.client.models.PostClientsResponse;
 import org.apache.fineract.client.models.PostLoanProductsRequest;
@@ -35,64 +33,52 @@ import org.apache.fineract.integrationtests.client.feign.FeignLoanTestBase;
 import org.apache.fineract.integrationtests.common.ClientHelper;
 import org.junit.jupiter.api.Test;
 
-@Slf4j
 public class LoanAccrualTransactionOnDisbursementByAccountingTypeTest extends FeignLoanTestBase {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanAccrualTransactionOnDisbursementByAccountingTypeTest.class);
     private static final String DISBURSEMENT_DATE = "01 January 2024";
     private static final Double LOAN_AMOUNT = 1000.0;
     private static final double INTEREST_RATE_PER_PERIOD = 12.0; // 12% annual
-
     // Customizer to set non-zero interest rate on the loan application
     // (applyLoanRequest defaults to interestRatePerPeriod=0 which would result in no interest and no accrual)
-    private static final Consumer<PostLoansRequest> WITH_INTEREST = request -> request
-            .interestRatePerPeriod(BigDecimal.valueOf(INTEREST_RATE_PER_PERIOD));
+    private static final Consumer<PostLoansRequest> WITH_INTEREST = request -> request.interestRatePerPeriod(BigDecimal.valueOf(INTEREST_RATE_PER_PERIOD));
 
     // ==================== New behavior: allow-cash-and-non-cash-accrual = false ====================
-
     @Test
     public void testNoAccrualTransactionCreatedForNoneAccountingType() {
         runAt(DISBURSEMENT_DATE, () -> {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL, new PutGlobalConfigurationsRequest().enabled(false));
             try {
                 PostClientsResponse client = clientHelper.createClient(ClientHelper.defaultClientCreationRequest());
-
-                PostLoanProductsRequest productRequest = createOnePeriod30DaysPeriodicAccrualProduct(INTEREST_RATE_PER_PERIOD)
-                        .accountingRule(1) // NONE
-                        .fundSourceAccountId(null) //
-                        .loanPortfolioAccountId(null) //
-                        .transfersInSuspenseAccountId(null) //
-                        .interestOnLoanAccountId(null) //
-                        .incomeFromFeeAccountId(null) //
-                        .incomeFromPenaltyAccountId(null) //
-                        .incomeFromRecoveryAccountId(null) //
-                        .writeOffAccountId(null) //
-                        .overpaymentLiabilityAccountId(null) //
-                        .receivableInterestAccountId(null) //
-                        .receivableFeeAccountId(null) //
-                        .receivablePenaltyAccountId(null) //
-                        .goodwillCreditAccountId(null) //
-                        .incomeFromGoodwillCreditInterestAccountId(null) //
-                        .incomeFromGoodwillCreditFeesAccountId(null) //
-                        .incomeFromGoodwillCreditPenaltyAccountId(null) //
-                        .incomeFromChargeOffInterestAccountId(null) //
-                        .incomeFromChargeOffFeesAccountId(null) //
-                        .incomeFromChargeOffPenaltyAccountId(null) //
-                        .chargeOffExpenseAccountId(null) //
-                        .chargeOffFraudExpenseAccountId(null);
-
+                PostLoanProductsRequest productRequest =  // NONE
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                createOnePeriod30DaysPeriodicAccrualProduct(INTEREST_RATE_PER_PERIOD).accountingRule(1).fundSourceAccountId(null).loanPortfolioAccountId(null).transfersInSuspenseAccountId(null).interestOnLoanAccountId(null).incomeFromFeeAccountId(null).incomeFromPenaltyAccountId(null).incomeFromRecoveryAccountId(null).writeOffAccountId(null).overpaymentLiabilityAccountId(null).receivableInterestAccountId(null).receivableFeeAccountId(null).receivablePenaltyAccountId(null).goodwillCreditAccountId(null).incomeFromGoodwillCreditInterestAccountId(null).incomeFromGoodwillCreditFeesAccountId(null).incomeFromGoodwillCreditPenaltyAccountId(null).incomeFromChargeOffInterestAccountId(null).incomeFromChargeOffFeesAccountId(null).incomeFromChargeOffPenaltyAccountId(null).chargeOffExpenseAccountId(null).chargeOffFraudExpenseAccountId(null);
                 Long loanProductId = createLoanProduct(productRequest);
                 Long loanId = applyAndApproveLoan(client.getClientId(), loanProductId, DISBURSEMENT_DATE, LOAN_AMOUNT, 1, WITH_INTEREST);
                 disburseLoan(loanId, BigDecimal.valueOf(LOAN_AMOUNT), DISBURSEMENT_DATE);
-
-                List<GetLoansLoanIdTransactions> accrualTransactions = getLoanDetails(loanId).getTransactions().stream()
-                        .filter(t -> "Accrual".equals(t.getType().getValue())).toList();
-
-                assertTrue(accrualTransactions.isEmpty(),
-                        "No accrual transactions should be created for None accounting type, but found: " + accrualTransactions.size());
+                List<GetLoansLoanIdTransactions> accrualTransactions = getLoanDetails(loanId).getTransactions().stream().filter(t -> "Accrual".equals(t.getType().getValue())).toList();
+                assertTrue(accrualTransactions.isEmpty(), "No accrual transactions should be created for None accounting type, but found: " + accrualTransactions.size());
             } finally {
-                globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL,
-                        new PutGlobalConfigurationsRequest().enabled(true));
+                globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL, new PutGlobalConfigurationsRequest().enabled(true));
             }
         });
     }
@@ -100,29 +86,20 @@ public class LoanAccrualTransactionOnDisbursementByAccountingTypeTest extends Fe
     @Test
     public void testNoAccrualTransactionCreatedForCashAccountingType() {
         runAt(DISBURSEMENT_DATE, () -> {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL, new PutGlobalConfigurationsRequest().enabled(false));
             try {
                 PostClientsResponse client = clientHelper.createClient(ClientHelper.defaultClientCreationRequest());
-
-                PostLoanProductsRequest productRequest = createOnePeriod30DaysPeriodicAccrualProduct(INTEREST_RATE_PER_PERIOD)
-                        .accountingRule(2) // CASH_BASED
-                        .receivableInterestAccountId(null) //
-                        .receivableFeeAccountId(null) //
-                        .receivablePenaltyAccountId(null);
-
+                PostLoanProductsRequest productRequest =  // CASH_BASED
+                //
+                //
+                createOnePeriod30DaysPeriodicAccrualProduct(INTEREST_RATE_PER_PERIOD).accountingRule(2).receivableInterestAccountId(null).receivableFeeAccountId(null).receivablePenaltyAccountId(null);
                 Long loanProductId = createLoanProduct(productRequest);
                 Long loanId = applyAndApproveLoan(client.getClientId(), loanProductId, DISBURSEMENT_DATE, LOAN_AMOUNT, 1, WITH_INTEREST);
                 disburseLoan(loanId, BigDecimal.valueOf(LOAN_AMOUNT), DISBURSEMENT_DATE);
-
-                List<GetLoansLoanIdTransactions> accrualTransactions = getLoanDetails(loanId).getTransactions().stream()
-                        .filter(t -> "Accrual".equals(t.getType().getValue())).toList();
-
-                assertTrue(accrualTransactions.isEmpty(),
-                        "No accrual transactions should be created for Cash accounting type, but found: " + accrualTransactions.size());
+                List<GetLoansLoanIdTransactions> accrualTransactions = getLoanDetails(loanId).getTransactions().stream().filter(t -> "Accrual".equals(t.getType().getValue())).toList();
+                assertTrue(accrualTransactions.isEmpty(), "No accrual transactions should be created for Cash accounting type, but found: " + accrualTransactions.size());
             } finally {
-                globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL,
-                        new PutGlobalConfigurationsRequest().enabled(true));
+                globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL, new PutGlobalConfigurationsRequest().enabled(true));
             }
         });
     }
@@ -130,29 +107,19 @@ public class LoanAccrualTransactionOnDisbursementByAccountingTypeTest extends Fe
     @Test
     public void testAccrualTransactionCreatedForUpfrontAccrualAccountingType() {
         runAt(DISBURSEMENT_DATE, () -> {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL, new PutGlobalConfigurationsRequest().enabled(false));
             try {
                 PostClientsResponse client = clientHelper.createClient(ClientHelper.defaultClientCreationRequest());
-
-                PostLoanProductsRequest productRequest = createOnePeriod30DaysPeriodicAccrualProduct(INTEREST_RATE_PER_PERIOD)
-                        .accountingRule(4); // ACCRUAL_UPFRONT
-
+                PostLoanProductsRequest productRequest = createOnePeriod30DaysPeriodicAccrualProduct(INTEREST_RATE_PER_PERIOD).accountingRule(4); // ACCRUAL_UPFRONT
                 Long loanProductId = createLoanProduct(productRequest);
                 Long loanId = applyAndApproveLoan(client.getClientId(), loanProductId, DISBURSEMENT_DATE, LOAN_AMOUNT, 1, WITH_INTEREST);
                 disburseLoan(loanId, BigDecimal.valueOf(LOAN_AMOUNT), DISBURSEMENT_DATE);
-
-                List<GetLoansLoanIdTransactions> accrualTransactions = getLoanDetails(loanId).getTransactions().stream()
-                        .filter(t -> "Accrual".equals(t.getType().getValue())).toList();
-
-                assertEquals(1, accrualTransactions.size(),
-                        "Exactly one accrual transaction should be created for Accrual Upfront accounting type");
+                List<GetLoansLoanIdTransactions> accrualTransactions = getLoanDetails(loanId).getTransactions().stream().filter(t -> "Accrual".equals(t.getType().getValue())).toList();
+                assertEquals(1, accrualTransactions.size(), "Exactly one accrual transaction should be created for Accrual Upfront accounting type");
                 BigDecimal interestPortion = accrualTransactions.getFirst().getInterestPortion();
-                assertTrue(interestPortion != null && interestPortion.compareTo(BigDecimal.ZERO) > 0,
-                        "Accrual transaction should have a positive interest portion");
+                assertTrue(interestPortion != null && interestPortion.compareTo(BigDecimal.ZERO) > 0, "Accrual transaction should have a positive interest portion");
             } finally {
-                globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL,
-                        new PutGlobalConfigurationsRequest().enabled(true));
+                globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL, new PutGlobalConfigurationsRequest().enabled(true));
             }
         });
     }
@@ -160,106 +127,78 @@ public class LoanAccrualTransactionOnDisbursementByAccountingTypeTest extends Fe
     @Test
     public void testNoAccrualTransactionAtDisbursementForPeriodicAccrualAccountingType() {
         runAt(DISBURSEMENT_DATE, () -> {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL, new PutGlobalConfigurationsRequest().enabled(false));
             try {
                 PostClientsResponse client = clientHelper.createClient(ClientHelper.defaultClientCreationRequest());
-
                 PostLoanProductsRequest productRequest = createOnePeriod30DaysPeriodicAccrualProduct(INTEREST_RATE_PER_PERIOD);
                 // accountingRule is already 3 (ACCRUAL_PERIODIC) by default in this method
-
                 Long loanProductId = createLoanProduct(productRequest);
                 Long loanId = applyAndApproveLoan(client.getClientId(), loanProductId, DISBURSEMENT_DATE, LOAN_AMOUNT, 1, WITH_INTEREST);
                 disburseLoan(loanId, BigDecimal.valueOf(LOAN_AMOUNT), DISBURSEMENT_DATE);
-
-                List<GetLoansLoanIdTransactions> accrualTransactions = getLoanDetails(loanId).getTransactions().stream()
-                        .filter(t -> "Accrual".equals(t.getType().getValue())).toList();
-
-                assertTrue(accrualTransactions.isEmpty(),
-                        "No accrual transactions should be created at disbursement for Periodic Accrual accounting type");
+                List<GetLoansLoanIdTransactions> accrualTransactions = getLoanDetails(loanId).getTransactions().stream().filter(t -> "Accrual".equals(t.getType().getValue())).toList();
+                assertTrue(accrualTransactions.isEmpty(), "No accrual transactions should be created at disbursement for Periodic Accrual accounting type");
             } finally {
-                globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL,
-                        new PutGlobalConfigurationsRequest().enabled(true));
+                globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL, new PutGlobalConfigurationsRequest().enabled(true));
             }
         });
     }
 
     // ==================== Legacy behavior: allow-cash-and-non-cash-accrual = true (default) ====================
-
     @Test
     public void testAccrualTransactionCreatedForNoneAccountingTypeWhenLegacyBehaviorEnabled() {
         runAt(DISBURSEMENT_DATE, () -> {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL, new PutGlobalConfigurationsRequest().enabled(true));
             // Legacy behavior: flag is enabled (true), accruals are created for NONE accounting type
             PostClientsResponse client = clientHelper.createClient(ClientHelper.defaultClientCreationRequest());
-
-            PostLoanProductsRequest productRequest = createOnePeriod30DaysPeriodicAccrualProduct(INTEREST_RATE_PER_PERIOD).accountingRule(1) // NONE
-                    .fundSourceAccountId(null) //
-                    .loanPortfolioAccountId(null) //
-                    .transfersInSuspenseAccountId(null) //
-                    .interestOnLoanAccountId(null) //
-                    .incomeFromFeeAccountId(null) //
-                    .incomeFromPenaltyAccountId(null) //
-                    .incomeFromRecoveryAccountId(null) //
-                    .writeOffAccountId(null) //
-                    .overpaymentLiabilityAccountId(null) //
-                    .receivableInterestAccountId(null) //
-                    .receivableFeeAccountId(null) //
-                    .receivablePenaltyAccountId(null) //
-                    .goodwillCreditAccountId(null) //
-                    .incomeFromGoodwillCreditInterestAccountId(null) //
-                    .incomeFromGoodwillCreditFeesAccountId(null) //
-                    .incomeFromGoodwillCreditPenaltyAccountId(null) //
-                    .incomeFromChargeOffInterestAccountId(null) //
-                    .incomeFromChargeOffFeesAccountId(null) //
-                    .incomeFromChargeOffPenaltyAccountId(null) //
-                    .chargeOffExpenseAccountId(null) //
-                    .chargeOffFraudExpenseAccountId(null);
-
+            PostLoanProductsRequest productRequest =  // NONE
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            createOnePeriod30DaysPeriodicAccrualProduct(INTEREST_RATE_PER_PERIOD).accountingRule(1).fundSourceAccountId(null).loanPortfolioAccountId(null).transfersInSuspenseAccountId(null).interestOnLoanAccountId(null).incomeFromFeeAccountId(null).incomeFromPenaltyAccountId(null).incomeFromRecoveryAccountId(null).writeOffAccountId(null).overpaymentLiabilityAccountId(null).receivableInterestAccountId(null).receivableFeeAccountId(null).receivablePenaltyAccountId(null).goodwillCreditAccountId(null).incomeFromGoodwillCreditInterestAccountId(null).incomeFromGoodwillCreditFeesAccountId(null).incomeFromGoodwillCreditPenaltyAccountId(null).incomeFromChargeOffInterestAccountId(null).incomeFromChargeOffFeesAccountId(null).incomeFromChargeOffPenaltyAccountId(null).chargeOffExpenseAccountId(null).chargeOffFraudExpenseAccountId(null);
             Long loanProductId = createLoanProduct(productRequest);
             Long loanId = applyAndApproveLoan(client.getClientId(), loanProductId, DISBURSEMENT_DATE, LOAN_AMOUNT, 1, WITH_INTEREST);
             disburseLoan(loanId, BigDecimal.valueOf(LOAN_AMOUNT), DISBURSEMENT_DATE);
-
-            List<GetLoansLoanIdTransactions> accrualTransactions = getLoanDetails(loanId).getTransactions().stream()
-                    .filter(t -> "Accrual".equals(t.getType().getValue())).toList();
-
-            assertEquals(1, accrualTransactions.size(),
-                    "One accrual transaction should be created for None accounting type when legacy behavior is enabled");
+            List<GetLoansLoanIdTransactions> accrualTransactions = getLoanDetails(loanId).getTransactions().stream().filter(t -> "Accrual".equals(t.getType().getValue())).toList();
+            assertEquals(1, accrualTransactions.size(), "One accrual transaction should be created for None accounting type when legacy behavior is enabled");
             BigDecimal interestPortion = accrualTransactions.getFirst().getInterestPortion();
-            assertTrue(interestPortion != null && interestPortion.compareTo(BigDecimal.ZERO) > 0,
-                    "Accrual transaction should have a positive interest portion");
+            assertTrue(interestPortion != null && interestPortion.compareTo(BigDecimal.ZERO) > 0, "Accrual transaction should have a positive interest portion");
         });
     }
 
     @Test
     public void testAccrualTransactionCreatedForCashAccountingTypeWhenLegacyBehaviorEnabled() {
         runAt(DISBURSEMENT_DATE, () -> {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ALLOW_CASH_AND_NON_CASH_ACCRUAL, new PutGlobalConfigurationsRequest().enabled(true));
             // Legacy behavior: flag is enabled (true), accruals are created for CASH accounting type
             PostClientsResponse client = clientHelper.createClient(ClientHelper.defaultClientCreationRequest());
-
-            PostLoanProductsRequest productRequest = createOnePeriod30DaysPeriodicAccrualProduct(INTEREST_RATE_PER_PERIOD).accountingRule(2) // CASH_BASED
-                    .receivableInterestAccountId(null) //
-                    .receivableFeeAccountId(null) //
-                    .receivablePenaltyAccountId(null);
-
+            PostLoanProductsRequest productRequest =  // CASH_BASED
+            //
+            //
+            createOnePeriod30DaysPeriodicAccrualProduct(INTEREST_RATE_PER_PERIOD).accountingRule(2).receivableInterestAccountId(null).receivableFeeAccountId(null).receivablePenaltyAccountId(null);
             Long loanProductId = createLoanProduct(productRequest);
             Long loanId = applyAndApproveLoan(client.getClientId(), loanProductId, DISBURSEMENT_DATE, LOAN_AMOUNT, 1, WITH_INTEREST);
             disburseLoan(loanId, BigDecimal.valueOf(LOAN_AMOUNT), DISBURSEMENT_DATE);
-
-            List<GetLoansLoanIdTransactions> accrualTransactions = getLoanDetails(loanId).getTransactions().stream()
-                    .filter(t -> "Accrual".equals(t.getType().getValue())).toList();
-
-            assertEquals(1, accrualTransactions.size(),
-                    "One accrual transaction should be created for Cash accounting type when legacy behavior is enabled");
+            List<GetLoansLoanIdTransactions> accrualTransactions = getLoanDetails(loanId).getTransactions().stream().filter(t -> "Accrual".equals(t.getType().getValue())).toList();
+            assertEquals(1, accrualTransactions.size(), "One accrual transaction should be created for Cash accounting type when legacy behavior is enabled");
             BigDecimal interestPortion = accrualTransactions.getFirst().getInterestPortion();
-            assertTrue(interestPortion != null && interestPortion.compareTo(BigDecimal.ZERO) > 0,
-                    "Accrual transaction should have a positive interest portion");
-
+            assertTrue(interestPortion != null && interestPortion.compareTo(BigDecimal.ZERO) > 0, "Accrual transaction should have a positive interest portion");
         });
     }
 }

@@ -26,23 +26,45 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "m_hook_templates")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public final class HookTemplate extends AbstractPersistableCustom<Long> {
-
     @Column(name = "name", nullable = false, length = 100)
     private String name;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "template", orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<HookSchema> fields = new HashSet<>();
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Set<HookSchema> getFields() {
+        return this.fields;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookTemplate setName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookTemplate setFields(final Set<HookSchema> fields) {
+        this.fields = fields;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public HookTemplate() {
+    }
 }

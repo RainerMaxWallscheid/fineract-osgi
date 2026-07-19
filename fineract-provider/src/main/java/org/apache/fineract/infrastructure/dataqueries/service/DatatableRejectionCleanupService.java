@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.infrastructure.dataqueries.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.commands.domain.CommandSource;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
@@ -27,29 +25,30 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class DatatableRejectionCleanupService implements CleanupService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DatatableRejectionCleanupService.class);
     private final JdbcTemplate jdbcTemplate;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
     private final FromJsonHelper fromJsonHelper;
 
     @Override
     public void cleanup(CommandSource commandSource) {
-
         boolean isCreateAction = "CREATE".equals(commandSource.getActionName());
         boolean isDatatableEntity = "DATATABLE".equals(commandSource.getEntityName());
         if (!isCreateAction || !isDatatableEntity) {
             return;
         }
-
-        final String datatableName = fromJsonHelper.parse(commandSource.getCommandAsJson()).getAsJsonObject().get("datatableName")
-                .getAsString();
-
+        final String datatableName = fromJsonHelper.parse(commandSource.getCommandAsJson()).getAsJsonObject().get("datatableName").getAsString();
         final String sql = "DROP TABLE IF EXISTS " + sqlGenerator.escape(datatableName);
         log.info("Cleaning up orphaned datatable after rejection: {}", datatableName);
         jdbcTemplate.execute(sql);
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public DatatableRejectionCleanupService(final JdbcTemplate jdbcTemplate, final DatabaseSpecificSQLGenerator sqlGenerator, final FromJsonHelper fromJsonHelper) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.sqlGenerator = sqlGenerator;
+        this.fromJsonHelper = fromJsonHelper;
     }
 }

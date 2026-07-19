@@ -21,8 +21,6 @@ package org.apache.fineract.useradministration.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -36,26 +34,21 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 public class PasswordPreferencesWritePlatformServiceJpaRepositoryImpl implements PasswordPreferencesWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PasswordPreferencesWritePlatformServiceJpaRepositoryImpl.class);
     private final PasswordValidationPolicyRepository validationRepository;
     private final PasswordPreferencesDataValidator dataValidator;
 
     @Transactional
     @Override
     public CommandProcessingResult updatePreferences(final JsonCommand command) {
-
         this.dataValidator.validateForUpdate(command.json());
         Long validationPolicyId = command.longValueOfParameterNamed(PasswordPreferencesApiConstants.VALIDATION_POLICY_ID);
         try {
             final List<PasswordValidationPolicy> validationPolicies = this.validationRepository.findAll();
-
             Map<String, Object> changes = new HashMap<>(1);
-
             boolean found = false;
-
             for (PasswordValidationPolicy policy : validationPolicies) {
                 if (policy.getId().equals(validationPolicyId)) {
                     found = true;
@@ -66,24 +59,26 @@ public class PasswordPreferencesWritePlatformServiceJpaRepositoryImpl implements
                     policy.deActivate();
                 }
             }
-
             if (!found) {
                 throw new PasswordValidationPolicyNotFoundException(validationPolicyId);
             }
-
             if (!changes.isEmpty()) {
                 this.validationRepository.saveAll(validationPolicies);
                 this.validationRepository.flush();
             }
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .with(changes) //
-                    .build();
+            return  //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).with(changes).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             log.error("Error occured.", dve);
-            throw ErrorHandler.getMappable(dve, "error.msg.password.validation.policy.unknown.data.integrity.issue",
-                    "Unknown data integrity issue with resource.");
+            throw ErrorHandler.getMappable(dve, "error.msg.password.validation.policy.unknown.data.integrity.issue", "Unknown data integrity issue with resource.");
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PasswordPreferencesWritePlatformServiceJpaRepositoryImpl(final PasswordValidationPolicyRepository validationRepository, final PasswordPreferencesDataValidator dataValidator) {
+        this.validationRepository = validationRepository;
+        this.dataValidator = dataValidator;
     }
 }

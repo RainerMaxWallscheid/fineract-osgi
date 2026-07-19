@@ -20,18 +20,12 @@ package org.apache.fineract.portfolio.delinquency.domain;
 
 import java.util.Arrays;
 import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.ApiFacingEnum;
 import org.apache.fineract.infrastructure.core.data.StringEnumOptionData;
 
-@Getter
-@RequiredArgsConstructor
 public enum DelinquencyMinimumPaymentType implements ApiFacingEnum<DelinquencyMinimumPaymentType> {
-
-    PERCENTAGE(1L, "delinquencyMinimumPayment.percentage", "Percentage payment type"), //
+    PERCENTAGE(1L, "delinquencyMinimumPayment.percentage", "Percentage payment type"),  //
     FLAT(2L, "delinquencyMinimumPayment.flat", "Flat payment type");
-
     private final Long id;
     private final String code;
     private final String humanReadableName;
@@ -42,5 +36,27 @@ public enum DelinquencyMinimumPaymentType implements ApiFacingEnum<DelinquencyMi
 
     public StringEnumOptionData toData() {
         return new StringEnumOptionData(name(), getCode(), getHumanReadableName());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private DelinquencyMinimumPaymentType(final Long id, final String code, final String humanReadableName) {
+        this.id = id;
+        this.code = code;
+        this.humanReadableName = humanReadableName;
     }
 }

@@ -19,17 +19,14 @@
 package org.apache.fineract.test.api;
 
 import java.util.concurrent.TimeUnit;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@Slf4j
-@RequiredArgsConstructor
 public class FineractClientConfiguration {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FineractClientConfiguration.class);
     private final ApiProperties apiProperties;
 
     @Bean
@@ -41,16 +38,16 @@ public class FineractClientConfiguration {
         long readTimeout = apiProperties.getReadTimeout();
         String apiBaseUrl = baseUrl + "/fineract-provider/api/";
         boolean debugEnabled = Boolean.parseBoolean(System.getProperty("fineract.feign.debug", "false"));
-
-        return FineractFeignClient.builder().baseUrl(apiBaseUrl).credentials(username, password).tenantId(tenantId)
-                .disableSslVerification(true).debug(debugEnabled).connectTimeout(60, TimeUnit.SECONDS)
-                .readTimeout((int) readTimeout, TimeUnit.SECONDS).build();
+        return FineractFeignClient.builder().baseUrl(apiBaseUrl).credentials(username, password).tenantId(tenantId).disableSslVerification(true).debug(debugEnabled).connectTimeout(60, TimeUnit.SECONDS).readTimeout((int) readTimeout, TimeUnit.SECONDS).build();
     }
 
     public FineractFeignClient fineractFeignClientForUser(final String username, final String password) {
         final String apiBaseUrl = apiProperties.getBaseUrl() + "/fineract-provider/api/";
-        return FineractFeignClient.builder().baseUrl(apiBaseUrl).credentials(username, password).tenantId(apiProperties.getTenantId())
-                .disableSslVerification(true).connectTimeout(60, TimeUnit.SECONDS)
-                .readTimeout((int) apiProperties.getReadTimeout(), TimeUnit.SECONDS).build();
+        return FineractFeignClient.builder().baseUrl(apiBaseUrl).credentials(username, password).tenantId(apiProperties.getTenantId()).disableSslVerification(true).connectTimeout(60, TimeUnit.SECONDS).readTimeout((int) apiProperties.getReadTimeout(), TimeUnit.SECONDS).build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FineractClientConfiguration(final ApiProperties apiProperties) {
+        this.apiProperties = apiProperties;
     }
 }

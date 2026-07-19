@@ -20,30 +20,63 @@ package org.apache.fineract.portfolio.collateralmanagement.data;
 
 import java.math.BigDecimal;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
 public final class ClientCollateralManagementData {
-
     private final String name;
-
     private final BigDecimal quantity;
-
     private final BigDecimal total;
-
     private final BigDecimal totalCollateral;
-
     private final Long clientId;
-
     private final List<LoanTransactionData> loanTransactionData;
-
     private final Long id;
 
-    public static ClientCollateralManagementData instance(final String name, final BigDecimal quantity, final BigDecimal total,
-            final BigDecimal totalCollateral, final Long clientId, final List<LoanTransactionData> loanTransactionData, final Long id) {
+    public static ClientCollateralManagementData instance(final String name, final BigDecimal quantity, final BigDecimal total, final BigDecimal totalCollateral, final Long clientId, final List<LoanTransactionData> loanTransactionData, final Long id) {
         return new ClientCollateralManagementData(name, quantity, total, totalCollateral, clientId, loanTransactionData, id);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getQuantity() {
+        return this.quantity;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotal() {
+        return this.total;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalCollateral() {
+        return this.totalCollateral;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getClientId() {
+        return this.clientId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<LoanTransactionData> getLoanTransactionData() {
+        return this.loanTransactionData;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ClientCollateralManagementData(final String name, final BigDecimal quantity, final BigDecimal total, final BigDecimal totalCollateral, final Long clientId, final List<LoanTransactionData> loanTransactionData, final Long id) {
+        this.name = name;
+        this.quantity = quantity;
+        this.total = total;
+        this.totalCollateral = totalCollateral;
+        this.clientId = clientId;
+        this.loanTransactionData = loanTransactionData;
+        this.id = id;
+    }
 }

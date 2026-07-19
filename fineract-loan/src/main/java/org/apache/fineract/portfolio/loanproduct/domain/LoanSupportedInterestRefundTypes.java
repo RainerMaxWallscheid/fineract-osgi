@@ -18,21 +18,36 @@
  */
 package org.apache.fineract.portfolio.loanproduct.domain;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.ApiFacingEnum;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 
-@Getter
-@RequiredArgsConstructor
 public enum LoanSupportedInterestRefundTypes implements ApiFacingEnum<LoanSupportedInterestRefundTypes> {
-
-    MERCHANT_ISSUED_REFUND(LoanTransactionType.MERCHANT_ISSUED_REFUND, "loanRefundType.merchant_issued_refund", "Merchant issued refund"), //
-    PAYOUT_REFUND(LoanTransactionType.PAYOUT_REFUND, "loanRefundType.payout_refund", "Payout refund"), //
-    ;
-
+    MERCHANT_ISSUED_REFUND(LoanTransactionType.MERCHANT_ISSUED_REFUND, "loanRefundType.merchant_issued_refund", "Merchant issued refund"),  //
+    PAYOUT_REFUND(LoanTransactionType.PAYOUT_REFUND, "loanRefundType.payout_refund", "Payout refund");
+    //
     private final LoanTransactionType transactionType;
     private final String code;
     private final String humanReadableName;
 
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionType getTransactionType() {
+        return this.transactionType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private LoanSupportedInterestRefundTypes(final LoanTransactionType transactionType, final String code, final String humanReadableName) {
+        this.transactionType = transactionType;
+        this.code = code;
+        this.humanReadableName = humanReadableName;
+    }
 }

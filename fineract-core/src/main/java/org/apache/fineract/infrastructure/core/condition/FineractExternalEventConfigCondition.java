@@ -18,11 +18,11 @@
  */
 package org.apache.fineract.infrastructure.core.condition;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 
-@Slf4j
 public class FineractExternalEventConfigCondition extends PropertiesCondition {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FineractExternalEventConfigCondition.class);
 
     @Override
     protected boolean matches(FineractProperties properties) {

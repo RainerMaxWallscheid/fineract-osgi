@@ -19,8 +19,6 @@
 package org.apache.fineract.template.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.template.data.TemplateCreateRequest;
@@ -29,11 +27,10 @@ import org.apache.fineract.template.service.TemplateDomainService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class TemplateCreateCommandHandler implements CommandHandler<TemplateCreateRequest, TemplateCreateResponse> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TemplateCreateCommandHandler.class);
     private final TemplateDomainService templateService;
 
     @Retry(name = "commandTemplateCreate", fallbackMethod = "fallback")
@@ -46,5 +43,10 @@ public class TemplateCreateCommandHandler implements CommandHandler<TemplateCrea
     @Override
     public TemplateCreateResponse fallback(Command<TemplateCreateRequest> command, Throwable t) {
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TemplateCreateCommandHandler(final TemplateDomainService templateService) {
+        this.templateService = templateService;
     }
 }

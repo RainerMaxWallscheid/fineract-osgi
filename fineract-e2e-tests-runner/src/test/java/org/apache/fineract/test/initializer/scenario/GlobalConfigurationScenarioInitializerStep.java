@@ -21,22 +21,17 @@ package org.apache.fineract.test.initializer.scenario;
 import static org.apache.fineract.test.initializer.global.GlobalConfigurationGlobalInitializerStep.CONFIG_KEY_ENABLE_ADDRESS;
 import static org.apache.fineract.test.initializer.global.GlobalConfigurationGlobalInitializerStep.CONFIG_KEY_ENABLE_BUSINESS_DATE;
 import static org.apache.fineract.test.initializer.global.GlobalConfigurationGlobalInitializerStep.CONFIG_KEY_ENABLE_RECALCULATE_COB_DATE;
-
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.test.helper.GlobalConfigurationHelper;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class GlobalConfigurationScenarioInitializerStep implements FineractScenarioInitializerStep {
-
     private final GlobalConfigurationHelper globalConfigurationHelper;
 
     @Override
     public void initializeForScenario() throws Exception {
         // Enable-address set to false
         globalConfigurationHelper.disableGlobalConfiguration(CONFIG_KEY_ENABLE_ADDRESS, 0L);
-
         // Enable business date and COB date
         globalConfigurationHelper.enableGlobalConfiguration(CONFIG_KEY_ENABLE_BUSINESS_DATE, 0L);
         globalConfigurationHelper.enableGlobalConfiguration(CONFIG_KEY_ENABLE_RECALCULATE_COB_DATE, 0L);
@@ -46,5 +41,10 @@ public class GlobalConfigurationScenarioInitializerStep implements FineractScena
     public void resetAfterScenario() {
         // Enable business date
         globalConfigurationHelper.disableGlobalConfiguration(CONFIG_KEY_ENABLE_BUSINESS_DATE, 0L);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GlobalConfigurationScenarioInitializerStep(final GlobalConfigurationHelper globalConfigurationHelper) {
+        this.globalConfigurationHelper = globalConfigurationHelper;
     }
 }

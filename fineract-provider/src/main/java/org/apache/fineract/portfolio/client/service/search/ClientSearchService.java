@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.client.service.search;
 
 import java.util.Objects;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.PagedRequest;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.domain.ClientRepository;
@@ -34,9 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class ClientSearchService {
-
     private final PlatformSecurityContext context;
     private final ClientRepository clientRepository;
     private final ClientSearchDataMapper clientSearchDataMapper;
@@ -48,19 +45,22 @@ public class ClientSearchService {
 
     private void validateTextSearchRequest(PagedRequest<ClientTextSearch> searchRequest) {
         Objects.requireNonNull(searchRequest, "searchRequest must not be null");
-
         context.isAuthenticated();
     }
 
     private Page<ClientSearchData> executeTextSearch(PagedRequest<ClientTextSearch> searchRequest) {
         final String hierarchy = context.authenticatedUser().getOffice().getHierarchy();
-
         Optional<ClientTextSearch> request = searchRequest.getRequest();
         String requestSearchText = request.map(ClientTextSearch::getText).orElse(null);
         String searchText = Objects.toString(requestSearchText, "");
-
         Pageable pageable = searchRequest.toPageable();
-
         return clientRepository.searchByText(searchText, pageable, hierarchy).map(clientSearchDataMapper::map);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ClientSearchService(final PlatformSecurityContext context, final ClientRepository clientRepository, final ClientSearchDataMapper clientSearchDataMapper) {
+        this.context = context;
+        this.clientRepository = clientRepository;
+        this.clientSearchDataMapper = clientSearchDataMapper;
     }
 }

@@ -20,14 +20,11 @@ package org.apache.fineract.infrastructure.core.service.database;
 
 import static org.apache.fineract.infrastructure.core.domain.FineractPlatformTenantConnection.resolveProtocol;
 import static org.apache.fineract.infrastructure.core.domain.FineractPlatformTenantConnection.toJdbcUrl;
-
 import com.zaxxer.hikari.HikariConfig;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Optional;
 import javax.sql.DataSource;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
@@ -41,24 +38,21 @@ import org.springframework.stereotype.Component;
  * variable
  */
 @Component
-@Slf4j
-@RequiredArgsConstructor
 public class DataSourcePerTenantServiceFactory {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DataSourcePerTenantServiceFactory.class);
     private final HikariConfig hikariConfig;
     private final FineractProperties fineractProperties;
     @Qualifier("hikariTenantDataSource")
     private final DataSource tenantDataSource;
     private final HikariDataSourceFactory hikariDataSourceFactory;
-
     private final DatabasePasswordEncryptor databasePasswordEncryptor;
     private final Optional<MeterRegistry> meterRegistry;
 
-    @SuppressFBWarnings(value = "SLF4J_SIGN_ONLY_FORMAT")
+    @SuppressFBWarnings("SLF4J_SIGN_ONLY_FORMAT")
     public DataSource createNewDataSourceFor(FineractPlatformTenant tenant, FineractPlatformTenantConnection tenantConnection) {
         if (!databasePasswordEncryptor.isMasterPasswordHashValid(tenantConnection.getMasterPasswordHash())) {
-            throw new IllegalArgumentException(
-                    "Invalid master password on tenant connection %d.".formatted(tenantConnection.getConnectionId()));
+            throw new IllegalArgumentException("Invalid master password on tenant connection %d.".formatted(tenantConnection.getConnectionId()));
         }
         String protocol = resolveProtocol(hikariConfig.getDriverClassName());
         // Default properties for Writing
@@ -75,12 +69,10 @@ public class DataSourcePerTenantServiceFactory {
             schemaName = StringUtils.defaultIfBlank(tenantConnection.getReadOnlySchemaName(), schemaName);
             schemaUsername = StringUtils.defaultIfBlank(tenantConnection.getReadOnlySchemaUsername(), schemaUsername);
             schemaPassword = StringUtils.defaultIfBlank(tenantConnection.getReadOnlySchemaPassword(), schemaPassword);
-            schemaConnectionParameters = StringUtils.defaultIfBlank(tenantConnection.getReadOnlySchemaConnectionParameters(),
-                    schemaConnectionParameters);
+            schemaConnectionParameters = StringUtils.defaultIfBlank(tenantConnection.getReadOnlySchemaConnectionParameters(), schemaConnectionParameters);
         }
         String jdbcUrl = toJdbcUrl(protocol, schemaServer, schemaPort, schemaName, schemaConnectionParameters);
         log.debug("{}", jdbcUrl);
-
         HikariConfig config = new HikariConfig();
         config.setReadOnly(fineractProperties.getMode().isReadOnlyMode());
         config.setJdbcUrl(jdbcUrl);
@@ -94,23 +86,17 @@ public class DataSourcePerTenantServiceFactory {
         config.setConnectionTestQuery(hikariConfig.getConnectionTestQuery());
         config.setAutoCommit(hikariConfig.isAutoCommit());
         config.setLeakDetectionThreshold(getLeakDetectionThreshold());
-
         // https://github.com/brettwooldridge/HikariCP/wiki/MBean-(JMX)-Monitoring-and-Management
         config.setRegisterMbeans(true);
-        meterRegistry.ifPresent(registry -> config
-                .setMetricsTrackerFactory(new TenantConnectionPoolMetricsTrackerFactory(tenant.getTenantIdentifier(), registry)));
-
+        meterRegistry.ifPresent(registry -> config.setMetricsTrackerFactory(new TenantConnectionPoolMetricsTrackerFactory(tenant.getTenantIdentifier(), registry)));
         // https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
         // These are the properties for each Tenant DB; the same configuration
         // is also in src/main/resources/META-INF/spring/hikariDataSource.xml
         // for the all Tenants DB -->
         config.setDataSourceProperties(hikariConfig.getDataSourceProperties());
-
         if (config.getLeakDetectionThreshold() > 0) {
-            log.warn("Tenant datasource {} leak detection enabled at {}ms; Hikari will log borrower stack traces for long-held connections",
-                    config.getPoolName(), config.getLeakDetectionThreshold());
+            log.warn("Tenant datasource {} leak detection enabled at {}ms; Hikari will log borrower stack traces for long-held connections", config.getPoolName(), config.getLeakDetectionThreshold());
         }
-
         return hikariDataSourceFactory.create(config);
     }
 
@@ -144,4 +130,13 @@ public class DataSourcePerTenantServiceFactory {
         return hikariConfig.getLeakDetectionThreshold();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DataSourcePerTenantServiceFactory(final HikariConfig hikariConfig, final FineractProperties fineractProperties, @Qualifier("hikariTenantDataSource") final DataSource tenantDataSource, final HikariDataSourceFactory hikariDataSourceFactory, final DatabasePasswordEncryptor databasePasswordEncryptor, final Optional<MeterRegistry> meterRegistry) {
+        this.hikariConfig = hikariConfig;
+        this.fineractProperties = fineractProperties;
+        this.tenantDataSource = tenantDataSource;
+        this.hikariDataSourceFactory = hikariDataSourceFactory;
+        this.databasePasswordEncryptor = databasePasswordEncryptor;
+        this.meterRegistry = meterRegistry;
+    }
 }

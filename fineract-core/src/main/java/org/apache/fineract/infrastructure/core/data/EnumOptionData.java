@@ -19,16 +19,13 @@
 package org.apache.fineract.infrastructure.core.data;
 
 import java.io.Serializable;
-import lombok.Getter;
 
 /**
  * <p>
  * Immutable data object representing generic enumeration value.
  * </p>
  */
-@Getter
 public class EnumOptionData extends BaseEnumOptionData<Long> implements Serializable {
-
     public EnumOptionData(Long id, String code, String description) {
         super(id, code, description);
     }

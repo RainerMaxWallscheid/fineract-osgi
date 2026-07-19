@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.workingcapitalloannearbreach.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.workingcapitalloannearbreach.data.WorkingCapitalNearBreachData;
 import org.apache.fineract.portfolio.workingcapitalloannearbreach.exception.WorkingCapitalNearBreachNotFoundException;
 import org.apache.fineract.portfolio.workingcapitalloannearbreach.mapper.WorkingCapitalNearBreachMapper;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class WorkingCapitalNearBreachReadPlatformServiceImpl implements WorkingCapitalNearBreachReadPlatformService {
-
     private final WorkingCapitalNearBreachRepository repository;
     private final WorkingCapitalNearBreachMapper mapper;
 
@@ -42,7 +39,12 @@ public class WorkingCapitalNearBreachReadPlatformServiceImpl implements WorkingC
 
     @Override
     public WorkingCapitalNearBreachData retrieveOne(final Long nearBreachId) {
-        return mapper
-                .toData(repository.findById(nearBreachId).orElseThrow(() -> new WorkingCapitalNearBreachNotFoundException(nearBreachId)));
+        return mapper.toData(repository.findById(nearBreachId).orElseThrow(() -> new WorkingCapitalNearBreachNotFoundException(nearBreachId)));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalNearBreachReadPlatformServiceImpl(final WorkingCapitalNearBreachRepository repository, final WorkingCapitalNearBreachMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
     }
 }

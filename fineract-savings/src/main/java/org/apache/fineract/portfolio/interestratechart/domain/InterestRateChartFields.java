@@ -25,35 +25,25 @@ import static org.apache.fineract.portfolio.interestratechart.InterestRateChartA
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartApiConstants.isPrimaryGroupingByAmountParamName;
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartApiConstants.localeParamName;
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartApiConstants.nameParamName;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.time.LocalDate;
 import java.util.Map;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.domain.LocalDateInterval;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 
 @Embeddable
-@Getter
-@Setter
 public class InterestRateChartFields {
-
     @Column(name = "name", length = 100, unique = false, nullable = false)
     private String name;
-
     @Column(name = "description", nullable = true)
     private String description;
-
     @Column(name = "from_date", nullable = false)
     private LocalDate fromDate;
-
     @Column(name = "end_date", nullable = true)
     private LocalDate endDate;
-
     @Column(name = "is_primary_grouping_by_amount", nullable = false)
     private boolean isPrimaryGroupingByAmount;
 
@@ -61,13 +51,11 @@ public class InterestRateChartFields {
         //
     }
 
-    public static InterestRateChartFields createNew(String name, String description, LocalDate fromDate, LocalDate toDate,
-            boolean isPrimaryGroupingByAmount) {
+    public static InterestRateChartFields createNew(String name, String description, LocalDate fromDate, LocalDate toDate, boolean isPrimaryGroupingByAmount) {
         return new InterestRateChartFields(name, description, fromDate, toDate, isPrimaryGroupingByAmount);
     }
 
-    private InterestRateChartFields(String name, String description, LocalDate fromDate, LocalDate toDate,
-            boolean isPrimaryGroupingByAmount) {
+    private InterestRateChartFields(String name, String description, LocalDate fromDate, LocalDate toDate, boolean isPrimaryGroupingByAmount) {
         this.name = name;
         this.description = description;
         this.fromDate = fromDate;
@@ -76,22 +64,18 @@ public class InterestRateChartFields {
     }
 
     public void update(JsonCommand command, final Map<String, Object> actualChanges, final DataValidatorBuilder baseDataValidator) {
-
         if (command.isChangeInStringParameterNamed(nameParamName, this.name)) {
             final String newValue = command.stringValueOfParameterNamed(nameParamName);
             actualChanges.put(nameParamName, newValue);
             this.name = newValue;
         }
-
         if (command.isChangeInStringParameterNamed(descriptionParamName, this.description)) {
             final String newValue = command.stringValueOfParameterNamed(descriptionParamName);
             actualChanges.put(descriptionParamName, newValue);
             this.description = newValue;
         }
-
         final String localeAsInput = command.locale();
         final String dateFormat = command.dateFormat();
-
         if (command.isChangeInLocalDateParameterNamed(fromDateParamName, getFromDate())) {
             final String newValueAsString = command.stringValueOfParameterNamed(fromDateParamName);
             actualChanges.put(fromDateParamName, newValueAsString);
@@ -99,7 +83,6 @@ public class InterestRateChartFields {
             actualChanges.put(dateFormatParamName, dateFormat);
             this.fromDate = command.localDateValueOfParameterNamed(fromDateParamName);
         }
-
         if (command.isChangeInLocalDateParameterNamed(endDateParamName, getEndDate())) {
             final String newValueAsString = command.stringValueOfParameterNamed(endDateParamName);
             actualChanges.put(endDateParamName, newValueAsString);
@@ -107,13 +90,11 @@ public class InterestRateChartFields {
             actualChanges.put(dateFormatParamName, dateFormat);
             this.endDate = command.localDateValueOfParameterNamed(endDateParamName);
         }
-
         if (command.isChangeInBooleanParameterNamed(isPrimaryGroupingByAmountParamName, this.isPrimaryGroupingByAmount)) {
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(isPrimaryGroupingByAmountParamName);
             actualChanges.put(isPrimaryGroupingByAmountParamName, newValue);
             this.isPrimaryGroupingByAmount = newValue;
         }
-
         if (isFromDateAfterToDate()) {
             baseDataValidator.parameter(fromDateParamName).value(fromDate).failWithCode("from.date.is.after.to.date");
         }
@@ -134,12 +115,10 @@ public class InterestRateChartFields {
         final LocalDate thatFromDate = that.getFromDate();
         LocalDate thatEndDate = that.getEndDate();
         thatEndDate = thatEndDate == null ? DateUtils.getBusinessLocalDate() : thatEndDate;
-
         final LocalDateInterval thisInterval = LocalDateInterval.create(thisFromDate, thisEndDate);
         final LocalDateInterval thatInterval = LocalDateInterval.create(thatFromDate, thatEndDate);
-
         return thisInterval.containsPortionOf(thatInterval) || thatInterval.containsPortionOf(thisInterval);// no
-                                                                                                            // overlapping
+        // overlapping
     }
 
     public boolean isApplicableChartFor(final LocalDate target) {
@@ -148,4 +127,53 @@ public class InterestRateChartFields {
         return interval.contains(target);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getFromDate() {
+        return this.fromDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getEndDate() {
+        return this.endDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isPrimaryGroupingByAmount() {
+        return this.isPrimaryGroupingByAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setName(final String name) {
+        this.name = name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDescription(final String description) {
+        this.description = description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setFromDate(final LocalDate fromDate) {
+        this.fromDate = fromDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setEndDate(final LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setPrimaryGroupingByAmount(final boolean isPrimaryGroupingByAmount) {
+        this.isPrimaryGroupingByAmount = isPrimaryGroupingByAmount;
+    }
 }

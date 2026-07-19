@@ -28,7 +28,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
@@ -45,9 +44,7 @@ import org.springframework.stereotype.Component;
 @Path("/v1/savingsaccounts/{savingsId}/onholdtransactions")
 @Component
 @Tag(name = "Deposit Account On Hold Fund Transactions", description = "")
-@RequiredArgsConstructor
 public class DepositAccountOnHoldFundTransactionsApiResource {
-
     private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<DepositAccountOnHoldTransactionData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -55,26 +52,25 @@ public class DepositAccountOnHoldFundTransactionsApiResource {
     private final SqlValidator sqlValidator;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve deposit account on hold fund transactions", operationId = "retrieveAllDepositAccountOnHoldFundTransactions")
     @AlternativeOperationId("retrieveAll_28")
-    public String retrieveAll(@PathParam("savingsId") final Long savingsId, @QueryParam("guarantorFundingId") final Long guarantorFundingId,
-            @Context final UriInfo uriInfo, @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit,
-            @QueryParam("orderBy") final String orderBy, @QueryParam("sortOrder") final String sortOrder) {
-
+    public String retrieveAll(@PathParam("savingsId") final Long savingsId, @QueryParam("guarantorFundingId") final Long guarantorFundingId, @Context final UriInfo uriInfo, @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit, @QueryParam("orderBy") final String orderBy, @QueryParam("sortOrder") final String sortOrder) {
         this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
-
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
-        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).offset(offset).orderBy(orderBy)
-                .sortOrder(sortOrder).build();
-
-        final Page<DepositAccountOnHoldTransactionData> transfers = this.depositAccountOnHoldTransactionReadPlatformService
-                .retriveAll(savingsId, guarantorFundingId, searchParameters);
-
+        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
+        final Page<DepositAccountOnHoldTransactionData> transfers = this.depositAccountOnHoldTransactionReadPlatformService.retriveAll(savingsId, guarantorFundingId, searchParameters);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-        return this.toApiJsonSerializer.serialize(settings, transfers,
-                SavingsApiSetConstants.SAVINGS_ACCOUNT_ON_HOLD_RESPONSE_DATA_PARAMETERS);
+        return this.toApiJsonSerializer.serialize(settings, transfers, SavingsApiSetConstants.SAVINGS_ACCOUNT_ON_HOLD_RESPONSE_DATA_PARAMETERS);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DepositAccountOnHoldFundTransactionsApiResource(final PlatformSecurityContext context, final DefaultToApiJsonSerializer<DepositAccountOnHoldTransactionData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper, final DepositAccountOnHoldTransactionReadPlatformService depositAccountOnHoldTransactionReadPlatformService, final SqlValidator sqlValidator) {
+        this.context = context;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.depositAccountOnHoldTransactionReadPlatformService = depositAccountOnHoldTransactionReadPlatformService;
+        this.sqlValidator = sqlValidator;
+    }
 }

@@ -19,8 +19,6 @@
 package org.apache.fineract.infrastructure.documentmanagement.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.infrastructure.documentmanagement.data.DocumentUpdateRequest;
@@ -29,11 +27,10 @@ import org.apache.fineract.infrastructure.documentmanagement.service.DocumentWri
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class DocumentUpdateCommandHandler implements CommandHandler<DocumentUpdateRequest, DocumentUpdateResponse> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DocumentUpdateCommandHandler.class);
     private final DocumentWritePlatformService writePlatformService;
 
     @Retry(name = "commandDocumentUpdate", fallbackMethod = "fallback")
@@ -47,5 +44,10 @@ public class DocumentUpdateCommandHandler implements CommandHandler<DocumentUpda
     public DocumentUpdateResponse fallback(Command<DocumentUpdateRequest> command, Throwable t) {
         // NOTE: fallback method needs to be in the same class
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DocumentUpdateCommandHandler(final DocumentWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

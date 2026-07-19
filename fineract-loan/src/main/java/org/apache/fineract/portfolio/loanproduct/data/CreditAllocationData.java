@@ -20,21 +20,46 @@ package org.apache.fineract.portfolio.loanproduct.data;
 
 import java.io.Serializable;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
 public class CreditAllocationData implements Serializable {
-
     private final String transactionType;
     private final List<CreditAllocationOrder> creditAllocationOrder;
 
-    @Getter
-    @AllArgsConstructor
-    public static class CreditAllocationOrder implements Serializable {
 
+    public static class CreditAllocationOrder implements Serializable {
         private final String creditAllocationRule;
         private final Integer order;
+
+        @java.lang.SuppressWarnings("all")
+                public String getCreditAllocationRule() {
+            return this.creditAllocationRule;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public Integer getOrder() {
+            return this.order;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public CreditAllocationOrder(final String creditAllocationRule, final Integer order) {
+            this.creditAllocationRule = creditAllocationRule;
+            this.order = order;
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getTransactionType() {
+        return this.transactionType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<CreditAllocationOrder> getCreditAllocationOrder() {
+        return this.creditAllocationOrder;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreditAllocationData(final String transactionType, final List<CreditAllocationOrder> creditAllocationOrder) {
+        this.transactionType = transactionType;
+        this.creditAllocationOrder = creditAllocationOrder;
     }
 }

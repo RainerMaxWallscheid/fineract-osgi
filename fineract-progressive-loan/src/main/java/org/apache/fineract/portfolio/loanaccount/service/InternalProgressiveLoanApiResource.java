@@ -29,8 +29,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.core.boot.FineractProfiles;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -43,14 +41,13 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 @Profile(FineractProfiles.TEST)
 @Component
 @Path("v1/internal/loan/progressive")
 @Tag(name = "Progressive Loan", description = "internal loan testing API. This API should be disabled in production!!!")
 public class InternalProgressiveLoanApiResource implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InternalProgressiveLoanApiResource.class);
     private final LoanRepositoryWrapper loanRepository;
     private final InterestScheduleModelRepositoryWrapper writePlatformService;
     private final InterestScheduleModelRepositoryWrapper interestScheduleModelRepositoryWrapper;
@@ -69,7 +66,7 @@ public class InternalProgressiveLoanApiResource implements InitializingBean {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Path("{loanId}/model")
     @Operation(summary = "Fetch ProgressiveLoanInterestScheduleModel", operationId = "retrieveOneInternalProgressiveLoan", description = "DO NOT USE THIS IN PRODUCTION!")
     @AlternativeOperationId("fetchModel")
@@ -79,8 +76,7 @@ public class InternalProgressiveLoanApiResource implements InitializingBean {
             throw new IllegalArgumentException("The loan is not progressive.");
         }
         ILoanConfigurationDetails loanConfigurationDetails = LoanConfigurationDetailsMapper.map(loan);
-        return writePlatformService.readProgressiveLoanInterestScheduleModel(loanId, loanConfigurationDetails,
-                loan.getLoanProductRelatedDetail().getInstallmentAmountInMultiplesOf()).orElse(null);
+        return writePlatformService.readProgressiveLoanInterestScheduleModel(loanId, loanConfigurationDetails, loan.getLoanProductRelatedDetail().getInstallmentAmountInMultiplesOf()).orElse(null);
     }
 
     private ProgressiveLoanInterestScheduleModel reprocessTransactionsAndGetModel(final Loan loan) {
@@ -90,7 +86,7 @@ public class InternalProgressiveLoanApiResource implements InitializingBean {
 
     @POST
     @Path("{loanId}/model")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update and Save ProgressiveLoanInterestScheduleModel", operationId = "updateInternalProgressiveLoan", description = "DO NOT USE THIS IN PRODUCTION!")
     @AlternativeOperationId("updateModel")
     @Transactional
@@ -100,16 +96,23 @@ public class InternalProgressiveLoanApiResource implements InitializingBean {
             throw new IllegalArgumentException("The loan is not progressive.");
         }
         ProgressiveLoanInterestScheduleModel model = reprocessTransactionsAndGetModel(loan);
-
         return writePlatformService.writeInterestScheduleModel(loan, model);
     }
 
     @DELETE
     @Path("{loanId}/model")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Delete ProgressiveLoanInterestScheduleModel By Loan ID", operationId = "deleteInternalProgressiveLoan", description = "DO NOT USE THIS IN PRODUCTION!")
     @Transactional
     public Long deleteModel(@PathParam("loanId") @Parameter(description = "loanId") long loanId) {
         return writePlatformService.removeByLoanId(loanId);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InternalProgressiveLoanApiResource(final LoanRepositoryWrapper loanRepository, final InterestScheduleModelRepositoryWrapper writePlatformService, final InterestScheduleModelRepositoryWrapper interestScheduleModelRepositoryWrapper, final LoanScheduleService loanScheduleService) {
+        this.loanRepository = loanRepository;
+        this.writePlatformService = writePlatformService;
+        this.interestScheduleModelRepositoryWrapper = interestScheduleModelRepositoryWrapper;
+        this.loanScheduleService = loanScheduleService;
     }
 }

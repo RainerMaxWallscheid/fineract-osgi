@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.infrastructure.jobs.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.ActionContext;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
@@ -30,11 +28,10 @@ import org.quartz.Trigger.CompletedExecutionInstruction;
 import org.quartz.TriggerListener;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class SchedulerTriggerListener implements TriggerListener {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SchedulerTriggerListener.class);
     private final TenantDetailsService tenantDetailsService;
     private final SchedulerVetoer schedulerVetoer;
 
@@ -53,7 +50,6 @@ public class SchedulerTriggerListener implements TriggerListener {
         final String tenantIdentifier = trigger.getJobDataMap().getString(SchedulerServiceConstants.TENANT_IDENTIFIER);
         final FineractPlatformTenant existingTenant = ThreadLocalContextUtil.getTenant();
         boolean contextInitialized = false;
-
         try {
             if (existingTenant == null || !existingTenant.getTenantIdentifier().equals(tenantIdentifier)) {
                 contextInitialized = true;
@@ -77,5 +73,11 @@ public class SchedulerTriggerListener implements TriggerListener {
     @Override
     public void triggerComplete(Trigger trigger, JobExecutionContext context, CompletedExecutionInstruction triggerInstructionCode) {
         log.debug("triggerComplete() trigger={}, context={}, completedExecutionInstruction={}", trigger, context, triggerInstructionCode);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SchedulerTriggerListener(final TenantDetailsService tenantDetailsService, final SchedulerVetoer schedulerVetoer) {
+        this.tenantDetailsService = tenantDetailsService;
+        this.schedulerVetoer = schedulerVetoer;
     }
 }

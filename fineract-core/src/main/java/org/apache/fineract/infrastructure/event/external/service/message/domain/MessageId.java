@@ -18,12 +18,16 @@
  */
 package org.apache.fineract.infrastructure.event.external.service.message.domain;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
-@Getter
 public class MessageId {
-
     private final long id;
+
+    @java.lang.SuppressWarnings("all")
+        public MessageId(final long id) {
+        this.id = id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public long getId() {
+        return this.id;
+    }
 }

@@ -20,8 +20,6 @@ package org.apache.fineract.portfolio.fund.service;
 
 import jakarta.persistence.PersistenceException;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -38,32 +36,26 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 public class FundWritePlatformServiceJpaRepositoryImpl implements FundWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FundWritePlatformServiceJpaRepositoryImpl.class);
     private final PlatformSecurityContext context;
     private final FundCommandFromApiJsonDeserializer fromApiJsonDeserializer;
     private final FundRepository fundRepository;
 
     @Transactional
     @Override
-    @CacheEvict(value = "funds", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat('fn')")
+    @CacheEvict(value = "funds", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(\'fn\')")
     public CommandProcessingResult createFund(final JsonCommand command) {
-
         try {
             this.context.authenticatedUser();
-
             this.fromApiJsonDeserializer.validateForCreate(command.json());
-
             final Fund fund = Fund.fromJson(command);
-
             this.fundRepository.saveAndFlush(fund);
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(fund.getId()) //
-                    .build();
+            return  //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(fund.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleFundDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
@@ -76,26 +68,21 @@ public class FundWritePlatformServiceJpaRepositoryImpl implements FundWritePlatf
 
     @Transactional
     @Override
-    @CacheEvict(value = "funds", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat('fn')")
+    @CacheEvict(value = "funds", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(\'fn\')")
     public CommandProcessingResult updateFund(final Long fundId, final JsonCommand command) {
-
         try {
             this.context.authenticatedUser();
-
             this.fromApiJsonDeserializer.validateForUpdate(command.json());
-
             final Fund fund = this.fundRepository.findById(fundId).orElseThrow(() -> new FundNotFoundException(fundId));
-
             final Map<String, Object> changes = fund.update(command);
             if (!changes.isEmpty()) {
                 this.fundRepository.saveAndFlush(fund);
             }
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(fund.getId()) //
-                    .with(changes) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(fund.getId()).with(changes).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleFundDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
@@ -112,16 +99,19 @@ public class FundWritePlatformServiceJpaRepositoryImpl implements FundWritePlatf
     private void handleFundDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final Exception dve) {
         if (realCause.getMessage().contains("m_fund_external_id_key")) {
             final String externalId = command.stringValueOfParameterNamed("externalId");
-            throw new PlatformDataIntegrityException("error.msg.fund.duplicate.externalId",
-                    "A fund with external id '" + externalId + "' already exists", "externalId", externalId);
+            throw new PlatformDataIntegrityException("error.msg.fund.duplicate.externalId", "A fund with external id \'" + externalId + "\' already exists", "externalId", externalId);
         } else if (realCause.getMessage().contains("m_fund_external_id_name")) {
             final String name = command.stringValueOfParameterNamed("name");
-            throw new PlatformDataIntegrityException("error.msg.fund.duplicate.name", "A fund with name '" + name + "' already exists",
-                    "name", name);
+            throw new PlatformDataIntegrityException("error.msg.fund.duplicate.name", "A fund with name \'" + name + "\' already exists", "name", name);
         }
-
         log.error("Error occured.", dve);
-        throw ErrorHandler.getMappable(dve, "error.msg.fund.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource: " + realCause.getMessage());
+        throw ErrorHandler.getMappable(dve, "error.msg.fund.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FundWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final FundCommandFromApiJsonDeserializer fromApiJsonDeserializer, final FundRepository fundRepository) {
+        this.context = context;
+        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
+        this.fundRepository = fundRepository;
     }
 }

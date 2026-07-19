@@ -28,7 +28,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -43,11 +42,9 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.springframework.stereotype.Component;
 
 @Path("/v1/email/configuration")
-@Produces({ MediaType.APPLICATION_JSON })
+@Produces({MediaType.APPLICATION_JSON})
 @Component
-@RequiredArgsConstructor
 public class EmailConfigurationApiResource {
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "EMAIL_CONFIGURATION";
     private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<EmailConfigurationData> toApiJsonSerializer;
@@ -60,24 +57,27 @@ public class EmailConfigurationApiResource {
     @AlternativeOperationId("retrieveAll_5")
     public String retrieveAll(@Context final UriInfo uriInfo) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
         final Collection<EmailConfigurationData> configuration = this.emailConfigurationReadPlatformService.retrieveAll();
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-
         return this.toApiJsonSerializer.serialize(settings, configuration);
     }
 
     @PUT
-    @Consumes({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update email configuration", operationId = "updateEmailConfiguration")
     @AlternativeOperationId("updateConfiguration")
     public String updateConfiguration(@Context final UriInfo uriInfo, final String apiRequestBodyAsJson) {
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateEmailConfiguration().withJson(apiRequestBodyAsJson).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EmailConfigurationApiResource(final PlatformSecurityContext context, final DefaultToApiJsonSerializer<EmailConfigurationData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final EmailConfigurationReadPlatformService emailConfigurationReadPlatformService) {
+        this.context = context;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.emailConfigurationReadPlatformService = emailConfigurationReadPlatformService;
     }
 }

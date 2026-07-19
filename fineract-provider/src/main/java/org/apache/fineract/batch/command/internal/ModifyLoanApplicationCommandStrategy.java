@@ -19,12 +19,10 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.command.CommandStrategyUtils;
 import org.apache.fineract.batch.domain.BatchRequest;
@@ -45,9 +43,7 @@ import org.springframework.stereotype.Component;
  * @see org.apache.fineract.batch.domain.BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class ModifyLoanApplicationCommandStrategy implements CommandStrategy {
-
     /**
      * {@link LoansApiResource} object
      */
@@ -67,15 +63,11 @@ public class ModifyLoanApplicationCommandStrategy implements CommandStrategy {
     public BatchResponse execute(final BatchRequest request, final UriInfo uriInfo) {
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final String relativeUrl = relativeUrlWithoutVersion(request);
-
         // Get the loan id for use in loansApiResource
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrl);
-
         final String loanIdPathParameter = pathParameters.get(1);
         Long loanId;
         if (loanIdPathParameter.contains("?")) {
@@ -83,17 +75,22 @@ public class ModifyLoanApplicationCommandStrategy implements CommandStrategy {
         } else {
             loanId = Long.parseLong(loanIdPathParameter);
         }
-
         final Map<String, String> queryParameters = CommandStrategyUtils.getQueryParameters(relativeUrl);
         final String command = queryParameters.get("command");
-
         responseBody = loansApiResource.modifyLoanApplication(loanId, command, request.getBody());
-
         response.setStatusCode(HttpStatus.SC_OK);
-
         // Sets the body of the response modifying the loan application
         response.setBody(responseBody);
         return response;
     }
 
+    /**
+     * Creates a new {@code ModifyLoanApplicationCommandStrategy} instance.
+     *
+     * @param loansApiResource {@link LoansApiResource} object
+     */
+    @java.lang.SuppressWarnings("all")
+        public ModifyLoanApplicationCommandStrategy(final LoansApiResource loansApiResource) {
+        this.loansApiResource = loansApiResource;
+    }
 }

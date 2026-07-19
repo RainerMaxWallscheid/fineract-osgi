@@ -19,15 +19,22 @@
 package org.apache.fineract.infrastructure.campaigns.sms.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SmsCampaignUpdateDto extends SmsCampaignDto {
-
     private String recurrence;
+
+    @java.lang.SuppressWarnings("all")
+        public String getRecurrence() {
+        return this.recurrence;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setRecurrence(final String recurrence) {
+        this.recurrence = recurrence;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SmsCampaignUpdateDto() {
+    }
 }

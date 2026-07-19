@@ -18,11 +18,40 @@
  */
 package org.apache.fineract.portfolio.meeting.command;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.portfolio.meeting.data.MeetingUpdateRequest;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class MeetingUpdateCommand extends Command<MeetingUpdateRequest> {}
+public class MeetingUpdateCommand extends Command<MeetingUpdateRequest> {
+	@java.lang.SuppressWarnings("all")
+		public MeetingUpdateCommand() {
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public java.lang.String toString() {
+		return "MeetingUpdateCommand()";
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public boolean equals(final java.lang.Object o) {
+		if (o == this) return true;
+		if (!(o instanceof MeetingUpdateCommand)) return false;
+		final MeetingUpdateCommand other = (MeetingUpdateCommand) o;
+		if (!other.canEqual((java.lang.Object) this)) return false;
+		if (!super.equals(o)) return false;
+		return true;
+	}
+
+	@java.lang.SuppressWarnings("all")
+		protected boolean canEqual(final java.lang.Object other) {
+		return other instanceof MeetingUpdateCommand;
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public int hashCode() {
+		final int result = super.hashCode();
+		return result;
+	}
+}

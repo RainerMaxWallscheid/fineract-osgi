@@ -26,8 +26,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -67,10 +65,9 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ClientChargeWritePlatformServiceImpl.class);
     private final ChargeRepositoryWrapper chargeRepository;
     private final ClientRepositoryWrapper clientRepository;
     private final ClientChargeDataValidator clientChargeDataValidator;
@@ -87,45 +84,36 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
     public CommandProcessingResult addCharge(Long clientId, JsonCommand command) {
         try {
             this.clientChargeDataValidator.validateAdd(command.json());
-
             final Client client = clientRepository.getActiveClientInUserScope(clientId);
-
             final Long chargeDefinitionId = command.longValueOfParameterNamed(ClientApiConstants.chargeIdParamName);
             final Charge charge = this.chargeRepository.findOneWithNotFoundDetection(chargeDefinitionId);
-
             // validate for client charge
             if (!charge.isClientCharge()) {
                 final String errorMessage = "Charge with identifier " + charge.getId() + " cannot be applied to a Client";
                 throw new ChargeCannotBeAppliedToException("client", errorMessage, charge.getId());
             }
-
             Money roundedAmount = calculateRoundedChargeAmount(charge, command);
             validateChargeAmountNotZero(roundedAmount);
             final LocalDate date = command.localDateValueOfParameterNamed(ClientApiConstants.dueAsOfDateParamName);
             final ClientCharge clientCharge = ClientCharge.createNew(client, charge, roundedAmount.getAmount(), date);
             final DateTimeFormatter fmt = DateTimeFormatter.ofPattern(command.dateFormat());
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-            final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
-                    .resource(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
+            final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
             LocalDate activationDate = client.getActivationDate();
             LocalDate dueDate = clientCharge.getDueLocalDate();
             if (DateUtils.isBefore(dueDate, activationDate)) {
-                baseDataValidator.reset().parameter(ClientApiConstants.dueAsOfDateParamName).value(dueDate.format(fmt))
-                        .failWithCodeNoParameterAddedToErrorCode("dueDate.before.activationDate");
-
+                baseDataValidator.reset().parameter(ClientApiConstants.dueAsOfDateParamName).value(dueDate.format(fmt)).failWithCodeNoParameterAddedToErrorCode("dueDate.before.activationDate");
                 if (!dataValidationErrors.isEmpty()) {
                     throw new PlatformApiDataValidationException(dataValidationErrors);
                 }
             }
-
             validateDueDateOnWorkingDay(clientCharge, fmt);
             this.clientChargeRepository.saveAndFlush(clientCharge);
-
-            return new CommandProcessingResultBuilder() //
-                    .withEntityId(clientCharge.getId()) //
-                    .withOfficeId(clientCharge.getClient().getOffice().getId()) //
-                    .withClientId(clientCharge.getClient().getId()) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withEntityId(clientCharge.getId()).withOfficeId(clientCharge.getClient().getOffice().getId()).withClientId(clientCharge.getClient().getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleDataIntegrityIssues(clientId, null, throwable, dve);
@@ -137,54 +125,41 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
     public CommandProcessingResult payCharge(Long clientId, Long clientChargeId, JsonCommand command) {
         try {
             this.clientChargeDataValidator.validatePayCharge(command.json());
-
             final Client client = this.clientRepository.getActiveClientInUserScope(clientId);
-
             final ClientCharge clientCharge = this.clientChargeRepository.findOneWithNotFoundDetection(clientChargeId);
-
             final Locale locale = command.extractLocale();
             final DateTimeFormatter fmt = DateTimeFormatter.ofPattern(command.dateFormat()).withLocale(locale);
             final LocalDate transactionDate = command.localDateValueOfParameterNamed(ClientApiConstants.transactionDateParamName);
             final BigDecimal amountPaid = command.bigDecimalValueOfParameterNamed(ClientApiConstants.amountParamName);
-            final ExternalId transactionExternalId = ExternalIdFactory
-                    .produce(command.stringValueOfParameterNamedAllowingNull(ClientApiConstants.externalIdParamName));
+            final ExternalId transactionExternalId = ExternalIdFactory.produce(command.stringValueOfParameterNamedAllowingNull(ClientApiConstants.externalIdParamName));
             final Money chargePaid = Money.of(clientCharge.getCurrency(), amountPaid);
-
             // Validate business rules for payment
             validatePaymentTransaction(client, clientCharge, fmt, transactionDate, amountPaid);
-
             // pay the charge
             clientCharge.pay(chargePaid);
-
             // create Payment Transaction
             final Map<String, Object> changes = new LinkedHashMap<>();
             final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
-
-            ClientTransaction clientTransaction = ClientTransaction.payCharge(client, client.getOffice(), paymentDetail, transactionDate,
-                    chargePaid, clientCharge.getCurrency().getCode(), transactionExternalId);
+            ClientTransaction clientTransaction = ClientTransaction.payCharge(client, client.getOffice(), paymentDetail, transactionDate, chargePaid, clientCharge.getCurrency().getCode(), transactionExternalId);
             this.clientTransactionRepository.saveAndFlush(clientTransaction);
-
             // update charge paid by associations
             final ClientChargePaidBy chargePaidBy = ClientChargePaidBy.instance(clientTransaction, clientCharge, amountPaid);
             clientTransaction.getClientChargePaidByCollection().add(chargePaidBy);
-
             // generate accounting entries
             generateAccountingEntries(clientTransaction);
-
-            return new CommandProcessingResultBuilder() //
-                    .withTransactionId(clientTransaction.getId().toString()) //
-                    .withEntityId(clientCharge.getId()) //
-                    .withSubEntityId(clientTransaction.getId()) //
-                    .withSubEntityExternalId(clientTransaction.getExternalId()) //
-                    .withOfficeId(clientCharge.getClient().getOffice().getId()) //
-                    .withClientId(clientCharge.getClient().getId()) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withTransactionId(clientTransaction.getId().toString()).withEntityId(clientCharge.getId()).withSubEntityId(clientTransaction.getId()).withSubEntityExternalId(clientTransaction.getExternalId()).withOfficeId(clientCharge.getClient().getOffice().getId()).withClientId(clientCharge.getClient().getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleDataIntegrityIssues(clientId, clientChargeId, throwable, dve);
             return CommandProcessingResult.empty();
         }
-
     }
 
     private void generateAccountingEntries(ClientTransaction clientTransaction) {
@@ -198,28 +173,22 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
             final Client client = this.clientRepository.getActiveClientInUserScope(clientId);
             final ClientCharge clientCharge = this.clientChargeRepository.findOneWithNotFoundDetection(clientChargeId);
             final LocalDate transactionDate = DateUtils.getBusinessLocalDate();
-
             // Validate business rules for payment
             validateWaiverTransaction(client, clientCharge);
-
             // waive the charge
             Money waivedAmount = clientCharge.waive();
-
             // create Waiver Transaction
-            ClientTransaction clientTransaction = ClientTransaction.waiver(client, client.getOffice(), transactionDate, waivedAmount,
-                    clientCharge.getCurrency().getCode());
+            ClientTransaction clientTransaction = ClientTransaction.waiver(client, client.getOffice(), transactionDate, waivedAmount, clientCharge.getCurrency().getCode());
             this.clientTransactionRepository.saveAndFlush(clientTransaction);
-
             // update charge paid by associations
             final ClientChargePaidBy chargePaidBy = ClientChargePaidBy.instance(clientTransaction, clientCharge, waivedAmount.getAmount());
             clientTransaction.getClientChargePaidByCollection().add(chargePaidBy);
-
-            return new CommandProcessingResultBuilder() //
-                    .withTransactionId(clientTransaction.getId().toString()) //
-                    .withEntityId(clientCharge.getId()) //
-                    .withOfficeId(clientCharge.getClient().getOffice().getId()) //
-                    .withClientId(clientCharge.getClient().getId()) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withTransactionId(clientTransaction.getId().toString()).withEntityId(clientCharge.getId()).withOfficeId(clientCharge.getClient().getOffice().getId()).withClientId(clientCharge.getClient().getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleDataIntegrityIssues(clientId, clientChargeId, throwable, dve);
@@ -232,18 +201,15 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
         try {
             final Client client = this.clientRepository.getActiveClientInUserScope(clientId);
             final ClientCharge clientCharge = this.clientChargeRepository.findOneWithNotFoundDetection(clientChargeId);
-
             // Validate business rules for charge deletion
             validateChargeDeletion(client, clientCharge);
-
             // delete the charge
             clientChargeRepository.delete(clientCharge);
-
-            return new CommandProcessingResultBuilder() //
-                    .withEntityId(clientCharge.getId()) //
-                    .withOfficeId(clientCharge.getClient().getOffice().getId()) //
-                    .withClientId(clientCharge.getClient().getId()) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withEntityId(clientCharge.getId()).withOfficeId(clientCharge.getClient().getOffice().getId()).withClientId(clientCharge.getClient().getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             final Throwable throwable = dve.getMostSpecificCause();
             handleDataIntegrityIssues(clientId, clientChargeId, throwable, dve);
@@ -269,36 +235,26 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
      *            if set to false transaction amount validation is skipped
      * @return
      */
-    private void validatePaymentDateAndAmount(final Client client, final ClientCharge clientCharge, final DateTimeFormatter fmt,
-            final LocalDate transactionDate, final BigDecimal amountPaid, final boolean requiresTransactionDateValidation,
-            final boolean requiresTransactionAmountValidation) {
+    private void validatePaymentDateAndAmount(final Client client, final ClientCharge clientCharge, final DateTimeFormatter fmt, final LocalDate transactionDate, final BigDecimal amountPaid, final boolean requiresTransactionDateValidation, final boolean requiresTransactionAmountValidation) {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
-                .resource(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
-
+        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
         if (clientCharge.isNotActive()) {
             baseDataValidator.reset().failWithCodeNoParameterAddedToErrorCode("charge.is.not.active");
             if (!dataValidationErrors.isEmpty()) {
                 throw new PlatformApiDataValidationException(dataValidationErrors);
             }
         }
-
         if (requiresTransactionDateValidation) {
             validateTransactionDateOnWorkingDay(transactionDate, clientCharge, fmt);
-
             if (DateUtils.isBefore(transactionDate, client.getActivationDate())) {
-                baseDataValidator.reset().parameter(ClientApiConstants.transactionDateParamName).value(transactionDate.format(fmt))
-                        .failWithCodeNoParameterAddedToErrorCode("transaction.before.activationDate");
+                baseDataValidator.reset().parameter(ClientApiConstants.transactionDateParamName).value(transactionDate.format(fmt)).failWithCodeNoParameterAddedToErrorCode("transaction.before.activationDate");
                 throw new PlatformApiDataValidationException(dataValidationErrors);
             }
-
             if (DateUtils.isDateInTheFuture(transactionDate)) {
-                baseDataValidator.reset().parameter(ClientApiConstants.transactionDateParamName).value(transactionDate.format(fmt))
-                        .failWithCodeNoParameterAddedToErrorCode("transaction.is.futureDate");
+                baseDataValidator.reset().parameter(ClientApiConstants.transactionDateParamName).value(transactionDate.format(fmt)).failWithCodeNoParameterAddedToErrorCode("transaction.is.futureDate");
                 throw new PlatformApiDataValidationException(dataValidationErrors);
             }
         }
-
         // validate charge is not already paid or waived
         if (clientCharge.isWaived()) {
             baseDataValidator.reset().failWithCodeNoParameterAddedToErrorCode("transaction.invalid.account.charge.is.already.waived");
@@ -311,7 +267,6 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
                 throw new PlatformApiDataValidationException(dataValidationErrors);
             }
         }
-
         if (requiresTransactionAmountValidation) {
             final Money chargePaid = Money.of(clientCharge.getCurrency(), amountPaid);
             if (!clientCharge.getAmountOutstanding().isGreaterThanOrEqualTo(chargePaid)) {
@@ -329,16 +284,13 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
         BigDecimal amountPaid = null;
         boolean requiresTransactionDateValidation = false;
         boolean requiresTransactionAmountValidation = false;
-        validatePaymentDateAndAmount(client, clientCharge, fmt, transactionDate, amountPaid, requiresTransactionDateValidation,
-                requiresTransactionAmountValidation);
+        validatePaymentDateAndAmount(client, clientCharge, fmt, transactionDate, amountPaid, requiresTransactionDateValidation, requiresTransactionAmountValidation);
     }
 
-    public void validatePaymentTransaction(final Client client, final ClientCharge clientCharge, final DateTimeFormatter fmt,
-            final LocalDate transactionDate, final BigDecimal amountPaid) {
+    public void validatePaymentTransaction(final Client client, final ClientCharge clientCharge, final DateTimeFormatter fmt, final LocalDate transactionDate, final BigDecimal amountPaid) {
         boolean requiresTransactionDateValidation = true;
         boolean requiresTransactionAmountValidation = true;
-        validatePaymentDateAndAmount(client, clientCharge, fmt, transactionDate, amountPaid, requiresTransactionDateValidation,
-                requiresTransactionAmountValidation);
+        validatePaymentDateAndAmount(client, clientCharge, fmt, transactionDate, amountPaid, requiresTransactionDateValidation, requiresTransactionAmountValidation);
     }
 
     public void validateChargeDeletion(final Client client, final ClientCharge clientCharge) {
@@ -347,8 +299,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
         BigDecimal amountPaid = null;
         boolean requiresTransactionDateValidation = false;
         boolean requiresTransactionAmountValidation = false;
-        validatePaymentDateAndAmount(client, clientCharge, fmt, transactionDate, amountPaid, requiresTransactionDateValidation,
-                requiresTransactionAmountValidation);
+        validatePaymentDateAndAmount(client, clientCharge, fmt, transactionDate, amountPaid, requiresTransactionDateValidation, requiresTransactionAmountValidation);
     }
 
     /**
@@ -356,8 +307,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
      * @return
      */
     @Override
-    public CommandProcessingResult updateCharge(@SuppressWarnings("unused") Long clientId,
-            @SuppressWarnings("unused") JsonCommand command) {
+    public CommandProcessingResult updateCharge(@SuppressWarnings("unused") Long clientId, @SuppressWarnings("unused") JsonCommand command) {
         // functionality not yet supported
         return null;
     }
@@ -369,8 +319,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
      * @param fmt
      */
     private void validateDueDateOnWorkingDay(final ClientCharge clientCharge, final DateTimeFormatter fmt) {
-        validateActivityDateFallOnAWorkingDay(clientCharge.getDueLocalDate(), clientCharge.getOfficeId(),
-                ClientApiConstants.dueAsOfDateParamName, "charge.due.date.is.on.holiday", "charge.due.date.is.a.non.workingday", fmt);
+        validateActivityDateFallOnAWorkingDay(clientCharge.getDueLocalDate(), clientCharge.getOfficeId(), ClientApiConstants.dueAsOfDateParamName, "charge.due.date.is.on.holiday", "charge.due.date.is.a.non.workingday", fmt);
     }
 
     /**
@@ -380,11 +329,8 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
      * @param clientCharge
      * @param fmt
      */
-    private void validateTransactionDateOnWorkingDay(final LocalDate transactionDate, final ClientCharge clientCharge,
-            final DateTimeFormatter fmt) {
-        validateActivityDateFallOnAWorkingDay(transactionDate, clientCharge.getOfficeId(), ClientApiConstants.transactionDateParamName,
-                "transaction.not.allowed.transaction.date.is.on.holiday", "transaction.not.allowed.transaction.date.is.a.non.workingday",
-                fmt);
+    private void validateTransactionDateOnWorkingDay(final LocalDate transactionDate, final ClientCharge clientCharge, final DateTimeFormatter fmt) {
+        validateActivityDateFallOnAWorkingDay(transactionDate, clientCharge.getOfficeId(), ClientApiConstants.transactionDateParamName, "transaction.not.allowed.transaction.date.is.on.holiday", "transaction.not.allowed.transaction.date.is.a.non.workingday", fmt);
     }
 
     /**
@@ -395,26 +341,19 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
      * @param errorMessageFragmentForActivityOnNonWorkingDay
      * @param fmt
      */
-    private void validateActivityDateFallOnAWorkingDay(final LocalDate date, final Long officeId, final String jsonPropertyName,
-            final String errorMessageFragmentForActivityOnHoliday, final String errorMessageFragmentForActivityOnNonWorkingDay,
-            final DateTimeFormatter fmt) {
+    private void validateActivityDateFallOnAWorkingDay(final LocalDate date, final Long officeId, final String jsonPropertyName, final String errorMessageFragmentForActivityOnHoliday, final String errorMessageFragmentForActivityOnNonWorkingDay, final DateTimeFormatter fmt) {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
-                .resource(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
+        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
         if (date != null) {
             // transaction date should not be on a holiday or non working day
             if (!this.configurationDomainService.allowTransactionsOnHolidayEnabled() && this.holidayRepository.isHoliday(officeId, date)) {
-                baseDataValidator.reset().parameter(jsonPropertyName).value(date.format(fmt))
-                        .failWithCodeNoParameterAddedToErrorCode(errorMessageFragmentForActivityOnHoliday);
+                baseDataValidator.reset().parameter(jsonPropertyName).value(date.format(fmt)).failWithCodeNoParameterAddedToErrorCode(errorMessageFragmentForActivityOnHoliday);
                 if (!dataValidationErrors.isEmpty()) {
                     throw new PlatformApiDataValidationException(dataValidationErrors);
                 }
             }
-
-            if (!this.configurationDomainService.allowTransactionsOnNonWorkingDayEnabled()
-                    && !this.workingDaysRepository.isWorkingDay(date)) {
-                baseDataValidator.reset().parameter(jsonPropertyName).value(date.format(fmt))
-                        .failWithCodeNoParameterAddedToErrorCode(errorMessageFragmentForActivityOnNonWorkingDay);
+            if (!this.configurationDomainService.allowTransactionsOnNonWorkingDayEnabled() && !this.workingDaysRepository.isWorkingDay(date)) {
+                baseDataValidator.reset().parameter(jsonPropertyName).value(date.format(fmt)).failWithCodeNoParameterAddedToErrorCode(errorMessageFragmentForActivityOnNonWorkingDay);
                 if (!dataValidationErrors.isEmpty()) {
                     throw new PlatformApiDataValidationException(dataValidationErrors);
                 }
@@ -422,25 +361,18 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
         }
     }
 
-    private void handleDataIntegrityIssues(@SuppressWarnings("unused") final Long clientId, final Long clientChargeId,
-            final Throwable realCause, final NonTransientDataAccessException dve) {
+    private void handleDataIntegrityIssues(@SuppressWarnings("unused") final Long clientId, final Long clientChargeId, final Throwable realCause, final NonTransientDataAccessException dve) {
         if (realCause.getMessage().contains("FK_m_client_charge_paid_by_m_client_charge")) {
-            throw new PlatformDataIntegrityException("error.msg.client.charge.cannot.be.deleted",
-                    "Client charge with id `" + clientChargeId + "` cannot be deleted as transactions have been made on the same",
-                    "clientChargeId", clientChargeId);
+            throw new PlatformDataIntegrityException("error.msg.client.charge.cannot.be.deleted", "Client charge with id `" + clientChargeId + "` cannot be deleted as transactions have been made on the same", "clientChargeId", clientChargeId);
         }
-
         log.error("Error occured.", dve);
-        throw ErrorHandler.getMappable(dve, "error.msg.client.charges.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource: " + realCause.getMessage());
+        throw ErrorHandler.getMappable(dve, "error.msg.client.charges.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
     }
 
     private Money calculateRoundedChargeAmount(final Charge charge, final JsonCommand command) {
         BigDecimal amount = command.bigDecimalValueOfParameterNamed(ClientApiConstants.amountParamName);
         amount = (amount == null) ? charge.getAmount() : amount;
-
         ApplicationCurrency currency = this.applicationCurrencyRepositoryWrapper.findOneWithNotFoundDetection(charge.getCurrencyCode());
-
         CurrencyData currencyData = currency.toData();
         return Money.of(currencyData, amount);
     }
@@ -448,10 +380,23 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
     private void validateChargeAmountNotZero(Money amount) {
         if (amount.isZero()) {
             List<ApiParameterError> errors = new ArrayList<>();
-            errors.add(ApiParameterError.parameterError("error.msg.client.charge.amount.rounded.to.zero",
-                    "This charge cannot be added because the calculated amount becomes zero after rounding.", "amount"));
+            errors.add(ApiParameterError.parameterError("error.msg.client.charge.amount.rounded.to.zero", "This charge cannot be added because the calculated amount becomes zero after rounding.", "amount"));
             throw new PlatformApiDataValidationException(errors);
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ClientChargeWritePlatformServiceImpl(final ChargeRepositoryWrapper chargeRepository, final ClientRepositoryWrapper clientRepository, final ClientChargeDataValidator clientChargeDataValidator, final ConfigurationDomainService configurationDomainService, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final ClientChargeRepositoryWrapper clientChargeRepository, final ClientTransactionRepository clientTransactionRepository, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final JournalEntryWritePlatformService journalEntryWritePlatformService, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper) {
+        this.chargeRepository = chargeRepository;
+        this.clientRepository = clientRepository;
+        this.clientChargeDataValidator = clientChargeDataValidator;
+        this.configurationDomainService = configurationDomainService;
+        this.holidayRepository = holidayRepository;
+        this.workingDaysRepository = workingDaysRepository;
+        this.clientChargeRepository = clientChargeRepository;
+        this.clientTransactionRepository = clientTransactionRepository;
+        this.paymentDetailWritePlatformService = paymentDetailWritePlatformService;
+        this.journalEntryWritePlatformService = journalEntryWritePlatformService;
+        this.applicationCurrencyRepositoryWrapper = applicationCurrencyRepositoryWrapper;
+    }
 }

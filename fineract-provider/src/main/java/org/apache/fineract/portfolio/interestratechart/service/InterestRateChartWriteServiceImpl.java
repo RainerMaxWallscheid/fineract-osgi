@@ -16,14 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.interestratechart.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Locale;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.interestratechart.data.InterestRateChartCreateRequest;
 import org.apache.fineract.portfolio.interestratechart.data.InterestRateChartCreateResponse;
 import org.apache.fineract.portfolio.interestratechart.data.InterestRateChartDeleteRequest;
@@ -35,9 +33,7 @@ import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChartF
 import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChartRepositoryWrapper;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 public class InterestRateChartWriteServiceImpl implements InterestRateChartWriteService {
-
     private final InterestRateChartRepositoryWrapper interestRateChartRepository;
 
     @Override
@@ -47,13 +43,9 @@ public class InterestRateChartWriteServiceImpl implements InterestRateChartWrite
         final Locale locale = request.getLocale() != null ? Locale.forLanguageTag(request.getLocale()) : Locale.getDefault();
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat, locale);
         final LocalDate fromDate = request.getFromDate() != null ? LocalDate.parse(request.getFromDate(), formatter) : null;
-
-        final InterestRateChartFields fields = InterestRateChartFields.createNew(request.getName(), request.getDescription(), fromDate,
-                null, false);
+        final InterestRateChartFields fields = InterestRateChartFields.createNew(request.getName(), request.getDescription(), fromDate, null, false);
         final InterestRateChart interestRateChart = InterestRateChart.createNew(fields, new ArrayList<>());
-
         interestRateChartRepository.saveAndFlush(interestRateChart);
-
         return InterestRateChartCreateResponse.builder().resourceId(interestRateChart.getId()).build();
     }
 
@@ -61,17 +53,13 @@ public class InterestRateChartWriteServiceImpl implements InterestRateChartWrite
     @Transactional
     public InterestRateChartUpdateResponse updateInterestRateChart(InterestRateChartUpdateRequest request) {
         final InterestRateChart interestRateChart = interestRateChartRepository.findOneWithNotFoundDetection(request.getId());
-
         if (request.getName() != null && !request.getName().equals(interestRateChart.chartFields().getName())) {
             interestRateChart.chartFields().setName(request.getName());
         }
-
         if (request.getDescription() != null && !request.getDescription().equals(interestRateChart.chartFields().getDescription())) {
             interestRateChart.chartFields().setDescription(request.getDescription());
         }
-
         interestRateChartRepository.saveAndFlush(interestRateChart);
-
         return InterestRateChartUpdateResponse.builder().resourceId(interestRateChart.getId()).build();
     }
 
@@ -79,9 +67,12 @@ public class InterestRateChartWriteServiceImpl implements InterestRateChartWrite
     @Transactional
     public InterestRateChartDeleteResponse deleteInterestRateChart(InterestRateChartDeleteRequest request) {
         final InterestRateChart chart = interestRateChartRepository.findOneWithNotFoundDetection(request.getChartId());
-
         interestRateChartRepository.delete(chart);
-
         return InterestRateChartDeleteResponse.builder().resourceId(chart.getId()).build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InterestRateChartWriteServiceImpl(final InterestRateChartRepositoryWrapper interestRateChartRepository) {
+        this.interestRateChartRepository = interestRateChartRepository;
     }
 }

@@ -20,7 +20,6 @@ package org.apache.fineract.infrastructure.contentstore.util;
 
 import static java.util.Objects.requireNonNullElse;
 import static org.apache.fineract.infrastructure.contentstore.processor.ContentProcessor.BEAN_NAME_EXECUTOR;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,17 +28,16 @@ import java.io.PipedOutputStream;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.contentstore.exception.ContentProcessorException;
 import org.apache.fineract.infrastructure.contentstore.processor.ContentProcessor;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 public final class ContentPipe {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ContentPipe.class);
     private final ExecutorService executor;
     private final FineractProperties properties;
 
@@ -51,7 +49,6 @@ public final class ContentPipe {
     public InputStream pipe(ContentProcessor.OutputStreamConsumer consumer) {
         var pis = new PipedInputStream(requireNonNullElse(properties.getContent().getDefaultBufferSize(), 8192));
         var pos = newPipedOutputStream(pis);
-
         var future = executor.submit(() -> {
             try (var os = pos) {
                 consumer.accept(os);
@@ -60,7 +57,6 @@ public final class ContentPipe {
                 throw new ContentProcessorException(new IOException(e));
             }
         });
-
         return new FutureInputStream(pis, future);
     }
 
@@ -68,26 +64,26 @@ public final class ContentPipe {
         // Java default buffer is 1024 bytes
         var pis = new PipedInputStream(requireNonNullElse(properties.getContent().getDefaultBufferSize(), 8192));
         var pos = newPipedOutputStream(pis);
-
         // submit the work to the executor
         var future = executor.submit(() -> {
-            try (var os = pos; var is = inputStream) {
+            try (
+                var os = pos;
+                var is = inputStream) {
                 // run the user logic (e.g., zipping, resizing)
                 consumer.accept(is, os);
-                // flushing is handled by try-with-resources close()
-            } catch (Throwable e) {
+            } catch (
+            // flushing is handled by try-with-resources close()
+            Throwable e) {
                 // if an error occurs, the pipe will close
                 throw new ContentProcessorException(new IOException(e));
             }
         });
-
         // tracks errors
         return new FutureInputStream(pis, future);
     }
 
     public void write(InputStream is, OutputStream os, byte[] buffer) throws IOException {
         int bytesRead;
-
         while ((bytesRead = is.read(buffer)) != -1) {
             os.write(buffer, 0, bytesRead);
         }
@@ -101,8 +97,8 @@ public final class ContentPipe {
         }
     }
 
-    private static class FutureInputStream extends InputStream {
 
+    private static class FutureInputStream extends InputStream {
         private final PipedInputStream delegate;
         private final Future<?> future;
 
@@ -120,16 +116,13 @@ public final class ContentPipe {
                     future.get();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-
                     throw new IOException("Processing interrupted", e);
                 } catch (ExecutionException e) {
                     // unwrap cause
                     Throwable cause = e.getCause();
-
                     if (cause instanceof IOException ioe) {
                         throw ioe;
                     }
-
                     throw new IOException("Processing failed in worker thread", cause);
                 }
             }
@@ -138,30 +131,23 @@ public final class ContentPipe {
         @Override
         public int read() throws IOException {
             checkException();
-
             int data = delegate.read();
-
             // check EOF because of error
             checkException();
-
             return data;
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
             checkException();
-
             int count = delegate.read(b, off, len);
-
             checkException();
-
             return count;
         }
 
         @Override
         public void close() throws IOException {
             delegate.close();
-
             // good practice
             future.cancel(true);
         }

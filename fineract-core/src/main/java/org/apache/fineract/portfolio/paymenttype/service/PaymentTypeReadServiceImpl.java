@@ -19,42 +19,41 @@
 package org.apache.fineract.portfolio.paymenttype.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
 import org.apache.fineract.portfolio.paymenttype.exception.PaymentTypeNotFoundException;
 import org.apache.fineract.portfolio.paymenttype.mapper.PaymentTypeMapper;
 import org.springframework.cache.annotation.Cacheable;
 
-@RequiredArgsConstructor
 public class PaymentTypeReadServiceImpl implements PaymentTypeReadService {
-
     private final PaymentTypeRepository repository;
     private final PaymentTypeMapper paymentTypeMapper;
 
     @Override
-    @Cacheable(value = "payment_types", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat('payment_types')")
+    @Cacheable(value = "payment_types", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(\'payment_types\')")
     public List<PaymentTypeData> retrieveAllPaymentTypes() {
         var paymentType = repository.findAllByOrderByPositionAsc();
-
         return paymentTypeMapper.map(paymentType);
     }
 
     @Override
-    @Cacheable(value = "paymentTypesWithCode", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat('payment_types')")
+    @Cacheable(value = "paymentTypesWithCode", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(\'payment_types\')")
     public List<PaymentTypeData> retrieveAllPaymentTypesWithCode() {
         var paymentType = repository.findAllByCodeNameIsNotNullOrderByPositionAsc();
-
         return paymentTypeMapper.map(paymentType);
     }
 
     @Override
     public PaymentTypeData retrieveOne(Long paymentTypeId) {
         final var paymentType = repository.findById(paymentTypeId).orElseThrow(() -> new PaymentTypeNotFoundException(paymentTypeId));
-
         return paymentTypeMapper.map(paymentType);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public PaymentTypeReadServiceImpl(final PaymentTypeRepository repository, final PaymentTypeMapper paymentTypeMapper) {
+        this.repository = repository;
+        this.paymentTypeMapper = paymentTypeMapper;
+    }
     /*
      * // TODO: do proper jakarta validation to fineract api error mapping private void
      * throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) { if

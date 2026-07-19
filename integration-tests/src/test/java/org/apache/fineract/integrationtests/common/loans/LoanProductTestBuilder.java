@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import lombok.Builder;
 import org.apache.fineract.client.models.AdvancedPaymentData;
 import org.apache.fineract.client.models.CreditAllocationData;
 import org.apache.fineract.integrationtests.common.Utils;
@@ -36,7 +35,6 @@ import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanSchedul
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleType;
 
 public class LoanProductTestBuilder {
-
     private static final String LOCALE = "en_GB";
     private static final String USD = "USD";
     private static final String DAYS = "0";
@@ -53,37 +51,29 @@ public class LoanProductTestBuilder {
     public static final String DUE_PENALTY_FEE_INTEREST_PRINCIPAL_IN_ADVANCE_PRINCIPAL_PENALTY_FEE_INTEREST_STRATEGY = "due-penalty-fee-interest-principal-in-advance-principal-penalty-fee-interest-strategy";
     public static final String DUE_PENALTY_INTEREST_PRINCIPAL_FEE_IN_ADVANCE_PENALTY_INTEREST_PRINCIPAL_FEE_STRATEGY = "due-penalty-interest-principal-fee-in-advance-penalty-interest-principal-fee-strategy";
     public static final String ADVANCED_PAYMENT_ALLOCATION_STRATEGY = "advanced-payment-allocation-strategy";
-
     // private static final String HEAVENS_FAMILY_STRATEGY ="heavensfamily-strategy";
     // private static final String CREO_CORE_STRATEGY ="creocore-strategy";
     public static final String RBI_INDIA_STRATEGY = "rbi-india-strategy";
-
     public static final String RECALCULATION_FREQUENCY_TYPE_SAME_AS_REPAYMENT_PERIOD = "1";
     public static final String RECALCULATION_FREQUENCY_TYPE_DAILY = "2";
     public static final String RECALCULATION_FREQUENCY_TYPE_WEEKLY = "3";
     public static final String RECALCULATION_FREQUENCY_TYPE_MONTHLY = "4";
-
     public static final String RECALCULATION_STRATEGY_RESCHEDULE_NEXT_REPAYMENTS = "1";
     public static final String RECALCULATION_STRATEGY_REDUCE_NUMBER_OF_INSTALLMENTS = "2";
     public static final String RECALCULATION_STRATEGY_REDUCE_EMI_AMOUN = "3";
     public static final String RECALCULATION_STRATEGY_ADJUST_LAST_UNPAID_PERIOD = "4";
-
     public static final String RECALCULATION_COMPOUNDING_METHOD_NONE = "0";
     public static final String RECALCULATION_COMPOUNDING_METHOD_INTEREST = "1";
     public static final String RECALCULATION_COMPOUNDING_METHOD_FEE = "2";
     public static final String RECALCULATION_COMPOUNDING_METHOD_INTEREST_AND_FEE = "3";
-
     public static final String NONE = "1";
     public static final String CASH_BASED = "2";
     public static final String ACCRUAL_PERIODIC = "3";
     public static final String ACCRUAL_UPFRONT = "4";
-
     public static final String INTEREST_APPLICABLE_STRATEGY_REST_DATE = "2";
     public static final String INTEREST_APPLICABLE_STRATEGY_ON_PRE_CLOSE_DATE = "1";
-
     private String digitsAfterDecimal = "2";
     private String inMultiplesOf = "0";
-
     private String nameOfLoanProduct = Utils.uniqueRandomStringGenerator("LOAN_PRODUCT_", 6);
     private String shortName = Utils.uniqueRandomStringGenerator("", 4);
     private String externalId = null;
@@ -106,12 +96,10 @@ public class LoanProductTestBuilder {
     private String minPrincipal = "1000.00";
     private String maxPrincipal = "10000000.00";
     private Account[] accountList = null;
-
     private List<Map<String, Long>> feeToIncomeAccountMappings = null;
     private List<Map<String, Long>> penaltyToIncomeAccountMappings = null;
     private List<Map<String, Long>> chargeOffReasonToExpenseAccountMappings = null;
     private Account feeAndPenaltyAssetAccount;
-
     private Boolean multiDisburseLoan = false;
     private Boolean allowFullTermForTranche = false;
     private final String outstandingLoanBalance = "35000";
@@ -121,7 +109,6 @@ public class LoanProductTestBuilder {
     private String overAppliedCalculationType = null;
     private Integer overAppliedNumber = null;
     private Boolean isEqualAmortization = false;
-
     private Boolean isInterestRecalculationEnabled = false;
     private String daysInYearType = "1";
     private String daysInMonthType = "1";
@@ -142,7 +129,6 @@ public class LoanProductTestBuilder {
     private String graceOnInterestPayment = null;
     private JsonObject allowAttributeOverrides = null;
     private Boolean allowPartialPeriodInterestCalculation = false;
-
     private Boolean allowVariableInstallments = Boolean.FALSE;
     private Integer minimumGap;
     private Integer maximumGap;
@@ -183,7 +169,6 @@ public class LoanProductTestBuilder {
 
     public HashMap<String, Object> build(final String chargeId, final Long delinquencyBucketId) {
         final HashMap<String, Object> map = new HashMap<>();
-
         if (chargeId != null) {
             List<HashMap<String, String>> charges = new ArrayList<>();
             HashMap<String, String> chargeMap = new HashMap<>();
@@ -220,7 +205,6 @@ public class LoanProductTestBuilder {
         map.put("overdueDaysForNPA", this.overdueDaysForNPA);
         map.put("loanScheduleType", loanScheduleType);
         map.put("loanScheduleProcessingType", loanScheduleProcessingType);
-
         if (this.minimumDaysBetweenDisbursalAndFirstRepayment != null) {
             map.put("minimumDaysBetweenDisbursalAndFirstRepayment", this.minimumDaysBetweenDisbursalAndFirstRepayment);
         }
@@ -248,7 +232,6 @@ public class LoanProductTestBuilder {
         if (this.allowFullTermForTranche && !this.multiDisburseLoan) {
             map.put("allowFullTermForTranche", this.allowFullTermForTranche);
         }
-
         if (this.fullAccountingConfig != null) {
             map.putAll(this.fullAccountingConfig.toMap());
         } else if (this.accountingRule.equals(ACCRUAL_UPFRONT) || this.accountingRule.equals(ACCRUAL_PERIODIC)) {
@@ -300,27 +283,22 @@ public class LoanProductTestBuilder {
         if (installmentAmountInMultiplesOf != null) {
             map.put("installmentAmountInMultiplesOf", this.installmentAmountInMultiplesOf);
         }
-
         // Delinquency Bucket
         if (delinquencyBucketId != null) {
             map.put("delinquencyBucketId", delinquencyBucketId);
         }
-
         if (this.delinquencyBucketId != null) {
             map.put("delinquencyBucketId", this.delinquencyBucketId);
         }
-
         if (this.feeToIncomeAccountMappings != null) {
             map.put("feeToIncomeAccountMappings", this.feeToIncomeAccountMappings);
         }
         if (this.penaltyToIncomeAccountMappings != null) {
             map.put("penaltyToIncomeAccountMappings", this.penaltyToIncomeAccountMappings);
         }
-
         if (this.chargeOffReasonToExpenseAccountMappings != null) {
             map.put("chargeOffReasonToExpenseAccountMappings", this.chargeOffReasonToExpenseAccountMappings);
         }
-
         if (this.dueDaysForRepaymentEvent != null) {
             map.put("dueDaysForRepaymentEvent", this.dueDaysForRepaymentEvent);
         }
@@ -337,27 +315,21 @@ public class LoanProductTestBuilder {
         if (interestRecognitionOnDisbursementDate) {
             map.put("interestRecognitionOnDisbursementDate", interestRecognitionOnDisbursementDate);
         }
-
         if (this.repaymentStartDateType != null) {
             map.put("repaymentStartDateType", repaymentStartDateType);
         }
-
         if (this.supportedInterestRefundTypes != null) {
             map.put("supportedInterestRefundTypes", supportedInterestRefundTypes);
         }
-
         if (this.chargeOffBehaviour != null) {
             map.put("chargeOffBehaviour", chargeOffBehaviour);
         }
-
         if (this.enableBuyDownFee != null) {
             map.put("enableBuyDownFee", this.enableBuyDownFee);
         }
-
         if (this.merchantBuyDownFee != null) {
             map.put("merchantBuyDownFee", this.merchantBuyDownFee);
         }
-
         return map;
     }
 
@@ -595,7 +567,6 @@ public class LoanProductTestBuilder {
                     map.put("receivablePenaltyAccountId", ID);
                 }
                 map.put("receivableInterestAccountId", ID);
-
             }
             if (this.accountList[i].getAccountType().equals(Account.AccountType.INCOME)) {
                 final String ID = this.accountList[i].getAccountID().toString();
@@ -622,7 +593,6 @@ public class LoanProductTestBuilder {
                 map.put("overpaymentLiabilityAccountId", ID);
             }
         }
-
         return map;
     }
 
@@ -658,8 +628,7 @@ public class LoanProductTestBuilder {
         return this;
     }
 
-    public LoanProductTestBuilder withInterestRecalculationDetails(final String interestRecalculationCompoundingMethod,
-            final String rescheduleStrategyMethod, String preCloseInterestCalculationStrategy) {
+    public LoanProductTestBuilder withInterestRecalculationDetails(final String interestRecalculationCompoundingMethod, final String rescheduleStrategyMethod, String preCloseInterestCalculationStrategy) {
         this.isInterestRecalculationEnabled = true;
         this.interestRecalculationCompoundingMethod = interestRecalculationCompoundingMethod;
         this.rescheduleStrategyMethod = rescheduleStrategyMethod;
@@ -667,9 +636,7 @@ public class LoanProductTestBuilder {
         return this;
     }
 
-    public LoanProductTestBuilder withInterestRecalculationRestFrequencyDetails(final String recalculationRestFrequencyType,
-            final String recalculationRestFrequencyInterval, final Integer recalculationRestFrequencyOnDayType,
-            final Integer recalculationRestFrequencyDayOfWeekType) {
+    public LoanProductTestBuilder withInterestRecalculationRestFrequencyDetails(final String recalculationRestFrequencyType, final String recalculationRestFrequencyInterval, final Integer recalculationRestFrequencyOnDayType, final Integer recalculationRestFrequencyDayOfWeekType) {
         this.isInterestRecalculationEnabled = true;
         this.recalculationRestFrequencyType = recalculationRestFrequencyType;
         this.recalculationRestFrequencyInterval = recalculationRestFrequencyInterval;
@@ -683,9 +650,7 @@ public class LoanProductTestBuilder {
         return this;
     }
 
-    public LoanProductTestBuilder withInterestRecalculationCompoundingFrequencyDetails(final String recalculationCompoundingFrequencyType,
-            final String recalculationCompoundingFrequencyInterval, final Integer recalculationCompoundingFrequencyOnDayType,
-            final Integer recalculationCompoundingFrequencyDayOfWeekType) {
+    public LoanProductTestBuilder withInterestRecalculationCompoundingFrequencyDetails(final String recalculationCompoundingFrequencyType, final String recalculationCompoundingFrequencyInterval, final Integer recalculationCompoundingFrequencyOnDayType, final Integer recalculationCompoundingFrequencyDayOfWeekType) {
         this.isInterestRecalculationEnabled = true;
         this.recalculationCompoundingFrequencyType = recalculationCompoundingFrequencyType;
         this.recalculationCompoundingFrequencyInterval = recalculationCompoundingFrequencyInterval;
@@ -694,8 +659,7 @@ public class LoanProductTestBuilder {
         return this;
     }
 
-    public LoanProductTestBuilder withMinimumDaysBetweenDisbursalAndFirstRepayment(
-            final String minimumDaysBetweenDisbursalAndFirstRepayment) {
+    public LoanProductTestBuilder withMinimumDaysBetweenDisbursalAndFirstRepayment(final String minimumDaysBetweenDisbursalAndFirstRepayment) {
         this.minimumDaysBetweenDisbursalAndFirstRepayment = minimumDaysBetweenDisbursalAndFirstRepayment;
         return this;
     }
@@ -705,8 +669,7 @@ public class LoanProductTestBuilder {
         return this;
     }
 
-    public LoanProductTestBuilder withOnHoldFundDetails(final String mandatoryGuarantee, final String minimumGuaranteeFromGuarantor,
-            final String minimumGuaranteeFromOwnFunds) {
+    public LoanProductTestBuilder withOnHoldFundDetails(final String mandatoryGuarantee, final String minimumGuaranteeFromGuarantor, final String minimumGuaranteeFromOwnFunds) {
         this.holdGuaranteeFunds = true;
         this.mandatoryGuarantee = mandatoryGuarantee;
         this.minimumGuaranteeFromGuarantor = minimumGuaranteeFromGuarantor;
@@ -725,8 +688,7 @@ public class LoanProductTestBuilder {
         return this;
     }
 
-    public LoanProductTestBuilder withVariableInstallmentsConfig(Boolean allowVariableInstallments, Integer minimumGap,
-            Integer maximumGap) {
+    public LoanProductTestBuilder withVariableInstallmentsConfig(Boolean allowVariableInstallments, Integer minimumGap, Integer maximumGap) {
         this.allowVariableInstallments = allowVariableInstallments;
         this.minimumGap = minimumGap;
         this.maximumGap = maximumGap;
@@ -790,8 +752,7 @@ public class LoanProductTestBuilder {
         return this;
     }
 
-    public LoanProductTestBuilder withEnableDownPayment(final Boolean enableDownPayment,
-            final String disbursedAmountPercentageForDownPayment, final Boolean enableAutoRepaymentForDownPayment) {
+    public LoanProductTestBuilder withEnableDownPayment(final Boolean enableDownPayment, final String disbursedAmountPercentageForDownPayment, final Boolean enableAutoRepaymentForDownPayment) {
         this.enableDownPayment = enableDownPayment;
         this.disbursedAmountPercentageForDownPayment = disbursedAmountPercentageForDownPayment;
         this.enableAutoRepaymentForDownPayment = enableAutoRepaymentForDownPayment;
@@ -854,9 +815,8 @@ public class LoanProductTestBuilder {
         return transactionProcessingStrategyCode;
     }
 
-    @Builder
-    public static class FullAccountingConfig {
 
+    public static class FullAccountingConfig {
         private final Long fundSourceAccountId;
         private final Long loanPortfolioAccountId;
         private final Long transfersInSuspenseAccountId;
@@ -882,49 +842,321 @@ public class LoanProductTestBuilder {
 
         public Map<String, String> toMap() {
             Map<String, String> map = new HashMap<>();
-            Optional.ofNullable(fundSourceAccountId)
-                    .ifPresent(fundSourceAccountId -> map.put("fundSourceAccountId", Long.toString(fundSourceAccountId)));
-            Optional.ofNullable(loanPortfolioAccountId)
-                    .ifPresent(loanPortfolioAccountId -> map.put("loanPortfolioAccountId", Long.toString(loanPortfolioAccountId)));
-            Optional.ofNullable(transfersInSuspenseAccountId).ifPresent(
-                    transfersInSuspenseAccountId -> map.put("transfersInSuspenseAccountId", Long.toString(transfersInSuspenseAccountId)));
-            Optional.ofNullable(interestOnLoanAccountId)
-                    .ifPresent(interestOnLoanAccountId -> map.put("interestOnLoanAccountId", Long.toString(interestOnLoanAccountId)));
-            Optional.ofNullable(incomeFromFeeAccountId)
-                    .ifPresent(incomeFromFeeAccountId -> map.put("incomeFromFeeAccountId", Long.toString(incomeFromFeeAccountId)));
-            Optional.ofNullable(incomeFromPenaltyAccountId).ifPresent(
-                    incomeFromPenaltyAccountId -> map.put("incomeFromPenaltyAccountId", Long.toString(incomeFromPenaltyAccountId)));
-            Optional.ofNullable(incomeFromRecoveryAccountId).ifPresent(
-                    incomeFromRecoveryAccountId -> map.put("incomeFromRecoveryAccountId", Long.toString(incomeFromRecoveryAccountId)));
-            Optional.ofNullable(writeOffAccountId)
-                    .ifPresent(writeOffAccountId -> map.put("writeOffAccountId", Long.toString(writeOffAccountId)));
-            Optional.ofNullable(overpaymentLiabilityAccountId).ifPresent(overpaymentLiabilityAccountId -> map
-                    .put("overpaymentLiabilityAccountId", Long.toString(overpaymentLiabilityAccountId)));
-            Optional.ofNullable(receivableInterestAccountId).ifPresent(
-                    receivableInterestAccountId -> map.put("receivableInterestAccountId", Long.toString(receivableInterestAccountId)));
-            Optional.ofNullable(receivableFeeAccountId)
-                    .ifPresent(receivableFeeAccountId -> map.put("receivableFeeAccountId", Long.toString(receivableFeeAccountId)));
-            Optional.ofNullable(receivablePenaltyAccountId).ifPresent(
-                    receivablePenaltyAccountId -> map.put("receivablePenaltyAccountId", Long.toString(receivablePenaltyAccountId)));
-            Optional.ofNullable(goodwillCreditAccountId)
-                    .ifPresent(goodwillCreditAccountId -> map.put("goodwillCreditAccountId", Long.toString(goodwillCreditAccountId)));
-            Optional.ofNullable(incomeFromGoodwillCreditInterestAccountId).ifPresent(incomeFromGoodwillCreditInterestAccountId -> map
-                    .put("incomeFromGoodwillCreditInterestAccountId", Long.toString(incomeFromGoodwillCreditInterestAccountId)));
-            Optional.ofNullable(incomeFromGoodwillCreditFeesAccountId).ifPresent(incomeFromGoodwillCreditFeesAccountId -> map
-                    .put("incomeFromGoodwillCreditFeesAccountId", Long.toString(incomeFromGoodwillCreditFeesAccountId)));
-            Optional.ofNullable(incomeFromGoodwillCreditPenaltyAccountId).ifPresent(incomeFromGoodwillCreditPenaltyAccountId -> map
-                    .put("incomeFromGoodwillCreditPenaltyAccountId", Long.toString(incomeFromGoodwillCreditPenaltyAccountId)));
-            Optional.ofNullable(incomeFromChargeOffInterestAccountId).ifPresent(incomeFromChargeOffInterestAccountId -> map
-                    .put("incomeFromChargeOffInterestAccountId", Long.toString(incomeFromChargeOffInterestAccountId)));
-            Optional.ofNullable(incomeFromChargeOffFeesAccountId).ifPresent(incomeFromChargeOffFeesAccountId -> map
-                    .put("incomeFromChargeOffFeesAccountId", Long.toString(incomeFromChargeOffFeesAccountId)));
-            Optional.ofNullable(chargeOffExpenseAccountId)
-                    .ifPresent(chargeOffExpenseAccountId -> map.put("chargeOffExpenseAccountId", Long.toString(chargeOffExpenseAccountId)));
-            Optional.ofNullable(chargeOffFraudExpenseAccountId).ifPresent(chargeOffFraudExpenseAccountId -> map
-                    .put("chargeOffFraudExpenseAccountId", Long.toString(chargeOffFraudExpenseAccountId)));
-            Optional.ofNullable(incomeFromChargeOffPenaltyAccountId).ifPresent(incomeFromChargeOffPenaltyAccountId -> map
-                    .put("incomeFromChargeOffPenaltyAccountId", Long.toString(incomeFromChargeOffPenaltyAccountId)));
+            Optional.ofNullable(fundSourceAccountId).ifPresent(fundSourceAccountId -> map.put("fundSourceAccountId", Long.toString(fundSourceAccountId)));
+            Optional.ofNullable(loanPortfolioAccountId).ifPresent(loanPortfolioAccountId -> map.put("loanPortfolioAccountId", Long.toString(loanPortfolioAccountId)));
+            Optional.ofNullable(transfersInSuspenseAccountId).ifPresent(transfersInSuspenseAccountId -> map.put("transfersInSuspenseAccountId", Long.toString(transfersInSuspenseAccountId)));
+            Optional.ofNullable(interestOnLoanAccountId).ifPresent(interestOnLoanAccountId -> map.put("interestOnLoanAccountId", Long.toString(interestOnLoanAccountId)));
+            Optional.ofNullable(incomeFromFeeAccountId).ifPresent(incomeFromFeeAccountId -> map.put("incomeFromFeeAccountId", Long.toString(incomeFromFeeAccountId)));
+            Optional.ofNullable(incomeFromPenaltyAccountId).ifPresent(incomeFromPenaltyAccountId -> map.put("incomeFromPenaltyAccountId", Long.toString(incomeFromPenaltyAccountId)));
+            Optional.ofNullable(incomeFromRecoveryAccountId).ifPresent(incomeFromRecoveryAccountId -> map.put("incomeFromRecoveryAccountId", Long.toString(incomeFromRecoveryAccountId)));
+            Optional.ofNullable(writeOffAccountId).ifPresent(writeOffAccountId -> map.put("writeOffAccountId", Long.toString(writeOffAccountId)));
+            Optional.ofNullable(overpaymentLiabilityAccountId).ifPresent(overpaymentLiabilityAccountId -> map.put("overpaymentLiabilityAccountId", Long.toString(overpaymentLiabilityAccountId)));
+            Optional.ofNullable(receivableInterestAccountId).ifPresent(receivableInterestAccountId -> map.put("receivableInterestAccountId", Long.toString(receivableInterestAccountId)));
+            Optional.ofNullable(receivableFeeAccountId).ifPresent(receivableFeeAccountId -> map.put("receivableFeeAccountId", Long.toString(receivableFeeAccountId)));
+            Optional.ofNullable(receivablePenaltyAccountId).ifPresent(receivablePenaltyAccountId -> map.put("receivablePenaltyAccountId", Long.toString(receivablePenaltyAccountId)));
+            Optional.ofNullable(goodwillCreditAccountId).ifPresent(goodwillCreditAccountId -> map.put("goodwillCreditAccountId", Long.toString(goodwillCreditAccountId)));
+            Optional.ofNullable(incomeFromGoodwillCreditInterestAccountId).ifPresent(incomeFromGoodwillCreditInterestAccountId -> map.put("incomeFromGoodwillCreditInterestAccountId", Long.toString(incomeFromGoodwillCreditInterestAccountId)));
+            Optional.ofNullable(incomeFromGoodwillCreditFeesAccountId).ifPresent(incomeFromGoodwillCreditFeesAccountId -> map.put("incomeFromGoodwillCreditFeesAccountId", Long.toString(incomeFromGoodwillCreditFeesAccountId)));
+            Optional.ofNullable(incomeFromGoodwillCreditPenaltyAccountId).ifPresent(incomeFromGoodwillCreditPenaltyAccountId -> map.put("incomeFromGoodwillCreditPenaltyAccountId", Long.toString(incomeFromGoodwillCreditPenaltyAccountId)));
+            Optional.ofNullable(incomeFromChargeOffInterestAccountId).ifPresent(incomeFromChargeOffInterestAccountId -> map.put("incomeFromChargeOffInterestAccountId", Long.toString(incomeFromChargeOffInterestAccountId)));
+            Optional.ofNullable(incomeFromChargeOffFeesAccountId).ifPresent(incomeFromChargeOffFeesAccountId -> map.put("incomeFromChargeOffFeesAccountId", Long.toString(incomeFromChargeOffFeesAccountId)));
+            Optional.ofNullable(chargeOffExpenseAccountId).ifPresent(chargeOffExpenseAccountId -> map.put("chargeOffExpenseAccountId", Long.toString(chargeOffExpenseAccountId)));
+            Optional.ofNullable(chargeOffFraudExpenseAccountId).ifPresent(chargeOffFraudExpenseAccountId -> map.put("chargeOffFraudExpenseAccountId", Long.toString(chargeOffFraudExpenseAccountId)));
+            Optional.ofNullable(incomeFromChargeOffPenaltyAccountId).ifPresent(incomeFromChargeOffPenaltyAccountId -> map.put("incomeFromChargeOffPenaltyAccountId", Long.toString(incomeFromChargeOffPenaltyAccountId)));
             return map;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                FullAccountingConfig(final Long fundSourceAccountId, final Long loanPortfolioAccountId, final Long transfersInSuspenseAccountId, final Long interestOnLoanAccountId, final Long incomeFromFeeAccountId, final Long incomeFromPenaltyAccountId, final Long incomeFromRecoveryAccountId, final Long writeOffAccountId, final Long overpaymentLiabilityAccountId, final Long receivableInterestAccountId, final Long receivableFeeAccountId, final Long receivablePenaltyAccountId, final Long goodwillCreditAccountId, final Long incomeFromGoodwillCreditInterestAccountId, final Long incomeFromGoodwillCreditFeesAccountId, final Long incomeFromGoodwillCreditPenaltyAccountId, final Long incomeFromChargeOffInterestAccountId, final Long incomeFromChargeOffFeesAccountId, final Long chargeOffExpenseAccountId, final Long chargeOffFraudExpenseAccountId, final Long incomeFromChargeOffPenaltyAccountId, final Long accountingRule) {
+            this.fundSourceAccountId = fundSourceAccountId;
+            this.loanPortfolioAccountId = loanPortfolioAccountId;
+            this.transfersInSuspenseAccountId = transfersInSuspenseAccountId;
+            this.interestOnLoanAccountId = interestOnLoanAccountId;
+            this.incomeFromFeeAccountId = incomeFromFeeAccountId;
+            this.incomeFromPenaltyAccountId = incomeFromPenaltyAccountId;
+            this.incomeFromRecoveryAccountId = incomeFromRecoveryAccountId;
+            this.writeOffAccountId = writeOffAccountId;
+            this.overpaymentLiabilityAccountId = overpaymentLiabilityAccountId;
+            this.receivableInterestAccountId = receivableInterestAccountId;
+            this.receivableFeeAccountId = receivableFeeAccountId;
+            this.receivablePenaltyAccountId = receivablePenaltyAccountId;
+            this.goodwillCreditAccountId = goodwillCreditAccountId;
+            this.incomeFromGoodwillCreditInterestAccountId = incomeFromGoodwillCreditInterestAccountId;
+            this.incomeFromGoodwillCreditFeesAccountId = incomeFromGoodwillCreditFeesAccountId;
+            this.incomeFromGoodwillCreditPenaltyAccountId = incomeFromGoodwillCreditPenaltyAccountId;
+            this.incomeFromChargeOffInterestAccountId = incomeFromChargeOffInterestAccountId;
+            this.incomeFromChargeOffFeesAccountId = incomeFromChargeOffFeesAccountId;
+            this.chargeOffExpenseAccountId = chargeOffExpenseAccountId;
+            this.chargeOffFraudExpenseAccountId = chargeOffFraudExpenseAccountId;
+            this.incomeFromChargeOffPenaltyAccountId = incomeFromChargeOffPenaltyAccountId;
+            this.accountingRule = accountingRule;
+        }
+
+
+        @java.lang.SuppressWarnings("all")
+                public static class FullAccountingConfigBuilder {
+            @java.lang.SuppressWarnings("all")
+                        private Long fundSourceAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long loanPortfolioAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long transfersInSuspenseAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long interestOnLoanAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long incomeFromFeeAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long incomeFromPenaltyAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long incomeFromRecoveryAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long writeOffAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long overpaymentLiabilityAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long receivableInterestAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long receivableFeeAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long receivablePenaltyAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long goodwillCreditAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long incomeFromGoodwillCreditInterestAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long incomeFromGoodwillCreditFeesAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long incomeFromGoodwillCreditPenaltyAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long incomeFromChargeOffInterestAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long incomeFromChargeOffFeesAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long chargeOffExpenseAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long chargeOffFraudExpenseAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long incomeFromChargeOffPenaltyAccountId;
+            @java.lang.SuppressWarnings("all")
+                        private Long accountingRule;
+
+            @java.lang.SuppressWarnings("all")
+                        FullAccountingConfigBuilder() {
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder fundSourceAccountId(final Long fundSourceAccountId) {
+                this.fundSourceAccountId = fundSourceAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder loanPortfolioAccountId(final Long loanPortfolioAccountId) {
+                this.loanPortfolioAccountId = loanPortfolioAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder transfersInSuspenseAccountId(final Long transfersInSuspenseAccountId) {
+                this.transfersInSuspenseAccountId = transfersInSuspenseAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder interestOnLoanAccountId(final Long interestOnLoanAccountId) {
+                this.interestOnLoanAccountId = interestOnLoanAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder incomeFromFeeAccountId(final Long incomeFromFeeAccountId) {
+                this.incomeFromFeeAccountId = incomeFromFeeAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder incomeFromPenaltyAccountId(final Long incomeFromPenaltyAccountId) {
+                this.incomeFromPenaltyAccountId = incomeFromPenaltyAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder incomeFromRecoveryAccountId(final Long incomeFromRecoveryAccountId) {
+                this.incomeFromRecoveryAccountId = incomeFromRecoveryAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder writeOffAccountId(final Long writeOffAccountId) {
+                this.writeOffAccountId = writeOffAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder overpaymentLiabilityAccountId(final Long overpaymentLiabilityAccountId) {
+                this.overpaymentLiabilityAccountId = overpaymentLiabilityAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder receivableInterestAccountId(final Long receivableInterestAccountId) {
+                this.receivableInterestAccountId = receivableInterestAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder receivableFeeAccountId(final Long receivableFeeAccountId) {
+                this.receivableFeeAccountId = receivableFeeAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder receivablePenaltyAccountId(final Long receivablePenaltyAccountId) {
+                this.receivablePenaltyAccountId = receivablePenaltyAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder goodwillCreditAccountId(final Long goodwillCreditAccountId) {
+                this.goodwillCreditAccountId = goodwillCreditAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder incomeFromGoodwillCreditInterestAccountId(final Long incomeFromGoodwillCreditInterestAccountId) {
+                this.incomeFromGoodwillCreditInterestAccountId = incomeFromGoodwillCreditInterestAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder incomeFromGoodwillCreditFeesAccountId(final Long incomeFromGoodwillCreditFeesAccountId) {
+                this.incomeFromGoodwillCreditFeesAccountId = incomeFromGoodwillCreditFeesAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder incomeFromGoodwillCreditPenaltyAccountId(final Long incomeFromGoodwillCreditPenaltyAccountId) {
+                this.incomeFromGoodwillCreditPenaltyAccountId = incomeFromGoodwillCreditPenaltyAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder incomeFromChargeOffInterestAccountId(final Long incomeFromChargeOffInterestAccountId) {
+                this.incomeFromChargeOffInterestAccountId = incomeFromChargeOffInterestAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder incomeFromChargeOffFeesAccountId(final Long incomeFromChargeOffFeesAccountId) {
+                this.incomeFromChargeOffFeesAccountId = incomeFromChargeOffFeesAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder chargeOffExpenseAccountId(final Long chargeOffExpenseAccountId) {
+                this.chargeOffExpenseAccountId = chargeOffExpenseAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder chargeOffFraudExpenseAccountId(final Long chargeOffFraudExpenseAccountId) {
+                this.chargeOffFraudExpenseAccountId = chargeOffFraudExpenseAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder incomeFromChargeOffPenaltyAccountId(final Long incomeFromChargeOffPenaltyAccountId) {
+                this.incomeFromChargeOffPenaltyAccountId = incomeFromChargeOffPenaltyAccountId;
+                return this;
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder accountingRule(final Long accountingRule) {
+                this.accountingRule = accountingRule;
+                return this;
+            }
+
+            @java.lang.SuppressWarnings("all")
+                        public LoanProductTestBuilder.FullAccountingConfig build() {
+                return new LoanProductTestBuilder.FullAccountingConfig(this.fundSourceAccountId, this.loanPortfolioAccountId, this.transfersInSuspenseAccountId, this.interestOnLoanAccountId, this.incomeFromFeeAccountId, this.incomeFromPenaltyAccountId, this.incomeFromRecoveryAccountId, this.writeOffAccountId, this.overpaymentLiabilityAccountId, this.receivableInterestAccountId, this.receivableFeeAccountId, this.receivablePenaltyAccountId, this.goodwillCreditAccountId, this.incomeFromGoodwillCreditInterestAccountId, this.incomeFromGoodwillCreditFeesAccountId, this.incomeFromGoodwillCreditPenaltyAccountId, this.incomeFromChargeOffInterestAccountId, this.incomeFromChargeOffFeesAccountId, this.chargeOffExpenseAccountId, this.chargeOffFraudExpenseAccountId, this.incomeFromChargeOffPenaltyAccountId, this.accountingRule);
+            }
+
+            @java.lang.Override
+            @java.lang.SuppressWarnings("all")
+                        public java.lang.String toString() {
+                return "LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder(fundSourceAccountId=" + this.fundSourceAccountId + ", loanPortfolioAccountId=" + this.loanPortfolioAccountId + ", transfersInSuspenseAccountId=" + this.transfersInSuspenseAccountId + ", interestOnLoanAccountId=" + this.interestOnLoanAccountId + ", incomeFromFeeAccountId=" + this.incomeFromFeeAccountId + ", incomeFromPenaltyAccountId=" + this.incomeFromPenaltyAccountId + ", incomeFromRecoveryAccountId=" + this.incomeFromRecoveryAccountId + ", writeOffAccountId=" + this.writeOffAccountId + ", overpaymentLiabilityAccountId=" + this.overpaymentLiabilityAccountId + ", receivableInterestAccountId=" + this.receivableInterestAccountId + ", receivableFeeAccountId=" + this.receivableFeeAccountId + ", receivablePenaltyAccountId=" + this.receivablePenaltyAccountId + ", goodwillCreditAccountId=" + this.goodwillCreditAccountId + ", incomeFromGoodwillCreditInterestAccountId=" + this.incomeFromGoodwillCreditInterestAccountId + ", incomeFromGoodwillCreditFeesAccountId=" + this.incomeFromGoodwillCreditFeesAccountId + ", incomeFromGoodwillCreditPenaltyAccountId=" + this.incomeFromGoodwillCreditPenaltyAccountId + ", incomeFromChargeOffInterestAccountId=" + this.incomeFromChargeOffInterestAccountId + ", incomeFromChargeOffFeesAccountId=" + this.incomeFromChargeOffFeesAccountId + ", chargeOffExpenseAccountId=" + this.chargeOffExpenseAccountId + ", chargeOffFraudExpenseAccountId=" + this.chargeOffFraudExpenseAccountId + ", incomeFromChargeOffPenaltyAccountId=" + this.incomeFromChargeOffPenaltyAccountId + ", accountingRule=" + this.accountingRule + ")";
+            }
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public static LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder builder() {
+            return new LoanProductTestBuilder.FullAccountingConfig.FullAccountingConfigBuilder();
         }
     }
 

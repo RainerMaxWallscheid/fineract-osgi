@@ -26,7 +26,6 @@ import static org.apache.fineract.portfolio.interestratechart.InterestIncentiveA
 import static org.apache.fineract.portfolio.interestratechart.InterestIncentiveApiConstants.entityTypeParamName;
 import static org.apache.fineract.portfolio.interestratechart.InterestIncentiveApiConstants.incentiveTypeparamName;
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartSlabApiConstants.incentivesParamName;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -36,7 +35,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
@@ -45,15 +43,11 @@ import org.apache.fineract.portfolio.interestratechart.domain.InterestIncentives
 import org.apache.fineract.portfolio.interestratechart.domain.InterestIncentivesFields;
 import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChartSlab;
 
-@RequiredArgsConstructor
 public class InterestIncentiveAssembler {
-
     private final FromJsonHelper fromApiJsonHelper;
 
-    public Collection<InterestIncentives> assembleIncentivesFrom(final JsonElement element, InterestRateChartSlab interestRateChartSlab,
-            final Locale locale) {
+    public Collection<InterestIncentives> assembleIncentivesFrom(final JsonElement element, InterestRateChartSlab interestRateChartSlab, final Locale locale) {
         final Collection<InterestIncentives> interestIncentivesSet = new HashSet<>();
-
         if (element.isJsonObject()) {
             final JsonObject topLevelJsonElement = element.getAsJsonObject();
             if (topLevelJsonElement.has(incentivesParamName) && topLevelJsonElement.get(incentivesParamName).isJsonArray()) {
@@ -65,12 +59,10 @@ public class InterestIncentiveAssembler {
                 }
             }
         }
-
         return interestIncentivesSet;
     }
 
-    private InterestIncentives assembleFrom(final JsonElement element, final InterestRateChartSlab interestRateChartSlab,
-            final Locale locale) {
+    private InterestIncentives assembleFrom(final JsonElement element, final InterestRateChartSlab interestRateChartSlab, final Locale locale) {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(INCENTIVE_RESOURCE_NAME);
         InterestIncentivesFields incentivesFields = createInterestIncentiveFields(element, baseDataValidator, locale);
@@ -78,21 +70,24 @@ public class InterestIncentiveAssembler {
         return new InterestIncentives(interestRateChartSlab, incentivesFields);
     }
 
-    private InterestIncentivesFields createInterestIncentiveFields(final JsonElement element, final DataValidatorBuilder baseDataValidator,
-            final Locale locale) {
+    private InterestIncentivesFields createInterestIncentiveFields(final JsonElement element, final DataValidatorBuilder baseDataValidator, final Locale locale) {
         Integer entityType = this.fromApiJsonHelper.extractIntegerNamed(entityTypeParamName, element, locale);
         Integer conditionType = this.fromApiJsonHelper.extractIntegerNamed(conditionTypeParamName, element, locale);
         Integer attributeName = this.fromApiJsonHelper.extractIntegerNamed(attributeNameParamName, element, locale);
         String attributeValue = this.fromApiJsonHelper.extractStringNamed(attributeValueParamName, element);
         Integer incentiveType = this.fromApiJsonHelper.extractIntegerNamed(incentiveTypeparamName, element, locale);
         BigDecimal amount = this.fromApiJsonHelper.extractBigDecimalNamed(amountParamName, element, locale);
-        return InterestIncentivesFields.createNew(entityType, attributeName, conditionType, attributeValue, incentiveType, amount,
-                baseDataValidator);
+        return InterestIncentivesFields.createNew(entityType, attributeName, conditionType, attributeValue, incentiveType, amount, baseDataValidator);
     }
 
     private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
         if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InterestIncentiveAssembler(final FromJsonHelper fromApiJsonHelper) {
+        this.fromApiJsonHelper = fromApiJsonHelper;
     }
 }

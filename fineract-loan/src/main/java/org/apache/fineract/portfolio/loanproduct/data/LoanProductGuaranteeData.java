@@ -20,21 +20,15 @@ package org.apache.fineract.portfolio.loanproduct.data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor
 public final class LoanProductGuaranteeData implements Serializable {
-
     private final Long id;
     private final Long productId;
     private final BigDecimal mandatoryGuarantee;
     private final BigDecimal minimumGuaranteeFromOwnFunds;
     private final BigDecimal minimumGuaranteeFromGuarantor;
 
-    public static LoanProductGuaranteeData instance(final Long id, final Long productId, final BigDecimal mandatoryGuarantee,
-            final BigDecimal minimumGuaranteeFromOwnFunds, final BigDecimal minimumGuaranteeFromGuarantor) {
+    public static LoanProductGuaranteeData instance(final Long id, final Long productId, final BigDecimal mandatoryGuarantee, final BigDecimal minimumGuaranteeFromOwnFunds, final BigDecimal minimumGuaranteeFromGuarantor) {
         return new LoanProductGuaranteeData(id, productId, mandatoryGuarantee, minimumGuaranteeFromOwnFunds, minimumGuaranteeFromGuarantor);
     }
 
@@ -42,4 +36,37 @@ public final class LoanProductGuaranteeData implements Serializable {
         return new LoanProductGuaranteeData(null, null, null, null, null);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getProductId() {
+        return this.productId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getMandatoryGuarantee() {
+        return this.mandatoryGuarantee;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getMinimumGuaranteeFromOwnFunds() {
+        return this.minimumGuaranteeFromOwnFunds;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getMinimumGuaranteeFromGuarantor() {
+        return this.minimumGuaranteeFromGuarantor;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanProductGuaranteeData(final Long id, final Long productId, final BigDecimal mandatoryGuarantee, final BigDecimal minimumGuaranteeFromOwnFunds, final BigDecimal minimumGuaranteeFromGuarantor) {
+        this.id = id;
+        this.productId = productId;
+        this.mandatoryGuarantee = mandatoryGuarantee;
+        this.minimumGuaranteeFromOwnFunds = minimumGuaranteeFromOwnFunds;
+        this.minimumGuaranteeFromGuarantor = minimumGuaranteeFromGuarantor;
+    }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.collectionsheet.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,16 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "COLLECTIONSHEET", action = "SAVE")
-@RequiredArgsConstructor
 public class SaveIndividualCollectionSheetCommandHandler implements NewCommandSourceHandler {
-
     private final CollectionSheetWritePlatformService collectionSheetWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.collectionSheetWritePlatformService.saveIndividualCollectionSheet(command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public SaveIndividualCollectionSheetCommandHandler(final CollectionSheetWritePlatformService collectionSheetWritePlatformService) {
+        this.collectionSheetWritePlatformService = collectionSheetWritePlatformService;
+    }
 }

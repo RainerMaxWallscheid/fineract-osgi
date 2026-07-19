@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.data;
 
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.config.MapstructMapperConfig;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
@@ -26,9 +25,7 @@ import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
 /**
  * Immutable data object represent loan status enumerations.
  */
-@Getter
 public class LoanStatusEnumData {
-
     private final Long id;
     private final String code;
     private final String value;
@@ -55,11 +52,66 @@ public class LoanStatusEnumData {
         this.overpaid = Long.valueOf(700).equals(this.id);
     }
 
+
     @org.mapstruct.Mapper(config = MapstructMapperConfig.class)
     public interface Mapper {
-
         default LoanStatusEnumData map(Loan source) {
             return LoanEnumerations.status(source.getStatus());
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isPendingApproval() {
+        return this.pendingApproval;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isWaitingForDisbursal() {
+        return this.waitingForDisbursal;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isActive() {
+        return this.active;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isClosedObligationsMet() {
+        return this.closedObligationsMet;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isClosedWrittenOff() {
+        return this.closedWrittenOff;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isClosedRescheduled() {
+        return this.closedRescheduled;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isClosed() {
+        return this.closed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isOverpaid() {
+        return this.overpaid;
     }
 }

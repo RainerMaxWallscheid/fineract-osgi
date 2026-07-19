@@ -18,11 +18,40 @@
  */
 package org.apache.fineract.organisation.staff.command;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.organisation.staff.data.StaffUploadRequest;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class StaffUploadCommand extends Command<StaffUploadRequest> {}
+public class StaffUploadCommand extends Command<StaffUploadRequest> {
+	@java.lang.SuppressWarnings("all")
+		public StaffUploadCommand() {
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public java.lang.String toString() {
+		return "StaffUploadCommand()";
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public boolean equals(final java.lang.Object o) {
+		if (o == this) return true;
+		if (!(o instanceof StaffUploadCommand)) return false;
+		final StaffUploadCommand other = (StaffUploadCommand) o;
+		if (!other.canEqual((java.lang.Object) this)) return false;
+		if (!super.equals(o)) return false;
+		return true;
+	}
+
+	@java.lang.SuppressWarnings("all")
+		protected boolean canEqual(final java.lang.Object other) {
+		return other instanceof StaffUploadCommand;
+	}
+
+	@java.lang.Override
+	@java.lang.SuppressWarnings("all")
+		public int hashCode() {
+		final int result = super.hashCode();
+		return result;
+	}
+}

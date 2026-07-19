@@ -26,8 +26,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.useradministration.domain.AppUser;
 
@@ -35,32 +33,93 @@ import org.apache.fineract.useradministration.domain.AppUser;
  * Stores expected and actual disbursement details per disbursement. One loan can have multiple disbursement details
  * (e.g. multiple tranches). Expected: date, amount, maturityDate. Actual: date, amount, disbursed by.
  */
-@Getter
-@Setter
 @Entity
 @Table(name = "m_wc_loan_disbursement_detail")
 public class WorkingCapitalLoanDisbursementDetails extends AbstractPersistableCustom<Long> {
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wc_loan_id", nullable = false)
     private WorkingCapitalLoan wcLoan;
-
     @Column(name = "expected_disburse_date")
     private LocalDate expectedDisbursementDate;
-
     @Column(name = "expected_amount", scale = 6, precision = 19)
     private BigDecimal expectedAmount;
-
     @Column(name = "expected_maturity_date")
     private LocalDate expectedMaturityDate;
-
     @Column(name = "actual_disburse_date")
     private LocalDate actualDisbursementDate;
-
     @Column(name = "actual_amount", scale = 6, precision = 19)
     private BigDecimal actualAmount;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "disbursedon_userid")
     private AppUser disbursedBy;
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoan getWcLoan() {
+        return this.wcLoan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getExpectedDisbursementDate() {
+        return this.expectedDisbursementDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getExpectedAmount() {
+        return this.expectedAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getExpectedMaturityDate() {
+        return this.expectedMaturityDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getActualDisbursementDate() {
+        return this.actualDisbursementDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getActualAmount() {
+        return this.actualAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AppUser getDisbursedBy() {
+        return this.disbursedBy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setWcLoan(final WorkingCapitalLoan wcLoan) {
+        this.wcLoan = wcLoan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setExpectedDisbursementDate(final LocalDate expectedDisbursementDate) {
+        this.expectedDisbursementDate = expectedDisbursementDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setExpectedAmount(final BigDecimal expectedAmount) {
+        this.expectedAmount = expectedAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setExpectedMaturityDate(final LocalDate expectedMaturityDate) {
+        this.expectedMaturityDate = expectedMaturityDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setActualDisbursementDate(final LocalDate actualDisbursementDate) {
+        this.actualDisbursementDate = actualDisbursementDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setActualAmount(final BigDecimal actualAmount) {
+        this.actualAmount = actualAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDisbursedBy(final AppUser disbursedBy) {
+        this.disbursedBy = disbursedBy;
+    }
 }

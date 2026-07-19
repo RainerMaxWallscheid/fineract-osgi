@@ -35,7 +35,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -52,9 +51,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Path("/v1/working-capital/breach")
 @Tag(name = "Working Capital Breach", description = "Working Capital Breach")
-@RequiredArgsConstructor
 public class WorkingCapitalBreachApiResource {
-
     private final PlatformSecurityContext context;
     private final WorkingCapitalBreachReadPlatformService breachReadPlatformService;
     private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
@@ -62,11 +59,10 @@ public class WorkingCapitalBreachApiResource {
 
     @GET
     @Path("template")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "retrieveWorkingCapitalBreachTemplate", summary = "Retrieve Working Capital Breach template", description = "Returns breach options for frequency type and amount calculation type.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalBreachTemplateResponse.class))) })
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalBreachTemplateResponse.class)))})
     public WorkingCapitalBreachTemplateResponse retrieveTemplate() {
         this.context.authenticatedUser().validateHasReadPermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
         return this.breachReadPlatformService.retrieveTemplate();
@@ -74,8 +70,8 @@ public class WorkingCapitalBreachApiResource {
 
     @GET
     @Path("breaches")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "retrieveAllWorkingCapitalBreaches", summary = "List Working Capital Breaches")
     public List<WorkingCapitalBreachData> retrieveAll() {
         this.context.authenticatedUser().validateHasReadPermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
@@ -84,8 +80,8 @@ public class WorkingCapitalBreachApiResource {
 
     @GET
     @Path("breaches/{breachId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "retrieveWorkingCapitalBreach", summary = "Retrieve Working Capital Breach")
     public WorkingCapitalBreachData retrieveOne(@PathParam("breachId") @Parameter(description = "breachId") final Long breachId) {
         this.context.authenticatedUser().validateHasReadPermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
@@ -94,37 +90,42 @@ public class WorkingCapitalBreachApiResource {
 
     @POST
     @Path("breaches")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "createWorkingCapitalBreach", summary = "Create Working Capital Breach")
     public CommandProcessingResult create(final WorkingCapitalBreachRequest request) {
         this.context.authenticatedUser().validateHasCreatePermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createWorkingCapitalBreach()
-                .withJson(jsonSerializer.serialize(request)).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createWorkingCapitalBreach().withJson(jsonSerializer.serialize(request)).build();
         return this.commandSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @PUT
     @Path("breaches/{breachId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "updateWorkingCapitalBreach", summary = "Update Working Capital Breach")
-    public CommandProcessingResult update(@PathParam("breachId") @Parameter(description = "breachId") final Long breachId,
-            final WorkingCapitalBreachRequest request) {
+    public CommandProcessingResult update(@PathParam("breachId") @Parameter(description = "breachId") final Long breachId, final WorkingCapitalBreachRequest request) {
         this.context.authenticatedUser().validateHasUpdatePermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateWorkingCapitalBreach(breachId)
-                .withJson(jsonSerializer.serialize(request)).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateWorkingCapitalBreach(breachId).withJson(jsonSerializer.serialize(request)).build();
         return this.commandSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @DELETE
     @Path("breaches/{breachId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "deleteWorkingCapitalBreach", summary = "Delete Working Capital Breach")
     public CommandProcessingResult delete(@PathParam("breachId") @Parameter(description = "breachId") final Long breachId) {
         this.context.authenticatedUser().validateHasDeletePermission(WorkingCapitalLoanProductConstants.WCLP_RESOURCE_NAME);
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteWorkingCapitalBreach(breachId).build();
         return this.commandSourceWritePlatformService.logCommandSource(commandRequest);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalBreachApiResource(final PlatformSecurityContext context, final WorkingCapitalBreachReadPlatformService breachReadPlatformService, final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService, final DefaultToApiJsonSerializer<String> jsonSerializer) {
+        this.context = context;
+        this.breachReadPlatformService = breachReadPlatformService;
+        this.commandSourceWritePlatformService = commandSourceWritePlatformService;
+        this.jsonSerializer = jsonSerializer;
     }
 }

@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.workingcapitalloan.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyAction;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanDelinquencyActionData;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanDelinquencyAction;
@@ -29,33 +28,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class WorkingCapitalLoanDelinquencyActionReadServiceImpl implements WorkingCapitalLoanDelinquencyActionReadService {
-
     private final WorkingCapitalLoanDelinquencyActionRepository actionRepository;
 
     @Transactional(readOnly = true)
     @Override
     public List<WorkingCapitalLoanDelinquencyActionData> retrieveDelinquencyActions(final Long workingCapitalLoanId) {
-        final List<WorkingCapitalLoanDelinquencyAction> actions = actionRepository
-                .findByWorkingCapitalLoanIdOrderById(workingCapitalLoanId);
-        final List<WorkingCapitalLoanDelinquencyAction> resumes = actions.stream()
-                .filter(a -> DelinquencyAction.RESUME.equals(a.getAction())).toList();
+        final List<WorkingCapitalLoanDelinquencyAction> actions = actionRepository.findByWorkingCapitalLoanIdOrderById(workingCapitalLoanId);
+        final List<WorkingCapitalLoanDelinquencyAction> resumes = actions.stream().filter(a -> DelinquencyAction.RESUME.equals(a.getAction())).toList();
         return actions.stream().map(action -> toData(action, resumes)).toList();
     }
 
-    private WorkingCapitalLoanDelinquencyActionData toData(final WorkingCapitalLoanDelinquencyAction action,
-            final List<WorkingCapitalLoanDelinquencyAction> resumes) {
+    private WorkingCapitalLoanDelinquencyActionData toData(final WorkingCapitalLoanDelinquencyAction action, final List<WorkingCapitalLoanDelinquencyAction> resumes) {
         LocalDate effectiveEndDate = null;
         if (DelinquencyAction.PAUSE.equals(action.getAction())) {
-            effectiveEndDate = resumes.stream()
-                    .filter(resume -> !action.getStartDate().isAfter(resume.getStartDate())
-                            && !resume.getStartDate().isAfter(action.getEndDate()))
-                    .map(WorkingCapitalLoanDelinquencyAction::getStartDate).findFirst().orElse(null);
+            effectiveEndDate = resumes.stream().filter(resume -> !action.getStartDate().isAfter(resume.getStartDate()) && !resume.getStartDate().isAfter(action.getEndDate())).map(WorkingCapitalLoanDelinquencyAction::getStartDate).findFirst().orElse(null);
         }
-        return new WorkingCapitalLoanDelinquencyActionData(action.getId(), action.getAction(), action.getStartDate(), action.getEndDate(),
-                effectiveEndDate, action.getMinimumPayment(), action.getMinimumPaymentType(), action.getFrequency(),
-                action.getFrequencyType());
+        return new WorkingCapitalLoanDelinquencyActionData(action.getId(), action.getAction(), action.getStartDate(), action.getEndDate(), effectiveEndDate, action.getMinimumPayment(), action.getMinimumPaymentType(), action.getFrequency(), action.getFrequencyType());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanDelinquencyActionReadServiceImpl(final WorkingCapitalLoanDelinquencyActionRepository actionRepository) {
+        this.actionRepository = actionRepository;
+    }
 }

@@ -19,13 +19,8 @@
 package org.apache.fineract.organisation.workingdays.data;
 
 import java.time.LocalDate;
-import lombok.Getter;
-import lombok.Setter;
 
-@Setter
-@Getter
 public class AdjustedDateDetailsDTO {
-
     /**
      * Variable tracks the current schedule date that has been changed
      */
@@ -35,7 +30,6 @@ public class AdjustedDateDetailsDTO {
      * repayments date.
      */
     LocalDate changedActualRepaymentDate;
-
     /**
      * Variable tracks the next repayment period due date
      */
@@ -46,10 +40,59 @@ public class AdjustedDateDetailsDTO {
         this.changedActualRepaymentDate = changedActualRepaymentDate;
     }
 
-    public AdjustedDateDetailsDTO(final LocalDate changedScheduleDate, final LocalDate changedActualRepaymentDate,
-            final LocalDate nextRepaymentPeriodDueDate) {
+    public AdjustedDateDetailsDTO(final LocalDate changedScheduleDate, final LocalDate changedActualRepaymentDate, final LocalDate nextRepaymentPeriodDueDate) {
         this.changedScheduleDate = changedScheduleDate;
         this.changedActualRepaymentDate = changedActualRepaymentDate;
         this.nextRepaymentPeriodDueDate = nextRepaymentPeriodDueDate;
+    }
+
+    /**
+     * Variable tracks the current schedule date that has been changed
+     */
+    @java.lang.SuppressWarnings("all")
+        public void setChangedScheduleDate(final LocalDate changedScheduleDate) {
+        this.changedScheduleDate = changedScheduleDate;
+    }
+
+    /**
+     * Variable tracks If the meeting has been changed , i.e future schedule also changes along with the current
+     * repayments date.
+     */
+    @java.lang.SuppressWarnings("all")
+        public void setChangedActualRepaymentDate(final LocalDate changedActualRepaymentDate) {
+        this.changedActualRepaymentDate = changedActualRepaymentDate;
+    }
+
+    /**
+     * Variable tracks the next repayment period due date
+     */
+    @java.lang.SuppressWarnings("all")
+        public void setNextRepaymentPeriodDueDate(final LocalDate nextRepaymentPeriodDueDate) {
+        this.nextRepaymentPeriodDueDate = nextRepaymentPeriodDueDate;
+    }
+
+    /**
+     * Variable tracks the current schedule date that has been changed
+     */
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getChangedScheduleDate() {
+        return this.changedScheduleDate;
+    }
+
+    /**
+     * Variable tracks If the meeting has been changed , i.e future schedule also changes along with the current
+     * repayments date.
+     */
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getChangedActualRepaymentDate() {
+        return this.changedActualRepaymentDate;
+    }
+
+    /**
+     * Variable tracks the next repayment period due date
+     */
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getNextRepaymentPeriodDueDate() {
+        return this.nextRepaymentPeriodDueDate;
     }
 }

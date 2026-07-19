@@ -20,13 +20,8 @@ package org.apache.fineract.portfolio.client.data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor
 public final class ClientCollateralManagementData implements Serializable {
-
     private final Long id;
     private final String name;
     private final BigDecimal quantity;
@@ -35,4 +30,49 @@ public final class ClientCollateralManagementData implements Serializable {
     private final BigDecimal total;
     private final BigDecimal totalCollateral;
 
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getQuantity() {
+        return this.quantity;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPctToBase() {
+        return this.pctToBase;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getUnitPrice() {
+        return this.unitPrice;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotal() {
+        return this.total;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getTotalCollateral() {
+        return this.totalCollateral;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ClientCollateralManagementData(final Long id, final String name, final BigDecimal quantity, final BigDecimal pctToBase, final BigDecimal unitPrice, final BigDecimal total, final BigDecimal totalCollateral) {
+        this.id = id;
+        this.name = name;
+        this.quantity = quantity;
+        this.pctToBase = pctToBase;
+        this.unitPrice = unitPrice;
+        this.total = total;
+        this.totalCollateral = totalCollateral;
+    }
 }

@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.savings.service;
 import java.math.MathContext;
 import java.time.LocalDate;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountCharge;
@@ -32,52 +31,47 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccountCharge;
  * The interest posting that may follow activation charge payment is delegated to
  * {@link SavingsAccountPostInterestService}.
  */
-@RequiredArgsConstructor
 public class SavingsAccountActivationServiceImpl implements SavingsAccountActivationService {
-
     private final SavingsAccountPostInterestService savingsAccountPostInterestService;
 
     @Override
-    public void processAccountUponActivation(final SavingsAccount account, final boolean isSavingsInterestPostingAtCurrentPeriodEnd,
-            final Integer financialYearBeginningMonth) {
+    public void processAccountUponActivation(final SavingsAccount account, final boolean isSavingsInterestPostingAtCurrentPeriodEnd, final Integer financialYearBeginningMonth) {
         // update annual fee due date
         for (SavingsAccountCharge charge : account.charges()) {
             charge.updateToNextDueDateFrom(account.getActivationDate());
         }
-
         // auto pay the activation time charges (No need of checking the pivot date
         // config)
         payActivationCharges(account, isSavingsInterestPostingAtCurrentPeriodEnd, financialYearBeginningMonth, false);
         // TODO : AA add activation charges to actual changes list
     }
 
-    private void payActivationCharges(final SavingsAccount account, final boolean isSavingsInterestPostingAtCurrentPeriodEnd,
-            final Integer financialYearBeginningMonth, final boolean backdatedTxnsAllowedTill) {
+    private void payActivationCharges(final SavingsAccount account, final boolean isSavingsInterestPostingAtCurrentPeriodEnd, final Integer financialYearBeginningMonth, final boolean backdatedTxnsAllowedTill) {
         boolean isSavingsChargeApplied = false;
         boolean postReversals = false;
         UUID refNo = UUID.randomUUID();
         for (SavingsAccountCharge savingsAccountCharge : account.charges()) {
             if (savingsAccountCharge.isSavingsActivation()) {
                 isSavingsChargeApplied = true;
-                account.payCharge(savingsAccountCharge, savingsAccountCharge.getAmountOutstanding(account.getCurrency()),
-                        account.getActivationDate(), backdatedTxnsAllowedTill, refNo.toString());
+                account.payCharge(savingsAccountCharge, savingsAccountCharge.getAmountOutstanding(account.getCurrency()), account.getActivationDate(), backdatedTxnsAllowedTill, refNo.toString());
             }
         }
-
         if (isSavingsChargeApplied) {
             final MathContext mc = MathContext.DECIMAL64;
             boolean isInterestTransfer = false;
             LocalDate postInterestAsOnDate = null;
             if (account.isBeforeLastPostingPeriod(account.getActivationDate(), backdatedTxnsAllowedTill)) {
                 final LocalDate today = DateUtils.getBusinessLocalDate();
-                savingsAccountPostInterestService.postInterest(account, mc, today, isInterestTransfer,
-                        isSavingsInterestPostingAtCurrentPeriodEnd, financialYearBeginningMonth, postInterestAsOnDate,
-                        backdatedTxnsAllowedTill, postReversals);
+                savingsAccountPostInterestService.postInterest(account, mc, today, isInterestTransfer, isSavingsInterestPostingAtCurrentPeriodEnd, financialYearBeginningMonth, postInterestAsOnDate, backdatedTxnsAllowedTill, postReversals);
             } else {
                 final LocalDate today = DateUtils.getBusinessLocalDate();
-                account.calculateInterestUsing(mc, today, isInterestTransfer, isSavingsInterestPostingAtCurrentPeriodEnd,
-                        financialYearBeginningMonth, postInterestAsOnDate, backdatedTxnsAllowedTill, postReversals);
+                account.calculateInterestUsing(mc, today, isInterestTransfer, isSavingsInterestPostingAtCurrentPeriodEnd, financialYearBeginningMonth, postInterestAsOnDate, backdatedTxnsAllowedTill, postReversals);
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsAccountActivationServiceImpl(final SavingsAccountPostInterestService savingsAccountPostInterestService) {
+        this.savingsAccountPostInterestService = savingsAccountPostInterestService;
     }
 }

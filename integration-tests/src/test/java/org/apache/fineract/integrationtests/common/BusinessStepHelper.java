@@ -20,20 +20,17 @@ package org.apache.fineract.integrationtests.common;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.fineract.client.models.BusinessStep;
 import org.apache.fineract.client.models.BusinessStepRequest;
 import org.apache.fineract.client.models.JobBusinessStepConfigData;
 import org.apache.fineract.client.util.Calls;
 
 public class BusinessStepHelper {
-
-    public BusinessStepHelper() {}
+    public BusinessStepHelper() {
+    }
 
     public BusinessStepsSnapshot getConfigurationSnapshot(String jobName) {
-        JobBusinessStepConfigData businessConfig = Calls
-                .ok(FineractClientHelper.getFineractClient().businessStepConfiguration.retrieveAllConfiguredBusinessStep(jobName));
+        JobBusinessStepConfigData businessConfig = Calls.ok(FineractClientHelper.getFineractClient().businessStepConfiguration.retrieveAllConfiguredBusinessStep(jobName));
         return new BusinessStepsSnapshot(jobName, businessConfig.getBusinessSteps());
     }
 
@@ -47,20 +44,32 @@ public class BusinessStepHelper {
             businessStep.setOrder(order);
             stepList.add(businessStep);
         }
-        Calls.ok(FineractClientHelper.getFineractClient().businessStepConfiguration.updateJobBusinessStepConfig(jobName,
-                new BusinessStepRequest().businessSteps(stepList)));
+        Calls.ok(FineractClientHelper.getFineractClient().businessStepConfiguration.updateJobBusinessStepConfig(jobName, new BusinessStepRequest().businessSteps(stepList)));
     }
 
-    @Getter
-    @AllArgsConstructor
-    public static class BusinessStepsSnapshot {
 
+    public static class BusinessStepsSnapshot {
         private String jobName;
         private List<BusinessStep> businessSteps;
 
         public void restore() {
-            Calls.ok(FineractClientHelper.getFineractClient().businessStepConfiguration.updateJobBusinessStepConfig(jobName,
-                    new BusinessStepRequest().businessSteps(businessSteps)));
+            Calls.ok(FineractClientHelper.getFineractClient().businessStepConfiguration.updateJobBusinessStepConfig(jobName, new BusinessStepRequest().businessSteps(businessSteps)));
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public String getJobName() {
+            return this.jobName;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public List<BusinessStep> getBusinessSteps() {
+            return this.businessSteps;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public BusinessStepsSnapshot(final String jobName, final List<BusinessStep> businessSteps) {
+            this.jobName = jobName;
+            this.businessSteps = businessSteps;
         }
     }
 }

@@ -18,13 +18,23 @@
  */
 package org.apache.fineract.infrastructure.jobs.service.jobname;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@Getter
-@RequiredArgsConstructor
 public class JobNameData {
-
     private final String enumStyleName;
     private final String humanReadableName;
+
+    @java.lang.SuppressWarnings("all")
+        public String getEnumStyleName() {
+        return this.enumStyleName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JobNameData(final String enumStyleName, final String humanReadableName) {
+        this.enumStyleName = enumStyleName;
+        this.humanReadableName = humanReadableName;
+    }
 }

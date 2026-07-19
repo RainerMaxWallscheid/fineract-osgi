@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.DataIntegrityErrorHandler;
@@ -32,10 +31,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN", action = "GOODWILLCREDIT")
 public class LoanGoodwillCreditCommandHandler implements NewCommandSourceHandler {
-
     private final LoanWritePlatformService writePlatformService;
     private final DataIntegrityErrorHandler dataIntegrityErrorHandler;
 
@@ -44,12 +41,16 @@ public class LoanGoodwillCreditCommandHandler implements NewCommandSourceHandler
     public CommandProcessingResult processCommand(final JsonCommand command) {
         try {
             boolean isRecoveryRepayment = false;
-            return this.writePlatformService.makeLoanRepayment(LoanTransactionType.GOODWILL_CREDIT, command.getLoanId(), command,
-                    isRecoveryRepayment);
+            return this.writePlatformService.makeLoanRepayment(LoanTransactionType.GOODWILL_CREDIT, command.getLoanId(), command, isRecoveryRepayment);
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.goodwillCredit",
-                    "Goodwill Credit");
+            dataIntegrityErrorHandler.handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve, "loan.goodwillCredit", "Goodwill Credit");
             return CommandProcessingResult.empty();
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanGoodwillCreditCommandHandler(final LoanWritePlatformService writePlatformService, final DataIntegrityErrorHandler dataIntegrityErrorHandler) {
+        this.writePlatformService = writePlatformService;
+        this.dataIntegrityErrorHandler = dataIntegrityErrorHandler;
     }
 }

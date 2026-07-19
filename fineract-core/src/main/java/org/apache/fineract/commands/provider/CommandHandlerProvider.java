@@ -20,8 +20,6 @@ package org.apache.fineract.commands.provider;
 
 import com.google.common.base.Preconditions;
 import java.util.HashMap;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.commands.annotation.CommandType;
@@ -46,10 +44,9 @@ import org.springframework.stereotype.Component;
  * @see CommandType
  */
 @Component
-@NoArgsConstructor
-@Slf4j
 public class CommandHandlerProvider implements ApplicationContextAware, InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CommandHandlerProvider.class);
     private final HashMap<String, String> registeredHandlers = new HashMap<>();
     private ApplicationContext applicationContext;
 
@@ -62,16 +59,16 @@ public class CommandHandlerProvider implements ApplicationContextAware, Initiali
         final String[] commandHandlerBeans = applicationContext.getBeanNamesForAnnotation(CommandType.class);
         if (ArrayUtils.isNotEmpty(commandHandlerBeans)) {
             for (final String commandHandlerName : commandHandlerBeans) {
-                log.debug("Register command handler '{}' ...", commandHandlerName);
+                log.debug("Register command handler \'{}\' ...", commandHandlerName);
                 final CommandType commandType = applicationContext.findAnnotationOnBean(commandHandlerName, CommandType.class);
                 try {
                     if (commandType != null) {
                         registeredHandlers.put(commandType.entity() + "|" + commandType.action(), commandHandlerName);
                     } else {
-                        log.error("Unable to register command handler '{}'!", commandHandlerName);
+                        log.error("Unable to register command handler \'{}\'!", commandHandlerName);
                     }
                 } catch (final Throwable th) {
-                    log.error("Unable to register command handler '{}'!", commandHandlerName, th);
+                    log.error("Unable to register command handler \'{}\'!", commandHandlerName, th);
                 }
             }
         }
@@ -91,7 +88,6 @@ public class CommandHandlerProvider implements ApplicationContextAware, Initiali
     public NewCommandSourceHandler getHandler(final String entity, final String action) {
         Preconditions.checkArgument(StringUtils.isNoneEmpty(entity), "An entity must be given!");
         Preconditions.checkArgument(StringUtils.isNoneEmpty(action), "An action must be given!");
-
         final String key = entity + "|" + action;
         if (!registeredHandlers.containsKey(key)) {
             throw new UnsupportedCommandException(key);
@@ -102,5 +98,9 @@ public class CommandHandlerProvider implements ApplicationContextAware, Initiali
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CommandHandlerProvider() {
     }
 }

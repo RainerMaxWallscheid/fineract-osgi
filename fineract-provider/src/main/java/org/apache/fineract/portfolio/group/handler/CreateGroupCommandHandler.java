@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.group.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,16 +28,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "GROUP", action = "CREATE")
-@RequiredArgsConstructor
 public class CreateGroupCommandHandler implements NewCommandSourceHandler {
-
     private final GroupingTypesWritePlatformService groupWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         final Long centerId = command.longValueOfParameterNamed("centerId");
         return this.groupWritePlatformService.createGroup(centerId, command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateGroupCommandHandler(final GroupingTypesWritePlatformService groupWritePlatformService) {
+        this.groupWritePlatformService = groupWritePlatformService;
     }
 }

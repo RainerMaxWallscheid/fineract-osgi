@@ -22,7 +22,6 @@ import static java.util.function.Function.identity;
 import static org.apache.fineract.client.feign.util.FeignCalls.fail;
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
 import static org.assertj.core.api.Assertions.assertThat;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.datatable.DataTable;
@@ -35,7 +34,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.fineract.client.feign.FeignException;
 import org.apache.fineract.client.feign.FineractFeignClient;
@@ -60,15 +58,12 @@ import org.apache.fineract.test.data.datatable.DatatableNameGenerator;
 import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 
-@RequiredArgsConstructor
 public class DatatablesStepDef extends AbstractStepDef {
-
     public static final String CREATE_DATATABLE_RESULT_KEY = "CreateDatatableResult";
     public static final String DATATABLE_NAME = "DatatableId";
     public static final String DATATABLE_QUERY_RESPONSE = "DatatableQueryResponse";
     public static final String DATATABLE_ENTRY_ID = "DatatableEntryId";
     private static final ObjectMapper OBJECT_MAPPER = ObjectMapperFactory.getShared();
-
     private final FineractFeignClient fineractClient;
     private final DatatableNameGenerator datatableNameGenerator;
 
@@ -77,9 +72,7 @@ public class DatatablesStepDef extends AbstractStepDef {
         final DatatableEntityType entityType = DatatableEntityType.fromString(entityTypeStr);
         final List<PostColumnHeaderData> columns = createRandomDatatableColumnsRequest();
         final PostDataTablesRequest request = createDatatableRequest(entityType, columns);
-
         final PostDataTablesResponse response = ok(() -> fineractClient.dataTables().createDatatable(request, Map.of()));
-
         testContext().set(CREATE_DATATABLE_RESULT_KEY, response);
         testContext().set(DATATABLE_NAME, response.getResourceIdentifier());
     }
@@ -91,9 +84,7 @@ public class DatatablesStepDef extends AbstractStepDef {
         final List<List<String>> rowsWithoutHeader = rows.subList(1, rows.size());
         final List<PostColumnHeaderData> columns = createDatatableColumnsRequest(rowsWithoutHeader);
         final PostDataTablesRequest request = createDatatableRequest(entityType, columns);
-
         final PostDataTablesResponse response = ok(() -> fineractClient.dataTables().createDatatable(request, Map.of()));
-
         testContext().set(CREATE_DATATABLE_RESULT_KEY, response);
         testContext().set(DATATABLE_NAME, response.getResourceIdentifier());
     }
@@ -103,9 +94,7 @@ public class DatatablesStepDef extends AbstractStepDef {
         final DatatableEntityType entityType = DatatableEntityType.fromString(entityTypeStr);
         final List<PostColumnHeaderData> columns = createRandomDatatableColumnsRequest();
         final PostDataTablesRequest request = createDatatableRequest(entityType, columns, true);
-
         final PostDataTablesResponse response = ok(() -> fineractClient.dataTables().createDatatable(request, Map.of()));
-
         testContext().set(CREATE_DATATABLE_RESULT_KEY, response);
         testContext().set(DATATABLE_NAME, response.getResourceIdentifier());
     }
@@ -117,16 +106,13 @@ public class DatatablesStepDef extends AbstractStepDef {
         final List<List<String>> rowsWithoutHeader = rows.subList(1, rows.size());
         final List<PostColumnHeaderData> columns = createDatatableColumnsRequest(rowsWithoutHeader);
         final PostDataTablesRequest request = createDatatableRequest(entityType, columns, true);
-
         final PostDataTablesResponse response = ok(() -> fineractClient.dataTables().createDatatable(request, Map.of()));
-
         testContext().set(CREATE_DATATABLE_RESULT_KEY, response);
         testContext().set(DATATABLE_NAME, response.getResourceIdentifier());
     }
 
     @Then("A datatable for {string} with column {string} is rejected with HTTP {int}")
-    public void thenCreateDatatableWithReservedColumnRejected(final String entityTypeStr, final String columnName,
-            final int expectedStatus) {
+    public void thenCreateDatatableWithReservedColumnRejected(final String entityTypeStr, final String columnName, final int expectedStatus) {
         final DatatableEntityType entityType = DatatableEntityType.fromString(entityTypeStr);
         final PostDataTablesRequest request = createDatatableRequest(entityType, List.of(numberColumn(columnName)));
         final CallFailedRuntimeException ex = fail(() -> fineractClient.dataTables().createDatatable(request, Map.of()));
@@ -137,28 +123,19 @@ public class DatatablesStepDef extends AbstractStepDef {
     public void thenColumnsMatch(final DataTable dataTable) {
         final String datatableName = currentDatatable();
         final GetDataTablesResponse response = ok(() -> fineractClient.dataTables().getDatatable(datatableName, Map.of()));
-
-        final Map<String, ResultsetColumnHeaderData> columnMap = response.getColumnHeaderData().stream()
-                .collect(Collectors.toMap(ResultsetColumnHeaderData::getColumnName, identity()));
-
+        final Map<String, ResultsetColumnHeaderData> columnMap = response.getColumnHeaderData().stream().collect(Collectors.toMap(ResultsetColumnHeaderData::getColumnName, identity()));
         final List<List<String>> rows = dataTable.asLists();
         final List<List<String>> rowsWithoutHeader = rows.subList(1, rows.size());
-
         for (final List<String> row : rowsWithoutHeader) {
             final String columnName = row.get(0);
             final boolean primaryKey = BooleanUtils.toBoolean(row.get(1));
             final boolean unique = BooleanUtils.toBoolean(row.get(2));
             final boolean indexed = BooleanUtils.toBoolean(row.get(3));
-
             final ResultsetColumnHeaderData columnMetadata = columnMap.get(columnName);
             assertThat(columnMetadata).withFailMessage("Column [%s] not found on datatable", columnName).isNotNull();
-
-            assertThat(columnMetadata.getIsColumnPrimaryKey())
-                    .withFailMessage("Primary key definition for column [%s] does not match", columnName).isEqualTo(primaryKey);
-            assertThat(columnMetadata.getIsColumnUnique())
-                    .withFailMessage("Unique constraint definition for column [%s] does not match", columnName).isEqualTo(unique);
-            assertThat(columnMetadata.getIsColumnIndexed()).withFailMessage("Index definition for column [%s] does not match", columnName)
-                    .isEqualTo(indexed);
+            assertThat(columnMetadata.getIsColumnPrimaryKey()).withFailMessage("Primary key definition for column [%s] does not match", columnName).isEqualTo(primaryKey);
+            assertThat(columnMetadata.getIsColumnUnique()).withFailMessage("Unique constraint definition for column [%s] does not match", columnName).isEqualTo(unique);
+            assertThat(columnMetadata.getIsColumnIndexed()).withFailMessage("Index definition for column [%s] does not match", columnName).isEqualTo(indexed);
         }
     }
 
@@ -168,9 +145,7 @@ public class DatatablesStepDef extends AbstractStepDef {
         final GetDataTablesResponse response = ok(() -> fineractClient.dataTables().getDatatable(datatableName, Map.of()));
         final List<String> actualColumns = response.getColumnHeaderData().stream().map(ResultsetColumnHeaderData::getColumnName).toList();
         final List<String> expected = readColumnNames(dataTable);
-        assertThat(actualColumns)
-                .withFailMessage("Expected datatable [%s] to contain columns %s but had %s", datatableName, expected, actualColumns)
-                .containsAll(expected);
+        assertThat(actualColumns).withFailMessage("Expected datatable [%s] to contain columns %s but had %s", datatableName, expected, actualColumns).containsAll(expected);
     }
 
     @Then("The datatable does not contain columns:")
@@ -179,16 +154,13 @@ public class DatatablesStepDef extends AbstractStepDef {
         final GetDataTablesResponse response = ok(() -> fineractClient.dataTables().getDatatable(datatableName, Map.of()));
         final List<String> actualColumns = response.getColumnHeaderData().stream().map(ResultsetColumnHeaderData::getColumnName).toList();
         final List<String> absent = readColumnNames(dataTable);
-        assertThat(actualColumns)
-                .withFailMessage("Expected datatable [%s] to NOT contain columns %s but had %s", datatableName, absent, actualColumns)
-                .doesNotContainAnyElementsOf(absent);
+        assertThat(actualColumns).withFailMessage("Expected datatable [%s] to NOT contain columns %s but had %s", datatableName, absent, actualColumns).doesNotContainAnyElementsOf(absent);
     }
 
     @When("The client calls the query endpoint for the created datatable with {string} column filter, and {string} value filter")
     public void whenQueryEndpointCalled(final String columnFilter, final String valueFilter) {
         try {
-            fineractClient.dataTables().queryValues(currentDatatable(),
-                    Map.of("columnFilter", columnFilter, "valueFilter", valueFilter, "resultColumns", columnFilter));
+            fineractClient.dataTables().queryValues(currentDatatable(), Map.of("columnFilter", columnFilter, "valueFilter", valueFilter, "resultColumns", columnFilter));
         } catch (FeignException e) {
             testContext().set(DATATABLE_QUERY_RESPONSE, e);
         }
@@ -211,18 +183,14 @@ public class DatatablesStepDef extends AbstractStepDef {
     public void thenListingByApptableIncludesCreated(final String apptable) {
         final String datatableName = currentDatatable();
         final List<GetDataTablesResponse> response = ok(() -> fineractClient.dataTables().getDatatables(apptable, Map.of()));
-        assertThat(response).extracting(GetDataTablesResponse::getRegisteredTableName)
-                .withFailMessage("Expected datatable [%s] to be listed under apptable [%s] but it was not", datatableName, apptable)
-                .contains(datatableName);
+        assertThat(response).extracting(GetDataTablesResponse::getRegisteredTableName).withFailMessage("Expected datatable [%s] to be listed under apptable [%s] but it was not", datatableName, apptable).contains(datatableName);
     }
 
     @Then("Listing datatables with apptable {string} excludes the created datatable")
     public void thenListingByApptableExcludesCreated(final String apptable) {
         final String datatableName = currentDatatable();
         final List<GetDataTablesResponse> response = ok(() -> fineractClient.dataTables().getDatatables(apptable, Map.of()));
-        assertThat(response).extracting(GetDataTablesResponse::getRegisteredTableName)
-                .withFailMessage("Datatable [%s] unexpectedly visible under apptable [%s]", datatableName, apptable)
-                .doesNotContain(datatableName);
+        assertThat(response).extracting(GetDataTablesResponse::getRegisteredTableName).withFailMessage("Datatable [%s] unexpectedly visible under apptable [%s]", datatableName, apptable).doesNotContain(datatableName);
     }
 
     @When("The datatable is deregistered")
@@ -264,24 +232,21 @@ public class DatatablesStepDef extends AbstractStepDef {
     @Then("Adding column {string} of type {string} to the datatable is rejected with HTTP {int}")
     public void thenAddColumnRejected(final String columnName, final String columnType, final int expectedStatus) {
         final String datatableName = currentDatatable();
-        final CallFailedRuntimeException ex = fail(
-                () -> fineractClient.dataTables().updateDatatable(datatableName, addColumnRequest(columnName, columnType), Map.of()));
+        final CallFailedRuntimeException ex = fail(() -> fineractClient.dataTables().updateDatatable(datatableName, addColumnRequest(columnName, columnType), Map.of()));
         assertRejected(ex, expectedStatus, "adding reserved column [%s] on [%s]".formatted(columnName, datatableName));
     }
 
     @Then("Renaming column {string} to {string} on the datatable is rejected with HTTP {int}")
     public void thenRenameColumnRejected(final String oldName, final String newName, final int expectedStatus) {
         final String datatableName = currentDatatable();
-        final CallFailedRuntimeException ex = fail(
-                () -> fineractClient.dataTables().updateDatatable(datatableName, renameColumnRequest(oldName, newName), Map.of()));
+        final CallFailedRuntimeException ex = fail(() -> fineractClient.dataTables().updateDatatable(datatableName, renameColumnRequest(oldName, newName), Map.of()));
         assertRejected(ex, expectedStatus, "renaming [%s] to reserved [%s] on [%s]".formatted(oldName, newName, datatableName));
     }
 
     @Then("Dropping column {string} from the datatable is rejected with HTTP {int}")
     public void thenDropColumnRejected(final String columnName, final int expectedStatus) {
         final String datatableName = currentDatatable();
-        final CallFailedRuntimeException ex = fail(
-                () -> fineractClient.dataTables().updateDatatable(datatableName, dropColumnRequest(columnName), Map.of()));
+        final CallFailedRuntimeException ex = fail(() -> fineractClient.dataTables().updateDatatable(datatableName, dropColumnRequest(columnName), Map.of()));
         assertRejected(ex, expectedStatus, "dropping reserved column [%s] on [%s]".formatted(columnName, datatableName));
     }
 
@@ -300,8 +265,7 @@ public class DatatablesStepDef extends AbstractStepDef {
         final String datatableName = currentDatatable();
         final Long entityId = resolveEntityId(entityType);
         final String body = buildEntryBodyJson(columnName, value);
-        final PostDataTablesAppTableIdResponse response = ok(
-                () -> fineractClient.dataTables().createDatatableEntry(datatableName, entityId, body, Map.of()));
+        final PostDataTablesAppTableIdResponse response = ok(() -> fineractClient.dataTables().createDatatableEntry(datatableName, entityId, body, Map.of()));
         testContext().set(DATATABLE_ENTRY_ID, response.getResourceId());
     }
 
@@ -313,11 +277,9 @@ public class DatatablesStepDef extends AbstractStepDef {
         final String body = buildEntryBodyJson(columnName, value);
         try {
             fineractClient.dataTables().createDatatableEntry(datatableName, entityId, body, Map.of());
-            throw new AssertionError(
-                    "Expected second entry on single-row datatable [" + datatableName + "] to be rejected, but it succeeded");
+            throw new AssertionError("Expected second entry on single-row datatable [" + datatableName + "] to be rejected, but it succeeded");
         } catch (final FeignException e) {
-            assertThat(e.status()).withFailMessage("Expected client/server error for second single-row entry, but got HTTP %d", e.status())
-                    .isGreaterThanOrEqualTo(400);
+            assertThat(e.status()).withFailMessage("Expected client/server error for second single-row entry, but got HTTP %d", e.status()).isGreaterThanOrEqualTo(400);
         }
     }
 
@@ -328,8 +290,7 @@ public class DatatablesStepDef extends AbstractStepDef {
         assertThat(rows).withFailMessage("No datatable rows found for entity %s", entityType).isNotEmpty();
         final Object actual = rows.getFirst().get(columnName);
         final Object expected = parseValue(expectedValue);
-        assertThat(valuesMatch(actual, expected)).withFailMessage("Column [%s] expected [%s] but was [%s]", columnName, expected, actual)
-                .isTrue();
+        assertThat(valuesMatch(actual, expected)).withFailMessage("Column [%s] expected [%s] but was [%s]", columnName, expected, actual).isTrue();
     }
 
     @Then("Fetching the datatable entry for {string} returns null in column {string}")
@@ -337,8 +298,7 @@ public class DatatablesStepDef extends AbstractStepDef {
         final DatatableEntityType entityType = DatatableEntityType.fromString(entityTypeStr);
         final List<Map<?, ?>> rows = fetchEntryRows(entityType);
         assertThat(rows).withFailMessage("No datatable rows found for entity %s", entityType).isNotEmpty();
-        assertThat(rows.getFirst().get(columnName))
-                .withFailMessage("Column [%s] expected null but was [%s]", columnName, rows.getFirst().get(columnName)).isNull();
+        assertThat(rows.getFirst().get(columnName)).withFailMessage("Column [%s] expected null but was [%s]", columnName, rows.getFirst().get(columnName)).isNull();
     }
 
     @When("The datatable entry for {string} is updated with value {string} in column {string}")
@@ -426,8 +386,7 @@ public class DatatablesStepDef extends AbstractStepDef {
         final String datatableName = currentDatatable();
         final Long entityId = resolveEntityId(entityType);
         final Long entryId = testContext().get(DATATABLE_ENTRY_ID);
-        final Object response = ok(
-                () -> fineractClient.dataTables().getDatatableManyEntry(datatableName, entityId, entryId, null, false, Map.of()));
+        final Object response = ok(() -> fineractClient.dataTables().getDatatableManyEntry(datatableName, entityId, entryId, null, false, Map.of()));
         final List<Map<?, ?>> rows = toRowList(response);
         assertThat(rows).withFailMessage("No datatable row found for entity %s entry %d", entityType, entryId).isNotEmpty();
         final Object expected = parseValue(expectedValue);
@@ -439,10 +398,8 @@ public class DatatablesStepDef extends AbstractStepDef {
     }
 
     private void assertRejected(final CallFailedRuntimeException ex, final int expectedStatus, final String operation) {
-        assertThat(ex.getStatus()).withFailMessage("Expected HTTP %d when %s but got HTTP %d", expectedStatus, operation, ex.getStatus())
-                .isEqualTo(expectedStatus);
-        assertThat(ex.getDeveloperMessage())
-                .withFailMessage("Server should return a non-blank developer message when %s, but was blank", operation).isNotBlank();
+        assertThat(ex.getStatus()).withFailMessage("Expected HTTP %d when %s but got HTTP %d", expectedStatus, operation, ex.getStatus()).isEqualTo(expectedStatus);
+        assertThat(ex.getDeveloperMessage()).withFailMessage("Server should return a non-blank developer message when %s, but was blank", operation).isNotBlank();
     }
 
     private List<String> readColumnNames(final DataTable dataTable) {
@@ -460,7 +417,6 @@ public class DatatablesStepDef extends AbstractStepDef {
             final long columnLength = Long.parseLong(row.get(2));
             final boolean unique = BooleanUtils.toBoolean(row.get(3));
             final boolean indexed = BooleanUtils.toBoolean(row.get(4));
-
             final PostColumnHeaderData postColumnHeaderData = new PostColumnHeaderData();
             postColumnHeaderData.setName(columnName);
             postColumnHeaderData.setType(columnType.getTypeString());
@@ -487,8 +443,7 @@ public class DatatablesStepDef extends AbstractStepDef {
         return createDatatableRequest(entityType, columns, false);
     }
 
-    private PostDataTablesRequest createDatatableRequest(final DatatableEntityType entityType, final List<PostColumnHeaderData> columns,
-            final boolean multiRow) {
+    private PostDataTablesRequest createDatatableRequest(final DatatableEntityType entityType, final List<PostColumnHeaderData> columns, final boolean multiRow) {
         final PostDataTablesRequest request = new PostDataTablesRequest();
         final String datatableName = datatableNameGenerator.generate(entityType);
         request.setDatatableName(datatableName);
@@ -549,8 +504,8 @@ public class DatatablesStepDef extends AbstractStepDef {
             final long parsed = Long.parseLong(value);
             return parsed >= Integer.MIN_VALUE && parsed <= Integer.MAX_VALUE ? (int) parsed : parsed;
         } catch (final NumberFormatException ignored) {
-            // not an integer, fall through
         }
+        // not an integer, fall through
         try {
             return new BigDecimal(value);
         } catch (final NumberFormatException ignored) {
@@ -616,31 +571,25 @@ public class DatatablesStepDef extends AbstractStepDef {
 
     private Long resolveLoanId() {
         final PostLoansResponse response = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
-        assertThat(response)
-                .withFailMessage(
-                        "No loan found in test context. Use 'Admin creates a fully customized loan with the following data' step first.")
-                .isNotNull();
+        assertThat(response).withFailMessage("No loan found in test context. Use \'Admin creates a fully customized loan with the following data\' step first.").isNotNull();
         return response.getLoanId();
     }
 
     private Long resolveWcLoanProductId() {
-        final PostWorkingCapitalLoanProductsResponse response = Optional
-                .<PostWorkingCapitalLoanProductsResponse>ofNullable(
-                        testContext().get(TestContextKey.WORKING_CAPITAL_LOAN_PRODUCT_CREATE_RESPONSE))
-                .orElseGet(() -> testContext().get(TestContextKey.DEFAULT_WORKING_CAPITAL_LOAN_PRODUCT_CREATE_RESPONSE_WCLP));
-        assertThat(response)
-                .withFailMessage(
-                        "No WC loan product found in test context. " + "Use 'Admin creates a new Working Capital Loan Product' step first.")
-                .isNotNull();
+        final PostWorkingCapitalLoanProductsResponse response = Optional.<PostWorkingCapitalLoanProductsResponse>ofNullable(testContext().get(TestContextKey.WORKING_CAPITAL_LOAN_PRODUCT_CREATE_RESPONSE)).orElseGet(() -> testContext().get(TestContextKey.DEFAULT_WORKING_CAPITAL_LOAN_PRODUCT_CREATE_RESPONSE_WCLP));
+        assertThat(response).withFailMessage("No WC loan product found in test context. " + "Use \'Admin creates a new Working Capital Loan Product\' step first.").isNotNull();
         return response.getResourceId();
     }
 
     private Long resolveWcLoanId() {
         final PostWorkingCapitalLoansResponse response = testContext().get(TestContextKey.WORKING_CAPITAL_LOAN_CREATE_RESPONSE);
-        assertThat(response)
-                .withFailMessage(
-                        "No WC loan found in test context. Use 'Admin creates a working capital loan with the following data' step first.")
-                .isNotNull();
+        assertThat(response).withFailMessage("No WC loan found in test context. Use \'Admin creates a working capital loan with the following data\' step first.").isNotNull();
         return response.getLoanId();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DatatablesStepDef(final FineractFeignClient fineractClient, final DatatableNameGenerator datatableNameGenerator) {
+        this.fineractClient = fineractClient;
+        this.datatableNameGenerator = datatableNameGenerator;
     }
 }

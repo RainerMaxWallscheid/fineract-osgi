@@ -1,4 +1,3 @@
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -19,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanorigination.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -31,15 +29,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "LOAN_ORIGINATOR", action = "UPDATE")
-@RequiredArgsConstructor
 @ConditionalOnProperty(value = "fineract.module.loan-origination.enabled", havingValue = "true")
 public class UpdateLoanOriginatorCommandHandler implements NewCommandSourceHandler {
-
     private final LoanOriginatorWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.update(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateLoanOriginatorCommandHandler(final LoanOriginatorWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

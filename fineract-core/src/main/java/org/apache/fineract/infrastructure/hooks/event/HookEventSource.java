@@ -19,13 +19,24 @@
 package org.apache.fineract.infrastructure.hooks.event;
 
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-@Getter
 public class HookEventSource implements Serializable {
-
     private final String entityName;
     private final String actionName;
+
+    @java.lang.SuppressWarnings("all")
+        public HookEventSource(final String entityName, final String actionName) {
+        this.entityName = entityName;
+        this.actionName = actionName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEntityName() {
+        return this.entityName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getActionName() {
+        return this.actionName;
+    }
 }

@@ -28,7 +28,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanBreachScheduleData;
 import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLoanBreachScheduleService;
@@ -37,22 +36,23 @@ import org.springframework.stereotype.Component;
 @Path("/v1/working-capital-loans/{loanId}/breach-schedule")
 @Component
 @Tag(name = "Working Capital Loan Breach Schedule", description = "Manages breach schedule periods for Working Capital loans")
-@RequiredArgsConstructor
 public class WorkingCapitalLoanBreachScheduleApiResource {
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "WORKINGCAPITALLOAN";
-
     private final PlatformSecurityContext context;
     private final WorkingCapitalLoanBreachScheduleService breachScheduleService;
 
     @GET
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Breach Schedule", description = "Retrieves the breach schedule periods for a Working Capital loan")
-    public List<WorkingCapitalLoanBreachScheduleData> retrieveBreachSchedule(
-            @PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
+    public List<WorkingCapitalLoanBreachScheduleData> retrieveBreachSchedule(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return breachScheduleService.retrieveBreachSchedule(loanId);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanBreachScheduleApiResource(final PlatformSecurityContext context, final WorkingCapitalLoanBreachScheduleService breachScheduleService) {
+        this.context = context;
+        this.breachScheduleService = breachScheduleService;
+    }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.event.external.service.serialization.serializer.loan;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
 import org.apache.fineract.avro.loan.v1.LoanChargeDeletedV1;
@@ -32,10 +31,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 @Order(Ordered.LOWEST_PRECEDENCE - 1)
 public class LoanChargeDeletedBusinessEventSerializer implements BusinessEventSerializer {
-
     private final ByteBufferConverter byteBufferConverter;
 
     @Override
@@ -55,5 +52,10 @@ public class LoanChargeDeletedBusinessEventSerializer implements BusinessEventSe
     @Override
     public Class<? extends GenericContainer> getSupportedSchema() {
         return LoanChargeDeletedV1.class;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanChargeDeletedBusinessEventSerializer(final ByteBufferConverter byteBufferConverter) {
+        this.byteBufferConverter = byteBufferConverter;
     }
 }

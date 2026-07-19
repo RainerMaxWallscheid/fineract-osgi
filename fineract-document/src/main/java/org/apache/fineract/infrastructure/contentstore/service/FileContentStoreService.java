@@ -20,15 +20,12 @@ package org.apache.fineract.infrastructure.contentstore.service;
 
 import static java.util.Objects.requireNonNull;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Stream;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.contentstore.data.ContentStoreType;
 import org.apache.fineract.infrastructure.contentstore.detector.ContentDetectorContext;
@@ -47,12 +44,11 @@ import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 @ConditionalOnProperty(name = "fineract.content.filesystem.enabled", havingValue = "true")
 public class FileContentStoreService implements ContentStoreService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FileContentStoreService.class);
     private final ContentPathSanitizer pathSanitizer;
     private final ContentPathRandomizer pathRandomizer;
     private final DefaultDownloadContentPolicy downloadContentPolicy;
@@ -65,12 +61,9 @@ public class FileContentStoreService implements ContentStoreService {
     @Override
     public InputStream download(String path) {
         downloadContentPolicy.check(ContentPolicyContext.builder().path(path).build());
-
         final var safePath = pathSanitizer.sanitize(path);
-
         try {
             final var target = getPath(safePath, false);
-
             return Files.newInputStream(target);
         } catch (IOException e) {
             throw new ContentStoreException(e);
@@ -81,55 +74,40 @@ public class FileContentStoreService implements ContentStoreService {
     public String upload(String path, InputStream is, String mimeType) {
         requireNonNull(path, "Path missing");
         requireNonNull(is, "Data missing");
-
         if (StringUtils.isEmpty(mimeType)) {
-            mimeType = Optional.ofNullable(contentDetectorManager.detect(ContentDetectorContext.builder().fileName(path).build()))
-                    .map(ContentDetectorContext::getMimeType).orElse(APPLICATION_OCTET_STREAM_VALUE);
+            mimeType = Optional.ofNullable(contentDetectorManager.detect(ContentDetectorContext.builder().fileName(path).build())).map(ContentDetectorContext::getMimeType).orElse(APPLICATION_OCTET_STREAM_VALUE);
         }
-
         preUploadContentPolicy.check(ContentPolicyContext.builder().path(path).mimeType(mimeType).build());
-
         var safePath = pathSanitizer.sanitize(path);
-
         final var target = Files.exists(getPath(safePath, false)) ? getPath(safePath, false) : getPath(safePath, true);
-
-        try (var in = is; var out = Files.newOutputStream(target)) {
+        try (
+            var in = is;
+            var out = Files.newOutputStream(target)) {
             in.transferTo(out);
         } catch (Exception e) {
             throw new ContentStoreException(e);
         }
-
         final var relativePath = getRelativePath(target);
-
         try {
-            postUploadContentPolicy
-                    .check(ContentPolicyContext.builder().path(path).inputStream(getInputStream(target)).mimeType(mimeType).build());
+            postUploadContentPolicy.check(ContentPolicyContext.builder().path(path).inputStream(getInputStream(target)).mimeType(mimeType).build());
         } catch (ContentPolicyException e) {
-            log.warn("Delete file because it didn't comply with the post-upload policy check: {} - {}", target, e.getMessage());
-
+            log.warn("Delete file because it didn\'t comply with the post-upload policy check: {} - {}", target, e.getMessage());
             delete(relativePath.toString());
-
             throw e;
         }
-
         return relativePath.toString();
     }
 
     @Override
     public void delete(String path) {
         deleteContentPolicy.check(ContentPolicyContext.builder().path(path).build());
-
         final var safePath = pathSanitizer.sanitize(path);
-
         try {
             final var target = getPath(safePath, false);
-
             final boolean deleted = Files.deleteIfExists(target);
-
             if (!hasFiles(target.getParent())) {
                 Files.deleteIfExists(target.getParent());
             }
-
             if (!deleted) {
                 // no need to throw an Error, what's a caller going to do about it, so simply log a warning
                 log.warn("Unable to delete file {}", safePath);
@@ -146,13 +124,10 @@ public class FileContentStoreService implements ContentStoreService {
 
     private Path getPath(String path, boolean randomize) {
         Path p;
-
         if (randomize) {
             var tail = Path.of(path);
             var file = tail.getFileName();
-
             p = getRootPath().resolve(tail.getParent()).resolve(pathRandomizer.randomize()).resolve(file);
-
             try {
                 if (Files.notExists(p.getParent())) {
                     Files.createDirectories(p.getParent());
@@ -163,7 +138,6 @@ public class FileContentStoreService implements ContentStoreService {
         } else {
             p = getRootPath().resolve(path);
         }
-
         return p;
     }
 
@@ -172,8 +146,7 @@ public class FileContentStoreService implements ContentStoreService {
     }
 
     private Path getRootPath() {
-        return Path.of(properties.getContent().getFilesystem().getRootFolder(),
-                ThreadLocalContextUtil.getTenant().getName().replaceAll(" ", "").trim());
+        return Path.of(properties.getContent().getFilesystem().getRootFolder(), ThreadLocalContextUtil.getTenant().getName().replaceAll(" ", "").trim());
     }
 
     private InputStream getInputStream(Path path) {
@@ -190,7 +163,18 @@ public class FileContentStoreService implements ContentStoreService {
                 return entries.anyMatch(Files::isRegularFile);
             }
         }
-
         return false;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FileContentStoreService(final ContentPathSanitizer pathSanitizer, final ContentPathRandomizer pathRandomizer, final DefaultDownloadContentPolicy downloadContentPolicy, final DefaultPreUploadContentPolicy preUploadContentPolicy, final DefaultPostUploadContentPolicy postUploadContentPolicy, final DefaultDeleteContentPolicy deleteContentPolicy, final ContentDetectorManager contentDetectorManager, final FineractProperties properties) {
+        this.pathSanitizer = pathSanitizer;
+        this.pathRandomizer = pathRandomizer;
+        this.downloadContentPolicy = downloadContentPolicy;
+        this.preUploadContentPolicy = preUploadContentPolicy;
+        this.postUploadContentPolicy = postUploadContentPolicy;
+        this.deleteContentPolicy = deleteContentPolicy;
+        this.contentDetectorManager = contentDetectorManager;
+        this.properties = properties;
     }
 }

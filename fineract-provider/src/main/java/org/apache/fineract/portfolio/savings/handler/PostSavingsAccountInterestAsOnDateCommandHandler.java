@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "SAVINGSACCOUNT", action = "POSTINTERESTASONDATE")
-@RequiredArgsConstructor
 public class PostSavingsAccountInterestAsOnDateCommandHandler implements NewCommandSourceHandler {
-
     private final SavingsAccountWritePlatformService writePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class PostSavingsAccountInterestAsOnDateCommandHandler implements NewComm
         return this.writePlatformService.postInterest(command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public PostSavingsAccountInterestAsOnDateCommandHandler(final SavingsAccountWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
+    }
 }

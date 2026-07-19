@@ -19,9 +19,7 @@
 package org.apache.fineract.infrastructure.jobs.service.retainedearning;
 
 import static org.apache.fineract.infrastructure.jobs.service.retainedearning.RetainedEarningJobConstant.TRIAL_BALANCE_SUMMARY_WITH_ASSET_OWNER;
-
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.exception.PlatformInternalServerException;
 import org.springframework.stereotype.Component;
@@ -31,9 +29,7 @@ import org.springframework.stereotype.Component;
  * {@link ConfigurationDomainService}. Centralizes the fiscal year date calculation used by both the Reader and Writer.
  */
 @Component
-@RequiredArgsConstructor
 public class RetainedEarningConfigurationService {
-
     private final ConfigurationDomainService configurationDomainService;
 
     public String getIncomeExpenseGlAccounts() {
@@ -47,8 +43,7 @@ public class RetainedEarningConfigurationService {
     public Long getOfficeId() {
         Long value = configurationDomainService.getOfficeId();
         if (value == null) {
-            throw new PlatformInternalServerException("error.retained.earning.office.id.not.configured",
-                    "Retained earning job office ID is not configured");
+            throw new PlatformInternalServerException("error.retained.earning.office.id.not.configured", "Retained earning job office ID is not configured");
         }
         return value;
     }
@@ -63,5 +58,10 @@ public class RetainedEarningConfigurationService {
         final int lastMonth = configurationDomainService.getLastMonthOfFinancialYear().intValue();
         LocalDate fiscalEndThisYear = LocalDate.of(currentDate.getYear(), lastMonth, lastDay);
         return fiscalEndThisYear.isBefore(currentDate) ? fiscalEndThisYear : fiscalEndThisYear.minusYears(1);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RetainedEarningConfigurationService(final ConfigurationDomainService configurationDomainService) {
+        this.configurationDomainService = configurationDomainService;
     }
 }

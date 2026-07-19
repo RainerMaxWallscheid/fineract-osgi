@@ -31,7 +31,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.portfolio.collateralmanagement.command.LoanCollateralDeleteCommand;
 import org.apache.fineract.portfolio.collateralmanagement.data.LoanCollateralDeleteRequest;
@@ -42,11 +41,9 @@ import org.springframework.stereotype.Component;
 
 @Path("/v1/loan-collateral-management")
 @Component
-@Produces({ MediaType.APPLICATION_JSON })
+@Produces({MediaType.APPLICATION_JSON})
 @Tag(name = "Loan Collateral Management", description = "Loan Collateral Management is for managing collateral operations")
-@RequiredArgsConstructor
 public class LoanCollateralManagementApiResource {
-
     private final LoanCollateralManagementReadService readService;
     private final CommandDispatcher dispatcher;
 
@@ -54,9 +51,7 @@ public class LoanCollateralManagementApiResource {
     @Path("{id}")
     @Operation(description = "Delete Loan Collateral", summary = "Delete Loan Collateral")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LoanCollateralDeleteResponse.class)))
-    public LoanCollateralDeleteResponse deleteLoanCollateral(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId,
-            @PathParam("id") @Parameter(description = "loan collateral id") final Long id) {
-
+    public LoanCollateralDeleteResponse deleteLoanCollateral(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId, @PathParam("id") @Parameter(description = "loan collateral id") final Long id) {
         final var request = LoanCollateralDeleteRequest.builder().id(id).loanId(loanId).build();
         final var command = new LoanCollateralDeleteCommand();
         command.setPayload(request);
@@ -67,8 +62,13 @@ public class LoanCollateralManagementApiResource {
     @GET
     @Path("{collateralId}")
     @Operation(description = "Get Loan Collateral Details", summary = "Get Loan Collateral Details")
-    public LoanCollateralResponseData getLoanCollateral(
-            @PathParam("collateralId") @Parameter(description = "collateralId") final Long collateralId) {
+    public LoanCollateralResponseData getLoanCollateral(@PathParam("collateralId") @Parameter(description = "collateralId") final Long collateralId) {
         return this.readService.getLoanCollateralResponseData(collateralId);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanCollateralManagementApiResource(final LoanCollateralManagementReadService readService, final CommandDispatcher dispatcher) {
+        this.readService = readService;
+        this.dispatcher = dispatcher;
     }
 }

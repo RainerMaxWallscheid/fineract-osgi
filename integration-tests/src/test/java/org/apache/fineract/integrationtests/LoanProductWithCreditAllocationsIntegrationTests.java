@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.accounting.common.AccountingConstants;
 import org.apache.fineract.client.models.AdvancedPaymentData;
 import org.apache.fineract.client.models.CreditAllocationData;
@@ -53,10 +52,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-@Slf4j
 @ExtendWith(LoanTestLifecycleExtension.class)
 public class LoanProductWithCreditAllocationsIntegrationTests {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanProductWithCreditAllocationsIntegrationTests.class);
     private static ResponseSpecification RESPONSE_SPEC;
     private static RequestSpecification REQUEST_SPEC;
     private static Account ASSET_ACCOUNT;
@@ -77,14 +76,12 @@ public class LoanProductWithCreditAllocationsIntegrationTests {
         AccountHelper accountHelper = new AccountHelper(REQUEST_SPEC, RESPONSE_SPEC);
         FINANCIAL_ACTIVITY_ACCOUNT_HELPER = new FinancialActivityAccountHelper(REQUEST_SPEC);
         LOAN_TRANSACTION_HELPER = new LoanTransactionHelper(REQUEST_SPEC, RESPONSE_SPEC);
-
         ASSET_ACCOUNT = accountHelper.createAssetAccount();
         FEE_PENALTY_ACCOUNT = accountHelper.createAssetAccount();
         TRANSFER_ACCOUNT = accountHelper.createAssetAccount();
         EXPENSE_ACCOUNT = accountHelper.createExpenseAccount();
         INCOME_ACCOUNT = accountHelper.createIncomeAccount();
         OVERPAYMENT_ACCOUNT = accountHelper.createLiabilityAccount();
-
         setProperFinancialActivity(TRANSFER_ACCOUNT);
     }
 
@@ -93,14 +90,11 @@ public class LoanProductWithCreditAllocationsIntegrationTests {
         // given
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData repaymentPaymentAllocation = createRepaymentPaymentAllocation();
-
         // when
-        String loanProductJSON = baseLoanProduct().addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation)
-                .addCreditAllocations(createChargebackAllocation()).build();
+        String loanProductJSON = baseLoanProduct().addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation).addCreditAllocations(createChargebackAllocation()).build();
         Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductJSON);
         Assertions.assertNotNull(loanProductId);
         GetLoanProductsProductIdResponse loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
-
         // then
         Assertions.assertNotNull(loanProduct.getCreditAllocation());
         Assertions.assertEquals(1, loanProduct.getCreditAllocation().size());
@@ -112,14 +106,12 @@ public class LoanProductWithCreditAllocationsIntegrationTests {
         // given
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData repaymentPaymentAllocation = createRepaymentPaymentAllocation();
-
         // create empty
         String loanProductJSON = baseLoanProduct().addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation).build();
         Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductJSON);
         Assertions.assertNotNull(loanProductId);
         GetLoanProductsProductIdResponse loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
         Assertions.assertEquals(0, loanProduct.getCreditAllocation().size());
-
         // add credit allocation
         PutLoanProductsProductIdRequest putLoanProductsProductIdRequest = updateLoanProductRequest(createChargebackAllocation());
         LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(), putLoanProductsProductIdRequest);
@@ -134,21 +126,17 @@ public class LoanProductWithCreditAllocationsIntegrationTests {
         // given
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData repaymentPaymentAllocation = createRepaymentPaymentAllocation();
-
         // when
-        String loanProductJSON = baseLoanProduct().addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation)
-                .addCreditAllocations(createChargebackAllocation()).build();
+        String loanProductJSON = baseLoanProduct().addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation).addCreditAllocations(createChargebackAllocation()).build();
         Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductJSON);
         Assertions.assertNotNull(loanProductId);
         GetLoanProductsProductIdResponse loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
         Assertions.assertNotNull(loanProduct.getCreditAllocation());
         Assertions.assertEquals(1, loanProduct.getCreditAllocation().size());
         Assertions.assertEquals(createChargebackAllocation(), loanProduct.getCreditAllocation().get(0));
-
         CreditAllocationData updated = createChargebackAllocation();
         List<CreditAllocationOrder> updatedOrder = createCreditAllocationOrders("FEE", "INTEREST", "PRINCIPAL", "PENALTY");
         updated.setCreditAllocationOrder(updatedOrder);
-
         PutLoanProductsProductIdRequest putLoanProductsProductIdRequest = updateLoanProductRequest(updated);
         LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(), putLoanProductsProductIdRequest);
         loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
@@ -161,17 +149,14 @@ public class LoanProductWithCreditAllocationsIntegrationTests {
         // given
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData repaymentPaymentAllocation = createRepaymentPaymentAllocation();
-
         // when
-        String loanProductJSON = baseLoanProduct().addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation)
-                .addCreditAllocations(createChargebackAllocation()).build();
+        String loanProductJSON = baseLoanProduct().addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation).addCreditAllocations(createChargebackAllocation()).build();
         Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductJSON);
         Assertions.assertNotNull(loanProductId);
         GetLoanProductsProductIdResponse loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
         Assertions.assertNotNull(loanProduct.getCreditAllocation());
         Assertions.assertEquals(1, loanProduct.getCreditAllocation().size());
         Assertions.assertEquals(createChargebackAllocation(), loanProduct.getCreditAllocation().get(0));
-
         PutLoanProductsProductIdRequest putLoanProductsProductIdRequest = updateLoanProductRequest(new CreditAllocationData[] {});
         LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(), putLoanProductsProductIdRequest);
         loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
@@ -181,17 +166,13 @@ public class LoanProductWithCreditAllocationsIntegrationTests {
     @Test
     public void testCreditAllocationIsNotAllowedWhenPaymentStrategyIsNotAdvancedPaymentStrategy() {
         // given
-        String loanProductJSON = baseLoanProduct().withRepaymentStrategy("mifos-standard-strategy")
-                .withLoanScheduleType(LoanScheduleType.CUMULATIVE).addCreditAllocations(createChargebackAllocation()).build();
+        String loanProductJSON = baseLoanProduct().withRepaymentStrategy("mifos-standard-strategy").withLoanScheduleType(LoanScheduleType.CUMULATIVE).addCreditAllocations(createChargebackAllocation()).build();
         ResponseSpecification errorResponse = new ResponseSpecBuilder().expectStatusCode(400).build();
         LoanTransactionHelper validationErrorHelper = new LoanTransactionHelper(REQUEST_SPEC, errorResponse);
-
         // when
         List<Map<String, String>> loanProductError = validationErrorHelper.getLoanProductError(loanProductJSON, "errors");
-
         // then
-        Assertions.assertEquals("In case 'mifos-standard-strategy' payment strategy, creditAllocation must not be provided",
-                loanProductError.get(0).get("defaultUserMessage"));
+        Assertions.assertEquals("In case \'mifos-standard-strategy\' payment strategy, creditAllocation must not be provided", loanProductError.get(0).get("defaultUserMessage"));
     }
 
     @Test
@@ -199,8 +180,7 @@ public class LoanProductWithCreditAllocationsIntegrationTests {
         // given
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         AdvancedPaymentData repaymentPaymentAllocation = createRepaymentPaymentAllocation();
-        String loanProductJSON = baseLoanProduct().addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation)
-                .addCreditAllocations(createChargebackAllocation()).build();
+        String loanProductJSON = baseLoanProduct().addAdvancedPaymentAllocation(defaultAllocation, repaymentPaymentAllocation).addCreditAllocations(createChargebackAllocation()).build();
         Integer loanProductId = LOAN_TRANSACTION_HELPER.getLoanProductId(loanProductJSON);
         Assertions.assertNotNull(loanProductId);
         GetLoanProductsProductIdResponse loanProduct = LOAN_TRANSACTION_HELPER.getLoanProduct(loanProductId);
@@ -209,15 +189,12 @@ public class LoanProductWithCreditAllocationsIntegrationTests {
         Assertions.assertEquals(createChargebackAllocation(), loanProduct.getCreditAllocation().get(0));
         PutLoanProductsProductIdRequest putLoanProductsProductIdRequest = updateLoanProductRequest("mifos-standard-strategy");
         putLoanProductsProductIdRequest.setPaymentAllocation(List.of());
-
         // when
         CallFailedRuntimeException callFailedRuntimeException = Assertions.assertThrows(CallFailedRuntimeException.class, () -> {
             LOAN_TRANSACTION_HELPER.updateLoanProduct(loanProductId.longValue(), putLoanProductsProductIdRequest);
         });
-
         // then
-        Assertions.assertTrue(callFailedRuntimeException.getMessage()
-                .contains("In case 'mifos-standard-strategy' payment strategy, creditAllocation must not be provided"));
+        Assertions.assertTrue(callFailedRuntimeException.getMessage().contains("In case \'mifos-standard-strategy\' payment strategy, creditAllocation must not be provided"));
     }
 
     private CreditAllocationData createChargebackAllocation() {
@@ -238,12 +215,7 @@ public class LoanProductWithCreditAllocationsIntegrationTests {
     }
 
     private LoanProductTestBuilder baseLoanProduct() {
-        return new LoanProductTestBuilder().withPrincipal("15,000.00").withNumberOfRepayments("4").withRepaymentAfterEvery("1")
-                .withRepaymentTypeAsMonth().withinterestRatePerPeriod("1")
-                .withAccountingRulePeriodicAccrual(new Account[] { ASSET_ACCOUNT, EXPENSE_ACCOUNT, INCOME_ACCOUNT, OVERPAYMENT_ACCOUNT })
-                .withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance()
-                .withFeeAndPenaltyAssetAccount(FEE_PENALTY_ACCOUNT).withLoanScheduleType(LoanScheduleType.PROGRESSIVE)
-                .withLoanScheduleProcessingType(LoanScheduleProcessingType.HORIZONTAL);
+        return new LoanProductTestBuilder().withPrincipal("15,000.00").withNumberOfRepayments("4").withRepaymentAfterEvery("1").withRepaymentTypeAsMonth().withinterestRatePerPeriod("1").withAccountingRulePeriodicAccrual(new Account[] {ASSET_ACCOUNT, EXPENSE_ACCOUNT, INCOME_ACCOUNT, OVERPAYMENT_ACCOUNT}).withInterestRateFrequencyTypeAsMonths().withAmortizationTypeAsEqualInstallments().withInterestTypeAsDecliningBalance().withFeeAndPenaltyAssetAccount(FEE_PENALTY_ACCOUNT).withLoanScheduleType(LoanScheduleType.PROGRESSIVE).withLoanScheduleProcessingType(LoanScheduleProcessingType.HORIZONTAL);
     }
 
     private PutLoanProductsProductIdRequest updateLoanProductRequest(CreditAllocationData... creditAllocationData) {
@@ -262,13 +234,7 @@ public class LoanProductWithCreditAllocationsIntegrationTests {
         AdvancedPaymentData advancedPaymentData = new AdvancedPaymentData();
         advancedPaymentData.setTransactionType("REPAYMENT");
         advancedPaymentData.setFutureInstallmentAllocationRule("NEXT_INSTALLMENT");
-
-        List<PaymentAllocationOrder> paymentAllocationOrders = getPaymentAllocationOrder(PaymentAllocationType.PAST_DUE_PENALTY,
-                PaymentAllocationType.PAST_DUE_FEE, PaymentAllocationType.PAST_DUE_INTEREST, PaymentAllocationType.PAST_DUE_PRINCIPAL,
-                PaymentAllocationType.DUE_PENALTY, PaymentAllocationType.DUE_FEE, PaymentAllocationType.DUE_INTEREST,
-                PaymentAllocationType.DUE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_PENALTY, PaymentAllocationType.IN_ADVANCE_FEE,
-                PaymentAllocationType.IN_ADVANCE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_INTEREST);
-
+        List<PaymentAllocationOrder> paymentAllocationOrders = getPaymentAllocationOrder(PaymentAllocationType.PAST_DUE_PENALTY, PaymentAllocationType.PAST_DUE_FEE, PaymentAllocationType.PAST_DUE_INTEREST, PaymentAllocationType.PAST_DUE_PRINCIPAL, PaymentAllocationType.DUE_PENALTY, PaymentAllocationType.DUE_FEE, PaymentAllocationType.DUE_INTEREST, PaymentAllocationType.DUE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_PENALTY, PaymentAllocationType.IN_ADVANCE_FEE, PaymentAllocationType.IN_ADVANCE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_INTEREST);
         advancedPaymentData.setPaymentAllocationOrder(paymentAllocationOrders);
         return advancedPaymentData;
     }
@@ -277,13 +243,7 @@ public class LoanProductWithCreditAllocationsIntegrationTests {
         AdvancedPaymentData advancedPaymentData = new AdvancedPaymentData();
         advancedPaymentData.setTransactionType("DEFAULT");
         advancedPaymentData.setFutureInstallmentAllocationRule("NEXT_INSTALLMENT");
-
-        List<PaymentAllocationOrder> paymentAllocationOrders = getPaymentAllocationOrder(PaymentAllocationType.PAST_DUE_PENALTY,
-                PaymentAllocationType.PAST_DUE_FEE, PaymentAllocationType.PAST_DUE_PRINCIPAL, PaymentAllocationType.PAST_DUE_INTEREST,
-                PaymentAllocationType.DUE_PENALTY, PaymentAllocationType.DUE_FEE, PaymentAllocationType.DUE_PRINCIPAL,
-                PaymentAllocationType.DUE_INTEREST, PaymentAllocationType.IN_ADVANCE_PENALTY, PaymentAllocationType.IN_ADVANCE_FEE,
-                PaymentAllocationType.IN_ADVANCE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_INTEREST);
-
+        List<PaymentAllocationOrder> paymentAllocationOrders = getPaymentAllocationOrder(PaymentAllocationType.PAST_DUE_PENALTY, PaymentAllocationType.PAST_DUE_FEE, PaymentAllocationType.PAST_DUE_PRINCIPAL, PaymentAllocationType.PAST_DUE_INTEREST, PaymentAllocationType.DUE_PENALTY, PaymentAllocationType.DUE_FEE, PaymentAllocationType.DUE_PRINCIPAL, PaymentAllocationType.DUE_INTEREST, PaymentAllocationType.IN_ADVANCE_PENALTY, PaymentAllocationType.IN_ADVANCE_FEE, PaymentAllocationType.IN_ADVANCE_PRINCIPAL, PaymentAllocationType.IN_ADVANCE_INTEREST);
         advancedPaymentData.setPaymentAllocationOrder(paymentAllocationOrders);
         return advancedPaymentData;
     }
@@ -301,9 +261,6 @@ public class LoanProductWithCreditAllocationsIntegrationTests {
     private static void setProperFinancialActivity(Account transferAccount) {
         List<GetFinancialActivityAccountsResponse> financialMappings = FINANCIAL_ACTIVITY_ACCOUNT_HELPER.getAllFinancialActivityAccounts();
         financialMappings.forEach(mapping -> FINANCIAL_ACTIVITY_ACCOUNT_HELPER.deleteFinancialActivityAccount(mapping.getId()));
-        FINANCIAL_ACTIVITY_ACCOUNT_HELPER.createFinancialActivityAccount(new PostFinancialActivityAccountsRequest()
-                .financialActivityId((long) AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue())
-                .glAccountId((long) transferAccount.getAccountID()));
+        FINANCIAL_ACTIVITY_ACCOUNT_HELPER.createFinancialActivityAccount(new PostFinancialActivityAccountsRequest().financialActivityId((long) AccountingConstants.FinancialActivity.ASSET_TRANSFER.getValue()).glAccountId((long) transferAccount.getAccountID()));
     }
-
 }

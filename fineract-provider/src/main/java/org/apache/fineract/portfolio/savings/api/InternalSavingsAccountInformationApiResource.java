@@ -27,8 +27,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.boot.FineractProfiles;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountWritePlatformService;
@@ -39,10 +37,9 @@ import org.springframework.stereotype.Component;
 @Profile(FineractProfiles.TEST)
 @Component
 @Path("/v1/internal/savingsaccounts")
-@RequiredArgsConstructor
-@Slf4j
 public class InternalSavingsAccountInformationApiResource implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InternalSavingsAccountInformationApiResource.class);
     private final SavingsAccountRepository repository;
     private final SavingsAccountWritePlatformService writePlatformService;
 
@@ -56,12 +53,11 @@ public class InternalSavingsAccountInformationApiResource implements Initializin
         log.warn("DO NOT USE THIS IN PRODUCTION!");
         log.warn("                                                            ");
         log.warn("------------------------------------------------------------");
-
     }
 
     @GET
     @Path("status/{statusId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @SuppressFBWarnings("SLF4J_SIGN_ONLY_FORMAT")
     public List<Long> getSavingsAccountsByStatus(@Context final UriInfo uriInfo, @PathParam("statusId") Integer statusId) {
         log.warn("------------------------------------------------------------");
@@ -69,7 +65,12 @@ public class InternalSavingsAccountInformationApiResource implements Initializin
         log.warn("Fetching loans by status {}", statusId);
         log.warn("                                                            ");
         log.warn("------------------------------------------------------------");
-
         return repository.findSavingsAccountIdsByStatusId(statusId);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InternalSavingsAccountInformationApiResource(final SavingsAccountRepository repository, final SavingsAccountWritePlatformService writePlatformService) {
+        this.repository = repository;
+        this.writePlatformService = writePlatformService;
     }
 }

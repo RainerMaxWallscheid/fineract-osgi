@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.workingcapitalloanproduct.service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.common.AccountingDropdownReadPlatformService;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
 import org.apache.fineract.accounting.producttoaccountmapping.service.WorkingCapitalLoanProductAdvancedAccountingReadHelper;
@@ -60,10 +59,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class WorkingCapitalLoanProductReadPlatformServiceImpl implements WorkingCapitalLoanProductReadPlatformService {
-
     private final WorkingCapitalLoanProductRepository repository;
     private final WorkingCapitalLoanProductMapper mapper;
     private final FundReadPlatformService fundReadPlatformService;
@@ -85,13 +82,10 @@ public class WorkingCapitalLoanProductReadPlatformServiceImpl implements Working
 
     @Override
     public WorkingCapitalLoanProductData retrieveWorkingCapitalLoanProduct(final Long productId) {
-        final WorkingCapitalLoanProduct product = this.repository.findByIdWithDetails(productId)
-                .orElseThrow(() -> new WorkingCapitalLoanProductNotFoundException(productId));
+        final WorkingCapitalLoanProduct product = this.repository.findByIdWithDetails(productId).orElseThrow(() -> new WorkingCapitalLoanProductNotFoundException(productId));
         final WorkingCapitalLoanProductData productData = this.mapper.toData(product);
-
         if (product.getAccountingRule().isAccrualWithDeferredRevenueAmortization()) {
-            final Map<String, GLAccountData> accountingMappings = this.wcAccountingMappingService.fetchAccountMappingDetails(productId,
-                    product.getAccountingRule());
+            final Map<String, GLAccountData> accountingMappings = this.wcAccountingMappingService.fetchAccountMappingDetails(productId, product.getAccountingRule());
             productData.setAccountingMappings(accountingMappings);
             productData.setPaymentChannelToFundSourceMappings(advancedAccountingReadHelper.fetchPaymentTypeToFundSourceMappings(productId));
             productData.setFeeToIncomeAccountMappings(advancedAccountingReadHelper.fetchFeeToIncomeMappings(productId));
@@ -99,67 +93,68 @@ public class WorkingCapitalLoanProductReadPlatformServiceImpl implements Working
             productData.setChargeOffReasonToExpenseAccountMappings(advancedAccountingReadHelper.fetchChargeOffReasonMappings(productId));
             productData.setWriteOffReasonsToExpenseMappings(advancedAccountingReadHelper.fetchWriteOffReasonMappings(productId));
         }
-
         return productData;
     }
 
     @Override
     public WorkingCapitalLoanProduct retrieveWorkingCapitalLoanProductByExternalId(final ExternalId externalId) {
-        return this.repository.findByExternalIdWithDetails(externalId)
-                .orElseThrow(() -> new WorkingCapitalLoanProductNotFoundException(externalId));
+        return this.repository.findByExternalIdWithDetails(externalId).orElseThrow(() -> new WorkingCapitalLoanProductNotFoundException(externalId));
     }
 
     @Override
     public WorkingCapitalLoanProductData retrieveNewWorkingCapitalLoanProductDetails() {
         final Collection<FundData> fundOptions = this.fundReadPlatformService.retrieveAllFunds();
         final Collection<CurrencyData> currencyOptions = this.currencyReadPlatformService.retrieveAllowedCurrencies();
-        final List<StringEnumOptionData> amortizationTypeOptions = ApiFacingEnum
-                .getValuesAsStringEnumOptionDataList(WorkingCapitalAmortizationType.class);
-        final List<StringEnumOptionData> periodFrequencyTypeOptions = ApiFacingEnum
-                .getValuesAsStringEnumOptionDataList(WorkingCapitalLoanPeriodFrequencyType.class);
+        final List<StringEnumOptionData> amortizationTypeOptions = ApiFacingEnum.getValuesAsStringEnumOptionDataList(WorkingCapitalAmortizationType.class);
+        final List<StringEnumOptionData> periodFrequencyTypeOptions = ApiFacingEnum.getValuesAsStringEnumOptionDataList(WorkingCapitalLoanPeriodFrequencyType.class);
         final List<WorkingCapitalBreachData> breachOptions = breachReadPlatformService.retrieveAll();
-        final List<StringEnumOptionData> advancedPaymentAllocationTypes = ApiFacingEnum
-                .getValuesAsStringEnumOptionDataList(WorkingCapitalPaymentAllocationType.class);
-        final List<StringEnumOptionData> delinquencyStartTypeOptions = ApiFacingEnum
-                .getValuesAsStringEnumOptionDataList(WorkingCapitalLoanDelinquencyStartType.class);
-        final List<StringEnumOptionData> delinquencyMinimumPaymentTypeOptions = ApiFacingEnum
-                .getValuesAsStringEnumOptionDataList(DelinquencyMinimumPaymentType.class);
-        final List<EnumOptionData> advancedPaymentAllocationTransactionTypes = PaymentAllocationTransactionType
-                .getValuesAsEnumOptionDataList();
-        final Collection<DelinquencyBucketData> delinquencyBucketOptions = this.delinquencyReadPlatformService
-                .retrieveAllDelinquencyBuckets();
+        final List<StringEnumOptionData> advancedPaymentAllocationTypes = ApiFacingEnum.getValuesAsStringEnumOptionDataList(WorkingCapitalPaymentAllocationType.class);
+        final List<StringEnumOptionData> delinquencyStartTypeOptions = ApiFacingEnum.getValuesAsStringEnumOptionDataList(WorkingCapitalLoanDelinquencyStartType.class);
+        final List<StringEnumOptionData> delinquencyMinimumPaymentTypeOptions = ApiFacingEnum.getValuesAsStringEnumOptionDataList(DelinquencyMinimumPaymentType.class);
+        final List<EnumOptionData> advancedPaymentAllocationTransactionTypes = PaymentAllocationTransactionType.getValuesAsEnumOptionDataList();
+        final Collection<DelinquencyBucketData> delinquencyBucketOptions = this.delinquencyReadPlatformService.retrieveAllDelinquencyBuckets();
         final List<WorkingCapitalNearBreachData> nearBreachOptions = nearBreachReadPlatformService.retrieveAll();
         final List<PaymentTypeData> paymentTypeOptions = this.paymentTypeReadService.retrieveAllPaymentTypes();
-
         final List<StringEnumOptionData> accountingRuleOptions = WorkingCapitalAccountingRuleType.toStringEnumOptions();
-        final Map<String, List<GLAccountData>> accountingMappingOptions = this.accountingDropdownReadPlatformService
-                .retrieveAccountMappingOptionsForLoanProducts();
-        final List<CodeValueData> chargeOffReasonOptions = this.codeValueReadPlatformService
-                .retrieveCodeValuesByCode(WorkingCapitalLoanConstants.CHARGE_OFF_REASONS);
-        final List<CodeValueData> writeOffReasonOptions = this.codeValueReadPlatformService
-                .retrieveCodeValuesByCode(WorkingCapitalLoanConstants.WRITE_OFF_REASONS);
+        final Map<String, List<GLAccountData>> accountingMappingOptions = this.accountingDropdownReadPlatformService.retrieveAccountMappingOptionsForLoanProducts();
+        final List<CodeValueData> chargeOffReasonOptions = this.codeValueReadPlatformService.retrieveCodeValuesByCode(WorkingCapitalLoanConstants.CHARGE_OFF_REASONS);
+        final List<CodeValueData> writeOffReasonOptions = this.codeValueReadPlatformService.retrieveCodeValuesByCode(WorkingCapitalLoanConstants.WRITE_OFF_REASONS);
+        return  //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        // TODO: Populate WC-specific charge options when WC charges are introduced.
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        WorkingCapitalLoanProductData.builder().fundOptions(fundOptions).currencyOptions(currencyOptions).amortizationTypeOptions(amortizationTypeOptions).periodFrequencyTypeOptions(periodFrequencyTypeOptions).breachOptions(breachOptions).advancedPaymentAllocationTypes(advancedPaymentAllocationTypes).advancedPaymentAllocationTransactionTypes(advancedPaymentAllocationTransactionTypes).delinquencyStartTypeOptions(delinquencyStartTypeOptions).delinquencyMinimumPaymentTypeOptions(delinquencyMinimumPaymentTypeOptions).delinquencyBucketOptions(delinquencyBucketOptions != null && !delinquencyBucketOptions.isEmpty() ? delinquencyBucketOptions : null).paymentTypeOptions(paymentTypeOptions != null && !paymentTypeOptions.isEmpty() ? paymentTypeOptions : null).chargeOptions(List.of()).penaltyOptions(List.of()).accountingRuleOptions(accountingRuleOptions).accountingMappingOptions(accountingMappingOptions).nearBreachOptions(nearBreachOptions).chargeOffReasonOptions(chargeOffReasonOptions != null && !chargeOffReasonOptions.isEmpty() ? chargeOffReasonOptions : null).writeOffReasonOptions(writeOffReasonOptions != null && !writeOffReasonOptions.isEmpty() ? writeOffReasonOptions : null).build();
+    }
 
-        return WorkingCapitalLoanProductData.builder() //
-                .fundOptions(fundOptions) //
-                .currencyOptions(currencyOptions) //
-                .amortizationTypeOptions(amortizationTypeOptions) //
-                .periodFrequencyTypeOptions(periodFrequencyTypeOptions) //
-                .breachOptions(breachOptions) //
-                .advancedPaymentAllocationTypes(advancedPaymentAllocationTypes) //
-                .advancedPaymentAllocationTransactionTypes(advancedPaymentAllocationTransactionTypes) //
-                .delinquencyStartTypeOptions(delinquencyStartTypeOptions) //
-                .delinquencyMinimumPaymentTypeOptions(delinquencyMinimumPaymentTypeOptions) //
-                .delinquencyBucketOptions(
-                        delinquencyBucketOptions != null && !delinquencyBucketOptions.isEmpty() ? delinquencyBucketOptions : null) //
-                .paymentTypeOptions(paymentTypeOptions != null && !paymentTypeOptions.isEmpty() ? paymentTypeOptions : null) //
-                // TODO: Populate WC-specific charge options when WC charges are introduced.
-                .chargeOptions(List.of()) //
-                .penaltyOptions(List.of()) //
-                .accountingRuleOptions(accountingRuleOptions) //
-                .accountingMappingOptions(accountingMappingOptions) //
-                .nearBreachOptions(nearBreachOptions) //
-                .chargeOffReasonOptions(chargeOffReasonOptions != null && !chargeOffReasonOptions.isEmpty() ? chargeOffReasonOptions : null) //
-                .writeOffReasonOptions(writeOffReasonOptions != null && !writeOffReasonOptions.isEmpty() ? writeOffReasonOptions : null) //
-                .build();
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanProductReadPlatformServiceImpl(final WorkingCapitalLoanProductRepository repository, final WorkingCapitalLoanProductMapper mapper, final FundReadPlatformService fundReadPlatformService, final CurrencyReadPlatformService currencyReadPlatformService, final DelinquencyReadPlatformService delinquencyReadPlatformService, final WorkingCapitalBreachReadPlatformService breachReadPlatformService, final PaymentTypeReadService paymentTypeReadService, final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService, final WorkingCapitalLoanProductAdvancedAccountingReadHelper advancedAccountingReadHelper, final CodeValueReadPlatformService codeValueReadPlatformService, final WorkingCapitalProductAccountingMappingService wcAccountingMappingService, final WorkingCapitalNearBreachReadPlatformService nearBreachReadPlatformService) {
+        this.repository = repository;
+        this.mapper = mapper;
+        this.fundReadPlatformService = fundReadPlatformService;
+        this.currencyReadPlatformService = currencyReadPlatformService;
+        this.delinquencyReadPlatformService = delinquencyReadPlatformService;
+        this.breachReadPlatformService = breachReadPlatformService;
+        this.paymentTypeReadService = paymentTypeReadService;
+        this.accountingDropdownReadPlatformService = accountingDropdownReadPlatformService;
+        this.advancedAccountingReadHelper = advancedAccountingReadHelper;
+        this.codeValueReadPlatformService = codeValueReadPlatformService;
+        this.wcAccountingMappingService = wcAccountingMappingService;
+        this.nearBreachReadPlatformService = nearBreachReadPlatformService;
     }
 }

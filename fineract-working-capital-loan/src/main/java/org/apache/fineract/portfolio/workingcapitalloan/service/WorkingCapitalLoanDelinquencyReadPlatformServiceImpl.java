@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.workingcapitalloan.service;
 
 import java.math.BigDecimal;
@@ -24,8 +23,6 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanCollectionData;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanDelinquencyTagHistoryData;
@@ -38,12 +35,11 @@ import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapita
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
 public class WorkingCapitalLoanDelinquencyReadPlatformServiceImpl implements WorkingCapitalLoanDelinquencyReadPlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalLoanDelinquencyReadPlatformServiceImpl.class);
     private final WorkingCapitalLoanDelinquencyRangeScheduleTagHistoryMapper delinquencyRangeScheduleTagHistoryMapper;
     private final WorkingCapitalLoanDelinquencyRangeScheduleTagHistoryRepository delinquencyRangeScheduleTagHistoryRepository;
     private final WorkingCapitalLoanDelinquencyRangeScheduleRepository delinquencyRangeScheduleRepository;
@@ -51,16 +47,11 @@ public class WorkingCapitalLoanDelinquencyReadPlatformServiceImpl implements Wor
     @Override
     public WorkingCapitalLoanCollectionData getCollectionData(Long loanId, LocalDate businessDate) {
         final WorkingCapitalLoanCollectionData template = WorkingCapitalLoanCollectionData.initializeEmptyData();
-        List<WorkingCapitalLoanDelinquencyRangeScheduleTagHistory> byLoanIdOrderByAddedOnDateDesc = delinquencyRangeScheduleTagHistoryRepository
-                .findByLoanIdOrderByAddedOnDateDesc(loanId);
-        List<WorkingCapitalLoanRangeScheduleDelinquencyData> list = byLoanIdOrderByAddedOnDateDesc.stream()
-                // get active delinquency tags
-                .filter(x -> x.getLiftedOnDate() == null).map(delinquencyRangeScheduleTagHistoryMapper::mapForCollectionData).toList();
-
-        Optional<WorkingCapitalLoanDelinquencyRangeScheduleTagHistory> oldestDelinquentTag = byLoanIdOrderByAddedOnDateDesc.stream()
-                .filter(x -> x.getLiftedOnDate() == null)
-                .min(Comparator.comparing(WorkingCapitalLoanDelinquencyRangeScheduleTagHistory::getAddedOnDate));
-
+        List<WorkingCapitalLoanDelinquencyRangeScheduleTagHistory> byLoanIdOrderByAddedOnDateDesc = delinquencyRangeScheduleTagHistoryRepository.findByLoanIdOrderByAddedOnDateDesc(loanId);
+        List<WorkingCapitalLoanRangeScheduleDelinquencyData> list = 
+        // get active delinquency tags
+        byLoanIdOrderByAddedOnDateDesc.stream().filter(x -> x.getLiftedOnDate() == null).map(delinquencyRangeScheduleTagHistoryMapper::mapForCollectionData).toList();
+        Optional<WorkingCapitalLoanDelinquencyRangeScheduleTagHistory> oldestDelinquentTag = byLoanIdOrderByAddedOnDateDesc.stream().filter(x -> x.getLiftedOnDate() == null).min(Comparator.comparing(WorkingCapitalLoanDelinquencyRangeScheduleTagHistory::getAddedOnDate));
         if (oldestDelinquentTag.isPresent()) {
             template.setDelinquentDays(DateUtils.getDifferenceInDays(oldestDelinquentTag.get().getAddedOnDate(), businessDate) + 1);
             template.setDelinquentDate(oldestDelinquentTag.get().getAddedOnDate());
@@ -68,19 +59,21 @@ public class WorkingCapitalLoanDelinquencyReadPlatformServiceImpl implements Wor
             template.setDelinquentAmount(delinquentAmount);
             template.setDelinquentPrincipal(delinquentAmount);
         }
-
-        delinquencyRangeScheduleRepository.findTopByLoanIdAndMinPaymentCriteriaMetFalseOrderByFromDateAsc(loanId)
-                .map(WorkingCapitalLoanDelinquencyRangeSchedule::getDelinquentDays).ifPresent(template::setPastDueDays);
-
+        delinquencyRangeScheduleRepository.findTopByLoanIdAndMinPaymentCriteriaMetFalseOrderByFromDateAsc(loanId).map(WorkingCapitalLoanDelinquencyRangeSchedule::getDelinquentDays).ifPresent(template::setPastDueDays);
         template.setInstallmentLevelDelinquency(list);
-
         return template;
     }
 
     @Override
     public List<WorkingCapitalLoanDelinquencyTagHistoryData> retrieveDelinquencyRangeScheduleTagHistory(Long loanId) {
-        List<WorkingCapitalLoanDelinquencyRangeScheduleTagHistory> byLoanIdOrderByAddedOnDateDesc = delinquencyRangeScheduleTagHistoryRepository
-                .findByLoanIdOrderByAddedOnDateDesc(loanId);
+        List<WorkingCapitalLoanDelinquencyRangeScheduleTagHistory> byLoanIdOrderByAddedOnDateDesc = delinquencyRangeScheduleTagHistoryRepository.findByLoanIdOrderByAddedOnDateDesc(loanId);
         return delinquencyRangeScheduleTagHistoryMapper.map(byLoanIdOrderByAddedOnDateDesc);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanDelinquencyReadPlatformServiceImpl(final WorkingCapitalLoanDelinquencyRangeScheduleTagHistoryMapper delinquencyRangeScheduleTagHistoryMapper, final WorkingCapitalLoanDelinquencyRangeScheduleTagHistoryRepository delinquencyRangeScheduleTagHistoryRepository, final WorkingCapitalLoanDelinquencyRangeScheduleRepository delinquencyRangeScheduleRepository) {
+        this.delinquencyRangeScheduleTagHistoryMapper = delinquencyRangeScheduleTagHistoryMapper;
+        this.delinquencyRangeScheduleTagHistoryRepository = delinquencyRangeScheduleTagHistoryRepository;
+        this.delinquencyRangeScheduleRepository = delinquencyRangeScheduleRepository;
     }
 }

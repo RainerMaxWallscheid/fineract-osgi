@@ -18,17 +18,14 @@
  */
 package org.apache.fineract.infrastructure.core.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.database.RoutingDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
 public class JdbcTemplateFactory {
-
     private final RoutingDataSource routingDataSource;
 
     public JdbcTemplate create(FineractPlatformTenant tenant) {
@@ -37,5 +34,10 @@ public class JdbcTemplateFactory {
 
     public NamedParameterJdbcTemplate createNamedParameterJdbcTemplate(FineractPlatformTenant tenant) {
         return new NamedParameterJdbcTemplate(routingDataSource);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JdbcTemplateFactory(final RoutingDataSource routingDataSource) {
+        this.routingDataSource = routingDataSource;
     }
 }

@@ -18,17 +18,13 @@
  */
 package org.apache.fineract.portfolio.client.domain;
 
-import lombok.Getter;
-
 /**
  * Type used to differentiate the type of client
  */
-@Getter
 public enum LegalForm {
-
-    PERSON(1, "legalFormType.person", "Person"), //
-    ENTITY(2, "legalFormType.entity", "Entity"); //
-
+    PERSON(1, "legalFormType.person", "Person"),  //
+    ENTITY(2, "legalFormType.entity", "Entity");
+    //
     private final Integer value;
     private final String code;
     private final String label;
@@ -40,7 +36,6 @@ public enum LegalForm {
     }
 
     public static LegalForm fromInt(final Integer type) {
-
         return switch (type) {
             case 1 -> LegalForm.PERSON;
             case 2 -> LegalForm.ENTITY;
@@ -58,6 +53,21 @@ public enum LegalForm {
 
     @Override
     public String toString() {
+        return this.label;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLabel() {
         return this.label;
     }
 }

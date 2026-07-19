@@ -19,11 +19,9 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
@@ -35,23 +33,17 @@ import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class DeleteWorkingCapitalLoanApplicationByExternalIdCommandStrategy implements CommandStrategy {
-
     private final WorkingCapitalLoanApiResource workingCapitalLoanApiResource;
     private final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer;
 
     @Override
     public BatchResponse execute(BatchRequest request, @SuppressWarnings("unused") UriInfo uriInfo) {
         final BatchResponse response = new BatchResponse();
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final String relativeUrl = relativeUrlWithoutVersion(request);
-
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrl);
-
         final String loanIdPathParameter = pathParameters.get(2);
         String loanExternalId;
         if (loanIdPathParameter.contains("?")) {
@@ -59,12 +51,15 @@ public class DeleteWorkingCapitalLoanApplicationByExternalIdCommandStrategy impl
         } else {
             loanExternalId = loanIdPathParameter;
         }
-
         final CommandProcessingResult commandProcessingResult = workingCapitalLoanApiResource.deleteLoanApplication(loanExternalId);
-
         response.setStatusCode(HttpStatus.SC_OK);
         response.setBody(toApiJsonSerializer.serialize(commandProcessingResult));
-
         return response;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DeleteWorkingCapitalLoanApplicationByExternalIdCommandStrategy(final WorkingCapitalLoanApiResource workingCapitalLoanApiResource, final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer) {
+        this.workingCapitalLoanApiResource = workingCapitalLoanApiResource;
+        this.toApiJsonSerializer = toApiJsonSerializer;
     }
 }

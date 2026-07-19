@@ -19,13 +19,8 @@
 package org.apache.fineract.validation.constraints;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.validator.HibernateValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,13 +34,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 
 @SpringBootTest
-@ContextConfiguration(classes = { DateFormatValidationTest.TestConfig.class })
+@ContextConfiguration(classes = {DateFormatValidationTest.TestConfig.class})
 class DateFormatValidationTest {
 
     @Configuration
-    @Import({ MessageSourceAutoConfiguration.class })
+    @Import({MessageSourceAutoConfiguration.class})
     static class TestConfig {
-
         @Bean
         public Validator validator() {
             return Validation.byProvider(HibernateValidator.class).configure().buildValidatorFactory().getValidator();
@@ -62,23 +56,23 @@ class DateFormatValidationTest {
         assertThat(errors).isEmpty();
     }
 
+    // literal date, not a pattern
+    // 'b' is not a valid pattern letter
     @ParameterizedTest
-    @ValueSource(strings = { "02 February 2026", // literal date, not a pattern
-            "invalid", "dd bbb yyyy", // 'b' is not a valid pattern letter
-    })
+    @ValueSource(strings = {"02 February 2026", "invalid", "dd bbb yyyy"})
     void invalidPatterns(String dateFormat) {
         var request = DateFormatModel.builder().dateFormat(dateFormat).build();
         var errors = validator.validate(request);
-        assertThat(errors).as("Expected dateFormat '%s' to be invalid", dateFormat).hasSize(1);
+        assertThat(errors).as("Expected dateFormat \'%s\' to be invalid", dateFormat).hasSize(1);
         assertThat(errors).anyMatch(e -> "dateFormat".equals(e.getPropertyPath().toString()));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "dd MMMM yyyy", "yyyy-MM-dd", "dd/MM/yyyy", "MMM dd, yyyy" })
+    @ValueSource(strings = {"dd MMMM yyyy", "yyyy-MM-dd", "dd/MM/yyyy", "MMM dd, yyyy"})
     void validPatterns(String dateFormat) {
         var request = DateFormatModel.builder().dateFormat(dateFormat).build();
         var errors = validator.validate(request);
-        assertThat(errors).as("Expected dateFormat '%s' to be valid", dateFormat).isEmpty();
+        assertThat(errors).as("Expected dateFormat \'%s\' to be valid", dateFormat).isEmpty();
     }
 
     @Test
@@ -93,13 +87,98 @@ class DateFormatValidationTest {
         assertThat(DateFormatValidator.isValidPattern("yyyy-MM-dd")).isTrue();
     }
 
-    @Builder
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    static class DateFormatModel {
 
+    static class DateFormatModel {
         @DateFormat
         private String dateFormat;
+
+
+        @java.lang.SuppressWarnings("all")
+                public static class DateFormatModelBuilder {
+            @java.lang.SuppressWarnings("all")
+                        private String dateFormat;
+
+            @java.lang.SuppressWarnings("all")
+                        DateFormatModelBuilder() {
+            }
+
+            /**
+             * @return {@code this}.
+             */
+            @java.lang.SuppressWarnings("all")
+                        public DateFormatValidationTest.DateFormatModel.DateFormatModelBuilder dateFormat(final String dateFormat) {
+                this.dateFormat = dateFormat;
+                return this;
+            }
+
+            @java.lang.SuppressWarnings("all")
+                        public DateFormatValidationTest.DateFormatModel build() {
+                return new DateFormatValidationTest.DateFormatModel(this.dateFormat);
+            }
+
+            @java.lang.Override
+            @java.lang.SuppressWarnings("all")
+                        public java.lang.String toString() {
+                return "DateFormatValidationTest.DateFormatModel.DateFormatModelBuilder(dateFormat=" + this.dateFormat + ")";
+            }
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public static DateFormatValidationTest.DateFormatModel.DateFormatModelBuilder builder() {
+            return new DateFormatValidationTest.DateFormatModel.DateFormatModelBuilder();
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public String getDateFormat() {
+            return this.dateFormat;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public void setDateFormat(final String dateFormat) {
+            this.dateFormat = dateFormat;
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public boolean equals(final java.lang.Object o) {
+            if (o == this) return true;
+            if (!(o instanceof DateFormatValidationTest.DateFormatModel)) return false;
+            final DateFormatValidationTest.DateFormatModel other = (DateFormatValidationTest.DateFormatModel) o;
+            if (!other.canEqual((java.lang.Object) this)) return false;
+            final java.lang.Object this$dateFormat = this.getDateFormat();
+            final java.lang.Object other$dateFormat = other.getDateFormat();
+            if (this$dateFormat == null ? other$dateFormat != null : !this$dateFormat.equals(other$dateFormat)) return false;
+            return true;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                protected boolean canEqual(final java.lang.Object other) {
+            return other instanceof DateFormatValidationTest.DateFormatModel;
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public int hashCode() {
+            final int PRIME = 59;
+            int result = 1;
+            final java.lang.Object $dateFormat = this.getDateFormat();
+            result = result * PRIME + ($dateFormat == null ? 43 : $dateFormat.hashCode());
+            return result;
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "DateFormatValidationTest.DateFormatModel(dateFormat=" + this.getDateFormat() + ")";
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public DateFormatModel() {
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public DateFormatModel(final String dateFormat) {
+            this.dateFormat = dateFormat;
+        }
     }
 }

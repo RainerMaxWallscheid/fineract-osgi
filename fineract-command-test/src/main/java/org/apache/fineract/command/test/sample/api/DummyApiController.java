@@ -21,11 +21,8 @@ package org.apache.fineract.command.test.sample.api;
 import static org.apache.fineract.command.core.CommandConstants.COMMAND_HTTP_HEADER_TENANT_ID;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.command.test.sample.command.DummyCommand;
 import org.apache.fineract.command.test.sample.data.DummyRequest;
@@ -37,39 +34,34 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
-@RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/test/dummy", consumes = APPLICATION_JSON_VALUE, produces = { APPLICATION_JSON_VALUE,
-        APPLICATION_PROBLEM_JSON_VALUE })
+@RequestMapping(value = "/test/dummy", consumes = APPLICATION_JSON_VALUE, produces = {APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE})
 class DummyApiController {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DummyApiController.class);
     private final CommandDispatcher pipeline;
 
     @PostMapping("/sync")
-    DummyResponse dummySync(@RequestHeader(value = COMMAND_HTTP_HEADER_TENANT_ID, required = false) String tenantId,
-            @RequestBody DummyRequest request) {
+    DummyResponse dummySync(@RequestHeader(value = COMMAND_HTTP_HEADER_TENANT_ID, required = false) String tenantId, @RequestBody DummyRequest request) {
         var command = new DummyCommand();
         command.setPayload(request);
-
         log.info("Tenant ID (unused): {}", tenantId);
-
         Supplier<DummyResponse> result = pipeline.dispatch(command);
-
         return result.get();
     }
 
     @Async
     @PostMapping("/async")
-    CompletableFuture<DummyResponse> dummyAsync(@RequestHeader(value = COMMAND_HTTP_HEADER_TENANT_ID, required = false) String tenantId,
-            @RequestBody DummyRequest request) {
+    CompletableFuture<DummyResponse> dummyAsync(@RequestHeader(value = COMMAND_HTTP_HEADER_TENANT_ID, required = false) String tenantId, @RequestBody DummyRequest request) {
         var command = new DummyCommand();
         command.setPayload(request);
-
         log.info("Tenant ID (unused): {}", tenantId);
-
         Supplier<DummyResponse> result = pipeline.dispatch(command);
-
         return CompletableFuture.supplyAsync(result);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DummyApiController(final CommandDispatcher pipeline) {
+        this.pipeline = pipeline;
     }
 }

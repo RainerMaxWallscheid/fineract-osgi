@@ -20,7 +20,6 @@ package org.apache.fineract.integrationtests;
 
 import java.math.BigDecimal;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.fineract.client.models.GetLoansLoanIdLoanInstallmentLevelDelinquency;
 import org.apache.fineract.client.models.GetLoansLoanIdResponse;
@@ -35,37 +34,26 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class LoanDelinquencyForNonActiveAccountsTest extends FeignLoanTestBase {
-
     @Test
     public void testDelinquencyCalculationsForRejectedLoanAccount() {
         runAt("06 May 2024", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-
             Long delinquencyBucketId = DelinquencyBucketsHelper.createBucket(List.of(//
-                    Pair.of(1, 10), //
-                    Pair.of(11, 30), //
-                    Pair.of(31, 60), //
-                    Pair.of(61, null)//
+            Pair.of(1, 10),  //
+            Pair.of(11, 30),  //
+            Pair.of(31, 60),  //
+            Pair.of(61, null)//
             ));
-
-            PostLoanProductsRequest loanProductsRequest = create1InstallmentAmountInMultiplesOf4Period1MonthLongWithInterestAndAmortizationProduct(
-                    InterestType.FLAT, AmortizationType.EQUAL_INSTALLMENTS);
+            PostLoanProductsRequest loanProductsRequest = create1InstallmentAmountInMultiplesOf4Period1MonthLongWithInterestAndAmortizationProduct(InterestType.FLAT, AmortizationType.EQUAL_INSTALLMENTS);
             loanProductsRequest.setEnableInstallmentLevelDelinquency(true);
             loanProductsRequest.setDelinquencyBucketId(delinquencyBucketId.longValue());
             Long loanProductId = createLoanProduct(loanProductsRequest);
-
             Long loanId = applyAndApproveLoan(clientId, loanProductId, "06 May 2024", 1000.0, 4);
-
             verifyDelinquency(loanId, 0, "0.0", null, null);
-
             updateBusinessDate("17 June 2024");
-
             undoLoanApproval(loanId);
-
             verifyDelinquency(loanId, 0, "0.0", null, null);
-
             rejectLoan(loanId, "17 June 2024");
-
             verifyDelinquency(loanId, 0, "0.0", null, null);
         });
     }
@@ -74,40 +62,26 @@ public class LoanDelinquencyForNonActiveAccountsTest extends FeignLoanTestBase {
     public void testDelinquencyCalculationsForRejectedLoanAccountCOBTest() {
         runAt("06 May 2024", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-
             Long delinquencyBucketId = DelinquencyBucketsHelper.createBucket(List.of(//
-                    Pair.of(1, 10), //
-                    Pair.of(11, 30), //
-                    Pair.of(31, 60), //
-                    Pair.of(61, null)//
+            Pair.of(1, 10),  //
+            Pair.of(11, 30),  //
+            Pair.of(31, 60),  //
+            Pair.of(61, null)//
             ));
-
-            PostLoanProductsRequest loanProductsRequest = create1InstallmentAmountInMultiplesOf4Period1MonthLongWithInterestAndAmortizationProduct(
-                    InterestType.FLAT, AmortizationType.EQUAL_INSTALLMENTS);
+            PostLoanProductsRequest loanProductsRequest = create1InstallmentAmountInMultiplesOf4Period1MonthLongWithInterestAndAmortizationProduct(InterestType.FLAT, AmortizationType.EQUAL_INSTALLMENTS);
             loanProductsRequest.setEnableInstallmentLevelDelinquency(true);
             loanProductsRequest.setDelinquencyBucketId(delinquencyBucketId.longValue());
             Long loanProductId = createLoanProduct(loanProductsRequest);
-
             Long loanId = applyAndApproveLoan(clientId, loanProductId, "06 May 2024", 1000.0, 4);
-
             verifyDelinquency(loanId, 0, "0.0", null, null);
-
             updateBusinessDate("17 June 2024");
-
             undoLoanApproval(loanId);
-
             verifyDelinquency(loanId, 0, "0.0", null, null);
-
             rejectLoan(loanId, "17 June 2024");
-
             verifyDelinquency(loanId, 0, "0.0", null, null);
-
             updateBusinessDate("18 June 2024");
-
             schedulerHelper.executeAndAwaitJob("Loan COB");
-
             verifyDelinquency(loanId, 0, "0.0", null, null);
-
         });
     }
 
@@ -115,33 +89,23 @@ public class LoanDelinquencyForNonActiveAccountsTest extends FeignLoanTestBase {
     public void testDelinquencyCalculationsForClosedLoanAccount() {
         runAt("06 May 2024", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-
             Long delinquencyBucketId = DelinquencyBucketsHelper.createBucket(List.of(//
-                    Pair.of(1, 10), //
-                    Pair.of(11, 30), //
-                    Pair.of(31, 60), //
-                    Pair.of(61, null)//
+            Pair.of(1, 10),  //
+            Pair.of(11, 30),  //
+            Pair.of(31, 60),  //
+            Pair.of(61, null)//
             ));
-
-            PostLoanProductsRequest loanProductsRequest = create1InstallmentAmountInMultiplesOf4Period1MonthLongWithInterestAndAmortizationProduct(
-                    InterestType.FLAT, AmortizationType.EQUAL_INSTALLMENTS);
+            PostLoanProductsRequest loanProductsRequest = create1InstallmentAmountInMultiplesOf4Period1MonthLongWithInterestAndAmortizationProduct(InterestType.FLAT, AmortizationType.EQUAL_INSTALLMENTS);
             loanProductsRequest.setEnableInstallmentLevelDelinquency(true);
             loanProductsRequest.setDelinquencyBucketId(delinquencyBucketId.longValue());
             Long loanProductId = createLoanProduct(loanProductsRequest);
-
             Long loanId = applyAndApproveLoan(clientId, loanProductId, "06 May 2024", 1000.0, 4);
-
             verifyDelinquency(loanId, 0, "0.0", null, null);
-
             updateBusinessDate("17 June 2024");
-
             disburseLoan(loanId, BigDecimal.valueOf(1000), "06 May 2024");
-
-            verifyDelinquency(loanId, 12, "250.0", null, null, //
-                    delinquency(11, 30, "250.0"));
-
+            verifyDelinquency(loanId, 12, "250.0", null, null,  //
+            delinquency(11, 30, "250.0"));
             addRepaymentForLoan(loanId, 1000.0, "17 June 2024");
-
             verifyDelinquency(loanId, 0, "0.0", "17 June 2024", "1000.0");
         });
     }
@@ -150,82 +114,67 @@ public class LoanDelinquencyForNonActiveAccountsTest extends FeignLoanTestBase {
     public void testDelinquencyCalculationsForOverPaidLoanAccount() {
         runAt("06 May 2024", () -> {
             Long clientId = clientHelper.createClient(ClientHelper.defaultClientCreationRequest()).getClientId();
-
             Long delinquencyBucketId = DelinquencyBucketsHelper.createBucket(List.of(//
-                    Pair.of(1, 10), //
-                    Pair.of(11, 30), //
-                    Pair.of(31, 60), //
-                    Pair.of(61, null)//
+            Pair.of(1, 10),  //
+            Pair.of(11, 30),  //
+            Pair.of(31, 60),  //
+            Pair.of(61, null)//
             ));
-
-            PostLoanProductsRequest loanProductsRequest = create1InstallmentAmountInMultiplesOf4Period1MonthLongWithInterestAndAmortizationProduct(
-                    InterestType.FLAT, AmortizationType.EQUAL_INSTALLMENTS);
+            PostLoanProductsRequest loanProductsRequest = create1InstallmentAmountInMultiplesOf4Period1MonthLongWithInterestAndAmortizationProduct(InterestType.FLAT, AmortizationType.EQUAL_INSTALLMENTS);
             loanProductsRequest.setEnableInstallmentLevelDelinquency(true);
             loanProductsRequest.setDelinquencyBucketId(delinquencyBucketId.longValue());
             Long loanProductId = createLoanProduct(loanProductsRequest);
-
             Long loanId = applyAndApproveLoan(clientId, loanProductId, "06 May 2024", 1000.0, 4);
-
             verifyDelinquency(loanId, 0, "0.0", null, null);
-
             updateBusinessDate("17 June 2024");
-
             disburseLoan(loanId, BigDecimal.valueOf(1000), "06 May 2024");
-
-            verifyDelinquency(loanId, 12, "250.0", null, null, //
-                    delinquency(11, 30, "250.0"));
-
+            verifyDelinquency(loanId, 12, "250.0", null, null,  //
+            delinquency(11, 30, "250.0"));
             addRepaymentForLoan(loanId, 1200.0, "17 June 2024");
-
             verifyDelinquency(loanId, 0, "0.0", "17 June 2024", "1200.0");
         });
     }
 
-    private void verifyDelinquency(Long loanId, Integer loanLevelDelinquentDays, String loanLevelDelinquentAmount,
-            String expectedLastRepaymentDate, String expectedLastRepaymentAmount,
-            InstallmentLevelDelinquencyAPIIntegrationTests.DelinquencyData... expectedInstallmentLevelDelinquencyData) {
+    private void verifyDelinquency(Long loanId, Integer loanLevelDelinquentDays, String loanLevelDelinquentAmount, String expectedLastRepaymentDate, String expectedLastRepaymentAmount, InstallmentLevelDelinquencyAPIIntegrationTests.DelinquencyData... expectedInstallmentLevelDelinquencyData) {
         GetLoansLoanIdResponse loan = getLoanDetails(loanId);
         assertThat(loan.getDelinquent()).isNotNull();
-        List<GetLoansLoanIdLoanInstallmentLevelDelinquency> installmentLevelDelinquency = loan.getDelinquent()
-                .getInstallmentLevelDelinquency();
-
+        List<GetLoansLoanIdLoanInstallmentLevelDelinquency> installmentLevelDelinquency = loan.getDelinquent().getInstallmentLevelDelinquency();
         assertThat(loan.getDelinquent().getDelinquentDays()).isEqualTo(loanLevelDelinquentDays);
-        assertThat(Utils.getDoubleValue(loan.getDelinquent().getDelinquentAmount()))
-                .isEqualByComparingTo(Double.valueOf(loanLevelDelinquentAmount));
+        assertThat(Utils.getDoubleValue(loan.getDelinquent().getDelinquentAmount())).isEqualByComparingTo(Double.valueOf(loanLevelDelinquentAmount));
         if (expectedLastRepaymentDate != null && expectedLastRepaymentAmount != null) {
             assertThat(loan.getDelinquent().getLastRepaymentDate()).isNotNull();
             Assertions.assertEquals(expectedLastRepaymentDate, loan.getDelinquent().getLastRepaymentDate().format(dateTimeFormatter));
             assertThat(loan.getDelinquent().getLastRepaymentAmount()).isNotNull();
-            assertThat(Utils.getDoubleValue(loan.getDelinquent().getLastRepaymentAmount()))
-                    .isEqualByComparingTo(Double.valueOf(expectedLastRepaymentAmount));
+            assertThat(Utils.getDoubleValue(loan.getDelinquent().getLastRepaymentAmount())).isEqualByComparingTo(Double.valueOf(expectedLastRepaymentAmount));
         }
-
         if (expectedInstallmentLevelDelinquencyData != null && expectedInstallmentLevelDelinquencyData.length > 0) {
             assertThat(installmentLevelDelinquency).isNotNull();
             assertThat(installmentLevelDelinquency).hasSize(expectedInstallmentLevelDelinquencyData.length);
             for (int i = 0; i < expectedInstallmentLevelDelinquencyData.length; i++) {
-                assertThat(installmentLevelDelinquency.get(i).getMaximumAgeDays())
-                        .isEqualTo(expectedInstallmentLevelDelinquencyData[i].maxAgeDays);
-                assertThat(installmentLevelDelinquency.get(i).getMinimumAgeDays())
-                        .isEqualTo(expectedInstallmentLevelDelinquencyData[i].minAgeDays);
-                assertThat(installmentLevelDelinquency.get(i).getDelinquentAmount())
-                        .isEqualByComparingTo(expectedInstallmentLevelDelinquencyData[i].delinquentAmount);
+                assertThat(installmentLevelDelinquency.get(i).getMaximumAgeDays()).isEqualTo(expectedInstallmentLevelDelinquencyData[i].maxAgeDays);
+                assertThat(installmentLevelDelinquency.get(i).getMinimumAgeDays()).isEqualTo(expectedInstallmentLevelDelinquencyData[i].minAgeDays);
+                assertThat(installmentLevelDelinquency.get(i).getDelinquentAmount()).isEqualByComparingTo(expectedInstallmentLevelDelinquencyData[i].delinquentAmount);
             }
         } else {
             assertThat(installmentLevelDelinquency).isNull();
         }
     }
 
-    @AllArgsConstructor
-    public static class DelinquencyData {
 
+    public static class DelinquencyData {
         Integer minAgeDays;
         Integer maxAgeDays;
         BigDecimal delinquentAmount;
+
+        @java.lang.SuppressWarnings("all")
+                public DelinquencyData(final Integer minAgeDays, final Integer maxAgeDays, final BigDecimal delinquentAmount) {
+            this.minAgeDays = minAgeDays;
+            this.maxAgeDays = maxAgeDays;
+            this.delinquentAmount = delinquentAmount;
+        }
     }
 
-    private static InstallmentLevelDelinquencyAPIIntegrationTests.DelinquencyData delinquency(Integer minAgeDays, Integer maxAgeDays,
-            String delinquentAmount) {
+    private static InstallmentLevelDelinquencyAPIIntegrationTests.DelinquencyData delinquency(Integer minAgeDays, Integer maxAgeDays, String delinquentAmount) {
         return new InstallmentLevelDelinquencyAPIIntegrationTests.DelinquencyData(minAgeDays, maxAgeDays, new BigDecimal(delinquentAmount));
     }
 }

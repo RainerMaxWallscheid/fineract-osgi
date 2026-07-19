@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.configuration.service;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
@@ -31,9 +30,7 @@ import org.springframework.stereotype.Component;
  * Loan.java) and we dont need this workaround anymore
  */
 @Component
-@RequiredArgsConstructor
 public class TemporaryConfigurationServiceContainer implements InitializingBean {
-
     private static volatile ConfigurationDomainService STATIC_REF_CONFIGURATION_SERVICE;
     private final ConfigurationDomainService configurationDomainService;
 
@@ -50,5 +47,10 @@ public class TemporaryConfigurationServiceContainer implements InitializingBean 
     @Override
     public void afterPropertiesSet() throws Exception {
         TemporaryConfigurationServiceContainer.STATIC_REF_CONFIGURATION_SERVICE = configurationDomainService;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TemporaryConfigurationServiceContainer(final ConfigurationDomainService configurationDomainService) {
+        this.configurationDomainService = configurationDomainService;
     }
 }

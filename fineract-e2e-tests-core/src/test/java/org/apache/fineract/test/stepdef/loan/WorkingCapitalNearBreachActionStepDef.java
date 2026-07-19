@@ -21,15 +21,12 @@ package org.apache.fineract.test.stepdef.loan;
 import static org.apache.fineract.client.feign.util.FeignCalls.fail;
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
 import static org.assertj.core.api.Assertions.assertThat;
-
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.PostWorkingCapitalLoansLoanIdNearBreachActionsRequest;
@@ -38,10 +35,9 @@ import org.apache.fineract.client.models.WorkingCapitalLoanNearBreachActionData;
 import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 
-@Slf4j
-@RequiredArgsConstructor
 public class WorkingCapitalNearBreachActionStepDef extends AbstractStepDef {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WorkingCapitalNearBreachActionStepDef.class);
     private final FineractFeignClient fineractClient;
 
     @When("Admin creates a near breach reschedule action with threshold {string} frequency {int} frequencyType {string}")
@@ -49,24 +45,20 @@ public class WorkingCapitalNearBreachActionStepDef extends AbstractStepDef {
         final Long loanId = extractLoanId();
         final PostWorkingCapitalLoansLoanIdNearBreachActionsRequest request = buildRequest(threshold, frequency, frequencyType);
         ok(() -> fineractClient.workingCapitalLoanNearBreachActions().createWorkingCapitalLoanNearBreachActionById(loanId, request));
-        log.info("Created near breach reschedule action for loan {} with threshold={} frequency={} frequencyType={}", loanId, threshold,
-                frequency, frequencyType);
+        log.info("Created near breach reschedule action for loan {} with threshold={} frequency={} frequencyType={}", loanId, threshold, frequency, frequencyType);
     }
 
     @When("Admin creates a near breach reschedule action with threshold {string} frequency {int} frequencyType {string} expecting error:")
-    public void createNearBreachRescheduleActionExpectingError(final String threshold, final int frequency, final String frequencyType,
-            final DataTable table) {
+    public void createNearBreachRescheduleActionExpectingError(final String threshold, final int frequency, final String frequencyType, final DataTable table) {
         final Long loanId = extractLoanId();
         final PostWorkingCapitalLoansLoanIdNearBreachActionsRequest request = buildRequest(threshold, frequency, frequencyType);
         final Map<String, String> expectedData = table.asMaps().get(0);
         final int expectedHttpCode = Integer.parseInt(expectedData.get("httpCode"));
         final String expectedErrorMessage = expectedData.get("errorMessage").trim();
-        final CallFailedRuntimeException exception = fail(
-                () -> fineractClient.workingCapitalLoanNearBreachActions().createWorkingCapitalLoanNearBreachActionById(loanId, request));
+        final CallFailedRuntimeException exception = fail(() -> fineractClient.workingCapitalLoanNearBreachActions().createWorkingCapitalLoanNearBreachActionById(loanId, request));
         assertHttpStatus(exception, expectedHttpCode);
         assertErrorMessage(exception, expectedErrorMessage);
-        log.info("Verified near breach reschedule action on loan {} failed with status {} and message: {}", loanId, exception.getStatus(),
-                expectedErrorMessage);
+        log.info("Verified near breach reschedule action on loan {} failed with status {} and message: {}", loanId, exception.getStatus(), expectedErrorMessage);
     }
 
     @Then("Near breach action history has {int} entry")
@@ -82,48 +74,34 @@ public class WorkingCapitalNearBreachActionStepDef extends AbstractStepDef {
     public void verifyNearBreachActionHistory(final DataTable dataTable) {
         final Long loanId = extractLoanId();
         final List<WorkingCapitalLoanNearBreachActionData> history = retrieveNearBreachActionHistory(loanId);
-
         final List<List<String>> rows = dataTable.asLists();
         final List<String> headers = rows.getFirst();
         final List<List<String>> expectedData = rows.subList(1, rows.size());
-
         assertThat(history).as("Near breach action history size should match expected data").hasSize(expectedData.size());
-
         for (int i = 0; i < expectedData.size(); i++) {
             final List<String> expectedRow = expectedData.get(i);
             final WorkingCapitalLoanNearBreachActionData actual = history.get(i);
-
             for (int j = 0; j < headers.size(); j++) {
                 final String header = headers.get(j);
                 final String expectedValue = expectedRow.get(j);
                 verifyActionField(actual, header, expectedValue, i + 1);
             }
         }
-
         log.info("Successfully verified {} near breach action history entries for loan {}", history.size(), loanId);
     }
 
-    private void verifyActionField(final WorkingCapitalLoanNearBreachActionData actual, final String fieldName, final String expectedValue,
-            final int rowNumber) {
+    private void verifyActionField(final WorkingCapitalLoanNearBreachActionData actual, final String fieldName, final String expectedValue, final int rowNumber) {
         switch (fieldName) {
-            case "action" -> assertThat(actual.getAction()).as("Action for row %d", rowNumber)
-                    .isEqualTo(WorkingCapitalLoanNearBreachActionData.ActionEnum.fromValue(expectedValue));
-            case "threshold" ->
-                assertThat(actual.getThreshold()).as("Threshold for row %d", rowNumber).isEqualByComparingTo(new BigDecimal(expectedValue));
-            case "frequency" ->
-                assertThat(actual.getFrequency()).as("Frequency for row %d", rowNumber).isEqualTo(Integer.parseInt(expectedValue));
-            case "frequencyType" ->
-                assertThat(actual.getFrequencyType()).as("FrequencyType for row %d", rowNumber).isEqualTo(expectedValue);
+            case "action" -> assertThat(actual.getAction()).as("Action for row %d", rowNumber).isEqualTo(WorkingCapitalLoanNearBreachActionData.ActionEnum.fromValue(expectedValue));
+            case "threshold" -> assertThat(actual.getThreshold()).as("Threshold for row %d", rowNumber).isEqualByComparingTo(new BigDecimal(expectedValue));
+            case "frequency" -> assertThat(actual.getFrequency()).as("Frequency for row %d", rowNumber).isEqualTo(Integer.parseInt(expectedValue));
+            case "frequencyType" -> assertThat(actual.getFrequencyType()).as("FrequencyType for row %d", rowNumber).isEqualTo(expectedValue);
             default -> throw new IllegalArgumentException("Unknown near breach action field: " + fieldName);
         }
     }
 
-    private PostWorkingCapitalLoansLoanIdNearBreachActionsRequest buildRequest(final String threshold, final int frequency,
-            final String frequencyType) {
-        return new PostWorkingCapitalLoansLoanIdNearBreachActionsRequest()
-                .action(PostWorkingCapitalLoansLoanIdNearBreachActionsRequest.ActionEnum.RESCHEDULE)
-                .nearBreachThreshold(new BigDecimal(threshold)).nearBreachFrequency(frequency).nearBreachFrequencyType(
-                        PostWorkingCapitalLoansLoanIdNearBreachActionsRequest.NearBreachFrequencyTypeEnum.fromValue(frequencyType));
+    private PostWorkingCapitalLoansLoanIdNearBreachActionsRequest buildRequest(final String threshold, final int frequency, final String frequencyType) {
+        return new PostWorkingCapitalLoansLoanIdNearBreachActionsRequest().action(PostWorkingCapitalLoansLoanIdNearBreachActionsRequest.ActionEnum.RESCHEDULE).nearBreachThreshold(new BigDecimal(threshold)).nearBreachFrequency(frequency).nearBreachFrequencyType(PostWorkingCapitalLoansLoanIdNearBreachActionsRequest.NearBreachFrequencyTypeEnum.fromValue(frequencyType));
     }
 
     private Long extractLoanId() {
@@ -140,9 +118,13 @@ public class WorkingCapitalNearBreachActionStepDef extends AbstractStepDef {
     }
 
     private List<WorkingCapitalLoanNearBreachActionData> retrieveNearBreachActionHistory(final Long loanId) {
-        final List<WorkingCapitalLoanNearBreachActionData> history = ok(
-                () -> fineractClient.workingCapitalLoanNearBreachActions().getWorkingCapitalLoanNearBreachActionsById(loanId));
+        final List<WorkingCapitalLoanNearBreachActionData> history = ok(() -> fineractClient.workingCapitalLoanNearBreachActions().getWorkingCapitalLoanNearBreachActionsById(loanId));
         log.debug("Near breach action history for loan {}: {}", loanId, history);
         return history;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalNearBreachActionStepDef(final FineractFeignClient fineractClient) {
+        this.fineractClient = fineractClient;
     }
 }

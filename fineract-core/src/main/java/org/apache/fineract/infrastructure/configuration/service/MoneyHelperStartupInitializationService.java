@@ -19,8 +19,6 @@
 package org.apache.fineract.infrastructure.configuration.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.tenant.TenantDetailsService;
 import org.springframework.beans.factory.InitializingBean;
@@ -32,11 +30,10 @@ import org.springframework.stereotype.Service;
  * is fully started to ensure all database migrations and tenant configurations are complete.
  */
 @Service
-@Slf4j
-@RequiredArgsConstructor
-@DependsOn({ "tenantDetailsService", "moneyHelperInitializationService", "tenantDatabaseUpgradeService" })
+@DependsOn({"tenantDetailsService", "moneyHelperInitializationService", "tenantDatabaseUpgradeService"})
 public class MoneyHelperStartupInitializationService implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MoneyHelperStartupInitializationService.class);
     private final TenantDetailsService tenantDetailsService;
     private final MoneyHelperInitializationService moneyHelperInitializationService;
 
@@ -45,18 +42,15 @@ public class MoneyHelperStartupInitializationService implements InitializingBean
      * ApplicationReadyEvent to ensure all database migrations and tenant configurations are complete.
      *
      * If it fails (for any reason), it will fail the application startup!
-     *
      */
     @Override
     public void afterPropertiesSet() throws Exception {
         log.info("Starting MoneyHelper initialization for all tenants...");
-
         List<FineractPlatformTenant> tenants = tenantDetailsService.findAllTenants();
         if (tenants.isEmpty()) {
             log.warn("No tenants found during MoneyHelper initialization");
             return;
         }
-
         for (FineractPlatformTenant tenant : tenants) {
             String tenantIdentifier = tenant.getTenantIdentifier();
             // Check if already initialized (in case of restart scenarios)
@@ -68,5 +62,11 @@ public class MoneyHelperStartupInitializationService implements InitializingBean
             moneyHelperInitializationService.initializeTenantRoundingMode(tenant);
         }
         log.info("MoneyHelper initialization completed");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MoneyHelperStartupInitializationService(final TenantDetailsService tenantDetailsService, final MoneyHelperInitializationService moneyHelperInitializationService) {
+        this.tenantDetailsService = tenantDetailsService;
+        this.moneyHelperInitializationService = moneyHelperInitializationService;
     }
 }

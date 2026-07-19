@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "SAVINGSACCOUNT", action = "REMOVESAVINGSOFFICER")
-@RequiredArgsConstructor
 public class RemoveSavingsOfficerCommandHandler implements NewCommandSourceHandler {
-
     private final SavingsAccountWritePlatformService savingsWritePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class RemoveSavingsOfficerCommandHandler implements NewCommandSourceHandl
         return this.savingsWritePlatformService.unassignFieldOfficer(command.entityId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public RemoveSavingsOfficerCommandHandler(final SavingsAccountWritePlatformService savingsWritePlatformService) {
+        this.savingsWritePlatformService = savingsWritePlatformService;
+    }
 }

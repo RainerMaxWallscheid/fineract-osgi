@@ -22,15 +22,12 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 
 /**
  * Immutable data object for office data.
  */
-@Getter
 public class OfficeData implements Serializable {
-
     private final Long id;
     private final String name;
     private final String nameDecorated;
@@ -40,14 +37,12 @@ public class OfficeData implements Serializable {
     private final Long parentId;
     private final String parentName;
     private final Collection<OfficeData> allowedParents;
-
     // import fields
     private transient Integer rowIndex;
     private String locale;
     private String dateFormat;
 
-    public static OfficeData importInstance(final String name, final Long parentId, final LocalDate openingDate,
-            final ExternalId externalId) {
+    public static OfficeData importInstance(final String name, final Long parentId, final LocalDate openingDate, final ExternalId externalId) {
         return new OfficeData(null, name, null, externalId, openingDate, null, parentId, null, null);
     }
 
@@ -70,13 +65,10 @@ public class OfficeData implements Serializable {
     }
 
     public static OfficeData appendedTemplate(final OfficeData office, final Collection<OfficeData> allowedParents) {
-        return new OfficeData(office.id, office.name, office.nameDecorated, office.externalId, office.openingDate, office.hierarchy,
-                office.parentId, office.parentName, allowedParents);
+        return new OfficeData(office.id, office.name, office.nameDecorated, office.externalId, office.openingDate, office.hierarchy, office.parentId, office.parentName, allowedParents);
     }
 
-    public OfficeData(final Long id, final String name, final String nameDecorated, final ExternalId externalId,
-            final LocalDate openingDate, final String hierarchy, final Long parentId, final String parentName,
-            final Collection<OfficeData> allowedParents) {
+    public OfficeData(final Long id, final String name, final String nameDecorated, final ExternalId externalId, final LocalDate openingDate, final String hierarchy, final Long parentId, final String parentName, final Collection<OfficeData> allowedParents) {
         this.id = id;
         this.name = name;
         this.nameDecorated = nameDecorated;
@@ -90,5 +82,65 @@ public class OfficeData implements Serializable {
 
     public boolean hasIdentifyOf(final Long officeId) {
         return this.id.equals(officeId);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getNameDecorated() {
+        return this.nameDecorated;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalId getExternalId() {
+        return this.externalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getOpeningDate() {
+        return this.openingDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHierarchy() {
+        return this.hierarchy;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getParentId() {
+        return this.parentId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getParentName() {
+        return this.parentName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<OfficeData> getAllowedParents() {
+        return this.allowedParents;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getRowIndex() {
+        return this.rowIndex;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLocale() {
+        return this.locale;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDateFormat() {
+        return this.dateFormat;
     }
 }

@@ -22,26 +22,16 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.security.constants.TwoFactorConfigurationConstants;
 
 @Entity
-@Table(name = "twofactor_configuration", uniqueConstraints = { @UniqueConstraint(columnNames = { "name" }, name = "name_UNIQUE") })
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
+@Table(name = "twofactor_configuration", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"}, name = "name_UNIQUE")})
 public class TwoFactorConfiguration extends AbstractPersistableCustom<Long> {
-
     @Column(name = "name", nullable = false, length = 32)
     private String name;
-
     @Column(name = "value", nullable = true, length = 1024)
     private String value;
 
@@ -52,7 +42,38 @@ public class TwoFactorConfiguration extends AbstractPersistableCustom<Long> {
         if (TwoFactorConfigurationConstants.BOOLEAN_PARAMETERS.contains(name)) {
             return BooleanUtils.toBooleanObject(value);
         }
-
         return getValue();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getValue() {
+        return this.value;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public TwoFactorConfiguration setName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public TwoFactorConfiguration setValue(final String value) {
+        this.value = value;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TwoFactorConfiguration() {
     }
 }

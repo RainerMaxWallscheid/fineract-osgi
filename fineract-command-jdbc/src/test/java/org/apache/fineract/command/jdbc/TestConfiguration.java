@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.command.jdbc;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.CommandProperties;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -27,11 +26,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
-@Slf4j
 @Configuration
-@EnableConfigurationProperties({ CommandProperties.class, JdbcCommandProperties.class })
+@EnableConfigurationProperties({CommandProperties.class, JdbcCommandProperties.class})
 @EnableAutoConfiguration
-@EnableJdbcRepositories(basePackages = { "org.apache.fineract.command.jdbc.store.domain" })
+@EnableJdbcRepositories(basePackages = {"org.apache.fineract.command.jdbc.store.domain"})
 @PropertySource("classpath:application-test.properties")
 @ComponentScan("org.apache.fineract.command.jdbc.store")
-public class TestConfiguration {}
+public class TestConfiguration {
+	@java.lang.SuppressWarnings("all")
+		private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TestConfiguration.class);
+}

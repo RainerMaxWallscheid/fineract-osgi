@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.security.converter;
 
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.security.data.FineractJwtAuthenticationToken;
 import org.apache.fineract.infrastructure.security.service.TenantAwareJpaPlatformUserDetailsService;
 import org.springframework.core.convert.converter.Converter;
@@ -33,9 +32,7 @@ import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
-@RequiredArgsConstructor
 public class FineractJwtAuthenticationTokenConverter implements Converter<Jwt, FineractJwtAuthenticationToken> {
-
     private final TenantAwareJpaPlatformUserDetailsService userDetailsService;
 
     @Override
@@ -48,5 +45,10 @@ public class FineractJwtAuthenticationTokenConverter implements Converter<Jwt, F
         } catch (UsernameNotFoundException ex) {
             throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN), ex);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FineractJwtAuthenticationTokenConverter(final TenantAwareJpaPlatformUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 }

@@ -27,9 +27,6 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.accounting.closure.api.GLClosureJsonInputParams;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -37,22 +34,15 @@ import org.apache.fineract.infrastructure.core.domain.AbstractAuditableCustom;
 import org.apache.fineract.organisation.office.domain.Office;
 
 @Entity
-@Table(name = "acc_gl_closure", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "office_id", "closing_date" }, name = "office_id_closing_date") })
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
+@Table(name = "acc_gl_closure", uniqueConstraints = {@UniqueConstraint(columnNames = {"office_id", "closing_date"}, name = "office_id_closing_date")})
 public class GLClosure extends AbstractAuditableCustom {
-
     @ManyToOne
     @JoinColumn(name = "office_id", nullable = false)
     private Office office;
-
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = true;
-
     @Column(name = "closing_date")
     private LocalDate closingDate;
-
     @Column(name = "comments", nullable = true, length = 500)
     private String comments;
 
@@ -78,8 +68,7 @@ public class GLClosure extends AbstractAuditableCustom {
         return actualChanges;
     }
 
-    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName,
-            final String propertyToBeUpdated) {
+    private void handlePropertyUpdate(final JsonCommand command, final Map<String, Object> actualChanges, final String paramName, final String propertyToBeUpdated) {
         if (command.isChangeInStringParameterNamed(paramName, propertyToBeUpdated)) {
             final String newValue = command.stringValueOfParameterNamed(paramName);
             actualChanges.put(paramName, newValue);
@@ -90,4 +79,27 @@ public class GLClosure extends AbstractAuditableCustom {
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        protected GLClosure() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Office getOffice() {
+        return this.office;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isDeleted() {
+        return this.deleted;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getClosingDate() {
+        return this.closingDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getComments() {
+        return this.comments;
+    }
 }

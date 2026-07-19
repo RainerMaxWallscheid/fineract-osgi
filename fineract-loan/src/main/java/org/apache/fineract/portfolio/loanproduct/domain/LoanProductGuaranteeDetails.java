@@ -24,8 +24,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 /**
@@ -33,23 +31,16 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
  *
  * @author conflux
  */
-
-@Getter
-@Setter
 @Entity
 @Table(name = "m_product_loan_guarantee_details")
 public class LoanProductGuaranteeDetails extends AbstractPersistableCustom<Long> {
-
     @OneToOne
     @JoinColumn(name = "loan_product_id", nullable = false)
     private LoanProduct loanProduct;
-
     @Column(name = "mandatory_guarantee", scale = 6, precision = 19, nullable = false)
     private BigDecimal mandatoryGuarantee;
-
     @Column(name = "minimum_guarantee_from_own_funds", scale = 6, precision = 19)
     private BigDecimal minimumGuaranteeFromOwnFunds;
-
     @Column(name = "minimum_guarantee_from_guarantor_funds", scale = 6, precision = 19)
     private BigDecimal minimumGuaranteeFromGuarantor;
 
@@ -57,8 +48,7 @@ public class LoanProductGuaranteeDetails extends AbstractPersistableCustom<Long>
         //
     }
 
-    public LoanProductGuaranteeDetails(final BigDecimal mandatoryGuarantee, final BigDecimal minimumGuaranteeFromOwnFunds,
-            final BigDecimal minimumGuaranteeFromGuarantor) {
+    public LoanProductGuaranteeDetails(final BigDecimal mandatoryGuarantee, final BigDecimal minimumGuaranteeFromOwnFunds, final BigDecimal minimumGuaranteeFromGuarantor) {
         this.mandatoryGuarantee = mandatoryGuarantee;
         this.minimumGuaranteeFromGuarantor = minimumGuaranteeFromGuarantor;
         this.minimumGuaranteeFromOwnFunds = minimumGuaranteeFromOwnFunds;
@@ -68,4 +58,43 @@ public class LoanProductGuaranteeDetails extends AbstractPersistableCustom<Long>
         this.loanProduct = loanProduct;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanProduct getLoanProduct() {
+        return this.loanProduct;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getMandatoryGuarantee() {
+        return this.mandatoryGuarantee;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getMinimumGuaranteeFromOwnFunds() {
+        return this.minimumGuaranteeFromOwnFunds;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getMinimumGuaranteeFromGuarantor() {
+        return this.minimumGuaranteeFromGuarantor;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanProduct(final LoanProduct loanProduct) {
+        this.loanProduct = loanProduct;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMandatoryGuarantee(final BigDecimal mandatoryGuarantee) {
+        this.mandatoryGuarantee = mandatoryGuarantee;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMinimumGuaranteeFromOwnFunds(final BigDecimal minimumGuaranteeFromOwnFunds) {
+        this.minimumGuaranteeFromOwnFunds = minimumGuaranteeFromOwnFunds;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMinimumGuaranteeFromGuarantor(final BigDecimal minimumGuaranteeFromGuarantor) {
+        this.minimumGuaranteeFromGuarantor = minimumGuaranteeFromGuarantor;
+    }
 }

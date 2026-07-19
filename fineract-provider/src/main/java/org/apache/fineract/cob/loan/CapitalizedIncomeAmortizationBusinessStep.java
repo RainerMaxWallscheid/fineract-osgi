@@ -19,8 +19,6 @@
 package org.apache.fineract.cob.loan;
 
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.service.LoanCapitalizedIncomeAmortizationProcessingService;
@@ -28,19 +26,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class CapitalizedIncomeAmortizationBusinessStep implements LoanCOBBusinessStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CapitalizedIncomeAmortizationBusinessStep.class);
     private final LoanCapitalizedIncomeAmortizationProcessingService loanCapitalizedIncomeAmortizationProcessingService;
 
     @Transactional
     @Override
     public Loan execute(Loan loan) {
         LocalDate businessDate = DateUtils.getBusinessLocalDate();
-
         loanCapitalizedIncomeAmortizationProcessingService.processCapitalizedIncomeAmortizationTillDate(loan, businessDate, true);
-
         return loan;
     }
 
@@ -52,5 +47,10 @@ public class CapitalizedIncomeAmortizationBusinessStep implements LoanCOBBusines
     @Override
     public String getHumanReadableName() {
         return "Capitalized income amortization";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CapitalizedIncomeAmortizationBusinessStep(final LoanCapitalizedIncomeAmortizationProcessingService loanCapitalizedIncomeAmortizationProcessingService) {
+        this.loanCapitalizedIncomeAmortizationProcessingService = loanCapitalizedIncomeAmortizationProcessingService;
     }
 }

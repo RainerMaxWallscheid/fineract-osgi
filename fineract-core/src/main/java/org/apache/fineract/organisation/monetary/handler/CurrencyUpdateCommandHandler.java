@@ -19,8 +19,6 @@
 package org.apache.fineract.organisation.monetary.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.organisation.monetary.data.CurrencyUpdateRequest;
@@ -29,11 +27,10 @@ import org.apache.fineract.organisation.monetary.service.CurrencyWritePlatformSe
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class CurrencyUpdateCommandHandler implements CommandHandler<CurrencyUpdateRequest, CurrencyUpdateResponse> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CurrencyUpdateCommandHandler.class);
     private final CurrencyWritePlatformService writePlatformService;
 
     @Retry(name = "commandCurrencyUpdate", fallbackMethod = "fallback")
@@ -47,5 +44,10 @@ public class CurrencyUpdateCommandHandler implements CommandHandler<CurrencyUpda
     public CurrencyUpdateResponse fallback(Command<CurrencyUpdateRequest> command, Throwable t) {
         // NOTE: fallback method needs to be in the same class
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CurrencyUpdateCommandHandler(final CurrencyWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

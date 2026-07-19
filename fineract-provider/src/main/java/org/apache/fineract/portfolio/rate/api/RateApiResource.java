@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.rate.api;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +32,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -48,15 +46,11 @@ import org.springframework.stereotype.Component;
 /**
  * Bowpi GT Created by Jose on 19/07/2017.
  */
-
 @Path("/v1/rates")
 @Component
 @Tag(name = "Rate", description = "")
-@RequiredArgsConstructor
 public class RateApiResource {
-
-    private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(
-            Arrays.asList("id", "name", "percentage", "productApply", "active"));
+    private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "name", "percentage", "productApply", "active"));
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "RATE";
     private final PlatformSecurityContext context;
     private final RateReadService readPlatformService;
@@ -65,48 +59,47 @@ public class RateApiResource {
 
     @GET
     @Path("{rateId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve a rate", operationId = "retrieveOneRate")
     @AlternativeOperationId("retrieveRate")
     public RateData retrieveRate(@PathParam("rateId") Long rateId) {
-
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
         return this.readPlatformService.retrieveOne(rateId);
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create a rate", operationId = "createRate")
     public CommandProcessingResult createRate(final RateRequest rateRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createRate().withJson(toApiJsonSerializer.serialize(rateRequest))
-                .build();
-
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createRate().withJson(toApiJsonSerializer.serialize(rateRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "List all rates", operationId = "retrieveAllRates")
     @AlternativeOperationId("getAllRates")
     public List<RateData> getAllRates() {
-
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
         return readPlatformService.retrieveAllRates();
     }
 
     @PUT
     @Path("{rateId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a rate", operationId = "updateRate")
     public CommandProcessingResult updateRate(@PathParam("rateId") Long rateId, final RateRequest rateRequest) {
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateRate(rateId)
-                .withJson(toApiJsonSerializer.serialize(rateRequest)).build();
-
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateRate(rateId).withJson(toApiJsonSerializer.serialize(rateRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public RateApiResource(final PlatformSecurityContext context, final RateReadService readPlatformService, final DefaultToApiJsonSerializer<RateData> toApiJsonSerializer, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.context = context;
+        this.readPlatformService = readPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+    }
 }

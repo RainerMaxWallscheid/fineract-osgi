@@ -20,23 +20,20 @@ package org.apache.fineract.test.initializer.suite;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.executeVoid;
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
-
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.ExecuteJobRequest;
 import org.apache.fineract.client.models.GetJobsResponse;
 import org.apache.fineract.client.models.PutJobsJobIDRequest;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 public class JobSuiteInitializerStep implements FineractSuiteInitializerStep {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JobSuiteInitializerStep.class);
     public static final String SEND_ASYNCHRONOUS_EVENTS_JOB_NAME = "Send Asynchronous Events";
     public static final String EVERY_1_SECONDS = "0/1 * * * * ?";
     public static final String EVERY_60_SECONDS = "0 0/1 * * * ?";
-
     private final FineractFeignClient fineractClient;
 
     public JobSuiteInitializerStep(FineractFeignClient fineractClient) {
@@ -56,22 +53,18 @@ public class JobSuiteInitializerStep implements FineractSuiteInitializerStep {
         log.debug("=== Initializing Send Asynchronous Events job ===");
         Long jobId = updateExternalEventJobFrequency(EVERY_1_SECONDS);
         log.debug("=== Updated cron expression to EVERY_1_SECONDS ===");
-
         // CRITICAL: SchedulerGlobalInitializerStep stops the scheduler globally
         // Solution: START the scheduler so the job runs every 1 second automatically
         log.debug("Starting scheduler to enable automatic job execution every 1 second...");
         executeVoid(() -> fineractClient.scheduler().handleCommandsScheduler("start", Map.of()));
         log.debug("Scheduler started successfully");
-
         // Manually execute once immediately to publish any queued events from initialization
-        log.debug("Manually executing '{}' job once to publish queued events...", SEND_ASYNCHRONOUS_EVENTS_JOB_NAME);
+        log.debug("Manually executing \'{}\' job once to publish queued events...", SEND_ASYNCHRONOUS_EVENTS_JOB_NAME);
         executeVoid(() -> fineractClient.schedulerJob().executeJob(jobId, new ExecuteJobRequest(), Map.of("command", "executeJob")));
-
         // Poll job history to confirm it ran
         log.debug("Polling job history to confirm initial execution...");
         Long initialRunCount = getJobRunCount(jobId);
         log.debug("Initial job run count: {}", initialRunCount);
-
         boolean jobRan = false;
         for (int i = 0; i < 30; i++) {
             Thread.sleep(200);
@@ -82,11 +75,9 @@ public class JobSuiteInitializerStep implements FineractSuiteInitializerStep {
                 break;
             }
         }
-
         if (!jobRan) {
             log.warn("WARNING: Job execution could not be confirmed via history polling");
         }
-
         // Wait for events to propagate to ActiveMQ
         log.debug("Waiting 1 second for event propagation to ActiveMQ...");
         Thread.sleep(1000);
@@ -106,7 +97,6 @@ public class JobSuiteInitializerStep implements FineractSuiteInitializerStep {
     @Override
     public void resetAfterSuite() {
         log.debug("=== JobSuiteInitializerStep.resetAfterSuite() - START ===");
-
         // Stop the scheduler to prevent jobs from running between test suites
         log.debug("Stopping scheduler...");
         try {
@@ -115,16 +105,13 @@ public class JobSuiteInitializerStep implements FineractSuiteInitializerStep {
         } catch (Exception e) {
             log.warn("Failed to stop scheduler: {}", e.getMessage());
         }
-
         // Reset cron expression to default
         updateExternalEventJobFrequency(EVERY_60_SECONDS);
         log.debug("=== JobSuiteInitializerStep.resetAfterSuite() - COMPLETED ===");
     }
 
     private Long updateExternalEventJobFrequency(String cronExpression) {
-        GetJobsResponse externalEventJobResponse = ok(() -> fineractClient.schedulerJob().retrieveAllSchedulerJobs()).stream()
-                .filter(r -> r.getDisplayName().equals(SEND_ASYNCHRONOUS_EVENTS_JOB_NAME)).findAny()
-                .orElseThrow(() -> new IllegalStateException(SEND_ASYNCHRONOUS_EVENTS_JOB_NAME + " is not found"));
+        GetJobsResponse externalEventJobResponse = ok(() -> fineractClient.schedulerJob().retrieveAllSchedulerJobs()).stream().filter(r -> r.getDisplayName().equals(SEND_ASYNCHRONOUS_EVENTS_JOB_NAME)).findAny().orElseThrow(() -> new IllegalStateException(SEND_ASYNCHRONOUS_EVENTS_JOB_NAME + " is not found"));
         Long jobId = externalEventJobResponse.getJobId();
         executeVoid(() -> fineractClient.schedulerJob().updateJobDetail(jobId, new PutJobsJobIDRequest().cronExpression(cronExpression)));
         return jobId;

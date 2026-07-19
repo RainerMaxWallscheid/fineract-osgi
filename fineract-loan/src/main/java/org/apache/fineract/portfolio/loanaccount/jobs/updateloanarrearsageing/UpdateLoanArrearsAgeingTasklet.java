@@ -18,17 +18,14 @@
  */
 package org.apache.fineract.portfolio.loanaccount.jobs.updateloanarrearsageing;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class UpdateLoanArrearsAgeingTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UpdateLoanArrearsAgeingTasklet.class);
     private final LoanArrearsAgeingUpdateHandler loanArrearsAgeingUpdateHandler;
 
     @Override
@@ -37,4 +34,8 @@ public class UpdateLoanArrearsAgeingTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public UpdateLoanArrearsAgeingTasklet(final LoanArrearsAgeingUpdateHandler loanArrearsAgeingUpdateHandler) {
+        this.loanArrearsAgeingUpdateHandler = loanArrearsAgeingUpdateHandler;
+    }
 }

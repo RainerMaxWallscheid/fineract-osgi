@@ -19,20 +19,16 @@
 package org.apache.fineract.command.jdbc.store.mapping;
 
 import static org.apache.fineract.command.core.CommandConstants.COMMAND_JSON_CLASS_ATTRIBUTE;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public final class CommandJsonMapper {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CommandJsonMapper.class);
     private final ObjectMapper mapper;
 
     @SuppressWarnings("unchecked")
@@ -40,15 +36,12 @@ public final class CommandJsonMapper {
         if (source == null) {
             return null;
         }
-
         var canonicalName = source.get(COMMAND_JSON_CLASS_ATTRIBUTE).asText();
-
         try {
             return (T) mapper.convertValue(source, Class.forName(canonicalName));
         } catch (Exception e) {
             log.error("Error while mapping json node", e);
         }
-
         return null;
     }
 
@@ -56,11 +49,13 @@ public final class CommandJsonMapper {
         if (source == null) {
             return null;
         }
-
         var json = mapper.convertValue(source, ObjectNode.class);
-
         json.set(COMMAND_JSON_CLASS_ATTRIBUTE, new TextNode(source.getClass().getCanonicalName()));
-
         return json;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CommandJsonMapper(final ObjectMapper mapper) {
+        this.mapper = mapper;
     }
 }

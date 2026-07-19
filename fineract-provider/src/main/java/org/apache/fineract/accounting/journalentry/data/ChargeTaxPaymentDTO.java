@@ -19,15 +19,38 @@
 package org.apache.fineract.accounting.journalentry.data;
 
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-@Getter
 public class ChargeTaxPaymentDTO {
-
     private final Long loanChargeId;
     private final Long creditAccountId;
     private final BigDecimal amount;
     private final boolean penalty;
+
+    @java.lang.SuppressWarnings("all")
+        public ChargeTaxPaymentDTO(final Long loanChargeId, final Long creditAccountId, final BigDecimal amount, final boolean penalty) {
+        this.loanChargeId = loanChargeId;
+        this.creditAccountId = creditAccountId;
+        this.amount = amount;
+        this.penalty = penalty;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanChargeId() {
+        return this.loanChargeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getCreditAccountId() {
+        return this.creditAccountId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isPenalty() {
+        return this.penalty;
+    }
 }

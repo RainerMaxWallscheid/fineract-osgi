@@ -22,8 +22,6 @@ import jakarta.annotation.PostConstruct;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.command.core.CommandHandlerManager;
@@ -35,13 +33,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @ConditionalOnMissingBean(value = CommandHandlerManager.class, ignored = DefaultCommandHandlerManager.class)
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class DefaultCommandHandlerManager implements CommandHandlerManager {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DefaultCommandHandlerManager.class);
     private final List<CommandHandler> handlers;
 
     @PostConstruct
@@ -52,7 +49,6 @@ public class DefaultCommandHandlerManager implements CommandHandlerManager {
     @Override
     public <REQ, RES> RES handle(Command<REQ> command) {
         CommandHandler<REQ, RES> handler = lookup(command);
-
         return handler.handle(command);
     }
 
@@ -60,34 +56,28 @@ public class DefaultCommandHandlerManager implements CommandHandlerManager {
         if (command == null) {
             throw new CommandHandlerNotFoundException(command);
         }
-
-        return handlers.stream().filter(handler -> handler.matches(command)).findFirst()
-                .orElseThrow(() -> new CommandHandlerNotFoundException(command));
+        return handlers.stream().filter(handler -> handler.matches(command)).findFirst().orElseThrow(() -> new CommandHandlerNotFoundException(command));
     }
 
     private void ensureCommandHandlerUniqueness(List<CommandHandler> commandHandlers) {
         final Set<Class<?>> registeredRequestTypes = new HashSet<>();
-
         for (CommandHandler handler : commandHandlers) {
             Class<?> userClass = AopProxyUtils.ultimateTargetClass(handler);
-
             Class<?> requestType = ResolvableType.forClass(userClass).as(CommandHandler.class).getGeneric(0).resolve();
-
             if (requestType == null) {
                 log.error("Warning: Could not resolve request payload type for handler: {}", userClass.getName());
                 throw new CommandHandlerInvalidRequestTypeException(userClass);
             }
-
             if (!registeredRequestTypes.add(requestType)) {
-
-                log.error("Critical Configuration ERROR: Duplicate CommandHandlers detected for request type [{}]. Conflict found for: {}",
-                        requestType.getName(), userClass.getSimpleName());
-
+                log.error("Critical Configuration ERROR: Duplicate CommandHandlers detected for request type [{}]. Conflict found for: {}", requestType.getName(), userClass.getSimpleName());
                 throw new CommandHandlerDuplicateException(requestType, userClass);
             }
         }
+        log.info("CommandHandler validation successful. Verified {} handler(s) uniquely map to their respective requests.", commandHandlers.size());
+    }
 
-        log.info("CommandHandler validation successful. Verified {} handler(s) uniquely map to their respective requests.",
-                commandHandlers.size());
+    @java.lang.SuppressWarnings("all")
+        public DefaultCommandHandlerManager(final List<CommandHandler> handlers) {
+        this.handlers = handlers;
     }
 }

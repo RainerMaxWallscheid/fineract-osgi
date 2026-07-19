@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.dataqueries.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -27,9 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class DeleteOneToOneDatatableEntryCommandHandler implements NewCommandSourceHandler {
-
     private final DatatableWriteService datatableWriteService;
 
     @Transactional
@@ -38,4 +35,8 @@ public class DeleteOneToOneDatatableEntryCommandHandler implements NewCommandSou
         return datatableWriteService.deleteDatatableEntries(command.getEntityName(), command.entityId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DeleteOneToOneDatatableEntryCommandHandler(final DatatableWriteService datatableWriteService) {
+        this.datatableWriteService = datatableWriteService;
+    }
 }

@@ -19,16 +19,13 @@
 package org.apache.fineract.infrastructure.event.external.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.event.external.data.ExternalEventConfigurationResponse;
 import org.apache.fineract.infrastructure.event.external.repository.ExternalEventConfigurationRepository;
 import org.apache.fineract.infrastructure.event.external.repository.domain.ExternalEventConfiguration;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class ExternalEventConfigurationReadPlatformServiceImpl implements ExternalEventConfigurationReadPlatformService {
-
     private final ExternalEventConfigurationRepository repository;
     private final ExternalEventsConfigurationMapper mapper;
 
@@ -40,4 +37,9 @@ public class ExternalEventConfigurationReadPlatformServiceImpl implements Extern
         return configurationData;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ExternalEventConfigurationReadPlatformServiceImpl(final ExternalEventConfigurationRepository repository, final ExternalEventsConfigurationMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
+    }
 }

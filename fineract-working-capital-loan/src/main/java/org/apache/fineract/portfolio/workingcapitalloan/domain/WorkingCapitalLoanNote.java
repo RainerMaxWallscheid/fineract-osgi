@@ -24,27 +24,34 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
 @Entity
 @Table(name = "m_wc_loan_note")
-@Getter
 public class WorkingCapitalLoanNote extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wc_loan_id", nullable = false)
     private WorkingCapitalLoan wcLoan;
-
     @Column(name = "note", length = 1000)
     private String note;
 
-    protected WorkingCapitalLoanNote() {}
+    protected WorkingCapitalLoanNote() {
+    }
 
     public static WorkingCapitalLoanNote create(final WorkingCapitalLoan wcLoan, final String note) {
         final WorkingCapitalLoanNote n = new WorkingCapitalLoanNote();
         n.wcLoan = wcLoan;
         n.note = note;
         return n;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoan getWcLoan() {
+        return this.wcLoan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getNote() {
+        return this.note;
     }
 }

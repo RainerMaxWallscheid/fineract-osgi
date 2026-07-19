@@ -19,18 +19,10 @@
 package org.apache.fineract.organisation.teller.domain;
 
 import java.io.Serializable;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
 public final class CashierTxnType implements Serializable {
-
     private Integer id;
     private String value;
-
     public static final CashierTxnType ALLOCATE = new CashierTxnType(101, "Allocate Cash");
     public static final CashierTxnType SETTLE = new CashierTxnType(102, "Settle Cash");
     public static final CashierTxnType INWARD_CASH_TXN = new CashierTxnType(103, "Cash In");
@@ -43,23 +35,42 @@ public final class CashierTxnType implements Serializable {
 
     public static CashierTxnType getCashierTxnType(Integer id) {
         CashierTxnType retVal = null;
-
         switch (id) {
-            case 101:
-                retVal = ALLOCATE;
+        case 101: 
+            retVal = ALLOCATE;
             break;
-            case 102:
-                retVal = SETTLE;
+        case 102: 
+            retVal = SETTLE;
             break;
-            case 103:
-                retVal = INWARD_CASH_TXN;
+        case 103: 
+            retVal = INWARD_CASH_TXN;
             break;
-            case 104:
-                retVal = OUTWARD_CASH_TXN;
+        case 104: 
+            retVal = OUTWARD_CASH_TXN;
             break;
-            default:
+        default: 
             break;
         }
         return retVal;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CashierTxnType() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CashierTxnType(final Integer id, final String value) {
+        this.id = id;
+        this.value = value;
     }
 }

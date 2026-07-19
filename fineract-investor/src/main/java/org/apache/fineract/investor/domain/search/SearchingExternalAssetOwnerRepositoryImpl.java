@@ -30,7 +30,6 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.jpa.CriteriaQueryFactory;
 import org.apache.fineract.infrastructure.core.service.PagedRequest;
@@ -44,67 +43,51 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@RequiredArgsConstructor
 public class SearchingExternalAssetOwnerRepositoryImpl implements SearchingExternalAssetOwnerRepository {
-
     @PersistenceContext
     private EntityManager entityManager;
-
     private final CriteriaQueryFactory criteriaQueryFactory;
 
     @Override
     public Page<SearchedExternalAssetOwner> searchInvestorData(PagedRequest<ExternalAssetOwnerSearchRequest> searchRequest) {
         final ExternalAssetOwnerSearchRequest request = searchRequest.getRequest().get();
         final Pageable pageable = searchRequest.toPageable();
-
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<SearchedExternalAssetOwner> query = cb.createQuery(SearchedExternalAssetOwner.class);
-
         Root<ExternalAssetOwnerTransfer> root = query.from(ExternalAssetOwnerTransfer.class);
         Path<ExternalAssetOwnerTransferDetails> details = root.join("externalAssetOwnerTransferDetails", JoinType.LEFT);
         Path<ExternalAssetOwner> owner = root.get("owner");
-
         Specification<ExternalAssetOwnerTransfer> spec = (r, q, builder) -> {
             Path<ExternalAssetOwner> o = r.get("owner");
-
             List<Predicate> predicates = new ArrayList<>();
-
             if (StringUtils.isNotBlank(request.getText())) {
                 String searchLikeValue = "%" + request.getText() + "%";
-                predicates.add(cb.or(cb.like(r.get("externalId"), searchLikeValue), cb.like(o.get("externalId"), searchLikeValue),
-                        cb.like(r.get("externalLoanId"), searchLikeValue)));
+                predicates.add(cb.or(cb.like(r.get("externalId"), searchLikeValue), cb.like(o.get("externalId"), searchLikeValue), cb.like(r.get("externalLoanId"), searchLikeValue)));
             }
-
             if (request.getSubmittedFromDate() != null) {
                 predicates.add(cb.greaterThanOrEqualTo(r.get("settlementDate"), request.getSubmittedFromDate()));
             }
             if (request.getSubmittedToDate() != null) {
                 predicates.add(cb.lessThanOrEqualTo(r.get("settlementDate"), request.getSubmittedToDate()));
             }
-
             if (request.getEffectiveFromDate() != null) {
                 predicates.add(cb.greaterThanOrEqualTo(r.get("effectiveDateFrom"), request.getEffectiveFromDate()));
             }
             if (request.getEffectiveToDate() != null) {
                 predicates.add(cb.lessThanOrEqualTo(r.get("effectiveDateTo"), request.getEffectiveToDate()));
             }
-
             return cb.and(predicates.toArray(new Predicate[0]));
         };
         criteriaQueryFactory.applySpecificationToCriteria(root, spec, query);
-
         List<Order> orders = criteriaQueryFactory.ordersFromPageable(pageable, cb, root, () -> cb.desc(root.get("settlementDate")));
         query.orderBy(orders);
-
-        query.select(cb.construct(SearchedExternalAssetOwner.class, root.get("id"), root.get("loanId"), root.get("externalLoanId"),
-                owner.get("externalId"), root.get("externalId"), root.get("externalGroupId"), root.get("status"), root.get("subStatus"),
-                root.get("purchasePriceRatio"), root.get("settlementDate"), root.get("effectiveDateFrom"), root.get("effectiveDateTo"),
-                details.get("id"), details.get("totalOutstanding"), details.get("totalPrincipalOutstanding"),
-                details.get("totalInterestOutstanding"), details.get("totalFeeChargesOutstanding"),
-                details.get("totalPenaltyChargesOutstanding"), details.get("totalOverpaid")));
-
+        query.select(cb.construct(SearchedExternalAssetOwner.class, root.get("id"), root.get("loanId"), root.get("externalLoanId"), owner.get("externalId"), root.get("externalId"), root.get("externalGroupId"), root.get("status"), root.get("subStatus"), root.get("purchasePriceRatio"), root.get("settlementDate"), root.get("effectiveDateFrom"), root.get("effectiveDateTo"), details.get("id"), details.get("totalOutstanding"), details.get("totalPrincipalOutstanding"), details.get("totalInterestOutstanding"), details.get("totalFeeChargesOutstanding"), details.get("totalPenaltyChargesOutstanding"), details.get("totalOverpaid")));
         TypedQuery<SearchedExternalAssetOwner> queryToExecute = entityManager.createQuery(query);
         return criteriaQueryFactory.readPage(queryToExecute, ExternalAssetOwnerTransfer.class, pageable, spec);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public SearchingExternalAssetOwnerRepositoryImpl(final CriteriaQueryFactory criteriaQueryFactory) {
+        this.criteriaQueryFactory = criteriaQueryFactory;
+    }
 }

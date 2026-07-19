@@ -19,18 +19,82 @@
 package org.apache.fineract.accounting.producttoaccountmapping.data;
 
 import java.io.Serializable;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 
-@Data
-@NoArgsConstructor
-@Accessors(chain = true)
 public class ClassificationToGLAccountData implements Serializable {
-
     private static final long serialVersionUID = 1L;
     private CodeValueData classificationCodeValue;
     private GLAccountData incomeAccount;
+
+    @java.lang.SuppressWarnings("all")
+        public CodeValueData getClassificationCodeValue() {
+        return this.classificationCodeValue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GLAccountData getIncomeAccount() {
+        return this.incomeAccount;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ClassificationToGLAccountData setClassificationCodeValue(final CodeValueData classificationCodeValue) {
+        this.classificationCodeValue = classificationCodeValue;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ClassificationToGLAccountData setIncomeAccount(final GLAccountData incomeAccount) {
+        this.incomeAccount = incomeAccount;
+        return this;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof ClassificationToGLAccountData)) return false;
+        final ClassificationToGLAccountData other = (ClassificationToGLAccountData) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$classificationCodeValue = this.getClassificationCodeValue();
+        final java.lang.Object other$classificationCodeValue = other.getClassificationCodeValue();
+        if (this$classificationCodeValue == null ? other$classificationCodeValue != null : !this$classificationCodeValue.equals(other$classificationCodeValue)) return false;
+        final java.lang.Object this$incomeAccount = this.getIncomeAccount();
+        final java.lang.Object other$incomeAccount = other.getIncomeAccount();
+        if (this$incomeAccount == null ? other$incomeAccount != null : !this$incomeAccount.equals(other$incomeAccount)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof ClassificationToGLAccountData;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $classificationCodeValue = this.getClassificationCodeValue();
+        result = result * PRIME + ($classificationCodeValue == null ? 43 : $classificationCodeValue.hashCode());
+        final java.lang.Object $incomeAccount = this.getIncomeAccount();
+        result = result * PRIME + ($incomeAccount == null ? 43 : $incomeAccount.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "ClassificationToGLAccountData(classificationCodeValue=" + this.getClassificationCodeValue() + ", incomeAccount=" + this.getIncomeAccount() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ClassificationToGLAccountData() {
+    }
 }

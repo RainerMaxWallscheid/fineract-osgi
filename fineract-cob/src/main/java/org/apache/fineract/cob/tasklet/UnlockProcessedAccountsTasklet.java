@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.cob.tasklet;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.domain.AccountLock;
 import org.apache.fineract.cob.service.AccountLockService;
 import org.springframework.batch.core.StepContribution;
@@ -35,10 +33,9 @@ import org.springframework.lang.NonNull;
  * {@code lock_placed_on_cob_business_date} on the lock record, proving all COB business steps completed. If the lock
  * still exists with no error, it is orphaned and should be removed.
  */
-@Slf4j
-@RequiredArgsConstructor
 public abstract class UnlockProcessedAccountsTasklet<T extends AccountLock> implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UnlockProcessedAccountsTasklet.class);
     private final AccountLockService<T> accountLockService;
 
     @Override
@@ -50,5 +47,10 @@ public abstract class UnlockProcessedAccountsTasklet<T extends AccountLock> impl
             log.debug("No orphaned account locks found after COB processing");
         }
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UnlockProcessedAccountsTasklet(final AccountLockService<T> accountLockService) {
+        this.accountLockService = accountLockService;
     }
 }

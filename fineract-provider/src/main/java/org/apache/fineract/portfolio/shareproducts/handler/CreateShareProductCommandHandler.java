@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.shareproducts.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "SHAREPRODUCT", action = "CREATE")
-@RequiredArgsConstructor
 public class CreateShareProductCommandHandler implements NewCommandSourceHandler {
-
     private final ShareProductWritePlatformService shareProductWritePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class CreateShareProductCommandHandler implements NewCommandSourceHandler
         return this.shareProductWritePlatformService.createShareProduct(jsonCommand);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public CreateShareProductCommandHandler(final ShareProductWritePlatformService shareProductWritePlatformService) {
+        this.shareProductWritePlatformService = shareProductWritePlatformService;
+    }
 }

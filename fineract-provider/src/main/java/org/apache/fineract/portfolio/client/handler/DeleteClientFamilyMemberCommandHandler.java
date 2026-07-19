@@ -16,10 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.client.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,14 +27,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 @CommandType(entity = "FAMILYMEMBERS", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteClientFamilyMemberCommandHandler implements NewCommandSourceHandler {
-
     private final ClientFamilyMembersWritePlatformService clientFamilyMembersWritePlatformService;
 
     @Override
     public CommandProcessingResult processCommand(JsonCommand command) {
-
         return this.clientFamilyMembersWritePlatformService.deleteFamilyMember(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DeleteClientFamilyMemberCommandHandler(final ClientFamilyMembersWritePlatformService clientFamilyMembersWritePlatformService) {
+        this.clientFamilyMembersWritePlatformService = clientFamilyMembersWritePlatformService;
     }
 }

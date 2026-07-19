@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.avro.BulkMessageItemV1;
 import org.apache.fineract.avro.BulkMessagePayloadV1;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
@@ -43,25 +41,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
-@Slf4j
 public class ExternalEventService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExternalEventService.class);
     private final ExternalEventRepository repository;
     private final ExternalEventIdempotencyKeyGenerator idempotencyKeyGenerator;
     private final BusinessEventSerializerFactory serializerFactory;
     private final ByteBufferConverter byteBufferConverter;
     private final BulkMessageItemFactory bulkMessageItemFactory;
     private final DataEnricherProcessor dataEnricherProcessor;
-
     private EntityManager entityManager;
 
     public <T> void postEvent(BusinessEvent<T> event) {
         if (event == null) {
             throw new IllegalArgumentException("event cannot be null");
         }
-
         try {
             entityManager.flush();
             ExternalEvent externalEvent;
@@ -71,12 +66,10 @@ public class ExternalEventService {
                 externalEvent = handleRegularBusinessEvent(event);
             }
             repository.save(externalEvent);
-            log.debug("Saved message with idempotency key: [{}] of type [{}] and category [{}]", externalEvent.getIdempotencyKey(),
-                    externalEvent.getType(), externalEvent.getCategory());
+            log.debug("Saved message with idempotency key: [{}] of type [{}] and category [{}]", externalEvent.getIdempotencyKey(), externalEvent.getType(), externalEvent.getCategory());
         } catch (IOException e) {
             throw new RuntimeException("Error while serializing event " + event.getClass().getSimpleName(), e);
         }
-
     }
 
     @PersistenceContext
@@ -96,9 +89,7 @@ public class ExternalEventService {
         String idempotencyKey = idempotencyKeyGenerator.generate(bulkBusinessEvent);
         BulkMessagePayloadV1 avroDto = new BulkMessagePayloadV1(messages);
         byte[] data = byteBufferConverter.convert(avroDto.toByteBuffer());
-
-        return new ExternalEvent(bulkBusinessEvent.getType(), bulkBusinessEvent.getCategory(), BulkMessagePayloadV1.class.getName(), data,
-                idempotencyKey, bulkBusinessEvent.getAggregateRootId());
+        return new ExternalEvent(bulkBusinessEvent.getType(), bulkBusinessEvent.getCategory(), BulkMessagePayloadV1.class.getName(), data, idempotencyKey, bulkBusinessEvent.getAggregateRootId());
     }
 
     private <T> ExternalEvent handleRegularBusinessEvent(BusinessEvent<T> event) throws IOException {
@@ -111,7 +102,16 @@ public class ExternalEventService {
         ByteBuffer buffer = avroDto.toByteBuffer();
         byte[] data = byteBufferConverter.convert(buffer);
         Long aggregateRootId = event.getAggregateRootId();
-
         return new ExternalEvent(eventType, eventCategory, schema, data, idempotencyKey, aggregateRootId);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalEventService(final ExternalEventRepository repository, final ExternalEventIdempotencyKeyGenerator idempotencyKeyGenerator, final BusinessEventSerializerFactory serializerFactory, final ByteBufferConverter byteBufferConverter, final BulkMessageItemFactory bulkMessageItemFactory, final DataEnricherProcessor dataEnricherProcessor) {
+        this.repository = repository;
+        this.idempotencyKeyGenerator = idempotencyKeyGenerator;
+        this.serializerFactory = serializerFactory;
+        this.byteBufferConverter = byteBufferConverter;
+        this.bulkMessageItemFactory = bulkMessageItemFactory;
+        this.dataEnricherProcessor = dataEnricherProcessor;
     }
 }

@@ -20,27 +20,22 @@ package org.apache.fineract.portfolio.collateralmanagement.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.collateralmanagement.data.CollateralManagementData;
 import org.apache.fineract.portfolio.collateralmanagement.domain.CollateralManagementDomain;
 import org.apache.fineract.portfolio.collateralmanagement.domain.CollateralManagementRepositoryWrapper;
 
-@RequiredArgsConstructor
 public class CollateralManagementReadServiceImpl implements CollateralManagementReadService {
-
     private final CollateralManagementRepositoryWrapper collateralManagementRepositoryWrapper;
 
     @Override
     public CollateralManagementData getCollateralProduct(Long collateralId) {
-        final CollateralManagementDomain collateralManagementDomain = this.collateralManagementRepositoryWrapper
-                .getCollateral(collateralId);
+        final CollateralManagementDomain collateralManagementDomain = this.collateralManagementRepositoryWrapper.getCollateral(collateralId);
         return CollateralManagementData.createNew(collateralManagementDomain);
     }
 
     @Override
     public List<CollateralManagementData> getAllCollateralProducts() {
-        final List<CollateralManagementDomain> collateralManagementDomainSet = this.collateralManagementRepositoryWrapper
-                .getAllCollaterals();
+        final List<CollateralManagementDomain> collateralManagementDomainSet = this.collateralManagementRepositoryWrapper.getAllCollaterals();
         List<CollateralManagementData> collateralManagementDataList = new ArrayList<>();
         for (CollateralManagementDomain collateralManagementDomain : collateralManagementDomainSet) {
             collateralManagementDataList.add(CollateralManagementData.createNew(collateralManagementDomain));
@@ -48,4 +43,8 @@ public class CollateralManagementReadServiceImpl implements CollateralManagement
         return collateralManagementDataList;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public CollateralManagementReadServiceImpl(final CollateralManagementRepositoryWrapper collateralManagementRepositoryWrapper) {
+        this.collateralManagementRepositoryWrapper = collateralManagementRepositoryWrapper;
+    }
 }

@@ -19,13 +19,11 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.command.CommandStrategyUtils;
 import org.apache.fineract.batch.domain.BatchRequest;
@@ -48,14 +46,11 @@ import org.springframework.stereotype.Component;
  * @see BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class GetReagePreviewByLoanIdCommandStrategy implements CommandStrategy {
-
     /**
      * Loan transactions api resource {@link LoanTransactionsApiResource}.
      */
     private final LoanTransactionsApiResource loanTransactionsApiResource;
-
     /**
      * The toApiJsonSerializer to convert json to object
      */
@@ -64,12 +59,9 @@ public class GetReagePreviewByLoanIdCommandStrategy implements CommandStrategy {
     @Override
     public BatchResponse execute(final BatchRequest request, final UriInfo uriInfo) {
         final BatchResponse response = new BatchResponse();
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final String relativeUrl = relativeUrlWithoutVersion(request);
-
         // Expected pattern - loans/" + NUMBER + "/transactions/reage-preview?queryParam1=<blah>&queryParam2=<blah>&....
         // Get the loan external id
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrl);
@@ -78,16 +70,24 @@ public class GetReagePreviewByLoanIdCommandStrategy implements CommandStrategy {
         if (relativeUrl.indexOf('?') > 0) {
             queryParameters = CommandStrategyUtils.getQueryParameters(relativeUrl);
         }
-
         // Build ReAgePreviewRequest from query parameters using generic utility
-        final ReAgePreviewRequest reAgePreviewRequest = CommandStrategyUtils.buildRequestFromQueryParameters(queryParameters,
-                ReAgePreviewRequest.class);
-
+        final ReAgePreviewRequest reAgePreviewRequest = CommandStrategyUtils.buildRequestFromQueryParameters(queryParameters, ReAgePreviewRequest.class);
         // Calls 'previewReAgeSchedule' function from 'loanTransactionsApiResource' using external id
         response.setStatusCode(HttpStatus.SC_OK);
         // Sets the body of the response after getting reage preview
         response.setBody(toApiJsonSerializer.serialize(loanTransactionsApiResource.previewReAgeSchedule(loanId, reAgePreviewRequest)));
-
         return response;
+    }
+
+    /**
+     * Creates a new {@code GetReagePreviewByLoanIdCommandStrategy} instance.
+     *
+     * @param loanTransactionsApiResource Loan transactions api resource {@link LoanTransactionsApiResource}.
+     * @param toApiJsonSerializer The toApiJsonSerializer to convert json to object
+     */
+    @java.lang.SuppressWarnings("all")
+        public GetReagePreviewByLoanIdCommandStrategy(final LoanTransactionsApiResource loanTransactionsApiResource, final DefaultToApiJsonSerializer<LoanScheduleData> toApiJsonSerializer) {
+        this.loanTransactionsApiResource = loanTransactionsApiResource;
+        this.toApiJsonSerializer = toApiJsonSerializer;
     }
 }

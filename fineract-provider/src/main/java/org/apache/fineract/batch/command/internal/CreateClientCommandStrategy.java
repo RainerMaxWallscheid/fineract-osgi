@@ -19,7 +19,6 @@
 package org.apache.fineract.batch.command.internal;
 
 import jakarta.ws.rs.core.UriInfo;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
@@ -41,30 +40,27 @@ import org.springframework.stereotype.Component;
  * @see org.apache.fineract.batch.domain.BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class CreateClientCommandStrategy implements CommandStrategy {
-
     private final ClientsApiResource clientsApiResource;
 
     @Override
     public BatchResponse execute(final BatchRequest request, @SuppressWarnings("unused") UriInfo uriInfo) {
-
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         // Calls 'create' function from 'ClientsApiResource' to create a new
         // client
         responseBody = clientsApiResource.create(request.getBody());
-
         response.setStatusCode(HttpStatus.SC_OK);
         // Sets the body of the response after the successful creation of
         // the client
         response.setBody(responseBody);
-
         return response;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public CreateClientCommandStrategy(final ClientsApiResource clientsApiResource) {
+        this.clientsApiResource = clientsApiResource;
+    }
 }

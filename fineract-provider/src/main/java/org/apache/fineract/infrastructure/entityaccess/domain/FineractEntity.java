@@ -18,17 +18,39 @@
  */
 package org.apache.fineract.infrastructure.entityaccess.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class FineractEntity {
-
     private Long entityId;
     private FineractEntityType type;
+
+    @java.lang.SuppressWarnings("all")
+        public Long getEntityId() {
+        return this.entityId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FineractEntityType getType() {
+        return this.type;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public FineractEntity setEntityId(final Long entityId) {
+        this.entityId = entityId;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public FineractEntity setType(final FineractEntityType type) {
+        this.type = type;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FineractEntity() {
+    }
 }

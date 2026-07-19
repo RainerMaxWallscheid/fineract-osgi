@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.savings.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -32,9 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @CommandType(entity = "SAVINGSACCOUNT", action = "REVERSETRANSACTION")
-@RequiredArgsConstructor
 public class ReverseTransactionSavingsAccountCommandHandler implements NewCommandSourceHandler {
-
     private final SavingsAccountWritePlatformService writePlatformService;
 
     @Transactional
@@ -42,5 +39,10 @@ public class ReverseTransactionSavingsAccountCommandHandler implements NewComman
     public CommandProcessingResult processCommand(final JsonCommand command) {
         final Long transactionId = Long.valueOf(command.getTransactionId());
         return this.writePlatformService.reverseTransaction(command.getSavingsId(), transactionId, false, command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ReverseTransactionSavingsAccountCommandHandler(final SavingsAccountWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

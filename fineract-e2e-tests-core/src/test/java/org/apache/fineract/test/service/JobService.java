@@ -21,13 +21,10 @@ package org.apache.fineract.test.service;
 import static org.apache.fineract.client.feign.util.FeignCalls.executeVoid;
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
 import static org.awaitility.Awaitility.await;
-
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.ExecuteJobRequest;
 import org.apache.fineract.client.models.GetJobsJobIDJobRunHistoryResponse;
@@ -39,16 +36,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class JobService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JobService.class);
     @Autowired
     private FineractFeignClient fineractClient;
-
     @Autowired
     private JobPollingProperties jobPollingProperties;
-
     private final JobResolver jobResolver;
 
     public void execute(Job job) {
@@ -71,19 +65,19 @@ public class JobService {
 
     private void waitUntilJobIsFinished(Job job, Long jobId, Long previousRunHistoryId) {
         String jobName = job.getName();
-        await().atMost(Duration.ofMillis(jobPollingProperties.getTimeoutInMillis())) //
-                .alias("%s didn't finish on time".formatted(jobName)) //
-                .pollInterval(Duration.ofMillis(jobPollingProperties.getIntervalInMillis())) //
-                .pollDelay(Duration.ofMillis(jobPollingProperties.getDelayInMillis())) //
-                .until(() -> {
-                    log.debug("Waiting for job {} to finish", jobName);
-                    JobDetailHistoryDataSwagger latestRunHistory = getLatestJobRunHistory(jobId);
-                    if (latestRunHistory == null || latestRunHistory.getJobRunEndTime() == null) {
-                        return false;
-                    }
-                    Long runHistoryId = latestRunHistory.getId();
-                    return runHistoryId != null && (previousRunHistoryId == null || runHistoryId > previousRunHistoryId);
-                });
+        //
+        //
+        //
+        //
+        await().atMost(Duration.ofMillis(jobPollingProperties.getTimeoutInMillis())).alias("%s didn\'t finish on time".formatted(jobName)).pollInterval(Duration.ofMillis(jobPollingProperties.getIntervalInMillis())).pollDelay(Duration.ofMillis(jobPollingProperties.getDelayInMillis())).until(() -> {
+            log.debug("Waiting for job {} to finish", jobName);
+            JobDetailHistoryDataSwagger latestRunHistory = getLatestJobRunHistory(jobId);
+            if (latestRunHistory == null || latestRunHistory.getJobRunEndTime() == null) {
+                return false;
+            }
+            Long runHistoryId = latestRunHistory.getId();
+            return runHistoryId != null && (previousRunHistoryId == null || runHistoryId > previousRunHistoryId);
+        });
     }
 
     private Long getRunHistoryId(JobDetailHistoryDataSwagger runHistory) {
@@ -97,5 +91,10 @@ public class JobService {
             return null;
         }
         return pageItems.get(0);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JobService(final JobResolver jobResolver) {
+        this.jobResolver = jobResolver;
     }
 }

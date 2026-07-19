@@ -19,16 +19,11 @@
 package org.apache.fineract.portfolio.savings.data;
 
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Immutable data object represent savings account status enumerations.
  */
-@Getter
-@RequiredArgsConstructor
 public class SavingsAccountStatusEnumData implements Serializable {
-
     private final Long id;
     private final String code;
     private final String value;
@@ -43,4 +38,85 @@ public class SavingsAccountStatusEnumData implements Serializable {
     private final boolean transferOnHold;
     private final boolean matured;
 
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCode() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getValue() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isSubmittedAndPendingApproval() {
+        return this.submittedAndPendingApproval;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isApproved() {
+        return this.approved;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isRejected() {
+        return this.rejected;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isWithdrawnByApplicant() {
+        return this.withdrawnByApplicant;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isActive() {
+        return this.active;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isClosed() {
+        return this.closed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isPrematureClosed() {
+        return this.prematureClosed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isTransferInProgress() {
+        return this.transferInProgress;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isTransferOnHold() {
+        return this.transferOnHold;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isMatured() {
+        return this.matured;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsAccountStatusEnumData(final Long id, final String code, final String value, final boolean submittedAndPendingApproval, final boolean approved, final boolean rejected, final boolean withdrawnByApplicant, final boolean active, final boolean closed, final boolean prematureClosed, final boolean transferInProgress, final boolean transferOnHold, final boolean matured) {
+        this.id = id;
+        this.code = code;
+        this.value = value;
+        this.submittedAndPendingApproval = submittedAndPendingApproval;
+        this.approved = approved;
+        this.rejected = rejected;
+        this.withdrawnByApplicant = withdrawnByApplicant;
+        this.active = active;
+        this.closed = closed;
+        this.prematureClosed = prematureClosed;
+        this.transferInProgress = transferInProgress;
+        this.transferOnHold = transferOnHold;
+        this.matured = matured;
+    }
 }

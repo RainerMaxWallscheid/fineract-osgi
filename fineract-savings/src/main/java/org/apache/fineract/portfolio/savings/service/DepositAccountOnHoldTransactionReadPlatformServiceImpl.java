@@ -24,7 +24,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.Page;
@@ -36,9 +35,7 @@ import org.apache.fineract.portfolio.savings.data.DepositAccountOnHoldTransactio
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-@RequiredArgsConstructor
 public class DepositAccountOnHoldTransactionReadPlatformServiceImpl implements DepositAccountOnHoldTransactionReadPlatformService {
-
     private final JdbcTemplate jdbcTemplate;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
     private final ColumnValidator columnValidator;
@@ -46,30 +43,25 @@ public class DepositAccountOnHoldTransactionReadPlatformServiceImpl implements D
     private final DepositAccountOnHoldTransactionsMapper mapper = new DepositAccountOnHoldTransactionsMapper();
 
     @Override
-    public Page<DepositAccountOnHoldTransactionData> retriveAll(Long savingsId, Long guarantorFundingId,
-            SearchParameters searchParameters) {
+    public Page<DepositAccountOnHoldTransactionData> retriveAll(Long savingsId, Long guarantorFundingId, SearchParameters searchParameters) {
         final StringBuilder sqlBuilder = new StringBuilder(200);
         List<Long> paramObj = new ArrayList<>(2);
         sqlBuilder.append("select " + sqlGenerator.calcFoundRows() + " ");
         sqlBuilder.append(this.mapper.schema());
-
         sqlBuilder.append(" where tr.savings_account_id = ? ");
         paramObj.add(savingsId);
         if (guarantorFundingId != null) {
             sqlBuilder.append(" and gt.guarantor_fund_detail_id = ? ");
             paramObj.add(guarantorFundingId);
         }
-
         if (searchParameters.hasOrderBy()) {
             sqlBuilder.append(" order by ").append(searchParameters.getOrderBy());
             this.columnValidator.validateSqlInjection(sqlBuilder.toString(), searchParameters.getOrderBy());
-
             if (searchParameters.hasSortOrder()) {
                 sqlBuilder.append(' ').append(searchParameters.getSortOrder());
                 this.columnValidator.validateSqlInjection(sqlBuilder.toString(), searchParameters.getSortOrder());
             }
         }
-
         if (searchParameters.hasLimit()) {
             sqlBuilder.append(" ");
             if (searchParameters.hasOffset()) {
@@ -78,18 +70,15 @@ public class DepositAccountOnHoldTransactionReadPlatformServiceImpl implements D
                 sqlBuilder.append(sqlGenerator.limit(searchParameters.getLimit()));
             }
         }
-
         final Object[] finalObjectArray = paramObj.toArray();
         return this.paginationHelper.fetchPage(this.jdbcTemplate, sqlBuilder.toString(), finalObjectArray, this.mapper);
-
     }
 
-    private static final class DepositAccountOnHoldTransactionsMapper implements RowMapper<DepositAccountOnHoldTransactionData> {
 
+    private static final class DepositAccountOnHoldTransactionsMapper implements RowMapper<DepositAccountOnHoldTransactionData> {
         private final String schemaSql;
 
         DepositAccountOnHoldTransactionsMapper() {
-
             final StringBuilder sqlBuilder = new StringBuilder(400);
             sqlBuilder.append(" tr.id as transactionId, tr.transaction_type_enum as transactionType, ");
             sqlBuilder.append(" tr.transaction_date as transactionDate, tr.amount as transactionAmount,");
@@ -106,7 +95,6 @@ public class DepositAccountOnHoldTransactionReadPlatformServiceImpl implements D
             sqlBuilder.append(" left join m_loan ml on ml.id = pa.loan_account_id");
             sqlBuilder.append(" left join m_client lc on lc.id = ml.client_id");
             sqlBuilder.append(" left join m_group lg on lg.id = ml.group_id");
-
             this.schemaSql = sqlBuilder.toString();
         }
 
@@ -115,12 +103,10 @@ public class DepositAccountOnHoldTransactionReadPlatformServiceImpl implements D
         }
 
         @Override
-        public DepositAccountOnHoldTransactionData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum)
-                throws SQLException {
+        public DepositAccountOnHoldTransactionData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
             final Long id = rs.getLong("transactionId");
             final int transactionTypeInt = JdbcSupport.getInteger(rs, "transactionType");
             final EnumOptionData transactionType = SavingsEnumerations.onHoldTransactionType(transactionTypeInt);
-
             final LocalDate date = JdbcSupport.getLocalDate(rs, "transactionDate");
             final BigDecimal amount = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs, "transactionAmount");
             final boolean reversed = rs.getBoolean("reversed");
@@ -130,9 +116,15 @@ public class DepositAccountOnHoldTransactionReadPlatformServiceImpl implements D
             final String loanAccountNum = rs.getString("loanAccountNum");
             final Long loanId = rs.getLong("loanid");
             final String loanClientName = rs.getString("loanClientName");
-            return DepositAccountOnHoldTransactionData.instance(id, amount, transactionType, date, reversed, savingsId, savingsAccountNum,
-                    savingsClientName, loanId, loanAccountNum, loanClientName);
+            return DepositAccountOnHoldTransactionData.instance(id, amount, transactionType, date, reversed, savingsId, savingsAccountNum, savingsClientName, loanId, loanAccountNum, loanClientName);
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DepositAccountOnHoldTransactionReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final DatabaseSpecificSQLGenerator sqlGenerator, final ColumnValidator columnValidator, final PaginationHelper paginationHelper) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.sqlGenerator = sqlGenerator;
+        this.columnValidator = columnValidator;
+        this.paginationHelper = paginationHelper;
+    }
 }

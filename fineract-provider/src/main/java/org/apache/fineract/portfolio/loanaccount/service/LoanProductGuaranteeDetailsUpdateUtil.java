@@ -20,40 +20,32 @@ package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.math.BigDecimal;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductGuaranteeDetails;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class LoanProductGuaranteeDetailsUpdateUtil {
-
-    public void update(final LoanProductGuaranteeDetails loanProductGuaranteeDetails, final JsonCommand command,
-            final Map<String, Object> actualChanges) {
-
-        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.mandatoryGuaranteeParamName,
-                loanProductGuaranteeDetails.getMandatoryGuarantee())) {
+    public void update(final LoanProductGuaranteeDetails loanProductGuaranteeDetails, final JsonCommand command, final Map<String, Object> actualChanges) {
+        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.mandatoryGuaranteeParamName, loanProductGuaranteeDetails.getMandatoryGuarantee())) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(LoanProductConstants.mandatoryGuaranteeParamName);
             actualChanges.put(LoanProductConstants.mandatoryGuaranteeParamName, newValue);
             loanProductGuaranteeDetails.setMandatoryGuarantee(newValue);
         }
-
-        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.minimumGuaranteeFromGuarantorParamName,
-                loanProductGuaranteeDetails.getMinimumGuaranteeFromGuarantor())) {
-            final BigDecimal newValue = command
-                    .bigDecimalValueOfParameterNamed(LoanProductConstants.minimumGuaranteeFromGuarantorParamName);
+        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.minimumGuaranteeFromGuarantorParamName, loanProductGuaranteeDetails.getMinimumGuaranteeFromGuarantor())) {
+            final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(LoanProductConstants.minimumGuaranteeFromGuarantorParamName);
             actualChanges.put(LoanProductConstants.minimumGuaranteeFromGuarantorParamName, newValue);
             loanProductGuaranteeDetails.setMinimumGuaranteeFromGuarantor(newValue);
         }
-
-        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.minimumGuaranteeFromOwnFundsParamName,
-                loanProductGuaranteeDetails.getMinimumGuaranteeFromOwnFunds())) {
+        if (command.isChangeInBigDecimalParameterNamed(LoanProductConstants.minimumGuaranteeFromOwnFundsParamName, loanProductGuaranteeDetails.getMinimumGuaranteeFromOwnFunds())) {
             final BigDecimal newValue = command.bigDecimalValueOfParameterNamed(LoanProductConstants.minimumGuaranteeFromOwnFundsParamName);
             actualChanges.put(LoanProductConstants.minimumGuaranteeFromOwnFundsParamName, newValue);
             loanProductGuaranteeDetails.setMinimumGuaranteeFromOwnFunds(newValue);
         }
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanProductGuaranteeDetailsUpdateUtil() {
     }
 }

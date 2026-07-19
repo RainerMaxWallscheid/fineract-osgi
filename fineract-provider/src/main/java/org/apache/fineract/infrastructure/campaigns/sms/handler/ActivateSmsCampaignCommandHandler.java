@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.campaigns.sms.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.campaigns.sms.service.SmsCampaignWritePlatformService;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "SMSCAMPAIGN", action = "ACTIVATE")
-@RequiredArgsConstructor
 public class ActivateSmsCampaignCommandHandler implements NewCommandSourceHandler {
-
     private final SmsCampaignWritePlatformService smsCampaignWritePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class ActivateSmsCampaignCommandHandler implements NewCommandSourceHandle
         return this.smsCampaignWritePlatformService.activateSmsCampaign(command.entityId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ActivateSmsCampaignCommandHandler(final SmsCampaignWritePlatformService smsCampaignWritePlatformService) {
+        this.smsCampaignWritePlatformService = smsCampaignWritePlatformService;
+    }
 }

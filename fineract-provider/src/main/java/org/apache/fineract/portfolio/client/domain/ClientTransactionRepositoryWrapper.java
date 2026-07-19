@@ -18,21 +18,17 @@
  */
 package org.apache.fineract.portfolio.client.domain;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.organisation.monetary.domain.OrganisationCurrencyRepositoryWrapper;
 import org.apache.fineract.portfolio.client.exception.ClientTransactionNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class ClientTransactionRepositoryWrapper {
-
     private final ClientTransactionRepository repository;
     private final OrganisationCurrencyRepositoryWrapper organisationCurrencyRepository;
 
     public ClientTransaction findOneWithNotFoundDetection(final Long clientId, final Long transactionId) {
-        final ClientTransaction clientTransaction = this.repository.findById(transactionId)
-                .orElseThrow(() -> new ClientTransactionNotFoundException(clientId, transactionId));
+        final ClientTransaction clientTransaction = this.repository.findById(transactionId).orElseThrow(() -> new ClientTransactionNotFoundException(clientId, transactionId));
         if (!clientTransaction.getClientId().equals(clientId)) {
             throw new ClientTransactionNotFoundException(clientId, transactionId);
         }
@@ -53,4 +49,9 @@ public class ClientTransactionRepositoryWrapper {
         this.repository.delete(clientTransaction);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ClientTransactionRepositoryWrapper(final ClientTransactionRepository repository, final OrganisationCurrencyRepositoryWrapper organisationCurrencyRepository) {
+        this.repository = repository;
+        this.organisationCurrencyRepository = organisationCurrencyRepository;
+    }
 }

@@ -38,7 +38,6 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.CONTENT_LENGTH;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
-
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -58,8 +57,6 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.infrastructure.contentstore.processor.Base64DecoderContentProcessor;
@@ -80,15 +77,13 @@ import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.stereotype.Component;
-
 // NOTE: left for backward compatibility only, could be unified with documents
 @Deprecated
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @Path("/v1/{entityType}/{entityId}/images")
 public class ImagesApiResource {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ImagesApiResource.class);
     private final ImageReadPlatformService imageReadPlatformService;
     private final CommandDispatcher dispatcher;
     private final ImageResizeContentProcessor imageResizeContentProcessor;
@@ -98,131 +93,95 @@ public class ImagesApiResource {
     private final DataUrlDecoderContentProcessor dataUrlDecoderContentProcessor;
     private final FileUploadValidator fileUploadValidator;
 
-    @GET
     // FINERACT-1265: Do NOT specify @Produces(TEXT_PLAIN) here - it may actually not (if it calls the next methods it's
     // octet-stream)
-    public Response retrieveImage(@PathParam(DOCUMENT_API_PARAM_ENTITY_TYPE) final String entityName,
-            @PathParam(DOCUMENT_API_PARAM_ENTITY_ID) final Long entityId, @QueryParam(IMAGE_API_PARAM_MAX_WIDTH) final Integer maxWidth,
-            @QueryParam(IMAGE_API_PARAM_MAX_HEIGHT) final Integer maxHeight, @QueryParam(IMAGE_API_PARAM_OUTPUT) String output,
-            @HeaderParam(ACCEPT) String acceptHeader) {
-
+    @GET
+    public Response retrieveImage(@PathParam(DOCUMENT_API_PARAM_ENTITY_TYPE) final String entityName, @PathParam(DOCUMENT_API_PARAM_ENTITY_ID) final Long entityId, @QueryParam(IMAGE_API_PARAM_MAX_WIDTH) final Integer maxWidth, @QueryParam(IMAGE_API_PARAM_MAX_HEIGHT) final Integer maxHeight, @QueryParam(IMAGE_API_PARAM_OUTPUT) String output, @HeaderParam(ACCEPT) String acceptHeader) {
         // TODO: pass resize information here and do all the processing in the service
         final var content = imageReadPlatformService.retrieveImage(entityName, entityId);
-
         String dispositionType = null;
         ContentProcessorContext ctx = new ContentProcessorContext(content.getStream());
         String type;
-
         // prevent clients sending non-sense
         if (!"octet".equalsIgnoreCase(output) && !"inline_octet".equalsIgnoreCase(output)) {
             output = null;
         }
-
         if ((StringUtils.isNotEmpty(output) && output.contains("octet")) || APPLICATION_OCTET_STREAM_VALUE.equalsIgnoreCase(acceptHeader)) {
             if (maxWidth != null && maxHeight != null) {
-                ctx = imageResizeContentProcessor.process(content.getStream(), Map.of(IMAGE_RESIZE_PARAM_MAX_WIDTH, maxWidth,
-                        IMAGE_RESIZE_PARAM_MAX_HEIGHT, maxHeight, IMAGE_RESIZE_PARAM_FORMAT, content.getFormat()));
+                ctx = imageResizeContentProcessor.process(content.getStream(), Map.of(IMAGE_RESIZE_PARAM_MAX_WIDTH, maxWidth, IMAGE_RESIZE_PARAM_MAX_HEIGHT, maxHeight, IMAGE_RESIZE_PARAM_FORMAT, content.getFormat()));
             }
-
             if (IMAGE_API_VALUE_OUTPUT_INLINE_OCTET.equalsIgnoreCase(output)) {
                 dispositionType = DISPOSITION_TYPE_INLINE;
             } else {
                 dispositionType = DISPOSITION_TYPE_ATTACHMENT;
             }
-
             type = content.getContentType();
         } else {
             // else stream base64 encoded original format
             if (maxWidth != null && maxHeight != null) {
-                ctx = imageResizeContentProcessor.then(base64EncoderContentProcessor).then(dataUrlEncoderContentProcessor).process(
-                        content.getStream(),
-                        Map.of(IMAGE_RESIZE_PARAM_MAX_WIDTH, maxWidth, IMAGE_RESIZE_PARAM_MAX_HEIGHT, maxHeight, IMAGE_RESIZE_PARAM_FORMAT,
-                                content.getFormat(), DATA_URL_ENCODE_PARAM_CONTENT_TYPE, content.getContentType(),
-                                DATA_URL_ENCODE_PARAM_ENCODING, IMAGE_API_VALUE_ENCODING_BASE64));
+                ctx = imageResizeContentProcessor.then(base64EncoderContentProcessor).then(dataUrlEncoderContentProcessor).process(content.getStream(), Map.of(IMAGE_RESIZE_PARAM_MAX_WIDTH, maxWidth, IMAGE_RESIZE_PARAM_MAX_HEIGHT, maxHeight, IMAGE_RESIZE_PARAM_FORMAT, content.getFormat(), DATA_URL_ENCODE_PARAM_CONTENT_TYPE, content.getContentType(), DATA_URL_ENCODE_PARAM_ENCODING, IMAGE_API_VALUE_ENCODING_BASE64));
             } else {
-                ctx = base64EncoderContentProcessor.then(dataUrlEncoderContentProcessor).process(content.getStream(),
-                        Map.of(DATA_URL_ENCODE_PARAM_CONTENT_TYPE, content.getContentType(), DATA_URL_ENCODE_PARAM_ENCODING,
-                                IMAGE_API_VALUE_ENCODING_BASE64));
+                ctx = base64EncoderContentProcessor.then(dataUrlEncoderContentProcessor).process(content.getStream(), Map.of(DATA_URL_ENCODE_PARAM_CONTENT_TYPE, content.getContentType(), DATA_URL_ENCODE_PARAM_ENCODING, IMAGE_API_VALUE_ENCODING_BASE64));
             }
-
             type = TEXT_PLAIN_VALUE;
         }
-
         // make sure we use the transformed input stream ("ctx.getInputStream()")
-        return StreamResponseUtil.ok(StreamResponseUtil.StreamResponseData.builder().fileName(content.getDisplayName()).type(type)
-                .stream(ctx.getInputStream()).dispositionType(dispositionType).build());
+        return StreamResponseUtil.ok(StreamResponseUtil.StreamResponseData.builder().fileName(content.getDisplayName()).type(type).stream(ctx.getInputStream()).dispositionType(dispositionType).build());
     }
 
     @POST
-    @Consumes({ MediaType.MULTIPART_FORM_DATA })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.MULTIPART_FORM_DATA})
+    @Produces({MediaType.APPLICATION_JSON})
     @ApiResponse(responseCode = "200", description = "Not Shown (multi-part form data)")
-    public ImageCreateResponse createImage(@PathParam(DOCUMENT_API_PARAM_ENTITY_TYPE) final String entityType,
-            @PathParam(DOCUMENT_API_PARAM_ENTITY_ID) final Long entityId, @HeaderParam(CONTENT_LENGTH) final Long fileSize,
-            @FormDataParam(DOCUMENT_API_PARAM_FILE) final InputStream is,
-            @FormDataParam(DOCUMENT_API_PARAM_FILE) final FormDataContentDisposition fileDetails,
-            @FormDataParam(DOCUMENT_API_PARAM_FILE) final FormDataBodyPart filePart) {
-
+    public ImageCreateResponse createImage(@PathParam(DOCUMENT_API_PARAM_ENTITY_TYPE) final String entityType, @PathParam(DOCUMENT_API_PARAM_ENTITY_ID) final Long entityId, @HeaderParam(CONTENT_LENGTH) final Long fileSize, @FormDataParam(DOCUMENT_API_PARAM_FILE) final InputStream is, @FormDataParam(DOCUMENT_API_PARAM_FILE) final FormDataContentDisposition fileDetails, @FormDataParam(DOCUMENT_API_PARAM_FILE) final FormDataBodyPart filePart) {
         fileUploadValidator.validate(fileSize, is, fileDetails, filePart);
-
         final var command = new ImageCreateCommand();
-
-        command.setPayload(
-                ImageCreateRequest.builder().entityId(entityId).entityType(entityType).fileName(fileDetails.getFileName()).size(fileSize)
-                        .type(Optional.ofNullable(filePart.getMediaType()).map(MediaType::toString).orElse(null)).stream(is).build());
-
+        command.setPayload(ImageCreateRequest.builder().entityId(entityId).entityType(entityType).fileName(fileDetails.getFileName()).size(fileSize).type(Optional.ofNullable(filePart.getMediaType()).map(MediaType::toString).orElse(null)).stream(is).build());
         final Supplier<ImageCreateResponse> response = dispatcher.dispatch(command);
-
         return response.get();
     }
 
     @POST
-    @Consumes({ MediaType.TEXT_PLAIN, MediaType.TEXT_HTML, MediaType.APPLICATION_JSON })
-    public ImageCreateResponse createImage(@PathParam(DOCUMENT_API_PARAM_ENTITY_TYPE) final String entityType,
-            @PathParam(DOCUMENT_API_PARAM_ENTITY_ID) final Long entityId, final InputStream body) {
-
+    @Consumes({MediaType.TEXT_PLAIN, MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
+    public ImageCreateResponse createImage(@PathParam(DOCUMENT_API_PARAM_ENTITY_TYPE) final String entityType, @PathParam(DOCUMENT_API_PARAM_ENTITY_ID) final Long entityId, final InputStream body) {
         requireNonNull(body, "Missing input stream");
-
         final var command = new ImageCreateCommand();
-
         var ctx = dataUrlDecoderContentProcessor.then(base64DecoderContentProcessor).process(new ContentProcessorContext(body));
-
         command.setPayload(ImageCreateRequest.builder().entityId(entityId).entityType(entityType).stream(ctx.getInputStream()).build());
-
         final Supplier<ImageCreateResponse> response = dispatcher.dispatch(command);
-
         return response.get();
     }
 
     @PUT
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @RequestBody(description = "Update image", content = {
-            @Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @io.swagger.v3.oas.annotations.media.Schema(type = "object")) })
-    public ImageCreateResponse updateImage(@PathParam(DOCUMENT_API_PARAM_ENTITY_TYPE) final String entityName,
-            @PathParam(DOCUMENT_API_PARAM_ENTITY_ID) final Long entityId, @HeaderParam(CONTENT_LENGTH) final Long fileSize,
-            @FormDataParam(DOCUMENT_API_PARAM_FILE) final InputStream inputStream,
-            @FormDataParam(DOCUMENT_API_PARAM_FILE) final FormDataContentDisposition fileDetails,
-            @FormDataParam(DOCUMENT_API_PARAM_FILE) final FormDataBodyPart bodyPart) {
+    @RequestBody(description = "Update image", content = {@Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @io.swagger.v3.oas.annotations.media.Schema(type = "object"))})
+    public ImageCreateResponse updateImage(@PathParam(DOCUMENT_API_PARAM_ENTITY_TYPE) final String entityName, @PathParam(DOCUMENT_API_PARAM_ENTITY_ID) final Long entityId, @HeaderParam(CONTENT_LENGTH) final Long fileSize, @FormDataParam(DOCUMENT_API_PARAM_FILE) final InputStream inputStream, @FormDataParam(DOCUMENT_API_PARAM_FILE) final FormDataContentDisposition fileDetails, @FormDataParam(DOCUMENT_API_PARAM_FILE) final FormDataBodyPart bodyPart) {
         return createImage(entityName, entityId, fileSize, inputStream, fileDetails, bodyPart);
     }
 
     @PUT
-    @Consumes({ MediaType.TEXT_PLAIN, MediaType.TEXT_HTML, MediaType.APPLICATION_JSON })
-    public ImageCreateResponse updateImage(@PathParam(DOCUMENT_API_PARAM_ENTITY_TYPE) final String entityName,
-            @PathParam(DOCUMENT_API_PARAM_ENTITY_ID) final Long entityId, final InputStream body) {
+    @Consumes({MediaType.TEXT_PLAIN, MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
+    public ImageCreateResponse updateImage(@PathParam(DOCUMENT_API_PARAM_ENTITY_TYPE) final String entityName, @PathParam(DOCUMENT_API_PARAM_ENTITY_ID) final Long entityId, final InputStream body) {
         return createImage(entityName, entityId, body);
     }
 
     @DELETE
-    public ImageDeleteResponse deleteImage(@PathParam(DOCUMENT_API_PARAM_ENTITY_TYPE) final String entityType,
-            @PathParam(DOCUMENT_API_PARAM_ENTITY_ID) final Long entityId) {
-
+    public ImageDeleteResponse deleteImage(@PathParam(DOCUMENT_API_PARAM_ENTITY_TYPE) final String entityType, @PathParam(DOCUMENT_API_PARAM_ENTITY_ID) final Long entityId) {
         final var command = new ImageDeleteCommand();
-
         command.setPayload(ImageDeleteRequest.builder().entityId(entityId).entityType(entityType).build());
-
         final Supplier<ImageDeleteResponse> response = dispatcher.dispatch(command);
-
         return response.get();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ImagesApiResource(final ImageReadPlatformService imageReadPlatformService, final CommandDispatcher dispatcher, final ImageResizeContentProcessor imageResizeContentProcessor, final Base64EncoderContentProcessor base64EncoderContentProcessor, final DataUrlEncoderContentProcessor dataUrlEncoderContentProcessor, final Base64DecoderContentProcessor base64DecoderContentProcessor, final DataUrlDecoderContentProcessor dataUrlDecoderContentProcessor, final FileUploadValidator fileUploadValidator) {
+        this.imageReadPlatformService = imageReadPlatformService;
+        this.dispatcher = dispatcher;
+        this.imageResizeContentProcessor = imageResizeContentProcessor;
+        this.base64EncoderContentProcessor = base64EncoderContentProcessor;
+        this.dataUrlEncoderContentProcessor = dataUrlEncoderContentProcessor;
+        this.base64DecoderContentProcessor = base64DecoderContentProcessor;
+        this.dataUrlDecoderContentProcessor = dataUrlDecoderContentProcessor;
+        this.fileUploadValidator = fileUploadValidator;
     }
 }

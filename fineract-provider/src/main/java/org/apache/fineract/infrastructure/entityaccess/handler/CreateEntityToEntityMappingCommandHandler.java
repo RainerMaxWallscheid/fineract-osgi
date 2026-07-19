@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.entityaccess.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "ENTITYMAPPING", action = "CREATE")
-@RequiredArgsConstructor
 public class CreateEntityToEntityMappingCommandHandler implements NewCommandSourceHandler {
-
     private final FineractEntityAccessWriteService fineractEntityAccessWriteService;
 
     @Override
@@ -40,4 +37,8 @@ public class CreateEntityToEntityMappingCommandHandler implements NewCommandSour
         return this.fineractEntityAccessWriteService.createEntityToEntityMapping(command.entityId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public CreateEntityToEntityMappingCommandHandler(final FineractEntityAccessWriteService fineractEntityAccessWriteService) {
+        this.fineractEntityAccessWriteService = fineractEntityAccessWriteService;
+    }
 }

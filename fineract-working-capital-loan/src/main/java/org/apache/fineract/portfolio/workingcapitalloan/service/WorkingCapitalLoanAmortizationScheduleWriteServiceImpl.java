@@ -24,7 +24,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.Validate;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
@@ -39,16 +38,13 @@ import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapita
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 // TODO: This is a temporary testing implementation. In the real flow, the amortization schedule
 // will be generated and saved as part of the loan lifecycle (approve/disburse) — not via a
 // standalone endpoint. The parameters will come from the loan entity + product, not from the
 // request body. Replace this once the full WCL lifecycle is implemented.
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class WorkingCapitalLoanAmortizationScheduleWriteServiceImpl implements WorkingCapitalLoanAmortizationScheduleWriteService {
-
     private final WorkingCapitalLoanRepository loanRepository;
     private final ProjectedAmortizationScheduleRepositoryWrapper scheduleRepositoryWrapper;
     private final ProjectedAmortizationScheduleCalculator calculator;
@@ -57,51 +53,38 @@ public class WorkingCapitalLoanAmortizationScheduleWriteServiceImpl implements W
     @Override
     public void generateAndSaveAmortizationSchedule(final Long loanId, final ProjectedAmortizationScheduleGenerateRequest request) {
         final WorkingCapitalLoan loan = loanRepository.findById(loanId).orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
-
         final MathContext mc = MoneyHelper.getMathContext();
-
         final ProjectedAmortizationScheduleModel model = ProjectedAmortizationScheduleModel.generate(//
-                request.getDiscountFeeAmount(), //
-                request.getNetDisbursementAmount(), //
-                request.getTotalPaymentVolume(), //
-                request.getPeriodPaymentRate(), //
-                request.getNpvDayCount(), //
-                request.getExpectedDisbursementDate(), //
-                mc, WorkingCapitalLoanCurrencyResolver.resolveCurrency(loan), DateUtils.getBusinessLocalDate());
-
+        request.getDiscountFeeAmount(),  //
+        request.getNetDisbursementAmount(),  //
+        request.getTotalPaymentVolume(),  //
+        request.getPeriodPaymentRate(),  //
+        request.getNpvDayCount(),  //
+        request.getExpectedDisbursementDate(),  //
+        mc, WorkingCapitalLoanCurrencyResolver.resolveCurrency(loan), DateUtils.getBusinessLocalDate());
         scheduleRepositoryWrapper.writeModel(loan, model);
     }
 
     @Override
-    public void generateAndSaveAmortizationScheduleOnDisbursement(final WorkingCapitalLoan loan, final BigDecimal disbursedAmount,
-            final LocalDate disbursementDate) {
-        final ProjectedAmortizationScheduleModel model = generateProjectedAmortizationScheduleModel(loan, disbursedAmount,
-                disbursementDate);
+    public void generateAndSaveAmortizationScheduleOnDisbursement(final WorkingCapitalLoan loan, final BigDecimal disbursedAmount, final LocalDate disbursementDate) {
+        final ProjectedAmortizationScheduleModel model = generateProjectedAmortizationScheduleModel(loan, disbursedAmount, disbursementDate);
         scheduleRepositoryWrapper.writeModel(loan, model);
     }
 
     @NonNull
-    private ProjectedAmortizationScheduleModel generateProjectedAmortizationScheduleModel(final WorkingCapitalLoan loan,
-            final BigDecimal disbursedAmount, final LocalDate disbursementDate) {
+    private ProjectedAmortizationScheduleModel generateProjectedAmortizationScheduleModel(final WorkingCapitalLoan loan, final BigDecimal disbursedAmount, final LocalDate disbursementDate) {
         Validate.notNull(loan, "loan must not be null");
         Validate.notNull(disbursedAmount, "disbursedAmount must not be null");
         Validate.notNull(disbursementDate, "disbursementDate must not be null");
-
         final MathContext mc = MoneyHelper.getMathContext();
         final BigDecimal discount = getWorkingCapitalLoanDiscountAmount(loan);
         final BigDecimal totalPaymentVolume = loan.getTotalPaymentVolume() != null ? loan.getTotalPaymentVolume() : BigDecimal.ZERO;
-        final BigDecimal periodPaymentRate = loan.getLoanProductRelatedDetails() != null
-                ? loan.getLoanProductRelatedDetails().getPeriodPaymentRate()
-                : null;
-        final Integer npvDayCount = loan.getLoanProductRelatedDetails() != null ? loan.getLoanProductRelatedDetails().getNpvDayCount()
-                : null;
-
+        final BigDecimal periodPaymentRate = loan.getLoanProductRelatedDetails() != null ? loan.getLoanProductRelatedDetails().getPeriodPaymentRate() : null;
+        final Integer npvDayCount = loan.getLoanProductRelatedDetails() != null ? loan.getLoanProductRelatedDetails().getNpvDayCount() : null;
         Validate.isTrue(totalPaymentVolume.signum() > 0, "totalPaymentVolume must be positive");
         Validate.notNull(periodPaymentRate, "periodPaymentRate must not be null");
         Validate.notNull(npvDayCount, "npvDayCount must not be null");
-
-        return ProjectedAmortizationScheduleModel.generate(discount, disbursedAmount, totalPaymentVolume, periodPaymentRate, npvDayCount,
-                disbursementDate, mc, WorkingCapitalLoanCurrencyResolver.resolveCurrency(loan), DateUtils.getBusinessLocalDate());
+        return ProjectedAmortizationScheduleModel.generate(discount, disbursedAmount, totalPaymentVolume, periodPaymentRate, npvDayCount, disbursementDate, mc, WorkingCapitalLoanCurrencyResolver.resolveCurrency(loan), DateUtils.getBusinessLocalDate());
     }
 
     @Override
@@ -131,38 +114,25 @@ public class WorkingCapitalLoanAmortizationScheduleWriteServiceImpl implements W
 
     private void generateAndSaveForApprovedLoanState(final WorkingCapitalLoan loan) {
         Validate.notNull(loan, "loan must not be null");
-
         final MathContext mc = MoneyHelper.getMathContext();
         final BigDecimal discount = getWorkingCapitalLoanDiscountAmount(loan);
-        final BigDecimal totalPaymentVolume = loan.getBalance() != null && loan.getTotalPaymentVolume() != null
-                ? loan.getTotalPaymentVolume()
-                : BigDecimal.ZERO;
-        final BigDecimal periodPaymentRate = loan.getLoanProductRelatedDetails() != null
-                ? loan.getLoanProductRelatedDetails().getPeriodPaymentRate()
-                : null;
-        final Integer npvDayCount = loan.getLoanProductRelatedDetails() != null ? loan.getLoanProductRelatedDetails().getNpvDayCount()
-                : null;
-
-        final WorkingCapitalLoanDisbursementDetails detail = loan.getDisbursementDetails() != null
-                && !loan.getDisbursementDetails().isEmpty() ? loan.getDisbursementDetails().getFirst() : null;
+        final BigDecimal totalPaymentVolume = loan.getBalance() != null && loan.getTotalPaymentVolume() != null ? loan.getTotalPaymentVolume() : BigDecimal.ZERO;
+        final BigDecimal periodPaymentRate = loan.getLoanProductRelatedDetails() != null ? loan.getLoanProductRelatedDetails().getPeriodPaymentRate() : null;
+        final Integer npvDayCount = loan.getLoanProductRelatedDetails() != null ? loan.getLoanProductRelatedDetails().getNpvDayCount() : null;
+        final WorkingCapitalLoanDisbursementDetails detail = loan.getDisbursementDetails() != null && !loan.getDisbursementDetails().isEmpty() ? loan.getDisbursementDetails().getFirst() : null;
         final LocalDate expectedDisbursementDate = detail != null ? detail.getExpectedDisbursementDate() : null;
-
         final BigDecimal netDisbursementAmount;
         if (loan.getApprovedPrincipal() != null && loan.getApprovedPrincipal().compareTo(BigDecimal.ZERO) > 0) {
             netDisbursementAmount = loan.getApprovedPrincipal();
         } else {
             netDisbursementAmount = detail != null && detail.getExpectedAmount() != null ? detail.getExpectedAmount() : BigDecimal.ZERO;
         }
-
         Validate.isTrue(totalPaymentVolume.signum() > 0, "totalPaymentVolume must be positive");
         Validate.notNull(periodPaymentRate, "periodPaymentRate must not be null");
         Validate.notNull(npvDayCount, "npvDayCount must not be null");
         Validate.notNull(expectedDisbursementDate, "expectedDisbursementDate must not be null");
         Validate.isTrue(netDisbursementAmount.signum() > 0, "net disbursement amount for schedule must be positive");
-
-        final ProjectedAmortizationScheduleModel model = ProjectedAmortizationScheduleModel.generate(discount, netDisbursementAmount,
-                totalPaymentVolume, periodPaymentRate, npvDayCount, expectedDisbursementDate, mc,
-                WorkingCapitalLoanCurrencyResolver.resolveCurrency(loan), DateUtils.getBusinessLocalDate());
+        final ProjectedAmortizationScheduleModel model = ProjectedAmortizationScheduleModel.generate(discount, netDisbursementAmount, totalPaymentVolume, periodPaymentRate, npvDayCount, expectedDisbursementDate, mc, WorkingCapitalLoanCurrencyResolver.resolveCurrency(loan), DateUtils.getBusinessLocalDate());
         scheduleRepositoryWrapper.writeModel(loan, model);
     }
 
@@ -171,15 +141,10 @@ public class WorkingCapitalLoanAmortizationScheduleWriteServiceImpl implements W
         Validate.notNull(loan, "loan must not be null");
         Validate.notNull(transactionDate, "transactionDate must not be null");
         Validate.notNull(repaymentAmount, "repaymentAmount must not be null");
-
         final MathContext mc = MoneyHelper.getMathContext();
-        final ProjectedAmortizationScheduleModel model = scheduleRepositoryWrapper
-                .readModel(loan.getId(), mc, WorkingCapitalLoanCurrencyResolver.resolveCurrency(loan))
-                .orElseThrow(() -> new IllegalStateException("Projected amortization schedule is not found for loan " + loan.getId()));
-
+        final ProjectedAmortizationScheduleModel model = scheduleRepositoryWrapper.readModel(loan.getId(), mc, WorkingCapitalLoanCurrencyResolver.resolveCurrency(loan)).orElseThrow(() -> new IllegalStateException("Projected amortization schedule is not found for loan " + loan.getId()));
         model.applyPayment(transactionDate, repaymentAmount);
         model.recalculateNetAmortizationAndDeferredBalanceFrom(transactionDate);
-
         scheduleRepositoryWrapper.writeModel(loan, model);
     }
 
@@ -187,43 +152,29 @@ public class WorkingCapitalLoanAmortizationScheduleWriteServiceImpl implements W
     public void regenerateAmortizationScheduleOnRateChange(final WorkingCapitalLoan loan, final BigDecimal newRate) {
         Validate.notNull(loan, "loan must not be null");
         Validate.notNull(newRate, "newRate must not be null");
-
         final MathContext mc = MoneyHelper.getMathContext();
         final CurrencyData currency = WorkingCapitalLoanCurrencyResolver.resolveCurrency(loan);
-        final ProjectedAmortizationScheduleModel model = scheduleRepositoryWrapper.readModel(loan.getId(), mc, currency)
-                .orElseThrow(() -> new IllegalStateException("Projected amortization schedule is not found for loan " + loan.getId()));
-
+        final ProjectedAmortizationScheduleModel model = scheduleRepositoryWrapper.readModel(loan.getId(), mc, currency).orElseThrow(() -> new IllegalStateException("Projected amortization schedule is not found for loan " + loan.getId()));
         final LocalDate businessDate = DateUtils.getBusinessLocalDate();
         final LocalDate loanDisbursementDate = resolveLoanDisbursementDate(loan);
         final int splitDayIndex = (int) ChronoUnit.DAYS.between(loanDisbursementDate, businessDate);
         final LocalDate modelRateChangeDate = model.expectedDisbursementDate().plusDays(splitDayIndex);
-
         model.clearLastRateSegment();
-
         calculator.applyRateChange(model, newRate, modelRateChangeDate);
-
         scheduleRepositoryWrapper.writeModel(loan, model);
     }
 
     @Override
     public void applyDiscountFeeAdjustment(final WorkingCapitalLoan loan) {
         Validate.notNull(loan, "loan must not be null");
-
         final MathContext mc = MoneyHelper.getMathContext();
         final CurrencyData currency = WorkingCapitalLoanCurrencyResolver.resolveCurrency(loan);
-        final ProjectedAmortizationScheduleModel currentModel = scheduleRepositoryWrapper.readModel(loan.getId(), mc, currency)
-                .orElseThrow(() -> new IllegalStateException("Projected amortization schedule is not found for loan " + loan.getId()));
-
+        final ProjectedAmortizationScheduleModel currentModel = scheduleRepositoryWrapper.readModel(loan.getId(), mc, currency).orElseThrow(() -> new IllegalStateException("Projected amortization schedule is not found for loan " + loan.getId()));
         final List<ProjectedAmortizationScheduleModel.ActualPayment> preservedPayments = currentModel.snapshotActualPayments();
-
         final BigDecimal disbursedAmount = resolveActualDisbursedAmount(loan);
         final LocalDate disbursementDate = resolveActualDisbursementDate(loan);
-
-        final ProjectedAmortizationScheduleModel restatedModel = generateProjectedAmortizationScheduleModel(loan, disbursedAmount,
-                disbursementDate);
-        preservedPayments.stream().sorted(Comparator.comparing(ProjectedAmortizationScheduleModel.ActualPayment::date))
-                .forEach(payment -> restatedModel.applyPayment(payment.date(), payment.amount().getAmount()));
-
+        final ProjectedAmortizationScheduleModel restatedModel = generateProjectedAmortizationScheduleModel(loan, disbursedAmount, disbursementDate);
+        preservedPayments.stream().sorted(Comparator.comparing(ProjectedAmortizationScheduleModel.ActualPayment::date)).forEach(payment -> restatedModel.applyPayment(payment.date(), payment.amount().getAmount()));
         scheduleRepositoryWrapper.writeModel(loan, restatedModel);
     }
 
@@ -231,16 +182,10 @@ public class WorkingCapitalLoanAmortizationScheduleWriteServiceImpl implements W
     public void rebuildScheduleFromPrincipalPayments(final WorkingCapitalLoan loan, final List<PrincipalPayment> principalPayments) {
         Validate.notNull(loan, "loan must not be null");
         Validate.notNull(principalPayments, "principalPayments must not be null");
-
         final BigDecimal disbursedAmount = resolveActualDisbursedAmount(loan);
         final LocalDate disbursementDate = resolveActualDisbursementDate(loan);
-
-        final ProjectedAmortizationScheduleModel model = generateProjectedAmortizationScheduleModel(loan, disbursedAmount,
-                disbursementDate);
-        principalPayments.stream().filter(payment -> payment.amount() != null && payment.amount().signum() > 0)
-                .sorted(Comparator.comparing(PrincipalPayment::date))
-                .forEach(payment -> model.applyPayment(payment.date(), payment.amount()));
-
+        final ProjectedAmortizationScheduleModel model = generateProjectedAmortizationScheduleModel(loan, disbursedAmount, disbursementDate);
+        principalPayments.stream().filter(payment -> payment.amount() != null && payment.amount().signum() > 0).sorted(Comparator.comparing(PrincipalPayment::date)).forEach(payment -> model.applyPayment(payment.date(), payment.amount()));
         scheduleRepositoryWrapper.writeModel(loan, model);
     }
 
@@ -249,15 +194,10 @@ public class WorkingCapitalLoanAmortizationScheduleWriteServiceImpl implements W
         Validate.notNull(loan, "loan must not be null");
         Validate.notNull(transactionDate, "transactionDate must not be null");
         Validate.notNull(repaymentAmount, "repaymentAmount must not be null");
-
         final MathContext mc = MoneyHelper.getMathContext();
-        final ProjectedAmortizationScheduleModel model = scheduleRepositoryWrapper
-                .readModel(loan.getId(), mc, WorkingCapitalLoanCurrencyResolver.resolveCurrency(loan))
-                .orElseThrow(() -> new IllegalStateException("Projected amortization schedule is not found for loan " + loan.getId()));
-
+        final ProjectedAmortizationScheduleModel model = scheduleRepositoryWrapper.readModel(loan.getId(), mc, WorkingCapitalLoanCurrencyResolver.resolveCurrency(loan)).orElseThrow(() -> new IllegalStateException("Projected amortization schedule is not found for loan " + loan.getId()));
         model.undoPayment(transactionDate, repaymentAmount);
         model.recalculateNetAmortizationAndDeferredBalanceFrom(transactionDate);
-
         scheduleRepositoryWrapper.writeModel(loan, model);
     }
 
@@ -272,8 +212,7 @@ public class WorkingCapitalLoanAmortizationScheduleWriteServiceImpl implements W
     }
 
     private BigDecimal resolveActualDisbursedAmount(final WorkingCapitalLoan loan) {
-        if (loan.getDisbursementDetails() != null && !loan.getDisbursementDetails().isEmpty()
-                && loan.getDisbursementDetails().getFirst().getActualAmount() != null) {
+        if (loan.getDisbursementDetails() != null && !loan.getDisbursementDetails().isEmpty() && loan.getDisbursementDetails().getFirst().getActualAmount() != null) {
             return loan.getDisbursementDetails().getFirst().getActualAmount();
         }
         return BigDecimal.ZERO;
@@ -284,5 +223,13 @@ public class WorkingCapitalLoanAmortizationScheduleWriteServiceImpl implements W
             return loan.getDisbursementDetails().getFirst().getActualDisbursementDate();
         }
         return null;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanAmortizationScheduleWriteServiceImpl(final WorkingCapitalLoanRepository loanRepository, final ProjectedAmortizationScheduleRepositoryWrapper scheduleRepositoryWrapper, final ProjectedAmortizationScheduleCalculator calculator, final ProjectedAmortizationScheduleModelParserService parserService) {
+        this.loanRepository = loanRepository;
+        this.scheduleRepositoryWrapper = scheduleRepositoryWrapper;
+        this.calculator = calculator;
+        this.parserService = parserService;
     }
 }

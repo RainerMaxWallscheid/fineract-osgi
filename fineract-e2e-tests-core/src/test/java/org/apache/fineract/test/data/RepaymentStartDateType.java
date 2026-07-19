@@ -18,19 +18,18 @@
  */
 package org.apache.fineract.test.data;
 
-import lombok.Getter;
-
-@Getter
 public enum RepaymentStartDateType {
-
-    INVALID(0), //
-    DISBURSEMENT_DATE(1), //
+    INVALID(0),  //
+    DISBURSEMENT_DATE(1),  //
     SUBMITTED_ON_DATE(2);
-
     public final Integer value;
 
     RepaymentStartDateType(Integer value) {
         this.value = value;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Integer getValue() {
+        return this.value;
+    }
 }

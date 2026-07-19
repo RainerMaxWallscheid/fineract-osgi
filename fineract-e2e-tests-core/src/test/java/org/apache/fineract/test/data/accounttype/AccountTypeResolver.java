@@ -19,34 +19,33 @@
 package org.apache.fineract.test.data.accounttype;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
-
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.GetGLAccountsResponse;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class AccountTypeResolver {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AccountTypeResolver.class);
     private final FineractFeignClient fineractClient;
 
     @Cacheable(key = "#accountType.getName()", value = "accountTypesByName")
     public long resolve(AccountType accountType) {
         String accountTypeName = accountType.getName();
         log.debug("Resolving account type by name [{}]", accountTypeName);
-        List<GetGLAccountsResponse> accountTypeResponses = ok(() -> fineractClient.generalLedgerAccount().retrieveAllAccountsUniversal(
-                Map.of("usage", 1, "manualEntriesAllowed", true, "disabled", false, "fetchRunningBalance", false)));
-        GetGLAccountsResponse foundAtr = accountTypeResponses.stream()//
-                .filter(atr -> accountTypeName.equals(atr.getName()))//
-                .findAny()//
-                .orElseThrow(() -> new IllegalArgumentException("Account type [%s] not found".formatted(accountTypeName)));//
-
+        List<GetGLAccountsResponse> accountTypeResponses = ok(() -> fineractClient.generalLedgerAccount().retrieveAllAccountsUniversal(Map.of("usage", 1, "manualEntriesAllowed", true, "disabled", false, "fetchRunningBalance", false)));
+        GetGLAccountsResponse foundAtr = //
+        //
+        //
+        accountTypeResponses.stream().filter(atr -> accountTypeName.equals(atr.getName())).findAny().orElseThrow(() -> new IllegalArgumentException("Account type [%s] not found".formatted(accountTypeName)));//
         return foundAtr.getId();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AccountTypeResolver(final FineractFeignClient fineractClient) {
+        this.fineractClient = fineractClient;
     }
 }

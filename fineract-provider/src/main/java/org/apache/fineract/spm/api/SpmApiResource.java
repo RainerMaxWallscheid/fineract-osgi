@@ -39,7 +39,6 @@ import jakarta.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamException;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
@@ -53,19 +52,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Path("/v1/surveys")
 @Component
 @Tag(name = "Spm-Surveys", description = "")
-@RequiredArgsConstructor
 public class SpmApiResource {
-
     private final PlatformSecurityContext securityContext;
     private final SpmService spmService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Transactional
     @Operation(summary = "List all Surveys", operationId = "fetchAllSurveys", description = "")
     @AlternativeOperationId("fetchAllSurveys_1")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SurveyData.class)))) })
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SurveyData.class))))})
     public List<SurveyData> fetchAllSurveys(@QueryParam("isActive") final Boolean isActive) {
         this.securityContext.authenticatedUser();
         final List<SurveyData> result = new ArrayList<>();
@@ -85,11 +81,10 @@ public class SpmApiResource {
 
     @GET
     @Path("/{id}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Transactional
     @Operation(summary = "Retrieve a Survey", description = "")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SurveyData.class))) })
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SurveyData.class)))})
     public SurveyData findSurvey(@PathParam("id") @Parameter(description = "Enter id") final Long id) {
         this.securityContext.authenticatedUser();
         final Survey survey = this.spmService.findById(id);
@@ -97,24 +92,22 @@ public class SpmApiResource {
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Transactional
-    @Operation(summary = "Create a Survey", description = "Adds a new survey to collect client related data.\n" + "\n"
-            + "Mandatory Fields\n" + "\n" + "countryCode, key, name, questions, responses, sequenceNo, text, description")
-    @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK") })
+    @Operation(summary = "Create a Survey", description = "Adds a new survey to collect client related data.\n" + "\n" + "Mandatory Fields\n" + "\n" + "countryCode, key, name, questions, responses, sequenceNo, text, description")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK")})
     public String createSurvey(@Parameter(description = "Create survey") final SurveyData surveyData) {
         this.securityContext.authenticatedUser();
         final Survey survey = SurveyMapper.map(surveyData, new Survey());
         this.spmService.createSurvey(survey);
         return getResponse(survey.getId());
-
     }
 
     @PUT
     @Path("/{id}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Transactional
     public String editSurvey(@PathParam("id") final Long id, final SurveyData surveyData) {
         this.securityContext.authenticatedUser();
@@ -126,11 +119,11 @@ public class SpmApiResource {
 
     @POST
     @Path("/{id}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Transactional
     @Operation(summary = "Deactivate Survey", description = "")
-    @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK") })
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK")})
     public void activateOrDeactivateSurvey(@PathParam("id") final Long id, @QueryParam("command") final String command) {
         this.securityContext.authenticatedUser();
         if (command != null && command.equalsIgnoreCase("activate")) {
@@ -140,7 +133,6 @@ public class SpmApiResource {
         } else {
             throw new UnrecognizedQueryParamException("command", command);
         }
-
     }
 
     private String getResponse(Long id) {
@@ -148,5 +140,11 @@ public class SpmApiResource {
         HashMap<String, Object> response = new HashMap<>();
         response.put("resourceId", id);
         return gson.toJson(response);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SpmApiResource(final PlatformSecurityContext securityContext, final SpmService spmService) {
+        this.securityContext = securityContext;
+        this.spmService = spmService;
     }
 }

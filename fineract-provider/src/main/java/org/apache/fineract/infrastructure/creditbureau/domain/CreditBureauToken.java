@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.infrastructure.creditbureau.domain;
 
 import jakarta.persistence.Column;
@@ -25,10 +24,6 @@ import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.slf4j.Logger;
@@ -36,29 +31,18 @@ import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name = "m_creditbureau_token")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class CreditBureauToken extends AbstractPersistableCustom<Long> {
-
     private static final Logger LOG = LoggerFactory.getLogger(CreditBureauToken.class);
-
     @Column(name = "username")
     private String userName;
-
     @Column(name = "token")
     private String accessToken;
-
     @Column(name = "token_type")
     private String tokenType;
-
     @Column(name = "expires_in")
     private String expiresIn;
-
     @Column(name = "issued")
     private String issued;
-
     @Column(name = "expiry_date")
     private LocalDate expires;
 
@@ -69,12 +53,96 @@ public class CreditBureauToken extends AbstractPersistableCustom<Long> {
         final String expiresIn = command.stringValueOfParameterNamed("expires_in");
         final String issued = command.stringValueOfParameterNamed(".issued");
         final String expiry = command.stringValueOfParameterNamed(".expires");
-
         DateTimeFormatter dateformat = new DateTimeFormatterBuilder().appendPattern("EEE, dd MMM yyyy kk:mm:ss zzz").toFormatter();
-
         LocalDate expires = LocalDate.parse(expiry, dateformat);
+        return new CreditBureauToken().setUserName(userName).setAccessToken(accessToken).setTokenType(tokenType).setExpiresIn(expiresIn).setIssued(issued).setExpires(expires);
+    }
 
-        return new CreditBureauToken().setUserName(userName).setAccessToken(accessToken).setTokenType(tokenType).setExpiresIn(expiresIn)
-                .setIssued(issued).setExpires(expires);
+    @java.lang.SuppressWarnings("all")
+        public String getUserName() {
+        return this.userName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getAccessToken() {
+        return this.accessToken;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getTokenType() {
+        return this.tokenType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getExpiresIn() {
+        return this.expiresIn;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getIssued() {
+        return this.issued;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getExpires() {
+        return this.expires;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditBureauToken setUserName(final String userName) {
+        this.userName = userName;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditBureauToken setAccessToken(final String accessToken) {
+        this.accessToken = accessToken;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditBureauToken setTokenType(final String tokenType) {
+        this.tokenType = tokenType;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditBureauToken setExpiresIn(final String expiresIn) {
+        this.expiresIn = expiresIn;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditBureauToken setIssued(final String issued) {
+        this.issued = issued;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditBureauToken setExpires(final LocalDate expires) {
+        this.expires = expires;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreditBureauToken() {
     }
 }

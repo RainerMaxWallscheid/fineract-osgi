@@ -21,29 +21,68 @@ package org.apache.fineract.infrastructure.dataqueries.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
-@Getter
-@Setter
-@AllArgsConstructor
 @Entity
 @Table(name = "x_registered_table")
 public class RegisteredDatatable extends AbstractPersistableCustom<Long> {
-
     @Column(name = "registered_table_name", nullable = false)
     private String datatableName;
-
     @Column(name = "application_table_name", nullable = false)
     private String entity;
-
     @Column(name = "entity_subtype", nullable = true)
     private String subtype;
-
     @Column(name = "category", nullable = false)
     private int category;
 
-    public RegisteredDatatable() {}
+    public RegisteredDatatable() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDatatableName() {
+        return this.datatableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEntity() {
+        return this.entity;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getSubtype() {
+        return this.subtype;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public int getCategory() {
+        return this.category;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDatatableName(final String datatableName) {
+        this.datatableName = datatableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setEntity(final String entity) {
+        this.entity = entity;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setSubtype(final String subtype) {
+        this.subtype = subtype;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setCategory(final int category) {
+        this.category = category;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RegisteredDatatable(final String datatableName, final String entity, final String subtype, final int category) {
+        this.datatableName = datatableName;
+        this.entity = entity;
+        this.subtype = subtype;
+        this.category = category;
+    }
 }

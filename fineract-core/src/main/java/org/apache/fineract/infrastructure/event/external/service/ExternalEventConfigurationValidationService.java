@@ -19,14 +19,11 @@
 package org.apache.fineract.infrastructure.event.external.service;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.JdbcTemplateFactory;
@@ -41,11 +38,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 public class ExternalEventConfigurationValidationService implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExternalEventConfigurationValidationService.class);
     private static final String EXTERNAL_EVENT_BUSINESS_INTERFACE = BusinessEvent.class.getName();
     private static final String BULK_BUSINESS_EVENT = BulkBusinessEvent.class.getName();
     private final TenantDetailsService tenantDetailsService;
@@ -60,7 +56,6 @@ public class ExternalEventConfigurationValidationService implements Initializing
     private void validateEventConfigurationForAllTenants() throws ExternalEventConfigurationNotFoundException {
         List<String> eventClasses = getAllEventClasses();
         List<FineractPlatformTenant> tenants = tenantDetailsService.findAllTenants();
-
         if (isNotEmpty(tenants)) {
             for (FineractPlatformTenant tenant : tenants) {
                 ThreadLocalContextUtil.setTenant(tenant);
@@ -69,15 +64,13 @@ public class ExternalEventConfigurationValidationService implements Initializing
         }
     }
 
-    private void validateEventConfigurationForIndividualTenant(FineractPlatformTenant tenant, List<String> eventClasses)
-            throws ExternalEventConfigurationNotFoundException {
+    private void validateEventConfigurationForIndividualTenant(FineractPlatformTenant tenant, List<String> eventClasses) throws ExternalEventConfigurationNotFoundException {
         log.info("Validating external event configuration for {}", tenant.getTenantIdentifier());
         List<String> eventConfigurations = getExternalEventConfigurationsForTenant(tenant);
         if (log.isDebugEnabled()) {
             log.debug("Missing from eventClasses: {}", CollectionUtils.subtract(eventClasses, eventConfigurations));
             log.debug("Missing from eventConfigurations: {}", CollectionUtils.subtract(eventConfigurations, eventClasses));
         }
-
         for (String eventTypeClass : eventClasses) {
             if (!eventConfigurations.contains(eventTypeClass)) {
                 throw new ExternalEventConfigurationNotFoundException(eventTypeClass);
@@ -99,12 +92,16 @@ public class ExternalEventConfigurationValidationService implements Initializing
             log.debug("Packages {}", sourcePackages);
         }
         String[] sourcePackagesForScan = new String[sourcePackages.size()];
-        try (ScanResult scanResult = new ClassGraph().enableAllInfo().acceptPackages(sourcePackages.toArray(sourcePackagesForScan))
-                .scan()) {
-            ClassInfoList businessEventClasses = scanResult.getClassesImplementing(EXTERNAL_EVENT_BUSINESS_INTERFACE)
-                    .filter(classInfo -> (!classInfo.implementsInterface(NoExternalEvent.class) && !classInfo.isInterface()
-                            && !classInfo.isAbstract() && !classInfo.getName().equalsIgnoreCase(BULK_BUSINESS_EVENT)));
+        try (ScanResult scanResult = new ClassGraph().enableAllInfo().acceptPackages(sourcePackages.toArray(sourcePackagesForScan)).scan()) {
+            ClassInfoList businessEventClasses = scanResult.getClassesImplementing(EXTERNAL_EVENT_BUSINESS_INTERFACE).filter(classInfo -> (!classInfo.implementsInterface(NoExternalEvent.class) && !classInfo.isInterface() && !classInfo.isAbstract() && !classInfo.getName().equalsIgnoreCase(BULK_BUSINESS_EVENT)));
             return businessEventClasses.stream().map(classInfo -> classInfo.getSimpleName()).collect(Collectors.toList());
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalEventConfigurationValidationService(final TenantDetailsService tenantDetailsService, final JdbcTemplateFactory jdbcTemplateFactory, final ExternalEventSourceService externalEventSourceService) {
+        this.tenantDetailsService = tenantDetailsService;
+        this.jdbcTemplateFactory = jdbcTemplateFactory;
+        this.externalEventSourceService = externalEventSourceService;
     }
 }

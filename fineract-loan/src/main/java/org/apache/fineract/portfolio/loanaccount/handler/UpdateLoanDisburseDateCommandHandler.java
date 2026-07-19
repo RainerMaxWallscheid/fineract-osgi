@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -27,15 +26,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class UpdateLoanDisburseDateCommandHandler implements NewCommandSourceHandler {
-
     private final LoanWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.updateDisbursementDateAndAmountForTranche(command.getLoanId(), command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateLoanDisburseDateCommandHandler(final LoanWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

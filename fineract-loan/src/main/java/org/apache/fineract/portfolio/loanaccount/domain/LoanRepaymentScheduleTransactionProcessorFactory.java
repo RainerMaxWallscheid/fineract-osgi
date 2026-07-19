@@ -20,27 +20,19 @@ package org.apache.fineract.portfolio.loanaccount.domain;
 
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.LoanRepaymentScheduleTransactionProcessor;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanTransactionProcessingStrategyNotFoundException;
 import org.apache.fineract.portfolio.loanproduct.data.TransactionProcessingStrategyData;
 import org.springframework.beans.factory.annotation.Value;
 
-@RequiredArgsConstructor
 public class LoanRepaymentScheduleTransactionProcessorFactory {
-
     private final LoanRepaymentScheduleTransactionProcessor defaultLoanRepaymentScheduleTransactionProcessor;
-
     private final List<LoanRepaymentScheduleTransactionProcessor> processors;
-
     @Value("${fineract.loan.transactionprocessor.error-not-found-fail}")
     private Boolean errorNotFoundFail;
 
     public LoanRepaymentScheduleTransactionProcessor determineProcessor(final String transactionProcessingStrategy) {
-
-        Optional<LoanRepaymentScheduleTransactionProcessor> processor = processors.stream()
-                .filter(p -> p.accept(transactionProcessingStrategy)).findFirst();
-
+        Optional<LoanRepaymentScheduleTransactionProcessor> processor = processors.stream().filter(p -> p.accept(transactionProcessingStrategy)).findFirst();
         if (processor.isEmpty() && Boolean.TRUE.equals(errorNotFoundFail)) {
             throw new LoanTransactionProcessingStrategyNotFoundException(transactionProcessingStrategy);
         } else {
@@ -50,5 +42,11 @@ public class LoanRepaymentScheduleTransactionProcessorFactory {
 
     public List<TransactionProcessingStrategyData> getStrategies() {
         return processors.stream().map(p -> new TransactionProcessingStrategyData(null, p.getCode(), p.getName())).toList();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanRepaymentScheduleTransactionProcessorFactory(final LoanRepaymentScheduleTransactionProcessor defaultLoanRepaymentScheduleTransactionProcessor, final List<LoanRepaymentScheduleTransactionProcessor> processors) {
+        this.defaultLoanRepaymentScheduleTransactionProcessor = defaultLoanRepaymentScheduleTransactionProcessor;
+        this.processors = processors;
     }
 }

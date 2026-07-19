@@ -19,13 +19,17 @@
 package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor
 public class PaidInAdvanceData {
-
     private final BigDecimal paidInAdvance;
 
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPaidInAdvance() {
+        return this.paidInAdvance;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PaidInAdvanceData(final BigDecimal paidInAdvance) {
+        this.paidInAdvance = paidInAdvance;
+    }
 }

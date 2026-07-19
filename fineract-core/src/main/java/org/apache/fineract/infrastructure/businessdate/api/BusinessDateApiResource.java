@@ -31,7 +31,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.infrastructure.businessdate.command.BusinessDateUpdateCommand;
 import org.apache.fineract.infrastructure.businessdate.data.api.BusinessDateResponse;
@@ -41,12 +40,10 @@ import org.apache.fineract.infrastructure.businessdate.mapper.BusinessDateMapper
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Path("/v1/businessdate")
 @Component
 @Tag(name = "Business Date Management", description = "Business date management enables you to set up, fetch and adjust organisation business dates")
 public class BusinessDateApiResource {
-
     private final BusinessDateReadPlatformService readPlatformService;
     private final CommandDispatcher dispatcher;
     private final BusinessDateMapper businessDateMapper;
@@ -67,18 +64,20 @@ public class BusinessDateApiResource {
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update Business Date", description = "")
     public BusinessDateUpdateResponse updateBusinessDate(@Valid BusinessDateUpdateRequest request) {
-
         final BusinessDateUpdateCommand command = new BusinessDateUpdateCommand();
-
         command.setPayload(request);
-
         final Supplier<BusinessDateUpdateResponse> response = dispatcher.dispatch(command);
-
         return response.get();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public BusinessDateApiResource(final BusinessDateReadPlatformService readPlatformService, final CommandDispatcher dispatcher, final BusinessDateMapper businessDateMapper) {
+        this.readPlatformService = readPlatformService;
+        this.dispatcher = dispatcher;
+        this.businessDateMapper = businessDateMapper;
+    }
 }

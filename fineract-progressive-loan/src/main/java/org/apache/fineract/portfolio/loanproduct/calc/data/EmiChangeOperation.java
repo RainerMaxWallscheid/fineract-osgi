@@ -20,28 +20,23 @@ package org.apache.fineract.portfolio.loanproduct.calc.data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.fineract.organisation.monetary.domain.Money;
 
-@Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class EmiChangeOperation {
 
-    public enum Action { //
-        DISBURSEMENT, //
-        INTEREST_RATE_CHANGE, //
-        CAPITALIZED_INCOME, //
-        ADD_REPAYMENT_PERIODS, //
+    public enum Action {
+        //
+        DISBURSEMENT,  //
+        INTEREST_RATE_CHANGE,  //
+        CAPITALIZED_INCOME,  //
+        ADD_REPAYMENT_PERIODS;
+        //
     }
 
     private final Action action;
     private final LocalDate submittedOnDate;
-
     private final Money amount;
     private final BigDecimal interestRate;
-
     private final int periodsToAdd;
 
     public static EmiChangeOperation disburse(final LocalDate disbursementDueDate, final Money disbursedAmount) {
@@ -56,8 +51,7 @@ public class EmiChangeOperation {
         return new EmiChangeOperation(Action.CAPITALIZED_INCOME, transactionDueDate, transactionAmount, null, 0);
     }
 
-    public static EmiChangeOperation addRepaymentPeriods(final LocalDate transactionDueDate, final Money transactionAmount,
-            final int numPeriods) {
+    public static EmiChangeOperation addRepaymentPeriods(final LocalDate transactionDueDate, final Money transactionAmount, final int numPeriods) {
         return new EmiChangeOperation(Action.ADD_REPAYMENT_PERIODS, transactionDueDate, transactionAmount, null, numPeriods);
     }
 
@@ -74,5 +68,39 @@ public class EmiChangeOperation {
 
     public boolean isInterestRateChange() {
         return action == Action.INTEREST_RATE_CHANGE;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Action getAction() {
+        return this.action;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getSubmittedOnDate() {
+        return this.submittedOnDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Money getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getInterestRate() {
+        return this.interestRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public int getPeriodsToAdd() {
+        return this.periodsToAdd;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private EmiChangeOperation(final Action action, final LocalDate submittedOnDate, final Money amount, final BigDecimal interestRate, final int periodsToAdd) {
+        this.action = action;
+        this.submittedOnDate = submittedOnDate;
+        this.amount = amount;
+        this.interestRate = interestRate;
+        this.periodsToAdd = periodsToAdd;
     }
 }

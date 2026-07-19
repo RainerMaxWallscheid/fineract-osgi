@@ -21,38 +21,83 @@ package org.apache.fineract.infrastructure.creditbureau.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "m_creditbureau")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class CreditBureau extends AbstractPersistableCustom<Long> {
-
     private String name;
-
     private String product;
-
     private String country;
-
     @Column(name = "implementation_key")
     private String implementationKey;
 
     public static CreditBureau fromJson(final JsonCommand command) {
-
         final String tname = command.stringValueOfParameterNamed("name");
         final String tproduct = command.stringValueOfParameterNamed("product");
         final String tcountry = command.stringValueOfParameterNamed("country");
         final String timplementationKey = command.stringValueOfParameterNamed("implementationKey");
-
         return new CreditBureau().setName(tname).setProduct(tproduct).setCountry(tcountry).setImplementationKey(timplementationKey);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getProduct() {
+        return this.product;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCountry() {
+        return this.country;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getImplementationKey() {
+        return this.implementationKey;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditBureau setName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditBureau setProduct(final String product) {
+        this.product = product;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditBureau setCountry(final String country) {
+        this.country = country;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditBureau setImplementationKey(final String implementationKey) {
+        this.implementationKey = implementationKey;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreditBureau() {
+    }
 }

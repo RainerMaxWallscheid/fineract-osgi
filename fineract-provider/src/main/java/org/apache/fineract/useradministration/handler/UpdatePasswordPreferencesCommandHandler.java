@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.useradministration.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "PASSWORD_PREFERENCES", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdatePasswordPreferencesCommandHandler implements NewCommandSourceHandler {
-
     private final PasswordPreferencesWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.updatePreferences(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdatePasswordPreferencesCommandHandler(final PasswordPreferencesWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

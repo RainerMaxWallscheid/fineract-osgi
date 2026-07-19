@@ -21,8 +21,6 @@ package org.apache.fineract.portfolio.savings.jobs.transferinteresttosavings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
 import org.apache.fineract.portfolio.account.data.AccountTransferDTO;
@@ -34,10 +32,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class TransferInterestToSavingsTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TransferInterestToSavingsTasklet.class);
     private final DepositAccountReadPlatformService depositAccountReadPlatformService;
     private final AccountTransfersWritePlatformService accountTransfersWritePlatformService;
 
@@ -49,12 +46,10 @@ public class TransferInterestToSavingsTasklet implements Tasklet {
             try {
                 accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
             } catch (final PlatformApiDataValidationException e) {
-                log.error("Validation exception while trasfering Interest from {} to {}", accountTransferDTO.getFromAccountId(),
-                        accountTransferDTO.getToAccountId(), e);
+                log.error("Validation exception while trasfering Interest from {} to {}", accountTransferDTO.getFromAccountId(), accountTransferDTO.getToAccountId(), e);
                 errors.add(e);
             } catch (final InsufficientAccountBalanceException e) {
-                log.warn("InsufficientAccountBalanceException while trasfering Interest from {} to {} ",
-                        accountTransferDTO.getFromAccountId(), accountTransferDTO.getToAccountId(), e);
+                log.warn("InsufficientAccountBalanceException while trasfering Interest from {} to {} ", accountTransferDTO.getFromAccountId(), accountTransferDTO.getToAccountId(), e);
                 errors.add(e);
             }
         }
@@ -62,5 +57,11 @@ public class TransferInterestToSavingsTasklet implements Tasklet {
             throw new JobExecutionException(errors);
         }
         return RepeatStatus.FINISHED;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public TransferInterestToSavingsTasklet(final DepositAccountReadPlatformService depositAccountReadPlatformService, final AccountTransfersWritePlatformService accountTransfersWritePlatformService) {
+        this.depositAccountReadPlatformService = depositAccountReadPlatformService;
+        this.accountTransfersWritePlatformService = accountTransfersWritePlatformService;
     }
 }

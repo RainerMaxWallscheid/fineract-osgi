@@ -41,8 +41,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.infrastructure.bulkimport.data.GlobalEntityType;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
@@ -63,14 +61,13 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Path("/v1/staff")
-@Produces({ MediaType.APPLICATION_JSON })
+@Produces({MediaType.APPLICATION_JSON})
 @Component
 @Tag(name = "Staff", description = "Allows you to model staff members. At present the key role of significance is whether this staff member is a loan officer or not.")
-@RequiredArgsConstructor
 public class StaffApiResource {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StaffApiResource.class);
     private final StaffReadService readPlatformService;
     private final OfficeReadPlatformService officeReadPlatformService;
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
@@ -78,50 +75,39 @@ public class StaffApiResource {
 
     @GET
     @Operation(summary = "Retrieve Staff", operationId = "retrieveAllStaff", description = """
-            Returns the list of staff members.
-
-            Example Requests:
-
-            - /staff
-            - /staff?status=ACTIVE
-            - /staff?status=INACTIVE
-            - /staff?status=ALL
-
-            By default it Returns all the ACTIVE Staff. Otherwise a status can be provided like e.g. status=INACTIVE,
-            then it returns all INACTIVE staff or status=ALL returns both ACTIVE and INACTIVE staff.
-            """)
+        Returns the list of staff members.
+        
+        Example Requests:
+        
+        - /staff
+        - /staff?status=ACTIVE
+        - /staff?status=INACTIVE
+        - /staff?status=ALL
+        
+        By default it Returns all the ACTIVE Staff. Otherwise a status can be provided like e.g. status=INACTIVE,
+        then it returns all INACTIVE staff or status=ALL returns both ACTIVE and INACTIVE staff.
+        """)
     @AlternativeOperationId("retrieveAll_16")
-    public List<StaffData> retrieveAll(@QueryParam("officeId") @Parameter(description = "officeId") final Long officeId,
-            @DefaultValue("false") @QueryParam("staffInOfficeHierarchy") @Parameter(description = "staffInOfficeHierarchy") final boolean staffInOfficeHierarchy,
-            @DefaultValue("false") @QueryParam("loanOfficersOnly") @Parameter(description = "loanOfficersOnly") final boolean loanOfficersOnly,
-            @DefaultValue("active") @QueryParam("status") @Parameter(description = "status") final String status) {
-        return staffInOfficeHierarchy ? readPlatformService.retrieveAllStaffInOfficeAndItsParentOfficeHierarchy(officeId, loanOfficersOnly)
-                : readPlatformService.retrieveAllStaff(officeId, loanOfficersOnly, Optional.ofNullable(status).orElse("active"));
+    public List<StaffData> retrieveAll(@QueryParam("officeId") @Parameter(description = "officeId") final Long officeId, @DefaultValue("false") @QueryParam("staffInOfficeHierarchy") @Parameter(description = "staffInOfficeHierarchy") final boolean staffInOfficeHierarchy, @DefaultValue("false") @QueryParam("loanOfficersOnly") @Parameter(description = "loanOfficersOnly") final boolean loanOfficersOnly, @DefaultValue("active") @QueryParam("status") @Parameter(description = "status") final String status) {
+        return staffInOfficeHierarchy ? readPlatformService.retrieveAllStaffInOfficeAndItsParentOfficeHierarchy(officeId, loanOfficersOnly) : readPlatformService.retrieveAllStaff(officeId, loanOfficersOnly, Optional.ofNullable(status).orElse("active"));
     }
 
     @GET
     @Path("{staffId}")
     @Operation(summary = "Retrieve a Staff Member", operationId = "retrieveOneStaff", description = """
-            Returns the details of a Staff Member.
-
-            Example Requests:
-
-            - /staff/1
-            """)
+        Returns the details of a Staff Member.
+        
+        Example Requests:
+        
+        - /staff/1
+        """)
     @AlternativeOperationId("retrieveOne_8")
-    public StaffData retrieveOne(@PathParam("staffId") @Parameter(description = "staffId") final Long staffId,
-            @DefaultValue("false") @QueryParam("template") @Parameter(description = "template", hidden = true) boolean template) {
+    public StaffData retrieveOne(@PathParam("staffId") @Parameter(description = "staffId") final Long staffId, @DefaultValue("false") @QueryParam("template") @Parameter(description = "template", hidden = true) boolean template) {
         StaffData staff = readPlatformService.retrieveStaff(staffId);
-
         if (template) {
             final Collection<OfficeData> allowedOffices = officeReadPlatformService.retrieveAllOfficesForDropdown();
-
-            staff = StaffData.builder().id(staff.getId()).firstname(staff.getFirstname()).lastname(staff.getLastname())
-                    .displayName(staff.getDisplayName()).officeId(staff.getOfficeId()).officeName(staff.getOfficeName())
-                    .isLoanOfficer(staff.getIsLoanOfficer()).externalId(staff.getExternalId()).mobileNo(staff.getMobileNo())
-                    .isActive(staff.getIsActive()).joiningDate(staff.getJoiningDate()).allowedOffices(allowedOffices).build();
+            staff = StaffData.builder().id(staff.getId()).firstname(staff.getFirstname()).lastname(staff.getLastname()).displayName(staff.getDisplayName()).officeId(staff.getOfficeId()).officeName(staff.getOfficeName()).isLoanOfficer(staff.getIsLoanOfficer()).externalId(staff.getExternalId()).mobileNo(staff.getMobileNo()).isActive(staff.getIsActive()).joiningDate(staff.getJoiningDate()).allowedOffices(allowedOffices).build();
         }
-
         return staff;
     }
 
@@ -130,73 +116,65 @@ public class StaffApiResource {
     @Produces("application/vnd.ms-excel")
     @Operation(summary = "Download bulk import template", operationId = "getBulkTemplateStaff")
     @AlternativeOperationId("getTemplate_1")
-    public Response getTemplate(@QueryParam("officeId") @Parameter(description = "officeId") final Long officeId,
-            @QueryParam("dateFormat") @Parameter(description = "dateFormat") final String dateFormat) {
+    public Response getTemplate(@QueryParam("officeId") @Parameter(description = "officeId") final Long officeId, @QueryParam("dateFormat") @Parameter(description = "dateFormat") final String dateFormat) {
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.STAFF.toString(), officeId, null, dateFormat);
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create a staff member", operationId = "createStaff", description = """
-            Creates a staff member.
-
-            Mandatory fields:
-
-            - officeId
-            - firstname
-            - lastname
-
-            Optional fields:
-
-            - isLoanOfficer
-            - isActive
-            """)
+        Creates a staff member.
+        
+        Mandatory fields:
+        
+        - officeId
+        - firstname
+        - lastname
+        
+        Optional fields:
+        
+        - isLoanOfficer
+        - isActive
+        """)
     @AlternativeOperationId("create_3")
     public StaffCreateResponse createStaff(@RequestBody(required = true) @Valid StaffCreateRequest request) {
         final var command = new StaffCreateCommand();
-
         command.setPayload(request);
-
         final Supplier<StaffCreateResponse> response = dispatcher.dispatch(command);
-
         return response.get();
     }
 
     @PUT
     @Path("{staffId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a Staff Member", operationId = "updateStaff", description = "Updates the details of a staff member.")
     @AlternativeOperationId("update_7")
-    public StaffUpdateResponse updateStaff(@PathParam("staffId") @Parameter(description = "staffId") final Long staffId,
-            @RequestBody(required = true) @Valid StaffUpdateRequest request) {
+    public StaffUpdateResponse updateStaff(@PathParam("staffId") @Parameter(description = "staffId") final Long staffId, @RequestBody(required = true) @Valid StaffUpdateRequest request) {
         request.setId(staffId);
-
         final var command = new StaffUpdateCommand();
-
         command.setPayload(request);
-
         final Supplier<StaffUpdateResponse> response = dispatcher.dispatch(command);
-
         return response.get();
     }
 
     @POST
     @Path("uploadtemplate")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces({ MediaType.WILDCARD })
-    @RequestBody(description = "Upload staff template", content = {
-            @Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = StaffUploadRequest.class)) })
-    public Long postTemplate(@FormDataParam("file") InputStream uploadedInputStream,
-            @FormDataParam("file") FormDataContentDisposition fileDetail, @FormDataParam("locale") final String locale,
-            @FormDataParam("dateFormat") final String dateFormat) {
+    @Produces({MediaType.WILDCARD})
+    @RequestBody(description = "Upload staff template", content = {@Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = StaffUploadRequest.class))})
+    public Long postTemplate(@FormDataParam("file") InputStream uploadedInputStream, @FormDataParam("file") FormDataContentDisposition fileDetail, @FormDataParam("locale") final String locale, @FormDataParam("dateFormat") final String dateFormat) {
         final var command = new StaffUploadCommand();
-
-        command.setPayload(StaffUploadRequest.builder().uploadedInputStream(uploadedInputStream).fileDetail(fileDetail).locale(locale)
-                .dateFormat(dateFormat).build());
-
+        command.setPayload(StaffUploadRequest.builder().uploadedInputStream(uploadedInputStream).fileDetail(fileDetail).locale(locale).dateFormat(dateFormat).build());
         final Supplier<StaffUpdateResponse> response = dispatcher.dispatch(command);
-
         // TODO: return the whole body, a number is not a valid JSON element!
         return response.get().getResourceId();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public StaffApiResource(final StaffReadService readPlatformService, final OfficeReadPlatformService officeReadPlatformService, final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService, final CommandDispatcher dispatcher) {
+        this.readPlatformService = readPlatformService;
+        this.officeReadPlatformService = officeReadPlatformService;
+        this.bulkImportWorkbookPopulatorService = bulkImportWorkbookPopulatorService;
+        this.dispatcher = dispatcher;
     }
 }

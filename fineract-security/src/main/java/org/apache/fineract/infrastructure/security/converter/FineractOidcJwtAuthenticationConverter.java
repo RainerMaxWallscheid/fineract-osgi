@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.infrastructure.security.converter;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.security.data.FineractJwtAuthenticationToken;
 import org.apache.fineract.infrastructure.security.exception.OidcUserNotFoundException;
 import org.apache.fineract.infrastructure.security.service.FineractOidcUserService;
@@ -46,19 +44,16 @@ import org.springframework.security.oauth2.jwt.Jwt;
  * {@code SpringSecurityPlatformSecurityContext.authenticatedUser()} resolves the principal as {@link AppUser} without
  * any additional changes downstream.
  */
-@Slf4j
-@RequiredArgsConstructor
 public class FineractOidcJwtAuthenticationConverter implements Converter<Jwt, FineractJwtAuthenticationToken> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FineractOidcJwtAuthenticationConverter.class);
     private final FineractOidcUserService oidcUserService;
 
     @Override
     @NonNull
     public FineractJwtAuthenticationToken convert(@NonNull Jwt jwt) {
         String username = oidcUserService.extractUsername(jwt);
-
-        log.debug("Converting external IdP JWT for username '{}' (subject: '{}')", username, jwt.getSubject());
-
+        log.debug("Converting external IdP JWT for username \'{}\' (subject: \'{}\')", username, jwt.getSubject());
         try {
             AppUser appUser = oidcUserService.resolveUser(jwt, username);
             return new FineractJwtAuthenticationToken(jwt, appUser.getAuthorities(), appUser);
@@ -66,5 +61,10 @@ public class FineractOidcJwtAuthenticationConverter implements Converter<Jwt, Fi
             log.warn("JWT conversion failed — OIDC user not found: {}", ex.getMessage());
             throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN, ex.getMessage(), null), ex);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public FineractOidcJwtAuthenticationConverter(final FineractOidcUserService oidcUserService) {
+        this.oidcUserService = oidcUserService;
     }
 }

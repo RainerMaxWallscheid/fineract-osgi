@@ -19,8 +19,6 @@
 package org.apache.fineract.command.implementation;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHookAfter;
 import org.apache.fineract.command.core.CommandHookBefore;
@@ -29,13 +27,12 @@ import org.apache.fineract.command.core.CommandHookManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @ConditionalOnMissingBean(value = CommandHookManager.class, ignored = DefaultCommandHookManager.class)
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class DefaultCommandHookManager implements CommandHookManager {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DefaultCommandHookManager.class);
     private final List<CommandHookBefore> beforeHooks;
     private final List<CommandHookAfter> afterHooks;
     private final List<CommandHookError> errorHooks;
@@ -53,5 +50,12 @@ public class DefaultCommandHookManager implements CommandHookManager {
     @Override
     public void error(Command command, Throwable error) {
         errorHooks.forEach(processor -> processor.onError(command, error));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DefaultCommandHookManager(final List<CommandHookBefore> beforeHooks, final List<CommandHookAfter> afterHooks, final List<CommandHookError> errorHooks) {
+        this.beforeHooks = beforeHooks;
+        this.afterHooks = afterHooks;
+        this.errorHooks = errorHooks;
     }
 }

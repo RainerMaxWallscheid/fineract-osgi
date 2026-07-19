@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.client.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,16 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "CLIENT", action = "REACTIVATE")
-@RequiredArgsConstructor
 public class ReActivateClientCommandHandler implements NewCommandSourceHandler {
-
     private final ClientWritePlatformService clientWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.clientWritePlatformService.reActivateClient(command.entityId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ReActivateClientCommandHandler(final ClientWritePlatformService clientWritePlatformService) {
+        this.clientWritePlatformService = clientWritePlatformService;
+    }
 }

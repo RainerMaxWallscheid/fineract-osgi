@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.event.external.service.serialization.serializer.share;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
 import org.apache.fineract.avro.share.v1.ShareAccountDataV1;
@@ -31,9 +30,7 @@ import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountReadPlatf
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class ShareAccountBusinessEventSerializer implements BusinessEventSerializer {
-
     private final ShareAccountReadPlatformService service;
     private final ShareAccountDataMapper mapper;
 
@@ -52,5 +49,11 @@ public class ShareAccountBusinessEventSerializer implements BusinessEventSeriali
     @Override
     public Class<? extends GenericContainer> getSupportedSchema() {
         return ShareAccountDataV1.class;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ShareAccountBusinessEventSerializer(final ShareAccountReadPlatformService service, final ShareAccountDataMapper mapper) {
+        this.service = service;
+        this.mapper = mapper;
     }
 }

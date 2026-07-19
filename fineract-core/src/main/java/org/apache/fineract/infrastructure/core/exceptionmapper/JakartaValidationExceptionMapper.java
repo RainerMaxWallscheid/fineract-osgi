@@ -25,25 +25,21 @@ import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Provider
 @Component
-@RequiredArgsConstructor
 public class JakartaValidationExceptionMapper implements FineractExceptionMapper, ExceptionMapper<ConstraintViolationException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JakartaValidationExceptionMapper.class);
 
     @Override
     public Response toResponse(final ConstraintViolationException exception) {
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-        final ApiGlobalErrorResponse dataValidationErrorResponse = ApiGlobalErrorResponse
-                .badClientRequest("validation.msg.validation.errors.exist", "Validation errors exist.", getApiParameterErrors(exception));
-
+        final ApiGlobalErrorResponse dataValidationErrorResponse = ApiGlobalErrorResponse.badClientRequest("validation.msg.validation.errors.exist", "Validation errors exist.", getApiParameterErrors(exception));
         return Response.status(Status.BAD_REQUEST).entity(dataValidationErrorResponse).type(MediaType.APPLICATION_JSON).build();
     }
 
@@ -56,9 +52,11 @@ public class JakartaValidationExceptionMapper implements FineractExceptionMapper
         return exception.getConstraintViolations().stream().map(violation -> {
             final String messageTemplate = violation.getMessageTemplate();
             final String messageKey = messageTemplate.replace("{", "").replace("}", "");
-
             return ApiParameterError.parameterError(messageKey, violation.getMessage(), violation.getPropertyPath().toString());
         }).toList();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public JakartaValidationExceptionMapper() {
+    }
 }

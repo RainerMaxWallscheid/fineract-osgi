@@ -22,21 +22,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 /**
  * Result of a GCM multicast message request .
  */
-
-@Data
-@NoArgsConstructor
-@Accessors(chain = true)
 public final class MulticastResult implements Serializable {
-
     private static final long serialVersionUID = 1L;
-
     private int success;
     private int failure;
     private int canonicalIds;
@@ -44,16 +35,14 @@ public final class MulticastResult implements Serializable {
     private List<Result> results;
     private List<Long> retryMulticastIds;
 
+
     public static final class Builder {
-
         private final List<Result> results = new ArrayList<>();
-
         // required parameters
         private final int success;
         private final int failure;
         private final int canonicalIds;
         private final long multicastId;
-
         // optional parameters
         private List<Long> retryMulticastIds;
 
@@ -90,5 +79,135 @@ public final class MulticastResult implements Serializable {
             tmpList = Collections.emptyList();
         }
         retryMulticastIds = Collections.unmodifiableList(tmpList);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public int getSuccess() {
+        return this.success;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public int getFailure() {
+        return this.failure;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public int getCanonicalIds() {
+        return this.canonicalIds;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public long getMulticastId() {
+        return this.multicastId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<Result> getResults() {
+        return this.results;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<Long> getRetryMulticastIds() {
+        return this.retryMulticastIds;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MulticastResult setSuccess(final int success) {
+        this.success = success;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MulticastResult setFailure(final int failure) {
+        this.failure = failure;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MulticastResult setCanonicalIds(final int canonicalIds) {
+        this.canonicalIds = canonicalIds;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MulticastResult setMulticastId(final long multicastId) {
+        this.multicastId = multicastId;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MulticastResult setResults(final List<Result> results) {
+        this.results = results;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MulticastResult setRetryMulticastIds(final List<Long> retryMulticastIds) {
+        this.retryMulticastIds = retryMulticastIds;
+        return this;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof MulticastResult)) return false;
+        final MulticastResult other = (MulticastResult) o;
+        if (this.getSuccess() != other.getSuccess()) return false;
+        if (this.getFailure() != other.getFailure()) return false;
+        if (this.getCanonicalIds() != other.getCanonicalIds()) return false;
+        if (this.getMulticastId() != other.getMulticastId()) return false;
+        final java.lang.Object this$results = this.getResults();
+        final java.lang.Object other$results = other.getResults();
+        if (this$results == null ? other$results != null : !this$results.equals(other$results)) return false;
+        final java.lang.Object this$retryMulticastIds = this.getRetryMulticastIds();
+        final java.lang.Object other$retryMulticastIds = other.getRetryMulticastIds();
+        if (this$retryMulticastIds == null ? other$retryMulticastIds != null : !this$retryMulticastIds.equals(other$retryMulticastIds)) return false;
+        return true;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        result = result * PRIME + this.getSuccess();
+        result = result * PRIME + this.getFailure();
+        result = result * PRIME + this.getCanonicalIds();
+        final long $multicastId = this.getMulticastId();
+        result = result * PRIME + (int) ($multicastId >>> 32 ^ $multicastId);
+        final java.lang.Object $results = this.getResults();
+        result = result * PRIME + ($results == null ? 43 : $results.hashCode());
+        final java.lang.Object $retryMulticastIds = this.getRetryMulticastIds();
+        result = result * PRIME + ($retryMulticastIds == null ? 43 : $retryMulticastIds.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "MulticastResult(success=" + this.getSuccess() + ", failure=" + this.getFailure() + ", canonicalIds=" + this.getCanonicalIds() + ", multicastId=" + this.getMulticastId() + ", results=" + this.getResults() + ", retryMulticastIds=" + this.getRetryMulticastIds() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MulticastResult() {
     }
 }

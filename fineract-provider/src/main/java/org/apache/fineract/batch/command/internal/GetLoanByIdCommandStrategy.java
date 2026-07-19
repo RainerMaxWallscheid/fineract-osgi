@@ -19,11 +19,9 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import jakarta.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
@@ -39,9 +37,7 @@ import org.springframework.stereotype.Component;
  * {@link LoansApiResource} and map those errors to appropriate status codes in BatchResponse.
  */
 @Component
-@RequiredArgsConstructor
 public class GetLoanByIdCommandStrategy implements CommandStrategy {
-
     /**
      * Loans api resource {@link LoansApiResource}.
      */
@@ -50,16 +46,12 @@ public class GetLoanByIdCommandStrategy implements CommandStrategy {
     @Override
     public BatchResponse execute(final BatchRequest request, final UriInfo uriInfo) {
         final MutableUriInfo parameterizedUriInfo = new MutableUriInfo(uriInfo);
-
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final String relativeUrl = relativeUrlWithoutVersion(request);
         Long loanId;
-
         // uriInfo will contain the query parameter value(s) that are sent in the actual batch uri.
         // for example: batches?enclosingTransaction=true
         // But the query parameters that are sent in the batch relative url has to be sent to
@@ -74,13 +66,11 @@ public class GetLoanByIdCommandStrategy implements CommandStrategy {
         if (relativeUrl.indexOf('?') > 0) {
             loanId = Long.parseLong(StringUtils.substringBetween(relativeUrl, "/", "?"));
             queryParameters = getQueryParameters(relativeUrl);
-
             // Add the query parameters sent in the relative URL to UriInfo
             addQueryParametersToUriInfo(parameterizedUriInfo, queryParameters);
         } else {
             loanId = Long.parseLong(StringUtils.substringAfter(relativeUrl, "/"));
         }
-
         // Calls 'retrieveLoan' function from 'LoansApiResource' to
         // get the loan details based on the loan id
         final boolean staffInSelectedOfficeOnly = false;
@@ -98,15 +88,10 @@ public class GetLoanByIdCommandStrategy implements CommandStrategy {
                 fields = queryParameters.get("fields");
             }
         }
-
-        responseBody = loansApiResource.retrieveLoan(loanId, staffInSelectedOfficeOnly, associations, exclude, fields,
-                parameterizedUriInfo);
-
+        responseBody = loansApiResource.retrieveLoan(loanId, staffInSelectedOfficeOnly, associations, exclude, fields, parameterizedUriInfo);
         response.setStatusCode(HttpStatus.SC_OK);
-
         // Sets the response after retrieving the loan
         response.setBody(responseBody);
-
         return response;
     }
 
@@ -140,5 +125,15 @@ public class GetLoanByIdCommandStrategy implements CommandStrategy {
         for (Map.Entry<String, String> entry : queryParameters.entrySet()) {
             uriInfo.addAdditionalQueryParameter(entry.getKey(), entry.getValue());
         }
+    }
+
+    /**
+     * Creates a new {@code GetLoanByIdCommandStrategy} instance.
+     *
+     * @param loansApiResource Loans api resource {@link LoansApiResource}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GetLoanByIdCommandStrategy(final LoansApiResource loansApiResource) {
+        this.loansApiResource = loansApiResource;
     }
 }

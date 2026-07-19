@@ -20,17 +20,14 @@ package org.apache.fineract.client.feign.util;
 
 import java.util.Collection;
 import java.util.Map;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FeignException;
 
 /**
  * Exception thrown by {@link FeignCalls} utility when Feign calls fail.
  */
-@Slf4j
-@Getter
 public class CallFailedRuntimeException extends RuntimeException {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CallFailedRuntimeException.class);
     private final int status;
     private final String developerMessage;
     private final String userMessageGlobalisationCode;
@@ -48,16 +45,13 @@ public class CallFailedRuntimeException extends RuntimeException {
 
     private static String createMessage(FeignException e) {
         StringBuilder sb = new StringBuilder("HTTP failed: status=").append(e.status());
-
         if (e.request() != null) {
             sb.append(", request=").append(e.request().url());
         }
-
         String contentString = e.responseBodyAsString();
         if (contentString != null && !contentString.isEmpty()) {
             sb.append(", errorBody=").append(contentString);
         }
-
         return sb.toString();
     }
 
@@ -66,5 +60,30 @@ public class CallFailedRuntimeException extends RuntimeException {
             return e.getDeveloperMessage();
         }
         return e.getMessage();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public int getStatus() {
+        return this.status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDeveloperMessage() {
+        return this.developerMessage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getUserMessageGlobalisationCode() {
+        return this.userMessageGlobalisationCode;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Map<String, Collection<String>> getHeaders() {
+        return this.headers;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getResponseBody() {
+        return this.responseBody;
     }
 }

@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.loanorigination.service;
 
 import java.util.Collections;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
 import org.apache.fineract.infrastructure.codes.mapper.CodeValueMapper;
@@ -40,11 +39,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 @ConditionalOnProperty(value = "fineract.module.loan-origination.enabled", havingValue = "true")
 public class LoanOriginatorReadPlatformServiceImpl implements LoanOriginatorReadPlatformService {
-
     private final LoanOriginatorRepository loanOriginatorRepository;
     private final LoanOriginatorMappingRepository loanOriginatorMappingRepository;
     private final LoanOriginatorMapper loanOriginatorMapper;
@@ -59,22 +56,19 @@ public class LoanOriginatorReadPlatformServiceImpl implements LoanOriginatorRead
 
     @Override
     public LoanOriginatorData retrieveById(final Long id) {
-        final LoanOriginator originator = this.loanOriginatorRepository.findByIdWithCodeValues(id)
-                .orElseThrow(() -> new LoanOriginatorNotFoundException(id));
+        final LoanOriginator originator = this.loanOriginatorRepository.findByIdWithCodeValues(id).orElseThrow(() -> new LoanOriginatorNotFoundException(id));
         return this.loanOriginatorMapper.toData(originator);
     }
 
     @Override
     public LoanOriginatorData retrieveByExternalId(final String externalId) {
-        final LoanOriginator originator = this.loanOriginatorRepository.findByExternalIdWithCodeValues(new ExternalId(externalId))
-                .orElseThrow(() -> new LoanOriginatorNotFoundException(externalId));
+        final LoanOriginator originator = this.loanOriginatorRepository.findByExternalIdWithCodeValues(new ExternalId(externalId)).orElseThrow(() -> new LoanOriginatorNotFoundException(externalId));
         return this.loanOriginatorMapper.toData(originator);
     }
 
     @Override
     public Long resolveIdByExternalId(final String externalId) {
-        final LoanOriginator originator = this.loanOriginatorRepository.findByExternalId(new ExternalId(externalId))
-                .orElseThrow(() -> new LoanOriginatorNotFoundException(externalId));
+        final LoanOriginator originator = this.loanOriginatorRepository.findByExternalId(new ExternalId(externalId)).orElseThrow(() -> new LoanOriginatorNotFoundException(externalId));
         return originator.getId();
     }
 
@@ -89,11 +83,17 @@ public class LoanOriginatorReadPlatformServiceImpl implements LoanOriginatorRead
 
     @Override
     public LoanOriginatorTemplateData retrieveTemplate() {
-        final List<CodeValueData> originationTypeOptions = codeValueMapper
-                .map(codeValueRepository.findByCodeName(LoanOriginatorApiConstants.ORIGINATOR_TYPE_CODE_NAME));
-        final List<CodeValueData> channelTypeOptions = codeValueMapper
-                .map(codeValueRepository.findByCodeName(LoanOriginatorApiConstants.CHANNEL_TYPE_CODE_NAME));
-        return new LoanOriginatorTemplateData(ExternalId.generate().getValue(), LoanOriginatorStatus.getAllValues(), originationTypeOptions,
-                channelTypeOptions);
+        final List<CodeValueData> originationTypeOptions = codeValueMapper.map(codeValueRepository.findByCodeName(LoanOriginatorApiConstants.ORIGINATOR_TYPE_CODE_NAME));
+        final List<CodeValueData> channelTypeOptions = codeValueMapper.map(codeValueRepository.findByCodeName(LoanOriginatorApiConstants.CHANNEL_TYPE_CODE_NAME));
+        return new LoanOriginatorTemplateData(ExternalId.generate().getValue(), LoanOriginatorStatus.getAllValues(), originationTypeOptions, channelTypeOptions);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanOriginatorReadPlatformServiceImpl(final LoanOriginatorRepository loanOriginatorRepository, final LoanOriginatorMappingRepository loanOriginatorMappingRepository, final LoanOriginatorMapper loanOriginatorMapper, final CodeValueRepository codeValueRepository, final CodeValueMapper codeValueMapper) {
+        this.loanOriginatorRepository = loanOriginatorRepository;
+        this.loanOriginatorMappingRepository = loanOriginatorMappingRepository;
+        this.loanOriginatorMapper = loanOriginatorMapper;
+        this.codeValueRepository = codeValueRepository;
+        this.codeValueMapper = codeValueMapper;
     }
 }

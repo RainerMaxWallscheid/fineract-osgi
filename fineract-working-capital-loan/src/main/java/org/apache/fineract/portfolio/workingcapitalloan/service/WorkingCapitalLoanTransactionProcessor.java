@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.workingcapitalloan.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanAllocationPlan;
@@ -39,9 +38,7 @@ import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapita
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class WorkingCapitalLoanTransactionProcessor {
-
     private final WorkingCapitalLoanChargeRepository chargeRepository;
     private final WorkingCapitalLoanBalanceRepository balanceRepository;
     private final WorkingCapitalLoanTransactionRepository transactionRepository;
@@ -57,31 +54,24 @@ public class WorkingCapitalLoanTransactionProcessor {
     private final WorkingCapitalLoanLifecycleStateMachine stateMachine;
     private final WorkingCapitalLoanDiscountFeeAmortizationService discountFeeAmortizationService;
 
-    public WorkingCapitalLoanTransactionAllocation processRepaymentLikeTransaction(final WorkingCapitalLoan loan,
-            final WorkingCapitalLoanTransaction transaction, final LoanTransactionType transactionType, final LocalDate transactionDate,
-            final BigDecimal transactionAmount) {
+    public WorkingCapitalLoanTransactionAllocation processRepaymentLikeTransaction(final WorkingCapitalLoan loan, final WorkingCapitalLoanTransaction transaction, final LoanTransactionType transactionType, final LocalDate transactionDate, final BigDecimal transactionAmount) {
         final Long loanId = loan.getId();
-        final WorkingCapitalLoanBalance balance = balanceRepository.findByWcLoan_Id(loanId)
-                .orElseGet(() -> WorkingCapitalLoanBalance.createFor(loan));
+        final WorkingCapitalLoanBalance balance = balanceRepository.findByWcLoan_Id(loanId).orElseGet(() -> WorkingCapitalLoanBalance.createFor(loan));
         final List<WorkingCapitalLoanCharge> charges = chargeRepository.findByLoanIdAndActiveTrueOrderByDueDateAscIdAsc(loanId);
-
         // Decide the allocation across penalty/fee/principal following the loan's configured payment allocation order
         // (principal-only when no order is configured), then materialize it onto the charges and refresh the balance.
-        final WorkingCapitalLoanAllocationRequest allocationRequest = allocationRequestFactory.build(loan, balance, charges,
-                transactionDate, transactionAmount, transactionType);
+        final WorkingCapitalLoanAllocationRequest allocationRequest = allocationRequestFactory.build(loan, balance, charges, transactionDate, transactionAmount, transactionType);
         final WorkingCapitalLoanAllocationPlan allocationPlan = allocationProcessor.plan(allocationRequest);
         final WorkingCapitalLoanTransactionAllocation allocation = allocationApplier.apply(transaction, null, allocationPlan, charges);
         balanceUpdater.apply(balance, allocationPlan);
         chargeRepository.saveAll(charges);
         balanceRepository.saveAndFlush(balance);
         allocationRepository.saveAndFlush(allocation);
-
         // A backdated transaction can change how the other transactions allocate across charges, so it triggers
         // reprocessing. When the loan has charges, reprocessing rebuilds the amortization schedule from scratch, so
         // the incremental apply below would be immediately overwritten and is skipped. For a charge-free loan
         // reprocessing is a no-op (principal-only allocation is order-independent), so the incremental apply stands.
-        final List<WorkingCapitalLoanTransaction> allTransactions = transactionRepository
-                .findByWcLoan_IdOrderByTransactionDateAscIdAsc(loanId);
+        final List<WorkingCapitalLoanTransaction> allTransactions = transactionRepository.findByWcLoan_IdOrderByTransactionDateAscIdAsc(loanId);
         final boolean backdated = isBackdatedTransaction(allTransactions, transaction);
         final boolean reprocessingWillRebuildSchedule = backdated && !charges.isEmpty();
         if (!reprocessingWillRebuildSchedule) {
@@ -98,33 +88,42 @@ public class WorkingCapitalLoanTransactionProcessor {
         }
         // Breach schedule is maintained incrementally here; reprocessing does not rebuild it.
         breachScheduleService.applyRepayment(loanId, transactionDate, transactionAmount);
-
         stateMachine.determineAndTransition(loan, transactionDate);
         triggerInlineAmortizationIfLoanClosed(loan, transactionDate);
-
         return allocation;
     }
 
-    private boolean isBackdatedTransaction(final List<WorkingCapitalLoanTransaction> allTransactions,
-            final WorkingCapitalLoanTransaction newTxn) {
+    private boolean isBackdatedTransaction(final List<WorkingCapitalLoanTransaction> allTransactions, final WorkingCapitalLoanTransaction newTxn) {
         // The same-date ID comparison is defensive only: the just-persisted transaction holds the highest
         // ID, so in practice only a strictly later transaction date marks the new one as backdated.
-        return allTransactions.stream().filter(txn -> !txn.isReversed() && !txn.getId().equals(newTxn.getId()))
-                .anyMatch(txn -> txn.getTransactionDate().isAfter(newTxn.getTransactionDate())
-                        || (txn.getTransactionDate().equals(newTxn.getTransactionDate()) && txn.getId().compareTo(newTxn.getId()) > 0));
+        return allTransactions.stream().filter(txn -> !txn.isReversed() && !txn.getId().equals(newTxn.getId())).anyMatch(txn -> txn.getTransactionDate().isAfter(newTxn.getTransactionDate()) || (txn.getTransactionDate().equals(newTxn.getTransactionDate()) && txn.getId().compareTo(newTxn.getId()) > 0));
     }
 
     public void triggerInlineAmortizationIfLoanClosed(final WorkingCapitalLoan loan, final LocalDate transactionDate) {
-        if ((loan.getLoanStatus().isClosed() || loan.getLoanStatus().isOverpaid())
-                && loan.getLoanProduct().getAccountingRule().isAccrualWithDeferredRevenueAmortization()) {
-            final BigDecimal discount = loan.getLoanProductRelatedDetails() != null ? loan.getLoanProductRelatedDetails().getDiscount()
-                    : null;
-            final boolean adjustmentNeeded = loan.getBalance() != null
-                    && MathUtil.isGreaterThanZero(loan.getBalance().getRealizedIncomeFromDiscountFee());
-
+        if ((loan.getLoanStatus().isClosed() || loan.getLoanStatus().isOverpaid()) && loan.getLoanProduct().getAccountingRule().isAccrualWithDeferredRevenueAmortization()) {
+            final BigDecimal discount = loan.getLoanProductRelatedDetails() != null ? loan.getLoanProductRelatedDetails().getDiscount() : null;
+            final boolean adjustmentNeeded = loan.getBalance() != null && MathUtil.isGreaterThanZero(loan.getBalance().getRealizedIncomeFromDiscountFee());
             if (MathUtil.isGreaterThanZero(discount) || adjustmentNeeded) {
                 discountFeeAmortizationService.processDiscountFeeAmortization(loan, transactionDate);
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanTransactionProcessor(final WorkingCapitalLoanChargeRepository chargeRepository, final WorkingCapitalLoanBalanceRepository balanceRepository, final WorkingCapitalLoanTransactionRepository transactionRepository, final WorkingCapitalLoanTransactionAllocationRepository allocationRepository, final WorkingCapitalLoanAllocationRequestFactory allocationRequestFactory, final WorkingCapitalLoanPaymentAllocationProcessor allocationProcessor, final WorkingCapitalLoanAllocationApplier allocationApplier, final WorkingCapitalLoanBalanceUpdater balanceUpdater, final WorkingCapitalLoanTransactionReprocessingService transactionReprocessingService, final WorkingCapitalLoanAmortizationScheduleWriteService amortizationScheduleWriteService, final WorkingCapitalLoanBreachScheduleService breachScheduleService, final WorkingCapitalLoanDelinquencyRangeScheduleService delinquencyRangeScheduleService, final WorkingCapitalLoanLifecycleStateMachine stateMachine, final WorkingCapitalLoanDiscountFeeAmortizationService discountFeeAmortizationService) {
+        this.chargeRepository = chargeRepository;
+        this.balanceRepository = balanceRepository;
+        this.transactionRepository = transactionRepository;
+        this.allocationRepository = allocationRepository;
+        this.allocationRequestFactory = allocationRequestFactory;
+        this.allocationProcessor = allocationProcessor;
+        this.allocationApplier = allocationApplier;
+        this.balanceUpdater = balanceUpdater;
+        this.transactionReprocessingService = transactionReprocessingService;
+        this.amortizationScheduleWriteService = amortizationScheduleWriteService;
+        this.breachScheduleService = breachScheduleService;
+        this.delinquencyRangeScheduleService = delinquencyRangeScheduleService;
+        this.stateMachine = stateMachine;
+        this.discountFeeAmortizationService = discountFeeAmortizationService;
     }
 }

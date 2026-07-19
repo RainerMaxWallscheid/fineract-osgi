@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.cob.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.conditions.LoanCOBEnabledCondition;
 import org.apache.fineract.cob.workingcapitalloan.WorkingCapitalLoanCOBConstant;
 import org.apache.fineract.cob.workingcapitalloan.WorkingCapitalLoanRetrieveIdService;
@@ -32,14 +31,13 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 @Conditional(LoanCOBEnabledCondition.class)
-public class AsyncWorkingCapitalLoanCOBExecutorServiceImpl extends AsyncCommonCOBExecutorService
-        implements AsyncWorkingCapitalLoanCOBExecutorService {
+public class AsyncWorkingCapitalLoanCOBExecutorServiceImpl extends AsyncCommonCOBExecutorService implements AsyncWorkingCapitalLoanCOBExecutorService {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AsyncWorkingCapitalLoanCOBExecutorServiceImpl.class);
 
-    public AsyncWorkingCapitalLoanCOBExecutorServiceImpl(JobLocator jobLocator, ScheduledJobDetailRepository scheduledJobDetailRepository,
-            JobStarter jobStarter, WorkingCapitalLoanRetrieveIdService retrieveIdService) {
+    public AsyncWorkingCapitalLoanCOBExecutorServiceImpl(JobLocator jobLocator, ScheduledJobDetailRepository scheduledJobDetailRepository, JobStarter jobStarter, WorkingCapitalLoanRetrieveIdService retrieveIdService) {
         super(jobLocator, scheduledJobDetailRepository, jobStarter, retrieveIdService);
     }
 

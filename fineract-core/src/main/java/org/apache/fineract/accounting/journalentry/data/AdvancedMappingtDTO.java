@@ -19,13 +19,24 @@
 package org.apache.fineract.accounting.journalentry.data;
 
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-@Getter
 public class AdvancedMappingtDTO {
-
     private final Long referenceValueId;
     private final BigDecimal amount;
+
+    @java.lang.SuppressWarnings("all")
+        public AdvancedMappingtDTO(final Long referenceValueId, final BigDecimal amount) {
+        this.referenceValueId = referenceValueId;
+        this.amount = amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getReferenceValueId() {
+        return this.referenceValueId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
 }

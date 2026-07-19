@@ -16,41 +16,56 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.rate.data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
 /**
  * Bowpi GT Created by Jose on 19/07/2017.
  */
-@Getter
 public final class RateData implements Serializable {
-
     private Long id;
-
     private String name;
-
     private BigDecimal percentage;
-
     private EnumOptionData productApply;
-
     private boolean active;
 
-    public static RateData instance(final Long id, final String name, final BigDecimal percentage, final EnumOptionData productApply,
-            final boolean active) {
+    public static RateData instance(final Long id, final String name, final BigDecimal percentage, final EnumOptionData productApply, final boolean active) {
         return new RateData(id, name, percentage, productApply, active);
     }
 
-    private RateData(final Long id, final String name, final BigDecimal percentage, final EnumOptionData productApply,
-            final boolean active) {
+    private RateData(final Long id, final String name, final BigDecimal percentage, final EnumOptionData productApply, final boolean active) {
         this.id = id;
         this.name = name;
         this.percentage = percentage;
         this.productApply = productApply;
         this.active = active;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getPercentage() {
+        return this.percentage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getProductApply() {
+        return this.productApply;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isActive() {
+        return this.active;
     }
 }

@@ -23,15 +23,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public final class LocalContentStorageUtil {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LocalContentStorageUtil.class);
     private static final long DEFAULT_MAX_WAIT_MILLIS = 10000;
     private static final long POLL_INTERVAL_MILLIS = 500;
 
-    private LocalContentStorageUtil() {}
+    private LocalContentStorageUtil() {
+    }
 
     public static String path(String path) {
         var currentPath = Path.of("").toAbsolutePath();
@@ -39,7 +39,6 @@ public final class LocalContentStorageUtil {
         if (resolvedPath != null) {
             return resolvedPath.toString();
         }
-
         throw notFound(path, currentPath);
     }
 
@@ -48,19 +47,16 @@ public final class LocalContentStorageUtil {
         long start = System.currentTimeMillis();
         Path previousPath = null;
         long previousSize = -1;
-
         while ((System.currentTimeMillis() - start) < DEFAULT_MAX_WAIT_MILLIS) {
             Path resolvedPath = find(path, currentPath);
             long size = resolvedPath == null ? -1 : size(resolvedPath);
             if (size > 0 && resolvedPath.equals(previousPath) && size == previousSize) {
                 return resolvedPath.toString();
             }
-
             previousPath = resolvedPath;
             previousSize = size;
             Thread.sleep(POLL_INTERVAL_MILLIS);
         }
-
         throw notFound(path, currentPath);
     }
 
@@ -79,12 +75,10 @@ public final class LocalContentStorageUtil {
         candidates.add(Path.of("/", path));
         candidates.add(Path.of("/home/runner/.fineract/DefaultDemoTenant").resolve(path));
         candidates.add(Path.of(System.getProperty("user.home")).toAbsolutePath().resolve(".fineract/DefaultDemoTenant").resolve(path));
-
         String dockerContentRoot = System.getenv("FINERACT_TEST_CONTENT_ROOT");
         if (dockerContentRoot != null && !dockerContentRoot.isBlank()) {
             candidates.add(Path.of(dockerContentRoot).resolve("DefaultDemoTenant").resolve(path));
         }
-
         candidates.add(currentPath.resolve("build/fineract/tmp/DefaultDemoTenant").resolve(path));
         Path parentPath = currentPath.getParent();
         if (parentPath != null) {

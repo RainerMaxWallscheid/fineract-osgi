@@ -21,7 +21,6 @@ package org.apache.fineract.organisation.monetary.domain;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 
@@ -29,11 +28,10 @@ import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
  * Pure utility class for monetary calculations and rounding operations. This class does not depend on Spring components
  * or configuration services. All rounding modes are initialized at startup and cached per tenant.
  */
-@Slf4j
 public final class MoneyHelper {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MoneyHelper.class);
     public static final int PRECISION = 19;
-
     private static final ConcurrentHashMap<String, RoundingMode> roundingModeCache = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, MathContext> mathContextCache = new ConcurrentHashMap<>();
 
@@ -55,12 +53,10 @@ public final class MoneyHelper {
         if (tenantIdentifier == null) {
             throw new IllegalArgumentException("Tenant identifier cannot be null");
         }
-
         RoundingMode roundingMode = validateAndConvertRoundingMode(roundingModeValue);
         roundingModeCache.put(tenantIdentifier, roundingMode);
         // Clear math context cache to force recreation with new rounding mode
         mathContextCache.remove(tenantIdentifier);
-
         log.info("Initialized rounding mode for tenant `{}`: {}", tenantIdentifier, roundingMode.name());
     }
 
@@ -74,7 +70,6 @@ public final class MoneyHelper {
     public static RoundingMode getRoundingMode() {
         String tenantId = getTenantIdentifier();
         RoundingMode roundingMode = roundingModeCache.get(tenantId);
-
         if (roundingMode == null) {
             throw new IllegalStateException("Rounding mode is not initialized for tenant: " + tenantId);
         }
@@ -105,11 +100,9 @@ public final class MoneyHelper {
         if (tenantIdentifier == null) {
             throw new IllegalArgumentException("Tenant identifier cannot be null");
         }
-
         RoundingMode roundingMode = validateAndConvertRoundingMode(roundingModeValue);
         roundingModeCache.put(tenantIdentifier, roundingMode);
         mathContextCache.remove(tenantIdentifier); // Force recreation with new rounding mode
-
         log.info("Updated rounding mode for tenant {}: {}", tenantIdentifier, roundingMode.name());
     }
 
@@ -144,7 +137,6 @@ public final class MoneyHelper {
         if (tenantId == null) {
             return;
         }
-
         roundingModeCache.remove(tenantId);
         mathContextCache.remove(tenantId);
         log.info("MoneyHelper cache cleared for tenant: {}", tenantId);
@@ -175,16 +167,13 @@ public final class MoneyHelper {
         if (tenant != null) {
             return tenant.getTenantIdentifier();
         }
-        throw new IllegalStateException(
-                "No tenant context available. " + "MoneyHelper requires a valid tenant context to ensure proper multi-tenant isolation.");
+        throw new IllegalStateException("No tenant context available. " + "MoneyHelper requires a valid tenant context to ensure proper multi-tenant isolation.");
     }
 
     private static RoundingMode validateAndConvertRoundingMode(int roundingModeValue) {
         if (roundingModeValue < 0 || roundingModeValue > 6) {
-            throw new IllegalArgumentException("Invalid rounding mode value: " + roundingModeValue
-                    + ". Valid values are 0-6 (corresponding to RoundingMode enum ordinals)");
+            throw new IllegalArgumentException("Invalid rounding mode value: " + roundingModeValue + ". Valid values are 0-6 (corresponding to RoundingMode enum ordinals)");
         }
-
         return RoundingMode.valueOf(roundingModeValue);
     }
 }

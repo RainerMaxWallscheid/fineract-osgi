@@ -20,13 +20,10 @@ package org.apache.fineract.portfolio.client.domain;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Getter;
 
 public enum ClientTransactionType {
-
-    PAY_CHARGE(1, "clientTransactionType.payCharge"), //
+    PAY_CHARGE(1, "clientTransactionType.payCharge"),  //
     WAIVE_CHARGE(2, "clientTransactionType.waiveCharge");
-
     private final Integer value;
     private final String code;
 
@@ -44,9 +41,7 @@ public enum ClientTransactionType {
     }
 
     private static final Map<Integer, ClientTransactionType> intToEnumMap = new HashMap<>();
-    @Getter
     private static int minValue;
-    @Getter
     private static int maxValue;
 
     static {
@@ -75,4 +70,13 @@ public enum ClientTransactionType {
         return name();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public static int getMinValue() {
+        return ClientTransactionType.minValue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static int getMaxValue() {
+        return ClientTransactionType.maxValue;
+    }
 }

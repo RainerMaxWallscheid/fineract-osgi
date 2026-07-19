@@ -21,7 +21,6 @@ package org.apache.fineract.notification.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.notification.domain.Notification;
 import org.apache.fineract.notification.domain.NotificationMapper;
@@ -30,31 +29,20 @@ import org.apache.fineract.useradministration.domain.AppUserRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
-@RequiredArgsConstructor
 public class NotificationWritePlatformServiceImpl implements NotificationWritePlatformService {
-
     private final NotificationGeneratorWritePlatformService notificationGeneratorWritePlatformService;
     private final NotificationGeneratorReadRepositoryWrapper notificationGeneratorReadRepositoryWrapper;
     private final AppUserRepository appUserRepository;
     private final NotificationMapperWritePlatformService notificationMapperWritePlatformService;
 
-    private Long insertIntoNotificationGenerator(String objectType, Long objectIdentifier, String action, Long actorId,
-            String notificationContent, boolean isSystemGenerated) {
-
-        Notification notification = new Notification().setObjectType(objectType).setObjectIdentifier(objectIdentifier).setAction(action)
-                .setActorId(actorId).setSystemGenerated(isSystemGenerated).setNotificationContent(notificationContent)
-                .setCreatedAt(DateUtils.getLocalDateTimeOfSystem());
-
+    private Long insertIntoNotificationGenerator(String objectType, Long objectIdentifier, String action, Long actorId, String notificationContent, boolean isSystemGenerated) {
+        Notification notification = new Notification().setObjectType(objectType).setObjectIdentifier(objectIdentifier).setAction(action).setActorId(actorId).setSystemGenerated(isSystemGenerated).setNotificationContent(notificationContent).setCreatedAt(DateUtils.getLocalDateTimeOfSystem());
         return this.notificationGeneratorWritePlatformService.create(notification);
     }
 
     @Override
-    public Long notify(Collection<Long> userIds, String objectType, Long objectId, String action, Long actorId, String notificationContent,
-            boolean isSystemGenerated) {
-
-        Long generatedNotificationId = insertIntoNotificationGenerator(objectType, objectId, action, actorId, notificationContent,
-                isSystemGenerated);
-
+    public Long notify(Collection<Long> userIds, String objectType, Long objectId, String action, Long actorId, String notificationContent, boolean isSystemGenerated) {
+        Long generatedNotificationId = insertIntoNotificationGenerator(objectType, objectId, action, actorId, notificationContent, isSystemGenerated);
         insertIntoNotificationMapper(userIds, generatedNotificationId);
         return generatedNotificationId;
     }
@@ -64,11 +52,18 @@ public class NotificationWritePlatformServiceImpl implements NotificationWritePl
         Notification notification = this.notificationGeneratorReadRepositoryWrapper.findById(generatedNotificationId);
         for (Long userId : userIds) {
             AppUser appUser = this.appUserRepository.findById(userId).orElseThrow();
-            NotificationMapper notificationMapper = new NotificationMapper().setNotification(notification).setUserId(appUser).setRead(false)
-                    .setCreatedAt(DateUtils.getLocalDateTimeOfSystem());
+            NotificationMapper notificationMapper = new NotificationMapper().setNotification(notification).setUserId(appUser).setRead(false).setCreatedAt(DateUtils.getLocalDateTimeOfSystem());
             this.notificationMapperWritePlatformService.create(notificationMapper);
             mappedIds.add(notificationMapper.getId());
         }
         return mappedIds;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public NotificationWritePlatformServiceImpl(final NotificationGeneratorWritePlatformService notificationGeneratorWritePlatformService, final NotificationGeneratorReadRepositoryWrapper notificationGeneratorReadRepositoryWrapper, final AppUserRepository appUserRepository, final NotificationMapperWritePlatformService notificationMapperWritePlatformService) {
+        this.notificationGeneratorWritePlatformService = notificationGeneratorWritePlatformService;
+        this.notificationGeneratorReadRepositoryWrapper = notificationGeneratorReadRepositoryWrapper;
+        this.appUserRepository = appUserRepository;
+        this.notificationMapperWritePlatformService = notificationMapperWritePlatformService;
     }
 }

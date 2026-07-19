@@ -36,7 +36,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -58,9 +57,7 @@ import org.springframework.stereotype.Component;
 @Path("/v1/survey")
 @Component
 @Tag(name = "Survey", description = "")
-@RequiredArgsConstructor
 public class SurveyApiResource {
-
     private final DefaultToApiJsonSerializer<SurveyData> toApiJsonSerializer;
     private final DefaultToApiJsonSerializer<ClientScoresOverview> toApiJsonClientScoreOverviewSerializer;
     private final PlatformSecurityContext context;
@@ -69,111 +66,94 @@ public class SurveyApiResource {
     private final GenericDataService genericDataService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve surveys", operationId = "retrieveAllSurveys", description = "Retrieve surveys. This allows to retrieve the list of survey tables registered .")
     @AlternativeOperationId("retrieveSurveys")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SurveyApiResourceSwagger.GetSurveyResponse.class))))
     public String retrieveSurveys() {
-
         this.context.authenticatedUser().validateHasReadPermission(SurveyApiConstants.SURVEY_RESOURCE_NAME);
-
         List<SurveyDataTableData> surveys = this.readSurveyService.retrieveAllSurveys();
         return this.toApiJsonSerializer.serialize(surveys);
     }
 
     @GET
     @Path("{surveyName}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve survey", operationId = "retrieveOneSurvey", description = "Lists a registered survey table details and the Apache Fineract Core application table they are registered to.")
     @AlternativeOperationId("retrieveSurvey")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SurveyApiResourceSwagger.GetSurveyResponse.class)))
     public String retrieveSurvey(@PathParam("surveyName") @Parameter(description = "surveyName") final String surveyName) {
-
         this.context.authenticatedUser().validateHasReadPermission(SurveyApiConstants.SURVEY_RESOURCE_NAME);
-
         SurveyDataTableData surveys = this.readSurveyService.retrieveSurvey(surveyName);
-
         return this.toApiJsonSerializer.serialize(surveys);
-
     }
 
     @POST
     @Path("{surveyName}/{apptableId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Create an entry in the survey table", operationId = "createSurveyEntry", description = "Insert and entry in a survey table (full fill the survey)."
-            + "\n" + "\n" + "Refer Link for sample Body:  [ https://fineract.apache.org/docs/legacy/#survey_create ] ")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Create an entry in the survey table", operationId = "createSurveyEntry", description = "Insert and entry in a survey table (full fill the survey)." + "\n" + "\n" + "Refer Link for sample Body:  [ https://fineract.apache.org/docs/legacy/#survey_create ] ")
     @AlternativeOperationId("createDatatableEntry_1")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = SurveyApiResourceSwagger.PostSurveySurveyNameApptableIdRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SurveyApiResourceSwagger.PostSurveySurveyNameApptableIdResponse.class)))
-    public String createDatatableEntry(@PathParam("surveyName") @Parameter(description = "surveyName") final String datatable,
-            @PathParam("apptableId") @Parameter(description = "apptableId") final Long apptableId, final String apiRequestBodyAsJson) {
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-                .fullFilSurvey(datatable, apptableId) //
-                .withJson(apiRequestBodyAsJson) //
-                .build();
-
+    public String createDatatableEntry(@PathParam("surveyName") @Parameter(description = "surveyName") final String datatable, @PathParam("apptableId") @Parameter(description = "apptableId") final Long apptableId, final String apiRequestBodyAsJson) {
+        final CommandWrapper commandRequest =  //
+        //
+        //
+        new CommandWrapperBuilder().fullFilSurvey(datatable, apptableId).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 
-    /** FIXME Vishwas what does this API really do? ***/
+    /**
+     * FIXME Vishwas what does this API really do? **
+     */
     @GET
     @Path("{surveyName}/{clientId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     public String getClientSurveyOverview(@PathParam("surveyName") final String surveyName, @PathParam("clientId") final Long clientId) {
-
         this.context.authenticatedUser().validateHasReadPermission(SurveyApiConstants.SURVEY_RESOURCE_NAME);
-
         List<ClientScoresOverview> scores = this.readSurveyService.retrieveClientSurveyScoreOverview(surveyName, clientId);
-
         return this.toApiJsonClientScoreOverviewSerializer.serialize(scores);
     }
 
     @GET
     @Path("{surveyName}/{clientId}/{entryId}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public String getSurveyEntry(@PathParam("surveyName") final String surveyName, @PathParam("clientId") final Long clientId,
-            @PathParam("entryId") final Long entryId) {
-
+    @Produces({MediaType.APPLICATION_JSON})
+    public String getSurveyEntry(@PathParam("surveyName") final String surveyName, @PathParam("clientId") final Long clientId, @PathParam("entryId") final Long entryId) {
         this.context.authenticatedUser().validateHasReadPermission(SurveyApiConstants.SURVEY_RESOURCE_NAME);
-
         final GenericResultsetData results = this.readSurveyService.retrieveSurveyEntry(surveyName, clientId, entryId);
-
         return this.genericDataService.generateJsonFromGenericResultsetData(results);
-
     }
 
     @PUT
     @Path("register/{surveyName}/{apptable}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    public String register(@PathParam("surveyName") final String datatable, @PathParam("apptable") final String apptable,
-            final String apiRequestBodyAsJson) {
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().registerSurvey(datatable, apptable).withJson(apiRequestBodyAsJson)
-                .build();
-
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    public String register(@PathParam("surveyName") final String datatable, @PathParam("apptable") final String apptable, final String apiRequestBodyAsJson) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().registerSurvey(datatable, apptable).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
-
     }
 
     @DELETE
     @Path("{surveyName}/{clientId}/{fulfilledId}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public String deleteDatatableEntries(@PathParam("surveyName") final String surveyName, @PathParam("clientId") final Long clientId,
-            @PathParam("fulfilledId") final Long fulfilledId) {
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-                .deleteDatatableEntry(surveyName, clientId, fulfilledId) //
-                .build();
-
+    @Produces({MediaType.APPLICATION_JSON})
+    public String deleteDatatableEntries(@PathParam("surveyName") final String surveyName, @PathParam("clientId") final Long clientId, @PathParam("fulfilledId") final Long fulfilledId) {
+        final CommandWrapper commandRequest =  //
+        //
+        new CommandWrapperBuilder().deleteDatatableEntry(surveyName, clientId, fulfilledId).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SurveyApiResource(final DefaultToApiJsonSerializer<SurveyData> toApiJsonSerializer, final DefaultToApiJsonSerializer<ClientScoresOverview> toApiJsonClientScoreOverviewSerializer, final PlatformSecurityContext context, final ReadSurveyService readSurveyService, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final GenericDataService genericDataService) {
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.toApiJsonClientScoreOverviewSerializer = toApiJsonClientScoreOverviewSerializer;
+        this.context = context;
+        this.readSurveyService = readSurveyService;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.genericDataService = genericDataService;
     }
 }

@@ -19,8 +19,6 @@
 package org.apache.fineract.infrastructure.documentmanagement.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.infrastructure.documentmanagement.data.ImageDeleteRequest;
@@ -29,11 +27,10 @@ import org.apache.fineract.infrastructure.documentmanagement.service.ImageWriteP
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class ImageDeleteCommandHandler implements CommandHandler<ImageDeleteRequest, ImageDeleteResponse> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ImageDeleteCommandHandler.class);
     private final ImageWritePlatformService writePlatformService;
 
     @Retry(name = "commandImageDelete", fallbackMethod = "fallback")
@@ -47,5 +44,10 @@ public class ImageDeleteCommandHandler implements CommandHandler<ImageDeleteRequ
     public ImageDeleteResponse fallback(Command<ImageDeleteRequest> command, Throwable t) {
         // NOTE: fallback method needs to be in the same class
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ImageDeleteCommandHandler(final ImageWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

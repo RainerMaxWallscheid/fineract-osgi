@@ -19,7 +19,6 @@
 package org.apache.fineract.integrationtests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
@@ -29,7 +28,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.AdvancedPaymentData;
 import org.apache.fineract.client.models.BusinessDateUpdateRequest;
 import org.apache.fineract.client.models.GetLoansLoanIdRepaymentPeriod;
@@ -54,9 +52,9 @@ import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanSchedul
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-@Slf4j
 public class RefundForActiveLoansWithAdvancedPaymentAllocationTest extends BaseLoanIntegrationTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RefundForActiveLoansWithAdvancedPaymentAllocationTest.class);
     private static final String DATETIME_PATTERN = "dd MMMM yyyy";
     private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern(DATETIME_PATTERN).toFormatter();
     private static RequestSpecification requestSpec;
@@ -74,7 +72,6 @@ public class RefundForActiveLoansWithAdvancedPaymentAllocationTest extends BaseL
         requestSpec.header("Authorization", "Basic " + Utils.loginIntoServerAndGetBase64EncodedAuthenticationKey());
         requestSpec.header("Fineract-Platform-TenantId", "default");
         responseSpec = new ResponseSpecBuilder().expectStatusCode(200).build();
-
         loanTransactionHelper = new LoanTransactionHelper(requestSpec, responseSpec);
         client = clientHelper.createClient(ClientHelper.defaultClientCreationRequest());
         businessDateHelper = new BusinessDateHelper();
@@ -84,431 +81,311 @@ public class RefundForActiveLoansWithAdvancedPaymentAllocationTest extends BaseL
     @Test
     public void refundForActiveLoanWithDefaultPaymentAllocationProcessingVertically() {
         try {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("2023.02.15").dateFormat("yyyy.MM.dd").locale("en"));
-
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
+            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("2023.02.15").dateFormat("yyyy.MM.dd").locale("en"));
             final Account assetAccount = accountHelper.createAssetAccount();
             final Account incomeAccount = accountHelper.createIncomeAccount();
             final Account expenseAccount = accountHelper.createExpenseAccount();
             final Account overpaymentAccount = accountHelper.createLiabilityAccount();
-
-            Integer loanProductId = createLoanProduct("1000", "30", "4", LoanScheduleProcessingType.VERTICAL, assetAccount, incomeAccount,
-                    expenseAccount, overpaymentAccount);
-
-            final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), loanProductId, 1000L, 90, 30, 3,
-                    BigDecimal.ZERO, "01 January 2023", "01 January 2023");
-
+            Integer loanProductId = createLoanProduct("1000", "30", "4", LoanScheduleProcessingType.VERTICAL, assetAccount, incomeAccount, expenseAccount, overpaymentAccount);
+            final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), loanProductId, 1000L, 90, 30, 3, BigDecimal.ZERO, "01 January 2023", "01 January 2023");
             int loanId = loanResponse.getLoanId().intValue();
-
-            loanTransactionHelper.approveLoan(loanResponse.getLoanId(),
-                    new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(1000)).dateFormat(DATETIME_PATTERN)
-                            .approvedOnDate("01 January 2023").locale("en"));
-
-            loanTransactionHelper.disburseLoan(loanResponse.getLoanId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("01 January 2023").dateFormat(DATETIME_PATTERN)
-                            .transactionAmount(BigDecimal.valueOf(1000.00)).locale("en"));
-
-            final double feePortion = 50.00;
-            final double penaltyPortion = 100.00;
-
-            Integer fee = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper
-                    .getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, String.valueOf(feePortion), false));
-
-            Integer penalty = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper
-                    .getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, String.valueOf(penaltyPortion), true));
-
+            loanTransactionHelper.approveLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(1000)).dateFormat(DATETIME_PATTERN).approvedOnDate("01 January 2023").locale("en"));
+            loanTransactionHelper.disburseLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().actualDisbursementDate("01 January 2023").dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
+            final double feePortion = 50.0;
+            final double penaltyPortion = 100.0;
+            Integer fee = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, String.valueOf(feePortion), false));
+            Integer penalty = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, String.valueOf(penaltyPortion), true));
             final String firstInstallmentChargeAddedDate = DATE_FORMATTER.format(LocalDate.of(2023, 1, 3));
-            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                    String.valueOf(fee), firstInstallmentChargeAddedDate, String.valueOf(feePortion)));
-
-            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                    String.valueOf(penalty), firstInstallmentChargeAddedDate, String.valueOf(penaltyPortion)));
-
+            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), firstInstallmentChargeAddedDate, String.valueOf(feePortion)));
+            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), firstInstallmentChargeAddedDate, String.valueOf(penaltyPortion)));
             final String secondInstallmentChargeAddedDate = DATE_FORMATTER.format(LocalDate.of(2023, 2, 3));
-            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                    String.valueOf(fee), secondInstallmentChargeAddedDate, String.valueOf(feePortion)));
-
-            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                    String.valueOf(penalty), secondInstallmentChargeAddedDate, String.valueOf(penaltyPortion)));
-
+            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), secondInstallmentChargeAddedDate, String.valueOf(feePortion)));
+            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), secondInstallmentChargeAddedDate, String.valueOf(penaltyPortion)));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
-
             GetLoansLoanIdRepaymentPeriod firstRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(2);
             GetLoansLoanIdRepaymentPeriod secondRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(3);
             GetLoansLoanIdRepaymentPeriod thirdRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(4);
-
             assertEquals(5, loanDetails.getRepaymentSchedule().getPeriods().size());
             assertEquals(feePortion, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesDue()));
             assertEquals(feePortion, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesDue()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
-            assertEquals(250.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(400.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(250.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
+            assertEquals(250.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
+            assertEquals(400.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(400.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 1, 31), firstRepaymentInstallment.getDueDate());
-
             assertEquals(feePortion, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesDue()));
             assertEquals(feePortion, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesDue()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(400.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(400.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(400.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 3, 2), secondRepaymentInstallment.getDueDate());
-
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(250.00, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 4, 1), thirdRepaymentInstallment.getDueDate());
-
-            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("2023.03.01").dateFormat("yyyy.MM.dd").locale("en"));
-            loanTransactionHelper.makeRepayment("01 March 2023", 810.0f, loanId);
-
+            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("2023.03.01").dateFormat("yyyy.MM.dd").locale("en"));
+            loanTransactionHelper.makeRepayment("01 March 2023", 810.0F, loanId);
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
-
             firstRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(2);
             secondRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(3);
             thirdRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(4);
-
             assertEquals(5, loanDetails.getRepaymentSchedule().getPeriods().size());
             assertEquals(feePortion, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
+            assertEquals(400.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 1, 31), firstRepaymentInstallment.getDueDate());
-
             assertEquals(feePortion, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(0.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(400.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 3, 2), secondRepaymentInstallment.getDueDate());
-
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(240.00, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(240.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 4, 1), thirdRepaymentInstallment.getDueDate());
-
-            loanTransactionHelper.makeRefundByCash("01 March 2023", 15.0f, loanId);
-
+            loanTransactionHelper.makeRefundByCash("01 March 2023", 15.0F, loanId);
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
-
             firstRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(2);
             secondRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(3);
             thirdRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(4);
-
             assertEquals(5, loanDetails.getRepaymentSchedule().getPeriods().size());
             assertEquals(feePortion, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
+            assertEquals(400.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 1, 31), firstRepaymentInstallment.getDueDate());
-
             assertEquals(feePortion, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalDue()));
-            assertEquals(5.00, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(5.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalDue()));
+            assertEquals(5.0, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalOutstanding()));
+            assertEquals(400.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(5.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 3, 2), secondRepaymentInstallment.getDueDate());
-
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(250.00, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 4, 1), thirdRepaymentInstallment.getDueDate());
-
-            loanTransactionHelper.makeRefundByCash("01 March 2023", 265.0f, loanId);
-
+            loanTransactionHelper.makeRefundByCash("01 March 2023", 265.0F, loanId);
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
-
             firstRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(2);
             secondRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(3);
             thirdRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(4);
-
             assertEquals(5, loanDetails.getRepaymentSchedule().getPeriods().size());
             assertEquals(feePortion, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
+            assertEquals(400.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 1, 31), firstRepaymentInstallment.getDueDate());
-
             assertEquals(feePortion, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(20.00, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(20.0, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalDue()));
-            assertEquals(250.00, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(270.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalDue()));
+            assertEquals(250.0, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalOutstanding()));
+            assertEquals(400.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(270.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 3, 2), secondRepaymentInstallment.getDueDate());
-
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(250.00, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 4, 1), thirdRepaymentInstallment.getDueDate());
         } finally {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
     @Test
     public void refundForActiveLoanWithDefaultPaymentAllocationProcessingHorizontally() {
         try {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("2023.02.15").dateFormat("yyyy.MM.dd").locale("en"));
-
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
+            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("2023.02.15").dateFormat("yyyy.MM.dd").locale("en"));
             final Account assetAccount = accountHelper.createAssetAccount();
             final Account incomeAccount = accountHelper.createIncomeAccount();
             final Account expenseAccount = accountHelper.createExpenseAccount();
             final Account overpaymentAccount = accountHelper.createLiabilityAccount();
-
-            Integer loanProductId = createLoanProduct("1000", "30", "4", LoanScheduleProcessingType.HORIZONTAL, assetAccount, incomeAccount,
-                    expenseAccount, overpaymentAccount);
-
-            final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), loanProductId, 1000L, 90, 30, 3,
-                    BigDecimal.ZERO, "01 January 2023", "01 January 2023");
-
+            Integer loanProductId = createLoanProduct("1000", "30", "4", LoanScheduleProcessingType.HORIZONTAL, assetAccount, incomeAccount, expenseAccount, overpaymentAccount);
+            final PostLoansResponse loanResponse = applyForLoanApplication(client.getClientId(), loanProductId, 1000L, 90, 30, 3, BigDecimal.ZERO, "01 January 2023", "01 January 2023");
             int loanId = loanResponse.getLoanId().intValue();
-
-            loanTransactionHelper.approveLoan(loanResponse.getLoanId(),
-                    new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(1000)).dateFormat(DATETIME_PATTERN)
-                            .approvedOnDate("01 January 2023").locale("en"));
-
-            loanTransactionHelper.disburseLoan(loanResponse.getLoanId(),
-                    new PostLoansLoanIdRequest().actualDisbursementDate("01 January 2023").dateFormat(DATETIME_PATTERN)
-                            .transactionAmount(BigDecimal.valueOf(1000.00)).locale("en"));
-
-            final double feePortion = 50.00;
-            final double penaltyPortion = 100.00;
-
-            Integer fee = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper
-                    .getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, String.valueOf(feePortion), false));
-
-            Integer penalty = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper
-                    .getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, String.valueOf(penaltyPortion), true));
-
+            loanTransactionHelper.approveLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().approvedLoanAmount(BigDecimal.valueOf(1000)).dateFormat(DATETIME_PATTERN).approvedOnDate("01 January 2023").locale("en"));
+            loanTransactionHelper.disburseLoan(loanResponse.getLoanId(), new PostLoansLoanIdRequest().actualDisbursementDate("01 January 2023").dateFormat(DATETIME_PATTERN).transactionAmount(BigDecimal.valueOf(1000.0)).locale("en"));
+            final double feePortion = 50.0;
+            final double penaltyPortion = 100.0;
+            Integer fee = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, String.valueOf(feePortion), false));
+            Integer penalty = ChargesHelper.createCharges(requestSpec, responseSpec, ChargesHelper.getLoanSpecifiedDueDateJSON(ChargesHelper.CHARGE_CALCULATION_TYPE_FLAT, String.valueOf(penaltyPortion), true));
             final String firstInstallmentChargeAddedDate = DATE_FORMATTER.format(LocalDate.of(2023, 1, 3));
-            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                    String.valueOf(fee), firstInstallmentChargeAddedDate, String.valueOf(feePortion)));
-
-            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                    String.valueOf(penalty), firstInstallmentChargeAddedDate, String.valueOf(penaltyPortion)));
-
+            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), firstInstallmentChargeAddedDate, String.valueOf(feePortion)));
+            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), firstInstallmentChargeAddedDate, String.valueOf(penaltyPortion)));
             final String secondInstallmentChargeAddedDate = DATE_FORMATTER.format(LocalDate.of(2023, 2, 3));
-            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                    String.valueOf(fee), secondInstallmentChargeAddedDate, String.valueOf(feePortion)));
-
-            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(
-                    String.valueOf(penalty), secondInstallmentChargeAddedDate, String.valueOf(penaltyPortion)));
-
+            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(fee), secondInstallmentChargeAddedDate, String.valueOf(feePortion)));
+            loanTransactionHelper.addChargesForLoan(loanId, LoanTransactionHelper.getSpecifiedDueDateChargesForLoanAsJSON(String.valueOf(penalty), secondInstallmentChargeAddedDate, String.valueOf(penaltyPortion)));
             GetLoansLoanIdResponse loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
-
             GetLoansLoanIdRepaymentPeriod firstRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(2);
             GetLoansLoanIdRepaymentPeriod secondRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(3);
             GetLoansLoanIdRepaymentPeriod thirdRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(4);
-
             assertEquals(5, loanDetails.getRepaymentSchedule().getPeriods().size());
             assertEquals(feePortion, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesDue()));
             assertEquals(feePortion, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesDue()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
-            assertEquals(250.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(400.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(250.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
+            assertEquals(250.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
+            assertEquals(400.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(400.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 1, 31), firstRepaymentInstallment.getDueDate());
-
             assertEquals(feePortion, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesDue()));
             assertEquals(feePortion, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesDue()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(400.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(400.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(400.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 3, 2), secondRepaymentInstallment.getDueDate());
-
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(250.00, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 4, 1), thirdRepaymentInstallment.getDueDate());
-
-            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE)
-                    .date("2023.03.01").dateFormat("yyyy.MM.dd").locale("en"));
-            loanTransactionHelper.makeRepayment("28 January 2023", 810.0f, loanId);
-
+            businessDateHelper.updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date("2023.03.01").dateFormat("yyyy.MM.dd").locale("en"));
+            loanTransactionHelper.makeRepayment("28 January 2023", 810.0F, loanId);
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
-
             firstRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(2);
             secondRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(3);
             thirdRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(4);
-
             assertEquals(5, loanDetails.getRepaymentSchedule().getPeriods().size());
             assertEquals(feePortion, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
+            assertEquals(400.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 1, 31), firstRepaymentInstallment.getDueDate());
-
             assertEquals(feePortion, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(50.00, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(50.0, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(100.00, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(150.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(100.0, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(400.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(150.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 3, 2), secondRepaymentInstallment.getDueDate());
-
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(90.00, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(90.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 4, 1), thirdRepaymentInstallment.getDueDate());
-
-            loanTransactionHelper.makeRefundByCash("28 January 2023", 15.0f, loanId);
-
+            loanTransactionHelper.makeRefundByCash("28 January 2023", 15.0F, loanId);
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
-
             firstRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(2);
             secondRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(3);
             thirdRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(4);
-
             assertEquals(5, loanDetails.getRepaymentSchedule().getPeriods().size());
             assertEquals(feePortion, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
+            assertEquals(400.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 1, 31), firstRepaymentInstallment.getDueDate());
-
             assertEquals(feePortion, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(50.00, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(50.0, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(100.00, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalDue()));
-            assertEquals(0.00, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(150.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(100.0, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalDue()));
+            assertEquals(0.0, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalOutstanding()));
+            assertEquals(400.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(150.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 3, 2), secondRepaymentInstallment.getDueDate());
-
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
             assertEquals(105.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 4, 1), thirdRepaymentInstallment.getDueDate());
-
             // fully unpaying the second installment
-            loanTransactionHelper.makeRefundByCash("28 January 2023", 395.0f, loanId);
-
+            loanTransactionHelper.makeRefundByCash("28 January 2023", 395.0F, loanId);
             loanDetails = loanTransactionHelper.getLoanDetails((long) loanId);
-
             firstRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(2);
             secondRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(3);
             thirdRepaymentInstallment = loanDetails.getRepaymentSchedule().getPeriods().get(4);
-
             assertEquals(5, loanDetails.getRepaymentSchedule().getPeriods().size());
             assertEquals(feePortion, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(0.00, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalDue()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getPrincipalOutstanding()));
+            assertEquals(400.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(firstRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 1, 31), firstRepaymentInstallment.getDueDate());
-
             assertEquals(feePortion, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesDue()));
             assertEquals(feePortion, Utils.getDoubleValue(secondRepaymentInstallment.getFeeChargesOutstanding()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesDue()));
             assertEquals(penaltyPortion, Utils.getDoubleValue(secondRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalDue()));
-            assertEquals(250.00, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalOutstanding()));
-            assertEquals(400.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(400.00, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(250.0, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalDue()));
+            assertEquals(250.0, Utils.getDoubleValue(secondRepaymentInstallment.getPrincipalOutstanding()));
+            assertEquals(400.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(400.0, Utils.getDoubleValue(secondRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 3, 2), secondRepaymentInstallment.getDueDate());
-
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
-            assertEquals(0.00, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
-            assertEquals(250.00, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
-            assertEquals(250.00, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getFeeChargesOutstanding()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesDue()));
+            assertEquals(0.0, Utils.getDoubleValue(thirdRepaymentInstallment.getPenaltyChargesOutstanding()));
+            assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalDueForPeriod()));
+            assertEquals(250.0, Utils.getDoubleValue(thirdRepaymentInstallment.getTotalOutstandingForPeriod()));
             assertEquals(LocalDate.of(2023, 4, 1), thirdRepaymentInstallment.getDueDate());
         } finally {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 
-    private Integer createLoanProduct(final String principal, final String repaymentAfterEvery, final String numberOfRepayments,
-            LoanScheduleProcessingType loanScheduleProcessingType, final Account... accounts) {
+    private Integer createLoanProduct(final String principal, final String repaymentAfterEvery, final String numberOfRepayments, LoanScheduleProcessingType loanScheduleProcessingType, final Account... accounts) {
         AdvancedPaymentData defaultAllocation = createDefaultPaymentAllocation();
         log.info("------------------------------CREATING NEW LOAN PRODUCT ---------------------------------------");
-        final String loanProductJSON = new LoanProductTestBuilder().withMinPrincipal(principal).withPrincipal(principal)
-                .withRepaymentTypeAsDays().withRepaymentAfterEvery(repaymentAfterEvery).withNumberOfRepayments(numberOfRepayments)
-                .withEnableDownPayment(true, "25", true).withinterestRatePerPeriod("0").withInterestRateFrequencyTypeAsMonths()
-                .withRepaymentStrategy(AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY)
-                .withLoanScheduleType(LoanScheduleType.PROGRESSIVE).withLoanScheduleProcessingType(loanScheduleProcessingType)
-                .withAmortizationTypeAsEqualPrincipalPayment().withInterestTypeAsFlat().withAccountingRulePeriodicAccrual(accounts)
-                .addAdvancedPaymentAllocation(defaultAllocation).withLoanScheduleProcessingType(LoanScheduleProcessingType.HORIZONTAL)
-                .withDaysInMonth("30").withDaysInYear("365").withMoratorium("0", "0").build(null);
+        final String loanProductJSON = new LoanProductTestBuilder().withMinPrincipal(principal).withPrincipal(principal).withRepaymentTypeAsDays().withRepaymentAfterEvery(repaymentAfterEvery).withNumberOfRepayments(numberOfRepayments).withEnableDownPayment(true, "25", true).withinterestRatePerPeriod("0").withInterestRateFrequencyTypeAsMonths().withRepaymentStrategy(AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).withLoanScheduleType(LoanScheduleType.PROGRESSIVE).withLoanScheduleProcessingType(loanScheduleProcessingType).withAmortizationTypeAsEqualPrincipalPayment().withInterestTypeAsFlat().withAccountingRulePeriodicAccrual(accounts).addAdvancedPaymentAllocation(defaultAllocation).withLoanScheduleProcessingType(LoanScheduleProcessingType.HORIZONTAL).withDaysInMonth("30").withDaysInYear("365").withMoratorium("0", "0").build(null);
         return loanTransactionHelper.getLoanProductId(loanProductJSON);
     }
 
-    private static PostLoansResponse applyForLoanApplication(final Long clientId, final Integer loanProductId, final Long principal,
-            final int loanTermFrequency, final int repaymentAfterEvery, final int numberOfRepayments, final BigDecimal interestRate,
-            final String expectedDisbursementDate, final String submittedOnDate) {
+    private static PostLoansResponse applyForLoanApplication(final Long clientId, final Integer loanProductId, final Long principal, final int loanTermFrequency, final int repaymentAfterEvery, final int numberOfRepayments, final BigDecimal interestRate, final String expectedDisbursementDate, final String submittedOnDate) {
         log.info("--------------------------------APPLYING FOR LOAN APPLICATION--------------------------------");
-        return loanTransactionHelper.applyLoan(new PostLoansRequest().clientId(clientId).productId(loanProductId.longValue())
-                .expectedDisbursementDate(expectedDisbursementDate).dateFormat(DATETIME_PATTERN)
-                .transactionProcessingStrategyCode(AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY)
-                .locale("en").submittedOnDate(submittedOnDate).amortizationType(1).interestRatePerPeriod(interestRate)
-                .interestCalculationPeriodType(1).interestType(0).repaymentFrequencyType(0).repaymentEvery(repaymentAfterEvery)
-                .repaymentFrequencyType(0).numberOfRepayments(numberOfRepayments).loanTermFrequency(loanTermFrequency)
-                .loanTermFrequencyType(0).principal(BigDecimal.valueOf(principal)).loanType("individual"));
+        return loanTransactionHelper.applyLoan(new PostLoansRequest().clientId(clientId).productId(loanProductId.longValue()).expectedDisbursementDate(expectedDisbursementDate).dateFormat(DATETIME_PATTERN).transactionProcessingStrategyCode(AdvancedPaymentScheduleTransactionProcessor.ADVANCED_PAYMENT_ALLOCATION_STRATEGY).locale("en").submittedOnDate(submittedOnDate).amortizationType(1).interestRatePerPeriod(interestRate).interestCalculationPeriodType(1).interestType(0).repaymentFrequencyType(0).repaymentEvery(repaymentAfterEvery).repaymentFrequencyType(0).numberOfRepayments(numberOfRepayments).loanTermFrequency(loanTermFrequency).loanTermFrequencyType(0).principal(BigDecimal.valueOf(principal)).loanType("individual"));
     }
 }

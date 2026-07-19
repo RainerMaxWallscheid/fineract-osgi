@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.jobs.setloandelinquencytags;
 
-import lombok.AllArgsConstructor;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
 import org.apache.fineract.portfolio.delinquency.helper.DelinquencyEffectivePauseHelper;
 import org.apache.fineract.portfolio.delinquency.service.DelinquencyReadPlatformService;
@@ -37,9 +36,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@AllArgsConstructor
 public class SetLoanDelinquencyTagsConfig {
-
     @Autowired
     private JobRepository jobRepository;
     @Autowired
@@ -48,27 +45,33 @@ public class SetLoanDelinquencyTagsConfig {
     private DelinquencyEffectivePauseHelper delinquencyEffectivePauseHelper;
     @Autowired
     private DelinquencyReadPlatformService delinquencyReadPlatformService;
-
     private DelinquencyWritePlatformService delinquencyWritePlatformService;
     private LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository;
     private LoanTransactionRepository loanTransactionRepository;
 
     @Bean
     public Step setLoanDelinquencyTagsStep() {
-        return new StepBuilder(JobName.LOAN_DELINQUENCY_CLASSIFICATION.name(), jobRepository)
-                .tasklet(setLoanDelinquencyTagsTasklet(), transactionManager).build();
+        return new StepBuilder(JobName.LOAN_DELINQUENCY_CLASSIFICATION.name(), jobRepository).tasklet(setLoanDelinquencyTagsTasklet(), transactionManager).build();
     }
 
     @Bean
     public Job setLoanDelinquencyTagsJob() {
-        return new JobBuilder(JobName.LOAN_DELINQUENCY_CLASSIFICATION.name(), jobRepository).start(setLoanDelinquencyTagsStep())
-                .incrementer(new RunIdIncrementer()).build();
+        return new JobBuilder(JobName.LOAN_DELINQUENCY_CLASSIFICATION.name(), jobRepository).start(setLoanDelinquencyTagsStep()).incrementer(new RunIdIncrementer()).build();
     }
 
     @Bean
     public SetLoanDelinquencyTagsTasklet setLoanDelinquencyTagsTasklet() {
-        return new SetLoanDelinquencyTagsTasklet(delinquencyWritePlatformService, loanRepaymentScheduleInstallmentRepository,
-                loanTransactionRepository, delinquencyEffectivePauseHelper, delinquencyReadPlatformService);
+        return new SetLoanDelinquencyTagsTasklet(delinquencyWritePlatformService, loanRepaymentScheduleInstallmentRepository, loanTransactionRepository, delinquencyEffectivePauseHelper, delinquencyReadPlatformService);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public SetLoanDelinquencyTagsConfig(final JobRepository jobRepository, final PlatformTransactionManager transactionManager, final DelinquencyEffectivePauseHelper delinquencyEffectivePauseHelper, final DelinquencyReadPlatformService delinquencyReadPlatformService, final DelinquencyWritePlatformService delinquencyWritePlatformService, final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository, final LoanTransactionRepository loanTransactionRepository) {
+        this.jobRepository = jobRepository;
+        this.transactionManager = transactionManager;
+        this.delinquencyEffectivePauseHelper = delinquencyEffectivePauseHelper;
+        this.delinquencyReadPlatformService = delinquencyReadPlatformService;
+        this.delinquencyWritePlatformService = delinquencyWritePlatformService;
+        this.loanRepaymentScheduleInstallmentRepository = loanRepaymentScheduleInstallmentRepository;
+        this.loanTransactionRepository = loanTransactionRepository;
+    }
 }

@@ -19,15 +19,12 @@
 package org.apache.fineract.notification.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.notification.domain.NotificationMapper;
 import org.apache.fineract.notification.domain.NotificationMapperRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class NotificationMapperReadRepositoryWrapperImpl implements NotificationMapperReadRepositoryWrapper {
-
     private final NotificationMapperRepository notificationMapperRepository;
 
     @Override
@@ -45,4 +42,8 @@ public class NotificationMapperReadRepositoryWrapperImpl implements Notification
         this.notificationMapperRepository.deleteById(id);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public NotificationMapperReadRepositoryWrapperImpl(final NotificationMapperRepository notificationMapperRepository) {
+        this.notificationMapperRepository = notificationMapperRepository;
+    }
 }

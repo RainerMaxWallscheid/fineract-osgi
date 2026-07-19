@@ -21,7 +21,6 @@ package org.apache.fineract.useradministration.service;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -35,35 +34,26 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 public class PermissionWritePlatformServiceJpaRepositoryImpl implements PermissionWritePlatformService {
-
     private final PlatformSecurityContext context;
     private final PermissionRepository permissionRepository;
     private final PermissionsCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 
-    @Caching(evict = { @CacheEvict(value = "users", allEntries = true), @CacheEvict(value = "usersByUsername", allEntries = true) })
+    @Caching(evict = {@CacheEvict(value = "users", allEntries = true), @CacheEvict(value = "usersByUsername", allEntries = true)})
     @Transactional
     @Override
     public CommandProcessingResult updateMakerCheckerPermissions(final JsonCommand command) {
         this.context.authenticatedUser();
-
         final Collection<Permission> allPermissions = this.permissionRepository.findAll();
-
         final PermissionsCommand permissionsCommand = this.fromApiJsonDeserializer.commandFromApiJson(command.json());
-
         final Map<String, Boolean> commandPermissions = permissionsCommand.getPermissions();
         final Map<String, Object> changes = new HashMap<>();
         final Map<String, Boolean> changedPermissions = new HashMap<>();
         for (Map.Entry<String, Boolean> entry : commandPermissions.entrySet()) {
-
             final Permission permission = findPermissionInCollectionByCode(allPermissions, entry.getKey());
-
-            if (permission.getCode().endsWith("_CHECKER") || permission.getCode().startsWith("READ_")
-                    || permission.getGrouping().equalsIgnoreCase("special")) {
+            if (permission.getCode().endsWith("_CHECKER") || permission.getCode().startsWith("READ_") || permission.getGrouping().equalsIgnoreCase("special")) {
                 throw new PermissionNotFoundException(entry.getKey());
             }
-
             final boolean isSelected = entry.getValue();
             final boolean changed = permission.enableMakerChecker(isSelected);
             if (changed) {
@@ -71,19 +61,16 @@ public class PermissionWritePlatformServiceJpaRepositoryImpl implements Permissi
                 this.permissionRepository.saveAndFlush(permission);
             }
         }
-
         if (!changedPermissions.isEmpty()) {
             changes.put("permissions", changedPermissions);
         }
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).with(changes).build();
     }
 
     private Permission findPermissionInCollectionByCode(final Collection<Permission> allPermissions, final String permissionCode) {
-
         if (allPermissions != null) {
             for (final Permission permission : allPermissions) {
                 if (permission.hasCode(permissionCode)) {
@@ -91,7 +78,13 @@ public class PermissionWritePlatformServiceJpaRepositoryImpl implements Permissi
                 }
             }
         }
-
         throw new PermissionNotFoundException(permissionCode);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PermissionWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final PermissionRepository permissionRepository, final PermissionsCommandFromApiJsonDeserializer fromApiJsonDeserializer) {
+        this.context = context;
+        this.permissionRepository = permissionRepository;
+        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
     }
 }

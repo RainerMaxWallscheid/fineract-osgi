@@ -19,14 +19,13 @@
 package org.apache.fineract.integrationtests.common;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
-
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.GetLoanProductsResponse;
 import org.apache.fineract.client.models.GetLoanProductsTemplateResponse;
 
-@Slf4j
 public class ProductMixHelper {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProductMixHelper.class);
 
     public List<GetLoanProductsResponse> getProductsMixList() {
         log.info("------------------------ RETRIEVING PRODUCT MIX -------------------------");

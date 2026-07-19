@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.collectionsheet.api;
 
 import static org.apache.fineract.infrastructure.core.service.CommandParameterUtil.GENERATE_COLLECTION_SHEET_COMMAND_VALUE;
 import static org.apache.fineract.infrastructure.core.service.CommandParameterUtil.SAVE_COLLECTION_SHEET_COMMAND_VALUE;
-
 import com.google.gson.JsonElement;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,7 +35,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -53,9 +51,7 @@ import org.springframework.stereotype.Component;
 @Path("/v1/collectionsheet")
 @Component
 @Tag(name = "Collection Sheet", description = "")
-@RequiredArgsConstructor
 public class CollectionSheetApiResource {
-
     private final CollectionSheetReadPlatformService collectionSheetReadPlatformService;
     private final ToApiJsonSerializer<Object> toApiJsonSerializer;
     private final FromJsonHelper fromJsonHelper;
@@ -63,19 +59,14 @@ public class CollectionSheetApiResource {
     private final PlatformSecurityContext context;
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Generate Individual Collection Sheet | Save Collection Sheet", description = "Generate Individual Collection Sheet:\n\n"
-            + "This Api retrieves repayment details of all individual loans under a office as on a specified meeting date.\n\n"
-            + "Save Collection Sheet:\n\n"
-            + "This Api allows the loan officer to perform bulk repayments of individual loans and deposit of mandatory savings on a given meeting date.")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Generate Individual Collection Sheet | Save Collection Sheet", description = "Generate Individual Collection Sheet:\n\n" + "This Api retrieves repayment details of all individual loans under a office as on a specified meeting date.\n\n" + "Save Collection Sheet:\n\n" + "This Api allows the loan officer to perform bulk repayments of individual loans and deposit of mandatory savings on a given meeting date.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = CollectionSheetRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CollectionSheetApiResourceSwagger.PostCollectionSheetResponse.class)))
-    public Response generateCollectionSheet(@QueryParam("command") @Parameter(description = "command") final String commandParam,
-            @Parameter(hidden = true) CollectionSheetRequest collectionSheetRequest) {
+    public Response generateCollectionSheet(@QueryParam("command") @Parameter(description = "command") final String commandParam, @Parameter(hidden = true) CollectionSheetRequest collectionSheetRequest) {
         final String payload = toApiJsonSerializer.serialize(collectionSheetRequest);
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(payload);
-
         if (CommandParameterUtil.is(commandParam, GENERATE_COLLECTION_SHEET_COMMAND_VALUE)) {
             this.context.authenticatedUser().validateHasReadPermission(CollectionSheetConstants.COLLECTIONSHEET_RESOURCE_NAME);
             final JsonElement parsedQuery = this.fromJsonHelper.parse(payload);
@@ -86,5 +77,14 @@ public class CollectionSheetApiResource {
             return Response.ok(this.commandsSourceWritePlatformService.logCommandSource(commandRequest)).build();
         }
         return Response.ok().build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CollectionSheetApiResource(final CollectionSheetReadPlatformService collectionSheetReadPlatformService, final ToApiJsonSerializer<Object> toApiJsonSerializer, final FromJsonHelper fromJsonHelper, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final PlatformSecurityContext context) {
+        this.collectionSheetReadPlatformService = collectionSheetReadPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.fromJsonHelper = fromJsonHelper;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.context = context;
     }
 }

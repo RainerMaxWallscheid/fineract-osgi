@@ -25,13 +25,11 @@ import static org.apache.fineract.portfolio.interestratechart.InterestRateChartA
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartApiConstants.isPrimaryGroupingByAmountParamName;
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartApiConstants.nameParamName;
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartSlabApiConstants.currencyCodeParamName;
-
 import com.google.gson.JsonElement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -42,9 +40,7 @@ import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChartF
 import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChartRepositoryWrapper;
 import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChartSlab;
 
-@RequiredArgsConstructor
 public class InterestRateChartAssembler {
-
     private final FromJsonHelper fromApiJsonHelper;
     private final InterestRateChartRepositoryWrapper interestRateChartRepositoryWrapper;
     private final InterestRateChartSlabAssembler chartSlabAssembler;
@@ -54,8 +50,7 @@ public class InterestRateChartAssembler {
      */
     public InterestRateChart assembleFrom(final JsonCommand command) {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
-                .resource(INTERESTRATE_CHART_RESOURCE_NAME);
+        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(INTERESTRATE_CHART_RESOURCE_NAME);
         final JsonElement element = command.parsedJson();
         final String currencyCode = this.fromApiJsonHelper.extractStringNamed(currencyCodeParamName, element);
         final InterestRateChart newChart = this.assembleFrom(element, currencyCode, baseDataValidator);
@@ -69,9 +64,7 @@ public class InterestRateChartAssembler {
         }
     }
 
-    public InterestRateChart assembleFrom(final JsonElement element, final String currencyCode,
-            final DataValidatorBuilder baseDataValidator) {
-
+    public InterestRateChart assembleFrom(final JsonElement element, final String currencyCode, final DataValidatorBuilder baseDataValidator) {
         final String name = this.fromApiJsonHelper.extractStringNamed(nameParamName, element);
         final String description = this.fromApiJsonHelper.extractStringNamed(descriptionParamName, element);
         final LocalDate fromDate = this.fromApiJsonHelper.extractLocalDateNamed(fromDateParamName, element);
@@ -80,20 +73,23 @@ public class InterestRateChartAssembler {
         if (isPrimaryGroupingByAmount == null) {
             isPrimaryGroupingByAmount = false;
         }
-
         // assemble chart Slabs
         final Collection<InterestRateChartSlab> newChartSlabs = this.chartSlabAssembler.assembleChartSlabsFrom(element, currencyCode);
-
-        final InterestRateChartFields fields = InterestRateChartFields.createNew(name, description, fromDate, toDate,
-                isPrimaryGroupingByAmount);
+        final InterestRateChartFields fields = InterestRateChartFields.createNew(name, description, fromDate, toDate, isPrimaryGroupingByAmount);
         final InterestRateChart newChart = InterestRateChart.createNew(fields, newChartSlabs);
         newChart.validateChartSlabs(baseDataValidator);
         return newChart;
     }
 
     public InterestRateChart assembleFrom(final Long interestRateChartId) {
-        final InterestRateChart interestRateChart = this.interestRateChartRepositoryWrapper
-                .findOneWithNotFoundDetection(interestRateChartId);
+        final InterestRateChart interestRateChart = this.interestRateChartRepositoryWrapper.findOneWithNotFoundDetection(interestRateChartId);
         return interestRateChart;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InterestRateChartAssembler(final FromJsonHelper fromApiJsonHelper, final InterestRateChartRepositoryWrapper interestRateChartRepositoryWrapper, final InterestRateChartSlabAssembler chartSlabAssembler) {
+        this.fromApiJsonHelper = fromApiJsonHelper;
+        this.interestRateChartRepositoryWrapper = interestRateChartRepositoryWrapper;
+        this.chartSlabAssembler = chartSlabAssembler;
     }
 }

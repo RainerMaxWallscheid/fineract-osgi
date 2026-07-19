@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.paymenttype.service;
 
 import jakarta.validation.Valid;
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.Strings;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
@@ -37,30 +36,24 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 
-@RequiredArgsConstructor
 public class PaymentTypeWriteServiceImpl implements PaymentTypeWriteService {
-
     private final PaymentTypeRepository repository;
     private final PaymentTypeCreateRequestMapper createRequestMapper;
 
     @Override
-    @CacheEvict(value = "payment_types", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat('payment_types')")
+    @CacheEvict(value = "payment_types", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(\'payment_types\')")
     public PaymentTypeCreateResponse createPaymentType(@Valid PaymentTypeCreateRequest request) {
         final var paymentType = createRequestMapper.map(request);
-
         repository.saveAndFlush(paymentType);
-
         return PaymentTypeCreateResponse.builder().resourceId(paymentType.getId()).build();
     }
 
     @Override
-    @CacheEvict(value = "payment_types", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat('payment_types')")
+    @CacheEvict(value = "payment_types", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(\'payment_types\')")
     @SuppressWarnings("AvoidHidingCauseException")
     public PaymentTypeUpdateResponse updatePaymentType(@Valid PaymentTypeUpdateRequest request) {
         try {
-            final var paymentType = repository.findById(request.getId())
-                    .orElseThrow(() -> new PaymentTypeNotFoundException(request.getId()));
-
+            final var paymentType = repository.findById(request.getId()).orElseThrow(() -> new PaymentTypeNotFoundException(request.getId()));
             if (!Strings.CS.equals(request.getName(), paymentType.getName())) {
                 paymentType.setName(request.getName());
             }
@@ -79,20 +72,17 @@ public class PaymentTypeWriteServiceImpl implements PaymentTypeWriteService {
             if (!Objects.equals(request.getIsSystemDefined(), paymentType.getIsSystemDefined())) {
                 paymentType.setIsSystemDefined(request.getIsSystemDefined());
             }
-
             repository.saveAndFlush(paymentType);
         } catch (final JpaSystemException | DataIntegrityViolationException e) {
             throw new PaymentTypeNotFoundException(request.getId());
         }
-
         return PaymentTypeUpdateResponse.builder().resourceId(request.getId()).build();
     }
 
     @Override
-    @CacheEvict(value = "payment_types", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat('payment_types')")
+    @CacheEvict(value = "payment_types", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat(\'payment_types\')")
     public PaymentTypeDeleteResponse deletePaymentType(@Valid PaymentTypeDeleteRequest request) {
         final var paymentType = repository.findById(request.getId()).orElseThrow(() -> new PaymentTypeNotFoundException(request.getId()));
-
         try {
             repository.delete(paymentType);
             repository.flush();
@@ -100,19 +90,21 @@ public class PaymentTypeWriteServiceImpl implements PaymentTypeWriteService {
             final Throwable throwable = e.getMostSpecificCause();
             handleDataIntegrityIssues(throwable, e);
         }
-
         return PaymentTypeDeleteResponse.builder().resourceId(paymentType.getId()).build();
     }
 
     private void handleDataIntegrityIssues(final Throwable realCause, final Exception dve) {
         if (realCause.getMessage().contains("acc_product_mapping")) {
-            throw new PlatformDataIntegrityException("error.msg.payment.type.association.exist",
-                    "cannot.delete.payment.type.with.association");
+            throw new PlatformDataIntegrityException("error.msg.payment.type.association.exist", "cannot.delete.payment.type.with.association");
         } else if (realCause.getMessage().contains("payment_type_id")) {
-            throw new PlatformDataIntegrityException("error.msg.payment.type.association.exist",
-                    "cannot.delete.payment.type.with.association");
+            throw new PlatformDataIntegrityException("error.msg.payment.type.association.exist", "cannot.delete.payment.type.with.association");
         }
-        throw ErrorHandler.getMappable(dve, "error.msg.paymenttypes.unknown.data.integrity.issue",
-                "Unknown data integrity issue with resource.");
+        throw ErrorHandler.getMappable(dve, "error.msg.paymenttypes.unknown.data.integrity.issue", "Unknown data integrity issue with resource.");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PaymentTypeWriteServiceImpl(final PaymentTypeRepository repository, final PaymentTypeCreateRequestMapper createRequestMapper) {
+        this.repository = repository;
+        this.createRequestMapper = createRequestMapper;
     }
 }

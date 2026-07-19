@@ -26,30 +26,48 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
 @Entity
 @Table(name = "m_loan_status_change_history")
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LoanStatusChangeHistory extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "status_code", nullable = false)
-    @Setter
     private LoanStatus status;
-
     @Column(name = "status_change_business_date", nullable = false)
     private LocalDate businessDate;
 
+    @java.lang.SuppressWarnings("all")
+        public Loan getLoan() {
+        return this.loan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanStatus getStatus() {
+        return this.status;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getBusinessDate() {
+        return this.businessDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanStatusChangeHistory(final Loan loan, final LoanStatus status, final LocalDate businessDate) {
+        this.loan = loan;
+        this.status = status;
+        this.businessDate = businessDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected LoanStatusChangeHistory() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setStatus(final LoanStatus status) {
+        this.status = status;
+    }
 }

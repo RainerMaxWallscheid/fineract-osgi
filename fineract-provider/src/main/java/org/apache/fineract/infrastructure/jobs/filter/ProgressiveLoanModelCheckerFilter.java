@@ -24,7 +24,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.http.BodyCachingHttpServletRequestWrapper;
 import org.apache.fineract.portfolio.loanaccount.service.ProgressiveLoanModelProcessingService;
 import org.apache.fineract.portfolio.loanproduct.calc.data.ProgressiveLoanInterestScheduleModel;
@@ -32,33 +31,31 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
-@RequiredArgsConstructor
 public class ProgressiveLoanModelCheckerFilter extends OncePerRequestFilter {
-
     private final ProgressiveLoanModelProcessingService progressiveLoanModelProcessingService;
     private final ProgressiveLoanModelCheckerHelper helper;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         request = new BodyCachingHttpServletRequestWrapper(request);
-
         if (!helper.isOnApiList((BodyCachingHttpServletRequestWrapper) request)) {
             proceed(filterChain, request, response);
         } else {
             List<Long> loanIds = helper.calculateRelevantLoanIds((BodyCachingHttpServletRequestWrapper) request);
             if (!loanIds.isEmpty()) {
-                progressiveLoanModelProcessingService
-                        .findLoanIdsRequiringModelRecalculation(loanIds, ProgressiveLoanInterestScheduleModel.getModelVersion())
-                        .forEach(progressiveLoanModelProcessingService::recalculateModelAndSave);
+                progressiveLoanModelProcessingService.findLoanIdsRequiringModelRecalculation(loanIds, ProgressiveLoanInterestScheduleModel.getModelVersion()).forEach(progressiveLoanModelProcessingService::recalculateModelAndSave);
             }
             proceed(filterChain, request, response);
         }
     }
 
-    private void proceed(FilterChain filterChain, HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+    private void proceed(FilterChain filterChain, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         filterChain.doFilter(request, response);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ProgressiveLoanModelCheckerFilter(final ProgressiveLoanModelProcessingService progressiveLoanModelProcessingService, final ProgressiveLoanModelCheckerHelper helper) {
+        this.progressiveLoanModelProcessingService = progressiveLoanModelProcessingService;
+        this.helper = helper;
+    }
 }

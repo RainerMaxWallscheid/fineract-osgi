@@ -20,11 +20,9 @@ package org.apache.fineract.infrastructure.jobs.service.retainedearning.listener
 
 import static org.apache.fineract.infrastructure.jobs.service.retainedearning.RetainedEarningJobConstant.JOB_SUMMARY_STEP_NAME;
 import static org.apache.fineract.infrastructure.jobs.service.retainedearning.RetainedEarningJobConstant.RETAINED_EARNING_JOB_NAME;
-
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
@@ -34,8 +32,9 @@ import org.springframework.stereotype.Component;
  * The job listener
  */
 @Component
-@Slf4j
 public class RetainedEarningJobListener implements JobExecutionListener {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RetainedEarningJobListener.class);
 
     /**
      * {@inheritDoc}
@@ -67,9 +66,7 @@ public class RetainedEarningJobListener implements JobExecutionListener {
      */
     private void logJobExecutionSummary(final JobExecution jobExecution) {
         final Long jobExecutionId = jobExecution.getId();
-        final Long recordProcessCount = jobExecution.getStepExecutions().stream()
-                .filter(stepExecution -> stepExecution.getStepName().equals(JOB_SUMMARY_STEP_NAME))
-                .mapToLong(stepExecution -> stepExecution.getWriteCount()).sum();
+        final Long recordProcessCount = jobExecution.getStepExecutions().stream().filter(stepExecution -> stepExecution.getStepName().equals(JOB_SUMMARY_STEP_NAME)).mapToLong(stepExecution -> stepExecution.getWriteCount()).sum();
         final Instant startDateTime = jobExecution.getStartTime().toInstant(ZoneOffset.UTC);
         final Instant endDateTime = jobExecution.getEndTime().toInstant(ZoneOffset.UTC);
         Long jobDuration = 0L;
@@ -80,10 +77,6 @@ public class RetainedEarningJobListener implements JobExecutionListener {
             endDateTimeMilliSecond = endDateTime.toEpochMilli();
             jobDuration = startDateTime.until(endDateTime, ChronoUnit.MINUTES);
         }
-        log.info(
-                "Execution Summary for jobName={}, totalRecordProcessCount={}, startTime={}, endTime={}, startTime_ms={}, endTime_ms={}, "
-                        + "jobExecutionId={}, jobExecutionDurationInMinutes={}, tenantId={}",
-                RETAINED_EARNING_JOB_NAME, recordProcessCount, startDateTime, endDateTime, startDateTimeMilliSecond, endDateTimeMilliSecond,
-                jobExecutionId, jobDuration, ThreadLocalContextUtil.getTenant().getTenantIdentifier());
+        log.info("Execution Summary for jobName={}, totalRecordProcessCount={}, startTime={}, endTime={}, startTime_ms={}, endTime_ms={}, " + "jobExecutionId={}, jobExecutionDurationInMinutes={}, tenantId={}", RETAINED_EARNING_JOB_NAME, recordProcessCount, startDateTime, endDateTime, startDateTimeMilliSecond, endDateTimeMilliSecond, jobExecutionId, jobDuration, ThreadLocalContextUtil.getTenant().getTenantIdentifier());
     }
 }

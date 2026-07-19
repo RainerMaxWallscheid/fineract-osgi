@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.cob.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.exceptions.BusinessStepException;
 import org.apache.fineract.cob.exceptions.BusinessStepNotBelongsToJobException;
 import org.apache.fineract.commands.annotation.CommandType;
@@ -28,16 +27,19 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 @Service
 @CommandType(entity = "BATCH_BUSINESS_STEP", action = "UPDATE")
 public class BusinessStepConfigUpdateHandler implements NewCommandSourceHandler {
-
     private final ConfigJobParameterService configJobParameterService;
 
     @Override
     @Transactional
     public CommandProcessingResult processCommand(JsonCommand command) throws BusinessStepNotBelongsToJobException, BusinessStepException {
         return configJobParameterService.updateStepConfigByJobName(command, command.getJobName());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BusinessStepConfigUpdateHandler(final ConfigJobParameterService configJobParameterService) {
+        this.configJobParameterService = configJobParameterService;
     }
 }

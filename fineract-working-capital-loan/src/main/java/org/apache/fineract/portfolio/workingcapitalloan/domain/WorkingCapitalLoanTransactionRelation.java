@@ -26,50 +26,68 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelationTypeEnum;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelationTypeEnumConverter;
 
-@Getter
 @Entity
 @Table(name = "m_wc_loan_transaction_relation")
 public class WorkingCapitalLoanTransactionRelation extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @ManyToOne
     @JoinColumn(name = "from_loan_transaction_id", nullable = false)
     private WorkingCapitalLoanTransaction fromTransaction;
-
-    @Setter
     @ManyToOne
     @JoinColumn(name = "to_loan_transaction_id")
     private WorkingCapitalLoanTransaction toTransaction;
-
-    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_loan_charge_id")
     private WorkingCapitalLoanCharge toCharge;
-
     @Column(name = "relation_type_enum", nullable = false)
     @Convert(converter = LoanTransactionRelationTypeEnumConverter.class)
     private LoanTransactionRelationTypeEnum relationType;
 
-    protected WorkingCapitalLoanTransactionRelation() {}
+    protected WorkingCapitalLoanTransactionRelation() {
+    }
 
-    public WorkingCapitalLoanTransactionRelation(@NotNull WorkingCapitalLoanTransaction fromTransaction,
-            WorkingCapitalLoanTransaction toTransaction, LoanTransactionRelationTypeEnum relationType) {
+    public WorkingCapitalLoanTransactionRelation(@NotNull WorkingCapitalLoanTransaction fromTransaction, WorkingCapitalLoanTransaction toTransaction, LoanTransactionRelationTypeEnum relationType) {
         this.fromTransaction = fromTransaction;
         this.toTransaction = toTransaction;
         this.relationType = relationType;
     }
 
-    public static WorkingCapitalLoanTransactionRelation linkToCharge(@NotNull WorkingCapitalLoanTransaction fromTransaction,
-            @NotNull WorkingCapitalLoanCharge charge, LoanTransactionRelationTypeEnum relationType) {
-        final WorkingCapitalLoanTransactionRelation relation = new WorkingCapitalLoanTransactionRelation(fromTransaction, null,
-                relationType);
+    public static WorkingCapitalLoanTransactionRelation linkToCharge(@NotNull WorkingCapitalLoanTransaction fromTransaction, @NotNull WorkingCapitalLoanCharge charge, LoanTransactionRelationTypeEnum relationType) {
+        final WorkingCapitalLoanTransactionRelation relation = new WorkingCapitalLoanTransactionRelation(fromTransaction, null, relationType);
         relation.toCharge = charge;
         return relation;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanTransaction getFromTransaction() {
+        return this.fromTransaction;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanTransaction getToTransaction() {
+        return this.toTransaction;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanCharge getToCharge() {
+        return this.toCharge;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionRelationTypeEnum getRelationType() {
+        return this.relationType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setToTransaction(final WorkingCapitalLoanTransaction toTransaction) {
+        this.toTransaction = toTransaction;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setToCharge(final WorkingCapitalLoanCharge toCharge) {
+        this.toCharge = toCharge;
+    }
 }

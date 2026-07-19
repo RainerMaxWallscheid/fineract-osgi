@@ -19,13 +19,11 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
@@ -44,9 +42,7 @@ import org.springframework.stereotype.Component;
  * @see BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class CreateTransactionLoanCommandStrategy implements CommandStrategy {
-
     /**
      * Loan transactions api resource {@link LoanTransactionsApiResource}.
      */
@@ -54,37 +50,38 @@ public class CreateTransactionLoanCommandStrategy implements CommandStrategy {
 
     @Override
     public BatchResponse execute(BatchRequest request, @SuppressWarnings("unused") UriInfo uriInfo) {
-
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrlWithoutVersion(request));
         final Long loanId = Long.parseLong(pathParameters.get(1));
-
         final Pattern commandPattern = Pattern.compile("^?command=[a-zA-Z\\-]+");
         final Matcher commandMatcher = commandPattern.matcher(pathParameters.get(2));
-
         if (!commandMatcher.find()) {
             // This would only occur if the CommandStrategyProvider is incorrectly configured.
             response.setRequestId(request.getRequestId());
             response.setStatusCode(HttpStatus.SC_NOT_IMPLEMENTED);
-            response.setBody(
-                    "Resource with method " + request.getMethod() + " and relativeUrl " + request.getRelativeUrl() + " doesn't exist");
+            response.setBody("Resource with method " + request.getMethod() + " and relativeUrl " + request.getRelativeUrl() + " doesn\'t exist");
             return response;
         }
         final String commandQueryParam = commandMatcher.group(0);
         final String command = commandQueryParam.substring(commandQueryParam.indexOf("=") + 1);
-
         responseBody = loanTransactionsApiResource.executeLoanTransaction(loanId, command, request.getBody());
-
         response.setStatusCode(HttpStatus.SC_OK);
         // Sets the body of the response after Charge has been successfully
         // created
         response.setBody(responseBody);
-
         return response;
+    }
+
+    /**
+     * Creates a new {@code CreateTransactionLoanCommandStrategy} instance.
+     *
+     * @param loanTransactionsApiResource Loan transactions api resource {@link LoanTransactionsApiResource}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreateTransactionLoanCommandStrategy(final LoanTransactionsApiResource loanTransactionsApiResource) {
+        this.loanTransactionsApiResource = loanTransactionsApiResource;
     }
 }

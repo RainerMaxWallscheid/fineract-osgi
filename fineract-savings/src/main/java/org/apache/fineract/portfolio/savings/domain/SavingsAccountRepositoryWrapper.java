@@ -20,7 +20,6 @@ package org.apache.fineract.portfolio.savings.domain;
 
 import java.time.LocalDate;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.SavingsAccrualData;
@@ -43,16 +42,13 @@ import org.springframework.transaction.annotation.Transactional;
  * </p>
  */
 @Service
-@RequiredArgsConstructor
 public class SavingsAccountRepositoryWrapper {
-
     private final SavingsAccountRepository repository;
     private final SavingsAccountTransactionRepository savingsAccountTransactionRepository;
 
     @Transactional(readOnly = true)
     public SavingsAccount findOneWithNotFoundDetection(final Long savingsId) {
-        final SavingsAccount account = this.repository.findById(savingsId)
-                .orElseThrow(() -> new SavingsAccountNotFoundException(savingsId));
+        final SavingsAccount account = this.repository.findById(savingsId).orElseThrow(() -> new SavingsAccountNotFoundException(savingsId));
         account.loadLazyCollections();
         return account;
     }
@@ -68,7 +64,6 @@ public class SavingsAccountRepositoryWrapper {
                 throw new SavingsAccountNotFoundException(savingsId);
             }
         }
-
         return account;
     }
 
@@ -122,13 +117,11 @@ public class SavingsAccountRepositoryWrapper {
     }
 
     @Transactional
-    public List<SavingsAccountTransaction> findTransactionsAfterPivotDate(@Param("savingsAccount") SavingsAccount savingsAccount,
-            @Param("date") LocalDate transactionDate) {
+    public List<SavingsAccountTransaction> findTransactionsAfterPivotDate(@Param("savingsAccount") SavingsAccount savingsAccount, @Param("date") LocalDate transactionDate) {
         return this.savingsAccountTransactionRepository.findTransactionsAfterPivotDate(savingsAccount, transactionDate);
     }
 
-    public List<SavingsAccountTransaction> findTransactionRunningBalanceBeforePivotDate(
-            @Param("savingsAccount") SavingsAccount savingsAccount, @Param("date") LocalDate date) {
+    public List<SavingsAccountTransaction> findTransactionRunningBalanceBeforePivotDate(@Param("savingsAccount") SavingsAccount savingsAccount, @Param("date") LocalDate date) {
         return this.savingsAccountTransactionRepository.findTransactionRunningBalanceBeforePivotDate(savingsAccount, date);
     }
 
@@ -173,12 +166,17 @@ public class SavingsAccountRepositoryWrapper {
     }
 
     @Transactional(readOnly = true)
-    public List<SavingsAccrualData> findAccrualData(final LocalDate tillDate, final Long savingsId, final Integer status,
-            final Integer accountingRule) {
+    public List<SavingsAccrualData> findAccrualData(final LocalDate tillDate, final Long savingsId, final Integer status, final Integer accountingRule) {
         return this.repository.findAccrualData(tillDate, savingsId, status, accountingRule);
     }
 
     public List<Long> findLoanIdsByStatusId(Integer status) {
         return null;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsAccountRepositoryWrapper(final SavingsAccountRepository repository, final SavingsAccountTransactionRepository savingsAccountTransactionRepository) {
+        this.repository = repository;
+        this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
     }
 }

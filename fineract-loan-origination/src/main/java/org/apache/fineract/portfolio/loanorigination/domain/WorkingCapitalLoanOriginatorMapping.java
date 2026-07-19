@@ -24,21 +24,13 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
-@Getter
-@Setter
 @Entity
-@NoArgsConstructor
 @Table(name = "m_wc_loan_originator_mapping")
 public class WorkingCapitalLoanOriginatorMapping extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @Column(name = "loan_id", nullable = false)
     private Long loanId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "originator_id", nullable = false)
     private LoanOriginator originator;
@@ -48,5 +40,29 @@ public class WorkingCapitalLoanOriginatorMapping extends AbstractAuditableWithUT
         mapping.setLoanId(loanId);
         mapping.setOriginator(originator);
         return mapping;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanId() {
+        return this.loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanOriginator getOriginator() {
+        return this.originator;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanId(final Long loanId) {
+        this.loanId = loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setOriginator(final LoanOriginator originator) {
+        this.originator = originator;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanOriginatorMapping() {
     }
 }

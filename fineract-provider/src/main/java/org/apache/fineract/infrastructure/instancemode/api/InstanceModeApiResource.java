@@ -30,8 +30,6 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.core.boot.FineractProfiles;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
@@ -43,10 +41,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Path("/v1/instance-mode")
 @Tag(name = "Instance Mode", description = "Instance mode changing API")
-@RequiredArgsConstructor
-@Slf4j
 public class InstanceModeApiResource implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InstanceModeApiResource.class);
     private final FineractProperties fineractProperties;
 
     @Override
@@ -62,7 +59,7 @@ public class InstanceModeApiResource implements InitializingBean {
     }
 
     @PUT
-    @Consumes({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
     @Operation(summary = "Changes the Fineract instance mode", operationId = "updateInstanceMode", description = "")
     @AlternativeOperationId("changeMode")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = InstanceModeApiResourceSwagger.ChangeInstanceModeRequest.class)))
@@ -79,5 +76,10 @@ public class InstanceModeApiResource implements InitializingBean {
         fineractProperties.getMode().setBatchWorkerEnabled(request.isBatchWorkerEnabled());
         fineractProperties.getMode().setBatchManagerEnabled(request.isBatchManagerEnabled());
         return Response.ok().build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InstanceModeApiResource(final FineractProperties fineractProperties) {
+        this.fineractProperties = fineractProperties;
     }
 }

@@ -19,20 +19,16 @@
 package org.apache.fineract.portfolio.search.data;
 
 import static org.apache.fineract.portfolio.search.service.SearchUtil.DEFAULT_PAGE_SIZE;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Locale;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-@Getter
 public class TransactionSearchRequest {
-
     private Long accountId;
     private LocalDate fromDate;
     private LocalDate toDate;
@@ -43,7 +39,6 @@ public class TransactionSearchRequest {
     private String[] types;
     private Boolean credit;
     private Boolean debit;
-
     private PageRequest pageable;
 
     public TransactionSearchRequest accountId(Long accountId) {
@@ -102,5 +97,60 @@ public class TransactionSearchRequest {
         String[] properties = Strings.isEmpty(orderByProps) ? null : orderByProps.split(",");
         this.pageable = properties == null ? PageRequest.of(offset, limit) : PageRequest.of(offset, limit, direction, properties);
         return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getAccountId() {
+        return this.accountId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getFromDate() {
+        return this.fromDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getToDate() {
+        return this.toDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getFromSubmittedDate() {
+        return this.fromSubmittedDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getToSubmittedDate() {
+        return this.toSubmittedDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getFromAmount() {
+        return this.fromAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getToAmount() {
+        return this.toAmount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String[] getTypes() {
+        return this.types;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Boolean getCredit() {
+        return this.credit;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Boolean getDebit() {
+        return this.debit;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PageRequest getPageable() {
+        return this.pageable;
     }
 }

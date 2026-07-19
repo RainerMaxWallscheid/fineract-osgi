@@ -18,19 +18,21 @@
  */
 package org.apache.fineract.infrastructure.contentstore.policy;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class DefaultPostUploadContentPolicy implements ContentPolicy {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DefaultPostUploadContentPolicy.class);
     private final MimeContentPolicy mimeContentPolicy;
 
     @Override
     public void check(ContentPolicyContext ctx) {
         mimeContentPolicy.check(ctx);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DefaultPostUploadContentPolicy(final MimeContentPolicy mimeContentPolicy) {
+        this.mimeContentPolicy = mimeContentPolicy;
     }
 }

@@ -37,7 +37,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -59,9 +58,7 @@ import org.springframework.stereotype.Component;
 @Path("/v1/products/{type}")
 @Component
 @Tag(name = "Products", description = "")
-@RequiredArgsConstructor
 public class ProductsApiResource {
-
     private final ApplicationContext applicationContext;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final DefaultToApiJsonSerializer<ProductData> toApiJsonSerializer;
@@ -70,11 +67,10 @@ public class ProductsApiResource {
 
     @GET
     @Path("template")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Share Product Template", operationId = "retrieveTemplateShareProduct")
     @AlternativeOperationId("retrieveTemplate_13")
-    public String retrieveTemplate(@PathParam("type") @Parameter(description = "type") final String productType,
-            @Context final UriInfo uriInfo) {
+    public String retrieveTemplate(@PathParam("type") @Parameter(description = "type") final String productType, @Context final UriInfo uriInfo) {
         String serviceName = productType + ProductsApiConstants.READPLATFORM_NAME;
         try {
             ShareProductReadPlatformService service = (ShareProductReadPlatformService) this.applicationContext.getBean(serviceName);
@@ -88,14 +84,11 @@ public class ProductsApiResource {
 
     @GET
     @Path("{productId}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Retrieve a Share Product", operationId = "retrieveOneShareProduct", description = "Retrieves a Share Product\n\n"
-            + "Example Requests:\n" + "\n" + "products/share/1\n" + "\n" + "\n" + "products/share/1?template=true")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Retrieve a Share Product", operationId = "retrieveOneShareProduct", description = "Retrieves a Share Product\n\n" + "Example Requests:\n" + "\n" + "products/share/1\n" + "\n" + "\n" + "products/share/1?template=true")
     @AlternativeOperationId("retrieveProduct")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProductsApiResourceSwagger.GetProductsTypeProductIdResponse.class))) })
-    public String retrieveProduct(@PathParam("productId") @Parameter(description = "productId") final Long productId,
-            @PathParam("type") @Parameter(description = "type") final String productType, @Context final UriInfo uriInfo) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProductsApiResourceSwagger.GetProductsTypeProductIdResponse.class)))})
+    public String retrieveProduct(@PathParam("productId") @Parameter(description = "productId") final Long productId, @PathParam("type") @Parameter(description = "type") final String productType, @Context final UriInfo uriInfo) {
         try {
             String serviceName = productType + ProductsApiConstants.READPLATFORM_NAME;
             ShareProductReadPlatformService service = (ShareProductReadPlatformService) this.applicationContext.getBean(serviceName);
@@ -108,15 +101,11 @@ public class ProductsApiResource {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "List Share Products", operationId = "retrieveAllShareProducts", description = "Lists Share Products\n\n"
-            + "Mandatory Fields: limit, offset\n\n" + "Example Requests:\n" + "\n" + "shareproducts")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "List Share Products", operationId = "retrieveAllShareProducts", description = "Lists Share Products\n\n" + "Mandatory Fields: limit, offset\n\n" + "Example Requests:\n" + "\n" + "shareproducts")
     @AlternativeOperationId("retrieveAllProducts")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProductsApiResourceSwagger.GetProductsTypeResponse.class))) })
-    public String retrieveAllProducts(@PathParam("type") @Parameter(description = "type") final String productType,
-            @QueryParam("offset") @Parameter(description = "offset") final Integer offset,
-            @QueryParam("limit") @Parameter(description = "limit") final Integer limit, @Context final UriInfo uriInfo) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProductsApiResourceSwagger.GetProductsTypeResponse.class)))})
+    public String retrieveAllProducts(@PathParam("type") @Parameter(description = "type") final String productType, @QueryParam("offset") @Parameter(description = "offset") final Integer offset, @QueryParam("limit") @Parameter(description = "limit") final Integer limit, @Context final UriInfo uriInfo) {
         try {
             String serviceName = productType + ProductsApiConstants.READPLATFORM_NAME;
             ShareProductReadPlatformService service = (ShareProductReadPlatformService) this.applicationContext.getBean(serviceName);
@@ -129,18 +118,13 @@ public class ProductsApiResource {
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Create a Share Product", operationId = "createShareProduct", description = "Creates a Share Product\n\n"
-            + "Mandatory Fields: name, shortName, description, currencyCode, digitsAfterDecimal,inMultiplesOf, locale, totalShares, unitPrice, nominalShares,allowDividendCalculationForInactiveClients,accountingRule\n\n"
-            + "Mandatory Fields for Cash based accounting (accountingRule = 2): shareReferenceId, shareSuspenseId, shareEquityId, incomeFromFeeAccountId\n\n"
-            + "Optional Fields: sharesIssued, minimumShares, maximumShares, minimumActivePeriodForDividends, minimumactiveperiodFrequencyType, lockinPeriodFrequency, lockinPeriodFrequencyType, marketPricePeriods, chargesSelected")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Create a Share Product", operationId = "createShareProduct", description = "Creates a Share Product\n\n" + "Mandatory Fields: name, shortName, description, currencyCode, digitsAfterDecimal,inMultiplesOf, locale, totalShares, unitPrice, nominalShares,allowDividendCalculationForInactiveClients,accountingRule\n\n" + "Mandatory Fields for Cash based accounting (accountingRule = 2): shareReferenceId, shareSuspenseId, shareEquityId, incomeFromFeeAccountId\n\n" + "Optional Fields: sharesIssued, minimumShares, maximumShares, minimumActivePeriodForDividends, minimumactiveperiodFrequencyType, lockinPeriodFrequency, lockinPeriodFrequencyType, marketPricePeriods, chargesSelected")
     @AlternativeOperationId("createProduct")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = ProductsApiResourceSwagger.PostProductsTypeRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProductsApiResourceSwagger.PostProductsTypeResponse.class))) })
-    public String createProduct(@PathParam("type") @Parameter(description = "type") final String productType,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProductsApiResourceSwagger.PostProductsTypeResponse.class)))})
+    public String createProduct(@PathParam("type") @Parameter(description = "type") final String productType, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
         CommandWrapper commandWrapper = null;
         this.platformSecurityContext.authenticatedUser();
         commandWrapper = new CommandWrapperBuilder().createProduct(productType).withJson(apiRequestBodyAsJson).build();
@@ -150,36 +134,37 @@ public class ProductsApiResource {
 
     @POST
     @Path("{productId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Handle Share Product commands", operationId = "handleCommandsShareProduct")
     @AlternativeOperationId("handleCommands_3")
-    public String handleCommands(@PathParam("type") @Parameter(description = "type") final String productType,
-            @PathParam("productId") @Parameter(description = "productId") final Long productId,
-            @QueryParam("command") @Parameter(description = "command") final String commandParam,
-            @SuppressWarnings("unused") @Context final UriInfo uriInfo, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        CommandWrapper commandWrapper = new CommandWrapperBuilder().createProductCommand(productType, commandParam, productId)
-                .withJson(apiRequestBodyAsJson).build();
+    public String handleCommands(@PathParam("type") @Parameter(description = "type") final String productType, @PathParam("productId") @Parameter(description = "productId") final Long productId, @QueryParam("command") @Parameter(description = "command") final String commandParam, @SuppressWarnings("unused") @Context final UriInfo uriInfo, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+        CommandWrapper commandWrapper = new CommandWrapperBuilder().createProductCommand(productType, commandParam, productId).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult commandProcessingResult = this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
         return this.toApiJsonSerializer.serialize(commandProcessingResult);
     }
 
     @PUT
     @Path("{productId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Update a Share Product", operationId = "updateShareProduct", description = "Updates a Share Product")
     @AlternativeOperationId("updateProduct")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = ProductsApiResourceSwagger.PutProductsTypeProductIdRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProductsApiResourceSwagger.PutProductsTypeProductIdResponse.class))) })
-    public String updateProduct(@PathParam("type") @Parameter(description = "type") final String productType,
-            @PathParam("productId") @Parameter(description = "productId") final Long productId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProductsApiResourceSwagger.PutProductsTypeProductIdResponse.class)))})
+    public String updateProduct(@PathParam("type") @Parameter(description = "type") final String productType, @PathParam("productId") @Parameter(description = "productId") final Long productId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
         this.platformSecurityContext.authenticatedUser();
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateProduct(productType, productId)
-                .withJson(apiRequestBodyAsJson).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateProduct(productType, productId).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProductsApiResource(final ApplicationContext applicationContext, final ApiRequestParameterHelper apiRequestParameterHelper, final DefaultToApiJsonSerializer<ProductData> toApiJsonSerializer, final PlatformSecurityContext platformSecurityContext, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.applicationContext = applicationContext;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.platformSecurityContext = platformSecurityContext;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
     }
 }

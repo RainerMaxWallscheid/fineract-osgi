@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.survey.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -30,18 +29,19 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Created by Cieyou on 3/12/14.
  */
-
 @Service
 @CommandType(entity = "LIKELIHOOD", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateLikelihoodCommandHandler implements NewCommandSourceHandler {
-
     private final WriteLikelihoodService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.update(command.entityId(), command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UpdateLikelihoodCommandHandler(final WriteLikelihoodService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

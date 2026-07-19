@@ -20,20 +20,56 @@ package org.apache.fineract.portfolio.delinquency.api;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Setter
-@Getter
-@NoArgsConstructor
 public class DelinquencyRangeRequest implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private String classification;
     private Integer minimumAgeDays;
     private Integer maximumAgeDays;
     private String locale;
+
+    @java.lang.SuppressWarnings("all")
+        public void setClassification(final String classification) {
+        this.classification = classification;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMinimumAgeDays(final Integer minimumAgeDays) {
+        this.minimumAgeDays = minimumAgeDays;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMaximumAgeDays(final Integer maximumAgeDays) {
+        this.maximumAgeDays = maximumAgeDays;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLocale(final String locale) {
+        this.locale = locale;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getClassification() {
+        return this.classification;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getMinimumAgeDays() {
+        return this.minimumAgeDays;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getMaximumAgeDays() {
+        return this.maximumAgeDays;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLocale() {
+        return this.locale;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyRangeRequest() {
+    }
 }

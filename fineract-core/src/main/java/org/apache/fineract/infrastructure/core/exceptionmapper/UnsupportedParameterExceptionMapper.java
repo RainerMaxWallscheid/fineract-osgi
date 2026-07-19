@@ -25,7 +25,6 @@ import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
@@ -40,27 +39,21 @@ import org.springframework.stereotype.Component;
 @Provider
 @Component
 @Scope("singleton")
-@Slf4j
 public class UnsupportedParameterExceptionMapper implements FineractExceptionMapper, ExceptionMapper<UnsupportedParameterException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UnsupportedParameterExceptionMapper.class);
 
     @Override
     public Response toResponse(final UnsupportedParameterException exception) {
         final List<ApiParameterError> errors = new ArrayList<>();
-
         for (final String parameterName : exception.getUnsupportedParameters()) {
             final StringBuilder validationErrorCode = new StringBuilder("error.msg.parameter.unsupported");
-            final StringBuilder defaultEnglishMessage = new StringBuilder("The parameter ").append(parameterName)
-                    .append(" is not supported.");
-            final ApiParameterError error = ApiParameterError.parameterError(validationErrorCode.toString(),
-                    defaultEnglishMessage.toString(), parameterName, parameterName);
-
+            final StringBuilder defaultEnglishMessage = new StringBuilder("The parameter ").append(parameterName).append(" is not supported.");
+            final ApiParameterError error = ApiParameterError.parameterError(validationErrorCode.toString(), defaultEnglishMessage.toString(), parameterName, parameterName);
             errors.add(error);
         }
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-
-        final ApiGlobalErrorResponse invalidParameterError = ApiGlobalErrorResponse
-                .badClientRequest("validation.msg.validation.errors.exist", "Validation errors exist.", errors);
-
+        final ApiGlobalErrorResponse invalidParameterError = ApiGlobalErrorResponse.badClientRequest("validation.msg.validation.errors.exist", "Validation errors exist.", errors);
         return Response.status(Status.BAD_REQUEST).entity(invalidParameterError).type(MediaType.APPLICATION_JSON).build();
     }
 

@@ -21,24 +21,14 @@ package org.apache.fineract.infrastructure.configuration.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Embeddable
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class ExternalServicePropertiesPK implements Serializable {
-
     private static final long serialVersionUID = 1L;
     @Column(name = "name", length = 150)
     private String name;
-
     @Column(name = "external_service_id")
     private Long externalServiceId;
 
@@ -54,17 +44,49 @@ public class ExternalServicePropertiesPK implements Serializable {
             return false;
         }
         final ExternalServicePropertiesPK rhs = (ExternalServicePropertiesPK) obj;
-        return new EqualsBuilder() //
-                .append(this.externalServiceId, rhs.externalServiceId) //
-                .append(this.name, rhs.name) //
-                .isEquals();
+        return  //
+        //
+        //
+        new EqualsBuilder().append(this.externalServiceId, rhs.externalServiceId).append(this.name, rhs.name).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37) //
-                .append(this.externalServiceId) //
-                .append(this.name) //
-                .toHashCode();
+        return  //
+        //
+        //
+        new HashCodeBuilder(17, 37).append(this.externalServiceId).append(this.name).toHashCode();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getExternalServiceId() {
+        return this.externalServiceId;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ExternalServicePropertiesPK setName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ExternalServicePropertiesPK setExternalServiceId(final Long externalServiceId) {
+        this.externalServiceId = externalServiceId;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalServicePropertiesPK() {
     }
 }

@@ -19,9 +19,6 @@
 package org.apache.fineract.command.hook;
 
 import static org.apache.fineract.command.core.CommandConstants.COMMAND_HOOK_ORDER_USERNAME;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHookBefore;
@@ -30,13 +27,12 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @Order(COMMAND_HOOK_ORDER_USERNAME)
 @ConditionalOnProperty(value = "fineract.command.hooks.username-pre", havingValue = "true")
 final class UsernameCommandHook implements CommandHookBefore<Object> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UsernameCommandHook.class);
     private static final String DEFAULT_USERNAME = "unknown";
 
     @Override
@@ -48,15 +44,16 @@ final class UsernameCommandHook implements CommandHookBefore<Object> {
 
     private String getUsername() {
         final var context = SecurityContextHolder.getContext();
-
         if (context != null) {
             final var auth = context.getAuthentication();
-
             if (auth != null) {
                 return auth.getName();
             }
         }
-
         return DEFAULT_USERNAME;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UsernameCommandHook() {
     }
 }

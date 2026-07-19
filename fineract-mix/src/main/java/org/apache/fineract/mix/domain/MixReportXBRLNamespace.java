@@ -20,24 +20,14 @@ package org.apache.fineract.mix.domain;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("mix_xbrl_namespace")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class MixReportXBRLNamespace implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id
     @Column("id")
     private Long id;
@@ -45,4 +35,50 @@ public class MixReportXBRLNamespace implements Serializable {
     private String prefix;
     @Column("url")
     private String url;
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getPrefix() {
+        return this.prefix;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getUrl() {
+        return this.url;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MixReportXBRLNamespace setId(final Long id) {
+        this.id = id;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MixReportXBRLNamespace setPrefix(final String prefix) {
+        this.prefix = prefix;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MixReportXBRLNamespace setUrl(final String url) {
+        this.url = url;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MixReportXBRLNamespace() {
+    }
 }

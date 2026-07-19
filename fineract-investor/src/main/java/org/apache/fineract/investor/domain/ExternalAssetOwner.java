@@ -21,20 +21,26 @@ package org.apache.fineract.investor.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 
-@Getter
-@Setter
 @Entity
-@NoArgsConstructor
 @Table(name = "m_external_asset_owner")
 public class ExternalAssetOwner extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @Column(name = "external_id", nullable = false, length = 100, unique = true)
     private ExternalId externalId;
 
+    @java.lang.SuppressWarnings("all")
+        public ExternalId getExternalId() {
+        return this.externalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setExternalId(final ExternalId externalId) {
+        this.externalId = externalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwner() {
+    }
 }

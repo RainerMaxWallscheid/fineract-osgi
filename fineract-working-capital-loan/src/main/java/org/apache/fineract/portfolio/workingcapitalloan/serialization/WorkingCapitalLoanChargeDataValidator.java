@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -39,37 +38,22 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class WorkingCapitalLoanChargeDataValidator {
-
     private final FromJsonHelper fromJsonHelper;
 
     public void validateChargeAdjustmentRequest(final String json) {
         if (StringUtils.isBlank(json)) {
             throw new InvalidJsonException();
         }
-
-        final Set<String> allowedParameters = new HashSet<>(
-                Arrays.asList(WorkingCapitalLoanChargeConstants.amountParamName, WorkingCapitalLoanChargeConstants.externalIdParamName,
-                        WorkingCapitalLoanChargeConstants.localeParamName, WorkingCapitalLoanChargeConstants.dateFormatParamName,
-                        WorkingCapitalLoanChargeConstants.noteParamName, WorkingCapitalLoanChargeConstants.paymentDetailsParamName,
-                        WorkingCapitalLoanChargeConstants.paymentTypeIdParamName, WorkingCapitalLoanChargeConstants.accountNumberParamName,
-                        WorkingCapitalLoanChargeConstants.checkNumberParamName, WorkingCapitalLoanChargeConstants.routingCodeParamName,
-                        WorkingCapitalLoanChargeConstants.receiptNumberParamName, WorkingCapitalLoanChargeConstants.bankNumberParamName));
-
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+        final Set<String> allowedParameters = new HashSet<>(Arrays.asList(WorkingCapitalLoanChargeConstants.amountParamName, WorkingCapitalLoanChargeConstants.externalIdParamName, WorkingCapitalLoanChargeConstants.localeParamName, WorkingCapitalLoanChargeConstants.dateFormatParamName, WorkingCapitalLoanChargeConstants.noteParamName, WorkingCapitalLoanChargeConstants.paymentDetailsParamName, WorkingCapitalLoanChargeConstants.paymentTypeIdParamName, WorkingCapitalLoanChargeConstants.accountNumberParamName, WorkingCapitalLoanChargeConstants.checkNumberParamName, WorkingCapitalLoanChargeConstants.routingCodeParamName, WorkingCapitalLoanChargeConstants.receiptNumberParamName, WorkingCapitalLoanChargeConstants.bankNumberParamName));
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+        }.getType();
         fromJsonHelper.checkForUnsupportedParameters(typeOfMap, json, allowedParameters);
-
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
-                .resource("workingCapitalLoanChargeAdjustment");
-
+        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("workingCapitalLoanChargeAdjustment");
         final JsonElement element = this.fromJsonHelper.parse(json);
-
-        final BigDecimal amount = this.fromJsonHelper.extractBigDecimalWithLocaleNamed(WorkingCapitalLoanChargeConstants.amountParamName,
-                element);
+        final BigDecimal amount = this.fromJsonHelper.extractBigDecimalWithLocaleNamed(WorkingCapitalLoanChargeConstants.amountParamName, element);
         baseDataValidator.reset().parameter(WorkingCapitalLoanChargeConstants.amountParamName).value(amount).notNull().positiveAmount();
-
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
     }
 
@@ -77,41 +61,32 @@ public class WorkingCapitalLoanChargeDataValidator {
         if (StringUtils.isBlank(json)) {
             throw new InvalidJsonException();
         }
-
-        final Set<String> allowedParameters = new HashSet<>(
-                Arrays.asList(WorkingCapitalLoanChargeConstants.chargeIdParamName, WorkingCapitalLoanChargeConstants.dueDateParamName,
-                        WorkingCapitalLoanChargeConstants.amountParamName, WorkingCapitalLoanChargeConstants.externalIdParamName,
-                        WorkingCapitalLoanChargeConstants.localeParamName, WorkingCapitalLoanChargeConstants.dateFormatParamName));
-
-        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+        final Set<String> allowedParameters = new HashSet<>(Arrays.asList(WorkingCapitalLoanChargeConstants.chargeIdParamName, WorkingCapitalLoanChargeConstants.dueDateParamName, WorkingCapitalLoanChargeConstants.amountParamName, WorkingCapitalLoanChargeConstants.externalIdParamName, WorkingCapitalLoanChargeConstants.localeParamName, WorkingCapitalLoanChargeConstants.dateFormatParamName));
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {
+        }.getType();
         fromJsonHelper.checkForUnsupportedParameters(typeOfMap, json, allowedParameters);
-
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("workingCapitalLoanCharge");
-
         final JsonElement element = this.fromJsonHelper.parse(json);
         final Long chargeId = this.fromJsonHelper.extractLongNamed(WorkingCapitalLoanChargeConstants.chargeIdParamName, element);
-        baseDataValidator.reset().parameter(WorkingCapitalLoanChargeConstants.chargeIdParamName).value(chargeId).notNull()
-                .integerGreaterThanZero();
-
-        final BigDecimal amount = this.fromJsonHelper.extractBigDecimalWithLocaleNamed(WorkingCapitalLoanChargeConstants.amountParamName,
-                element);
+        baseDataValidator.reset().parameter(WorkingCapitalLoanChargeConstants.chargeIdParamName).value(chargeId).notNull().integerGreaterThanZero();
+        final BigDecimal amount = this.fromJsonHelper.extractBigDecimalWithLocaleNamed(WorkingCapitalLoanChargeConstants.amountParamName, element);
         baseDataValidator.reset().parameter(WorkingCapitalLoanChargeConstants.amountParamName).value(amount).notNull().positiveAmount();
-
         if (this.fromJsonHelper.parameterExists(WorkingCapitalLoanChargeConstants.dueDateParamName, element)) {
-            final LocalDate dueDate = this.fromJsonHelper.extractLocalDateNamed(WorkingCapitalLoanChargeConstants.dueDateParamName,
-                    element);
+            final LocalDate dueDate = this.fromJsonHelper.extractLocalDateNamed(WorkingCapitalLoanChargeConstants.dueDateParamName, element);
             baseDataValidator.reset().parameter(WorkingCapitalLoanChargeConstants.dueDateParamName).value(dueDate).notBlank();
         }
-
         throwExceptionIfValidationWarningsExist(dataValidationErrors);
-
     }
 
     private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
         if (!dataValidationErrors.isEmpty()) {
-            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
-                    dataValidationErrors);
+            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.", dataValidationErrors);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanChargeDataValidator(final FromJsonHelper fromJsonHelper) {
+        this.fromJsonHelper = fromJsonHelper;
     }
 }

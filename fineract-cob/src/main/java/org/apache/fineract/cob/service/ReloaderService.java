@@ -19,15 +19,12 @@
 package org.apache.fineract.cob.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class ReloaderService {
-
     private final List<ReloadService> reloadServices;
 
     public <S extends AbstractPersistableCustom<Long>> S reload(S input) {
@@ -37,5 +34,10 @@ public class ReloaderService {
             }
         }
         return input;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ReloaderService(final List<ReloadService> reloadServices) {
+        this.reloadServices = reloadServices;
     }
 }

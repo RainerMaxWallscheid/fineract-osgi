@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.data.COBIdAndExternalIdAndAccountNo;
 import org.apache.fineract.cob.data.COBIdAndLastClosedBusinessDate;
 import org.apache.fineract.cob.data.COBParameter;
@@ -39,32 +38,24 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class RetrieveSavingsIdServiceImpl implements RetrieveSavingsIdService {
-
-    private static final Collection<Integer> NON_CLOSED_SAVINGS_STATUSES = new ArrayList<>(
-            Arrays.asList(SavingsAccountStatusType.SUBMITTED_AND_PENDING_APPROVAL.getValue(), SavingsAccountStatusType.APPROVED.getValue(),
-                    SavingsAccountStatusType.ACTIVE.getValue(), SavingsAccountStatusType.TRANSFER_IN_PROGRESS.getValue(),
-                    SavingsAccountStatusType.TRANSFER_ON_HOLD.getValue()));
-
+    private static final Collection<Integer> NON_CLOSED_SAVINGS_STATUSES = new ArrayList<>(Arrays.asList(SavingsAccountStatusType.SUBMITTED_AND_PENDING_APPROVAL.getValue(), SavingsAccountStatusType.APPROVED.getValue(), SavingsAccountStatusType.ACTIVE.getValue(), SavingsAccountStatusType.TRANSFER_IN_PROGRESS.getValue(), SavingsAccountStatusType.TRANSFER_ON_HOLD.getValue()));
     private final SavingsAccountRepository savingsAccountRepository;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
-    public List<COBPartition> retrieveSavingsCOBPartitions(Long numberOfDays, LocalDate businessDate, boolean isCatchUp,
-            int partitionSize) {
+    public List<COBPartition> retrieveSavingsCOBPartitions(Long numberOfDays, LocalDate businessDate, boolean isCatchUp, int partitionSize) {
         String sql = """
-                    select min(id) as min, max(id) as max, page, count(id) as count from
-                    (select floor(((row_number() over(order by id))-1) / :pageSize) as page, t.* from
-                    (select id from m_savings_account where status_enum in (:statusIds) and
-                """;
+                select min(id) as min, max(id) as max, page, count(id) as count from
+                (select floor(((row_number() over(order by id))-1) / :pageSize) as page, t.* from
+                (select id from m_savings_account where status_enum in (:statusIds) and
+            """;
         if (isCatchUp) {
             sql = sql + " last_closed_business_date = :businessDate ";
         } else {
             sql = sql + " (last_closed_business_date = :businessDate or last_closed_business_date is null) ";
         }
         sql = sql + " order by id) t) t2 group by page order by page";
-
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("pageSize", partitionSize);
         parameters.addValue("statusIds", NON_CLOSED_SAVINGS_STATUSES);
@@ -92,19 +83,12 @@ public class RetrieveSavingsIdServiceImpl implements RetrieveSavingsIdService {
     }
 
     @Override
-    public List<Long> retrieveAllNonClosedSavingsByLastClosedBusinessDateAndMinAndMaxSavingsId(COBParameter savingsCOBParameter,
-            boolean isCatchUp) {
-        LocalDate cobBusinessDate = ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE)
-                .minusDays(SavingsCOBConstant.NUMBER_OF_DAYS_BEHIND);
-
+    public List<Long> retrieveAllNonClosedSavingsByLastClosedBusinessDateAndMinAndMaxSavingsId(COBParameter savingsCOBParameter, boolean isCatchUp) {
+        LocalDate cobBusinessDate = ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE).minusDays(SavingsCOBConstant.NUMBER_OF_DAYS_BEHIND);
         if (isCatchUp) {
-            return savingsAccountRepository.findAllSavingsByLastClosedBusinessDateNotNullAndMinAndMaxSavingsIdAndStatuses(
-                    savingsCOBParameter.getMinAccountId(), savingsCOBParameter.getMaxAccountId(), cobBusinessDate,
-                    NON_CLOSED_SAVINGS_STATUSES);
+            return savingsAccountRepository.findAllSavingsByLastClosedBusinessDateNotNullAndMinAndMaxSavingsIdAndStatuses(savingsCOBParameter.getMinAccountId(), savingsCOBParameter.getMaxAccountId(), cobBusinessDate, NON_CLOSED_SAVINGS_STATUSES);
         } else {
-            return savingsAccountRepository.findAllSavingsByLastClosedBusinessDateAndMinAndMaxSavingsIdAndStatuses(
-                    savingsCOBParameter.getMinAccountId(), savingsCOBParameter.getMaxAccountId(), cobBusinessDate,
-                    NON_CLOSED_SAVINGS_STATUSES);
+            return savingsAccountRepository.findAllSavingsByLastClosedBusinessDateAndMinAndMaxSavingsIdAndStatuses(savingsCOBParameter.getMinAccountId(), savingsCOBParameter.getMaxAccountId(), cobBusinessDate, NON_CLOSED_SAVINGS_STATUSES);
         }
     }
 
@@ -113,5 +97,11 @@ public class RetrieveSavingsIdServiceImpl implements RetrieveSavingsIdService {
         // This will be implemented when we add the query to join with SavingsAccountLock
         // For now, return empty list as the lock table doesn't exist yet
         return List.of();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RetrieveSavingsIdServiceImpl(final SavingsAccountRepository savingsAccountRepository, final NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        this.savingsAccountRepository = savingsAccountRepository;
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 }

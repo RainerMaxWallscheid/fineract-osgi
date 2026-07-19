@@ -23,31 +23,66 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "m_creditreport")
-@NoArgsConstructor
-@Getter
-@Setter
-@Accessors(chain = true)
 public class CreditReport extends AbstractPersistableCustom<Long> {
-
     @Column(name = "credit_bureau_id")
     private Long creditBureauId;
-
     @Column(name = "national_id")
     private String nationalId;
-
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "credit_reports")
     private byte[] creditReports;
 
     public static CreditReport instance(final Long creditBureauId, final String nationalId, final byte[] creditReports) {
         return new CreditReport().setCreditBureauId(creditBureauId).setNationalId(nationalId).setCreditReports(creditReports);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreditReport() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getCreditBureauId() {
+        return this.creditBureauId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getNationalId() {
+        return this.nationalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public byte[] getCreditReports() {
+        return this.creditReports;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditReport setCreditBureauId(final Long creditBureauId) {
+        this.creditBureauId = creditBureauId;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditReport setNationalId(final String nationalId) {
+        this.nationalId = nationalId;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreditReport setCreditReports(final byte[] creditReports) {
+        this.creditReports = creditReports;
+        return this;
     }
 }

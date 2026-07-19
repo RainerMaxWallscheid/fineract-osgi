@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,10 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN", action = "CHARGEBACK")
 public class LoanRepaymentChargebackCommandHandler implements NewCommandSourceHandler {
-
     private final LoanWritePlatformService writePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class LoanRepaymentChargebackCommandHandler implements NewCommandSourceHa
         return this.writePlatformService.chargebackLoanTransaction(command.getLoanId(), command.entityId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanRepaymentChargebackCommandHandler(final LoanWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
+    }
 }

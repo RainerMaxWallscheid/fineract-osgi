@@ -35,7 +35,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.HashSet;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
@@ -53,9 +52,7 @@ import org.springframework.stereotype.Component;
 @Path("/v1/loans/{loanId}/schedule")
 @Component
 @Tag(name = "Loan Rescheduling", description = "Loan Term Variations provides the ability to change due dates, amounts and number of instalments before loan approval.")
-@RequiredArgsConstructor
 public class LoanScheduleApiResource {
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "LOAN";
     private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<LoanScheduleData> toApiJsonSerializer;
@@ -64,26 +61,17 @@ public class LoanScheduleApiResource {
     private final ApiRequestParameterHelper apiRequestParameterHelper;
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Operation(summary = "Calculate loan repayment schedule based on Loan term variations | Updates loan repayment schedule based on Loan term variations | Updates loan repayment schedule by removing Loan term variations", operationId = "handleCommandsLoanSchedule", description = "Calculate loan repayment schedule based on Loan term variations:\n\n"
-            + "Mandatory Fields: exceptions,locale,dateFormat\n\n" + "Updates loan repayment schedule based on Loan term variations:\n\n"
-            + "Mandatory Fields: exceptions,locale,dateFormat\n\n" + "Updates loan repayment schedule by removing Loan term variations:\n\n"
-            + "It updates the loan repayment schedule by removing Loan term variations\n\n"
-            + "Showing request/response for 'Updates loan repayment schedule by removing Loan term variations'")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Calculate loan repayment schedule based on Loan term variations | Updates loan repayment schedule based on Loan term variations | Updates loan repayment schedule by removing Loan term variations", operationId = "handleCommandsLoanSchedule", description = "Calculate loan repayment schedule based on Loan term variations:\n\n" + "Mandatory Fields: exceptions,locale,dateFormat\n\n" + "Updates loan repayment schedule based on Loan term variations:\n\n" + "Mandatory Fields: exceptions,locale,dateFormat\n\n" + "Updates loan repayment schedule by removing Loan term variations:\n\n" + "It updates the loan repayment schedule by removing Loan term variations\n\n" + "Showing request/response for \'Updates loan repayment schedule by removing Loan term variations\'")
     @AlternativeOperationId("calculateLoanScheduleOrSubmitVariableSchedule")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = LoanScheduleApiResourceSwagger.PostLoansLoanIdScheduleRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LoanScheduleApiResourceSwagger.PostLoansLoanIdScheduleResponse.class)))
-    public String calculateLoanScheduleOrSubmitVariableSchedule(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId,
-            @QueryParam("command") @Parameter(description = "command") final String commandParam, @Context final UriInfo uriInfo,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-
+    public String calculateLoanScheduleOrSubmitVariableSchedule(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId, @QueryParam("command") @Parameter(description = "command") final String commandParam, @Context final UriInfo uriInfo, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
         CommandWrapper commandRequest = null;
         if (is(commandParam, "calculateLoanSchedule")) {
             this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-            final LoanScheduleData loanSchedule = this.calculationPlatformService.generateLoanScheduleForVariableInstallmentRequest(loanId,
-                    apiRequestBodyAsJson);
-
+            final LoanScheduleData loanSchedule = this.calculationPlatformService.generateLoanScheduleForVariableInstallmentRequest(loanId, apiRequestBodyAsJson);
             final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
             return this.toApiJsonSerializer.serialize(settings, loanSchedule, new HashSet<>());
         } else if (is(commandParam, "addVariations")) {
@@ -91,9 +79,7 @@ public class LoanScheduleApiResource {
         } else if (is(commandParam, "deleteVariations")) {
             commandRequest = new CommandWrapperBuilder().deleteScheduleExceptions(loanId).build();
         }
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 
@@ -101,4 +87,12 @@ public class LoanScheduleApiResource {
         return StringUtils.isNotBlank(commandParam) && commandParam.trim().equalsIgnoreCase(commandValue);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanScheduleApiResource(final PlatformSecurityContext context, final DefaultToApiJsonSerializer<LoanScheduleData> toApiJsonSerializer, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final LoanScheduleCalculationPlatformService calculationPlatformService, final ApiRequestParameterHelper apiRequestParameterHelper) {
+        this.context = context;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.calculationPlatformService = calculationPlatformService;
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+    }
 }

@@ -20,9 +20,7 @@ package org.apache.fineract.test.helper;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
 import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.GlobalConfigurationPropertyData;
@@ -30,9 +28,7 @@ import org.apache.fineract.client.models.PutGlobalConfigurationsRequest;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class GlobalConfigurationHelper {
-
     private final FineractFeignClient fineractClient;
 
     public void disableGlobalConfiguration(String configKey, Long value) {
@@ -44,34 +40,31 @@ public class GlobalConfigurationHelper {
     }
 
     private void switchAndSetGlobalConfiguration(String configKey, boolean enabled, Long value) {
-        GlobalConfigurationPropertyData configuration = ok(
-                () -> fineractClient.globalConfiguration().retrieveOneByName(configKey, Map.of()));
+        GlobalConfigurationPropertyData configuration = ok(() -> fineractClient.globalConfiguration().retrieveOneByName(configKey, Map.of()));
         Long configId = configuration.getId();
-
         PutGlobalConfigurationsRequest updateRequest = new PutGlobalConfigurationsRequest().enabled(enabled).value(value);
-
         ok(() -> fineractClient.globalConfiguration().updateGlobalConfiguration(configId, updateRequest, Map.of()));
-        GlobalConfigurationPropertyData updatedConfiguration = ok(
-                () -> fineractClient.globalConfiguration().retrieveOneByName(configKey, Map.of()));
+        GlobalConfigurationPropertyData updatedConfiguration = ok(() -> fineractClient.globalConfiguration().retrieveOneByName(configKey, Map.of()));
         boolean isEnabled = BooleanUtils.toBoolean(updatedConfiguration.getEnabled());
         assertThat(isEnabled).isEqualTo(enabled);
     }
 
     public void setGlobalConfigValueString(String configKey, String value) {
-        GlobalConfigurationPropertyData configuration = ok(
-                () -> fineractClient.globalConfiguration().retrieveOneByName(configKey, Map.of()));
+        GlobalConfigurationPropertyData configuration = ok(() -> fineractClient.globalConfiguration().retrieveOneByName(configKey, Map.of()));
         Long configId = configuration.getId();
-
         PutGlobalConfigurationsRequest updateRequest = new PutGlobalConfigurationsRequest().enabled(true).stringValue(value);
-
         ok(() -> fineractClient.globalConfiguration().updateGlobalConfiguration(configId, updateRequest, Map.of()));
-        GlobalConfigurationPropertyData updatedConfiguration = ok(
-                () -> fineractClient.globalConfiguration().retrieveOneByName(configKey, Map.of()));
+        GlobalConfigurationPropertyData updatedConfiguration = ok(() -> fineractClient.globalConfiguration().retrieveOneByName(configKey, Map.of()));
         boolean isEnabled = BooleanUtils.toBoolean(updatedConfiguration.getEnabled());
         assertThat(isEnabled).isEqualTo(true);
     }
 
     public GlobalConfigurationPropertyData getGlobalConfiguration(String configKey) {
         return ok(() -> fineractClient.globalConfiguration().retrieveOneByName(configKey, Map.of()));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public GlobalConfigurationHelper(final FineractFeignClient fineractClient) {
+        this.fineractClient = fineractClient;
     }
 }

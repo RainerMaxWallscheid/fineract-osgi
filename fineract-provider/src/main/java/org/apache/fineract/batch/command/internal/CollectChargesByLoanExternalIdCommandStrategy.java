@@ -19,12 +19,10 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.command.CommandStrategyUtils;
 import org.apache.fineract.batch.domain.BatchRequest;
@@ -44,9 +42,7 @@ import org.springframework.stereotype.Component;
  * @see BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class CollectChargesByLoanExternalIdCommandStrategy implements CommandStrategy {
-
     /**
      * Loan charges api resource {@link LoanChargesApiResource}.
      */
@@ -57,34 +53,37 @@ public class CollectChargesByLoanExternalIdCommandStrategy implements CommandStr
         final MutableUriInfo parameterizedUriInfo = new MutableUriInfo(uriInfo);
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
         final String relativeUrl = relativeUrlWithoutVersion(request);
         // Expected pattern - loans\/external-id\/[\w\d_-]+\/charges
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrl);
-
         // Pluck out the loanExternalId out of the relative path
         final String loanExternalId = pathParameters.get(2);
-
         Map<String, String> queryParameters;
         if (relativeUrl.indexOf('?') > 0) {
             queryParameters = CommandStrategyUtils.getQueryParameters(relativeUrl);
-
             // Add the query parameters sent in the relative URL to UriInfo
             CommandStrategyUtils.addQueryParametersToUriInfo(parameterizedUriInfo, queryParameters);
         }
-
         // Calls 'retrieveAllLoanCharges' function from
         // 'LoanChargesApiResource' to Collect
         // Charges for a loan
         responseBody = loanChargesApiResource.retrieveAllLoanCharges(loanExternalId, parameterizedUriInfo);
-
         response.setStatusCode(HttpStatus.SC_OK);
         // Sets the body of the response after Charges have been
         // successfully collected
         response.setBody(responseBody);
-
         return response;
+    }
+
+    /**
+     * Creates a new {@code CollectChargesByLoanExternalIdCommandStrategy} instance.
+     *
+     * @param loanChargesApiResource Loan charges api resource {@link LoanChargesApiResource}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CollectChargesByLoanExternalIdCommandStrategy(final LoanChargesApiResource loanChargesApiResource) {
+        this.loanChargesApiResource = loanChargesApiResource;
     }
 }

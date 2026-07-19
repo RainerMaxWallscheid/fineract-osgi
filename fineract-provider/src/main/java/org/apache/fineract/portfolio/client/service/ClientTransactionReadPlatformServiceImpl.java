@@ -23,7 +23,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
@@ -46,21 +45,18 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class ClientTransactionReadPlatformServiceImpl implements ClientTransactionReadPlatformService {
-
     private final JdbcTemplate jdbcTemplate;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
     private final ClientTransactionMapper clientTransactionMapper = new ClientTransactionMapper();
     private final PaginationHelper paginationHelper;
     private final ClientTransactionRepository clientTransactionRepository;
 
-    private static final class ClientTransactionMapper implements RowMapper<ClientTransactionData> {
 
+    private static final class ClientTransactionMapper implements RowMapper<ClientTransactionData> {
         private final String schemaSql;
 
         ClientTransactionMapper() {
-
             final StringBuilder sqlBuilder = new StringBuilder(400);
             sqlBuilder.append("tr.id as transactionId, tr.transaction_type_enum as transactionType,  ");
             sqlBuilder.append("tr.transaction_date as transactionDate, tr.amount as transactionAmount, ");
@@ -69,8 +65,7 @@ public class ClientTransactionReadPlatformServiceImpl implements ClientTransacti
             sqlBuilder.append("c.id as clientId, c.account_no as accountNo, ccpb.client_charge_id as clientChargeId, ");
             sqlBuilder.append("pd.payment_type_id as paymentType,pd.account_number as accountNumber,pd.check_number as checkNumber, ");
             sqlBuilder.append("pd.receipt_number as receiptNumber, pd.bank_number as bankNumber,pd.routing_code as routingCode,  ");
-            sqlBuilder.append(
-                    "tr.currency_code as currencyCode, curr.decimal_places as currencyDigits, curr.currency_multiplesof as inMultiplesOf, ");
+            sqlBuilder.append("tr.currency_code as currencyCode, curr.decimal_places as currencyDigits, curr.currency_multiplesof as inMultiplesOf, ");
             sqlBuilder.append("curr.name as currencyName, curr.internationalized_name_code as currencyNameCode,  ");
             sqlBuilder.append("curr.display_symbol as currencyDisplaySymbol,  ");
             sqlBuilder.append("pt.value as paymentTypeName  ");
@@ -96,12 +91,10 @@ public class ClientTransactionReadPlatformServiceImpl implements ClientTransacti
             final String externalId = rs.getString("externalId");
             final int transactionTypeInt = JdbcSupport.getInteger(rs, "transactionType");
             final EnumOptionData transactionType = ClientEnumerations.clientTransactionType(transactionTypeInt);
-
             final LocalDate date = JdbcSupport.getLocalDate(rs, "transactionDate");
             final LocalDate submittedOnDate = JdbcSupport.getLocalDate(rs, "submittedOnDate");
             final BigDecimal amount = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs, "transactionAmount");
             final boolean reversed = rs.getBoolean("reversed");
-
             PaymentDetailData paymentDetailData = null;
             if (ClientTransactionType.fromInt(transactionType.getId().intValue()).equals(ClientTransactionType.PAY_CHARGE)) {
                 final Long paymentTypeId = JdbcSupport.getLong(rs, "paymentType");
@@ -113,22 +106,17 @@ public class ClientTransactionReadPlatformServiceImpl implements ClientTransacti
                     final String routingCode = rs.getString("routingCode");
                     final String receiptNumber = rs.getString("receiptNumber");
                     final String bankNumber = rs.getString("bankNumber");
-                    paymentDetailData = new PaymentDetailData(id, paymentType, accountNumber, checkNumber, routingCode, receiptNumber,
-                            bankNumber);
+                    paymentDetailData = new PaymentDetailData(id, paymentType, accountNumber, checkNumber, routingCode, receiptNumber, bankNumber);
                 }
             }
-
             final String currencyCode = rs.getString("currencyCode");
             final String currencyName = rs.getString("currencyName");
             final String currencyNameCode = rs.getString("currencyNameCode");
             final String currencyDisplaySymbol = rs.getString("currencyDisplaySymbol");
             final Integer currencyDigits = JdbcSupport.getInteger(rs, "currencyDigits");
             final Integer inMultiplesOf = JdbcSupport.getInteger(rs, "inMultiplesOf");
-            final CurrencyData currency = new CurrencyData(currencyCode, currencyName, currencyDigits, inMultiplesOf, currencyDisplaySymbol,
-                    currencyNameCode);
-
-            return ClientTransactionData.create(id, officeId, officeName, transactionType, date, currency, paymentDetailData, amount,
-                    externalId, submittedOnDate, reversed);
+            final CurrencyData currency = new CurrencyData(currencyCode, currencyName, currencyDigits, inMultiplesOf, currencyDisplaySymbol, currencyNameCode);
+            return ClientTransactionData.create(id, officeId, officeName, transactionType, date, currency, paymentDetailData, amount, externalId, submittedOnDate, reversed);
         }
     }
 
@@ -136,13 +124,10 @@ public class ClientTransactionReadPlatformServiceImpl implements ClientTransacti
     public Page<ClientTransactionData> retrieveAllTransactions(Long clientId, SearchParameters searchParameters) {
         Object[] parameters = new Object[1];
         final StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("select " + sqlGenerator.calcFoundRows() + " ").append(this.clientTransactionMapper.schema())
-                .append(" where c.id = ? ");
+        sqlBuilder.append("select " + sqlGenerator.calcFoundRows() + " ").append(this.clientTransactionMapper.schema()).append(" where c.id = ? ");
         parameters[0] = clientId;
         sqlBuilder.append(" order by tr.transaction_date DESC, tr.submitted_on_date DESC, tr.id DESC ");
-
         // apply limit and offsets
-
         if (searchParameters.hasLimit()) {
             sqlBuilder.append(" ");
             if (searchParameters.hasOffset()) {
@@ -151,7 +136,6 @@ public class ClientTransactionReadPlatformServiceImpl implements ClientTransacti
                 sqlBuilder.append(sqlGenerator.limit(searchParameters.getLimit()));
             }
         }
-
         return this.paginationHelper.fetchPage(this.jdbcTemplate, sqlBuilder.toString(), parameters, this.clientTransactionMapper);
     }
 
@@ -184,4 +168,11 @@ public class ClientTransactionReadPlatformServiceImpl implements ClientTransacti
         return clientTransactionRepository.findByExternalId(transactionExternalId);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ClientTransactionReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final DatabaseSpecificSQLGenerator sqlGenerator, final PaginationHelper paginationHelper, final ClientTransactionRepository clientTransactionRepository) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.sqlGenerator = sqlGenerator;
+        this.paginationHelper = paginationHelper;
+        this.clientTransactionRepository = clientTransactionRepository;
+    }
 }

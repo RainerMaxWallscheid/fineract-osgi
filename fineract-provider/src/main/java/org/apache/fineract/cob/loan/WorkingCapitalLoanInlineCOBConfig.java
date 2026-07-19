@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.cob.loan;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.COBBusinessStepService;
 import org.apache.fineract.cob.COBConstant;
 import org.apache.fineract.cob.common.CustomJobParameterResolver;
@@ -54,9 +53,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Configuration
 @EnableBatchIntegration
 @Conditional(LoanCOBEnabledCondition.class)
-@RequiredArgsConstructor
 public class WorkingCapitalLoanInlineCOBConfig {
-
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
     private final PropertyService propertyService;
@@ -71,40 +68,25 @@ public class WorkingCapitalLoanInlineCOBConfig {
 
     @Bean
     public InlineLoanCOBBuildExecutionContextTasklet<WorkingCapitalLoan, WorkingCapitalLoanCOBBusinessStep> inlineWorkingCapitalLoanCOBBuildExecutionContextTasklet() {
-        return new InlineLoanCOBBuildExecutionContextTasklet<>(cobBusinessStepService, customJobParameterRepository,
-                customJobParameterResolver, WorkingCapitalLoanCOBBusinessStep.class,
-                WorkingCapitalLoanCOBConstant.WORKING_CAPITAL_LOAN_COB_JOB_NAME);
+        return new InlineLoanCOBBuildExecutionContextTasklet<>(cobBusinessStepService, customJobParameterRepository, customJobParameterResolver, WorkingCapitalLoanCOBBusinessStep.class, WorkingCapitalLoanCOBConstant.WORKING_CAPITAL_LOAN_COB_JOB_NAME);
     }
 
     @Bean
-    protected Step inlineWorkingCapitalLoanCOBBuildExecutionContextStep(
-            InlineLoanCOBBuildExecutionContextTasklet<WorkingCapitalLoan, WorkingCapitalLoanCOBBusinessStep> inlineWorkingCapitalLoanCOBBuildExecutionContextTasklet,
-            ExecutionContextPromotionListener inlineWorkingCapitalLoanCobPromotionListener) {
-        return new StepBuilder("Inline COB build execution context step", jobRepository)
-                .tasklet(inlineWorkingCapitalLoanCOBBuildExecutionContextTasklet, transactionManager)
-                .listener(inlineWorkingCapitalLoanCobPromotionListener).build();
+    protected Step inlineWorkingCapitalLoanCOBBuildExecutionContextStep(InlineLoanCOBBuildExecutionContextTasklet<WorkingCapitalLoan, WorkingCapitalLoanCOBBusinessStep> inlineWorkingCapitalLoanCOBBuildExecutionContextTasklet, ExecutionContextPromotionListener inlineWorkingCapitalLoanCobPromotionListener) {
+        return new StepBuilder("Inline COB build execution context step", jobRepository).tasklet(inlineWorkingCapitalLoanCOBBuildExecutionContextTasklet, transactionManager).listener(inlineWorkingCapitalLoanCobPromotionListener).build();
     }
 
     @Bean
-    public Step inlineWorkingCapitalLoanCOBStep(WorkingCapitalInlineCOBLoanItemReader inlineWorkingCapitalLoanCobWorkerItemReader,
-            WorkingCapitalLoanInlineCOBWorkerItemProcessor inlineWorkingCapitalLoanCobWorkerItemProcessor,
-            InlineWorkingCapitalLoanCOBWorkerItemWriter inlineWorkingCapitalLoanCobWorkerItemWriter,
-            InlineWorkingCapitalLoanCOBWorkerItemListener inlineWorkingCapitalLoanCobLoanItemListener) {
-        return new StepBuilder("Inline Working Capital Loan COB Step", jobRepository)
-                .<WorkingCapitalLoan, WorkingCapitalLoan>chunk(propertyService.getChunkSize(JobName.WORKING_CAPITAL_LOAN_COB_JOB.name()),
-                        transactionManager)
-                .reader(inlineWorkingCapitalLoanCobWorkerItemReader).processor(inlineWorkingCapitalLoanCobWorkerItemProcessor)
-                .writer(inlineWorkingCapitalLoanCobWorkerItemWriter).listener(inlineWorkingCapitalLoanCobLoanItemListener).build();
+    public Step inlineWorkingCapitalLoanCOBStep(WorkingCapitalInlineCOBLoanItemReader inlineWorkingCapitalLoanCobWorkerItemReader, WorkingCapitalLoanInlineCOBWorkerItemProcessor inlineWorkingCapitalLoanCobWorkerItemProcessor, InlineWorkingCapitalLoanCOBWorkerItemWriter inlineWorkingCapitalLoanCobWorkerItemWriter, InlineWorkingCapitalLoanCOBWorkerItemListener inlineWorkingCapitalLoanCobLoanItemListener) {
+        return new StepBuilder("Inline Working Capital Loan COB Step", jobRepository).<WorkingCapitalLoan, WorkingCapitalLoan>chunk(propertyService.getChunkSize(JobName.WORKING_CAPITAL_LOAN_COB_JOB.name()), transactionManager).reader(inlineWorkingCapitalLoanCobWorkerItemReader).processor(inlineWorkingCapitalLoanCobWorkerItemProcessor).writer(inlineWorkingCapitalLoanCobWorkerItemWriter).listener(inlineWorkingCapitalLoanCobLoanItemListener).build();
     }
 
     @Bean(name = "inlineWorkingCapitalLoanCOBJob")
-    public Job inlineWorkingCapitalLoanCOBJob(Step inlineWorkingCapitalLoanCOBBuildExecutionContextStep,
-            Step inlineWorkingCapitalLoanCOBStep, Step inlineWorkingCapitalLoanCOBResetContextStep) {
-        return new JobBuilder(WorkingCapitalLoanCOBConstant.INLINE_WORKING_CAPITAL_LOAN_COB_JOB_NAME, jobRepository) //
-                .start(inlineWorkingCapitalLoanCOBBuildExecutionContextStep).next(inlineWorkingCapitalLoanCOBStep)
-                .next(inlineWorkingCapitalLoanCOBResetContextStep) //
-                .incrementer(new RunIdIncrementer()) //
-                .build();
+    public Job inlineWorkingCapitalLoanCOBJob(Step inlineWorkingCapitalLoanCOBBuildExecutionContextStep, Step inlineWorkingCapitalLoanCOBStep, Step inlineWorkingCapitalLoanCOBResetContextStep) {
+        return  //
+        //
+        //
+        new JobBuilder(WorkingCapitalLoanCOBConstant.INLINE_WORKING_CAPITAL_LOAN_COB_JOB_NAME, jobRepository).start(inlineWorkingCapitalLoanCOBBuildExecutionContextStep).next(inlineWorkingCapitalLoanCOBStep).next(inlineWorkingCapitalLoanCOBResetContextStep).incrementer(new RunIdIncrementer()).build();
     }
 
     @JobScope
@@ -121,8 +103,7 @@ public class WorkingCapitalLoanInlineCOBConfig {
 
     @Bean
     public Step inlineWorkingCapitalLoanCOBResetContextStep(ResetContextTasklet inlineWorkingCapitalLoanCOBResetContext) {
-        return new StepBuilder("Reset context - Step", jobRepository).tasklet(inlineWorkingCapitalLoanCOBResetContext, transactionManager)
-                .build();
+        return new StepBuilder("Reset context - Step", jobRepository).tasklet(inlineWorkingCapitalLoanCOBResetContext, transactionManager).build();
     }
 
     @Bean
@@ -143,7 +124,20 @@ public class WorkingCapitalLoanInlineCOBConfig {
     @Bean
     public ExecutionContextPromotionListener inlineWorkingCapitalLoanCobPromotionListener() {
         ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
-        listener.setKeys(new String[] { COBConstant.COB_PARAMETER, COBConstant.BUSINESS_STEPS, COBConstant.BUSINESS_DATE_PARAMETER_NAME });
+        listener.setKeys(new String[] {COBConstant.COB_PARAMETER, COBConstant.BUSINESS_STEPS, COBConstant.BUSINESS_DATE_PARAMETER_NAME});
         return listener;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanInlineCOBConfig(final JobRepository jobRepository, final PlatformTransactionManager transactionManager, final PropertyService propertyService, final COBBusinessStepService cobBusinessStepService, @Qualifier("requiresNewTransactionJdbcTemplate") final TransactionTemplate requiresNewTransactionJdbcTemplate, final CustomJobParameterRepository customJobParameterRepository, final CustomJobParameterResolver customJobParameterResolver, @Qualifier("workingCapitalLoanLockingService") final LockingService loanLockingService, final WorkingCapitalLoanRepository loanRepository) {
+        this.jobRepository = jobRepository;
+        this.transactionManager = transactionManager;
+        this.propertyService = propertyService;
+        this.cobBusinessStepService = cobBusinessStepService;
+        this.requiresNewTransactionJdbcTemplate = requiresNewTransactionJdbcTemplate;
+        this.customJobParameterRepository = customJobParameterRepository;
+        this.customJobParameterResolver = customJobParameterResolver;
+        this.loanLockingService = loanLockingService;
+        this.loanRepository = loanRepository;
     }
 }

@@ -19,11 +19,9 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
@@ -43,9 +41,7 @@ import org.springframework.stereotype.Component;
  * @see org.apache.fineract.batch.domain.BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class CollectChargesCommandStrategy implements CommandStrategy {
-
     /**
      * Loan charges api resource {@link LoanChargesApiResource}.
      */
@@ -53,28 +49,31 @@ public class CollectChargesCommandStrategy implements CommandStrategy {
 
     @Override
     public BatchResponse execute(BatchRequest request, final UriInfo uriInfo) {
-
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrlWithoutVersion(request));
-
         // Pluck out the loanId out of the relative path
         final Long loanId = Long.parseLong(pathParameters.get(1));
-
         // Calls 'retrieveAllLoanCharges' function from
         // 'LoanChargesApiResource' to Collect
         // Charges for a loan
         responseBody = loanChargesApiResource.retrieveAllLoanCharges(loanId, uriInfo);
-
         response.setStatusCode(HttpStatus.SC_OK);
         // Sets the body of the response after Charges have been
         // successfully collected
         response.setBody(responseBody);
-
         return response;
+    }
+
+    /**
+     * Creates a new {@code CollectChargesCommandStrategy} instance.
+     *
+     * @param loanChargesApiResource Loan charges api resource {@link LoanChargesApiResource}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CollectChargesCommandStrategy(final LoanChargesApiResource loanChargesApiResource) {
+        this.loanChargesApiResource = loanChargesApiResource;
     }
 }

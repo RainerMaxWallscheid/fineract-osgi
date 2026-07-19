@@ -21,15 +21,12 @@ package org.apache.fineract.organisation.provisioning.service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.organisation.provisioning.data.ProvisioningCategoryData;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-@RequiredArgsConstructor
 public class ProvisioningCategoryReadPlatformServiceImpl implements ProvisioningCategoryReadPlatformService {
-
     private final JdbcTemplate jdbcTemplate;
     private final ProvisioningCategoryRowMapper provisionCategoryRowMapper = new ProvisioningCategoryRowMapper();
 
@@ -41,8 +38,8 @@ public class ProvisioningCategoryReadPlatformServiceImpl implements Provisioning
         return this.jdbcTemplate.query(sql, this.provisionCategoryRowMapper); // NOSONAR
     }
 
-    private static final class ProvisioningCategoryRowMapper implements RowMapper<ProvisioningCategoryData> {
 
+    private static final class ProvisioningCategoryRowMapper implements RowMapper<ProvisioningCategoryData> {
         @Override
         public ProvisioningCategoryData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
             final Long id = JdbcSupport.getLong(rs, "id");
@@ -54,5 +51,10 @@ public class ProvisioningCategoryReadPlatformServiceImpl implements Provisioning
         public String schema() {
             return " pc.id as id, pc.category_name as category_name, pc.description as description";
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProvisioningCategoryReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 }

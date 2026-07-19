@@ -22,16 +22,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.isNull;
 import static org.apache.fineract.command.core.CommandConstants.COMMAND_JSON_CLASS_ATTRIBUTE;
 import static org.apache.fineract.command.core.CommandState.UNKNOWN;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.resilience4j.retry.annotation.Retry;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandState;
@@ -45,12 +41,11 @@ import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @ConditionalOnMissingBean(value = CommandStore.class, ignored = JdbcCommandStore.class)
 public class JdbcCommandStore implements CommandStore {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JdbcCommandStore.class);
     private final CommandMapper mapper;
     private final CommandRepository repository;
     private final ObjectMapper objectMapper;
@@ -59,15 +54,13 @@ public class JdbcCommandStore implements CommandStore {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getRequestById(Long id) {
-        return (T) repository.findById(id).map(CommandEntity::getRequest)
-                .map(json -> objectMapper.convertValue(json, forName(json.get(COMMAND_JSON_CLASS_ATTRIBUTE).asText()))).orElse(null);
+        return (T) repository.findById(id).map(CommandEntity::getRequest).map(json -> objectMapper.convertValue(json, forName(json.get(COMMAND_JSON_CLASS_ATTRIBUTE).asText()))).orElse(null);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getResponseById(Long id) {
-        return (T) repository.findById(id).map(CommandEntity::getResponse)
-                .map(json -> objectMapper.convertValue(json, forName(json.get(COMMAND_JSON_CLASS_ATTRIBUTE).asText()))).orElse(null);
+        return (T) repository.findById(id).map(CommandEntity::getResponse).map(json -> objectMapper.convertValue(json, forName(json.get(COMMAND_JSON_CLASS_ATTRIBUTE).asText()))).orElse(null);
     }
 
     @Override
@@ -78,15 +71,13 @@ public class JdbcCommandStore implements CommandStore {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getRequestByKey(String key) {
-        return (T) repository.findOneByIdempotencyKey(key).map(CommandEntity::getRequest)
-                .map(json -> objectMapper.convertValue(json, forName(json.get(COMMAND_JSON_CLASS_ATTRIBUTE).asText()))).orElse(null);
+        return (T) repository.findOneByIdempotencyKey(key).map(CommandEntity::getRequest).map(json -> objectMapper.convertValue(json, forName(json.get(COMMAND_JSON_CLASS_ATTRIBUTE).asText()))).orElse(null);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getResponseByKey(String key) {
-        return (T) repository.findOneByIdempotencyKey(key).map(CommandEntity::getResponse)
-                .map(json -> objectMapper.convertValue(json, forName(json.get(COMMAND_JSON_CLASS_ATTRIBUTE).asText()))).orElse(null);
+        return (T) repository.findOneByIdempotencyKey(key).map(CommandEntity::getResponse).map(json -> objectMapper.convertValue(json, forName(json.get(COMMAND_JSON_CLASS_ATTRIBUTE).asText()))).orElse(null);
     }
 
     @Override
@@ -99,29 +90,22 @@ public class JdbcCommandStore implements CommandStore {
     public void store(Command<?> command, Object response, CommandState state) {
         final long startedAt = System.nanoTime();
         final var commandEntity = isNull(response) ? mapper.map(command) : mapper.map(command, response);
-
         if (state != null) {
             commandEntity.setState(state);
         }
-
-        log.debug("Storing command idempotencyKey={}, state={}, payloadType={}, thread={}", command.getIdempotencyKey(),
-                commandEntity.getState(), payloadType(command), Thread.currentThread().getName());
-
+        log.debug("Storing command idempotencyKey={}, state={}, payloadType={}, thread={}", command.getIdempotencyKey(), commandEntity.getState(), payloadType(command), Thread.currentThread().getName());
         try {
             repository.save(commandEntity);
             command.setCommandId(commandEntity.getId());
-            log.debug("Stored command id={}, idempotencyKey={}, state={}, elapsedMs={}", commandEntity.getId(), command.getIdempotencyKey(),
-                    commandEntity.getState(), elapsedMillis(startedAt));
+            log.debug("Stored command id={}, idempotencyKey={}, state={}, elapsedMs={}", commandEntity.getId(), command.getIdempotencyKey(), commandEntity.getState(), elapsedMillis(startedAt));
         } catch (RuntimeException e) {
-            log.warn("Command store save failed idempotencyKey={}, state={}, payloadType={}, elapsedMs={}; retry/fallback may follow",
-                    command.getIdempotencyKey(), commandEntity.getState(), payloadType(command), elapsedMillis(startedAt), e);
+            log.warn("Command store save failed idempotencyKey={}, state={}, payloadType={}, elapsedMs={}; retry/fallback may follow", command.getIdempotencyKey(), commandEntity.getState(), payloadType(command), elapsedMillis(startedAt), e);
             throw e;
         }
     }
 
     void fallback(Command<?> command, Object response, CommandState state, Throwable t) throws Exception {
-        log.warn("Command store fallback idempotencyKey={}, state={}, payloadType={}, deadLetterQueueEnabled={}",
-                command.getIdempotencyKey(), state, payloadType(command), properties.getFileDeadLetterQueueEnabled(), t);
+        log.warn("Command store fallback idempotencyKey={}, state={}, payloadType={}, deadLetterQueueEnabled={}", command.getIdempotencyKey(), state, payloadType(command), properties.getFileDeadLetterQueueEnabled(), t);
         if (Boolean.TRUE.equals(properties.getFileDeadLetterQueueEnabled())) {
             write(command);
         }
@@ -137,25 +121,32 @@ public class JdbcCommandStore implements CommandStore {
         }
     }
 
-    @SneakyThrows
     private Class<?> forName(String clazz) {
-        return Class.forName(clazz);
+        try {
+            return Class.forName(clazz);
+        } catch (final java.lang.Throwable $ex) {
+            throw new java.lang.RuntimeException($ex);
+        }
     }
 
     private void write(Command<?> command) throws IOException {
-        var file = Path
-                .of(properties.getFileDeadLetterQueuePath(),
-                        command.getCreatedAt().toEpochMilli() + "-"
-                                + Optional.ofNullable(command.getIdempotencyKey()).orElseGet(() -> UUID.randomUUID().toString()) + ".json")
-                .toFile();
+        var file = Path.of(properties.getFileDeadLetterQueuePath(), command.getCreatedAt().toEpochMilli() + "-" + Optional.ofNullable(command.getIdempotencyKey()).orElseGet(() -> UUID.randomUUID().toString()) + ".json").toFile();
         FileUtils.write(file, objectMapper.writeValueAsString(command), UTF_8);
     }
 
     private static long elapsedMillis(long startedAt) {
-        return (System.nanoTime() - startedAt) / 1_000_000L;
+        return (System.nanoTime() - startedAt) / 1000000L;
     }
 
     private static String payloadType(Command<?> command) {
         return Optional.ofNullable(command.getPayload()).map(Object::getClass).map(Class::getName).orElse("null");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JdbcCommandStore(final CommandMapper mapper, final CommandRepository repository, final ObjectMapper objectMapper, final JdbcCommandProperties properties) {
+        this.mapper = mapper;
+        this.repository = repository;
+        this.objectMapper = objectMapper;
+        this.properties = properties;
     }
 }

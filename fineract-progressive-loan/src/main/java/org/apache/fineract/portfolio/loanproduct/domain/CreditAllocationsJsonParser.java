@@ -24,20 +24,16 @@ import com.google.gson.JsonElement;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 public class CreditAllocationsJsonParser {
-
     public final CreditAllocationsValidator creditAllocationsValidator;
 
-    public List<LoanProductCreditAllocationRule> assembleLoanProductCreditAllocationRules(final JsonCommand command,
-            String loanTransactionProcessingStrategyCode) {
+    public List<LoanProductCreditAllocationRule> assembleLoanProductCreditAllocationRules(final JsonCommand command, String loanTransactionProcessingStrategyCode) {
         JsonArray creditAllocation = command.arrayOfParameterNamed("creditAllocation");
         List<LoanProductCreditAllocationRule> productCreditAllocationRules = null;
         if (creditAllocation != null) {
@@ -107,4 +103,8 @@ public class CreditAllocationsJsonParser {
         return null;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public CreditAllocationsJsonParser(final CreditAllocationsValidator creditAllocationsValidator) {
+        this.creditAllocationsValidator = creditAllocationsValidator;
+    }
 }

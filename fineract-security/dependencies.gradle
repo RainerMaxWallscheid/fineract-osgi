@@ -80,8 +80,6 @@ dependencies {
     implementation 'com.sun.mail:jakarta.mail'
 
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'org.mapstruct:mapstruct-processor'
 
     // Test dependencies

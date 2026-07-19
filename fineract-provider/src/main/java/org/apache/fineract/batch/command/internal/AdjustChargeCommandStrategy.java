@@ -19,13 +19,11 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
@@ -43,9 +41,7 @@ import org.springframework.stereotype.Component;
  * @see BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class AdjustChargeCommandStrategy implements CommandStrategy {
-
     /**
      * Loan charges api resource {@link LoanChargesApiResource}.
      */
@@ -55,30 +51,23 @@ public class AdjustChargeCommandStrategy implements CommandStrategy {
     public BatchResponse execute(final BatchRequest request, final UriInfo uriInfo) {
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final String relativeUrl = relativeUrlWithoutVersion(request);
-
         // Get the loan and charge ids for use in loanChargesApiResource
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrl);
         final Long loanId = Long.parseLong(pathParameters.get(1));
-
         final Pattern commandPattern = Pattern.compile("^?command=[a-zA-Z]+");
         final Matcher commandMatcher = commandPattern.matcher(pathParameters.get(3));
-
         if (!commandMatcher.find()) {
             // This would only occur if the CommandStrategyProvider is incorrectly configured.
             response.setRequestId(request.getRequestId());
             response.setStatusCode(HttpStatus.SC_NOT_IMPLEMENTED);
-            response.setBody(
-                    "Resource with method " + request.getMethod() + " and relativeUrl " + request.getRelativeUrl() + " doesn't exist");
+            response.setBody("Resource with method " + request.getMethod() + " and relativeUrl " + request.getRelativeUrl() + " doesn\'t exist");
             return response;
         }
         final String commandQueryParam = commandMatcher.group(0);
         final String command = commandQueryParam.substring(commandQueryParam.indexOf("=") + 1);
-
         final String chargeIdPathParameter = pathParameters.get(3);
         Long loanChargeId;
         if (chargeIdPathParameter.contains("?")) {
@@ -86,15 +75,21 @@ public class AdjustChargeCommandStrategy implements CommandStrategy {
         } else {
             loanChargeId = Long.parseLong(pathParameters.get(3));
         }
-
         // Calls 'executeLoanCharge' function from 'loanChargesApiResource'
         responseBody = loanChargesApiResource.executeLoanCharge(loanId, loanChargeId, command, request.getBody());
-
         response.setStatusCode(HttpStatus.SC_OK);
-
         // Sets the body of the response after retrieving the charge
         response.setBody(responseBody);
-
         return response;
+    }
+
+    /**
+     * Creates a new {@code AdjustChargeCommandStrategy} instance.
+     *
+     * @param loanChargesApiResource Loan charges api resource {@link LoanChargesApiResource}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public AdjustChargeCommandStrategy(final LoanChargesApiResource loanChargesApiResource) {
+        this.loanChargesApiResource = loanChargesApiResource;
     }
 }

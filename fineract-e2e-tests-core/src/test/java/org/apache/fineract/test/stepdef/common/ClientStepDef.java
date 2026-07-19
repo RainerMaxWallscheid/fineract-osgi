@@ -20,11 +20,9 @@ package org.apache.fineract.test.stepdef.common;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
 import static org.assertj.core.api.Assertions.assertThat;
-
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.util.Collections;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.ClientAddressRequest;
 import org.apache.fineract.client.models.PostClientsRequest;
@@ -35,9 +33,7 @@ import org.apache.fineract.test.messaging.event.EventCheckHelper;
 import org.apache.fineract.test.stepdef.AbstractStepDef;
 import org.apache.fineract.test.support.TestContextKey;
 
-@RequiredArgsConstructor
 public class ClientStepDef extends AbstractStepDef {
-
     private final FineractFeignClient fineractClient;
     private final ClientRequestFactory clientRequestFactory;
     private final EventCheckHelper eventCheckHelper;
@@ -45,40 +41,33 @@ public class ClientStepDef extends AbstractStepDef {
     @When("Admin creates a client with random data")
     public void createClientRandomFirstNameLastName() {
         PostClientsRequest clientsRequest = clientRequestFactory.defaultClientCreationRequest();
-
         PostClientsResponse response = ok(() -> fineractClient.clients().createClient(clientsRequest));
         testContext().set(TestContextKey.CLIENT_CREATE_RESPONSE, response);
-
         eventCheckHelper.clientEventCheck(response);
     }
 
     @When("Admin creates a client with random data in the last created office")
     public void createClientInLastCreatedOffice() {
         final PostOfficesResponse officeResponse = testContext().get(TestContextKey.OFFICE_CREATE_RESPONSE);
-        assertThat(officeResponse).as("No office was created. Use 'Admin creates a new office' step first.").isNotNull();
-        final PostClientsRequest clientsRequest = clientRequestFactory.defaultClientCreationRequest()//
-                .officeId(officeResponse.getOfficeId());
-
+        assertThat(officeResponse).as("No office was created. Use \'Admin creates a new office\' step first.").isNotNull();
+        final PostClientsRequest clientsRequest = //
+        clientRequestFactory.defaultClientCreationRequest().officeId(officeResponse.getOfficeId());
         final PostClientsResponse response = ok(() -> fineractClient.clients().createClient(clientsRequest));
         testContext().set(TestContextKey.CLIENT_CREATE_RESPONSE, response);
-
         eventCheckHelper.clientEventCheck(response);
     }
 
     @When("Admin creates a second client with random data")
     public void createSecondClientRandomFirstNameLastName() {
         PostClientsRequest clientsRequest = clientRequestFactory.defaultClientCreationRequest();
-
         PostClientsResponse response = ok(() -> fineractClient.clients().createClient(clientsRequest));
         testContext().set(TestContextKey.CLIENT_CREATE_SECOND_CLIENT_RESPONSE, response);
-
         eventCheckHelper.clientEventCheck(response);
     }
 
     @When("Admin creates a client with Firstname {string} and Lastname {string}")
     public void createClient(String firstName, String lastName) {
         PostClientsRequest clientsRequest = clientRequestFactory.defaultClientCreationRequest().firstname(firstName).lastname(lastName);
-
         PostClientsResponse response = ok(() -> fineractClient.clients().createClient(clientsRequest));
         testContext().set(TestContextKey.CLIENT_CREATE_RESPONSE, response);
     }
@@ -91,24 +80,15 @@ public class ClientStepDef extends AbstractStepDef {
         String city = "Budapest";
         boolean addressIsActive = true;
         String postalCode = "1000";
-
-        ClientAddressRequest addressRequest = new ClientAddressRequest().postalCode(postalCode).city(city).countryId(countryId)
-                .stateProvinceId(stateId).addressTypeId(addressTypeId).isActive(addressIsActive);
-
-        PostClientsRequest clientsRequest = clientRequestFactory.defaultClientCreationRequest().firstname(firstName).lastname(lastName)
-                .address(Collections.singletonList(addressRequest));
-
+        ClientAddressRequest addressRequest = new ClientAddressRequest().postalCode(postalCode).city(city).countryId(countryId).stateProvinceId(stateId).addressTypeId(addressTypeId).isActive(addressIsActive);
+        PostClientsRequest clientsRequest = clientRequestFactory.defaultClientCreationRequest().firstname(firstName).lastname(lastName).address(Collections.singletonList(addressRequest));
         PostClientsResponse response = ok(() -> fineractClient.clients().createClient(clientsRequest));
         testContext().set(TestContextKey.CLIENT_CREATE_RESPONSE, response);
-
     }
 
     @When("Admin creates a client with Firstname {string} and Lastname {string} with {string} activation date")
     public void createClientWithSpecifiedDates(String firstName, String lastName, String activationDate) {
-
-        PostClientsRequest clientsRequest = clientRequestFactory.defaultClientCreationRequest().firstname(firstName).lastname(lastName)
-                .activationDate(activationDate);
-
+        PostClientsRequest clientsRequest = clientRequestFactory.defaultClientCreationRequest().firstname(firstName).lastname(lastName).activationDate(activationDate);
         PostClientsResponse response = ok(() -> fineractClient.clients().createClient(clientsRequest));
         testContext().set(TestContextKey.CLIENT_CREATE_RESPONSE, response);
     }
@@ -116,9 +96,14 @@ public class ClientStepDef extends AbstractStepDef {
     @Then("Client is created successfully")
     public void checkClientCreatedSuccessfully() {
         PostClientsResponse response = testContext().get(TestContextKey.CLIENT_CREATE_RESPONSE);
-
         assertThat(response.getClientId()).isNotNull();
-
         eventCheckHelper.clientEventCheck(response);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ClientStepDef(final FineractFeignClient fineractClient, final ClientRequestFactory clientRequestFactory, final EventCheckHelper eventCheckHelper) {
+        this.fineractClient = fineractClient;
+        this.clientRequestFactory = clientRequestFactory;
+        this.eventCheckHelper = eventCheckHelper;
     }
 }

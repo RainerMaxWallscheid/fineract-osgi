@@ -28,7 +28,6 @@ import jakarta.ws.rs.core.MediaType;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.annotation.AlternativeOperationId;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.teller.data.CashierData;
@@ -38,19 +37,20 @@ import org.springframework.stereotype.Component;
 @Path("/v1/cashiers")
 @Component
 @Tag(name = "Cashiers", description = "")
-@RequiredArgsConstructor
 public class CashierApiResource {
-
     private final TellerManagementReadPlatformService readPlatformService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "List Cashiers", operationId = "retrieveAllCashiers")
     @AlternativeOperationId("getCashierData")
-    public Collection<CashierData> getCashierData(@QueryParam("officeId") final Long officeId, @QueryParam("tellerId") final Long tellerId,
-            @QueryParam("staffId") final Long staffId, @QueryParam("date") final String date) {
-        final LocalDate dateRestriction = date != null ? LocalDate.parse(date, DateTimeFormatter.BASIC_ISO_DATE)
-                : DateUtils.getBusinessLocalDate();
+    public Collection<CashierData> getCashierData(@QueryParam("officeId") final Long officeId, @QueryParam("tellerId") final Long tellerId, @QueryParam("staffId") final Long staffId, @QueryParam("date") final String date) {
+        final LocalDate dateRestriction = date != null ? LocalDate.parse(date, DateTimeFormatter.BASIC_ISO_DATE) : DateUtils.getBusinessLocalDate();
         return readPlatformService.getCashierData(officeId, tellerId, staffId, dateRestriction);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CashierApiResource(final TellerManagementReadPlatformService readPlatformService) {
+        this.readPlatformService = readPlatformService;
     }
 }

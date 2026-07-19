@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.workingcapitalloan.api;
 
 import static org.apache.fineract.portfolio.workingcapitalloan.validator.WorkingCapitalLoanBreachActionParameters.ACTION;
-
 import com.google.gson.JsonElement;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,7 +37,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
@@ -58,13 +56,10 @@ import org.springframework.stereotype.Component;
 @Path("/v1/working-capital-loans")
 @Component
 @Tag(name = "Working Capital Loan Breach Actions", description = "Manages breach pause, resume, reschedule, reset, undo reset, disable and enable actions for Working Capital loans")
-@RequiredArgsConstructor
 public class WorkingCapitalLoanBreachActionApiResource {
-
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "WC_BREACH_ACTION";
     private static final String RESET_RESOURCE_NAME_FOR_PERMISSIONS = "WC_BREACH_RESET";
     private static final String DISABLE_RESOURCE_NAME_FOR_PERMISSIONS = "WC_BREACH_DISABLE";
-
     private final PlatformSecurityContext context;
     private final FromJsonHelper fromJsonHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
@@ -73,57 +68,44 @@ public class WorkingCapitalLoanBreachActionApiResource {
 
     @POST
     @Path("{loanId}/breach-actions")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Create Breach Action", description = "Creates a breach action (pause, reschedule, resume, reset, undo_reset, disable, enable) for a Working Capital loan. A resume shortens the currently active pause to the current business date. A disable stops breach evaluation as of the current business date; an enable re-triggers and recomputes breach evaluation as of that date.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = WorkingCapitalLoanBreachActionApiResourceSwagger.PostWorkingCapitalLoansBreachActionRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanBreachActionApiResourceSwagger.PostWorkingCapitalLoansBreachActionResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "404", description = "Working Capital Loan not found") })
-    public CommandProcessingResult createBreachAction(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanBreachActionApiResourceSwagger.PostWorkingCapitalLoansBreachActionResponse.class))), @ApiResponse(responseCode = "400", description = "Bad Request"), @ApiResponse(responseCode = "404", description = "Working Capital Loan not found")})
+    public CommandProcessingResult createBreachAction(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
         return executeBreachAction(loanId, apiRequestBodyAsJson);
     }
 
     @POST
     @Path("external-id/{loanExternalId}/breach-actions")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "createBreachActionByExternalId", summary = "Create Breach Action by external id", description = "Creates a breach action (pause, reschedule, resume, reset, undo_reset, disable, enable) for a Working Capital loan identified by external id.")
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = WorkingCapitalLoanBreachActionApiResourceSwagger.PostWorkingCapitalLoansBreachActionRequest.class)))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanBreachActionApiResourceSwagger.PostWorkingCapitalLoansBreachActionResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "404", description = "Working Capital Loan not found") })
-    public CommandProcessingResult createBreachAction(
-            @PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId,
-            @Parameter(hidden = true) final String apiRequestBodyAsJson) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingCapitalLoanBreachActionApiResourceSwagger.PostWorkingCapitalLoansBreachActionResponse.class))), @ApiResponse(responseCode = "400", description = "Bad Request"), @ApiResponse(responseCode = "404", description = "Working Capital Loan not found")})
+    public CommandProcessingResult createBreachAction(@PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
         return createBreachAction(resolveExternalId(loanExternalId), apiRequestBodyAsJson);
     }
 
     @GET
     @Path("{loanId}/breach-actions")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Retrieve Breach Actions", description = "Retrieves all breach actions for a Working Capital loan")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = WorkingCapitalLoanBreachActionData.class)))) })
-    public List<WorkingCapitalLoanBreachActionData> retrieveBreachActions(
-            @PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = WorkingCapitalLoanBreachActionData.class))))})
+    public List<WorkingCapitalLoanBreachActionData> retrieveBreachActions(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
         this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
         return readService.retrieveBreachActions(loanId);
     }
 
     @GET
     @Path("external-id/{loanExternalId}/breach-actions")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "retrieveBreachActionsByExternalId", summary = "Retrieve Breach Actions by external id", description = "Retrieves all breach actions for a Working Capital loan identified by external id")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = WorkingCapitalLoanBreachActionData.class)))) })
-    public List<WorkingCapitalLoanBreachActionData> retrieveBreachActions(
-            @PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId) {
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = WorkingCapitalLoanBreachActionData.class))))})
+    public List<WorkingCapitalLoanBreachActionData> retrieveBreachActions(@PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId) {
         return retrieveBreachActions(resolveExternalId(loanExternalId));
     }
 
@@ -135,8 +117,7 @@ public class WorkingCapitalLoanBreachActionApiResource {
         if (isDisableOrEnableAction(action)) {
             this.context.authenticatedUser().validateHasCreatePermission(DISABLE_RESOURCE_NAME_FOR_PERMISSIONS);
         }
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson)
-                .createWorkingCapitalLoanBreachAction(loanId).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson).createWorkingCapitalLoanBreachAction(loanId).build();
         return this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
@@ -165,4 +146,12 @@ public class WorkingCapitalLoanBreachActionApiResource {
         return resolvedLoanId;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanBreachActionApiResource(final PlatformSecurityContext context, final FromJsonHelper fromJsonHelper, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final WorkingCapitalLoanBreachActionReadService readService, final WorkingCapitalLoanApplicationReadPlatformService loanReadPlatformService) {
+        this.context = context;
+        this.fromJsonHelper = fromJsonHelper;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.readService = readService;
+        this.loanReadPlatformService = loanReadPlatformService;
+    }
 }

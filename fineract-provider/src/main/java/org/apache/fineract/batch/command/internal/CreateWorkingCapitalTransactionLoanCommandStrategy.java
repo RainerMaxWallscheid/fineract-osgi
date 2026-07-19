@@ -19,12 +19,10 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.command.CommandStrategyUtils;
 import org.apache.fineract.batch.domain.BatchRequest;
@@ -36,33 +34,29 @@ import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class CreateWorkingCapitalTransactionLoanCommandStrategy implements CommandStrategy {
-
     private final WorkingCapitalLoanTransactionsApiResource workingCapitalLoanTransactionsApiResource;
     private final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer;
 
     @Override
     public BatchResponse execute(BatchRequest request, @SuppressWarnings("unused") UriInfo uriInfo) {
         final BatchResponse response = new BatchResponse();
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final String relativeUrl = relativeUrlWithoutVersion(request);
-
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrl);
         final Long loanId = Long.parseLong(pathParameters.get(1));
-
         final Map<String, String> queryParameters = CommandStrategyUtils.getQueryParameters(relativeUrl);
         final String command = queryParameters.get("command");
-
-        final CommandProcessingResult commandProcessingResult = workingCapitalLoanTransactionsApiResource.executeLoanTransactionById(loanId,
-                command, request.getBody());
-
+        final CommandProcessingResult commandProcessingResult = workingCapitalLoanTransactionsApiResource.executeLoanTransactionById(loanId, command, request.getBody());
         response.setStatusCode(HttpStatus.SC_OK);
         response.setBody(toApiJsonSerializer.serialize(commandProcessingResult));
-
         return response;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateWorkingCapitalTransactionLoanCommandStrategy(final WorkingCapitalLoanTransactionsApiResource workingCapitalLoanTransactionsApiResource, final DefaultToApiJsonSerializer<CommandProcessingResult> toApiJsonSerializer) {
+        this.workingCapitalLoanTransactionsApiResource = workingCapitalLoanTransactionsApiResource;
+        this.toApiJsonSerializer = toApiJsonSerializer;
     }
 }

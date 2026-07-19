@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -70,9 +69,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class WorkingCapitalLoanProductWritePlatformServiceImpl implements WorkingCapitalLoanProductWritePlatformService {
-
     private final WorkingCapitalLoanProductDataValidator validator;
     private final WorkingCapitalLoanProductRepository repository;
     private final WorkingCapitalLoanRepository workingCapitalLoanRepository;
@@ -88,47 +85,27 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
     @Override
     public CommandProcessingResult createWorkingCapitalLoanProduct(final JsonCommand command) {
         this.validator.validateForCreate(command.json());
-
-        final Fund fund = findFundByIdIfProvided(command.parameterExists(WorkingCapitalLoanProductConstants.fundIdParamName)
-                ? command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.fundIdParamName)
-                : null);
-        final DelinquencyBucket delinquencyBucket = findDelinquencyBucketByIdIfProvided(
-                command.parameterExists(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName)
-                        ? command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName)
-                        : null);
-        final WorkingCapitalBreach breach = findBreachByIdIfProvided(
-                command.parameterExists(WorkingCapitalLoanProductConstants.breachIdParamName)
-                        ? command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.breachIdParamName)
-                        : null);
-        final WorkingCapitalNearBreach nearBreach = (breach == null) ? null
-                : findNearBreachByIdIfProvided(command.parameterExists(WorkingCapitalLoanProductConstants.nearBreachIdParamName)
-                        ? command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.nearBreachIdParamName)
-                        : null);
-        final List<WorkingCapitalLoanProductPaymentAllocationRule> paymentAllocationRules = this.advancedPaymentAllocationsJsonParser
-                .assembleWCPaymentAllocationRules(command);
-        final WorkingCapitalLoanProduct product = createProductFromCommand(fund, delinquencyBucket, breach, nearBreach, command,
-                paymentAllocationRules);
-
+        final Fund fund = findFundByIdIfProvided(command.parameterExists(WorkingCapitalLoanProductConstants.fundIdParamName) ? command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.fundIdParamName) : null);
+        final DelinquencyBucket delinquencyBucket = findDelinquencyBucketByIdIfProvided(command.parameterExists(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName) ? command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName) : null);
+        final WorkingCapitalBreach breach = findBreachByIdIfProvided(command.parameterExists(WorkingCapitalLoanProductConstants.breachIdParamName) ? command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.breachIdParamName) : null);
+        final WorkingCapitalNearBreach nearBreach = (breach == null) ? null : findNearBreachByIdIfProvided(command.parameterExists(WorkingCapitalLoanProductConstants.nearBreachIdParamName) ? command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.nearBreachIdParamName) : null);
+        final List<WorkingCapitalLoanProductPaymentAllocationRule> paymentAllocationRules = this.advancedPaymentAllocationsJsonParser.assembleWCPaymentAllocationRules(command);
+        final WorkingCapitalLoanProduct product = createProductFromCommand(fund, delinquencyBucket, breach, nearBreach, command, paymentAllocationRules);
         this.repository.saveAndFlush(product);
-
         // Create GL account mappings if accounting is enabled
         this.wcAccountingMappingService.createAccountMapping(product.getId(), command);
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(product.getId()) //
-                .withEntityExternalId(product.getExternalId()) //
-                .build();
+        return  //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(product.getId()).withEntityExternalId(product.getExternalId()).build();
     }
 
     @Transactional
     @Override
     public CommandProcessingResult updateWorkingCapitalLoanProduct(final Long productId, final JsonCommand command) {
-        final WorkingCapitalLoanProduct product = this.repository.findById(productId)
-                .orElseThrow(() -> new WorkingCapitalLoanProductNotFoundException(productId));
-
+        final WorkingCapitalLoanProduct product = this.repository.findById(productId).orElseThrow(() -> new WorkingCapitalLoanProductNotFoundException(productId));
         this.validator.validateForUpdate(command.json());
-
         // Check for duplicates before updating (only if values are being changed)
         if (command.parameterExists(WorkingCapitalLoanProductConstants.externalIdParamName)) {
             final String externalIdValue = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.externalIdParamName);
@@ -139,118 +116,94 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
                 }
             }
         }
-
         if (command.parameterExists(WorkingCapitalLoanProductConstants.nameParamName)) {
             final String name = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.nameParamName);
             if (name != null && !name.isBlank() && this.repository.existsByName(name) && !name.equals(product.getName())) {
                 throw new WorkingCapitalLoanProductDuplicateNameException(name);
             }
         }
-
         if (command.parameterExists(WorkingCapitalLoanProductConstants.shortNameParamName)) {
             final String shortName = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.shortNameParamName);
-            if (shortName != null && !shortName.isBlank() && this.repository.existsByShortName(shortName)
-                    && !shortName.equals(product.getShortName())) {
+            if (shortName != null && !shortName.isBlank() && this.repository.existsByShortName(shortName) && !shortName.equals(product.getShortName())) {
                 throw new WorkingCapitalLoanProductDuplicateShortNameException(shortName);
             }
         }
-
         final Map<String, Object> changes = updateProductFields(product, command);
-
         // Handle accounting rule update
         if (command.parameterExists(WorkingCapitalLoanProductConstants.accountingRuleParamName)) {
-            final String newAccountingRuleValue = command
-                    .stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.accountingRuleParamName);
+            final String newAccountingRuleValue = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.accountingRuleParamName);
             if (newAccountingRuleValue == null || newAccountingRuleValue.isBlank()) {
-                throw new PlatformApiDataValidationException(List.of(ApiParameterError.parameterError(
-                        "validation.msg.WORKINGCAPITALLOANPRODUCT.accountingRule.cannot.be.blank",
-                        "The parameter `accountingRule` is mandatory.", WorkingCapitalLoanProductConstants.accountingRuleParamName)));
+                throw new PlatformApiDataValidationException(List.of(ApiParameterError.parameterError("validation.msg.WORKINGCAPITALLOANPRODUCT.accountingRule.cannot.be.blank", "The parameter `accountingRule` is mandatory.", WorkingCapitalLoanProductConstants.accountingRuleParamName)));
             }
             final WorkingCapitalAccountingRuleType newAccountingRule = WorkingCapitalAccountingRuleType.valueOf(newAccountingRuleValue);
             final boolean accountingRuleChanged = newAccountingRule != product.getAccountingRule();
-
             if (accountingRuleChanged) {
                 product.setAccountingRule(newAccountingRule);
                 changes.put(WorkingCapitalLoanProductConstants.accountingRuleParamName, newAccountingRuleValue);
             }
-
-            final Map<String, Object> accountingMappingChanges = this.wcAccountingMappingService.updateAccountMapping(productId, command,
-                    accountingRuleChanged, newAccountingRule);
+            final Map<String, Object> accountingMappingChanges = this.wcAccountingMappingService.updateAccountMapping(productId, command, accountingRuleChanged, newAccountingRule);
             changes.putAll(accountingMappingChanges);
         }
-
         if (!changes.isEmpty()) {
             this.repository.saveAndFlush(product);
         }
-
-        return new CommandProcessingResultBuilder() //
-                .withCommandId(command.commandId()) //
-                .withEntityId(productId) //
-                .withEntityExternalId(product.getExternalId()) //
-                .with(changes) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(productId).withEntityExternalId(product.getExternalId()).with(changes).build();
     }
 
     @Transactional
     @Override
     public CommandProcessingResult deleteWorkingCapitalLoanProduct(final Long productId) {
-        final WorkingCapitalLoanProduct product = this.repository.findById(productId)
-                .orElseThrow(() -> new WorkingCapitalLoanProductNotFoundException(productId));
-
+        final WorkingCapitalLoanProduct product = this.repository.findById(productId).orElseThrow(() -> new WorkingCapitalLoanProductNotFoundException(productId));
         if (this.workingCapitalLoanRepository.existsByLoanProduct_Id(productId)) {
             throw new WorkingCapitalLoanProductCannotBeDeletedException(productId);
         }
-
         this.wcAccountingMappingService.deleteAccountMapping(productId);
         this.repository.delete(product);
-
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(productId) //
-                .withEntityExternalId(product.getExternalId()) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withEntityId(productId).withEntityExternalId(product.getExternalId()).build();
     }
 
     private Map<String, Object> updateProductFields(final WorkingCapitalLoanProduct product, final JsonCommand command) {
         final Map<String, Object> changes = new HashMap<>();
-
         // Update Details category
         if (command.isChangeInStringParameterNamed(WorkingCapitalLoanProductConstants.nameParamName, product.getName())) {
             final String newValue = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.nameParamName);
             changes.put(WorkingCapitalLoanProductConstants.nameParamName, newValue);
             product.setName(newValue);
         }
-
         if (command.isChangeInStringParameterNamed(WorkingCapitalLoanProductConstants.shortNameParamName, product.getShortName())) {
             final String newValue = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.shortNameParamName);
             changes.put(WorkingCapitalLoanProductConstants.shortNameParamName, newValue);
             product.setShortName(newValue);
         }
-
         if (command.isChangeInStringParameterNamed(WorkingCapitalLoanProductConstants.descriptionParamName, product.getDescription())) {
             final String newValue = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.descriptionParamName);
             changes.put(WorkingCapitalLoanProductConstants.descriptionParamName, newValue);
             product.setDescription(newValue);
         }
-
         if (command.isChangeInLocalDateParameterNamed(WorkingCapitalLoanProductConstants.startDateParamName, product.getStartDate())) {
             final LocalDate newValue = command.localDateValueOfParameterNamed(WorkingCapitalLoanProductConstants.startDateParamName);
             changes.put(WorkingCapitalLoanProductConstants.startDateParamName, newValue);
             product.setStartDate(newValue);
         }
-
         if (command.isChangeInLocalDateParameterNamed(WorkingCapitalLoanProductConstants.closeDateParamName, product.getCloseDate())) {
             final LocalDate newValue = command.localDateValueOfParameterNamed(WorkingCapitalLoanProductConstants.closeDateParamName);
             changes.put(WorkingCapitalLoanProductConstants.closeDateParamName, newValue);
             product.setCloseDate(newValue);
         }
-
         if (command.isChangeInExternalIdParameterNamed(WorkingCapitalLoanProductConstants.externalIdParamName, product.getExternalId())) {
             final String externalIdValue = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.externalIdParamName);
             final ExternalId newValue = ExternalIdFactory.produce(externalIdValue);
             changes.put(WorkingCapitalLoanProductConstants.externalIdParamName, newValue != null ? newValue.getValue() : null);
             product.setExternalId(newValue);
         }
-
         // Update embedded details (via UpdateUtil; JsonCommand does not belong in entities)
         if (product.getCurrency() != null) {
             changes.putAll(updateUtil.updateCurrency(product, command));
@@ -261,7 +214,6 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
         if (product.getMinMaxConstraints() != null) {
             changes.putAll(updateUtil.updateMinMaxConstraints(product.getMinMaxConstraints(), command));
         }
-
         // Update fund if changed
         final Long existingFundId = product.getFund() != null ? product.getFund().getId() : null;
         if (command.isChangeInLongParameterNamed(WorkingCapitalLoanProductConstants.fundIdParamName, existingFundId)) {
@@ -270,18 +222,14 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
             product.setFund(fund);
             changes.put(WorkingCapitalLoanProductConstants.fundIdParamName, fundId);
         }
-
         // Update delinquency bucket if changed
         final Long existingDelinquencyBucketId = product.getDelinquencyBucket() != null ? product.getDelinquencyBucket().getId() : null;
-        if (command.isChangeInLongParameterNamed(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName,
-                existingDelinquencyBucketId)) {
-            final Long delinquencyBucketId = command
-                    .longValueOfParameterNamed(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName);
+        if (command.isChangeInLongParameterNamed(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName, existingDelinquencyBucketId)) {
+            final Long delinquencyBucketId = command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName);
             final DelinquencyBucket delinquencyBucket = findDelinquencyBucketByIdIfProvided(delinquencyBucketId);
             product.setDelinquencyBucket(delinquencyBucket);
             changes.put(WorkingCapitalLoanProductConstants.delinquencyBucketIdParamName, delinquencyBucketId);
         }
-
         final Long existingBreachId = product.getBreach() != null ? product.getBreach().getId() : null;
         if (command.isChangeInLongParameterNamed(WorkingCapitalLoanProductConstants.breachIdParamName, existingBreachId)) {
             final Long breachId = command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.breachIdParamName);
@@ -289,7 +237,6 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
             product.setBreach(breach);
             changes.put(WorkingCapitalLoanProductConstants.breachIdParamName, breachId);
         }
-
         final Long existingNearBreachId = product.getNearBreach() != null ? product.getNearBreach().getId() : null;
         if (command.isChangeInLongParameterNamed(WorkingCapitalLoanProductConstants.nearBreachIdParamName, existingNearBreachId)) {
             final Long nearBreachId = command.longValueOfParameterNamed(WorkingCapitalLoanProductConstants.nearBreachIdParamName);
@@ -297,58 +244,44 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
             product.setNearBreach(nearBreach);
             changes.put(WorkingCapitalLoanProductConstants.nearBreachIdParamName, nearBreachId);
         }
-
         // Update payment allocation rules if changed
         if (command.parameterExists(WorkingCapitalLoanProductConstants.paymentAllocationParamName)) {
-            final List<WorkingCapitalLoanProductPaymentAllocationRule> newRules = this.advancedPaymentAllocationsJsonParser
-                    .assembleWCPaymentAllocationRules(command);
+            final List<WorkingCapitalLoanProductPaymentAllocationRule> newRules = this.advancedPaymentAllocationsJsonParser.assembleWCPaymentAllocationRules(command);
             if (newRules != null) {
                 updatePaymentAllocationRules(product, newRules);
-                changes.put(WorkingCapitalLoanProductConstants.paymentAllocationParamName,
-                        command.jsonFragment(WorkingCapitalLoanProductConstants.paymentAllocationParamName));
+                changes.put(WorkingCapitalLoanProductConstants.paymentAllocationParamName, command.jsonFragment(WorkingCapitalLoanProductConstants.paymentAllocationParamName));
             }
         }
-
         // Update configurable attributes if changed
         if (command.parameterExists(WorkingCapitalLoanProductConstants.allowAttributeOverridesParamName)) {
             if (product.getConfigurableAttributes() == null) {
                 // Create new configurable attributes if they don't exist
-                final WorkingCapitalLoanProductConfigurableAttributes configurableAttributes = createConfigurableAttributesFromCommand(
-                        command);
+                final WorkingCapitalLoanProductConfigurableAttributes configurableAttributes = createConfigurableAttributesFromCommand(command);
                 configurableAttributes.setWcProduct(product);
                 product.setConfigurableAttributes(configurableAttributes);
-                changes.put(WorkingCapitalLoanProductConstants.allowAttributeOverridesParamName,
-                        command.jsonFragment(WorkingCapitalLoanProductConstants.allowAttributeOverridesParamName));
+                changes.put(WorkingCapitalLoanProductConstants.allowAttributeOverridesParamName, command.jsonFragment(WorkingCapitalLoanProductConstants.allowAttributeOverridesParamName));
             } else {
                 // Update existing configurable attributes
-                final Map<String, Object> configChanges = updateUtil.updateConfigurableAttributes(product.getConfigurableAttributes(),
-                        command);
+                final Map<String, Object> configChanges = updateUtil.updateConfigurableAttributes(product.getConfigurableAttributes(), command);
                 if (!configChanges.isEmpty()) {
-                    changes.put(WorkingCapitalLoanProductConstants.allowAttributeOverridesParamName,
-                            command.jsonFragment(WorkingCapitalLoanProductConstants.allowAttributeOverridesParamName));
+                    changes.put(WorkingCapitalLoanProductConstants.allowAttributeOverridesParamName, command.jsonFragment(WorkingCapitalLoanProductConstants.allowAttributeOverridesParamName));
                 }
             }
         }
-
         return changes;
     }
 
-    private void updatePaymentAllocationRules(final WorkingCapitalLoanProduct product,
-            final List<WorkingCapitalLoanProductPaymentAllocationRule> newRules) {
+    private void updatePaymentAllocationRules(final WorkingCapitalLoanProduct product, final List<WorkingCapitalLoanProductPaymentAllocationRule> newRules) {
         final Map<PaymentAllocationTransactionType, WorkingCapitalLoanProductPaymentAllocationRule> existingRulesByTransactionType = new HashMap<>();
-        final Set<PaymentAllocationTransactionType> incomingTransactionTypes = new HashSet<>(
-                newRules.stream().map(WorkingCapitalLoanProductPaymentAllocationRule::getTransactionType).toList());
-
+        final Set<PaymentAllocationTransactionType> incomingTransactionTypes = new HashSet<>(newRules.stream().map(WorkingCapitalLoanProductPaymentAllocationRule::getTransactionType).toList());
         product.getPaymentAllocationRules().removeIf(existingRule -> {
             if (!incomingTransactionTypes.contains(existingRule.getTransactionType())) {
                 return true;
             }
             return existingRulesByTransactionType.putIfAbsent(existingRule.getTransactionType(), existingRule) != null;
         });
-
         for (final WorkingCapitalLoanProductPaymentAllocationRule newRule : newRules) {
-            final WorkingCapitalLoanProductPaymentAllocationRule existingRule = existingRulesByTransactionType
-                    .get(newRule.getTransactionType());
+            final WorkingCapitalLoanProductPaymentAllocationRule existingRule = existingRulesByTransactionType.get(newRule.getTransactionType());
             if (existingRule != null) {
                 existingRule.setAllocationTypes(newRule.getAllocationTypes());
             } else {
@@ -359,100 +292,58 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
         }
     }
 
-    private WorkingCapitalLoanProduct createProductFromCommand(final Fund fund, final DelinquencyBucket delinquencyBucket,
-            final WorkingCapitalBreach breach, final WorkingCapitalNearBreach nearBreach, final JsonCommand command,
-            final List<WorkingCapitalLoanProductPaymentAllocationRule> paymentAllocationRules) {
+    private WorkingCapitalLoanProduct createProductFromCommand(final Fund fund, final DelinquencyBucket delinquencyBucket, final WorkingCapitalBreach breach, final WorkingCapitalNearBreach nearBreach, final JsonCommand command, final List<WorkingCapitalLoanProductPaymentAllocationRule> paymentAllocationRules) {
         // Details category
         final String name = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.nameParamName);
         final String shortName = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.shortNameParamName);
         final String description = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.descriptionParamName);
         final LocalDate startDate = command.localDateValueOfParameterNamed(WorkingCapitalLoanProductConstants.startDateParamName);
         final LocalDate closeDate = command.localDateValueOfParameterNamed(WorkingCapitalLoanProductConstants.closeDateParamName);
-        final ExternalId externalId = command.parameterExists(WorkingCapitalLoanProductConstants.externalIdParamName)
-                ? ExternalIdFactory.produce(command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.externalIdParamName))
-                : null;
-
+        final ExternalId externalId = command.parameterExists(WorkingCapitalLoanProductConstants.externalIdParamName) ? ExternalIdFactory.produce(command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.externalIdParamName)) : null;
         // Currency category
         final String currencyCode = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.currencyCodeParamName);
         final Integer decimalPlace = command.integerValueOfParameterNamed(WorkingCapitalLoanProductConstants.digitsAfterDecimalParamName);
-        final Integer currencyInMultiplesOf = command
-                .integerValueOfParameterNamed(WorkingCapitalLoanProductConstants.inMultiplesOfParamName);
+        final Integer currencyInMultiplesOf = command.integerValueOfParameterNamed(WorkingCapitalLoanProductConstants.inMultiplesOfParamName);
         final MonetaryCurrency currency = new MonetaryCurrency(currencyCode, decimalPlace, currencyInMultiplesOf);
-
         // Related detail (core product parameters)
-        final String amortizationTypeValue = command
-                .stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.amortizationTypeParamName);
+        final String amortizationTypeValue = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.amortizationTypeParamName);
         final WorkingCapitalAmortizationType amortizationType = WorkingCapitalAmortizationType.fromString(amortizationTypeValue);
         final Integer npvDayCount = command.integerValueOfParameterNamed(WorkingCapitalLoanProductConstants.npvDayCountParamName);
         final BigDecimal principal = command.bigDecimalValueOfParameterNamed(WorkingCapitalLoanProductConstants.principalParamName);
-        final BigDecimal periodPaymentRate = command
-                .bigDecimalValueOfParameterNamed(WorkingCapitalLoanProductConstants.periodPaymentRateParamName);
+        final BigDecimal periodPaymentRate = command.bigDecimalValueOfParameterNamed(WorkingCapitalLoanProductConstants.periodPaymentRateParamName);
         final Integer repaymentEvery = command.integerValueOfParameterNamed(WorkingCapitalLoanProductConstants.repaymentEveryParamName);
-        final String repaymentFrequencyTypeValue = command
-                .stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.repaymentFrequencyTypeParamName);
-        final WorkingCapitalLoanPeriodFrequencyType repaymentFrequencyType = WorkingCapitalLoanPeriodFrequencyType
-                .fromString(repaymentFrequencyTypeValue);
-        final BigDecimal discount = command.parameterExists(WorkingCapitalLoanProductConstants.discountParamName)
-                ? command.bigDecimalValueOfParameterNamed(WorkingCapitalLoanProductConstants.discountParamName)
-                : null;
-        final Integer delinquencyGraceDays = command
-                .integerValueOfParameterNamed(WorkingCapitalLoanProductConstants.delinquencyGraceDaysParamName);
-        final String delinquencyStartTypeValue = command
-                .stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.delinquencyStartTypeParamName);
-        final WorkingCapitalLoanDelinquencyStartType delinquencyStartType = WorkingCapitalLoanDelinquencyStartType
-                .fromString(delinquencyStartTypeValue);
-        final Integer breachGraceDaysValue = command
-                .integerValueOfParameterNamed(WorkingCapitalLoanProductConstants.breachGraceDaysParamName);
+        final String repaymentFrequencyTypeValue = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.repaymentFrequencyTypeParamName);
+        final WorkingCapitalLoanPeriodFrequencyType repaymentFrequencyType = WorkingCapitalLoanPeriodFrequencyType.fromString(repaymentFrequencyTypeValue);
+        final BigDecimal discount = command.parameterExists(WorkingCapitalLoanProductConstants.discountParamName) ? command.bigDecimalValueOfParameterNamed(WorkingCapitalLoanProductConstants.discountParamName) : null;
+        final Integer delinquencyGraceDays = command.integerValueOfParameterNamed(WorkingCapitalLoanProductConstants.delinquencyGraceDaysParamName);
+        final String delinquencyStartTypeValue = command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.delinquencyStartTypeParamName);
+        final WorkingCapitalLoanDelinquencyStartType delinquencyStartType = WorkingCapitalLoanDelinquencyStartType.fromString(delinquencyStartTypeValue);
+        final Integer breachGraceDaysValue = command.integerValueOfParameterNamed(WorkingCapitalLoanProductConstants.breachGraceDaysParamName);
         final Integer breachGraceDays = breachGraceDaysValue != null ? breachGraceDaysValue : Integer.valueOf(0);
-
-        final WorkingCapitalLoanProductRelatedDetail relatedDetail = new WorkingCapitalLoanProductRelatedDetail(amortizationType,
-                npvDayCount, principal, periodPaymentRate, repaymentEvery, repaymentFrequencyType, discount, delinquencyGraceDays,
-                delinquencyStartType, breachGraceDays);
-
+        final WorkingCapitalLoanProductRelatedDetail relatedDetail = new WorkingCapitalLoanProductRelatedDetail(amortizationType, npvDayCount, principal, periodPaymentRate, repaymentEvery, repaymentFrequencyType, discount, delinquencyGraceDays, delinquencyStartType, breachGraceDays);
         // Min/max constraints
-        final BigDecimal minPrincipal = command.parameterExists(WorkingCapitalLoanProductConstants.minPrincipalParamName)
-                ? command.bigDecimalValueOfParameterNamed(WorkingCapitalLoanProductConstants.minPrincipalParamName)
-                : null;
-        final BigDecimal maxPrincipal = command.parameterExists(WorkingCapitalLoanProductConstants.maxPrincipalParamName)
-                ? command.bigDecimalValueOfParameterNamed(WorkingCapitalLoanProductConstants.maxPrincipalParamName)
-                : null;
-        final BigDecimal minPeriodPaymentRate = command.parameterExists(WorkingCapitalLoanProductConstants.minPeriodPaymentRateParamName)
-                ? command.bigDecimalValueOfParameterNamed(WorkingCapitalLoanProductConstants.minPeriodPaymentRateParamName)
-                : null;
-        final BigDecimal maxPeriodPaymentRate = command.parameterExists(WorkingCapitalLoanProductConstants.maxPeriodPaymentRateParamName)
-                ? command.bigDecimalValueOfParameterNamed(WorkingCapitalLoanProductConstants.maxPeriodPaymentRateParamName)
-                : null;
-        final WorkingCapitalLoanProductMinMaxConstraints minMaxConstraints = new WorkingCapitalLoanProductMinMaxConstraints(minPrincipal,
-                maxPrincipal, minPeriodPaymentRate, maxPeriodPaymentRate);
-
+        final BigDecimal minPrincipal = command.parameterExists(WorkingCapitalLoanProductConstants.minPrincipalParamName) ? command.bigDecimalValueOfParameterNamed(WorkingCapitalLoanProductConstants.minPrincipalParamName) : null;
+        final BigDecimal maxPrincipal = command.parameterExists(WorkingCapitalLoanProductConstants.maxPrincipalParamName) ? command.bigDecimalValueOfParameterNamed(WorkingCapitalLoanProductConstants.maxPrincipalParamName) : null;
+        final BigDecimal minPeriodPaymentRate = command.parameterExists(WorkingCapitalLoanProductConstants.minPeriodPaymentRateParamName) ? command.bigDecimalValueOfParameterNamed(WorkingCapitalLoanProductConstants.minPeriodPaymentRateParamName) : null;
+        final BigDecimal maxPeriodPaymentRate = command.parameterExists(WorkingCapitalLoanProductConstants.maxPeriodPaymentRateParamName) ? command.bigDecimalValueOfParameterNamed(WorkingCapitalLoanProductConstants.maxPeriodPaymentRateParamName) : null;
+        final WorkingCapitalLoanProductMinMaxConstraints minMaxConstraints = new WorkingCapitalLoanProductMinMaxConstraints(minPrincipal, maxPrincipal, minPeriodPaymentRate, maxPeriodPaymentRate);
         // Accounting
-        final String accountingRuleValue = command.parameterExists(WorkingCapitalLoanProductConstants.accountingRuleParamName)
-                ? command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.accountingRuleParamName)
-                : WorkingCapitalAccountingRuleType.NONE.name();
+        final String accountingRuleValue = command.parameterExists(WorkingCapitalLoanProductConstants.accountingRuleParamName) ? command.stringValueOfParameterNamed(WorkingCapitalLoanProductConstants.accountingRuleParamName) : WorkingCapitalAccountingRuleType.NONE.name();
         final WorkingCapitalAccountingRuleType accountingRule = WorkingCapitalAccountingRuleType.valueOf(accountingRuleValue);
-
         // Configurable attributes
         final WorkingCapitalLoanProductConfigurableAttributes configurableAttributes = createConfigurableAttributesFromCommand(command);
-
-        return new WorkingCapitalLoanProduct(name, shortName, externalId, fund, delinquencyBucket, startDate, closeDate, description,
-                accountingRule, currency, relatedDetail, minMaxConstraints, paymentAllocationRules, configurableAttributes, breach,
-                nearBreach);
+        return new WorkingCapitalLoanProduct(name, shortName, externalId, fund, delinquencyBucket, startDate, closeDate, description, accountingRule, currency, relatedDetail, minMaxConstraints, paymentAllocationRules, configurableAttributes, breach, nearBreach);
     }
 
     private WorkingCapitalBreach findBreachByIdIfProvided(final Long breachId) {
         if (breachId == null) {
             return null;
         }
-        return this.breachRepository.findById(breachId)
-                .orElseThrow(() -> new GeneralPlatformDomainRuleException("error.msg.wclp.breach.not.found",
-                        "Working Capital Breach with id " + breachId + " was not found.", breachId));
+        return this.breachRepository.findById(breachId).orElseThrow(() -> new GeneralPlatformDomainRuleException("error.msg.wclp.breach.not.found", "Working Capital Breach with id " + breachId + " was not found.", breachId));
     }
 
     private WorkingCapitalNearBreach findNearBreachByIdIfProvided(final Long nearBreachId) {
-        return (nearBreachId == null) ? null
-                : this.nearBreachRepository.findById(nearBreachId)
-                        .orElseThrow(() -> new GeneralPlatformDomainRuleException("error.msg.wclp.near.breach.not.found",
-                                "Working Capital Near Breach with id " + nearBreachId + " was not found.", nearBreachId));
+        return (nearBreachId == null) ? null : this.nearBreachRepository.findById(nearBreachId).orElseThrow(() -> new GeneralPlatformDomainRuleException("error.msg.wclp.near.breach.not.found", "Working Capital Near Breach with id " + nearBreachId + " was not found.", nearBreachId));
     }
 
     private WorkingCapitalLoanProductConfigurableAttributes createConfigurableAttributesFromCommand(final JsonCommand command) {
@@ -461,39 +352,26 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
         boolean discountDefault = false;
         boolean periodPaymentFrequency = false;
         boolean periodPaymentFrequencyType = false;
-
         if (command.parameterExists(WorkingCapitalLoanProductConstants.allowAttributeOverridesParamName)) {
-            final JsonObject allowOverrides = command.parsedJson().getAsJsonObject()
-                    .getAsJsonObject(WorkingCapitalLoanProductConstants.allowAttributeOverridesParamName);
+            final JsonObject allowOverrides = command.parsedJson().getAsJsonObject().getAsJsonObject(WorkingCapitalLoanProductConstants.allowAttributeOverridesParamName);
             if (allowOverrides != null && !allowOverrides.isJsonNull()) {
-                if (allowOverrides.has(WorkingCapitalLoanProductConstants.delinquencyBucketClassificationOverridableParamName)
-                        && !allowOverrides.get(WorkingCapitalLoanProductConstants.delinquencyBucketClassificationOverridableParamName)
-                                .isJsonNull()) {
-                    delinquencyBucketClassification = allowOverrides
-                            .get(WorkingCapitalLoanProductConstants.delinquencyBucketClassificationOverridableParamName).getAsBoolean();
+                if (allowOverrides.has(WorkingCapitalLoanProductConstants.delinquencyBucketClassificationOverridableParamName) && !allowOverrides.get(WorkingCapitalLoanProductConstants.delinquencyBucketClassificationOverridableParamName).isJsonNull()) {
+                    delinquencyBucketClassification = allowOverrides.get(WorkingCapitalLoanProductConstants.delinquencyBucketClassificationOverridableParamName).getAsBoolean();
                 }
-                if (allowOverrides.has(WorkingCapitalLoanProductConstants.breachOverridableParamName)
-                        && !allowOverrides.get(WorkingCapitalLoanProductConstants.breachOverridableParamName).isJsonNull()) {
+                if (allowOverrides.has(WorkingCapitalLoanProductConstants.breachOverridableParamName) && !allowOverrides.get(WorkingCapitalLoanProductConstants.breachOverridableParamName).isJsonNull()) {
                     breach = allowOverrides.get(WorkingCapitalLoanProductConstants.breachOverridableParamName).getAsBoolean();
                 }
-                if (allowOverrides.has(WorkingCapitalLoanProductConstants.discountDefaultOverridableParamName)
-                        && !allowOverrides.get(WorkingCapitalLoanProductConstants.discountDefaultOverridableParamName).isJsonNull()) {
-                    discountDefault = allowOverrides.get(WorkingCapitalLoanProductConstants.discountDefaultOverridableParamName)
-                            .getAsBoolean();
+                if (allowOverrides.has(WorkingCapitalLoanProductConstants.discountDefaultOverridableParamName) && !allowOverrides.get(WorkingCapitalLoanProductConstants.discountDefaultOverridableParamName).isJsonNull()) {
+                    discountDefault = allowOverrides.get(WorkingCapitalLoanProductConstants.discountDefaultOverridableParamName).getAsBoolean();
                 }
-                if (allowOverrides.has(WorkingCapitalLoanProductConstants.periodPaymentFrequencyOverridableParamName) && !allowOverrides
-                        .get(WorkingCapitalLoanProductConstants.periodPaymentFrequencyOverridableParamName).isJsonNull()) {
-                    periodPaymentFrequency = allowOverrides
-                            .get(WorkingCapitalLoanProductConstants.periodPaymentFrequencyOverridableParamName).getAsBoolean();
+                if (allowOverrides.has(WorkingCapitalLoanProductConstants.periodPaymentFrequencyOverridableParamName) && !allowOverrides.get(WorkingCapitalLoanProductConstants.periodPaymentFrequencyOverridableParamName).isJsonNull()) {
+                    periodPaymentFrequency = allowOverrides.get(WorkingCapitalLoanProductConstants.periodPaymentFrequencyOverridableParamName).getAsBoolean();
                 }
-                if (allowOverrides.has(WorkingCapitalLoanProductConstants.periodPaymentFrequencyTypeOverridableParamName) && !allowOverrides
-                        .get(WorkingCapitalLoanProductConstants.periodPaymentFrequencyTypeOverridableParamName).isJsonNull()) {
-                    periodPaymentFrequencyType = allowOverrides
-                            .get(WorkingCapitalLoanProductConstants.periodPaymentFrequencyTypeOverridableParamName).getAsBoolean();
+                if (allowOverrides.has(WorkingCapitalLoanProductConstants.periodPaymentFrequencyTypeOverridableParamName) && !allowOverrides.get(WorkingCapitalLoanProductConstants.periodPaymentFrequencyTypeOverridableParamName).isJsonNull()) {
+                    periodPaymentFrequencyType = allowOverrides.get(WorkingCapitalLoanProductConstants.periodPaymentFrequencyTypeOverridableParamName).getAsBoolean();
                 }
             }
         }
-
         final WorkingCapitalLoanProductConfigurableAttributes configurableAttributes = new WorkingCapitalLoanProductConfigurableAttributes();
         configurableAttributes.setDelinquencyBucketClassification(delinquencyBucketClassification);
         configurableAttributes.setBreach(breach);
@@ -514,8 +392,20 @@ public class WorkingCapitalLoanProductWritePlatformServiceImpl implements Workin
         if (delinquencyBucketId == null) {
             return null;
         }
-        return this.delinquencyBucketRepository.findById(delinquencyBucketId)
-                .orElseThrow(() -> DelinquencyBucketNotFoundException.notFound(delinquencyBucketId));
+        return this.delinquencyBucketRepository.findById(delinquencyBucketId).orElseThrow(() -> DelinquencyBucketNotFoundException.notFound(delinquencyBucketId));
     }
 
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanProductWritePlatformServiceImpl(final WorkingCapitalLoanProductDataValidator validator, final WorkingCapitalLoanProductRepository repository, final WorkingCapitalLoanRepository workingCapitalLoanRepository, final WorkingCapitalLoanProductUpdateUtil updateUtil, final FundRepository fundRepository, final DelinquencyBucketRepository delinquencyBucketRepository, final WorkingCapitalAdvancedPaymentAllocationsJsonParser advancedPaymentAllocationsJsonParser, final WorkingCapitalBreachRepository breachRepository, final WorkingCapitalProductAccountingMappingService wcAccountingMappingService, final WorkingCapitalNearBreachRepository nearBreachRepository) {
+        this.validator = validator;
+        this.repository = repository;
+        this.workingCapitalLoanRepository = workingCapitalLoanRepository;
+        this.updateUtil = updateUtil;
+        this.fundRepository = fundRepository;
+        this.delinquencyBucketRepository = delinquencyBucketRepository;
+        this.advancedPaymentAllocationsJsonParser = advancedPaymentAllocationsJsonParser;
+        this.breachRepository = breachRepository;
+        this.wcAccountingMappingService = wcAccountingMappingService;
+        this.nearBreachRepository = nearBreachRepository;
+    }
 }

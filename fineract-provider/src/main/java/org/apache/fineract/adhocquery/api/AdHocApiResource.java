@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.adhocquery.data.AdHocData;
 import org.apache.fineract.adhocquery.data.AdHocRequest;
 import org.apache.fineract.adhocquery.service.AdHocReadPlatformService;
@@ -50,32 +49,27 @@ import org.springframework.stereotype.Component;
 @Path("/v1/adhocquery")
 @Component
 @Tag(name = "AdhocQuery Api", description = "")
-@RequiredArgsConstructor
 public class AdHocApiResource {
-
     /**
      * The set of parameters that are supported in response for {@link AdhocData}
      */
-    private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "name", "query", "tableName",
-            "tableField", "isActive", "createdBy", "createdOn", "createdById", "updatedById", "updatedOn", "email"));
-
+    private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "name", "query", "tableName", "tableField", "isActive", "createdBy", "createdOn", "createdById", "updatedById", "updatedOn", "email"));
     private final PlatformSecurityContext context;
     private final AdHocReadPlatformService adHocReadPlatformService;
     private final DefaultToApiJsonSerializer<AdHocData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(operationId = "retrieveAll_1")
     @AlternativeOperationId("retrieveAll_2")
     public List<AdHocData> retrieveAll() {
-
         this.context.authenticatedUser();
         return adHocReadPlatformService.retrieveAllAdHocQuery();
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     @Path("template")
     public AdHocData template() {
         this.context.authenticatedUser();
@@ -83,36 +77,27 @@ public class AdHocApiResource {
     }
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     public CommandProcessingResult createAdHocQuery(final AdHocRequest adHocRequest) {
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createAdHoc()
-                .withJson(toApiJsonSerializer.serialize(adHocRequest)).build();
-
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createAdHoc().withJson(toApiJsonSerializer.serialize(adHocRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
     @GET
     @Path("{adHocId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     public AdHocData retrieveAdHocQuery(@PathParam("adHocId") @Parameter(description = "adHocId") final Long adHocId) {
-
         this.context.authenticatedUser();
-
         return adHocReadPlatformService.retrieveOne(adHocId);
     }
 
     @PUT
     @Path("{adHocId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    public CommandProcessingResult update(@PathParam("adHocId") @Parameter(description = "adHocId") final Long adHocId,
-            final AdHocRequest adHocRequest) {
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateAdHoc(adHocId)
-                .withJson(toApiJsonSerializer.serialize(adHocRequest)).build();
-
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    public CommandProcessingResult update(@PathParam("adHocId") @Parameter(description = "adHocId") final Long adHocId, final AdHocRequest adHocRequest) {
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateAdHoc(adHocId).withJson(toApiJsonSerializer.serialize(adHocRequest)).build();
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
@@ -124,12 +109,17 @@ public class AdHocApiResource {
      */
     @DELETE
     @Path("{adHocId}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON})
     public CommandProcessingResult deleteAdHocQuery(@PathParam("adHocId") @Parameter(description = "adHocId") final Long adHocId) {
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteAdHoc(adHocId).build();
-
         return commandsSourceWritePlatformService.logCommandSource(commandRequest);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public AdHocApiResource(final PlatformSecurityContext context, final AdHocReadPlatformService adHocReadPlatformService, final DefaultToApiJsonSerializer<AdHocData> toApiJsonSerializer, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+        this.context = context;
+        this.adHocReadPlatformService = adHocReadPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+    }
 }

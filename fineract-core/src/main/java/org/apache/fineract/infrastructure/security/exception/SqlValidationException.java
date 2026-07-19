@@ -18,12 +18,9 @@
  */
 package org.apache.fineract.infrastructure.security.exception;
 
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 
-@Getter
 public class SqlValidationException extends AbstractPlatformDomainRuleException {
-
     public SqlValidationException(final String message) {
         super("error.msg.sql.validation", "SQL validation error: " + message);
     }

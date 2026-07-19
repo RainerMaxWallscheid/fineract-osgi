@@ -29,7 +29,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.Collection;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.infrastructure.cache.command.CacheSwitchCommand;
 import org.apache.fineract.infrastructure.cache.data.CacheData;
@@ -41,47 +40,48 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/caches")
-@Produces({ MediaType.APPLICATION_JSON })
+@Produces({MediaType.APPLICATION_JSON})
 @Component
 @Tag(name = "Cache", description = """
-        The following settings are possible for cache:
-
-        No Caching: caching turned off
-
-        Single node: caching on for single instance deployments of platorm (works for multiple tenants but only one tomcat).
-        By default caching is set to No Caching. Switching between caches results in the cache been clear e.g. from single
-        node to no cache and back again would clear down the single node cache.
-        """)
-@RequiredArgsConstructor
+    The following settings are possible for cache:
+    
+    No Caching: caching turned off
+    
+    Single node: caching on for single instance deployments of platorm (works for multiple tenants but only one tomcat).
+    By default caching is set to No Caching. Switching between caches results in the cache been clear e.g. from single
+    node to no cache and back again would clear down the single node cache.
+    """)
 public class CacheApiResource {
-
     @Qualifier("runtimeDelegatingCacheManager")
     private final RuntimeDelegatingCacheManager cacheService;
     private final CommandDispatcher dispatcher;
 
     @GET
     @Operation(operationId = "retrieveAll_2", summary = "Retrieve Cache Types", description = """
-            Returns the list of caches.
-
-            Example Requests:
-
-            caches
-            """)
+        Returns the list of caches.
+        
+        Example Requests:
+        
+        caches
+        """)
     @AlternativeOperationId("retrieveAll_4")
     public Collection<CacheData> retrieveAll() {
         return cacheService.retrieveAll();
     }
 
     @PUT
-    @Consumes({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
     @Operation(summary = "Switch Cache", description = "Switches the cache to chosen one.")
     public CacheSwitchResponse switchCache(@Valid CacheSwitchRequest request) {
         final var command = new CacheSwitchCommand();
-
         command.setPayload(request);
-
         final Supplier<CacheSwitchResponse> response = dispatcher.dispatch(command);
-
         return response.get();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CacheApiResource(@Qualifier("runtimeDelegatingCacheManager") final RuntimeDelegatingCacheManager cacheService, final CommandDispatcher dispatcher) {
+        this.cacheService = cacheService;
+        this.dispatcher = dispatcher;
     }
 }

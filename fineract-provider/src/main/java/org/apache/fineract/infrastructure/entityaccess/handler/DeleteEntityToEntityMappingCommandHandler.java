@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.entityaccess.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "ENTITYMAPPING", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteEntityToEntityMappingCommandHandler implements NewCommandSourceHandler {
-
     private final FineractEntityAccessWriteService fineractEntityAccessWriteService;
 
     @Override
@@ -40,4 +37,8 @@ public class DeleteEntityToEntityMappingCommandHandler implements NewCommandSour
         return this.fineractEntityAccessWriteService.deleteEntityToEntityMapping(command.entityId());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public DeleteEntityToEntityMappingCommandHandler(final FineractEntityAccessWriteService fineractEntityAccessWriteService) {
+        this.fineractEntityAccessWriteService = fineractEntityAccessWriteService;
+    }
 }

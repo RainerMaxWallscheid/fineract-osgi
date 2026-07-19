@@ -18,21 +18,24 @@
  */
 package org.apache.fineract.infrastructure.contentstore.policy;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class DefaultDeleteContentPolicy implements ContentPolicy {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DefaultDeleteContentPolicy.class);
     private final TraversalContentPolicy traversalContentPolicy;
     private final FineractProperties properties;
 
     @Override
     public void check(ContentPolicyContext ctx) {
         traversalContentPolicy.check(ctx);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DefaultDeleteContentPolicy(final TraversalContentPolicy traversalContentPolicy, final FineractProperties properties) {
+        this.traversalContentPolicy = traversalContentPolicy;
+        this.properties = properties;
     }
 }

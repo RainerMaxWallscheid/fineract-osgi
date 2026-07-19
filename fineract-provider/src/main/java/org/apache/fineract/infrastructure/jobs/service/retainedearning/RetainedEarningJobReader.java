@@ -20,8 +20,6 @@ package org.apache.fineract.infrastructure.jobs.service.retainedearning;
 
 import java.time.LocalDate;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.jobs.service.retainedearning.data.AccountGLJournalEntryAnnualSummaryData;
@@ -37,15 +35,13 @@ import org.springframework.stereotype.Component;
  * Spring Batch ItemReader for Retained Earning Job. Fetches trial balance data and delegates processing to the data
  * service. Compatible with RetainedEarningJobWriter.
  */
-@Slf4j
 @Component
 @StepScope
-@RequiredArgsConstructor
 public class RetainedEarningJobReader implements ItemReader<AccountGLJournalEntryAnnualSummaryData>, StepExecutionListener {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RetainedEarningJobReader.class);
     private final RetainedEarningDataService retainedEarningDataService;
     private final RetainedEarningConfigurationService retainedEarningConfigurationService;
-
     private ListItemReader<AccountGLJournalEntryAnnualSummaryData> delegate;
 
     @Override
@@ -65,24 +61,21 @@ public class RetainedEarningJobReader implements ItemReader<AccountGLJournalEntr
         try {
             final LocalDate currentDate = ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.BUSINESS_DATE);
             final LocalDate lastDayOfPreviousFiscalYear = retainedEarningConfigurationService.getLastDayOfPreviousFiscalYear(currentDate);
-
-            log.info("Retained earning job started: businessDate={}, fiscalYearEnd={}, dayOfWeek={}", currentDate,
-                    lastDayOfPreviousFiscalYear, currentDate.getDayOfWeek());
-
-            List<AccountGLJournalEntryAnnualSummaryData> rawData = retainedEarningDataService
-                    .fetchTrialBalanceData(retainedEarningConfigurationService.getReportName(), lastDayOfPreviousFiscalYear);
-
+            log.info("Retained earning job started: businessDate={}, fiscalYearEnd={}, dayOfWeek={}", currentDate, lastDayOfPreviousFiscalYear, currentDate.getDayOfWeek());
+            List<AccountGLJournalEntryAnnualSummaryData> rawData = retainedEarningDataService.fetchTrialBalanceData(retainedEarningConfigurationService.getReportName(), lastDayOfPreviousFiscalYear);
             log.info("Fetched {} raw records from trial balance for fiscalYearEnd={}", rawData.size(), lastDayOfPreviousFiscalYear);
-
-            final List<AccountGLJournalEntryAnnualSummaryData> processedData = retainedEarningDataService.processTrialBalanceData(rawData,
-                    lastDayOfPreviousFiscalYear);
-
+            final List<AccountGLJournalEntryAnnualSummaryData> processedData = retainedEarningDataService.processTrialBalanceData(rawData, lastDayOfPreviousFiscalYear);
             delegate = new ListItemReader<>(processedData);
             log.info("Initialized with {} total records for fiscalYearEnd={}", processedData.size(), lastDayOfPreviousFiscalYear);
-
         } catch (Exception e) {
             log.error("Failed to initialize RetainedEarningJobReader", e);
             throw new RuntimeException("Error initializing reader: " + e.getMessage(), e);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RetainedEarningJobReader(final RetainedEarningDataService retainedEarningDataService, final RetainedEarningConfigurationService retainedEarningConfigurationService) {
+        this.retainedEarningDataService = retainedEarningDataService;
+        this.retainedEarningConfigurationService = retainedEarningConfigurationService;
     }
 }

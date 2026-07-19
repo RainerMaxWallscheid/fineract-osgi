@@ -18,29 +18,24 @@
  */
 package com.acme.fineract.loan.cob;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.loan.LoanCOBBusinessStep;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanAccountDomainService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class AcmeNoopBusinessStep implements LoanCOBBusinessStep, InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AcmeNoopBusinessStep.class);
     private static final String ENUM_STYLED_NAME = "ACME_LOAN_NOOP";
-
     private static final String HUMAN_READABLE_NAME = "ACME Loan Noop";
-
     // NOTE: just to demonstrate that dependency injection is working
     private final LoanAccountDomainService loanAccountDomainService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        log.warn("Acme COB Loan: '{}'", getClass().getCanonicalName());
+        log.warn("Acme COB Loan: \'{}\'", getClass().getCanonicalName());
     }
 
     @Override
@@ -56,5 +51,10 @@ public class AcmeNoopBusinessStep implements LoanCOBBusinessStep, InitializingBe
     @Override
     public String getHumanReadableName() {
         return HUMAN_READABLE_NAME;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AcmeNoopBusinessStep(final LoanAccountDomainService loanAccountDomainService) {
+        this.loanAccountDomainService = loanAccountDomainService;
     }
 }

@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.notification.eventandlistener;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.notification.data.NotificationData;
 import org.springframework.context.ApplicationListener;
@@ -29,10 +27,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile("!activeMqEnabled")
-@RequiredArgsConstructor
-@Slf4j
 public class SpringNotificationEventListener implements ApplicationListener<NotificationEvent> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SpringNotificationEventListener.class);
     private final NotificationEventListener notificationEventListener;
 
     @Override
@@ -47,4 +44,8 @@ public class SpringNotificationEventListener implements ApplicationListener<Noti
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public SpringNotificationEventListener(final NotificationEventListener notificationEventListener) {
+        this.notificationEventListener = notificationEventListener;
+    }
 }

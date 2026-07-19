@@ -26,16 +26,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.jobs.data.JobParameterDTO;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class JobParameterDataParser {
-
     private final FromJsonHelper jsonHelper;
 
     public Set<JobParameterDTO> parseExecution(String requestBody) {
@@ -52,9 +49,13 @@ public class JobParameterDataParser {
         }
         Set<JobParameterDTO> jobParameters = new HashSet<>();
         for (final JsonElement jobParameterElement : jobParametersJsonArray) {
-            jobParameters.add(new JobParameterDTO(jobParameterElement.getAsJsonObject().get("parameterName").getAsString(),
-                    jobParameterElement.getAsJsonObject().get("parameterValue").getAsString()));
+            jobParameters.add(new JobParameterDTO(jobParameterElement.getAsJsonObject().get("parameterName").getAsString(), jobParameterElement.getAsJsonObject().get("parameterValue").getAsString()));
         }
         return Collections.unmodifiableSet(jobParameters);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JobParameterDataParser(final FromJsonHelper jsonHelper) {
+        this.jsonHelper = jsonHelper;
     }
 }

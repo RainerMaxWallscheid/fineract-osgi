@@ -25,26 +25,26 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.springframework.lang.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@RequiredArgsConstructor
 public class BusinessDateFilter extends OncePerRequestFilter {
-
     private final BusinessDateReadPlatformService businessDateReadPlatformService;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         if (ThreadLocalContextUtil.getTenant() != null) {
             HashMap<BusinessDateType, LocalDate> businessDates = businessDateReadPlatformService.getBusinessDates();
             ThreadLocalContextUtil.setBusinessDates(businessDates);
         }
-
         filterChain.doFilter(request, response);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BusinessDateFilter(final BusinessDateReadPlatformService businessDateReadPlatformService) {
+        this.businessDateReadPlatformService = businessDateReadPlatformService;
     }
 }

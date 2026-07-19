@@ -24,7 +24,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.springframework.context.annotation.Scope;
@@ -36,17 +35,16 @@ import org.springframework.stereotype.Component;
 @Provider
 @Component
 @Scope("singleton")
-@Slf4j
 public class JsonSyntaxExceptionMapper implements ExceptionMapper<JsonSyntaxException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JsonSyntaxExceptionMapper.class);
 
     @Override
     public Response toResponse(final JsonSyntaxException exception) {
         final String globalisationMessageCode = "error.msg.invalid.request.body";
         final String defaultUserMessage = "The JSON syntax provided in the body of the request is invalid: " + exception.getMessage();
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-
         final ApiParameterError error = ApiParameterError.generalError(globalisationMessageCode, defaultUserMessage);
-
         return Response.status(Status.BAD_REQUEST).entity(error).type(MediaType.APPLICATION_JSON).build();
     }
 }

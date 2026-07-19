@@ -29,13 +29,11 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.CommandProperties;
 import org.apache.fineract.command.test.sample.data.DummyRequest;
 import org.apache.fineract.command.test.sample.data.DummyResponse;
@@ -52,22 +50,18 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.test.context.ContextConfiguration;
 
-@Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = TestConfiguration.class)
 @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
 class CommandSampleApiTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CommandSampleApiTest.class);
     @LocalServerPort
     private int port;
-
     private String baseUrl;
-
     private List<ClientHttpRequestInterceptor> interceptors;
-
     @Autowired
     private TestRestTemplate restTemplate;
-
     @Autowired
     private CommandProperties properties;
 
@@ -88,9 +82,7 @@ class CommandSampleApiTest {
     void validation() {
         restTemplate.getRestTemplate().setInterceptors(interceptors);
         var problemDetail = restTemplate.postForObject(baseUrl + "/sync", DummyRequest.builder().build(), ProblemDetail.class);
-
         log.warn("Problem detail (sync) : {} ({})", problemDetail.getDetail(), problemDetail.getProperties());
-
         assertNotNull(problemDetail, "Response should not be null.");
     }
 
@@ -98,22 +90,15 @@ class CommandSampleApiTest {
     void dummyApiSync() {
         final var content = "test-sync";
         final var idempotencyKey = UUID.randomUUID().toString();
-
         restTemplate.getRestTemplate().setInterceptors(interceptors);
-
         final var headers = new HttpHeaders();
         headers.add(properties.getIdemPotencyKeyHeaderName(), idempotencyKey);
-
         final var request = new HttpEntity<>(DummyRequest.builder().content(content).build(), headers);
-
         final var result = restTemplate.postForObject(baseUrl + "/sync", request, DummyResponse.class);
-
         log.warn("Result (sync) : {}", result);
-
         assertNotNull(result, "Response should not be null.");
         assertNotNull(result.getContent(), "Response body should not be null.");
         assertEquals(content.toUpperCase(Locale.ROOT), result.getContent(), "Wrong response content.");
-
         // DummyResponse response = store.getResponseByKey(idempotencyKey);
         //
         // assertNotNull(response, "There should be a command entity stored with a response.");
@@ -126,8 +111,9 @@ class CommandSampleApiTest {
         // log.warn("Command response: {}", response);
     }
 
+    // TODO: implement idempotency properly with backwards compatibility
     @Test
-    @Disabled // TODO: implement idempotency properly with backwards compatibility
+    @Disabled
     void dummyApiIdempotencySync() {
         dummyApiIdempotency("/sync");
     }
@@ -144,22 +130,15 @@ class CommandSampleApiTest {
             headers.addAll(ACCEPT, List.of(APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE));
             return execution.execute(req, body);
         });
-
         restTemplate.getRestTemplate().setInterceptors(interceptors);
-
         // first request passes
         var response = restTemplate.postForEntity(baseUrl + path, request, Map.class);
-
         assertThat(response.getStatusCode()).isEqualTo(OK);
-
         // second request fails, because we are using the same request ID in both cases
         response = restTemplate.postForEntity(baseUrl + path, request, Map.class);
-
         log.info("Body: {} - {}", response.getBody(), response.getStatusCode());
-
         // Assert HTTP status
         assertThat(response.getStatusCode()).isEqualTo(INTERNAL_SERVER_ERROR);
-
         log.info("Idempotency all good!");
     }
 }

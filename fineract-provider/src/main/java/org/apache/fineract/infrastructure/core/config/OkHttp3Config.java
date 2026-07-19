@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.infrastructure.core.config;
 
 import java.security.SecureRandom;
@@ -27,49 +26,46 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Slf4j
-@RequiredArgsConstructor
 @Configuration
 public class OkHttp3Config {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(OkHttp3Config.class);
     private final FineractProperties fineractProperties;
 
     @Bean
     public OkHttpClient okHttpClient() throws Exception {
-        var okBuilder = new OkHttpClient.Builder()//
-                .connectTimeout(Duration.ofSeconds(fineractProperties.getClientConnectTimeout()))//
-                .readTimeout(Duration.ofSeconds(fineractProperties.getClientReadTimeout()))//
-                .writeTimeout(Duration.ofSeconds(fineractProperties.getClientWriteTimeout())); //
-
+        var okBuilder = //
+        //
+        //
+        new OkHttpClient.Builder().connectTimeout(Duration.ofSeconds(fineractProperties.getClientConnectTimeout())).readTimeout(Duration.ofSeconds(fineractProperties.getClientReadTimeout())).writeTimeout(Duration.ofSeconds(fineractProperties.getClientWriteTimeout())); //
         if (Boolean.TRUE.equals(fineractProperties.getInsecureHttpClient())) {
             final X509TrustManager insecureX509TrustManager = new X509TrustManager() {
-
                 @Override
-                public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {}// NOSONAR
-
+                public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                }// NOSONAR
                 @Override
-                public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {}// NOSONAR
-
+                public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                }// NOSONAR
                 @Override
                 public X509Certificate[] getAcceptedIssuers() {
                     return new X509Certificate[] {};
                 }
             };
-
             SSLContext insecureSSLContext = SSLContext.getInstance("TLS");
-            insecureSSLContext.init(null, new TrustManager[] { insecureX509TrustManager }, new SecureRandom());
-
+            insecureSSLContext.init(null, new TrustManager[] {insecureX509TrustManager}, new SecureRandom());
             okBuilder.sslSocketFactory(insecureSSLContext.getSocketFactory(), insecureX509TrustManager);
             HostnameVerifier insecureHostnameVerifier = (hostname, session) -> true;// NOSONAR
             okBuilder.hostnameVerifier(insecureHostnameVerifier);
         }
-
         return okBuilder.build();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OkHttp3Config(final FineractProperties fineractProperties) {
+        this.fineractProperties = fineractProperties;
     }
 }

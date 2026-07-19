@@ -18,22 +18,24 @@
  */
 package org.apache.fineract.infrastructure.contentstore.util;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class DefaultContentPathRandomizer implements ContentPathRandomizer {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DefaultContentPathRandomizer.class);
     private final FineractProperties properties;
 
     @Override
     public String randomize() {
         // TODO: make length configurable
         return RandomStringUtils.secureStrong().nextAlphabetic(16);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DefaultContentPathRandomizer(final FineractProperties properties) {
+        this.properties = properties;
     }
 }

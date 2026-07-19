@@ -19,15 +19,12 @@
 package org.apache.fineract.notification.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.notification.domain.Notification;
 import org.apache.fineract.notification.domain.NotificationRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class NotificationGeneratorReadRepositoryWrapperImpl implements NotificationGeneratorReadRepositoryWrapper {
-
     private final NotificationRepository notificationRepository;
 
     @Override
@@ -45,4 +42,8 @@ public class NotificationGeneratorReadRepositoryWrapperImpl implements Notificat
         this.notificationRepository.deleteById(id);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public NotificationGeneratorReadRepositoryWrapperImpl(final NotificationRepository notificationRepository) {
+        this.notificationRepository = notificationRepository;
+    }
 }

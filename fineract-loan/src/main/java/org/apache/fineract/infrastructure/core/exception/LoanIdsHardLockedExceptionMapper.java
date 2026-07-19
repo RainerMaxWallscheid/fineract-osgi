@@ -21,7 +21,6 @@ package org.apache.fineract.infrastructure.core.exception;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.exceptionmapper.FineractExceptionMapper;
 import org.apache.fineract.infrastructure.jobs.exception.LoanIdsHardLockedException;
@@ -31,15 +30,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("singleton")
-@Slf4j
 public class LoanIdsHardLockedExceptionMapper implements FineractExceptionMapper, ExceptionMapper<LoanIdsHardLockedException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LoanIdsHardLockedExceptionMapper.class);
 
     @Override
     public Response toResponse(LoanIdsHardLockedException exception) {
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-        return Response.status(HttpStatus.SC_CONFLICT)
-                .entity(ApiGlobalErrorResponse.loanIsLocked(exception.getLoanIdFromRequest()).toJson()).type(MediaType.APPLICATION_JSON)
-                .build();
+        return Response.status(HttpStatus.SC_CONFLICT).entity(ApiGlobalErrorResponse.loanIsLocked(exception.getLoanIdFromRequest()).toJson()).type(MediaType.APPLICATION_JSON).build();
     }
 
     @Override

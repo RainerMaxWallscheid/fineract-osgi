@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanorigination.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.portfolio.loanorigination.domain.LoanOriginator;
@@ -39,69 +38,57 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 @ConditionalOnProperty(value = "fineract.module.loan-origination.enabled", havingValue = "true")
 public class WorkingCapitalLoanOriginatorWritePlatformServiceImpl implements WorkingCapitalLoanOriginatorWritePlatformService {
-
     private final WorkingCapitalLoanRepository workingCapitalLoanRepository;
     private final LoanOriginatorRepository loanOriginatorRepository;
     private final WorkingCapitalLoanOriginatorMappingRepository workingCapitalLoanOriginatorMappingRepository;
 
     @Override
     public CommandProcessingResult attachOriginatorToWorkingCapitalLoan(final Long loanId, final Long originatorId) {
-        final WorkingCapitalLoan loan = this.workingCapitalLoanRepository.findById(loanId)
-                .orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
-
+        final WorkingCapitalLoan loan = this.workingCapitalLoanRepository.findById(loanId).orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
         if (!loan.getLoanStatus().isSubmittedAndPendingApproval()) {
             throw new WorkingCapitalLoanNotInSubmittedStatusForOriginationException(loanId, loan.getLoanStatus().getCode());
         }
-
-        final LoanOriginator originator = this.loanOriginatorRepository.findById(originatorId)
-                .orElseThrow(() -> new LoanOriginatorNotFoundException(originatorId));
-
+        final LoanOriginator originator = this.loanOriginatorRepository.findById(originatorId).orElseThrow(() -> new LoanOriginatorNotFoundException(originatorId));
         if (originator.getStatus() != LoanOriginatorStatus.ACTIVE) {
             throw new LoanOriginatorNotActiveException(originatorId, originator.getStatus().getValue());
         }
-
         if (this.workingCapitalLoanOriginatorMappingRepository.existsByLoanIdAndOriginatorId(loanId, originatorId)) {
             throw new LoanOriginatorMappingAlreadyExistsException(loanId, originatorId);
         }
-
         final WorkingCapitalLoanOriginatorMapping mapping = WorkingCapitalLoanOriginatorMapping.create(loanId, originator);
         this.workingCapitalLoanOriginatorMappingRepository.saveAndFlush(mapping);
-
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(loanId) //
-                .withEntityExternalId(loan.getExternalId()) //
-                .withSubEntityId(originatorId) //
-                .withSubEntityExternalId(originator.getExternalId()) //
-                .build();
+        return  //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withEntityId(loanId).withEntityExternalId(loan.getExternalId()).withSubEntityId(originatorId).withSubEntityExternalId(originator.getExternalId()).build();
     }
 
     @Override
     public CommandProcessingResult detachOriginatorFromWorkingCapitalLoan(final Long loanId, final Long originatorId) {
-        final WorkingCapitalLoan loan = this.workingCapitalLoanRepository.findById(loanId)
-                .orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
-
+        final WorkingCapitalLoan loan = this.workingCapitalLoanRepository.findById(loanId).orElseThrow(() -> new WorkingCapitalLoanNotFoundException(loanId));
         if (!loan.getLoanStatus().isSubmittedAndPendingApproval()) {
             throw new WorkingCapitalLoanNotInSubmittedStatusForOriginationException(loanId, loan.getLoanStatus().getCode());
         }
-
-        final LoanOriginator originator = this.loanOriginatorRepository.findById(originatorId)
-                .orElseThrow(() -> new LoanOriginatorNotFoundException(originatorId));
-
-        final WorkingCapitalLoanOriginatorMapping mapping = this.workingCapitalLoanOriginatorMappingRepository
-                .findByLoanIdAndOriginatorId(loanId, originatorId)
-                .orElseThrow(() -> new WorkingCapitalLoanOriginatorMappingNotFoundException(loanId, originatorId));
-
+        final LoanOriginator originator = this.loanOriginatorRepository.findById(originatorId).orElseThrow(() -> new LoanOriginatorNotFoundException(originatorId));
+        final WorkingCapitalLoanOriginatorMapping mapping = this.workingCapitalLoanOriginatorMappingRepository.findByLoanIdAndOriginatorId(loanId, originatorId).orElseThrow(() -> new WorkingCapitalLoanOriginatorMappingNotFoundException(loanId, originatorId));
         this.workingCapitalLoanOriginatorMappingRepository.delete(mapping);
+        return  //
+        //
+        //
+        //
+        //
+        new CommandProcessingResultBuilder().withEntityId(loanId).withEntityExternalId(loan.getExternalId()).withSubEntityId(originatorId).withSubEntityExternalId(originator.getExternalId()).build();
+    }
 
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(loanId) //
-                .withEntityExternalId(loan.getExternalId()) //
-                .withSubEntityId(originatorId) //
-                .withSubEntityExternalId(originator.getExternalId()) //
-                .build();
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanOriginatorWritePlatformServiceImpl(final WorkingCapitalLoanRepository workingCapitalLoanRepository, final LoanOriginatorRepository loanOriginatorRepository, final WorkingCapitalLoanOriginatorMappingRepository workingCapitalLoanOriginatorMappingRepository) {
+        this.workingCapitalLoanRepository = workingCapitalLoanRepository;
+        this.loanOriginatorRepository = loanOriginatorRepository;
+        this.workingCapitalLoanOriginatorMappingRepository = workingCapitalLoanOriginatorMappingRepository;
     }
 }

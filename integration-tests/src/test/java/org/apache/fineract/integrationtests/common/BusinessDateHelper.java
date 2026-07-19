@@ -19,10 +19,8 @@
 package org.apache.fineract.integrationtests.common;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
-
 import java.time.LocalDate;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.BusinessDateResponse;
 import org.apache.fineract.client.models.BusinessDateUpdateRequest;
 import org.apache.fineract.client.models.BusinessDateUpdateResponse;
@@ -30,12 +28,13 @@ import org.apache.fineract.client.models.PutGlobalConfigurationsRequest;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.configuration.api.GlobalConfigurationConstants;
 
-@Slf4j
 public final class BusinessDateHelper {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BusinessDateHelper.class);
     private static final String DATETIME_PATTERN = "dd MMMM yyyy";
 
-    public BusinessDateHelper() {}
+    public BusinessDateHelper() {
+    }
 
     public static BusinessDateUpdateResponse updateBusinessDate(final BusinessDateUpdateRequest request) {
         log.info("------------------UPDATE BUSINESS DATE----------------------");
@@ -44,8 +43,7 @@ public final class BusinessDateHelper {
     }
 
     public static BusinessDateUpdateResponse updateBusinessDate(final BusinessDateType type, final LocalDate date) {
-        return updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.valueOf(type.name()))
-                .date(Utils.dateFormatter.format(date)).dateFormat(Utils.DATE_FORMAT).locale("en"));
+        return updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.valueOf(type.name())).date(Utils.dateFormatter.format(date)).dateFormat(Utils.DATE_FORMAT).locale("en"));
     }
 
     public BusinessDateResponse getBusinessDate(final String type) {
@@ -58,14 +56,11 @@ public final class BusinessDateHelper {
 
     public static void runAt(String date, Runnable runnable) {
         try {
-            new GlobalConfigurationHelper().updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-            updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date(date)
-                    .dateFormat(DATETIME_PATTERN).locale("en"));
+            new GlobalConfigurationHelper().updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
+            updateBusinessDate(new BusinessDateUpdateRequest().type(BusinessDateUpdateRequest.TypeEnum.BUSINESS_DATE).date(date).dateFormat(DATETIME_PATTERN).locale("en"));
             runnable.run();
         } finally {
-            new GlobalConfigurationHelper().updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            new GlobalConfigurationHelper().updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
     }
 }

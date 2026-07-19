@@ -31,7 +31,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.cob.data.LoanIdsResponseDTO;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
@@ -43,25 +42,27 @@ import org.springframework.stereotype.Component;
 @Path("/v1/jobs")
 @Component
 @Tag(name = "Inline Job", description = "")
-@RequiredArgsConstructor
 public class InlineJobApiResource {
-
     private final PortfolioCommandSourceWritePlatformService commandWritePlatformService;
     private final DefaultToApiJsonSerializer<LoanIdsResponseDTO> serializer;
 
     @POST
     @Path("{jobName}/inline")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Operation(summary = "Starts an inline Job", operationId = "executeInlineJob", description = "Starts an inline Job")
     @RequestBody(content = @Content(schema = @Schema(implementation = InlineJobResourceSwagger.InlineJobRequest.class)))
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = InlineJobResourceSwagger.InlineJobResponse.class)))
     @ApiResponse(responseCode = "400", description = "Request body item size validation error")
-    public String executeInlineJob(@PathParam("jobName") @Parameter(description = "jobName") final String jobName,
-            @Parameter(hidden = true) final String jsonRequestBody) {
-
+    public String executeInlineJob(@PathParam("jobName") @Parameter(description = "jobName") final String jobName, @Parameter(hidden = true) final String jsonRequestBody) {
         final CommandWrapper commandRequest = new CommandWrapperBuilder().executeInlineJob(jobName).withJson(jsonRequestBody).build();
         CommandProcessingResult result = commandWritePlatformService.logCommandSource(commandRequest);
         return serializer.serialize(result);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InlineJobApiResource(final PortfolioCommandSourceWritePlatformService commandWritePlatformService, final DefaultToApiJsonSerializer<LoanIdsResponseDTO> serializer) {
+        this.commandWritePlatformService = commandWritePlatformService;
+        this.serializer = serializer;
     }
 }

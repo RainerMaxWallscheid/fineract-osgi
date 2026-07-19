@@ -23,12 +23,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import java.io.IOException;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.jersey.converter.JsonConverter;
 
-@RequiredArgsConstructor
 public class JacksonDeserializerAdapter<T> extends JsonDeserializer<T> {
-
     private final JsonConverter<T> converter;
 
     @Override
@@ -39,5 +36,10 @@ public class JacksonDeserializerAdapter<T> extends JsonDeserializer<T> {
     @Override
     public Class<?> handledType() {
         return converter.convertedType();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JacksonDeserializerAdapter(final JsonConverter<T> converter) {
+        this.converter = converter;
     }
 }

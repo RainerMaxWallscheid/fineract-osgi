@@ -19,12 +19,10 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.command.CommandStrategyUtils;
@@ -45,9 +43,7 @@ import org.springframework.stereotype.Component;
  * @see BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class GetChargeByIdCommandStrategy implements CommandStrategy {
-
     /**
      * Loan charges api resource {@link LoanChargesApiResource}.
      */
@@ -56,15 +52,11 @@ public class GetChargeByIdCommandStrategy implements CommandStrategy {
     @Override
     public BatchResponse execute(final BatchRequest request, final UriInfo uriInfo) {
         final MutableUriInfo parameterizedUriInfo = new MutableUriInfo(uriInfo);
-
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final String relativeUrl = relativeUrlWithoutVersion(request);
-
         // Get the loan and charge ids for use in loanChargesApiResource
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrl);
         final Long loanId = Long.parseLong(pathParameters.get(1));
@@ -74,19 +66,25 @@ public class GetChargeByIdCommandStrategy implements CommandStrategy {
         } else {
             chargeId = Long.parseLong(pathParameters.get(3));
         }
-
         Map<String, String> queryParameters;
         if (relativeUrl.indexOf('?') > 0) {
             queryParameters = CommandStrategyUtils.getQueryParameters(relativeUrl);
-
             // Add the query parameters sent in the relative URL to UriInfo
             CommandStrategyUtils.addQueryParametersToUriInfo(parameterizedUriInfo, queryParameters);
         }
-
         responseBody = loanChargesApiResource.retrieveLoanCharge(loanId, chargeId, parameterizedUriInfo);
         response.setStatusCode(HttpStatus.SC_OK);
         response.setBody(responseBody);
-
         return response;
+    }
+
+    /**
+     * Creates a new {@code GetChargeByIdCommandStrategy} instance.
+     *
+     * @param loanChargesApiResource Loan charges api resource {@link LoanChargesApiResource}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public GetChargeByIdCommandStrategy(final LoanChargesApiResource loanChargesApiResource) {
+        this.loanChargesApiResource = loanChargesApiResource;
     }
 }

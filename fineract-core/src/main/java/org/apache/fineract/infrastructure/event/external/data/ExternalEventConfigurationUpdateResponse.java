@@ -21,19 +21,98 @@ package org.apache.fineract.infrastructure.event.external.data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Builder
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class ExternalEventConfigurationUpdateResponse implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private HashMap<String, Object> changes;
+
+
+    @java.lang.SuppressWarnings("all")
+        public static class ExternalEventConfigurationUpdateResponseBuilder {
+        @java.lang.SuppressWarnings("all")
+                private HashMap<String, Object> changes;
+
+        @java.lang.SuppressWarnings("all")
+                ExternalEventConfigurationUpdateResponseBuilder() {
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public ExternalEventConfigurationUpdateResponse.ExternalEventConfigurationUpdateResponseBuilder changes(final HashMap<String, Object> changes) {
+            this.changes = changes;
+            return this;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public ExternalEventConfigurationUpdateResponse build() {
+            return new ExternalEventConfigurationUpdateResponse(this.changes);
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "ExternalEventConfigurationUpdateResponse.ExternalEventConfigurationUpdateResponseBuilder(changes=" + this.changes + ")";
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static ExternalEventConfigurationUpdateResponse.ExternalEventConfigurationUpdateResponseBuilder builder() {
+        return new ExternalEventConfigurationUpdateResponse.ExternalEventConfigurationUpdateResponseBuilder();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public HashMap<String, Object> getChanges() {
+        return this.changes;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setChanges(final HashMap<String, Object> changes) {
+        this.changes = changes;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof ExternalEventConfigurationUpdateResponse)) return false;
+        final ExternalEventConfigurationUpdateResponse other = (ExternalEventConfigurationUpdateResponse) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$changes = this.getChanges();
+        final java.lang.Object other$changes = other.getChanges();
+        if (this$changes == null ? other$changes != null : !this$changes.equals(other$changes)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof ExternalEventConfigurationUpdateResponse;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $changes = this.getChanges();
+        result = result * PRIME + ($changes == null ? 43 : $changes.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "ExternalEventConfigurationUpdateResponse(changes=" + this.getChanges() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalEventConfigurationUpdateResponse() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalEventConfigurationUpdateResponse(final HashMap<String, Object> changes) {
+        this.changes = changes;
+    }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,15 +27,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "WAIVECHARGE", action = "UNDO")
 public class UndoLoanChargeWaiveCommandHandler implements NewCommandSourceHandler {
-
     final LoanChargeWritePlatformService loanWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.loanWritePlatformService.undoWaiveLoanCharge(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UndoLoanChargeWaiveCommandHandler(final LoanChargeWritePlatformService loanWritePlatformService) {
+        this.loanWritePlatformService = loanWritePlatformService;
     }
 }

@@ -23,7 +23,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.data.ApiGlobalErrorResponse;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.springframework.context.annotation.Scope;
@@ -38,14 +37,14 @@ import org.springframework.stereotype.Component;
 @Provider
 @Component
 @Scope("singleton")
-@Slf4j
 public class UnsupporterOperationExceptionMapper implements FineractExceptionMapper, ExceptionMapper<UnsupportedOperationException> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UnsupporterOperationExceptionMapper.class);
 
     @Override
     public Response toResponse(final UnsupportedOperationException exception) {
         log.warn("Exception occurred", ErrorHandler.findMostSpecificException(exception));
-        final ApiGlobalErrorResponse notFoundErrorResponse = ApiGlobalErrorResponse.notImplemented("not.implemented",
-                exception.getMessage());
+        final ApiGlobalErrorResponse notFoundErrorResponse = ApiGlobalErrorResponse.notImplemented("not.implemented", exception.getMessage());
         return Response.status(Status.NOT_IMPLEMENTED).entity(notFoundErrorResponse).type(MediaType.APPLICATION_JSON).build();
     }
 

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.cob.workingcapitalloan;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.workingcapitalloan.repository.WorkingCapitalLoanRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -26,9 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Configuration
-@RequiredArgsConstructor
 public class WorkingCapitalLoanRetrieveIdConfiguration {
-
     private final WorkingCapitalLoanRepository loanRepository;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -36,5 +33,11 @@ public class WorkingCapitalLoanRetrieveIdConfiguration {
     @ConditionalOnMissingBean
     public WorkingCapitalLoanRetrieveIdService workingCapitalLoanRetrieveIdService() {
         return new WorkingCapitalLoanRetrieveIdServiceImpl(namedParameterJdbcTemplate, loanRepository);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanRetrieveIdConfiguration(final WorkingCapitalLoanRepository loanRepository, final NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        this.loanRepository = loanRepository;
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 }

@@ -28,34 +28,62 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.portfolio.loanproduct.domain.PaymentAllocationTransactionType;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.domain.WorkingCapitalPaymentAllocationType;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.domain.WorkingCapitalPaymentAllocationTypeListConverter;
 
 @Entity
-@Table(name = "m_wc_loan_payment_allocation_rule", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "wc_loan_id", "transaction_type" }, name = "uq_m_wc_loan_payment_allocation_rule") })
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "m_wc_loan_payment_allocation_rule", uniqueConstraints = {@UniqueConstraint(columnNames = {"wc_loan_id", "transaction_type"}, name = "uq_m_wc_loan_payment_allocation_rule")})
 public class WorkingCapitalLoanPaymentAllocationRule extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @ManyToOne
     @JoinColumn(name = "wc_loan_id", nullable = false)
     private WorkingCapitalLoan wcLoan;
-
     @Column(name = "transaction_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentAllocationTransactionType transactionType;
-
     @Convert(converter = WorkingCapitalPaymentAllocationTypeListConverter.class)
     @Column(name = "allocation_types", nullable = false)
     private List<WorkingCapitalPaymentAllocationType> allocationTypes;
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoan getWcLoan() {
+        return this.wcLoan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public PaymentAllocationTransactionType getTransactionType() {
+        return this.transactionType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<WorkingCapitalPaymentAllocationType> getAllocationTypes() {
+        return this.allocationTypes;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setWcLoan(final WorkingCapitalLoan wcLoan) {
+        this.wcLoan = wcLoan;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setTransactionType(final PaymentAllocationTransactionType transactionType) {
+        this.transactionType = transactionType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setAllocationTypes(final List<WorkingCapitalPaymentAllocationType> allocationTypes) {
+        this.allocationTypes = allocationTypes;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanPaymentAllocationRule(final WorkingCapitalLoan wcLoan, final PaymentAllocationTransactionType transactionType, final List<WorkingCapitalPaymentAllocationType> allocationTypes) {
+        this.wcLoan = wcLoan;
+        this.transactionType = transactionType;
+        this.allocationTypes = allocationTypes;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected WorkingCapitalLoanPaymentAllocationRule() {
+    }
 }

@@ -18,15 +18,23 @@
  */
 package org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.organisation.monetary.domain.Money;
 
-@Getter
-@Setter
-@AllArgsConstructor
 public class MoneyHolder {
-
     private Money moneyObject;
+
+    @java.lang.SuppressWarnings("all")
+        public Money getMoneyObject() {
+        return this.moneyObject;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMoneyObject(final Money moneyObject) {
+        this.moneyObject = moneyObject;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MoneyHolder(final Money moneyObject) {
+        this.moneyObject = moneyObject;
+    }
 }

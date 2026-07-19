@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.accounting.journalentry.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryRunningBalanceUpdateService;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
@@ -28,9 +27,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @CommandType(entity = "JOURNALENTRY", action = "UPDATERUNNINGBALANCE")
-@RequiredArgsConstructor
 public class UpdateRunningBalanceCommandHandler implements NewCommandSourceHandler {
-
     private final JournalEntryRunningBalanceUpdateService journalEntryRunningBalanceUpdateService;
 
     @Override
@@ -38,4 +35,8 @@ public class UpdateRunningBalanceCommandHandler implements NewCommandSourceHandl
         return journalEntryRunningBalanceUpdateService.updateOfficeRunningBalance(command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public UpdateRunningBalanceCommandHandler(final JournalEntryRunningBalanceUpdateService journalEntryRunningBalanceUpdateService) {
+        this.journalEntryRunningBalanceUpdateService = journalEntryRunningBalanceUpdateService;
+    }
 }

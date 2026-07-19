@@ -19,17 +19,8 @@
 package org.apache.fineract.portfolio.delinquency.data;
 
 import java.io.Serializable;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
-@ToString
-@AllArgsConstructor
-@Getter
-@Setter
 public class DelinquencyRangeData implements Serializable {
-
     private Long id;
     private String classification;
     private Integer minimumAgeDays;
@@ -43,4 +34,57 @@ public class DelinquencyRangeData implements Serializable {
         return new DelinquencyRangeData(id, "", 0, 0);
     }
 
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "DelinquencyRangeData(id=" + this.getId() + ", classification=" + this.getClassification() + ", minimumAgeDays=" + this.getMinimumAgeDays() + ", maximumAgeDays=" + this.getMaximumAgeDays() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DelinquencyRangeData(final Long id, final String classification, final Integer minimumAgeDays, final Integer maximumAgeDays) {
+        this.id = id;
+        this.classification = classification;
+        this.minimumAgeDays = minimumAgeDays;
+        this.maximumAgeDays = maximumAgeDays;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getClassification() {
+        return this.classification;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getMinimumAgeDays() {
+        return this.minimumAgeDays;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getMaximumAgeDays() {
+        return this.maximumAgeDays;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setId(final Long id) {
+        this.id = id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setClassification(final String classification) {
+        this.classification = classification;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMinimumAgeDays(final Integer minimumAgeDays) {
+        this.minimumAgeDays = minimumAgeDays;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMaximumAgeDays(final Integer maximumAgeDays) {
+        this.maximumAgeDays = maximumAgeDays;
+    }
 }

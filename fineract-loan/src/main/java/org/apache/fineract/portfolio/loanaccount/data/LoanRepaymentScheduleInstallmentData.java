@@ -22,27 +22,44 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@AllArgsConstructor
-@Getter
 public final class LoanRepaymentScheduleInstallmentData implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private Long id;
-
     private Integer installmentId;
-
     private LocalDate date;
-
     private BigDecimal amount;
 
-    public static LoanRepaymentScheduleInstallmentData instanceOf(final Long id, final Integer installmentId, final LocalDate date,
-            final BigDecimal amount) {
+    public static LoanRepaymentScheduleInstallmentData instanceOf(final Long id, final Integer installmentId, final LocalDate date, final BigDecimal amount) {
         return new LoanRepaymentScheduleInstallmentData(id, installmentId, date, amount);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanRepaymentScheduleInstallmentData(final Long id, final Integer installmentId, final LocalDate date, final BigDecimal amount) {
+        this.id = id;
+        this.installmentId = installmentId;
+        this.date = date;
+        this.amount = amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getInstallmentId() {
+        return this.installmentId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getDate() {
+        return this.date;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
 }

@@ -22,8 +22,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.portfolio.meeting.data.MeetingData;
 import org.apache.fineract.portfolio.meeting.exception.MeetingNotFoundException;
@@ -33,41 +31,33 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
 @ConditionalOnMissingBean(value = MeetingReadService.class, ignored = MeetingReadServiceImpl.class)
 public class MeetingReadServiceImpl implements MeetingReadService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MeetingReadServiceImpl.class);
     private final JdbcTemplate jdbcTemplate;
 
+
     private static final class MeetingDataMapper implements RowMapper<MeetingData> {
-
         public String schema() {
-
-            return " select m.id as id, m.meeting_date as meetingDate from m_meeting m "
-                    + "inner join m_calendar_instance ci on m.calendar_instance_id = ci.id ";
+            return " select m.id as id, m.meeting_date as meetingDate from m_meeting m " + "inner join m_calendar_instance ci on m.calendar_instance_id = ci.id ";
         }
 
         @Override
         public MeetingData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-
             final Long id = rs.getLong("id");
             final LocalDate meetingDate = JdbcSupport.getLocalDate(rs, "meetingDate");
-
             return MeetingData.builder().id(id).meetingDate(meetingDate).build();
         }
     }
 
     @Override
     public MeetingData retrieveMeeting(final Long meetingId, final Long entityId, final Integer entityTypeId) {
-
         try {
             final MeetingDataMapper rm = new MeetingDataMapper();
-
             final String sql = rm.schema() + " where m.id = ? and ci.entity_id = ? and ci.entity_type_enum = ? ";
-
-            return this.jdbcTemplate.queryForObject(sql, rm, new Object[] { meetingId, entityId, entityTypeId }); // NOSONAR
+            return this.jdbcTemplate.queryForObject(sql, rm, new Object[] {meetingId, entityId, entityTypeId}); // NOSONAR
         } catch (final EmptyResultDataAccessException e) {
             throw new MeetingNotFoundException(meetingId, e);
         }
@@ -81,7 +71,6 @@ public class MeetingReadServiceImpl implements MeetingReadService {
             sql = sql + " order by m.meeting_date desc " + " limit ? ";
             return this.jdbcTemplate.query(sql, rm, entityId, entityTypeId, limit);
         }
-
         return this.jdbcTemplate.query(sql, rm, entityId, entityTypeId);
     }
 
@@ -89,9 +78,7 @@ public class MeetingReadServiceImpl implements MeetingReadService {
     public MeetingData retrieveLastMeeting(Long calendarInstanceId) {
         try {
             final MeetingDataMapper rm = new MeetingDataMapper();
-
             final String sql = rm.schema() + " where ci.id = ? order by m.meeting_date desc, m.id desc limit 1";
-
             return this.jdbcTemplate.queryForObject(sql, rm, calendarInstanceId);
         } catch (EmptyResultDataAccessException e) {
             // TODO: should we really suppress this exception?
@@ -99,4 +86,8 @@ public class MeetingReadServiceImpl implements MeetingReadService {
         }
     }
 
+    @java.lang.SuppressWarnings("all")
+        public MeetingReadServiceImpl(final JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 }

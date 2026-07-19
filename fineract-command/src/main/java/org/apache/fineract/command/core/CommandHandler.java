@@ -19,21 +19,22 @@
 package org.apache.fineract.command.core;
 
 import com.google.common.reflect.TypeToken;
-import lombok.SneakyThrows;
 
 public interface CommandHandler<REQ, RES> {
-
     RES handle(Command<REQ> command);
 
-    @SneakyThrows
     default RES fallback(Command<REQ> command, Throwable t) {
-        // NOTE: any command handler can override this default to implement more specialized fallbacks.
-        throw t;
+        try {
+            // NOTE: any command handler can override this default to implement more specialized fallbacks.
+            throw t;
+        } catch (final java.lang.Throwable $ex) {
+            throw new java.lang.RuntimeException($ex);
+        }
     }
 
     default boolean matches(Command<REQ> command) {
-        TypeToken<REQ> handlerType = new TypeToken<>(getClass()) {};
-
+        TypeToken<REQ> handlerType = new TypeToken<>(getClass()) {
+        };
         return handlerType.getRawType().isAssignableFrom(command.getPayload().getClass());
     }
 }

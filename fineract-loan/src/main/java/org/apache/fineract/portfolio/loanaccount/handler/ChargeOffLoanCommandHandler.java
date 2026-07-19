@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,16 +27,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN", action = "CHARGEOFF")
 public class ChargeOffLoanCommandHandler implements NewCommandSourceHandler {
-
     private final LoanWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return writePlatformService.chargeOff(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ChargeOffLoanCommandHandler(final LoanWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

@@ -34,7 +34,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.models.PostSavingsAccountTransactionsRequest;
 import org.apache.fineract.client.models.PostSavingsAccountsAccountIdRequest;
 import org.apache.fineract.client.models.SavingsAccountData;
@@ -47,9 +46,9 @@ import org.apache.fineract.integrationtests.common.Utils;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-@Slf4j
 public class SavingsTestLifecycleExtension implements AfterAllCallback {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SavingsTestLifecycleExtension.class);
     private SavingsAccountHelper savingsAccountHelper;
     private SchedulerJobHelper schedulerJobHelper;
     public static final String DATE_FORMAT = "dd MMMM yyyy";
@@ -75,20 +74,13 @@ public class SavingsTestLifecycleExtension implements AfterAllCallback {
 
     private void closeSavingsAccount(Long savingsId) {
         try {
-            SavingsAccountData savingsAccountData = Calls
-                    .ok(FineractClientHelper.getFineractClient().savingsAccounts.retrieveSavingsAccount(savingsId, false, null, "all"));
-            BigDecimal accountBalance = MathUtil.subtract(savingsAccountData.getSummary().getAvailableBalance(),
-                    savingsAccountData.getMinRequiredBalance(), MathContext.DECIMAL64);
+            SavingsAccountData savingsAccountData = Calls.ok(FineractClientHelper.getFineractClient().savingsAccounts.retrieveSavingsAccount(savingsId, false, null, "all"));
+            BigDecimal accountBalance = MathUtil.subtract(savingsAccountData.getSummary().getAvailableBalance(), savingsAccountData.getMinRequiredBalance(), MathContext.DECIMAL64);
             if (accountBalance.compareTo(BigDecimal.ZERO) > 0) {
-                savingsAccountHelper.closeSavingsAccount(savingsId, new PostSavingsAccountsAccountIdRequest().locale("en")
-                        .dateFormat(DATE_FORMAT).closedOnDate(dateFormatter.format(Utils.getLocalDateOfTenant())).withdrawBalance(true));
+                savingsAccountHelper.closeSavingsAccount(savingsId, new PostSavingsAccountsAccountIdRequest().locale("en").dateFormat(DATE_FORMAT).closedOnDate(dateFormatter.format(Utils.getLocalDateOfTenant())).withdrawBalance(true));
             } else if (accountBalance.compareTo(BigDecimal.ZERO) < 0) {
-                savingsAccountHelper.depositIntoSavingsAccount(savingsId,
-                        new PostSavingsAccountTransactionsRequest().locale("en").dateFormat(DATE_FORMAT)
-                                .transactionDate(dateFormatter.format(Utils.getLocalDateOfTenant())).transactionAmount(accountBalance.abs())
-                                .paymentTypeId(1));
-                savingsAccountHelper.closeSavingsAccount(savingsId, new PostSavingsAccountsAccountIdRequest().locale("en")
-                        .dateFormat(DATE_FORMAT).closedOnDate(dateFormatter.format(Utils.getLocalDateOfTenant())));
+                savingsAccountHelper.depositIntoSavingsAccount(savingsId, new PostSavingsAccountTransactionsRequest().locale("en").dateFormat(DATE_FORMAT).transactionDate(dateFormatter.format(Utils.getLocalDateOfTenant())).transactionAmount(accountBalance.abs()).paymentTypeId(1));
+                savingsAccountHelper.closeSavingsAccount(savingsId, new PostSavingsAccountsAccountIdRequest().locale("en").dateFormat(DATE_FORMAT).closedOnDate(dateFormatter.format(Utils.getLocalDateOfTenant())));
             }
         } catch (Exception e) {
             log.warn("Unable to close savings account: {}, Reason: {}", savingsId, e.getMessage());

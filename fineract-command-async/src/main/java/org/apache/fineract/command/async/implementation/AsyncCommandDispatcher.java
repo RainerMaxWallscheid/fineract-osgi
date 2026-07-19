@@ -20,48 +20,38 @@ package org.apache.fineract.command.async.implementation;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.SECONDS;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandDispatcher;
 import org.apache.fineract.command.core.CommandHandlerManager;
 import org.apache.fineract.command.core.CommandHookManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-
 // TODO: WIP - not ready yet for prime time
-@Slf4j
-@RequiredArgsConstructor
 @Component
 @ConditionalOnProperty(value = "fineract.command.async.enabled", havingValue = "true")
 public class AsyncCommandDispatcher implements CommandDispatcher {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AsyncCommandDispatcher.class);
     private final CommandHandlerManager handlerManager;
     private final CommandHookManager hookManager;
 
     @Override
     public <REQ, RES> Supplier<RES> dispatch(final Command<REQ> command) {
         requireNonNull(command, "Command must not be null");
-
         CompletableFuture<RES> future = CompletableFuture.supplyAsync(() -> {
             hookManager.before(command);
-
             RES response = handlerManager.handle(command);
-
             hookManager.after(command, response);
-
             return response;
         }).whenComplete((response, t) -> {
             if (t != null) {
                 hookManager.error(command, t);
             }
         });
-
         return () -> {
             try {
                 // TODO: make this configurable
@@ -70,5 +60,11 @@ public class AsyncCommandDispatcher implements CommandDispatcher {
                 throw new RuntimeException(e);
             }
         };
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AsyncCommandDispatcher(final CommandHandlerManager handlerManager, final CommandHookManager hookManager) {
+        this.handlerManager = handlerManager;
+        this.hookManager = hookManager;
     }
 }

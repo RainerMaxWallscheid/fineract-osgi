@@ -25,7 +25,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
@@ -37,21 +36,18 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-@RequiredArgsConstructor
 public class HolidayReadPlatformServiceImpl implements HolidayReadPlatformService {
-
     private final PlatformSecurityContext context;
     private final JdbcTemplate jdbcTemplate;
 
-    private static final class HolidayMapper implements RowMapper<HolidayData> {
 
+    private static final class HolidayMapper implements RowMapper<HolidayData> {
         private final String schema;
 
         HolidayMapper() {
             final StringBuilder sqlBuilder = new StringBuilder(200);
             sqlBuilder.append("h.id as id, h.name as name, h.description as description, h.from_date as fromDate, h.to_date as toDate, ");
-            sqlBuilder.append(
-                    "h.repayments_rescheduled_to as repaymentsScheduleTO, h.rescheduling_type as reschedulingType, h.status_enum as statusEnum ");
+            sqlBuilder.append("h.repayments_rescheduled_to as repaymentsScheduleTO, h.rescheduling_type as reschedulingType, h.status_enum as statusEnum ");
             sqlBuilder.append("from m_holiday h ");
             this.schema = sqlBuilder.toString();
         }
@@ -71,39 +67,27 @@ public class HolidayReadPlatformServiceImpl implements HolidayReadPlatformServic
             final Integer statusEnum = JdbcSupport.getInteger(rs, "statusEnum");
             final Integer reschedulingType = JdbcSupport.getInteger(rs, "reschedulingType");
             final EnumOptionData status = HolidayEnumerations.holidayStatusType(statusEnum);
-
-            return new HolidayData().setId(id).setName(name).setDescription(description).setFromDate(fromDate).setToDate(toDate)
-                    .setRepaymentsRescheduledTo(repaymentsScheduleTO).setStatus(status).setReschedulingType(reschedulingType);
+            return new HolidayData().setId(id).setName(name).setDescription(description).setFromDate(fromDate).setToDate(toDate).setRepaymentsRescheduledTo(repaymentsScheduleTO).setStatus(status).setReschedulingType(reschedulingType);
         }
-
     }
 
     @Override
-    public Collection<HolidayData> retrieveAllHolidaysBySearchParamerters(final Long officeId, final LocalDate fromDate,
-            final LocalDate toDate) {
+    public Collection<HolidayData> retrieveAllHolidaysBySearchParamerters(final Long officeId, final LocalDate fromDate, final LocalDate toDate) {
         this.context.authenticatedUser();
-
         final DateTimeFormatter df = DateUtils.DEFAULT_DATE_FORMATTER;
-
         final Object[] objectArray = new Object[3];
         int arrayPos = 0;
-
         final HolidayMapper rm = new HolidayMapper();
         String sql = "select " + rm.schema() + " join m_holiday_office hf on h.id = hf.holiday_id and hf.office_id = ? ";
-
         objectArray[arrayPos] = officeId;
         arrayPos = arrayPos + 1;
-
         if (fromDate != null || toDate != null) {
             sql += "and ";
-
             if (fromDate != null) {
                 sql += "h.from_Date >= ? ";
-
                 objectArray[arrayPos] = df.format(fromDate);
                 arrayPos = arrayPos + 1;
             }
-
             if (toDate != null) {
                 sql += fromDate != null ? "and " : "";
                 sql += "h.to_date <= ? ";
@@ -111,9 +95,7 @@ public class HolidayReadPlatformServiceImpl implements HolidayReadPlatformServic
                 arrayPos = arrayPos + 1;
             }
         }
-
         final Object[] finalObjectArray = Arrays.copyOf(objectArray, arrayPos);
-
         return this.jdbcTemplate.query(sql, rm, finalObjectArray); // NOSONAR
     }
 
@@ -121,10 +103,8 @@ public class HolidayReadPlatformServiceImpl implements HolidayReadPlatformServic
     public HolidayData retrieveHoliday(Long holidayId) {
         try {
             final HolidayMapper rm = new HolidayMapper();
-
             final String sql = " select " + rm.schema() + " where h.id = ?";
-
-            return this.jdbcTemplate.queryForObject(sql, rm, new Object[] { holidayId }); // NOSONAR
+            return this.jdbcTemplate.queryForObject(sql, rm, new Object[] {holidayId}); // NOSONAR
         } catch (final EmptyResultDataAccessException e) {
             throw new HolidayNotFoundException(holidayId, e);
         }
@@ -132,11 +112,13 @@ public class HolidayReadPlatformServiceImpl implements HolidayReadPlatformServic
 
     @Override
     public List<EnumOptionData> retrieveRepaymentScheduleUpdationTyeOptions() {
-
-        final List<EnumOptionData> repSchUpdationTypeOptions = Arrays.asList(
-                HolidayEnumerations.rescheduleType(RescheduleType.RESCHEDULETOSPECIFICDATE),
-                HolidayEnumerations.rescheduleType(RescheduleType.RESCHEDULETONEXTREPAYMENTDATE));
+        final List<EnumOptionData> repSchUpdationTypeOptions = Arrays.asList(HolidayEnumerations.rescheduleType(RescheduleType.RESCHEDULETOSPECIFICDATE), HolidayEnumerations.rescheduleType(RescheduleType.RESCHEDULETONEXTREPAYMENTDATE));
         return repSchUpdationTypeOptions;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public HolidayReadPlatformServiceImpl(final PlatformSecurityContext context, final JdbcTemplate jdbcTemplate) {
+        this.context = context;
+        this.jdbcTemplate = jdbcTemplate;
+    }
 }

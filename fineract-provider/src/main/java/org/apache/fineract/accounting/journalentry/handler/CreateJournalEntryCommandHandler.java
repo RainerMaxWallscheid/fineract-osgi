@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.accounting.journalentry.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
@@ -29,15 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "JOURNALENTRY", action = "CREATE")
-@RequiredArgsConstructor
 public class CreateJournalEntryCommandHandler implements NewCommandSourceHandler {
-
     private final JournalEntryWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.createJournalEntry(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateJournalEntryCommandHandler(final JournalEntryWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

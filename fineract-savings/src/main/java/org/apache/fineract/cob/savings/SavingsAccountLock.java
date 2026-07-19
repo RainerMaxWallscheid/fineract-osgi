@@ -27,37 +27,26 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 
 @Entity
 @Table(name = "m_savings_account_locks")
-@NoArgsConstructor
-@Getter
 public class SavingsAccountLock {
-
     @Id
     @Column(name = "savings_id", nullable = false)
     private Long savingsId;
-
     @Version
     @Column(name = "version")
     private Long version;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "lock_owner", nullable = false)
     private SavingsLockOwner lockOwner;
-
     @Column(name = "lock_placed_on", nullable = false)
     private OffsetDateTime lockPlacedOn;
-
     @Column(name = "error")
     private String error;
-
     @Column(name = "stacktrace")
     private String stacktrace;
-
     @Column(name = "lock_placed_on_cob_business_date")
     private LocalDate lockPlacedOnCobBusinessDate;
 
@@ -76,5 +65,44 @@ public class SavingsAccountLock {
     public void setNewLockOwner(SavingsLockOwner newLockOwner) {
         this.lockOwner = newLockOwner;
         this.lockPlacedOn = DateUtils.getAuditOffsetDateTime();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsAccountLock() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getSavingsId() {
+        return this.savingsId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getVersion() {
+        return this.version;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsLockOwner getLockOwner() {
+        return this.lockOwner;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OffsetDateTime getLockPlacedOn() {
+        return this.lockPlacedOn;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getError() {
+        return this.error;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getStacktrace() {
+        return this.stacktrace;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getLockPlacedOnCobBusinessDate() {
+        return this.lockPlacedOnCobBusinessDate;
     }
 }

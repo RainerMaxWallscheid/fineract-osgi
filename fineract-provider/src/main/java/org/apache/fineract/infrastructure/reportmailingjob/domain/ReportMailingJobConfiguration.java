@@ -22,26 +22,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
-@Table(name = "m_report_mailing_job_configuration", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "name" }, name = "unique_name") })
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
+@Table(name = "m_report_mailing_job_configuration", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"}, name = "unique_name")})
 public class ReportMailingJobConfiguration extends AbstractPersistableCustom<Long> {
-
     private static final long serialVersionUID = 3099279770861263184L;
-
     @Column(name = "name", nullable = false)
     private String name;
-
     @Column(name = "value", nullable = false)
     private String value;
 
@@ -49,8 +37,40 @@ public class ReportMailingJobConfiguration extends AbstractPersistableCustom<Lon
      * creates an instance of the ReportMailingJobConfiguration class
      *
      * @return ReportMailingJobConfiguration object
-     **/
+     */
     public static ReportMailingJobConfiguration newInstance(final String name, final String value) {
         return new ReportMailingJobConfiguration().setName(name).setValue(value);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getValue() {
+        return this.value;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ReportMailingJobConfiguration setName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public ReportMailingJobConfiguration setValue(final String value) {
+        this.value = value;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ReportMailingJobConfiguration() {
     }
 }

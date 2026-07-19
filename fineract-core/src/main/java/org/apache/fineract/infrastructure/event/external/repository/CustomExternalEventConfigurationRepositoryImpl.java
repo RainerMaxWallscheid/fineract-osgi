@@ -20,15 +20,12 @@ package org.apache.fineract.infrastructure.event.external.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.event.external.exception.ExternalEventConfigurationNotFoundException;
 import org.apache.fineract.infrastructure.event.external.repository.domain.ExternalEventConfiguration;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class CustomExternalEventConfigurationRepositoryImpl implements CustomExternalEventConfigurationRepository {
-
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -39,5 +36,9 @@ public class CustomExternalEventConfigurationRepositoryImpl implements CustomExt
             throw new ExternalEventConfigurationNotFoundException(externalEventType);
         }
         return configuration;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CustomExternalEventConfigurationRepositoryImpl() {
     }
 }

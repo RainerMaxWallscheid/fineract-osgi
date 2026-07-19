@@ -30,8 +30,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.cob.domain.LoanAccountLock;
 import org.apache.fineract.cob.domain.LoanAccountLockRepository;
@@ -48,10 +46,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Component
 @Path("/v1/internal/loans")
 @Tag(name = "Loan Account Lock")
-@RequiredArgsConstructor
-@Slf4j
 public class InternalLoanAccountLockApiResource implements InitializingBean {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InternalLoanAccountLockApiResource.class);
     private final LoanAccountLockRepository loanAccountLockRepository;
 
     @Override
@@ -64,25 +61,21 @@ public class InternalLoanAccountLockApiResource implements InitializingBean {
         log.warn("DO NOT USE THIS IN PRODUCTION!");
         log.warn("                                                            ");
         log.warn("------------------------------------------------------------");
-
     }
 
     @POST
     @Path("{loanId}/place-lock/{lockOwner}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @SuppressFBWarnings("SLF4J_SIGN_ONLY_FORMAT")
-    public Response placeLockOnLoanAccount(@Context final UriInfo uriInfo, @PathParam("loanId") final Long loanId,
-            @PathParam("lockOwner") final String lockOwner, @RequestBody(required = false) final LockRequest request) {
+    public Response placeLockOnLoanAccount(@Context final UriInfo uriInfo, @PathParam("loanId") final Long loanId, @PathParam("lockOwner") final String lockOwner, @RequestBody(required = false) final LockRequest request) {
         log.warn("------------------------------------------------------------");
         log.warn("                                                            ");
         log.warn("Placing lock on loan: {}", loanId);
         log.warn("                                                            ");
         log.warn("------------------------------------------------------------");
-
         final LocalDate cobBusinessDate = resolveCobBusinessDate(request);
         final LoanAccountLock loanAccountLock = new LoanAccountLock(loanId, LockOwner.valueOf(lockOwner), cobBusinessDate);
-
         if (request != null && StringUtils.isNotBlank(request.getError())) {
             loanAccountLock.setError(request.getError(), request.getError());
         }
@@ -98,5 +91,10 @@ public class InternalLoanAccountLockApiResource implements InitializingBean {
             return request.getCobBusinessDate();
         }
         return ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InternalLoanAccountLockApiResource(final LoanAccountLockRepository loanAccountLockRepository) {
+        this.loanAccountLockRepository = loanAccountLockRepository;
     }
 }

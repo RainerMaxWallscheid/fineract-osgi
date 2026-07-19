@@ -19,8 +19,6 @@
 package org.apache.fineract.infrastructure.businessdate.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.infrastructure.businessdate.data.api.BusinessDateUpdateRequest;
@@ -31,11 +29,10 @@ import org.apache.fineract.infrastructure.businessdate.service.BusinessDateWrite
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class BusinessDateUpdateHandler implements CommandHandler<BusinessDateUpdateRequest, BusinessDateUpdateResponse> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BusinessDateUpdateHandler.class);
     private final BusinessDateWritePlatformService businessDateWritePlatformService;
     private final BusinessDateMapper businessDateMapper;
 
@@ -52,5 +49,11 @@ public class BusinessDateUpdateHandler implements CommandHandler<BusinessDateUpd
     public BusinessDateUpdateResponse fallback(Command<BusinessDateUpdateRequest> command, Throwable t) {
         // NOTE: fallback method needs to be in the same class
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BusinessDateUpdateHandler(final BusinessDateWritePlatformService businessDateWritePlatformService, final BusinessDateMapper businessDateMapper) {
+        this.businessDateWritePlatformService = businessDateWritePlatformService;
+        this.businessDateMapper = businessDateMapper;
     }
 }

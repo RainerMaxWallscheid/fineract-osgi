@@ -20,16 +20,12 @@ package org.apache.fineract.portfolio.loanaccount.guarantor.data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.Getter;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
 import org.apache.fineract.portfolio.savings.data.DepositAccountOnHoldTransactionData;
 
-@Getter
 public final class GuarantorTransactionData implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @SuppressWarnings("unused")
     private final Long id;
     @SuppressWarnings("unused")
@@ -39,18 +35,34 @@ public final class GuarantorTransactionData implements Serializable {
     @SuppressWarnings("unused")
     private final boolean reversed;
 
-    private GuarantorTransactionData(final Long id, final DepositAccountOnHoldTransactionData onHoldTransactionData,
-            final LoanTransactionData loanTransactionData, final boolean reversed) {
-
+    private GuarantorTransactionData(final Long id, final DepositAccountOnHoldTransactionData onHoldTransactionData, final LoanTransactionData loanTransactionData, final boolean reversed) {
         this.id = id;
         this.onHoldTransactionData = onHoldTransactionData;
         this.loanTransactionData = loanTransactionData;
         this.reversed = reversed;
     }
 
-    public static GuarantorTransactionData instance(final Long id, final DepositAccountOnHoldTransactionData onHoldTransactionData,
-            final LoanTransactionData loanTransactionData, final boolean reversed) {
+    public static GuarantorTransactionData instance(final Long id, final DepositAccountOnHoldTransactionData onHoldTransactionData, final LoanTransactionData loanTransactionData, final boolean reversed) {
         return new GuarantorTransactionData(id, onHoldTransactionData, loanTransactionData, reversed);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DepositAccountOnHoldTransactionData getOnHoldTransactionData() {
+        return this.onHoldTransactionData;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionData getLoanTransactionData() {
+        return this.loanTransactionData;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isReversed() {
+        return this.reversed;
+    }
 }

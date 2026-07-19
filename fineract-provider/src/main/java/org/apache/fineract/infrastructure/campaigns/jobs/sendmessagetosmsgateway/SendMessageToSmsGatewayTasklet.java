@@ -25,8 +25,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.fineract.infrastructure.campaigns.helper.SmsConfigUtils;
 import org.apache.fineract.infrastructure.campaigns.sms.constants.SmsCampaignConstants;
@@ -53,10 +51,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
 
-@Slf4j
-@RequiredArgsConstructor
 public class SendMessageToSmsGatewayTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SendMessageToSmsGatewayTasklet.class);
     private final SmsMessageRepository smsMessageRepository;
     private final NotificationSenderService notificationSenderService;
     private final SmsConfigUtils smsConfigUtils;
@@ -70,8 +67,7 @@ public class SendMessageToSmsGatewayTasklet implements Tasklet {
         int totalRecords;
         do {
             PageRequest pageRequest = PageRequest.of(0, pageLimit);
-            org.springframework.data.domain.Page<SmsMessage> pendingMessages = smsMessageRepository
-                    .findByStatusType(SmsMessageStatusType.PENDING.getValue(), pageRequest);
+            org.springframework.data.domain.Page<SmsMessage> pendingMessages = smsMessageRepository.findByStatusType(SmsMessageStatusType.PENDING.getValue(), pageRequest);
             List<SmsMessage> toSaveMessages = new ArrayList<>();
             List<SmsMessage> toSendNotificationMessages = new ArrayList<>();
             try {
@@ -85,9 +81,7 @@ public class SendMessageToSmsGatewayTasklet implements Tasklet {
                             smsData.setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue());
                             toSendNotificationMessages.add(smsData);
                         } else {
-                            SmsMessageApiQueueResourceData apiQueueResourceData = SmsMessageApiQueueResourceData.instance(smsData.getId(),
-                                    tenantIdentifier, null, null, smsData.getMobileNo(), smsData.getMessage(),
-                                    smsData.getSmsCampaign().getProviderId());
+                            SmsMessageApiQueueResourceData apiQueueResourceData = SmsMessageApiQueueResourceData.instance(smsData.getId(), tenantIdentifier, null, null, smsData.getMobileNo(), smsData.getMessage(), smsData.getSmsCampaign().getProviderId());
                             apiQueueResourceDataCollection.add(apiQueueResourceData);
                             smsData.setStatusType(SmsMessageStatusType.WAITING_FOR_DELIVERY_REPORT.getValue());
                             toSaveMessages.add(smsData);
@@ -111,8 +105,8 @@ public class SendMessageToSmsGatewayTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
-    class SmsTask implements Runnable, ApplicationListener<ContextClosedEvent> {
 
+    class SmsTask implements Runnable, ApplicationListener<ContextClosedEvent> {
         private final FineractPlatformTenant tenant;
         private final Collection<SmsMessageApiQueueResourceData> apiQueueResourceDatas;
 
@@ -136,14 +130,22 @@ public class SendMessageToSmsGatewayTasklet implements Tasklet {
 
     @SuppressFBWarnings("SLF4J_SIGN_ONLY_FORMAT")
     private void connectAndSendToIntermediateServer(Collection<SmsMessageApiQueueResourceData> apiQueueResourceDatas) {
-        Map<String, Object> hostConfig = smsConfigUtils.getMessageGateWayRequestURI("sms",
-                SmsMessageApiQueueResourceData.toJsonString(apiQueueResourceDatas));
+        Map<String, Object> hostConfig = smsConfigUtils.getMessageGateWayRequestURI("sms", SmsMessageApiQueueResourceData.toJsonString(apiQueueResourceDatas));
         URI uri = (URI) hostConfig.get("uri");
         HttpEntity<?> entity = (HttpEntity<?>) hostConfig.get("entity");
-        ResponseEntity<String> responseOne = restTemplate.exchange(uri, HttpMethod.POST, entity, new ParameterizedTypeReference<>() {});
+        ResponseEntity<String> responseOne = restTemplate.exchange(uri, HttpMethod.POST, entity, new ParameterizedTypeReference<>() {
+        });
         if (!responseOne.getStatusCode().equals(HttpStatus.ACCEPTED)) {
             log.debug("{}", responseOne.getStatusCode().value());
             throw new ConnectionFailureException(SmsCampaignConstants.SMS);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SendMessageToSmsGatewayTasklet(final SmsMessageRepository smsMessageRepository, final NotificationSenderService notificationSenderService, final SmsConfigUtils smsConfigUtils, final ThreadPoolTaskExecutor taskExecutor) {
+        this.smsMessageRepository = smsMessageRepository;
+        this.notificationSenderService = notificationSenderService;
+        this.smsConfigUtils = smsConfigUtils;
+        this.taskExecutor = taskExecutor;
     }
 }

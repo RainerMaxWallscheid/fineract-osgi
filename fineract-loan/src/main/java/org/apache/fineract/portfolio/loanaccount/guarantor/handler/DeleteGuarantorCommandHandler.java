@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.guarantor.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,14 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "GUARANTOR", action = "DELETE")
-@RequiredArgsConstructor
 public class DeleteGuarantorCommandHandler implements NewCommandSourceHandler {
-
     private final GuarantorWritePlatformService guarantorWritePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.guarantorWritePlatformService.removeGuarantor(command.getLoanId(), command.entityId(), command.subentityId());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DeleteGuarantorCommandHandler(final GuarantorWritePlatformService guarantorWritePlatformService) {
+        this.guarantorWritePlatformService = guarantorWritePlatformService;
     }
 }

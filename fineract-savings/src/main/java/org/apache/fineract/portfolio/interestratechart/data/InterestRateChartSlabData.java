@@ -24,7 +24,6 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
@@ -32,12 +31,9 @@ import org.apache.fineract.organisation.monetary.data.CurrencyData;
 /**
  * Immutable data object representing a InterestRateChartSlab.
  */
-@Getter
 public final class InterestRateChartSlabData implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     private final Long id;
     private final String description;
     private final EnumOptionData periodType;
@@ -47,10 +43,8 @@ public final class InterestRateChartSlabData implements Serializable {
     private final BigDecimal amountRangeTo;
     private final BigDecimal annualInterestRate;
     private final CurrencyData currency;
-
     // associations
     private Set<InterestIncentiveData> incentives;
-
     // template
     private final Collection<EnumOptionData> periodTypes;
     private final Collection<EnumOptionData> entityTypeOptions;
@@ -61,9 +55,7 @@ public final class InterestRateChartSlabData implements Serializable {
     private final Collection<CodeValueData> clientTypeOptions;
     private final Collection<CodeValueData> clientClassificationOptions;
 
-    public static InterestRateChartSlabData instance(final Long id, final String description, final EnumOptionData periodType,
-            final Integer fromPeriod, final Integer toPeriod, final BigDecimal amountRangeFrom, final BigDecimal amountRangeTo,
-            final BigDecimal annualInterestRate, final CurrencyData currency) {
+    public static InterestRateChartSlabData instance(final Long id, final String description, final EnumOptionData periodType, final Integer fromPeriod, final Integer toPeriod, final BigDecimal amountRangeFrom, final BigDecimal amountRangeTo, final BigDecimal annualInterestRate, final CurrencyData currency) {
         final Collection<EnumOptionData> periodTypes = null;
         final Set<InterestIncentiveData> incentivesData = null;
         final Collection<EnumOptionData> entityTypeOptions = null;
@@ -73,27 +65,14 @@ public final class InterestRateChartSlabData implements Serializable {
         final Collection<CodeValueData> genderOptions = null;
         final Collection<CodeValueData> clientTypeOptions = null;
         final Collection<CodeValueData> clientClassificationOptions = null;
-        return new InterestRateChartSlabData(id, description, periodType, fromPeriod, toPeriod, amountRangeFrom, amountRangeTo,
-                annualInterestRate, currency, incentivesData, periodTypes, entityTypeOptions, attributeNameOptions, conditionTypeOptions,
-                incentiveTypeOptions, genderOptions, clientTypeOptions, clientClassificationOptions);
+        return new InterestRateChartSlabData(id, description, periodType, fromPeriod, toPeriod, amountRangeFrom, amountRangeTo, annualInterestRate, currency, incentivesData, periodTypes, entityTypeOptions, attributeNameOptions, conditionTypeOptions, incentiveTypeOptions, genderOptions, clientTypeOptions, clientClassificationOptions);
     }
 
-    public static InterestRateChartSlabData withTemplate(final InterestRateChartSlabData chartSlab,
-            final Collection<EnumOptionData> periodTypes, final Collection<EnumOptionData> entityTypeOptions,
-            final Collection<EnumOptionData> attributeNameOptions, final Collection<EnumOptionData> conditionTypeOptions,
-            final Collection<EnumOptionData> incentiveTypeOptions, final Collection<CodeValueData> genderOptions,
-            final Collection<CodeValueData> clientTypeOptions, final Collection<CodeValueData> clientClassificationOptions) {
-        return new InterestRateChartSlabData(chartSlab.id, chartSlab.description, chartSlab.periodType, chartSlab.fromPeriod,
-                chartSlab.toPeriod, chartSlab.amountRangeFrom, chartSlab.amountRangeTo, chartSlab.annualInterestRate, chartSlab.currency,
-                chartSlab.incentives, periodTypes, entityTypeOptions, attributeNameOptions, conditionTypeOptions, incentiveTypeOptions,
-                genderOptions, clientTypeOptions, clientClassificationOptions);
+    public static InterestRateChartSlabData withTemplate(final InterestRateChartSlabData chartSlab, final Collection<EnumOptionData> periodTypes, final Collection<EnumOptionData> entityTypeOptions, final Collection<EnumOptionData> attributeNameOptions, final Collection<EnumOptionData> conditionTypeOptions, final Collection<EnumOptionData> incentiveTypeOptions, final Collection<CodeValueData> genderOptions, final Collection<CodeValueData> clientTypeOptions, final Collection<CodeValueData> clientClassificationOptions) {
+        return new InterestRateChartSlabData(chartSlab.id, chartSlab.description, chartSlab.periodType, chartSlab.fromPeriod, chartSlab.toPeriod, chartSlab.amountRangeFrom, chartSlab.amountRangeTo, chartSlab.annualInterestRate, chartSlab.currency, chartSlab.incentives, periodTypes, entityTypeOptions, attributeNameOptions, conditionTypeOptions, incentiveTypeOptions, genderOptions, clientTypeOptions, clientClassificationOptions);
     }
 
-    public static InterestRateChartSlabData template(final Collection<EnumOptionData> periodTypes,
-            final Collection<EnumOptionData> entityTypeOptions, final Collection<EnumOptionData> attributeNameOptions,
-            final Collection<EnumOptionData> conditionTypeOptions, final Collection<EnumOptionData> incentiveTypeOptions,
-            final Collection<CodeValueData> genderOptions, final Collection<CodeValueData> clientTypeOptions,
-            final Collection<CodeValueData> clientClassificationOptions) {
+    public static InterestRateChartSlabData template(final Collection<EnumOptionData> periodTypes, final Collection<EnumOptionData> entityTypeOptions, final Collection<EnumOptionData> attributeNameOptions, final Collection<EnumOptionData> conditionTypeOptions, final Collection<EnumOptionData> incentiveTypeOptions, final Collection<CodeValueData> genderOptions, final Collection<CodeValueData> clientTypeOptions, final Collection<CodeValueData> clientClassificationOptions) {
         final Long id = null;
         final String description = null;
         final EnumOptionData periodType = null;
@@ -104,18 +83,10 @@ public final class InterestRateChartSlabData implements Serializable {
         final BigDecimal annualInterestRate = null;
         final CurrencyData currency = null;
         final Set<InterestIncentiveData> incentivesData = null;
-        return new InterestRateChartSlabData(id, description, periodType, fromPeriod, toPeriod, amountRangeFrom, amountRangeTo,
-                annualInterestRate, currency, incentivesData, periodTypes, entityTypeOptions, attributeNameOptions, conditionTypeOptions,
-                incentiveTypeOptions, genderOptions, clientTypeOptions, clientClassificationOptions);
+        return new InterestRateChartSlabData(id, description, periodType, fromPeriod, toPeriod, amountRangeFrom, amountRangeTo, annualInterestRate, currency, incentivesData, periodTypes, entityTypeOptions, attributeNameOptions, conditionTypeOptions, incentiveTypeOptions, genderOptions, clientTypeOptions, clientClassificationOptions);
     }
 
-    private InterestRateChartSlabData(final Long id, final String description, final EnumOptionData periodType, final Integer fromPeriod,
-            final Integer toPeriod, final BigDecimal amountRangeFrom, final BigDecimal amountRangeTo, final BigDecimal annualInterestRate,
-            final CurrencyData currency, final Set<InterestIncentiveData> incentivesData, final Collection<EnumOptionData> periodTypes,
-            final Collection<EnumOptionData> entityTypeOptions, final Collection<EnumOptionData> attributeNameOptions,
-            final Collection<EnumOptionData> conditionTypeOptions, final Collection<EnumOptionData> incentiveTypeOptions,
-            final Collection<CodeValueData> genderOptions, final Collection<CodeValueData> clientTypeOptions,
-            final Collection<CodeValueData> clientClassificationOptions) {
+    private InterestRateChartSlabData(final Long id, final String description, final EnumOptionData periodType, final Integer fromPeriod, final Integer toPeriod, final BigDecimal amountRangeFrom, final BigDecimal amountRangeTo, final BigDecimal annualInterestRate, final CurrencyData currency, final Set<InterestIncentiveData> incentivesData, final Collection<EnumOptionData> periodTypes, final Collection<EnumOptionData> entityTypeOptions, final Collection<EnumOptionData> attributeNameOptions, final Collection<EnumOptionData> conditionTypeOptions, final Collection<EnumOptionData> incentiveTypeOptions, final Collection<CodeValueData> genderOptions, final Collection<CodeValueData> clientTypeOptions, final Collection<CodeValueData> clientClassificationOptions) {
         this.id = id;
         this.description = description;
         this.periodType = periodType;
@@ -176,7 +147,6 @@ public final class InterestRateChartSlabData implements Serializable {
         if (this.incentives == null) {
             this.incentives = new HashSet<>();
         }
-
         this.incentives.add(incentiveData);
     }
 
@@ -212,4 +182,93 @@ public final class InterestRateChartSlabData implements Serializable {
         return this.clientClassificationOptions;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDescription() {
+        return this.description;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getPeriodType() {
+        return this.periodType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getFromPeriod() {
+        return this.fromPeriod;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getToPeriod() {
+        return this.toPeriod;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountRangeFrom() {
+        return this.amountRangeFrom;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmountRangeTo() {
+        return this.amountRangeTo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAnnualInterestRate() {
+        return this.annualInterestRate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CurrencyData getCurrency() {
+        return this.currency;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Set<InterestIncentiveData> getIncentives() {
+        return this.incentives;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<EnumOptionData> getPeriodTypes() {
+        return this.periodTypes;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<EnumOptionData> getEntityTypeOptions() {
+        return this.entityTypeOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<EnumOptionData> getAttributeNameOptions() {
+        return this.attributeNameOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<EnumOptionData> getConditionTypeOptions() {
+        return this.conditionTypeOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<EnumOptionData> getIncentiveTypeOptions() {
+        return this.incentiveTypeOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<CodeValueData> getGenderOptions() {
+        return this.genderOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<CodeValueData> getClientTypeOptions() {
+        return this.clientTypeOptions;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<CodeValueData> getClientClassificationOptions() {
+        return this.clientClassificationOptions;
+    }
 }

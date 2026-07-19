@@ -19,8 +19,6 @@
 package org.apache.fineract.infrastructure.hooks.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.infrastructure.hooks.data.HookCreateRequest;
@@ -29,11 +27,10 @@ import org.apache.fineract.infrastructure.hooks.service.HookWritePlatformService
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class HookCreateCommandHandler implements CommandHandler<HookCreateRequest, HookCreateResponse> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(HookCreateCommandHandler.class);
     private final HookWritePlatformService writePlatformService;
 
     @Retry(name = "commandHookCreate", fallbackMethod = "fallback")
@@ -46,5 +43,10 @@ public class HookCreateCommandHandler implements CommandHandler<HookCreateReques
     @Override
     public HookCreateResponse fallback(Command<HookCreateRequest> command, Throwable t) {
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public HookCreateCommandHandler(final HookWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

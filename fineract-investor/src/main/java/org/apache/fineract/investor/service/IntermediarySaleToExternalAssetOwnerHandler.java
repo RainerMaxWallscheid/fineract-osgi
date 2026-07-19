@@ -18,18 +18,15 @@
  */
 package org.apache.fineract.investor.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
 @Service
 @CommandType(entity = "LOAN", action = "INTERMEDIARYSALE")
 public class IntermediarySaleToExternalAssetOwnerHandler implements NewCommandSourceHandler {
-
     private final ExternalAssetOwnersWriteService externalAssetOwnersWriteService;
 
     @Override
@@ -37,4 +34,8 @@ public class IntermediarySaleToExternalAssetOwnerHandler implements NewCommandSo
         return externalAssetOwnersWriteService.intermediarySaleLoanByLoanId(command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public IntermediarySaleToExternalAssetOwnerHandler(final ExternalAssetOwnersWriteService externalAssetOwnersWriteService) {
+        this.externalAssetOwnersWriteService = externalAssetOwnersWriteService;
+    }
 }

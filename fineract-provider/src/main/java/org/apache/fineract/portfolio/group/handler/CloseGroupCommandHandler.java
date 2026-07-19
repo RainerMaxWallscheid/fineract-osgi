@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.group.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "GROUP", action = "CLOSE")
-@RequiredArgsConstructor
 public class CloseGroupCommandHandler implements NewCommandSourceHandler {
-
     private final GroupingTypesWritePlatformService groupingTypesWritePlatformService;
 
     @Override
@@ -40,4 +37,8 @@ public class CloseGroupCommandHandler implements NewCommandSourceHandler {
         return this.groupingTypesWritePlatformService.closeGroup(command.entityId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public CloseGroupCommandHandler(final GroupingTypesWritePlatformService groupingTypesWritePlatformService) {
+        this.groupingTypesWritePlatformService = groupingTypesWritePlatformService;
+    }
 }

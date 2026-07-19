@@ -16,12 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.portfolio.interestratechart.handler;
 
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHandler;
 import org.apache.fineract.portfolio.interestratechart.data.InterestRateChartUpdateRequest;
@@ -30,12 +27,10 @@ import org.apache.fineract.portfolio.interestratechart.service.InterestRateChart
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
-public class InterestRateChartUpdateCommandHandler
-        implements CommandHandler<InterestRateChartUpdateRequest, InterestRateChartUpdateResponse> {
-
+public class InterestRateChartUpdateCommandHandler implements CommandHandler<InterestRateChartUpdateRequest, InterestRateChartUpdateResponse> {
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InterestRateChartUpdateCommandHandler.class);
     private final InterestRateChartWriteService writePlatformService;
 
     @Retry(name = "commandInterestRateChartUpdate", fallbackMethod = "fallback")
@@ -49,5 +44,10 @@ public class InterestRateChartUpdateCommandHandler
     public InterestRateChartUpdateResponse fallback(Command<InterestRateChartUpdateRequest> command, Throwable t) {
         // NOTE: fallback method needs to be in the same class
         return CommandHandler.super.fallback(command, t);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InterestRateChartUpdateCommandHandler(final InterestRateChartWriteService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

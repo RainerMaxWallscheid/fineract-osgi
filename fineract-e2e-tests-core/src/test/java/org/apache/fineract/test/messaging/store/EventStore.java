@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.avro.BulkMessageItemV1;
 import org.apache.fineract.avro.BulkMessagePayloadV1;
 import org.apache.fineract.avro.MessageV1;
@@ -37,10 +35,9 @@ import org.apache.fineract.test.messaging.event.Event;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class EventStore {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(EventStore.class);
     public static final String BULK_BUSINESS_EVENT_TYPE = "BulkBusinessEvent";
     private final List<EventMessage<?>> receivedEvents = new CopyOnWriteArrayList<>();
 
@@ -60,8 +57,7 @@ public class EventStore {
     }
 
     public <R, T extends Event<R>> List<EventMessage<R>> findByType(T type) {
-        return receivedEvents.stream().filter(em -> em.getType().equals(type.getEventName())).map(em -> (EventMessage<R>) em)
-                .collect(Collectors.toList());
+        return receivedEvents.stream().filter(em -> em.getType().equals(type.getEventName())).map(em -> (EventMessage<R>) em).collect(Collectors.toList());
     }
 
     public List<EventMessage<?>> getReceivedEvents() {
@@ -76,8 +72,7 @@ public class EventStore {
         Object dataObject = getDataObject(msgObject);
         if (BULK_BUSINESS_EVENT_TYPE.equals(type)) {
             BulkMessagePayloadV1 bulkPayload = (BulkMessagePayloadV1) dataObject;
-            List<EventMessage<Object>> bulkEvents = bulkPayload.getDatas().stream()
-                    .map((BulkMessageItemV1 item) -> getEventMessageFromBulkItem(item, businessDate, idempotencyKey)).toList();
+            List<EventMessage<Object>> bulkEvents = bulkPayload.getDatas().stream().map((BulkMessageItemV1 item) -> getEventMessageFromBulkItem(item, businessDate, idempotencyKey)).toList();
             if (log.isDebugEnabled()) {
                 bulkEvents.forEach(msg -> {
                     log.debug("Received Bulk event {}", new LoggedEvent(msg));
@@ -105,15 +100,13 @@ public class EventStore {
         }
     }
 
-    private Object getDataObject(MessageV1 msgObject)
-            throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    private Object getDataObject(MessageV1 msgObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         String dataschema = msgObject.getDataschema();
         ByteBuffer data = msgObject.getData();
         return deserialize(dataschema, data);
     }
 
-    private Object deserialize(String dataschema, ByteBuffer data)
-            throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    private Object deserialize(String dataschema, ByteBuffer data) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Class<?> eventClass = Class.forName(dataschema);
         Method fromByteBuffer = eventClass.getMethod("fromByteBuffer", ByteBuffer.class);
         return fromByteBuffer.invoke(null, data);
@@ -121,5 +114,9 @@ public class EventStore {
 
     public void reset() {
         receivedEvents.clear();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EventStore() {
     }
 }

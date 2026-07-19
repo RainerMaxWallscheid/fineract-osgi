@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.shareaccounts.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "SHAREACCOUNT", action = "REJECTADDITIONALSHARES")
-@RequiredArgsConstructor
 public class RejectAddtionalSharesCommandHandler implements NewCommandSourceHandler {
-
     private final ShareAccountWritePlatformService shareAccountWritePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class RejectAddtionalSharesCommandHandler implements NewCommandSourceHand
         return this.shareAccountWritePlatformService.rejectAdditionalShares(jsonCommand.entityId(), jsonCommand);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public RejectAddtionalSharesCommandHandler(final ShareAccountWritePlatformService shareAccountWritePlatformService) {
+        this.shareAccountWritePlatformService = shareAccountWritePlatformService;
+    }
 }

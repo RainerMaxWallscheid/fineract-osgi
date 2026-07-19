@@ -20,14 +20,16 @@ package org.apache.fineract.infrastructure.event.external.service.message.domain
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
-import lombok.Getter;
 
-@Getter
 public class MessageData {
-
     private final ByteBuffer data;
 
     public MessageData(ByteBuffer data) {
         this.data = Objects.requireNonNull(data, "data cannot be null");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ByteBuffer getData() {
+        return this.data;
     }
 }

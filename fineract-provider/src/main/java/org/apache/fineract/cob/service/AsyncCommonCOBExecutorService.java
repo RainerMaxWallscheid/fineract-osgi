@@ -24,8 +24,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.cob.COBConstant;
 import org.apache.fineract.cob.data.COBIdAndLastClosedBusinessDate;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
@@ -49,10 +47,9 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.scheduling.annotation.Async;
 
-@Slf4j
-@RequiredArgsConstructor
 public abstract class AsyncCommonCOBExecutorService implements AsyncCOBExecutorService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AsyncCommonCOBExecutorService.class);
     private final JobLocator jobLocator;
     private final ScheduledJobDetailRepository scheduledJobDetailRepository;
     private final JobStarter jobStarter;
@@ -64,20 +61,15 @@ public abstract class AsyncCommonCOBExecutorService implements AsyncCOBExecutorS
         try {
             ThreadLocalContextUtil.init(context);
             LocalDate cobBusinessDate = ThreadLocalContextUtil.getBusinessDateByType(BusinessDateType.COB_DATE);
-            List<COBIdAndLastClosedBusinessDate> loanIdAndLastClosedBusinessDate = retrieveIdService
-                    .retrieveLoanIdsOldestCobProcessed(cobBusinessDate);
-
-            LocalDate oldestCOBProcessedDate = !loanIdAndLastClosedBusinessDate.isEmpty()
-                    ? loanIdAndLastClosedBusinessDate.get(0).getLastClosedBusinessDate()
-                    : cobBusinessDate;
+            List<COBIdAndLastClosedBusinessDate> loanIdAndLastClosedBusinessDate = retrieveIdService.retrieveLoanIdsOldestCobProcessed(cobBusinessDate);
+            LocalDate oldestCOBProcessedDate = !loanIdAndLastClosedBusinessDate.isEmpty() ? loanIdAndLastClosedBusinessDate.get(0).getLastClosedBusinessDate() : cobBusinessDate;
             if (DateUtils.isBefore(oldestCOBProcessedDate, cobBusinessDate)) {
                 executeLoanCOBDayByDayUntilCOBBusinessDate(oldestCOBProcessedDate, cobBusinessDate);
             }
         } catch (NoSuchJobException e) {
             // Throwing an error here is useless as it will be swallowed hence it is async method
             log.error("Job not found: {}", getJobName(), new JobNotFoundException(getJobName(), e));
-        } catch (JobInstanceAlreadyCompleteException | JobRestartException | JobParametersInvalidException
-                | JobExecutionAlreadyRunningException | JobExecutionException e) {
+        } catch (JobInstanceAlreadyCompleteException | JobRestartException | JobParametersInvalidException | JobExecutionAlreadyRunningException | JobExecutionException e) {
             // Throwing an error here is useless as it will be swallowed hence it is async method
             log.error("Error executing job", e);
         } finally {
@@ -89,17 +81,13 @@ public abstract class AsyncCommonCOBExecutorService implements AsyncCOBExecutorS
 
     public abstract String getJobHumanReadableName();
 
-    private void executeLoanCOBDayByDayUntilCOBBusinessDate(LocalDate oldestCOBProcessedDate, LocalDate cobBusinessDate)
-            throws NoSuchJobException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
-            JobParametersInvalidException, JobRestartException, JobExecutionException {
+    private void executeLoanCOBDayByDayUntilCOBBusinessDate(LocalDate oldestCOBProcessedDate, LocalDate cobBusinessDate) throws NoSuchJobException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException, JobExecutionException {
         Job job = jobLocator.getJob(getJobName());
         ScheduledJobDetail scheduledJobDetail = scheduledJobDetailRepository.findByJobName(getJobHumanReadableName());
         LocalDate executingBusinessDate = oldestCOBProcessedDate.plusDays(1);
         String tenantIdentifier = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
-
         while (!DateUtils.isAfter(executingBusinessDate, cobBusinessDate)) {
-            JobParameterDTO jobParameterDTO = new JobParameterDTO(COBConstant.BUSINESS_DATE_PARAMETER_NAME,
-                    executingBusinessDate.format(DateTimeFormatter.ISO_DATE));
+            JobParameterDTO jobParameterDTO = new JobParameterDTO(COBConstant.BUSINESS_DATE_PARAMETER_NAME, executingBusinessDate.format(DateTimeFormatter.ISO_DATE));
             JobParameterDTO jobParameterCatchUpDTO = new JobParameterDTO(COBConstant.IS_CATCH_UP_PARAMETER_NAME, "true");
             JobParameterDTO tenantParameterDTO = new JobParameterDTO(SchedulerServiceConstants.TENANT_IDENTIFIER, tenantIdentifier);
             Set<JobParameterDTO> jobParameters = new HashSet<>();
@@ -107,5 +95,13 @@ public abstract class AsyncCommonCOBExecutorService implements AsyncCOBExecutorS
             jobStarter.run(job, scheduledJobDetail, jobParameters, tenantIdentifier);
             executingBusinessDate = executingBusinessDate.plusDays(1);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AsyncCommonCOBExecutorService(final JobLocator jobLocator, final ScheduledJobDetailRepository scheduledJobDetailRepository, final JobStarter jobStarter, final RetrieveIdService retrieveIdService) {
+        this.jobLocator = jobLocator;
+        this.scheduledJobDetailRepository = scheduledJobDetailRepository;
+        this.jobStarter = jobStarter;
+        this.retrieveIdService = retrieveIdService;
     }
 }

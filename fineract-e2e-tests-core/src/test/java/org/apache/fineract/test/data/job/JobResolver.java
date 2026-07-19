@@ -19,20 +19,16 @@
 package org.apache.fineract.test.data.job;
 
 import static org.apache.fineract.client.feign.util.FeignCalls.ok;
-
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.GetJobsResponse;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class JobResolver {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JobResolver.class);
     private final FineractFeignClient fineractClient;
 
     @Cacheable(key = "#job.getShortName()", value = "jobsByShortName")
@@ -41,5 +37,10 @@ public class JobResolver {
         log.debug("Resolving job by short-name [{}]", shortName);
         GetJobsResponse response = ok(() -> fineractClient.schedulerJob().retrieveByShortName(shortName, Map.of()));
         return response.getJobId();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JobResolver(final FineractFeignClient fineractClient) {
+        this.fineractClient = fineractClient;
     }
 }

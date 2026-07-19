@@ -20,15 +20,11 @@ package org.apache.fineract.test.messaging;
 
 import static java.lang.String.format;
 import static org.awaitility.Awaitility.await;
-
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.test.messaging.config.EventProperties;
 import org.apache.fineract.test.messaging.event.Event;
 import org.apache.fineract.test.messaging.event.EventFactory;
@@ -38,11 +34,10 @@ import org.assertj.core.api.Assertions;
 import org.awaitility.core.ConditionTimeoutException;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
-@Slf4j
 public class EventAssertion {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(EventAssertion.class);
     private final EventStore eventStore;
     private final EventFactory eventFactory;
     private final EventProperties eventProperties;
@@ -69,8 +64,7 @@ public class EventAssertion {
                 }
             });
         } catch (ConditionTimeoutException e) {
-            Assertions.fail(
-                    event.getEventName() + " hasn't been received within " + eventProperties.getWaitTimeoutInMillis() / 1000 + " seconds");
+            Assertions.fail(event.getEventName() + " hasn\'t been received within " + eventProperties.getWaitTimeoutInMillis() / 1000 + " seconds");
         }
     }
 
@@ -86,14 +80,11 @@ public class EventAssertion {
                 }
                 return eventStore.findByType(event).stream().anyMatch(em -> event.getIdExtractor().apply(em.getData()).equals(id));
             });
-
-            String receivedEventsLogParam = eventStore.getReceivedEvents().stream().map(LoggedEvent::new).map(LoggedEvent::toString)
-                    .reduce("", (s, e) -> format("%s%s%n", s, e));
-            Assertions.fail("%s has been received, but it was unexpected. Events received but not verified: %s", event.getEventName(),
-                    receivedEventsLogParam);
+            String receivedEventsLogParam = eventStore.getReceivedEvents().stream().map(LoggedEvent::new).map(LoggedEvent::toString).reduce("", (s, e) -> format("%s%s%n", s, e));
+            Assertions.fail("%s has been received, but it was unexpected. Events received but not verified: %s", event.getEventName(), receivedEventsLogParam);
         } catch (ConditionTimeoutException e) {
-            // This is the expected outcome here!
         }
+        // This is the expected outcome here!
     }
 
     public <R, T extends Event<R>> EventAssertionBuilder<R> assertEvent(Class<T> eventClazz, Long id) {
@@ -115,21 +106,16 @@ public class EventAssertion {
         }
         T event = eventFactory.create(eventClazz);
         try {
-            await().atMost(Duration.ofMillis(eventProperties.getWaitTimeoutInMillis()))
-                    .until(() -> eventStore.findByType(event).stream().anyMatch(filter));
-
-            String receivedEventsLogParam = eventStore.getReceivedEvents().stream().map(LoggedEvent::new).map(LoggedEvent::toString)
-                    .reduce("", (s, e) -> format("%s%s%n", s, e));
-            Assertions.fail("%s has been received, but it was unexpected. Events received but not verified: %s", event.getEventName(),
-                    receivedEventsLogParam);
+            await().atMost(Duration.ofMillis(eventProperties.getWaitTimeoutInMillis())).until(() -> eventStore.findByType(event).stream().anyMatch(filter));
+            String receivedEventsLogParam = eventStore.getReceivedEvents().stream().map(LoggedEvent::new).map(LoggedEvent::toString).reduce("", (s, e) -> format("%s%s%n", s, e));
+            Assertions.fail("%s has been received, but it was unexpected. Events received but not verified: %s", event.getEventName(), receivedEventsLogParam);
         } catch (ConditionTimeoutException e) {
-            // This is the expected outcome here!
         }
+        // This is the expected outcome here!
     }
 
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    public class EventAssertionBuilder<R> {
 
+    public class EventAssertionBuilder<R> {
         private final EventMessage<R> eventMessage;
 
         public EventAssertionBuilder<R> isRaisedOnBusinessDate(LocalDate businessDate) {
@@ -158,11 +144,15 @@ public class EventAssertion {
             }
             return new EventBigDecimalAssertionBuilder<>(eventMessage, dataValue);
         }
+
+        @java.lang.SuppressWarnings("all")
+                private EventAssertionBuilder(final EventMessage<R> eventMessage) {
+            this.eventMessage = eventMessage;
+        }
     }
 
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    public class EventDataAssertionBuilder<R, V> {
 
+    public class EventDataAssertionBuilder<R, V> {
         private final EventMessage<R> eventMessage;
         private final V extractedValue;
 
@@ -179,11 +169,16 @@ public class EventAssertion {
             }
             return new EventAssertionBuilder<>(eventMessage);
         }
+
+        @java.lang.SuppressWarnings("all")
+                private EventDataAssertionBuilder(final EventMessage<R> eventMessage, final V extractedValue) {
+            this.eventMessage = eventMessage;
+            this.extractedValue = extractedValue;
+        }
     }
 
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    public class EventBigDecimalAssertionBuilder<R> {
 
+    public class EventBigDecimalAssertionBuilder<R> {
         private final EventMessage<R> eventMessage;
         private final BigDecimal extractedValue;
 
@@ -204,5 +199,18 @@ public class EventAssertion {
             }
             return new EventAssertionBuilder<>(eventMessage);
         }
+
+        @java.lang.SuppressWarnings("all")
+                private EventBigDecimalAssertionBuilder(final EventMessage<R> eventMessage, final BigDecimal extractedValue) {
+            this.eventMessage = eventMessage;
+            this.extractedValue = extractedValue;
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EventAssertion(final EventStore eventStore, final EventFactory eventFactory, final EventProperties eventProperties) {
+        this.eventStore = eventStore;
+        this.eventFactory = eventFactory;
+        this.eventProperties = eventProperties;
     }
 }

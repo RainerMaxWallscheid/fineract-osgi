@@ -20,16 +20,11 @@ package org.apache.fineract.portfolio.savings.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountChargeData;
 
-@Getter
 public class SavingsAccountChargesPaidByData implements Serializable {
-
     private final Long chargeId;
     private final BigDecimal amount;
-    @Setter
     private SavingsAccountChargeData savingsAccountChargeData;
 
     public SavingsAccountChargesPaidByData(final Long chargeId, final BigDecimal amount) {
@@ -49,4 +44,23 @@ public class SavingsAccountChargesPaidByData implements Serializable {
         return (this.savingsAccountChargeData == null) ? false : this.savingsAccountChargeData.isPenalty();
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Long getChargeId() {
+        return this.chargeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public SavingsAccountChargeData getSavingsAccountChargeData() {
+        return this.savingsAccountChargeData;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setSavingsAccountChargeData(final SavingsAccountChargeData savingsAccountChargeData) {
+        this.savingsAccountChargeData = savingsAccountChargeData;
+    }
 }

@@ -19,7 +19,6 @@
 package org.apache.fineract.integrationtests.common.externalevents;
 
 import static org.apache.fineract.integrationtests.common.Utils.initializeRESTAssured;
-
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 import io.restassured.builder.RequestSpecBuilder;
@@ -30,7 +29,6 @@ import io.restassured.specification.ResponseSpecification;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.integrationtests.common.ExternalEventConfigurationHelper;
 import org.apache.fineract.integrationtests.common.Utils;
 import org.junit.jupiter.api.Assertions;
@@ -38,9 +36,9 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-@Slf4j
 public class ExternalEventsExtension implements AfterEachCallback, BeforeEachCallback {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExternalEventsExtension.class);
     private Map<String, Boolean> original;
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
@@ -55,32 +53,24 @@ public class ExternalEventsExtension implements AfterEachCallback, BeforeEachCal
 
     @Override
     public void afterEach(ExtensionContext context) {
-        ArrayList<Map<String, Object>> allExternalEventConfigurations = ExternalEventConfigurationHelper
-                .getAllExternalEventConfigurations(requestSpec, responseSpec);
-        Map<String, Boolean> collected = allExternalEventConfigurations.stream()
-                .map(map -> Map.entry((String) map.get("type"), (Boolean) map.get("enabled")))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
+        ArrayList<Map<String, Object>> allExternalEventConfigurations = ExternalEventConfigurationHelper.getAllExternalEventConfigurations(requestSpec, responseSpec);
+        Map<String, Boolean> collected = allExternalEventConfigurations.stream().map(map -> Map.entry((String) map.get("type"), (Boolean) map.get("enabled"))).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         Map<String, MapDifference.ValueDifference<Boolean>> diff = Maps.difference(original, collected).entriesDiffering();
         diff.keySet().forEach(key -> {
             MapDifference.ValueDifference<Boolean> valueDifference = diff.get(key);
-            log.debug("External event {} changed from {} to {}. Restoring to its original state.", key, valueDifference.leftValue(),
-                    valueDifference.rightValue());
+            log.debug("External event {} changed from {} to {}. Restoring to its original state.", key, valueDifference.leftValue(), valueDifference.rightValue());
             restore(key, valueDifference.leftValue());
         });
     }
 
     @Override
     public void beforeEach(ExtensionContext context) {
-        ArrayList<Map<String, Object>> allExternalEventConfigurations = ExternalEventConfigurationHelper
-                .getAllExternalEventConfigurations(requestSpec, responseSpec);
-        original = allExternalEventConfigurations.stream().map(map -> Map.entry((String) map.get("type"), (Boolean) map.get("enabled")))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        ArrayList<Map<String, Object>> allExternalEventConfigurations = ExternalEventConfigurationHelper.getAllExternalEventConfigurations(requestSpec, responseSpec);
+        original = allExternalEventConfigurations.stream().map(map -> Map.entry((String) map.get("type"), (Boolean) map.get("enabled"))).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private void restore(String key, Boolean value) {
-        final Map<String, Boolean> updatedConfigurations = ExternalEventConfigurationHelper.updateExternalEventConfigurations(requestSpec,
-                responseSpec, "{\"externalEventConfigurations\":{\"" + key + "\":" + value + "}}\n");
+        final Map<String, Boolean> updatedConfigurations = ExternalEventConfigurationHelper.updateExternalEventConfigurations(requestSpec, responseSpec, "{\"externalEventConfigurations\":{\"" + key + "\":" + value + "}}\n");
         Assertions.assertEquals(updatedConfigurations.size(), 1);
         Assertions.assertTrue(updatedConfigurations.containsKey(key));
         Assertions.assertEquals(value, updatedConfigurations.get(key));

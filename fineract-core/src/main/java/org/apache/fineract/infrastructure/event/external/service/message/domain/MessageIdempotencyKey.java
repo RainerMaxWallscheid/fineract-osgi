@@ -19,14 +19,16 @@
 package org.apache.fineract.infrastructure.event.external.service.message.domain;
 
 import java.util.Objects;
-import lombok.Getter;
 
-@Getter
 public class MessageIdempotencyKey {
-
     private final String idempotencyKey;
 
     public MessageIdempotencyKey(String idempotencyKey) {
         this.idempotencyKey = Objects.requireNonNull(idempotencyKey, "idempotencyKey cannot be null");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getIdempotencyKey() {
+        return this.idempotencyKey;
     }
 }

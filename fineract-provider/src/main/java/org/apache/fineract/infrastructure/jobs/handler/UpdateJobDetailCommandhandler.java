@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.jobs.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,9 +27,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @CommandType(entity = "SCHEDULER", action = "UPDATE")
-@RequiredArgsConstructor
 public class UpdateJobDetailCommandhandler implements NewCommandSourceHandler {
-
     private final SchedularWritePlatformService schedularWritePlatformService;
 
     @Override
@@ -38,4 +35,8 @@ public class UpdateJobDetailCommandhandler implements NewCommandSourceHandler {
         return this.schedularWritePlatformService.updateJobDetail(command.entityId(), command);
     }
 
+    @java.lang.SuppressWarnings("all")
+        public UpdateJobDetailCommandhandler(final SchedularWritePlatformService schedularWritePlatformService) {
+        this.schedularWritePlatformService = schedularWritePlatformService;
+    }
 }

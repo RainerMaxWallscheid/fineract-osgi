@@ -27,8 +27,6 @@ import com.google.gson.JsonSerializer;
 import com.google.gson.ToNumberPolicy;
 import java.math.MathContext;
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.serialization.gson.JsonExcludeAnnotationBasedExclusionStrategy;
 import org.apache.fineract.infrastructure.core.serialization.gson.LocalDateAdapter;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
@@ -39,36 +37,18 @@ import org.apache.fineract.portfolio.loanproduct.calc.data.RepaymentPeriod;
 import org.apache.fineract.portfolio.loanproduct.domain.ILoanConfigurationDetails;
 import org.springframework.lang.NonNull;
 
-@Slf4j
-@RequiredArgsConstructor
 public class ProgressiveLoanInterestScheduleModelParserServiceGsonImpl implements ProgressiveLoanInterestScheduleModelParserService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProgressiveLoanInterestScheduleModelParserServiceGsonImpl.class);
     private final Gson gsonSerializer = createSerializer();
 
     private Gson createSerializer() {
-        return new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateAdapter().nullSafe())
-                .setNumberToNumberStrategy(ToNumberPolicy.BIG_DECIMAL)
-                .registerTypeAdapter(Money.class, (JsonSerializer<Money>) (money, type, context) -> new JsonPrimitive(money.getAmount()))
-                .addDeserializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy())
-                .addSerializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy()).create();
+        return new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateAdapter().nullSafe()).setNumberToNumberStrategy(ToNumberPolicy.BIG_DECIMAL).registerTypeAdapter(Money.class, (JsonSerializer<Money>) (money, type, context) -> new JsonPrimitive(money.getAmount())).addDeserializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy()).addSerializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy()).create();
     }
 
-    private Gson createDeserializer(ILoanConfigurationDetails loanProductRelatedDetail, MathContext mc,
-            Integer installmentAmountInMultipliesOf) {
-        InterestScheduleModelServiceGsonContext ctx = new InterestScheduleModelServiceGsonContext(
-                new MonetaryCurrency(loanProductRelatedDetail.getCurrencyData()), mc, loanProductRelatedDetail,
-                installmentAmountInMultipliesOf);
-        return new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateAdapter().nullSafe())
-                .setNumberToNumberStrategy(ToNumberPolicy.BIG_DECIMAL)
-                .registerTypeAdapter(Money.class,
-                        (JsonDeserializer<Money>) (jsonElement, type, context) -> Money.of(ctx.getCurrency(), jsonElement.getAsBigDecimal(),
-                                ctx.getMc()))
-                .registerTypeAdapter(InterestPeriod.class, (InstanceCreator<InterestPeriod>) ctx::createInterestPeriodInstance)
-                .registerTypeAdapter(ProgressiveLoanInterestScheduleModel.class,
-                        (InstanceCreator<ProgressiveLoanInterestScheduleModel>) ctx::createProgressiveLoanInterestScheduleModelInstance)
-                .registerTypeAdapter(RepaymentPeriod.class, (InstanceCreator<RepaymentPeriod>) ctx::createRepaymentPeriodInstance)
-                .addDeserializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy())
-                .addSerializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy()).create();
+    private Gson createDeserializer(ILoanConfigurationDetails loanProductRelatedDetail, MathContext mc, Integer installmentAmountInMultipliesOf) {
+        InterestScheduleModelServiceGsonContext ctx = new InterestScheduleModelServiceGsonContext(new MonetaryCurrency(loanProductRelatedDetail.getCurrencyData()), mc, loanProductRelatedDetail, installmentAmountInMultipliesOf);
+        return new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateAdapter().nullSafe()).setNumberToNumberStrategy(ToNumberPolicy.BIG_DECIMAL).registerTypeAdapter(Money.class, (JsonDeserializer<Money>) (jsonElement, type, context) -> Money.of(ctx.getCurrency(), jsonElement.getAsBigDecimal(), ctx.getMc())).registerTypeAdapter(InterestPeriod.class, (InstanceCreator<InterestPeriod>) ctx::createInterestPeriodInstance).registerTypeAdapter(ProgressiveLoanInterestScheduleModel.class, (InstanceCreator<ProgressiveLoanInterestScheduleModel>) ctx::createProgressiveLoanInterestScheduleModelInstance).registerTypeAdapter(RepaymentPeriod.class, (InstanceCreator<RepaymentPeriod>) ctx::createRepaymentPeriodInstance).addDeserializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy()).addSerializationExclusionStrategy(new JsonExcludeAnnotationBasedExclusionStrategy()).create();
     }
 
     @Override
@@ -77,8 +57,7 @@ public class ProgressiveLoanInterestScheduleModelParserServiceGsonImpl implement
     }
 
     @Override
-    public ProgressiveLoanInterestScheduleModel fromJson(String s, @NonNull ILoanConfigurationDetails loanProductRelatedDetail,
-            @NonNull MathContext mc, Integer installmentAmountInMultipliesOf) {
+    public ProgressiveLoanInterestScheduleModel fromJson(String s, @NonNull ILoanConfigurationDetails loanProductRelatedDetail, @NonNull MathContext mc, Integer installmentAmountInMultipliesOf) {
         if (s == null) {
             return null;
         }
@@ -89,5 +68,9 @@ public class ProgressiveLoanInterestScheduleModelParserServiceGsonImpl implement
             log.warn("Failed to parse ProgressiveLoanInterestScheduleModel json. Falling back to default value.", e);
             return null;
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ProgressiveLoanInterestScheduleModelParserServiceGsonImpl() {
     }
 }

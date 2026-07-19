@@ -33,8 +33,6 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
@@ -60,10 +58,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-@Slf4j
-@RequiredArgsConstructor
 public class ExecuteReportMailingJobsTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExecuteReportMailingJobsTasklet.class);
     private final ReportMailingJobRepository reportMailingJobRepository;
     private final ReportMailingJobValidator reportMailingJobValidator;
     private final ReadReportingService readReportingService;
@@ -71,50 +68,36 @@ public class ExecuteReportMailingJobsTasklet implements Tasklet {
     private final ReportMailingJobEmailService reportMailingJobEmailService;
     private final ReportMailingJobRunHistoryRepository reportMailingJobRunHistoryRepository;
     private final FineractProperties fineractProperties;
-
     private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         final Collection<ReportMailingJob> reportMailingJobCollection = reportMailingJobRepository.findByIsActiveTrueAndIsDeletedFalse();
-
         for (ReportMailingJob reportMailingJob : reportMailingJobCollection) {
             final LocalDateTime localDateTimeOftenant = DateUtils.getLocalDateTimeOfTenant();
             final LocalDateTime nextRunDateTime = reportMailingJob.getNextRunDateTime();
-
             if (nextRunDateTime != null && DateUtils.isBefore(nextRunDateTime, localDateTimeOftenant)) {
-                final ReportMailingJobEmailAttachmentFileFormat emailAttachmentFileFormat = ReportMailingJobEmailAttachmentFileFormat
-                        .newInstance(reportMailingJob.getEmailAttachmentFileFormat());
-
+                final ReportMailingJobEmailAttachmentFileFormat emailAttachmentFileFormat = ReportMailingJobEmailAttachmentFileFormat.newInstance(reportMailingJob.getEmailAttachmentFileFormat());
                 if (emailAttachmentFileFormat != null && emailAttachmentFileFormat != ReportMailingJobEmailAttachmentFileFormat.INVALID) {
                     final Report stretchyReport = reportMailingJob.getStretchyReport();
                     final String reportName = (stretchyReport != null) ? stretchyReport.getReportName() : null;
                     final StringBuilder errorLog = new StringBuilder();
-                    final Map<String, String> validateStretchyReportParamMap = reportMailingJobValidator
-                            .validateStretchyReportParamMap(reportMailingJob.getStretchyReportParamMap());
+                    final Map<String, String> validateStretchyReportParamMap = reportMailingJobValidator.validateStretchyReportParamMap(reportMailingJob.getStretchyReportParamMap());
                     MultivaluedMap<String, String> reportParams = new MultivaluedStringMap();
-
                     if (validateStretchyReportParamMap != null) {
-
                         for (Map.Entry<String, String> validateStretchyReportParamMapEntry : validateStretchyReportParamMap.entrySet()) {
                             String key = validateStretchyReportParamMapEntry.getKey();
                             String value = validateStretchyReportParamMapEntry.getValue();
-
                             if (key != null && key.toLowerCase(Locale.ROOT).contains("date")) {
-                                ReportMailingJobStretchyReportParamDateOption reportMailingJobStretchyReportParamDateOption = ReportMailingJobStretchyReportParamDateOption
-                                        .newInstance(value);
-
+                                ReportMailingJobStretchyReportParamDateOption reportMailingJobStretchyReportParamDateOption = ReportMailingJobStretchyReportParamDateOption.newInstance(value);
                                 if (reportMailingJobStretchyReportParamDateOption != ReportMailingJobStretchyReportParamDateOption.INVALID) {
                                     value = ReportMailingJobDateUtil.getDateAsString(reportMailingJobStretchyReportParamDateOption);
                                 }
                             }
-
                             reportParams.add(key, value);
                         }
                     }
-
                     generateReportOutputStream(reportMailingJob, emailAttachmentFileFormat, reportParams, reportName, errorLog);
-
                     updateReportMailingJobAfterJobExecution(reportMailingJob, errorLog, localDateTimeOftenant);
                 }
             }
@@ -122,32 +105,24 @@ public class ExecuteReportMailingJobsTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
-    private void generateReportOutputStream(final ReportMailingJob reportMailingJob,
-            final ReportMailingJobEmailAttachmentFileFormat emailAttachmentFileFormat, final MultivaluedMap<String, String> reportParams,
-            final String reportName, final StringBuilder errorLog) {
+    private void generateReportOutputStream(final ReportMailingJob reportMailingJob, final ReportMailingJobEmailAttachmentFileFormat emailAttachmentFileFormat, final MultivaluedMap<String, String> reportParams, final String reportName, final StringBuilder errorLog) {
         try {
             final String reportType = readReportingService.getReportType(reportName, false);
             final ReportingProcessService reportingProcessService = reportingProcessServiceProvider.findReportingProcessService(reportType);
-
             if (reportingProcessService != null) {
                 final Response processReport = reportingProcessService.processRequest(reportName, reportParams);
                 final Object responseObject = (processReport != null) ? processReport.getEntity() : null;
-
                 if (responseObject != null && responseObject.getClass().equals(ByteArrayOutputStream.class)) {
                     final ByteArrayOutputStream byteArrayOutputStream = (ByteArrayOutputStream) responseObject;
                     final Path fileLocation = Path.of(fineractProperties.getContent().getFilesystem().getRootFolder());
                     final Path fileNameWithoutExtension = fileLocation.resolve(reportName);
-
                     if (!Files.isDirectory(fileLocation)) {
                         Files.createDirectories(fileLocation);
                     }
-
                     if (byteArrayOutputStream.size() == 0) {
                         errorLog.append("Report processing failed, empty output stream created");
                     } else if ((errorLog != null && errorLog.length() == 0) && (byteArrayOutputStream.size() > 0)) {
-                        final Path fileName = fileNameWithoutExtension
-                                .resolveSibling(reportName + "." + emailAttachmentFileFormat.getValue());
-
+                        final Path fileName = fileNameWithoutExtension.resolveSibling(reportName + "." + emailAttachmentFileFormat.getValue());
                         sendReportFileToEmailRecipients(reportMailingJob, fileName, byteArrayOutputStream, errorLog);
                     }
                 } else {
@@ -157,48 +132,35 @@ public class ExecuteReportMailingJobsTasklet implements Tasklet {
                 errorLog.append(ReportingProcessServiceProvider.SERVICE_MISSING).append(reportType);
             }
         } catch (Exception e) {
-            errorLog.append("The ReportMailingJobWritePlatformServiceImpl.generateReportOutputStream method threw an Exception: ").append(e)
-                    .append(" ---------- ");
+            errorLog.append("The ReportMailingJobWritePlatformServiceImpl.generateReportOutputStream method threw an Exception: ").append(e).append(" ---------- ");
         }
     }
 
-    private void updateReportMailingJobAfterJobExecution(final ReportMailingJob reportMailingJob, final StringBuilder errorLog,
-            final LocalDateTime jobStartDateTime) {
+    private void updateReportMailingJobAfterJobExecution(final ReportMailingJob reportMailingJob, final StringBuilder errorLog, final LocalDateTime jobStartDateTime) {
         final String recurrence = reportMailingJob.getRecurrence();
         final LocalDateTime nextRunDateTime = reportMailingJob.getNextRunDateTime();
         ReportMailingJobPreviousRunStatus reportMailingJobPreviousRunStatus = ReportMailingJobPreviousRunStatus.SUCCESS;
-
         reportMailingJob.setPreviousRunErrorLog(null);
-
         if (errorLog != null && errorLog.length() > 0) {
             reportMailingJobPreviousRunStatus = ReportMailingJobPreviousRunStatus.ERROR;
             reportMailingJob.setPreviousRunErrorLog(errorLog.toString());
         }
-
         reportMailingJob.increaseNumberOfRunsByOne();
         reportMailingJob.setPreviousRunStatus(reportMailingJobPreviousRunStatus.getValue());
         reportMailingJob.setPreviousRunDateTime(reportMailingJob.getNextRunDateTime());
-
         if (StringUtils.isEmpty(recurrence)) {
             reportMailingJob.setActive(false);
-
             reportMailingJob.setNextRunDateTime(null);
         } else if (nextRunDateTime != null) {
             final LocalDateTime nextRecurringDateTime = createNextRecurringDateTime(recurrence, nextRunDateTime);
-
             reportMailingJob.setNextRunDateTime(nextRecurringDateTime);
         }
-
         reportMailingJobRepository.save(reportMailingJob);
-
-        createReportMailingJobRunHistroryAfterJobExecution(reportMailingJob, errorLog, jobStartDateTime,
-                reportMailingJobPreviousRunStatus.getValue());
+        createReportMailingJobRunHistroryAfterJobExecution(reportMailingJob, errorLog, jobStartDateTime, reportMailingJobPreviousRunStatus.getValue());
     }
 
-    private void sendReportFileToEmailRecipients(final ReportMailingJob reportMailingJob, final Path fileName,
-            final ByteArrayOutputStream byteArrayOutputStream, final StringBuilder errorLog) {
+    private void sendReportFileToEmailRecipients(final ReportMailingJob reportMailingJob, final Path fileName, final ByteArrayOutputStream byteArrayOutputStream, final StringBuilder errorLog) {
         final Set<String> emailRecipients = this.reportMailingJobValidator.validateEmailRecipients(reportMailingJob.getEmailRecipients());
-
         try {
             final Path parent = fileName.getParent();
             if (parent != null) {
@@ -208,43 +170,42 @@ public class ExecuteReportMailingJobsTasklet implements Tasklet {
             try (var outputStream = Files.newOutputStream(fileName)) {
                 byteArrayOutputStream.writeTo(outputStream);
             }
-
             for (String emailRecipient : emailRecipients) {
-                final ReportMailingJobEmailData reportMailingJobEmailData = new ReportMailingJobEmailData().setTo(emailRecipient)
-                        .setText(reportMailingJob.getEmailMessage()).setSubject(reportMailingJob.getEmailSubject()).setAttachment(file);
-
+                final ReportMailingJobEmailData reportMailingJobEmailData = new ReportMailingJobEmailData().setTo(emailRecipient).setText(reportMailingJob.getEmailMessage()).setSubject(reportMailingJob.getEmailSubject()).setAttachment(file);
                 reportMailingJobEmailService.sendEmailWithAttachment(reportMailingJobEmailData);
             }
         } catch (IOException e) {
-            errorLog.append("The ReportMailingJobWritePlatformServiceImpl.sendReportFileToEmailRecipients method threw an IOException "
-                    + "exception: ").append(e).append(" ---------- ");
+            errorLog.append("The ReportMailingJobWritePlatformServiceImpl.sendReportFileToEmailRecipients method threw an IOException " + "exception: ").append(e).append(" ---------- ");
         }
     }
 
     private LocalDateTime createNextRecurringDateTime(final String recurrencePattern, final LocalDateTime startDateTime) {
         LocalDateTime nextRecurringDateTime = null;
-
         if (StringUtils.isNotBlank(recurrencePattern) && startDateTime != null) {
             final LocalDate nextDayLocalDate = startDateTime.plus(Duration.ofDays(1)).toLocalDate();
-            final LocalDate nextRecurringLocalDate = CalendarUtils.getNextRecurringDate(recurrencePattern, startDateTime.toLocalDate(),
-                    nextDayLocalDate);
-            final String nextDateTimeString = nextRecurringLocalDate + " " + startDateTime.getHour() + ":" + startDateTime.getMinute() + ":"
-                    + startDateTime.getSecond();
+            final LocalDate nextRecurringLocalDate = CalendarUtils.getNextRecurringDate(recurrencePattern, startDateTime.toLocalDate(), nextDayLocalDate);
+            final String nextDateTimeString = nextRecurringLocalDate + " " + startDateTime.getHour() + ":" + startDateTime.getMinute() + ":" + startDateTime.getSecond();
             final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
-
             nextRecurringDateTime = LocalDateTime.parse(nextDateTimeString, dateTimeFormatter);
         }
-
         return nextRecurringDateTime;
     }
 
-    private void createReportMailingJobRunHistroryAfterJobExecution(final ReportMailingJob reportMailingJob, final StringBuilder errorLog,
-            final LocalDateTime jobStartDateTime, final String jobRunStatus) {
+    private void createReportMailingJobRunHistroryAfterJobExecution(final ReportMailingJob reportMailingJob, final StringBuilder errorLog, final LocalDateTime jobStartDateTime, final String jobRunStatus) {
         final LocalDateTime jobEndDateTime = DateUtils.getLocalDateTimeOfTenant();
         final String errorLogToString = (errorLog != null) ? errorLog.toString() : null;
-        final ReportMailingJobRunHistory reportMailingJobRunHistory = ReportMailingJobRunHistory.newInstance(reportMailingJob,
-                jobStartDateTime, jobEndDateTime, jobRunStatus, null, errorLogToString);
-
+        final ReportMailingJobRunHistory reportMailingJobRunHistory = ReportMailingJobRunHistory.newInstance(reportMailingJob, jobStartDateTime, jobEndDateTime, jobRunStatus, null, errorLogToString);
         reportMailingJobRunHistoryRepository.save(reportMailingJobRunHistory);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExecuteReportMailingJobsTasklet(final ReportMailingJobRepository reportMailingJobRepository, final ReportMailingJobValidator reportMailingJobValidator, final ReadReportingService readReportingService, final ReportingProcessServiceProvider reportingProcessServiceProvider, final ReportMailingJobEmailService reportMailingJobEmailService, final ReportMailingJobRunHistoryRepository reportMailingJobRunHistoryRepository, final FineractProperties fineractProperties) {
+        this.reportMailingJobRepository = reportMailingJobRepository;
+        this.reportMailingJobValidator = reportMailingJobValidator;
+        this.readReportingService = readReportingService;
+        this.reportingProcessServiceProvider = reportingProcessServiceProvider;
+        this.reportMailingJobEmailService = reportMailingJobEmailService;
+        this.reportMailingJobRunHistoryRepository = reportMailingJobRunHistoryRepository;
+        this.fineractProperties = fineractProperties;
     }
 }

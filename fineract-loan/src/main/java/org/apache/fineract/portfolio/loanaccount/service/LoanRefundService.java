@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanEvent;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanLifecycleStateMachine;
@@ -28,18 +27,14 @@ import org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.Mon
 import org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.TransactionCtx;
 import org.apache.fineract.portfolio.loanaccount.serialization.LoanRefundValidator;
 
-@RequiredArgsConstructor
 public class LoanRefundService {
-
     private final LoanRefundValidator loanRefundValidator;
     private final LoanTransactionProcessingService loadTransactionProcessingService;
     private final LoanLifecycleStateMachine loanLifecycleStateMachine;
 
     public void makeRefund(final Loan loan, final LoanTransaction loanTransaction) {
         loanRefundValidator.validateTransferRefund(loan, loanTransaction);
-
         loanTransaction.updateLoan(loan);
-
         if (loanTransaction.isNotZero()) {
             loan.addLoanTransaction(loanTransaction);
         }
@@ -59,32 +54,28 @@ public class LoanRefundService {
     public void creditBalanceRefund(final Loan loan, final LoanTransaction newCreditBalanceRefundTransaction) {
         loanRefundValidator.validateCreditBalanceRefund(loan, newCreditBalanceRefundTransaction);
         loan.getLoanTransactions().add(newCreditBalanceRefundTransaction);
-
         loanLifecycleStateMachine.determineAndTransition(loan, newCreditBalanceRefundTransaction.getTransactionDate());
     }
 
     private void handleRefundTransaction(final Loan loan, final LoanTransaction loanTransaction) {
         loanLifecycleStateMachine.transition(LoanEvent.LOAN_REFUND, loan);
-
         loanTransaction.updateLoan(loan);
-
         loanRefundValidator.validateRefundEligibility(loan, loanTransaction);
-
         if (loanTransaction.isNotZero()) {
             loan.addLoanTransaction(loanTransaction);
         }
-
         loanRefundValidator.validateRefundTransactionType(loanTransaction);
-
         final LocalDate loanTransactionDate = extractTransactionDate(loan, loanTransaction);
-
         loanRefundValidator.validateTransactionDateNotInFuture(loanTransactionDate);
         loanRefundValidator.validateTransactionAmountThreshold(loan, null);
-
-        loadTransactionProcessingService.processLatestTransaction(loan.getTransactionProcessingStrategyCode(), loanTransaction,
-                new TransactionCtx(loan.getCurrency(), loan.getRepaymentScheduleInstallments(), loan.getActiveCharges(),
-                        new MoneyHolder(loan.getTotalOverpaidAsMoney()), null, loan.getActiveLoanTermVariations()));
-
+        loadTransactionProcessingService.processLatestTransaction(loan.getTransactionProcessingStrategyCode(), loanTransaction, new TransactionCtx(loan.getCurrency(), loan.getRepaymentScheduleInstallments(), loan.getActiveCharges(), new MoneyHolder(loan.getTotalOverpaidAsMoney()), null, loan.getActiveLoanTermVariations()));
         loanLifecycleStateMachine.determineAndTransition(loan, loanTransaction.getTransactionDate());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanRefundService(final LoanRefundValidator loanRefundValidator, final LoanTransactionProcessingService loadTransactionProcessingService, final LoanLifecycleStateMachine loanLifecycleStateMachine) {
+        this.loanRefundValidator = loanRefundValidator;
+        this.loadTransactionProcessingService = loadTransactionProcessingService;
+        this.loanLifecycleStateMachine = loanLifecycleStateMachine;
     }
 }

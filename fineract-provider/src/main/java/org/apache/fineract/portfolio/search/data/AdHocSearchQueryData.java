@@ -20,13 +20,10 @@ package org.apache.fineract.portfolio.search.data;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import lombok.Getter;
 import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
 
-@Getter
 public final class AdHocSearchQueryData {
-
     @SuppressWarnings("unused")
     private final String officeName;
     @SuppressWarnings("unused")
@@ -37,7 +34,6 @@ public final class AdHocSearchQueryData {
     private final BigDecimal loanOutStanding;
     @SuppressWarnings("unused")
     private final Double percentage;
-
     @SuppressWarnings("unused")
     private final Collection<LoanProductData> loanProducts;
     @SuppressWarnings("unused")
@@ -52,25 +48,54 @@ public final class AdHocSearchQueryData {
         return new AdHocSearchQueryData(officeName, loanProductName, count, loanOutStanding, percentage, loanProducts, offices);
     }
 
-    public static AdHocSearchQueryData matchedResult(final String officeName, final String loanProductName, final Integer count,
-            final BigDecimal loanOutStanding, final Double percentage) {
-
+    public static AdHocSearchQueryData matchedResult(final String officeName, final String loanProductName, final Integer count, final BigDecimal loanOutStanding, final Double percentage) {
         final Collection<LoanProductData> loanProducts = null;
         final Collection<OfficeData> offices = null;
         return new AdHocSearchQueryData(officeName, loanProductName, count, loanOutStanding, percentage, loanProducts, offices);
     }
 
-    private AdHocSearchQueryData(final String officeName, final String loanProductName, final Integer count,
-            final BigDecimal loanOutStanding, final Double percentage, final Collection<LoanProductData> loanProducts,
-            final Collection<OfficeData> offices) {
-
+    private AdHocSearchQueryData(final String officeName, final String loanProductName, final Integer count, final BigDecimal loanOutStanding, final Double percentage, final Collection<LoanProductData> loanProducts, final Collection<OfficeData> offices) {
         this.officeName = officeName;
         this.loanProductName = loanProductName;
         this.count = count;
         this.loanOutStanding = loanOutStanding;
         this.percentage = percentage;
-
         this.loanProducts = loanProducts;
         this.offices = offices;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getOfficeName() {
+        return this.officeName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLoanProductName() {
+        return this.loanProductName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getCount() {
+        return this.count;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getLoanOutStanding() {
+        return this.loanOutStanding;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Double getPercentage() {
+        return this.percentage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<LoanProductData> getLoanProducts() {
+        return this.loanProducts;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Collection<OfficeData> getOffices() {
+        return this.offices;
     }
 }

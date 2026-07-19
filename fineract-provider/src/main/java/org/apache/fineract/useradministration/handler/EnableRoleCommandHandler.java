@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.useradministration.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -29,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "ROLE", action = "ENABLE")
-@RequiredArgsConstructor
 public class EnableRoleCommandHandler implements NewCommandSourceHandler {
-
     private final RoleWritePlatformService writePlatformService;
 
     @Transactional
@@ -40,4 +37,8 @@ public class EnableRoleCommandHandler implements NewCommandSourceHandler {
         return this.writePlatformService.enableRole(command.entityId());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public EnableRoleCommandHandler(final RoleWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
+    }
 }

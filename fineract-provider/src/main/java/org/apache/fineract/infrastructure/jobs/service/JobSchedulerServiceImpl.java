@@ -22,8 +22,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
@@ -39,10 +37,9 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class JobSchedulerServiceImpl implements ApplicationListener<ContextRefreshedEvent> {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JobSchedulerServiceImpl.class);
     private final FineractProperties fineractProperties;
     private final SchedularWritePlatformService schedularWritePlatformService;
     private final TenantDetailsService tenantDetailsService;
@@ -63,8 +60,7 @@ public class JobSchedulerServiceImpl implements ApplicationListener<ContextRefre
             HashMap<BusinessDateType, LocalDate> businessDates = businessDateReadPlatformService.getBusinessDates();
             ThreadLocalContextUtil.setActionContext(ActionContext.DEFAULT);
             ThreadLocalContextUtil.setBusinessDates(businessDates);
-            final List<ScheduledJobDetail> scheduledJobDetails = schedularWritePlatformService
-                    .retrieveAllJobs(fineractProperties.getNodeId());
+            final List<ScheduledJobDetail> scheduledJobDetails = schedularWritePlatformService.retrieveAllJobs(fineractProperties.getNodeId());
             for (final ScheduledJobDetail jobDetails : scheduledJobDetails) {
                 try {
                     jobRegisterService.scheduleJob(jobDetails);
@@ -82,5 +78,14 @@ public class JobSchedulerServiceImpl implements ApplicationListener<ContextRefre
             ThreadLocalContextUtil.reset();
         }
         log.info("Scheduling batch jobs has finished");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JobSchedulerServiceImpl(final FineractProperties fineractProperties, final SchedularWritePlatformService schedularWritePlatformService, final TenantDetailsService tenantDetailsService, final JobRegisterService jobRegisterService, final BusinessDateReadPlatformService businessDateReadPlatformService) {
+        this.fineractProperties = fineractProperties;
+        this.schedularWritePlatformService = schedularWritePlatformService;
+        this.tenantDetailsService = tenantDetailsService;
+        this.jobRegisterService = jobRegisterService;
+        this.businessDateReadPlatformService = businessDateReadPlatformService;
     }
 }

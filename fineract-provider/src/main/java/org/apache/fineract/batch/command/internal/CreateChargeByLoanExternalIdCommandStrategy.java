@@ -19,12 +19,10 @@
 package org.apache.fineract.batch.command.internal;
 
 import static org.apache.fineract.batch.command.CommandStrategyUtils.relativeUrlWithoutVersion;
-
 import com.google.common.base.Splitter;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.batch.command.CommandStrategy;
 import org.apache.fineract.batch.command.CommandStrategyUtils;
 import org.apache.fineract.batch.domain.BatchRequest;
@@ -43,9 +41,7 @@ import org.springframework.stereotype.Component;
  * @see BatchResponse
  */
 @Component
-@RequiredArgsConstructor
 public class CreateChargeByLoanExternalIdCommandStrategy implements CommandStrategy {
-
     /**
      * Loan charges api resource {@link LoanChargesApiResource}.
      */
@@ -53,15 +49,11 @@ public class CreateChargeByLoanExternalIdCommandStrategy implements CommandStrat
 
     @Override
     public BatchResponse execute(BatchRequest request, @SuppressWarnings("unused") final UriInfo uriInfo) {
-
         final BatchResponse response = new BatchResponse();
         final String responseBody;
-
         response.setRequestId(request.getRequestId());
         response.setHeaders(request.getHeaders());
-
         final String relativeUrl = relativeUrlWithoutVersion(request);
-
         // Expected pattern - loans\/external-id\/[\w\d_-]+\/charges
         final List<String> pathParameters = Splitter.on('/').splitToList(relativeUrl);
         final String loanExternalIdPathParameter = pathParameters.get(2);
@@ -71,19 +63,25 @@ public class CreateChargeByLoanExternalIdCommandStrategy implements CommandStrat
         } else {
             loanExternalId = pathParameters.get(2);
         }
-
         final Map<String, String> queryParameters = CommandStrategyUtils.getQueryParameters(relativeUrl);
         final String command = queryParameters.get("command");
-
         // Calls 'executeLoanCharge' function from 'LoanChargesApiResource'
         // to create a new charge for based on loan external id
         responseBody = loanChargesApiResource.executeLoanCharge(loanExternalId, command, request.getBody());
-
         response.setStatusCode(HttpStatus.SC_OK);
         // Sets the body of the response after Charge has been successfully
         // created
         response.setBody(responseBody);
-
         return response;
+    }
+
+    /**
+     * Creates a new {@code CreateChargeByLoanExternalIdCommandStrategy} instance.
+     *
+     * @param loanChargesApiResource Loan charges api resource {@link LoanChargesApiResource}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public CreateChargeByLoanExternalIdCommandStrategy(final LoanChargesApiResource loanChargesApiResource) {
+        this.loanChargesApiResource = loanChargesApiResource;
     }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.client.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -30,14 +29,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = ClientApiConstants.CLIENT_RESOURCE_NAME, action = ClientApiConstants.CLIENT_TRANSACTION_ACTION_UNDO)
-@RequiredArgsConstructor
 public class UndoClientTransactionCommandHandler implements NewCommandSourceHandler {
-
     private final ClientTransactionWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.undo(command.getClientId(), command.entityId());
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public UndoClientTransactionCommandHandler(final ClientTransactionWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

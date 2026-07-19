@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.workingcapitalloanbreach.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -28,15 +27,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "WORKINGCAPITALBREACH", action = "CREATE")
 public class CreateWorkingCapitalBreachCommandHandler implements NewCommandSourceHandler {
-
     private final WorkingCapitalBreachWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
         return this.writePlatformService.create(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateWorkingCapitalBreachCommandHandler(final WorkingCapitalBreachWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

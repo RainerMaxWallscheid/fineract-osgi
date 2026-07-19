@@ -23,27 +23,62 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "m_hook_registered_events")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public class HookResource extends AbstractPersistableCustom<Long> {
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "hook_id", referencedColumnName = "id", nullable = false)
     private Hook hook;
-
     @Column(name = "entity_name", nullable = false, length = 45)
     private String entityName;
-
     @Column(name = "action_name", nullable = false, length = 45)
     private String actionName;
+
+    @java.lang.SuppressWarnings("all")
+        public Hook getHook() {
+        return this.hook;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEntityName() {
+        return this.entityName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getActionName() {
+        return this.actionName;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookResource setHook(final Hook hook) {
+        this.hook = hook;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookResource setEntityName(final String entityName) {
+        this.entityName = entityName;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public HookResource setActionName(final String actionName) {
+        this.actionName = actionName;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public HookResource() {
+    }
 }

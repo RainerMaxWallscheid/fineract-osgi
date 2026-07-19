@@ -20,8 +20,6 @@ package org.apache.fineract.infrastructure.contentstore.policy;
 
 import java.util.List;
 import java.util.regex.Pattern;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.contentstore.exception.ContentPolicyException;
@@ -30,13 +28,11 @@ import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class WhitelistContentPolicy implements ContentPolicy {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WhitelistContentPolicy.class);
     private final FineractProperties properties;
-
     private List<Pattern> regexWhitelist;
 
     @EventListener(ApplicationStartedEvent.class)
@@ -48,25 +44,24 @@ public class WhitelistContentPolicy implements ContentPolicy {
     public void check(ContentPolicyContext ctx) {
         if (properties.getContent().isRegexWhitelistEnabled()) {
             final var fileName = FilenameUtils.getName(ctx.getPath());
-
             boolean matches = regexWhitelist.stream().anyMatch(p -> p.matcher(fileName).matches());
-
             if (!matches) {
                 throw new ContentPolicyException(String.format("File name not allowed: %s", fileName));
             }
         }
-
         if (properties.getContent().isMimeWhitelistEnabled()) {
             final var fileName = FilenameUtils.getName(ctx.getPath());
-
             if (StringUtils.isEmpty(ctx.getMimeType())) {
                 throw new ContentPolicyException(String.format("Could not detect mime type for filename %s!", fileName));
             }
-
             if (!properties.getContent().getMimeWhitelist().contains(ctx.getMimeType())) {
-                throw new ContentPolicyException(
-                        String.format("Detected mime type %s for filename %s not allowed!", ctx.getMimeType(), fileName));
+                throw new ContentPolicyException(String.format("Detected mime type %s for filename %s not allowed!", ctx.getMimeType(), fileName));
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WhitelistContentPolicy(final FineractProperties properties) {
+        this.properties = properties;
     }
 }

@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.fineract.infrastructure.core.config.TaskExecutorConstant;
@@ -48,10 +46,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-@Slf4j
-@RequiredArgsConstructor
 public class RecalculateInterestForLoanTasklet implements Tasklet {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RecalculateInterestForLoanTasklet.class);
     private final LoanReadPlatformService loanReadPlatformService;
     private final LoanWritePlatformService loanWritePlatformService;
     private final ApplicationContext applicationContext;
@@ -66,14 +63,12 @@ public class RecalculateInterestForLoanTasklet implements Tasklet {
             final String officeId = (String) jobParameters.get("officeId").getValue();
             log.debug("recalculateInterest: officeId={}", officeId);
             Long officeIdLong = Long.valueOf(officeId);
-
             final OfficeData office = officeReadPlatformService.retrieveOffice(officeIdLong);
             if (office == null) {
                 throw new OfficeNotFoundException(officeIdLong);
             }
             final int threadPoolSize = Integer.parseInt((String) jobParameters.get("thread-pool-size").getValue());
             final int batchSize = Integer.parseInt((String) jobParameters.get("batch-size").getValue());
-
             recalculateInterest(office, threadPoolSize, batchSize);
         } else {
             Collection<Long> loanIds = loanReadPlatformService.fetchLoansForInterestRecalculation();
@@ -99,20 +94,15 @@ public class RecalculateInterestForLoanTasklet implements Tasklet {
         final int pageSize = batchSize * threadPoolSize;
         taskExecutor.setCorePoolSize(threadPoolSize);
         taskExecutor.setMaxPoolSize(threadPoolSize);
-
         Long maxLoanIdInList = 0L;
         final String officeHierarchy = office.getHierarchy() + "%";
-
-        List<Long> loanIds = Collections.synchronizedList(
-                this.loanReadPlatformService.fetchLoansForInterestRecalculation(pageSize, maxLoanIdInList, officeHierarchy));
-
+        List<Long> loanIds = Collections.synchronizedList(this.loanReadPlatformService.fetchLoansForInterestRecalculation(pageSize, maxLoanIdInList, officeHierarchy));
         do {
             int totalFilteredRecords = loanIds.size();
             log.debug("Starting accrual - total filtered records - {}", totalFilteredRecords);
             recalculateInterest(loanIds, threadPoolSize);
             maxLoanIdInList += pageSize + 1;
-            loanIds = Collections.synchronizedList(
-                    this.loanReadPlatformService.fetchLoansForInterestRecalculation(pageSize, maxLoanIdInList, officeHierarchy));
+            loanIds = Collections.synchronizedList(this.loanReadPlatformService.fetchLoansForInterestRecalculation(pageSize, maxLoanIdInList, officeHierarchy));
         } while (!CollectionUtils.isEmpty(loanIds));
     }
 
@@ -120,16 +110,13 @@ public class RecalculateInterestForLoanTasklet implements Tasklet {
         if (loanIds == null || loanIds.isEmpty()) {
             return;
         }
-
         int actualBatchSize = (int) Math.ceil(loanIds.size() / (double) threadPoolSize);
-
-        List<Future<Void>> responses = ListUtils.partition(loanIds, actualBatchSize).stream().filter(subList -> !subList.isEmpty())
-                .map(subList -> {
-                    RecalculateInterestPoster recalculateInterestPoster = applicationContext.getBean(RecalculateInterestPoster.class);
-                    recalculateInterestPoster.setLoanIds(subList);
-                    recalculateInterestPoster.setFineractContext(ThreadLocalContextUtil.getContext());
-                    return (Callable<Void>) recalculateInterestPoster;
-                }).map(taskExecutor::submit).toList();
+        List<Future<Void>> responses = ListUtils.partition(loanIds, actualBatchSize).stream().filter(subList -> !subList.isEmpty()).map(subList -> {
+            RecalculateInterestPoster recalculateInterestPoster = applicationContext.getBean(RecalculateInterestPoster.class);
+            recalculateInterestPoster.setLoanIds(subList);
+            recalculateInterestPoster.setFineractContext(ThreadLocalContextUtil.getContext());
+            return (Callable<Void>) recalculateInterestPoster;
+        }).map(taskExecutor::submit).toList();
         checkCompletion(responses);
     }
 
@@ -154,5 +141,14 @@ public class RecalculateInterestForLoanTasklet implements Tasklet {
         } catch (ExecutionException e2) {
             log.error("Execution exception while posting IR entries", e2);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public RecalculateInterestForLoanTasklet(final LoanReadPlatformService loanReadPlatformService, final LoanWritePlatformService loanWritePlatformService, final ApplicationContext applicationContext, final OfficeReadPlatformService officeReadPlatformService, @Qualifier(TaskExecutorConstant.CONFIGURABLE_TASK_EXECUTOR_BEAN_NAME) final ThreadPoolTaskExecutor taskExecutor) {
+        this.loanReadPlatformService = loanReadPlatformService;
+        this.loanWritePlatformService = loanWritePlatformService;
+        this.applicationContext = applicationContext;
+        this.officeReadPlatformService = officeReadPlatformService;
+        this.taskExecutor = taskExecutor;
     }
 }

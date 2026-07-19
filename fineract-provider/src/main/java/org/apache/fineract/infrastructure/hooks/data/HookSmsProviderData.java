@@ -23,16 +23,10 @@ import static org.apache.fineract.infrastructure.hooks.api.HookApiConstants.phon
 import static org.apache.fineract.infrastructure.hooks.api.HookApiConstants.smsProviderAccountIdName;
 import static org.apache.fineract.infrastructure.hooks.api.HookApiConstants.smsProviderName;
 import static org.apache.fineract.infrastructure.hooks.api.HookApiConstants.smsProviderTokenIdName;
-
 import java.util.Set;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.hooks.domain.HookConfiguration;
 
-@Getter
-@Setter
 public class HookSmsProviderData {
-
     private String url;
     private String phoneNo;
     private String smsProvider;
@@ -43,7 +37,6 @@ public class HookSmsProviderData {
     private String endpoint;
 
     public HookSmsProviderData(final Set<HookConfiguration> config) {
-
         for (final HookConfiguration conf : config) {
             final String fieldName = conf.getFieldName();
             if (fieldName.equals(payloadURLName)) {
@@ -62,5 +55,85 @@ public class HookSmsProviderData {
                 this.phoneNo = conf.getFieldValue();
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getUrl() {
+        return this.url;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getPhoneNo() {
+        return this.phoneNo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getSmsProvider() {
+        return this.smsProvider;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getSmsProviderAccountId() {
+        return this.smsProviderAccountId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getSmsProviderToken() {
+        return this.smsProviderToken;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getTenantId() {
+        return this.tenantId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getMifosToken() {
+        return this.mifosToken;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEndpoint() {
+        return this.endpoint;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setUrl(final String url) {
+        this.url = url;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setPhoneNo(final String phoneNo) {
+        this.phoneNo = phoneNo;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setSmsProvider(final String smsProvider) {
+        this.smsProvider = smsProvider;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setSmsProviderAccountId(final String smsProviderAccountId) {
+        this.smsProviderAccountId = smsProviderAccountId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setSmsProviderToken(final String smsProviderToken) {
+        this.smsProviderToken = smsProviderToken;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setTenantId(final String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setMifosToken(final String mifosToken) {
+        this.mifosToken = mifosToken;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setEndpoint(final String endpoint) {
+        this.endpoint = endpoint;
     }
 }

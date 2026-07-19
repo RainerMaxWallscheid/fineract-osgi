@@ -20,34 +20,81 @@ package org.apache.fineract.mix.domain;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("mix_taxonomy_mapping")
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 public final class MixTaxonomyMapping implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id
     @Column("id")
     private Long id;
-
     @Column("identifier")
     private String identifier;
-
     @Column("config")
     private String config;
-
     @Column("currency")
     private String currency;
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getIdentifier() {
+        return this.identifier;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getConfig() {
+        return this.config;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getCurrency() {
+        return this.currency;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomyMapping setId(final Long id) {
+        this.id = id;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomyMapping setIdentifier(final String identifier) {
+        this.identifier = identifier;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomyMapping setConfig(final String config) {
+        this.config = config;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomyMapping setCurrency(final String currency) {
+        this.currency = currency;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MixTaxonomyMapping() {
+    }
 }

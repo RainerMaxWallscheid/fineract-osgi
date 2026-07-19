@@ -24,55 +24,40 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.security.exception.SqlValidationException;
 import org.apache.fineract.infrastructure.security.service.SqlValidator;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public class DefaultSqlValidator implements SqlValidator {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DefaultSqlValidator.class);
     private final FineractProperties properties;
-
     private Map<String, Pattern> patterns = new LinkedHashMap<>();
     private Map<String, FineractProperties.FineractSqlValidationProfileProperties> profiles = new LinkedHashMap<>();
-
     private static final String MAIN_PROFILE = "main";
 
     @PostConstruct
     public void init() {
         properties.getSqlValidation().getPatterns().forEach(pattern -> {
             log.info("Setup SQL validation pattern: {}", pattern.getName());
-
             patterns.put(pattern.getName(), Pattern.compile(pattern.getPattern(), Pattern.DOTALL));
         });
         properties.getSqlValidation().getProfiles().forEach(profile -> {
             log.info("Setup SQL validation profile: {}", profile.getName());
-
-            profile.getPatternRefs()
-                    .sort(Comparator.comparing(FineractProperties.FineractSqlValidationPatternReferenceProperties::getOrder));
-
+            profile.getPatternRefs().sort(Comparator.comparing(FineractProperties.FineractSqlValidationPatternReferenceProperties::getOrder));
             profiles.put(profile.getName(), profile);
         });
-
         // consistency checks
-
         if (!profiles.containsKey(MAIN_PROFILE)) {
-            throw new IllegalStateException(
-                    "SQL validation profile 'main' missing. This validation profile is the default fallback and has to be provided. NOTE: YOU CANNOT DISABLE SQL VALIDATION!!!");
+            throw new IllegalStateException("SQL validation profile \'main\' missing. This validation profile is the default fallback and has to be provided. NOTE: YOU CANNOT DISABLE SQL VALIDATION!!!");
         }
-
         // the default profile needs at least one pattern reference
         if (profiles.get(MAIN_PROFILE).getPatternRefs().isEmpty()) {
-            throw new IllegalStateException(
-                    "SQL Validation pattern references in profile 'main' are empty. Please make sure there is at least one reference available. NOTE: YOU CANNOT DISABLE SQL VALIDATION!!!");
+            throw new IllegalStateException("SQL Validation pattern references in profile \'main\' are empty. Please make sure there is at least one reference available. NOTE: YOU CANNOT DISABLE SQL VALIDATION!!!");
         }
-
         // the default profile needs to be enabled
         profiles.get(MAIN_PROFILE).setEnabled(true);
     }
@@ -87,14 +72,17 @@ public class DefaultSqlValidator implements SqlValidator {
         if (StringUtils.isBlank(statement)) {
             return;
         }
-
         for (var ref : profiles.getOrDefault(profile, profiles.get(MAIN_PROFILE)).getPatternRefs()) {
             Matcher matcher = patterns.get(ref.getName()).matcher(statement);
-
             if (matcher.matches()) {
                 log.warn("SQL validation error: >> {} <<", statement);
-                throw new SqlValidationException(String.format("invalid SQL statement (detected '%s' pattern)", ref.getName()));
+                throw new SqlValidationException(String.format("invalid SQL statement (detected \'%s\' pattern)", ref.getName()));
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DefaultSqlValidator(final FineractProperties properties) {
+        this.properties = properties;
     }
 }

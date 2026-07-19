@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.event.external.service.serialization.serializer.workingcapitalloan;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.fineract.avro.generator.ByteBufferSerializable;
 import org.apache.fineract.avro.workingcapitalloan.v1.WorkingCapitalLoanTransactionDataV1;
@@ -31,9 +30,7 @@ import org.apache.fineract.portfolio.workingcapitalloan.service.WorkingCapitalLo
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class WorkingCapitalLoanTransactionBusinessEventSerializer implements BusinessEventSerializer {
-
     private final WorkingCapitalLoanTransactionReadPlatformService readPlatformService;
     private final WorkingCapitalLoanTransactionDataMapper mapper;
 
@@ -54,5 +51,11 @@ public class WorkingCapitalLoanTransactionBusinessEventSerializer implements Bus
     @Override
     public Class<? extends GenericContainer> getSupportedSchema() {
         return WorkingCapitalLoanTransactionDataV1.class;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanTransactionBusinessEventSerializer(final WorkingCapitalLoanTransactionReadPlatformService readPlatformService, final WorkingCapitalLoanTransactionDataMapper mapper) {
+        this.readPlatformService = readPlatformService;
+        this.mapper = mapper;
     }
 }

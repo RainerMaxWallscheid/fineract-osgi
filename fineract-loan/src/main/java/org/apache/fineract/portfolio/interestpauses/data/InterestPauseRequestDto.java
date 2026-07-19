@@ -21,25 +21,15 @@ package org.apache.fineract.portfolio.interestpauses.data;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
 @Schema(description = "Request DTO for creating an interest pause")
 public class InterestPauseRequestDto {
-
     @Schema(example = "2024-01-01", description = "Start date of the interest pause period")
     private String startDate;
-
     @Schema(example = "2024-01-11", description = "End date of the interest pause period")
     private String endDate;
-
     @Schema(example = "yyyy-MM-dd", description = "Format of the dates provided")
     private String dateFormat;
-
     @Schema(example = "en", description = "Locale to interpret the date format")
     private String locale;
 
@@ -57,5 +47,37 @@ public class InterestPauseRequestDto {
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Error deserializing request from JSON", e);
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getStartDate() {
+        return this.startDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEndDate() {
+        return this.endDate;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDateFormat() {
+        return this.dateFormat;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLocale() {
+        return this.locale;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InterestPauseRequestDto(final String startDate, final String endDate, final String dateFormat, final String locale) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.dateFormat = dateFormat;
+        this.locale = locale;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public InterestPauseRequestDto() {
     }
 }

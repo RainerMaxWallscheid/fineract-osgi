@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.accounting.financialactivityaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.accounting.financialactivityaccount.service.FinancialActivityAccountWritePlatformService;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
@@ -29,15 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @CommandType(entity = "FINANCIALACTIVITYACCOUNT", action = "CREATE")
-@RequiredArgsConstructor
 public class CreateFinancialActivityAccountHandler implements NewCommandSourceHandler {
-
     private final FinancialActivityAccountWritePlatformService writePlatformService;
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
-
         return this.writePlatformService.createFinancialActivityAccountMapping(command);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CreateFinancialActivityAccountHandler(final FinancialActivityAccountWritePlatformService writePlatformService) {
+        this.writePlatformService = writePlatformService;
     }
 }

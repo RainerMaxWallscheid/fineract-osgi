@@ -21,26 +21,157 @@ package org.apache.fineract.portfolio.meeting.data;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Builder
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class MeetingDeleteRequest implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @NotNull(message = "{org.apache.fineract.portfolio.meeting.id.not-null}")
     private Long id;
-
     @NotNull(message = "{org.apache.fineract.portfolio.meeting.entity-id.not-null}")
     private Long entityId;
-
     @NotNull(message = "{org.apache.fineract.portfolio.meeting.entity-type.not-null}")
     private String entityType;
+
+
+    @java.lang.SuppressWarnings("all")
+        public static class MeetingDeleteRequestBuilder {
+        @java.lang.SuppressWarnings("all")
+                private Long id;
+        @java.lang.SuppressWarnings("all")
+                private Long entityId;
+        @java.lang.SuppressWarnings("all")
+                private String entityType;
+
+        @java.lang.SuppressWarnings("all")
+                MeetingDeleteRequestBuilder() {
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public MeetingDeleteRequest.MeetingDeleteRequestBuilder id(final Long id) {
+            this.id = id;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public MeetingDeleteRequest.MeetingDeleteRequestBuilder entityId(final Long entityId) {
+            this.entityId = entityId;
+            return this;
+        }
+
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+                public MeetingDeleteRequest.MeetingDeleteRequestBuilder entityType(final String entityType) {
+            this.entityType = entityType;
+            return this;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public MeetingDeleteRequest build() {
+            return new MeetingDeleteRequest(this.id, this.entityId, this.entityType);
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+                public java.lang.String toString() {
+            return "MeetingDeleteRequest.MeetingDeleteRequestBuilder(id=" + this.id + ", entityId=" + this.entityId + ", entityType=" + this.entityType + ")";
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public static MeetingDeleteRequest.MeetingDeleteRequestBuilder builder() {
+        return new MeetingDeleteRequest.MeetingDeleteRequestBuilder();
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getEntityId() {
+        return this.entityId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEntityType() {
+        return this.entityType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setId(final Long id) {
+        this.id = id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setEntityId(final Long entityId) {
+        this.entityId = entityId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setEntityType(final String entityType) {
+        this.entityType = entityType;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof MeetingDeleteRequest)) return false;
+        final MeetingDeleteRequest other = (MeetingDeleteRequest) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$id = this.getId();
+        final java.lang.Object other$id = other.getId();
+        if (this$id == null ? other$id != null : !this$id.equals(other$id)) return false;
+        final java.lang.Object this$entityId = this.getEntityId();
+        final java.lang.Object other$entityId = other.getEntityId();
+        if (this$entityId == null ? other$entityId != null : !this$entityId.equals(other$entityId)) return false;
+        final java.lang.Object this$entityType = this.getEntityType();
+        final java.lang.Object other$entityType = other.getEntityType();
+        if (this$entityType == null ? other$entityType != null : !this$entityType.equals(other$entityType)) return false;
+        return true;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof MeetingDeleteRequest;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $id = this.getId();
+        result = result * PRIME + ($id == null ? 43 : $id.hashCode());
+        final java.lang.Object $entityId = this.getEntityId();
+        result = result * PRIME + ($entityId == null ? 43 : $entityId.hashCode());
+        final java.lang.Object $entityType = this.getEntityType();
+        result = result * PRIME + ($entityType == null ? 43 : $entityType.hashCode());
+        return result;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+        return "MeetingDeleteRequest(id=" + this.getId() + ", entityId=" + this.getEntityId() + ", entityType=" + this.getEntityType() + ")";
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MeetingDeleteRequest() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public MeetingDeleteRequest(final Long id, final Long entityId, final String entityType) {
+        this.id = id;
+        this.entityId = entityId;
+        this.entityType = entityType;
+    }
 }

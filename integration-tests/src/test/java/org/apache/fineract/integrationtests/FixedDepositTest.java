@@ -21,7 +21,6 @@ package org.apache.fineract.integrationtests;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -46,7 +45,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.accounting.common.AccountingConstants.FinancialActivity;
 import org.apache.fineract.client.models.GetFixedDepositAccountsAccountIdTransactionsResponse;
 import org.apache.fineract.client.models.PostTaxesComponentsRequest;
@@ -89,10 +87,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-@Slf4j
-@SuppressWarnings({ "unused", "unchecked", "rawtypes", "static-access" })
+@SuppressWarnings({"unused", "unchecked", "rawtypes", "static-access"})
 public class FixedDepositTest extends IntegrationTest {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FixedDepositTest.class);
     private ResponseSpecification responseSpec;
     private RequestSpecification requestSpec;
     private FixedDepositProductHelper fixedDepositProductHelper;
@@ -102,9 +100,7 @@ public class FixedDepositTest extends IntegrationTest {
     private JournalEntryHelper journalEntryHelper;
     private FinancialActivityAccountHelper financialActivityAccountHelper;
     private GlobalConfigurationHelper globalConfigurationHelper;
-
     private FixedDepositAccountInterestCalculationServiceImpl fixedDepositAccountInterestCalculationServiceImpl;
-
     public static final String WHOLE_TERM = "1";
     public static final String TILL_PREMATURE_WITHDRAWAL = "2";
     private static final String DAILY = "1";
@@ -115,11 +111,9 @@ public class FixedDepositTest extends IntegrationTest {
     private static final String INTEREST_CALCULATION_USING_DAILY_BALANCE = "1";
     private static final String DAYS_360 = "360";
     private static final String DAYS_365 = "365";
-
     private static final String NONE = "1";
     private static final String CASH_BASED = "2";
     private static final String ACCRUAL = "3";
-
     public static final String MINIMUM_OPENING_BALANCE = "1000.0";
     public static final String ACCOUNT_TYPE_INDIVIDUAL = "INDIVIDUAL";
     public static final String CLOSURE_TYPE_WITHDRAW_DEPOSIT = "100";
@@ -131,7 +125,6 @@ public class FixedDepositTest extends IntegrationTest {
     public static final Integer QUARTERLY_INTERVAL = 3;
     public static final Integer BIANNULLY_INTERVAL = 6;
     public static final Integer ANNUL_INTERVAL = 12;
-
     // TODO Given the difference in calculation methods in test vs application,
     // the exact values
     // returned may differ enough to cause differences in rounding. Given this,
@@ -139,8 +132,7 @@ public class FixedDepositTest extends IntegrationTest {
     // A proper solution would be to implement the exact interest
     // calculation in this test,
     // and then to compare the exact results
-    public static final Float THRESHOLD = 1.0f;
-
+    public static final Float THRESHOLD = 1.0F;
     private MockedStatic<MoneyHelper> moneyHelperStatic;
     private SchedulerJobHelper schedulerJobHelper;
 
@@ -159,7 +151,7 @@ public class FixedDepositTest extends IntegrationTest {
         TimeZone.setDefault(TimeZone.getTimeZone(Utils.TENANT_TIME_ZONE));
     }
 
-    /***
+    /**
      * Test case for Fixed Deposit Account Interest Calculation
      */
     @Test
@@ -175,11 +167,9 @@ public class FixedDepositTest extends IntegrationTest {
         JsonElement element = parser.parse(apiRequestBodyAsJson);
         moneyHelperStatic = Mockito.mockStatic(MoneyHelper.class);
         moneyHelperStatic.when(() -> MoneyHelper.getMathContext()).thenReturn(new MathContext(12, RoundingMode.UP));
-        fixedDepositAccountInterestCalculationServiceImpl = new FixedDepositAccountInterestCalculationServiceImpl(
-                new DepositAccountDataValidator(new FromJsonHelper(), null), new FromJsonHelper());
+        fixedDepositAccountInterestCalculationServiceImpl = new FixedDepositAccountInterestCalculationServiceImpl(new DepositAccountDataValidator(new FromJsonHelper(), null), new FromJsonHelper());
         try {
-            HashMap h = fixedDepositAccountInterestCalculationServiceImpl
-                    .calculateInterest(new JsonQuery(apiRequestBodyAsJson, element, new FromJsonHelper()));
+            HashMap h = fixedDepositAccountInterestCalculationServiceImpl.calculateInterest(new JsonQuery(apiRequestBodyAsJson, element, new FromJsonHelper()));
             fail("The function must throw an exception when called with invalid Compounding period");
         } catch (PlatformApiDataValidationException e) {
             assertEquals("Validation errors exist.", e.getMessage());
@@ -201,11 +191,9 @@ public class FixedDepositTest extends IntegrationTest {
         JsonElement element = parser.parse(apiRequestBodyAsJson);
         moneyHelperStatic = Mockito.mockStatic(MoneyHelper.class);
         moneyHelperStatic.when(() -> MoneyHelper.getMathContext()).thenReturn(new MathContext(12, RoundingMode.UP));
-        fixedDepositAccountInterestCalculationServiceImpl = new FixedDepositAccountInterestCalculationServiceImpl(
-                new DepositAccountDataValidator(new FromJsonHelper(), null), new FromJsonHelper());
+        fixedDepositAccountInterestCalculationServiceImpl = new FixedDepositAccountInterestCalculationServiceImpl(new DepositAccountDataValidator(new FromJsonHelper(), null), new FromJsonHelper());
         try {
-            HashMap h = fixedDepositAccountInterestCalculationServiceImpl
-                    .calculateInterest(new JsonQuery(apiRequestBodyAsJson, element, new FromJsonHelper()));
+            HashMap h = fixedDepositAccountInterestCalculationServiceImpl.calculateInterest(new JsonQuery(apiRequestBodyAsJson, element, new FromJsonHelper()));
             fail("The function must throw an exception when called with invalid Compounding period");
         } catch (PlatformApiDataValidationException e) {
             assertEquals("Validation errors exist.", e.getMessage());
@@ -227,55 +215,47 @@ public class FixedDepositTest extends IntegrationTest {
         JsonElement element = parser.parse(apiRequestBodyAsJson);
         moneyHelperStatic = Mockito.mockStatic(MoneyHelper.class);
         moneyHelperStatic.when(() -> MoneyHelper.getMathContext()).thenReturn(new MathContext(12, RoundingMode.UP));
-        fixedDepositAccountInterestCalculationServiceImpl = new FixedDepositAccountInterestCalculationServiceImpl(
-                new DepositAccountDataValidator(new FromJsonHelper(), null), new FromJsonHelper());
+        fixedDepositAccountInterestCalculationServiceImpl = new FixedDepositAccountInterestCalculationServiceImpl(new DepositAccountDataValidator(new FromJsonHelper(), null), new FromJsonHelper());
         BigDecimal expectedResult = new BigDecimal("10506.250000");
-        BigDecimal actualResult = new BigDecimal(fixedDepositAccountInterestCalculationServiceImpl
-                .calculateInterest(new JsonQuery(apiRequestBodyAsJson, element, new FromJsonHelper())).get("maturityAmount").toString());
+        BigDecimal actualResult = new BigDecimal(fixedDepositAccountInterestCalculationServiceImpl.calculateInterest(new JsonQuery(apiRequestBodyAsJson, element, new FromJsonHelper())).get("maturityAmount").toString());
         assertEquals(expectedResult, actualResult);
         moneyHelperStatic.close();
     }
 
-    /***
+    /**
      * Test case for Fixed Deposit Product with default attributes
      */
     @Test
     public void testFixedDepositProductCreation() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
-
-        /***
+        /**
          * Create GL Accounts for product account mapping
          */
         final Account assetAccount = this.accountHelper.createAssetAccount();
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         final String accountingRule = CASH_BASED;
-        /***
+        /**
          * Create FD product with charts (must be 200 OK)
          */
-        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount,
-                incomeAccount, expenseAccount);
+        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
         Assertions.assertNotNull(fixedDepositProductId);
-
         /***
          * Create FD product without charts (must be 400 Bad Request)
          */
         this.responseSpec = new ResponseSpecBuilder().expectStatusCode(400).build();
-        createFixedDepositProductWithoutCharts(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount, incomeAccount,
-                expenseAccount);
+        createFixedDepositProductWithoutCharts(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
     }
 
-    /***
+    /**
      * Test case for Fixed Deposit Account premature closure with transaction type withdrawal and Cash Based accounting
      * enabled
      */
@@ -285,129 +265,98 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
-        /***
+        /**
          * Create GL Accounts for product account mapping
          */
         final Account assetAccount = this.accountHelper.createAssetAccount();
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String ACTIVATION_DATE = dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer currentDate = Integer.valueOf(currentDateFormat.format(todaysDate.getTime()));
         Integer daysInMonth = todaysDate.getActualMaximum(Calendar.DATE);
         Integer numberOfDaysLeft = daysInMonth - currentDate + 1;
         todaysDate.add(Calendar.DATE, numberOfDaysLeft);
         final String INTEREST_POSTED_DATE = dateFormat.format(todaysDate.getTime());
         final String CLOSED_ON_DATE = dateFormat.format(Calendar.getInstance().getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
-        /***
+        /**
          * Create FD product with CashBased accounting enabled
          */
         final String accountingRule = CASH_BASED;
-        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount,
-                incomeAccount, expenseAccount);
+        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        /***
+        /**
          * Apply for FD account with created product and verify status
          */
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         /***
          * Approve the FD account and verify whether account is approved
          */
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
-        /***
-         * Activate the FD Account and verify whether account is activated
-         */
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, ACTIVATION_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
-
+        /**
+         * Activate the FD Account and verify whether account is activated
+         */
         HashMap accountSummary = this.fixedDepositAccountHelper.getFixedDepositSummary(fixedDepositAccountId);
-
         Float depositAmount = (Float) accountSummary.get("totalDeposits");
-
-        /***
+        /**
          * Verify journal entries posted for initial deposit transaction which happened at activation time
          */
-        final JournalEntry[] assetAccountInitialEntry = { new JournalEntry(depositAmount, JournalEntry.TransactionType.DEBIT) };
-        final JournalEntry[] liablilityAccountInitialEntry = { new JournalEntry(depositAmount, JournalEntry.TransactionType.CREDIT) };
+        final JournalEntry[] assetAccountInitialEntry = {new JournalEntry(depositAmount, JournalEntry.TransactionType.DEBIT)};
+        final JournalEntry[] liablilityAccountInitialEntry = {new JournalEntry(depositAmount, JournalEntry.TransactionType.CREDIT)};
         this.journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, ACTIVATION_DATE, assetAccountInitialEntry);
         this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, ACTIVATION_DATE, liablilityAccountInitialEntry);
-
         /***
          * Update interest earned of FD account
          */
         fixedDepositAccountId = this.fixedDepositAccountHelper.calculateInterestForFixedDeposit(fixedDepositAccountId);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        /***
+        /**
          * Post interest and verify the account summary
          */
         Integer transactionIdForPostInterest = this.fixedDepositAccountHelper.postInterestForFixedDeposit(fixedDepositAccountId);
         Assertions.assertNotNull(transactionIdForPostInterest);
-
         accountSummary = this.fixedDepositAccountHelper.getFixedDepositSummary(fixedDepositAccountId);
         Float totalInterestPosted = (Float) accountSummary.get("totalInterestPosted");
-
-        /***
+        /**
          * Verify journal entries transactions for interest posting transaction
          */
-        final JournalEntry[] expenseAccountEntry = { new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.DEBIT) };
-        final JournalEntry[] liablilityAccountEntry = { new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.CREDIT) };
+        final JournalEntry[] expenseAccountEntry = {new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.DEBIT)};
+        final JournalEntry[] liablilityAccountEntry = {new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.CREDIT)};
         this.journalEntryHelper.checkJournalEntryForAssetAccount(expenseAccount, INTEREST_POSTED_DATE, expenseAccountEntry);
         this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, INTEREST_POSTED_DATE, liablilityAccountEntry);
-
         this.fixedDepositAccountHelper.calculatePrematureAmountForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE);
-
-        Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.prematureCloseForFixedDeposit(
-                fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_WITHDRAW_DEPOSIT, null, CommonConstants.RESPONSE_RESOURCE_ID);
+        Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.prematureCloseForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_WITHDRAW_DEPOSIT, null, CommonConstants.RESPONSE_RESOURCE_ID);
         Assertions.assertNotNull(prematureClosureTransactionId);
-
-        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositAccountIsPrematureClosed(fixedDepositAccountStatusHashMap);
-
-        /***
+        /**
          * Verify journal entry transactions for preclosure transaction
          */
-        HashMap accountDetails = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap accountDetails = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float maturityAmount = Float.valueOf(accountDetails.get("maturityAmount").toString());
-        this.journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, CLOSED_ON_DATE,
-                new JournalEntry(maturityAmount, JournalEntry.TransactionType.CREDIT));
-        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, CLOSED_ON_DATE,
-                new JournalEntry(maturityAmount, JournalEntry.TransactionType.DEBIT));
-
+        this.journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, CLOSED_ON_DATE, new JournalEntry(maturityAmount, JournalEntry.TransactionType.CREDIT));
+        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, CLOSED_ON_DATE, new JournalEntry(maturityAmount, JournalEntry.TransactionType.DEBIT));
     }
 
     @Test
@@ -416,8 +365,7 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
-        /***
+        /**
          * Create GL Accounts for product account mapping
          */
         final Account assetAccount = this.accountHelper.createAssetAccount();
@@ -425,130 +373,97 @@ public class FixedDepositTest extends IntegrationTest {
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
         final Account liabilityAccountForTax = this.accountHelper.createLiabilityAccount();
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String ACTIVATION_DATE = dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer currentDate = Integer.valueOf(currentDateFormat.format(todaysDate.getTime()));
         Integer daysInMonth = todaysDate.getActualMaximum(Calendar.DATE);
         Integer numberOfDaysLeft = daysInMonth - currentDate + 1;
         todaysDate.add(Calendar.DATE, numberOfDaysLeft);
         final String INTEREST_POSTED_DATE = dateFormat.format(todaysDate.getTime());
         final String CLOSED_ON_DATE = dateFormat.format(Calendar.getInstance().getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
-        /***
+        /**
          * Create FD product with CashBased accounting enabled
          */
         final String accountingRule = CASH_BASED;
         final Integer taxGroupId = createTaxGroup("10", liabilityAccountForTax);
-        Integer fixedDepositProductId = createFixedDepositProductWithWithHoldTax(VALID_FROM, VALID_TO, String.valueOf(taxGroupId),
-                accountingRule, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
+        Integer fixedDepositProductId = createFixedDepositProductWithWithHoldTax(VALID_FROM, VALID_TO, String.valueOf(taxGroupId), accountingRule, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        /***
+        /**
          * Apply for FD account with created product and verify status
          */
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         /***
          * Approve the FD account and verify whether account is approved
          */
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
-        /***
-         * Activate the FD Account and verify whether account is activated
-         */
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, ACTIVATION_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
-
+        /**
+         * Activate the FD Account and verify whether account is activated
+         */
         HashMap accountSummary = this.fixedDepositAccountHelper.getFixedDepositSummary(fixedDepositAccountId);
-
         Float depositAmount = (Float) accountSummary.get("totalDeposits");
-
-        /***
+        /**
          * Verify journal entries posted for initial deposit transaction which happened at activation time
          */
-        final JournalEntry[] assetAccountInitialEntry = { new JournalEntry(depositAmount, JournalEntry.TransactionType.DEBIT) };
-        final JournalEntry[] liablilityAccountInitialEntry = { new JournalEntry(depositAmount, JournalEntry.TransactionType.CREDIT) };
+        final JournalEntry[] assetAccountInitialEntry = {new JournalEntry(depositAmount, JournalEntry.TransactionType.DEBIT)};
+        final JournalEntry[] liablilityAccountInitialEntry = {new JournalEntry(depositAmount, JournalEntry.TransactionType.CREDIT)};
         this.journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, ACTIVATION_DATE, assetAccountInitialEntry);
         this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, ACTIVATION_DATE, liablilityAccountInitialEntry);
-
         /***
          * Update interest earned of FD account
          */
         fixedDepositAccountId = this.fixedDepositAccountHelper.calculateInterestForFixedDeposit(fixedDepositAccountId);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        /***
+        /**
          * Post interest and verify the account summary
          */
         Integer transactionIdForPostInterest = this.fixedDepositAccountHelper.postInterestForFixedDeposit(fixedDepositAccountId);
         Assertions.assertNotNull(transactionIdForPostInterest);
-
         accountSummary = this.fixedDepositAccountHelper.getFixedDepositSummary(fixedDepositAccountId);
         Float totalInterestPosted = (Float) accountSummary.get("totalInterestPosted");
         Assertions.assertNull(accountSummary.get("totalWithholdTax"));
-
-        /***
+        /**
          * Verify journal entries transactions for interest posting transaction
          */
-        final JournalEntry[] expenseAccountEntry = { new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.DEBIT) };
-        final JournalEntry[] liablilityAccountEntry = { new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.CREDIT) };
+        final JournalEntry[] expenseAccountEntry = {new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.DEBIT)};
+        final JournalEntry[] liablilityAccountEntry = {new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.CREDIT)};
         this.journalEntryHelper.checkJournalEntryForAssetAccount(expenseAccount, INTEREST_POSTED_DATE, expenseAccountEntry);
         this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, INTEREST_POSTED_DATE, liablilityAccountEntry);
-
         this.fixedDepositAccountHelper.calculatePrematureAmountForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE);
-
-        Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.prematureCloseForFixedDeposit(
-                fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_WITHDRAW_DEPOSIT, null, CommonConstants.RESPONSE_RESOURCE_ID);
+        Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.prematureCloseForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_WITHDRAW_DEPOSIT, null, CommonConstants.RESPONSE_RESOURCE_ID);
         Assertions.assertNotNull(prematureClosureTransactionId);
-
-        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositAccountIsPrematureClosed(fixedDepositAccountStatusHashMap);
-
-        /***
+        /**
          * Verify journal entry transactions for preclosure transaction
          */
-        HashMap accountDetails = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap accountDetails = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float maturityAmount = Float.valueOf(accountDetails.get("maturityAmount").toString());
-
         HashMap summary = (HashMap) accountDetails.get("summary");
         Assertions.assertNotNull(summary.get("totalWithholdTax"));
         Float withHoldTax = (Float) summary.get("totalWithholdTax");
-
-        this.journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, CLOSED_ON_DATE,
-                new JournalEntry(maturityAmount, JournalEntry.TransactionType.CREDIT));
-        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, CLOSED_ON_DATE,
-                new JournalEntry(maturityAmount, JournalEntry.TransactionType.DEBIT));
-        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccountForTax, CLOSED_ON_DATE,
-                new JournalEntry(withHoldTax, JournalEntry.TransactionType.CREDIT));
-
+        this.journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, CLOSED_ON_DATE, new JournalEntry(maturityAmount, JournalEntry.TransactionType.CREDIT));
+        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, CLOSED_ON_DATE, new JournalEntry(maturityAmount, JournalEntry.TransactionType.DEBIT));
+        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccountForTax, CLOSED_ON_DATE, new JournalEntry(withHoldTax, JournalEntry.TransactionType.CREDIT));
     }
 
     @Test
@@ -557,8 +472,7 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
-        /***
+        /**
          * Create GL Accounts for product account mapping
          */
         final Account assetAccount = this.accountHelper.createAssetAccount();
@@ -566,106 +480,79 @@ public class FixedDepositTest extends IntegrationTest {
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
         final Account liabilityAccountForTax = this.accountHelper.createLiabilityAccount();
-
         DateTimeFormatter monthDayFormat = new DateTimeFormatterBuilder().appendPattern("dd MMM").toFormatter();
         DateTimeFormatter currentDateFormat = new DateTimeFormatterBuilder().appendPattern("dd").toFormatter();
-
         LocalDate todaysDate = Utils.getLocalDateOfTenant();
         todaysDate = todaysDate.minusMonths(20);
         final String VALID_FROM = Utils.dateFormatter.format(todaysDate);
         todaysDate = todaysDate.plusYears(10);
         final String VALID_TO = Utils.dateFormatter.format(todaysDate);
-
         todaysDate = Utils.getLocalDateOfTenant();
         todaysDate = todaysDate.minusMonths(20);
         final String SUBMITTED_ON_DATE = Utils.dateFormatter.format(todaysDate);
         final String APPROVED_ON_DATE = Utils.dateFormatter.format(todaysDate);
         final String ACTIVATION_DATE = Utils.dateFormatter.format(todaysDate);
-
         LocalDate closedOn = todaysDate.plusMonths(14);
         final String CLOSED_ON_DATE = Utils.dateFormatter.format(closedOn);
-
         Integer clientId = ClientHelper.createClient(requestSpec, responseSpec);
         Assertions.assertNotNull(clientId);
-
-        /***
+        /**
          * Create FD product with CashBased accounting enabled
          */
         final Integer taxGroupId = createTaxGroup("10", liabilityAccountForTax);
-        Integer fixedDepositProductId = createFixedDepositProductWithWithHoldTax(VALID_FROM, VALID_TO, String.valueOf(taxGroupId),
-                CASH_BASED, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
+        Integer fixedDepositProductId = createFixedDepositProductWithWithHoldTax(VALID_FROM, VALID_TO, String.valueOf(taxGroupId), CASH_BASED, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        /***
+        /**
          * Apply for FD account with created product and verify status
          */
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         /***
          * Approve the FD account and verify whether account is approved
          */
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
-        /***
-         * Activate the FD Account and verify whether account is activated
-         */
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, ACTIVATION_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
-
+        /**
+         * Activate the FD Account and verify whether account is activated
+         */
         HashMap accountSummary = this.fixedDepositAccountHelper.getFixedDepositSummary(fixedDepositAccountId);
-
         Float depositAmount = (Float) accountSummary.get("totalDeposits");
-
-        /***
+        /**
          * Verify journal entries posted for initial deposit transaction which happened at activation time
          */
-        final JournalEntry[] assetAccountInitialEntry = { new JournalEntry(depositAmount, JournalEntry.TransactionType.DEBIT) };
-        final JournalEntry[] liabilityAccountInitialEntry = { new JournalEntry(depositAmount, JournalEntry.TransactionType.CREDIT) };
+        final JournalEntry[] assetAccountInitialEntry = {new JournalEntry(depositAmount, JournalEntry.TransactionType.DEBIT)};
+        final JournalEntry[] liabilityAccountInitialEntry = {new JournalEntry(depositAmount, JournalEntry.TransactionType.CREDIT)};
         this.journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, ACTIVATION_DATE, assetAccountInitialEntry);
         this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, ACTIVATION_DATE, liabilityAccountInitialEntry);
-
         /***
          * Update interest earned of FD account
          */
         fixedDepositAccountId = this.fixedDepositAccountHelper.calculateInterestForFixedDeposit(fixedDepositAccountId);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        /***
+        /**
          * Post interest and verify the account summary
          */
         Integer transactionIdForPostInterest = this.fixedDepositAccountHelper.postInterestForFixedDeposit(fixedDepositAccountId);
         Assertions.assertNotNull(transactionIdForPostInterest);
-
         accountSummary = this.fixedDepositAccountHelper.getFixedDepositSummary(fixedDepositAccountId);
         accountSummary.get("totalInterestPosted");
         Assertions.assertNull(accountSummary.get("totalWithholdTax"));
-
-        /***
+        /**
          * FD account verify whether account is matured
          */
-
         SchedulerJobHelper schedulerJobHelper = new SchedulerJobHelper(requestSpec);
         String JobName = "Update Deposit Accounts Maturity details";
         schedulerJobHelper.executeAndAwaitJob(JobName);
-
-        HashMap accountDetails = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
-
+        HashMap accountDetails = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         HashMap summary = (HashMap) accountDetails.get("summary");
         Assertions.assertNotNull(summary.get("totalWithholdTax"));
         Float withHoldTax = (Float) summary.get("totalWithholdTax");
-        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccountForTax, CLOSED_ON_DATE,
-                new JournalEntry(withHoldTax, JournalEntry.TransactionType.CREDIT));
-
-        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccountForTax, CLOSED_ON_DATE, new JournalEntry(withHoldTax, JournalEntry.TransactionType.CREDIT));
+        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositAccountIsMatured(fixedDepositAccountStatusHashMap);
     }
 
@@ -777,58 +664,45 @@ public class FixedDepositTest extends IntegrationTest {
         testFixedDepositAccountForInterestRate(chartToUse, depositAmount, depositPeriod, interestRate);
     }
 
-    private void testFixedDepositAccountForInterestRate(final String chartToUse, final String depositAmount, final String depositPeriod,
-            final Float interestRate) {
+    private void testFixedDepositAccountForInterestRate(final String chartToUse, final String depositAmount, final String depositPeriod, final Float interestRate) {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         final String VALID_FROM = "01 March 2014";
         final String VALID_TO = "01 March 2016";
-
         final String SUBMITTED_ON_DATE = "01 March 2015";
         final String APPROVED_ON_DATE = "01 March 2015";
         final String ACTIVATION_DATE = "01 March 2015";
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
-        /***
+        /**
          * Create FD product with CashBased accounting enabled
          */
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, chartToUse);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        /***
+        /**
          * Apply for FD account with created product and verify status
          */
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM, depositAmount, depositPeriod);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM, depositAmount, depositPeriod);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         /***
          * Approve the FD account and verify whether account is approved
          */
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
-        /***
-         * Activate the FD Account and verify whether account is activated
-         */
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, ACTIVATION_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
-
+        /**
+         * Activate the FD Account and verify whether account is activated
+         */
         HashMap accountSummary = this.fixedDepositAccountHelper.getFixedDepositDetails(fixedDepositAccountId);
-
         Assertions.assertEquals(interestRate, accountSummary.get("nominalAnnualInterestRate"));
     }
 
-    /***
+    /**
      * Test case for FD Account premature closure with transaction transfers to savings account and Cash Based
      * accounting enabled
      */
@@ -838,164 +712,119 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
-        /***
+        /**
          * Create GL Accounts for product account mapping
          */
         final Account assetAccount = this.accountHelper.createAssetAccount();
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String ACTIVATION_DATE = dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer currentDate = Integer.valueOf(currentDateFormat.format(todaysDate.getTime()));
         Integer daysInMonth = todaysDate.getActualMaximum(Calendar.DATE);
         Integer numberOfDaysLeft = daysInMonth - currentDate + 1;
         todaysDate.add(Calendar.DATE, numberOfDaysLeft);
         final String INTEREST_POSTED_DATE = dateFormat.format(todaysDate.getTime());
         final String CLOSED_ON_DATE = dateFormat.format(Calendar.getInstance().getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
-        /***
+        /**
          * Create Savings product with CashBased accounting enabled
          */
         final String accountingRule = CASH_BASED;
-        final Integer savingsProductID = createSavingsProduct(this.requestSpec, this.responseSpec, MINIMUM_OPENING_BALANCE, accountingRule,
-                assetAccount, liabilityAccount, incomeAccount, expenseAccount);
+        final Integer savingsProductID = createSavingsProduct(this.requestSpec, this.responseSpec, MINIMUM_OPENING_BALANCE, accountingRule, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
         Assertions.assertNotNull(savingsProductID);
-
         final Integer savingsId = this.savingsAccountHelper.applyForSavingsApplication(clientId, savingsProductID, ACCOUNT_TYPE_INDIVIDUAL);
         Assertions.assertNotNull(savingsProductID);
-
         HashMap savingsStatusHashMap = SavingsStatusChecker.getStatusOfSavings(this.requestSpec, this.responseSpec, savingsId);
         SavingsStatusChecker.verifySavingsIsPending(savingsStatusHashMap);
-
         savingsStatusHashMap = this.savingsAccountHelper.approveSavings(savingsId);
         SavingsStatusChecker.verifySavingsIsApproved(savingsStatusHashMap);
-
         savingsStatusHashMap = this.savingsAccountHelper.activateSavings(savingsId);
         SavingsStatusChecker.verifySavingsIsActive(savingsStatusHashMap);
-
-        /***
+        /**
          * Create FD product with CashBased accounting enabled
          */
-        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount,
-                incomeAccount, expenseAccount);
+        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, ACTIVATION_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
-
         HashMap accountSummary = this.fixedDepositAccountHelper.getFixedDepositSummary(fixedDepositAccountId);
-
         Float depositAmount = (Float) accountSummary.get("totalDeposits");
-
-        /***
+        /**
          * Verify journal entries posted for initial deposit transaction which happened at activation time
          */
-        final JournalEntry[] assetAccountInitialEntry = { new JournalEntry(depositAmount, JournalEntry.TransactionType.DEBIT) };
-        final JournalEntry[] liablilityAccountInitialEntry = { new JournalEntry(depositAmount, JournalEntry.TransactionType.CREDIT) };
+        final JournalEntry[] assetAccountInitialEntry = {new JournalEntry(depositAmount, JournalEntry.TransactionType.DEBIT)};
+        final JournalEntry[] liablilityAccountInitialEntry = {new JournalEntry(depositAmount, JournalEntry.TransactionType.CREDIT)};
         this.journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, ACTIVATION_DATE, assetAccountInitialEntry);
         this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, ACTIVATION_DATE, liablilityAccountInitialEntry);
-
         /***
          * Update interest earned of FD account
          */
         fixedDepositAccountId = this.fixedDepositAccountHelper.calculateInterestForFixedDeposit(fixedDepositAccountId);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        /***
+        /**
          * Post interest and verify the account summary
          */
         Integer transactionIdForPostInterest = this.fixedDepositAccountHelper.postInterestForFixedDeposit(fixedDepositAccountId);
         Assertions.assertNotNull(transactionIdForPostInterest);
-
         accountSummary = this.fixedDepositAccountHelper.getFixedDepositSummary(fixedDepositAccountId);
         Float totalInterestPosted = (Float) accountSummary.get("totalInterestPosted");
-
-        /***
+        /**
          * Verify journal entries transactions for interest posting transaction
          */
-        final JournalEntry[] expenseAccountEntry = { new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.DEBIT) };
-        final JournalEntry[] liablilityAccountEntry = { new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.CREDIT) };
+        final JournalEntry[] expenseAccountEntry = {new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.DEBIT)};
+        final JournalEntry[] liablilityAccountEntry = {new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.CREDIT)};
         this.journalEntryHelper.checkJournalEntryForAssetAccount(expenseAccount, INTEREST_POSTED_DATE, expenseAccountEntry);
         this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, INTEREST_POSTED_DATE, liablilityAccountEntry);
-
         HashMap savingsSummaryBefore = this.savingsAccountHelper.getSavingsSummary(savingsId);
         Float balanceBefore = (Float) savingsSummaryBefore.get("accountBalance");
-
-        /***
+        /**
          * Retrieve mapped financial account for liability transfer
          */
         Account financialAccount = getMappedLiabilityFinancialAccount();
-
         this.fixedDepositAccountHelper.calculatePrematureAmountForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE);
-
-        /***
+        /**
          * Preclose the account and verify journal entries
          */
-        Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.prematureCloseForFixedDeposit(
-                fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_TRANSFER_TO_SAVINGS, savingsId, CommonConstants.RESPONSE_RESOURCE_ID);
+        Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.prematureCloseForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_TRANSFER_TO_SAVINGS, savingsId, CommonConstants.RESPONSE_RESOURCE_ID);
         Assertions.assertNotNull(prematureClosureTransactionId);
-
-        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositAccountIsPrematureClosed(fixedDepositAccountStatusHashMap);
-
-        HashMap fixedDepositData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap fixedDepositData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float prematurityAmount = (Float) fixedDepositData.get("maturityAmount");
-
-        /***
+        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, CLOSED_ON_DATE, new JournalEntry(prematurityAmount, JournalEntry.TransactionType.CREDIT), new JournalEntry(prematurityAmount, JournalEntry.TransactionType.DEBIT));
+        this.journalEntryHelper.checkJournalEntryForAssetAccount(financialAccount, CLOSED_ON_DATE, new JournalEntry(prematurityAmount, JournalEntry.TransactionType.DEBIT), new JournalEntry(prematurityAmount, JournalEntry.TransactionType.CREDIT));
+        /**
          * Verify journal entry transactions for preclosure transaction As this transaction is an account transfer you
          * should get financial account mapping details and verify amounts
          */
-        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, CLOSED_ON_DATE,
-                new JournalEntry(prematurityAmount, JournalEntry.TransactionType.CREDIT),
-                new JournalEntry(prematurityAmount, JournalEntry.TransactionType.DEBIT));
-
-        this.journalEntryHelper.checkJournalEntryForAssetAccount(financialAccount, CLOSED_ON_DATE,
-                new JournalEntry(prematurityAmount, JournalEntry.TransactionType.DEBIT),
-                new JournalEntry(prematurityAmount, JournalEntry.TransactionType.CREDIT));
-
         HashMap savingsSummaryAfter = this.savingsAccountHelper.getSavingsSummary(savingsId);
         Float balanceAfter = (Float) savingsSummaryAfter.get("accountBalance");
         Float expectedSavingsBalance = balanceBefore + prematurityAmount;
-
         Assertions.assertEquals(expectedSavingsBalance, balanceAfter, "Verifying Savings Account Balance after Premature Closure");
-
     }
 
-    /***
+    /**
      * Test case for Fixed Deposit Account premature closure with transaction type ReInvest and Cash Based accounting
      * enabled
      */
@@ -1005,185 +834,134 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
-        FixedDepositAccountHelper fixedDepositAccountHelperValidationError = new FixedDepositAccountHelper(this.requestSpec,
-                new ResponseSpecBuilder().build());
-
-        /***
+        FixedDepositAccountHelper fixedDepositAccountHelperValidationError = new FixedDepositAccountHelper(this.requestSpec, new ResponseSpecBuilder().build());
+        /**
          * Create GL Accounts for product account mapping
          */
         final Account assetAccount = this.accountHelper.createAssetAccount();
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String ACTIVATION_DATE = dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer currentDate = Integer.valueOf(currentDateFormat.format(todaysDate.getTime()));
         Integer daysInMonth = todaysDate.getActualMaximum(Calendar.DATE);
         Integer numberOfDaysLeft = daysInMonth - currentDate + 1;
         todaysDate.add(Calendar.DATE, numberOfDaysLeft);
         final String INTEREST_POSTED_DATE = dateFormat.format(todaysDate.getTime());
         final String CLOSED_ON_DATE = dateFormat.format(Calendar.getInstance().getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
-        /***
+        /**
          * Create FD product with CashBased accounting enabled
          */
         final String accountingRule = CASH_BASED;
-        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount,
-                incomeAccount, expenseAccount);
+        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, ACTIVATION_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
-
         HashMap accountSummary = this.fixedDepositAccountHelper.getFixedDepositSummary(fixedDepositAccountId);
-
         Float depositAmount = (Float) accountSummary.get("totalDeposits");
-
-        /***
+        /**
          * Verify journal entries posted for initial deposit transaction which happened at activation time
          */
-        final JournalEntry[] assetAccountInitialEntry = { new JournalEntry(depositAmount, JournalEntry.TransactionType.DEBIT) };
-        final JournalEntry[] liablilityAccountInitialEntry = { new JournalEntry(depositAmount, JournalEntry.TransactionType.CREDIT) };
+        final JournalEntry[] assetAccountInitialEntry = {new JournalEntry(depositAmount, JournalEntry.TransactionType.DEBIT)};
+        final JournalEntry[] liablilityAccountInitialEntry = {new JournalEntry(depositAmount, JournalEntry.TransactionType.CREDIT)};
         this.journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, ACTIVATION_DATE, assetAccountInitialEntry);
         this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, ACTIVATION_DATE, liablilityAccountInitialEntry);
-
         fixedDepositAccountId = this.fixedDepositAccountHelper.calculateInterestForFixedDeposit(fixedDepositAccountId);
         Assertions.assertNotNull(fixedDepositAccountId);
-
         Integer transactionIdForPostInterest = this.fixedDepositAccountHelper.postInterestForFixedDeposit(fixedDepositAccountId);
         Assertions.assertNotNull(transactionIdForPostInterest);
-
         accountSummary = this.fixedDepositAccountHelper.getFixedDepositSummary(fixedDepositAccountId);
         Float totalInterestPosted = (Float) accountSummary.get("totalInterestPosted");
-
-        /***
+        /**
          * Verify journal entries transactions for interest posting transaction
          */
-        final JournalEntry[] expenseAccountEntry = { new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.DEBIT) };
-        final JournalEntry[] liablilityAccountEntry = { new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.CREDIT) };
+        final JournalEntry[] expenseAccountEntry = {new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.DEBIT)};
+        final JournalEntry[] liablilityAccountEntry = {new JournalEntry(totalInterestPosted, JournalEntry.TransactionType.CREDIT)};
         this.journalEntryHelper.checkJournalEntryForAssetAccount(expenseAccount, INTEREST_POSTED_DATE, expenseAccountEntry);
         this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, INTEREST_POSTED_DATE, liablilityAccountEntry);
-
         this.fixedDepositAccountHelper.calculatePrematureAmountForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE);
-
-        ArrayList<HashMap> errorResponse = (ArrayList<HashMap>) fixedDepositAccountHelperValidationError.prematureCloseForFixedDeposit(
-                fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_REINVEST, null, CommonConstants.RESPONSE_ERROR);
-
-        assertEquals("validation.msg.fixeddepositaccount.onAccountClosureId.reinvest.not.allowed",
-                errorResponse.get(0).get(CommonConstants.RESPONSE_ERROR_MESSAGE_CODE));
-
+        ArrayList<HashMap> errorResponse = (ArrayList<HashMap>) fixedDepositAccountHelperValidationError.prematureCloseForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_REINVEST, null, CommonConstants.RESPONSE_ERROR);
+        assertEquals("validation.msg.fixeddepositaccount.onAccountClosureId.reinvest.not.allowed", errorResponse.get(0).get(CommonConstants.RESPONSE_ERROR_MESSAGE_CODE));
     }
 
     @Test
     public void testFixedDepositAccountUpdation() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         monthDayFormat.format(todaysDate.getTime());
         String submittedOnDate = dateFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
         FixedDepositProductHelper.retrieveAllFixedDepositProducts(this.requestSpec, this.responseSpec);
         FixedDepositProductHelper.retrieveFixedDepositProductById(this.requestSpec, this.responseSpec, fixedDepositProductId.toString());
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                submittedOnDate, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), submittedOnDate, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
         todaysDate.add(Calendar.DATE, -1);
         submittedOnDate = dateFormat.format(todaysDate.getTime());
-        HashMap modificationsHashMap = this.fixedDepositAccountHelper.updateFixedDepositAccount(clientId.toString(),
-                fixedDepositProductId.toString(), fixedDepositAccountId.toString(), VALID_FROM, VALID_TO, WHOLE_TERM, submittedOnDate);
+        HashMap modificationsHashMap = this.fixedDepositAccountHelper.updateFixedDepositAccount(clientId.toString(), fixedDepositProductId.toString(), fixedDepositAccountId.toString(), VALID_FROM, VALID_TO, WHOLE_TERM, submittedOnDate);
         Assertions.assertTrue(modificationsHashMap.containsKey("submittedOnDate"));
-
     }
 
     @Test
     public void testFixedDepositAccountUndoApproval() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.undoApproval(fixedDepositAccountId);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
     }
@@ -1193,37 +971,27 @@ public class FixedDepositTest extends IntegrationTest {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String REJECTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.rejectApplication(fixedDepositAccountId, REJECTED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsRejected(fixedDepositAccountStatusHashMap);
         FixedDepositAccountStatusChecker.verifyFixedDepositAccountIsClosed(fixedDepositAccountStatusHashMap);
@@ -1234,37 +1002,27 @@ public class FixedDepositTest extends IntegrationTest {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String WITHDRAWN_ON_DATE = dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.withdrawApplication(fixedDepositAccountId, WITHDRAWN_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsWithdrawn(fixedDepositAccountStatusHashMap);
         FixedDepositAccountStatusChecker.verifyFixedDepositAccountIsClosed(fixedDepositAccountStatusHashMap);
@@ -1274,36 +1032,26 @@ public class FixedDepositTest extends IntegrationTest {
     public void testFixedDepositAccountIsDeleted() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountId = (Integer) this.fixedDepositAccountHelper.deleteFixedDepositApplication(fixedDepositAccountId, "resourceId");
         Assertions.assertNotNull(fixedDepositAccountId);
     }
@@ -1312,17 +1060,14 @@ public class FixedDepositTest extends IntegrationTest {
     public void testMaturityAmountForMonthlyCompoundingAndMonthlyPosting_With_360_Days() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         Integer currentDate = Integer.valueOf(currentDateFormat.format(todaysDate.getTime()));
@@ -1331,49 +1076,32 @@ public class FixedDepositTest extends IntegrationTest {
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(),
-                fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_360, WHOLE_TERM,
-                INTEREST_CALCULATION_USING_DAILY_BALANCE, MONTHLY, MONTHLY);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(), fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_360, WHOLE_TERM, INTEREST_CALCULATION_USING_DAILY_BALANCE, MONTHLY, MONTHLY);
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
-        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float principal = (Float) fixedDepositAccountData.get("depositAmount");
         Float maturityAmount = (Float) fixedDepositAccountData.get("maturityAmount");
         Integer depositPeriod = (Integer) fixedDepositAccountData.get("depositPeriod");
         HashMap daysInYearMap = (HashMap) fixedDepositAccountData.get("interestCalculationDaysInYearType");
         Integer daysInYear = (Integer) daysInYearMap.get("id");
-        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper
-                .getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
+        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper.getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
         Float interestRate = FixedDepositAccountHelper.getInterestRate(interestRateChartData, depositPeriod);
         double interestRateInFraction = interestRate / 100;
         double perDay = (double) 1 / daysInYear;
         log.info("per day = {}", perDay);
         double interestPerDay = interestRateInFraction * perDay;
-
         todaysDate.getActualMaximum(Calendar.DATE);
-
-        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay,
-                MONTHLY_INTERVAL, MONTHLY_INTERVAL);
-
+        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay, MONTHLY_INTERVAL, MONTHLY_INTERVAL);
         log.info("{}", principal.toString());
         Assertions.assertTrue(Math.abs(principal - maturityAmount) < THRESHOLD, "Verifying Maturity amount for Fixed Deposit Account");
     }
@@ -1384,112 +1112,77 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateTimeFormatter dateFormat = Utils.dateFormatter;
-
         LocalDate todaysDate = Utils.getLocalDateOfTenant();
         todaysDate = todaysDate.minusMonths(3);
         final String VALID_FROM = dateFormat.format(todaysDate);
         todaysDate = todaysDate.plusYears(10);
         final String VALID_TO = dateFormat.format(todaysDate);
-
         todaysDate = Utils.getLocalDateOfTenant();
         todaysDate = todaysDate.minusMonths(1);
         todaysDate = todaysDate.minusDays(1);
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate);
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate);
         final String ACTIVATION_DATE = dateFormat.format(todaysDate);
-
         todaysDate = Utils.getLocalDateOfTenant();
         final String CLOSED_ON_DATE = dateFormat.format(todaysDate);
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(),
-                fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_360, WHOLE_TERM,
-                INTEREST_CALCULATION_USING_DAILY_BALANCE, MONTHLY, MONTHLY);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(), fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_360, WHOLE_TERM, INTEREST_CALCULATION_USING_DAILY_BALANCE, MONTHLY, MONTHLY);
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, ACTIVATION_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
-
-        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float principal = (Float) fixedDepositAccountData.get("depositAmount");
         Integer depositPeriod = (Integer) fixedDepositAccountData.get("depositPeriod");
         HashMap daysInYearMap = (HashMap) fixedDepositAccountData.get("interestCalculationDaysInYearType");
         Float preClosurePenalInterestRate = (Float) fixedDepositAccountData.get("preClosurePenalInterest");
         Integer daysInYear = (Integer) daysInYearMap.get("id");
-        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper
-                .getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
-
+        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper.getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
         Float interestRate = FixedDepositAccountHelper.getInterestRate(interestRateChartData, depositPeriod);
         interestRate -= preClosurePenalInterestRate;
         double interestRateInFraction = interestRate / 100;
         double perDay = (double) 1 / daysInYear;
         log.info("per day = {}", perDay);
         double interestPerDay = interestRateInFraction * perDay;
-
         todaysDate = todaysDate.minusMonths(1);
         todaysDate = todaysDate.minusDays(1);
-
         Float interestPerMonth = (float) (interestPerDay * principal * DAYS.between(todaysDate, Utils.getLocalDateOfTenant()));
         principal += interestPerMonth;
         log.info("{}", Utils.dateFormatter.format(todaysDate));
         log.info("IPM = {}", interestPerMonth);
         log.info("principal = {}", principal);
-
         Integer transactionIdForPostInterest = this.fixedDepositAccountHelper.postInterestForFixedDeposit(fixedDepositAccountId);
-
         this.fixedDepositAccountHelper.calculatePrematureAmountForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE);
-
-        Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.prematureCloseForFixedDeposit(
-                fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_WITHDRAW_DEPOSIT, null, CommonConstants.RESPONSE_RESOURCE_ID);
+        Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.prematureCloseForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_WITHDRAW_DEPOSIT, null, CommonConstants.RESPONSE_RESOURCE_ID);
         Assertions.assertNotNull(prematureClosureTransactionId);
-
-        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositAccountIsPrematureClosed(fixedDepositAccountStatusHashMap);
-
-        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
-
+        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float maturityAmount = (float) fixedDepositAccountData.get("maturityAmount");
-
         Assertions.assertTrue(Math.abs(principal - maturityAmount) < THRESHOLD, "Verifying Pre-Closure maturity amount");
-
     }
 
     @Test
     public void testMaturityAmountForMonthlyCompoundingAndMonthlyPosting_With_365_Days() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         Integer currentDate = Integer.valueOf(currentDateFormat.format(todaysDate.getTime()));
@@ -1498,45 +1191,31 @@ public class FixedDepositTest extends IntegrationTest {
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
-        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float principal = (Float) fixedDepositAccountData.get("depositAmount");
         Float maturityAmount = (Float) fixedDepositAccountData.get("maturityAmount");
         Integer depositPeriod = (Integer) fixedDepositAccountData.get("depositPeriod");
         HashMap daysInYearMap = (HashMap) fixedDepositAccountData.get("interestCalculationDaysInYearType");
         Integer daysInYear = (Integer) daysInYearMap.get("id");
-        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper
-                .getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
+        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper.getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
         Float interestRate = FixedDepositAccountHelper.getInterestRate(interestRateChartData, depositPeriod);
         double interestRateInFraction = interestRate / 100;
         double perDay = (double) 1 / daysInYear;
         log.info("per day = {}", perDay);
         double interestPerDay = interestRateInFraction * perDay;
-
         todaysDate.getActualMaximum(Calendar.DATE);
-
-        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay,
-                MONTHLY_INTERVAL, MONTHLY_INTERVAL);
-
+        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay, MONTHLY_INTERVAL, MONTHLY_INTERVAL);
         log.info("{}", principal.toString());
         Assertions.assertTrue(Math.abs(principal - maturityAmount) < THRESHOLD, "Verifying Maturity amount for Fixed Deposit Account");
     }
@@ -1547,15 +1226,12 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateTimeFormatter dateFormat = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter();
-
         LocalDate todaysDate = Utils.getLocalDateOfTenant();
         todaysDate = todaysDate.minusMonths(3);
         final String VALID_FROM = dateFormat.format(todaysDate);
         todaysDate = todaysDate.plusYears(10);
         final String VALID_TO = dateFormat.format(todaysDate);
-
         todaysDate = Utils.getLocalDateOfTenant();
         todaysDate = todaysDate.minusMonths(1);
         todaysDate = todaysDate.minusDays(1);
@@ -1567,67 +1243,44 @@ public class FixedDepositTest extends IntegrationTest {
         todaysDate = todaysDate.plusDays(1);
         final String CLOSED_ON_DATE = dateFormat.format(todaysDate);
         LocalDate closingDate = todaysDate;
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, ACTIVATION_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
-
-        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float principal = (Float) fixedDepositAccountData.get("depositAmount");
         Integer depositPeriod = (Integer) fixedDepositAccountData.get("depositPeriod");
         HashMap daysInYearMap = (HashMap) fixedDepositAccountData.get("interestCalculationDaysInYearType");
         Float preClosurePenalInterestRate = (Float) fixedDepositAccountData.get("preClosurePenalInterest");
         Integer daysInYear = (Integer) daysInYearMap.get("id");
-        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper
-                .getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
-
+        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper.getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
         Float interestRate = FixedDepositAccountHelper.getInterestRate(interestRateChartData, depositPeriod);
         interestRate -= preClosurePenalInterestRate;
         double interestRateInFraction = interestRate / 100;
         double perDay = (double) 1 / daysInYear;
         log.info("per day = {}", perDay);
         double interestPerDay = interestRateInFraction * perDay;
-
         long daysBetween = DAYS.between(activationDate, closingDate);
         Float totalInterest = (float) (interestPerDay * principal * daysBetween);
         principal += totalInterest;
         log.info("principal = {}", principal);
-
         this.fixedDepositAccountHelper.calculatePrematureAmountForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE);
-
-        Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.prematureCloseForFixedDeposit(
-                fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_WITHDRAW_DEPOSIT, null, CommonConstants.RESPONSE_RESOURCE_ID);
+        Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.prematureCloseForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_WITHDRAW_DEPOSIT, null, CommonConstants.RESPONSE_RESOURCE_ID);
         Assertions.assertNotNull(prematureClosureTransactionId);
-
-        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositAccountIsPrematureClosed(fixedDepositAccountStatusHashMap);
-
-        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
-
+        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float maturityAmount = (float) fixedDepositAccountData.get("maturityAmount");
-
         Assertions.assertTrue(Math.abs(principal - maturityAmount) < THRESHOLD, "Verifying Pre-Closure maturity amount");
-
     }
 
     @Test
@@ -1636,15 +1289,12 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateTimeFormatter dateFormat = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter();
-
         LocalDate todaysDate = Utils.getLocalDateOfTenant().minusDays(32);
         todaysDate = todaysDate.minusMonths(3);
         final String VALID_FROM = dateFormat.format(todaysDate);
         todaysDate = todaysDate.plusYears(10);
         final String VALID_TO = dateFormat.format(todaysDate);
-
         todaysDate = Utils.getLocalDateOfTenant().minusDays(32);
         todaysDate = todaysDate.minusMonths(1);
         todaysDate = todaysDate.minusDays(1);
@@ -1652,74 +1302,48 @@ public class FixedDepositTest extends IntegrationTest {
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate);
         final String ACTIVATION_DATE = dateFormat.format(todaysDate);
         LocalDate activationDate = todaysDate;
-
         todaysDate = Utils.getLocalDateOfTenant();
         final String CLOSED_ON_DATE = dateFormat.format(todaysDate);
         LocalDate closingDate = todaysDate;
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, TILL_PREMATURE_WITHDRAWAL);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, TILL_PREMATURE_WITHDRAWAL);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, ACTIVATION_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
-
-        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float principal = (Float) fixedDepositAccountData.get("depositAmount");
         HashMap daysInYearMap = (HashMap) fixedDepositAccountData.get("interestCalculationDaysInYearType");
         Float preClosurePenalInterestRate = (Float) fixedDepositAccountData.get("preClosurePenalInterest");
         Integer daysInYear = (Integer) daysInYearMap.get("id");
-        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper
-                .getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
-
+        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper.getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
         Integer depositedPeriod = Math.toIntExact(ChronoUnit.MONTHS.between(activationDate, closingDate));
-
         Float interestRate = FixedDepositAccountHelper.getInterestRate(interestRateChartData, depositedPeriod);
         interestRate -= preClosurePenalInterestRate;
         double interestRateInFraction = interestRate / 100;
         double perDay = (double) 1 / daysInYear;
         log.info("per day = {}", perDay);
         double interestPerDay = interestRateInFraction * perDay;
-
         long daysBetween = DAYS.between(activationDate, closingDate);
         Float totalInterest = (float) (interestPerDay * principal * daysBetween);
         principal += totalInterest;
-
         log.info("principal = {}", principal);
-
         this.fixedDepositAccountHelper.calculatePrematureAmountForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE);
-
-        Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.prematureCloseForFixedDeposit(
-                fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_WITHDRAW_DEPOSIT, null, CommonConstants.RESPONSE_RESOURCE_ID);
+        Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.prematureCloseForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_WITHDRAW_DEPOSIT, null, CommonConstants.RESPONSE_RESOURCE_ID);
         Assertions.assertNotNull(prematureClosureTransactionId);
-
-        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositAccountIsPrematureClosed(fixedDepositAccountStatusHashMap);
-
-        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
-
+        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float expectedPrematureAmount = principal;
         Float maturityAmount = (float) fixedDepositAccountData.get("maturityAmount");
-
         Assertions.assertTrue(Math.abs(expectedPrematureAmount - maturityAmount) < THRESHOLD, "Verifying Pre-Closure maturity amount");
-
     }
 
     @Test
@@ -1728,15 +1352,12 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateTimeFormatter dateFormat = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter();
-
         LocalDate todaysDate = Utils.getLocalDateOfTenant().minusDays(32);
         todaysDate = todaysDate.minusMonths(3);
         final String VALID_FROM = dateFormat.format(todaysDate);
         todaysDate = todaysDate.plusYears(10);
         final String VALID_TO = dateFormat.format(todaysDate);
-
         todaysDate = Utils.getLocalDateOfTenant().minusDays(32);
         todaysDate = todaysDate.minusMonths(1);
         todaysDate = todaysDate.minusDays(1);
@@ -1744,95 +1365,63 @@ public class FixedDepositTest extends IntegrationTest {
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate);
         final String ACTIVATION_DATE = dateFormat.format(todaysDate);
         LocalDate activationDate = todaysDate;
-
         todaysDate = Utils.getLocalDateOfTenant();
         final String CLOSED_ON_DATE = dateFormat.format(todaysDate);
         LocalDate closingDate = todaysDate;
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, TILL_PREMATURE_WITHDRAWAL);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, TILL_PREMATURE_WITHDRAWAL);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(),
-                fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_360, TILL_PREMATURE_WITHDRAWAL,
-                INTEREST_CALCULATION_USING_DAILY_BALANCE, MONTHLY, MONTHLY);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(), fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_360, TILL_PREMATURE_WITHDRAWAL, INTEREST_CALCULATION_USING_DAILY_BALANCE, MONTHLY, MONTHLY);
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, ACTIVATION_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
-
-        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float principal = (Float) fixedDepositAccountData.get("depositAmount");
         HashMap daysInYearMap = (HashMap) fixedDepositAccountData.get("interestCalculationDaysInYearType");
         Float preClosurePenalInterestRate = (Float) fixedDepositAccountData.get("preClosurePenalInterest");
         Integer daysInYear = (Integer) daysInYearMap.get("id");
-        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper
-                .getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
-
+        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper.getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
         Integer depositedPeriod = Math.toIntExact(ChronoUnit.MONTHS.between(activationDate, closingDate));
-
         Float interestRate = FixedDepositAccountHelper.getInterestRate(interestRateChartData, depositedPeriod);
         interestRate -= preClosurePenalInterestRate;
         double interestRateInFraction = interestRate / 100;
         double perDay = (double) 1 / daysInYear;
         log.info("per day = {}", perDay);
         double interestPerDay = interestRateInFraction * perDay;
-
         long daysBetween = DAYS.between(activationDate, closingDate);
         Float totalInterest = (float) (interestPerDay * principal * daysBetween);
         principal += totalInterest;
-
         log.info("principal = {}", principal);
-
         this.fixedDepositAccountHelper.calculatePrematureAmountForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE);
-
-        Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.prematureCloseForFixedDeposit(
-                fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_WITHDRAW_DEPOSIT, null, CommonConstants.RESPONSE_RESOURCE_ID);
+        Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.prematureCloseForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE, CLOSURE_TYPE_WITHDRAW_DEPOSIT, null, CommonConstants.RESPONSE_RESOURCE_ID);
         Assertions.assertNotNull(prematureClosureTransactionId);
-
-        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositAccountIsPrematureClosed(fixedDepositAccountStatusHashMap);
-
-        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
-
+        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float expectedPrematureAmount = principal;
         Float maturityAmount = (Float) fixedDepositAccountData.get("maturityAmount");
-
         Assertions.assertTrue(Math.abs(expectedPrematureAmount - maturityAmount) < THRESHOLD, "Verifying Pre-Closure maturity amount");
-
     }
 
     @Test
     public void testMaturityAmountForDailyCompoundingAndMonthlyPosting_With_365_Days() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         Integer currentDate = Integer.valueOf(currentDateFormat.format(todaysDate.getTime()));
@@ -1841,70 +1430,48 @@ public class FixedDepositTest extends IntegrationTest {
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(),
-                fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_365, WHOLE_TERM,
-                INTEREST_CALCULATION_USING_DAILY_BALANCE, DAILY, MONTHLY);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(), fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_365, WHOLE_TERM, INTEREST_CALCULATION_USING_DAILY_BALANCE, DAILY, MONTHLY);
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
-        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float principal = (Float) fixedDepositAccountData.get("depositAmount");
         Float maturityAmount = (Float) fixedDepositAccountData.get("maturityAmount");
         Integer depositPeriod = (Integer) fixedDepositAccountData.get("depositPeriod");
         HashMap daysInYearMap = (HashMap) fixedDepositAccountData.get("interestCalculationDaysInYearType");
         Integer daysInYear = (Integer) daysInYearMap.get("id");
-        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper
-                .getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
-
+        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper.getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
         Float interestRate = FixedDepositAccountHelper.getInterestRate(interestRateChartData, depositPeriod);
         double interestRateInFraction = interestRate / 100;
         double perDay = (double) 1 / daysInYear;
         log.info("per day = {}", perDay);
         double interestPerDay = interestRateInFraction * perDay;
-
         todaysDate.getActualMaximum(Calendar.DATE);
-
-        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay,
-                DAILY_COMPOUNDING_INTERVAL, MONTHLY_INTERVAL);
-
+        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay, DAILY_COMPOUNDING_INTERVAL, MONTHLY_INTERVAL);
         log.info("{}", principal.toString());
         Assertions.assertTrue(Math.abs(principal - maturityAmount) < THRESHOLD, "Verifying Maturity amount for Fixed Deposit Account");
-
     }
 
     @Test
     public void testMaturityAmountForDailyCompoundingAndMonthlyPosting_With_360_Days() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         // todaysDate.add(Calendar.MONTH, -1);
         Integer currentDate = Integer.valueOf(currentDateFormat.format(todaysDate.getTime()));
@@ -1913,55 +1480,36 @@ public class FixedDepositTest extends IntegrationTest {
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         log.info("Submitted Date: {}", SUBMITTED_ON_DATE);
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(),
-                fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_360, WHOLE_TERM,
-                INTEREST_CALCULATION_USING_DAILY_BALANCE, DAILY, MONTHLY);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(), fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_360, WHOLE_TERM, INTEREST_CALCULATION_USING_DAILY_BALANCE, DAILY, MONTHLY);
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
-        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float principal = (Float) fixedDepositAccountData.get("depositAmount");
         Float maturityAmount = (Float) fixedDepositAccountData.get("maturityAmount");
         Integer depositPeriod = (Integer) fixedDepositAccountData.get("depositPeriod");
         HashMap daysInYearMap = (HashMap) fixedDepositAccountData.get("interestCalculationDaysInYearType");
         Integer daysInYear = (Integer) daysInYearMap.get("id");
-        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper
-                .getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
-
+        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper.getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
         Float interestRate = FixedDepositAccountHelper.getInterestRate(interestRateChartData, depositPeriod);
         double interestRateInFraction = interestRate / 100;
         double perDay = (double) 1 / daysInYear;
         log.info("per day = {}", perDay);
         double interestPerDay = interestRateInFraction * perDay;
-
         todaysDate.getActualMaximum(Calendar.DATE);
-
-        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay,
-                DAILY_COMPOUNDING_INTERVAL, MONTHLY_INTERVAL);
-
+        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay, DAILY_COMPOUNDING_INTERVAL, MONTHLY_INTERVAL);
         principal = new BigDecimal(principal).setScale(0, RoundingMode.FLOOR).floatValue();
         maturityAmount = new BigDecimal(maturityAmount).setScale(0, RoundingMode.FLOOR).floatValue();
         log.info("{}", principal.toString());
-
         assertThat(maturityAmount).isIn(principal, principal - 1); // FINERACT-887
     }
 
@@ -1969,14 +1517,11 @@ public class FixedDepositTest extends IntegrationTest {
     public void testMaturityAmountForDailyCompoundingAndAnnuallyPosting_With_365_Days() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
-
         todaysDate.add(Calendar.YEAR, -1);
         Integer currentMonth = Integer.valueOf(currentMonthFormat.format(todaysDate.getTime()));
         Integer numberOfMonths = 12 - currentMonth;
@@ -1988,78 +1533,52 @@ public class FixedDepositTest extends IntegrationTest {
         daysInMonth = todaysDate.getActualMaximum(Calendar.DATE);
         log.info("{}", dateFormat.format(todaysDate.getTime()));
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
-
         final String VALID_TO = null;
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String ACTIVATION_DATE = dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(),
-                fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_365, WHOLE_TERM,
-                INTEREST_CALCULATION_USING_DAILY_BALANCE, DAILY, ANNUALLY);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(), fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_365, WHOLE_TERM, INTEREST_CALCULATION_USING_DAILY_BALANCE, DAILY, ANNUALLY);
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, ACTIVATION_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
-
-        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float principal = (Float) fixedDepositAccountData.get("depositAmount");
         Integer depositPeriod = (Integer) fixedDepositAccountData.get("depositPeriod");
         HashMap daysInYearMap = (HashMap) fixedDepositAccountData.get("interestCalculationDaysInYearType");
         Integer daysInYear = (Integer) daysInYearMap.get("id");
-        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper
-                .getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
-
+        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper.getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
         Float interestRate = FixedDepositAccountHelper.getInterestRate(interestRateChartData, depositPeriod);
         double interestRateInFraction = interestRate / 100;
         double perDay = (double) 1 / daysInYear;
         log.info("per day = {}", perDay);
         double interestPerDay = interestRateInFraction * perDay;
-
-        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay,
-                DAILY_COMPOUNDING_INTERVAL, ANNUL_INTERVAL);
-
-        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
-
+        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay, DAILY_COMPOUNDING_INTERVAL, ANNUL_INTERVAL);
+        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float expectedPrematureAmount = principal;
         Float maturityAmount = (Float) fixedDepositAccountData.get("maturityAmount");
-
         Assertions.assertTrue(Math.abs(expectedPrematureAmount - maturityAmount) < THRESHOLD, "Verifying Maturity amount");
-
     }
 
     @Test
     public void testMaturityAmountDailyCompoundingAndAnnuallyPostingWith_360_Days() {
         this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
-
         todaysDate.add(Calendar.YEAR, -1);
         Integer currentMonth = Integer.valueOf(currentMonthFormat.format(todaysDate.getTime()));
         Integer numberOfMonths = 12 - currentMonth;
@@ -2071,64 +1590,41 @@ public class FixedDepositTest extends IntegrationTest {
         daysInMonth = todaysDate.getActualMaximum(Calendar.DATE);
         log.info("{}", dateFormat.format(todaysDate.getTime()));
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
-
         final String VALID_TO = null;
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String ACTIVATION_DATE = dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(),
-                fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_360, WHOLE_TERM,
-                INTEREST_CALCULATION_USING_DAILY_BALANCE, DAILY, ANNUALLY);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(), fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_360, WHOLE_TERM, INTEREST_CALCULATION_USING_DAILY_BALANCE, DAILY, ANNUALLY);
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, ACTIVATION_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
-
-        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float principal = (Float) fixedDepositAccountData.get("depositAmount");
         Integer depositPeriod = (Integer) fixedDepositAccountData.get("depositPeriod");
         HashMap daysInYearMap = (HashMap) fixedDepositAccountData.get("interestCalculationDaysInYearType");
         Integer daysInYear = (Integer) daysInYearMap.get("id");
-        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper
-                .getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
-
+        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper.getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
         Float interestRate = FixedDepositAccountHelper.getInterestRate(interestRateChartData, depositPeriod);
         double interestRateInFraction = interestRate / 100;
         double perDay = (double) 1 / daysInYear;
         log.info("per day = {}", perDay);
         double interestPerDay = interestRateInFraction * perDay;
-
-        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay,
-                DAILY_COMPOUNDING_INTERVAL, ANNUL_INTERVAL);
-
-        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
-
+        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay, DAILY_COMPOUNDING_INTERVAL, ANNUL_INTERVAL);
+        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float expectedPrematureAmount = principal;
         Float maturityAmount = (Float) fixedDepositAccountData.get("maturityAmount");
-
         Assertions.assertTrue(Math.abs(expectedPrematureAmount - maturityAmount) < THRESHOLD, "Verifying Maturity amount");
-
     }
 
     @Test
@@ -2137,12 +1633,10 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.YEAR, -1);
         Integer currentMonth = Integer.valueOf(currentMonthFormat.format(todaysDate.getTime()));
@@ -2155,61 +1649,39 @@ public class FixedDepositTest extends IntegrationTest {
         daysInMonth = todaysDate.getActualMaximum(Calendar.DATE);
         log.info("{}", dateFormat.format(todaysDate.getTime()));
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
-
         final String VALID_TO = null;
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(),
-                fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_365, WHOLE_TERM,
-                INTEREST_CALCULATION_USING_DAILY_BALANCE, BI_ANNUALLY, BI_ANNUALLY);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(), fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_365, WHOLE_TERM, INTEREST_CALCULATION_USING_DAILY_BALANCE, BI_ANNUALLY, BI_ANNUALLY);
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
-        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float principal = (Float) fixedDepositAccountData.get("depositAmount");
         Integer depositPeriod = (Integer) fixedDepositAccountData.get("depositPeriod");
         HashMap daysInYearMap = (HashMap) fixedDepositAccountData.get("interestCalculationDaysInYearType");
         Integer daysInYear = (Integer) daysInYearMap.get("id");
-        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper
-                .getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
-
+        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper.getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
         Float interestRate = FixedDepositAccountHelper.getInterestRate(interestRateChartData, depositPeriod);
         double interestRateInFraction = interestRate / 100;
         double perDay = (double) 1 / daysInYear;
         log.info("per day = {}", perDay);
         double interestPerDay = interestRateInFraction * perDay;
-
-        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay,
-                BIANNULLY_INTERVAL, BIANNULLY_INTERVAL);
-
-        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
-
+        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay, BIANNULLY_INTERVAL, BIANNULLY_INTERVAL);
+        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float expectedPrematureAmount = principal;
         Float maturityAmount = (Float) fixedDepositAccountData.get("maturityAmount");
-
         Assertions.assertTrue(Math.abs(expectedPrematureAmount - maturityAmount) < THRESHOLD, "Verifying Pre-Closure maturity amount");
-
     }
 
     @Test
@@ -2218,12 +1690,10 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.YEAR, -1);
         Integer currentMonth = Integer.valueOf(currentMonthFormat.format(todaysDate.getTime()));
@@ -2236,61 +1706,39 @@ public class FixedDepositTest extends IntegrationTest {
         daysInMonth = todaysDate.getActualMaximum(Calendar.DATE);
         log.info("{}", dateFormat.format(todaysDate.getTime()));
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
-
         final String VALID_TO = null;
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(),
-                fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_360, WHOLE_TERM,
-                INTEREST_CALCULATION_USING_DAILY_BALANCE, BI_ANNUALLY, BI_ANNUALLY);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(), fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_360, WHOLE_TERM, INTEREST_CALCULATION_USING_DAILY_BALANCE, BI_ANNUALLY, BI_ANNUALLY);
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
-        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float principal = (Float) fixedDepositAccountData.get("depositAmount");
         Integer depositPeriod = (Integer) fixedDepositAccountData.get("depositPeriod");
         HashMap daysInYearMap = (HashMap) fixedDepositAccountData.get("interestCalculationDaysInYearType");
         Integer daysInYear = (Integer) daysInYearMap.get("id");
-        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper
-                .getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
-
+        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper.getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
         Float interestRate = FixedDepositAccountHelper.getInterestRate(interestRateChartData, depositPeriod);
         double interestRateInFraction = interestRate / 100;
         double perDay = (double) 1 / daysInYear;
         log.info("per day = {}", perDay);
         double interestPerDay = interestRateInFraction * perDay;
-
-        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay,
-                BIANNULLY_INTERVAL, BIANNULLY_INTERVAL);
-
-        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
-
+        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay, BIANNULLY_INTERVAL, BIANNULLY_INTERVAL);
+        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float expectedPrematureAmount = principal;
         Float maturityAmount = (Float) fixedDepositAccountData.get("maturityAmount");
-
         Assertions.assertTrue(Math.abs(expectedPrematureAmount - maturityAmount) < THRESHOLD, "Verifying Pre-Closure maturity amount");
-
     }
 
     @Test
@@ -2299,12 +1747,10 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.YEAR, -1);
         Integer currentMonth = Integer.valueOf(currentMonthFormat.format(todaysDate.getTime()));
@@ -2317,59 +1763,38 @@ public class FixedDepositTest extends IntegrationTest {
         daysInMonth = todaysDate.getActualMaximum(Calendar.DATE);
         log.info("{}", dateFormat.format(todaysDate.getTime()));
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
-
         final String VALID_TO = null;
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(),
-                fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_365, WHOLE_TERM,
-                INTEREST_CALCULATION_USING_DAILY_BALANCE, QUARTERLY, QUARTERLY);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(), fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_365, WHOLE_TERM, INTEREST_CALCULATION_USING_DAILY_BALANCE, QUARTERLY, QUARTERLY);
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
-        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float principal = (Float) fixedDepositAccountData.get("depositAmount");
         Integer depositPeriod = (Integer) fixedDepositAccountData.get("depositPeriod");
         HashMap daysInYearMap = (HashMap) fixedDepositAccountData.get("interestCalculationDaysInYearType");
         Integer daysInYear = (Integer) daysInYearMap.get("id");
-        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper
-                .getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
-
+        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper.getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
         Float interestRate = FixedDepositAccountHelper.getInterestRate(interestRateChartData, depositPeriod);
         double interestRateInFraction = interestRate / 100;
         double perDay = (double) 1 / daysInYear;
         log.info("per day = {}", perDay);
         double interestPerDay = interestRateInFraction * perDay;
-
-        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay,
-                QUARTERLY_INTERVAL, QUARTERLY_INTERVAL);
-
-        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
-
+        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay, QUARTERLY_INTERVAL, QUARTERLY_INTERVAL);
+        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float expectedPrematureAmount = principal;
         Float maturityAmount = (Float) fixedDepositAccountData.get("maturityAmount");
-
         Assertions.assertTrue(Math.abs(expectedPrematureAmount - maturityAmount) < THRESHOLD, "Verifying Pre-Closure maturity amount");
     }
 
@@ -2379,12 +1804,10 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentMonthFormat = new SimpleDateFormat("MM");
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.YEAR, -1);
         Integer currentMonth = Integer.valueOf(currentMonthFormat.format(todaysDate.getTime()));
@@ -2397,63 +1820,42 @@ public class FixedDepositTest extends IntegrationTest {
         daysInMonth = todaysDate.getActualMaximum(Calendar.DATE);
         log.info("{}", dateFormat.format(todaysDate.getTime()));
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
-
         final String VALID_TO = null;
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         dateFormat.format(todaysDate.getTime());
         monthDayFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
         final String accountingRule = NONE;
         Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(),
-                fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_360, WHOLE_TERM,
-                INTEREST_CALCULATION_USING_DAILY_BALANCE, QUARTERLY, QUARTERLY);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        this.fixedDepositAccountHelper.updateInterestCalculationConfigForFixedDeposit(clientId.toString(), fixedDepositProductId.toString(), fixedDepositAccountId.toString(), SUBMITTED_ON_DATE, VALID_FROM, VALID_TO, DAYS_360, WHOLE_TERM, INTEREST_CALCULATION_USING_DAILY_BALANCE, QUARTERLY, QUARTERLY);
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
-        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
+        HashMap fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float principal = (Float) fixedDepositAccountData.get("depositAmount");
         Integer depositPeriod = (Integer) fixedDepositAccountData.get("depositPeriod");
         HashMap daysInYearMap = (HashMap) fixedDepositAccountData.get("interestCalculationDaysInYearType");
         Integer daysInYear = (Integer) daysInYearMap.get("id");
-        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper
-                .getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
-
+        ArrayList<ArrayList<HashMap>> interestRateChartData = FixedDepositProductHelper.getInterestRateChartSlabsByProductId(this.requestSpec, this.responseSpec, fixedDepositProductId);
         Float interestRate = FixedDepositAccountHelper.getInterestRate(interestRateChartData, depositPeriod);
         double interestRateInFraction = interestRate / 100;
         double perDay = (double) 1 / daysInYear;
         log.info("per day = {}", perDay);
         double interestPerDay = interestRateInFraction * perDay;
-
-        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay,
-                QUARTERLY_INTERVAL, QUARTERLY_INTERVAL);
-
-        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec,
-                fixedDepositAccountId);
-
+        principal = FixedDepositAccountHelper.getPrincipalAfterCompoundingInterest(todaysDate, principal, depositPeriod, interestPerDay, QUARTERLY_INTERVAL, QUARTERLY_INTERVAL);
+        fixedDepositAccountData = FixedDepositAccountHelper.getFixedDepositAccountById(this.requestSpec, this.responseSpec, fixedDepositAccountId);
         Float expectedPrematureAmount = principal;
         Float maturityAmount = (Float) fixedDepositAccountData.get("maturityAmount");
-
         Assertions.assertTrue(Math.abs(expectedPrematureAmount - maturityAmount) < THRESHOLD, "Verifying Pre-Closure maturity amount");
     }
 
-    /***
+    /**
      * Test case for Fixed Deposit Account rollover with maturity instruction as re invest maturity
      * amount(principal+interest)
      */
@@ -2463,70 +1865,54 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
-        /***
+        /**
          * Create GL Accounts for product account mapping
          */
         final Account assetAccount = this.accountHelper.createAssetAccount();
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String ACTIVATION_DATE = dateFormat.format(todaysDate.getTime());
-
         Integer currentDate = Integer.valueOf(currentDateFormat.format(todaysDate.getTime()));
         Integer daysInMonth = todaysDate.getActualMaximum(Calendar.DATE);
         Integer numberOfDaysLeft = daysInMonth - currentDate + 1;
         todaysDate.add(Calendar.DATE, numberOfDaysLeft);
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
-        /***
+        /**
          * Create FD product with CashBased accounting enabled
          */
         final String accountingRule = CASH_BASED;
-        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount,
-                incomeAccount, expenseAccount);
+        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        /***
+        /**
          * Set maturityInstructionId as re-invest principal+interest
          */
         final Integer maturityInstructionId = 300;
-
-        /***
+        /**
          * Apply for FD account with created product and verify status
          */
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM, maturityInstructionId);
-
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM, maturityInstructionId);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         /***
          * Approve the FD account and verify whether account is approved
          */
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
         /***
          * Activate the FD Account and verify whether account is activated
          */
@@ -2534,7 +1920,7 @@ public class FixedDepositTest extends IntegrationTest {
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
     }
 
-    /***
+    /**
      * Test case for Fixed Deposit Account rollover with maturity instruction as re invest principal only
      */
     @Test
@@ -2543,77 +1929,61 @@ public class FixedDepositTest extends IntegrationTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
-        /***
+        /**
          * Create GL Accounts for product account mapping
          */
         final Account assetAccount = this.accountHelper.createAssetAccount();
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         new SimpleDateFormat("dd MMM", Locale.US);
         DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String ACTIVATION_DATE = dateFormat.format(todaysDate.getTime());
-
         Integer currentDate = Integer.valueOf(currentDateFormat.format(todaysDate.getTime()));
         Integer daysInMonth = todaysDate.getActualMaximum(Calendar.DATE);
         Integer numberOfDaysLeft = daysInMonth - currentDate + 1;
         todaysDate.add(Calendar.DATE, numberOfDaysLeft);
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
-        /***
+        /**
          * Create FD product with CashBased accounting enabled
          */
         final String accountingRule = CASH_BASED;
-        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount,
-                incomeAccount, expenseAccount);
+        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        /***
+        /**
          * Set maturityInstructionId as re-invest principal
          */
         final Integer maturityInstructionId = 400;
-
-        /***
+        /**
          * Apply for FD account with created product and verify status
          */
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM, maturityInstructionId);
-
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM, maturityInstructionId);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         /***
          * Approve the FD account and verify whether account is approved
          */
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
-        /***
-         * Activate the FD Account and verify whether account is activated
-         */
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, ACTIVATION_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
     }
 
+    /**
+     * Activate the FD Account and verify whether account is activated
+     */
     @Test
     public void testCloseFixedDepositForCLOSURE_TYPE_REINVEST_withConfigurationMaturityInstruction() {
         try {
@@ -2621,21 +1991,17 @@ public class FixedDepositTest extends IntegrationTest {
             final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
             final Account incomeAccount = this.accountHelper.createIncomeAccount();
             final Account expenseAccount = this.accountHelper.createExpenseAccount();
-
             this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
             this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
             DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
             DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
             DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
             Calendar todaysDate = Calendar.getInstance();
             int currentYear = todaysDate.get(Calendar.YEAR);
             todaysDate.set(currentYear, Calendar.JANUARY, 1);
             final String VALID_FROM = dateFormat.format(todaysDate.getTime());
             todaysDate.set(currentYear + 1, Calendar.MARCH, 1);
             final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
             todaysDate = Calendar.getInstance();
             Integer currentDate = Integer.valueOf(currentDateFormat.format(todaysDate.getTime()));
             todaysDate.set(currentYear, Calendar.JANUARY, 1);
@@ -2643,41 +2009,25 @@ public class FixedDepositTest extends IntegrationTest {
             final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
             dateFormat.format(todaysDate.getTime());
             monthDayFormat.format(todaysDate.getTime());
-
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             LocalDate marchDate = LocalDate.of(currentYear + 1, 3, 1);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, marchDate);
-
             log.info("Submitted Date: {}", SUBMITTED_ON_DATE);
-
             final String accountingRule = ACCRUAL;
-            Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount,
-                    incomeAccount, expenseAccount);
+            Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
             Assertions.assertNotNull(fixedDepositProductId);
-
             Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
             Assertions.assertNotNull(clientId);
-
-            Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                    SUBMITTED_ON_DATE, WHOLE_TERM, Integer.valueOf(CLOSURE_TYPE_REINVEST));
+            Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM, Integer.valueOf(CLOSURE_TYPE_REINVEST));
             Assertions.assertNotNull(fixedDepositAccountId);
-
             this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
             this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
-
             schedulerJobHelper.executeAndAwaitJob("Update Deposit Accounts Maturity details");
-
-            HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                    this.responseSpec, fixedDepositAccountId.toString());
-
+            HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
             FixedDepositAccountStatusChecker.verifyFixedDepositAccountIsClosed(fixedDepositAccountStatusHashMap);
         } finally {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
-
     }
 
     @Test
@@ -2696,21 +2046,17 @@ public class FixedDepositTest extends IntegrationTest {
             final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
             final Account incomeAccount = this.accountHelper.createIncomeAccount();
             final Account expenseAccount = this.accountHelper.createExpenseAccount();
-
             this.fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
             this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
-
             DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
             DateFormat monthDayFormat = new SimpleDateFormat("dd MMM", Locale.US);
             DateFormat currentDateFormat = new SimpleDateFormat("dd");
-
             Calendar todaysDate = Calendar.getInstance();
             int currentYear = todaysDate.get(Calendar.YEAR);
             todaysDate.set(currentYear, Calendar.JANUARY, 1);
             final String VALID_FROM = dateFormat.format(todaysDate.getTime());
             todaysDate.set(currentYear + 1, Calendar.JANUARY, 1);
             final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
             todaysDate = Calendar.getInstance();
             Integer currentDate = Integer.valueOf(currentDateFormat.format(todaysDate.getTime()));
             todaysDate.set(currentYear, Calendar.JANUARY, 1);
@@ -2718,56 +2064,33 @@ public class FixedDepositTest extends IntegrationTest {
             final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
             dateFormat.format(todaysDate.getTime());
             monthDayFormat.format(todaysDate.getTime());
-
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(true));
-
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(true));
             LocalDate marchDate = LocalDate.of(currentYear + 1, 1, 1);
             BusinessDateHelper.updateBusinessDate(BusinessDateType.BUSINESS_DATE, marchDate);
-
             log.info("Submitted Date: {}", SUBMITTED_ON_DATE);
-
             final String accountingRule = ACCRUAL;
-            Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount,
-                    incomeAccount, expenseAccount);
+            Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, accountingRule, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
             Assertions.assertNotNull(fixedDepositProductId);
-
             Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
             Assertions.assertNotNull(clientId);
-
-            Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                    SUBMITTED_ON_DATE, WHOLE_TERM, "10000", "12");
+            Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM, "10000", "12");
             Assertions.assertNotNull(fixedDepositAccountId);
-
             this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
             this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
-
             schedulerJobHelper.executeAndAwaitJob("Update Deposit Accounts Maturity details");
-
-            HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                    this.responseSpec, fixedDepositAccountId.toString());
-
+            HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
             FixedDepositAccountStatusChecker.verifyFixedDepositAccountIsMatured(fixedDepositAccountStatusHashMap);
-
             todaysDate.set(currentYear + 1, Calendar.JANUARY, 1);
             final String CLOSED_ON_DATE = dateFormat.format(todaysDate.getTime());
-
-            Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.closeForFixedDeposit(fixedDepositAccountId,
-                    CLOSED_ON_DATE, reInvest, null, CommonConstants.RESPONSE_RESOURCE_ID);
-
-            fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                    this.responseSpec, fixedDepositAccountId.toString());
-
+            Integer prematureClosureTransactionId = (Integer) this.fixedDepositAccountHelper.closeForFixedDeposit(fixedDepositAccountId, CLOSED_ON_DATE, reInvest, null, CommonConstants.RESPONSE_RESOURCE_ID);
+            fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
             FixedDepositAccountStatusChecker.verifyFixedDepositAccountIsClosed(fixedDepositAccountStatusHashMap);
         } finally {
-            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE,
-                    new PutGlobalConfigurationsRequest().enabled(false));
+            globalConfigurationHelper.updateGlobalConfiguration(GlobalConfigurationConstants.ENABLE_BUSINESS_DATE, new PutGlobalConfigurationsRequest().enabled(false));
         }
-
     }
 
-    private Integer createFixedDepositProduct(final String validFrom, final String validTo, final String accountingRule,
-            Account... accounts) {
+    private Integer createFixedDepositProduct(final String validFrom, final String validTo, final String accountingRule, Account... accounts) {
         log.info("------------------------------CREATING NEW FIXED DEPOSIT PRODUCT ---------------------------------------");
         FixedDepositProductHelper fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         if (accountingRule.equals(CASH_BASED)) {
@@ -2777,13 +2100,12 @@ public class FixedDepositTest extends IntegrationTest {
         } else if (accountingRule.equals(ACCRUAL)) {
             fixedDepositProductHelper = fixedDepositProductHelper.withAccountingRuleAsAccrual(accounts);
         }
-        final String fixedDepositProductJSON = fixedDepositProductHelper.withPeriodRangeChart() //
-                .build(validFrom, validTo, true);
+        final String fixedDepositProductJSON =  //
+        fixedDepositProductHelper.withPeriodRangeChart().build(validFrom, validTo, true);
         return FixedDepositProductHelper.createFixedDepositProduct(fixedDepositProductJSON, requestSpec, responseSpec);
     }
 
-    private Integer createFixedDepositProductWithoutCharts(final String validFrom, final String validTo, final String accountingRule,
-            Account... accounts) {
+    private Integer createFixedDepositProductWithoutCharts(final String validFrom, final String validTo, final String accountingRule, Account... accounts) {
         log.info("------------------------------CREATING NEW FIXED DEPOSIT PRODUCT ---------------------------------------");
         FixedDepositProductHelper fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         if (accountingRule.equals(CASH_BASED)) {
@@ -2791,13 +2113,12 @@ public class FixedDepositTest extends IntegrationTest {
         } else if (accountingRule.equals(NONE)) {
             fixedDepositProductHelper = fixedDepositProductHelper.withAccountingRuleAsNone();
         }
-        final String fixedDepositProductJSON = fixedDepositProductHelper.withPeriodRangeChart() //
-                .build(validFrom, validTo, false);
+        final String fixedDepositProductJSON =  //
+        fixedDepositProductHelper.withPeriodRangeChart().build(validFrom, validTo, false);
         return FixedDepositProductHelper.createFixedDepositProduct(fixedDepositProductJSON, requestSpec, responseSpec);
     }
 
-    private Integer createFixedDepositProductWithWithHoldTax(final String validFrom, final String validTo, final String taxGroupId,
-            final String accountingRule, Account... accounts) {
+    private Integer createFixedDepositProductWithWithHoldTax(final String validFrom, final String validTo, final String taxGroupId, final String accountingRule, Account... accounts) {
         log.info("------------------------------CREATING NEW FIXED DEPOSIT PRODUCT ---------------------------------------");
         FixedDepositProductHelper fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         if (accountingRule.equals(CASH_BASED)) {
@@ -2805,14 +2126,13 @@ public class FixedDepositTest extends IntegrationTest {
         } else if (accountingRule.equals(NONE)) {
             fixedDepositProductHelper = fixedDepositProductHelper.withAccountingRuleAsNone();
         }
-        final String fixedDepositProductJSON = fixedDepositProductHelper.withPeriodRangeChart() //
-                .withWithHoldTax(taxGroupId)//
-                .build(validFrom, validTo);
+        final String fixedDepositProductJSON =  //
+        //
+        fixedDepositProductHelper.withPeriodRangeChart().withWithHoldTax(taxGroupId).build(validFrom, validTo);
         return FixedDepositProductHelper.createFixedDepositProduct(fixedDepositProductJSON, requestSpec, responseSpec);
     }
 
-    private Integer createFixedDepositProduct(final String validFrom, final String validTo, final String accountingRule,
-            final String chartToBePicked, Account... accounts) {
+    private Integer createFixedDepositProduct(final String validFrom, final String validTo, final String accountingRule, final String chartToBePicked, Account... accounts) {
         log.info("------------------------------CREATING NEW FIXED DEPOSIT PRODUCT ---------------------------------------");
         FixedDepositProductHelper fixedDepositProductHelper = new FixedDepositProductHelper(this.requestSpec, this.responseSpec);
         if (accountingRule.equals(CASH_BASED)) {
@@ -2821,73 +2141,61 @@ public class FixedDepositTest extends IntegrationTest {
             fixedDepositProductHelper = fixedDepositProductHelper.withAccountingRuleAsNone();
         }
         switch (chartToBePicked) {
-            case "period":
-                fixedDepositProductHelper = fixedDepositProductHelper.withPeriodRangeChart();
+        case "period": 
+            fixedDepositProductHelper = fixedDepositProductHelper.withPeriodRangeChart();
             break;
-            case "amount":
-                fixedDepositProductHelper = fixedDepositProductHelper.withAmountRangeChart();
+        case "amount": 
+            fixedDepositProductHelper = fixedDepositProductHelper.withAmountRangeChart();
             break;
-            case "period_amount":
-                fixedDepositProductHelper = fixedDepositProductHelper.withPeriodAndAmountRangeChart();
+        case "period_amount": 
+            fixedDepositProductHelper = fixedDepositProductHelper.withPeriodAndAmountRangeChart();
             break;
-            case "amount_period":
-                fixedDepositProductHelper = fixedDepositProductHelper.withAmountAndPeriodRangeChart();
+        case "amount_period": 
+            fixedDepositProductHelper = fixedDepositProductHelper.withAmountAndPeriodRangeChart();
             break;
-            default:
+        default: 
             break;
         }
-
-        final String fixedDepositProductJSON = fixedDepositProductHelper //
-                .build(validFrom, validTo);
+        final String fixedDepositProductJSON =  //
+        fixedDepositProductHelper.build(validFrom, validTo);
         return FixedDepositProductHelper.createFixedDepositProduct(fixedDepositProductJSON, requestSpec, responseSpec);
     }
 
-    private Integer applyForFixedDepositApplication(final String clientID, final String productID, final String submittedOnDate,
-            final String penalInterestType) {
+    private Integer applyForFixedDepositApplication(final String clientID, final String productID, final String submittedOnDate, final String penalInterestType) {
         log.info("--------------------------------APPLYING FOR FIXED DEPOSIT ACCOUNT --------------------------------");
-        final String fixedDepositApplicationJSON = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec) //
-                .withSubmittedOnDate(submittedOnDate).build(clientID, productID, penalInterestType);
-        return FixedDepositAccountHelper.applyFixedDepositApplicationGetId(fixedDepositApplicationJSON, this.requestSpec,
-                this.responseSpec);
+        final String fixedDepositApplicationJSON =  //
+        new FixedDepositAccountHelper(this.requestSpec, this.responseSpec).withSubmittedOnDate(submittedOnDate).build(clientID, productID, penalInterestType);
+        return FixedDepositAccountHelper.applyFixedDepositApplicationGetId(fixedDepositApplicationJSON, this.requestSpec, this.responseSpec);
     }
 
-    private Integer applyForFixedDepositApplication(final String clientID, final String productID, final String submittedOnDate,
-            final String penalInterestType, final Integer maturityInstructionId) {
+    private Integer applyForFixedDepositApplication(final String clientID, final String productID, final String submittedOnDate, final String penalInterestType, final Integer maturityInstructionId) {
         log.info("--------------------------------APPLYING FOR FIXED DEPOSIT ACCOUNT --------------------------------");
-        final String fixedDepositApplicationJSON = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec) //
-                .withSubmittedOnDate(submittedOnDate).withMaturityInstructionId(maturityInstructionId)
-                .build(clientID, productID, penalInterestType);
-        return FixedDepositAccountHelper.applyFixedDepositApplicationGetId(fixedDepositApplicationJSON, this.requestSpec,
-                this.responseSpec);
+        final String fixedDepositApplicationJSON =  //
+        new FixedDepositAccountHelper(this.requestSpec, this.responseSpec).withSubmittedOnDate(submittedOnDate).withMaturityInstructionId(maturityInstructionId).build(clientID, productID, penalInterestType);
+        return FixedDepositAccountHelper.applyFixedDepositApplicationGetId(fixedDepositApplicationJSON, this.requestSpec, this.responseSpec);
     }
 
-    private Integer applyForFixedDepositApplication(final String clientID, final String productID, final String submittedOnDate,
-            final String penalInterestType, final String depositAmount, final String depositPeriod) {
+    private Integer applyForFixedDepositApplication(final String clientID, final String productID, final String submittedOnDate, final String penalInterestType, final String depositAmount, final String depositPeriod) {
         log.info("--------------------------------APPLYING FOR FIXED DEPOSIT ACCOUNT --------------------------------");
-        final String fixedDepositApplicationJSON = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec)
-                //
-                .withSubmittedOnDate(submittedOnDate).withDepositPeriod(depositPeriod).withDepositAmount(depositAmount)
-                .build(clientID, productID, penalInterestType);
-        return FixedDepositAccountHelper.applyFixedDepositApplicationGetId(fixedDepositApplicationJSON, this.requestSpec,
-                this.responseSpec);
+        final String fixedDepositApplicationJSON = 
+        //
+        new FixedDepositAccountHelper(this.requestSpec, this.responseSpec).withSubmittedOnDate(submittedOnDate).withDepositPeriod(depositPeriod).withDepositAmount(depositAmount).build(clientID, productID, penalInterestType);
+        return FixedDepositAccountHelper.applyFixedDepositApplicationGetId(fixedDepositApplicationJSON, this.requestSpec, this.responseSpec);
     }
 
-    private Integer createSavingsProduct(final RequestSpecification requestSpec, final ResponseSpecification responseSpec,
-            final String minOpenningBalance, final String accountingRule, Account... accounts) {
+    private Integer createSavingsProduct(final RequestSpecification requestSpec, final ResponseSpecification responseSpec, final String minOpenningBalance, final String accountingRule, Account... accounts) {
         log.info("------------------------------CREATING NEW SAVINGS PRODUCT ---------------------------------------");
-
         SavingsProductHelper savingsProductHelper = new SavingsProductHelper();
         if (accountingRule.equals(CASH_BASED)) {
             savingsProductHelper = savingsProductHelper.withAccountingRuleAsCashBased(accounts);
         } else if (accountingRule.equals(NONE)) {
             savingsProductHelper = savingsProductHelper.withAccountingRuleAsNone();
         }
-
-        final String savingsProductJSON = savingsProductHelper //
-                .withInterestCompoundingPeriodTypeAsDaily() //
-                .withInterestPostingPeriodTypeAsMonthly() //
-                .withInterestCalculationPeriodTypeAsDailyBalance() //
-                .withMinimumOpenningBalance(minOpenningBalance).build();
+        final String savingsProductJSON =  //
+        //
+        //
+        //
+        savingsProductHelper.withInterestCompoundingPeriodTypeAsDaily().withInterestPostingPeriodTypeAsMonthly().withInterestCalculationPeriodTypeAsDailyBalance().withMinimumOpenningBalance(minOpenningBalance).build();
         return SavingsProductHelper.createSavingsProduct(savingsProductJSON, requestSpec, responseSpec);
     }
 
@@ -2901,7 +2209,7 @@ public class FixedDepositTest extends IntegrationTest {
         if (financialActivities.isEmpty()) {
             financialAccount = createLiabilityFinancialAccountTransferType(LIABILITY_TRANSFER_FINANCIAL_ACTIVITY_ID);
         } else {
-            /***
+            /**
              * extract mapped liability financial account
              */
             Account mappedLiabilityAccount = null;
@@ -2913,9 +2221,6 @@ public class FixedDepositTest extends IntegrationTest {
                     break;
                 }
             }
-            /***
-             * If liability transfer is not defined create liability transfer
-             */
             if (mappedLiabilityAccount == null) {
                 mappedLiabilityAccount = createLiabilityFinancialAccountTransferType(LIABILITY_TRANSFER_FINANCIAL_ACTIVITY_ID);
             }
@@ -2924,37 +2229,30 @@ public class FixedDepositTest extends IntegrationTest {
         return financialAccount;
     }
 
+    /**
+     * If liability transfer is not defined create liability transfer
+     */
     private Account createLiabilityFinancialAccountTransferType(final Integer liabilityTransferFinancialActivityId) {
-        /***
+        /**
          * Create and verify financial account transfer type is created
          */
         final Account liabilityAccountForMapping = this.accountHelper.createLiabilityAccount();
-        Integer financialActivityAccountId = (Integer) financialActivityAccountHelper.createFinancialActivityAccount(
-                liabilityTransferFinancialActivityId, liabilityAccountForMapping.getAccountID(), this.responseSpec,
-                CommonConstants.RESPONSE_RESOURCE_ID);
+        Integer financialActivityAccountId = (Integer) financialActivityAccountHelper.createFinancialActivityAccount(liabilityTransferFinancialActivityId, liabilityAccountForMapping.getAccountID(), this.responseSpec, CommonConstants.RESPONSE_RESOURCE_ID);
         Assertions.assertNotNull(financialActivityAccountId);
-        assertFinancialActivityAccountCreation(financialActivityAccountId, liabilityTransferFinancialActivityId,
-                liabilityAccountForMapping);
+        assertFinancialActivityAccountCreation(financialActivityAccountId, liabilityTransferFinancialActivityId, liabilityAccountForMapping);
         return liabilityAccountForMapping;
     }
 
-    private void assertFinancialActivityAccountCreation(Integer financialActivityAccountId, Integer financialActivityId,
-            Account glAccount) {
-        HashMap mappingDetails = this.financialActivityAccountHelper.getFinancialActivityAccount(financialActivityAccountId,
-                this.responseSpec);
+    private void assertFinancialActivityAccountCreation(Integer financialActivityAccountId, Integer financialActivityId, Account glAccount) {
+        HashMap mappingDetails = this.financialActivityAccountHelper.getFinancialActivityAccount(financialActivityAccountId, this.responseSpec);
         Assertions.assertEquals(financialActivityId, ((HashMap) mappingDetails.get("financialActivityData")).get("id"));
         Assertions.assertEquals(glAccount.getAccountID(), ((HashMap) mappingDetails.get("glAccountData")).get("id"));
     }
 
     private Integer createTaxGroup(final String percentage, final Account liabilityAccountForTax) {
-        final PostTaxesComponentsRequest componentRequest = new PostTaxesComponentsRequest()
-                .name(Utils.randomStringGenerator("Tax_component_Name_", 5)).percentage(Float.parseFloat(percentage))
-                .startDate("01 January 2013").dateFormat("dd MMMM yyyy").locale("en").creditAccountType(2)
-                .creditAccountId(liabilityAccountForTax.getAccountID().longValue());
+        final PostTaxesComponentsRequest componentRequest = new PostTaxesComponentsRequest().name(Utils.randomStringGenerator("Tax_component_Name_", 5)).percentage(Float.parseFloat(percentage)).startDate("01 January 2013").dateFormat("dd MMMM yyyy").locale("en").creditAccountType(2).creditAccountId(liabilityAccountForTax.getAccountID().longValue());
         final var componentResponse = TaxComponentHelper.createTaxComponent(componentRequest);
-        final PostTaxesGroupRequest groupRequest = new PostTaxesGroupRequest().name(Utils.randomStringGenerator("Tax_group_Name_", 5))
-                .dateFormat("dd MMMM yyyy").locale("en").taxComponents(Set.of(
-                        new PostTaxesGroupTaxComponents().taxComponentId(componentResponse.getResourceId()).startDate("01 January 2013")));
+        final PostTaxesGroupRequest groupRequest = new PostTaxesGroupRequest().name(Utils.randomStringGenerator("Tax_group_Name_", 5)).dateFormat("dd MMMM yyyy").locale("en").taxComponents(Set.of(new PostTaxesGroupTaxComponents().taxComponentId(componentResponse.getResourceId()).startDate("01 January 2013")));
         return TaxGroupHelper.createTaxGroup(groupRequest).getResourceId().intValue();
     }
 
@@ -2967,52 +2265,36 @@ public class FixedDepositTest extends IntegrationTest {
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.journalEntryHelper = new JournalEntryHelper(this.requestSpec, this.responseSpec);
-
         final Account assetAccount = this.accountHelper.createAssetAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String ACTIVATION_DATE = dateFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
-        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, CASH_BASED, assetAccount, liabilityAccount,
-                incomeAccount, expenseAccount);
+        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, CASH_BASED, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, ACTIVATION_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
-
         this.fixedDepositAccountHelper.calculateInterestForFixedDeposit(fixedDepositAccountId);
-
         Integer postInterestResult = this.fixedDepositAccountHelper.postInterestForFixedDeposit(fixedDepositAccountId);
         Assertions.assertNotNull(postInterestResult);
-
         // Compute INTEREST_POSTED_DATE as end of the activation month - Fineract posts interest
         // at the last day of the posting period (MONTHLY) = end of the month containing ACTIVATION_DATE.
         // All other FD tests use this same pattern (e.g. line 314).
@@ -3023,23 +2305,16 @@ public class FixedDepositTest extends IntegrationTest {
         Integer numberOfDaysLeft = daysInMonth - currentDay + 1;
         todaysDate.add(Calendar.DATE, numberOfDaysLeft);
         final String INTEREST_POSTED_DATE = dateFormat.format(todaysDate.getTime());
-
         // Capture interest amount before undo for journal entry assertions
         HashMap accountSummaryBeforeUndo = this.fixedDepositAccountHelper.getFixedDepositSummary(fixedDepositAccountId);
         Float totalInterestPostedBeforeUndo = (Float) accountSummaryBeforeUndo.get("totalInterestPosted");
         Assertions.assertNotNull(totalInterestPostedBeforeUndo);
-        Assertions.assertTrue(totalInterestPostedBeforeUndo > 0f, "Expected interest > 0 before undo");
-
+        Assertions.assertTrue(totalInterestPostedBeforeUndo > 0.0F, "Expected interest > 0 before undo");
         // Verify journal entries exist after interest posting
-        this.journalEntryHelper.checkJournalEntryForAssetAccount(expenseAccount, INTEREST_POSTED_DATE,
-                new JournalEntry[] { new JournalEntry(totalInterestPostedBeforeUndo, JournalEntry.TransactionType.DEBIT) });
-        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, INTEREST_POSTED_DATE,
-                new JournalEntry[] { new JournalEntry(totalInterestPostedBeforeUndo, JournalEntry.TransactionType.CREDIT) });
-
-        List<GetFixedDepositAccountsAccountIdTransactionsResponse> transactions = this.fixedDepositAccountHelper
-                .getFixedDepositTransactions(fixedDepositAccountId);
+        this.journalEntryHelper.checkJournalEntryForAssetAccount(expenseAccount, INTEREST_POSTED_DATE, new JournalEntry[] {new JournalEntry(totalInterestPostedBeforeUndo, JournalEntry.TransactionType.DEBIT)});
+        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, INTEREST_POSTED_DATE, new JournalEntry[] {new JournalEntry(totalInterestPostedBeforeUndo, JournalEntry.TransactionType.CREDIT)});
+        List<GetFixedDepositAccountsAccountIdTransactionsResponse> transactions = this.fixedDepositAccountHelper.getFixedDepositTransactions(fixedDepositAccountId);
         Assertions.assertNotNull(transactions);
-
         Integer interestTransactionId = null;
         for (GetFixedDepositAccountsAccountIdTransactionsResponse txn : transactions) {
             if (txn.getTransactionType() != null && Boolean.TRUE.equals(txn.getTransactionType().getInterestPosting())) {
@@ -3048,35 +2323,26 @@ public class FixedDepositTest extends IntegrationTest {
             }
         }
         Assertions.assertNotNull(interestTransactionId);
-
         Long undoResult = this.fixedDepositAccountHelper.undoFixedDepositTransaction(fixedDepositAccountId, interestTransactionId);
         Assertions.assertNotNull(undoResult);
-
         // 1. Verify transaction is marked reversed
-        List<GetFixedDepositAccountsAccountIdTransactionsResponse> transactionsAfterUndo = this.fixedDepositAccountHelper
-                .getFixedDepositTransactions(fixedDepositAccountId);
+        List<GetFixedDepositAccountsAccountIdTransactionsResponse> transactionsAfterUndo = this.fixedDepositAccountHelper.getFixedDepositTransactions(fixedDepositAccountId);
         boolean foundReversed = false;
         for (GetFixedDepositAccountsAccountIdTransactionsResponse txn : transactionsAfterUndo) {
             if (txn.getId() != null && txn.getId().intValue() == interestTransactionId) {
-                Assertions.assertTrue(Boolean.TRUE.equals(txn.getReversed()),
-                        "Interest posting transaction must be marked reversed after undo");
+                Assertions.assertTrue(Boolean.TRUE.equals(txn.getReversed()), "Interest posting transaction must be marked reversed after undo");
                 foundReversed = true;
                 break;
             }
         }
         Assertions.assertTrue(foundReversed, "Interest transaction must still be present after undo");
-
         // 2. Verify balance returns to zero
         HashMap accountSummaryAfterUndo = this.fixedDepositAccountHelper.getFixedDepositSummary(fixedDepositAccountId);
         Float totalInterestPostedAfterUndo = (Float) accountSummaryAfterUndo.get("totalInterestPosted");
-        Assertions.assertEquals(0f, totalInterestPostedAfterUndo == null ? 0f : totalInterestPostedAfterUndo, 0.01f,
-                "totalInterestPosted must be zero after undo");
-
+        Assertions.assertEquals(0.0F, totalInterestPostedAfterUndo == null ? 0.0F : totalInterestPostedAfterUndo, 0.01F, "totalInterestPosted must be zero after undo");
         // 3. Verify reversal journal entries
-        this.journalEntryHelper.checkJournalEntryForAssetAccount(expenseAccount, INTEREST_POSTED_DATE,
-                new JournalEntry[] { new JournalEntry(totalInterestPostedBeforeUndo, JournalEntry.TransactionType.CREDIT) });
-        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, INTEREST_POSTED_DATE,
-                new JournalEntry[] { new JournalEntry(totalInterestPostedBeforeUndo, JournalEntry.TransactionType.DEBIT) });
+        this.journalEntryHelper.checkJournalEntryForAssetAccount(expenseAccount, INTEREST_POSTED_DATE, new JournalEntry[] {new JournalEntry(totalInterestPostedBeforeUndo, JournalEntry.TransactionType.CREDIT)});
+        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, INTEREST_POSTED_DATE, new JournalEntry[] {new JournalEntry(totalInterestPostedBeforeUndo, JournalEntry.TransactionType.DEBIT)});
     }
 
     @Test
@@ -3085,50 +2351,35 @@ public class FixedDepositTest extends IntegrationTest {
         this.fixedDepositAccountHelper = new FixedDepositAccountHelper(this.requestSpec, this.responseSpec);
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.journalEntryHelper = new JournalEntryHelper(this.requestSpec, this.responseSpec);
-
         final Account assetAccount = this.accountHelper.createAssetAccount();
         final Account liabilityAccount = this.accountHelper.createLiabilityAccount();
         final Account incomeAccount = this.accountHelper.createIncomeAccount();
         final Account expenseAccount = this.accountHelper.createExpenseAccount();
-
         DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-
         Calendar todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -3);
         final String VALID_FROM = dateFormat.format(todaysDate.getTime());
         todaysDate.add(Calendar.YEAR, 10);
         final String VALID_TO = dateFormat.format(todaysDate.getTime());
-
         todaysDate = Calendar.getInstance();
         todaysDate.add(Calendar.MONTH, -1);
         final String SUBMITTED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String APPROVED_ON_DATE = dateFormat.format(todaysDate.getTime());
         final String ACTIVATION_DATE = dateFormat.format(todaysDate.getTime());
-
         Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
         Assertions.assertNotNull(clientId);
-
-        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, CASH_BASED, assetAccount, liabilityAccount,
-                incomeAccount, expenseAccount);
+        Integer fixedDepositProductId = createFixedDepositProduct(VALID_FROM, VALID_TO, CASH_BASED, assetAccount, liabilityAccount, incomeAccount, expenseAccount);
         Assertions.assertNotNull(fixedDepositProductId);
-
-        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(),
-                SUBMITTED_ON_DATE, WHOLE_TERM);
+        Integer fixedDepositAccountId = applyForFixedDepositApplication(clientId.toString(), fixedDepositProductId.toString(), SUBMITTED_ON_DATE, WHOLE_TERM);
         Assertions.assertNotNull(fixedDepositAccountId);
-
-        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec,
-                this.responseSpec, fixedDepositAccountId.toString());
+        HashMap fixedDepositAccountStatusHashMap = FixedDepositAccountStatusChecker.getStatusOfFixedDepositAccount(this.requestSpec, this.responseSpec, fixedDepositAccountId.toString());
         FixedDepositAccountStatusChecker.verifyFixedDepositIsPending(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.approveFixedDeposit(fixedDepositAccountId, APPROVED_ON_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsApproved(fixedDepositAccountStatusHashMap);
-
         fixedDepositAccountStatusHashMap = this.fixedDepositAccountHelper.activateFixedDeposit(fixedDepositAccountId, ACTIVATION_DATE);
         FixedDepositAccountStatusChecker.verifyFixedDepositIsActive(fixedDepositAccountStatusHashMap);
-
         // Find the deposit transaction created on activation
-        List<GetFixedDepositAccountsAccountIdTransactionsResponse> transactions = this.fixedDepositAccountHelper
-                .getFixedDepositTransactions(fixedDepositAccountId);
+        List<GetFixedDepositAccountsAccountIdTransactionsResponse> transactions = this.fixedDepositAccountHelper.getFixedDepositTransactions(fixedDepositAccountId);
         Assertions.assertNotNull(transactions);
         Integer depositTransactionId = null;
         for (GetFixedDepositAccountsAccountIdTransactionsResponse txn : transactions) {
@@ -3138,51 +2389,37 @@ public class FixedDepositTest extends IntegrationTest {
             }
         }
         Assertions.assertNotNull(depositTransactionId);
-
         // Capture deposit amount before adjust for journal entry assertions
         HashMap accountSummaryBeforeAdjust = this.fixedDepositAccountHelper.getFixedDepositSummary(fixedDepositAccountId);
         Float totalDepositsBeforeAdjust = (Float) accountSummaryBeforeAdjust.get("totalDeposits");
         Assertions.assertNotNull(totalDepositsBeforeAdjust);
-        Assertions.assertTrue(totalDepositsBeforeAdjust > 0f, "Expected totalDeposits > 0 before adjust");
-
+        Assertions.assertTrue(totalDepositsBeforeAdjust > 0.0F, "Expected totalDeposits > 0 before adjust");
         // Verify original deposit journal entries exist
-        this.journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, ACTIVATION_DATE,
-                new JournalEntry[] { new JournalEntry(totalDepositsBeforeAdjust, JournalEntry.TransactionType.DEBIT) });
-        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, ACTIVATION_DATE,
-                new JournalEntry[] { new JournalEntry(totalDepositsBeforeAdjust, JournalEntry.TransactionType.CREDIT) });
-
+        this.journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, ACTIVATION_DATE, new JournalEntry[] {new JournalEntry(totalDepositsBeforeAdjust, JournalEntry.TransactionType.DEBIT)});
+        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, ACTIVATION_DATE, new JournalEntry[] {new JournalEntry(totalDepositsBeforeAdjust, JournalEntry.TransactionType.CREDIT)});
         // Adjust the deposit to a new amount
         final double NEW_DEPOSIT_AMOUNT = 200000.0;
-        Long adjustResult = this.fixedDepositAccountHelper.adjustFixedDepositTransaction(fixedDepositAccountId, depositTransactionId,
-                ACTIVATION_DATE, NEW_DEPOSIT_AMOUNT);
+        Long adjustResult = this.fixedDepositAccountHelper.adjustFixedDepositTransaction(fixedDepositAccountId, depositTransactionId, ACTIVATION_DATE, NEW_DEPOSIT_AMOUNT);
         Assertions.assertNotNull(adjustResult);
-
         // 1. Verify original deposit transaction is marked reversed
-        List<GetFixedDepositAccountsAccountIdTransactionsResponse> transactionsAfterAdjust = this.fixedDepositAccountHelper
-                .getFixedDepositTransactions(fixedDepositAccountId);
+        List<GetFixedDepositAccountsAccountIdTransactionsResponse> transactionsAfterAdjust = this.fixedDepositAccountHelper.getFixedDepositTransactions(fixedDepositAccountId);
         boolean foundReversed = false;
         for (GetFixedDepositAccountsAccountIdTransactionsResponse txn : transactionsAfterAdjust) {
             if (txn.getId() != null && txn.getId().intValue() == depositTransactionId) {
-                Assertions.assertTrue(Boolean.TRUE.equals(txn.getReversed()),
-                        "Original deposit transaction must be marked reversed after adjust");
+                Assertions.assertTrue(Boolean.TRUE.equals(txn.getReversed()), "Original deposit transaction must be marked reversed after adjust");
                 foundReversed = true;
                 break;
             }
         }
         Assertions.assertTrue(foundReversed, "Original deposit transaction must still be present after adjust");
-
         // 2. Verify new deposit amount is reflected in account summary
         HashMap accountSummaryAfterAdjust = this.fixedDepositAccountHelper.getFixedDepositSummary(fixedDepositAccountId);
         Float totalDepositsAfterAdjust = (Float) accountSummaryAfterAdjust.get("totalDeposits");
         Assertions.assertNotNull(totalDepositsAfterAdjust);
-        Assertions.assertEquals((float) NEW_DEPOSIT_AMOUNT, totalDepositsAfterAdjust, 0.01f,
-                "totalDeposits must reflect new amount after adjust");
-
+        Assertions.assertEquals((float) NEW_DEPOSIT_AMOUNT, totalDepositsAfterAdjust, 0.01F, "totalDeposits must reflect new amount after adjust");
         // 3. Verify reversal journal entries (opposite of original) and new deposit entries
-        this.journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, ACTIVATION_DATE,
-                new JournalEntry[] { new JournalEntry(totalDepositsBeforeAdjust, JournalEntry.TransactionType.CREDIT) });
-        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, ACTIVATION_DATE,
-                new JournalEntry[] { new JournalEntry(totalDepositsBeforeAdjust, JournalEntry.TransactionType.DEBIT) });
+        this.journalEntryHelper.checkJournalEntryForAssetAccount(assetAccount, ACTIVATION_DATE, new JournalEntry[] {new JournalEntry(totalDepositsBeforeAdjust, JournalEntry.TransactionType.CREDIT)});
+        this.journalEntryHelper.checkJournalEntryForLiabilityAccount(liabilityAccount, ACTIVATION_DATE, new JournalEntry[] {new JournalEntry(totalDepositsBeforeAdjust, JournalEntry.TransactionType.DEBIT)});
     }
 
     @AfterEach
@@ -3191,8 +2428,7 @@ public class FixedDepositTest extends IntegrationTest {
         List<HashMap> financialActivities = this.financialActivityAccountHelper.getAllFinancialActivityAccounts(this.responseSpec);
         for (HashMap financialActivity : financialActivities) {
             Integer financialActivityAccountId = (Integer) financialActivity.get("id");
-            Integer deletedFinancialActivityAccountId = this.financialActivityAccountHelper
-                    .deleteFinancialActivityAccount(financialActivityAccountId, this.responseSpec, CommonConstants.RESPONSE_RESOURCE_ID);
+            Integer deletedFinancialActivityAccountId = this.financialActivityAccountHelper.deleteFinancialActivityAccount(financialActivityAccountId, this.responseSpec, CommonConstants.RESPONSE_RESOURCE_ID);
             Assertions.assertNotNull(deletedFinancialActivityAccountId);
             Assertions.assertEquals(financialActivityAccountId, deletedFinancialActivityAccountId);
         }

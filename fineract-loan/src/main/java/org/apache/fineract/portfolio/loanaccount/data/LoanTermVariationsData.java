@@ -21,15 +21,12 @@ package org.apache.fineract.portfolio.loanaccount.data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTermVariationType;
 import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
 
-@Getter
 public class LoanTermVariationsData implements Comparable<LoanTermVariationsData> {
-
     private final Long id;
     private final EnumOptionData termType;
     private LocalDate termVariationApplicableFrom;
@@ -39,8 +36,7 @@ public class LoanTermVariationsData implements Comparable<LoanTermVariationsData
     private Boolean isProcessed;
     private OffsetDateTime createdDate;
 
-    public LoanTermVariationsData(final Long id, final EnumOptionData termType, final LocalDate termVariationApplicableFrom,
-            final BigDecimal decimalValue, final LocalDate dateValue, final boolean isSpecificToInstallment) {
+    public LoanTermVariationsData(final Long id, final EnumOptionData termType, final LocalDate termVariationApplicableFrom, final BigDecimal decimalValue, final LocalDate dateValue, final boolean isSpecificToInstallment) {
         this.id = id;
         this.termType = termType;
         this.termVariationApplicableFrom = termVariationApplicableFrom;
@@ -49,8 +45,7 @@ public class LoanTermVariationsData implements Comparable<LoanTermVariationsData
         this.isSpecificToInstallment = isSpecificToInstallment;
     }
 
-    public LoanTermVariationsData(final Long id, final Integer termType, final LocalDate termVariationApplicableFrom,
-            final BigDecimal decimalValue, final LocalDate dateValue, final boolean isSpecificToInstallment) {
+    public LoanTermVariationsData(final Long id, final Integer termType, final LocalDate termVariationApplicableFrom, final BigDecimal decimalValue, final LocalDate dateValue, final boolean isSpecificToInstallment) {
         this.id = id;
         this.termType = LoanEnumerations.loanVariationType(LoanTermVariationType.fromInt(termType));
         this.termVariationApplicableFrom = termVariationApplicableFrom;
@@ -59,8 +54,7 @@ public class LoanTermVariationsData implements Comparable<LoanTermVariationsData
         this.isSpecificToInstallment = isSpecificToInstallment;
     }
 
-    public LoanTermVariationsData(final EnumOptionData termType, final LocalDate termVariationApplicableFrom, final BigDecimal decimalValue,
-            LocalDate dateValue, final boolean isSpecificToInstallment) {
+    public LoanTermVariationsData(final EnumOptionData termType, final LocalDate termVariationApplicableFrom, final BigDecimal decimalValue, LocalDate dateValue, final boolean isSpecificToInstallment) {
         this.id = null;
         this.termType = termType;
         this.termVariationApplicableFrom = termVariationApplicableFrom;
@@ -69,8 +63,7 @@ public class LoanTermVariationsData implements Comparable<LoanTermVariationsData
         this.isSpecificToInstallment = isSpecificToInstallment;
     }
 
-    public LoanTermVariationsData(Long id, EnumOptionData type, LocalDate termApplicableFrom, BigDecimal decimalValue, LocalDate dateValue,
-            boolean isSpecificToInstallment, OffsetDateTime createdDate) {
+    public LoanTermVariationsData(Long id, EnumOptionData type, LocalDate termApplicableFrom, BigDecimal decimalValue, LocalDate dateValue, boolean isSpecificToInstallment, OffsetDateTime createdDate) {
         this(id, type, termApplicableFrom, decimalValue, dateValue, isSpecificToInstallment);
         this.createdDate = createdDate;
     }
@@ -126,4 +119,38 @@ public class LoanTermVariationsData implements Comparable<LoanTermVariationsData
         this.termVariationApplicableFrom = applicableFromDate;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public EnumOptionData getTermType() {
+        return this.termType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getTermVariationApplicableFrom() {
+        return this.termVariationApplicableFrom;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public BigDecimal getDecimalValue() {
+        return this.decimalValue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LocalDate getDateValue() {
+        return this.dateValue;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Boolean getIsProcessed() {
+        return this.isProcessed;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public OffsetDateTime getCreatedDate() {
+        return this.createdDate;
+    }
 }

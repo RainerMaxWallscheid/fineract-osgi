@@ -25,14 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepaymentPeriodData;
 import org.apache.fineract.util.StreamUtil;
 
-@RequiredArgsConstructor
 public class CustomizedLoanCapitalizedIncomeBalanceRepositoryImpl implements CustomizedLoanCapitalizedIncomeBalanceRepository {
-
     private final EntityManager entityManager;
 
     @Override
@@ -47,12 +44,14 @@ public class CustomizedLoanCapitalizedIncomeBalanceRepositoryImpl implements Cus
         // class java.util.ImmutableCollections$SubList for parameter loanIds with expected type of
         // interface java.io.Serializable from query string ...
         loanIds = new ArrayList<>(loanIds);
-
-        TypedQuery<LoanTransactionRepaymentPeriodData> query = entityManager.createQuery(
-                LoanCapitalizedIncomeBalanceRepository.FIND_BALANCE_REPAYMENT_SCHEDULE_DATA + " WHERE lcib.loan.id IN :loanIds",
-                LoanTransactionRepaymentPeriodData.class);
+        TypedQuery<LoanTransactionRepaymentPeriodData> query = entityManager.createQuery(LoanCapitalizedIncomeBalanceRepository.FIND_BALANCE_REPAYMENT_SCHEDULE_DATA + " WHERE lcib.loan.id IN :loanIds", LoanTransactionRepaymentPeriodData.class);
         query.setParameter("loanIds", loanIds);
         List<LoanTransactionRepaymentPeriodData> result = query.getResultList();
         return result.stream().collect(Collectors.groupingBy(LoanTransactionRepaymentPeriodData::getLoanId));
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public CustomizedLoanCapitalizedIncomeBalanceRepositoryImpl(final EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 }

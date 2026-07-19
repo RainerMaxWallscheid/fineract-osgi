@@ -23,8 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
@@ -63,10 +61,9 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-@Slf4j
-@RequiredArgsConstructor
 public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWritePlatformService {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AppUserWritePlatformServiceJpaRepositoryImpl.class);
     private final PlatformSecurityContext context;
     private final UserDomainService userDomainService;
     private final PlatformPasswordEncoder platformPasswordEncoder;
@@ -80,45 +77,35 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
 
     @Override
     @Transactional
-    @Caching(evict = { @CacheEvict(value = "users", allEntries = true), @CacheEvict(value = "usersByUsername", allEntries = true) })
+    @Caching(evict = {@CacheEvict(value = "users", allEntries = true), @CacheEvict(value = "usersByUsername", allEntries = true)})
     public CommandProcessingResult createUser(final JsonCommand command) {
         try {
             this.context.authenticatedUser();
-
             this.fromApiJsonDeserializer.validateForCreate(command.json());
-
             final String officeIdParamName = "officeId";
             final Long officeId = command.longValueOfParameterNamed(officeIdParamName);
-
             final Office userOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
-
             final String[] roles = command.arrayValueOfParameterNamed("roles");
             final Set<Role> allRoles = assembleSetOfRoles(roles);
-
             final String staffIdParamName = "staffId";
             final Long staffId = command.longValueOfParameterNamed(staffIdParamName);
-
             Staff linkedStaff;
             if (staffId != null) {
-                linkedStaff = this.staffRepository.findByOffice(staffId, userOffice.getId())
-                        .orElseThrow(() -> new StaffNotFoundException(staffId));
+                linkedStaff = this.staffRepository.findByOffice(staffId, userOffice.getId()).orElseThrow(() -> new StaffNotFoundException(staffId));
             } else {
                 linkedStaff = null;
             }
-
             AppUser appUser = AppUser.fromJson(userOffice, linkedStaff, allRoles, command);
             if (this.configurationDomainService.isForcePasswordResetOnFirstLoginEnabled()) {
                 appUser.updatePasswordResetRequired(true);
             }
-
             final Boolean sendPasswordToEmail = command.booleanObjectValueOfParameterNamed("sendPasswordToEmail");
             this.userDomainService.create(appUser, sendPasswordToEmail);
-
-            return new CommandProcessingResultBuilder() //
-                    .withCommandId(command.commandId()) //
-                    .withEntityId(appUser.getId()) //
-                    .withOfficeId(userOffice.getId()) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(appUser.getId()).withOfficeId(userOffice.getId()).build();
         } catch (final DataIntegrityViolationException dve) {
             throw handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
         } catch (final JpaSystemException | PersistenceException | AuthenticationServiceException dve) {
@@ -127,25 +114,19 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
             throw handleDataIntegrityIssues(command, throwable, dve);
         } catch (final PlatformEmailSendException e) {
             log.error("createUser: PlatformEmailSendException", e);
-
             final String email = command.stringValueOfParameterNamed("email");
-            final ApiParameterError error = ApiParameterError.parameterError("error.msg.user.email.invalid",
-                    "Sending email failed; is parameter email is invalid? More details available in server log: " + e.getMessage(), "email",
-                    email);
-
-            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
-                    List.of(error), e);
+            final ApiParameterError error = ApiParameterError.parameterError("error.msg.user.email.invalid", "Sending email failed; is parameter email is invalid? More details available in server log: " + e.getMessage(), "email", email);
+            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.", List.of(error), e);
         }
     }
 
     @Override
     @Transactional
-    @Caching(evict = { @CacheEvict(value = "users", allEntries = true), @CacheEvict(value = "usersByUsername", allEntries = true) })
+    @Caching(evict = {@CacheEvict(value = "users", allEntries = true), @CacheEvict(value = "usersByUsername", allEntries = true)})
     public CommandProcessingResult changeUserPassword(final Long userId, final JsonCommand command) {
         try {
             this.context.authenticatedUser(new CommandWrapperBuilder().changeUserPassword(userId).build());
-            this.fromApiJsonDeserializer.validateForChangePassword(command.json(),
-                    this.context.authenticatedUser(new CommandWrapperBuilder().changeUserPassword(userId).build()));
+            this.fromApiJsonDeserializer.validateForChangePassword(command.json(), this.context.authenticatedUser(new CommandWrapperBuilder().changeUserPassword(userId).build()));
             final AppUser userToUpdate = this.appUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
             final AppUserPreviousPassword currentPasswordToSaveAsPreview = getCurrentPasswordToSaveAsPreview(userToUpdate, command);
             final Map<String, Object> changes = userToUpdate.changePassword(command, this.platformPasswordEncoder);
@@ -156,11 +137,11 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
                     this.appUserPreviewPasswordRepository.save(currentPasswordToSaveAsPreview);
                 }
             }
-            return new CommandProcessingResultBuilder() //
-                    .withEntityId(userId) //
-                    .withOfficeId(userToUpdate.getOffice().getId()) //
-                    .with(changes) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withEntityId(userId).withOfficeId(userToUpdate.getOffice().getId()).with(changes).build();
         } catch (final DataIntegrityViolationException dve) {
             throw handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
         } catch (final JpaSystemException | PersistenceException | AuthenticationServiceException dve) {
@@ -172,60 +153,46 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
 
     @Override
     @Transactional
-    @Caching(evict = { @CacheEvict(value = "users", allEntries = true), @CacheEvict(value = "usersByUsername", allEntries = true) })
+    @Caching(evict = {@CacheEvict(value = "users", allEntries = true), @CacheEvict(value = "usersByUsername", allEntries = true)})
     public CommandProcessingResult updateUser(final Long userId, final JsonCommand command) {
         try {
             final AppUser currentUser = this.context.authenticatedUser(new CommandWrapperBuilder().updateUser(null).build());
-
             this.fromApiJsonDeserializer.validateForUpdate(command.json(), currentUser);
-
             final AppUser userToUpdate = this.appUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-
             final AppUserPreviousPassword currentPasswordToSaveAsPreview = getCurrentPasswordToSaveAsPreview(userToUpdate, command);
-
             final Map<String, Object> changes = userToUpdate.update(command, this.platformPasswordEncoder);
-
             if (changes.containsKey("officeId")) {
                 final Long officeId = (Long) changes.get("officeId");
                 final Office office = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
                 userToUpdate.changeOffice(office);
             }
-
             if (changes.containsKey("staffId")) {
                 final Long staffId = (Long) changes.get("staffId");
                 Staff linkedStaff = null;
                 if (staffId != null) {
-                    linkedStaff = this.staffRepository.findByOffice(staffId, userToUpdate.getOffice().getId())
-                            .orElseThrow(() -> new StaffNotFoundException(staffId));
+                    linkedStaff = this.staffRepository.findByOffice(staffId, userToUpdate.getOffice().getId()).orElseThrow(() -> new StaffNotFoundException(staffId));
                 }
                 userToUpdate.changeStaff(linkedStaff);
             }
-
             if (changes.containsKey("roles")) {
                 final String[] roleIds = (String[]) changes.get("roles");
                 final Set<Role> allRoles = assembleSetOfRoles(roleIds);
-
                 userToUpdate.updateRoles(allRoles);
             }
-
             if (!changes.isEmpty()) {
-                if ((changes.containsKey("password") || changes.containsKey("passwordEncoded")) && !currentUser.getId().equals(userId)
-                        && this.configurationDomainService.isForcePasswordResetOnFirstLoginEnabled()) {
+                if ((changes.containsKey("password") || changes.containsKey("passwordEncoded")) && !currentUser.getId().equals(userId) && this.configurationDomainService.isForcePasswordResetOnFirstLoginEnabled()) {
                     userToUpdate.updatePasswordResetRequired(true);
                 }
                 this.appUserRepository.saveAndFlush(userToUpdate);
-
                 if (currentPasswordToSaveAsPreview != null) {
                     this.appUserPreviewPasswordRepository.save(currentPasswordToSaveAsPreview);
                 }
-
             }
-
-            return new CommandProcessingResultBuilder() //
-                    .withEntityId(userId) //
-                    .withOfficeId(userToUpdate.getOffice().getId()) //
-                    .with(changes) //
-                    .build();
+            return  //
+            //
+            //
+            //
+            new CommandProcessingResultBuilder().withEntityId(userId).withOfficeId(userToUpdate.getOffice().getId()).with(changes).build();
         } catch (final DataIntegrityViolationException dve) {
             throw handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
         } catch (final JpaSystemException | PersistenceException | AuthenticationServiceException dve) {
@@ -241,16 +208,13 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
      */
     private AppUserPreviousPassword getCurrentPasswordToSaveAsPreview(final AppUser user, final JsonCommand command) {
         final String passWordEncodedValue = user.getEncodedPassword(command, this.platformPasswordEncoder);
-
         AppUserPreviousPassword currentPasswordToSaveAsPreview = null;
-
         if (passWordEncodedValue != null) {
             final Integer passwordReuseRestrictionCount = this.configurationDomainService.getPasswordReuseRestrictionCount();
             if (passwordReuseRestrictionCount != null) {
                 List<AppUserPreviousPassword> previousPasswords;
                 if (passwordReuseRestrictionCount == 0) {
-                    previousPasswords = this.appUserPreviewPasswordRepository.findByUserId(user.getId(),
-                            PageRequest.of(0, Integer.MAX_VALUE, Sort.Direction.DESC, "removalDate"));
+                    previousPasswords = this.appUserPreviewPasswordRepository.findByUserId(user.getId(), PageRequest.of(0, Integer.MAX_VALUE, Sort.Direction.DESC, "removalDate"));
                 } else {
                     PageRequest pageRequest = PageRequest.of(0, passwordReuseRestrictionCount, Sort.Direction.DESC, "removalDate");
                     previousPasswords = this.appUserPreviewPasswordRepository.findByUserId(user.getId(), pageRequest);
@@ -261,16 +225,13 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
                     }
                 }
             }
-
             currentPasswordToSaveAsPreview = new AppUserPreviousPassword(user);
         }
-
         return currentPasswordToSaveAsPreview;
     }
 
     private Set<Role> assembleSetOfRoles(final String[] rolesArray) {
         final Set<Role> allRoles = new HashSet<>();
-
         if (!ObjectUtils.isEmpty(rolesArray)) {
             for (final String roleId : rolesArray) {
                 final Long id = Long.valueOf(roleId);
@@ -278,26 +239,23 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
                 allRoles.add(role);
             }
         }
-
         return allRoles;
     }
 
     @Override
     @Transactional
-    @Caching(evict = { @CacheEvict(value = "users", allEntries = true), @CacheEvict(value = "usersByUsername", allEntries = true) })
+    @Caching(evict = {@CacheEvict(value = "users", allEntries = true), @CacheEvict(value = "usersByUsername", allEntries = true)})
     public CommandProcessingResult deleteUser(final Long userId) {
         final AppUser user = this.appUserRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         if (user.isDeleted()) {
             throw new UserNotFoundException(userId);
         }
-
         user.delete();
         this.appUserRepository.save(user);
-
-        return new CommandProcessingResultBuilder() //
-                .withEntityId(userId) //
-                .withOfficeId(user.getOffice().getId()) //
-                .build();
+        return  //
+        //
+        //
+        new CommandProcessingResultBuilder().withEntityId(userId).withOfficeId(user.getOffice().getId()).build();
     }
 
     /*
@@ -313,5 +271,19 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
         }
         log.error("handleDataIntegrityIssues: Neither duplicate username nor existing user; unknown error occured", dve);
         return ErrorHandler.getMappable(dve, "error.msg.unknown.data.integrity.issue", "Unknown data integrity issue with resource.");
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AppUserWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final UserDomainService userDomainService, final PlatformPasswordEncoder platformPasswordEncoder, final AppUserRepository appUserRepository, final OfficeRepositoryWrapper officeRepositoryWrapper, final RoleRepository roleRepository, final UserDataValidator fromApiJsonDeserializer, final AppUserPreviousPasswordRepository appUserPreviewPasswordRepository, final StaffRepository staffRepository, final ConfigurationDomainService configurationDomainService) {
+        this.context = context;
+        this.userDomainService = userDomainService;
+        this.platformPasswordEncoder = platformPasswordEncoder;
+        this.appUserRepository = appUserRepository;
+        this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.roleRepository = roleRepository;
+        this.fromApiJsonDeserializer = fromApiJsonDeserializer;
+        this.appUserPreviewPasswordRepository = appUserPreviewPasswordRepository;
+        this.staffRepository = staffRepository;
+        this.configurationDomainService = configurationDomainService;
     }
 }

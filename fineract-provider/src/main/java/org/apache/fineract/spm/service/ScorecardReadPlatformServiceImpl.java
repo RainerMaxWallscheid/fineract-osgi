@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.spm.data.ScorecardData;
@@ -31,21 +30,19 @@ import org.apache.fineract.spm.data.ScorecardValue;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-@RequiredArgsConstructor
 public class ScorecardReadPlatformServiceImpl implements ScorecardReadPlatformService {
-
     private final JdbcTemplate jdbcTemplate;
     private final PlatformSecurityContext context;
 
-    private static final class ScorecardMapper implements RowMapper<ScorecardData> {
 
+    private static final class ScorecardMapper implements RowMapper<ScorecardData> {
         private static final String SCORECARD_SCHEMA = """
-                sc.id as id, sc.survey_id as surveyId, s.a_name as surveyName,
-                sc.client_id as clientId,
-                sc.user_id as userId, user.username as username
-                from m_survey_scorecards sc
-                left join m_surveys s ON s.id = sc.survey_id
-                left join m_appuser user ON user.id = sc.user_id\s""";
+            sc.id as id, sc.survey_id as surveyId, s.a_name as surveyName,
+            sc.client_id as clientId,
+            sc.user_id as userId, user.username as username
+            from m_survey_scorecards sc
+            left join m_surveys s ON s.id = sc.survey_id
+            left join m_appuser user ON user.id = sc.user_id """;
 
         public String schema() {
             return SCORECARD_SCHEMA;
@@ -53,25 +50,23 @@ public class ScorecardReadPlatformServiceImpl implements ScorecardReadPlatformSe
 
         @Override
         public ScorecardData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-
             final Long id = rs.getLong("id");
             final Long surveyId = rs.getLong("surveyId");
             final String surveyName = rs.getString("surveyName");
             final Long clientId = rs.getLong("clientId");
             final Long userId = rs.getLong("userId");
             final String username = rs.getString("username");
-
             return ScorecardData.instance(id, userId, username, surveyId, surveyName, clientId);
         }
     }
 
-    private static final class ScorecardValueMapper implements RowMapper<ScorecardValue> {
 
+    private static final class ScorecardValueMapper implements RowMapper<ScorecardValue> {
         private static final String SCORECARD_VALUE_SCHEMA = """
-                sc.question_id as questionId, sc.response_id as responseId,
-                sc.created_on as createdOn, sc.a_value as value
-                from m_survey_scorecards sc
-                where sc.survey_id = ? and sc.client_id = ?\s""";
+            sc.question_id as questionId, sc.response_id as responseId,
+            sc.created_on as createdOn, sc.a_value as value
+            from m_survey_scorecards sc
+            where sc.survey_id = ? and sc.client_id = ? """;
 
         public String schema() {
             return SCORECARD_VALUE_SCHEMA;
@@ -79,12 +74,10 @@ public class ScorecardReadPlatformServiceImpl implements ScorecardReadPlatformSe
 
         @Override
         public ScorecardValue mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
-
             final Long questionId = rs.getLong("questionId");
             final Long responseId = rs.getLong("responseId");
             final OffsetDateTime createdOn = JdbcSupport.getOffsetDateTime(rs, "createdOn");
             final Integer value = rs.getInt("value");
-
             return ScorecardValue.instance(questionId, responseId, value, createdOn);
         }
     }
@@ -92,7 +85,7 @@ public class ScorecardReadPlatformServiceImpl implements ScorecardReadPlatformSe
     List<ScorecardValue> getScorecardValueBySurveyAndClient(final Long surveyId, final Long clientId) {
         ScorecardValueMapper scvm = new ScorecardValueMapper();
         String sql = "select " + scvm.schema();
-        return this.jdbcTemplate.query(sql, scvm, new Object[] { surveyId, clientId }); // NOSONAR
+        return this.jdbcTemplate.query(sql, scvm, new Object[] {surveyId, clientId}); // NOSONAR
     }
 
     Collection<ScorecardData> updateScorecardValues(Collection<ScorecardData> scorecard) {
@@ -107,7 +100,7 @@ public class ScorecardReadPlatformServiceImpl implements ScorecardReadPlatformSe
         this.context.authenticatedUser();
         ScorecardMapper scm = new ScorecardMapper();
         String sql = "select " + scm.schema() + " where sc.survey_id = ? " + " group by sc.survey_id, sc.client_id, sc.id ";
-        Collection<ScorecardData> scorecardDatas = this.jdbcTemplate.query(sql, scm, new Object[] { surveyId }); // NOSONAR
+        Collection<ScorecardData> scorecardDatas = this.jdbcTemplate.query(sql, scm, new Object[] {surveyId}); // NOSONAR
         updateScorecardValues(scorecardDatas);
         return scorecardDatas;
     }
@@ -117,7 +110,7 @@ public class ScorecardReadPlatformServiceImpl implements ScorecardReadPlatformSe
         this.context.authenticatedUser();
         ScorecardMapper scm = new ScorecardMapper();
         String sql = "select " + scm.schema() + " where sc.client_id = ? " + " group by sc.survey_id, sc.client_id, sc.id ";
-        Collection<ScorecardData> scorecardDatas = this.jdbcTemplate.query(sql, scm, new Object[] { clientId }); // NOSONAR
+        Collection<ScorecardData> scorecardDatas = this.jdbcTemplate.query(sql, scm, new Object[] {clientId}); // NOSONAR
         updateScorecardValues(scorecardDatas);
         return scorecardDatas;
     }
@@ -126,11 +119,15 @@ public class ScorecardReadPlatformServiceImpl implements ScorecardReadPlatformSe
     public Collection<ScorecardData> retrieveScorecardBySurveyAndClient(Long surveyId, Long clientId) {
         this.context.authenticatedUser();
         ScorecardMapper scm = new ScorecardMapper();
-        String sql = "select " + scm.schema() + " where sc.survey_id = ? and sc.client_id = ? "
-                + " group by sc.survey_id, sc.client_id, sc.id ";
-        Collection<ScorecardData> scorecardDatas = this.jdbcTemplate.query(sql, scm, new Object[] { surveyId, clientId }); // NOSONAR
+        String sql = "select " + scm.schema() + " where sc.survey_id = ? and sc.client_id = ? " + " group by sc.survey_id, sc.client_id, sc.id ";
+        Collection<ScorecardData> scorecardDatas = this.jdbcTemplate.query(sql, scm, new Object[] {surveyId, clientId}); // NOSONAR
         updateScorecardValues(scorecardDatas);
         return scorecardDatas;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public ScorecardReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate, final PlatformSecurityContext context) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.context = context;
+    }
 }

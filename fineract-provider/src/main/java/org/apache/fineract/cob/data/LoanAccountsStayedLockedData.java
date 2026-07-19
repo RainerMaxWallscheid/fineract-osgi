@@ -19,12 +19,17 @@
 package org.apache.fineract.cob.data;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
 public class LoanAccountsStayedLockedData {
-
     private List<LoanAccountStayedLockedData> loanAccounts;
+
+    @java.lang.SuppressWarnings("all")
+        public List<LoanAccountStayedLockedData> getLoanAccounts() {
+        return this.loanAccounts;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanAccountsStayedLockedData(final List<LoanAccountStayedLockedData> loanAccounts) {
+        this.loanAccounts = loanAccounts;
+    }
 }

@@ -26,8 +26,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
@@ -62,29 +60,21 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
  *
  * If multi-tenant and basic auth credentials are invalid, a http error response is returned.
  */
-
-@Slf4j
 public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFilter {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TenantAwareBasicAuthenticationFilter.class);
     private static boolean FIRST_REQUEST_PROCESSED = false;
     private static final String TENANT_ID_REQUEST_HEADER = "Fineract-Platform-TenantId";
     private static final boolean EXCEPTION_IF_HEADER_MISSING = true;
-
     private final ToApiJsonSerializer<PlatformRequestLog> toApiJsonSerializer;
     private final ConfigurationDomainService configurationDomainService;
     private final CacheWritePlatformService cacheWritePlatformService;
     private final UserNotificationService userNotificationService;
     private final AuthTenantDetailsService basicAuthTenantDetailsService;
     private final BusinessDateReadPlatformService businessDateReadPlatformService;
-
-    @Setter
     private RequestMatcher requestMatcher = AnyRequestMatcher.INSTANCE;
 
-    public TenantAwareBasicAuthenticationFilter(final AuthenticationManager authenticationManager,
-            final AuthenticationEntryPoint authenticationEntryPoint, ToApiJsonSerializer<PlatformRequestLog> toApiJsonSerializer,
-            ConfigurationDomainService configurationDomainService, CacheWritePlatformService cacheWritePlatformService,
-            UserNotificationService userNotificationService, AuthTenantDetailsService basicAuthTenantDetailsService,
-            BusinessDateReadPlatformService businessDateReadPlatformService) {
+    public TenantAwareBasicAuthenticationFilter(final AuthenticationManager authenticationManager, final AuthenticationEntryPoint authenticationEntryPoint, ToApiJsonSerializer<PlatformRequestLog> toApiJsonSerializer, ConfigurationDomainService configurationDomainService, CacheWritePlatformService cacheWritePlatformService, UserNotificationService userNotificationService, AuthTenantDetailsService basicAuthTenantDetailsService, BusinessDateReadPlatformService businessDateReadPlatformService) {
         super(authenticationManager, authenticationEntryPoint);
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.configurationDomainService = configurationDomainService;
@@ -96,12 +86,9 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
 
     @Override
     @SuppressFBWarnings("SLF4J_SIGN_ONLY_FORMAT")
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final StopWatch task = new StopWatch();
         task.start();
-
         try {
             ThreadLocalContextUtil.reset();
             if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
@@ -111,16 +98,12 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
             } else {
                 if (requestMatcher.matches(request)) {
                     String tenantIdentifier = request.getHeader(TENANT_ID_REQUEST_HEADER);
-
                     if (org.apache.commons.lang3.StringUtils.isBlank(tenantIdentifier)) {
                         tenantIdentifier = request.getParameter("tenantIdentifier");
                     }
-
                     if (tenantIdentifier == null && EXCEPTION_IF_HEADER_MISSING) {
-                        throw new InvalidTenantIdentifierException("No tenant identifier found: Add request header of '"
-                                + TENANT_ID_REQUEST_HEADER + "' or add the parameter 'tenantIdentifier' to query string of request URL.");
+                        throw new InvalidTenantIdentifierException("No tenant identifier found: Add request header of \'" + TENANT_ID_REQUEST_HEADER + "\' or add the parameter \'tenantIdentifier\' to query string of request URL.");
                     }
-
                     String pathInfo = request.getRequestURI();
                     boolean isReportRequest = false;
                     if (pathInfo != null && pathInfo.contains("report")) {
@@ -131,15 +114,12 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
                     HashMap<BusinessDateType, LocalDate> businessDates = businessDateReadPlatformService.getBusinessDates();
                     ThreadLocalContextUtil.setBusinessDates(businessDates);
                     String authToken = request.getHeader("Authorization");
-
                     if (authToken != null && authToken.startsWith("Basic ")) {
                         ThreadLocalContextUtil.setAuthToken(authToken.replaceFirst("Basic ", ""));
                     }
-
                     if (!FIRST_REQUEST_PROCESSED) {
                         final String baseUrl = request.getRequestURL().toString().replace(request.getPathInfo(), "/");
                         System.setProperty("baseUrl", baseUrl);
-
                         final boolean ehcacheEnabled = configurationDomainService.isEhcacheEnabled();
                         if (ehcacheEnabled) {
                             cacheWritePlatformService.switchToCache(CacheType.SINGLE_NODE);
@@ -149,13 +129,11 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
                         TenantAwareBasicAuthenticationFilter.FIRST_REQUEST_PROCESSED = true;
                     }
                 }
-
                 super.doFilterInternal(request, response, filterChain);
             }
         } catch (final InvalidTenantIdentifierException e) {
             // deal with exception at low level
             SecurityContextHolder.getContext().setAuthentication(null);
-
             response.addHeader("WWW-Authenticate", "Basic realm=\"" + "Fineract Platform API" + "\"");
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } finally {
@@ -167,16 +145,18 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
     }
 
     @Override
-    protected void onSuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, Authentication authResult)
-            throws IOException {
+    protected void onSuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, Authentication authResult) throws IOException {
         super.onSuccessfulAuthentication(request, response, authResult);
         AppUser user = (AppUser) authResult.getPrincipal();
-
         if (userNotificationService.hasUnreadUserNotifications(user.getId())) {
             response.addHeader("X-Notification-Refresh", "true");
         } else {
             response.addHeader("X-Notification-Refresh", "false");
         }
+    }
 
+    @java.lang.SuppressWarnings("all")
+        public void setRequestMatcher(final RequestMatcher requestMatcher) {
+        this.requestMatcher = requestMatcher;
     }
 }

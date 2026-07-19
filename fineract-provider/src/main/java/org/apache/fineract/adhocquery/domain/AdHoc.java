@@ -23,50 +23,33 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.adhocquery.api.AdHocJsonInputParams;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableCustom;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true)
 @Entity
 @Table(name = "m_adhoc")
 public class AdHoc extends AbstractAuditableCustom {
-
     @Column(name = "name", length = 100)
     private String name;
-
     @Column(name = "query", length = 2000)
     private String query;
-
     @Column(name = "table_name", length = 100)
     private String tableName;
-
     @Column(name = "table_fields", length = 2000)
     private String tableFields;
-
     @Column(name = "email", length = 500)
     private String email;
-
     @Column(name = "report_run_frequency_code")
     private Long reportRunFrequency;
-
     @Column(name = "report_run_every")
     private Long reportRunEvery;
-
     @Column(name = "is_active", nullable = false)
     private boolean active;
 
     public static AdHoc fromJson(final JsonCommand command) {
         final String name = command.stringValueOfParameterNamed(AdHocJsonInputParams.NAME.getValue());
-
         final String query = command.stringValueOfParameterNamed(AdHocJsonInputParams.QUERY.getValue());
         final String tableName = command.stringValueOfParameterNamed(AdHocJsonInputParams.TABLENAME.getValue());
         final String tableFields = command.stringValueOfParameterNamed(AdHocJsonInputParams.TABLEFIELDS.getValue());
@@ -74,23 +57,17 @@ public class AdHoc extends AbstractAuditableCustom {
         final Long reportRunFrequency = command.longValueOfParameterNamed(AdHocJsonInputParams.REPORT_RUN_FREQUENCY.getValue());
         final Long reportRunEvery = command.longValueOfParameterNamed(AdHocJsonInputParams.REPORT_RUN_EVERY.getValue());
         final boolean active = command.booleanPrimitiveValueOfParameterNamed(AdHocJsonInputParams.ACTIVE.getValue());
-        return new AdHoc().setName(StringUtils.defaultIfEmpty(name, null)).setQuery(StringUtils.defaultIfEmpty(query, null))
-                .setTableName(StringUtils.defaultIfEmpty(tableName, null)).setTableFields(StringUtils.defaultIfEmpty(tableFields, null))
-                .setEmail(StringUtils.defaultIfEmpty(email, null)).setReportRunFrequency(reportRunFrequency)
-                .setReportRunEvery(reportRunEvery).setActive(false);
+        return new AdHoc().setName(StringUtils.defaultIfEmpty(name, null)).setQuery(StringUtils.defaultIfEmpty(query, null)).setTableName(StringUtils.defaultIfEmpty(tableName, null)).setTableFields(StringUtils.defaultIfEmpty(tableFields, null)).setEmail(StringUtils.defaultIfEmpty(email, null)).setReportRunFrequency(reportRunFrequency).setReportRunEvery(reportRunEvery).setActive(false);
     }
 
     public Map<String, Object> update(final JsonCommand command) {
-
         final Map<String, Object> actualChanges = new LinkedHashMap<>(7);
-
         final String nameParamName = "name";
         if (command.isChangeInStringParameterNamed(nameParamName, this.name)) {
             final String newValue = command.stringValueOfParameterNamed(nameParamName);
             actualChanges.put(nameParamName, newValue);
             this.name = newValue;
         }
-
         final String descriptionParamName = "query";
         if (command.isChangeInStringParameterNamed(descriptionParamName, this.query)) {
             final String newValue = command.stringValueOfParameterNamed(descriptionParamName);
@@ -136,4 +113,119 @@ public class AdHoc extends AbstractAuditableCustom {
         return actualChanges;
     }
 
+    @java.lang.SuppressWarnings("all")
+        public String getName() {
+        return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getQuery() {
+        return this.query;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getTableName() {
+        return this.tableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getTableFields() {
+        return this.tableFields;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getEmail() {
+        return this.email;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getReportRunFrequency() {
+        return this.reportRunFrequency;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getReportRunEvery() {
+        return this.reportRunEvery;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean isActive() {
+        return this.active;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public AdHoc setName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public AdHoc setQuery(final String query) {
+        this.query = query;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public AdHoc setTableName(final String tableName) {
+        this.tableName = tableName;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public AdHoc setTableFields(final String tableFields) {
+        this.tableFields = tableFields;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public AdHoc setEmail(final String email) {
+        this.email = email;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public AdHoc setReportRunFrequency(final Long reportRunFrequency) {
+        this.reportRunFrequency = reportRunFrequency;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public AdHoc setReportRunEvery(final Long reportRunEvery) {
+        this.reportRunEvery = reportRunEvery;
+        return this;
+    }
+
+    /**
+     * @return {@code this}.
+     */
+    @java.lang.SuppressWarnings("all")
+        public AdHoc setActive(final boolean active) {
+        this.active = active;
+        return this;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public AdHoc() {
+    }
 }

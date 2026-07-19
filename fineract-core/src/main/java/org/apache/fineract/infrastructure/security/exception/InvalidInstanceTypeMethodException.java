@@ -18,21 +18,21 @@
  */
 package org.apache.fineract.infrastructure.security.exception;
 
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 
 /**
  * {@link RuntimeException} thrown when an invalid method in the Fineract instance type called in request to platform.
- *
- *
  */
-@Getter
 public class InvalidInstanceTypeMethodException extends AbstractPlatformDomainRuleException {
-
     private final String method;
 
     public InvalidInstanceTypeMethodException(final String method) {
         super("error.msg.invalid.method.for.instance.type", "Method Not Allowed " + method + " for the instance type");
         this.method = method;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getMethod() {
+        return this.method;
     }
 }

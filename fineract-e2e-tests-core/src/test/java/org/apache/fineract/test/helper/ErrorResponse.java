@@ -22,19 +22,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.List;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.client.feign.ObjectMapperFactory;
 import retrofit2.Response;
 
-@NoArgsConstructor
-@Getter
-@Setter
 public class ErrorResponse {
-
     private static final ObjectMapper OBJECT_MAPPER = ObjectMapperFactory.getShared();
-
     private String developerMessage;
     private Integer httpStatusCode;
     private List<ErrorDetail> errors;
@@ -43,24 +35,20 @@ public class ErrorResponse {
         if (hasTopLevelErrorOnly()) {
             return createErrorFromDeveloperMessage();
         }
-
         if (errors == null || errors.isEmpty()) {
             if (this.developerMessage != null) {
                 return createErrorFromDeveloperMessage();
             }
             throw new IllegalStateException("No errors found in response");
         }
-
         if (errors.size() != 1) {
             throw new IllegalStateException("Multiple errors found");
         }
-
         return errors.iterator().next();
     }
 
     private boolean hasTopLevelErrorOnly() {
-        return this.httpStatusCode != null && this.httpStatusCode == 400 && this.developerMessage != null
-                && this.developerMessage.contains("invalid") && (this.errors == null || this.errors.isEmpty());
+        return this.httpStatusCode != null && this.httpStatusCode == 400 && this.developerMessage != null && this.developerMessage.contains("invalid") && (this.errors == null || this.errors.isEmpty());
     }
 
     private ErrorDetail createErrorFromDeveloperMessage() {
@@ -98,11 +86,8 @@ public class ErrorResponse {
         }
     }
 
-    @NoArgsConstructor
-    @Getter
-    @Setter
-    public static class ErrorDetail {
 
+    public static class ErrorDetail {
         private String developerMessage;
         private List<ErrorMessageArg> args;
 
@@ -115,13 +100,82 @@ public class ErrorResponse {
             }
             return developerMessage;
         }
+
+        @java.lang.SuppressWarnings("all")
+                public ErrorDetail() {
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public String getDeveloperMessage() {
+            return this.developerMessage;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public List<ErrorMessageArg> getArgs() {
+            return this.args;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public void setDeveloperMessage(final String developerMessage) {
+            this.developerMessage = developerMessage;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public void setArgs(final List<ErrorMessageArg> args) {
+            this.args = args;
+        }
     }
 
-    @NoArgsConstructor
-    @Getter
-    @Setter
-    public static class ErrorMessageArg {
 
+    public static class ErrorMessageArg {
         private Object value;
+
+        @java.lang.SuppressWarnings("all")
+                public ErrorMessageArg() {
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public Object getValue() {
+            return this.value;
+        }
+
+        @java.lang.SuppressWarnings("all")
+                public void setValue(final Object value) {
+            this.value = value;
+        }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ErrorResponse() {
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getDeveloperMessage() {
+        return this.developerMessage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Integer getHttpStatusCode() {
+        return this.httpStatusCode;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public List<ErrorDetail> getErrors() {
+        return this.errors;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setDeveloperMessage(final String developerMessage) {
+        this.developerMessage = developerMessage;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setHttpStatusCode(final Integer httpStatusCode) {
+        this.httpStatusCode = httpStatusCode;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setErrors(final List<ErrorDetail> errors) {
+        this.errors = errors;
     }
 }

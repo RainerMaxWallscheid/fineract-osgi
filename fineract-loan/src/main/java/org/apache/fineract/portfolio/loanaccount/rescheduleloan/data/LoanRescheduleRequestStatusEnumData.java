@@ -18,17 +18,12 @@
  */
 package org.apache.fineract.portfolio.loanaccount.rescheduleloan.data;
 
-import lombok.Getter;
-import lombok.experimental.Accessors;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 
 /**
  * Immutable data object represent loan reschedule request status enumerations.
- **/
-@Getter
-@Accessors(fluent = true)
+ */
 public class LoanRescheduleRequestStatusEnumData {
-
     private final Long id;
     private final String code;
     private final String value;
@@ -40,7 +35,7 @@ public class LoanRescheduleRequestStatusEnumData {
      * LoanRescheduleRequestStatusEnumData constructor
      *
      * Note: Same status types/states for loan accounts are used in here
-     **/
+     */
     public LoanRescheduleRequestStatusEnumData(Long id, String code, String value) {
         this.id = id;
         this.code = code;
@@ -59,6 +54,36 @@ public class LoanRescheduleRequestStatusEnumData {
     }
 
     public boolean isRejected() {
+        return this.rejected;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long id() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String code() {
+        return this.code;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String value() {
+        return this.value;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean pendingApproval() {
+        return this.pendingApproval;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean approved() {
+        return this.approved;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public boolean rejected() {
         return this.rejected;
     }
 }

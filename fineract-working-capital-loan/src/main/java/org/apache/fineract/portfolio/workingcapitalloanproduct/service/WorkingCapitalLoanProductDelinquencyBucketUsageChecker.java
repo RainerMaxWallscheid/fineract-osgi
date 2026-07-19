@@ -18,20 +18,22 @@
  */
 package org.apache.fineract.portfolio.workingcapitalloanproduct.service;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucket;
 import org.apache.fineract.portfolio.delinquency.spi.DelinquencyBucketUsageChecker;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.repository.WorkingCapitalLoanProductRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class WorkingCapitalLoanProductDelinquencyBucketUsageChecker implements DelinquencyBucketUsageChecker {
-
     private final WorkingCapitalLoanProductRepository repository;
 
     @Override
     public boolean hasUsages(final DelinquencyBucket delinquencyBucket) {
         return repository.existsByDelinquencyBucket(delinquencyBucket);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalLoanProductDelinquencyBucketUsageChecker(final WorkingCapitalLoanProductRepository repository) {
+        this.repository = repository;
     }
 }

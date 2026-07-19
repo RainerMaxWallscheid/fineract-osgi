@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.loanaccount.handler;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -27,10 +26,8 @@ import org.apache.fineract.portfolio.loanaccount.loanschedule.service.LoanSchedu
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @CommandType(entity = "LOAN", action = "DELETESCHEDULEEXCEPTIONS")
 public class LoanScheduleDeleteVariationCommandHandler implements NewCommandSourceHandler {
-
     private final LoanScheduleWritePlatformService loanScheduleWritePlatformService;
 
     @Override
@@ -38,4 +35,8 @@ public class LoanScheduleDeleteVariationCommandHandler implements NewCommandSour
         return this.loanScheduleWritePlatformService.deleteLoanScheduleVariations(command.getLoanId());
     }
 
+    @java.lang.SuppressWarnings("all")
+        public LoanScheduleDeleteVariationCommandHandler(final LoanScheduleWritePlatformService loanScheduleWritePlatformService) {
+        this.loanScheduleWritePlatformService = loanScheduleWritePlatformService;
+    }
 }

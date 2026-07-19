@@ -21,30 +21,24 @@ package org.apache.fineract.portfolio.loanproduct.domain;
 // TODO FINERACT-1932-Fineract modularization: Move to fineract-progressive-loan module after refactor of Loan and LoanProduct classes
 import java.util.Arrays;
 import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 
-@Getter
-@RequiredArgsConstructor
 public enum PaymentAllocationTransactionType {
-
-    DEFAULT(null, "Default"), //
-    REPAYMENT(LoanTransactionType.REPAYMENT, "Repayment"), //
-    DOWN_PAYMENT(LoanTransactionType.DOWN_PAYMENT, "Down payment"), //
-    MERCHANT_ISSUED_REFUND(LoanTransactionType.MERCHANT_ISSUED_REFUND, "Merchant issued refund"), //
-    PAYOUT_REFUND(LoanTransactionType.PAYOUT_REFUND, "Payout refund"), //
-    GOODWILL_CREDIT(LoanTransactionType.GOODWILL_CREDIT, "Goodwill credit"), //
-    CHARGE_REFUND(LoanTransactionType.CHARGE_REFUND, "Charge refund"), //
-    CHARGE_ADJUSTMENT(LoanTransactionType.CHARGE_ADJUSTMENT, "Charge adjustment"), //
-    WAIVE_INTEREST(LoanTransactionType.WAIVE_INTEREST, "Waive interest"), //
-    CHARGE_PAYMENT(LoanTransactionType.CHARGE_PAYMENT, "Charge payment"), //
-    REFUND_FOR_ACTIVE_LOAN(LoanTransactionType.REFUND_FOR_ACTIVE_LOAN, "Refund for active loan"), //
-    INTEREST_PAYMENT_WAIVER(LoanTransactionType.INTEREST_PAYMENT_WAIVER, "Interest payment waiver"), //
-    INTEREST_REFUND(LoanTransactionType.INTEREST_REFUND, "Interest refund"), //
+    DEFAULT(null, "Default"),  //
+    REPAYMENT(LoanTransactionType.REPAYMENT, "Repayment"),  //
+    DOWN_PAYMENT(LoanTransactionType.DOWN_PAYMENT, "Down payment"),  //
+    MERCHANT_ISSUED_REFUND(LoanTransactionType.MERCHANT_ISSUED_REFUND, "Merchant issued refund"),  //
+    PAYOUT_REFUND(LoanTransactionType.PAYOUT_REFUND, "Payout refund"),  //
+    GOODWILL_CREDIT(LoanTransactionType.GOODWILL_CREDIT, "Goodwill credit"),  //
+    CHARGE_REFUND(LoanTransactionType.CHARGE_REFUND, "Charge refund"),  //
+    CHARGE_ADJUSTMENT(LoanTransactionType.CHARGE_ADJUSTMENT, "Charge adjustment"),  //
+    WAIVE_INTEREST(LoanTransactionType.WAIVE_INTEREST, "Waive interest"),  //
+    CHARGE_PAYMENT(LoanTransactionType.CHARGE_PAYMENT, "Charge payment"),  //
+    REFUND_FOR_ACTIVE_LOAN(LoanTransactionType.REFUND_FOR_ACTIVE_LOAN, "Refund for active loan"),  //
+    INTEREST_PAYMENT_WAIVER(LoanTransactionType.INTEREST_PAYMENT_WAIVER, "Interest payment waiver"),  //
+    INTEREST_REFUND(LoanTransactionType.INTEREST_REFUND, "Interest refund"),  //
     CAPITALIZED_INCOME_ADJUSTMENT(LoanTransactionType.CAPITALIZED_INCOME_ADJUSTMENT, "Capitalized income adjustment");
-
     private final LoanTransactionType loanTransactionType;
     private final String humanReadableName;
 
@@ -54,5 +48,21 @@ public enum PaymentAllocationTransactionType {
 
     public boolean isDefault() {
         return this == DEFAULT;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanTransactionType getLoanTransactionType() {
+        return this.loanTransactionType;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getHumanReadableName() {
+        return this.humanReadableName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        private PaymentAllocationTransactionType(final LoanTransactionType loanTransactionType, final String humanReadableName) {
+        this.loanTransactionType = loanTransactionType;
+        this.humanReadableName = humanReadableName;
     }
 }

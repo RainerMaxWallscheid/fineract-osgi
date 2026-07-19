@@ -18,19 +18,21 @@
  */
 package org.apache.fineract.infrastructure.contentstore.detector;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@RequiredArgsConstructor
 @Component
 public final class DefaultContentDetectorManager implements ContentDetectorManager {
-
+    @java.lang.SuppressWarnings("all")
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DefaultContentDetectorManager.class);
     private final TikaContentDetector tikaContentDetector;
 
     @Override
     public ContentDetectorContext detect(ContentDetectorContext ctx) {
         return tikaContentDetector.detect(ctx);
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public DefaultContentDetectorManager(final TikaContentDetector tikaContentDetector) {
+        this.tikaContentDetector = tikaContentDetector;
     }
 }

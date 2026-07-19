@@ -23,23 +23,38 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 
-@Getter
-@Setter
 @Table(name = "m_external_asset_owner_transfer_loan_mapping")
-@NoArgsConstructor
 @Entity
 public class ExternalAssetOwnerTransferLoanMapping extends AbstractAuditableWithUTCDateTimeCustom<Long> {
-
     @Column(name = "loan_id", nullable = false)
     private Long loanId;
-
     @ManyToOne
     @JoinColumn(name = "owner_transfer_id", nullable = false)
     private ExternalAssetOwnerTransfer ownerTransfer;
 
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanId() {
+        return this.loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnerTransfer getOwnerTransfer() {
+        return this.ownerTransfer;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setLoanId(final Long loanId) {
+        this.loanId = loanId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setOwnerTransfer(final ExternalAssetOwnerTransfer ownerTransfer) {
+        this.ownerTransfer = ownerTransfer;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalAssetOwnerTransferLoanMapping() {
+    }
 }

@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.workingcapitalloanproduct.WorkingCapitalLoanProductConstants;
@@ -35,14 +34,9 @@ import org.springframework.stereotype.Component;
  * order). Used by both product and loan application validators.
  */
 @Component
-@RequiredArgsConstructor
 public class WorkingCapitalPaymentAllocationDataValidator {
-
-    private static final Set<String> SUPPORTED_PAYMENT_ALLOCATION_RULE_PARAMS = new HashSet<>(
-            Arrays.asList("transactionType", "paymentAllocationOrder"));
-    private static final Set<String> SUPPORTED_PAYMENT_ALLOCATION_ORDER_PARAMS = new HashSet<>(
-            Arrays.asList("paymentAllocationRule", "order"));
-
+    private static final Set<String> SUPPORTED_PAYMENT_ALLOCATION_RULE_PARAMS = new HashSet<>(Arrays.asList("transactionType", "paymentAllocationOrder"));
+    private static final Set<String> SUPPORTED_PAYMENT_ALLOCATION_ORDER_PARAMS = new HashSet<>(Arrays.asList("paymentAllocationRule", "order"));
     private final FromJsonHelper fromApiJsonHelper;
 
     /**
@@ -53,8 +47,7 @@ public class WorkingCapitalPaymentAllocationDataValidator {
         if (element == null || !element.isJsonObject()) {
             return;
         }
-        final JsonElement paymentAllocationElement = element.getAsJsonObject()
-                .get(WorkingCapitalLoanProductConstants.paymentAllocationParamName);
+        final JsonElement paymentAllocationElement = element.getAsJsonObject().get(WorkingCapitalLoanProductConstants.paymentAllocationParamName);
         if (paymentAllocationElement == null || !paymentAllocationElement.isJsonArray()) {
             return;
         }
@@ -64,24 +57,21 @@ public class WorkingCapitalPaymentAllocationDataValidator {
                 continue;
             }
             final JsonObject rule = ruleEl.getAsJsonObject();
-            fromApiJsonHelper.checkForUnsupportedNestedParameters(WorkingCapitalLoanProductConstants.paymentAllocationParamName, rule,
-                    SUPPORTED_PAYMENT_ALLOCATION_RULE_PARAMS);
+            fromApiJsonHelper.checkForUnsupportedNestedParameters(WorkingCapitalLoanProductConstants.paymentAllocationParamName, rule, SUPPORTED_PAYMENT_ALLOCATION_RULE_PARAMS);
             final String transactionType = fromApiJsonHelper.extractStringNamed("transactionType", rule);
             baseDataValidator.reset().parameter("paymentAllocation.transactionType").value(transactionType).notBlank();
             final JsonElement orderEl = rule.get("paymentAllocationOrder");
             if (orderEl == null) {
                 baseDataValidator.reset().parameter("paymentAllocation.paymentAllocationOrder").value(null).notNull();
             } else if (!orderEl.isJsonArray()) {
-                baseDataValidator.reset().parameter("paymentAllocation.paymentAllocationOrder").failWithCode("must.be.array",
-                        "paymentAllocationOrder must be an array");
+                baseDataValidator.reset().parameter("paymentAllocation.paymentAllocationOrder").failWithCode("must.be.array", "paymentAllocationOrder must be an array");
             } else {
                 for (final JsonElement orderItemEl : orderEl.getAsJsonArray()) {
                     if (orderItemEl == null || !orderItemEl.isJsonObject()) {
                         continue;
                     }
                     final JsonObject orderItem = orderItemEl.getAsJsonObject();
-                    fromApiJsonHelper.checkForUnsupportedNestedParameters(orderParamPath, orderItem,
-                            SUPPORTED_PAYMENT_ALLOCATION_ORDER_PARAMS);
+                    fromApiJsonHelper.checkForUnsupportedNestedParameters(orderParamPath, orderItem, SUPPORTED_PAYMENT_ALLOCATION_ORDER_PARAMS);
                     final String paymentAllocationRule = fromApiJsonHelper.extractStringNamed("paymentAllocationRule", orderItem);
                     baseDataValidator.reset().parameter(orderParamPath + ".paymentAllocationRule").value(paymentAllocationRule).notBlank();
                     final Integer order = fromApiJsonHelper.extractIntegerNamed("order", orderItem, Locale.getDefault());
@@ -89,5 +79,10 @@ public class WorkingCapitalPaymentAllocationDataValidator {
                 }
             }
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public WorkingCapitalPaymentAllocationDataValidator(final FromJsonHelper fromApiJsonHelper) {
+        this.fromApiJsonHelper = fromApiJsonHelper;
     }
 }

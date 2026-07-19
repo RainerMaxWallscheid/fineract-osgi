@@ -19,7 +19,6 @@
 package org.apache.fineract.infrastructure.core.jersey;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
@@ -34,7 +33,6 @@ import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -46,9 +44,7 @@ import org.springframework.stereotype.Component;
 @Produces(MediaType.APPLICATION_JSON_VALUE)
 @Consumes(MediaType.APPLICATION_JSON_VALUE)
 @Component
-@RequiredArgsConstructor
 public class JerseyJacksonObjectArgumentHandler<T> implements MessageBodyReader<T>, MessageBodyWriter<T> {
-
     private final MappingJackson2HttpMessageConverter converter;
 
     @Override
@@ -57,9 +53,8 @@ public class JerseyJacksonObjectArgumentHandler<T> implements MessageBodyReader<
     }
 
     @Override
-    @SuppressWarnings({ "unchecked" })
-    public T readFrom(Class<T> type, Type genericType, Annotation[] annotations, jakarta.ws.rs.core.MediaType mediaType,
-            MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
+    @SuppressWarnings({"unchecked"})
+    public T readFrom(Class<T> type, Type genericType, Annotation[] annotations, jakarta.ws.rs.core.MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
         if (String.class == genericType) {
             // If the request type is String, keep it that way.
             StringWriter writer = new StringWriter();
@@ -80,8 +75,7 @@ public class JerseyJacksonObjectArgumentHandler<T> implements MessageBodyReader<
     }
 
     @Override
-    public void writeTo(T t, Class<?> type, Type genericType, Annotation[] annotations, jakarta.ws.rs.core.MediaType mediaType,
-            MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+    public void writeTo(T t, Class<?> type, Type genericType, Annotation[] annotations, jakarta.ws.rs.core.MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
         if (String.class == genericType) {
             // If the response type is String, keep it that way.
             IOUtils.write((String) t, entityStream, UTF_8);
@@ -94,5 +88,10 @@ public class JerseyJacksonObjectArgumentHandler<T> implements MessageBodyReader<
             });
             converter.write(t, genericType, MediaType.APPLICATION_JSON, new SimpleHttpOutputMessage(entityStream, headers));
         }
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public JerseyJacksonObjectArgumentHandler(final MappingJackson2HttpMessageConverter converter) {
+        this.converter = converter;
     }
 }

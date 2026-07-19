@@ -18,18 +18,47 @@
  */
 package org.apache.fineract.cob.data;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 
-@AllArgsConstructor
-@Getter
 public class LoanDataForExternalTransfer {
-
     Long id;
     ExternalId externalId;
     LoanStatus loanStatus;
     Long loanProductId;
     String loanProductShortName;
+
+    @java.lang.SuppressWarnings("all")
+        public LoanDataForExternalTransfer(final Long id, final ExternalId externalId, final LoanStatus loanStatus, final Long loanProductId, final String loanProductShortName) {
+        this.id = id;
+        this.externalId = externalId;
+        this.loanStatus = loanStatus;
+        this.loanProductId = loanProductId;
+        this.loanProductShortName = loanProductShortName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getId() {
+        return this.id;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public ExternalId getExternalId() {
+        return this.externalId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public LoanStatus getLoanStatus() {
+        return this.loanStatus;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getLoanProductId() {
+        return this.loanProductId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public String getLoanProductShortName() {
+        return this.loanProductShortName;
+    }
 }
