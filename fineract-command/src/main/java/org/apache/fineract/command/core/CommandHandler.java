@@ -24,12 +24,16 @@ public interface CommandHandler<REQ, RES> {
     RES handle(Command<REQ> command);
 
     default RES fallback(Command<REQ> command, Throwable t) {
-        try {
-            // NOTE: any command handler can override this default to implement more specialized fallbacks.
-            throw t;
-        } catch (final java.lang.Throwable $ex) {
-            throw new java.lang.RuntimeException($ex);
+        // NOTE: any command handler can override this default to implement more specialized fallbacks.
+        // Re-throw platform/runtime exceptions as-is so Jersey mappers still produce 404/400/etc.
+        // (Delombok of @SneakyThrows used to wrap every Throwable in RuntimeException → HTTP 500.)
+        if (t instanceof RuntimeException runtimeException) {
+            throw runtimeException;
         }
+        if (t instanceof Error error) {
+            throw error;
+        }
+        throw new RuntimeException(t);
     }
 
     default boolean matches(Command<REQ> command) {
