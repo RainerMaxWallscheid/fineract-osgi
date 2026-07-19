@@ -108,6 +108,12 @@ tasks.named('cargoStartLocal').configure {
                 pids.split('\n').each { pid -> "kill -9 ${pid}".execute() }
             }
         }
+        // Cargo standalone config must be empty/absent; leftover dirs from aborted runs break start.
+        def cargoConf = new File(System.getProperty('java.io.tmpdir'), 'cargo')
+        if (cargoConf.exists()) {
+            logger.lifecycle("cargoStartLocal: removing leftover cargo dir ${cargoConf}")
+            cargoConf.deleteDir()
+        }
     }
 }
 

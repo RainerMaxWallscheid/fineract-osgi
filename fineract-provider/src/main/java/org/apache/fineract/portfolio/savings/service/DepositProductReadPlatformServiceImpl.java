@@ -40,6 +40,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 public class DepositProductReadPlatformServiceImpl implements DepositProductReadPlatformService {
+    // Must be initialized before product mappers (they call SHARED_COLUMNS.schema() in constructors).
+    private static final SharedDepositProductColumns SHARED_COLUMNS = new SharedDepositProductColumns();
     private static final FixedDepositProductMapper FIXED_DEPOSIT_PRODUCT_MAPPER = new FixedDepositProductMapper();
     private static final RecurringDepositProductMapper RECURRING_DEPOSIT_PRODUCT_MAPPER = new RecurringDepositProductMapper();
     private static final DepositProductLookupMapper DEPOSIT_PRODUCT_LOOKUP_MAPPER = new DepositProductLookupMapper();
@@ -183,8 +185,6 @@ public class DepositProductReadPlatformServiceImpl implements DepositProductRead
             return DepositProductData.instance(id, name, shortName, description, currency, nominalAnnualInterestRate, compoundingInterestPeriodType, interestPostingPeriodType, interestCalculationType, interestCalculationDaysInYearType, lockinPeriodFrequency, lockinPeriodFrequencyType, accountingRuleType, minBalanceForInterestCalculation, withHoldTax, taxGroupData);
         }
     }
-
-    private static final SharedDepositProductColumns SHARED_COLUMNS = new SharedDepositProductColumns();
 
     private static class FixedDepositProductMapper implements RowMapper<FixedDepositProductData> {
         private final String schemaSql;
