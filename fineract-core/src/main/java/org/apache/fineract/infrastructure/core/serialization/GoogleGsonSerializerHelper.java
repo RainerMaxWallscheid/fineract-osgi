@@ -29,8 +29,10 @@ import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.ServiceLoader;
 import java.util.Set;
 import org.apache.fineract.infrastructure.core.api.DateAdapter;
+import org.apache.fineract.infrastructure.core.serialization.gson.FineractGsonTypeAdapterRegistrar;
 import org.apache.fineract.infrastructure.core.api.ExternalIdAdapter;
 import org.apache.fineract.infrastructure.core.api.JodaDateTimeAdapter;
 import org.apache.fineract.infrastructure.core.api.JodaMonthDayAdapter;
@@ -112,5 +114,9 @@ public final class GoogleGsonSerializerHelper {
         builder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
         builder.registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeAdapter());
         builder.registerTypeAdapter(ExternalId.class, new ExternalIdAdapter());
+        // Module SPI: composed DTOs that must serialize flat for API compatibility
+        for (FineractGsonTypeAdapterRegistrar registrar : ServiceLoader.load(FineractGsonTypeAdapterRegistrar.class)) {
+            registrar.register(builder);
+        }
     }
 }

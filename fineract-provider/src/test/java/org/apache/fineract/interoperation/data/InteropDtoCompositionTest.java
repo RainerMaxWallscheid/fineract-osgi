@@ -97,4 +97,14 @@ class InteropDtoCompositionTest {
         assertTrue(InteropTransactionRequestResponseData.class.getSuperclass().getSimpleName().equals("CommandProcessingResult"));
         assertTrue(InteropResponseData.class.getSuperclass().equals(Object.class));
     }
+
+    @Test
+    void getOnlyInteropDtosDoNotExtendCommandProcessingResult() {
+        assertTrue(InteropTransactionsData.class.getSuperclass().equals(Object.class));
+        assertTrue(InteropTransactionData.class.getSuperclass().equals(Object.class));
+        assertTrue(InteropIdentifiersResponseData.class.getSuperclass().equals(Object.class));
+        assertTrue(InteropKycResponseData.class.getSuperclass().equals(Object.class));
+        // Identifier-account stays a CommandProcessingResult for the write pipeline
+        assertTrue(InteropIdentifierAccountResponseData.class.getSuperclass().getSimpleName().equals("CommandProcessingResult"));
+    }
 }
