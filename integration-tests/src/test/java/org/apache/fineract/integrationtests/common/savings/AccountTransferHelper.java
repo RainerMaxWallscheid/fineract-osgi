@@ -158,6 +158,8 @@ public class AccountTransferHelper {
     public Object accountTransferWithInvalidDate(final Integer fromClientId, final Integer fromAccountId, final Integer toClientId,
             final Integer toAccountId, final String fromAccountType, final String toAccountType, final String transferAmount) {
         LOG.info("--------------------------------ACCOUNT TRANSFER--------------------------------");
+        // Invalid transferDate vs dateFormat yyyyMMdd must fail validation with HTTP 400.
+        this.responseSpec = new ResponseSpecBuilder().expectStatusCode(400).build();
         final String accountTransferJSON = new AccountTransferHelper(this.requestSpec, this.responseSpec) //
                 .withTransferOnDate(ACCOUNT_TRANSFER_INVALID_DATE) //
                 .build(fromAccountId.toString(), fromClientId.toString(), toAccountId.toString(), toClientId.toString(), fromAccountType,
