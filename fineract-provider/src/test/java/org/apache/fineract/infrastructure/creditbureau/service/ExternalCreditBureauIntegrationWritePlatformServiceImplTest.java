@@ -43,6 +43,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.Locale;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -419,7 +420,7 @@ public class ExternalCreditBureauIntegrationWritePlatformServiceImplTest {
         jsonResponse.put("userName", "testUser");
         jsonResponse.put(".issued", "sample");
         jsonResponse.put(".expires", ZonedDateTime.now(ZoneId.systemDefault()).plusSeconds(3600)
-                .format(new DateTimeFormatterBuilder().appendPattern("EEE, dd MMM yyyy kk:mm:ss zzz").toFormatter()));
+                .format(new DateTimeFormatterBuilder().appendPattern("EEE, dd MMM yyyy kk:mm:ss zzz").toFormatter(Locale.ENGLISH)));
         return mapper.writeValueAsString(jsonResponse);
     }
 

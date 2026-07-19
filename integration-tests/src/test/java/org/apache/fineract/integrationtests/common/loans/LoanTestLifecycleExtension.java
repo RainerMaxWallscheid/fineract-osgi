@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
+import java.util.Locale;
 import org.apache.fineract.client.models.GetLoansLoanIdResponse;
 import org.apache.fineract.client.models.GetLoansLoanIdTransactionsTemplateResponse;
 import org.apache.fineract.client.models.PostLoansLoanIdRequest;
@@ -43,7 +44,7 @@ public class LoanTestLifecycleExtension implements AfterEachCallback, BeforeEach
 
     private LoanTransactionHelper loanTransactionHelper;
     public static final String DATE_FORMAT = "dd MMMM yyyy";
-    private final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern(DATE_FORMAT).toFormatter();
+    private final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern(DATE_FORMAT).toFormatter(Locale.ENGLISH);
 
     @Override
     public void afterEach(ExtensionContext context) {
@@ -57,7 +58,7 @@ public class LoanTestLifecycleExtension implements AfterEachCallback, BeforeEach
 
     private void closeOpenLoans() {
         LocalDate cleanupDate = determineCleanupDate();
-        BusinessDateHelper.runAt(DateTimeFormatter.ofPattern(DATE_FORMAT).format(cleanupDate), () -> {
+        BusinessDateHelper.runAt(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH).format(cleanupDate), () -> {
             this.loanTransactionHelper = new LoanTransactionHelper(null, null);
 
             List<Long> loanIds = LoanTransactionHelper.getLoanIdsByStatusId(300);

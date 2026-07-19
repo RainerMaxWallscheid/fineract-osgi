@@ -26,6 +26,7 @@ import io.cucumber.java.en.Then;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.CommandProcessingResult;
@@ -43,7 +44,7 @@ import org.junit.jupiter.api.Assertions;
 
 public class LoanInterestPauseStepDef extends AbstractStepDef {
     private static final String DATE_FORMAT = "dd MMMM yyyy";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
     private static final int INTEREST_PAUSE_TERM_TYPE_ID = 11;
     private final EventAssertion eventAssertion;
     private final FineractFeignClient fineractClient;

@@ -589,7 +589,7 @@ public class SavingsAccountHelper {
 
     public Integer payCharge(final Integer chargeId, final Integer savingsId, String amount, LocalDate dueDate) {
         return (Integer) performSavingActions(createChargesURL("paycharge", savingsId, chargeId),
-                getSavingsPayChargeJSON(amount, dueDate.format(DateTimeFormatter.ofPattern(CommonConstants.DATE_FORMAT))),
+                getSavingsPayChargeJSON(amount, dueDate.format(DateTimeFormatter.ofPattern(CommonConstants.DATE_FORMAT, Locale.ENGLISH))),
                 CommonConstants.RESPONSE_RESOURCE_ID);
     }
 

@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 import org.apache.fineract.client.feign.FeignException;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.models.BusinessDateResponse;
@@ -60,7 +61,7 @@ public class BusinessDateStepDef extends AbstractStepDef {
     public void checkBusinessDate(String businessDate) {
         BusinessDateResponse businessDateResponse = ok(
                 () -> fineractClient.businessDateManagement().getBusinessDate(BusinessDateHelper.BUSINESS_DATE, Map.of()));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ENGLISH);
         LocalDate localDate = LocalDate.parse(businessDate, formatter);
 
         assertThat(businessDateResponse.getDate()).isEqualTo(localDate);

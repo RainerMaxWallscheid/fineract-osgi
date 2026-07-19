@@ -33,6 +33,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.Locale;
 import org.apache.fineract.client.models.AllowAttributeOverrides;
 import org.apache.fineract.client.models.GetCodesResponse;
 import org.apache.fineract.client.models.GetLoansLoanIdResponse;
@@ -80,7 +81,7 @@ public class LoanChargeOffAccountingTest extends BaseLoanIntegrationTest {
     private Account incomeAccount;
     private Account expenseAccount;
     private Account overpaymentAccount;
-    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter();
+    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
     private InlineLoanCOBHelper inlineLoanCOBHelper;
 
     @BeforeEach

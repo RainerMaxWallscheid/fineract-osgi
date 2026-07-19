@@ -69,7 +69,7 @@ public class JournalEntriesStepDef extends AbstractStepDef {
 
     @Then("Loan Transactions tab has a {string} transaction with date {string} which has the following Journal entries:")
     public void journalEntryDataCheck(String transactionType, String transactionDate, DataTable table) throws IOException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         long loanId = loanResponse.getLoanId();
         Map<String, Object> queryParams = new HashMap<>();
@@ -163,7 +163,7 @@ public class JournalEntriesStepDef extends AbstractStepDef {
 
     @Then("Loan Transactions tab has {int} a {string} transactions with date {string} which has the following Journal entries:")
     public void journalEntryDataCheck(int numberTrns, String transactionType, String transactionDate, DataTable table) throws IOException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         long loanId = loanResponse.getLoanId();
         Map<String, Object> queryParams = new HashMap<>();
@@ -227,7 +227,7 @@ public class JournalEntriesStepDef extends AbstractStepDef {
 
     @Then("In Loan transactions the replayed {string} transaction with date {string} has a reverted transaction pair with the following Journal entries:")
     public void revertedJournalEntryDataCheck(String transactionType, String transactionDate, DataTable table) throws IOException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         long loanId = loanResponse.getLoanId();
         String resourceId = String.valueOf(loanId);
@@ -280,7 +280,7 @@ public class JournalEntriesStepDef extends AbstractStepDef {
 
     @Then("Loan Transactions tab has a {string} transaction with date {string} has no the Journal entries")
     public void journalEntryNoDataCheck(String transactionType, String transactionDate) throws IOException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
         PostLoansResponse loanResponse = testContext().get(TestContextKey.LOAN_CREATE_RESPONSE);
         long loanId = loanResponse.getLoanId();
         Map<String, Object> queryParams = new HashMap<>();

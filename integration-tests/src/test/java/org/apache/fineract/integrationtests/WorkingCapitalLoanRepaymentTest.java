@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.Locale;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.GetWorkingCapitalLoansLoanIdResponse;
 import org.apache.fineract.client.models.PostWorkingCapitalLoansLoanIdRequest;
@@ -119,7 +120,7 @@ public class WorkingCapitalLoanRepaymentTest {
         loanHelper.disburseById(loanId, WorkingCapitalLoanDisbursementTestBuilder.buildDisburseRequest(disbursementDate,
                 BigDecimal.valueOf(5000), BigDecimal.valueOf(100), null, null, null, null, null, null, null));
         final LocalDate repaymentDate = disbursementDate.plusDays(1);
-        BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+        BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                 () -> loanHelper.makeRepaymentByLoanId(loanId, WorkingCapitalLoanDisbursementTestBuilder
                         .buildRepaymentRequest(repaymentDate, BigDecimal.valueOf(5200), null, "repayment", 1, "repayment-account")));
 
@@ -146,7 +147,7 @@ public class WorkingCapitalLoanRepaymentTest {
         loanHelper.disburseById(loanId,
                 WorkingCapitalLoanDisbursementTestBuilder.buildDisburseRequest(approvedOnDate, BigDecimal.valueOf(5000)));
         final LocalDate repaymentDate = approvedOnDate.plusDays(1);
-        BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")), () -> {
+        BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)), () -> {
             externalEventHelper.deleteAllExternalEvents();
             loanHelper.makeRepaymentByLoanId(loanId, WorkingCapitalLoanDisbursementTestBuilder.buildRepaymentRequest(repaymentDate,
                     BigDecimal.valueOf(100), null, "repayment", 1, "repayment-account"));
@@ -172,7 +173,7 @@ public class WorkingCapitalLoanRepaymentTest {
         final Long loanId = createApprovedAndDisbursedLoan(createProduct(), BigDecimal.valueOf(5000), BigDecimal.valueOf(5000),
                 approvedOnDate);
         final CallFailedRuntimeException[] exHolder = new CallFailedRuntimeException[1];
-        BusinessDateHelper.runAt(approvedOnDate.plusDays(1).format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+        BusinessDateHelper.runAt(approvedOnDate.plusDays(1).format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                 () -> exHolder[0] = loanHelper.runRepaymentByLoanIdExpectingFailure(loanId, WorkingCapitalLoanDisbursementTestBuilder
                         .buildRepaymentRequest(approvedOnDate.plusDays(1), null, null, null, null, null)));
         assertEquals(400, exHolder[0].getStatus());
@@ -193,7 +194,7 @@ public class WorkingCapitalLoanRepaymentTest {
         final Long loanId = createApprovedAndDisbursedLoan(createProduct(), BigDecimal.valueOf(5000), BigDecimal.valueOf(5000),
                 approvedOnDate);
         final CallFailedRuntimeException[] exHolder = new CallFailedRuntimeException[1];
-        BusinessDateHelper.runAt(approvedOnDate.plusDays(1).format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+        BusinessDateHelper.runAt(approvedOnDate.plusDays(1).format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                 () -> exHolder[0] = loanHelper.runRepaymentByLoanIdExpectingFailure(loanId, WorkingCapitalLoanDisbursementTestBuilder
                         .buildRepaymentRequest(approvedOnDate.plusDays(1), BigDecimal.valueOf(100), 0L, null, null, null)));
         assertEquals(400, exHolder[0].getStatus());
@@ -226,7 +227,7 @@ public class WorkingCapitalLoanRepaymentTest {
         loanHelper.disburseById(loanId,
                 WorkingCapitalLoanDisbursementTestBuilder.buildDisburseRequest(approvedOnDate, BigDecimal.valueOf(5000)));
         final CallFailedRuntimeException[] exHolder = new CallFailedRuntimeException[1];
-        BusinessDateHelper.runAt(approvedOnDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+        BusinessDateHelper.runAt(approvedOnDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                 () -> exHolder[0] = loanHelper.runRepaymentByLoanIdExpectingFailure(loanId, WorkingCapitalLoanDisbursementTestBuilder
                         .buildRepaymentRequest(approvedOnDate.minusDays(1), BigDecimal.valueOf(100), null, null, null, null)));
         assertEquals(400, exHolder[0].getStatus());
@@ -238,7 +239,7 @@ public class WorkingCapitalLoanRepaymentTest {
         final Long loanId = createApprovedAndDisbursedLoan(createProduct(), BigDecimal.valueOf(5000), BigDecimal.valueOf(5000),
                 approvedOnDate);
         final CallFailedRuntimeException[] exHolder = new CallFailedRuntimeException[1];
-        BusinessDateHelper.runAt(approvedOnDate.plusDays(1).format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+        BusinessDateHelper.runAt(approvedOnDate.plusDays(1).format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                 () -> exHolder[0] = loanHelper.runRepaymentByLoanIdExpectingFailure(loanId, WorkingCapitalLoanDisbursementTestBuilder
                         .buildRepaymentRequest(approvedOnDate.plusDays(1), BigDecimal.valueOf(-100), null, null, null, null)));
         assertEquals(400, exHolder[0].getStatus());
@@ -258,7 +259,7 @@ public class WorkingCapitalLoanRepaymentTest {
         loanHelper.disburseById(loanId,
                 WorkingCapitalLoanDisbursementTestBuilder.buildDisburseRequest(approvedOnDate, BigDecimal.valueOf(5000)));
         final LocalDate repaymentDate = approvedOnDate.plusDays(1);
-        BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+        BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                 () -> loanHelper.makeRepaymentByLoanExternalId(loanExternalId, WorkingCapitalLoanDisbursementTestBuilder
                         .buildRepaymentRequest(repaymentDate, BigDecimal.valueOf(100), null, "repayment", 1, "repayment-account")));
         assertEquals(2, Objects.requireNonNull(loanHelper.retrieveTransactionsByLoanId(loanId).getContent()).size());
@@ -274,7 +275,7 @@ public class WorkingCapitalLoanRepaymentTest {
         final Long loanId2 = createApprovedAndDisbursedLoan(productId, BigDecimal.valueOf(3000), BigDecimal.valueOf(3000), approvedOnDate);
         final LocalDate repaymentDate = approvedOnDate.plusDays(1);
 
-        BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+        BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                 () -> loanHelper.makeRepaymentByLoanId(loanId1, WorkingCapitalLoanDisbursementTestBuilder
                         .buildTransactionRequest(repaymentDate, BigDecimal.valueOf(100), null, null, null, null, sharedExternalId)));
         final CallFailedRuntimeException ex = loanHelper.runRepaymentByLoanIdExpectingFailure(loanId2,
@@ -289,7 +290,7 @@ public class WorkingCapitalLoanRepaymentTest {
         final Long loanId = createApprovedAndDisbursedLoan(createProduct(), BigDecimal.valueOf(5000), BigDecimal.valueOf(5000),
                 approvedOnDate);
         final LocalDate repaymentDate = approvedOnDate.plusDays(1);
-        BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+        BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                 () -> loanHelper.makeRepaymentByLoanId(loanId, WorkingCapitalLoanDisbursementTestBuilder
                         .buildRepaymentRequest(repaymentDate, BigDecimal.valueOf(5000), null, "full payoff", 1, "repayment-account")));
         final GetWorkingCapitalLoansLoanIdResponse loanData = loanHelper.retrieveById(loanId);
@@ -315,7 +316,7 @@ public class WorkingCapitalLoanRepaymentTest {
         for (int day = 1; day <= 3; day++) {
             final int repaymentDay = day;
             final LocalDate repaymentDate = disbursementDate.plusDays(day);
-            BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+            BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                     () -> loanHelper.makeRepaymentByLoanId(loanId,
                             WorkingCapitalLoanDisbursementTestBuilder.buildRepaymentRequest(repaymentDate, BigDecimal.valueOf(50), null,
                                     "reference-schedule-day-" + repaymentDay, 1, "repayment-account")));

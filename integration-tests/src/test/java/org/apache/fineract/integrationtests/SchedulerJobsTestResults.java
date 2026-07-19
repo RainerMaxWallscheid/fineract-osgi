@@ -124,7 +124,7 @@ public class SchedulerJobsTestResults extends IntegrationTest {
     private JournalEntryHelper journalEntryHelper;
     private ClientHelper clientHelper;
     private TimeZone systemTimeZone;
-    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter();
+    private DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
     private BusinessDateHelper businessDateHelper;
     private static BusinessStepHelper businessStepHelper;
     private GlobalConfigurationHelper globalConfigurationHelper;

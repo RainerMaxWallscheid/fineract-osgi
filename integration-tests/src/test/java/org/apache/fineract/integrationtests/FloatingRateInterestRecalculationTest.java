@@ -32,6 +32,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import org.apache.fineract.client.models.FloatingRatePeriodRequest;
 import org.apache.fineract.client.models.FloatingRateRequest;
 import org.apache.fineract.client.models.GetLoansLoanIdRepaymentPeriod;
@@ -66,7 +67,7 @@ public class FloatingRateInterestRecalculationTest extends BaseLoanIntegrationTe
     private LoanTransactionHelper loanTransactionHelper;
     private ClientHelper clientHelper;
     private AccountHelper accountHelper;
-    private final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter();
+    private final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
 
     private static final BigDecimal INITIAL_INTEREST_RATE = new BigDecimal("12");
     private static final BigDecimal CHANGED_INTEREST_RATE = new BigDecimal("6");

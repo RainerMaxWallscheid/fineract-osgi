@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.Locale;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.GetJournalEntriesTransactionIdResponse;
 import org.apache.fineract.client.models.GetWorkingCapitalLoansLoanIdResponse;
@@ -139,13 +140,13 @@ public class WorkingCapitalLoanRepaymentAccountingTest {
         final Long productId = createAccrualWithDeferredRevenueAmortizationProduct();
         final LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
         AtomicLong loanId = new AtomicLong(0L);
-        BusinessDateHelper.runAt(currentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")), () -> {
+        BusinessDateHelper.runAt(currentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)), () -> {
             loanId.set(createApprovedAndDisbursedLoan(productId, BigDecimal.valueOf(5000), currentDate));
         });
         final LocalDate repaymentDate = currentDate.plusDays(1);
         final AtomicLong repaymentTxnId = new AtomicLong(0L);
         BusinessDateHelper
-                .runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+                .runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                         () -> repaymentTxnId.set(loanHelper.makeRepaymentByLoanId(loanId.get(),
                                 WorkingCapitalLoanDisbursementTestBuilder.buildRepaymentRequest(repaymentDate, BigDecimal.valueOf(3000),
                                         null, "partial repayment", 1, "repayment-account"))));
@@ -168,13 +169,13 @@ public class WorkingCapitalLoanRepaymentAccountingTest {
         final Long productId = createAccrualWithDeferredRevenueAmortizationProduct();
         final LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
         AtomicLong loanId = new AtomicLong(0L);
-        BusinessDateHelper.runAt(currentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")), () -> {
+        BusinessDateHelper.runAt(currentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)), () -> {
             loanId.set(createApprovedAndDisbursedLoan(productId, BigDecimal.valueOf(5000), currentDate));
         });
         final LocalDate repaymentDate = currentDate.plusDays(1);
         final AtomicLong repaymentTxnId = new AtomicLong(0L);
         BusinessDateHelper
-                .runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+                .runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                         () -> repaymentTxnId.set(loanHelper.makeRepaymentByLoanId(loanId.get(),
                                 WorkingCapitalLoanDisbursementTestBuilder.buildRepaymentRequest(repaymentDate, BigDecimal.valueOf(5200),
                                         null, "overpayment repayment", 1, "repayment-account"))));
@@ -198,12 +199,12 @@ public class WorkingCapitalLoanRepaymentAccountingTest {
         final Long productId = createAccrualWithDeferredRevenueAmortizationProduct();
         final LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
         AtomicLong loanId = new AtomicLong(0L);
-        BusinessDateHelper.runAt(currentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")), () -> {
+        BusinessDateHelper.runAt(currentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)), () -> {
             loanId.set(createApprovedAndDisbursedLoan(productId, BigDecimal.valueOf(5000), currentDate));
         });
         final LocalDate repaymentDate = currentDate.plusDays(1);
         final AtomicLong repaymentTxnId = new AtomicLong(0L);
-        BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+        BusinessDateHelper.runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                 () -> repaymentTxnId.set(loanHelper.makeRepaymentByLoanId(loanId.get(), WorkingCapitalLoanDisbursementTestBuilder
                         .buildRepaymentRequest(repaymentDate, BigDecimal.valueOf(5000), null, "full payoff", 1, "repayment-account"))));
 
@@ -225,13 +226,13 @@ public class WorkingCapitalLoanRepaymentAccountingTest {
         final Long productId = createAccrualWithDeferredRevenueAmortizationProduct();
         final LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
         AtomicLong loanId = new AtomicLong(0L);
-        BusinessDateHelper.runAt(currentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")), () -> {
+        BusinessDateHelper.runAt(currentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)), () -> {
             loanId.set(createApprovedAndDisbursedLoan(productId, BigDecimal.valueOf(5000), currentDate));
         });
 
         // pay off the loan in full first, closing it
         final LocalDate payoffDate = currentDate.plusDays(1);
-        BusinessDateHelper.runAt(payoffDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+        BusinessDateHelper.runAt(payoffDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                 () -> loanHelper.makeRepaymentByLoanId(loanId.get(), WorkingCapitalLoanDisbursementTestBuilder
                         .buildRepaymentRequest(payoffDate, BigDecimal.valueOf(5000), null, "full payoff", 1, "repayment-account")));
         final GetWorkingCapitalLoansLoanIdResponse loanAfterPayoff = loanHelper.retrieveById(loanId.get());
@@ -242,7 +243,7 @@ public class WorkingCapitalLoanRepaymentAccountingTest {
         final LocalDate secondRepaymentDate = payoffDate.plusDays(1);
         final AtomicLong secondRepaymentTxnId = new AtomicLong(0L);
         BusinessDateHelper
-                .runAt(secondRepaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+                .runAt(secondRepaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                         () -> secondRepaymentTxnId.set(loanHelper.makeRepaymentByLoanId(loanId.get(),
                                 WorkingCapitalLoanDisbursementTestBuilder.buildRepaymentRequest(secondRepaymentDate,
                                         BigDecimal.valueOf(300), null, "repayment on closed loan", 1, "repayment-account"))));
@@ -266,14 +267,14 @@ public class WorkingCapitalLoanRepaymentAccountingTest {
         final Long productId = createAccrualWithDeferredRevenueAmortizationProduct();
         final LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
         AtomicLong loanId = new AtomicLong(0L);
-        BusinessDateHelper.runAt(currentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")), () -> {
+        BusinessDateHelper.runAt(currentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)), () -> {
             loanId.set(createApprovedAndDisbursedLoan(productId, BigDecimal.valueOf(5000), currentDate));
         });
 
         // overpay the loan first
         final LocalDate overpaymentDate = currentDate.plusDays(1);
         BusinessDateHelper
-                .runAt(overpaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+                .runAt(overpaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                         () -> loanHelper.makeRepaymentByLoanId(loanId.get(),
                                 WorkingCapitalLoanDisbursementTestBuilder.buildRepaymentRequest(overpaymentDate, BigDecimal.valueOf(5200),
                                         null, "overpayment repayment", 1, "repayment-account")));
@@ -284,7 +285,7 @@ public class WorkingCapitalLoanRepaymentAccountingTest {
         // make a further repayment against the already-overpaid loan
         final LocalDate secondRepaymentDate = overpaymentDate.plusDays(1);
         final AtomicLong secondRepaymentTxnId = new AtomicLong(0L);
-        BusinessDateHelper.runAt(secondRepaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+        BusinessDateHelper.runAt(secondRepaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                 () -> secondRepaymentTxnId.set(loanHelper.makeRepaymentByLoanId(loanId.get(),
                         WorkingCapitalLoanDisbursementTestBuilder.buildRepaymentRequest(secondRepaymentDate, BigDecimal.valueOf(100), null,
                                 "repayment on overpaid loan", 1, "repayment-account"))));
@@ -307,7 +308,7 @@ public class WorkingCapitalLoanRepaymentAccountingTest {
         // Create product with NONE accounting rule
         final LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
         AtomicLong loanId = new AtomicLong(0L);
-        BusinessDateHelper.runAt(currentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")), () -> {
+        BusinessDateHelper.runAt(currentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)), () -> {
             final String uniqueName = "WCL NoAcct " + UUID.randomUUID().toString().substring(0, 8);
             final String uniqueShortName = UUID.randomUUID().toString().replace("-", "").substring(0, 4);
             final Long productId = productHelper
@@ -321,7 +322,7 @@ public class WorkingCapitalLoanRepaymentAccountingTest {
         final LocalDate repaymentDate = currentDate.plusDays(1);
         final AtomicLong repaymentTxnId = new AtomicLong(0L);
         BusinessDateHelper
-                .runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+                .runAt(repaymentDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)),
                         () -> repaymentTxnId.set(loanHelper.makeRepaymentByLoanId(loanId.get(),
                                 WorkingCapitalLoanDisbursementTestBuilder.buildRepaymentRequest(repaymentDate, BigDecimal.valueOf(3000),
                                         null, "no accounting repayment", 1, "repayment-account"))));

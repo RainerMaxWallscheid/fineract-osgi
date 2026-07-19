@@ -171,7 +171,7 @@ public abstract class BaseLoanIntegrationTest extends IntegrationTest {
     protected ClientHelper clientHelper = new ClientHelper(requestSpec, responseSpec);
     protected SchedulerJobHelper schedulerJobHelper = new SchedulerJobHelper(requestSpec);
     protected final InlineLoanCOBHelper inlineLoanCOBHelper = new InlineLoanCOBHelper(requestSpec, responseSpec);
-    protected DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
+    protected DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH);
     protected final CodeHelper codeHelper = new CodeHelper();
     protected final ChargesHelper chargesHelper = new ChargesHelper();
     protected final ExternalEventHelper externalEventHelper = new ExternalEventHelper();
@@ -1093,7 +1093,7 @@ public abstract class BaseLoanIntegrationTest extends IntegrationTest {
 
     protected void verifyRepaymentSchedule(Long loanId, Installment... installments) {
         GetLoansLoanIdResponse loanResponse = loanTransactionHelper.getLoan(requestSpec, responseSpec, loanId.intValue());
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH);
         assertNotNull(loanResponse.getRepaymentSchedule());
         assertNotNull(loanResponse.getRepaymentSchedule().getPeriods());
         Assertions.assertEquals(installments.length, loanResponse.getRepaymentSchedule().getPeriods().size(), "Expected installments are not matching with the installments configured on the loan");
@@ -1161,7 +1161,7 @@ public abstract class BaseLoanIntegrationTest extends IntegrationTest {
     }
 
     protected void runFromToInclusive(String fromDate, String toDate, Runnable runnable) {
-        DateTimeFormatter format = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
+        DateTimeFormatter format = DateTimeFormatter.ofPattern(DATETIME_PATTERN, Locale.ENGLISH);
         LocalDate startDate = LocalDate.parse(fromDate, format);
         LocalDate endDate = LocalDate.parse(toDate, format);
         LocalDate currentDate = startDate;

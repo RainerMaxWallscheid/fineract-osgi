@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 import org.apache.fineract.integrationtests.common.ClientHelper;
 import org.apache.fineract.integrationtests.common.Utils;
 import org.apache.fineract.integrationtests.common.savings.SavingsAccountHelper;
@@ -58,7 +59,7 @@ public class DividendsIntegrationTests {
     @SuppressWarnings("unchecked")
     @Test
     public void testCreateDividends() {
-        DateFormat simple = new SimpleDateFormat("dd MMMM yyyy");
+        DateFormat simple = new SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH);
         final Integer productId = createShareProduct();
         ArrayList<Integer> shareAccounts = new ArrayList<>();
         for (int i = 0; i < 5; i++) {

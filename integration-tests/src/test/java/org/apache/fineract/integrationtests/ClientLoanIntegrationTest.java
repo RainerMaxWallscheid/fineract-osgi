@@ -167,7 +167,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
     private static final LoanProductHelper LOAN_PRODUCT_HELPER = new LoanProductHelper();
     private static final String DATETIME_PATTERN = "dd MMMM yyyy";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = new DateTimeFormatterBuilder().appendPattern(DATETIME_PATTERN)
-            .toFormatter();
+            .toFormatter(Locale.ENGLISH);
     private static final BusinessDateHelper BUSINESS_DATE_HELPER = new BusinessDateHelper();
     private static final ChargesHelper CHARGES_HELPER = new ChargesHelper();
     private static final ClientHelper CLIENT_HELPER = new ClientHelper(REQUEST_SPEC, RESPONSE_SPEC);
@@ -7498,7 +7498,7 @@ public class ClientLoanIntegrationTest extends BaseLoanIntegrationTest {
             List<HashMap> collaterals) {
         LOG.info("--------------------------------APPLYING FOR LOAN APPLICATION--------------------------------");
 
-        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN);
+        DateFormat dateFormat = new SimpleDateFormat(DATETIME_PATTERN, Locale.ENGLISH);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
         final String loanApplicationJSON = new LoanApplicationTestBuilder() //
                 .withPrincipal(principal) //

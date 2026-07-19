@@ -28,6 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Locale;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.GetWorkingCapitalLoanTransactionIdResponse;
 import org.apache.fineract.client.models.GetWorkingCapitalLoanTransactionsResponse;
@@ -271,6 +272,6 @@ public class WorkingCapitalLoanTransactionPaymentTypeTest {
     }
 
     private String fmt(final LocalDate date) {
-        return date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        return date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
     }
 }

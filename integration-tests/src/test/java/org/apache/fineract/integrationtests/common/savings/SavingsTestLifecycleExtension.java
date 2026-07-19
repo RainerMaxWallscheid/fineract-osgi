@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import java.util.Locale;
 import org.apache.fineract.client.models.PostSavingsAccountTransactionsRequest;
 import org.apache.fineract.client.models.PostSavingsAccountsAccountIdRequest;
 import org.apache.fineract.client.models.SavingsAccountData;
@@ -53,11 +54,11 @@ public class SavingsTestLifecycleExtension implements AfterAllCallback {
     private SchedulerJobHelper schedulerJobHelper;
     public static final String DATE_FORMAT = "dd MMMM yyyy";
     private static final int CLEANUP_THREAD_COUNT = 10;
-    private final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern(DATE_FORMAT).toFormatter();
+    private final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern(DATE_FORMAT).toFormatter(Locale.ENGLISH);
 
     @Override
     public void afterAll(ExtensionContext context) {
-        BusinessDateHelper.runAt(DateTimeFormatter.ofPattern(DATE_FORMAT).format(Utils.getLocalDateOfTenant()), () -> {
+        BusinessDateHelper.runAt(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH).format(Utils.getLocalDateOfTenant()), () -> {
             RequestSpecification requestSpec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
             requestSpec.header("Authorization", "Basic " + Utils.loginIntoServerAndGetBase64EncodedAuthenticationKey());
             requestSpec.header("Fineract-Platform-TenantId", "default");

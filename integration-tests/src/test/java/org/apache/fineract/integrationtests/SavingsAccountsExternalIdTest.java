@@ -21,6 +21,7 @@ package org.apache.fineract.integrationtests;
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+import java.util.Locale;
 import org.apache.fineract.client.models.DeleteSavingsAccountsAccountIdResponse;
 import org.apache.fineract.client.models.PostSavingsAccountsAccountIdRequest;
 import org.apache.fineract.client.models.PostSavingsAccountsAccountIdResponse;
@@ -47,7 +48,7 @@ public class SavingsAccountsExternalIdTest extends IntegrationTest {
     public static final String EXTERNAL_ID = UUID.randomUUID().toString();
     private final String dateFormat = "dd MMMM yyyy";
     private final String locale = "en";
-    private final String formattedDate = Utils.getLocalDateOfTenant().format(DateTimeFormatter.ofPattern(dateFormat));
+    private final String formattedDate = Utils.getLocalDateOfTenant().format(DateTimeFormatter.ofPattern(dateFormat, Locale.ENGLISH));
 
     @Test
     @Order(1)

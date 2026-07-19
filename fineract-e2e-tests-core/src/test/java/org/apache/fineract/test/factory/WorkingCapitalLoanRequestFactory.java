@@ -20,6 +20,7 @@ package org.apache.fineract.test.factory;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import org.apache.fineract.client.models.PostWorkingCapitalLoansBreachActionRequest;
 import org.apache.fineract.client.models.PostWorkingCapitalLoansDelinquencyActionRequest;
 import org.apache.fineract.client.models.PostWorkingCapitalLoansLoanIdRequest;
@@ -44,7 +45,7 @@ public class WorkingCapitalLoanRequestFactory {
     public static final BigDecimal DEFAULT_PERIOD_PAYMENT_RATE = new BigDecimal(1);
     public static final BigDecimal DEFAULT_DISCOUNT_ZERO = BigDecimal.ZERO;
     public static final BigDecimal DEFAULT_PAYMENT_RATE = new BigDecimal(15);
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
     public static final String DATE_SUBMIT_STRING = FORMATTER.format(Utils.now().minusMonths(1L));
 
     public PostWorkingCapitalLoansRequest defaultWorkingCapitalLoansRequest(Long clientId) {

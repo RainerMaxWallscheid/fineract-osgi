@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Locale;
 import org.apache.fineract.client.feign.FineractFeignClient;
 import org.apache.fineract.client.feign.util.CallFailedRuntimeException;
 import org.apache.fineract.client.models.LoanScheduleData;
@@ -49,7 +50,7 @@ import org.apache.fineract.test.support.TestContextKey;
 
 public class LoanReAmortizationStepDef extends AbstractStepDef {
     private static final String DATE_FORMAT = "dd MMMM yyyy";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.ENGLISH);
     private final FineractFeignClient fineractClient;
     private final EventAssertion eventAssertion;
     private final LoanRequestFactory loanRequestFactory;

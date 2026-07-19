@@ -56,6 +56,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.Locale;
 import okhttp3.ResponseBody;
 import org.apache.fineract.accounting.common.AccountingConstants;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
@@ -130,7 +131,7 @@ public class InitiateExternalAssetOwnerTransferTest extends BaseLoanIntegrationT
     private static LocalDate TODAYS_DATE;
     public String ownerExternalId;
     private static ReportHelper reportHelper;
-    private final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter();
+    private final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy").toFormatter(Locale.ENGLISH);
 
     @BeforeAll
     public static void setupInvestorBusinessStep() {

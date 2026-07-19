@@ -34,6 +34,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Locale;
 import org.apache.fineract.client.util.CallFailedRuntimeException;
 import org.apache.fineract.infrastructure.creditbureau.data.CreditBureauReportData;
 import org.apache.fineract.integrationtests.common.CreditBureauConfigurationHelper;
@@ -132,7 +133,7 @@ public class CreditBureauTest {
         jsonResponse.put("userName", "testUser");
         jsonResponse.put(".issued", "sample");
         jsonResponse.put(".expires", ZonedDateTime.now(ZoneId.systemDefault()).plusSeconds(3600)
-                .format(new DateTimeFormatterBuilder().appendPattern("EEE, dd MMM yyyy kk:mm:ss zzz").toFormatter()));
+                .format(new DateTimeFormatterBuilder().appendPattern("EEE, dd MMM yyyy kk:mm:ss zzz").toFormatter(Locale.ENGLISH)));
         wm.stubFor(WireMock.post("/token/").willReturn(WireMock.jsonResponse(MAPPER.writeValueAsString(jsonResponse), 200)));
         wm.stubFor(WireMock.post("/search/NRC213")
                 .willReturn(WireMock.jsonResponse("{\"ResponseMessage\":\"OK\",\"Data\":[{\"UniqueID\":\"123456\"}]}", 200)));
@@ -170,7 +171,7 @@ public class CreditBureauTest {
         jsonResponse.put("userName", "testUser");
         jsonResponse.put(".issued", "sample");
         jsonResponse.put(".expires", ZonedDateTime.now(ZoneId.systemDefault()).plusSeconds(3600)
-                .format(new DateTimeFormatterBuilder().appendPattern("EEE, dd MMM yyyy kk:mm:ss zzz").toFormatter()));
+                .format(new DateTimeFormatterBuilder().appendPattern("EEE, dd MMM yyyy kk:mm:ss zzz").toFormatter(Locale.ENGLISH)));
         wm.stubFor(WireMock.post("/token/").willReturn(WireMock.jsonResponse(MAPPER.writeValueAsString(jsonResponse), 200)));
         wm.stubFor(WireMock.post("/search/NRC213")
                 .willReturn(WireMock.jsonResponse("{\"ResponseMessage\":\"OK\",\"Data\":[{\"UniqueID\":\"123456\"}]}", 200)));

@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.Locale;
 import org.apache.fineract.batch.command.internal.CreateTransactionLoanCommandStrategy;
 import org.apache.fineract.batch.domain.BatchRequest;
 import org.apache.fineract.batch.domain.BatchResponse;
@@ -322,7 +323,7 @@ public final class BatchHelper {
         br.setRelativeUrl("v1/loans");
         br.setMethod("POST");
         br.setReference(reference);
-        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
 
         String body = "{\"dateFormat\": \"dd MMMM yyyy\", \"locale\": \"en_GB\", \"clientId\": \"$.clientId\"," + "\"productId\": "
                 + productId + ", \"principal\": \"" + loanAmount + "\", \"loanTermFrequency\": 10,"
@@ -476,7 +477,7 @@ public final class BatchHelper {
         br.setReference(reference);
 
         final String dateFormat = "dd MMMM yyyy";
-        final String dateString = LocalDate.now(Utils.getZoneIdOfTenant()).format(DateTimeFormatter.ofPattern(dateFormat));
+        final String dateString = LocalDate.now(Utils.getZoneIdOfTenant()).format(DateTimeFormatter.ofPattern(dateFormat, Locale.ENGLISH));
 
         final String body = String.format(
                 "{\"chargeId\": \"%d\", \"locale\": \"en\", \"amount\": \"100.0\", " + "\"dateFormat\": \"%s\", \"dueDate\": \"%s\"}",
@@ -716,7 +717,7 @@ public final class BatchHelper {
         br.setRelativeUrl("v1/loans/$.loanId?command=approve");
         br.setReference(reference);
         br.setMethod("POST");
-        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         br.setBody("{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", \"approvedOnDate\": \"" + dateString + "\","
                 + "\"note\": \"Loan approval note\", \"expectedDisbursementDate\": \"" + dateString + "\"}");
 
@@ -730,7 +731,7 @@ public final class BatchHelper {
         br.setRelativeUrl("v1/loans/$.loanId?command=approveX");
         br.setReference(reference);
         br.setMethod("POST");
-        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         br.setBody("{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", \"approvedOnDate\": \"" + dateString + "\","
                 + "\"note\": \"Loan approval note\"}");
 
@@ -772,7 +773,7 @@ public final class BatchHelper {
         br.setRelativeUrl("v1/loans/$.loanId?command=disburse");
         br.setReference(reference);
         br.setMethod("POST");
-        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         br.setBody("{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", \"actualDisbursementDate\": \"" + dateString + "\"}");
 
         return br;
@@ -802,7 +803,7 @@ public final class BatchHelper {
         br.setRelativeUrl("v1/loans/external-id/$.resourceExternalId?command=" + command);
         br.setReference(reference);
         br.setMethod("POST");
-        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         if ("disburse".equals(command)) {
             br.setBody("{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", \"actualDisbursementDate\": \"" + dateString + "\"}");
         } else if ("approve".equals(command)) {
@@ -840,7 +841,7 @@ public final class BatchHelper {
         br.setRequestId(requestId);
         br.setRelativeUrl(String.format("loans/" + loanId + "/transactions?command=%s", "repayment"));
         br.setMethod("POST");
-        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         br.setBody(String.format(
                 "{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", " + "\"transactionDate\": \"%s\",  \"transactionAmount\": %s}",
                 dateString, amount));
@@ -869,7 +870,7 @@ public final class BatchHelper {
         br.setReference(reference);
         br.setRelativeUrl(String.format("v1/loans/$.loanId/transactions?command=%s", transactionCommand));
         br.setMethod("POST");
-        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         br.setBody(String.format("{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", "
                 + "\"transactionDate\": \"%s\",  \"transactionAmount\": %s, \"note\":null}", dateString, amount));
 
@@ -883,7 +884,7 @@ public final class BatchHelper {
         br.setRequestId(requestId);
         br.setRelativeUrl(String.format("v1/loans/" + loanId + "/transactions?command=%s", transactionCommand));
         br.setMethod("POST");
-        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         br.setBody(String.format(
                 "{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", " + "\"transactionDate\": \"%s\",  \"transactionAmount\": %s}",
                 dateString, amount));
@@ -914,7 +915,7 @@ public final class BatchHelper {
         br.setReference(reference);
         br.setRelativeUrl(String.format("v1/loans/external-id/$.externalId/transactions?command=%s", transactionCommand));
         br.setMethod("POST");
-        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         br.setBody(String.format(
                 "{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", " + "\"transactionDate\": \"%s\",  \"transactionAmount\": %s}",
                 dateString, amount));
@@ -1017,7 +1018,7 @@ public final class BatchHelper {
         br.setReference(referenceId);
         br.setRelativeUrl(String.format("v1/loans/$.loanId/transactions?command=%s", "charge-off"));
         br.setMethod("POST");
-        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         br.setBody(String.format("{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", " + "\"transactionDate\": \"%s\", \"note\":null}",
                 dateString));
 
@@ -1051,9 +1052,9 @@ public final class BatchHelper {
         br.setMethod("POST");
         final LocalDate today = LocalDate.now(Utils.getZoneIdOfTenant());
         final LocalDate adjustedDueDate = LocalDate.now(Utils.getZoneIdOfTenant()).plusDays(40);
-        final String submittedOnDate = today.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
-        final String rescheduleFromDateString = rescheduleFromDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
-        final String adjustedDueDateString = adjustedDueDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        final String submittedOnDate = today.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
+        final String rescheduleFromDateString = rescheduleFromDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
+        final String adjustedDueDateString = adjustedDueDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         br.setBody(String.format("{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", "
                 + "\"submittedOnDate\": \"%s\",  \"rescheduleFromDate\": \"%s\", \"rescheduleReasonId\": %d, \"adjustedDueDate\": \"%s\", \"loanId\": \"$.loanId\"}",
                 submittedOnDate, rescheduleFromDateString, rescheduleReasonId, adjustedDueDateString));
@@ -1080,7 +1081,7 @@ public final class BatchHelper {
         br.setRelativeUrl("v1/rescheduleloans/$.resourceId?command=approve");
         br.setMethod("POST");
         final LocalDate approvedOnDate = LocalDate.now(Utils.getZoneIdOfTenant());
-        final String approvedOnDateString = approvedOnDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        final String approvedOnDateString = approvedOnDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         br.setBody(String.format("{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", " + "\"approvedOnDate\": \"%s\"}",
                 approvedOnDateString));
 
@@ -1419,7 +1420,7 @@ public final class BatchHelper {
         br.setReference(reference);
         br.setRelativeUrl("v1/loans/$.loanId/transactions/$.resourceId");
         br.setMethod("POST");
-        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         br.setBody(String.format(
                 "{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", " + "\"transactionDate\": \"%s\",  \"transactionAmount\": %s}",
                 dateString, amount));
@@ -1452,7 +1453,7 @@ public final class BatchHelper {
         br.setReference(reference);
         br.setRelativeUrl(String.format("v1/loans/external-id/%s/transactions/external-id/%s", loanExternalId, transactionExternalId));
         br.setMethod("POST");
-        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        String dateString = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         br.setBody(String.format(
                 "{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", " + "\"transactionDate\": \"%s\",  \"transactionAmount\": %s}",
                 dateString, amount));
@@ -1649,7 +1650,7 @@ public final class BatchHelper {
      */
     public static BatchRequest depositSavingAccount(final Long requestId, final Long reference, final float amount) {
         final LocalDate transactionDate = LocalDate.now(Utils.getZoneIdOfTenant());
-        final String transactionDateString = transactionDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        final String transactionDateString = transactionDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         String json = String.format(
                 "{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", "
                         + "\"transactionDate\": \"%s\", \"transactionAmount\": \"%s\", \"paymentTypeId\": \"1\"}",
@@ -1671,7 +1672,7 @@ public final class BatchHelper {
      */
     public static BatchRequest withdrawSavingAccount(final Long requestId, final Long reference, final float amount) {
         final LocalDate transactionDate = LocalDate.now(Utils.getZoneIdOfTenant());
-        final String transactionDateString = transactionDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        final String transactionDateString = transactionDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         String json = String.format(
                 "{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", "
                         + "\"transactionDate\": \"%s\", \"transactionAmount\": \"%s\", \"paymentTypeId\": \"1\"}",
@@ -1730,7 +1731,7 @@ public final class BatchHelper {
         br.setRelativeUrl("v1/savingsaccounts/$.id/transactions?command=holdAmount");
         br.setMethod(HttpMethod.POST);
         final LocalDate transactionDate = LocalDate.now(Utils.getZoneIdOfTenant());
-        final String transactionDateString = transactionDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        final String transactionDateString = transactionDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         br.setBody(String.format(
                 "{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", "
                         + "\"transactionDate\": \"%s\", \"transactionAmount\": \"%s\", \"reasonForBlock\": \"test\"}",

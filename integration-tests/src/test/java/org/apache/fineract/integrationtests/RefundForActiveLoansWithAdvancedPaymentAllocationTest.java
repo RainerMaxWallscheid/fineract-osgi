@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.Locale;
 import org.apache.fineract.client.models.AdvancedPaymentData;
 import org.apache.fineract.client.models.BusinessDateUpdateRequest;
 import org.apache.fineract.client.models.GetLoansLoanIdRepaymentPeriod;
@@ -56,7 +57,7 @@ public class RefundForActiveLoansWithAdvancedPaymentAllocationTest extends BaseL
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RefundForActiveLoansWithAdvancedPaymentAllocationTest.class);
     private static final String DATETIME_PATTERN = "dd MMMM yyyy";
-    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern(DATETIME_PATTERN).toFormatter();
+    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern(DATETIME_PATTERN).toFormatter(Locale.ENGLISH);
     private static RequestSpecification requestSpec;
     private static ResponseSpecification responseSpec;
     private static LoanTransactionHelper loanTransactionHelper;

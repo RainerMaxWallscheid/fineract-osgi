@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import org.apache.fineract.client.models.BusinessDateUpdateRequest;
 import org.apache.fineract.client.models.ChargeRequest;
 import org.apache.fineract.client.models.GetLoansLoanIdResponse;
@@ -87,7 +88,7 @@ public class LoanSpecificDueDateChargeAfterMaturityTest extends BaseLoanIntegrat
     private static final String LOAN_TERM_FREQUENCY = "1";
     private static final String INDIVIDUAL_LOAN = "individual";
     private static final BusinessDateHelper BUSINESS_DATE_HELPER = new BusinessDateHelper();
-    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern(DATETIME_PATTERN).toFormatter();
+    private static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder().appendPattern(DATETIME_PATTERN).toFormatter(Locale.ENGLISH);
     private static final ChargesHelper CHARGES_HELPER = new ChargesHelper();
     private static RequestSpecification requestSpec;
     private static ResponseSpecification responseSpec;

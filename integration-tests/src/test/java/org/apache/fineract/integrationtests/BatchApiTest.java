@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.Locale;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.fineract.batch.command.internal.AdjustLoanTransactionCommandStrategy;
 import org.apache.fineract.batch.command.internal.CreateTransactionLoanCommandStrategy;
@@ -2452,7 +2453,7 @@ public class BatchApiTest extends BaseLoanIntegrationTest {
         br.setRequestId(1L);
         br.setRelativeUrl(String.format("loans/" + loanId + "/transactions?command=repayment"));
         br.setMethod("POST");
-        String dateString = LocalDate.now(Utils.getZoneIdOfTenant()).format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        String dateString = LocalDate.now(Utils.getZoneIdOfTenant()).format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         br.setBody(String.format(
                 "{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", " + "\"transactionDate\": \"%s\",  \"transactionAmount\": \"500\"}",
                 dateString));
@@ -2533,7 +2534,7 @@ public class BatchApiTest extends BaseLoanIntegrationTest {
         br.setRequestId(1L);
         br.setRelativeUrl(String.format("v1/loans/" + loanId + "/transactions?command=repayment"));
         br.setMethod("POST");
-        String dateString = LocalDate.now(Utils.getZoneIdOfTenant()).format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        String dateString = LocalDate.now(Utils.getZoneIdOfTenant()).format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         br.setBody(String.format(
                 "{\"locale\": \"en\", \"dateFormat\": \"dd MMMM yyyy\", " + "\"transactionDate\": \"%s\",  \"transactionAmount\": \"500\"}",
                 dateString));

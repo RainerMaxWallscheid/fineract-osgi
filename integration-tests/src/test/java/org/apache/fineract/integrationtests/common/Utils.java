@@ -88,7 +88,12 @@ public final class Utils {
     public static final String DATE_FORMAT = "dd MMMM yyyy";
     public static final String DATE_TIME_FORMAT = "dd MMMM yyyy HH:mm";
     public static final String LOCALE = "en";
-    public static final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern(DATE_FORMAT).toFormatter();
+    /**
+     * Formats dates for API requests that send {@code dateFormat=dd MMMM yyyy} and {@code locale=en}. Must use English
+     * month names regardless of the JVM default locale (e.g. de_DE would otherwise produce "Juli" instead of "July").
+     */
+    public static final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern(DATE_FORMAT)
+            .toFormatter(Locale.ENGLISH);
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
     private static final SecureRandom random = new SecureRandom();
     private static final Gson gson = new Gson();
@@ -493,13 +498,13 @@ public final class Utils {
     }
 
     public static String convertDateToURLFormat(final Calendar dateToBeConvert) {
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMMMM yyyy");
+        DateFormat dateFormat = new SimpleDateFormat("dd MMMMMM yyyy", Locale.ENGLISH);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
         return dateFormat.format(dateToBeConvert.getTime());
     }
 
     public static String convertDateToURLFormat(final Calendar dateToBeConvert, final String dateGormat) {
-        DateFormat dateFormat = new SimpleDateFormat(dateGormat);
+        DateFormat dateFormat = new SimpleDateFormat(dateGormat, Locale.ENGLISH);
         dateFormat.setTimeZone(Utils.getTimeZoneOfTenant());
         return dateFormat.format(dateToBeConvert.getTime());
     }
@@ -582,7 +587,7 @@ public final class Utils {
         DateTimeFormatter dateTimeFormatterBuilder = new DateTimeFormatterBuilder().parseCaseInsensitive().parseLenient()
                 .appendPattern(dateFormat).optionalStart().appendPattern(" HH:mm:ss").optionalEnd()
                 .parseDefaulting(ChronoField.HOUR_OF_DAY, 0).parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
+                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter(Locale.ENGLISH);
         LocalDate localDate = LocalDate.of(getYear(), getMonth(), getDay());
         return dateTimeFormatterBuilder.format(localDate);
     }
@@ -591,7 +596,7 @@ public final class Utils {
         DateTimeFormatter dateTimeFormatterBuilder = new DateTimeFormatterBuilder().parseCaseInsensitive().parseLenient()
                 .appendPattern(dateFormat).optionalStart().appendPattern(" HH:mm:ss").optionalEnd()
                 .parseDefaulting(ChronoField.HOUR_OF_DAY, 0).parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
+                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter(Locale.ENGLISH);
         LocalDateTime localDate = LocalDateTime.of(getYear(), getMonth(), getDay(), getHour(), getMinute(), getSecond());
         return dateTimeFormatterBuilder.format(localDate);
     }
