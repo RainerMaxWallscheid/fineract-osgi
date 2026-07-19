@@ -59,7 +59,7 @@ Erstellung eines neuen Kreditantrags über die REST-API. Das Szenario zeigt den 
    Business Event / Hook (z. B. Loan Created).  
    Optional: asynchroner Consumer ruft **externe KI-Analyse** (Scoring, Fraud-Hints) auf – ohne den Write-Pfad zu blockieren.
 10. **HTTP Response**  
-    Client erhält `200/201` mit Loan-ID und Status (Gson-Serialisierung; Wire-JSON bleibt flach, siehe [ADR-015](08_design_decisions.md)).
+    Client erhält `200/201` mit Loan-ID und Status (Gson-Serialisierung; Wire-JSON bleibt flach, siehe [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)).
 
 ### Sequenzdiagramm
 
@@ -122,7 +122,7 @@ Eigenschaften:
 - Zentrale Idempotency- und Maker-Checker-Logik
 - Starke Kopplung an Gson-Helfer und String-Keys
 - Synchrone Ausführung im Request-Thread (Retry via Resilience4j möglich)
-- Response-DTOs: wo sinnvoll **Composition statt Vererbung** (Shared-Felder flach in Spezialtypen; GET-only ohne CPR-Vererbung) – [ADR-015](08_design_decisions.md), Crosscutting [6.13](06_crosscutting_concepts.md)
+- Response-DTOs: wo sinnvoll **Composition statt Vererbung** (Shared-Felder flach in Spezialtypen; GET-only ohne CPR-Vererbung) – [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md), Crosscutting [6.13](06_crosscutting_concepts.md)
 
 ### 4.3.2 Neuer Command-Stack (`fineract-command`)
 

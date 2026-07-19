@@ -520,7 +520,7 @@ Beispiele: Loan COB on/off, External Events, Correlation IDs, IP Tracking, Journ
 | **CQRS nach außen** | Writes als Commands, Reads als Queries – auch wenn URL-Design historisch gemischt ist |
 | **Idempotenz** | Header/Key für Writes; Pflicht für Integrations-Retries |
 | **OpenAPI** | Client-Generierung (`fineract-client`); Dummy/DTO-Typen für Spec |
-| **DTO Composition** | Spezialisierte API-DTOs **komponieren** Shared-Felder statt tiefer Vererbung ([ADR-015](08_design_decisions.md)) |
+| **DTO Composition** | Spezialisierte API-DTOs **komponieren** Shared-Felder statt tiefer Vererbung ([ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)) |
 | **Compatibility** | Neue Command-Pipeline und DTO-Refactors dürfen REST-JSON-Verträge nicht brechen (flach halten) |
 | **Correlation** | `X-Correlation-ID` für Support-Fälle |
 

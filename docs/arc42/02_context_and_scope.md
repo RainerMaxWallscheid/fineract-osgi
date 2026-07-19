@@ -160,7 +160,7 @@ fineract-osgi erscheint nach außen oft als „eine API“, intern aber als:
 | Vertrag | OpenAPI; Clients: `fineract-client` |
 | Sicherheit | Basic / OAuth2-OIDC / 2FA; Permissions |
 | Idempotenz | Idempotency-Key für Writes empfohlen |
-| Kompatibilität | stabil während interner Command-Migration ([ADR-004](08_design_decisions.md)) |
+| Kompatibilität | stabil während interner Command-Migration ([ADR-004](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md)) |
 
 ### Interne Schnittstellen (logisch)
 

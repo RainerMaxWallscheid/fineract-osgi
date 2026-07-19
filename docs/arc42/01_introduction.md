@@ -95,7 +95,7 @@ Details und Szenarien: [07 Quality Attributes](07_quality_attributes.md).
 
 - Weiterentwicklung auf Basis des Fineract-Ökosystems (Java, Gradle, Spring).  
 - Dokumentation und Code im **selben Repository** (`docs/arc42/`).  
-- Upstream-Drift muss bewusst gemanagt werden ([ADR-001](08_design_decisions.md)).
+- Upstream-Drift muss bewusst gemanagt werden ([ADR-001](decisions/ADR-001-fork-fineract-osgi-statt-pure-upstream.md)).
 
 ### Technisch
 
