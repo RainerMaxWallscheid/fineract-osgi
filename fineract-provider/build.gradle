@@ -304,13 +304,15 @@ tasks.named('licenseMain') {
 
 bootRun {
     classpath += configurations.bootRunDriver
-    // Cap the app heap: exit 137 (SIGKILL) usually means the OS OOM-killed an unbounded
-    // Java process. 4g is enough for local dev while leaving room for the Gradle daemon
-    // (org.gradle.jvmargs=-Xmx12g) and Postgres. Override with -DbootRun.xmx=6g if needed.
-    def bootRunXmx = System.getProperty('bootRun.xmx', '4g')
+    // Cap the app heap. Exit 137 = SIGKILL from the OS OOM killer when the Fineract JVM
+    // and the Gradle daemon (org.gradle.jvmargs=-Xmx12g) compete for RAM.
+    // 2g is enough for local ServerApplication startup; override with -DbootRun.xmx=4g if needed.
+    def bootRunXmx = System.getProperty('bootRun.xmx', '2g')
     jvmArgs = [
+            "-Xms512m",
             "-Xmx${bootRunXmx}",
             "-XX:+ExitOnOutOfMemoryError",
+            "-XX:MaxMetaspaceSize=512m",
             "-Dspring.output.ansi.enabled=ALWAYS"
     ]
 }
@@ -466,5 +468,25 @@ tasks.register('devRun', org.springframework.boot.gradle.tasks.run.BootRun) {
 
     doFirst {
         println "Running in development mode - quality checks are disabled"
+        println "App heap: ${System.getProperty('bootRun.xmx', '2g')} (override with -DbootRun.xmx=4g)"
+        println "If you get exit code 137 (OOM kill), free memory first:"
+        println "  ./gradlew --stop"
+        println "  # then: ./gradlew :fineract-provider:devRun --no-daemon"
+        // Warn when multiple Gradle daemons are already holding large heaps
+        try {
+            def daemonCount = new ByteArrayOutputStream()
+            exec {
+                commandLine 'bash', '-c', 'ps -A -o command | grep -c "[G]radleDaemon" || true'
+                standardOutput = daemonCount
+                ignoreExitValue = true
+            }
+            def n = daemonCount.toString().trim() as Integer
+            if (n > 1) {
+                logger.warn("WARNING: ${n} Gradle daemons are running (each may reserve up to 12g). " +
+                        "Run './gradlew --stop' before devRun to avoid OS OOM kill (exit 137).")
+            }
+        } catch (Exception ignored) {
+            // best-effort only
+        }
     }
 }
