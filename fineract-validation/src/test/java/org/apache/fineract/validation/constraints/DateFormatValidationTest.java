@@ -56,10 +56,10 @@ class DateFormatValidationTest {
         assertThat(errors).isEmpty();
     }
 
-    // literal date, not a pattern
+    // literal date value, not a format pattern (unknown letters) — do not convert to yyyyMMdd
     // 'b' is not a valid pattern letter
     @ParameterizedTest
-    @ValueSource(strings = {"20260202", "invalid", "dd bbb yyyy"})
+    @ValueSource(strings = {"02 February 2026", "invalid", "dd bbb yyyy"})
     void invalidPatterns(String dateFormat) {
         var request = DateFormatModel.builder().dateFormat(dateFormat).build();
         var errors = validator.validate(request);
@@ -77,7 +77,8 @@ class DateFormatValidationTest {
 
     @Test
     void staticIsValidPattern_invalid() {
-        assertThat(DateFormatValidator.isValidPattern("20260202")).isFalse();
+        // digits-only is a valid all-literal pattern; use a non-pattern string here
+        assertThat(DateFormatValidator.isValidPattern("02 February 2026")).isFalse();
         assertThat(DateFormatValidator.isValidPattern("unknown")).isFalse();
     }
 
