@@ -40,7 +40,9 @@ class DataValidatorBuilderDateFormatTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "20260202", "not-a-pattern", "P!@#$", "{{invalid}}" })
+    // "02 February 2026" is intentionally a date value, not a format pattern (unknown letters).
+    // Do not convert it to yyyyMMdd — digits-only is a valid all-literal DateTimeFormatter pattern.
+    @ValueSource(strings = { "02 February 2026", "not-a-pattern", "P!@#$", "{{invalid}}" })
     void validDateTimeFormatPatternShouldRejectInvalidPatterns(final String pattern) {
         final List<ApiParameterError> errors = new ArrayList<>();
         new DataValidatorBuilder(errors).resource(RESOURCE).parameter(PARAMETER).value(pattern).validDateTimeFormatPattern();

@@ -235,7 +235,7 @@ public class LoanWritePlatformServiceJpaRepositoryImplTest {
         when(loanProduct.getLoanProductRelatedDetail()).thenReturn(loanProductDetail);
 
         LoanTransaction t1 = LoanTransaction.repayment(null, Money.of(CurrencyData.blank(), BigDecimal.valueOf(100)), null,
-                DateUtils.parseLocalDate("2025-05-15"));
+                DateUtils.parseLocalDate("2025-05-15"), ExternalId.empty());
 
         loan = new LoanBuilder(loanProduct).withId(LOAN_ID).withLoanStatus(LoanStatus.ACTIVE).withLoanTransactions(List.of(t1)).build();
 
@@ -260,7 +260,7 @@ public class LoanWritePlatformServiceJpaRepositoryImplTest {
         when(loanProduct.getLoanProductRelatedDetail()).thenReturn(loanProductDetail);
 
         LoanTransaction t1 = LoanTransaction.repayment(null, Money.of(CurrencyData.blank(), BigDecimal.valueOf(100)), null,
-                DateUtils.parseLocalDate("2025-05-13"));
+                DateUtils.parseLocalDate("2025-05-13"), ExternalId.empty());
 
         loan = new LoanBuilder(loanProduct).withId(LOAN_ID).withLoanStatus(LoanStatus.ACTIVE).withLoanTransactions(List.of(t1)).build();
 
