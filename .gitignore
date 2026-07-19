@@ -39,3 +39,7 @@ gradleExp/
 # Ignore only generated nested output if present:
 docs/**/build/
 docs/**/.asciidoctor/
+
+# OSGi runtime artifacts (scaffold under osgi/ is tracked)
+osgi/logs/*.log
+osgi/equinox/*.jar
