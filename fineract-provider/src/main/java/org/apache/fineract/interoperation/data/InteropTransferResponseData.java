@@ -24,9 +24,21 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.interoperation.domain.InteropActionState;
 
-public final class InteropTransferResponseData extends InteropResponseData {
+/**
+ * Transfer response: {@link CommandProcessingResult} plus composed
+ * {@link InteropResponseData} fields (flattened for Gson) and transfer-specific payload.
+ */
+public final class InteropTransferResponseData extends CommandProcessingResult {
+
+    @NotNull
+    private final String transactionCode;
+    @NotNull
+    private final InteropActionState state;
+    private final String expiration;
+    private final List<ExtensionData> extensionList;
 
     @NotNull
     private final String transferCode;
@@ -34,17 +46,20 @@ public final class InteropTransferResponseData extends InteropResponseData {
     private String completedTimestamp;
 
     private InteropTransferResponseData(Long resourceId, Long officeId, Long commandId, Map<String, Object> changesOnly,
-            @NotNull String transactionCode, @NotNull InteropActionState state, LocalDateTime expiration, List<ExtensionData> extensionList,
-            @NotNull String transferCode, LocalDateTime completedTimestamp) {
-        super(resourceId, officeId, commandId, changesOnly, transactionCode, state, expiration, extensionList);
+            @NotNull InteropResponseData response, @NotNull String transferCode, LocalDateTime completedTimestamp) {
+        super(resourceId, officeId, commandId, changesOnly);
+        this.transactionCode = response.getTransactionCode();
+        this.state = response.getState();
+        this.expiration = response.getExpiration();
+        this.extensionList = response.getExtensionList();
         this.transferCode = transferCode;
-        this.completedTimestamp = format(completedTimestamp);
+        this.completedTimestamp = InteropResponseData.format(completedTimestamp);
     }
 
     public static InteropTransferResponseData build(Long commandId, @NotNull String transactionCode, @NotNull InteropActionState state,
             LocalDateTime expiration, List<ExtensionData> extensionList, @NotNull String transferCode, LocalDateTime completedTimestamp) {
-        return new InteropTransferResponseData(null, null, commandId, null, transactionCode, state, expiration, extensionList, transferCode,
-                completedTimestamp);
+        return new InteropTransferResponseData(null, null, commandId, null,
+                InteropResponseData.of(transactionCode, state, expiration, extensionList), transferCode, completedTimestamp);
     }
 
     public static InteropTransferResponseData build(@NotNull String transactionCode, @NotNull InteropActionState state,
@@ -62,6 +77,22 @@ public final class InteropTransferResponseData extends InteropResponseData {
         return build(null, transactionCode, state, transferCode);
     }
 
+    public String getTransactionCode() {
+        return transactionCode;
+    }
+
+    public InteropActionState getState() {
+        return state;
+    }
+
+    public String getExpiration() {
+        return expiration;
+    }
+
+    public List<ExtensionData> getExtensionList() {
+        return extensionList;
+    }
+
     public String getTransferCode() {
         return transferCode;
     }
@@ -72,6 +103,6 @@ public final class InteropTransferResponseData extends InteropResponseData {
 
     @Transient
     public LocalDateTime getCompletedTimestampDate() throws ParseException {
-        return parse(completedTimestamp);
+        return InteropResponseData.parse(completedTimestamp);
     }
 }

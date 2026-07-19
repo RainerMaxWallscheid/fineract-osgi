@@ -36,6 +36,7 @@ import static org.apache.fineract.interoperation.util.InteropUtil.PARAM_TRANSACT
 
 import com.google.gson.JsonObject;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -45,27 +46,38 @@ import org.apache.fineract.interoperation.domain.InteropAmountType;
 import org.apache.fineract.interoperation.domain.InteropTransactionRole;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 
-public class InteropQuoteRequestData extends InteropRequestData {
+/**
+ * Quote request composed around shared {@link InteropRequestData}.
+ */
+public final class InteropQuoteRequestData {
 
     static final String[] PARAMS = { PARAM_TRANSACTION_CODE, PARAM_REQUEST_CODE, PARAM_ACCOUNT_ID, PARAM_AMOUNT, PARAM_TRANSACTION_TYPE,
             PARAM_TRANSACTION_ROLE, PARAM_NOTE, PARAM_GEO_CODE, PARAM_EXPIRATION, PARAM_EXTENSION_LIST, PARAM_QUOTE_CODE, PARAM_AMOUNT_TYPE,
             PARAM_FEES, PARAM_LOCALE, PARAM_DATE_FORMAT };
+
+    @NotNull
+    private final InteropRequestData request;
     @NotNull
     private final String quoteCode;
     @NotNull
     private final InteropAmountType amountType;
 
-    private final MoneyData fees; // only for disclosed Payer fees on the Payee
-                                  // side
+    private final MoneyData fees; // only for disclosed Payer fees on the Payee side
+
+    public InteropQuoteRequestData(@NotNull InteropRequestData request, @NotNull String quoteCode, @NotNull InteropAmountType amountType,
+            MoneyData fees) {
+        this.request = request;
+        this.quoteCode = quoteCode;
+        this.amountType = amountType;
+        this.fees = fees;
+    }
 
     public InteropQuoteRequestData(@NotNull String transactionCode, String requestCode, @NotNull String accountId,
             @NotNull MoneyData amount, @NotNull InteropTransactionRole transactionRole, @NotNull InteropTransactionTypeData transactionType,
             String note, GeoCodeData geoCode, LocalDateTime expiration, List<ExtensionData> extensionList, @NotNull String quoteCode,
             @NotNull InteropAmountType amountType, MoneyData fees) {
-        super(transactionCode, requestCode, accountId, amount, transactionRole, transactionType, note, geoCode, expiration, extensionList);
-        this.quoteCode = quoteCode;
-        this.amountType = amountType;
-        this.fees = fees;
+        this(new InteropRequestData(transactionCode, requestCode, accountId, amount, transactionRole, transactionType, note, geoCode,
+                expiration, extensionList), quoteCode, amountType, fees);
     }
 
     public InteropQuoteRequestData(@NotNull String transactionCode, @NotNull String accountId, @NotNull InteropAmountType amountType,
@@ -75,11 +87,9 @@ public class InteropQuoteRequestData extends InteropRequestData {
                 null);
     }
 
-    private InteropQuoteRequestData(@NotNull InteropRequestData other, @NotNull String quoteCode, @NotNull InteropAmountType amountType,
-            MoneyData fees) {
-        this(other.getTransactionCode(), other.getRequestCode(), other.getAccountId(), other.getAmount(), other.getTransactionRole(),
-                other.getTransactionType(), other.getNote(), other.getGeoCode(), other.getExpiration(), other.getExtensionList(), quoteCode,
-                amountType, fees);
+    @NotNull
+    public InteropRequestData getRequest() {
+        return request;
     }
 
     public String getQuoteCode() {
@@ -94,9 +104,56 @@ public class InteropQuoteRequestData extends InteropRequestData {
         return fees;
     }
 
-    @Override
+    @NotNull
+    public String getTransactionCode() {
+        return request.getTransactionCode();
+    }
+
+    public String getRequestCode() {
+        return request.getRequestCode();
+    }
+
+    @NotNull
+    public String getAccountId() {
+        return request.getAccountId();
+    }
+
+    @NotNull
+    public MoneyData getAmount() {
+        return request.getAmount();
+    }
+
+    public InteropTransactionTypeData getTransactionType() {
+        return request.getTransactionType();
+    }
+
+    @NotNull
+    public InteropTransactionRole getTransactionRole() {
+        return request.getTransactionRole();
+    }
+
+    public String getNote() {
+        return request.getNote();
+    }
+
+    public GeoCodeData getGeoCode() {
+        return request.getGeoCode();
+    }
+
+    public LocalDateTime getExpiration() {
+        return request.getExpiration();
+    }
+
+    public LocalDate getExpirationLocalDate() {
+        return request.getExpirationLocalDate();
+    }
+
+    public List<ExtensionData> getExtensionList() {
+        return request.getExtensionList();
+    }
+
     public void normalizeAmounts(@NotNull MonetaryCurrency currency) {
-        super.normalizeAmounts(currency);
+        request.normalizeAmounts(currency);
         if (fees != null) {
             fees.normalizeAmount(currency);
         }
@@ -111,13 +168,16 @@ public class InteropQuoteRequestData extends InteropRequestData {
         jsonHelper.checkForUnsupportedParameters(element, Arrays.asList(PARAMS));
 
         InteropRequestData interopRequestData = InteropRequestData.validateAndParse(dataValidator, element, jsonHelper);
+        if (interopRequestData == null && dataValidator.hasError()) {
+            return null;
+        }
 
         String quoteCode = jsonHelper.extractStringNamed(PARAM_QUOTE_CODE, element);
         DataValidatorBuilder dataValidatorCopy = dataValidator.reset().parameter(PARAM_QUOTE_CODE).value(quoteCode).notBlank();
 
         String amountTypeString = jsonHelper.extractStringNamed(PARAM_AMOUNT_TYPE, element);
         dataValidatorCopy = dataValidatorCopy.reset().parameter(PARAM_AMOUNT_TYPE).value(amountTypeString).notBlank();
-        InteropAmountType amountType = InteropAmountType.valueOf(amountTypeString);
+        InteropAmountType amountType = amountTypeString == null ? null : InteropAmountType.valueOf(amountTypeString);
 
         JsonObject feesElement = jsonHelper.extractJsonObjectNamed(PARAM_FEES, element);
         dataValidator.merge(dataValidatorCopy);
@@ -130,6 +190,7 @@ public class InteropQuoteRequestData extends InteropRequestData {
         dataValidatorCopy = dataValidatorCopy.reset().parameter(PARAM_TRANSACTION_TYPE).value(transactionTypeElement).notNull();
 
         dataValidator.merge(dataValidatorCopy);
-        return dataValidator.hasError() ? null : new InteropQuoteRequestData(interopRequestData, quoteCode, amountType, fees);
+        return dataValidator.hasError() || interopRequestData == null ? null
+                : new InteropQuoteRequestData(interopRequestData, quoteCode, amountType, fees);
     }
 }

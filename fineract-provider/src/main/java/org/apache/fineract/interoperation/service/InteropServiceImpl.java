@@ -35,6 +35,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -284,7 +285,7 @@ public class InteropServiceImpl implements InteropService {
         // always Payer
         InteropTransactionRequestData request = dataValidator.validateAndParseCreateRequest(command);
         // TODO: error handling
-        validateAndGetSavingAccount(request);
+        validateAndGetSavingAccount(request.getRequest(), request::normalizeAmounts);
         return InteropTransactionRequestResponseData.build(command.commandId(), request.getTransactionCode(), InteropActionState.ACCEPTED, request.getExpiration(), request.getExtensionList(), request.getRequestCode());
     }
 
@@ -298,7 +299,7 @@ public class InteropServiceImpl implements InteropService {
     @Transactional
     public InteropQuoteResponseData createQuote(@NonNull JsonCommand command) {
         InteropQuoteRequestData request = dataValidator.validateAndParseCreateQuote(command);
-        SavingsAccount savingsAccount = validateAndGetSavingAccount(request);
+        SavingsAccount savingsAccount = validateAndGetSavingAccount(request.getRequest(), request::normalizeAmounts);
         SavingsAccountTransactionType transactionType = request.getTransactionRole().getTransactionType();
         final BigDecimal fee;
         if (transactionType.isDebit()) {
@@ -328,7 +329,7 @@ public class InteropServiceImpl implements InteropService {
         // matching, at CREATE it is debited anyway
         SavingsAccountTransactionType transactionType = request.getTransactionRole().getTransactionType();
         if (transactionType.isDebit()) {
-            SavingsAccount savingsAccount = validateAndGetSavingAccount(request);
+            SavingsAccount savingsAccount = validateAndGetSavingAccount(request.getRequest(), request::normalizeAmounts);
             BigDecimal total = calculateTotalTransferAmount(request, savingsAccount);
             if (MathUtil.isLessThan(savingsAccount.getWithdrawableBalance(), total)) {
                 throw new InsufficientAccountBalanceException(savingsAccount.getExternalId().getValue(), savingsAccount.getWithdrawableBalance(), null, total);
@@ -354,7 +355,7 @@ public class InteropServiceImpl implements InteropService {
     public InteropTransferResponseData commitTransfer(@NonNull JsonCommand command) {
         InteropTransferRequestData request = dataValidator.validateAndParseTransferRequest(command);
         boolean isDebit = request.getTransactionRole().getTransactionType().isDebit();
-        SavingsAccount savingsAccount = validateAndGetSavingAccount(request);
+        SavingsAccount savingsAccount = validateAndGetSavingAccount(request.getRequest(), request::normalizeAmounts);
         String transferCode = request.getTransferCode();
         if (findTransaction(savingsAccount, transferCode, (isDebit ? WITHDRAWAL : DEPOSIT).getValue()) != null) {
             throw new InteropTransferAlreadyCommittedException(savingsAccount.getExternalId().getValue(), transferCode);
@@ -400,7 +401,7 @@ public class InteropServiceImpl implements InteropService {
     @NonNull
     public InteropTransferResponseData releaseTransfer(@NonNull JsonCommand command) {
         InteropTransferRequestData request = dataValidator.validateAndParseTransferRequest(command);
-        SavingsAccount savingsAccount = validateAndGetSavingAccount(request);
+        SavingsAccount savingsAccount = validateAndGetSavingAccount(request.getRequest(), request::normalizeAmounts);
         LocalDateTime transactionDateTime = DateUtils.getLocalDateTimeOfTenant();
         LocalDate transactionDate = DateUtils.getBusinessLocalDate();
         SavingsAccountTransaction holdTransaction = findTransaction(savingsAccount, request.getTransferCode(), AMOUNT_HOLD.getValue());
@@ -473,7 +474,8 @@ public class InteropServiceImpl implements InteropService {
         return loan;
     }
 
-    private SavingsAccount validateAndGetSavingAccount(@NonNull InteropRequestData request) {
+    private SavingsAccount validateAndGetSavingAccount(@NonNull InteropRequestData request,
+            @NonNull Consumer<MonetaryCurrency> amountNormalizer) {
         // TODO: error handling
         SavingsAccount savingsAccount = validateAndGetSavingAccount(request.getAccountId());
         savingsAccount.setHelpers(savingsAccountTransactionSummaryWrapper, savingsHelper, configurationDomainService);
@@ -485,7 +487,7 @@ public class InteropServiceImpl implements InteropService {
         if (!savingsAccount.isTransactionAllowed(transactionType, request.getExpirationLocalDate())) {
             throw new InteropAccountTransactionNotAllowedException(request.getAccountId());
         }
-        request.normalizeAmounts(savingsAccount.getCurrency());
+        amountNormalizer.accept(savingsAccount.getCurrency());
         return savingsAccount;
     }
 

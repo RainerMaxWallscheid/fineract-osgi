@@ -34,6 +34,7 @@ import static org.apache.fineract.interoperation.util.InteropUtil.PARAM_TRANSFER
 
 import com.google.gson.JsonObject;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -42,28 +43,37 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.interoperation.domain.InteropTransactionRole;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 
-public class InteropTransferRequestData extends InteropRequestData {
+/**
+ * Transfer request composed around shared {@link InteropRequestData}.
+ */
+public final class InteropTransferRequestData {
 
     static final String[] PARAMS = { PARAM_TRANSACTION_CODE, PARAM_ACCOUNT_ID, PARAM_AMOUNT, PARAM_TRANSACTION_ROLE, PARAM_TRANSACTION_TYPE,
             PARAM_NOTE, PARAM_EXPIRATION, PARAM_EXTENSION_LIST, PARAM_TRANSFER_CODE, PARAM_FSP_FEE, PARAM_FSP_COMMISSION, PARAM_LOCALE,
             PARAM_DATE_FORMAT };
 
     @NotNull
+    private final InteropRequestData request;
+    @NotNull
     private final String transferCode;
 
-    // validation: what was specified in quotes step
-    private MoneyData fspFee;
+    private final MoneyData fspFee;
+    private final MoneyData fspCommission;
 
-    private MoneyData fspCommission;
+    public InteropTransferRequestData(@NotNull InteropRequestData request, @NotNull String transferCode, MoneyData fspFee,
+            MoneyData fspCommission) {
+        this.request = request;
+        this.transferCode = transferCode;
+        this.fspFee = fspFee;
+        this.fspCommission = fspCommission;
+    }
 
     public InteropTransferRequestData(@NotNull String transactionCode, @NotNull String accountId, @NotNull MoneyData amount,
             @NotNull InteropTransactionRole transactionRole, InteropTransactionTypeData transactionType, String note,
             LocalDateTime expiration, List<ExtensionData> extensionList, @NotNull String transferCode, MoneyData fspFee,
             MoneyData fspCommission) {
-        super(transactionCode, null, accountId, amount, transactionRole, transactionType, note, null, expiration, extensionList);
-        this.transferCode = transferCode;
-        this.fspFee = fspFee;
-        this.fspCommission = fspCommission;
+        this(new InteropRequestData(transactionCode, null, accountId, amount, transactionRole, transactionType, note, null, expiration,
+                extensionList), transferCode, fspFee, fspCommission);
     }
 
     public InteropTransferRequestData(@NotNull String transactionCode, @NotNull String transferCode, @NotNull String accountId,
@@ -71,9 +81,9 @@ public class InteropTransferRequestData extends InteropRequestData {
         this(transactionCode, accountId, amount, transactionRole, null, null, null, null, transferCode, null, null);
     }
 
-    private InteropTransferRequestData(InteropRequestData other, @NotNull String transferCode, MoneyData fspFee, MoneyData fspCommission) {
-        this(other.getTransactionCode(), other.getAccountId(), other.getAmount(), other.getTransactionRole(), other.getTransactionType(),
-                other.getNote(), other.getExpiration(), other.getExtensionList(), transferCode, fspFee, fspCommission);
+    @NotNull
+    public InteropRequestData getRequest() {
+        return request;
     }
 
     public String getTransferCode() {
@@ -88,9 +98,56 @@ public class InteropTransferRequestData extends InteropRequestData {
         return fspCommission;
     }
 
-    @Override
+    @NotNull
+    public String getTransactionCode() {
+        return request.getTransactionCode();
+    }
+
+    public String getRequestCode() {
+        return request.getRequestCode();
+    }
+
+    @NotNull
+    public String getAccountId() {
+        return request.getAccountId();
+    }
+
+    @NotNull
+    public MoneyData getAmount() {
+        return request.getAmount();
+    }
+
+    public InteropTransactionTypeData getTransactionType() {
+        return request.getTransactionType();
+    }
+
+    @NotNull
+    public InteropTransactionRole getTransactionRole() {
+        return request.getTransactionRole();
+    }
+
+    public String getNote() {
+        return request.getNote();
+    }
+
+    public GeoCodeData getGeoCode() {
+        return request.getGeoCode();
+    }
+
+    public LocalDateTime getExpiration() {
+        return request.getExpiration();
+    }
+
+    public LocalDate getExpirationLocalDate() {
+        return request.getExpirationLocalDate();
+    }
+
+    public List<ExtensionData> getExtensionList() {
+        return request.getExtensionList();
+    }
+
     public void normalizeAmounts(@NotNull MonetaryCurrency currency) {
-        super.normalizeAmounts(currency);
+        request.normalizeAmounts(currency);
         if (fspFee != null) {
             fspFee.normalizeAmount(currency);
         }
@@ -121,6 +178,7 @@ public class InteropTransferRequestData extends InteropRequestData {
         dataValidatorCopy = dataValidator.reset().parameter(PARAM_TRANSACTION_ROLE).value(transactionRoleString).notNull();
 
         dataValidator.merge(dataValidatorCopy);
-        return dataValidator.hasError() ? null : new InteropTransferRequestData(interopRequestData, transferCode, fspFee, fspCommission);
+        return dataValidator.hasError() || interopRequestData == null ? null
+                : new InteropTransferRequestData(interopRequestData, transferCode, fspFee, fspCommission);
     }
 }

@@ -47,7 +47,12 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.interoperation.domain.InteropTransactionRole;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 
-public class InteropRequestData {
+/**
+ * Shared interop request payload. Specialized requests
+ * ({@link InteropQuoteRequestData}, {@link InteropTransferRequestData},
+ * {@link InteropTransactionRequestData}) compose this type instead of extending it.
+ */
+public final class InteropRequestData {
 
     @NotNull
     private final String transactionCode;
@@ -71,7 +76,7 @@ public class InteropRequestData {
 
     private List<ExtensionData> extensionList;
 
-    protected InteropRequestData(@NotNull String transactionCode, String requestCode, @NotNull String accountId, @NotNull MoneyData amount,
+    public InteropRequestData(@NotNull String transactionCode, String requestCode, @NotNull String accountId, @NotNull MoneyData amount,
             @NotNull InteropTransactionRole transactionRole, InteropTransactionTypeData transactionType, String note, GeoCodeData geoCode,
             LocalDateTime expiration, List<ExtensionData> extensionList) {
         this.transactionCode = transactionCode;
@@ -86,7 +91,7 @@ public class InteropRequestData {
         this.extensionList = extensionList;
     }
 
-    protected InteropRequestData(@NotNull String transactionCode, @NotNull String accountId, @NotNull MoneyData amount,
+    public InteropRequestData(@NotNull String transactionCode, @NotNull String accountId, @NotNull MoneyData amount,
             @NotNull InteropTransactionRole transactionRole) {
         this(transactionCode, null, accountId, amount, transactionRole, null, null, null, null, null);
     }
@@ -194,11 +199,7 @@ public class InteropRequestData {
         String locale = jsonHelper.extractStringNamed(PARAM_LOCALE, element);
         LocalDateTime expiration = locale == null
                 ? jsonHelper.extractLocalDateTimeNamed(PARAM_EXPIRATION, element, ISO8601_DATE_TIME_FORMAT, DEFAULT_LOCALE)
-                : jsonHelper.extractLocalDateTimeNamed(PARAM_EXPIRATION, element); // PARAM_DATE_FORMAT
-        // also
-        // must
-        // be
-        // set
+                : jsonHelper.extractLocalDateTimeNamed(PARAM_EXPIRATION, element);
 
         JsonArray extensionArray = jsonHelper.extractJsonArrayNamed(PARAM_EXTENSION_LIST, element);
         ArrayList<ExtensionData> extensionList = null;
