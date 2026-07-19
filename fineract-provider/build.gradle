@@ -304,7 +304,13 @@ tasks.named('licenseMain') {
 
 bootRun {
     classpath += configurations.bootRunDriver
+    // Cap the app heap: exit 137 (SIGKILL) usually means the OS OOM-killed an unbounded
+    // Java process. 4g is enough for local dev while leaving room for the Gradle daemon
+    // (org.gradle.jvmargs=-Xmx12g) and Postgres. Override with -DbootRun.xmx=6g if needed.
+    def bootRunXmx = System.getProperty('bootRun.xmx', '4g')
     jvmArgs = [
+            "-Xmx${bootRunXmx}",
+            "-XX:+ExitOnOutOfMemoryError",
             "-Dspring.output.ansi.enabled=ALWAYS"
     ]
 }
