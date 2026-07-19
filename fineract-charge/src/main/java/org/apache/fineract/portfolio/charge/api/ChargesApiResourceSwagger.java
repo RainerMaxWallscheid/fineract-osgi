@@ -205,7 +205,7 @@ final class ChargesApiResourceSwagger {
         public boolean penalty;
         @Schema(example = "MMdd")
         public String monthDayFormat;
-        @Schema(example = "01 March")
+        @Schema(example = "0301")
         public String feeOnMonthDay;
         @Schema(example = "1")
         public Integer feeInterval;

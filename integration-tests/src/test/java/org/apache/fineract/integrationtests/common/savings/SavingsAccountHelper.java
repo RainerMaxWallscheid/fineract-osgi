@@ -1189,7 +1189,7 @@ public class SavingsAccountHelper {
         final HashMap<String, Object> map = new HashMap<>();
         map.put("chargeId", chargeId);
         map.put("amount", amount);
-        map.put("feeOnMonthDay", "15 January");
+        map.put("feeOnMonthDay", "0115");
         map.put("locale", CommonConstants.LOCALE);
         map.put("monthDayFormat", "MMdd");
         map.put("dateFormat", "yyyyMMdd");

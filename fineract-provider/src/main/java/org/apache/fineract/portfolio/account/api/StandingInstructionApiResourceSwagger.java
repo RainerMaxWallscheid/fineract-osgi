@@ -485,7 +485,7 @@ final class StandingInstructionApiResourceSwagger {
         public String locale;
         @Schema(example = "yyyyMMdd")
         public String dateFormat;
-        @Schema(example = "02 April")
+        @Schema(example = "0402")
         public String recurrenceOnMonthDay;
         @Schema(example = "MMdd")
         public String monthDayFormat;

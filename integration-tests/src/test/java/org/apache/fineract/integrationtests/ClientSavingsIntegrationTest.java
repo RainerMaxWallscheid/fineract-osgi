@@ -712,7 +712,7 @@ public class ClientSavingsIntegrationTest {
             Assertions.assertTrue(charges == null || charges.isEmpty());
 
             this.savingsAccountHelper.addChargesForSavingsWithDueDateAndFeeOnMonthDay(savingsId, chargeId, "20230110", 100,
-                    "15 January");
+                    "0115");
             charges = this.savingsAccountHelper.getSavingsCharges(savingsId);
             Assertions.assertEquals(1, charges.size());
 
@@ -3049,7 +3049,7 @@ public class ClientSavingsIntegrationTest {
             Assertions.assertNotNull(chargeId);
 
             this.savingsAccountHelper.addChargesForSavingsWithDueDateAndFeeOnMonthDay(savingsId, chargeId, "20230215", 100,
-                    "15 February");
+                    "0215");
 
             ArrayList<HashMap> charges = this.savingsAccountHelper.getSavingsCharges(savingsId);
             Assertions.assertEquals(1, charges.size());

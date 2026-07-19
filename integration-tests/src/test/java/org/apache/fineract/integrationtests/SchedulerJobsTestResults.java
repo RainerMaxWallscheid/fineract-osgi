@@ -191,7 +191,7 @@ public class SchedulerJobsTestResults extends IntegrationTest {
             Assertions.assertNotNull(annualFeeChargeId);
 
             this.savingsAccountHelper.addChargesForSavingsWithDueDateAndFeeOnMonthDay(savingsId, annualFeeChargeId, "20230110", 100,
-                    "15 January");
+                    "0115");
             ArrayList<HashMap> chargesPendingState = this.savingsAccountHelper.getSavingsCharges(savingsId);
             Assertions.assertEquals(1, chargesPendingState.size());
 
