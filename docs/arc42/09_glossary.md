@@ -30,6 +30,7 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **Batch Worker** | B | Node-Rolle, die Job-Partitionen ausführt (`batch-worker-enabled`). Horizontal skalierbar. → [05](05_deployment_view.md) |
 | **Bundle (OSGi)** | T | Installierbare OSGi-Einheit (JAR) mit Manifest, Lifecycle und optionalen Services. → [04](04_runtime_view.md), [05](05_deployment_view.md) |
 | **Business Date** | F | Fachliches Geschäftstag-Datum eines Tenants; steuert u. a. Buchungslogik und COB. Filter: `BusinessDateFilter`. |
+| **Boy Scout Rule** | A | Hinterlasse angefassten Code etwas sauberer als vorgefunden (im PR-Scope). → [ADR-018](decisions/ADR-018-clean-code.md) |
 | **Business Event** | T | Domänenereignis nach fachlicher Änderung (z. B. Loan created); intern oder als External Event. → [06](06_crosscutting_concepts.md) |
 | **Business Step** | F/T | Einzelner Schritt in einer COB-/Job-Pipeline (z. B. Accrual, Penalty). |
 | **Circuit Breaker** | T | Resilience-Muster: unterbindet Calls zu einem fehlerhaften Downstream (z. B. KI-API) temporär. |
