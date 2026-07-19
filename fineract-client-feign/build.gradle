@@ -66,6 +66,8 @@ tasks.register('buildJavaSdk', org.openapitools.generator.gradle.plugin.tasks.Ge
 
     ]
     dependsOn(':fineract-provider:resolve')
+    // Avoid concurrent OpenAPI generation (client + feign) exhausting the Gradle daemon heap
+    mustRunAfter(':fineract-client:buildJavaSdk')
 }
 
 sourceSets {

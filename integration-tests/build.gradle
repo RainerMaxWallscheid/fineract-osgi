@@ -94,7 +94,20 @@ cargo {
 }
 
 cargoRunLocal.dependsOn ':fineract-war:war'
-cargoStartLocal.dependsOn ':fineract-war:war'
+// Always stop first so leftover Tomcat does not keep cargo.rmi.port / 8443 busy
+cargoStartLocal.dependsOn ':fineract-war:war', cargoStopLocal
+
+tasks.named('cargoStartLocal').configure {
+    doFirst {
+        [8205, 8443].each { port ->
+            def pids = "lsof -ti tcp:${port}".execute().text.trim()
+            if (pids) {
+                logger.lifecycle("cargoStartLocal: freeing port ${port} (pids: ${pids.replace('\n', ' ')})")
+                pids.split('\n').each { pid -> "kill -9 ${pid}".execute() }
+            }
+        }
+    }
+}
 
 import java.net.HttpURLConnection
 import java.net.URL
