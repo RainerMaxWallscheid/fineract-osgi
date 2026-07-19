@@ -27,12 +27,15 @@ import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -3076,100 +3079,147 @@ public class ClientSavingsIntegrationTest {
         }
     }
 
+    /**
+     * Fixed business date for backdated running-balance tests. Interest day counts are derived from this date so
+     * expected balances stay stable regardless of the host clock / tenant "today".
+     */
+    private static final LocalDate BACKDATE_BALANCE_BUSINESS_DATE = LocalDate.of(2025, 3, 15);
+    private static final String BACKDATE_BALANCE_BUSINESS_DATE_STRING = "15 March 2025";
+    private static final BigDecimal DAILY_POSTING_INTEREST_RATE = new BigDecimal("10");
+    private static final BigDecimal DAYS_IN_YEAR = new BigDecimal("365");
+    private static final int SAVINGS_CURRENCY_DECIMALS = 4;
+
     @Test
     public void testRunningBalanceAfterWithdrawalWithBackdateConfigurationOn() {
-        this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
-        this.savingsProductHelper = new SavingsProductHelper();
-        this.scheduleJobHelper = new SchedulerJobHelper(requestSpec);
-        configurationForBackdatedTransaction();
-        LocalDate transactionDate = LocalDate.now(Utils.getZoneIdOfTenant()).minusDays(5);
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
-        String startDate = formatter.format(transactionDate);
-        String secondTrx = formatter.format(transactionDate.plusDays(1));
-        final String jobName = "Post Interest For Savings";
-        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
-        Assertions.assertNotNull(clientID);
+        // Deposit 100 on B-5, post interest, withdraw 200 on B-4 → net -100 with mixed credit/OD interest.
+        BusinessDateHelper.runAt(BACKDATE_BALANCE_BUSINESS_DATE_STRING, () -> {
+            this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
+            this.savingsProductHelper = new SavingsProductHelper();
+            this.scheduleJobHelper = new SchedulerJobHelper(requestSpec);
+            configurationForBackdatedTransaction();
 
-        final Integer savingsId = createSavingsAccountDailyPostingOverdraft(clientID, startDate);
-        this.savingsAccountHelper.depositToSavingsAccount(savingsId, "100", startDate, CommonConstants.RESPONSE_RESOURCE_ID);
-        this.scheduleJobHelper.executeAndAwaitJob(jobName);
-        this.savingsAccountHelper.withdrawalFromSavingsAccount(savingsId, "200", secondTrx, CommonConstants.RESPONSE_RESOURCE_ID);
-        HashMap<String, Object> summaryObj = this.savingsAccountHelper.getSavingsSummary(savingsId);
+            final LocalDate startLocalDate = BACKDATE_BALANCE_BUSINESS_DATE.minusDays(5);
+            final LocalDate secondLocalDate = startLocalDate.plusDays(1);
+            final String startDate = Utils.dateFormatter.format(startLocalDate);
+            final String secondTrx = Utils.dateFormatter.format(secondLocalDate);
+            final String jobName = "Post Interest For Savings";
 
-        assertEquals("-100.0822", summaryObj.get("availableBalance").toString(), "Equality check for Balance");
+            final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
+            Assertions.assertNotNull(clientID);
+
+            final Integer savingsId = createSavingsAccountDailyPostingOverdraft(clientID, startDate);
+            this.savingsAccountHelper.depositToSavingsAccount(savingsId, "100", startDate, CommonConstants.RESPONSE_RESOURCE_ID);
+            this.scheduleJobHelper.executeAndAwaitJob(jobName);
+            this.savingsAccountHelper.withdrawalFromSavingsAccount(savingsId, "200", secondTrx, CommonConstants.RESPONSE_RESOURCE_ID);
+
+            final long creditDays = ChronoUnit.DAYS.between(startLocalDate, secondLocalDate);
+            final long overdraftDays = ChronoUnit.DAYS.between(secondLocalDate, BACKDATE_BALANCE_BUSINESS_DATE);
+            final BigDecimal creditInterest = calcDailyInterest(new BigDecimal("100"), DAILY_POSTING_INTEREST_RATE, creditDays);
+            final BigDecimal overdraftInterest = calcDailyInterest(new BigDecimal("100"), DAILY_POSTING_INTEREST_RATE, overdraftDays);
+            final BigDecimal expected = new BigDecimal("-100").add(creditInterest).subtract(overdraftInterest);
+
+            assertAvailableBalance(this.savingsAccountHelper.getSavingsSummary(savingsId), expected);
+        });
     }
 
     @Test
     public void testRunningBalanceAfterDepositWithBackdateConfigurationOn() {
-        this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
-        this.savingsProductHelper = new SavingsProductHelper();
-        this.scheduleJobHelper = new SchedulerJobHelper(requestSpec);
-        configurationForBackdatedTransaction();
-        LocalDate transactionDate = LocalDate.now(Utils.getZoneIdOfTenant()).minusDays(5);
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
-        String startDate = formatter.format(transactionDate);
-        String secondTrx = formatter.format(transactionDate.plusDays(1));
-        final String jobName = "Post Interest For Savings";
-        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
-        Assertions.assertNotNull(clientID);
+        // Withdraw 100 on B-5, post interest, deposit 200 on B-4 → net +100 with mixed OD/credit interest.
+        BusinessDateHelper.runAt(BACKDATE_BALANCE_BUSINESS_DATE_STRING, () -> {
+            this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
+            this.savingsProductHelper = new SavingsProductHelper();
+            this.scheduleJobHelper = new SchedulerJobHelper(requestSpec);
+            configurationForBackdatedTransaction();
 
-        final Integer savingsId = createSavingsAccountDailyPostingOverdraft(clientID, startDate);
-        this.savingsAccountHelper.withdrawalFromSavingsAccount(savingsId, "100", startDate, CommonConstants.RESPONSE_RESOURCE_ID);
-        this.scheduleJobHelper.executeAndAwaitJob(jobName);
-        this.savingsAccountHelper.depositToSavingsAccount(savingsId, "200", secondTrx, CommonConstants.RESPONSE_RESOURCE_ID);
-        HashMap<String, Object> summaryObj = this.savingsAccountHelper.getSavingsSummary(savingsId);
-        assertEquals("100.0822", summaryObj.get("availableBalance").toString(), "Equality check for Balance");
+            final LocalDate startLocalDate = BACKDATE_BALANCE_BUSINESS_DATE.minusDays(5);
+            final LocalDate secondLocalDate = startLocalDate.plusDays(1);
+            final String startDate = Utils.dateFormatter.format(startLocalDate);
+            final String secondTrx = Utils.dateFormatter.format(secondLocalDate);
+            final String jobName = "Post Interest For Savings";
+
+            final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
+            Assertions.assertNotNull(clientID);
+
+            final Integer savingsId = createSavingsAccountDailyPostingOverdraft(clientID, startDate);
+            this.savingsAccountHelper.withdrawalFromSavingsAccount(savingsId, "100", startDate, CommonConstants.RESPONSE_RESOURCE_ID);
+            this.scheduleJobHelper.executeAndAwaitJob(jobName);
+            this.savingsAccountHelper.depositToSavingsAccount(savingsId, "200", secondTrx, CommonConstants.RESPONSE_RESOURCE_ID);
+
+            final long overdraftDays = ChronoUnit.DAYS.between(startLocalDate, secondLocalDate);
+            final long creditDays = ChronoUnit.DAYS.between(secondLocalDate, BACKDATE_BALANCE_BUSINESS_DATE);
+            final BigDecimal overdraftInterest = calcDailyInterest(new BigDecimal("100"), DAILY_POSTING_INTEREST_RATE, overdraftDays);
+            final BigDecimal creditInterest = calcDailyInterest(new BigDecimal("100"), DAILY_POSTING_INTEREST_RATE, creditDays);
+            final BigDecimal expected = new BigDecimal("100").subtract(overdraftInterest).add(creditInterest);
+
+            assertAvailableBalance(this.savingsAccountHelper.getSavingsSummary(savingsId), expected);
+        });
     }
 
     @Test
     public void testRunningBalanceAfterWithdrawalReversalWithBackdateConfigurationOn() {
-        this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
-        this.savingsProductHelper = new SavingsProductHelper();
-        this.scheduleJobHelper = new SchedulerJobHelper(requestSpec);
-        configurationForBackdatedTransaction();
-        LocalDate transactionDate = LocalDate.now(Utils.getZoneIdOfTenant()).minusDays(5);
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
-        String startDate = formatter.format(transactionDate);
-        String secondTrx = formatter.format(transactionDate.plusDays(1));
-        final String jobName = "Post Interest For Savings";
-        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
-        Assertions.assertNotNull(clientID);
+        // Deposit 100, post interest, withdraw 200, reverse withdrawal → +100 with full-period credit interest.
+        BusinessDateHelper.runAt(BACKDATE_BALANCE_BUSINESS_DATE_STRING, () -> {
+            this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
+            this.savingsProductHelper = new SavingsProductHelper();
+            this.scheduleJobHelper = new SchedulerJobHelper(requestSpec);
+            configurationForBackdatedTransaction();
 
-        final Integer savingsId = createSavingsAccountDailyPostingOverdraft(clientID, startDate);
-        this.savingsAccountHelper.depositToSavingsAccount(savingsId, "100", startDate, CommonConstants.RESPONSE_RESOURCE_ID);
-        this.scheduleJobHelper.executeAndAwaitJob(jobName);
+            final LocalDate startLocalDate = BACKDATE_BALANCE_BUSINESS_DATE.minusDays(5);
+            final LocalDate secondLocalDate = startLocalDate.plusDays(1);
+            final String startDate = Utils.dateFormatter.format(startLocalDate);
+            final String secondTrx = Utils.dateFormatter.format(secondLocalDate);
+            final String jobName = "Post Interest For Savings";
 
-        Integer withdrawalToReverse = (Integer) this.savingsAccountHelper.withdrawalFromSavingsAccount(savingsId, "200", secondTrx,
-                CommonConstants.RESPONSE_RESOURCE_ID);
-        this.savingsAccountHelper.reverseSavingsAccountTransaction(savingsId, withdrawalToReverse);
-        HashMap<String, Object> summaryObj = this.savingsAccountHelper.getSavingsSummary(savingsId);
+            final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
+            Assertions.assertNotNull(clientID);
 
-        assertEquals("100.137", summaryObj.get("availableBalance").toString(), "Equality check for Balance");
+            final Integer savingsId = createSavingsAccountDailyPostingOverdraft(clientID, startDate);
+            this.savingsAccountHelper.depositToSavingsAccount(savingsId, "100", startDate, CommonConstants.RESPONSE_RESOURCE_ID);
+            this.scheduleJobHelper.executeAndAwaitJob(jobName);
+
+            Integer withdrawalToReverse = (Integer) this.savingsAccountHelper.withdrawalFromSavingsAccount(savingsId, "200", secondTrx,
+                    CommonConstants.RESPONSE_RESOURCE_ID);
+            this.savingsAccountHelper.reverseSavingsAccountTransaction(savingsId, withdrawalToReverse);
+
+            final long interestDays = ChronoUnit.DAYS.between(startLocalDate, BACKDATE_BALANCE_BUSINESS_DATE);
+            final BigDecimal interest = calcDailyInterest(new BigDecimal("100"), DAILY_POSTING_INTEREST_RATE, interestDays);
+            final BigDecimal expected = new BigDecimal("100").add(interest);
+
+            assertAvailableBalance(this.savingsAccountHelper.getSavingsSummary(savingsId), expected);
+        });
     }
 
     @Test
     public void testRunningBalanceAfterDepositReversalWithBackdateConfigurationOn() {
-        this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
-        this.savingsProductHelper = new SavingsProductHelper();
-        this.scheduleJobHelper = new SchedulerJobHelper(requestSpec);
-        configurationForBackdatedTransaction();
-        LocalDate transactionDate = Utils.getLocalDateOfTenant().minusDays(5);
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
-        String startDate = formatter.format(transactionDate);
-        String secondTrx = formatter.format(transactionDate.plusDays(1));
-        final String jobName = "Post Interest For Savings";
-        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
-        Assertions.assertNotNull(clientID);
+        // Withdraw 100, post interest, deposit 200, reverse deposit → -100 with full-period OD interest.
+        BusinessDateHelper.runAt(BACKDATE_BALANCE_BUSINESS_DATE_STRING, () -> {
+            this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
+            this.savingsProductHelper = new SavingsProductHelper();
+            this.scheduleJobHelper = new SchedulerJobHelper(requestSpec);
+            configurationForBackdatedTransaction();
 
-        final Integer savingsId = createSavingsAccountDailyPostingOverdraft(clientID, startDate);
-        this.savingsAccountHelper.withdrawalFromSavingsAccount(savingsId, "100", startDate, CommonConstants.RESPONSE_RESOURCE_ID);
-        this.scheduleJobHelper.executeAndAwaitJob(jobName);
-        Integer depositToReverse = (Integer) this.savingsAccountHelper.depositToSavingsAccount(savingsId, "200", secondTrx,
-                CommonConstants.RESPONSE_RESOURCE_ID);
-        this.savingsAccountHelper.reverseSavingsAccountTransaction(savingsId, depositToReverse);
+            final LocalDate startLocalDate = BACKDATE_BALANCE_BUSINESS_DATE.minusDays(5);
+            final LocalDate secondLocalDate = startLocalDate.plusDays(1);
+            final String startDate = Utils.dateFormatter.format(startLocalDate);
+            final String secondTrx = Utils.dateFormatter.format(secondLocalDate);
+            final String jobName = "Post Interest For Savings";
 
-        HashMap<String, Object> summaryObj = this.savingsAccountHelper.getSavingsSummary(savingsId);
-        assertEquals("-100.137", summaryObj.get("availableBalance").toString(), "Equality check for Balance");
+            final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, startDate);
+            Assertions.assertNotNull(clientID);
+
+            final Integer savingsId = createSavingsAccountDailyPostingOverdraft(clientID, startDate);
+            this.savingsAccountHelper.withdrawalFromSavingsAccount(savingsId, "100", startDate, CommonConstants.RESPONSE_RESOURCE_ID);
+            this.scheduleJobHelper.executeAndAwaitJob(jobName);
+            Integer depositToReverse = (Integer) this.savingsAccountHelper.depositToSavingsAccount(savingsId, "200", secondTrx,
+                    CommonConstants.RESPONSE_RESOURCE_ID);
+            this.savingsAccountHelper.reverseSavingsAccountTransaction(savingsId, depositToReverse);
+
+            final long interestDays = ChronoUnit.DAYS.between(startLocalDate, BACKDATE_BALANCE_BUSINESS_DATE);
+            final BigDecimal interest = calcDailyInterest(new BigDecimal("100"), DAILY_POSTING_INTEREST_RATE, interestDays);
+            final BigDecimal expected = new BigDecimal("-100").subtract(interest);
+
+            assertAvailableBalance(this.savingsAccountHelper.getSavingsSummary(savingsId), expected);
+        });
     }
 
     @Test
@@ -3643,6 +3693,28 @@ public class ClientSavingsIntegrationTest {
                 .withInterestPostingPeriodTypeAsDaily().withInterestCalculationPeriodTypeAsDailyBalance()
                 .withOverDraftRate(overDraftLimit, nominalAnnualInterestRateOverdraft).build();
         return SavingsProductHelper.createSavingsProduct(savingsProductJSON, requestSpec, responseSpec);
+    }
+
+    /**
+     * Simple daily interest for the daily-posting overdraft product used by the backdate balance tests (365-day year,
+     * 4 decimal currency places, HALF_EVEN). Matches the historical hardcoded expectations such as 0.0822 (3 days) and
+     * 0.137 (5 days) on principal 100 at 10%.
+     */
+    private static BigDecimal calcDailyInterest(final BigDecimal principal, final BigDecimal annualRatePercent, final long days) {
+        if (days <= 0) {
+            return BigDecimal.ZERO.setScale(SAVINGS_CURRENCY_DECIMALS, RoundingMode.HALF_EVEN);
+        }
+        final BigDecimal rate = annualRatePercent.divide(new BigDecimal("100"), MathContext.DECIMAL64);
+        final BigDecimal dayFactor = BigDecimal.ONE.divide(DAYS_IN_YEAR, MathContext.DECIMAL64);
+        final BigDecimal dailyRate = rate.multiply(dayFactor, MathContext.DECIMAL64);
+        final BigDecimal periodRate = dailyRate.multiply(BigDecimal.valueOf(days), MathContext.DECIMAL64);
+        return principal.multiply(periodRate, MathContext.DECIMAL64).setScale(SAVINGS_CURRENCY_DECIMALS, RoundingMode.HALF_EVEN);
+    }
+
+    private static void assertAvailableBalance(final HashMap<String, Object> summary, final BigDecimal expected) {
+        final BigDecimal actual = new BigDecimal(summary.get("availableBalance").toString());
+        assertEquals(0, expected.compareTo(actual),
+                "Equality check for Balance, expected=" + expected.toPlainString() + " actual=" + actual.toPlainString());
     }
 
     public void configurationForBackdatedTransaction() {
