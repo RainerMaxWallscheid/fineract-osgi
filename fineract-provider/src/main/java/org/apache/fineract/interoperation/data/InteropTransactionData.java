@@ -21,7 +21,6 @@ package org.apache.fineract.interoperation.data;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
@@ -29,7 +28,13 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccountChargePaidBy;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
 
-public class InteropTransactionData extends CommandProcessingResult {
+/**
+ * Single savings transaction view for interop. Composes a resource id instead of
+ * extending {@code CommandProcessingResult}.
+ */
+public final class InteropTransactionData {
+
+    private final Long resourceId;
     @NotNull
     private final String accountId;
     @NotNull
@@ -49,8 +54,10 @@ public class InteropTransactionData extends CommandProcessingResult {
     private final LocalDate valueDateTime;
     private String note;
 
-    public InteropTransactionData(Long entityId, String accountId, String transactionId, SavingsAccountTransactionType transactionType, BigDecimal amount, BigDecimal chargeAmount, String currency, BigDecimal accountBalance, LocalDate bookingDateTime, LocalDate valueDateTime, String note) {
-        super(entityId);
+    public InteropTransactionData(Long resourceId, String accountId, String transactionId, SavingsAccountTransactionType transactionType,
+            BigDecimal amount, BigDecimal chargeAmount, String currency, BigDecimal accountBalance, LocalDate bookingDateTime,
+            LocalDate valueDateTime, String note) {
+        this.resourceId = resourceId;
         this.accountId = accountId;
         this.savingTransactionId = transactionId;
         this.transactionType = transactionType;
@@ -82,60 +89,55 @@ public class InteropTransactionData extends CommandProcessingResult {
         LocalDate valueDateTime = endOfBalanceLocalDate == null ? bookingDateTime : endOfBalanceLocalDate;
         StringBuilder sb = new StringBuilder();
         sb.append(SavingsEnumerations.transactionType(transactionType).getValue());
-        return new InteropTransactionData(savingsAccount.getId(), savingsAccount.getExternalId().getValue(), transactionId, transactionType, amount, chargeAmount, currency, runningBalance, bookingDateTime, valueDateTime, sb.toString());
+        return new InteropTransactionData(savingsAccount.getId(), savingsAccount.getExternalId().getValue(), transactionId, transactionType,
+                amount, chargeAmount, currency, runningBalance, bookingDateTime, valueDateTime, sb.toString());
     }
 
     public void updateNote(String note) {
         this.note = note;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public String getAccountId() {
-        return this.accountId;
+    public Long getResourceId() {
+        return resourceId;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public String getSavingTransactionId() {
-        return this.savingTransactionId;
+    public String getAccountId() {
+        return accountId;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public SavingsAccountTransactionType getTransactionType() {
-        return this.transactionType;
+    public String getSavingTransactionId() {
+        return savingTransactionId;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public BigDecimal getAmount() {
-        return this.amount;
+    public SavingsAccountTransactionType getTransactionType() {
+        return transactionType;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public BigDecimal getChargeAmount() {
-        return this.chargeAmount;
+    public BigDecimal getAmount() {
+        return amount;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public String getCurrency() {
-        return this.currency;
+    public BigDecimal getChargeAmount() {
+        return chargeAmount;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public BigDecimal getAccountBalance() {
-        return this.accountBalance;
+    public String getCurrency() {
+        return currency;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public LocalDate getBookingDateTime() {
-        return this.bookingDateTime;
+    public BigDecimal getAccountBalance() {
+        return accountBalance;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public LocalDate getValueDateTime() {
-        return this.valueDateTime;
+    public LocalDate getBookingDateTime() {
+        return bookingDateTime;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public String getNote() {
-        return this.note;
+    public LocalDate getValueDateTime() {
+        return valueDateTime;
+    }
+
+    public String getNote() {
+        return note;
     }
 }

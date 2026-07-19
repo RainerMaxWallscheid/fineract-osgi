@@ -23,18 +23,22 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 
-public class InteropIdentifierAccountResponseData extends CommandProcessingResult {
+/**
+ * Identifier→account response returned from the command pipeline — must remain a
+ * {@link CommandProcessingResult}. Domain payload is composed as flat fields.
+ */
+public final class InteropIdentifierAccountResponseData extends CommandProcessingResult {
 
     @NotEmpty
     private String accountId;
 
-    protected InteropIdentifierAccountResponseData(Long resourceId, Long officeId, Long commandId, Map<String, Object> changesOnly,
+    private InteropIdentifierAccountResponseData(Long resourceId, Long officeId, Long commandId, Map<String, Object> changesOnly,
             @NotNull String accountId) {
         super(resourceId, officeId, commandId, changesOnly);
         this.accountId = accountId;
     }
 
-    protected static InteropIdentifierAccountResponseData build(Long resourceId, Long officeId, Long commandId,
+    private static InteropIdentifierAccountResponseData build(Long resourceId, Long officeId, Long commandId,
             Map<String, Object> changesOnly, @NotNull String accountId) {
         return new InteropIdentifierAccountResponseData(resourceId, officeId, commandId, changesOnly, accountId);
     }
@@ -52,7 +56,7 @@ public class InteropIdentifierAccountResponseData extends CommandProcessingResul
         return accountId;
     }
 
-    protected void setAccountId(String accountId) {
+    void setAccountId(String accountId) {
         this.accountId = accountId;
     }
 }

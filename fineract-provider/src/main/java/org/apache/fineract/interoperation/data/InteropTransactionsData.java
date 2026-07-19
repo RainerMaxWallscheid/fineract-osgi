@@ -22,16 +22,21 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 
-public class InteropTransactionsData extends CommandProcessingResult {
-    List<InteropTransactionData> transactions;
+/**
+ * Account transactions response. Composes a resource id instead of extending
+ * {@code CommandProcessingResult}.
+ */
+public final class InteropTransactionsData {
 
-    public InteropTransactionsData(Long entityId, List<InteropTransactionData> transactions) {
-        super(entityId);
+    private final Long resourceId;
+    private List<InteropTransactionData> transactions;
+
+    public InteropTransactionsData(Long resourceId, List<InteropTransactionData> transactions) {
+        this.resourceId = resourceId;
         this.transactions = transactions;
     }
 
@@ -46,13 +51,15 @@ public class InteropTransactionsData extends CommandProcessingResult {
         return new InteropTransactionsData(account.getId(), trans);
     }
 
-    @java.lang.SuppressWarnings("all")
-        public List<InteropTransactionData> getTransactions() {
-        return this.transactions;
+    public Long getResourceId() {
+        return resourceId;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public void setTransactions(final List<InteropTransactionData> transactions) {
+    public List<InteropTransactionData> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(final List<InteropTransactionData> transactions) {
         this.transactions = transactions;
     }
 }

@@ -76,7 +76,8 @@ import org.springframework.stereotype.Component;
 public class InteropApiResource {
     private final PlatformSecurityContext context;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
-    private final DefaultToApiJsonSerializer<CommandProcessingResult> jsonSerializer;
+    // Object: interop GET DTOs no longer all extend CommandProcessingResult (composition).
+    private final DefaultToApiJsonSerializer<Object> jsonSerializer;
     private final InteropService interopService;
     private final PortfolioCommandSourceWritePlatformService commandsSourceService;
 
@@ -314,7 +315,7 @@ public class InteropApiResource {
     }
 
     @java.lang.SuppressWarnings("all")
-        public InteropApiResource(final PlatformSecurityContext context, final ApiRequestParameterHelper apiRequestParameterHelper, final DefaultToApiJsonSerializer<CommandProcessingResult> jsonSerializer, final InteropService interopService, final PortfolioCommandSourceWritePlatformService commandsSourceService) {
+        public InteropApiResource(final PlatformSecurityContext context, final ApiRequestParameterHelper apiRequestParameterHelper, final DefaultToApiJsonSerializer<Object> jsonSerializer, final InteropService interopService, final PortfolioCommandSourceWritePlatformService commandsSourceService) {
         this.context = context;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.jsonSerializer = jsonSerializer;

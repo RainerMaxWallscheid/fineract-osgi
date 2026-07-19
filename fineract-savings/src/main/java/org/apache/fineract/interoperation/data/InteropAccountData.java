@@ -24,7 +24,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.interoperation.domain.InteropIdentifier;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
@@ -33,7 +32,17 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccountStatusType;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountSubStatusEnum;
 import org.apache.fineract.portfolio.savings.domain.SavingsProduct;
 
-public class InteropAccountData extends CommandProcessingResult {
+/**
+ * Interop savings account details. Composes command-result identifiers instead of
+ * extending {@code CommandProcessingResult}.
+ */
+public final class InteropAccountData {
+
+    private final Long resourceId;
+    private final Long officeId;
+    private final Long commandId;
+    private final Map<String, Object> changes;
+    private final Long clientId;
 
     @NotNull
     private final String accountId;
@@ -52,12 +61,8 @@ public class InteropAccountData extends CommandProcessingResult {
     @NotNull
     private final SavingsAccountStatusType status;
     private final SavingsAccountSubStatusEnum subStatus;
-
-    private final AccountType accountType; // differentiate Individual, JLG or
-                                           // Group account
-    private final DepositAccountType depositType; // differentiate deposit
-                                                  // accounts Savings, FD and RD
-                                                  // accounts
+    private final AccountType accountType;
+    private final DepositAccountType depositType;
     @NotNull
     private final LocalDate activatedOn;
     private final LocalDate statusUpdateOn;
@@ -71,7 +76,11 @@ public class InteropAccountData extends CommandProcessingResult {
             SavingsAccountStatusType status, SavingsAccountSubStatusEnum subStatus, AccountType accountType, DepositAccountType depositType,
             LocalDate activatedOn, LocalDate statusUpdateOn, LocalDate withdrawnOn, LocalDate balanceOn,
             List<InteropIdentifierData> identifiers, long clientId) {
-        super(resourceId, officeId, commandId, changesOnly, clientId);
+        this.resourceId = resourceId;
+        this.officeId = officeId;
+        this.commandId = commandId;
+        this.changes = changesOnly;
+        this.clientId = clientId;
         this.accountId = accountId;
         this.savingProductId = productId;
         this.productName = productName;
@@ -138,5 +147,89 @@ public class InteropAccountData extends CommandProcessingResult {
             return account.getSubmittedOnDate();
         }
         return null;
+    }
+
+    public Long getResourceId() {
+        return resourceId;
+    }
+
+    public Long getOfficeId() {
+        return officeId;
+    }
+
+    public Long getCommandId() {
+        return commandId;
+    }
+
+    public Map<String, Object> getChanges() {
+        return changes;
+    }
+
+    public Long getClientId() {
+        return clientId;
+    }
+
+    public String getAccountId() {
+        return accountId;
+    }
+
+    public String getSavingProductId() {
+        return savingProductId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public String getShortProductName() {
+        return shortProductName;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public BigDecimal getAccountBalance() {
+        return accountBalance;
+    }
+
+    public BigDecimal getAvailableBalance() {
+        return availableBalance;
+    }
+
+    public SavingsAccountStatusType getStatus() {
+        return status;
+    }
+
+    public SavingsAccountSubStatusEnum getSubStatus() {
+        return subStatus;
+    }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public DepositAccountType getDepositType() {
+        return depositType;
+    }
+
+    public LocalDate getActivatedOn() {
+        return activatedOn;
+    }
+
+    public LocalDate getStatusUpdateOn() {
+        return statusUpdateOn;
+    }
+
+    public LocalDate getWithdrawnOn() {
+        return withdrawnOn;
+    }
+
+    public LocalDate getBalanceOn() {
+        return balanceOn;
+    }
+
+    public List<InteropIdentifierData> getIdentifiers() {
+        return identifiers;
     }
 }

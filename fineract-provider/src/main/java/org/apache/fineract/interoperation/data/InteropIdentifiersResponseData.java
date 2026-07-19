@@ -22,22 +22,33 @@ import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.interoperation.domain.InteropIdentifier;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 
-public class InteropIdentifiersResponseData extends CommandProcessingResult {
+/**
+ * Account identifiers list response. Composes command-result identifiers instead of
+ * extending {@code CommandProcessingResult}.
+ */
+public final class InteropIdentifiersResponseData {
+
+    private final Long resourceId;
+    private final Long officeId;
+    private final Long commandId;
+    private final Map<String, Object> changes;
 
     @NotNull
-    private List<InteropIdentifierData> identifiers;
+    private final List<InteropIdentifierData> identifiers;
 
-    protected InteropIdentifiersResponseData(Long resourceId, Long officeId, Long commandId, Map<String, Object> changesOnly,
+    private InteropIdentifiersResponseData(Long resourceId, Long officeId, Long commandId, Map<String, Object> changesOnly,
             @NotNull List<InteropIdentifierData> identifiers) {
-        super(resourceId, officeId, commandId, changesOnly);
+        this.resourceId = resourceId;
+        this.officeId = officeId;
+        this.commandId = commandId;
+        this.changes = changesOnly;
         this.identifiers = identifiers;
     }
 
-    protected InteropIdentifiersResponseData(@NotNull List<InteropIdentifierData> identifiers) {
+    private InteropIdentifiersResponseData(@NotNull List<InteropIdentifierData> identifiers) {
         this(null, null, null, null, identifiers);
     }
 
@@ -49,5 +60,26 @@ public class InteropIdentifiersResponseData extends CommandProcessingResult {
             }
         }
         return new InteropIdentifiersResponseData(result);
+    }
+
+    public Long getResourceId() {
+        return resourceId;
+    }
+
+    public Long getOfficeId() {
+        return officeId;
+    }
+
+    public Long getCommandId() {
+        return commandId;
+    }
+
+    public Map<String, Object> getChanges() {
+        return changes;
+    }
+
+    @NotNull
+    public List<InteropIdentifierData> getIdentifiers() {
+        return identifiers;
     }
 }

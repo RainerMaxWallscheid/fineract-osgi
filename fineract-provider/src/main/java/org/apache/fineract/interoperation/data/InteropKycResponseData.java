@@ -19,28 +19,35 @@
 package org.apache.fineract.interoperation.data;
 
 import java.util.Map;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 
-public class InteropKycResponseData extends CommandProcessingResult {
+/**
+ * KYC response. Composes command-result identifiers instead of extending
+ * {@code CommandProcessingResult}.
+ */
+public final class InteropKycResponseData {
+
+    private final Long resourceId;
+    private final Long officeId;
+    private final Long commandId;
+    private final Map<String, Object> changes;
 
     private String nationality;
     private String dateOfBirth;
     private String contactPhone;
     private String gender;
-
     private IdDocument[] idDocument;
-
     private PostalAddress postalAddress;
-
     private SubjectName subjectName;
-
     private String emailAddress;
     private String birthCountry;
 
     public InteropKycResponseData(Long resourceId, Long officeId, Long commandId, Map<String, Object> changesOnly, String nationality,
             String dateOfBirth, String contactPhone, String gender, IdDocument[] idDocument, PostalAddress postalAddress,
             SubjectName subjectName, String emailAddress, String birthCountry) {
-        super(resourceId, officeId, commandId, changesOnly);
+        this.resourceId = resourceId;
+        this.officeId = officeId;
+        this.commandId = commandId;
+        this.changes = changesOnly;
         this.nationality = nationality;
         this.dateOfBirth = dateOfBirth;
         this.contactPhone = contactPhone;
@@ -59,7 +66,6 @@ public class InteropKycResponseData extends CommandProcessingResult {
     }
 
     public static InteropKycResponseData build(InteropKycData accountKyc) {
-
         PostalAddress postalAddress = new PostalAddress(accountKyc.getAddressLine1(), accountKyc.getAddressLine2(), accountKyc.getCity(),
                 accountKyc.getStateProvince(), accountKyc.getPostalCode(), accountKyc.getCountry());
         IdDocument idDocument = new IdDocument(accountKyc.getIdType(), accountKyc.getIdNo(), accountKyc.getCountry(),
@@ -70,6 +76,22 @@ public class InteropKycResponseData extends CommandProcessingResult {
         return new InteropKycResponseData(accountKyc.getNationality(), accountKyc.getDateOfBirth(), accountKyc.getContactPhone(),
                 accountKyc.getGender(), new IdDocument[] { idDocument }, postalAddress, subjectName, accountKyc.getEmail(),
                 accountKyc.getCountry());
+    }
+
+    public Long getResourceId() {
+        return resourceId;
+    }
+
+    public Long getOfficeId() {
+        return officeId;
+    }
+
+    public Long getCommandId() {
+        return commandId;
+    }
+
+    public Map<String, Object> getChanges() {
+        return changes;
     }
 
     public String getNationality() {
@@ -143,5 +165,4 @@ public class InteropKycResponseData extends CommandProcessingResult {
     public void setBirthCountry(String birthCountry) {
         this.birthCountry = birthCountry;
     }
-
 }
