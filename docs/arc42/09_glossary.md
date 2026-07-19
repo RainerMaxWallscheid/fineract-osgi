@@ -21,6 +21,7 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 |---------|:---:|------------|
 | **Actuator** | T | Spring-Boot-Endpunkte für Health, Metrics u. a. (`/fineract-provider/actuator/...`). Genutzt für K8s-Probes. → [05](05_deployment_view.md) |
 | **ADR** | A | *Architecture Decision Record* – dokumentierte Designentscheidung (Kapitel 8, ADR-light). → [08](08_design_decisions.md) |
+| **Aggregate** | A/T | DDD: Konsistenzgrenze und Write-Einheit (Root + zugehörige Entities). → [ADR-019](decisions/ADR-019-domain-driven-design.md) |
 | **All-in-One** | B | Deployment-Topologie, in der Read, Write, Batch-Manager und Worker in **einem** Prozess aktiv sind. → [05](05_deployment_view.md) |
 | **AppUser** | F/T | Authentifizierter Back-Office-Benutzer in Fineract; Berechtigungen über Rollen/Permissions. |
 | **arc42** | A | Vorlage zur Architekturdokumentation (Kontext, Bausteine, Runtime, Deployment, Qualität, ADRs, …). |
@@ -140,8 +141,6 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **Spring Boot** | T | Application-Framework des Fineract-Kerns; bleibt laut ADR-003 erhalten. → [08](08_design_decisions.md) |
 | **Spring Events** | T | In-Process-Events; Default für lokale Job-Verteilung ohne Broker. |
 | **SynchronousCommandProcessingService** | T | Zentrale Legacy-Komponente zur synchronen Command-Ausführung. |
-| **Tenant** |
- F | Logisches Institut/Mandant mit eigener Fachdatenbank und Konfiguration. |
 
 ---
 
@@ -149,10 +148,12 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 
 | Begriff | Tag | Definition |
 |---------|:---:|------------|
+| **Tenant** | F | Logisches Institut/Mandant mit eigener Fachdatenbank und Konfiguration. |
 | **Tenant Context** | T | Thread-/Request-gebundene Mandanteninformation (ID, DS, Timezone, User, Business Date). |
 | **ThreadLocalContext** | T | Halter des Tenant-/Request-Contexts; muss nach Request/Job geleert werden. → [06](06_crosscutting_concepts.md) |
 | **Trust Boundary** | A | Grenze zwischen vertrauenswürdig und nicht vertrauenswürdig (primär HTTPS-API). → [`SECURITY.md`](../../SECURITY.md) |
 | **Two-Factor (2FA)** | T | Zweite Authentisierungsstufe (OTP etc.) zusätzlich zu Passwort/OIDC. |
+| **Ubiquitous Language** | A | Gemeinsame Fachsprache in Code, API, Gherkin und Doku. → [ADR-019](decisions/ADR-019-domain-driven-design.md) |
 | **Write Node** | B | Instanz mit `write-enabled` für CQRS-Commands. |
 | **xAI Grok API** | T | Externe KI-Inferenz-API; Referenz-Integration für Scoring/Analyse-Bundles. → [06](06_crosscutting_concepts.md), [08](08_design_decisions.md) |
 
