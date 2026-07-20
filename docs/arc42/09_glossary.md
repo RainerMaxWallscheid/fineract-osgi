@@ -11,7 +11,7 @@ Begriffsverzeichnis für die arc42-Dokumentation von **fineract-osgi**. Einträg
 | *F* | Fachlichkeit Core Banking |
 | *T* | Technik / Framework |
 
-Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
+Verweise auf Kapitel: [01](01_introduction.md)–[10](10_domain_context_map.md).
 
 ---
 
@@ -31,7 +31,8 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **Batch Worker** | B | Node-Rolle, die Job-Partitionen ausführt (`batch-worker-enabled`). Horizontal skalierbar. → [05](05_deployment_view.md) |
 | **Bundle (OSGi)** | T | Installierbare OSGi-Einheit (JAR) mit Manifest, Lifecycle und optionalen Services. → [04](04_runtime_view.md), [05](05_deployment_view.md) |
 | **Business Date** | F | Fachliches Geschäftstag-Datum eines Tenants; steuert u. a. Buchungslogik und COB. Filter: `BusinessDateFilter`. |
-| **Bounded Context** | A | DDD: explizite Grenze eines Fachmodells (oft ein Domain-Modul). → [ADR-019](decisions/ADR-019-domain-driven-design.md) |
+| **Bounded Context** | A | DDD: explizite Grenze eines Fachmodells (oft ein Domain-Modul). → [ADR-019](decisions/ADR-019-domain-driven-design.md), [10 Context Map](10_domain_context_map.md) |
+| **Anti-Corruption Layer (ACL)** | A | DDD: Übersetzungsschicht, die fremde/externe Modelle vom eigenen Bounded Context abschirmt (z. B. Interop, KI, Legacy-JSON). → [10](10_domain_context_map.md) |
 | **Boy Scout Rule** | A | Hinterlasse angefassten Code etwas sauberer als vorgefunden (im PR-Scope). → [ADR-018](decisions/ADR-018-clean-code.md) |
 | **Business Event** | T | Domänenereignis nach fachlicher Änderung (z. B. Loan created); intern oder als External Event. → [06](06_crosscutting_concepts.md) |
 | **Business Step** | F/T | Einzelner Schritt in einer COB-/Job-Pipeline (z. B. Accrual, Penalty). |
@@ -42,7 +43,11 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **Command Handler** | T | Führt die fachliche Write-Logik für einen Command-Typ aus (`NewCommandSourceHandler` bzw. `CommandHandler<REQ,RES>`). |
 | **Command Hook** | T | Vor-/Nach-/Fehler-Callback um die Command-Ausführung (z. B. Username, Timestamp). |
 | **Compatibility** | A | Qualitätsziel: stabile REST-Verträge trotz interner Migration. → [07](07_quality_attributes.md) |
+| **Conformist (CF)** | A | DDD Context-Map: Downstream übernimmt das Upstream-Modell weitgehend unverändert. → [10](10_domain_context_map.md) |
+| **Context Map** | A | DDD: Karte der Bounded Contexts und ihrer Integrationsbeziehungen (U/D, OHS, ACL, …). → [10](10_domain_context_map.md) |
+| **Core Domain** | A | DDD: strategisch differenzierender Teil der Domäne (hier v. a. Loan Servicing, Savings). → [10](10_domain_context_map.md) |
 | **Correlation-ID** | B/T | Request-übergreifende Trace-ID (Header z. B. `X-Correlation-ID`) für Logs und Support. → [06](06_crosscutting_concepts.md) |
+| **Customer/Supplier (C/S)** | A | DDD Context-Map: Downstream ist Kunde des Upstream (explizite Lieferbeziehung). → [10](10_domain_context_map.md) |
 | **Clean Code** | A | Praktiken für lesbaren, testbaren, wartbaren Code (Namen, kleine Einheiten, Boy Scout, SOLID-Orientierung). → [ADR-018](decisions/ADR-018-clean-code.md) |
 | **CQRS** | A/T | *Command Query Responsibility Segregation* – Trennung von Schreib- und Lesepfaden. → [06](06_crosscutting_concepts.md), [08](08_design_decisions.md) |
 
@@ -82,6 +87,7 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 
 | Begriff | Tag | Definition |
 |---------|:---:|------------|
+| **Generic Subdomain** | A | DDD: austauschbare/standardisierbare Domäne (IAM, Documents, Validation, …). → [10](10_domain_context_map.md) |
 | **Gherkin** | A | BDD-Notation (Given/When/Then); Anforderungsartefakte unter [`docs/gherkin/`](../gherkin/README.md), getaggt mit `@arc42-*` / `@adr-*` / `@quality-Q-*`. → [08](08_design_decisions.md) |
 | **HikariCP** | T | JDBC-Connection-Pool von Fineract; Konfiguration über `FINERACT_HIKARI_*`. |
 | **Hook** | T | Konfigurierbare Integration/Webhook auf Business Events; auch Command Hooks im neuen Stack. |
@@ -113,6 +119,7 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **Node ID** | B | `FINERACT_NODE_ID` – eindeutige Kennung einer Instanz im Cluster. |
 | **Observability** | B | Fähigkeit, Zustand über Logs, Metrics und Traces zu erkennen. → [06](06_crosscutting_concepts.md), [07](07_quality_attributes.md) |
 | **OIDC** | T | *OpenID Connect* – Authentisierungsprotokoll auf OAuth2; in Fineract tenant-fähig konfigurierbar. |
+| **Open Host Service (OHS)** | A | DDD Context-Map: Upstream bietet eine stabile API/Events für mehrere Downstream-Konsumenten. → [10](10_domain_context_map.md) |
 | **OpenAPI** | T | Spezifikation der REST-API; Basis für `fineract-client` und Vertragstests. |
 | **Operability** | A | Qualitätsziel: Betreibbarkeit, Diagnose, Deploy. → [07](07_quality_attributes.md) |
 | **OSGi** | T | *Open Services Gateway initiative* – Modularitäts- und Service-Framework-Standard. → [08](08_design_decisions.md) |
@@ -131,6 +138,7 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **Policy Gate** | A | Synchrone Entscheidungsstelle (z. B. KI-Score) vor Fortsetzung eines Commands. → [04](04_runtime_view.md) |
 | **Port (Hexagon)** | A | Fachliche Schnittstelle zwischen Application/Domain und Adapter (nicht TCP-Port). → [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **PostgreSQL** | B | Primäre Zieldatenbank in der fineract-osgi-Referenzarchitektur. → [08](08_design_decisions.md) |
+| **Published Language (PL)** | A | DDD: gemeinsames Integrationsvokabular zwischen Contexts (Events, Commands, DTOs/Avro). → [10](10_domain_context_map.md) |
 | **Quality Scenario** | A | Messbares Qualitätsszenario (Stimulus, Umgebung, Response, Maß). → [07](07_quality_attributes.md) |
 | **Read Node** | B | Instanz mit `read-enabled` (und typisch ohne Write/Batch), für Queries/Reports. |
 | **Remote Job Message Handler** | T | Mechanismus zur Verteilung von Job-Arbeit (Spring Events, JMS oder Kafka). |
@@ -140,8 +148,10 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **SACCO** | F | *Savings and Credit Cooperative* – typische Nutzergruppe im Microfinance-Kontext. → [02](02_context_and_scope.md) |
 | **Service Tracker** | T | OSGi-Hilfe zum Verfolgen von Service-Verfügbarkeit (bind/unbind). |
 | **SLO** | B | *Service Level Objective* – angestrebte Betriebszielgröße (Latenz, Verfügbarkeit). → [07](07_quality_attributes.md) |
+| **Shared Kernel (SK)** | A | DDD: eng begrenzte, gemeinsam genutzte Modellteile (Money, Tenant, IDs) – bewusst klein halten. → [10](10_domain_context_map.md), [ADR-019](decisions/ADR-019-domain-driven-design.md) |
 | **Spring Boot** | T | Application-Framework des Fineract-Kerns; bleibt laut ADR-003 erhalten. → [08](08_design_decisions.md) |
 | **Spring Events** | T | In-Process-Events; Default für lokale Job-Verteilung ohne Broker. |
+| **Supporting Subdomain** | A | DDD: nötig für den Betrieb, aber nicht der strategische Kern (Client, Accounting, Products, COB, …). → [10](10_domain_context_map.md) |
 | **SynchronousCommandProcessingService** | T | Zentrale Legacy-Komponente zur synchronen Command-Ausführung. |
 
 ---
@@ -156,6 +166,7 @@ Verweise auf Kapitel: [01](01_introduction.md)–[08](08_design_decisions.md).
 | **Trust Boundary** | A | Grenze zwischen vertrauenswürdig und nicht vertrauenswürdig (primär HTTPS-API). → [`SECURITY.md`](../../SECURITY.md) |
 | **Two-Factor (2FA)** | T | Zweite Authentisierungsstufe (OTP etc.) zusätzlich zu Passwort/OIDC. |
 | **Ubiquitous Language** | A | Gemeinsame Fachsprache in Code, API, Gherkin und Doku. → [ADR-019](decisions/ADR-019-domain-driven-design.md) |
+| **Upstream / Downstream (U/D)** | A | DDD Context-Map: Downstream hängt vom Modell/API des Upstream ab. → [10](10_domain_context_map.md) |
 | **Write Node** | B | Instanz mit `write-enabled` für CQRS-Commands. |
 | **xAI Grok API** | T | Externe KI-Inferenz-API; Referenz-Integration für Scoring/Analyse-Bundles. → [06](06_crosscutting_concepts.md), [08](08_design_decisions.md) |
 

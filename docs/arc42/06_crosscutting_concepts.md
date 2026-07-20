@@ -596,9 +596,9 @@ Core Banking braucht **klare Fachmodelle und Context-Grenzen** – nicht nur tec
 
 | Konzept | Umsetzung |
 |---------|-----------|
-| **Bounded Context** | Domain-Gradle-Module (Loan, Savings, Accounting, Client, …) |
+| **Bounded Context** | Domain-Gradle-Module (Loan, Savings, Accounting, Client, …); kanonische Liste → [10](10_domain_context_map.md) |
 | **Ubiquitous Language** | Code, Commands, Gherkin, arc42 dieselbe Fachsprache |
-| **Context Map** | Integration über Commands, Events, IDs, GL-Mappings – nicht freies Entity-Sharing |
+| **Context Map** | [10 Domain Context Map](10_domain_context_map.md) – Integration über Commands, Events, IDs, GL-Mappings – nicht freies Entity-Sharing |
 | **Anti-Corruption Layer** | Interop/KI/Import/Legacy-JSON → typsichere Application-Modelle |
 
 ### Taktisch
@@ -762,7 +762,7 @@ sequenceDiagram
 - Cache-/Idempotency-Store-Entscheidung (DB only vs. Redis)
 - Weitere DTO-Hierarchien auf Composition migrieren (Loan/Savings-Product wo sinnvoll); ggf. generierte OpenAPI-Modelle angleichen
 - Hexagon E3: Ports an Persistenz-/Event-/KI-Hotspots extrahieren; Dependency-Rule in Reviews/ArchUnit
-- DDD D3: Aggregatgrenzen Loan/Savings/Accounting schärfen; Context-Map für Interop/KI dokumentieren
+- DDD D3: Aggregatgrenzen Loan/Savings/Accounting schärfen; D4: ACL Interop/KI standardisieren (Context Map: [10](10_domain_context_map.md), D1 erledigt)
 - Event Sourcing ES0/ES1: Event-Store-Port, Metamodell, Greenfield-Pflicht; Pilot-Aggregat (ES2)
 
 ---

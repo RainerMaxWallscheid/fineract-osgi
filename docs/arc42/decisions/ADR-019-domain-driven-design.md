@@ -28,9 +28,11 @@ Ohne DDD-Vokabular bleiben Aggregatgrenzen, Ubiquitous Language und Context-Maps
 |---------|----------------|
 | **Bounded Context** | Gradle-/Domain-Module und klare API-Oberflächen: Loan, Savings/Deposit, Accounting, Client/Organisation, COB, Security/Tenant, Command |
 | **Ubiquitous Language** | Fachbegriffe in Code, Commands, Gherkin, arc42 (Loan Application, Disbursement, Journal Entry, Maturity, Tenant, …) |
-| **Context Map** | Integration über Commands, Domain/Business Events, Hooks, GL-Mappings, Account Associations – nicht über freies Entity-Sharing über Modulgrenzen |
+| **Context Map** | Kanonsich dokumentiert in [10 Domain Context Map](../10_domain_context_map.md); Integration über Commands, Domain/Business Events, Hooks, GL-Mappings, Account Associations – nicht über freies Entity-Sharing über Modulgrenzen |
 | **Anti-Corruption Layer** | Adapter zu externer KI, Payment/Interop, Import/Bulk, Legacy-JSON (`JsonCommand`) → typsichere Commands/DTOs |
 | **Shared Kernel (eng)** | `fineract-core` Infrastruktur + wenige echte Shared-Konzepte (Money/Currency, Office, Permissions) – bewusst klein halten |
+
+Ausführliche Context Map, Subdomain-Klassifikation und Migrationsreihenfolge: **[Kapitel 10 – Domain Context Map](../10_domain_context_map.md)** (D1).
 
 ```mermaid
 flowchart LR
@@ -84,10 +86,10 @@ flowchart LR
 
 | Stufe | Inhalt |
 |-------|--------|
-| **D1** | Vokabular + dieses ADR; Context-Map in Doku |
+| **D1** | Vokabular + dieses ADR; Context-Map in Doku → **[10 Domain Context Map](../10_domain_context_map.md)** |
 | **D2** | Neue Features mit klarem Aggregate/Command/Event |
 | **D3** | Aggregatgrenzen und Domain Services an Hotspots schärfen (Loan, Savings, Accounting) |
-| **D4** | Context-Map + ACL für Interop/KI/Import standardisieren |
+| **D4** | ACL für Interop/KI/Import standardisieren; Context Map fortlaufend schärfen |
 
 ### Alternativen
 
@@ -118,7 +120,7 @@ flowchart LR
 - [ADR-017](ADR-017-hexagonale-architektur.md) Hexagon  
 - [ADR-018](ADR-018-clean-code.md) Clean Code / Ubiquitous Language  
 - [ADR-020](ADR-020-event-sourcing-writes-pflicht.md) Event Sourcing für Writes (Pflicht)  
-- Building Blocks [03](../03_building_block_view.md) · Runtime [04](../04_runtime_view.md) · Crosscutting [06](../06_crosscutting_concepts.md)
+- Building Blocks [03](../03_building_block_view.md) · Domain Context Map [10](../10_domain_context_map.md) · Runtime [04](../04_runtime_view.md) · Crosscutting [06](../06_crosscutting_concepts.md)
 
 ---
 

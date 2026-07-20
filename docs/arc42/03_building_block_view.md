@@ -41,7 +41,7 @@ flowchart TB
 |----------|----------------|--------------------|
 | **API & Application Shell** | Boot, REST, Actuator, Verdrahtung | `fineract-provider`, optional `fineract-war` |
 | **Platform Infrastructure** | Tenant, Security, Commands, Config, Jobs-Infra | `fineract-core`, `fineract-security`, `fineract-command*`, `fineract-validation` |
-| **Domain Modules** | Fachlogik Portfolio & Accounting (**Bounded Contexts**, [ADR-019](decisions/ADR-019-domain-driven-design.md)) | `fineract-loan`, `fineract-savings`, … |
+| **Domain Modules** | Fachlogik Portfolio & Accounting (**Bounded Contexts**, [ADR-019](decisions/ADR-019-domain-driven-design.md), Context Map [10](10_domain_context_map.md)) | `fineract-loan`, `fineract-savings`, … |
 | **OSGi Runtime** | Dynamische Modularität | `osgi/`, Equinox, Feature-JARs |
 | **Integration Edge** | Events, Messaging, KI-Calls | Hooks, Kafka/JMS Producer, KI-Bundle |
 | **Persistence** | Tenants-Registry + Tenant-Fachdaten | PostgreSQL (primary) |
@@ -145,6 +145,8 @@ flowchart TB
 | **fineract-avro-schemas** | Schema-Definitionen für Events/Messaging |
 
 ### 3.2.3 Domain Modules
+
+Fachliche Bounded Contexts, Upstream/Downstream und Migrationsreihenfolge: **[10 Domain Context Map](10_domain_context_map.md)**. Gradle-Module sind die physische Abbildung – nicht 1:1 mit jedem Context identisch.
 
 | Modul | Fachverantwortung |
 |-------|-------------------|

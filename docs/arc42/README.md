@@ -15,6 +15,7 @@ Dieses Verzeichnis enthält die arc42-Dokumentation für **fineract-osgi** – A
 | 07 | [Quality Attributes](07_quality_attributes.md) | NFRs, Scenarios, Trade-offs |
 | 08 | [Design Decisions](08_design_decisions.md) | ADRs 001–020 in [`decisions/`](decisions/) |
 | 09 | [Glossary](09_glossary.md) | Begriffe, Abkürzungen, Ports, Env |
+| 10 | [Domain Context Map](10_domain_context_map.md) | Bounded Contexts, Subdomains, U/D-Map, Migrationsreihenfolge (DDD D1) |
 
 ## Ergänzende Artefakte
 
@@ -43,8 +44,9 @@ Vollständige Mapping-Tabelle: [`docs/gherkin/README.md`](../gherkin/README.md).
 
 - **Neu:** 01 → 02 → 03 → 09  
 - **Feature-Dev:** 03 → 04 → 06 → passendes Gherkin-Feature  
+- **Domain / DDD:** 10 → ADR-019 → ADR-020 → 03 (Module)  
 - **Ops:** 05 → 07 → 09 → `node_modes` / `close_of_business`  
-- **Architektur:** 07 → 08 → Quality-Tags in Gherkin  
+- **Architektur:** 07 → 08 → 10 → Quality-Tags in Gherkin  
 
 ## Konventionen
 
