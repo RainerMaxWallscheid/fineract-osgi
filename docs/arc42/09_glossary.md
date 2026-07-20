@@ -11,7 +11,7 @@ Begriffsverzeichnis für die arc42-Dokumentation von **fineract-osgi**. Einträg
 | *F* | Fachlichkeit Core Banking |
 | *T* | Technik / Framework |
 
-Verweise auf Kapitel: [01](01_introduction.md)–[10](10_domain_context_map.md).
+Verweise auf Kapitel: [01](01_introduction.md)–[13](13_archunit_bounded_context_rules.md).
 
 ---
 
@@ -21,7 +21,9 @@ Verweise auf Kapitel: [01](01_introduction.md)–[10](10_domain_context_map.md).
 |---------|:---:|------------|
 | **Actuator** | T | Spring-Boot-Endpunkte für Health, Metrics u. a. (`/fineract-provider/actuator/...`). Genutzt für K8s-Probes. → [05](05_deployment_view.md) |
 | **ADR** | A | *Architecture Decision Record* – dokumentierte Designentscheidung (Kapitel 8, ADR-light). → [08](08_design_decisions.md) |
-| **Aggregate** | A/T | DDD: Konsistenzgrenze und Write-Einheit (Root + zugehörige Entities). → [ADR-019](decisions/ADR-019-domain-driven-design.md) |
+| **Aggregate** | A/T | DDD: Konsistenzgrenze und Write-Einheit (Root + zugehörige Entities). → [ADR-019](decisions/ADR-019-domain-driven-design.md), Canvas [11](11_aggregate_canvas.md) |
+| **Aggregate Canvas** | A | Kompakte Beschreibung eines Aggregates: Root, Members, Invarianten, Commands, Events, Konflikte. → [11](11_aggregate_canvas.md) |
+| **ArchUnit** | T | Library für Architektur-/Dependency-Tests (z. B. Bounded-Context-Grenzen). → [13](13_archunit_bounded_context_rules.md) |
 | **All-in-One** | B | Deployment-Topologie, in der Read, Write, Batch-Manager und Worker in **einem** Prozess aktiv sind. → [05](05_deployment_view.md) |
 | **AppUser** | F/T | Authentifizierter Back-Office-Benutzer in Fineract; Berechtigungen über Rollen/Permissions. |
 | **arc42** | A | Vorlage zur Architekturdokumentation (Kontext, Bausteine, Runtime, Deployment, Qualität, ADRs, …). |
@@ -34,7 +36,7 @@ Verweise auf Kapitel: [01](01_introduction.md)–[10](10_domain_context_map.md).
 | **Bounded Context** | A | DDD: explizite Grenze eines Fachmodells (oft ein Domain-Modul). → [ADR-019](decisions/ADR-019-domain-driven-design.md), [10 Context Map](10_domain_context_map.md) |
 | **Anti-Corruption Layer (ACL)** | A | DDD: Übersetzungsschicht, die fremde/externe Modelle vom eigenen Bounded Context abschirmt (z. B. Interop, KI, Legacy-JSON). → [10](10_domain_context_map.md) |
 | **Boy Scout Rule** | A | Hinterlasse angefassten Code etwas sauberer als vorgefunden (im PR-Scope). → [ADR-018](decisions/ADR-018-clean-code.md) |
-| **Business Event** | T | Domänenereignis nach fachlicher Änderung (z. B. Loan created); intern oder als External Event. → [06](06_crosscutting_concepts.md) |
+| **Business Event** | T | Domänenereignis nach fachlicher Änderung (z. B. Loan created); intern oder als External Event. → [06](06_crosscutting_concepts.md), Inventar [12](12_event_catalog.md) |
 | **Business Step** | F/T | Einzelner Schritt in einer COB-/Job-Pipeline (z. B. Accrual, Penalty). |
 | **Circuit Breaker** | T | Resilience-Muster: unterbindet Calls zu einem fehlerhaften Downstream (z. B. KI-API) temporär. |
 | **COB** | F | *Close of Business* – periodischer Tagesabschluss (Zinsen, Penalties, Status etc.), oft partitioniert. → [04](04_runtime_view.md) |
@@ -68,9 +70,10 @@ Verweise auf Kapitel: [01](01_introduction.md)–[10](10_domain_context_map.md).
 | **DTO Composition** | A | Spezialisierte API-DTOs halten Shared-Felder als Komponente oder flache Kopie statt durch Vererbung; Wire-JSON bleibt flach. → [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md) |
 | **EclipseLink** | T | JPA-Provider in fineract-osgi (statt Hibernate); Static Weaving, Spring `EclipseLinkJpaVendorAdapter`. → [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md) |
 | **Equinox** | T | Eclipse OSGi-Framework, in fineract-osgi als OSGi-Runtime vorgesehen. → [05](05_deployment_view.md), [08](08_design_decisions.md) |
+| **Event Catalog** | A | Inventar der Business-Event-TYPEs und Mapping auf Domain/ES-Events. → [12](12_event_catalog.md) |
 | **Event Sourcing** | A | Persistenzmuster: Zustand als append-only Sequenz von Domain Events; Pflicht für Domain-Writes. → [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) |
 | **Event Store** | T | Append-only Speicher der Aggregat-Event-Streams (Write Source of Truth). → [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) |
-| **External Event** | T | Für Systeme außerhalb des Prozesses publiziertes Ereignis (Kafka/JMS). |
+| **External Event** | T | Für Systeme außerhalb des Prozesses publiziertes Ereignis (Kafka/JMS). Katalog: [12](12_event_catalog.md). |
 | **Fail-Closed** | A | Bei Fehler/Timeout des Downstream (z. B. KI) wird die Operation **abgelehnt**. → [06](06_crosscutting_concepts.md) |
 | **Fail-Open** | A | Bei Fehler/Timeout läuft die Kernoperation **weiter** (Default für async KI). → [08](08_design_decisions.md) |
 | **Flatten (API JSON)** | T | Serialisierung komponierter DTOs so, dass Shared- und Spezialfelder auf Root-Ebene erscheinen (Gson/Jackson), ohne Breaking Change. → [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md) |

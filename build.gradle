@@ -26,6 +26,7 @@ buildscript {
         fineractJavaProjects = subprojects.findAll{
             [
                 'fineract-core',
+                'fineract-architecture',
                 'fineract-security',
                 'fineract-cob',
                 'fineract-validation',

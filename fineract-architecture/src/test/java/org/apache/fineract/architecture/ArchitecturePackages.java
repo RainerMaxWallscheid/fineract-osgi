@@ -1,0 +1,73 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.fineract.architecture;
+
+/**
+ * Package constants for ArchUnit rules aligned with the Domain Context Map
+ * ({@code docs/arc42/10_domain_context_map.md}).
+ */
+public final class ArchitecturePackages {
+
+    public static final String BASE = "org.apache.fineract";
+
+    // --- Domain packages (entity / aggregate roots) ---
+    public static final String LOAN_ACCOUNT_DOMAIN = "..portfolio.loanaccount.domain..";
+    public static final String LOAN_PRODUCT_DOMAIN = "..portfolio.loanproduct.domain..";
+    public static final String SAVINGS_DOMAIN = "..portfolio.savings.domain..";
+    public static final String CLIENT_DOMAIN = "..portfolio.client.domain..";
+    public static final String GROUP_DOMAIN = "..portfolio.group.domain..";
+    public static final String CHARGE_DOMAIN = "..portfolio.charge.domain..";
+    public static final String TAX_DOMAIN = "..portfolio.tax.domain..";
+    public static final String ACCOUNTING_DOMAIN = "..accounting..domain..";
+    public static final String JOURNAL_ENTRY_DOMAIN = "..accounting.journalentry.domain..";
+    public static final String WORKING_CAPITAL_DOMAIN = "..portfolio.workingcapitalloan.domain..";
+    public static final String LOAN_ORIGINATION_DOMAIN = "..portfolio.loanorigination.domain..";
+
+    /**
+     * REST/JAX-RS resource packages (module {@code ..api..} under functional areas).
+     * Intentionally <strong>excludes</strong> {@code infrastructure.core.api} ({@code JsonCommand}) —
+     * that is application infrastructure, tracked separately if needed.
+     * Do not use bare {@code ..api..} (matches {@code jakarta.ws.rs.api}).
+     */
+    public static final String[] REST_RESOURCE_PACKAGES = { //
+            "..portfolio..api..", //
+            "..accounting..api..", //
+            "..organisation..api..", //
+            "..useradministration..api..", //
+            "..spm..api..", //
+            "..mix..api..", //
+            "..notification..api..", //
+            "..interoperation..api..", //
+            "..investor..api..", //
+            "..infrastructure.jobs.api..", //
+            "..infrastructure.campaigns..api..", //
+            "..infrastructure.hooks.api..", //
+            "..infrastructure.report.api..", //
+            "..infrastructure.configuration.api..", //
+            "..infrastructure.documentmanagement.api..", //
+            "..infrastructure.codes.api..", //
+            "..infrastructure.surveys.api..", //
+            "..infrastructure.bulkimport.api..", //
+            "..infrastructure.dataqueries.api..", //
+            "..infrastructure.accountnumberformat.api..", //
+            "..infrastructure.creditbureau.api..", //
+    };
+
+    private ArchitecturePackages() {}
+}

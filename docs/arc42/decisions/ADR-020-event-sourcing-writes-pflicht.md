@@ -126,6 +126,7 @@ Bis Cutover eines Aggregates gilt: Legacy-JPA-Write **geduldet**, aber **kein** 
 ### Bezug
 
 - [ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) · [ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md) · [ADR-017](ADR-017-hexagonale-architektur.md) · [ADR-019](ADR-019-domain-driven-design.md)  
+- Event-Inventar Ist→ES: [12 Event Catalog](../12_event_catalog.md)  
 - Runtime Commands [04.3](../04_runtime_view.md) · Crosscutting Events [06.6](../06_crosscutting_concepts.md) · Quality Correctness [07](../07_quality_attributes.md)
 
 ---

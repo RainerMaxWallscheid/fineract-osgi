@@ -241,6 +241,8 @@ Früh scheitern, klar kommunizieren, Domain-Invarianten schützen.
 
 ## 6.6 Domain Events, Hooks & External Events
 
+Vollständiges Inventar der Business-Event-TYPEs und ES-Mapping: **[12 Event Catalog](12_event_catalog.md)**.
+
 ### Motivation
 
 Nachgelagerte Systeme (Reporting, CRM, KI, Messaging) sollen den Core nicht blockieren und lose koppeln.
@@ -605,7 +607,7 @@ Core Banking braucht **klare Fachmodelle und Context-Grenzen** – nicht nur tec
 
 | Baustein | Rolle |
 |----------|--------|
-| **Aggregate** | Konsistenzgrenze beim Write (z. B. Loan, SavingsAccount) |
+| **Aggregate** | Konsistenzgrenze beim Write (z. B. Loan, SavingsAccount); Canvas → [11](11_aggregate_canvas.md) |
 | **Entity / Value Object** | Identität vs. Werte (Money, Enums/Converter) |
 | **Repository** | Persistenz-Port des Aggregates (Spring Data / Wrapper) |
 | **Domain Service** | Fachlogik über Entities hinweg (Zins, Accounting) |
@@ -761,9 +763,9 @@ sequenceDiagram
 - Policy-as-Code für Fail-Open/Fail-Closed pro Produkt
 - Cache-/Idempotency-Store-Entscheidung (DB only vs. Redis)
 - Weitere DTO-Hierarchien auf Composition migrieren (Loan/Savings-Product wo sinnvoll); ggf. generierte OpenAPI-Modelle angleichen
-- Hexagon E3: Ports an Persistenz-/Event-/KI-Hotspots extrahieren; Dependency-Rule in Reviews/ArchUnit
-- DDD D3: Aggregatgrenzen Loan/Savings/Accounting schärfen; D4: ACL Interop/KI standardisieren (Context Map: [10](10_domain_context_map.md), D1 erledigt)
-- Event Sourcing ES0/ES1: Event-Store-Port, Metamodell, Greenfield-Pflicht; Pilot-Aggregat (ES2)
+- Hexagon E3: Ports an Persistenz-/Event-/KI-Hotspots extrahieren; Domain-Entity-Grenzen via ArchUnit ([13](13_archunit_bounded_context_rules.md)) — weiter Debt abbauen (Freeze-Store schrumpfen)
+- DDD D3: Aggregatgrenzen weiter schärfen (Canvas [11](11_aggregate_canvas.md)); D4: ACL Interop/KI (Context Map [10](10_domain_context_map.md))
+- Event Sourcing ES0/ES1: Event-Store-Port, Metamodell, Greenfield-Pflicht; Pilot-Aggregat (ES2); Event-Inventar: [12](12_event_catalog.md)
 
 ---
 

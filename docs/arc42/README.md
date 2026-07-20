@@ -16,6 +16,9 @@ Dieses Verzeichnis enthält die arc42-Dokumentation für **fineract-osgi** – A
 | 08 | [Design Decisions](08_design_decisions.md) | ADRs 001–020 in [`decisions/`](decisions/) |
 | 09 | [Glossary](09_glossary.md) | Begriffe, Abkürzungen, Ports, Env |
 | 10 | [Domain Context Map](10_domain_context_map.md) | Bounded Contexts, Subdomains, U/D-Map, Migrationsreihenfolge (DDD D1) |
+| 11 | [Aggregate Canvas](11_aggregate_canvas.md) | Loan, SavingsAccount, Client: Invarianten, Commands, Events, Konflikte (DDD taktisch) |
+| 12 | [Event Catalog](12_event_catalog.md) | Alle Business-Event-TYPEs → ES-Zielnamen, Lücken, Avro, LoanEvent |
+| 13 | [ArchUnit BC Rules](13_archunit_bounded_context_rules.md) | ArchUnit-Regeln gegen Cross-Context-Entity-Imports (Freeze-Baseline) |
 
 ## Ergänzende Artefakte
 
@@ -44,7 +47,7 @@ Vollständige Mapping-Tabelle: [`docs/gherkin/README.md`](../gherkin/README.md).
 
 - **Neu:** 01 → 02 → 03 → 09  
 - **Feature-Dev:** 03 → 04 → 06 → passendes Gherkin-Feature  
-- **Domain / DDD:** 10 → ADR-019 → ADR-020 → 03 (Module)  
+- **Domain / DDD:** 10 → 11 → 12 → 13 → ADR-019 → ADR-020 → 03 (Module)  
 - **Ops:** 05 → 07 → 09 → `node_modes` / `close_of_business`  
 - **Architektur:** 07 → 08 → 10 → Quality-Tags in Gherkin  
 

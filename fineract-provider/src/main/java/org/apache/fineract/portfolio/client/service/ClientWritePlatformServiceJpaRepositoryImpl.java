@@ -50,8 +50,17 @@ import org.apache.fineract.infrastructure.dataqueries.data.EntityTables;
 import org.apache.fineract.infrastructure.dataqueries.data.StatusEnum;
 import org.apache.fineract.infrastructure.dataqueries.service.EntityDatatableChecksWritePlatformService;
 import org.apache.fineract.infrastructure.event.business.domain.client.ClientActivateBusinessEvent;
+import org.apache.fineract.infrastructure.event.business.domain.client.ClientAssignStaffBusinessEvent;
+import org.apache.fineract.infrastructure.event.business.domain.client.ClientCloseBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.client.ClientCreateBusinessEvent;
+import org.apache.fineract.infrastructure.event.business.domain.client.ClientDeleteBusinessEvent;
+import org.apache.fineract.infrastructure.event.business.domain.client.ClientReactivateBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.client.ClientRejectBusinessEvent;
+import org.apache.fineract.infrastructure.event.business.domain.client.ClientUnassignStaffBusinessEvent;
+import org.apache.fineract.infrastructure.event.business.domain.client.ClientUndoRejectBusinessEvent;
+import org.apache.fineract.infrastructure.event.business.domain.client.ClientUndoWithdrawBusinessEvent;
+import org.apache.fineract.infrastructure.event.business.domain.client.ClientUpdateBusinessEvent;
+import org.apache.fineract.infrastructure.event.business.domain.client.ClientWithdrawBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.domain.Office;
@@ -136,6 +145,8 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             if (clientNonPerson != null) {
                 this.clientNonPersonRepository.delete(clientNonPerson);
             }
+            // Notify before delete so external serializers can still load ClientData
+            businessEventNotifierService.notifyPostBusinessEvent(new ClientDeleteBusinessEvent(client));
             this.clientRepository.delete(client);
             this.clientRepository.flush();
             return  //
@@ -558,6 +569,9 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                     extractAndCreateClientNonPerson(clientForUpdate, command);
                 }
             }
+            if (!changes.isEmpty()) {
+                businessEventNotifierService.notifyPostBusinessEvent(new ClientUpdateBusinessEvent(clientForUpdate));
+            }
             return  //
             //
             //
@@ -641,8 +655,11 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         final String staffIdParamName = ClientApiConstants.staffIdParamName;
         if (!command.isChangeInLongParameterNamed(staffIdParamName, presentStaffId)) {
             clientForUpdate.unassignStaff();
+            this.clientRepository.saveAndFlush(clientForUpdate);
+            businessEventNotifierService.notifyPostBusinessEvent(new ClientUnassignStaffBusinessEvent(clientForUpdate));
+        } else {
+            this.clientRepository.saveAndFlush(clientForUpdate);
         }
-        this.clientRepository.saveAndFlush(clientForUpdate);
         actualChanges.put(staffIdParamName, presentStaffId);
         return  //
         //
@@ -667,6 +684,9 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             clientForUpdate.assignStaff(staff);
         }
         this.clientRepository.saveAndFlush(clientForUpdate);
+        if (staffId != null) {
+            businessEventNotifierService.notifyPostBusinessEvent(new ClientAssignStaffBusinessEvent(clientForUpdate));
+        }
         actualChanges.put(ClientApiConstants.staffIdParamName, staffId);
         return  //
         //
@@ -728,6 +748,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             }
             client.close(currentUser, closureReason, closureDate);
             this.clientRepository.saveAndFlush(client);
+            businessEventNotifierService.notifyPostBusinessEvent(new ClientCloseBusinessEvent(client));
             return  //
             //
             //
@@ -835,6 +856,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         }
         client.withdraw(currentUser, withdrawalReason, withdrawalDate);
         this.clientRepository.saveAndFlush(client);
+        businessEventNotifierService.notifyPostBusinessEvent(new ClientWithdrawBusinessEvent(client));
         return  //
         //
         //
@@ -858,6 +880,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         }
         client.reActivate(currentUser, reactivateDate);
         this.clientRepository.saveAndFlush(client);
+        businessEventNotifierService.notifyPostBusinessEvent(new ClientReactivateBusinessEvent(client));
         return  //
         //
         //
@@ -881,6 +904,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         }
         client.reOpened(currentUser, undoRejectDate);
         this.clientRepository.saveAndFlush(client);
+        businessEventNotifierService.notifyPostBusinessEvent(new ClientUndoRejectBusinessEvent(client));
         return  //
         //
         //
@@ -904,6 +928,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         }
         client.reOpened(currentUser, undoWithdrawalDate);
         this.clientRepository.saveAndFlush(client);
+        businessEventNotifierService.notifyPostBusinessEvent(new ClientUndoWithdrawBusinessEvent(client));
         return  //
         //
         //

@@ -1,0 +1,41 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+dependencies {
+    // Domain modules on the test classpath so ArchUnit can analyze production classes.
+    // Prefer testImplementation (not implementation) — this module has no runtime/main role.
+    testImplementation project(path: ':fineract-core')
+    testImplementation project(path: ':fineract-loan')
+    testImplementation project(path: ':fineract-savings')
+    testImplementation project(path: ':fineract-accounting')
+    testImplementation project(path: ':fineract-progressive-loan')
+    testImplementation project(path: ':fineract-working-capital-loan')
+    testImplementation project(path: ':fineract-loan-origination')
+    testImplementation project(path: ':fineract-investor')
+    testImplementation project(path: ':fineract-charge')
+    testImplementation project(path: ':fineract-tax')
+    testImplementation project(path: ':fineract-rates')
+    testImplementation project(path: ':fineract-cob')
+    testImplementation project(path: ':fineract-branch')
+
+    testImplementation('com.tngtech.archunit:archunit-junit5')
+    testImplementation('org.junit.jupiter:junit-jupiter-api')
+    testImplementation('org.junit.jupiter:junit-jupiter-engine')
+    testImplementation('org.junit.jupiter:junit-jupiter-params')
+}

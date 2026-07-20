@@ -268,7 +268,9 @@ Organisation ──► Client/Group ──► Loan / Savings ──► Accountin
 
 ## 10.5 Aggregate Roots (Kerncontexts)
 
-Detail-Canvas kann später pro Aggregat ergänzt werden. Hier die **empfohlenen Roots** für Reviews und ES-Streams.
+Ausführliche Canvases (Invarianten, Commands, Events, Konflikte): **[11 Aggregate Canvas](11_aggregate_canvas.md)** für `Loan`, `SavingsAccount`, `Client`.
+
+Hier die **empfohlenen Roots** für Reviews und ES-Streams.
 
 ### 10.5.1 Loan Servicing
 
@@ -406,7 +408,9 @@ Bei neuem oder angefasstem Code:
 
 | Thema | Nächster Schritt |
 |-------|------------------|
-| Aggregate Canvas Loan / Savings / Client | Invarianten, Commands, Events, Konflikte pro Root |
+| Aggregate Canvas Loan / Savings / Client | → erledigt in [11](11_aggregate_canvas.md) |
+| Event-Katalog Ist → ES | → erledigt in [12](12_event_catalog.md) |
+| ArchUnit Cross-Context-Entity-Imports | → erledigt in [13](13_archunit_bounded_context_rules.md) / `:fineract-architecture` |
 | Import-Audit `portfolio.client.domain.Client` in Loan/Savings | ACL-Backlog und ArchUnit-Regeln |
 | Share Accounts & Account Transfer als eigene Module | Extraktion aus provider |
 | Interop/KI ACL-Standard | Ports + Fail-Open/Closed-Policy pro Use Case (D4) |
@@ -425,7 +429,9 @@ Bei neuem oder angefasstem Code:
 | [03 Building Blocks](03_building_block_view.md) | Physische Module |
 | [06.15 DDD](06_crosscutting_concepts.md) | Querschnitt Kurzfassung |
 | [09 Glossary](09_glossary.md) | Begriffe (BC, OHS, ACL, …) |
+| [11 Aggregate Canvas](11_aggregate_canvas.md) | Loan, Savings, Client taktisch |
+| [12 Event Catalog](12_event_catalog.md) | Business Events → ES |
 
 ---
 
-*Navigation:* [README](README.md) · [08 Design Decisions](08_design_decisions.md) · [09 Glossary](09_glossary.md)
+*Navigation:* [README](README.md) · [11 Aggregate Canvas](11_aggregate_canvas.md) · [12 Event Catalog](12_event_catalog.md) · [08 Design Decisions](08_design_decisions.md)

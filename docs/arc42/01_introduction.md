@@ -130,6 +130,9 @@ Details und Szenarien: [07 Quality Attributes](07_quality_attributes.md).
 | [08](08_design_decisions.md) | ADRs | *Warum so und nicht anders?* |
 | [09](09_glossary.md) | Begriffe | *Was bedeutet X?* |
 | [10](10_domain_context_map.md) | Domain Context Map (DDD) | *Welche Bounded Contexts und U/D-Beziehungen?* |
+| [11](11_aggregate_canvas.md) | Aggregate Canvas | *Welche Invarianten, Commands und Events pro Root?* |
+| [12](12_event_catalog.md) | Event-Katalog | *Welche Business Events gibt es und wie mappen sie auf ES?* |
+| [13](13_archunit_bounded_context_rules.md) | ArchUnit BC Rules | *Welche Domain-Abhängigkeiten sind verboten?* |
 
 Ergänzend im Repo:
 
@@ -149,7 +152,7 @@ Einstieg und Mapping: [gherkin/README.md](../gherkin/README.md). Domain-Beispiel
 | Rolle | Empfohlene Reihenfolge |
 |-------|------------------------|
 | **Neu im Projekt** | 01 → 02 → 03 → 09 → 04 |
-| **Domain / DDD** | 10 → 08 ADR-019/020 → 03 → 06.15 |
+| **Domain / DDD** | 10 → 11 → 12 → 13 → 08 ADR-019/020 → 03 → 06.15 |
 | **Backend-Dev Feature** | 03 → 04 → 06 → 08 (ADR-004) → 10 (Context) |
 | **OSGi / KI Extension** | 03 → 04.3/4.4/4.7 → 06.7/6.8 → 08 ADR-002/005/006 |
 | **DevOps** | 05 → 06.9–6.11 → 07.5–7.7/7.11 → 09 Ports/Env |

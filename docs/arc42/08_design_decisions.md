@@ -42,7 +42,7 @@ Die einzelnen ADRs liegen unter [`decisions/`](decisions/) – **eine Datei pro 
 | [ADR-017](decisions/ADR-017-hexagonale-architektur.md) | Hexagonale Architektur | accepted | Ports & Adapters als Leitbild; Mapping auf CQRS/OSGi/KI |
 | [ADR-018](decisions/ADR-018-clean-code.md) | Clean Code | accepted | Lesbarer, testbarer Code; Boy Scout; SOLID als Orientierung |
 | [ADR-019](decisions/ADR-019-domain-driven-design.md) | Domain-Driven Design | accepted | Bounded Contexts, Aggregates, UL; Context Map → [10](10_domain_context_map.md) |
-| [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) | Event Sourcing Writes | accepted | Create/Update/Delete event-sourced; Journal/Reads als Projektionen |
+| [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) | Event Sourcing Writes | accepted | Create/Update/Delete event-sourced; Inventar → [12](12_event_catalog.md) |
 
 ```mermaid
 flowchart TB

@@ -88,7 +88,7 @@ flowchart LR
 |-------|--------|
 | **D1** | Vokabular + dieses ADR; Context-Map in Doku → **[10 Domain Context Map](../10_domain_context_map.md)** |
 | **D2** | Neue Features mit klarem Aggregate/Command/Event |
-| **D3** | Aggregatgrenzen und Domain Services an Hotspots schärfen (Loan, Savings, Accounting) |
+| **D3** | Aggregatgrenzen und Domain Services an Hotspots schärfen (Loan, Savings, Accounting) – Canvas: [11](../11_aggregate_canvas.md) |
 | **D4** | ACL für Interop/KI/Import standardisieren; Context Map fortlaufend schärfen |
 
 ### Alternativen
@@ -120,7 +120,7 @@ flowchart LR
 - [ADR-017](ADR-017-hexagonale-architektur.md) Hexagon  
 - [ADR-018](ADR-018-clean-code.md) Clean Code / Ubiquitous Language  
 - [ADR-020](ADR-020-event-sourcing-writes-pflicht.md) Event Sourcing für Writes (Pflicht)  
-- Building Blocks [03](../03_building_block_view.md) · Domain Context Map [10](../10_domain_context_map.md) · Runtime [04](../04_runtime_view.md) · Crosscutting [06](../06_crosscutting_concepts.md)
+- Building Blocks [03](../03_building_block_view.md) · Domain Context Map [10](../10_domain_context_map.md) · Aggregate Canvas [11](../11_aggregate_canvas.md) · Event Catalog [12](../12_event_catalog.md) · Runtime [04](../04_runtime_view.md) · Crosscutting [06](../06_crosscutting_concepts.md)
 
 ---
 

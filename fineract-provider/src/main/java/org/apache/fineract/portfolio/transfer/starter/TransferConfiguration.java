@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.transfer.starter;
 
 import org.apache.fineract.infrastructure.core.service.TransactionBoundApplicationEventPublisher;
+import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
 import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
@@ -50,10 +51,11 @@ public class TransferConfiguration {
             StaffRepositoryWrapper staffRepositoryWrapper, SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper,
             SavingsAccountWritePlatformService savingsAccountWritePlatformService,
             ClientTransferDetailsRepositoryWrapper clientTransferDetailsRepositoryWrapper, PlatformSecurityContext context,
-            LoanOfficerService loanOfficerService, TransactionBoundApplicationEventPublisher eventPublisher) {
+            LoanOfficerService loanOfficerService, TransactionBoundApplicationEventPublisher eventPublisher,
+            BusinessEventNotifierService businessEventNotifierService) {
         return new TransferWritePlatformServiceJpaRepositoryImpl(clientRepositoryWrapper, officeRepository, calendarInstanceRepository,
                 groupRepository, loanWritePlatformService, savingsAccountWritePlatformService, loanRepositoryWrapper,
                 savingsAccountRepositoryWrapper, transfersDataValidator, staffRepositoryWrapper, clientTransferDetailsRepositoryWrapper,
-                context, loanOfficerService, eventPublisher);
+                context, loanOfficerService, eventPublisher, businessEventNotifierService);
     }
 }
