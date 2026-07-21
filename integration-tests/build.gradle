@@ -117,6 +117,8 @@ tasks.named('cargoStartLocal').configure {
 }
 
 import java.net.HttpURLConnection
+import java.net.InetSocketAddress
+import java.net.Socket
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
@@ -128,6 +130,37 @@ tasks.register('waitForFineract') {
         int timeoutSeconds = (project.findProperty('waitForFineractTimeoutSeconds') ?: '600') as int
         int waited = 0
         int interval = 5
+
+        // Expected JDBC backend for this Cargo run (see cargo.local.containerProperties above)
+        String dbHint
+        int dbPort
+        if (project.hasProperty('dbType') && 'postgresql'.equalsIgnoreCase(dbType as String)) {
+            dbHint = 'PostgreSQL (localhost:5432, -PdbType=postgresql)'
+            dbPort = 5432
+        } else if (project.hasProperty('dbType') && 'mysql'.equalsIgnoreCase(dbType as String)) {
+            dbHint = 'MySQL (localhost:3306, -PdbType=mysql)'
+            dbPort = 3306
+        } else {
+            dbHint = 'MariaDB (localhost:3306, default; or docker compose -f docker-compose-mariadb-test.yml up -d)'
+            dbPort = 3306
+        }
+
+        // Fail fast if the database port is closed — Cargo still starts Tomcat, but Fineract never becomes healthy.
+        try {
+            def socket = new Socket()
+            socket.connect(new InetSocketAddress('localhost', dbPort), 1500)
+            socket.close()
+            println "Database port ${dbPort} is open (${dbHint})."
+        } catch (Exception e) {
+            throw new GradleException(
+                    "Fineract cannot start: database port localhost:${dbPort} is not accepting connections.\n" +
+                    "Expected: ${dbHint}\n" +
+                    "Cargo log: ${file("$buildDir/cargo/integration-tests-output.log").absolutePath}\n" +
+                    "Examples:\n" +
+                    "  docker compose -f docker-compose-mariadb-test.yml up -d\n" +
+                    "  ./gradlew :integration-tests:test -PdbType=postgresql   # if PostgreSQL is already running\n" +
+                    "Root cause of previous Cargo failure is often: Connection refused to the tenant/DB host.")
+        }
 
         TrustManager[] trustAllCerts = [
             new X509TrustManager() {
@@ -143,7 +176,7 @@ tasks.register('waitForFineract') {
         HttpsURLConnection.setDefaultHostnameVerifier({ hostname, session -> true })
 
         URL url = new URL("https://localhost:8443/fineract-provider/actuator/health")
-        println "Waiting for Fineract startup (timeout: ${timeoutSeconds}s)..."
+        println "Waiting for Fineract startup (timeout: ${timeoutSeconds}s, DB: ${dbHint})..."
 
         while (waited < timeoutSeconds) {
             try {
@@ -162,7 +195,27 @@ tasks.register('waitForFineract') {
             println "Still waiting..."
         }
 
-        throw new GradleException("Fineract did not start within ${timeoutSeconds} seconds")
+        // On timeout: surface the most useful lines from the Cargo log (app crash root cause).
+        File cargoLog = file("$buildDir/cargo/integration-tests-output.log")
+        String logHint = ""
+        if (cargoLog.exists()) {
+            def lines = cargoLog.readLines()
+            def interesting = lines.findAll { line ->
+                line.contains('ERROR') || line.contains('Caused by:') ||
+                        line.contains('Application run failed') || line.contains('Configuration not found') ||
+                        line.contains('Connection refused') || line.contains('ExternalEventConfiguration')
+            }.takeRight(25)
+            if (interesting) {
+                logHint = "\n--- cargo log excerpts (${cargoLog.name}) ---\n" + interesting.join('\n') + "\n--- end excerpts ---\n"
+            }
+            logHint += "Full log: ${cargoLog.absolutePath}\n"
+        }
+
+        throw new GradleException(
+                "Fineract did not start within ${timeoutSeconds} seconds (health: ${url}).\n" +
+                "Expected DB: ${dbHint}\n" +
+                "Common causes: DB not running; Liquibase/external-event config missing; Cargo WAR not rebuilt.\n" +
+                logHint)
     }
 }
 

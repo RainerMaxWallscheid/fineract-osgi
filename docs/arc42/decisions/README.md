@@ -24,6 +24,7 @@ Einzelne Architekturentscheidungen für **fineract-osgi**. Übersicht und Format
 | ADR-018 | [ADR-018-clean-code.md](ADR-018-clean-code.md) |
 | ADR-019 | [ADR-019-domain-driven-design.md](ADR-019-domain-driven-design.md) |
 | ADR-020 | [ADR-020-event-sourcing-writes-pflicht.md](ADR-020-event-sourcing-writes-pflicht.md) |
+| ADR-021 | [ADR-021-modul-kommunikation-nur-ueber-module-api.md](ADR-021-modul-kommunikation-nur-ueber-module-api.md) |
 
 ## Neues ADR anlegen
 

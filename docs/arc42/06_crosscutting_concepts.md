@@ -276,6 +276,19 @@ flowchart LR
 - Event-Payloads versionieren; Consumer müssen tolerant sein.
 - KI und Dritt-systeme: best effort mit Retry/DLQ, Core-Erfolg nicht rückabwickeln (außer explizite synchrone Policy Gates).
 
+### Pflicht bei neuen Business Events (Boot)
+
+Jeder **konkrete** `*BusinessEvent`, der **nicht** `NoExternalEvent` implementiert, muss in der Tenant-Tabelle **`m_external_event_configuration`** stehen (`type` = Java-SimpleName).
+
+| Mechanismus | Wirkung |
+|-------------|---------|
+| `ExternalEventConfigurationValidationService` | Classpath-Scan aller `BusinessEvent`-Implementierungen beim Start |
+| Fehlender DB-Eintrag | `ExternalEventConfigurationNotFoundException` → **ApplicationContext startet nicht** |
+| Integrationstests | `waitForFineract` läuft in Timeout, obwohl Cargo/Tomcat läuft |
+
+**Im selben PR:** Liquibase-Insert (typisch `enabled=false`) + Changelog-Include.  
+Details und Muster: **[12.9 Event Catalog – Pflicht External-Event-Konfiguration](12_event_catalog.md#129-pflicht-external-event-konfiguration-in-der-db)**.
+
 ---
 
 ## 6.7 OSGi Modularity
@@ -763,7 +776,7 @@ sequenceDiagram
 - Policy-as-Code für Fail-Open/Fail-Closed pro Produkt
 - Cache-/Idempotency-Store-Entscheidung (DB only vs. Redis)
 - Weitere DTO-Hierarchien auf Composition migrieren (Loan/Savings-Product wo sinnvoll); ggf. generierte OpenAPI-Modelle angleichen
-- Hexagon E3: Ports an Persistenz-/Event-/KI-Hotspots extrahieren; Domain-Entity-Grenzen via ArchUnit ([13](13_archunit_bounded_context_rules.md)) — weiter Debt abbauen (Freeze-Store schrumpfen)
+- Hexagon E3 / ADR-021: Ports in `moduleapi`; Cross-Module nur über Module API ([14](14_module_api_boundaries.md)); ArchUnit Entity + Module-API-Regeln ([13](13_archunit_bounded_context_rules.md)) — Freeze-Store schrumpfen
 - DDD D3: Aggregatgrenzen weiter schärfen (Canvas [11](11_aggregate_canvas.md)); D4: ACL Interop/KI (Context Map [10](10_domain_context_map.md))
 - Event Sourcing ES0/ES1: Event-Store-Port, Metamodell, Greenfield-Pflicht; Pilot-Aggregat (ES2); Event-Inventar: [12](12_event_catalog.md)
 

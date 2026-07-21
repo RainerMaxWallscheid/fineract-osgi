@@ -74,6 +74,7 @@ Verweise auf Kapitel: [01](01_introduction.md)–[13](13_archunit_bounded_contex
 | **Event Sourcing** | A | Persistenzmuster: Zustand als append-only Sequenz von Domain Events; Pflicht für Domain-Writes. → [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) |
 | **Event Store** | T | Append-only Speicher der Aggregat-Event-Streams (Write Source of Truth). → [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) |
 | **External Event** | T | Für Systeme außerhalb des Prozesses publiziertes Ereignis (Kafka/JMS). Katalog: [12](12_event_catalog.md). |
+| **External Event Configuration** | T | Tabelle `m_external_event_configuration`: jeder konkrete `BusinessEvent`-Typ (außer `NoExternalEvent`) muss beim Boot registriert sein, sonst startet die App nicht. → [12.9](12_event_catalog.md#129-pflicht-external-event-konfiguration-in-der-db), [06.6](06_crosscutting_concepts.md) |
 | **Fail-Closed** | A | Bei Fehler/Timeout des Downstream (z. B. KI) wird die Operation **abgelehnt**. → [06](06_crosscutting_concepts.md) |
 | **Fail-Open** | A | Bei Fehler/Timeout läuft die Kernoperation **weiter** (Default für async KI). → [08](08_design_decisions.md) |
 | **Flatten (API JSON)** | T | Serialisierung komponierter DTOs so, dass Shared- und Spezialfelder auf Root-Ebene erscheinen (Gson/Jackson), ohne Breaking Change. → [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md) |
@@ -118,6 +119,7 @@ Verweise auf Kapitel: [01](01_introduction.md)–[13](13_archunit_bounded_contex
 | **Maker-Checker** | F | Vier-Augen-Prinzip: Command wartet auf Freigabe, bevor die Fachpersistenz final wird. → [06](06_crosscutting_concepts.md) |
 | **MDC** | T | *Mapped Diagnostic Context* – kontextuelle Log-Felder (Tenant, Correlation-ID, …). |
 | **Mode Flags** | B | Schalter `fineract.mode.read/write/batch-*-enabled` zur Rollensteuerung eines Nodes. → [05](05_deployment_view.md) |
+| **Module API** | A | Veröffentlichter Port-Schnitt eines Gradle-Domain-Moduls (`..moduleapi..`); einzige erlaubte fachliche Abhängigkeit für andere Module. ≠ REST-`..api..`. → [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [14](14_module_api_boundaries.md) |
 | **Multi-Tenancy** | A/F | Ein Deployment bedient viele Institute (Tenants) mit isolierten Daten/Kontexten. → [06](06_crosscutting_concepts.md) |
 | **Node ID** | B | `FINERACT_NODE_ID` – eindeutige Kennung einer Instanz im Cluster. |
 | **Observability** | B | Fähigkeit, Zustand über Logs, Metrics und Traces zu erkennen. → [06](06_crosscutting_concepts.md), [07](07_quality_attributes.md) |

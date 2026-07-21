@@ -148,6 +148,8 @@ flowchart TB
 
 Fachliche Bounded Contexts, Upstream/Downstream und Migrationsreihenfolge: **[10 Domain Context Map](10_domain_context_map.md)**. Gradle-Module sind die physische Abbildung – nicht 1:1 mit jedem Context identisch.
 
+**Modul-Kommunikation:** nur über **`moduleapi`**, Events und Shared Kernel ([ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [14 Module API Boundaries](14_module_api_boundaries.md)) – nicht über fremde `domain`/`service`-Implementierungen.
+
 | Modul | Fachverantwortung |
 |-------|-------------------|
 | **fineract-loan** | Klassischer Loan-Lifecycle, Produkte, Transaktionen |

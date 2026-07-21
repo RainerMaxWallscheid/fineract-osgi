@@ -75,6 +75,21 @@ public class ExternalEventConfigurationHelper {
         clientRejectBusinessEvent.put("enabled", false);
         defaults.add(clientRejectBusinessEvent);
 
+        // Client lifecycle / staff / transfer events (Liquibase 0242)
+        addDefaultExternalEvent(defaults, "ClientUpdateBusinessEvent");
+        addDefaultExternalEvent(defaults, "ClientCloseBusinessEvent");
+        addDefaultExternalEvent(defaults, "ClientWithdrawBusinessEvent");
+        addDefaultExternalEvent(defaults, "ClientReactivateBusinessEvent");
+        addDefaultExternalEvent(defaults, "ClientUndoRejectBusinessEvent");
+        addDefaultExternalEvent(defaults, "ClientUndoWithdrawBusinessEvent");
+        addDefaultExternalEvent(defaults, "ClientDeleteBusinessEvent");
+        addDefaultExternalEvent(defaults, "ClientAssignStaffBusinessEvent");
+        addDefaultExternalEvent(defaults, "ClientUnassignStaffBusinessEvent");
+        addDefaultExternalEvent(defaults, "ClientTransferProposeBusinessEvent");
+        addDefaultExternalEvent(defaults, "ClientTransferAcceptBusinessEvent");
+        addDefaultExternalEvent(defaults, "ClientTransferRejectBusinessEvent");
+        addDefaultExternalEvent(defaults, "ClientTransferWithdrawBusinessEvent");
+
         Map<String, Object> documentCreatedBusinessEvent = new HashMap<>();
         documentCreatedBusinessEvent.put("type", "DocumentCreatedBusinessEvent");
         documentCreatedBusinessEvent.put("enabled", false);
@@ -716,6 +731,13 @@ public class ExternalEventConfigurationHelper {
         defaults.add(workingCapitalLoanChargeAdjustmentPostBusinessEvent);
 
         return defaults;
+    }
+
+    private static void addDefaultExternalEvent(ArrayList<Map<String, Object>> defaults, String type) {
+        Map<String, Object> event = new HashMap<>();
+        event.put("type", type);
+        event.put("enabled", false);
+        defaults.add(event);
     }
 
     // TODO: Rewrite to use fineract-client instead!

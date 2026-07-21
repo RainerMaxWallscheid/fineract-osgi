@@ -13,12 +13,13 @@ Dieses Verzeichnis enthält die arc42-Dokumentation für **fineract-osgi** – A
 | 05 | [Deployment View](05_deployment_view.md) | Compose, K8s, Modes, OSGi-Betrieb |
 | 06 | [Crosscutting Concepts](06_crosscutting_concepts.md) | Tenant, Security, CQRS, Events, Observability |
 | 07 | [Quality Attributes](07_quality_attributes.md) | NFRs, Scenarios, Trade-offs |
-| 08 | [Design Decisions](08_design_decisions.md) | ADRs 001–020 in [`decisions/`](decisions/) |
+| 08 | [Design Decisions](08_design_decisions.md) | ADRs 001–021 in [`decisions/`](decisions/) |
 | 09 | [Glossary](09_glossary.md) | Begriffe, Abkürzungen, Ports, Env |
 | 10 | [Domain Context Map](10_domain_context_map.md) | Bounded Contexts, Subdomains, U/D-Map, Migrationsreihenfolge (DDD D1) |
 | 11 | [Aggregate Canvas](11_aggregate_canvas.md) | Loan, SavingsAccount, Client: Invarianten, Commands, Events, Konflikte (DDD taktisch) |
 | 12 | [Event Catalog](12_event_catalog.md) | Alle Business-Event-TYPEs → ES-Zielnamen, Lücken, Avro, LoanEvent |
 | 13 | [ArchUnit BC Rules](13_archunit_bounded_context_rules.md) | ArchUnit-Regeln gegen Cross-Context-Entity-Imports (Freeze-Baseline) |
+| 14 | [Module API Boundaries](14_module_api_boundaries.md) | Subprojekte nur über `moduleapi` (ADR-021) |
 
 ## Ergänzende Artefakte
 

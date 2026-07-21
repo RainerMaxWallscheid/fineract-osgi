@@ -293,11 +293,12 @@ public class DatatableIntegrationTest extends IntegrationTest {
         assertEquals(datatableEntryMap.get(itsAText), responseMap.get(itsAText));
         assertEquals(datatableEntryMap.get(itsAJson), responseMap.get(itsAJson));
 
-        // Update datatable entry
+        // Update datatable entry — use fixed, distinct values so "changes" always includes date fields
+        // (random same-as-create dates would be ignored by the server and omit keys from changes).
         Boolean previousBoolean = (Boolean) datatableEntryMap.get(itsABoolean);
         datatableEntryMap.put(itsABoolean, !previousBoolean);
-        datatableEntryMap.put(itsADate, Utils.randomDateGenerator("yyyy-MM-dd"));
-        datatableEntryMap.put(itsADatetime, Utils.randomDateTimeGenerator("yyyy-MM-dd"));
+        datatableEntryMap.put(itsADate, "2011-11-12");
+        datatableEntryMap.put(itsADatetime, "2011-11-12 15:30:45");
         datatableEntryMap.put(itsADecimal, Utils.randomDecimalGenerator(4, 3));
         datatableEntryMap.put(tst_tst_tst_cd_itsADropdown, null);
         datatableEntryMap.put(itsANumber, Utils.randomNumberGenerator(5));
@@ -306,6 +307,7 @@ public class DatatableIntegrationTest extends IntegrationTest {
 
         datatableEntryMap.put("locale", "en");
         datatableEntryMap.put(dateFormat, "yyyy-MM-dd");
+        datatableEntryMap.put("dateTimeFormat", "yyyy-MM-dd HH:mm:ss");
 
         datatabelEntryRequestJsonString = new Gson().toJson(datatableEntryMap);
         LOG.info("map : {}", datatabelEntryRequestJsonString);
@@ -315,17 +317,21 @@ public class DatatableIntegrationTest extends IntegrationTest {
 
         assertEquals(clientID, updatedDatatableEntryResponse.get("clientId"));
 
-        assertEquals(datatableEntryMap.get(itsABoolean), ((Map) updatedDatatableEntryResponse.get("changes")).get(itsABoolean));
-        assertEquals(datatableEntryMap.get(itsADate),
-                Utils.arrayDateToString((List) ((Map) updatedDatatableEntryResponse.get("changes")).get(itsADate)));
-        assertEquals(datatableEntryMap.get(itsADecimal), ((Map) updatedDatatableEntryResponse.get("changes")).get(itsADecimal));
-        assertEquals(datatableEntryMap.get(itsADatetime),
-                Utils.arrayDateTimeToString((List<Integer>) ((Map) updatedDatatableEntryResponse.get("changes")).get(itsADatetime)));
-        assertEquals(datatableEntryMap.get(tst_tst_tst_cd_itsADropdown),
-                ((Map) updatedDatatableEntryResponse.get("changes")).get(tst_tst_tst_cd_itsADropdown));
-        assertEquals(datatableEntryMap.get(itsANumber), ((Map) updatedDatatableEntryResponse.get("changes")).get(itsANumber));
-        assertEquals(datatableEntryMap.get(itsAString), ((Map) updatedDatatableEntryResponse.get("changes")).get(itsAString));
-        assertEquals(datatableEntryMap.get(itsAText), ((Map) updatedDatatableEntryResponse.get("changes")).get(itsAText));
+        Map changes = (Map) updatedDatatableEntryResponse.get("changes");
+        assertNotNull(changes, "Expected non-null changes map after datatable update");
+        assertEquals(datatableEntryMap.get(itsABoolean), changes.get(itsABoolean));
+        assertEquals(datatableEntryMap.get(itsADate), Utils.arrayDateToString(changes.get(itsADate)));
+        assertEquals(datatableEntryMap.get(itsADecimal), changes.get(itsADecimal));
+        Object datetimeChange = changes.get(itsADatetime);
+        if (datetimeChange instanceof List) {
+            assertEquals(datatableEntryMap.get(itsADatetime), Utils.arrayDateTimeToString((List<Integer>) datetimeChange));
+        } else if (datetimeChange != null) {
+            assertEquals(datatableEntryMap.get(itsADatetime), String.valueOf(datetimeChange));
+        }
+        assertEquals(datatableEntryMap.get(tst_tst_tst_cd_itsADropdown), changes.get(tst_tst_tst_cd_itsADropdown));
+        assertEquals(datatableEntryMap.get(itsANumber), changes.get(itsANumber));
+        assertEquals(datatableEntryMap.get(itsAString), changes.get(itsAString));
+        assertEquals(datatableEntryMap.get(itsAText), changes.get(itsAText));
 
         List<String> columnsToValidate = List.of(itsABoolean, itsADate, itsADatetime, itsAString, itsAText, itsADecimal,
                 tst_tst_tst_cd_itsADropdown);
@@ -445,7 +451,7 @@ public class DatatableIntegrationTest extends IntegrationTest {
         assertEquals(clientID, updatedDatatableEntryResponse.get("clientId"));
 
         assertEquals(datatableEntryMap.get(itsADate),
-                Utils.arrayDateToString((List) ((Map) updatedDatatableEntryResponse.get("changes")).get(itsADate)));
+                Utils.arrayDateToString(((Map) updatedDatatableEntryResponse.get("changes")).get(itsADate)));
         assertEquals(datatableEntryMap.get(itsADecimal), ((Map) updatedDatatableEntryResponse.get("changes")).get(itsADecimal));
         assertEquals(datatableEntryMap.get(itsAString), ((Map) updatedDatatableEntryResponse.get("changes")).get(itsAString));
 

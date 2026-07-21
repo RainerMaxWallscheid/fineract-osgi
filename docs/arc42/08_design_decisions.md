@@ -43,6 +43,7 @@ Die einzelnen ADRs liegen unter [`decisions/`](decisions/) – **eine Datei pro 
 | [ADR-018](decisions/ADR-018-clean-code.md) | Clean Code | accepted | Lesbarer, testbarer Code; Boy Scout; SOLID als Orientierung |
 | [ADR-019](decisions/ADR-019-domain-driven-design.md) | Domain-Driven Design | accepted | Bounded Contexts, Aggregates, UL; Context Map → [10](10_domain_context_map.md) |
 | [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) | Event Sourcing Writes | accepted | Create/Update/Delete event-sourced; Inventar → [12](12_event_catalog.md) |
+| [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md) | Module API only | accepted | Subprojekte nur über `moduleapi` / Events / Shared Kernel |
 
 ```mermaid
 flowchart TB
@@ -65,6 +66,9 @@ flowchart TB
     ADR004 --> ADR020[ADR-020 Event Sourcing]
     ADR016 --> ADR020
     ADR019 --> ADR020
+    ADR017 --> ADR021[ADR-021 Module API]
+    ADR019 --> ADR021
+    ADR002 --> ADR021
     ADR002 --> ADR005[ADR-005 Externe KI]
     ADR005 --> ADR006[ADR-006 Async KI]
     ADR003 --> ADR007[ADR-007 Node Modes]

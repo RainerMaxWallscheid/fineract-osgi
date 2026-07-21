@@ -621,12 +621,29 @@ public final class Utils {
         return 10 + random.nextInt(50);
     }
 
-    public static String arrayDateToString(List intArray) {
-        String[] strArray = (String[]) intArray.stream().map(String::valueOf).toArray(String[]::new);
-        return String.join("-", strArray);
+    /**
+     * Formats API date values which may be a List of integers [y,m,d], a String, or null.
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static String arrayDateToString(Object dateValue) {
+        if (dateValue == null) {
+            return null;
+        }
+        if (dateValue instanceof String) {
+            return (String) dateValue;
+        }
+        if (dateValue instanceof List) {
+            List intArray = (List) dateValue;
+            String[] strArray = (String[]) intArray.stream().map(String::valueOf).toArray(String[]::new);
+            return String.join("-", strArray);
+        }
+        return String.valueOf(dateValue);
     }
 
     public static String arrayDateTimeToString(List<Integer> integerList) {
+        if (integerList == null) {
+            return null;
+        }
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < 6; i++) {
             if (i < 2) {

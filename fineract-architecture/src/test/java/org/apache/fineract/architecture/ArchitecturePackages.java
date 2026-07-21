@@ -40,10 +40,106 @@ public final class ArchitecturePackages {
     public static final String LOAN_ORIGINATION_DOMAIN = "..portfolio.loanorigination.domain..";
 
     /**
+     * Public inter-module surface (ADR-021). Not the same as REST {@code ..api..} packages.
+     */
+    public static final String MODULE_API = "..moduleapi..";
+
+    // --- Logical module ownership (package slices ≈ Gradle domain modules) ---
+
+    /** Packages that belong to the Loan Servicing / Loan Product slice. */
+    public static final String[] LOAN_OWNED = { //
+            "..portfolio.loanaccount..", //
+            "..portfolio.loanproduct..", //
+            "..portfolio.delinquency..", //
+            "..portfolio.interestpauses..", //
+            "..portfolio.collateral..", //
+            "..portfolio.collateralmanagement..", //
+            "..portfolio.loanorigination..", //
+            "..portfolio.workingcapitalloan..", //
+            "..portfolio.workingcapitalloanproduct..", //
+            "..portfolio.workingcapitalloanbreach..", //
+            "..portfolio.workingcapitalloannearbreach..", //
+    };
+
+    public static final String[] SAVINGS_OWNED = { //
+            "..portfolio.savings..", //
+            "..portfolio.interestratechart..", //
+    };
+
+    public static final String[] ACCOUNTING_OWNED = { //
+            "..accounting..", //
+    };
+
+    public static final String[] CHARGE_OWNED = { //
+            "..portfolio.charge..", //
+    };
+
+    public static final String[] INVESTOR_OWNED = { //
+            "..investor..", //
+    };
+
+    // --- Module-internal packages (must not be depended on by foreign slices) ---
+    // Intentionally excludes: moduleapi, data (DTO transition), exception, business events.
+
+    public static final String[] LOAN_INTERNAL = { //
+            "..portfolio.loanaccount.domain..", //
+            "..portfolio.loanaccount.service..", //
+            "..portfolio.loanaccount.handler..", //
+            "..portfolio.loanproduct.domain..", //
+            "..portfolio.loanproduct.service..", //
+            "..portfolio.loanproduct.handler..", //
+            "..portfolio.delinquency.domain..", //
+            "..portfolio.delinquency.service..", //
+            "..portfolio.delinquency.handler..", //
+            "..portfolio.loanorigination.domain..", //
+            "..portfolio.loanorigination.service..", //
+            "..portfolio.loanorigination.handler..", //
+            "..portfolio.workingcapitalloan.domain..", //
+            "..portfolio.workingcapitalloan.service..", //
+            "..portfolio.workingcapitalloan.handler..", //
+    };
+
+    public static final String[] SAVINGS_INTERNAL = { //
+            "..portfolio.savings.domain..", //
+            "..portfolio.savings.service..", //
+            "..portfolio.savings.handler..", //
+            "..portfolio.interestratechart.domain..", //
+            "..portfolio.interestratechart.service..", //
+    };
+
+    public static final String[] ACCOUNTING_INTERNAL = { //
+            "..accounting..domain..", //
+            "..accounting..service..", //
+            "..accounting..handler..", //
+            "..accounting..serialization..", //
+    };
+
+    public static final String[] CHARGE_INTERNAL = { //
+            "..portfolio.charge.domain..", //
+            "..portfolio.charge.service..", //
+            "..portfolio.charge.handler..", //
+            "..portfolio.charge.serialization..", //
+    };
+
+    public static final String[] CLIENT_INTERNAL = { //
+            "..portfolio.client.domain..", //
+            "..portfolio.client.service..", //
+            "..portfolio.client.handler..", //
+    };
+
+    public static final String[] TAX_INTERNAL = { //
+            "..portfolio.tax.domain..", //
+            "..portfolio.tax.service..", //
+            "..portfolio.tax.handler..", //
+    };
+
+    /**
      * REST/JAX-RS resource packages (module {@code ..api..} under functional areas).
      * Intentionally <strong>excludes</strong> {@code infrastructure.core.api} ({@code JsonCommand}) —
      * that is application infrastructure, tracked separately if needed.
      * Do not use bare {@code ..api..} (matches {@code jakarta.ws.rs.api}).
+     * <p>
+     * Distinct from {@link #MODULE_API} (inter-module ports).
      */
     public static final String[] REST_RESOURCE_PACKAGES = { //
             "..portfolio..api..", //

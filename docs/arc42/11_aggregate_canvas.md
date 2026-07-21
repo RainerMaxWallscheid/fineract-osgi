@@ -400,6 +400,8 @@ Ist-Enum: `ClientStatus` (Pending `100`, Active `300`, Transfer `303/304`, Close
 
 Vollständige Tabelle: [12 Event Catalog](12_event_catalog.md). Noch offen: Identifier, Family, Address, ClientCharge.
 
+**Hinweis:** Neue `*BusinessEvent`-Klassen brauchen immer einen Eintrag in `m_external_event_configuration` (Liquibase), sonst startet die App nicht → [12.9](12_event_catalog.md#129-pflicht-external-event-konfiguration-in-der-db).
+
 ### 11.3.7 Policies
 
 | Event | Downstream |

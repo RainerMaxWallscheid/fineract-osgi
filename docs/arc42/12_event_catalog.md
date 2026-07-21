@@ -9,7 +9,7 @@ Ergänzt:
 - DDD: [ADR-019](decisions/ADR-019-domain-driven-design.md)
 - Messaging/Hooks: [06 Crosscutting](06_crosscutting_concepts.md)
 
-**Status:** living inventory – bei neuen Event-Klassen aktualisieren (siehe [12.9 Pflege](#129-pflege-und-code-scan)).
+**Status:** living inventory – bei neuen Event-Klassen aktualisieren (siehe [12.9 Pflicht DB-Config](#129-pflicht-external-event-konfiguration-in-der-db) und [12.10 Pflege](#1210-pflege-und-code-scan)).
 
 ---
 
@@ -520,14 +520,72 @@ Alle anderen TYPEs sind **potentiell** externalisierbar, sofern External Events 
 
 ---
 
-## 12.9 Pflege und Code-Scan
+## 12.9 Pflicht: External-Event-Konfiguration in der DB
 
-Neuen Event-Typen hinzufügen:
+> **Jeder neue konkrete `*BusinessEvent` (der nicht `NoExternalEvent` implementiert) muss in `m_external_event_configuration` registriert werden** – sonst startet die Anwendung nicht.
 
-1. Java-Klasse unter `…/event/business/domain/…` mit `TYPE`.
-2. Zeile in diesem Kapitel (passender Context/Unterabschnitt).
-3. Optional Serializer + Avro, wenn external.
-4. ES-Mapping: past-tense Name, Stream, Upcaster-Version.
+### Warum
+
+`ExternalEventConfigurationValidationService` scannt beim Boot alle Klassen, die `BusinessEvent` implementieren (ClassGraph, Quelle: `ExternalEventSourceService`). Für jeden Simple-Name muss ein Eintrag in `m_external_event_configuration` existieren:
+
+```text
+Configuration not found for external event <SimpleName>
+→ BeanCreationException → App/Context startet nicht
+→ Integrationstests: waitForFineract Timeout (Cargo/Tomcat up, App down)
+```
+
+Ausnahme: `NoExternalEvent`, abstrakte Basisklassen, Interfaces, `BulkBusinessEvent`.
+
+### Was im selben PR mitliefern
+
+| Schritt | Artefakt |
+|---------|----------|
+| 1 | Java-Klasse `…BusinessEvent` mit `TYPE` / `getType()` |
+| 2 | **Liquibase** Tenant-Changelog: `INSERT` in `m_external_event_configuration` (`type` = SimpleName, typisch `enabled=false`) |
+| 3 | Include in `fineract-provider/.../changelog-tenant.xml` (bzw. Modul-Changelog) |
+| 4 | Unit-Test-Listen aktualisieren, falls vorhanden (`ExternalEventConfigurationValidationServiceTest`) |
+| 5 | Optional: Serializer + Avro |
+| 6 | Zeile in diesem Katalog (Kap. 12.2) |
+| 7 | ES-Mapping (past tense, Stream) wenn Write-SoT betroffen |
+
+### Liquibase-Muster (Beispiel)
+
+```xml
+<changeSet author="fineract" id="…">
+    <preConditions onFail="MARK_RAN">
+        <sqlCheck expectedResult="0">
+            SELECT COUNT(*) FROM m_external_event_configuration
+            WHERE type = 'MyNewBusinessEvent'
+        </sqlCheck>
+    </preConditions>
+    <insert tableName="m_external_event_configuration">
+        <column name="type" value="MyNewBusinessEvent"/>
+        <column name="enabled" valueBoolean="false"/>
+    </insert>
+</changeSet>
+```
+
+Referenz: `parts/0242_add_client_lifecycle_external_event_configuration.xml` (Client-Lifecycle-Events).
+
+### Review-Checkliste
+
+- [ ] Neuer Event-Typ hat DB-Konfiguration (Liquibase)?  
+- [ ] `enabled` bewusst gesetzt (Default oft `false` bis Consumer/Serializer stehen)?  
+- [ ] App-Start / `waitForFineract` bzw. Actuator Health nach Migrate grün?  
+- [ ] Katalog und ggf. Unit-Test-Whitelist angepasst?
+
+---
+
+## 12.10 Pflege und Code-Scan
+
+Neuen Event-Typen hinzufügen: **zuerst [12.9](#129-pflicht-external-event-konfiguration-in-der-db)** (DB-Registrierung ist Pflicht, kein Optional).
+
+1. Java-Klasse unter `…/event/business/domain/…` mit `TYPE`.  
+2. **Liquibase `m_external_event_configuration`** (Pflicht, außer `NoExternalEvent`).  
+3. Zeile in diesem Kapitel (passender Context/Unterabschnitt).  
+4. Optional Serializer + Avro, wenn external.  
+5. ES-Mapping: past-tense Name, Stream, Upcaster-Version.  
+6. `ExternalEventConfigurationValidationServiceTest` Listen erweitern (falls betroffen).
 
 **Scan-Kommando (Inventar neu erzeugen):**
 
@@ -541,16 +599,17 @@ grep -R --include='*BusinessEvent.java' 'static final String TYPE' \
 
 ---
 
-## 12.10 Bezug
+## 12.11 Bezug
 
 | Dokument | Rolle |
 |----------|--------|
 | [10 Context Map](10_domain_context_map.md) | Context-Grenzen |
 | [11 Aggregate Canvas](11_aggregate_canvas.md) | Commands/Invarianten |
+| [06.6 Events](06_crosscutting_concepts.md) | Transport, Boot-Validierung |
 | [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) | ES-Pflicht Writes |
 | [ADR-019](decisions/ADR-019-domain-driven-design.md) | Domain Events |
 | [ADR-012](decisions/ADR-012-messaging-fuer-verteilte-jobs-kafka-jms-optional.md) | Transport |
-| Code | `BusinessEventNotifierService`, `LoanEvent`, `fineract-avro-schemas` |
+| Code | `BusinessEventNotifierService`, `ExternalEventConfigurationValidationService`, `m_external_event_configuration`, `fineract-avro-schemas` |
 
 ---
 

@@ -24,7 +24,8 @@ Bezug: [10 Context Map](10_domain_context_map.md) · [11 Aggregate Canvas](11_ag
 
 | Artefakt | Pfad |
 |----------|------|
-| Regeln | `fineract-architecture/.../BoundedContextEntityDependencyRulesTest.java` |
+| Entity-Grenzen | `…/BoundedContextEntityDependencyRulesTest.java` |
+| **Module API-Grenzen** | `…/ModuleApiBoundaryRulesTest.java` ([ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [14](14_module_api_boundaries.md)) |
 | Package-Konstanten | `ArchitecturePackages.java` |
 | ArchUnit Config | `src/test/resources/archunit.properties` |
 | Freeze-Baseline | `src/test/resources/archunit_store/` |

@@ -67,7 +67,11 @@ public class ExternalEventConfigurationValidationServiceTest {
 
         // given
         List<String> configurations = Arrays.asList("CentersCreateBusinessEvent", "ClientActivateBusinessEvent",
-                "ClientCreateBusinessEvent", "ClientRejectBusinessEvent", "DocumentCreatedBusinessEvent", "DocumentDeletedBusinessEvent",
+                "ClientAssignStaffBusinessEvent", "ClientCloseBusinessEvent", "ClientCreateBusinessEvent", "ClientDeleteBusinessEvent",
+                "ClientReactivateBusinessEvent", "ClientRejectBusinessEvent", "ClientTransferAcceptBusinessEvent",
+                "ClientTransferProposeBusinessEvent", "ClientTransferRejectBusinessEvent", "ClientTransferWithdrawBusinessEvent",
+                "ClientUnassignStaffBusinessEvent", "ClientUndoRejectBusinessEvent", "ClientUndoWithdrawBusinessEvent",
+                "ClientUpdateBusinessEvent", "ClientWithdrawBusinessEvent", "DocumentCreatedBusinessEvent", "DocumentDeletedBusinessEvent",
                 "FixedDepositAccountCreateBusinessEvent", "GroupsCreateBusinessEvent", "LoanAcceptTransferBusinessEvent",
                 "LoanAddChargeBusinessEvent", "LoanAdjustTransactionBusinessEvent", "LoanApplicationModifiedBusinessEvent",
                 "LoanApplyOverdueChargeBusinessEvent", "LoanApprovedBusinessEvent", "LoanBalanceChangedBusinessEvent",
@@ -166,8 +170,13 @@ public class ExternalEventConfigurationValidationServiceTest {
 
         // given
         List<String> configurationWithMissingCentersCreateBusinessEvent = Arrays.asList("MockBusinessEvent", "MockBusinessEvent",
-                "ClientActivateBusinessEvent", "ClientCreateBusinessEvent", "ClientRejectBusinessEvent", "DocumentCreatedBusinessEvent",
-                "DocumentDeletedBusinessEvent", "FixedDepositAccountCreateBusinessEvent", "GroupsCreateBusinessEvent",
+                "ClientActivateBusinessEvent", "ClientAssignStaffBusinessEvent", "ClientCloseBusinessEvent", "ClientCreateBusinessEvent",
+                "ClientDeleteBusinessEvent", "ClientReactivateBusinessEvent", "ClientRejectBusinessEvent",
+                "ClientTransferAcceptBusinessEvent", "ClientTransferProposeBusinessEvent", "ClientTransferRejectBusinessEvent",
+                "ClientTransferWithdrawBusinessEvent", "ClientUnassignStaffBusinessEvent", "ClientUndoRejectBusinessEvent",
+                "ClientUndoWithdrawBusinessEvent", "ClientUpdateBusinessEvent", "ClientWithdrawBusinessEvent",
+                "DocumentCreatedBusinessEvent", "DocumentDeletedBusinessEvent", "FixedDepositAccountCreateBusinessEvent",
+                "GroupsCreateBusinessEvent",
                 "LoanAcceptTransferBusinessEvent", "LoanAddChargeBusinessEvent", "LoanAdjustTransactionBusinessEvent",
                 "LoanApplicationModifiedBusinessEvent", "LoanApplyOverdueChargeBusinessEvent", "LoanApprovedBusinessEvent",
                 "LoanBalanceChangedBusinessEvent", "LoanChargebackTransactionBusinessEvent", "LoanChargePaymentPostBusinessEvent",
