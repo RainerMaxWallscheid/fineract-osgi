@@ -1,31 +1,31 @@
 # 5. Deployment View
 
-Die Deployment View beschreibt, **wo** und **wie** die Bausteine aus [Kapitel 3](03_building_block_view.md) betrieben werden und welche Infrastruktur sie zur Laufzeit ([Kapitel 4](04_runtime_view.md)) benötigen.
+The Deployment View describes **where** and **how** the building blocks from [Chapter 3](03_building_block_view.md) are operated and which infrastructure they need at runtime ([Chapter 4](04_runtime_view.md)).
 
-**Fokus**: Infrastrukturknoten, Deployables, Ports, Konfiguration und typische Topologien – keine Produkt-UI-Details.
+**Focus**: Infrastructure nodes, deployables, ports, configuration, and typical topologies – no product UI details.
 
-**Hinweis**: Die mitgelieferten `docker-compose*.yml`-Dateien und Beispiel-Manifeste sind primär für **Entwicklung und Tests** gedacht. Produktions-Deployments brauchen gehärtete Secrets, TLS, Backups und Capacity-Planning.
+**Note**: The shipped `docker-compose*.yml` files and example manifests are primarily intended for **development and tests**. Production deployments need hardened secrets, TLS, backups, and capacity planning.
 
 ---
 
-## 5.1 Überblick der Deployment-Ebenen
+## 5.1 Overview of Deployment Layers
 
-| Ebene | Beschreibung | Typische Artefakte |
-|-------|--------------|--------------------|
-| **L1 – Infrastruktur** | Hosts, Cloud, Cluster, Netzwerk | VMs, Kubernetes Nodes, Load Balancer |
-| **L2 – Plattformdienste** | DB, Messaging, Observability | PostgreSQL/MySQL/MariaDB, Kafka/ActiveMQ, Prometheus |
-| **L3 – Application Nodes** | Fineract-Prozesse mit Rollen | Read / Write / Batch-Manager / Batch-Worker |
-| **L4 – OSGi Runtime** | Dynamische Module im Prozess | Equinox + Feature-Bundles |
-| **L5 – Externe Systeme** | Optional, außerhalb des Clusters | xAI Grok API, Payment Gateways, IdP (OIDC) |
+| Layer | Description | Typical Artifacts |
+|-------|-------------|-------------------|
+| **L1 – Infrastructure** | Hosts, cloud, cluster, network | VMs, Kubernetes nodes, load balancer |
+| **L2 – Platform services** | DB, messaging, observability | PostgreSQL/MySQL/MariaDB, Kafka/ActiveMQ, Prometheus |
+| **L3 – Application nodes** | Fineract processes with roles | Read / Write / Batch Manager / Batch Worker |
+| **L4 – OSGi Runtime** | Dynamic modules in-process | Equinox + feature bundles |
+| **L5 – External systems** | Optional, outside the cluster | xAI Grok API, payment gateways, IdP (OIDC) |
 
 ```mermaid
 flowchart TB
-    subgraph L1["L1 Infrastruktur"]
+    subgraph L1["L1 Infrastructure"]
         LB[Load Balancer / Ingress]
         N1[Node / VM / Pod Host]
     end
 
-    subgraph L2["L2 Plattform"]
+    subgraph L2["L2 Platform"]
         DB[(PostgreSQL / MySQL)]
         MQ[Kafka / ActiveMQ]
         OBS[Prometheus / Grafana / Tempo]
@@ -43,7 +43,7 @@ flowchart TB
         B[Feature Bundles]
     end
 
-    subgraph L5["L5 Extern"]
+    subgraph L5["L5 External"]
         KI[xAI Grok API]
         IDP[OIDC IdP]
     end
@@ -65,99 +65,99 @@ flowchart TB
 
 ---
 
-## 5.2 Infrastrukturknoten und Deployables
+## 5.2 Infrastructure Nodes and Deployables
 
 ### 5.2.1 Application Deployable
 
-| Eigenschaft | Wert |
-|-------------|------|
-| **Artefakt** | Spring-Boot-Fat-JAR / Container-Image (`fineract:latest` / `apache/fineract:latest`) |
-| **Modul** | `fineract-provider` (+ Domain-Module wie `fineract-loan`, `fineract-command`, …) |
-| **Runtime** | JVM (G1GC empfohlen), HTTPS standardmäßig |
-| **Hauptport** | **8443** (TLS) |
+| Property | Value |
+|----------|-------|
+| **Artifact** | Spring Boot fat JAR / container image (`fineract:latest` / `apache/fineract:latest`) |
+| **Module** | `fineract-provider` (+ domain modules such as `fineract-loan`, `fineract-command`, …) |
+| **Runtime** | JVM (G1GC recommended), HTTPS by default |
+| **Main port** | **8443** (TLS) |
 | **Health** | `/fineract-provider/actuator/health/liveness`, `.../readiness` |
-| **Debug (optional)** | Port **5000** (JDWP, nur Dev) |
+| **Debug (optional)** | Port **5000** (JDWP, dev only) |
 
-Container-Definition (Auszug aus `config/docker/compose/fineract.yml`):
+Container definition (excerpt from `config/docker/compose/fineract.yml`):
 
 - Image: `fineract:latest`
-- Volumes: Logback-Override, AWS-Credentials (optional), Log-Verzeichnis
-- Healthcheck: TCP/Prozess auf Port 8443
-- User: `FINERACT_USER` / `FINERACT_GROUP` (Default `1000:1000`)
+- Volumes: Logback override, AWS credentials (optional), log directory
+- Healthcheck: TCP/process on port 8443
+- User: `FINERACT_USER` / `FINERACT_GROUP` (default `1000:1000`)
 
-### 5.2.2 Datenbank
+### 5.2.2 Database
 
-| DB | Compose-Service | Zweck |
-|----|-----------------|--------|
-| **PostgreSQL** (Ziel für fineract-osgi) | `db` via `postgresql.yml` | Tenant-Metadaten + Tenant-DBs |
-| MySQL / MariaDB | alternative Compose-Dateien | Upstream-Kompatibilität, K8s-Beispiel |
+| DB | Compose Service | Purpose |
+|----|-----------------|---------|
+| **PostgreSQL** (target for fineract-osgi) | `db` via `postgresql.yml` | Tenant metadata + tenant DBs |
+| MySQL / MariaDB | alternative Compose files | Upstream compatibility, K8s example |
 
-Wichtige DB-Namen (PostgreSQL-Beispiel aus `postgresql.env`):
+Important DB names (PostgreSQL example from `postgresql.env`):
 
-- `fineract_tenants` – Tenant-Registry / Connection-Metadaten
-- `fineract_default` – Default-Tenant-Schema/DB
+- `fineract_tenants` – tenant registry / connection metadata
+- `fineract_default` – default tenant schema/DB
 
-Connection Pool (HikariCP) über `FINERACT_HIKARI_*` (siehe `fineract-common.env`).
+Connection pool (HikariCP) via `FINERACT_HIKARI_*` (see `fineract-common.env`).
 
-### 5.2.3 Messaging (optional, für Multi-Node Batch)
+### 5.2.3 Messaging (Optional, for Multi-Node Batch)
 
-| Broker | Compose | Einsatz |
-|--------|---------|---------|
-| **Apache Kafka** | `docker-compose-postgresql-kafka.yml` | Remote Job Messages + External Events |
-| **ActiveMQ** | `docker-compose-postgresql-activemq.yml` | JMS-basierte Job-/Event-Verteilung |
+| Broker | Compose | Use |
+|--------|---------|-----|
+| **Apache Kafka** | `docker-compose-postgresql-kafka.yml` | Remote job messages + external events |
+| **ActiveMQ** | `docker-compose-postgresql-activemq.yml` | JMS-based job/event distribution |
 
-Ohne Broker laufen Manager und Worker typischerweise **im selben Prozess** (Single-Node) mit Spring Events.
+Without a broker, manager and worker typically run **in the same process** (single node) with Spring events.
 
 ### 5.2.4 OSGi Framework (fineract-osgi)
 
-| Eigenschaft | Wert |
-|-------------|------|
+| Property | Value |
+|----------|-------|
 | **Framework** | Eclipse Equinox (`org.eclipse.osgi`) |
-| **Start** | `osgi/start-equinox.sh` oder Gradle-Task `equinoxStart` |
-| **Console** | Port **2501** (Equinox Console) |
+| **Start** | `osgi/start-equinox.sh` or Gradle task `equinoxStart` |
+| **Console** | Port **2501** (Equinox console) |
 | **Config** | `osgi/equinox/config.ini` |
 | **Bundles** | `osgi/bundles/` |
 | **Logs** | `osgi/logs/equinox.log` |
 
-Zielbild Produktion: Equinox **eingebettet** im Fineract-Prozess (oder als dedizierter Sidecar nur für Bundle-Management in späteren Iterationen). Aktuell: Workspace-Scaffold unter `osgi/` und `docs/arc42/osgi.gradle`.
+Production target picture: Equinox **embedded** in the Fineract process (or as a dedicated sidecar only for bundle management in later iterations). Currently: workspace scaffold under `osgi/` and `docs/arc42/osgi.gradle`.
 
-### 5.2.5 Observability-Stack (optional)
+### 5.2.5 Observability Stack (Optional)
 
-Unter `config/docker/`:
+Under `config/docker/`:
 
-| Komponente | Zweck | Env-Schalter |
-|------------|--------|--------------|
-| Prometheus | Metriken | `FINERACT_MANAGEMENT_PROMETHEUS_ENABLED` |
+| Component | Purpose | Env Switch |
+|-----------|---------|------------|
+| Prometheus | Metrics | `FINERACT_MANAGEMENT_PROMETHEUS_ENABLED` |
 | Grafana | Dashboards | Compose `observability.yml` |
 | Tempo / OTLP | Traces | `FINERACT_MANAGEMENT_OLTP_*` |
-| CloudWatch | AWS-Metriken | `FINERACT_MANAGEMENT_CLOUDWATCH_*` |
+| CloudWatch | AWS metrics | `FINERACT_MANAGEMENT_CLOUDWATCH_*` |
 
 ---
 
-## 5.3 Node-Rollen (Read / Write / Batch)
+## 5.3 Node Roles (Read / Write / Batch)
 
-Fineract steuert die Rollen über Mode-Flags (Application Properties / Env):
+Fineract controls roles via mode flags (application properties / env):
 
-| Flag | Env-Variable | Bedeutung |
-|------|--------------|-----------|
-| Read | `FINERACT_MODE_READ_ENABLED` | Lesende API (Queries, Reports) |
-| Write | `FINERACT_MODE_WRITE_ENABLED` | Schreibende Commands (CQRS Write-Pfad) |
-| Batch Manager | `FINERACT_MODE_BATCH_MANAGER_ENABLED` | Plant/partitioniert Jobs (z. B. COB) |
-| Batch Worker | `FINERACT_MODE_BATCH_WORKER_ENABLED` | Führt Job-Partitionen aus |
+| Flag | Env Variable | Meaning |
+|------|--------------|---------|
+| Read | `FINERACT_MODE_READ_ENABLED` | Read API (queries, reports) |
+| Write | `FINERACT_MODE_WRITE_ENABLED` | Write commands (CQRS write path) |
+| Batch Manager | `FINERACT_MODE_BATCH_MANAGER_ENABLED` | Plans/partitions jobs (e.g. COB) |
+| Batch Worker | `FINERACT_MODE_BATCH_WORKER_ENABLED` | Executes job partitions |
 
-Zusätzlich:
+Additionally:
 
-- `FINERACT_NODE_ID` – eindeutige Node-Kennung (Manager oft `1`, Worker `2+`)
-- Worker: `FINERACT_LIQUIBASE_ENABLED=false` (Schema-Migration nur einmal, typisch am Manager)
+- `FINERACT_NODE_ID` – unique node identifier (manager often `1`, workers `2+`)
+- Worker: `FINERACT_LIQUIBASE_ENABLED=false` (schema migration only once, typically on the manager)
 
-### Empfohlene Rollen-Kombinationen
+### Recommended Role Combinations
 
-| Topologie | Read | Write | Batch Manager | Batch Worker | Einsatz |
-|-----------|:----:|:-----:|:-------------:|:------------:|---------|
-| **All-in-One** | ✓ | ✓ | ✓ | ✓ | Dev, kleine Institute |
-| **API + Batch getrennt** | ✓ | ✓ | – | – auf API; Manager+Worker separat | Mittlere Last |
-| **Manager / Worker** | optional | optional | ✓ (1×) | ✓ (N×) | COB-Skalierung |
-| **Read-Replica-Nodes** | ✓ | – | – | – | Report-/Lese-Last |
+| Topology | Read | Write | Batch Manager | Batch Worker | Use |
+|----------|:----:|:-----:|:-------------:|:------------:|-----|
+| **All-in-One** | ✓ | ✓ | ✓ | ✓ | Dev, small institutions |
+| **API + Batch separated** | ✓ | ✓ | – | – on API; manager+worker separate | Medium load |
+| **Manager / Worker** | optional | optional | ✓ (1×) | ✓ (N×) | COB scaling |
+| **Read-replica nodes** | ✓ | – | – | – | Report/read load |
 
 ```mermaid
 flowchart LR
@@ -188,24 +188,24 @@ flowchart LR
     Wn --> DB
 ```
 
-Env-Vorlagen im Repo:
+Env templates in the repository:
 
-- `config/docker/env/fineract-manager.env` – Manager, COB-Chunk/Partition-Größen
-- `config/docker/env/fineract-worker.env` – Worker, Liquibase aus
+- `config/docker/env/fineract-manager.env` – manager, COB chunk/partition sizes
+- `config/docker/env/fineract-worker.env` – worker, Liquibase off
 
 ---
 
-## 5.4 Deployment-Szenario A: Docker Compose (Single Node)
+## 5.4 Deployment Scenario A: Docker Compose (Single Node)
 
-**Zweck**: lokaler Smoke-Test, Entwickler-Setup, Demo.
+**Purpose**: local smoke test, developer setup, demo.
 
-**Referenzdateien**:
+**Reference files**:
 
 - `docker-compose.yml` / `docker-compose-postgresql.yml`
 - `config/docker/compose/fineract.yml`, `postgresql.yml`
 - `config/docker/env/fineract.env`, `fineract-common.env`, `fineract-postgresql.env`
 
-### Topologie
+### Topology
 
 ```mermaid
 flowchart TB
@@ -223,42 +223,42 @@ flowchart TB
 | Service | Image / Source | Ports | Depends on |
 |---------|----------------|-------|------------|
 | `db` | `postgres:18.x` | 5432 | – |
-| `fineract` | `fineract:latest` | 8443 (, 5000 Debug) | `db` healthy |
+| `fineract` | `fineract:latest` | 8443 (, 5000 debug) | `db` healthy |
 
-### Start (Beispiel)
+### Start (Example)
 
 ```bash
-# Image bauen (projektspezifischer Gradle/Docker-Workflow)
+# Build image (project-specific Gradle/Docker workflow)
 docker compose -f docker-compose-postgresql.yml up -d
 ```
 
-### Eigenschaften
+### Characteristics
 
-- Alle Mode-Flags typischerweise **true** (All-in-One)
-- SSL im Container aktiv (`FINERACT_SERVER_SSL_ENABLED=true`)
-- Health: Compose wartet auf DB (`service_healthy`), Fineract-Healthcheck auf 8443
-- **Nicht** production-ready (klare Kommentare in den Compose-Dateien)
+- All mode flags typically **true** (all-in-one)
+- SSL active in the container (`FINERACT_SERVER_SSL_ENABLED=true`)
+- Health: Compose waits for DB (`service_healthy`), Fineract healthcheck on 8443
+- **Not** production-ready (clear comments in the Compose files)
 
-### Varianten im Repo
+### Variants in the Repository
 
-| Datei | Fokus |
-|-------|--------|
+| File | Focus |
+|------|-------|
 | `docker-compose-postgresql.yml` | Standard PostgreSQL |
 | `docker-compose-mysql.yml` / `mariadb.yml` | Alternative DBs |
-| `docker-compose-development.yml` | Dev-nahe Konfiguration |
-| `docker-compose-oauth2-test.yml` | OAuth2/OIDC-Tests |
-| `docker-compose-twofactor-test.yml` | 2FA-Tests |
-| `docker-compose-web-app.yml` / `community-app.yml` | UI neben API |
+| `docker-compose-development.yml` | Dev-oriented configuration |
+| `docker-compose-oauth2-test.yml` | OAuth2/OIDC tests |
+| `docker-compose-twofactor-test.yml` | 2FA tests |
+| `docker-compose-web-app.yml` / `community-app.yml` | UI alongside API |
 
 ---
 
-## 5.5 Deployment-Szenario B: Docker Compose Multi-Node (Manager + Worker)
+## 5.5 Deployment Scenario B: Docker Compose Multi-Node (Manager + Worker)
 
-**Zweck**: verteilter COB / Remote Jobs, Lastverteilung der Batch-Plane.
+**Purpose**: distributed COB / remote jobs, load distribution of the batch plane.
 
-**Referenz**: `docker-compose-postgresql-kafka.yml` (analog ActiveMQ-Variante).
+**Reference**: `docker-compose-postgresql-kafka.yml` (analogous ActiveMQ variant).
 
-### Topologie
+### Topology
 
 ```mermaid
 flowchart TB
@@ -271,51 +271,51 @@ flowchart TB
     W <--> K
 ```
 
-### Rollen-Mapping
+### Role Mapping
 
-| Service | Node-ID | Manager | Worker | Liquibase | Ports |
+| Service | Node ID | Manager | Worker | Liquibase | Ports |
 |---------|---------|:-------:|:------:|:---------:|-------|
-| `fineract-manager` | 1 | ✓ | – | ✓ (Default) | 8443 |
-| `fineract-worker` (Replicas 2) | 2 | – | ✓ | ✗ | 8444–8445 → 8443 |
+| `fineract-manager` | 1 | ✓ | – | ✓ (default) | 8443 |
+| `fineract-worker` (replicas 2) | 2 | – | ✓ | ✗ | 8444–8445 → 8443 |
 
-### Messaging-Konfiguration (Kafka-Beispiel)
+### Messaging Configuration (Kafka Example)
 
-Aus `kafka-client.env` / verwandten Env-Dateien:
+From `kafka-client.env` / related env files:
 
-- Remote Job Handler: Kafka enabled, Topic z. B. `job-topic`
-- External Events: Kafka enabled, Topic z. B. `external-events`
+- Remote job handler: Kafka enabled, topic e.g. `job-topic`
+- External events: Kafka enabled, topic e.g. `external-events`
 - Bootstrap: `kafka:9092`
 
-### Startreihenfolge
+### Start Order
 
-1. `kafka` startet  
+1. `kafka` starts  
 2. `db` healthy  
-3. `fineract-manager` healthy (Schema/Migration, Job-Orchestrierung)  
-4. `fineract-worker` Replicas starten und konsumieren Partitionen  
+3. `fineract-manager` healthy (schema/migration, job orchestration)  
+4. `fineract-worker` replicas start and consume partitions  
 
-### Betriebsregeln
+### Operating Rules
 
-- **Genau ein** aktiver Batch-Manager pro Cluster (Split-Brain vermeiden).
-- Worker horizontal skalieren; Manager eher vertikal / HA aktiv-passiv.
-- Shared DB muss Connection-Limits für `Manager + N×Worker + Online-API` tragen.
-- COB-Tuning: `LOAN_COB_CHUNK_SIZE`, `LOAN_COB_PARTITION_SIZE`, `LOAN_COB_POLL_INTERVAL`.
+- **Exactly one** active batch manager per cluster (avoid split-brain).
+- Scale workers horizontally; manager more vertically / HA active-passive.
+- Shared DB must carry connection limits for `Manager + N×Worker + Online API`.
+- COB tuning: `LOAN_COB_CHUNK_SIZE`, `LOAN_COB_PARTITION_SIZE`, `LOAN_COB_POLL_INTERVAL`.
 
 ---
 
-## 5.6 Deployment-Szenario C: Kubernetes
+## 5.6 Deployment Scenario C: Kubernetes
 
-**Zweck**: Cluster-Betrieb, Service-Discovery, Rolling/Recreate-Deploys, Secrets.
+**Purpose**: cluster operations, service discovery, rolling/recreate deploys, secrets.
 
-**Referenzverzeichnis**: `kubernetes/`
+**Reference directory**: `kubernetes/`
 
-| Datei | Inhalt |
-|-------|--------|
+| File | Content |
+|------|---------|
 | `fineract-server-deployment.yml` | Service (LoadBalancer :8443) + Deployment `fineract-server` |
 | `fineractmysql-deployment.yml` | PV/PVC, MySQL Service + Deployment |
-| `fineractmysql-configmap.yml` | DB-Init/Config |
-| `kubectl-startup.sh` / `kubectl-shutdown.sh` | Orchestrierung apply/wait/delete |
+| `fineractmysql-configmap.yml` | DB init/config |
+| `kubectl-startup.sh` / `kubectl-shutdown.sh` | Orchestration apply/wait/delete |
 
-### Logische Topologie
+### Logical Topology
 
 ```mermaid
 flowchart TB
@@ -327,44 +327,44 @@ flowchart TB
     MySQL --> PVC[(PVC / PV)]
 ```
 
-### Wichtige K8s-Aspekte (Server-Deployment)
+### Important K8s Aspects (Server Deployment)
 
-| Aspekt | Umsetzung im Beispiel |
-|--------|------------------------|
+| Aspect | Implementation in the Example |
+|--------|-------------------------------|
 | **Image** | `apache/fineract:latest` |
 | **Resources** | Requests 200m CPU / 1Gi; Limits 1000m / 2Gi |
 | **Liveness** | HTTPS GET `.../actuator/health/liveness` (initialDelay 90s) |
 | **Readiness** | HTTPS GET `.../actuator/health/readiness` (initialDelay 60s) |
-| **Strategy** | `Recreate` (einfaches Beispiel; Produktion oft RollingUpdate + PDB) |
-| **Secrets** | `fineract-tenants-db-secret` (Username/Password) |
-| **Init** | Busybox wartet auf MySQL-Port 3306 |
+| **Strategy** | `Recreate` (simple example; production often RollingUpdate + PDB) |
+| **Secrets** | `fineract-tenants-db-secret` (username/password) |
+| **Init** | Busybox waits for MySQL port 3306 |
 
-### Start-Skript (vereinfachter Ablauf)
+### Startup Script (Simplified Flow)
 
 ```bash
 cd kubernetes
 ./kubectl-startup.sh
-# 1) Secret anlegen
+# 1) Create secret
 # 2) ConfigMap + MySQL apply + wait ready
 # 3) fineract-server apply + wait ready
 ```
 
-### Produktions-Erweiterungen (Zielbild fineract-osgi)
+### Production Extensions (Target Picture fineract-osgi)
 
-- PostgreSQL als primäre DB (StatefulSet oder Managed Service)
-- Getrennte Deployments: `fineract-write`, `fineract-read`, `fineract-batch-manager`, `fineract-batch-worker`
-- Ingress + cert-manager statt nacktem LoadBalancer-TLS im Pod
-- HorizontalPodAutoscaler für Read/Worker
-- NetworkPolicies (App → DB/MQ only)
-- OSGi-Bundle-Volume oder Init-Container, der Bundles nach `osgi/bundles` legt
+- PostgreSQL as primary DB (StatefulSet or managed service)
+- Separate deployments: `fineract-write`, `fineract-read`, `fineract-batch-manager`, `fineract-batch-worker`
+- Ingress + cert-manager instead of bare LoadBalancer TLS in the pod
+- HorizontalPodAutoscaler for read/worker
+- NetworkPolicies (app → DB/MQ only)
+- OSGi bundle volume or init container that places bundles in `osgi/bundles`
 
 ---
 
-## 5.7 Deployment-Szenario D: OSGi / Equinox Runtime
+## 5.7 Deployment Scenario D: OSGi / Equinox Runtime
 
-**Zweck**: dynamische Modularität – Feature-Bundles (KI, Product Rules) zur Laufzeit laden.
+**Purpose**: dynamic modularity – load feature bundles (AI, product rules) at runtime.
 
-### Prozesssicht
+### Process View
 
 ```mermaid
 flowchart TB
@@ -386,29 +386,29 @@ flowchart TB
     B2 -.->|HTTPS| KI[xAI Grok API]
 ```
 
-### Verzeichnis- und Konfigurationslayout
+### Directory and Configuration Layout
 
 ```
 osgi/
-  start-equinox.sh          # Start-Skript
+  start-equinox.sh          # Start script
   equinox/
-    config.ini              # Framework + Fineract Mode Flags
-    org.eclipse.osgi-*.jar  # Framework JAR (bereitstellen)
-  bundles/                  # installierbare Feature-JARs
+    config.ini              # Framework + Fineract mode flags
+    org.eclipse.osgi-*.jar  # Framework JAR (provide)
+  bundles/                  # Installable feature JARs
   config/                   # OSGi configuration area
   logs/                     # equinox.log
 ```
 
-### `config.ini` – relevante Keys
+### `config.ini` – Relevant Keys
 
-| Key | Bedeutung |
-|-----|-----------|
-| `osgi.noShutdown=true` | Framework bleibt nach Start aktiv |
-| `osgi.console.enable.builtin=true` | Equinox Console |
-| `osgi.bundles.defaultStartLevel=4` | Default Start-Level für Bundles |
-| `osgi.startLevel=6` | Framework Start-Level |
-| `osgi.logfile=logs/equinox.log` | Framework-Log |
-| `fineract.mode.*.enabled` | Rollen analog Application Modes |
+| Key | Meaning |
+|-----|---------|
+| `osgi.noShutdown=true` | Framework stays active after start |
+| `osgi.console.enable.builtin=true` | Equinox console |
+| `osgi.bundles.defaultStartLevel=4` | Default start level for bundles |
+| `osgi.startLevel=6` | Framework start level |
+| `osgi.logfile=logs/equinox.log` | Framework log |
+| `fineract.mode.*.enabled` | Roles analogous to application modes |
 
 ### Start
 
@@ -420,38 +420,38 @@ osgi/
 #   -configuration osgi/equinox/config.ini
 ```
 
-Gradle-Alternative (`docs/arc42/osgi.gradle`): Task `equinoxStart` mit Main-Class `org.eclipse.osgi.launch.Equinox`.
+Gradle alternative (`docs/arc42/osgi.gradle`): task `equinoxStart` with main class `org.eclipse.osgi.launch.Equinox`.
 
-### Deployment-Regeln für Bundles
+### Deployment Rules for Bundles
 
-1. Bundle-JAR signieren/prüfen (Supply Chain).
-2. Nach `osgi/bundles` deployen (ConfigMap/Volume/Object Storage Sync).
-3. Start-Level so wählen, dass Core vor Extensions startet.
-4. Optional Services: fehlendes Bundle → Core degradiert, kein Totalausfall ([Runtime View 4.4](04_runtime_view.md)).
-5. Rolling Update: Bundle stop → unbind → update → start; laufende Transaktionen nicht hart abbrechen.
+1. Sign/verify bundle JARs (supply chain).
+2. Deploy to `osgi/bundles` (ConfigMap/volume/object storage sync).
+3. Choose start levels so core starts before extensions.
+4. Optional services: missing bundle → core degrades, no total outage ([Runtime View 4.4](04_runtime_view.md)).
+5. Rolling update: bundle stop → unbind → update → start; do not hard-abort running transactions.
 
 ---
 
-## 5.8 Netzwerk, Ports und Endpunkte
+## 5.8 Network, Ports, and Endpoints
 
-| Port | Protokoll | Dienst | Umgebung |
-|------|-----------|--------|----------|
-| **8443** | HTTPS | Fineract REST + Actuator | alle App-Nodes |
+| Port | Protocol | Service | Environment |
+|------|----------|---------|-------------|
+| **8443** | HTTPS | Fineract REST + Actuator | all app nodes |
 | **5432** | TCP | PostgreSQL | DB |
-| **3306** | TCP | MySQL/MariaDB | alternative DB / K8s-Beispiel |
-| **9092** | TCP | Kafka | Multi-Node Jobs/Events |
-| **61616** | TCP | ActiveMQ | JMS-Alternative |
-| **2501** | TCP | Equinox Console | OSGi Dev/Ops (absichern!) |
-| **5000** | JDWP | Remote Debug | nur Development |
-| **4318** | HTTP | OTLP (Tempo) | Observability |
+| **3306** | TCP | MySQL/MariaDB | alternative DB / K8s example |
+| **9092** | TCP | Kafka | multi-node jobs/events |
+| **61616** | TCP | ActiveMQ | JMS alternative |
+| **2501** | TCP | Equinox console | OSGi dev/ops (secure!) |
+| **5000** | JDWP | Remote debug | development only |
+| **4318** | HTTP | OTLP (Tempo) | observability |
 
-Öffentliche API-Basis (typisch):
+Public API base (typical):
 
 ```
 https://<host>:8443/fineract-provider/api/v1/...
 ```
 
-Health (K8s-Probes):
+Health (K8s probes):
 
 ```
 https://<host>:8443/fineract-provider/actuator/health/liveness
@@ -460,9 +460,9 @@ https://<host>:8443/fineract-provider/actuator/health/readiness
 
 ---
 
-## 5.9 Konfiguration und Secrets
+## 5.9 Configuration and Secrets
 
-### Schichten
+### Layers
 
 ```mermaid
 flowchart LR
@@ -474,30 +474,30 @@ flowchart LR
     B --> D
 ```
 
-### Wichtige Konfigurationsgruppen
+### Important Configuration Groups
 
-| Gruppe | Beispiele | Quelle im Repo |
-|--------|-----------|----------------|
+| Group | Examples | Source in Repo |
+|-------|----------|----------------|
 | **Node / Mode** | `FINERACT_NODE_ID`, `FINERACT_MODE_*` | `fineract.env`, manager/worker env |
 | **Datasource** | `FINERACT_HIKARI_*`, `FINERACT_DEFAULT_TENANTDB_*` | `fineract-postgresql.env`, common |
-| **Pool** | Min Idle, Max Pool, Timeouts | `fineract-common.env` |
-| **Messaging** | Kafka/JMS Broker URLs, Topics | `kafka-client.env`, `activemq.env` |
-| **Security** | SSL, OAuth2, 2FA | compose-test-Varianten |
+| **Pool** | Min idle, max pool, timeouts | `fineract-common.env` |
+| **Messaging** | Kafka/JMS broker URLs, topics | `kafka-client.env`, `activemq.env` |
+| **Security** | SSL, OAuth2, 2FA | compose test variants |
 | **Observability** | Prometheus, OTLP, CloudWatch | `prometheus.env`, `oltp.env`, … |
-| **COB** | Chunk/Partition/Poll | `fineract-manager.env` |
+| **COB** | Chunk/partition/poll | `fineract-manager.env` |
 
-### Secrets-Handling
+### Secrets Handling
 
-| Umgebung | Empfehlung |
-|----------|------------|
-| Docker Compose (Dev) | Env-Dateien – **keine** Prod-Passwörter committen |
-| Kubernetes | `Secret` (Beispiel: `fineract-tenants-db-secret`) |
-| Produktion | External Secrets / Vault / Cloud KMS; Rotation; Least Privilege DB-User |
-| KI-API | API-Keys nur als Secret; nie in Bundle-JAR hardcoden |
+| Environment | Recommendation |
+|-------------|----------------|
+| Docker Compose (dev) | Env files – **do not** commit prod passwords |
+| Kubernetes | `Secret` (example: `fineract-tenants-db-secret`) |
+| Production | External Secrets / Vault / Cloud KMS; rotation; least-privilege DB user |
+| AI API | API keys only as secrets; never hardcode in bundle JAR |
 
 ---
 
-## 5.10 Persistenz und Multi-Tenancy im Deployment
+## 5.10 Persistence and Multi-Tenancy in Deployment
 
 ```mermaid
 flowchart TB
@@ -508,95 +508,95 @@ flowchart TB
     Tenants --> Tn[(Tenant N DB)]
 ```
 
-Deployment-Implikationen:
+Deployment implications:
 
-- **Backup**: Tenants-DB + jede Tenant-DB (konsistente Snapshots idealerweise zeitnah).
-- **Connection Limits**: `Hikari maximumPoolSize × Node-Anzahl × Tenants` vs. DB `max_connections`.
-- **Schema-Migration**: Liquibase primär auf Manager/führendem Write-Node; Worker ohne Migration.
-- **Storage**: K8s PV für DB; App-Nodes weitgehend stateless (Logs/temp separat).
+- **Backup**: tenants DB + every tenant DB (consistent snapshots ideally close in time).
+- **Connection limits**: `Hikari maximumPoolSize × node count × tenants` vs. DB `max_connections`.
+- **Schema migration**: Liquibase primarily on manager/leading write node; workers without migration.
+- **Storage**: K8s PV for DB; app nodes largely stateless (logs/temp separate).
 
 ---
 
-## 5.11 Infrastruktur für Runtime-Szenarien
+## 5.11 Infrastructure for Runtime Scenarios
 
-Mapping der [Runtime View](04_runtime_view.md) auf Deployment:
+Mapping of the [Runtime View](04_runtime_view.md) to deployment:
 
-| Runtime-Szenario | Deployment-Anforderung |
+| Runtime Scenario | Deployment Requirement |
 |------------------|------------------------|
-| Loan Creation (Write) | ≥1 Write-Node, DB primary, TLS, Auth |
-| Command Processing | gleiche Write-Nodes; optional disruptor-Tuning pro JVM |
-| OSGi Bundle Lifecycle | Equinox im Prozess + Bundle-Storage + Console-Zugriff (abgesichert) |
-| Multi-Tenant Request | korrekte Tenant-DB-Erreichbarkeit; genügend Pool/Connections |
-| COB | Batch Manager + N Worker, Messaging oder co-located, COB-Filter beachten |
-| KI-Analyse | Egress zu externer API, Timeouts, Secrets, optionales KI-Bundle |
+| Loan Creation (Write) | ≥1 write node, DB primary, TLS, auth |
+| Command Processing | same write nodes; optional disruptor tuning per JVM |
+| OSGi Bundle Lifecycle | Equinox in-process + bundle storage + console access (secured) |
+| Multi-Tenant Request | correct tenant DB reachability; enough pool/connections |
+| COB | Batch manager + N workers, messaging or co-located, observe COB filters |
+| AI analysis | Egress to external API, timeouts, secrets, optional AI bundle |
 
 ---
 
-## 5.12 Skalierung und Hochverfügbarkeit
+## 5.12 Scaling and High Availability
 
-| Ebene | Horizontal | Vertikal | HA-Muster |
-|-------|------------|----------|-----------|
-| **Read Nodes** | ja (stateless) | Heap/CPU | Load Balancer, mehrere Replicas |
-| **Write Nodes** | begrenzt (DB-Contention) | Heap/CPU | Session-frei; Idempotency hilft bei Retries |
-| **Batch Manager** | nein (aktiv 1) | ja | Aktiv/Passiv, Leader Election (Ziel) |
-| **Batch Worker** | ja | ja | konkurrierende Consumer auf Job-Topic |
-| **DB** | Read Replicas für Reports | IOPS/RAM | Managed HA, Failover |
-| **Kafka** | Broker-Cluster | – | Replication Factor ≥ 3 in Prod |
-| **OSGi Bundles** | pro Node identisches Set | – | gleiche Bundle-Versionen cluster-weit |
+| Layer | Horizontal | Vertical | HA Pattern |
+|-------|------------|----------|------------|
+| **Read nodes** | yes (stateless) | Heap/CPU | Load balancer, multiple replicas |
+| **Write nodes** | limited (DB contention) | Heap/CPU | Session-free; idempotency helps on retries |
+| **Batch Manager** | no (active 1) | yes | Active/passive, leader election (target) |
+| **Batch Worker** | yes | yes | Competing consumers on job topic |
+| **DB** | Read replicas for reports | IOPS/RAM | Managed HA, failover |
+| **Kafka** | Broker cluster | – | Replication factor ≥ 3 in prod |
+| **OSGi bundles** | identical set per node | – | same bundle versions cluster-wide |
 
-### Kapazitäts-Faustregeln (Startpunkt, messen!)
+### Capacity Rules of Thumb (Starting Point, Measure!)
 
-- Write-Node Heap: 2–4 GiB klein, 8+ GiB COB-lastig  
-- Worker: CPU-bound bei COB-Steps; mehr Replicas vor mehr Heap testen  
-- DB: IOPS und Connections sind häufig der Flaschenhals, nicht die API-Pods  
-
----
-
-## 5.13 Sicherheitsaspekte im Deployment
-
-| Thema | Maßnahme |
-|-------|----------|
-| **Transport** | HTTPS 8443; internes mTLS optional (Service Mesh) |
-| **Secrets** | keine Klartext-Passwörter in Images/Git |
-| **Equinox Console** | Port 2501 nicht öffentlich; nur Admin-Netz / port-forward |
-| **JDWP 5000** | nur Dev; nie in Prod-Services exposen |
-| **Network Policy** | App → DB/MQ/KI-API; kein breites Egress |
-| **Image Supply Chain** | pinned Tags/Digests, Scanning, signierte Bundles |
-| **AuthN/Z** | Basic/OAuth2/2FA je nach Compose-/Prod-Profil; Tenant-Header nicht spoofen lassen |
+- Write-node heap: 2–4 GiB small, 8+ GiB COB-heavy  
+- Worker: CPU-bound on COB steps; try more replicas before more heap  
+- DB: IOPS and connections are often the bottleneck, not the API pods  
 
 ---
 
-## 5.14 Deployment-Qualität und Constraints
+## 5.13 Security Aspects in Deployment
 
-- **Stateless App-Nodes** erleichtern Skalierung; Zustand liegt in DB und Messaging.
-- **Rollen-Flags** müssen zur Topologie passen (kein zweiter aktiver Manager „aus Versehen“).
-- **OSGi** erhöht Flexibilität, verlangt aber Bundle-Lifecycle-Disziplin und Versions-Kompatibilität.
-- **Observability** ist Teil des Deployments: ohne Metriken/Traces sind COB- und Pool-Probleme schwer diagnostizierbar.
-- Compose-/Beispiel-K8s-Setups sind **Blaupausen**, keine fertige Bank-Produktion.
-
----
-
-## 5.15 Offene Punkte / nächste Iterationen
-
-- Finales Image-Layout: eingebettetes Equinox vs. separater Bundle-Manager
-- Helm-Chart für fineract-osgi (PostgreSQL, Manager/Worker, Bundle-PVC)
-- Managed PostgreSQL + Kafka auf Cloud-Providern (Referenzarchitektur)
-- Blue/Green oder Canary für Bundle- und App-Releases
-- Disaster-Recovery-Runbook (RPO/RTO für Tenant-DBs)
-- Härtungs-Checklist (TLS-Zertifikate, Secret-Rotation, Console-Disable in Prod)
+| Topic | Measure |
+|-------|---------|
+| **Transport** | HTTPS 8443; internal mTLS optional (service mesh) |
+| **Secrets** | no plaintext passwords in images/Git |
+| **Equinox console** | Port 2501 not public; admin network / port-forward only |
+| **JDWP 5000** | dev only; never expose in prod services |
+| **Network policy** | App → DB/MQ/AI API; no broad egress |
+| **Image supply chain** | pinned tags/digests, scanning, signed bundles |
+| **AuthN/Z** | Basic/OAuth2/2FA per Compose/prod profile; do not allow tenant-header spoofing |
 
 ---
 
-## 5.16 Verwandte Gherkin-Features
+## 5.14 Deployment Quality and Constraints
 
-| Deployment-Thema | Feature |
+- **Stateless app nodes** ease scaling; state lives in DB and messaging.
+- **Role flags** must match the topology (no second active manager “by accident”).
+- **OSGi** increases flexibility but requires bundle lifecycle discipline and version compatibility.
+- **Observability** is part of deployment: without metrics/traces, COB and pool problems are hard to diagnose.
+- Compose/example K8s setups are **blueprints**, not a finished bank production.
+
+---
+
+## 5.15 Open Points / Next Iterations
+
+- Final image layout: embedded Equinox vs. separate bundle manager
+- Helm chart for fineract-osgi (PostgreSQL, manager/worker, bundle PVC)
+- Managed PostgreSQL + Kafka on cloud providers (reference architecture)
+- Blue/green or canary for bundle and app releases
+- Disaster-recovery runbook (RPO/RTO for tenant DBs)
+- Hardening checklist (TLS certificates, secret rotation, console disable in prod)
+
+---
+
+## 5.16 Related Gherkin Features
+
+| Deployment Topic | Feature |
 |------------------|---------|
-| Node Modes Read/Write/Batch | [crosscutting/node_modes.feature](../gherkin/features/crosscutting/node_modes.feature) |
+| Node modes Read/Write/Batch | [crosscutting/node_modes.feature](../gherkin/features/crosscutting/node_modes.feature) |
 | Manager/Worker + COB | [cob/close_of_business.feature](../gherkin/features/cob/close_of_business.feature) |
-| OSGi Bundle-Betrieb | [osgi/optional_bundle_degradation.feature](../gherkin/features/osgi/optional_bundle_degradation.feature) |
+| OSGi bundle operations | [osgi/optional_bundle_degradation.feature](../gherkin/features/osgi/optional_bundle_degradation.feature) |
 
 Tags: `@arc42-05`, `@adr-007`, `@adr-012` — Mapping: [gherkin/README.md](../gherkin/README.md).
 
 ---
 
-*Weiter*: [06 Crosscutting Concepts](06_crosscutting_concepts.md) · *Zurück*: [04 Runtime View](04_runtime_view.md)
+*Next*: [06 Crosscutting Concepts](06_crosscutting_concepts.md) · *Back*: [04 Runtime View](04_runtime_view.md)

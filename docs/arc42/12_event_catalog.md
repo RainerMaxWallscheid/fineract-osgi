@@ -1,28 +1,28 @@
-# 12. Event-Katalog (Business Events → Domain/ES)
+# 12. Event Catalog (Business Events → Domain/ES)
 
-Vollständiger Katalog der **konkreten** `*BusinessEvent`-Typen im Repo (Stand Code-Scan), gemappt auf Bounded Contexts, Aggregate-Streams und **ES-Zielnamen** ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)).
+Complete catalog of the **concrete** `*BusinessEvent` types in the repo (as of code scan), mapped to bounded contexts, aggregate streams, and **ES target names** ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)).
 
-Ergänzt:
+Complements:
 
-- strategisch: [10 Domain Context Map](10_domain_context_map.md)
-- taktisch: [11 Aggregate Canvas](11_aggregate_canvas.md)
+- strategic: [10 Domain Context Map](10_domain_context_map.md)
+- tactical: [11 Aggregate Canvas](11_aggregate_canvas.md)
 - DDD: [ADR-019](decisions/ADR-019-domain-driven-design.md)
-- Messaging/Hooks: [06 Crosscutting](06_crosscutting_concepts.md)
+- messaging/hooks: [06 Crosscutting](06_crosscutting_concepts.md)
 
-**Status:** living inventory – bei neuen Event-Klassen aktualisieren (siehe [12.9 Pflicht DB-Config](#129-pflicht-external-event-konfiguration-in-der-db) und [12.10 Pflege](#1210-pflege-und-code-scan)).
+**Status:** living inventory – update when new event classes are added (see [12.9 Required DB config](#129-required-external-event-configuration-in-the-db) and [12.10 Maintenance](#1210-maintenance-and-code-scan)).
 
 ---
 
-## 12.1 Event-Taxonomie
+## 12.1 Event taxonomy
 
-| Schicht | Rolle | Persistenz / Transport | Beispiel |
+| Layer | Role | Persistence / transport | Example |
 |---------|--------|------------------------|---------|
-| **Domain Event (ES-Ziel)** | Autoritative Tatsache am Aggregate; append-only Stream | Event Store (Write-SoT) | `LoanRepaymentPosted` |
-| **Business Event (Ist)** | Nachricht nach Domain-Änderung (in-process) | `BusinessEventNotifierService` | `LoanTransactionMakeRepaymentPostBusinessEvent` |
-| **External Event** | Downstream/Partner (Kafka/JMS) | Avro + Serializer, wenn nicht `NoExternalEvent` | `MessageV1` + `LoanTransactionDataV1` |
-| **Internal Lifecycle Trigger** | State Machine, kein externes Produkt-Event | Enum im Domain-Code | `LoanEvent.LOAN_DISBURSED` |
-| **Pre-Event** | Hook *vor* Commit der Wirkung | oft kompensierbar; **kein** ES-Fakt | `…PreBusinessEvent` |
-| **Post-Event / Fact** | Nach erfolgreicher Änderung | ES-Kandidat / Outbox | `…PostBusinessEvent` oder `…BusinessEvent` |
+| **Domain Event (ES target)** | Authoritative fact on the aggregate; append-only stream | Event store (write SoT) | `LoanRepaymentPosted` |
+| **Business Event (as-is)** | Message after domain change (in-process) | `BusinessEventNotifierService` | `LoanTransactionMakeRepaymentPostBusinessEvent` |
+| **External Event** | Downstream/partners (Kafka/JMS) | Avro + serializer, unless `NoExternalEvent` | `MessageV1` + `LoanTransactionDataV1` |
+| **Internal Lifecycle Trigger** | State machine, no external product event | Enum in domain code | `LoanEvent.LOAN_DISBURSED` |
+| **Pre-Event** | Hook *before* effect commit | often compensatable; **not** an ES fact | `…PreBusinessEvent` |
+| **Post-Event / Fact** | After successful change | ES candidate / outbox | `…PostBusinessEvent` or `…BusinessEvent` |
 
 ```mermaid
 flowchart LR
@@ -36,345 +36,345 @@ flowchart LR
   DE --> RM[Read Model Projector]
 ```
 
-### Spaltenlegende (Tabellen)
+### Column legend (tables)
 
-| Spalte | Bedeutung |
+| Column | Meaning |
 |--------|-----------|
-| **Ist TYPE** | `getType()` / `TYPE`-Konstante der Java-Klasse |
-| **Phase** | `pre` = vor Wirkung; `post` = nach Commit-Wirkung; `fact` = einfaches Fakt-Event |
-| **Aggregat/Stream** | ES-Stream-Zuordnung (Ziel) |
-| **ES-Zielname** | Vorgeschlagener Domain-Event-Name (ohne `BusinessEvent`-Suffix); `—` = nicht in ES |
-| **ES-Rolle** | Kandidat vs. hook-only |
-| **GL** | Typische Journal-Relevanz (heuristisch) |
-| **Ext** | Potentiell externalisierbar; `nein` = `NoExternalEvent` o. ä.; `ja*` = sofern External-Events global aktiv und Serializer existiert |
+| **As-is TYPE** | `getType()` / `TYPE` constant of the Java class |
+| **Phase** | `pre` = before effect; `post` = after commit effect; `fact` = simple fact event |
+| **Aggregate/Stream** | ES stream assignment (target) |
+| **ES target name** | Proposed domain event name (without `BusinessEvent` suffix); `—` = not in ES |
+| **ES role** | Candidate vs. hook-only |
+| **GL** | Typical journal relevance (heuristic) |
+| **Ext** | Potentially externalisable; `no` = `NoExternalEvent` or similar; `yes*` = if external events are globally enabled and a serializer exists |
 
-### Inventar-Überblick (Code-Scan)
+### Inventory overview (code scan)
 
-| Bereich | Konkrete TYPEs | Bemerkung |
+| Area | Concrete TYPEs | Note |
 |---------|---------------:|-----------|
-| Loan Servicing | ~98 | größter Katalog; viele Pre/Post-Paare |
-| Working Capital Loan | 8 | eigene Transaction-Events |
-| Savings | 9 | dünner als Loan |
-| FD/RD Create | 2 | Lifecycle unvollständig als Events |
-| Client | 16 | Lifecycle/Staff/Transfer verdrahtet (Identifier/Charge/Family noch offen) |
-| Group/Center | 2 | nur Create |
+| Loan Servicing | ~98 | largest catalog; many pre/post pairs |
+| Working Capital Loan | 8 | own transaction events |
+| Savings | 9 | thinner than loan |
+| FD/RD Create | 2 | lifecycle incomplete as events |
+| Client | 16 | lifecycle/staff/transfer wired (identifier/charge/family still open) |
+| Group/Center | 2 | create only |
 | Share | 3 | |
 | Investor | 1 | Ownership Transfer |
 | Accounting | 1 | `JournalEntryCreated` (`NoExternalEvent`) |
 | Document | 2 | |
 | Datatable | 3 | `NoExternalEvent` |
-| COB locks | 2 | operativ |
-| LoanProduct | 1 | nur Create |
+| COB locks | 2 | operational |
+| LoanProduct | 1 | create only |
 | Platform bulk | 1 | Envelope |
-| **Summe konkret** | **~149** | +13 Client-Lifecycle/Transfer Events; plus abstrakte Basisklassen |
+| **Concrete total** | **~149** | +13 client lifecycle/transfer events; plus abstract base classes |
 
 ---
 
-## 12.2 Katalog nach Bounded Context
+## 12.2 Catalog by bounded context
 
 ### Client & Group (Party) — Client
 
-_Konkrete Business-Event-Typen: **16**_ (Lifecycle + Staff + Transfer; Serializer: `ClientBusinessEventSerializer` → Avro `ClientDataV1`)
+_Concrete business event types: **16**_ (lifecycle + staff + transfer; serializer: `ClientBusinessEventSerializer` → Avro `ClientDataV1`)
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `ClientCreateBusinessEvent` | fact | Client | `ClientCreated` | ES-Kandidat | selten/nein | ja* |
-| `ClientActivateBusinessEvent` | fact | Client | `ClientActivated` | ES-Kandidat | selten/nein | ja* |
-| `ClientUpdateBusinessEvent` | fact | Client | `ClientUpdated` | ES-Kandidat | selten/nein | ja* |
-| `ClientCloseBusinessEvent` | fact | Client | `ClientClosed` | ES-Kandidat | selten/nein | ja* |
-| `ClientRejectBusinessEvent` | fact | Client | `ClientRejected` | ES-Kandidat | selten/nein | ja* |
-| `ClientWithdrawBusinessEvent` | fact | Client | `ClientWithdrawn` | ES-Kandidat | selten/nein | ja* |
-| `ClientReactivateBusinessEvent` | fact | Client | `ClientReactivated` | ES-Kandidat | selten/nein | ja* |
-| `ClientUndoRejectBusinessEvent` | fact | Client | `ClientRejectionUndone` | ES-Kandidat | selten/nein | ja* |
-| `ClientUndoWithdrawBusinessEvent` | fact | Client | `ClientWithdrawalUndone` | ES-Kandidat | selten/nein | ja* |
-| `ClientDeleteBusinessEvent` | fact | Client | `ClientDeleted` | ES-Kandidat | selten/nein | ja* |
-| `ClientAssignStaffBusinessEvent` | fact | Client | `ClientStaffAssigned` | ES-Kandidat | selten/nein | ja* |
-| `ClientUnassignStaffBusinessEvent` | fact | Client | `ClientStaffUnassigned` | ES-Kandidat | selten/nein | ja* |
-| `ClientTransferProposeBusinessEvent` | fact | Client | `ClientTransferProposed` | ES-Kandidat | selten/nein | ja* |
-| `ClientTransferAcceptBusinessEvent` | fact | Client | `ClientTransferAccepted` | ES-Kandidat | selten/nein | ja* |
-| `ClientTransferRejectBusinessEvent` | fact | Client | `ClientTransferRejected` | ES-Kandidat | selten/nein | ja* |
-| `ClientTransferWithdrawBusinessEvent` | fact | Client | `ClientTransferWithdrawn` | ES-Kandidat | selten/nein | ja* |
+| `ClientCreateBusinessEvent` | fact | Client | `ClientCreated` | ES candidate | rare/no | yes* |
+| `ClientActivateBusinessEvent` | fact | Client | `ClientActivated` | ES candidate | rare/no | yes* |
+| `ClientUpdateBusinessEvent` | fact | Client | `ClientUpdated` | ES candidate | rare/no | yes* |
+| `ClientCloseBusinessEvent` | fact | Client | `ClientClosed` | ES candidate | rare/no | yes* |
+| `ClientRejectBusinessEvent` | fact | Client | `ClientRejected` | ES candidate | rare/no | yes* |
+| `ClientWithdrawBusinessEvent` | fact | Client | `ClientWithdrawn` | ES candidate | rare/no | yes* |
+| `ClientReactivateBusinessEvent` | fact | Client | `ClientReactivated` | ES candidate | rare/no | yes* |
+| `ClientUndoRejectBusinessEvent` | fact | Client | `ClientRejectionUndone` | ES candidate | rare/no | yes* |
+| `ClientUndoWithdrawBusinessEvent` | fact | Client | `ClientWithdrawalUndone` | ES candidate | rare/no | yes* |
+| `ClientDeleteBusinessEvent` | fact | Client | `ClientDeleted` | ES candidate | rare/no | yes* |
+| `ClientAssignStaffBusinessEvent` | fact | Client | `ClientStaffAssigned` | ES candidate | rare/no | yes* |
+| `ClientUnassignStaffBusinessEvent` | fact | Client | `ClientStaffUnassigned` | ES candidate | rare/no | yes* |
+| `ClientTransferProposeBusinessEvent` | fact | Client | `ClientTransferProposed` | ES candidate | rare/no | yes* |
+| `ClientTransferAcceptBusinessEvent` | fact | Client | `ClientTransferAccepted` | ES candidate | rare/no | yes* |
+| `ClientTransferRejectBusinessEvent` | fact | Client | `ClientTransferRejected` | ES candidate | rare/no | yes* |
+| `ClientTransferWithdrawBusinessEvent` | fact | Client | `ClientTransferWithdrawn` | ES candidate | rare/no | yes* |
 
 ### Client & Group (Party) — Group/Center
 
-_Konkrete Business-Event-Typen: **2**_
+_Concrete business event types: **2**_
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `CentersCreateBusinessEvent` | fact | Group/Center | `CentersCreate` | ES-Kandidat | selten/nein | ja* |
-| `GroupsCreateBusinessEvent` | fact | Group/Center | `GroupsCreate` | ES-Kandidat | selten/nein | ja* |
+| `CentersCreateBusinessEvent` | fact | Group/Center | `CentersCreate` | ES candidate | rare/no | yes* |
+| `GroupsCreateBusinessEvent` | fact | Group/Center | `GroupsCreate` | ES candidate | rare/no | yes* |
 
 ### Loan Servicing
 
-_Konkrete Business-Event-Typen: **98**_
+_Concrete business event types: **98**_
 
 #### lifecycle
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `LoanApplicationModifiedBusinessEvent` | fact | Loan | `LoanApplicationModified` | ES-Kandidat | nein | ja* |
-| `LoanApprovedAmountChangedBusinessEvent` | fact | Loan | `LoanApprovedAmountChanged` | ES-Kandidat | nein | ja* |
-| `LoanApprovedBusinessEvent` | fact | Loan | `LoanApproved` | ES-Kandidat | nein | ja* |
-| `LoanCloseBusinessEvent` | fact | Loan | `LoanClose` | ES-Kandidat | nein | ja* |
-| `LoanCreatedBusinessEvent` | fact | Loan | `LoanCreated` | ES-Kandidat | nein | ja* |
-| `LoanDisbursalBusinessEvent` | fact | Loan | `LoanDisbursal` | ES-Kandidat | ja | ja* |
-| `LoanRejectedBusinessEvent` | fact | Loan | `LoanRejected` | ES-Kandidat | nein | ja* |
-| `LoanStatusChangedBusinessEvent` | fact | Loan | `LoanStatusChanged` | ES-Kandidat | nein | ja* |
-| `LoanUndoApprovalBusinessEvent` | fact | Loan | `LoanUndoApproval` | ES-Kandidat | nein | ja* |
-| `LoanUndoDisbursalBusinessEvent` | fact | Loan | `LoanUndoDisbursal` | ES-Kandidat | ja | ja* |
-| `LoanUndoLastDisbursalBusinessEvent` | fact | Loan | `LoanUndoLastDisbursal` | ES-Kandidat | ja | ja* |
-| `LoanUpdateDisbursementDataBusinessEvent` | fact | Loan | `LoanUpdateDisbursementData` | ES-Kandidat | nein | ja* |
-| `LoanWithdrawnByApplicantBusinessEvent` | fact | Loan | `LoanWithdrawnByApplicant` | ES-Kandidat | nein | ja* |
+| `LoanApplicationModifiedBusinessEvent` | fact | Loan | `LoanApplicationModified` | ES candidate | no | yes* |
+| `LoanApprovedAmountChangedBusinessEvent` | fact | Loan | `LoanApprovedAmountChanged` | ES candidate | no | yes* |
+| `LoanApprovedBusinessEvent` | fact | Loan | `LoanApproved` | ES candidate | no | yes* |
+| `LoanCloseBusinessEvent` | fact | Loan | `LoanClose` | ES candidate | no | yes* |
+| `LoanCreatedBusinessEvent` | fact | Loan | `LoanCreated` | ES candidate | no | yes* |
+| `LoanDisbursalBusinessEvent` | fact | Loan | `LoanDisbursal` | ES candidate | yes | yes* |
+| `LoanRejectedBusinessEvent` | fact | Loan | `LoanRejected` | ES candidate | no | yes* |
+| `LoanStatusChangedBusinessEvent` | fact | Loan | `LoanStatusChanged` | ES candidate | no | yes* |
+| `LoanUndoApprovalBusinessEvent` | fact | Loan | `LoanUndoApproval` | ES candidate | no | yes* |
+| `LoanUndoDisbursalBusinessEvent` | fact | Loan | `LoanUndoDisbursal` | ES candidate | yes | yes* |
+| `LoanUndoLastDisbursalBusinessEvent` | fact | Loan | `LoanUndoLastDisbursal` | ES candidate | yes | yes* |
+| `LoanUpdateDisbursementDataBusinessEvent` | fact | Loan | `LoanUpdateDisbursementData` | ES candidate | no | yes* |
+| `LoanWithdrawnByApplicantBusinessEvent` | fact | Loan | `LoanWithdrawnByApplicant` | ES candidate | no | yes* |
 
 #### transactions
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `LoanAccrualAdjustmentTransactionBusinessEvent` | fact | Loan | `LoanAccrualAdjustmentTransaction` | ES-Kandidat | ja | ja* |
-| `LoanAccrualTransactionCreatedBusinessEvent` | fact | Loan | `LoanAccrualTransactionCreated` | ES-Kandidat | ja | ja* |
-| `LoanAdjustTransactionBusinessEvent` | fact | Loan | `LoanAdjustTransaction` | ES-Kandidat | ja | ja* |
-| `LoanBuyDownFeeAdjustmentTransactionCreatedBusinessEvent` | fact | Loan | `LoanBuyDownFeeAdjustmentTransactionCreated` | ES-Kandidat | ja | ja* |
-| `LoanBuyDownFeeAmortizationAdjustmentTransactionCreatedBusinessEvent` | fact | Loan | `LoanBuyDownFeeAmortizationAdjustmentTransactionCreated` | ES-Kandidat | ja | ja* |
-| `LoanBuyDownFeeAmortizationTransactionCreatedBusinessEvent` | fact | Loan | `LoanBuyDownFeeAmortizationTransactionCreated` | ES-Kandidat | ja | ja* |
-| `LoanBuyDownFeeTransactionCreatedBusinessEvent` | fact | Loan | `LoanBuyDownFeeTransactionCreated` | ES-Kandidat | ja | ja* |
-| `LoanCapitalizedIncomeAdjustmentTransactionCreatedBusinessEvent` | fact | Loan | `LoanCapitalizedIncomeAdjustmentTransactionCreated` | ES-Kandidat | ja | ja* |
-| `LoanCapitalizedIncomeAmortizationAdjustmentTransactionCreatedBusinessEvent` | fact | Loan | `LoanCapitalizedIncomeAmortizationAdjustmentTransactionCreated` | ES-Kandidat | ja | ja* |
-| `LoanCapitalizedIncomeAmortizationTransactionCreatedBusinessEvent` | fact | Loan | `LoanCapitalizedIncomeAmortizationTransactionCreated` | ES-Kandidat | ja | ja* |
-| `LoanCapitalizedIncomeTransactionCreatedBusinessEvent` | fact | Loan | `LoanCapitalizedIncomeTransactionCreated` | ES-Kandidat | ja | ja* |
-| `LoanCreditBalanceRefundPostBusinessEvent` | post | Loan | `LoanCreditBalanceRefund` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanCreditBalanceRefundPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `LoanDisbursalTransactionBusinessEvent` | fact | Loan | `LoanDisbursalTransaction` | ES-Kandidat | ja | ja* |
-| `LoanForeClosurePostBusinessEvent` | post | Loan | `LoanForeClosure` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanForeClosurePreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `LoanRefundPostBusinessEvent` | post | Loan | `LoanRefund` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanRefundPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `LoanRepaymentDueBusinessEvent` | fact | Loan | `LoanRepaymentDue` | ES-Kandidat | ja | ja* |
-| `LoanRepaymentOverdueBusinessEvent` | fact | Loan | `LoanRepaymentOverdue` | ES-Kandidat | ja | ja* |
-| `LoanTransactionAccrualActivityPostBusinessEvent` | post | Loan | `LoanTransactionAccrualActivity` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanTransactionAccrualActivityPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `LoanTransactionContractTerminationPostBusinessEvent` | post | Loan | `LoanTransactionContractTermination` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanTransactionDownPaymentPostBusinessEvent` | post | Loan | `LoanTransactionDownPayment` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanTransactionDownPaymentPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `LoanTransactionGoodwillCreditPostBusinessEvent` | post | Loan | `LoanTransactionGoodwillCredit` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanTransactionGoodwillCreditPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `LoanTransactionInterestPaymentWaiverPostBusinessEvent` | post | Loan | `LoanTransactionInterestPaymentWaiver` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanTransactionInterestPaymentWaiverPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `LoanTransactionInterestRefundPostBusinessEvent` | post | Loan | `LoanTransactionInterestRefund` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanTransactionInterestRefundPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `LoanTransactionMakeRepaymentPostBusinessEvent` | post | Loan | `LoanTransactionMakeRepayment` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanTransactionMakeRepaymentPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `LoanTransactionMerchantIssuedRefundPostBusinessEvent` | post | Loan | `LoanTransactionMerchantIssuedRefund` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanTransactionMerchantIssuedRefundPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `LoanTransactionPayoutRefundPostBusinessEvent` | post | Loan | `LoanTransactionPayoutRefund` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanTransactionPayoutRefundPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `LoanTransactionRecoveryPaymentPostBusinessEvent` | post | Loan | `LoanTransactionRecoveryPayment` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanTransactionRecoveryPaymentPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `LoanUndoContractTerminationBusinessEvent` | fact | Loan | `LoanUndoContractTermination` | ES-Kandidat | ja | ja* |
-| `LoanWaiveInterestBusinessEvent` | fact | Loan | `LoanWaiveInterest` | ES-Kandidat | ja | ja* |
+| `LoanAccrualAdjustmentTransactionBusinessEvent` | fact | Loan | `LoanAccrualAdjustmentTransaction` | ES candidate | yes | yes* |
+| `LoanAccrualTransactionCreatedBusinessEvent` | fact | Loan | `LoanAccrualTransactionCreated` | ES candidate | yes | yes* |
+| `LoanAdjustTransactionBusinessEvent` | fact | Loan | `LoanAdjustTransaction` | ES candidate | yes | yes* |
+| `LoanBuyDownFeeAdjustmentTransactionCreatedBusinessEvent` | fact | Loan | `LoanBuyDownFeeAdjustmentTransactionCreated` | ES candidate | yes | yes* |
+| `LoanBuyDownFeeAmortizationAdjustmentTransactionCreatedBusinessEvent` | fact | Loan | `LoanBuyDownFeeAmortizationAdjustmentTransactionCreated` | ES candidate | yes | yes* |
+| `LoanBuyDownFeeAmortizationTransactionCreatedBusinessEvent` | fact | Loan | `LoanBuyDownFeeAmortizationTransactionCreated` | ES candidate | yes | yes* |
+| `LoanBuyDownFeeTransactionCreatedBusinessEvent` | fact | Loan | `LoanBuyDownFeeTransactionCreated` | ES candidate | yes | yes* |
+| `LoanCapitalizedIncomeAdjustmentTransactionCreatedBusinessEvent` | fact | Loan | `LoanCapitalizedIncomeAdjustmentTransactionCreated` | ES candidate | yes | yes* |
+| `LoanCapitalizedIncomeAmortizationAdjustmentTransactionCreatedBusinessEvent` | fact | Loan | `LoanCapitalizedIncomeAmortizationAdjustmentTransactionCreated` | ES candidate | yes | yes* |
+| `LoanCapitalizedIncomeAmortizationTransactionCreatedBusinessEvent` | fact | Loan | `LoanCapitalizedIncomeAmortizationTransactionCreated` | ES candidate | yes | yes* |
+| `LoanCapitalizedIncomeTransactionCreatedBusinessEvent` | fact | Loan | `LoanCapitalizedIncomeTransactionCreated` | ES candidate | yes | yes* |
+| `LoanCreditBalanceRefundPostBusinessEvent` | post | Loan | `LoanCreditBalanceRefund` | ES candidate (post = committed) | yes | yes* |
+| `LoanCreditBalanceRefundPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `LoanDisbursalTransactionBusinessEvent` | fact | Loan | `LoanDisbursalTransaction` | ES candidate | yes | yes* |
+| `LoanForeClosurePostBusinessEvent` | post | Loan | `LoanForeClosure` | ES candidate (post = committed) | yes | yes* |
+| `LoanForeClosurePreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `LoanRefundPostBusinessEvent` | post | Loan | `LoanRefund` | ES candidate (post = committed) | yes | yes* |
+| `LoanRefundPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `LoanRepaymentDueBusinessEvent` | fact | Loan | `LoanRepaymentDue` | ES candidate | yes | yes* |
+| `LoanRepaymentOverdueBusinessEvent` | fact | Loan | `LoanRepaymentOverdue` | ES candidate | yes | yes* |
+| `LoanTransactionAccrualActivityPostBusinessEvent` | post | Loan | `LoanTransactionAccrualActivity` | ES candidate (post = committed) | yes | yes* |
+| `LoanTransactionAccrualActivityPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `LoanTransactionContractTerminationPostBusinessEvent` | post | Loan | `LoanTransactionContractTermination` | ES candidate (post = committed) | yes | yes* |
+| `LoanTransactionDownPaymentPostBusinessEvent` | post | Loan | `LoanTransactionDownPayment` | ES candidate (post = committed) | yes | yes* |
+| `LoanTransactionDownPaymentPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `LoanTransactionGoodwillCreditPostBusinessEvent` | post | Loan | `LoanTransactionGoodwillCredit` | ES candidate (post = committed) | yes | yes* |
+| `LoanTransactionGoodwillCreditPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `LoanTransactionInterestPaymentWaiverPostBusinessEvent` | post | Loan | `LoanTransactionInterestPaymentWaiver` | ES candidate (post = committed) | yes | yes* |
+| `LoanTransactionInterestPaymentWaiverPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `LoanTransactionInterestRefundPostBusinessEvent` | post | Loan | `LoanTransactionInterestRefund` | ES candidate (post = committed) | yes | yes* |
+| `LoanTransactionInterestRefundPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `LoanTransactionMakeRepaymentPostBusinessEvent` | post | Loan | `LoanTransactionMakeRepayment` | ES candidate (post = committed) | yes | yes* |
+| `LoanTransactionMakeRepaymentPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `LoanTransactionMerchantIssuedRefundPostBusinessEvent` | post | Loan | `LoanTransactionMerchantIssuedRefund` | ES candidate (post = committed) | yes | yes* |
+| `LoanTransactionMerchantIssuedRefundPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `LoanTransactionPayoutRefundPostBusinessEvent` | post | Loan | `LoanTransactionPayoutRefund` | ES candidate (post = committed) | yes | yes* |
+| `LoanTransactionPayoutRefundPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `LoanTransactionRecoveryPaymentPostBusinessEvent` | post | Loan | `LoanTransactionRecoveryPayment` | ES candidate (post = committed) | yes | yes* |
+| `LoanTransactionRecoveryPaymentPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `LoanUndoContractTerminationBusinessEvent` | fact | Loan | `LoanUndoContractTermination` | ES candidate | yes | yes* |
+| `LoanWaiveInterestBusinessEvent` | fact | Loan | `LoanWaiveInterest` | ES candidate | yes | yes* |
 
 #### charges
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `LoanAddChargeBusinessEvent` | fact | Loan | `LoanAddCharge` | ES-Kandidat | nein | ja* |
-| `LoanApplyOverdueChargeBusinessEvent` | fact | Loan | `LoanApplyOverdueCharge` | ES-Kandidat | nein | ja* |
-| `LoanChargeAdjustmentPostBusinessEvent` | post | Loan | `LoanChargeAdjustment` | ES-Kandidat (post = committed) | nein | ja* |
-| `LoanChargeAdjustmentPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `LoanChargeOffPostBusinessEvent` | post | Loan | `LoanChargeOff` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanChargeOffPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `LoanChargePaymentPostBusinessEvent` | post | Loan | `LoanChargePayment` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanChargePaymentPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `LoanChargeRefundBusinessEvent` | fact | Loan | `LoanChargeRefund` | ES-Kandidat | ja | ja* |
-| `LoanChargebackTransactionBusinessEvent` | fact | Loan | `LoanChargebackTransaction` | ES-Kandidat | ja | ja* |
-| `LoanDeleteChargeBusinessEvent` | fact | Loan | `LoanDeleteCharge` | ES-Kandidat | nein | ja* |
-| `LoanUndoChargeOffBusinessEvent` | fact | Loan | `LoanUndoChargeOff` | ES-Kandidat | ja | ja* |
-| `LoanUpdateChargeBusinessEvent` | fact | Loan | `LoanUpdateCharge` | ES-Kandidat | nein | ja* |
-| `LoanWaiveChargeBusinessEvent` | fact | Loan | `LoanWaiveCharge` | ES-Kandidat | ja | ja* |
-| `LoanWaiveChargeUndoBusinessEvent` | fact | Loan | `LoanWaiveChargeUndo` | ES-Kandidat | ja | ja* |
+| `LoanAddChargeBusinessEvent` | fact | Loan | `LoanAddCharge` | ES candidate | no | yes* |
+| `LoanApplyOverdueChargeBusinessEvent` | fact | Loan | `LoanApplyOverdueCharge` | ES candidate | no | yes* |
+| `LoanChargeAdjustmentPostBusinessEvent` | post | Loan | `LoanChargeAdjustment` | ES candidate (post = committed) | no | yes* |
+| `LoanChargeAdjustmentPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `LoanChargeOffPostBusinessEvent` | post | Loan | `LoanChargeOff` | ES candidate (post = committed) | yes | yes* |
+| `LoanChargeOffPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `LoanChargePaymentPostBusinessEvent` | post | Loan | `LoanChargePayment` | ES candidate (post = committed) | yes | yes* |
+| `LoanChargePaymentPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `LoanChargeRefundBusinessEvent` | fact | Loan | `LoanChargeRefund` | ES candidate | yes | yes* |
+| `LoanChargebackTransactionBusinessEvent` | fact | Loan | `LoanChargebackTransaction` | ES candidate | yes | yes* |
+| `LoanDeleteChargeBusinessEvent` | fact | Loan | `LoanDeleteCharge` | ES candidate | no | yes* |
+| `LoanUndoChargeOffBusinessEvent` | fact | Loan | `LoanUndoChargeOff` | ES candidate | yes | yes* |
+| `LoanUpdateChargeBusinessEvent` | fact | Loan | `LoanUpdateCharge` | ES candidate | no | yes* |
+| `LoanWaiveChargeBusinessEvent` | fact | Loan | `LoanWaiveCharge` | ES candidate | yes | yes* |
+| `LoanWaiveChargeUndoBusinessEvent` | fact | Loan | `LoanWaiveChargeUndo` | ES candidate | yes | yes* |
 
 #### schedule
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `LoanCloseAsRescheduleBusinessEvent` | fact | Loan | `LoanCloseAsReschedule` | ES-Kandidat | nein | ja* |
-| `LoanInterestRecalculationBusinessEvent` | fact | Loan | `LoanInterestRecalculation` | ES-Kandidat | ja | ja* |
-| `LoanReAgeBusinessEvent` | fact | Loan | `LoanReAge` | ES-Kandidat | nein | ja* |
-| `LoanReAgeTransactionBusinessEvent` | fact | Loan | `LoanReAgeTransaction` | ES-Kandidat | nein | ja* |
-| `LoanReAmortizeBusinessEvent` | fact | Loan | `LoanReAmortize` | ES-Kandidat | nein | ja* |
-| `LoanReAmortizeTransactionBusinessEvent` | fact | Loan | `LoanReAmortizeTransaction` | ES-Kandidat | nein | ja* |
-| `LoanRescheduledDueAdjustScheduleBusinessEvent` | fact | Loan | `LoanRescheduledDueAdjustSchedule` | ES-Kandidat | nein | ja* |
-| `LoanRescheduledDueCalendarChangeBusinessEvent` | fact | Loan | `LoanRescheduledDueCalendarChange` | ES-Kandidat | nein | ja* |
-| `LoanRescheduledDueHolidayBusinessEvent` | fact | Loan | `LoanRescheduledDueHoliday` | ES-Kandidat | nein | ja* |
-| `LoanScheduleVariationsAddedBusinessEvent` | fact | Loan | `LoanScheduleVariationsAdded` | ES-Kandidat | nein | ja* |
-| `LoanScheduleVariationsDeletedBusinessEvent` | fact | Loan | `LoanScheduleVariationsDeleted` | ES-Kandidat | nein | ja* |
-| `LoanUndoReAgeBusinessEvent` | fact | Loan | `LoanUndoReAge` | ES-Kandidat | nein | ja* |
-| `LoanUndoReAgeTransactionBusinessEvent` | fact | Loan | `LoanUndoReAgeTransaction` | ES-Kandidat | nein | ja* |
-| `LoanUndoReAmortizeBusinessEvent` | fact | Loan | `LoanUndoReAmortize` | ES-Kandidat | nein | ja* |
-| `LoanUndoReAmortizeTransactionBusinessEvent` | fact | Loan | `LoanUndoReAmortizeTransaction` | ES-Kandidat | nein | ja* |
+| `LoanCloseAsRescheduleBusinessEvent` | fact | Loan | `LoanCloseAsReschedule` | ES candidate | no | yes* |
+| `LoanInterestRecalculationBusinessEvent` | fact | Loan | `LoanInterestRecalculation` | ES candidate | yes | yes* |
+| `LoanReAgeBusinessEvent` | fact | Loan | `LoanReAge` | ES candidate | no | yes* |
+| `LoanReAgeTransactionBusinessEvent` | fact | Loan | `LoanReAgeTransaction` | ES candidate | no | yes* |
+| `LoanReAmortizeBusinessEvent` | fact | Loan | `LoanReAmortize` | ES candidate | no | yes* |
+| `LoanReAmortizeTransactionBusinessEvent` | fact | Loan | `LoanReAmortizeTransaction` | ES candidate | no | yes* |
+| `LoanRescheduledDueAdjustScheduleBusinessEvent` | fact | Loan | `LoanRescheduledDueAdjustSchedule` | ES candidate | no | yes* |
+| `LoanRescheduledDueCalendarChangeBusinessEvent` | fact | Loan | `LoanRescheduledDueCalendarChange` | ES candidate | no | yes* |
+| `LoanRescheduledDueHolidayBusinessEvent` | fact | Loan | `LoanRescheduledDueHoliday` | ES candidate | no | yes* |
+| `LoanScheduleVariationsAddedBusinessEvent` | fact | Loan | `LoanScheduleVariationsAdded` | ES candidate | no | yes* |
+| `LoanScheduleVariationsDeletedBusinessEvent` | fact | Loan | `LoanScheduleVariationsDeleted` | ES candidate | no | yes* |
+| `LoanUndoReAgeBusinessEvent` | fact | Loan | `LoanUndoReAge` | ES candidate | no | yes* |
+| `LoanUndoReAgeTransactionBusinessEvent` | fact | Loan | `LoanUndoReAgeTransaction` | ES candidate | no | yes* |
+| `LoanUndoReAmortizeBusinessEvent` | fact | Loan | `LoanUndoReAmortize` | ES candidate | no | yes* |
+| `LoanUndoReAmortizeTransactionBusinessEvent` | fact | Loan | `LoanUndoReAmortizeTransaction` | ES candidate | no | yes* |
 
 #### transfer
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `LoanAcceptTransferBusinessEvent` | fact | Loan | `LoanAcceptTransfer` | ES-Kandidat | nein | ja* |
-| `LoanInitiateTransferBusinessEvent` | fact | Loan | `LoanInitiateTransfer` | ES-Kandidat | nein | ja* |
-| `LoanRejectTransferBusinessEvent` | fact | Loan | `LoanRejectTransfer` | ES-Kandidat | nein | ja* |
-| `LoanWithdrawTransferBusinessEvent` | fact | Loan | `LoanWithdrawTransfer` | ES-Kandidat | nein | ja* |
+| `LoanAcceptTransferBusinessEvent` | fact | Loan | `LoanAcceptTransfer` | ES candidate | no | yes* |
+| `LoanInitiateTransferBusinessEvent` | fact | Loan | `LoanInitiateTransfer` | ES candidate | no | yes* |
+| `LoanRejectTransferBusinessEvent` | fact | Loan | `LoanRejectTransfer` | ES candidate | no | yes* |
+| `LoanWithdrawTransferBusinessEvent` | fact | Loan | `LoanWithdrawTransfer` | ES candidate | no | yes* |
 
 #### officer
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `LoanReassignOfficerBusinessEvent` | fact | Loan | `LoanReassignOfficer` | ES-Kandidat | nein | ja* |
-| `LoanRemoveOfficerBusinessEvent` | fact | Loan | `LoanRemoveOfficer` | ES-Kandidat | nein | ja* |
+| `LoanReassignOfficerBusinessEvent` | fact | Loan | `LoanReassignOfficer` | ES candidate | no | yes* |
+| `LoanRemoveOfficerBusinessEvent` | fact | Loan | `LoanRemoveOfficer` | ES candidate | no | yes* |
 
 #### risk-snapshot
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `LoanAccountCustomSnapshotBusinessEvent` | fact | Loan | `LoanAccountCustomSnapshot` | ES-Kandidat | nein | ja* |
-| `LoanAccountDelinquencyPauseChangedBusinessEvent` | fact | Loan | `LoanAccountDelinquencyPauseChanged` | ES-Kandidat | nein | ja* |
-| `LoanAccountSnapshotBusinessEvent` | fact | Loan | `LoanAccountSnapshot` | ES-Kandidat | nein | ja* |
-| `LoanBalanceChangedBusinessEvent` | fact | Loan | `LoanBalanceChanged` | ES-Kandidat | nein | ja* |
-| `LoanDelinquencyRangeChangeBusinessEvent` | fact | Loan | `LoanDelinquencyRangeChange` | ES-Kandidat | nein | ja* |
+| `LoanAccountCustomSnapshotBusinessEvent` | fact | Loan | `LoanAccountCustomSnapshot` | ES candidate | no | yes* |
+| `LoanAccountDelinquencyPauseChangedBusinessEvent` | fact | Loan | `LoanAccountDelinquencyPauseChanged` | ES candidate | no | yes* |
+| `LoanAccountSnapshotBusinessEvent` | fact | Loan | `LoanAccountSnapshot` | ES candidate | no | yes* |
+| `LoanBalanceChangedBusinessEvent` | fact | Loan | `LoanBalanceChanged` | ES candidate | no | yes* |
+| `LoanDelinquencyRangeChangeBusinessEvent` | fact | Loan | `LoanDelinquencyRangeChange` | ES candidate | no | yes* |
 
 #### other
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `LoanUndoWrittenOffBusinessEvent` | fact | Loan | `LoanUndoWrittenOff` | ES-Kandidat | ja | ja* |
-| `LoanWrittenOffPostBusinessEvent` | post | Loan | `LoanWrittenOff` | ES-Kandidat (post = committed) | ja | ja* |
-| `LoanWrittenOffPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
+| `LoanUndoWrittenOffBusinessEvent` | fact | Loan | `LoanUndoWrittenOff` | ES candidate | yes | yes* |
+| `LoanWrittenOffPostBusinessEvent` | post | Loan | `LoanWrittenOff` | ES candidate (post = committed) | yes | yes* |
+| `LoanWrittenOffPreBusinessEvent` | pre | Loan | `—` | hook-only (pre); no ES fact | no | yes* |
 
 ### Product Catalog — LoanProduct
 
-_Konkrete Business-Event-Typen: **1**_
+_Concrete business event types: **1**_
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `LoanProductCreateBusinessEvent` | fact | LoanProduct | `LoanProductCreate` | ES-Kandidat | nein | ja* |
+| `LoanProductCreateBusinessEvent` | fact | LoanProduct | `LoanProductCreate` | ES candidate | no | yes* |
 
 ### Loan Servicing — Working Capital
 
-_Konkrete Business-Event-Typen: **8**_
+_Concrete business event types: **8**_
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `WorkingCapitalLoanChargeAdjustmentPostBusinessEvent` | post | WorkingCapitalLoan / Loan | `WorkingCapitalLoanChargeAdjustment` | ES-Kandidat (post = committed) | nein | ja* |
-| `WorkingCapitalLoanChargeAdjustmentPreBusinessEvent` | pre | WorkingCapitalLoan / Loan | `—` | hook-only (pre); kein ES-Fakt | nein | ja* |
-| `WorkingCapitalLoanCreditBalanceRefundTransactionBusinessEvent` | fact | WorkingCapitalLoan / Loan | `WorkingCapitalLoanCreditBalanceRefundTransaction` | ES-Kandidat | ja | ja* |
-| `WorkingCapitalLoanDisbursalTransactionBusinessEvent` | fact | WorkingCapitalLoan / Loan | `WorkingCapitalLoanDisbursalTransaction` | ES-Kandidat | ja | ja* |
-| `WorkingCapitalLoanDiscountFeeAdjustmentTransactionBusinessEvent` | fact | WorkingCapitalLoan / Loan | `WorkingCapitalLoanDiscountFeeAdjustmentTransaction` | ES-Kandidat | nein | ja* |
-| `WorkingCapitalLoanDiscountFeeTransactionBusinessEvent` | fact | WorkingCapitalLoan / Loan | `WorkingCapitalLoanDiscountFeeTransaction` | ES-Kandidat | nein | ja* |
-| `WorkingCapitalLoanRepaymentTransactionBusinessEvent` | fact | WorkingCapitalLoan / Loan | `WorkingCapitalLoanRepaymentTransaction` | ES-Kandidat | ja | ja* |
-| `WorkingCapitalLoanUndoDisbursalTransactionBusinessEvent` | fact | WorkingCapitalLoan / Loan | `WorkingCapitalLoanUndoDisbursalTransaction` | ES-Kandidat | ja | ja* |
+| `WorkingCapitalLoanChargeAdjustmentPostBusinessEvent` | post | WorkingCapitalLoan / Loan | `WorkingCapitalLoanChargeAdjustment` | ES candidate (post = committed) | no | yes* |
+| `WorkingCapitalLoanChargeAdjustmentPreBusinessEvent` | pre | WorkingCapitalLoan / Loan | `—` | hook-only (pre); no ES fact | no | yes* |
+| `WorkingCapitalLoanCreditBalanceRefundTransactionBusinessEvent` | fact | WorkingCapitalLoan / Loan | `WorkingCapitalLoanCreditBalanceRefundTransaction` | ES candidate | yes | yes* |
+| `WorkingCapitalLoanDisbursalTransactionBusinessEvent` | fact | WorkingCapitalLoan / Loan | `WorkingCapitalLoanDisbursalTransaction` | ES candidate | yes | yes* |
+| `WorkingCapitalLoanDiscountFeeAdjustmentTransactionBusinessEvent` | fact | WorkingCapitalLoan / Loan | `WorkingCapitalLoanDiscountFeeAdjustmentTransaction` | ES candidate | no | yes* |
+| `WorkingCapitalLoanDiscountFeeTransactionBusinessEvent` | fact | WorkingCapitalLoan / Loan | `WorkingCapitalLoanDiscountFeeTransaction` | ES candidate | no | yes* |
+| `WorkingCapitalLoanRepaymentTransactionBusinessEvent` | fact | WorkingCapitalLoan / Loan | `WorkingCapitalLoanRepaymentTransaction` | ES candidate | yes | yes* |
+| `WorkingCapitalLoanUndoDisbursalTransactionBusinessEvent` | fact | WorkingCapitalLoan / Loan | `WorkingCapitalLoanUndoDisbursalTransaction` | ES candidate | yes | yes* |
 
 ### Savings & Deposits — SavingsAccount
 
-_Konkrete Business-Event-Typen: **9**_
+_Concrete business event types: **9**_
 
 #### lifecycle
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `SavingsActivateBusinessEvent` | fact | SavingsAccount | `SavingsActivate` | ES-Kandidat | nein | ja* |
-| `SavingsApproveBusinessEvent` | fact | SavingsAccount | `SavingsApprove` | ES-Kandidat | nein | ja* |
-| `SavingsCloseBusinessEvent` | fact | SavingsAccount | `SavingsClose` | ES-Kandidat | nein | ja* |
-| `SavingsCreateBusinessEvent` | fact | SavingsAccount | `SavingsCreate` | ES-Kandidat | nein | ja* |
-| `SavingsRejectBusinessEvent` | fact | SavingsAccount | `SavingsReject` | ES-Kandidat | nein | ja* |
+| `SavingsActivateBusinessEvent` | fact | SavingsAccount | `SavingsActivate` | ES candidate | no | yes* |
+| `SavingsApproveBusinessEvent` | fact | SavingsAccount | `SavingsApprove` | ES candidate | no | yes* |
+| `SavingsCloseBusinessEvent` | fact | SavingsAccount | `SavingsClose` | ES candidate | no | yes* |
+| `SavingsCreateBusinessEvent` | fact | SavingsAccount | `SavingsCreate` | ES candidate | no | yes* |
+| `SavingsRejectBusinessEvent` | fact | SavingsAccount | `SavingsReject` | ES candidate | no | yes* |
 
 #### transactions
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `SavingsAccountForceWithdrawalBusinessEvent` | fact | SavingsAccount | `SavingsAccountForceWithdrawal` | ES-Kandidat | ja | ja* |
-| `SavingsDepositBusinessEvent` | fact | SavingsAccount | `SavingsDeposit` | ES-Kandidat | ja | ja* |
-| `SavingsWithdrawalBusinessEvent` | fact | SavingsAccount | `SavingsWithdrawal` | ES-Kandidat | ja | ja* |
+| `SavingsAccountForceWithdrawalBusinessEvent` | fact | SavingsAccount | `SavingsAccountForceWithdrawal` | ES candidate | yes | yes* |
+| `SavingsDepositBusinessEvent` | fact | SavingsAccount | `SavingsDeposit` | ES candidate | yes | yes* |
+| `SavingsWithdrawalBusinessEvent` | fact | SavingsAccount | `SavingsWithdrawal` | ES candidate | yes | yes* |
 
 #### interest
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `SavingsPostInterestBusinessEvent` | fact | SavingsAccount | `SavingsPostInterest` | ES-Kandidat | ja | ja* |
+| `SavingsPostInterestBusinessEvent` | fact | SavingsAccount | `SavingsPostInterest` | ES candidate | yes | yes* |
 
 ### Savings & Deposits — FD/RD
 
-_Konkrete Business-Event-Typen: **2**_
+_Concrete business event types: **2**_
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `FixedDepositAccountCreateBusinessEvent` | fact | FixedDepositAccount | `FixedDepositAccountCreate` | ES-Kandidat | ja | ja* |
-| `RecurringDepositAccountCreateBusinessEvent` | fact | RecurringDepositAccount | `RecurringDepositAccountCreate` | ES-Kandidat | ja | ja* |
+| `FixedDepositAccountCreateBusinessEvent` | fact | FixedDepositAccount | `FixedDepositAccountCreate` | ES candidate | yes | yes* |
+| `RecurringDepositAccountCreateBusinessEvent` | fact | RecurringDepositAccount | `RecurringDepositAccountCreate` | ES candidate | yes | yes* |
 
 ### Share Accounts
 
-_Konkrete Business-Event-Typen: **3**_
+_Concrete business event types: **3**_
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `ShareAccountApproveBusinessEvent` | fact | ShareAccount/Product | `ShareAccountApprove` | ES-Kandidat | nein | ja* |
-| `ShareAccountCreateBusinessEvent` | fact | ShareAccount/Product | `ShareAccountCreate` | ES-Kandidat | nein | ja* |
-| `ShareProductDividentsCreateBusinessEvent` | fact | ShareAccount/Product | `ShareProductDividentsCreate` | ES-Kandidat | nein | ja* |
+| `ShareAccountApproveBusinessEvent` | fact | ShareAccount/Product | `ShareAccountApprove` | ES candidate | no | yes* |
+| `ShareAccountCreateBusinessEvent` | fact | ShareAccount/Product | `ShareAccountCreate` | ES candidate | no | yes* |
+| `ShareProductDividentsCreateBusinessEvent` | fact | ShareAccount/Product | `ShareProductDividentsCreate` | ES candidate | no | yes* |
 
 ### Investor / Secondary Market
 
-_Konkrete Business-Event-Typen: **1**_
+_Concrete business event types: **1**_
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `LoanOwnershipTransferBusinessEvent` | fact | LoanOwnership | `LoanOwnershipTransfer` | ES-Kandidat | nein | ja* |
+| `LoanOwnershipTransferBusinessEvent` | fact | LoanOwnership | `LoanOwnershipTransfer` | ES candidate | no | yes* |
 
 ### Accounting (GL) — Projection events
 
-_Konkrete Business-Event-Typen: **1**_
+_Concrete business event types: **1**_
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `JournalEntryCreatedBusinessEvent` | fact | JournalEntry (projection) | `JournalEntryCreated` | Projection-Signal (kein Portfolio-SoT) | ja | nein |
+| `JournalEntryCreatedBusinessEvent` | fact | JournalEntry (projection) | `JournalEntryCreated` | Projection signal (not portfolio SoT) | yes | no |
 
 ### Document Management
 
-_Konkrete Business-Event-Typen: **2**_
+_Concrete business event types: **2**_
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `DocumentCreatedBusinessEvent` | fact | Document | `DocumentCreated` | ES-Kandidat | selten/nein | ja* |
-| `DocumentDeletedBusinessEvent` | fact | Document | `DocumentDeleted` | ES-Kandidat | selten/nein | ja* |
+| `DocumentCreatedBusinessEvent` | fact | Document | `DocumentCreated` | ES candidate | rare/no | yes* |
+| `DocumentDeletedBusinessEvent` | fact | Document | `DocumentDeleted` | ES candidate | rare/no | yes* |
 
 ### Platform — Datatables
 
-_Konkrete Business-Event-Typen: **3**_
+_Concrete business event types: **3**_
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `DatatableEntryCreatedBusinessEvent` | fact | DatatableEntry | `DatatableEntryCreated` | ES-Kandidat | selten/nein | nein |
-| `DatatableEntryDeletedBusinessEvent` | fact | DatatableEntry | `DatatableEntryDeleted` | ES-Kandidat | selten/nein | nein |
-| `DatatableEntryUpdatedBusinessEvent` | fact | DatatableEntry | `DatatableEntryUpdated` | ES-Kandidat | selten/nein | nein |
+| `DatatableEntryCreatedBusinessEvent` | fact | DatatableEntry | `DatatableEntryCreated` | ES candidate | rare/no | no |
+| `DatatableEntryDeletedBusinessEvent` | fact | DatatableEntry | `DatatableEntryDeleted` | ES candidate | rare/no | no |
+| `DatatableEntryUpdatedBusinessEvent` | fact | DatatableEntry | `DatatableEntryUpdated` | ES candidate | rare/no | no |
 
 ### COB / Batch Operations
 
-_Konkrete Business-Event-Typen: **2**_
+_Concrete business event types: **2**_
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `LoanAccountsStayedLockedBusinessEvent` | fact | COB (ops) | `LoanAccountsStayedLocked` | ES-Kandidat | selten/nein | ja* |
-| `SavingsAccountsStayedLockedBusinessEvent` | fact | COB (ops) | `SavingsAccountsStayedLocked` | ES-Kandidat | selten/nein | ja* |
+| `LoanAccountsStayedLockedBusinessEvent` | fact | COB (ops) | `LoanAccountsStayedLocked` | ES candidate | rare/no | yes* |
+| `SavingsAccountsStayedLockedBusinessEvent` | fact | COB (ops) | `SavingsAccountsStayedLocked` | ES candidate | rare/no | yes* |
 
 ### Platform
 
-_Konkrete Business-Event-Typen: **1**_
+_Concrete business event types: **1**_
 
-| Ist TYPE (`getType`) | Phase | Aggregat/Stream | ES-Zielname (Vorschlag) | ES-Rolle | GL | Ext |
+| As-is TYPE (`getType`) | Phase | Aggregate/Stream | ES target name (proposal) | ES role | GL | Ext |
 |---|:---:|---|---|---|:---:|:---:|
-| `BulkBusinessEvent` | fact | n/a (bulk envelope) | `Bulk` | ES-Kandidat | nein | ja* |
+| `BulkBusinessEvent` | fact | n/a (bulk envelope) | `Bulk` | ES candidate | no | yes* |
 
 ---
 
-## 12.3 Interne Loan-Lifecycle-Trigger (`LoanEvent`)
+## 12.3 Internal loan lifecycle triggers (`LoanEvent`)
 
-Kein Business-/External-Event, sondern Input der `DefaultLoanLifecycleStateMachine`:
+Not a business/external event, but input to `DefaultLoanLifecycleStateMachine`:
 
-| `LoanEvent` | Typische Statuswirkung | Verwandte Business Events (Auszug) |
+| `LoanEvent` | Typical status effect | Related business events (excerpt) |
 |-------------|------------------------|-------------------------------------|
 | `LOAN_CREATED` | → `SUBMITTED_AND_PENDING_APPROVAL` | `LoanCreatedBusinessEvent` |
 | `LOAN_APPROVED` | Pending → `APPROVED` | `LoanApprovedBusinessEvent` |
@@ -384,171 +384,171 @@ Kein Business-/External-Event, sondern Input der `DefaultLoanLifecycleStateMachi
 | `LOAN_DISBURSED` | Approved → `ACTIVE` | `LoanDisbursalBusinessEvent`, `LoanDisbursalTransactionBusinessEvent` |
 | `LOAN_DISBURSAL_UNDO` / `_LAST` | Active → Approved | `LoanUndoDisbursal*BusinessEvent` |
 | `LOAN_REPAYMENT_OR_WAIVER` / `REPAID_IN_FULL` | Active / Closed / Overpaid | `LoanTransactionMakeRepayment*`, `LoanStatusChanged` |
-| `LOAN_OVERPAYMENT` | → `OVERPAID` | Status + Balance Events |
+| `LOAN_OVERPAYMENT` | → `OVERPAID` | Status + balance events |
 | `WRITE_OFF_OUTSTANDING` / `_UNDO` | → `CLOSED_WRITTEN_OFF` | `LoanWrittenOff*`, `LoanUndoWrittenOff` |
-| `LOAN_RESCHEDULE` | → `CLOSED_RESCHEDULE_OUTSTANDING_AMOUNT` | `LoanCloseAsReschedule`, Reschedule-Events |
-| `LOAN_CHARGE_PAYMENT` / `LOAN_CHARGE_ADDED` / `LOAN_CHARGE_ADJUSTMENT` | oft Active bleiben | Charge-* Events |
-| `LOAN_FORECLOSURE` | Close-Pfad | `LoanForeClosure*` |
+| `LOAN_RESCHEDULE` | → `CLOSED_RESCHEDULE_OUTSTANDING_AMOUNT` | `LoanCloseAsReschedule`, reschedule events |
+| `LOAN_CHARGE_PAYMENT` / `LOAN_CHARGE_ADDED` / `LOAN_CHARGE_ADJUSTMENT` | often remain Active | Charge-* events |
+| `LOAN_FORECLOSURE` | Close path | `LoanForeClosure*` |
 | `LOAN_CREDIT_BALANCE_REFUND` | Overpaid → Closed | `LoanCreditBalanceRefund*` |
-| `LOAN_CHARGEBACK` | u. a. Closed/Overpaid → Active | `LoanChargebackTransactionBusinessEvent` |
-| `LOAN_INITIATE_TRANSFER` / `COMPLETE` / `REJECT` / `WITHDRAW` | Transfer-Status | `Loan*TransferBusinessEvent` |
+| `LOAN_CHARGEBACK` | among others Closed/Overpaid → Active | `LoanChargebackTransactionBusinessEvent` |
+| `LOAN_INITIATE_TRANSFER` / `COMPLETE` / `REJECT` / `WITHDRAW` | Transfer status | `Loan*TransferBusinessEvent` |
 | `LOAN_CONTRACT_TERMINATION` | Contract end | `LoanTransactionContractTermination*` |
 | `LOAN_ADJUST_TRANSACTION` | Adjust | `LoanAdjustTransactionBusinessEvent` |
-| `LOAN_REFUND` / `LOAN_RECOVERY_PAYMENT` / `LOAN_EDIT_MULTI_DISBURSE_DATE` / `INTERST_REBATE_OWED` / `LOAN_CLOSED` | diverse | zugehörige Tx/Close Events |
-| *(nebenbei)* | Statuswechsel allgemein | `LoanStatusChangedBusinessEvent` |
+| `LOAN_REFUND` / `LOAN_RECOVERY_PAYMENT` / `LOAN_EDIT_MULTI_DISBURSE_DATE` / `INTERST_REBATE_OWED` / `LOAN_CLOSED` | various | related Tx/Close events |
+| *(incidental)* | Status change in general | `LoanStatusChangedBusinessEvent` |
 
 ---
 
-## 12.4 ES-Namenskonvention (Ziel)
+## 12.4 ES naming convention (target)
 
-| Regel | Beispiel |
+| Rule | Example |
 |-------|----------|
-| Past tense / Fakt | `LoanDisbursed`, nicht `DisburseLoan` |
-| Aggregat-Präfix | `Client…`, `Loan…`, `Savings…` |
-| Kein `BusinessEvent` / `Pre`/`Post` im Stream-Namen | `LoanRepaymentPosted` statt `…MakeRepaymentPostBusinessEvent` |
-| Pre-Events **nicht** in den Event Store | nur Post/Fact |
-| Undo als eigenes Event | `LoanDisbursalUndone`, `LoanWriteOffUndone` |
-| Schema-Version | `LoanRepaymentPostedV1` (Avro/Upcaster) parallel möglich |
-| Stream-ID | `Loan-{id}`, `SavingsAccount-{id}`, `Client-{id}` |
+| Past tense / fact | `LoanDisbursed`, not `DisburseLoan` |
+| Aggregate prefix | `Client…`, `Loan…`, `Savings…` |
+| No `BusinessEvent` / `Pre`/`Post` in stream name | `LoanRepaymentPosted` instead of `…MakeRepaymentPostBusinessEvent` |
+| Pre-events **not** in the event store | post/fact only |
+| Undo as own event | `LoanDisbursalUndone`, `LoanWriteOffUndone` |
+| Schema version | `LoanRepaymentPostedV1` (Avro/upcaster) possible in parallel |
+| Stream ID | `Loan-{id}`, `SavingsAccount-{id}`, `Client-{id}` |
 
-**Mapping-Muster Ist → ES**
+**Mapping pattern as-is → ES**
 
-| Ist-Muster | ES-Muster |
+| As-is pattern | ES pattern |
 |------------|-----------|
-| `XBusinessEvent` | `X` → ideal umbenennen zu past tense (`Xed`/`XPosted`) |
-| `XPreBusinessEvent` | verwerfen für ES; Application-Hook |
-| `XPostBusinessEvent` | `X` / `XPosted` als Domain Event |
-| `LoanStatusChangedBusinessEvent` | oft **ableitbar** aus spezifischerem Event; optional deduplizieren |
-| `LoanBalanceChangedBusinessEvent` | oft Projection/Read-Signal, nicht primärer SoT-Fakt |
-| Snapshots (`LoanAccountSnapshot*`) | **kein** Domain-Event der Wahrheit; periodische/Read-Hilfe |
+| `XBusinessEvent` | `X` → ideally rename to past tense (`Xed`/`XPosted`) |
+| `XPreBusinessEvent` | discard for ES; application hook |
+| `XPostBusinessEvent` | `X` / `XPosted` as domain event |
+| `LoanStatusChangedBusinessEvent` | often **derivable** from a more specific event; optional deduplicate |
+| `LoanBalanceChangedBusinessEvent` | often projection/read signal, not primary SoT fact |
+| Snapshots (`LoanAccountSnapshot*`) | **not** a domain event of truth; periodic/read aid |
 
 ---
 
-## 12.5 Lückenanalyse (Commands ohne Business Event)
+## 12.5 Gap analysis (commands without business event)
 
-### Client (Upstream – Lifecycle größtenteils geschlossen)
+### Client (upstream – lifecycle largely closed)
 
-| Command-Gruppe | Ist-Event | Status |
+| Command group | As-is event | Status |
 |----------------|-----------|--------|
-| Create / Activate / Reject | `ClientCreate` / `Activate` / `Reject` | vorhanden |
-| Update / Close / Withdraw / Reactivate | `ClientUpdate` / `Close` / `Withdraw` / `Reactivate` | **verdrahtet** |
-| Undo Reject / Undo Withdraw | `ClientUndoReject` / `ClientUndoWithdraw` | **verdrahtet** |
-| Delete (pending only) | `ClientDelete` | **verdrahtet** (vor physischem Delete) |
-| Assign / Unassign Staff | `ClientAssignStaff` / `ClientUnassignStaff` | **verdrahtet** |
-| Transfer Propose/Accept/Reject/Withdraw | `ClientTransfer*` | **verdrahtet** |
-| Identifier CRUD | **fehlt** | künftiges Sub-Aggregate-Event |
-| Family / Address | **fehlt** | optional |
-| Client Charge / Pay / Waive | **fehlt** | optional / Accounting-nah |
+| Create / Activate / Reject | `ClientCreate` / `Activate` / `Reject` | present |
+| Update / Close / Withdraw / Reactivate | `ClientUpdate` / `Close` / `Withdraw` / `Reactivate` | **wired** |
+| Undo Reject / Undo Withdraw | `ClientUndoReject` / `ClientUndoWithdraw` | **wired** |
+| Delete (pending only) | `ClientDelete` | **wired** (before physical delete) |
+| Assign / Unassign Staff | `ClientAssignStaff` / `ClientUnassignStaff` | **wired** |
+| Transfer Propose/Accept/Reject/Withdraw | `ClientTransfer*` | **wired** |
+| Identifier CRUD | **missing** | future sub-aggregate event |
+| Family / Address | **missing** | optional |
+| Client Charge / Pay / Waive | **missing** | optional / accounting-adjacent |
 
 ### Savings
 
-| Thema | Ist | Lücke |
+| Topic | As-is | Gap |
 |-------|-----|--------|
 | Application undo / withdraw | Create/Approve/Reject/Activate/Close | Undo Approve, Withdraw Application, Modify |
 | Holds / Blocks / SubStatus | — | `AmountHeld`, `Released`, `Blocked`, `CreditsBlocked`, … |
-| Charges am Account | — | Add/Pay/Waive/Inactivate |
+| Charges on account | — | Add/Pay/Waive/Inactivate |
 | Transaction Adjustment | Deposit/Withdrawal/Force | `SavingsTransactionAdjusted` |
-| FD/RD Lifecycle | nur `*Create` | Approve, Activate, Mature, PrematureClose, Interest |
-| GSIM | — | gesamte GSIM-Palette |
+| FD/RD Lifecycle | only `*Create` | Approve, Activate, Mature, PrematureClose, Interest |
+| GSIM | — | entire GSIM palette |
 
-### Loan (relativ vollständig, Restlücken)
+### Loan (relatively complete, residual gaps)
 
-| Thema | Hinweis |
+| Topic | Note |
 |-------|---------|
-| Pre/Post-Paare | ES nur Post; Pre bleibt Hook |
-| `LoanBalanceChanged` / Snapshots | als Domain-SoT hinterfragen |
-| GLIM-spezifische Events | oft über normale Loan-Events + GLIM-ID |
-| Product Update/Delete | nur `LoanProductCreate` |
-| Fraud mark | prüfen, ob nur Command ohne Event |
+| Pre/Post pairs | ES only Post; Pre remains hook |
+| `LoanBalanceChanged` / Snapshots | question as domain SoT |
+| GLIM-specific events | often via normal loan events + GLIM ID |
+| Product Update/Delete | only `LoanProductCreate` |
+| Fraud mark | check whether command only without event |
 
 ### Group / Share / Organisation
 
-| Context | Lücke |
+| Context | Gap |
 |---------|--------|
 | Group/Center | Update, Activate, Close, Membership |
-| Share | Transaktionen, Close, Reject, … |
-| Organisation (Office/Staff) | praktisch keine Business Events im Scan |
+| Share | Transactions, Close, Reject, … |
+| Organisation (Office/Staff) | practically no business events in scan |
 
 ---
 
-## 12.6 Avro / External Payload (Published Language)
+## 12.6 Avro / external payload (published language)
 
-Payload-Schemas unter `fineract-avro-schemas/src/main/avro/` – **nicht** 1:1 pro Business-Event-TYPE, sondern wiederverwendbare Datencontainer:
+Payload schemas under `fineract-avro-schemas/src/main/avro/` – **not** 1:1 per business event TYPE, but reusable data containers:
 
-| Domain-Ordner | Typische Schemas | Genutzt von (Serializer-Gruppen) |
+| Domain folder | Typical schemas | Used by (serializer groups) |
 |---------------|------------------|----------------------------------|
-| `loan/v1` | `LoanAccountDataV1`, `LoanTransactionDataV1`, `LoanChargeDataV1`, `LoanChargeDeletedV1`, Delinquency/Schedule/Ownership, … | Loan* Serializers |
-| `savings/v1` | `SavingsAccountDataV1`, `SavingsAccountTransactionDataV1`, Locked, … | Savings* Serializers |
+| `loan/v1` | `LoanAccountDataV1`, `LoanTransactionDataV1`, `LoanChargeDataV1`, `LoanChargeDeletedV1`, Delinquency/Schedule/Ownership, … | Loan* serializers |
+| `savings/v1` | `SavingsAccountDataV1`, `SavingsAccountTransactionDataV1`, Locked, … | Savings* serializers |
 | `fixeddeposit/v1`, `recurringdeposit/v1` | Account Data | FD/RD Create |
 | `client/v1` | `ClientDataV1`, Timeline, Collateral | Client* |
 | `group/v1` | `GroupGeneralDataV1`, Roles | Groups* |
 | `share/v1` | Share Account/Product/Tx | Share* |
 | `document/v1` | `DocumentDataV1` | Document* |
-| `gl/v1` | `GLAccountDataV1` | (Journal oft intern) |
+| `gl/v1` | `GLAccountDataV1` | (Journal often internal) |
 | `workingcapitalloan/v1` | `WorkingCapitalLoanTransactionDataV1` | WC Tx |
-| Envelope | `MessageV1`, `BulkMessage*` | alle External Events |
+| Envelope | `MessageV1`, `BulkMessage*` | all external events |
 
-**ES-Hinweis:** Avro-DTOs sind **Integrations-/Read-orientiert**. Domain Events im Store sollten schlanke, versionierte Fakten sein; Avro kann Projection/External bleiben.
+**ES note:** Avro DTOs are **integration/read-oriented**. Domain events in the store should be lean, versioned facts; Avro can remain projection/external.
 
 ---
 
-## 12.7 `NoExternalEvent` / interne-only
+## 12.7 `NoExternalEvent` / internal-only
 
-| TYPE | Grund |
+| TYPE | Reason |
 |------|--------|
 | `DatatableEntryCreatedBusinessEvent` | `NoExternalEvent` |
 | `DatatableEntryUpdatedBusinessEvent` | `NoExternalEvent` |
 | `DatatableEntryDeletedBusinessEvent` | `NoExternalEvent` |
-| `JournalEntryCreatedBusinessEvent` | typisch intern (`LoanJournalEntryCreatedBusinessEvent` / Journal) – nicht als Partner-API gedacht |
+| `JournalEntryCreatedBusinessEvent` | typically internal (`LoanJournalEntryCreatedBusinessEvent` / Journal) – not intended as partner API |
 
-Alle anderen TYPEs sind **potentiell** externalisierbar, sofern External Events aktiviert und ein Serializer greift.
+All other TYPEs are **potentially** externalisable if external events are enabled and a serializer applies.
 
 ---
 
-## 12.8 Priorität für ES-Einführung
+## 12.8 Priority for ES introduction
 
-| Prio | Events zuerst | Warum |
+| Prio | Events first | Why |
 |:----:|---------------|--------|
-| 1 | Client lifecycle (Create/Activate/Close/… – **neu**) | Upstream; Guards für Portfolio |
-| 2 | Charge Catalog (greenfield, noch dünn im Katalog) | ES-Pilot klein |
-| 3 | Savings Create/Approve/Activate/Deposit/Withdrawal/Interest/Close | mittlerer Kern |
-| 4 | Loan Create/Approve/Disburse/Repayment/WriteOff/Close (+ Post-Tx) | Portfolio-Kern |
-| 5 | Loan Charges, Reschedule, Transfers | nach Kern |
-| 6 | WC, Investor, Share, COB ops | spezialisiert |
+| 1 | Client lifecycle (Create/Activate/Close/… – **new**) | Upstream; guards for portfolio |
+| 2 | Charge Catalog (greenfield, still thin in catalog) | Small ES pilot |
+| 3 | Savings Create/Approve/Activate/Deposit/Withdrawal/Interest/Close | medium core |
+| 4 | Loan Create/Approve/Disburse/Repayment/WriteOff/Close (+ Post-Tx) | Portfolio core |
+| 5 | Loan Charges, Reschedule, Transfers | after core |
+| 6 | WC, Investor, Share, COB ops | specialised |
 
-**Regel:** Ein Command erzeugt **0..n Domain Events** im Store; Business Events können 1:1 gespiegelt oder aus Domain Events projiziert werden (Strangler: Dual-Publish).
+**Rule:** One command produces **0..n domain events** in the store; business events can be mirrored 1:1 or projected from domain events (strangler: dual-publish).
 
 ---
 
-## 12.9 Pflicht: External-Event-Konfiguration in der DB
+## 12.9 Required: external event configuration in the DB
 
-> **Jeder neue konkrete `*BusinessEvent` (der nicht `NoExternalEvent` implementiert) muss in `m_external_event_configuration` registriert werden** – sonst startet die Anwendung nicht.
+> **Every new concrete `*BusinessEvent` (that does not implement `NoExternalEvent`) must be registered in `m_external_event_configuration`** – otherwise the application does not start.
 
-### Warum
+### Why
 
-`ExternalEventConfigurationValidationService` scannt beim Boot alle Klassen, die `BusinessEvent` implementieren (ClassGraph, Quelle: `ExternalEventSourceService`). Für jeden Simple-Name muss ein Eintrag in `m_external_event_configuration` existieren:
+`ExternalEventConfigurationValidationService` scans at boot all classes that implement `BusinessEvent` (ClassGraph, source: `ExternalEventSourceService`). For every simple name an entry in `m_external_event_configuration` must exist:
 
 ```text
 Configuration not found for external event <SimpleName>
-→ BeanCreationException → App/Context startet nicht
-→ Integrationstests: waitForFineract Timeout (Cargo/Tomcat up, App down)
+→ BeanCreationException → App/Context does not start
+→ Integration tests: waitForFineract timeout (Cargo/Tomcat up, app down)
 ```
 
-Ausnahme: `NoExternalEvent`, abstrakte Basisklassen, Interfaces, `BulkBusinessEvent`.
+Exception: `NoExternalEvent`, abstract base classes, interfaces, `BulkBusinessEvent`.
 
-### Was im selben PR mitliefern
+### What to ship in the same PR
 
-| Schritt | Artefakt |
+| Step | Artifact |
 |---------|----------|
-| 1 | Java-Klasse `…BusinessEvent` mit `TYPE` / `getType()` |
-| 2 | **Liquibase** Tenant-Changelog: `INSERT` in `m_external_event_configuration` (`type` = SimpleName, typisch `enabled=false`) |
-| 3 | Include in `fineract-provider/.../changelog-tenant.xml` (bzw. Modul-Changelog) |
-| 4 | Unit-Test-Listen aktualisieren, falls vorhanden (`ExternalEventConfigurationValidationServiceTest`) |
-| 5 | Optional: Serializer + Avro |
-| 6 | Zeile in diesem Katalog (Kap. 12.2) |
-| 7 | ES-Mapping (past tense, Stream) wenn Write-SoT betroffen |
+| 1 | Java class `…BusinessEvent` with `TYPE` / `getType()` |
+| 2 | **Liquibase** tenant changelog: `INSERT` into `m_external_event_configuration` (`type` = SimpleName, typically `enabled=false`) |
+| 3 | Include in `fineract-provider/.../changelog-tenant.xml` (or module changelog) |
+| 4 | Update unit-test lists if present (`ExternalEventConfigurationValidationServiceTest`) |
+| 5 | Optional: serializer + Avro |
+| 6 | Row in this catalog (ch. 12.2) |
+| 7 | ES mapping (past tense, stream) when write SoT is affected |
 
-### Liquibase-Muster (Beispiel)
+### Liquibase pattern (example)
 
 ```xml
 <changeSet author="fineract" id="…">
@@ -565,49 +565,49 @@ Ausnahme: `NoExternalEvent`, abstrakte Basisklassen, Interfaces, `BulkBusinessEv
 </changeSet>
 ```
 
-Referenz: `parts/0242_add_client_lifecycle_external_event_configuration.xml` (Client-Lifecycle-Events).
+Reference: `parts/0242_add_client_lifecycle_external_event_configuration.xml` (client lifecycle events).
 
-### Review-Checkliste
+### Review checklist
 
-- [ ] Neuer Event-Typ hat DB-Konfiguration (Liquibase)?  
-- [ ] `enabled` bewusst gesetzt (Default oft `false` bis Consumer/Serializer stehen)?  
-- [ ] App-Start / `waitForFineract` bzw. Actuator Health nach Migrate grün?  
-- [ ] Katalog und ggf. Unit-Test-Whitelist angepasst?
+- [ ] New event type has DB configuration (Liquibase)?  
+- [ ] `enabled` set deliberately (default often `false` until consumer/serializer are ready)?  
+- [ ] App start / `waitForFineract` or actuator health green after migrate?  
+- [ ] Catalog and unit-test whitelist updated if needed?
 
 ---
 
-## 12.10 Pflege und Code-Scan
+## 12.10 Maintenance and code scan
 
-Neuen Event-Typen hinzufügen: **zuerst [12.9](#129-pflicht-external-event-konfiguration-in-der-db)** (DB-Registrierung ist Pflicht, kein Optional).
+When adding new event types: **first [12.9](#129-required-external-event-configuration-in-the-db)** (DB registration is mandatory, not optional).
 
-1. Java-Klasse unter `…/event/business/domain/…` mit `TYPE`.  
-2. **Liquibase `m_external_event_configuration`** (Pflicht, außer `NoExternalEvent`).  
-3. Zeile in diesem Kapitel (passender Context/Unterabschnitt).  
-4. Optional Serializer + Avro, wenn external.  
-5. ES-Mapping: past-tense Name, Stream, Upcaster-Version.  
-6. `ExternalEventConfigurationValidationServiceTest` Listen erweitern (falls betroffen).
+1. Java class under `…/event/business/domain/…` with `TYPE`.  
+2. **Liquibase `m_external_event_configuration`** (required, except `NoExternalEvent`).  
+3. Row in this chapter (matching context/subsection).  
+4. Optional serializer + Avro when external.  
+5. ES mapping: past-tense name, stream, upcaster version.  
+6. Extend `ExternalEventConfigurationValidationServiceTest` lists (if affected).
 
-**Scan-Kommando (Inventar neu erzeugen):**
+**Scan command (regenerate inventory):**
 
 ```bash
 find . -path '*/src/main/java/*' -name '*BusinessEvent.java' ! -path '*/build/*' \
   | wc -l
-# TYPE-Konstanten:
+# TYPE constants:
 grep -R --include='*BusinessEvent.java' 'static final String TYPE' \
   fineract-*/src/main/java | wc -l
 ```
 
 ---
 
-## 12.11 Bezug
+## 12.11 References
 
-| Dokument | Rolle |
+| Document | Role |
 |----------|--------|
-| [10 Context Map](10_domain_context_map.md) | Context-Grenzen |
-| [11 Aggregate Canvas](11_aggregate_canvas.md) | Commands/Invarianten |
-| [06.6 Events](06_crosscutting_concepts.md) | Transport, Boot-Validierung |
-| [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) | ES-Pflicht Writes |
-| [ADR-019](decisions/ADR-019-domain-driven-design.md) | Domain Events |
+| [10 Context Map](10_domain_context_map.md) | Context boundaries |
+| [11 Aggregate Canvas](11_aggregate_canvas.md) | Commands/invariants |
+| [06.6 Events](06_crosscutting_concepts.md) | Transport, boot validation |
+| [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) | ES mandatory writes |
+| [ADR-019](decisions/ADR-019-domain-driven-design.md) | Domain events |
 | [ADR-012](decisions/ADR-012-messaging-fuer-verteilte-jobs-kafka-jms-optional.md) | Transport |
 | Code | `BusinessEventNotifierService`, `ExternalEventConfigurationValidationService`, `m_external_event_configuration`, `fineract-avro-schemas` |
 

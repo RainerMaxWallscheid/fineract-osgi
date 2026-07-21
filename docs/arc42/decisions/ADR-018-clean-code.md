@@ -1,102 +1,102 @@
-# ADR-018 – Clean Code als Entwicklungsleitbild
+# ADR-018 – Clean Code as Development Guiding Model
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Maintainability, Reliability, Testability, Compatibility |
+| **Qualities** | Maintainability, Reliability, Testability, Compatibility |
 
-### Kontext
+### Context
 
-fineract-osgi erbt einen **großen, historisch gewachsenen** Codebestand (Apache Fineract 1.x): lange Methoden, Magic Strings in `JsonCommand`, tiefe DTO-Vererbung, gemischte Persistenz (JPA/JDBC), parallele Command-Stacks. Gleichzeitig steigen die Anforderungen an:
+fineract-osgi inherits a **large, historically grown** codebase (Apache Fineract 1.x): long methods, magic strings in `JsonCommand`, deep DTO inheritance, mixed persistence (JPA/JDBC), parallel command stacks. At the same time, requirements rise for:
 
-- modulweise Modernisierung ([ADR-003](ADR-003-spring-boot-gradle-module-als-kern-beibehalten.md), [ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md)),
-- lesbare API- und Domain-Grenzen ([ADR-015](ADR-015-api-dtos-composition-statt-vererbung.md), [ADR-017](ADR-017-hexagonale-architektur.md)),
-- sichere Änderungen unter hoher Testlast (Unit, Integration, E2E),
-- Onboarding und AI-gestützte Entwicklung (`AGENTS.md`, arc42).
+- module-wise modernization ([ADR-003](ADR-003-spring-boot-gradle-module-als-kern-beibehalten.md), [ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md)),
+- readable API and domain boundaries ([ADR-015](ADR-015-api-dtos-composition-statt-vererbung.md), [ADR-017](ADR-017-hexagonale-architektur.md)),
+- safe change under high test load (unit, integration, E2E),
+- onboarding and AI-assisted development (`AGENTS.md`, arc42).
 
-Ohne ein gemeinsames **Clean-Code-Leitbild** drohen inkonsistente Styles, „Quick Fixes“ neben migrierten Pfaden und Refactors ohne fachlichen Nutzen.
+Without a shared **Clean Code guiding model**, inconsistent styles, “quick fixes” beside migrated paths, and refactors without domain benefit risk proliferating.
 
-### Entscheidung
+### Decision
 
-**Clean Code** (nach Robert C. Martin und etablierten Praktiken) gilt als **verbindliches Qualitätsleitbild** für neuen und angefassten Code in fineract-osgi – **pragmatisch**, mit Boy Scout Rule, ohne Big-Bang-Rewrite des Legacy.
+**Clean Code** (after Robert C. Martin and established practices) is the **binding quality guiding model** for new and touched code in fineract-osgi – **pragmatically**, with the Boy Scout Rule, without a big-bang rewrite of legacy.
 
-#### Kernprinzipien (verbindlich für neuen / angefassten Code)
+#### Core principles (binding for new / touched code)
 
-| Prinzip | In fineract-osgi |
-|---------|------------------|
-| **Aussagekräftige Namen** | Fachsprache (Loan, Deposit, Tenant); keine Abkürzungsfriedhöfe; API-/Command-Namen spiegeln Use Cases |
-| **Kleine, fokussierte Einheiten** | Methoden/Klassen eine Verantwortung; Handler dünn, Domain-Logik in Domain Services |
-| **Funktionen ohne Seiteneffekte wo möglich** | Klare Command-Grenzen; keine versteckten Writes in Read-Pfaden |
-| **DRY mit Augenmaß** | Shared nur bei echter Wiederholung; keine vorzeitigen Framework-Abstraktionen |
-| **Composition over inheritance** | DTOs und Erweiterungen: [ADR-015](ADR-015-api-dtos-composition-statt-vererbung.md); Domain: klare Aggregates statt tiefer Hierarchien |
-| **Fehler explizit** | Platform-/Domain-Exceptions; keine geschluckten Exceptions; Validierung vor Side Effects |
-| **Kommentare sparsam** | Code erklärt *was*; Kommentare für *warum* (EclipseLink-Workarounds, Tenant-Invariants, Idempotenz) |
-| **Tests als Spezifikation** | Unit für Domain/Handler; IT für Adapter; Composition-/Contract-Tests an API-Nähten |
-| **Boy Scout Rule** | Hinterlasse angefassten Code etwas sauberer – im Diff-Scope, nicht als Mega-Refactor |
-| **Dependency Rule** | Domain ohne REST/JPA-Vendor-APIs ([ADR-017](ADR-017-hexagonale-architektur.md)) |
+| Principle | In fineract-osgi |
+|-----------|------------------|
+| **Meaningful names** | Domain language (Loan, Deposit, Tenant); no abbreviation graveyards; API/command names mirror use cases |
+| **Small, focused units** | Methods/classes one responsibility; handlers thin, domain logic in domain services |
+| **Functions without side effects where possible** | Clear command boundaries; no hidden writes on read paths |
+| **DRY with judgement** | Share only for real repetition; no premature framework abstractions |
+| **Composition over inheritance** | DTOs and extensions: [ADR-015](ADR-015-api-dtos-composition-statt-vererbung.md); domain: clear aggregates instead of deep hierarchies |
+| **Errors explicit** | Platform/domain exceptions; no swallowed exceptions; validation before side effects |
+| **Comments sparingly** | Code explains *what*; comments for *why* (EclipseLink workarounds, tenant invariants, idempotency) |
+| **Tests as specification** | Unit for domain/handler; IT for adapters; composition/contract tests at API seams |
+| **Boy Scout Rule** | Leave touched code a bit cleaner – within diff scope, not as a mega-refactor |
+| **Dependency rule** | Domain without REST/JPA vendor APIs ([ADR-017](ADR-017-hexagonale-architektur.md)) |
 
-#### SOLID (als Orientierung, nicht Dogma)
+#### SOLID (as orientation, not dogma)
 
-| Buchstabe | Anwendung |
-|-----------|-----------|
-| **S** | Ein Handler / ein Use Case; Resource ≠ Domain |
-| **O** | Erweiterung über Ports, OSGi-Bundles, Events – nicht durch Core-Fork |
-| **L** | Subtypen nur wo Is-A gilt (kein CPR für reine GET-DTOs) |
-| **I** | Schmale Repository-/Port-Interfaces; keine „God“-Service-APIs neu einführen |
-| **D** | Application hängt an Ports (Repos, Event-Notifier, KI), nicht an konkreten Adaptern |
+| Letter | Application |
+|--------|-------------|
+| **S** | One handler / one use case; resource ≠ domain |
+| **O** | Extension via ports, OSGi bundles, events – not by core fork |
+| **L** | Subtypes only where is-a holds (no CPR for pure GET DTOs) |
+| **I** | Narrow repository/port interfaces; do not introduce new “god” service APIs |
+| **D** | Application depends on ports (repos, event notifier, AI), not concrete adapters |
 
-#### Tooling & Durchsetzung
+#### Tooling & enforcement
 
-| Mittel | Rolle |
-|--------|--------|
-| **Spotless / Format** | einheitliche Formatierung (Projekt-Gradle) |
-| **Checkstyle / SpotBugs** (wo aktiv) | mechanische Hygiene |
-| **CI Tests** | Unit + Integration + ausgewählte E2E |
-| **Code Review** | Clean-Code- und Hexagon-Regeln; Scope-Disziplin |
-| **arc42 + Gherkin** | Architektur- und Verhaltens-Klarheit |
-| **AGENTS.md / SECURITY.md** | Agenten und Scans an Leitplanken binden |
+| Means | Role |
+|-------|------|
+| **Spotless / format** | uniform formatting (project Gradle) |
+| **Checkstyle / SpotBugs** (where active) | mechanical hygiene |
+| **CI tests** | unit + integration + selected E2E |
+| **Code review** | Clean Code and hexagon rules; scope discipline |
+| **arc42 + Gherkin** | architecture and behaviour clarity |
+| **AGENTS.md / SECURITY.md** | bind agents and scans to guardrails |
 
-#### Boy Scout vs. Legacy
+#### Boy Scout vs. legacy
 
-| Situation | Erwartung |
-|-----------|-----------|
-| **Neuer Pfad** (`fineract-command`, neues Modul, neuer Adapter) | Clean-Code-Regeln vollständig |
-| **Angefasstes Legacy** | Fix + lokale Verbesserung (Namen, Extraktion, Test); kein unaufgefordertes Modul-Rewrite |
-| **Großrefactor** | Eigenes Ticket/ADR-Bezug; grüne CI; API-Kompatibilität |
+| Situation | Expectation |
+|-----------|-------------|
+| **New path** (`fineract-command`, new module, new adapter) | Clean Code rules fully |
+| **Touched legacy** | Fix + local improvement (names, extraction, test); no unsolicited module rewrite |
+| **Large refactor** | Own ticket/ADR reference; green CI; API compatibility |
 
-### Alternativen
+### Alternatives
 
-| Option | Bewertung |
-|--------|-----------|
-| Kein formales Clean-Code-Leitbild | Inkonsistenz, schlechtes Onboarding |
-| Strikte „Clean Architecture only“-Packages | Zu teuer parallel zu Hexagon/CQRS-Migration |
-| Nur automatische Formatter | Unzureichend für Namen, Grenzen, Tests |
-| Big-Bang Clean-Rewrite | Inkompatibel mit ADR-003/004 |
+| Option | Assessment |
+|--------|------------|
+| No formal Clean Code guiding model | Inconsistency, poor onboarding |
+| Strict “Clean Architecture only” packages | Too expensive parallel to hexagon/CQRS migration |
+| Automatic formatters only | Insufficient for names, boundaries, tests |
+| Big-bang clean rewrite | Incompatible with ADR-003/004 |
 
-### Konsequenzen
+### Consequences
 
-- **+** Gemeinsame Review-Sprache; bessere Lesbarkeit und Testbarkeit  
-- **+** Verstärkt Hexagon, DTO-Composition, Command-Migration  
-- **+** AI-/Agenten-Arbeit bleibt an nachvollziehbaren Regeln  
-- **−** Bestandscode weicht ab – Erwartung ist Evolution, nicht Perfektion  
-- **−** Reviews brauchen Disziplin gegen Scope-Creep („solange ich hier bin…“)  
+- **+** Shared review language; better readability and testability  
+- **+** Reinforces hexagon, DTO composition, command migration  
+- **+** AI/agent work stays bound to traceable rules  
+- **−** Existing code diverges – expectation is evolution, not perfection  
+- **−** Reviews need discipline against scope creep (“while I’m here…”)  
 
 ### Non-Goals
 
-- Umformatierung des gesamten Repos in einem PR  
-- Erzwingen von maximal kurzen Methoden um den Preis unlesbarer Fragmentierung  
-- Ablösung fachlich nötiger Komplexität (Zins, COB, Multi-Tenant) durch „einfachen“ Code  
-- Ersatz für Architektur-ADRs (Hexagon, JPA, CQRS bleiben führend für Struktur)
+- Reformatting the entire repo in one PR  
+- Enforcing maximally short methods at the cost of unreadable fragmentation  
+- Replacing domain-necessary complexity (interest, COB, multi-tenant) with “simple” code  
+- Substitute for architecture ADRs (hexagon, JPA, CQRS remain leading for structure)
 
-### Bezug
+### Related
 
 - [ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) Commands  
-- [ADR-014](ADR-014-arc42-gherkin-als-doku-strategie.md) Doku  
+- [ADR-014](ADR-014-arc42-gherkin-als-doku-strategie.md) Docs  
 - [ADR-015](ADR-015-api-dtos-composition-statt-vererbung.md) Composition  
-- [ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md) Persistenz-Klarheit  
-- [ADR-017](ADR-017-hexagonale-architektur.md) Dependency Rule  
-- Quality Maintainability: [07.8](../07_quality_attributes.md) · Crosscutting: [06](../06_crosscutting_concepts.md)
+- [ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md) Persistence clarity  
+- [ADR-017](ADR-017-hexagonale-architektur.md) Dependency rule  
+- Quality maintainability: [07.8](../07_quality_attributes.md) · Crosscutting: [06](../06_crosscutting_concepts.md)
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

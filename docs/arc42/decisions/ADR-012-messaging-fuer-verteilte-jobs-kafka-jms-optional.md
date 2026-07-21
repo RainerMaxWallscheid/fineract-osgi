@@ -1,36 +1,36 @@
-# ADR-012 – Messaging für verteilte Jobs (Kafka/JMS optional)
+# ADR-012 – Messaging for Distributed Jobs (Kafka/JMS optional)
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Scalability, Reliability |
+| **Qualities** | Scalability, Reliability |
 
-### Kontext
+### Context
 
-COB und Remote Jobs brauchen bei mehreren Workern eine Verteilung. Für Single-Node reichen In-Process-Events.
+COB and remote jobs need distribution when multiple workers are present. For single-node, in-process events suffice.
 
-### Entscheidung
+### Decision
 
-- **Default lokal**: Spring Events (`fineract.remote-job-message-handler.spring-events`).  
-- **Verteilt**: Kafka **oder** JMS/ActiveMQ per Konfiguration.  
-- External Events analog optional über denselben Broker-Stack.  
-- Kein Zwang zu einem Broker in der Minimalinstallation.
+- **Local default**: Spring Events (`fineract.remote-job-message-handler.spring-events`).  
+- **Distributed**: Kafka **or** JMS/ActiveMQ via configuration.  
+- External events optionally use the same broker stack.  
+- No forced broker in a minimal installation.
 
-### Alternativen
+### Alternatives
 
-| Option | Bewertung |
-|--------|-----------|
-| Immer Kafka erzwingen | Hürde für kleine Deployments |
-| Nur DB-Polling für Work-Queues | Einfach, aber Last und Locking auf der Banking-DB |
-| Cloud-proprietary Queues only | Lock-in; Adapter später möglich |
+| Option | Assessment |
+|--------|------------|
+| Always force Kafka | Barrier for small deployments |
+| DB polling only for work queues | Simple, but load and locking on the banking DB |
+| Cloud-proprietary queues only | Lock-in; adapters possible later |
 
-### Konsequenzen
+### Consequences
 
-- **+** Skalierbare Worker-Plane  
-- **+** Entkopplung Online vs. Batch  
-- **−** At-least-once → idempotente Consumer/Steps  
-- **−** Ops-Kompetenz für Broker-HA in Prod  
+- **+** Scalable worker plane  
+- **+** Decoupling online vs. batch  
+- **−** At-least-once → idempotent consumers/steps  
+- **−** Ops competence for broker HA in production  
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

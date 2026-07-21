@@ -3,36 +3,36 @@
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Maintainability, Correctness, Extensibility, Compatibility |
+| **Qualities** | Maintainability, Correctness, Extensibility, Compatibility |
 
-### Kontext
+### Context
 
-fineract-osgi bildet **Core Banking** ab: Loans, Savings/Deposits, Accounting, Clients, COB, Multi-Tenancy. Die Fachsprache und die Modulgrenzen (Gradle: `fineract-loan`, `fineract-savings`, `fineract-accounting`, …) entsprechen bereits grob **Bounded Contexts**, ohne dass DDD bisher explizit als Leitbild dokumentiert war.
+fineract-osgi models **core banking**: loans, savings/deposits, accounting, clients, COB, multi-tenancy. Domain language and module boundaries (Gradle: `fineract-loan`, `fineract-savings`, `fineract-accounting`, …) already roughly match **bounded contexts**, without DDD having been documented explicitly as a guiding model until now.
 
-Gleichzeitig gelten:
+At the same time the following apply:
 
-- **CQRS** und Command-Pipelines ([ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md)),
-- **hexagonales** Leitbild ([ADR-017](ADR-017-hexagonale-architektur.md)),
-- **JPA-Writes / JDBC-Reads** ([ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md)),
+- **CQRS** and command pipelines ([ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md)),
+- **hexagonal** guiding model ([ADR-017](ADR-017-hexagonale-architektur.md)),
+- **JPA writes / JDBC reads** ([ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md)),
 - **Clean Code** ([ADR-018](ADR-018-clean-code.md)).
 
-Ohne DDD-Vokabular bleiben Aggregatgrenzen, Ubiquitous Language und Context-Maps implizit – Reviews und Migrationen werden uneinheitlich.
+Without DDD vocabulary, aggregate boundaries, ubiquitous language, and context maps remain implicit – reviews and migrations become inconsistent.
 
-### Entscheidung
+### Decision
 
-**Domain-Driven Design** (taktisch + strategisch, pragmatisch) ist Leitbild für die **fachliche Modellierung** in fineract-osgi. Es ergänzt Hexagon (Struktur der Abhängigkeiten) und CQRS (Schreib-/Lesepfade) – **kein** Big-Bang-Event-Sourcing und kein erzwungenes „reines“ DDD-Package-Layout.
+**Domain-Driven Design** (tactical + strategic, pragmatic) is the guiding model for **domain modelling** in fineract-osgi. It complements hexagon (dependency structure) and CQRS (write/read paths) – **not** a big-bang event sourcing and no forced “pure” DDD package layout.
 
-#### Strategisches DDD
+#### Strategic DDD
 
-| Konzept | fineract-osgi |
+| Concept | fineract-osgi |
 |---------|----------------|
-| **Bounded Context** | Gradle-/Domain-Module und klare API-Oberflächen: Loan, Savings/Deposit, Accounting, Client/Organisation, COB, Security/Tenant, Command |
-| **Ubiquitous Language** | Fachbegriffe in Code, Commands, Gherkin, arc42 (Loan Application, Disbursement, Journal Entry, Maturity, Tenant, …) |
-| **Context Map** | Kanonsich dokumentiert in [10 Domain Context Map](../10_domain_context_map.md); Integration über Commands, Domain/Business Events, Hooks, GL-Mappings, Account Associations – nicht über freies Entity-Sharing über Modulgrenzen |
-| **Anti-Corruption Layer** | Adapter zu externer KI, Payment/Interop, Import/Bulk, Legacy-JSON (`JsonCommand`) → typsichere Commands/DTOs |
-| **Shared Kernel (eng)** | `fineract-core` Infrastruktur + wenige echte Shared-Konzepte (Money/Currency, Office, Permissions) – bewusst klein halten |
+| **Bounded context** | Gradle/domain modules and clear API surfaces: Loan, Savings/Deposit, Accounting, Client/Organisation, COB, Security/Tenant, Command |
+| **Ubiquitous language** | Domain terms in code, commands, Gherkin, arc42 (Loan Application, Disbursement, Journal Entry, Maturity, Tenant, …) |
+| **Context map** | Canonically documented in [10 Domain Context Map](../10_domain_context_map.md); integration via commands, domain/business events, hooks, GL mappings, account associations – not free entity sharing across module boundaries |
+| **Anti-corruption layer** | Adapters to external AI, payment/interop, import/bulk, legacy JSON (`JsonCommand`) → type-safe commands/DTOs |
+| **Shared kernel (narrow)** | `fineract-core` infrastructure + few truly shared concepts (Money/Currency, Office, Permissions) – keep deliberately small |
 
-Ausführliche Context Map, Subdomain-Klassifikation und Migrationsreihenfolge: **[Kapitel 10 – Domain Context Map](../10_domain_context_map.md)** (D1).
+Full context map, subdomain classification, and migration order: **[Chapter 10 – Domain Context Map](../10_domain_context_map.md)** (D1).
 
 ```mermaid
 flowchart LR
@@ -47,81 +47,81 @@ flowchart LR
     C -->|owns accounts| L
     C --> S
     L -.->|events / associations| S
-    KI[KI Adapter ACL] -.-> L
+    KI[AI Adapter ACL] -.-> L
 ```
 
-#### Taktisches DDD
+#### Tactical DDD
 
-| Baustein | Bedeutung in fineract-osgi | Beispiele |
-|----------|----------------------------|-----------|
-| **Entity** | Identität über Lebenszyklus | `Loan`, `SavingsAccount`, `Client`, `GLAccount` |
-| **Value Object** | Gleichheit über Werte; oft immutable | Money/Currency, Enums mit Converter, Datumsperioden |
-| **Aggregate** | Konsistenzgrenze; Write über Root | Loan (+ transactions/charges im Use Case), SavingsAccount, Client |
-| **Repository** | Persistenz-Port des Aggregates | Spring Data `*Repository` / Wrapper ([ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md)) |
-| **Domain Service** | Fachlogik über mehrere Entities ohne natürliche Root-Heimat | Zinsberechnung, Accounting-Processor, Transfer-Domain |
-| **Application Service** | Use-Case-Orchestrierung, TX-Grenze | Command Handler, WritePlatformService |
-| **Domain / Business Event** | Tatsache nach erfolgreicher Änderung | Loan created, Account activated; Hooks / External Events |
-| **Factory** | Komplexes Erzeugen von Aggregates | Application-Submit, Product-Instanziierung |
+| Building block | Meaning in fineract-osgi | Examples |
+|----------------|--------------------------|----------|
+| **Entity** | Identity over lifecycle | `Loan`, `SavingsAccount`, `Client`, `GLAccount` |
+| **Value object** | Equality by values; often immutable | Money/Currency, enums with converter, date periods |
+| **Aggregate** | Consistency boundary; write via root | Loan (+ transactions/charges in the use case), SavingsAccount, Client |
+| **Repository** | Persistence port of the aggregate | Spring Data `*Repository` / wrapper ([ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md)) |
+| **Domain service** | Domain logic across multiple entities without a natural root home | Interest calculation, accounting processor, transfer domain |
+| **Application service** | Use-case orchestration, TX boundary | Command handler, WritePlatformService |
+| **Domain / business event** | Fact after successful change | Loan created, account activated; hooks / external events |
+| **Factory** | Complex creation of aggregates | Application submit, product instantiation |
 
-#### Mapping Hexagon ↔ DDD
+#### Mapping hexagon ↔ DDD
 
 | Hexagon | DDD |
 |---------|-----|
-| Domain Ring | Entities, VOs, Aggregates, Domain Services, Domain Events |
-| Application Ring | Application Services, Command Handlers, Use Cases |
-| Ports | Repository-Interfaces, Event-Publisher, externe Policy-Ports |
-| Driving Adapters | REST, COB/Batch, OSGi-Eingänge |
-| Driven Adapters | JPA, JDBC-Reads, Kafka/JMS, KI-HTTP, Document Store |
+| Domain ring | Entities, VOs, aggregates, domain services, domain events |
+| Application ring | Application services, command handlers, use cases |
+| Ports | Repository interfaces, event publisher, external policy ports |
+| Driving adapters | REST, COB/batch, OSGi entry points |
+| Driven adapters | JPA, JDBC reads, Kafka/JMS, AI HTTP, document store |
 
-#### Regeln für neuen / angefassten Code
+#### Rules for new / touched code
 
-1. **Aggregatgrenze respektieren** – Writes ändern ein Aggregat pro Transaktion wo möglich; Querschnitte über Domain Services + klare Reihenfolge (z. B. Loan dann Accounting).  
-2. **Sprache angleichen** – Klassennamen, Commands, Gherkin und API-Doku dieselbe Fachsprache.  
-3. **Kein Anemic-Zwang** – Verhalten an Aggregates/Domain Services, nicht nur Setter-Entities + God-Service (Evolution, Boy Scout).  
-4. **Context-Grenzen** – kein wildes Importieren von Loan-Entities in fremde Module; Integration über IDs, Events, Application-APIs.  
-5. **Read-Modelle** – Queries dürfen den Write-Aggregate nicht aufblasen (CQRS); ReadPlatform / Projections sind eigene Modelle.  
-6. **Legacy** – `JsonCommand` und anämische Stellen: bei Berührung verbessern, nicht Big-Bang-remodeln.
+1. **Respect aggregate boundary** – writes change one aggregate per transaction where possible; cross-cuts via domain services + clear order (e.g. loan then accounting).  
+2. **Align language** – class names, commands, Gherkin, and API docs share the same domain language.  
+3. **No anemic mandate** – behaviour on aggregates/domain services, not only setter entities + god service (evolution, Boy Scout).  
+4. **Context boundaries** – no wild importing of loan entities into foreign modules; integration via IDs, events, application APIs.  
+5. **Read models** – queries must not inflate the write aggregate (CQRS); ReadPlatform / projections are separate models.  
+6. **Legacy** – `JsonCommand` and anemic spots: improve when touched, do not big-bang remodel.
 
-#### Evolutionsstufen
+#### Evolution stages
 
-| Stufe | Inhalt |
-|-------|--------|
-| **D1** | Vokabular + dieses ADR; Context-Map in Doku → **[10 Domain Context Map](../10_domain_context_map.md)** |
-| **D2** | Neue Features mit klarem Aggregate/Command/Event |
-| **D3** | Aggregatgrenzen und Domain Services an Hotspots schärfen (Loan, Savings, Accounting) – Canvas: [11](../11_aggregate_canvas.md) |
-| **D4** | ACL für Interop/KI/Import standardisieren; Context Map fortlaufend schärfen |
+| Stage | Content |
+|-------|---------|
+| **D1** | Vocabulary + this ADR; context map in docs → **[10 Domain Context Map](../10_domain_context_map.md)** |
+| **D2** | New features with clear aggregate/command/event |
+| **D3** | Sharpen aggregate boundaries and domain services at hotspots (Loan, Savings, Accounting) – canvas: [11](../11_aggregate_canvas.md) |
+| **D4** | Standardize ACL for interop/AI/import; continuously refine context map |
 
-### Alternativen
+### Alternatives
 
-| Option | Bewertung |
-|--------|-----------|
-| Nur technische Schichten ohne DDD | Fachliche Grenzen bleiben implizit |
-| Microservices pro Bounded Context sofort | Zu teuer; Hexagon/Module reichen zuerst |
-| Striktes DDD-Framework (z. B. erzwungene Base-Klassen) | Overhead; Fineract-Patterns reichen |
+| Option | Assessment |
+|--------|------------|
+| Technical layers only without DDD | Domain boundaries remain implicit |
+| Microservices per bounded context immediately | Too expensive; hexagon/modules suffice first |
+| Strict DDD framework (e.g. forced base classes) | Overhead; Fineract patterns suffice |
 
-### Konsequenzen
+### Consequences
 
-- **+** Gemeinsame Fach- und Modellsprache für Teams und Agenten  
-- **+** Passt zu CQRS, Hexagon, Clean Code; Write-Modell künftig event-sourced ([ADR-020](ADR-020-event-sourcing-writes-pflicht.md))  
-- **+** Bessere Review-Fragen: „Welches Aggregat? Welcher Context? Welche Events?“  
-- **−** Bestand oft anämisch / service-lastig – Migration inkrementell  
-- **−** Risiko übermodellierter Aggregates – Pragmatismus und Performance (COB) beachten  
+- **+** Shared domain and modelling language for teams and agents  
+- **+** Fits CQRS, hexagon, Clean Code; write model eventually event-sourced ([ADR-020](ADR-020-event-sourcing-writes-pflicht.md))  
+- **+** Better review questions: “Which aggregate? Which context? Which events?”  
+- **−** Existing often anemic / service-heavy – migration incremental  
+- **−** Risk of over-modelled aggregates – keep pragmatism and performance (COB) in mind  
 
 ### Non-Goals
 
-- Umbenennen aller Packages nach `domain`/`application` in einem Schritt  
-- Ein Aggregat für „das ganze Portfolio“  
-- Ersetzen von Accounting-Double-Entry durch Domain-Events **ohne** Journal-Projektion (Journal bleibt, siehe [ADR-020](ADR-020-event-sourcing-writes-pflicht.md))  
+- Renaming all packages to `domain`/`application` in one step  
+- One aggregate for “the whole portfolio”  
+- Replacing accounting double-entry with domain events **without** journal projection (journal remains, see [ADR-020](ADR-020-event-sourcing-writes-pflicht.md))  
 
-### Bezug
+### Related
 
 - [ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) CQRS  
-- [ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md) Persistenz  
+- [ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md) Persistence  
 - [ADR-017](ADR-017-hexagonale-architektur.md) Hexagon  
-- [ADR-018](ADR-018-clean-code.md) Clean Code / Ubiquitous Language  
-- [ADR-020](ADR-020-event-sourcing-writes-pflicht.md) Event Sourcing für Writes (Pflicht)  
-- Building Blocks [03](../03_building_block_view.md) · Domain Context Map [10](../10_domain_context_map.md) · Aggregate Canvas [11](../11_aggregate_canvas.md) · Event Catalog [12](../12_event_catalog.md) · Runtime [04](../04_runtime_view.md) · Crosscutting [06](../06_crosscutting_concepts.md)
+- [ADR-018](ADR-018-clean-code.md) Clean Code / ubiquitous language  
+- [ADR-020](ADR-020-event-sourcing-writes-pflicht.md) Event sourcing for writes (mandatory)  
+- Building blocks [03](../03_building_block_view.md) · Domain context map [10](../10_domain_context_map.md) · Aggregate canvas [11](../11_aggregate_canvas.md) · Event catalog [12](../12_event_catalog.md) · Runtime [04](../04_runtime_view.md) · Crosscutting [06](../06_crosscutting_concepts.md)
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

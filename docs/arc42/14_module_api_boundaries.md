@@ -1,21 +1,21 @@
 # 14. Module API Boundaries
 
-Subprojekte (Gradle Domain-Module) kommunizieren **nur über Module APIs** – DDD Bounded Contexts + Hexagon Ports ([ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md)).
+Subprojects (Gradle domain modules) communicate **only via module APIs** – DDD bounded contexts + hexagon ports ([ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md)).
 
 ---
 
 ## 14.1 Problem
 
-| Heute | Risiko |
+| Today | Risk |
 |-------|--------|
-| `fineract-loan` → `Charge` Entity | enge Kopplung, schwierige ES-Migration |
-| `fineract-investor` → `Loan` Entity | Investor kennt Loan-Internals |
-| Accounting-Code in Loan-Packages | Context-Leak |
-| REST-`api` mit Domain vermischt | Adapter ≠ Port |
+| `fineract-loan` → `Charge` entity | tight coupling, difficult ES migration |
+| `fineract-investor` → `Loan` entity | Investor knows loan internals |
+| Accounting code in loan packages | Context leak |
+| REST `api` mixed with domain | Adapter ≠ port |
 
 ---
 
-## 14.2 Zielbild
+## 14.2 Target picture
 
 ```mermaid
 flowchart LR
@@ -32,86 +32,86 @@ flowchart LR
   end
   LApp --> LDom
   LRest --> LApp
-  LApp -->|nur Ports/DTOs| CModApi
+  LApp -->|ports/DTOs only| CModApi
   CModApi --> CDom
   CRest --> CDom
   LApp -.->|Events| ChargeMod
 ```
 
-**Composition Root** (`fineract-provider`) verdrahtet Implementierungen; Domain-Module hängen nicht an fremden Impls.
+**Composition root** (`fineract-provider`) wires implementations; domain modules do not depend on foreign impls.
 
 ---
 
-## 14.3 Package-Konvention
+## 14.3 Package convention
 
-| Slice | Package | Sichtbarkeit |
+| Slice | Package | Visibility |
 |-------|---------|--------------|
-| **Module API** | `org.apache.fineract.<area>.moduleapi` | **exportiert** an andere Module |
-| Domain | `...domain` | intern |
-| Application | `...service`, `...handler` | intern (Interfaces wandern schrittweise nach `moduleapi`) |
-| REST | `...api` | Driving Adapter – nicht von fremden Domain-Modulen importieren |
-| Data (Übergang) | `...data` | DTO; mittelfristig in `moduleapi` oder Read-Model-Modul |
+| **Module API** | `org.apache.fineract.<area>.moduleapi` | **exported** to other modules |
+| Domain | `...domain` | internal |
+| Application | `...service`, `...handler` | internal (interfaces migrate stepwise into `moduleapi`) |
+| REST | `...api` | Driving adapter – do not import from foreign domain modules |
+| Data (transition) | `...data` | DTO; mid-term into `moduleapi` or read-model module |
 
-Beispiele (Scaffolds vorhanden):
+Examples (scaffolds present):
 
 - `org.apache.fineract.portfolio.loanaccount.moduleapi`
 - `org.apache.fineract.portfolio.savings.moduleapi`
 - `org.apache.fineract.portfolio.charge.moduleapi`
 - `org.apache.fineract.accounting.moduleapi`
-- `org.apache.fineract.portfolio.client.moduleapi` (wenn Client-Modul extrahiert; bis dahin Core-Package)
+- `org.apache.fineract.portfolio.client.moduleapi` (when client module extracted; until then core package)
 
 ---
 
-## 14.4 Was darf in `moduleapi` liegen?
+## 14.4 What may live in `moduleapi`?
 
-| Erlaubt | Nicht erlaubt |
+| Allowed | Not allowed |
 |---------|----------------|
-| Port-Interfaces (`ChargeLookupPort`, `ClientStatusGuard`) | JPA-Entities / `@Entity` |
-| Commands/Queries als typisierte Interfaces | `*Repository` Spring-Data |
-| Stabile DTOs / IDs / Value Objects | REST Resources / Jersey |
-| Event-Typen der Published Language (oder Verweis) | Handler-Implementierungen |
-| Exceptions der Public Contract Surface | EclipseLink/JPA-Typen |
+| Port interfaces (`ChargeLookupPort`, `ClientStatusGuard`) | JPA entities / `@Entity` |
+| Commands/queries as typed interfaces | `*Repository` Spring Data |
+| Stable DTOs / IDs / value objects | REST resources / Jersey |
+| Event types of the published language (or reference) | Handler implementations |
+| Exceptions of the public contract surface | EclipseLink/JPA types |
 
-Implementierungen: `...service.impl` oder Adapter-Packages **im selben Modul**, von Spring/OSGi an Ports gebunden.
+Implementations: `...service.impl` or adapter packages **in the same module**, bound to ports by Spring/OSGi.
 
 ---
 
-## 14.5 ArchUnit-Durchsetzung
+## 14.5 ArchUnit enforcement
 
-| Testklasse | Fokus |
+| Test class | Focus |
 |------------|--------|
-| [`BoundedContextEntityDependencyRulesTest`](../../fineract-architecture/src/test/java/org/apache/fineract/architecture/BoundedContextEntityDependencyRulesTest.java) | Domain-Entity Cross-Imports |
-| [`ModuleApiBoundaryRulesTest`](../../fineract-architecture/src/test/java/org/apache/fineract/architecture/ModuleApiBoundaryRulesTest.java) | Modul-Slice darf fremde **Internals** nicht nutzen |
+| [`BoundedContextEntityDependencyRulesTest`](../../fineract-architecture/src/test/java/org/apache/fineract/architecture/BoundedContextEntityDependencyRulesTest.java) | Domain-entity cross-imports |
+| [`ModuleApiBoundaryRulesTest`](../../fineract-architecture/src/test/java/org/apache/fineract/architecture/ModuleApiBoundaryRulesTest.java) | Module slice must not use foreign **internals** |
 
 ```bash
 ./gradlew :fineract-architecture:test
 ```
 
-Legacy-Verstöße: **Freeze-Store**. Neue Internal-Imports → Build rot. Debt abbauen → Store schrumpft.
+Legacy violations: **freeze store**. New internal imports → build red. Reduce debt → store shrinks.
 
 ---
 
-## 14.6 Migrations-Playbook (pro Hotspot)
+## 14.6 Migration playbook (per hotspot)
 
-1. **Port definieren** in Provider-`moduleapi` (z. B. `ChargeDefinitionPort.findActiveCharge(id)`).  
-2. **Adapter** im Provider-Modul implementiert Port mit bestehendem Domain-Code.  
-3. **Consumer** (Loan) auf Port umstellen.  
-4. ArchUnit-Freeze schrumpft.  
-5. Optional: Port-Interface nach eigenem Modul-`moduleapi` verschieben, wenn Ownership klar ist.
+1. **Define port** in provider `moduleapi` (e.g. `ChargeDefinitionPort.findActiveCharge(id)`).  
+2. **Adapter** in the provider module implements the port with existing domain code.  
+3. **Consumer** (loan) switches to the port.  
+4. ArchUnit freeze shrinks.  
+5. Optional: move port interface into own module `moduleapi` when ownership is clear.
 
 ---
 
-## 14.7 provider vs. Domain-Module
+## 14.7 provider vs. domain modules
 
-| Modul-Typ | Regel |
+| Module type | Rule |
 |-----------|--------|
-| **Domain-Module** (loan, savings, accounting, …) | nur fremde `moduleapi` (+ Events, Shared Kernel) |
-| **fineract-provider** | Composition Root: darf Module verdrahten; neue Fachlogik trotzdem in Domain-Modulen |
-| **fineract-core** | Shared Kernel + Infrastruktur – nicht als „Müllhalde“ für Aggregates |
+| **Domain modules** (loan, savings, accounting, …) | only foreign `moduleapi` (+ events, shared kernel) |
+| **fineract-provider** | Composition root: may wire modules; new business logic still belongs in domain modules |
+| **fineract-core** | Shared kernel + infrastructure – not a “dump” for aggregates |
 
 ---
 
-## 14.8 Bezug
+## 14.8 References
 
 - [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md)  
 - [ADR-017 Hexagon](decisions/ADR-017-hexagonale-architektur.md)  

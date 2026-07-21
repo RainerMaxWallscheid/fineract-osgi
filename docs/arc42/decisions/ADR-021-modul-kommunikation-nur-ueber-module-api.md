@@ -1,35 +1,35 @@
-# ADR-021 – Modul-Kommunikation nur über Module API
+# ADR-021 – Module Communication Only via Module API
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Maintainability, Extensibility, Testability, Compatibility |
-| **Bezieht sich auf** | [ADR-017](ADR-017-hexagonale-architektur.md), [ADR-019](ADR-019-domain-driven-design.md), [ADR-002](ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md) |
+| **Qualities** | Maintainability, Extensibility, Testability, Compatibility |
+| **Related to** | [ADR-017](ADR-017-hexagonale-architektur.md), [ADR-019](ADR-019-domain-driven-design.md), [ADR-002](ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md) |
 
-### Kontext
+### Context
 
-fineract-osgi ist ein **modularer Monolith** (Gradle-Module ≈ Bounded Contexts). Heute greifen Module oft **direkt** auf fremde Internals zu:
+fineract-osgi is a **modular monolith** (Gradle modules ≈ bounded contexts). Today modules often access foreign **internals** directly:
 
-- JPA-Entities (`Loan`, `Charge`, `GLAccount`, …)
-- WritePlatformService-Implementierungen
-- Handler, Repositories, Starter-Konfiguration
+- JPA entities (`Loan`, `Charge`, `GLAccount`, …)
+- WritePlatformService implementations
+- Handlers, repositories, starter configuration
 
-Das widerspricht Hexagon (Ports an Modulgrenzen) und DDD (keine freigeteilten Aggregates über Context-Grenzen). OSGi-Feature-Bundles brauchen dieselben **stabilen Ports**.
+This contradicts hexagon (ports at module boundaries) and DDD (no freely shared aggregates across context boundaries). OSGi feature bundles need the same **stable ports**.
 
-Gleichzeitig sind `..api..`-Packages historisch oft **REST-Driving-Adapters** (`*ApiResource`) – **nicht** die Modul-Public-API. Deshalb neuer, expliziter Name.
+At the same time, `..api..` packages are historically often **REST driving adapters** (`*ApiResource`) – **not** the module public API. Hence a new, explicit name.
 
-### Entscheidung
+### Decision
 
-**Subprojekte (Domain-Module) kommunizieren untereinander nur über eine veröffentlichte Module API** – nicht über Domain-Entities, Service-Implementierungen oder REST-Resource-Klassen.
+**Subprojects (domain modules) communicate with each other only through a published Module API** – not through domain entities, service implementations, or REST resource classes.
 
-#### Namenskonvention
+#### Naming convention
 
-| Begriff | Package-Muster | Rolle |
-|---------|----------------|--------|
-| **Module API** | `..moduleapi..` | **Einzige** erlaubte fachliche Schnittstelle für *andere* Module (Ports, Commands/Queries als Interfaces, stabile DTOs/IDs) |
-| **REST API** | `..api..` (historisch) | Driving Adapter HTTP – **nicht** für Modul-zu-Modul |
-| **Intern** | `..domain..`, `..service..`, `..handler..`, `..starter..`, Repositories, Mapper-Impls | Nur modul-intern |
-| **Shared Kernel** | bewusst eng in `fineract-core` | Money, Tenant, ExternalId, Permissions, Command-Metamodell – kein Business-Aggregate |
+| Term | Package pattern | Role |
+|------|-----------------|------|
+| **Module API** | `..moduleapi..` | **Only** allowed domain interface for *other* modules (ports, commands/queries as interfaces, stable DTOs/IDs) |
+| **REST API** | `..api..` (historical) | Driving adapter HTTP – **not** for module-to-module |
+| **Internal** | `..domain..`, `..service..`, `..handler..`, `..starter..`, repositories, mapper impls | Module-internal only |
+| **Shared kernel** | deliberately narrow in `fineract-core` | Money, Tenant, ExternalId, Permissions, command metamodel – no business aggregate |
 
 ```text
 ┌─────────────────┐         moduleapi / Events          ┌─────────────────┐
@@ -39,73 +39,73 @@ Gleichzeitig sind `..api..`-Packages historisch oft **REST-Driving-Adapters** (`
 └─────────────────┘                                     └─────────────────┘
 ```
 
-#### Erlaubte Integrationsmittel zwischen Modulen
+#### Allowed integration means between modules
 
-1. **Module API** (`..moduleapi..`) – Ports + stabile Transferobjekte  
-2. **Domain / Business Events** (Published Language, siehe Event Catalog)  
-3. **Shared Kernel** (eng)  
-4. **Avro / External Event Schemas** für asynchrone Downstream-Integrationen  
+1. **Module API** (`..moduleapi..`) – ports + stable transfer objects  
+2. **Domain / business events** (published language, see event catalog)  
+3. **Shared kernel** (narrow)  
+4. **Avro / external event schemas** for asynchronous downstream integrations  
 
-#### Verboten (Ziel; Legacy per ArchUnit eingefroren)
+#### Forbidden (target; legacy frozen via ArchUnit)
 
-- Import fremder `..domain..`-Entities  
-- Aufruf fremder `*WritePlatformService`-/Repository-**Implementierungen**  
-- Abhängigkeit von fremden REST-`..api..`-Resources oder `*JsonInputParams` aus REST-Paketen  
-- „Utility“-Zugriff auf fremde `handler`/`starter`
+- Import of foreign `..domain..` entities  
+- Call of foreign `*WritePlatformService`/repository **implementations**  
+- Dependency on foreign REST `..api..` resources or `*JsonInputParams` from REST packages  
+- “Utility” access to foreign `handler`/`starter`
 
-#### Hexagon-Mapping
+#### Hexagon mapping
 
-| Hexagon | Modul-Intern | Über Modulgrenze |
-|---------|--------------|------------------|
-| Domain | Aggregates, Invarianten | **nie** direkt exportiert |
-| Application | Handlers, Use Cases | optional Ports in `moduleapi` |
-| Ports | Interfaces in `moduleapi` | **ja** – das ist die Module API |
-| Adapters | REST, JPA, Kafka, OSGi | REST nicht von fremden Modulen importieren |
+| Hexagon | Module-internal | Across module boundary |
+|---------|-----------------|------------------------|
+| Domain | Aggregates, invariants | **never** exported directly |
+| Application | Handlers, use cases | optional ports in `moduleapi` |
+| Ports | Interfaces in `moduleapi` | **yes** – that is the Module API |
+| Adapters | REST, JPA, Kafka, OSGi | REST not imported by foreign modules |
 
-#### Evolutionsstufen
+#### Evolution stages
 
-| Stufe | Inhalt |
-|-------|--------|
-| **M1** | Dieses ADR + ArchUnit-Regeln mit Freeze-Baseline |
-| **M2** | Pro Domain-Modul `moduleapi`-Package + `package-info`; neue Cross-Module-Features **nur** über Module API |
-| **M3** | Hotspot-Ports extrahieren (z. B. Charge-Lookup, GL-Mapping, Client-Guard) und Freeze-Store schrumpfen |
-| **M4** | Gradle `java-library` / getrennte `-api`-Artefakte oder OSGi Export-Packages = `moduleapi` only |
+| Stage | Content |
+|-------|---------|
+| **M1** | This ADR + ArchUnit rules with freeze baseline |
+| **M2** | Per domain module `moduleapi` package + `package-info`; new cross-module features **only** via Module API |
+| **M3** | Extract hotspot ports (e.g. charge lookup, GL mapping, client guard) and shrink freeze store |
+| **M4** | Gradle `java-library` / separate `-api` artifacts or OSGi export packages = `moduleapi` only |
 
-### Alternativen
+### Alternatives
 
-| Option | Bewertung |
-|--------|-----------|
-| REST `..api..` als Modul-API missbrauchen | Verwechslung Driving Adapter ↔ Port; abgelehnt |
-| Microservices pro Modul sofort | zu teuer; Module API skaliert im Monolith und zu OSGi |
-| Alles in `fineract-core` teilen | Shared Kernel explodiert; abgelehnt |
-| Nur Code-Review ohne ArchUnit | Regressionen unkontrolliert |
+| Option | Assessment |
+|--------|------------|
+| Misuse REST `..api..` as module API | Confuses driving adapter ↔ port; rejected |
+| Microservices per module immediately | too expensive; Module API scales in the monolith and toward OSGi |
+| Share everything in `fineract-core` | Shared kernel explodes; rejected |
+| Code review only without ArchUnit | Regressions uncontrolled |
 
-### Konsequenzen
+### Consequences
 
-- **+** Klare Context-Grenzen, bessere Testbarkeit, OSGi-ready Ports  
-- **+** Passt zu Context Map, Event Catalog, Entity-ArchUnit-Regeln  
-- **−** Bestand verletzt Regeln massiv → **FreezingArchRule** bis Strangler greift  
-- **−** Teams müssen bei Cross-Module-Features zuerst Port in `moduleapi` definieren  
+- **+** Clear context boundaries, better testability, OSGi-ready ports  
+- **+** Fits context map, event catalog, entity ArchUnit rules  
+- **−** Existing code violates rules heavily → **FreezingArchRule** until strangler takes hold  
+- **−** Teams must define a port in `moduleapi` first for cross-module features  
 
 ### Non-Goals
 
-- Sofortiges Umbenennen aller REST-`api`-Packages  
-- Big-Bang-Extraktion aller Service-Interfaces  
-- Provider-Shell darf Module verdrahten (Composition Root) – sie ist kein Domain-Modul im Sinne der Regel  
+- Immediate rename of all REST `api` packages  
+- Big-bang extraction of all service interfaces  
+- Provider shell may wire modules (composition root) – it is not a domain module under this rule  
 
-### Durchsetzung
+### Enforcement
 
 - ArchUnit: [`ModuleApiBoundaryRulesTest`](../../../fineract-architecture/src/test/java/org/apache/fineract/architecture/ModuleApiBoundaryRulesTest.java)  
-- Doku: [13 ArchUnit](../13_archunit_bounded_context_rules.md), [14 Module API](../14_module_api_boundaries.md)  
-- Freeze-Store: `fineract-architecture/src/test/resources/archunit_store/`
+- Docs: [13 ArchUnit](../13_archunit_bounded_context_rules.md), [14 Module API](../14_module_api_boundaries.md)  
+- Freeze store: `fineract-architecture/src/test/resources/archunit_store/`
 
-### Bezug
+### Related
 
-- [ADR-017 Hexagon](ADR-017-hexagonale-architektur.md) – Ports an Grenzen  
-- [ADR-019 DDD](ADR-019-domain-driven-design.md) – Context Map ohne Entity-Sharing  
-- [ADR-002 OSGi](ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md) – exportierbare Contracts  
+- [ADR-017 Hexagon](ADR-017-hexagonale-architektur.md) – ports at boundaries  
+- [ADR-019 DDD](ADR-019-domain-driven-design.md) – context map without entity sharing  
+- [ADR-002 OSGi](ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md) – exportable contracts  
 - [10 Context Map](../10_domain_context_map.md)
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

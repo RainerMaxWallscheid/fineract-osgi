@@ -1,41 +1,41 @@
-# ADR-004 – CQRS und Command-Pipeline beibehalten & modernisieren
+# ADR-004 – Keep & modernize CQRS and the command pipeline
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Korrektheit, Maintainability, Performance, Compatibility |
+| **Qualities** | Correctness, Maintainability, Performance, Compatibility |
 
-### Kontext
+### Context
 
-Writes laufen über CQRS (`SynchronousCommandProcessingService`). Historisch: JSON-Strings, Magic Keys, schwere Test- und Refactoring-Kosten (`fineract-command/README.md`). Gleichzeitig sind Audit, Maker-Checker und Idempotenz wertvoll und bleiben nötig.
+Writes run via CQRS (`SynchronousCommandProcessingService`). Historically: JSON strings, magic keys, high test and refactoring cost (`fineract-command/README.md`). At the same time, audit, maker-checker, and idempotency are valuable and remain required.
 
-### Entscheidung
+### Decision
 
-1. **CQRS beibehalten** (Reads vs. Writes).  
-2. **Legacy-Pipeline unangetastet parallel** weiterlaufen lassen.  
-3. Neuen Stack **`fineract-command`** einführen:  
-   - typsichere `Command<REQ>`  
+1. **Keep CQRS** (reads vs. writes).  
+2. Leave the **legacy pipeline running in parallel**, untouched.  
+3. Introduce the new stack **`fineract-command`**:  
+   - type-safe `Command<REQ>`  
    - Jakarta Validation  
-   - austauschbare `CommandDispatcher` (sync Pflicht; async/Disruptor optional)  
-   - Hooks für Cross-Cutting  
-4. Migration **modulweise**, REST-Vertrag **100 % abwärtskompatibel**.  
-5. Storage-Layer-Cleanup ist **Non-Goal** dieser Entscheidung.
+   - pluggable `CommandDispatcher` (sync mandatory; async/Disruptor optional)  
+   - hooks for cross-cutting concerns  
+4. Migration **module by module**, REST contract **100% backward compatible**.  
+5. Storage-layer cleanup is a **non-goal** of this decision.
 
-### Alternativen
+### Alternatives
 
-| Option | Bewertung |
-|--------|-----------|
-| Big-Bang Ersatz der Legacy-Pipeline | Zu riskant für Banking-Core |
-| Event-Sourced Rewrite | Fachlich/operativ anderer Systemtyp |
-| Direkt Apache Camel als einziger Bus | Optional später; nicht als Blocker für Typisierung |
-| CQRS aufgeben, klassische Service-Calls | Verlust Audit/Idempotency-Zentralisierung |
+| Option | Assessment |
+|--------|------------|
+| Big-bang replacement of the legacy pipeline | Too risky for a banking core |
+| Event-sourced rewrite | Functionally/operationally a different system type |
+| Apache Camel as the only bus from day one | Optional later; not a blocker for typing |
+| Drop CQRS for classical service calls | Loss of centralized audit/idempotency |
 
-### Konsequenzen
+### Consequences
 
-- **+** Typsicherheit, bessere DX, messbare Pipeline  
-- **+** Rollback auf sync Dispatcher möglich  
-- **−** Zwei Command-Welten während der Migration  
-- **−** Disziplin nötig, Legacy nicht weiter aufzublähen  
+- **+** Type safety, better DX, measurable pipeline  
+- **+** Rollback to sync dispatcher possible  
+- **−** Two command worlds during migration  
+- **−** Discipline needed not to further inflate legacy  
 
 ```mermaid
 flowchart LR
@@ -46,10 +46,10 @@ flowchart LR
     N --> D
 ```
 
-### Bezug
+### Related
 
-- Runtime [4.3](../04_runtime_view.md), Crosscutting [6.4](../06_crosscutting_concepts.md), FINERACT-2169 u. a.
+- Runtime [4.3](../04_runtime_view.md), Crosscutting [6.4](../06_crosscutting_concepts.md), FINERACT-2169 and others.
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

@@ -1,16 +1,16 @@
 # 3. Building Block View
 
-Die Building Block View beschreibt die **statische Zerlegung** von fineract-osgi: verantwortliche Bausteine, ihre Schnittstellen und Abhängigkeiten. Dynamik → [04 Runtime View](04_runtime_view.md); Verteilung → [05 Deployment View](05_deployment_view.md).
+The Building Block View describes the **static decomposition** of fineract-osgi: responsible building blocks, their interfaces, and dependencies. Dynamics → [04 Runtime View](04_runtime_view.md); distribution → [05 Deployment View](05_deployment_view.md).
 
 **Notation**
 
-- **Level 1**: System im Groben  
-- **Level 2**: logische / Gradle-Module und Laufzeit-Schichten  
-- **Level 3**: ausgewählte Innenansichten (Command, Security, OSGi/KI)  
+- **Level 1**: System at a glance  
+- **Level 2**: Logical / Gradle modules and runtime layers  
+- **Level 3**: Selected internal views (Command, Security, OSGi/AI)  
 
 ---
 
-## 3.1 Level 1 – Gesamtsystem
+## 3.1 Level 1 – Overall System
 
 ```mermaid
 flowchart TB
@@ -19,10 +19,10 @@ flowchart TB
       DOM[Domain Modules<br/>Loan Savings Accounting …]
       INFRA[Platform Infrastructure<br/>Core Security Command Validation]
       OSGi[OSGi Runtime<br/>Equinox + Feature Bundles]
-      INT[Integration Edge<br/>Events Hooks Messaging KI]
+      INT[Integration Edge<br/>Events Hooks Messaging AI]
     end
 
-    Client[Clients / UI / Integratoren] --> API
+    Client[Clients / UI / Integrators] --> API
     API --> INFRA
     INFRA --> DOM
     DOM --> DB[(PostgreSQL Tenant DBs)]
@@ -35,33 +35,33 @@ flowchart TB
     INT --> Hooks[HTTP Hooks]
 ```
 
-### Level-1-Bausteine
+### Level-1 Building Blocks
 
-| Baustein | Verantwortung | Typische Artefakte |
-|----------|----------------|--------------------|
-| **API & Application Shell** | Boot, REST, Actuator, Verdrahtung | `fineract-provider`, optional `fineract-war` |
-| **Platform Infrastructure** | Tenant, Security, Commands, Config, Jobs-Infra | `fineract-core`, `fineract-security`, `fineract-command*`, `fineract-validation` |
-| **Domain Modules** | Fachlogik Portfolio & Accounting (**Bounded Contexts**, [ADR-019](decisions/ADR-019-domain-driven-design.md), Context Map [10](10_domain_context_map.md)) | `fineract-loan`, `fineract-savings`, … |
-| **OSGi Runtime** | Dynamische Modularität | `osgi/`, Equinox, Feature-JARs |
-| **Integration Edge** | Events, Messaging, KI-Calls | Hooks, Kafka/JMS Producer, KI-Bundle |
-| **Persistence** | Tenants-Registry + Tenant-Fachdaten | PostgreSQL (primary) |
+| Building Block | Responsibility | Typical Artifacts |
+|----------------|----------------|-------------------|
+| **API & Application Shell** | Boot, REST, Actuator, wiring | `fineract-provider`, optional `fineract-war` |
+| **Platform Infrastructure** | Tenant, security, commands, config, jobs infra | `fineract-core`, `fineract-security`, `fineract-command*`, `fineract-validation` |
+| **Domain Modules** | Portfolio & accounting domain logic (**bounded contexts**, [ADR-019](decisions/ADR-019-domain-driven-design.md), context map [10](10_domain_context_map.md)) | `fineract-loan`, `fineract-savings`, … |
+| **OSGi Runtime** | Dynamic modularity | `osgi/`, Equinox, feature JARs |
+| **Integration Edge** | Events, messaging, AI calls | Hooks, Kafka/JMS producer, AI bundle |
+| **Persistence** | Tenants registry + tenant domain data | PostgreSQL (primary) |
 
-### Externe Level-1-Nachbarn
+### External Level-1 Neighbors
 
-| Nachbar | Beziehung |
-|---------|-----------|
-| Clients / Integratoren | HTTPS REST |
+| Neighbor | Relationship |
+|----------|--------------|
+| Clients / integrators | HTTPS REST |
 | IdP | OIDC/JWT |
 | DB | JDBC |
-| Message Broker | Jobs/Events (optional) |
-| KI-API | HTTPS aus Bundle (optional) |
-| UI-Produkte | nur als API-Konsumenten |
+| Message broker | Jobs/events (optional) |
+| AI API | HTTPS from bundle (optional) |
+| UI products | only as API consumers |
 
 ---
 
-## 3.2 Level 2 – Schichten, Modulgruppen und Hexagon-Mapping
+## 3.2 Level 2 – Layers, Module Groups, and Hexagon Mapping
 
-fineract-osgi folgt einem **hexagonalen Leitbild** (Ports & Adapters, [ADR-017](decisions/ADR-017-hexagonale-architektur.md)): Domain im Zentrum, Application/Use-Cases darum, **Driving**-Adapter (REST, Jobs) und **Driven**-Adapter (JPA, JDBC, Events, KI) am Rand. Die Gradle-Module bleiben die physische Zerlegung; das Hexagon ist die **logische** Abhängigkeitssicht.
+fineract-osgi follows a **hexagonal guiding model** (ports & adapters, [ADR-017](decisions/ADR-017-hexagonale-architektur.md)): domain in the center, application/use cases around it, **driving** adapters (REST, jobs) and **driven** adapters (JPA, JDBC, events, AI) at the edge. Gradle modules remain the physical decomposition; the hexagon is the **logical** dependency view.
 
 ```mermaid
 flowchart TB
@@ -90,7 +90,7 @@ flowchart TB
       CORE[fineract-core JPA JDBC]
       VAL[fineract-validation]
       COB[fineract-cob]
-      INT[Events Hooks Messaging KI]
+      INT[Events Hooks Messaging AI]
     end
 
     subgraph Modular Runtime
@@ -113,98 +113,98 @@ flowchart TB
     EQ --> BND
 ```
 
-| Hexagon-Ring | Bausteine (Beispiele) |
-|--------------|----------------------|
-| **Driving** | REST Resources, Actuator, COB/Batch-Entry, OSGi-Eingänge |
-| **Application** | Security/Tenant-Filter, Command-Pipelines, Job-Orchestrierung |
-| **Domain** | Loan, Savings, Accounting, Client, … (DDD Aggregates; Write-Events) |
-| **Driven** | Event Store (Ziel), JPA/JDBC Projectors & Reads, Validation, COB, Hooks/Messaging/KI |
-| **Steckbar** | Equinox Feature-Bundles hinter Service-Registry-Ports |
+| Hexagon Ring | Building Blocks (Examples) |
+|--------------|----------------------------|
+| **Driving** | REST resources, Actuator, COB/batch entry, OSGi entry points |
+| **Application** | Security/tenant filters, command pipelines, job orchestration |
+| **Domain** | Loan, Savings, Accounting, Client, … (DDD aggregates; write events) |
+| **Driven** | Event store (target), JPA/JDBC projectors & reads, validation, COB, hooks/messaging/AI |
+| **Pluggable** | Equinox feature bundles behind service-registry ports |
 
 ### 3.2.1 Application Shell
 
-| Modul | Rolle |
-|-------|--------|
-| **fineract-provider** | Hauptanwendung: startet Spring Boot, aggregiert Domain- und Infra-Module, exponiert API |
-| **fineract-war** | optionales WAR-Packaging (nicht primärer Deploy-Pfad) |
-| **fineract-db** | DB-nahe Ressourcen/Migrationen (je nach Layout) |
+| Module | Role |
+|--------|------|
+| **fineract-provider** | Main application: starts Spring Boot, aggregates domain and infra modules, exposes API |
+| **fineract-war** | Optional WAR packaging (not the primary deploy path) |
+| **fineract-db** | DB-related resources/migrations (depending on layout) |
 
 ### 3.2.2 Platform / Infrastructure
 
-| Modul | Rolle |
-|-------|--------|
-| **fineract-core** | Gemeinsame Infrastruktur: Legacy Commands, Config, ThreadLocal/Tenant-Hilfen, diverse Plattform-Services |
-| **fineract-security** | AuthN/Z, Tenant-aware Filter, OIDC, 2FA, Login/User-Details APIs |
-| **fineract-command** | Neuer typsicherer Command-Stack (Dispatcher, Handler-API, Hooks) |
-| **fineract-command-async** | Asynchrone Dispatcher-Variante |
-| **fineract-command-disruptor** | LMAX-Disruptor-Variante |
-| **fineract-command-jdbc** / **-audit** | Persistenz-/Audit-Aspekte des neuen Stacks |
-| **fineract-command-test** | Testunterstützung |
-| **fineract-validation** | Validierungsbausteine |
-| **fineract-cob** | COB-Komponenten und Business-Step-Integration |
-| **fineract-avro-schemas** | Schema-Definitionen für Events/Messaging |
+| Module | Role |
+|--------|------|
+| **fineract-core** | Shared infrastructure: legacy commands, config, ThreadLocal/tenant helpers, various platform services |
+| **fineract-security** | AuthN/Z, tenant-aware filters, OIDC, 2FA, login/user-details APIs |
+| **fineract-command** | New type-safe command stack (dispatcher, handler API, hooks) |
+| **fineract-command-async** | Asynchronous dispatcher variant |
+| **fineract-command-disruptor** | LMAX Disruptor variant |
+| **fineract-command-jdbc** / **-audit** | Persistence/audit aspects of the new stack |
+| **fineract-command-test** | Test support |
+| **fineract-validation** | Validation building blocks |
+| **fineract-cob** | COB components and business-step integration |
+| **fineract-avro-schemas** | Schema definitions for events/messaging |
 
 ### 3.2.3 Domain Modules
 
-Fachliche Bounded Contexts, Upstream/Downstream und Migrationsreihenfolge: **[10 Domain Context Map](10_domain_context_map.md)**. Gradle-Module sind die physische Abbildung – nicht 1:1 mit jedem Context identisch.
+Business bounded contexts, upstream/downstream, and migration order: **[10 Domain Context Map](10_domain_context_map.md)**. Gradle modules are the physical mapping – not 1:1 with every context.
 
-**Modul-Kommunikation:** nur über **`moduleapi`**, Events und Shared Kernel ([ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [14 Module API Boundaries](14_module_api_boundaries.md)) – nicht über fremde `domain`/`service`-Implementierungen.
+**Module communication:** only via **`moduleapi`**, events, and shared kernel ([ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [14 Module API Boundaries](14_module_api_boundaries.md)) – not via foreign `domain`/`service` implementations.
 
-| Modul | Fachverantwortung |
-|-------|-------------------|
-| **fineract-loan** | Klassischer Loan-Lifecycle, Produkte, Transaktionen |
-| **fineract-progressive-loan** | Progressive Loan Schedule/Logik |
-| **fineract-progressive-loan-embeddable-schedule-generator** | Einbettbarer Schedule-Generator |
-| **fineract-working-capital-loan** | Working-Capital-Loan-Variante |
-| **fineract-loan-origination** | Origination-nahe Erweiterungen |
-| **fineract-savings** | Spareinlagen |
+| Module | Domain Responsibility |
+|--------|----------------------|
+| **fineract-loan** | Classic loan lifecycle, products, transactions |
+| **fineract-progressive-loan** | Progressive loan schedule/logic |
+| **fineract-progressive-loan-embeddable-schedule-generator** | Embeddable schedule generator |
+| **fineract-working-capital-loan** | Working-capital loan variant |
+| **fineract-loan-origination** | Origination-related extensions |
+| **fineract-savings** | Savings deposits |
 | **fineract-accounting** | Journal, GL, accounting rules |
-| **fineract-charge** | Gebühren |
-| **fineract-tax** | Steuern |
-| **fineract-rates** | Zins-/Rate-Tabellen |
-| **fineract-branch** | Branch/Teller-Aspekte |
-| **fineract-investor** | Investor-/Secondary-Market-Aspekte (wo genutzt) |
-| **fineract-document** | Dokumente/Anhänge |
+| **fineract-charge** | Charges/fees |
+| **fineract-tax** | Taxes |
+| **fineract-rates** | Interest/rate tables |
+| **fineract-branch** | Branch/teller aspects |
+| **fineract-investor** | Investor/secondary-market aspects (where used) |
+| **fineract-document** | Documents/attachments |
 | **fineract-report** | Reporting |
-| **fineract-mix** | MIX/regulatorische Reportformate |
+| **fineract-mix** | MIX/regulatory report formats |
 
-### 3.2.4 Clients, Tests, Doku
+### 3.2.4 Clients, Tests, Documentation
 
-| Modul / Pfad | Rolle |
-|--------------|--------|
-| **fineract-client** / **fineract-client-feign** | API-Clients aus OpenAPI |
-| **fineract-e2e-tests-*** / **integration-tests** | End-to-End- und Integrationstests |
-| **fineract-doc** | Asciidoc/Antora-Projektdoku (Upstream-Stil) |
-| **docs/arc42** | Diese Architektur-Doku |
-| **docs/gherkin** | BDD-Features |
-| **osgi/** | Equinox-Runtime-Scaffold |
-| **config/docker**, **kubernetes/** | Betriebsblaupausen |
+| Module / Path | Role |
+|---------------|------|
+| **fineract-client** / **fineract-client-feign** | API clients from OpenAPI |
+| **fineract-e2e-tests-*** / **integration-tests** | End-to-end and integration tests |
+| **fineract-doc** | Asciidoc/Antora project docs (upstream style) |
+| **docs/arc42** | This architecture documentation |
+| **docs/gherkin** | BDD features |
+| **osgi/** | Equinox runtime scaffold |
+| **config/docker**, **kubernetes/** | Operations blueprints |
 
-### 3.2.5 OSGi Feature-Bundles (Zielbild)
+### 3.2.5 OSGi Feature Bundles (Target Picture)
 
-Noch nicht alle als feste Repo-Module finalisiert; logische Bausteine:
+Not all are finalized yet as fixed repository modules; logical building blocks:
 
-| Bundle (logisch) | Verantwortung |
-|------------------|---------------|
-| **core-bridge** | Spring ↔ OSGi Service Lookup |
-| **api-contracts** | stabile Service-Interfaces (Validator, Scorer, …) |
-| **ki-scoring** | Anbindung xAI Grok / CreditScoreProvider |
-| **dynamic-product-config** | instituts-spezifische Produktregeln |
-| **customer-extension-*** | kundenspezifisch, external build |
+| Bundle (Logical) | Responsibility |
+|------------------|----------------|
+| **core-bridge** | Spring ↔ OSGi service lookup |
+| **api-contracts** | Stable service interfaces (validator, scorer, …) |
+| **ki-scoring** | xAI Grok / CreditScoreProvider integration |
+| **dynamic-product-config** | Institution-specific product rules |
+| **customer-extension-*** | Customer-specific, external build |
 
-Prinzip: **Interfaces im Core/API-Bundle**, Implementierung austauschbar ([ADR-002](decisions/ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md)).
+Principle: **interfaces in the core/API bundle**, implementation replaceable ([ADR-002](decisions/ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md)).
 
 ---
 
-## 3.3 Level-2-Abhängigkeitsregeln
+## 3.3 Level-2 Dependency Rules
 
-| Regel | Begründung |
-|-------|------------|
-| Domain hängt nicht von REST-Controllern ab | Ersetzbarkeit der Transport-Schicht |
-| Domain kennt keine konkrete KI-API | nur optionale Interfaces |
-| `fineract-command` ist unabhängig von Legacy-JSON-Helfern nutzbar | parallele Migration |
-| Feature-Bundles hängen von API-Contracts ab, nicht umgekehrt | keine Zyklen |
-| Worker-Nodes brauchen Domain+COB, nicht zwingend alle Admin-UIs | schlankere Rolle |
+| Rule | Rationale |
+|------|-----------|
+| Domain does not depend on REST controllers | Replaceability of the transport layer |
+| Domain does not know a concrete AI API | only optional interfaces |
+| `fineract-command` is usable independently of legacy JSON helpers | parallel migration |
+| Feature bundles depend on API contracts, not the reverse | no cycles |
+| Worker nodes need domain+COB, not necessarily all admin UIs | leaner role |
 
 ```mermaid
 flowchart BT
@@ -230,11 +230,11 @@ flowchart BT
     loan --> command
 ```
 
-*(Vereinfacht; reale `build.gradle`-Kanten sind feiner.)*
+*(Simplified; real `build.gradle` edges are finer.)*
 
 ---
 
-## 3.4 Level 3 – Command-Subsystem
+## 3.4 Level 3 – Command Subsystem
 
 ```mermaid
 flowchart LR
@@ -257,22 +257,22 @@ flowchart LR
     S2 --> DB
 ```
 
-| Baustein | Verantwortung |
-|----------|----------------|
-| **PortfolioCommandSourceWritePlatformService** | Einstieg Legacy-Writes, Maker-Checker-Anbindung |
-| **SynchronousCommandProcessingService** | Routing, Retry, Idempotenz, Audit-Status |
-| **CommandHandlerProvider** | Findet Handler zu Action/Entity |
-| **CommandDispatcher** | Neuer austauschbarer Ausführungskanal |
-| **CommandHookManager** | Before/After/Error-Querschnitt |
-| **CommandStore / Audit-Module** | Persistenz Command-Zustände (neu/alt) |
-| **API-DTOs (data packages)** | Request/Response-Nutzlast; spezialisierte Typen **komponieren** Shared-Felder und bleiben für Gson flach ([ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)) |
-| **FineractGsonTypeAdapterRegistrar** | SPI in `fineract-core` – Module registrieren Gson-TypeAdapter (z. B. Flatten) via ServiceLoader |
+| Building Block | Responsibility |
+|----------------|----------------|
+| **PortfolioCommandSourceWritePlatformService** | Entry for legacy writes, maker-checker integration |
+| **SynchronousCommandProcessingService** | Routing, retry, idempotency, audit status |
+| **CommandHandlerProvider** | Finds handlers for action/entity |
+| **CommandDispatcher** | New replaceable execution channel |
+| **CommandHookManager** | Before/after/error cross-cutting |
+| **CommandStore / Audit modules** | Persistence of command states (new/legacy) |
+| **API DTOs (data packages)** | Request/response payload; specialized types **compose** shared fields and stay flat for Gson ([ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)) |
+| **FineractGsonTypeAdapterRegistrar** | SPI in `fineract-core` – modules register Gson type adapters (e.g. flatten) via ServiceLoader |
 
-Details Runtime: [04.3](04_runtime_view.md) · ADR: [ADR-004](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md), [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)
+Runtime details: [04.3](04_runtime_view.md) · ADR: [ADR-004](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md), [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)
 
 ---
 
-## 3.5 Level 3 – Security- und Tenant-Subsystem
+## 3.5 Level 3 – Security and Tenant Subsystem
 
 ```mermaid
 flowchart TB
@@ -287,20 +287,20 @@ flowchart TB
     DSR --> TDB[(Tenant DB)]
 ```
 
-| Baustein | Modul | Verantwortung |
-|----------|-------|----------------|
-| Tenant-aware Filters | `fineract-security` | Mandant + Auth-Reihenfolge |
-| OIDC/JWT Converter | `fineract-security` | Token → Fineract-Principal |
+| Building Block | Module | Responsibility |
+|----------------|--------|----------------|
+| Tenant-aware filters | `fineract-security` | Tenant + auth order |
+| OIDC/JWT converter | `fineract-security` | Token → Fineract principal |
 | TwoFactor* | `fineract-security` | 2FA |
-| PlatformSecurityContext | core/security | Permission-Checks |
-| ThreadLocalContextUtil | `fineract-core` | Context halten/clearen |
-| Tenant datasource config | core + properties | Pools, RO-Connections |
+| PlatformSecurityContext | core/security | Permission checks |
+| ThreadLocalContextUtil | `fineract-core` | Hold/clear context |
+| Tenant datasource config | core + properties | Pools, RO connections |
 
 → [06.2](06_crosscutting_concepts.md), [06.3](06_crosscutting_concepts.md)
 
 ---
 
-## 3.6 Level 3 – OSGi- und KI-Subsystem
+## 3.6 Level 3 – OSGi and AI Subsystem
 
 ```mermaid
 flowchart TB
@@ -310,7 +310,7 @@ flowchart TB
       EQ[Equinox Framework]
       REG[(Service Registry)]
       API[API Bundle Interfaces]
-      KIB[KI Scoring Bundle]
+      KIB[AI Scoring Bundle]
       PRB[Product Rules Bundle]
     end
 
@@ -324,19 +324,19 @@ flowchart TB
     KIB --> DB[(Score / Notes in Tenant DB)]
 ```
 
-| Baustein | Verantwortung |
-|----------|----------------|
-| **Equinox** | Bundle-Lifecycle, Console, Start-Level |
-| **API Interfaces** | z. B. `CreditScoreProvider`, `ProductRuleExtension` |
-| **KI Bundle** | Mapping, HTTP-Client, Timeout/Retry, Persistenz Enrichment |
-| **Bridge** | optionales Lookup ohne harten Classpath-Zwang |
-| **config.ini / bundles/** | Betriebs-Konfiguration und Deploy-Ordner |
+| Building Block | Responsibility |
+|----------------|----------------|
+| **Equinox** | Bundle lifecycle, console, start level |
+| **API Interfaces** | e.g. `CreditScoreProvider`, `ProductRuleExtension` |
+| **AI Bundle** | Mapping, HTTP client, timeout/retry, persistence enrichment |
+| **Bridge** | Optional lookup without hard classpath coupling |
+| **config.ini / bundles/** | Operations configuration and deploy folder |
 
 → [04.4](04_runtime_view.md), [04.7](04_runtime_view.md), [05.7](05_deployment_view.md)
 
 ---
 
-## 3.7 Level 3 – COB- / Job-Subsystem
+## 3.7 Level 3 – COB / Job Subsystem
 
 ```mermaid
 flowchart LR
@@ -353,83 +353,83 @@ flowchart LR
     FILT --> LOAN
 ```
 
-| Baustein | Verantwortung |
-|----------|----------------|
-| **Batch Manager** | Job starten, partitionieren, Fortschritt |
-| **Worker** | Partition ausführen |
-| **Business Steps** | fachliche COB-Schritte |
-| **COB API Filter** | Online-Writes während COB schützen |
-| **Message Handler** | Transport der Partitionen |
+| Building Block | Responsibility |
+|----------------|----------------|
+| **Batch Manager** | Start jobs, partition, track progress |
+| **Worker** | Execute partition |
+| **Business Steps** | Domain COB steps |
+| **COB API Filter** | Protect online writes during COB |
+| **Message Handler** | Transport of partitions |
 
 → [04.6](04_runtime_view.md), [05.5](05_deployment_view.md)
 
 ---
 
-## 3.8 Wichtige Datenbestände (logisch)
+## 3.8 Important Data Stores (Logical)
 
-| Bestand | Inhalt | Zugriff |
-|---------|--------|---------|
-| **fineract_tenants** | Tenant-Metadaten, JDBC-Ziele | Platform beim Request-Start |
-| **Tenant Schema/DB** | Clients, Loans, Savings, GL, Commands, … | Domain + Commands |
-| **Command Audit** | Write-Historie, Idempotenz-Unterstützung | Command Pipeline |
-| **Job / COB Metadata** | Laufstatus, Fehler | Batch-Subsystem |
-| **Event Outbox** *(Ziel)* | zuverlässige External Events | Integration Edge |
-| **OSGi Bundle Storage** | Feature-JARs | Equinox |
-| **Logs / Metrics** | Betrieb | Observability-Stack |
+| Store | Content | Access |
+|-------|---------|--------|
+| **fineract_tenants** | Tenant metadata, JDBC targets | Platform at request start |
+| **Tenant schema/DB** | Clients, loans, savings, GL, commands, … | Domain + commands |
+| **Command audit** | Write history, idempotency support | Command pipeline |
+| **Job / COB metadata** | Run status, errors | Batch subsystem |
+| **Event outbox** *(target)* | Reliable external events | Integration edge |
+| **OSGi bundle storage** | Feature JARs | Equinox |
+| **Logs / metrics** | Operations | Observability stack |
 
 ---
 
-## 3.9 Qualitätseigenschaften der Bausteine
+## 3.9 Quality Properties of the Building Blocks
 
-| Baustein | Primäre Qualitätsbeiträge |
-|----------|---------------------------|
-| Command Pipelines | Korrektheit, Audit, Kompatibilität |
-| Security/Tenant | Security, Isolation |
-| Domain Loan/Savings/Accounting | Fachliche Korrektheit |
-| COB/Worker | Reliability, Scalability, Performance (Batch) |
-| OSGi + KI Bundles | Extensibility, Maintainability |
-| provider + Modes | Deployability, Scalability |
+| Building Block | Primary Quality Contributions |
+|----------------|-------------------------------|
+| Command pipelines | Correctness, audit, compatibility |
+| Security/Tenant | Security, isolation |
+| Domain Loan/Savings/Accounting | Domain correctness |
+| COB/Worker | Reliability, scalability, performance (batch) |
+| OSGi + AI bundles | Extensibility, maintainability |
+| provider + modes | Deployability, scalability |
 | Observability in provider | Operability |
 
 → Mapping: [07](07_quality_attributes.md), [06.15](06_crosscutting_concepts.md)
 
 ---
 
-## 3.10 Typische Änderungswege („wo ändere ich X?“)
+## 3.10 Typical Change Paths (“Where do I change X?”)
 
-| Änderung | Primäre Bausteine |
-|----------|-------------------|
-| Neues REST-Write-Feld (migriertes Modul) | Resource/DTO → `fineract-command` Handler → Domain |
-| Neues REST-Write-Feld (Legacy) | Resource → JsonCommand Keys → Legacy Handler → Domain |
-| Neue Permission | Security/Roles + Resource Checks |
-| Neuer COB-Schritt | `fineract-cob` / Business Step + Job Config |
-| KI-Scoring | OSGi API + KI-Bundle + Event Subscription |
-| Institutsregel ohne Core-PR | Feature-Bundle gegen Extension Interface |
-| Neue Node-Rolle im Cluster | Env Mode Flags + Deploy Manifest, kein Domain-Fork |
-| Neuer Downstream-Consumer | External Events / Hook Config |
-
----
-
-## 3.11 Offene Baustein-Arbeiten
-
-- Finale Maven/Gradle-Koordinaten und Package-Exports der OSGi-API-Bundles  
-- Explizite `core-bridge`-Implementierung Spring↔OSGi  
-- Vereinheitlichung Event-Outbox als eigenes Modul  
-- Building-Block-Diagramme aus realen `dependencies.gradle` generieren (CI-Check auf verbotene Kanten)  
-- Level-3-Detail für Accounting und Savings analog Loan  
+| Change | Primary Building Blocks |
+|--------|-------------------------|
+| New REST write field (migrated module) | Resource/DTO → `fineract-command` handler → domain |
+| New REST write field (legacy) | Resource → JsonCommand keys → legacy handler → domain |
+| New permission | Security/roles + resource checks |
+| New COB step | `fineract-cob` / business step + job config |
+| AI scoring | OSGi API + AI bundle + event subscription |
+| Institution rule without core PR | Feature bundle against extension interface |
+| New node role in cluster | Env mode flags + deploy manifest, no domain fork |
+| New downstream consumer | External events / hook config |
 
 ---
 
-## 3.12 Verwandte Gherkin-Features
+## 3.11 Open Building-Block Work
 
-| Baustein-Fokus | Feature |
-|----------------|---------|
+- Final Maven/Gradle coordinates and package exports of the OSGi API bundles  
+- Explicit `core-bridge` implementation Spring↔OSGi  
+- Unification of event outbox as its own module  
+- Generate building-block diagrams from real `dependencies.gradle` (CI check for forbidden edges)  
+- Level-3 detail for Accounting and Savings analogous to Loan  
+
+---
+
+## 3.12 Related Gherkin Features
+
+| Building-Block Focus | Feature |
+|----------------------|---------|
 | Loan + Commands | [loan/loan_creation.feature](../gherkin/features/loan/loan_creation.feature), [crosscutting/command_processing.feature](../gherkin/features/crosscutting/command_processing.feature) |
 | Accounting | [accounting/loan_disbursement_journal.feature](../gherkin/features/accounting/loan_disbursement_journal.feature) |
 | Savings / Client | [savings/…](../gherkin/features/savings/savings_account_open.feature), [client/…](../gherkin/features/client/client_create.feature) |
-| OSGi / KI | [osgi/…](../gherkin/features/osgi/) |
+| OSGi / AI | [osgi/…](../gherkin/features/osgi/) |
 | Mapping | [gherkin/README.md](../gherkin/README.md) |
 
 ---
 
-*Weiter*: [04 Runtime View](04_runtime_view.md) · *Zurück*: [02 Context and Scope](02_context_and_scope.md)
+*Next*: [04 Runtime View](04_runtime_view.md) · *Back*: [02 Context and Scope](02_context_and_scope.md)

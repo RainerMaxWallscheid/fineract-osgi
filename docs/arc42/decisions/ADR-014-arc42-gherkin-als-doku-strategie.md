@@ -1,33 +1,33 @@
-# ADR-014 – arc42 + Gherkin als Doku-Strategie
+# ADR-014 – arc42 + Gherkin as Documentation Strategy
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Maintainability, Operability |
+| **Qualities** | Maintainability, Operability |
 
-### Kontext
+### Context
 
-Architektur- und Fachverhalten müssen für Menschen und Agenten auffindbar sein (`docs/`, `AGENTS.md`).
+Architecture and business behaviour must be discoverable for humans and agents (`docs/`, `AGENTS.md`).
 
-### Entscheidung
+### Decision
 
-- **arc42** unter `docs/arc42/` für Architektur (Kontext bis Entscheidungen).  
-- **Gherkin** unter `docs/gherkin/` für verhaltensnahe Anforderungen (BDD).  
-- Querverweise zwischen Runtime, Deployment, Crosscutting, Quality und ADRs.
+- **arc42** under `docs/arc42/` for architecture (context through decisions).  
+- **Gherkin** under `docs/gherkin/` for behaviour-oriented requirements (BDD).  
+- Cross-references among runtime, deployment, crosscutting, quality, and ADRs.
 
-### Alternativen
+### Alternatives
 
-| Option | Bewertung |
-|--------|-----------|
-| Nur Code als Doku | Zu hohe Onboarding-Kosten |
-| Nur Wiki extern | Drift zum Repo |
-| C4 only | Ergänzend möglich; arc42 deckt Qualität/ADRs besser ab |
+| Option | Assessment |
+|--------|------------|
+| Code as the only documentation | Onboarding cost too high |
+| External wiki only | Drift from the repo |
+| C4 only | Possible as a complement; arc42 covers quality/ADRs better |
 
-### Konsequenzen
+### Consequences
 
-- **+** Einheitliche Navigationsstruktur, PR-reviewbare Doku  
-- **−** Doku muss bei Architekturänderungen mitgepflegt werden  
+- **+** Uniform navigation structure, PR-reviewable documentation  
+- **−** Documentation must be maintained when architecture changes  
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

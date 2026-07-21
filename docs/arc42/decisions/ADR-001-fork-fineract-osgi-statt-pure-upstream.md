@@ -1,41 +1,41 @@
-# ADR-001 – Fork fineract-osgi statt pure Upstream
+# ADR-001 – Fork fineract-osgi instead of pure upstream
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Extensibility, Maintainability, Compatibility (kontrolliert) |
+| **Qualities** | Extensibility, Maintainability, Compatibility (controlled) |
 
-### Kontext
+### Context
 
-Apache Fineract deckt Core Banking für Inklusion ab, ist aber monolithisch/modular nur auf Build-Ebene. fineract-osgi will **OSGi-Laufzeitmodularität** und **KI-Erweiterbarkeit** vorantreiben, ohne den Upstream-Release-Takt und jede Community-Entscheidung zu blockieren.
+Apache Fineract covers core banking for financial inclusion, but is modular only at the build level (monolithic/modular at build time). fineract-osgi aims to advance **OSGi runtime modularity** and **AI extensibility** without being blocked by the upstream release cadence and every community decision.
 
-### Entscheidung
+### Decision
 
-Einen **dedizierten Fork/Arbeitsstrang `fineract-osgi`** führen, der:
+Maintain a **dedicated fork/workstream `fineract-osgi`** that:
 
-- den Fineract-1.x-Kern und Domain-Module übernimmt,
-- OSGi- und KI-Pfade dokumentiert und schrittweise implementiert,
-- Upstream-Fixes selektiv übernimmt.
+- adopts the Fineract 1.x core and domain modules,
+- documents and incrementally implements OSGi and AI paths,
+- selectively merges upstream fixes.
 
-### Alternativen
+### Alternatives
 
-| Option | Warum nicht (jetzt) |
-|--------|---------------------|
-| Nur Upstream-PRs | Zu langsam/unsicher für OSGi-Experimente; Scope-Konflikt |
-| Komplett neues System | Fachlicher Verlust, Jahre Aufwand |
-| Nur Plugins ohne Fork | Laufzeit-Plugin-Modell fehlt im Upstream |
+| Option | Why not (now) |
+|--------|----------------|
+| Upstream PRs only | Too slow/uncertain for OSGi experiments; scope conflict |
+| Completely new system | Loss of domain capability; years of effort |
+| Plugins only without a fork | Upstream lacks a runtime plugin model |
 
-### Konsequenzen
+### Consequences
 
-- **+** Eigene Architektur-Roadmap (arc42, OSGi, KI)  
-- **+** Experimente ohne Upstream zu destabilisieren  
-- **−** Merge-Aufwand und Drift-Risiko zu Apache Fineract  
-- **−** Klare Governance nötig (was zurückfließt, was fork-spezifisch bleibt)
+- **+** Own architecture roadmap (arc42, OSGi, AI)  
+- **+** Experiments without destabilizing upstream  
+- **−** Merge effort and drift risk vs. Apache Fineract  
+- **−** Clear governance required (what flows back, what stays fork-specific)
 
-### Bezug
+### Related
 
 - [01 Introduction](../01_introduction.md), [02 Context](../02_context_and_scope.md)
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

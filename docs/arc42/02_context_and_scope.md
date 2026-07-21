@@ -1,62 +1,62 @@
 # 2. Architecture Constraints & Context and Scope
 
-Dieses Kapitel verortet **fineract-osgi** in Fach- und Technikwelt: wer kommuniziert womit, was liegt im Scope, und welche äußeren Zwänge gelten.
+This chapter situates **fineract-osgi** in its business and technical world: who communicates with what, what is in scope, and which external constraints apply.
 
 ---
 
-## 2.1 Fachlicher Kontext (Business Context)
+## 2.1 Business Context
 
 ### Mission
 
-Bereitstellung einer **mandantenfähigen Core-Banking-API** für Institute der finanziellen Inklusion: Verwaltung von Kunden, Krediten, Spareinlagen, Buchhaltung und periodischem Tagesgeschäft (COB).
+Provide a **multi-tenant core banking API** for institutions of financial inclusion: management of clients, loans, savings deposits, accounting, and periodic day-end processing (COB).
 
-### Typische Nutzerorganisationen
+### Typical User Organizations
 
-| Segment | Beispiele | Typische Last |
-|---------|-----------|---------------|
-| Microfinance Institutions (MFI) | Kreditgruppen, Individual Loans | mittel, stark COB-getrieben |
-| SACCOs / Cooperatives | Spar- und Kreditgenossenschaften | mittel |
-| Credit Unions / kleine Banken | Filialnetz, Officer-Arbeitsplätze | höher, mehr Integrationen |
-| BaaS / Platform Provider | viele Tenants auf einer Plattform | hoch, Multi-Tenant-Ops |
+| Segment | Examples | Typical Load |
+|---------|----------|--------------|
+| Microfinance Institutions (MFI) | Group lending, individual loans | medium, strongly COB-driven |
+| SACCOs / Cooperatives | Savings and credit cooperatives | medium |
+| Credit unions / small banks | Branch network, officer workstations | higher, more integrations |
+| BaaS / platform providers | Many tenants on one platform | high, multi-tenant ops |
 
-### Fachliche Kernfähigkeiten
+### Core Business Capabilities
 
-- **Client / Party** – Kunden und Gruppen  
-- **Loan Lifecycle** – Antrag, Genehmigung, Auszahlung, Tilgung, Reschedule, …  
-- **Savings / Deposits** – Konten, Zinsen, Transaktionen  
-- **Accounting** – Journal, GL, Abschlüsse  
-- **Products & Charges** – Produktdefinitionen, Gebühren  
-- **Organisation** – Offices, Staff, Branch/Teller (wo aktiv)  
-- **Reporting / MIX** – Auswertungen und regulatorische Formate  
-- **Batch / COB** – Close of Business und verwandte Jobs  
+- **Client / Party** – clients and groups  
+- **Loan Lifecycle** – application, approval, disbursement, repayment, reschedule, …  
+- **Savings / Deposits** – accounts, interest, transactions  
+- **Accounting** – journal, GL, period close  
+- **Products & Charges** – product definitions, fees  
+- **Organisation** – offices, staff, branch/teller (where active)  
+- **Reporting / MIX** – analytics and regulatory formats  
+- **Batch / COB** – close of business and related jobs  
 
-Differenzierung fineract-osgi: dieselben Fähigkeiten **modular erweiterbar** (OSGi) und **KI-anreicherbar** (externe Scores/Hinweise).
+Differentiation of fineract-osgi: the same capabilities, **modularly extensible** (OSGi) and **AI-enrichable** (external scores/hints).
 
 ```mermaid
 C4Context
-    title Fachlicher Kontext fineract-osgi (vereinfacht)
+    title Business Context fineract-osgi (simplified)
 
-    Person(officer, "Loan Officer / Admin", "Back-Office Nutzer")
-    Person(integrator, "Integrator / BaaS", "Systeme anbinden")
+    Person(officer, "Loan Officer / Admin", "Back-office user")
+    Person(integrator, "Integrator / BaaS", "Connect systems")
     System(fineract, "fineract-osgi", "Core Banking API")
-    System_Ext(ui, "Web / Mobile UI", "separates Produkt")
-    System_Ext(pay, "Payment Gateway", "Auszahlung/Einzug")
-    System_Ext(crm, "CRM / CBS Partner", "Kunden/Vertrieb")
-    System_Ext(ki, "KI Service", "xAI Grok o.ä.")
+    System_Ext(ui, "Web / Mobile UI", "separate product")
+    System_Ext(pay, "Payment Gateway", "disbursement/collection")
+    System_Ext(crm, "CRM / CBS Partner", "clients/sales")
+    System_Ext(ki, "AI Service", "xAI Grok or similar")
     System_Ext(idp, "IdP", "OIDC")
-    SystemDb(db, "PostgreSQL", "Tenants + Fachdaten")
+    SystemDb(db, "PostgreSQL", "tenants + domain data")
 
-    Rel(officer, ui, "nutzt")
+    Rel(officer, ui, "uses")
     Rel(ui, fineract, "REST HTTPS")
     Rel(integrator, fineract, "REST HTTPS")
     Rel(fineract, db, "JDBC")
     Rel(fineract, pay, "optional")
     Rel(fineract, crm, "Events / Hooks")
-    Rel(fineract, ki, "async Score")
+    Rel(fineract, ki, "async score")
     Rel(fineract, idp, "OIDC/JWT")
 ```
 
-> Hinweis: Falls der Renderer kein C4-Mermaid unterstützt, gilt das nachfolgende Blockdiagramm als kanonisch.
+> Note: If the renderer does not support C4 Mermaid, the following block diagram is canonical.
 
 ```mermaid
 flowchart TB
@@ -97,72 +97,72 @@ flowchart TB
 
 ---
 
-## 2.2 Technischer Kontext (Technical Context)
+## 2.2 Technical Context
 
-### Eingaben (Input)
+### Inputs
 
-| Kanal | Inhalt | Protokoll |
-|-------|--------|-----------|
-| **REST API** | Commands & Queries (Portfolio, Accounting, Admin) | HTTPS :8443 |
-| **Auth** | Credentials, JWT/OIDC, optional 2FA | Header / Token |
-| **Tenant-Header** | Mandantenwahl | z. B. Tenant-ID-Header |
-| **Batch Trigger** | Scheduler, manuell, Catch-up | intern / Job API |
-| **Messaging** | Job-Partitionen, Events (wenn verteilt) | Kafka / JMS |
-| **OSGi Console** | Bundle-Admin (Ops) | :2501 (abgesichert) |
+| Channel | Content | Protocol |
+|---------|---------|----------|
+| **REST API** | Commands & queries (portfolio, accounting, admin) | HTTPS :8443 |
+| **Auth** | Credentials, JWT/OIDC, optional 2FA | Header / token |
+| **Tenant header** | Tenant selection | e.g. tenant ID header |
+| **Batch trigger** | Scheduler, manual, catch-up | internal / job API |
+| **Messaging** | Job partitions, events (when distributed) | Kafka / JMS |
+| **OSGi console** | Bundle admin (ops) | :2501 (secured) |
 
-### Ausgaben (Output)
+### Outputs
 
-| Kanal | Inhalt |
-|-------|--------|
-| **REST Responses** | Ressourcen-IDs, Status, Query-Daten |
-| **Command Audit** | `m_portfolio_command_source` u. a. |
-| **Journal / Ledger** | Accounting-Buchungen |
-| **Business / External Events** | z. B. LoanCreated an Downstream |
-| **Hooks** | konfigurierbare HTTP-Callbacks |
-| **Reports** | Report-Modul / Exporte |
-| **Metrics / Traces / Logs** | Betriebssignale |
-| **KI Enrichment** | Scores/Notes am Geschäftsvorfall (optional) |
+| Channel | Content |
+|---------|---------|
+| **REST responses** | Resource IDs, status, query data |
+| **Command audit** | `m_portfolio_command_source` and related |
+| **Journal / ledger** | Accounting entries |
+| **Business / external events** | e.g. LoanCreated to downstream |
+| **Hooks** | Configurable HTTP callbacks |
+| **Reports** | Report module / exports |
+| **Metrics / traces / logs** | Operational signals |
+| **AI enrichment** | Scores/notes on the business case (optional) |
 
-### Nachbarsysteme
+### Neighboring Systems
 
-| System | Richtung | Kopplung | Bemerkung |
-|--------|----------|----------|-----------|
-| **PostgreSQL** (primär) | App → DB | stark | Fachliche Source of Truth |
-| **MySQL/MariaDB** | alternativ | stark | Upstream-Kompatibilität |
-| **Kafka / ActiveMQ** | bidirektional | mittel | verteilte Jobs & Events |
-| **OIDC IdP** | App → IdP | mittel | Production Auth |
-| **xAI Grok / KI** | Bundle → API | schwach/optional | async, Fail-Open default |
-| **Payment Gateway** | App ↔ extern | schwach | oft über Integration/Hook |
-| **CRM / Data Lake** | Events → extern | schwach | Consumer-seitig |
-| **Web/Mobile UI** | UI → API | schwach | out of scope als Produkt |
-| **Reverse Proxy / WAF** | Client → Proxy → API | betrieblich | empfohlen vor Prod |
+| System | Direction | Coupling | Note |
+|--------|-----------|----------|------|
+| **PostgreSQL** (primary) | App → DB | strong | Domain source of truth |
+| **MySQL/MariaDB** | alternative | strong | Upstream compatibility |
+| **Kafka / ActiveMQ** | bidirectional | medium | Distributed jobs & events |
+| **OIDC IdP** | App → IdP | medium | Production auth |
+| **xAI Grok / AI** | Bundle → API | weak/optional | async, fail-open default |
+| **Payment gateway** | App ↔ external | weak | often via integration/hook |
+| **CRM / data lake** | Events → external | weak | consumer-side |
+| **Web/mobile UI** | UI → API | weak | out of scope as a product |
+| **Reverse proxy / WAF** | Client → proxy → API | operational | recommended before prod |
 
-### Node-Rollen im technischen Kontext
+### Node Roles in the Technical Context
 
-fineract-osgi erscheint nach außen oft als „eine API“, intern aber als:
+Outwardly, fineract-osgi often appears as “one API,” but internally as:
 
-- **Write Nodes** – Commands  
-- **Read Nodes** – Queries/Reports  
-- **Batch Manager / Worker** – COB und Jobs  
+- **Write nodes** – commands  
+- **Read nodes** – queries/reports  
+- **Batch manager / worker** – COB and jobs  
 
 → [05 Deployment View](05_deployment_view.md)
 
 ---
 
-## 2.3 Schnittstellenübersicht
+## 2.3 Interface Overview
 
-### Externe Schnittstelle: REST
+### External Interface: REST
 
-| Eigenschaft | Wert |
-|-------------|------|
-| Basis | `/fineract-provider/api/v1/...` |
-| Stil | Ressourcen + command-orientierte Writes (CQRS) |
-| Vertrag | OpenAPI; Clients: `fineract-client` |
-| Sicherheit | Basic / OAuth2-OIDC / 2FA; Permissions |
-| Idempotenz | Idempotency-Key für Writes empfohlen |
-| Kompatibilität | stabil während interner Command-Migration ([ADR-004](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md)) |
+| Property | Value |
+|----------|-------|
+| Base | `/fineract-provider/api/v1/...` |
+| Style | Resources + command-oriented writes (CQRS) |
+| Contract | OpenAPI; clients: `fineract-client` |
+| Security | Basic / OAuth2-OIDC / 2FA; permissions |
+| Idempotency | Idempotency key for writes recommended |
+| Compatibility | stable during internal command migration ([ADR-004](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md)) |
 
-### Interne Schnittstellen (logisch)
+### Internal Interfaces (Logical)
 
 ```mermaid
 flowchart LR
@@ -172,19 +172,19 @@ flowchart LR
     DOM --> DB[(Tenant DB)]
     DOM --> EVT[Events / Hooks]
     EVT --> OSGi[OSGi Services]
-    OSGi --> KI[External KI]
+    OSGi --> KI[External AI]
     CMD --> AUD[Audit Store]
 ```
 
-| Schnittstelle | Von → Nach | Vertrag |
-|---------------|------------|---------|
-| Resource → Command | REST → Legacy/Neu Pipeline | CommandWrapper / Command&lt;REQ&gt; |
-| Handler → Domain | Command → WritePlatformService | DTO / Domain API |
-| Domain → Persistence | Services → JDBC/JPA | Transaktionen, Tenant-DS |
-| Domain → Events | Services → Publisher | Business Event Typen |
-| Core → OSGi | Spring Bridge → Registry | optionale Service-Interfaces |
-| OSGi → KI | Bundle → HTTPS | Provider-spezifisch, timeoutbehaftet |
-| Manager → Worker | Message Handler | Job-Payload auf Kafka/JMS/Spring |
+| Interface | From → To | Contract |
+|-----------|-----------|----------|
+| Resource → Command | REST → legacy/new pipeline | CommandWrapper / Command&lt;REQ&gt; |
+| Handler → Domain | Command → WritePlatformService | DTO / domain API |
+| Domain → Persistence | Services → JDBC/JPA | Transactions, tenant DS |
+| Domain → Events | Services → publisher | Business event types |
+| Core → OSGi | Spring bridge → registry | Optional service interfaces |
+| OSGi → AI | Bundle → HTTPS | Provider-specific, timeout-bound |
+| Manager → Worker | Message handler | Job payload on Kafka/JMS/Spring |
 
 ---
 
@@ -192,129 +192,129 @@ flowchart LR
 
 ### In Scope
 
-| Bereich | Konkret |
-|---------|---------|
-| **Fachkern** | Loan, Savings, Client, Accounting, Charges, Tax, Rates, Reports (Fineract-Module) |
-| **Multi-Tenancy** | Tenant-Resolution, getrennte Fach-DBs, Business Date |
-| **CQRS / Commands** | Legacy + schrittweise `fineract-command` |
-| **COB / Jobs** | Partitionierung, Manager/Worker, COB-Filter |
-| **Security** | AuthN/Z, OIDC, 2FA, Audit, Maker-Checker |
-| **OSGi Modularität** | Equinox, Bundles, optionale Services |
-| **KI-Integration** | externes Scoring/Analyse über Bundle |
-| **Betriebstopologien** | Compose, K8s-Beispiele, Modes, Observability |
-| **Dokumentation** | arc42, Glossar, Verweise auf Gherkin/Security |
+| Area | Concrete |
+|------|----------|
+| **Domain core** | Loan, Savings, Client, Accounting, Charges, Tax, Rates, Reports (Fineract modules) |
+| **Multi-tenancy** | Tenant resolution, separate domain DBs, business date |
+| **CQRS / Commands** | Legacy + stepwise `fineract-command` |
+| **COB / Jobs** | Partitioning, manager/worker, COB filters |
+| **Security** | AuthN/Z, OIDC, 2FA, audit, maker-checker |
+| **OSGi modularity** | Equinox, bundles, optional services |
+| **AI integration** | External scoring/analysis via bundle |
+| **Operating topologies** | Compose, K8s examples, modes, observability |
+| **Documentation** | arc42, glossary, references to Gherkin/Security |
 
 ### Out of Scope
 
-| Bereich | Begründung |
-|---------|------------|
-| **First-Class UI** | separate Produkte (Web App, Community App) |
-| **Self-Service Endkunden-Portal** | anderes Threat Model / Produkt |
-| **Payment Rails (SWIFT/RTGS)** | Downstream-Verantwortung |
-| **Blockchain / Krypto-Ledger** | nicht Teil des Accounting-Modells |
-| **Training/Hosting von ML-Modellen im Core** | ADR-005: externe KI |
-| **Volumetric DDoS-Abwehr** | Proxy/Cloud |
-| **Physische DB-Host-Sicherheit** | Infrastruktur |
-| **Instituts-spezifische Mobile Apps** | Integratoren |
-| **Vollständige Upstream-Governance ersetzen** | Fork-Linie, kein Apache-Ersatz |
+| Area | Rationale |
+|------|-----------|
+| **First-class UI** | Separate products (web app, community app) |
+| **Self-service end-customer portal** | Different threat model / product |
+| **Payment rails (SWIFT/RTGS)** | Downstream responsibility |
+| **Blockchain / crypto ledger** | Not part of the accounting model |
+| **Training/hosting of ML models in the core** | ADR-005: external AI |
+| **Volumetric DDoS defense** | Proxy/cloud |
+| **Physical DB host security** | Infrastructure |
+| **Institution-specific mobile apps** | Integrators |
+| **Fully replacing upstream governance** | Fork line, not an Apache replacement |
 
-### Scope-Diagramm
+### Scope Diagram
 
 ```mermaid
 flowchart TB
     subgraph InScope["In Scope – fineract-osgi"]
       API[REST Core Banking]
       DOM[Domain + COB]
-      OSGi[OSGi + KI Bridge]
+      OSGi[OSGi + AI Bridge]
       OPS[Deploy Modes + Observability]
     end
 
     subgraph OutScope["Out of Scope"]
-      UI[Web/Mobile UI Produkte]
+      UI[Web/Mobile UI Products]
       PS[Payment Networks]
       ML[Model Training Cluster]
       SS[Self-Service Portal]
     end
 
-    UI -->|nutzt| API
+    UI -->|uses| API
     API -.->|events/hooks| PS
-    OSGi -->|inference| EXT[External KI API]
+    OSGi -->|inference| EXT[External AI API]
 ```
 
 ---
 
-## 2.5 Annahmen
+## 2.5 Assumptions
 
-1. Clients sind **Back-Office** oder vertrauenswürdige Integratoren, keine anonymen Internet-Endkunden direkt.  
-2. Vor Produktion steht ein **Reverse Proxy/WAF** mit TLS.  
-3. Pro Tenant existiert eine erreichbare Fachdatenbank; Registry in `fineract_tenants`.  
-4. COB-Fenster und SLOs werden pro Deployment kalibriert (Richtwerte in Kap. 7).  
-5. OSGi-Features sind **optional**; Kernprozesse laufen ohne sie.  
-6. KI-Ergebnisse sind **Entscheidungshilfen**, sofern nicht explizit als Policy Gate konfiguriert.  
-7. Cluster-Nodes einer Rolle teilen **dieselbe Bundle-Version**.  
-
----
-
-## 2.6 Externe Randbedingungen & Compliance-Ansatz
-
-| Thema | Haltung |
-|-------|---------|
-| **Datenschutz / PII** | Minimierung in KI-Payloads; keine Secrets in Logs |
-| **Auditierbarkeit** | Commands und kritische Änderungen nachvollziehbar |
-| **Multi-Tenant Isolation** | harte Anforderung, nicht optional |
-| **Secrets** | Env/K8s/Vault – nicht im Image hardcoden |
-| **Lizenz** | Apache-2.0-Ökosystem; Bundle-Lizenzen separat prüfen |
-| **Regulierung** | Architektur unterstützt Controls; Zertifizierung ist Kunden-/Deploy-Sache |
-
-Threat Model-Basis: [`SECURITY.md`](../../SECURITY.md).
+1. Clients are **back-office** or trusted integrators, not anonymous internet end-customers directly.  
+2. A **reverse proxy/WAF** with TLS stands in front of production.  
+3. Each tenant has a reachable domain database; registry in `fineract_tenants`.  
+4. COB windows and SLOs are calibrated per deployment (guidelines in ch. 7).  
+5. OSGi features are **optional**; core processes run without them.  
+6. AI results are **decision support**, unless explicitly configured as a policy gate.  
+7. Cluster nodes of a role share the **same bundle version**.  
 
 ---
 
-## 2.7 Kontext-Mapping zu Runtime-Szenarien
+## 2.6 External Constraints & Compliance Approach
 
-| Fachlicher Anlass | Runtime-Szenario | Kapitel |
-|-------------------|------------------|---------|
-| Officer legt Kredit an | Loan Creation | [04.2](04_runtime_view.md) |
-| Integrator sendet Write | Command Processing | [04.3](04_runtime_view.md) |
-| Ops aktiviert Scoring | OSGi + KI | [04.4](04_runtime_view.md), [04.7](04_runtime_view.md) |
-| Tagesabschluss | COB | [04.6](04_runtime_view.md) |
-| Viele Institute | Multi-Tenant Request | [04.5](04_runtime_view.md) |
+| Topic | Stance |
+|-------|--------|
+| **Data protection / PII** | Minimization in AI payloads; no secrets in logs |
+| **Auditability** | Commands and critical changes are traceable |
+| **Multi-tenant isolation** | Hard requirement, not optional |
+| **Secrets** | Env/K8s/Vault – do not hardcode in the image |
+| **License** | Apache-2.0 ecosystem; review bundle licenses separately |
+| **Regulation** | Architecture supports controls; certification is a customer/deploy concern |
+
+Threat model baseline: [`SECURITY.md`](../../SECURITY.md).
 
 ---
 
-## 2.8 Abgrenzung der Verantwortung
+## 2.7 Context Mapping to Runtime Scenarios
 
-| Verantwortung | fineract-osgi | Extern |
-|---------------|:-------------:|:------:|
-| Fachliche Invarianten Loans/Savings/GL | ✓ | |
-| API-Vertrag & Idempotenz | ✓ | Client muss Keys senden |
+| Business Trigger | Runtime Scenario | Chapter |
+|------------------|------------------|---------|
+| Officer creates a loan | Loan Creation | [04.2](04_runtime_view.md) |
+| Integrator sends a write | Command Processing | [04.3](04_runtime_view.md) |
+| Ops enables scoring | OSGi + AI | [04.4](04_runtime_view.md), [04.7](04_runtime_view.md) |
+| Day-end processing | COB | [04.6](04_runtime_view.md) |
+| Many institutions | Multi-Tenant Request | [04.5](04_runtime_view.md) |
+
+---
+
+## 2.8 Responsibility Boundaries
+
+| Responsibility | fineract-osgi | External |
+|----------------|:-------------:|:--------:|
+| Domain invariants loans/savings/GL | ✓ | |
+| API contract & idempotency | ✓ | Client must send keys |
 | UI/UX | | ✓ |
-| IdP-Betrieb | | ✓ (außer Dev-Basic-Auth) |
-| KI-Modellgüte | | ✓ Vendor/Team |
-| DB-Backup/HA | Konfig-Hilfe | ✓ Infrastruktur |
-| Bundle-Inhalt Kunde | Verträge/Extension Points | ✓ Implementierung |
-| Netzwerk-DDoS | | ✓ Proxy/Cloud |
+| IdP operations | | ✓ (except dev basic auth) |
+| AI model quality | | ✓ vendor/team |
+| DB backup/HA | Config help | ✓ infrastructure |
+| Customer bundle content | Contracts/extension points | ✓ implementation |
+| Network DDoS | | ✓ proxy/cloud |
 
 ---
 
-## 2.9 Offene Kontextfragen
+## 2.9 Open Context Questions
 
-- Welche External-Event-Semantik (at-least-once vs. Outbox) wird Produktstandard?  
-- Welche KI-Use-Cases sind „nur Enrichment“ vs. „Policy Gate“?  
-- Tenant-Provisioning-API/Prozess standardisieren?  
-- Offizielle Support-Matrix PostgreSQL-Versionen für fineract-osgi?
-
----
-
-## 2.10 Verwandte Gherkin-Features
-
-| Verhalten | Feature |
-|-----------|---------|
-| Kunde anlegen | [client/client_create.feature](../gherkin/features/client/client_create.feature) |
-| Sparkonto eröffnen | [savings/savings_account_open.feature](../gherkin/features/savings/savings_account_open.feature) |
-| Kredit anlegen | [loan/loan_creation.feature](../gherkin/features/loan/loan_creation.feature) |
-| Mapping gesamt | [gherkin/README.md](../gherkin/README.md) |
+- Which external-event semantics (at-least-once vs. outbox) become product standard?  
+- Which AI use cases are “enrichment only” vs. “policy gate”?  
+- Standardize tenant provisioning API/process?  
+- Official support matrix of PostgreSQL versions for fineract-osgi?
 
 ---
 
-*Weiter*: [03 Building Block View](03_building_block_view.md) · *Zurück*: [01 Introduction](01_introduction.md)
+## 2.10 Related Gherkin Features
+
+| Behavior | Feature |
+|----------|---------|
+| Create client | [client/client_create.feature](../gherkin/features/client/client_create.feature) |
+| Open savings account | [savings/savings_account_open.feature](../gherkin/features/savings/savings_account_open.feature) |
+| Create loan | [loan/loan_creation.feature](../gherkin/features/loan/loan_creation.feature) |
+| Full mapping | [gherkin/README.md](../gherkin/README.md) |
+
+---
+
+*Next*: [03 Building Block View](03_building_block_view.md) · *Back*: [01 Introduction](01_introduction.md)

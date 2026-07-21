@@ -1,51 +1,51 @@
-# ADR-020 – Event Sourcing für Write / Update / Delete als Pflicht
+# ADR-020 – Event Sourcing for Write / Update / Delete as Mandatory
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Correctness, Reliability, Maintainability, Extensibility, Compatibility |
-| **Supersedes (teilweise)** | Ablehnung „Event Sourcing als Ledger“ in älteren Entscheidungsnotizen; Non-Goal in [ADR-019](ADR-019-domain-driven-design.md) bzgl. Event-Sourcing-Pflicht |
+| **Qualities** | Correctness, Reliability, Maintainability, Extensibility, Compatibility |
+| **Supersedes (partially)** | Rejection of “event sourcing as ledger” in older decision notes; non-goal in [ADR-019](ADR-019-domain-driven-design.md) regarding mandatory event sourcing |
 
-### Kontext
+### Context
 
-Schreibende Operationen (Create / Update / Delete bzw. fachliche State-Transitions) laufen heute über:
+Write operations (create / update / delete or domain state transitions) today run through:
 
-- Command-Pipeline ([ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md)),
-- **Zustandsspeicherung** in relationalen Tabellen via Spring Data JPA / EclipseLink ([ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md)),
-- optionale **Business/External Events** nach dem Commit (Nebenwirkung, nicht Source of Truth).
+- command pipeline ([ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md)),
+- **state storage** in relational tables via Spring Data JPA / EclipseLink ([ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md)),
+- optional **business/external events** after commit (side effect, not source of truth).
 
-Das erschwert:
+This hinders:
 
-- vollständige **Audit-Historie** des Aggregat-Zustands (nur Command-Audit + aktuelle Zeile),
-- **zeitliche Rekonstruktion** und Debugging („warum war der Saldo so?“),
-- einheitliche Integration (Downstream oft nur „aktueller Stand“),
-- klare Trennung Write-Model vs. Read-Model im Sinne von CQRS.
+- complete **audit history** of aggregate state (only command audit + current row),
+- **temporal reconstruction** and debugging (“why was the balance like that?”),
+- uniform integration (downstream often only “current state”),
+- clear separation of write model vs. read model in the CQRS sense.
 
-fineract-osgi hat bereits CQRS-Anklänge (Commands vs. ReadPlatform), DDD-Aggregates ([ADR-019](ADR-019-domain-driven-design.md)) und Hexagon-Ports ([ADR-017](ADR-017-hexagonale-architektur.md)). Event Sourcing macht den **Write-Pfad** event-zentrisch.
+fineract-osgi already has CQRS traits (commands vs. ReadPlatform), DDD aggregates ([ADR-019](ADR-019-domain-driven-design.md)), and hexagon ports ([ADR-017](ADR-017-hexagonale-architektur.md)). Event sourcing makes the **write path** event-centric.
 
-### Entscheidung
+### Decision
 
-**Event Sourcing ist Pflicht** für alle **Write-, Update- und Delete-Operationen** (inkl. fachlicher Lifecycle-Transitions) an **Domain-Aggregates** im Zielbild von fineract-osgi.
+**Event sourcing is mandatory** for all **write, update, and delete operations** (including domain lifecycle transitions) on **domain aggregates** in the target picture of fineract-osgi.
 
-#### Was „Pflicht“ bedeutet
+#### What “mandatory” means
 
-| Gilt für | Bedeutung |
-|----------|-----------|
-| **Create / Update / Delete / Transition** | Jede zustandsändernde Domain-Operation appendet **Domain Events** in einen **append-only Event Store** (pro Aggregat-Stream). |
-| **Source of Truth (Write)** | Der **Event-Stream** ist die autoritative Historie des Aggregates; der aktuelle Zustand wird daraus abgeleitet (Memory-Fold oder materialisierte Snapshot-Projektion). |
-| **Commands** | Commands validieren und entscheiden; Ergebnis sind Events, nicht „nur“ ein `repo.save(entity)`. |
-| **Deletes** | Soft/Hard fachlich als Events (`…Deleted`, `…Closed`, `…Cancelled`) – kein stilles physisches Löschen als alleinige Wahrheit. |
+| Applies to | Meaning |
+|------------|---------|
+| **Create / update / delete / transition** | Every state-changing domain operation appends **domain events** to an **append-only event store** (per aggregate stream). |
+| **Source of truth (write)** | The **event stream** is the authoritative history of the aggregate; current state is derived from it (in-memory fold or materialized snapshot projection). |
+| **Commands** | Commands validate and decide; result is events, not “only” a `repo.save(entity)`. |
+| **Deletes** | Soft/hard domain deletes as events (`…Deleted`, `…Closed`, `…Cancelled`) – no silent physical delete as sole truth. |
 
-#### Was **nicht** der Event Store ist
+#### What the event store is **not**
 
-| Thema | Regelung |
-|-------|----------|
-| **Double-Entry / Journal** | Bleibt **relational und buchhalterisch korrekt** (Ledger). Journal Entries sind **Projektionen / Nebenmodelle**, abgeleitet aus Domain Events (oder expliziten Accounting-Events) – nicht ersetzt durch „Event = Buchung“. |
-| **Read/Query-APIs** | Weiterhin **Read Models** (JDBC, Projections, Tabellen) – CQRS. Kein Pflicht-Replay pro GET. |
-| **Technische Tabellen** | Idempotency Keys, Jobs, Sessions, Config: nicht zwingend event-sourced. |
-| **Import/Bulk-Staging** | Staging darf tabellarisch sein; Commit in die Domain erfolgt event-sourced. |
+| Topic | Rule |
+|-------|------|
+| **Double-entry / journal** | Remains **relational and bookkeeping-correct** (ledger). Journal entries are **projections / side models**, derived from domain events (or explicit accounting events) – not replaced by “event = booking”. |
+| **Read/query APIs** | Continue as **read models** (JDBC, projections, tables) – CQRS. No mandatory replay per GET. |
+| **Technical tables** | Idempotency keys, jobs, sessions, config: not necessarily event-sourced. |
+| **Import/bulk staging** | Staging may be tabular; commit into the domain is event-sourced. |
 
-#### Ziel-Architektur (Write)
+#### Target architecture (write)
 
 ```mermaid
 sequenceDiagram
@@ -66,69 +66,69 @@ sequenceDiagram
     C-->>D: CommandProcessingResult
 ```
 
-#### Technische Leitplanken
+#### Technical guardrails
 
-1. **Stream pro Aggregat** (z. B. `Loan-{id}`, `SavingsAccount-{id}`) mit Versions-/Sequence-Optimistic-Concurrency.  
-2. **Idempotente Commands** bleiben Pflicht (Client-Key + Event-Dedup).  
-3. **Snapshots** erlaubt/empfohlen für lange Streams (Performance), abgeleitet aus Events.  
-4. **Projectors** aktualisieren Read Models und Accounting asynchron oder in derselben TX nur wo streng nötig (Trade-off Konsistenz vs. Latenz dokumentieren pro Context).  
-5. **Tenant-Isolation**: Event Store tenant-fähig (Schema/DB pro Tenant oder zwingendes Tenant-Attribut + RLS-äquivalent).  
-6. **Schema-Evolution** der Events (Upcasters / Versionierung) von Tag 1.  
-7. **Hexagon**: Event Store und Projectors = **Driven Adapters**; Aggregate-Entscheidungslogik = Domain.
+1. **Stream per aggregate** (e.g. `Loan-{id}`, `SavingsAccount-{id}`) with version/sequence optimistic concurrency.  
+2. **Idempotent commands** remain mandatory (client key + event dedup).  
+3. **Snapshots** allowed/recommended for long streams (performance), derived from events.  
+4. **Projectors** update read models and accounting asynchronously or in the same TX only where strictly needed (document consistency vs. latency trade-off per context).  
+5. **Tenant isolation**: event store tenant-capable (schema/DB per tenant or mandatory tenant attribute + RLS equivalent).  
+6. **Schema evolution** of events (upcasters / versioning) from day 1.  
+7. **Hexagon**: event store and projectors = **driven adapters**; aggregate decision logic = domain.
 
-#### Migrationsstrategie (Strangler)
+#### Migration strategy (strangler)
 
-| Phase | Inhalt |
-|-------|--------|
-| **ES0 – Pflicht & Standards** | Dieses ADR; Event-Metamodell, Store-API-Port, Concurrency, Tenant |
-| **ES1 – Greenfield** | Neue Aggregates / neue Bounded Contexts **nur** event-sourced |
-| **ES2 – Pilot** | Ein bestehendes Aggregat end-to-end (z. B. ein schlankes Subdomain-Aggregat oder Interop-Identifier) |
-| **ES3 – Portfolio-Kern** | Loan / Savings schrittweise: Dual-Write oder Catch-up-Replay, dann Cutover Stream = SoT |
-| **ES4 – Abschluss** | Restliche Domain-Writes; Zustandstabellen nur noch als Projection |
+| Phase | Content |
+|-------|---------|
+| **ES0 – Mandate & standards** | This ADR; event metamodel, store API port, concurrency, tenant |
+| **ES1 – Greenfield** | New aggregates / new bounded contexts **only** event-sourced |
+| **ES2 – Pilot** | One existing aggregate end-to-end (e.g. a slim subdomain aggregate or interop identifier) |
+| **ES3 – Portfolio core** | Loan / Savings stepwise: dual-write or catch-up replay, then cutover stream = SoT |
+| **ES4 – Completion** | Remaining domain writes; state tables only as projection |
 
-Bis Cutover eines Aggregates gilt: Legacy-JPA-Write **geduldet**, aber **kein** neues zustandsänderndes Feature auf reinem State-only-Write ohne Event-Plan.
+Until cutover of an aggregate: legacy JPA write is **tolerated**, but **no** new state-changing feature on pure state-only write without an event plan.
 
-#### Bezug zu früheren ADRs
+#### Relation to earlier ADRs
 
-| ADR | Anpassung |
-|-----|-----------|
-| [ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) | Commands erzeugen Events; Result weiterhin an API |
-| [ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md) | JPA/JDBC primär für **Read Models / Snapshots / Journal**, nicht mehr alleinige Write-SoT |
-| [ADR-019](ADR-019-domain-driven-design.md) | Aggregates entscheiden Events; Non-Goal „ES-Pflicht“ ist **aufgehoben** |
-| [ADR-017](ADR-017-hexagonale-architektur.md) | Event Store = Driven Port/Adapter |
+| ADR | Adjustment |
+|-----|------------|
+| [ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) | Commands produce events; result still at API |
+| [ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md) | JPA/JDBC primarily for **read models / snapshots / journal**, no longer sole write SoT |
+| [ADR-019](ADR-019-domain-driven-design.md) | Aggregates decide events; non-goal “ES mandate” is **lifted** |
+| [ADR-017](ADR-017-hexagonale-architektur.md) | Event store = driven port/adapter |
 
-### Alternativen
+### Alternatives
 
-| Option | Warum nicht |
-|--------|-------------|
-| Nur Audit-Log zusätzlich zum State | Keine echte Rekonstruktion, inkonsistent |
-| Event Sourcing nur optional | Wird nie Standard; fragmentierte Modelle |
-| Event = einziges Ledger (kein Journal) | Verletzt Double-Entry / Aufsichtspraxis |
-| Sofort Big-Bang aller Aggregates | Betriebs- und Korrektheitsrisiko inakzeptabel |
+| Option | Why not |
+|--------|---------|
+| Audit log only in addition to state | No true reconstruction, inconsistent |
+| Event sourcing only optional | Never becomes standard; fragmented models |
+| Event = sole ledger (no journal) | Violates double-entry / supervisory practice |
+| Immediate big-bang of all aggregates | Operational and correctness risk unacceptable |
 
-### Konsequenzen
+### Consequences
 
-- **+** Vollständige Write-Historie, bessere Auditierbarkeit und Debugging  
-- **+** Natürliche Integration (Projectors, External Events aus Domain Events)  
-- **+** Passt zu CQRS, DDD Aggregates, Hexagon  
-- **−** Hoher Migrations- und Schulungsaufwand  
-- **−** Komplexität: Upcasting, Replay, Projector-Lag, Snapshot-Strategie  
-- **−** COB/Performance muss event- und projection-bewusst designt werden  
-- **−** Bis ES3/ES4 koexistieren zwei Write-Paradigmen (Strangler-Disziplin nötig)  
+- **+** Full write history, better auditability and debugging  
+- **+** Natural integration (projectors, external events from domain events)  
+- **+** Fits CQRS, DDD aggregates, hexagon  
+- **−** High migration and training effort  
+- **−** Complexity: upcasting, replay, projector lag, snapshot strategy  
+- **−** COB/performance must be designed event- and projection-aware  
+- **−** Until ES3/ES4 two write paradigms coexist (strangler discipline needed)  
 
 ### Non-Goals
 
-- Event Sourcing für reine **Query**-Pfade  
-- Ersetzen des **Accounting-Journals** durch Event Store allein  
-- Sofortige Abschaltung von JPA  
-- Blockchain / immutable distributed ledger als Store  
+- Event sourcing for pure **query** paths  
+- Replacing the **accounting journal** by the event store alone  
+- Immediate shutdown of JPA  
+- Blockchain / immutable distributed ledger as store  
 
-### Bezug
+### Related
 
 - [ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) · [ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md) · [ADR-017](ADR-017-hexagonale-architektur.md) · [ADR-019](ADR-019-domain-driven-design.md)  
-- Event-Inventar Ist→ES: [12 Event Catalog](../12_event_catalog.md)  
-- Runtime Commands [04.3](../04_runtime_view.md) · Crosscutting Events [06.6](../06_crosscutting_concepts.md) · Quality Correctness [07](../07_quality_attributes.md)
+- Event inventory as-is→ES: [12 Event Catalog](../12_event_catalog.md)  
+- Runtime commands [04.3](../04_runtime_view.md) · Crosscutting events [06.6](../06_crosscutting_concepts.md) · Quality correctness [07](../07_quality_attributes.md)
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

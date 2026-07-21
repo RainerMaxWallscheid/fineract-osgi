@@ -1,47 +1,47 @@
-# ADR-002 – OSGi (Equinox) für Laufzeitmodularität
+# ADR-002 – OSGi (Equinox) for runtime modularity
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Extensibility, Maintainability, Deployability |
+| **Qualities** | Extensibility, Maintainability, Deployability |
 
-### Kontext
+### Context
 
-Gradle-Module strukturieren den Build, erlauben aber kein **dynamisches** Aktivieren/Ersetzen von Features (KI, instituts-spezifische Regeln) zur Laufzeit. Kunden sollen Erweiterungen laden können, ohne den Core neu zu bauen.
+Gradle modules structure the build but do not allow **dynamic** activation/replacement of features (AI, institution-specific rules) at runtime. Customers should be able to load extensions without rebuilding the core.
 
-### Entscheidung
+### Decision
 
-**OSGi** als Modularitätsmodell einführen; als Framework **Eclipse Equinox** (siehe `osgi/`, `docs/arc42/osgi.gradle`).
+Introduce **OSGi** as the modularity model; as framework use **Eclipse Equinox** (see `osgi/`, `docs/arc42/osgi.gradle`).
 
-Prinzipien:
+Principles:
 
-1. Feature-Implementierungen als **Bundles**  
-2. Verträge als exportierte **Service-Interfaces**  
-3. Core nutzt Services **optional** (Service Registry / Tracker)  
-4. Fehlt ein Bundle → **Degradation**, kein Totalausfall  
+1. Feature implementations as **bundles**  
+2. Contracts as exported **service interfaces**  
+3. Core uses services **optionally** (Service Registry / Tracker)  
+4. Missing bundle → **degradation**, not total failure  
 
-### Alternativen
+### Alternatives
 
-| Option | Bewertung |
-|--------|-----------|
-| **Apache Felix** | Valide; Equinox wegen Tooling/Console/Enterprise-Nähe bevorzugt |
-| **Apache Karaf** | Mehr Ops-Komfort, aber schwergewichtigere Plattform; später optional als Distribution |
-| **PF4J / Spring Plugin** | Leichter, aber schwächere Isolation/Versionierung als OSGi |
-| **Microservices pro Feature** | Maximale Isolation, aber Ops- und Transaktionskomplexität für Core Banking zu hoch |
-| **Nur Gradle-Module** | Unzureichend für Hot-Deploy und kunden-spezifische Binaries |
+| Option | Assessment |
+|--------|------------|
+| **Apache Felix** | Valid; Equinox preferred for tooling/console/enterprise proximity |
+| **Apache Karaf** | More ops comfort, but heavier platform; later optional as a distribution |
+| **PF4J / Spring Plugin** | Lighter, but weaker isolation/versioning than OSGi |
+| **Microservices per feature** | Maximum isolation, but ops and transaction complexity too high for core banking |
+| **Gradle modules only** | Insufficient for hot-deploy and customer-specific binaries |
 
-### Konsequenzen
+### Consequences
 
-- **+** Hot-Deploy, klare API/Impl-Trennung, kunden-spezifische Bundles  
-- **+** Unterstützt Qualitätsziel Erweiterbarkeit ([Q-EXT-*](../07_quality_attributes.md))  
-- **−** Bundle-Lifecycle, Package-Exports, Versionsdisziplin  
-- **−** Lernkurve; Equinox Console muss gehärtet werden (Port 2501)  
-- **−** Cluster: gleiche Bundle-Versionen auf allen Nodes  
+- **+** Hot-deploy, clear API/impl separation, customer-specific bundles  
+- **+** Supports the extensibility quality goal ([Q-EXT-*](../07_quality_attributes.md))  
+- **−** Bundle lifecycle, package exports, versioning discipline  
+- **−** Learning curve; Equinox console must be hardened (port 2501)  
+- **−** Cluster: same bundle versions on all nodes  
 
-### Bezug
+### Related
 
 - Runtime [4.4](../04_runtime_view.md), Deployment [5.7](../05_deployment_view.md), Crosscutting [6.7](../06_crosscutting_concepts.md)
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

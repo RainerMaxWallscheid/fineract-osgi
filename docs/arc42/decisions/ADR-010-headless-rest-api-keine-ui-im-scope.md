@@ -1,30 +1,30 @@
-# ADR-010 – Headless REST-API, keine UI im Scope
+# ADR-010 – Headless REST API, no UI in scope
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Maintainability, Compatibility |
+| **Qualities** | Maintainability, Compatibility |
 
-### Kontext
+### Context
 
-Fineract ist API-first; UIs (Web App, Community App, Self-Service) sind separate Produkte ([`SECURITY.md`](../../../SECURITY.md), [Kap. 2](../02_context_and_scope.md)).
+Fineract is API-first; UIs (web app, community app, self-service) are separate products ([`SECURITY.md`](../../../SECURITY.md), [Ch. 2](../02_context_and_scope.md)).
 
-### Entscheidung
+### Decision
 
-fineract-osgi liefert **keine** First-Class-UI im Architektur-Scope. Integration über REST/OpenAPI; optionale Compose-Dateien für UI-Nebenstacks sind Demo, nicht Kern.
+fineract-osgi delivers **no** first-class UI in the architecture scope. Integration via REST/OpenAPI; optional Compose files for UI side stacks are demo, not core.
 
-### Alternativen
+### Alternatives
 
-| Option | Warum nicht |
-|--------|-------------|
-| UI in denselben Deployable | Vermischt Release-Zyklen und Threat Model |
-| GraphQL als Primär-API | Zusätzliche Oberfläche ohne Bedarf der bestehenden Integratoren |
+| Option | Why not |
+|--------|---------|
+| UI in the same deployable | Mixes release cycles and threat model |
+| GraphQL as primary API | Extra surface without demand from existing integrators |
 
-### Konsequenzen
+### Consequences
 
-- **+** Klarer Schnitt, kleineres Security-Scope  
-- **−** UX-Verantwortung liegt bei Integratoren/Frontend-Teams  
+- **+** Clear cut, smaller security scope  
+- **−** UX responsibility lies with integrators/frontend teams  
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

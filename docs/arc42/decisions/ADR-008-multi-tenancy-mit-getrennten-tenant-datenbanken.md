@@ -1,36 +1,36 @@
-# ADR-008 – Multi-Tenancy mit getrennten Tenant-Datenbanken
+# ADR-008 – Multi-tenancy with separate tenant databases
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Security, Isolation, Scalability |
+| **Qualities** | Security, Isolation, Scalability |
 
-### Kontext
+### Context
 
-SaaS-/Hosting-Szenarien bedienen viele Institute. Strikte Trennung von Daten und oft Konfiguration (inkl. OIDC pro Tenant) ist Pflicht.
+SaaS/hosting scenarios serve many institutions. Strict separation of data and often configuration (including OIDC per tenant) is mandatory.
 
-### Entscheidung
+### Decision
 
-- Zentrale **Tenants-Registry-DB** (`fineract_tenants`)  
-- **Fachdaten pro Tenant** in eigener DB/Schema  
-- Request- und Job-Context über Filter + ThreadLocal  
-- Optional Read-only-Connections für Report-Nodes  
+- Central **tenants registry DB** (`fineract_tenants`)  
+- **Business data per tenant** in its own DB/schema  
+- Request and job context via filter + ThreadLocal  
+- Optional read-only connections for report nodes  
 
-### Alternativen
+### Alternatives
 
-| Option | Bewertung |
-|--------|-----------|
-| Shared Schema + `tenant_id` Spalte | Einfacher Betrieb, schwächere Isolation, riskantere Queries |
-| DB-pro-Tenant auf eigenem Server immer | Maximale Isolation, hohe Kosten; optional für Großkunden |
-| Schema-pro-Request dynamisch ohne Pool | Performance-Falle |
+| Option | Assessment |
+|--------|------------|
+| Shared schema + `tenant_id` column | Simpler ops, weaker isolation, riskier queries |
+| DB-per-tenant always on its own server | Maximum isolation, high cost; optional for large customers |
+| Dynamic schema-per-request without pool | Performance trap |
 
-### Konsequenzen
+### Consequences
 
-- **+** Starke Isolation, Backup/Restore pro Institut möglich  
-- **+** Passt zu Security-Szenarien Q-SEC-1  
-- **−** Connection-Pools multiplizieren sich  
-- **−** Ops muss Tenant-Lifecycle (Provisionierung) beherrschen  
+- **+** Strong isolation; backup/restore per institution possible  
+- **+** Fits security scenarios Q-SEC-1  
+- **−** Connection pools multiply  
+- **−** Ops must master the tenant lifecycle (provisioning)  
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

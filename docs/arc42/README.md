@@ -1,61 +1,61 @@
-# arc42 Architekturdokumentation
+# arc42 Architecture Documentation
 
-Dieses Verzeichnis enthält die arc42-Dokumentation für **fineract-osgi** – Apache Fineract 1.x mit Fokus auf OSGi-Modularität und KI-Erweiterbarkeit.
+This directory contains the arc42 documentation for **fineract-osgi** – Apache Fineract 1.x with a focus on OSGi modularity and AI extensibility.
 
 ## Navigation
 
-| Kap. | Dokument | Inhalt |
-|------|----------|--------|
-| 01 | [Introduction and Goals](01_introduction.md) | Zweck, Stakeholder, Ziele, Lesepfade |
-| 02 | [Context and Scope](02_context_and_scope.md) | Fach-/Technikkontext, Schnittstellen, In/Out of Scope |
-| 03 | [Building Block View](03_building_block_view.md) | Statische Zerlegung Level 1–3 |
-| 04 | [Runtime View](04_runtime_view.md) | Abläufe: Loan, Commands, OSGi, COB, KI |
-| 05 | [Deployment View](05_deployment_view.md) | Compose, K8s, Modes, OSGi-Betrieb |
+| Ch. | Document | Content |
+|-----|----------|---------|
+| 01 | [Introduction and Goals](01_introduction.md) | Purpose, stakeholders, goals, reading paths |
+| 02 | [Context and Scope](02_context_and_scope.md) | Business/technical context, interfaces, in/out of scope |
+| 03 | [Building Block View](03_building_block_view.md) | Static decomposition levels 1–3 |
+| 04 | [Runtime View](04_runtime_view.md) | Flows: Loan, Commands, OSGi, COB, AI |
+| 05 | [Deployment View](05_deployment_view.md) | Compose, K8s, modes, OSGi operations |
 | 06 | [Crosscutting Concepts](06_crosscutting_concepts.md) | Tenant, Security, CQRS, Events, Observability |
-| 07 | [Quality Attributes](07_quality_attributes.md) | NFRs, Scenarios, Trade-offs |
+| 07 | [Quality Attributes](07_quality_attributes.md) | NFRs, scenarios, trade-offs |
 | 08 | [Design Decisions](08_design_decisions.md) | ADRs 001–021 in [`decisions/`](decisions/) |
-| 09 | [Glossary](09_glossary.md) | Begriffe, Abkürzungen, Ports, Env |
-| 10 | [Domain Context Map](10_domain_context_map.md) | Bounded Contexts, Subdomains, U/D-Map, Migrationsreihenfolge (DDD D1) |
-| 11 | [Aggregate Canvas](11_aggregate_canvas.md) | Loan, SavingsAccount, Client: Invarianten, Commands, Events, Konflikte (DDD taktisch) |
-| 12 | [Event Catalog](12_event_catalog.md) | Alle Business-Event-TYPEs → ES-Zielnamen, Lücken, Avro, LoanEvent |
-| 13 | [ArchUnit BC Rules](13_archunit_bounded_context_rules.md) | ArchUnit-Regeln gegen Cross-Context-Entity-Imports (Freeze-Baseline) |
-| 14 | [Module API Boundaries](14_module_api_boundaries.md) | Subprojekte nur über `moduleapi` (ADR-021) |
+| 09 | [Glossary](09_glossary.md) | Terms, abbreviations, ports, env |
+| 10 | [Domain Context Map](10_domain_context_map.md) | Bounded contexts, subdomains, U/D map, migration order (DDD D1) |
+| 11 | [Aggregate Canvas](11_aggregate_canvas.md) | Loan, SavingsAccount, Client: invariants, commands, events, conflicts (tactical DDD) |
+| 12 | [Event Catalog](12_event_catalog.md) | All business event TYPEs → ES target names, gaps, Avro, LoanEvent |
+| 13 | [ArchUnit BC Rules](13_archunit_bounded_context_rules.md) | ArchUnit rules against cross-context entity imports (freeze baseline) |
+| 14 | [Module API Boundaries](14_module_api_boundaries.md) | Subprojects only via `moduleapi` (ADR-021) |
 
-## Ergänzende Artefakte
+## Complementary Artifacts
 
-| Pfad | Inhalt |
-|------|--------|
-| [`osgi.gradle`](osgi.gradle) | Equinox-Abhängigkeiten und Start-Task (Doku-Scaffold) |
-| [`osgi/`](osgi/) | Beispiel-Equinox-Layout unter der Doku |
-| [`../gherkin/`](../gherkin/README.md) | BDD-/Gherkin-Anforderungen (an arc42 getaggt) |
-| [`../../SECURITY.md`](../../SECURITY.md) | Threat Model |
-| [`../../osgi/`](../../osgi/) | Laufzeit-Scaffold Equinox im Repo-Root |
+| Path | Content |
+|------|---------|
+| [`osgi.gradle`](osgi.gradle) | Equinox dependencies and start task (doc scaffold) |
+| [`osgi/`](osgi/) | Example Equinox layout under the documentation |
+| [`../gherkin/`](../gherkin/README.md) | BDD/Gherkin requirements (tagged to arc42) |
+| [`../../SECURITY.md`](../../SECURITY.md) | Threat model |
+| [`../../osgi/`](../../osgi/) | Runtime Equinox scaffold at the repository root |
 
-## Gherkin-Anbindung
+## Gherkin Integration
 
-Verhaltensspezifikationen liegen unter [`docs/gherkin/features/`](../gherkin/features/).  
-Vollständige Mapping-Tabelle: [`docs/gherkin/README.md`](../gherkin/README.md).
+Behavior specifications live under [`docs/gherkin/features/`](../gherkin/features/).  
+Full mapping table: [`docs/gherkin/README.md`](../gherkin/README.md).
 
-| arc42-Fokus | Gherkin (Einstieg) |
-|-------------|-------------------|
+| arc42 Focus | Gherkin (Entry Points) |
+|-------------|------------------------|
 | Runtime Loan / Commands | [loan_creation](../gherkin/features/loan/loan_creation.feature), [command_processing](../gherkin/features/crosscutting/command_processing.feature) |
 | Multi-Tenant / Security | [multi_tenant_isolation](../gherkin/features/crosscutting/multi_tenant_isolation.feature), [security_authentication](../gherkin/features/crosscutting/security_authentication.feature) |
-| OSGi / KI | [optional_bundle_degradation](../gherkin/features/osgi/optional_bundle_degradation.feature), [ki_scoring_async](../gherkin/features/osgi/ki_scoring_async.feature) |
+| OSGi / AI | [optional_bundle_degradation](../gherkin/features/osgi/optional_bundle_degradation.feature), [ki_scoring_async](../gherkin/features/osgi/ki_scoring_async.feature) |
 | COB / Modes | [close_of_business](../gherkin/features/cob/close_of_business.feature), [node_modes](../gherkin/features/crosscutting/node_modes.feature) |
 | Domain Client/Savings/Accounting | [client_create](../gherkin/features/client/client_create.feature), [savings_account_open](../gherkin/features/savings/savings_account_open.feature), [loan_disbursement_journal](../gherkin/features/accounting/loan_disbursement_journal.feature) |
 
-## Lesepfade (kurz)
+## Reading Paths (Short)
 
-- **Neu:** 01 → 02 → 03 → 09  
-- **Feature-Dev:** 03 → 04 → 06 → passendes Gherkin-Feature  
-- **Domain / DDD:** 10 → 11 → 12 → 13 → ADR-019 → ADR-020 → 03 (Module)  
+- **Newcomers:** 01 → 02 → 03 → 09  
+- **Feature development:** 03 → 04 → 06 → matching Gherkin feature  
+- **Domain / DDD:** 10 → 11 → 12 → 13 → ADR-019 → ADR-020 → 03 (modules)  
 - **Ops:** 05 → 07 → 09 → `node_modes` / `close_of_business`  
-- **Architektur:** 07 → 08 → 10 → Quality-Tags in Gherkin  
+- **Architecture:** 07 → 08 → 10 → quality tags in Gherkin  
 
-## Konventionen
+## Conventions
 
-- Sprache: Deutsch mit etablierten englischen Technikbegriffen  
-- Diagramme: Mermaid in Markdown  
-- Entscheidungen: ADR-light in Kapitel 08  
-- Begriffe: bei Erstnennung idealerweise im [Glossar](09_glossary.md) pflegen  
-- Verhalten: Gherkin-Scenarios mit `@arc42-NN` / `@adr-NNN` / `@quality-Q-…` taggen  
+- Language: English with established technical terms  
+- Diagrams: Mermaid in Markdown  
+- Decisions: ADR-light in chapter 08  
+- Terms: on first use, ideally maintain them in the [Glossary](09_glossary.md)  
+- Behavior: tag Gherkin scenarios with `@arc42-NN` / `@adr-NNN` / `@quality-Q-…`  

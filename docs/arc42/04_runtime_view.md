@@ -1,68 +1,68 @@
 # 4. Runtime View
 
-Die Runtime View beschreibt, wie die Bausteine aus [Kapitel 3](03_building_block_view.md) zur Laufzeit zusammenarbeiten. Im Fokus stehen typische, architekturprägende Szenarien – nicht jede API-Variante.
+The Runtime View describes how the building blocks from [Chapter 3](03_building_block_view.md) collaborate at runtime. The focus is on typical, architecture-shaping scenarios – not every API variant.
 
-**Notation**: Abläufe als nummerierte Schritte und optional als Mermaid-Sequenzdiagramme. Beteiligte Bausteine sind in **fett** hervorgehoben.
-
----
-
-## 4.1 Überblick der Szenarien
-
-| # | Szenario | Zweck | Primäre Bausteine |
-|---|----------|--------|-------------------|
-| 1 | Loan Creation | Typischer Write-Pfad (CQRS) | REST API, Command Pipeline, Loan Module, DB, Events |
-| 2 | Command Processing (Legacy & Neu) | Zentrale Schreibverarbeitung | `SynchronousCommandProcessingService`, `fineract-command` |
-| 3 | OSGi Bundle Lifecycle | Dynamische Modularität | Equinox, Bundle Activator, OSGi Services |
-| 4 | Multi-Tenant Request | Isolation pro Institut | Filter, Tenant Context, DataSource Routing |
-| 5 | Close of Business (COB) | Batch-/Tagesabschluss | COB Jobs, Loan Business Steps, Scheduler |
-| 6 | KI-gestützte Analyse (optional) | Externe Erweiterung | Event Hook, KI-Integration Layer, xAI Grok API |
+**Notation**: Flows as numbered steps and optionally as Mermaid sequence diagrams. Participating building blocks are highlighted in **bold**.
 
 ---
 
-## 4.2 Szenario 1: Loan Creation
+## 4.1 Scenario Overview
 
-Erstellung eines neuen Kreditantrags über die REST-API. Das Szenario zeigt den klassischen **Write-Pfad** von Fineract (CQRS) und die Erweiterbarkeit über Events/OSGi.
+| # | Scenario | Purpose | Primary Building Blocks |
+|---|----------|---------|-------------------------|
+| 1 | Loan Creation | Typical write path (CQRS) | REST API, Command Pipeline, Loan Module, DB, Events |
+| 2 | Command Processing (Legacy & New) | Central write processing | `SynchronousCommandProcessingService`, `fineract-command` |
+| 3 | OSGi Bundle Lifecycle | Dynamic modularity | Equinox, Bundle Activator, OSGi Services |
+| 4 | Multi-Tenant Request | Isolation per institution | Filter, Tenant Context, DataSource Routing |
+| 5 | Close of Business (COB) | Batch / day-end | COB Jobs, Loan Business Steps, Scheduler |
+| 6 | AI-supported analysis (optional) | External extension | Event Hook, AI Integration Layer, xAI Grok API |
 
-### Beteiligte Bausteine
+---
 
-- **Client** (Mobile App, Branch System, Integrator)
-- **fineract-provider** (REST Resource, Security Filter)
+## 4.2 Scenario 1: Loan Creation
+
+Creation of a new loan application via the REST API. The scenario shows the classic Fineract **write path** (CQRS) and extensibility via events/OSGi.
+
+### Participating Building Blocks
+
+- **Client** (mobile app, branch system, integrator)
+- **fineract-provider** (REST resource, security filter)
 - **Command Layer** (Command Wrapper → Handler)
-- **Loan Module** (`fineract-loan` / Portfolio Services)
-- **Accounting / Client** (Validierung von Verknüpfungen)
-- **PostgreSQL** (Persistenz, Audit/`m_portfolio_command_source`)
-- **Event / Hook Layer** (Business Events, optionale externe KI)
+- **Loan Module** (`fineract-loan` / portfolio services)
+- **Accounting / Client** (validation of linkages)
+- **PostgreSQL** (persistence, audit/`m_portfolio_command_source`)
+- **Event / Hook Layer** (business events, optional external AI)
 
-### Ablauf
+### Flow
 
 1. **REST API Call**  
-   Client sendet `POST /loans` (JSON) mit Tenant-Header und Authentifizierung.
+   Client sends `POST /loans` (JSON) with tenant header and authentication.
 2. **Security & Tenant Context**  
-   Auth-Filter prüft Credentials/Token; Tenant-Filter setzt `ThreadLocalContext` (Tenant-ID, DataSource).
+   Auth filter checks credentials/token; tenant filter sets `ThreadLocalContext` (tenant ID, data source).
 3. **Command Wrapper**  
-   Die Resource baut einen `CommandWrapper` (Action: `CREATE`, Entity: `LOAN`) und übergibt ihn an  
+   The resource builds a `CommandWrapper` (Action: `CREATE`, Entity: `LOAN`) and passes it to  
    `PortfolioCommandSourceWritePlatformService.logCommandSource(...)`.
 4. **Idempotency & Audit**  
-   Optionaler Idempotency-Key wird aufgelöst; Command wird in `m_portfolio_command_source` vorgemerkt.
+   Optional idempotency key is resolved; command is pre-recorded in `m_portfolio_command_source`.
 5. **Command Handler**  
-   `SynchronousCommandProcessingService` findet den passenden `NewCommandSourceHandler`  
-   (z. B. Submit/Create Loan Application Handler).
+   `SynchronousCommandProcessingService` finds the matching `NewCommandSourceHandler`  
+   (e.g. Submit/Create Loan Application Handler).
 6. **Validation**  
-   JSON-Schema-/Business-Validierung (Produkt, Client, Währung, Beträge, Datumsregeln).  
-   Bei OSGi-Erweiterungen: zusätzliche Validatoren als OSGi Services (z. B. dynamische Produktregeln).
+   JSON schema/business validation (product, client, currency, amounts, date rules).  
+   With OSGi extensions: additional validators as OSGi services (e.g. dynamic product rules).
 7. **Domain Logic & Persistence**  
-   Loan-Application-Entity wird angelegt; verknüpfte Daten (Charges, Collaterals, Schedule-Vorbereitung)  
-   werden in **PostgreSQL** in einer Transaktion geschrieben.
-8. **Command Result & Audit-Abschluss**  
-   `CommandProcessingResult` (Resource-ID, Changes) – ggf. als spezialisierter Subtyp mit **flach komponierten** Domain-Feldern – wird serialisiert; Command-Status → `PROCESSED`.  
-   Zielbild ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)): zustandsändernde Commands **appenden Domain Events** in den Event Store; Projektionen aktualisieren Read Models / Journal.
+   Loan application entity is created; related data (charges, collaterals, schedule preparation)  
+   is written to **PostgreSQL** in one transaction.
+8. **Command Result & Audit Completion**  
+   `CommandProcessingResult` (resource ID, changes) – possibly as a specialized subtype with **flatly composed** domain fields – is serialized; command status → `PROCESSED`.  
+   Target picture ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)): state-changing commands **append domain events** to the event store; projections update read models / journal.
 9. **Event Publishing**  
-   Domain-/Business Events (aus dem Stream bzw. nach Append) → Hooks / External Events.  
-   Optional: asynchroner Consumer ruft **externe KI-Analyse** auf – ohne den Write-Pfad zu blockieren.
+   Domain/business events (from the stream or after append) → hooks / external events.  
+   Optional: async consumer invokes **external AI analysis** – without blocking the write path.
 10. **HTTP Response**  
-    Client erhält `200/201` mit Loan-ID und Status (Gson-Serialisierung; Wire-JSON bleibt flach, siehe [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)).
+    Client receives `200/201` with loan ID and status (Gson serialization; wire JSON stays flat, see [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)).
 
-### Sequenzdiagramm
+### Sequence Diagram
 
 ```mermaid
 sequenceDiagram
@@ -73,7 +73,7 @@ sequenceDiagram
     participant Loan as Loan Module
     participant DB as PostgreSQL
     participant Evt as Event / Hook Layer
-    participant KI as KI Service<br/>(optional)
+    participant KI as AI Service<br/>(optional)
 
     Client->>API: POST /loans (+ Tenant, Auth)
     API->>API: Security + Tenant Context
@@ -90,27 +90,27 @@ sequenceDiagram
     API-->>Client: 200/201 + loanId
 ```
 
-### Fehler- und Sonderfälle
+### Error and Special Cases
 
-| Fall | Verhalten |
-|------|-----------|
-| Validierungsfehler | Exception → HTTP 400; Command ggf. als ERROR markiert |
-| Fehlende Berechtigung | Security Context → HTTP 403 |
-| Doppelter Idempotency-Key | Bereits verarbeitetes Ergebnis wird zurückgegeben (kein Doppel-Insert) |
-| Maker-Checker aktiv | Command bleibt auf Approval warten; keine Domain-Persistenz bis Checker freigibt |
-| KI-Service down | Write-Pfad bleibt erfolgreich; KI-Analyse wird geloggt/retried (best effort) |
+| Case | Behavior |
+|------|----------|
+| Validation error | Exception → HTTP 400; command may be marked ERROR |
+| Missing permission | Security context → HTTP 403 |
+| Duplicate idempotency key | Already processed result is returned (no double insert) |
+| Maker-checker active | Command waits for approval; no domain persistence until checker releases |
+| AI service down | Write path remains successful; AI analysis is logged/retried (best effort) |
 
 ---
 
-## 4.3 Szenario 2: Command Processing (Legacy und neuer Stack)
+## 4.3 Scenario 2: Command Processing (Legacy and New Stack)
 
-Schreibende Operationen laufen über CQRS. fineract-osgi behält den **Legacy-Pfad** und baut parallel den **typsicheren Command-Stack** (`fineract-command`) aus.
+Write operations run through CQRS. fineract-osgi retains the **legacy path** and expands the **type-safe command stack** (`fineract-command`) in parallel.
 
-Im **hexagonalen Leitbild** ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)) sind REST/Batch **Driving Adapters**, Command Handler **Application**, Domain-Services **Domain**, JPA/JDBC/Events/KI **Driven Adapters**.  
-**DDD** ([ADR-019](decisions/ADR-019-domain-driven-design.md)): der Handler orchestriert typisch **ein Aggregat** (z. B. Loan) pro Command; Nebenwirkungen (Accounting, Events) bewusst und nach Invarianten. Invarianten/Commands/Events: [11 Aggregate Canvas](11_aggregate_canvas.md).  
-**Event Sourcing** ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)): Create/Update/Delete des Aggregates appenden Domain Events (Write-SoT); Read Models und Journal sind Projektionen.
+In the **hexagonal guiding model** ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)), REST/batch are **driving adapters**, command handlers are **application**, domain services are **domain**, JPA/JDBC/events/AI are **driven adapters**.  
+**DDD** ([ADR-019](decisions/ADR-019-domain-driven-design.md)): the handler typically orchestrates **one aggregate** (e.g. Loan) per command; side effects (accounting, events) deliberately and after invariants. Invariants/commands/events: [11 Aggregate Canvas](11_aggregate_canvas.md).  
+**Event sourcing** ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)): create/update/delete of the aggregate append domain events (write SoT); read models and journal are projections.
 
-### 4.3.1 Legacy-Pfad (heutiger Default)
+### 4.3.1 Legacy Path (Current Default)
 
 ```
 REST Resource
@@ -121,108 +121,108 @@ REST Resource
           → WritePlatformService (Domain)
 ```
 
-Eigenschaften:
+Characteristics:
 
-- Payload oft als **JSON-String** / `JsonCommand`
-- Zentrale Idempotency- und Maker-Checker-Logik
-- Starke Kopplung an Gson-Helfer und String-Keys
-- Synchrone Ausführung im Request-Thread (Retry via Resilience4j möglich)
-- Response-DTOs: wo sinnvoll **Composition statt Vererbung** (Shared-Felder flach in Spezialtypen; GET-only ohne CPR-Vererbung) – [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md), Crosscutting [6.13](06_crosscutting_concepts.md)
+- Payload often as **JSON string** / `JsonCommand`
+- Central idempotency and maker-checker logic
+- Strong coupling to Gson helpers and string keys
+- Synchronous execution on the request thread (retry via Resilience4j possible)
+- Response DTOs: where sensible **composition instead of inheritance** (shared fields flat in specialized types; GET-only without CPR inheritance) – [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md), crosscutting [6.13](06_crosscutting_concepts.md)
 
-### 4.3.2 Neuer Command-Stack (`fineract-command`)
+### 4.3.2 New Command Stack (`fineract-command`)
 
 ```
 REST (Spring MVC, DTO)
   → CommandDispatcher (sync / async / disruptor)
     → CommandHookManager (before / after / error)
       → CommandHandler<REQ, RES>
-        → Domain Service (ein Request-DTO)
+        → Domain Service (one request DTO)
 ```
 
-Eigenschaften:
+Characteristics:
 
-- **Typsichere** `Command<REQ>`-Payloads und Jakarta Validation
-- Request-DTOs bevorzugt als **Composition** (Shared-Komponente + create/update-spezifische Felder), nicht als tiefe Vererbung
-- Austauschbare Dispatcher: synchron, asynchron, LMAX Disruptor
-- Hooks für Cross-Cutting (Username, Timestamp, Headers, Audit)
-- Migration schrittweise pro Modul, REST-API bleibt rückwärtskompatibel
+- **Type-safe** `Command<REQ>` payloads and Jakarta Validation
+- Request DTOs preferably as **composition** (shared component + create/update-specific fields), not deep inheritance
+- Replaceable dispatchers: synchronous, asynchronous, LMAX Disruptor
+- Hooks for cross-cutting (username, timestamp, headers, audit)
+- Stepwise migration per module; REST API remains backward compatible
 
-### Laufzeit-Entscheidung
+### Runtime Decision
 
 ```mermaid
 flowchart LR
-    A[Write Request] --> B{Modul migriert?}
-    B -->|nein| C[Legacy SynchronousCommandProcessingService]
-    B -->|ja| D[fineract-command Dispatcher]
+    A[Write Request] --> B{Module migrated?}
+    B -->|no| C[Legacy SynchronousCommandProcessingService]
+    B -->|yes| D[fineract-command Dispatcher]
     C --> E[Domain Write Service]
     D --> E
     E --> F[(PostgreSQL)]
 ```
 
-Zielzustand: neue Features und OSGi-gebundene Handler bevorzugen den neuen Stack; Legacy bleibt bis zur vollständigen Migration.
+Target state: new features and OSGi-bound handlers prefer the new stack; legacy remains until full migration.
 
 ---
 
-## 4.4 Szenario 3: OSGi Bundle Lifecycle
+## 4.4 Scenario 3: OSGi Bundle Lifecycle
 
-fineract-osgi nutzt **Eclipse Equinox** als OSGi-Framework (siehe `osgi/` und `docs/arc42/osgi.gradle`). Zur Laufzeit können Feature-Bundles (z. B. KI-Scoring, Dynamic Product Config) installiert, gestartet und gestoppt werden, ohne den gesamten Core neu zu deployen.
+fineract-osgi uses **Eclipse Equinox** as the OSGi framework (see `osgi/` and `docs/arc42/osgi.gradle`). At runtime, feature bundles (e.g. AI scoring, dynamic product config) can be installed, started, and stopped without redeploying the entire core.
 
-### Ablauf: Bundle Start
+### Flow: Bundle Start
 
 1. **Framework Start**  
-   Equinox startet (`start-equinox.sh` / Gradle-Task `equinoxStart`) mit `config.ini` und Console-Port.
+   Equinox starts (`start-equinox.sh` / Gradle task `equinoxStart`) with `config.ini` and console port.
 2. **Bundle Installation**  
-   JARs aus `osgi/bundles` (oder Remote-Repo) werden installiert; Start-Level gemäß Konfiguration.
+   JARs from `osgi/bundles` (or remote repo) are installed; start level per configuration.
 3. **Activator / DS Components**  
-   `BundleActivator.start()` oder Declarative Services registrieren Services im **OSGi Service Registry**.
+   `BundleActivator.start()` or Declarative Services register services in the **OSGi Service Registry**.
 4. **Service Binding**  
-   Core oder andere Bundles binden optionale Services (z. B. `CreditScoreProvider`, `ProductRuleExtension`).
-5. **Bereit**  
-   REST/Command-Pfad kann die Erweiterung nutzen, sobald der Service `ACTIVE` und gebunden ist.
+   Core or other bundles bind optional services (e.g. `CreditScoreProvider`, `ProductRuleExtension`).
+5. **Ready**  
+   REST/command path can use the extension once the service is `ACTIVE` and bound.
 
-### Ablauf: Bundle Stop / Update
+### Flow: Bundle Stop / Update
 
-1. Unbind abhängiger Consumer (graceful: Requests ohne Extension fortsetzen oder 503 je nach Policy).
-2. `Bundle.stop()` → Services deregistrieren.
-3. Optional: Update auf neue Bundle-Version → Refresh → erneuter Start.
+1. Unbind dependent consumers (graceful: continue requests without extension, or 503 per policy).
+2. `Bundle.stop()` → deregister services.
+3. Optional: update to new bundle version → refresh → start again.
 
-### Sequenzdiagramm (Service-Nutzung im Request)
+### Sequence Diagram (Service Use in Request)
 
 ```mermaid
 sequenceDiagram
     participant API as Command Handler
     participant Reg as OSGi Service Registry
-    participant Ext as Feature Bundle<br/>(z.B. KI-Scoring)
+    participant Ext as Feature Bundle<br/>(e.g. AI Scoring)
     participant Core as Core Domain Service
 
     API->>Reg: lookup(CreditScoreProvider)
-    alt Service vorhanden
-        Reg-->>API: Ext-Proxy
+    alt Service present
+        Reg-->>API: Ext proxy
         API->>Ext: score(application)
         Ext-->>API: ScoreResult
         API->>Core: continue with score hints
-    else Service fehlt
+    else Service missing
         Reg-->>API: empty
-        API->>Core: default path (ohne KI)
+        API->>Core: default path (without AI)
     end
 ```
 
-**Designprinzip**: Erweiterungen sind **optional**. Fehlt ein Bundle, bleibt der Core-Banking-Pfad funktionsfähig (Degradation statt Hard-Fail).
+**Design principle**: Extensions are **optional**. If a bundle is missing, the core banking path remains functional (degradation instead of hard fail).
 
 ---
 
-## 4.5 Szenario 4: Multi-Tenant Request
+## 4.5 Scenario 4: Multi-Tenant Request
 
-Jeder HTTP-Request (und jeder Batch-Job) läuft im Kontext genau eines Tenants.
+Every HTTP request (and every batch job) runs in the context of exactly one tenant.
 
-### Ablauf
+### Flow
 
-1. Request trifft ein (Header z. B. `Fineract-Platform-TenantId` oder Subdomain/Routing-Regel).
-2. **Tenant-Resolution-Filter** lädt Tenant-Metadaten (Name, Timezone, Connection).
-3. **ThreadLocalContext** speichert Tenant, Business Date, Auth-User.
-4. DataSource-/Connection-Routing wählt die Tenant-DB (oder Schema).
-5. Business-Logik und Persistenz laufen ausschließlich in diesem Kontext.
-6. Nach Response: Context wird cleared (kein Leak zwischen Threads / Virtual Threads).
+1. Request arrives (header e.g. `Fineract-Platform-TenantId` or subdomain/routing rule).
+2. **Tenant resolution filter** loads tenant metadata (name, timezone, connection).
+3. **ThreadLocalContext** stores tenant, business date, auth user.
+4. DataSource/connection routing selects the tenant DB (or schema).
+5. Business logic and persistence run exclusively in this context.
+6. After response: context is cleared (no leak across threads / virtual threads).
 
 ```mermaid
 sequenceDiagram
@@ -242,25 +242,25 @@ sequenceDiagram
     Filter-->>Client: HTTP response
 ```
 
-Batch-Jobs (COB) setzen den Tenant-Context pro Job-Partition analog – parallelisierte Partitions dürfen Tenants nicht mischen.
+Batch jobs (COB) set the tenant context per job partition analogously – parallelized partitions must not mix tenants.
 
 ---
 
-## 4.6 Szenario 5: Close of Business (COB)
+## 4.6 Scenario 5: Close of Business (COB)
 
-COB ist der periodische Batch-Lauf für Zinsen, Penalties, Statusübergänge und verwandte Tagesabschluss-Schritte.
+COB is the periodic batch run for interest, penalties, status transitions, and related day-end steps.
 
-### Ablauf (Loan COB, vereinfacht)
+### Flow (Loan COB, simplified)
 
-1. **Scheduler** triggert COB-Job (Cron / manuell / Catch-up).
-2. **Partitioning**: offene Loans werden in Chunks aufgeteilt (Skalierung über Worker).
-3. Pro Loan / Chunk:
-   - Business Date prüfen
-   - konfigurierte **Business Steps** sequentiell ausführen  
-     (z. B. Accrual, Penalty, Delinquency)
-   - Ergebnisse in DB committen
-4. COB-Metadaten aktualisieren (letzter erfolgreicher Lauf, Fehlerliste).
-5. Optional: Bulk Business Events für nachgelagerte Systeme.
+1. **Scheduler** triggers COB job (cron / manual / catch-up).
+2. **Partitioning**: open loans are split into chunks (scale via workers).
+3. Per loan / chunk:
+   - Check business date
+   - Execute configured **business steps** sequentially  
+     (e.g. accrual, penalty, delinquency)
+   - Commit results to DB
+4. Update COB metadata (last successful run, error list).
+5. Optional: bulk business events for downstream systems.
 
 ```mermaid
 flowchart TB
@@ -275,93 +275,92 @@ flowchart TB
     BS --> E[Business Events]
 ```
 
-### Interaktion mit Online-Traffic
+### Interaction with Online Traffic
 
-- **COB API Filter** können Schreibzugriffe auf Loans blockieren oder verzögern, die gerade im COB sind (Konsistenz).
-- Read-Nodes können COB-lastige Workloads entkoppeln (siehe Deployment View).
+- **COB API filters** can block or delay write access to loans currently in COB (consistency).
+- Read nodes can decouple COB-heavy workloads (see Deployment View).
 
 ---
 
-## 4.7 Szenario 6: KI-gestützte Analyse (optional)
+## 4.7 Scenario 6: AI-Supported Analysis (Optional)
 
-Ziel: externe Intelligenz (z. B. **xAI Grok API**) an Fineract anbinden, ohne den monolithischen Core mit ML-Modellen zu belasten.
+Goal: attach external intelligence (e.g. **xAI Grok API**) to Fineract without loading the monolithic core with ML models.
 
-### Typischer Auslöser
+### Typical Trigger
 
-- Nach Loan Creation / Approval (Event)
-- Vor Disbursement (synchrone Policy-Prüfung, wenn konfiguriert)
-- Manueller API-Call eines Officers („Score this application“)
+- After loan creation / approval (event)
+- Before disbursement (synchronous policy check, if configured)
+- Manual API call by an officer (“Score this application”)
 
-### Ablauf (asynchron, empfohlen)
+### Flow (Asynchronous, Recommended)
 
-1. Domain Event `LoanApplicationSubmitted` wird publiziert.
-2. **KI-Integration Bundle** (OSGi) empfängt Event über Hook/Consumer.
-3. Mapping: Fineract-Domänendaten → anonymisiertes/feature-reduziertes Prompt-Payload.
-4. HTTP-Call an externe KI-API (Timeout, Circuit Breaker).
-5. Ergebnis wird als:
-   - Note / Custom Data am Loan,
-   - separates Scoring-Aggregat, oder
-   - Audit-Log-Eintrag  
-   persistiert.
-6. UI/API kann Score lesen; Kernbuchungen bleiben davon entkoppelt.
+1. Domain event `LoanApplicationSubmitted` is published.
+2. **AI integration bundle** (OSGi) receives the event via hook/consumer.
+3. Mapping: Fineract domain data → anonymized/feature-reduced prompt payload.
+4. HTTP call to external AI API (timeout, circuit breaker).
+5. Result is persisted as:
+   - note / custom data on the loan,
+   - separate scoring aggregate, or
+   - audit log entry.
+6. UI/API can read the score; core postings remain decoupled from it.
 
-### Synchrone Variante (Policy Gate)
+### Synchronous Variant (Policy Gate)
 
-Nur wenn konfiguriert (z. B. „reject if score &lt; threshold“):
+Only if configured (e.g. “reject if score &lt; threshold”):
 
 ```
-Command Handler → OSGi CreditScoreProvider → KI API → allow/deny → continue/abort
+Command Handler → OSGi CreditScoreProvider → AI API → allow/deny → continue/abort
 ```
 
-Bei Timeout: konfigurierbare Fail-Open / Fail-Closed Policy (Default: Fail-Open für Verfügbarkeit, Fail-Closed für regulierte Produkte).
+On timeout: configurable fail-open / fail-closed policy (default: fail-open for availability, fail-closed for regulated products).
 
 ---
 
-## 4.8 Querschnittliche Laufzeitaspekte
+## 4.8 Cross-Cutting Runtime Aspects
 
-| Aspekt | Laufzeitverhalten |
-|--------|-------------------|
-| **Security** | Jeder Write prüft Permissions im `PlatformSecurityContext`; OAuth2/Basic je nach Deployment |
-| **Audit** | Commands und Hook-Events erzeugen nachvollziehbare Spuren (`m_portfolio_command_source`, App-Logs) |
-| **Transaktionen** | Domain-Writes in Spring-Transaktionen; Events oft transaction-bound (nach Commit) |
-| **Idempotenz** | Write-APIs mit Idempotency-Key vermeiden Doppelbuchungen bei Retries |
-| **Resilience** | Retry (Commands), Timeouts (externe KI), optionale Circuit Breaker |
-| **Observability** | Structured Logging, Micrometer-Metriken, Equinox-Log (`osgi/logs`) |
-| **Modi** | `fineract.mode.read/write/batch.*` steuern, welche Rollen ein Node übernimmt |
-
----
-
-## 4.9 Laufzeit-Qualität und Constraints
-
-- **Latenz Write-Pfad**: dominiert durch DB + Validierung; externe KI gehört nicht in den Default-Hot-Path.
-- **Durchsatz COB**: horizontal über Partitionen/Worker; OSGi-Extensions in Business Steps müssen idempotent und schnell sein.
-- **Hot Deploy**: Bundle-Updates dürfen laufende Transaktionen nicht korrumpieren; Consumer nutzen Service Tracker / optional bindings.
-- **Konsistenz**: Tenant-Isolation und Command-Audit sind nicht verhandelbar; Feature-Flags steuern nur optionale Pfade.
+| Aspect | Runtime Behavior |
+|--------|------------------|
+| **Security** | Every write checks permissions in `PlatformSecurityContext`; OAuth2/Basic depending on deployment |
+| **Audit** | Commands and hook events produce traceable trails (`m_portfolio_command_source`, app logs) |
+| **Transactions** | Domain writes in Spring transactions; events often transaction-bound (after commit) |
+| **Idempotency** | Write APIs with idempotency key avoid double postings on retries |
+| **Resilience** | Retry (commands), timeouts (external AI), optional circuit breaker |
+| **Observability** | Structured logging, Micrometer metrics, Equinox log (`osgi/logs`) |
+| **Modes** | `fineract.mode.read/write/batch.*` control which roles a node assumes |
 
 ---
 
-## 4.10 Offene Punkte / nächste Iterationen
+## 4.9 Runtime Quality and Constraints
 
-- Konkrete Bundle-Manifeste und Package-Exports für Loan-/KI-Extensions
-- Endgültige Wahl der Event-Bridge (interne Spring Events vs. Kafka/ActiveMQ Outbox)
-- Messwerte (SLOs) für Command-Latenz und COB-Dauer pro Tenant-Größe
-- Detaillierte Maker-Checker-Sequenz als eigenes Unter-Szenario, falls Compliance es verlangt
+- **Write-path latency**: dominated by DB + validation; external AI does not belong on the default hot path.
+- **COB throughput**: horizontal via partitions/workers; OSGi extensions in business steps must be idempotent and fast.
+- **Hot deploy**: bundle updates must not corrupt running transactions; consumers use service tracker / optional bindings.
+- **Consistency**: tenant isolation and command audit are non-negotiable; feature flags control only optional paths.
 
 ---
 
-## 4.11 Verwandte Gherkin-Features
+## 4.10 Open Points / Next Iterations
 
-| Runtime-Szenario | Tag | Feature |
+- Concrete bundle manifests and package exports for loan/AI extensions
+- Final choice of event bridge (internal Spring events vs. Kafka/ActiveMQ outbox)
+- Metrics (SLOs) for command latency and COB duration per tenant size
+- Detailed maker-checker sequence as its own sub-scenario if compliance requires it
+
+---
+
+## 4.11 Related Gherkin Features
+
+| Runtime Scenario | Tag | Feature |
 |------------------|-----|---------|
 | 4.2 Loan Creation | `@runtime-loan-creation` | [loan/loan_creation.feature](../gherkin/features/loan/loan_creation.feature) |
 | 4.3 Command Processing | `@runtime-command-processing` | [crosscutting/command_processing.feature](../gherkin/features/crosscutting/command_processing.feature) |
 | 4.4 OSGi Lifecycle | `@runtime-osgi-lifecycle` | [osgi/optional_bundle_degradation.feature](../gherkin/features/osgi/optional_bundle_degradation.feature) |
 | 4.5 Multi-Tenant | `@runtime-multi-tenant` | [crosscutting/multi_tenant_isolation.feature](../gherkin/features/crosscutting/multi_tenant_isolation.feature) |
 | 4.6 COB | `@runtime-cob` | [cob/close_of_business.feature](../gherkin/features/cob/close_of_business.feature) |
-| 4.7 KI-Analyse | `@runtime-ki-analysis` | [osgi/ki_scoring_async.feature](../gherkin/features/osgi/ki_scoring_async.feature) |
+| 4.7 AI Analysis | `@runtime-ki-analysis` | [osgi/ki_scoring_async.feature](../gherkin/features/osgi/ki_scoring_async.feature) |
 
-Vollständiges Mapping: [gherkin/README.md](../gherkin/README.md).
+Full mapping: [gherkin/README.md](../gherkin/README.md).
 
 ---
 
-*Weiter*: [05 Deployment View](05_deployment_view.md) · *Zurück*: [03 Building Block View](03_building_block_view.md)
+*Next*: [05 Deployment View](05_deployment_view.md) · *Back*: [03 Building Block View](03_building_block_view.md)

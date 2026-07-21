@@ -1,35 +1,35 @@
-# ADR-003 – Spring Boot + Gradle-Module als Kern beibehalten
+# ADR-003 – Keep Spring Boot + Gradle modules as the core
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Maintainability, Compatibility, Reliability |
+| **Qualities** | Maintainability, Compatibility, Reliability |
 
-### Kontext
+### Context
 
-Ein vollständiger Rewrite (neue Sprache, neues Framework) würde Fachlogik (Loans, Savings, Accounting, COB) riskieren. Fineract bringt Spring, Batch, Security und ein großes Testnetz mit.
+A full rewrite (new language, new framework) would put domain logic (loans, savings, accounting, COB) at risk. Fineract already brings Spring, Batch, Security, and a large test suite.
 
-### Entscheidung
+### Decision
 
-- **Spring Boot** bleibt Application-Container und DI-Grundlage.  
-- Bestehende **Gradle-Module** (`fineract-provider`, `fineract-loan`, `fineract-core`, …) bleiben die Build-Struktur.  
-- OSGi **ergänzt** den Kern (Bridge), ersetzt ihn nicht in einem Schritt.
+- **Spring Boot** remains the application container and DI foundation.  
+- Existing **Gradle modules** (`fineract-provider`, `fineract-loan`, `fineract-core`, …) remain the build structure.  
+- OSGi **extends** the core (bridge); it does not replace it in a single step.
 
-### Alternativen
+### Alternatives
 
-| Option | Warum verworfen |
-|--------|-----------------|
-| Quarkus / Micronaut Rewrite | Kein ausreichender ROI vs. Migrationsrisiko |
-| Reines OSGi-Blueprint ohne Spring | Verlust Ökosystem und Contributor-Wissen |
-| Softwarica „Modulith only“ ohne OSGi | Reicht nicht für dynamische Kunden-Features |
+| Option | Why rejected |
+|--------|--------------|
+| Quarkus / Micronaut rewrite | Insufficient ROI vs. migration risk |
+| Pure OSGi Blueprint without Spring | Loss of ecosystem and contributor knowledge |
+| Softwarica “modulith only” without OSGi | Not enough for dynamic customer features |
 
-### Konsequenzen
+### Consequences
 
-- **+** Kontinuität, bestehende Tests und Integrationen nutzbar  
-- **+** Schrittweise Modernisierung möglich  
-- **−** Zwei Welten (Spring + OSGi) müssen gebridged werden  
-- **−** Technische Schulden des Monolithen bleiben zunächst bestehen  
+- **+** Continuity; existing tests and integrations remain usable  
+- **+** Incremental modernization possible  
+- **−** Two worlds (Spring + OSGi) must be bridged  
+- **−** Technical debt of the monolith remains for now  
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

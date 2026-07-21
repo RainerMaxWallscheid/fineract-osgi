@@ -1,63 +1,63 @@
 # 11. Aggregate Canvas – Loan, Savings, Client
 
-Taktisches DDD für die drei zentralen Write-Aggregates. Ergänzt die strategische [Domain Context Map](10_domain_context_map.md) und die Leitbilder [ADR-019](decisions/ADR-019-domain-driven-design.md) / [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md).
+Tactical DDD for the three central write aggregates. Complements the strategic [Domain Context Map](10_domain_context_map.md) and the north-star decisions [ADR-019](decisions/ADR-019-domain-driven-design.md) / [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md).
 
-**Zweck dieses Kapitels**
+**Purpose of this chapter**
 
-| Nutzen | Für wen |
+| Benefit | For whom |
 |--------|---------|
-| Klare Konsistenzgrenzen und Invarianten | Feature-Dev, Reviews |
-| Command → Status → Event-Mapping | ES-Migration, CQRS |
-| Konflikt- und Schnitt-Empfehlungen | God-Aggregate-Abbau |
-| Abgleich Ist-Code ↔ Zielmodell | Modernisierung |
+| Clear consistency boundaries and invariants | Feature dev, reviews |
+| Command → status → event mapping | ES migration, CQRS |
+| Conflict and split recommendations | God-aggregate reduction |
+| Alignment as-is code ↔ target model | Modernisation |
 
-**Quellen im Code (Ist)**
+**Sources in code (as-is)**
 
-| Aggregat | Root-Klasse | Status | Lifecycle / Events |
+| Aggregate | Root class | Status | Lifecycle / events |
 |----------|-------------|--------|-------------------|
 | Loan | `fineract-loan` … `Loan` (~2.2k LOC) | `LoanStatus` | `LoanEvent`, `DefaultLoanLifecycleStateMachine`, `*Loan*BusinessEvent` |
-| Savings | `fineract-savings` … `SavingsAccount` (~3.7k LOC) | `SavingsAccountStatusType` + SubStatus | `Savings*BusinessEvent`, Handlers |
-| Client | `fineract-core` … `Client` (~1k LOC) | `ClientStatus` | `ClientCreate/Activate/RejectBusinessEvent`, Handlers |
+| Savings | `fineract-savings` … `SavingsAccount` (~3.7k LOC) | `SavingsAccountStatusType` + SubStatus | `Savings*BusinessEvent`, handlers |
+| Client | `fineract-core` … `Client` (~1k LOC) | `ClientStatus` | `ClientCreate/Activate/RejectBusinessEvent`, handlers |
 
-**Canvas-Legende**
+**Canvas legend**
 
-| Feld | Bedeutung |
+| Field | Meaning |
 |------|-----------|
-| **Root** | Einstieg für Writes; Stream-ID für Event Sourcing |
-| **Members** | Entities/VOs *innerhalb* der Konsistenzgrenze |
-| **Invarianten** | Müssen nach jedem Command gelten |
-| **Commands** | Application-Eingänge (Handler-Namen ≈ Ist) |
-| **Domain Events** | Tatsache nach erfolgreicher Entscheidung (ES-Ziel / Business Events Ist) |
-| **Policies** | Reaktionen anderer Contexts (Accounting, COB, …) |
-| **Konflikte** | Concurrent Writes, Optimistic Lock, Saga-Risiken |
+| **Root** | Entry point for writes; stream ID for event sourcing |
+| **Members** | Entities/VOs *inside* the consistency boundary |
+| **Invariants** | Must hold after every command |
+| **Commands** | Application inputs (handler names ≈ as-is) |
+| **Domain Events** | Fact after successful decision (ES target / business events as-is) |
+| **Policies** | Reactions of other contexts (Accounting, COB, …) |
+| **Conflicts** | Concurrent writes, optimistic lock, saga risks |
 
 ---
 
-## 11.1 Aggregate Canvas: `Loan`
+## 11.1 Aggregate canvas: `Loan`
 
-### 11.1.1 Steckbrief
+### 11.1.1 Profile
 
 | | |
 |--|--|
 | **Bounded Context** | Loan Servicing ([10.2](10_domain_context_map.md)) |
 | **Aggregate Root** | `Loan` |
-| **Identity** | `LoanId` (technisch `Long` / künftig typed VO); fachlich `accountNo`, optional `externalId` |
-| **ES Stream** | `Loan-{id}` (Optimistic Concurrency / `@Version` heute) |
+| **Identity** | `LoanId` (technically `Long` / typed VO in future); business `accountNo`, optional `externalId` |
+| **ES Stream** | `Loan-{id}` (optimistic concurrency / `@Version` today) |
 | **Ubiquitous Language** | Application, Approval, Disbursement, Repayment Schedule, Installment, Transaction, Charge, Write-off, Reschedule, Overpaid, Delinquency |
-| **Nicht im Aggregat** | `Client` Entity, `Group` Entity, `LoanProduct` als mutable Shared Object, GL-Journal |
+| **Not in the aggregate** | `Client` entity, `Group` entity, `LoanProduct` as mutable shared object, GL journal |
 
-### 11.1.2 Members (Konsistenzgrenze – Ziel)
+### 11.1.2 Members (consistency boundary – target)
 
 ```text
 Loan (Root)
 ├── Status + Timeline (submitted/approved/disbursed/closed/…)
-├── Term / ProductSnapshot (frozen Konditionen)     ← heute: ManyToOne LoanProduct
-├── ClientId / GroupId / OfficeId / StaffId         ← heute: Entity-Refs
+├── Term / ProductSnapshot (frozen terms)     ← today: ManyToOne LoanProduct
+├── ClientId / GroupId / OfficeId / StaffId         ← today: entity refs
 ├── LoanRepaymentScheduleDetail (embedded terms)
 ├── LoanRepaymentScheduleInstallment[]
-├── LoanTransaction[]          (kritischer Zustand; Historie → Events)
+├── LoanTransaction[]          (critical state; history → events)
 ├── LoanCharge[] (+ PaidBy, InstallmentCharge)
-├── LoanDisbursementDetails[]  (Multi-Disburse)
+├── LoanDisbursementDetails[]  (multi-disburse)
 ├── LoanSummary                (derived)
 ├── LoanTermVariations[]
 ├── Payment/Credit Allocation Rules (progressive)
@@ -65,16 +65,16 @@ Loan (Root)
 └── Officer Assignment History
 ```
 
-**Optional eigene Roots (Schnitt-Empfehlung):**
+**Optional own roots (split recommendation):**
 
-| Kandidat | Wann trennen |
+| Candidate | When to separate |
 |----------|----------------|
-| `LoanRescheduleRequest` | Workflow vor Apply; Apply emittiert Events auf `Loan` |
-| `LoanCharge` | Sehr hohe Parallelität / lange Streams |
-| `GLIM` | Gruppen-Container bereits eigene Entity |
-| Progressive/WC-spezifische Breach-Objekte | Andere Lifecycle-Sprache |
+| `LoanRescheduleRequest` | Workflow before apply; apply emits events on `Loan` |
+| `LoanCharge` | Very high parallelism / long streams |
+| `GLIM` | Group container already own entity |
+| Progressive/WC-specific breach objects | Different lifecycle language |
 
-### 11.1.3 Statusmaschine
+### 11.1.3 State machine
 
 ```mermaid
 stateDiagram-v2
@@ -96,103 +96,103 @@ stateDiagram-v2
     TRANSFER_IN_PROGRESS --> TRANSFER_ON_HOLD: hold
 ```
 
-Ist-Enum: `LoanStatus` (`100` Pending … `700` Overpaid). Interne Trigger: `LoanEvent`. Implementierung: `DefaultLoanLifecycleStateMachine`.
+As-is enum: `LoanStatus` (`100` Pending … `700` Overpaid). Internal triggers: `LoanEvent`. Implementation: `DefaultLoanLifecycleStateMachine`.
 
-### 11.1.4 Invarianten
+### 11.1.4 Invariants
 
-| ID | Invariante | Typische Verletzung |
+| ID | Invariant | Typical violation |
 |----|------------|---------------------|
-| L-I1 | Statusübergänge nur gemäß State Machine | Approve aus Active |
-| L-I2 | Disbursement nur aus `APPROVED` (bzw. erlaubte Sonderfälle Multi-Disburse / closed→disburse policy) | Disburse im Pending |
-| L-I3 | Keine fachliche Tilgung vor erstem Disbursement | Repayment im Approved ohne Active |
-| L-I4 | Principal/Interest/Fees/Penalties im Summary = f(Schedule, Transactions, Charges) | Manuelles Summary-Schreiben |
-| L-I5 | Beträge in Product-Currency; Scale gemäß Currency | Fremdwährung ohne FX-Context |
-| L-I6 | `ClientId` gesetzt für Individual Loan; Group/GLIM-Regeln für Gruppenkredite | Loan ohne Party-Bezug |
-| L-I7 | Product-Snapshot: nach Approval/Disburse keine stillen Produkt-Mutationen am laufenden Loan | Live-Join auf geändertes Product |
-| L-I8 | Transaction-Reihenfolge und Value Dates fachlich konsistent (Business Date) | Backdating gegen Closure/Policy |
-| L-I9 | Charge-off / Write-off beenden reguläre Accrual-Pfade gemäß Policy | Accrual nach Write-off |
-| L-I10 | Optimistic concurrency: parallele Writes auf dasselbe `Loan-{id}` serialisieren | Lost Update Schedule vs. Repayment |
+| L-I1 | Status transitions only per state machine | Approve from Active |
+| L-I2 | Disbursement only from `APPROVED` (or allowed special cases multi-disburse / closed→disburse policy) | Disburse while Pending |
+| L-I3 | No business repayment before first disbursement | Repayment in Approved without Active |
+| L-I4 | Principal/Interest/Fees/Penalties in summary = f(Schedule, Transactions, Charges) | Manual summary write |
+| L-I5 | Amounts in product currency; scale per currency | Foreign currency without FX context |
+| L-I6 | `ClientId` set for individual loan; group/GLIM rules for group loans | Loan without party reference |
+| L-I7 | Product snapshot: after approval/disburse no silent product mutations on the live loan | Live join on changed product |
+| L-I8 | Transaction order and value dates business-consistent (business date) | Backdating against closure/policy |
+| L-I9 | Charge-off / write-off end regular accrual paths per policy | Accrual after write-off |
+| L-I10 | Optimistic concurrency: parallel writes on same `Loan-{id}` serialise | Lost update schedule vs. repayment |
 
-### 11.1.5 Commands (Auszug, gruppiert)
+### 11.1.5 Commands (excerpt, grouped)
 
-Abgeleitet aus `*CommandHandler` im Loan-Modul (Ist-Namen).
+Derived from `*CommandHandler` in the loan module (as-is names).
 
-| Gruppe | Commands (Handler ≈) | Erwarteter Status vorher |
+| Group | Commands (handler ≈) | Expected status beforehand |
 |--------|----------------------|---------------------------|
 | **Application** | Submit, Modify, Delete Application | Pending |
 | **Decision** | Approve, Undo Approval, Reject, Withdraw by Applicant | Pending / Approved |
 | **Disbursement** | Disburse, Disburse to Savings, Undo Disburse, Undo Last Disburse, Update Disburse Date/Details | Approved / Active |
 | **Repayment & Adjust** | Repayment, Recovery Payment, Down Payment, Goodwill Credit, Refunds, Chargeback, Adjustment, Waive Interest | Active / Overpaid / Closed* |
-| **Charges** | Add/Update/Delete/Pay/Waive Charge, Charge Adjustment/Refund, Overdue Charge | je Policy Active+ |
+| **Charges** | Add/Update/Delete/Pay/Waive Charge, Charge Adjustment/Refund, Overdue Charge | per policy Active+ |
 | **Lifecycle end** | Close, Close as Rescheduled, Write-off, Undo Write-off, Foreclosure, Contract Termination | Active / … |
 | **Restructure** | Schedule Variation Create/Delete, Re-Age, Re-Amortize (+ Undo) | Active |
 | **Charge-off** | Charge-off, Undo Charge-off | Active |
 | **Amount changes** | Approved Amount / Available Disbursement Amount Modification | Approved / Active |
-| **Officer / Fraud** | Assign/Remove Officer, Mark Fraud | diverse |
-| **Transfer** | Initiate / Complete / Reject / Withdraw Transfer (oft über Client-Transfer-Orchestrierung) | Active |
+| **Officer / Fraud** | Assign/Remove Officer, Mark Fraud | various |
+| **Transfer** | Initiate / Complete / Reject / Withdraw Transfer (often via client-transfer orchestration) | Active |
 | **GLIM bulk** | GLIM Approve/Disburse/Repay/Undo | Group path |
 
-### 11.1.6 Domain / Business Events
+### 11.1.6 Domain / business events
 
-**Interne Lifecycle-Events (`LoanEvent`)** steuern die State Machine.  
-**Business Events** (Ist, Auswahl) sind die Published Language Richtung Hooks/External Events/Accounting:
+**Internal lifecycle events (`LoanEvent`)** drive the state machine.  
+**Business events** (as-is, selection) are the published language toward hooks/external events/accounting:
 
-| Kategorie | Events (Beispiele) |
+| Category | Events (examples) |
 |-----------|-------------------|
 | Application | `LoanCreated`, `LoanApplicationModified`, `LoanApproved`, `LoanUndoApproval`, `LoanRejected`, `LoanWithdrawnByApplicant` |
 | Disbursement | `LoanDisbursal`, `LoanDisbursalTransaction`, `LoanUndoDisbursal`, `LoanUndoLastDisbursal` |
-| Money in/out | `LoanTransactionMakeRepayment*`, Refund/Goodwill/DownPayment/Recovery/Waiver Pre/Post Events |
+| Money in/out | `LoanTransactionMakeRepayment*`, Refund/Goodwill/DownPayment/Recovery/Waiver Pre/Post events |
 | Charges | `LoanAddCharge`, `LoanUpdateCharge`, `LoanDeleteCharge`, `LoanWaiveCharge`, Charge Payment/Adjustment/Refund |
 | Close / Risk | `LoanClose`, `LoanCloseAsReschedule`, `LoanWrittenOff*`, `LoanChargeOff*`, `LoanForeClosure*`, `LoanStatusChanged` |
 | Schedule | `LoanInterestRecalculation`, Reschedule-due-*, `LoanScheduleVariations*`, ReAge/ReAmortize |
 | Transfer | `LoanInitiateTransfer`, `LoanRejectTransfer`, `LoanWithdrawTransfer`, Accept Transfer |
 | Balance | `LoanBalanceChanged`, Delinquency range/pause, Snapshots |
 
-**ES-Ziel:** dieselben Fakten als append-only Stream-Events; Business Events = Projektion/Outbox der Domain Events ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)).
+**ES target:** the same facts as append-only stream events; business events = projection/outbox of domain events ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)).
 
-### 11.1.7 Policies (Downstream)
+### 11.1.7 Policies (downstream)
 
-| Nach Event | Downstream Context | Reaktion |
+| After event | Downstream context | Reaction |
 |------------|-------------------|----------|
-| Disbursement / Repayment / Write-off / Charge … | **Accounting** | Journal Entries (Projector) |
-| Disburse to Savings | **Savings** | Deposit (über Transfer/Orchestrierung) |
-| Status/Balance geändert | **COB** | Accrual, Penalty, Delinquency Steps |
+| Disbursement / Repayment / Write-off / Charge … | **Accounting** | Journal entries (projector) |
+| Disburse to Savings | **Savings** | Deposit (via transfer/orchestration) |
+| Status/balance changed | **COB** | Accrual, penalty, delinquency steps |
 | Ownership transfer | **Investor** | Secondary market postings |
-| Client transfer complete | **Organisation** indirekt | Office auf Read Models |
+| Client transfer complete | **Organisation** indirectly | Office on read models |
 
-### 11.1.8 Konflikte & Transaktionsgrenzen
+### 11.1.8 Conflicts & transaction boundaries
 
-| Konflikt | Umgang |
+| Conflict | Handling |
 |----------|--------|
-| Zwei parallele Repayments | Optimistic lock auf Loan-Version; zweiter Command retry/fail |
-| COB Accrual vs. Online-Repayment | COB-Lock / Stay-locked; Business Date Ordering |
-| Reschedule Apply vs. Payment | Reschedule als eigener Request-Root bis Apply; Apply exklusiv auf Loan |
-| Multi-Disburse + Charge | Eine TX, ein Aggregate Write |
-| Loan + Savings Disburse | **Nicht** ein Aggregat – Process/Saga: Loan disburse event → Savings deposit command (oder synchrone Orchestrierung mit klarer Kompensation) |
+| Two parallel repayments | Optimistic lock on loan version; second command retry/fail |
+| COB accrual vs. online repayment | COB lock / stay-locked; business date ordering |
+| Reschedule apply vs. payment | Reschedule as own request root until apply; apply exclusive on loan |
+| Multi-disburse + charge | One TX, one aggregate write |
+| Loan + Savings disburse | **Not** one aggregate – process/saga: loan disburse event → savings deposit command (or synchronous orchestration with clear compensation) |
 
-### 11.1.9 Design Debt → Ziel
+### 11.1.9 Design debt → target
 
-| Ist | Ziel |
+| As-is | Target |
 |-----|------|
-| God-Class `Loan` mit allen Collections | Root hält **aktuellen** Zustand; Historie = Event Stream; schwere Queries im Read Model |
+| God class `Loan` with all collections | Root holds **current** state; history = event stream; heavy queries in read model |
 | `@ManyToOne Client/Product` | `ClientId` + `ProductSnapshot` VO |
-| Accounting-Code im Loan-Modul | nur Domain Events; Mapping in Accounting |
-| Origination im selben Aggregat-Modell | Application-Phase → **Loan Origination** Context, Handoff-Event |
+| Accounting code in loan module | domain events only; mapping in accounting |
+| Origination in same aggregate model | Application phase → **Loan Origination** context, handoff event |
 
 ---
 
-## 11.2 Aggregate Canvas: `SavingsAccount`
+## 11.2 Aggregate canvas: `SavingsAccount`
 
-### 11.2.1 Steckbrief
+### 11.2.1 Profile
 
 | | |
 |--|--|
 | **Bounded Context** | Savings & Deposits |
-| **Aggregate Root** | `SavingsAccount` (FD/RD als Spezialisierung oder eigene Roots – siehe 11.2.9) |
+| **Aggregate Root** | `SavingsAccount` (FD/RD as specialisation or own roots – see 11.2.9) |
 | **Identity** | `SavingsAccountId`; `accountNo`; optional `externalId` |
 | **ES Stream** | `SavingsAccount-{id}` |
 | **Ubiquitous Language** | Deposit, Withdrawal, Activation, Interest Posting, Hold, Block Credit/Debit, Dormant, Escheat, Maturity, Pre-Closure |
-| **Nicht im Aggregat** | `Client` Entity, Product als live-mutable Ref, GL-Journal, Loan |
+| **Not in the aggregate** | `Client` entity, product as live-mutable ref, GL journal, Loan |
 
 ### 11.2.2 Members
 
@@ -204,12 +204,12 @@ SavingsAccount (Root)
 ├── SavingsAccountSummary (balances, interest posted, …)
 ├── SavingsAccountTransaction[]
 ├── SavingsAccountCharge[]
-├── OnHold amounts / OnHold transactions (Refs)
-├── DepositAccountTerm / Recurring / InterestChart am Account (FD/RD)
+├── OnHold amounts / OnHold transactions (refs)
+├── DepositAccountTerm / Recurring / InterestChart on account (FD/RD)
 └── Officer Assignment History
 ```
 
-### 11.2.3 Statusmaschine
+### 11.2.3 State machine
 
 ```mermaid
 stateDiagram-v2
@@ -228,39 +228,39 @@ stateDiagram-v2
     PRE_MATURE_CLOSURE --> CLOSED: Settle
 ```
 
-**SubStatus** (orthogonal, `SavingsAccountSubStatusEnum`): steuert operatives Sperren (Block all / credit / debit), Inaktivität, Dormant, Escheat – ohne den Hauptstatus zu ersetzen.
+**SubStatus** (orthogonal, `SavingsAccountSubStatusEnum`): controls operational locks (block all / credit / debit), inactivity, dormant, escheat – without replacing the main status.
 
-### 11.2.4 Invarianten
+### 11.2.4 Invariants
 
-| ID | Invariante |
+| ID | Invariant |
 |----|------------|
-| S-I1 | Statusübergänge nur erlaubte Application/Activate/Close/Transfer/Maturity-Pfade |
-| S-I2 | Deposit/Withdrawal primär im Status `ACTIVE` (Force-Withdrawal/Policy-Ausnahmen dokumentieren) |
-| S-I3 | Bei `BLOCK` / `BLOCK_DEBIT` / `BLOCK_CREDIT`: entsprechende Buchungsrichtungen verboten |
-| S-I4 | Available Balance = Ledger Balance − Holds − Min-Balance-Reserven (Product Policy) |
-| S-I5 | Withdrawal darf Available Balance nicht unter Policy-Minimum drücken (außer Overdraft erlaubt) |
-| S-I6 | Interest Posting idempotent pro Periode/Business Date (COB-sicher) |
-| S-I7 | Charges: fällige Account Charges konsistent zu Transactions (Pay/Waive/Inactivate) |
-| S-I8 | FD: vor Maturity keine freien Withdrawals außer Pre-Closure-Pfad |
-| S-I9 | RD: Mandatory Deposit-Regeln vs. actual deposits nachvollziehbar |
-| S-I10 | Currency/Scale wie Loan; eine Währung pro Account |
+| S-I1 | Status transitions only along allowed application/activate/close/transfer/maturity paths |
+| S-I2 | Deposit/withdrawal primarily in status `ACTIVE` (force-withdrawal/policy exceptions must be documented) |
+| S-I3 | Under `BLOCK` / `BLOCK_DEBIT` / `BLOCK_CREDIT`: corresponding booking directions forbidden |
+| S-I4 | Available balance = ledger balance − holds − min-balance reserves (product policy) |
+| S-I5 | Withdrawal must not push available balance below policy minimum (unless overdraft allowed) |
+| S-I6 | Interest posting idempotent per period/business date (COB-safe) |
+| S-I7 | Charges: due account charges consistent with transactions (pay/waive/inactivate) |
+| S-I8 | FD: before maturity no free withdrawals except pre-closure path |
+| S-I9 | RD: mandatory deposit rules vs. actual deposits must be reconcilable |
+| S-I10 | Currency/scale as for loan; one currency per account |
 
-### 11.2.5 Commands (Auszug)
+### 11.2.5 Commands (excerpt)
 
-| Gruppe | Commands (Handler ≈) |
+| Group | Commands (handler ≈) |
 |--------|----------------------|
 | **Application** | Savings/FD/RD Submit, Modify, Delete, Approve, Undo Approve, Reject, Withdraw Application |
 | **Activation / Close** | Activate, Close, Premature Close (FD/RD), GSIM Activate/Close |
 | **Cash** | Deposit, Withdrawal, Force Withdrawal, Transaction Adjustment |
 | **Interest** | Calculate Interest, Post Interest, Post Interest as-on-date |
 | **Charges** | Add/Delete/Pay/Inactivate/Waive Account Charge, Annual Fee |
-| **Holds / Blocks** | Hold Amount, Release Amount, Block Account, Block Credits, Block Debits (+ Unblock-Varianten wo vorhanden) |
+| **Holds / Blocks** | Hold Amount, Release Amount, Block Account, Block Credits, Block Debits (+ unblock variants where present) |
 | **GSIM** | GSIM Submit/Approve/Undo/Reject/Deposit/Activation/Close |
-| **Product config** | Create/Update/Delete Savings/FD/RD **Product** → eigenes Config-Aggregate, nicht Account |
+| **Product config** | Create/Update/Delete Savings/FD/RD **Product** → own config aggregate, not account |
 
-### 11.2.6 Domain / Business Events
+### 11.2.6 Domain / business events
 
-| Kategorie | Ist-Beispiele / ES-Zielnamen |
+| Category | As-is examples / ES target names |
 |-----------|------------------------------|
 | Lifecycle | `SavingsAccountSubmitted`, `Approved`, `Activated`, `Rejected`, `Closed`, `Matured`, `PreMatureClosed` |
 | Cash | `SavingsDeposit`, `SavingsWithdrawal`, `SavingsAccountForceWithdrawal`, `SavingsAccountTransaction` |
@@ -268,41 +268,41 @@ stateDiagram-v2
 | Risk/Ops | `AmountHeld`, `AmountReleased`, `AccountBlocked`, `CreditsBlocked`, `DebitsBlocked`, `SubStatusChanged` |
 | Charges | `SavingsChargeAdded`, `Paid`, `Waived`, `Inactivated` |
 
-Avro-Schemas unter `fineract-avro-schemas` (`SavingsAccount*`, FD/RD) bilden die **Published Language** Richtung externe Systeme.
+Avro schemas under `fineract-avro-schemas` (`SavingsAccount*`, FD/RD) form the **published language** toward external systems.
 
 ### 11.2.7 Policies
 
 | Event | Downstream |
 |-------|------------|
-| Deposit/Withdrawal/Interest/Close | **Accounting** Journal |
-| Activate/Close | **Client** Read Model / Interop Identifier |
-| Hold/Block | **Interop / Payments** ACL (Quote/Transfer darf failen) |
-| Interest/Dormancy | **COB** Steps |
+| Deposit/Withdrawal/Interest/Close | **Accounting** journal |
+| Activate/Close | **Client** read model / Interop identifier |
+| Hold/Block | **Interop / Payments** ACL (quote/transfer may fail) |
+| Interest/Dormancy | **COB** steps |
 
-### 11.2.8 Konflikte
+### 11.2.8 Conflicts
 
-| Konflikt | Umgang |
+| Conflict | Handling |
 |----------|--------|
-| Parallel Deposit + Withdrawal | Optimistic lock Account-Version |
-| Hold vs. Withdrawal | Hold im Aggregate; Withdrawal prüft Available |
-| COB Interest Post vs. Online Tx | Business Date + Lock; idempotente Posting-Keys |
-| Account Transfer Loan←→Savings | Process Context; zwei Aggregate Writes in definierter Reihenfolge |
-| GSIM parent vs. child accounts | Parent orchestriert; Child-Accounts eigene Streams |
+| Parallel deposit + withdrawal | Optimistic lock account version |
+| Hold vs. withdrawal | Hold in aggregate; withdrawal checks available |
+| COB interest post vs. online tx | Business date + lock; idempotent posting keys |
+| Account transfer Loan←→Savings | Process context; two aggregate writes in defined order |
+| GSIM parent vs. child accounts | Parent orchestrates; child accounts own streams |
 
-### 11.2.9 FD / RD: ein Root oder mehrere?
+### 11.2.9 FD / RD: one root or several?
 
-| Option | Empfehlung |
+| Option | Recommendation |
 |--------|------------|
-| **A – Ein Root `SavingsAccount`** mit Type + Term-Details | Passt zum Ist-Code (`IDepositAccountType`); ein Stream-Typ |
-| **B – Eigene Roots FD/RD** | Klarere Invarianten Maturity/Pre-Closure; mehr Duplikation |
+| **A – One root `SavingsAccount`** with type + term details | Fits as-is code (`IDepositAccountType`); one stream type |
+| **B – Own roots FD/RD** | Clearer maturity/pre-closure invariants; more duplication |
 
-**Empfehlung:** mittelfristig **A mit starkem Typ** und eigenen Domain Services für Maturity; bei ES-Stream-Explosion oder Team-Split → **B**.
+**Recommendation:** medium term **A with strong typing** and own domain services for maturity; if ES stream explosion or team split → **B**.
 
 ---
 
-## 11.3 Aggregate Canvas: `Client`
+## 11.3 Aggregate canvas: `Client`
 
-### 11.3.1 Steckbrief
+### 11.3.1 Profile
 
 | | |
 |--|--|
@@ -311,7 +311,7 @@ Avro-Schemas unter `fineract-avro-schemas` (`SavingsAccount*`, FD/RD) bilden die
 | **Identity** | `ClientId`; `accountNo`; `externalId`; unique `mobileNo` / `email` (tenant-scoped) |
 | **ES Stream** | `Client-{id}` |
 | **Ubiquitous Language** | Pending, Active, Reject, Withdraw, Close, Reactivate, Transfer, Identifier, Legal Form (Person/Entity) |
-| **Nicht im Aggregat** | Loan/Savings Accounts, Group als *volle* Membership-Wahrheit (besser Group-Aggregate + Events), Documents-Bytes |
+| **Not in the aggregate** | Loan/Savings accounts, Group as *full* membership truth (prefer group aggregate + events), document bytes |
 
 ### 11.3.2 Members
 
@@ -323,16 +323,16 @@ Client (Root)
 ├── DisplayName / Mobile / Email / DoB / Gender / Type / Classification
 ├── Timeline (submitted, activated, rejected, withdrawn, closed, reopened)
 ├── ClientIdentifier[]
-├── ClientFamilyMember[]          (kann groß werden → optional split)
+├── ClientFamilyMember[]          (can grow large → optional split)
 ├── Address links (ClientAddress) (optional split)
-├── ClientCharge[] + ClientTransaction[] (Gebühren ohne Konto)
+├── ClientCharge[] + ClientTransaction[] (fees without account)
 ├── defaultSavingsProductId / defaultSavingsAccountId (IDs only)
-└── imageId (Document-Ref, nicht Blob)
+└── imageId (document ref, not blob)
 ```
 
-**Verwandte Roots im Party-Context:** `Group`, `ClientTransfer` (Process).
+**Related roots in party context:** `Group`, `ClientTransfer` (process).
 
-### 11.3.3 Statusmaschine
+### 11.3.3 State machine
 
 ```mermaid
 stateDiagram-v2
@@ -350,26 +350,26 @@ stateDiagram-v2
     TRANSFER_ON_HOLD --> ACTIVE: Resume/Complete
 ```
 
-Ist-Enum: `ClientStatus` (Pending `100`, Active `300`, Transfer `303/304`, Closed `600`, Rejected `700`, Withdrawn `800`).
+As-is enum: `ClientStatus` (Pending `100`, Active `300`, Transfer `303/304`, Closed `600`, Rejected `700`, Withdrawn `800`).
 
-### 11.3.4 Invarianten
+### 11.3.4 Invariants
 
-| ID | Invariante |
+| ID | Invariant |
 |----|------------|
-| C-I1 | Statusübergänge nur gemäß State Machine |
-| C-I2 | Activation erfordert Office und gültige Pflichtfelder (Name/Legal Form Policy) |
-| C-I3 | Active Client ist Voraussetzung für *neue* Loan/Savings Applications (Policy im Downstream, erzwungen über Client-Status-Query) |
-| C-I4 | Closed/Rejected/Withdrawn: keine neuen Portfolio-Accounts |
-| C-I5 | Identifiers unique pro Typ/Value im Tenant |
-| C-I6 | Mobile/Email uniqueness Constraints respektieren |
-| C-I7 | Transfer: während `TRANSFER_*` eingeschränkte Mutationen |
-| C-I8 | `OfficeId` immer gesetzt; Transfer ändert Office nur über Transfer-Pfad |
-| C-I9 | ClientCharges nur im erlaubten Status zahlbar/waivable |
-| C-I10 | Keine Einbettung von Loan/Savings-Salden in Client-Write-Modell |
+| C-I1 | Status transitions only per state machine |
+| C-I2 | Activation requires office and valid mandatory fields (name/legal form policy) |
+| C-I3 | Active client is prerequisite for *new* loan/savings applications (policy in downstream, enforced via client status query) |
+| C-I4 | Closed/Rejected/Withdrawn: no new portfolio accounts |
+| C-I5 | Identifiers unique per type/value in tenant |
+| C-I6 | Mobile/email uniqueness constraints respected |
+| C-I7 | Transfer: restricted mutations while `TRANSFER_*` |
+| C-I8 | `OfficeId` always set; transfer changes office only via transfer path |
+| C-I9 | ClientCharges payable/waivable only in allowed status |
+| C-I10 | No embedding of loan/savings balances in client write model |
 
-### 11.3.5 Commands (Auszug)
+### 11.3.5 Commands (excerpt)
 
-| Gruppe | Commands (Handler ≈) |
+| Group | Commands (handler ≈) |
 |--------|----------------------|
 | **Lifecycle** | Create, Update, Activate, Close, Reject, Undo Reject, Withdraw, Undo Withdraw, Reactivate, Delete* |
 | **Staff** | Assign Staff, Unassign Staff |
@@ -377,13 +377,13 @@ Ist-Enum: `ClientStatus` (Pending `100`, Active `300`, Transfer `303/304`, Close
 | **Family** | Add/Update/Delete Family Member |
 | **Address** | Add/Update Address |
 | **Charges** | Create/Delete/Pay/Waive Client Charge, Undo Client Transaction |
-| **Savings default** | Update Client Savings Account (Default-Account **ID**) |
+| **Savings default** | Update Client Savings Account (default account **ID**) |
 
-\*Delete nur im erlaubten Pending-Fenster / Policy.
+\*Delete only in the allowed pending window / policy.
 
-### 11.3.6 Domain / Business Events
+### 11.3.6 Domain / business events
 
-| Ist (Provider) | ES-Ziel |
+| As-is (provider) | ES target |
 |----------------|---------|
 | `ClientCreateBusinessEvent` | `ClientCreated` |
 | `ClientActivateBusinessEvent` | `ClientActivated` |
@@ -398,43 +398,43 @@ Ist-Enum: `ClientStatus` (Pending `100`, Active `300`, Transfer `303/304`, Close
 | `ClientAssignStaffBusinessEvent` / `ClientUnassignStaffBusinessEvent` | Staff assigned/unassigned |
 | `ClientTransferPropose/Accept/Reject/WithdrawBusinessEvent` | Transfer lifecycle |
 
-Vollständige Tabelle: [12 Event Catalog](12_event_catalog.md). Noch offen: Identifier, Family, Address, ClientCharge.
+Full table: [12 Event Catalog](12_event_catalog.md). Still open: Identifier, Family, Address, ClientCharge.
 
-**Hinweis:** Neue `*BusinessEvent`-Klassen brauchen immer einen Eintrag in `m_external_event_configuration` (Liquibase), sonst startet die App nicht → [12.9](12_event_catalog.md#129-pflicht-external-event-konfiguration-in-der-db).
+**Note:** New `*BusinessEvent` classes always need an entry in `m_external_event_configuration` (Liquibase), otherwise the app does not start → [12.9](12_event_catalog.md#129-required-external-event-configuration-in-the-db).
 
 ### 11.3.7 Policies
 
 | Event | Downstream |
 |-------|------------|
-| `ClientActivated` | Loan/Savings Origination freigeben (Guard) |
-| `ClientClosed` | Neue Accounts verbieten; bestehende Accounts: instituts-Policy (block vs. force-close) |
-| `ClientTransferred` | Loan/Savings Officer/Office-Update (Orchestrierung, nicht im Client-TX stumm mutieren) |
-| Create/Activate | **Interop** KYC Identifier; **Documents** optional |
-| ClientCharge paid | **Accounting** wenn gebucht |
+| `ClientActivated` | Enable loan/savings origination (guard) |
+| `ClientClosed` | Forbid new accounts; existing accounts: institutional policy (block vs. force-close) |
+| `ClientTransferred` | Loan/Savings officer/office update (orchestration, do not silently mutate inside the client TX) |
+| Create/Activate | **Interop** KYC identifier; **Documents** optional |
+| ClientCharge paid | **Accounting** when posted |
 
-### 11.3.8 Konflikte
+### 11.3.8 Conflicts
 
-| Konflikt | Umgang |
+| Conflict | Handling |
 |----------|--------|
-| Parallel Update Client vs. Activate | Version auf Client |
-| Transfer vs. Loan Disburse | Transfer-Substatus; Downstream lehnt Disburse ab wenn Client under transfer |
-| Close Client mit offenen Loans | Domain Rule / Application Guard (Supporting Policy) – nicht stillschweigend im Client-Aggregate „Loans schließen“ |
-| Group membership vs. Client | Membership-Änderungen am **Group**-Aggregate oder explizite Domain Service mit zwei Writes |
+| Parallel update client vs. activate | Version on client |
+| Transfer vs. loan disburse | Transfer substatus; downstream rejects disburse when client under transfer |
+| Close client with open loans | Domain rule / application guard (supporting policy) – do not silently “close loans” inside the client aggregate |
+| Group membership vs. client | Membership changes on the **Group** aggregate or explicit domain service with two writes |
 
-### 11.3.9 Design Debt → Ziel
+### 11.3.9 Design debt → target
 
-| Ist | Ziel |
+| As-is | Target |
 |-----|------|
-| `Client` in `fineract-core` | Party-Modul / BC mit Ports |
-| JPA `Set<Group> groups` am Client | IDs + Group-Aggregate als Source of Membership |
-| Wenige Business Events | Volle Lifecycle-Event-Palette für ES und Guards |
-| ClientCharge + Transactions im selben Root | ok solange Volumen klein; sonst Split |
+| `Client` in `fineract-core` | Party module / BC with ports |
+| JPA `Set<Group> groups` on client | IDs + group aggregate as source of membership |
+| Few business events | Full lifecycle event palette for ES and guards |
+| ClientCharge + transactions in same root | OK while volume small; otherwise split |
 
 ---
 
-## 11.4 Querschnitt: Commands → Events → Projektionen
+## 11.4 Cross-cutting: commands → events → projections
 
-Gemeinsames Muster für alle drei Aggregates ([ADR-004](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md), [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)):
+Common pattern for all three aggregates ([ADR-004](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md), [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)):
 
 ```mermaid
 sequenceDiagram
@@ -456,64 +456,64 @@ sequenceDiagram
     H-->>API: CommandProcessingResult
 ```
 
-| Aggregat | Typische Projection Targets |
+| Aggregate | Typical projection targets |
 |----------|----------------------------|
-| Loan | `m_loan*`, Schedule tables, Delinquency, Search, Avro external |
-| Savings | `m_savings*`, Interest summary, Avro |
-| Client | `m_client*`, Identifiers, Address, Search |
+| Loan | `m_loan*`, schedule tables, delinquency, search, Avro external |
+| Savings | `m_savings*`, interest summary, Avro |
+| Client | `m_client*`, identifiers, address, search |
 
 ---
 
-## 11.5 Vergleichende Entscheidungsmatrix
+## 11.5 Comparative decision matrix
 
-| Frage | Loan | SavingsAccount | Client |
+| Question | Loan | SavingsAccount | Client |
 |-------|------|----------------|--------|
-| **ES-Pilot geeignet?** | nein (zu groß zuerst) | bedingt (nach Client) | **ja** (nach Charge-Pilot) |
-| **God-Aggregate-Risiko** | sehr hoch | sehr hoch | mittel |
-| **Downstream-Druck** | Accounting, COB, Investor | Accounting, COB, Interop | Loan, Savings, Interop |
-| **Upstream-Abhängigkeiten** | Client, Product, Charge, Tax, Org | Client, Product, Charge, Tax, Org | Organisation |
-| **Natürliche Stream-Länge** | sehr lang (Tx + Schedule) | lang (Tx) | kurz–mittel |
-| **Snapshot-Empfehlung** | ja (nach N Events / nach Disburse) | ja | optional |
-| **Split-Priorität** | RescheduleRequest, ProductSnapshot | FD/RD services, Holds | Address/Family optional |
+| **Suitable ES pilot?** | no (too large first) | conditional (after client) | **yes** (after charge pilot) |
+| **God-aggregate risk** | very high | very high | medium |
+| **Downstream pressure** | Accounting, COB, Investor | Accounting, COB, Interop | Loan, Savings, Interop |
+| **Upstream dependencies** | Client, Product, Charge, Tax, Org | Client, Product, Charge, Tax, Org | Organisation |
+| **Natural stream length** | very long (tx + schedule) | long (tx) | short–medium |
+| **Snapshot recommendation** | yes (after N events / after disburse) | yes | optional |
+| **Split priority** | RescheduleRequest, ProductSnapshot | FD/RD services, holds | Address/Family optional |
 
 ---
 
-## 11.6 Review-Checkliste (pro PR am Aggregat)
+## 11.6 Review checklist (per PR on the aggregate)
 
-1. Welches **Root** wird geschrieben? (nur eines idealerweise)  
-2. Welche **Invarianten** (L-I* / S-I* / C-I*) sind betroffen und getestet?  
-3. Welcher **Status** vorher/nachher? State Machine erlaubt den Übergang?  
-4. Welche **Domain Events** entstehen? Namen in UL?  
-5. Werden fremde Entities (**Client/Product/GL**) importiert statt IDs/Events?  
-6. Braucht **Accounting** eine Projection? Idempotenz?  
-7. **Concurrency**: Version/Lock, COB-Interaktion?  
-8. Read-Pfad: neues Feld nur im **Write-Model** oder auch Projection?
+1. Which **root** is written? (ideally only one)  
+2. Which **invariants** (L-I* / S-I* / C-I*) are affected and tested?  
+3. Which **status** before/after? Does the state machine allow the transition?  
+4. Which **domain events** arise? Names in UL?  
+5. Are foreign entities (**Client/Product/GL**) imported instead of IDs/events?  
+6. Does **Accounting** need a projection? Idempotency?  
+7. **Concurrency**: version/lock, COB interaction?  
+8. Read path: new field only in the **write model** or also projection?
 
 ---
 
-## 11.7 Nächste Vertiefungen
+## 11.7 Next deep dives
 
-| Artefakt | Inhalt |
+| Artifact | Content |
 |----------|--------|
-| Event-Katalog pro Aggregat | → erledigt in [12 Event Catalog](12_event_catalog.md) |
-| ArchUnit-Regeln | → erledigt in [13](13_archunit_bounded_context_rules.md) |
-| Aggregate Canvas `Group`, `JournalEntry`, `LoanProduct` | Supporting Contexts |
-| Gherkin-Szenarien pro Invariante | z. B. `@invariant L-I2` an Disbursement-Features |
+| Event catalog per aggregate | → done in [12 Event Catalog](12_event_catalog.md) |
+| ArchUnit rules | → done in [13](13_archunit_bounded_context_rules.md) |
+| Aggregate canvas `Group`, `JournalEntry`, `LoanProduct` | Supporting contexts |
+| Gherkin scenarios per invariant | e.g. `@invariant L-I2` on disbursement features |
 
 ---
 
-## 11.8 Bezug
+## 11.8 References
 
-| Dokument | Rolle |
+| Document | Role |
 |----------|--------|
-| [10 Domain Context Map](10_domain_context_map.md) | Strategische Grenzen |
-| [12 Event Catalog](12_event_catalog.md) | Ist-BusinessEvents → ES-Zielnamen |
+| [10 Domain Context Map](10_domain_context_map.md) | Strategic boundaries |
+| [12 Event Catalog](12_event_catalog.md) | As-is business events → ES target names |
 | [ADR-019 DDD](decisions/ADR-019-domain-driven-design.md) | Aggregates, UL |
-| [ADR-020 Event Sourcing](decisions/ADR-020-event-sourcing-writes-pflicht.md) | Stream = Write-SoT |
-| [ADR-004 CQRS](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) | Commands / Queries |
-| [04 Runtime View](04_runtime_view.md) | Loan/Command-Abläufe |
-| [06.15 DDD](06_crosscutting_concepts.md) | Querschnitt |
-| Code | `LoanStatus`, `LoanEvent`, `DefaultLoanLifecycleStateMachine`, `SavingsAccountStatusType`, `ClientStatus`, Command Handlers |
+| [ADR-020 Event Sourcing](decisions/ADR-020-event-sourcing-writes-pflicht.md) | Stream = write SoT |
+| [ADR-004 CQRS](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) | Commands / queries |
+| [04 Runtime View](04_runtime_view.md) | Loan/command flows |
+| [06.15 DDD](06_crosscutting_concepts.md) | Cross-cutting |
+| Code | `LoanStatus`, `LoanEvent`, `DefaultLoanLifecycleStateMachine`, `SavingsAccountStatusType`, `ClientStatus`, command handlers |
 
 ---
 

@@ -1,38 +1,38 @@
 # 7. Quality Attributes
 
-Dieses Kapitel beschreibt die **architekturrelevanten Qualitätsanforderungen** von fineract-osgi: was „gut genug“ bedeutet, wie die Architektur darauf reagiert und wie Erfolg messbar wird.
+This chapter describes the **architecture-relevant quality requirements** of fineract-osgi: what “good enough” means, how the architecture responds, and how success becomes measurable.
 
-Es baut auf [Runtime](04_runtime_view.md), [Deployment](05_deployment_view.md) und [Crosscutting Concepts](06_crosscutting_concepts.md) auf. Sicherheits-Threat-Model der Upstream-Basis: [`SECURITY.md`](../../SECURITY.md).
+It builds on [Runtime](04_runtime_view.md), [Deployment](05_deployment_view.md), and [Crosscutting Concepts](06_crosscutting_concepts.md). Security threat model of the upstream basis: [`SECURITY.md`](../../SECURITY.md).
 
 **Notation (Quality Scenarios)**:
 
-| Feld | Bedeutung |
-|------|-----------|
-| **Stimulus** | Auslöser (Last, Fehler, Änderungswunsch, Angriff) |
-| **Umgebung** | Betriebszustand |
-| **Response** | Erwartetes Systemverhalten |
-| **Maß** | Messbare Akzeptanz (Zielwerte sind Startpunkte, zu kalibrieren) |
+| Field | Meaning |
+|-------|---------|
+| **Stimulus** | Trigger (load, failure, change request, attack) |
+| **Environment** | Operating state |
+| **Response** | Expected system behavior |
+| **Measure** | Measurable acceptance (target values are starting points, to be calibrated) |
 
 ---
 
-## 7.1 Qualitätsziele (Priorität)
+## 7.1 Quality Goals (Priority)
 
-| Prio | Qualitätsziel | Kurzbeschreibung | Primäre Hebel |
-|:----:|---------------|------------------|---------------|
-| 1 | **Korrektheit & Integrität** | Buchungen, Salden, Audit stimmen; keine stillen Doppelbuchungen | CQRS, Transaktionen, Idempotenz, Validierung |
-| 2 | **Sicherheit & Isolation** | AuthN/Z, Tenant-Trennung, kein Cross-Tenant-Leak | `fineract-security`, Multi-Tenancy, TLS |
-| 3 | **Zuverlässigkeit** | COB und API bleiben bei Teilausfällen beherrschbar | Retry, Partitioning, Modes, Health Probes |
-| 4 | **Skalierbarkeit** | Mehr Tenants, mehr COB-Last, mehr Lese-Traffic | Read/Write/Batch-Nodes, Kafka/JMS, OSGi |
-| 5 | **Wartbarkeit** | Module verständlich, Migration beherrschbar | Gradle-Module, `fineract-command`, OSGi-Grenzen |
-| 6 | **Erweiterbarkeit** | KI und Instituts-Features ohne Core-Fork | OSGi Bundles, Events, externe KI |
-| 7 | **Performance** | Akzeptable API-Latenz; COB in Zeitfenster | Pools, Chunk/Partition, async KI |
-| 8 | **Operability** | Beobachten, deployen, diagnoseieren | Actuator, Metrics, Traces, Correlation-ID |
-| 9 | **Kompatibilität** | Stabile REST-Verträge für Integratoren | OpenAPI, parallele Command-Stacks |
+| Prio | Quality goal | Short description | Primary levers |
+|:----:|--------------|-------------------|----------------|
+| 1 | **Correctness & Integrity** | Bookings, balances, audit are correct; no silent double bookings | CQRS, transactions, idempotency, validation |
+| 2 | **Security & Isolation** | AuthN/Z, tenant separation, no cross-tenant leak | `fineract-security`, multi-tenancy, TLS |
+| 3 | **Reliability** | COB and API remain manageable under partial failures | Retry, partitioning, modes, health probes |
+| 4 | **Scalability** | More tenants, more COB load, more read traffic | Read/Write/Batch nodes, Kafka/JMS, OSGi |
+| 5 | **Maintainability** | Modules understandable, migration manageable | Gradle modules, `fineract-command`, OSGi boundaries |
+| 6 | **Extensibility** | AI and institution features without core fork | OSGi bundles, events, external AI |
+| 7 | **Performance** | Acceptable API latency; COB within time window | Pools, chunk/partition, async AI |
+| 8 | **Operability** | Observe, deploy, diagnose | Actuator, metrics, traces, Correlation-ID |
+| 9 | **Compatibility** | Stable REST contracts for integrators | OpenAPI, parallel command stacks |
 
 ```mermaid
 flowchart TB
     Q[Quality Goals fineract-osgi]
-    Q --> C[Korrektheit]
+    Q --> C[Correctness]
     Q --> S[Security / Isolation]
     Q --> R[Reliability]
     Q --> SC[Scalability]
@@ -46,25 +46,25 @@ flowchart TB
     S --> S1[Tenant + Permissions]
     R --> R1[COB Partition + Retry]
     SC --> SC1[Node Modes + Messaging]
-    E --> E1[OSGi + KI Bundle]
-    P --> P1[Hot-Path ohne sync KI]
+    E --> E1[OSGi + AI Bundle]
+    P --> P1[Hot-Path without sync AI]
 ```
 
 ---
 
-## 7.2 Quality Tree (Übersicht)
+## 7.2 Quality Tree (Overview)
 
 ```text
 fineract-osgi Quality
 ├── Runtime Qualities
-│   ├── Performance (API-Latenz, COB-Durchsatz)
+│   ├── Performance (API latency, COB throughput)
 │   ├── Scalability (horizontal Read/Worker, multi-tenant)
-│   ├── Reliability / Availability (Teilausfälle, Restarts)
+│   ├── Reliability / Availability (partial failures, restarts)
 │   └── Security (AuthN/Z, Isolation, Audit)
 ├── Development Qualities
-│   ├── Maintainability (Modulgrenzen, typsichere Commands)
-│   ├── Extensibility (OSGi, Events, KI)
-│   └── Compatibility / Migratability (Legacy + neuer Stack)
+│   ├── Maintainability (module boundaries, type-safe commands)
+│   ├── Extensibility (OSGi, Events, AI)
+│   └── Compatibility / Migratability (Legacy + new stack)
 └── Operational Qualities
     ├── Observability (Logs, Metrics, Traces)
     ├── Deployability (Docker, K8s, Modes)
@@ -73,177 +73,177 @@ fineract-osgi Quality
 
 ---
 
-## 7.3 Korrektheit & Datenintegrität
+## 7.3 Correctness & Data Integrity
 
 ### Motivation
 
-Fehlerhafte Kreditsalden oder doppelte Tilgungen sind inakzeptabel. Qualität „Performance“ darf Korrektheit nicht untergraben.
+Incorrect loan balances or double repayments are unacceptable. The quality “performance” must not undermine correctness.
 
-### Architekturbeitrag
+### Architecture contribution
 
-| Mechanismus | Beitrag |
-|-------------|---------|
-| CQRS Write-Pfad | Zentrale, nachvollziehbare Mutationsstelle |
-| DB-Transaktionen | Atomare Domain-Writes |
-| Idempotency Key | Sichere Client-Retries |
-| Command Audit (`m_portfolio_command_source`) | Rekonstruktion „wer hat was wann“ |
-| Validierungsschichten | Fehler vor Side Effects ([Kap. 6.5](06_crosscutting_concepts.md)) |
-| Maker-Checker | Vier-Augen für kritische Operationen |
-| COB-Filter | Weniger Race Conditions Online vs. Batch |
+| Mechanism | Contribution |
+|-----------|--------------|
+| CQRS write path | Central, traceable mutation point |
+| DB transactions | Atomic domain writes |
+| Idempotency Key | Safe client retries |
+| Command Audit (`m_portfolio_command_source`) | Reconstruction of “who did what when” |
+| Validation layers | Errors before side effects ([Ch. 6.5](06_crosscutting_concepts.md)) |
+| Maker-Checker | Four-eyes for critical operations |
+| COB filter | Fewer race conditions online vs. batch |
 
-### Szenario Q-CORR-1: Doppelter Submit
+### Scenario Q-CORR-1: Duplicate submit
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Client sendet denselben `POST /loans` zweimal (Netz-Retry) mit gleichem Idempotency-Key |
-| Umgebung | Write-Node normal lastig |
-| Response | Genau eine fachliche Anlage; zweiter Call liefert gespeichertes Ergebnis |
-| Maß | Keine doppelte Loan-ID; Command-Status konsistent; HTTP ohne 5xx-Schleife |
+| Field | Content |
+|-------|---------|
+| Stimulus | Client sends the same `POST /loans` twice (network retry) with the same idempotency key |
+| Environment | Write node under normal load |
+| Response | Exactly one domain creation; second call returns the stored result |
+| Measure | No duplicate loan ID; command status consistent; HTTP without 5xx loop |
 
-### Szenario Q-CORR-2: Fehlschlag mitten im Write
+### Scenario Q-CORR-2: Failure mid-write
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Exception nach Teilarbeit in der Domain-Transaktion |
-| Umgebung | Einzelner Write-Node |
-| Response | Rollback der Fachdaten; Command als ERROR auditiert; kein „halber“ Kredit |
-| Maß | DB-Invarianten halten; kein orphan schedule ohne Loan |
+| Field | Content |
+|-------|---------|
+| Stimulus | Exception after partial work in the domain transaction |
+| Environment | Single write node |
+| Response | Rollback of domain data; command audited as ERROR; no “half” loan |
+| Measure | DB invariants hold; no orphan schedule without loan |
 
 ### Constraints
 
-- Externe KI darf Buchungen **nicht still** verändern (nur Enrichment / explizite Policy).
-- Event-Consumer sind standardmäßig **at-least-once** → Consumer idempotent bauen.
+- External AI must **not silently** change bookings (only enrichment / explicit policy).
+- Event consumers are by default **at-least-once** → build consumers idempotently.
 
 ---
 
-## 7.4 Sicherheit & Tenant-Isolation
+## 7.4 Security & Tenant Isolation
 
 ### Motivation
 
-Back-Office-Core-Banking: authentifizierte Nutzer, tenant-scoped Daten. Primäre Trust Boundary: HTTPS-API hinter Reverse Proxy/WAF ([`SECURITY.md`](../../SECURITY.md)).
+Back-office core banking: authenticated users, tenant-scoped data. Primary trust boundary: HTTPS API behind reverse proxy/WAF ([`SECURITY.md`](../../SECURITY.md)).
 
-### Architekturbeitrag
+### Architecture contribution
 
-| Mechanismus | Beitrag |
-|-------------|---------|
-| AuthN (Basic / OIDC / JWT / 2FA) | Identität feststellen |
-| Permissions + Security Context | Autorisierung pro Aktion |
-| Tenant Filter + ThreadLocal | Context-Isolation pro Request/Job |
-| Getrennte Tenant-DBs/Schemas | Datenisolation |
+| Mechanism | Contribution |
+|-----------|--------------|
+| AuthN (Basic / OIDC / JWT / 2FA) | Establish identity |
+| Permissions + Security Context | Authorization per action |
+| Tenant Filter + ThreadLocal | Context isolation per request/job |
+| Separate tenant DBs/schemas | Data isolation |
 | Audit Trail | Accountability |
-| TLS, Secrets, Network Policies | Transport- und Betriebs-Härtung ([Kap. 5.13](05_deployment_view.md)) |
+| TLS, Secrets, Network Policies | Transport and operational hardening ([Ch. 5.13](05_deployment_view.md)) |
 
-### Szenario Q-SEC-1: Cross-Tenant-Zugriff
+### Scenario Q-SEC-1: Cross-tenant access
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Authentifizierter User von Tenant A fordert Ressource von Tenant B an |
-| Umgebung | Multi-Tenant-Produktion |
-| Response | Kein Datenzugriff; 403/404 gemäß Policy |
-| Maß | 0 erfolgreiche Cross-Tenant-Reads/Writes in Tests und Audits |
+| Field | Content |
+|-------|---------|
+| Stimulus | Authenticated user of tenant A requests resource of tenant B |
+| Environment | Multi-tenant production |
+| Response | No data access; 403/404 per policy |
+| Measure | 0 successful cross-tenant reads/writes in tests and audits |
 
-### Szenario Q-SEC-2: Unauthentifizierter API-Zugriff
+### Scenario Q-SEC-2: Unauthenticated API access
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Request ohne gültige Credentials auf geschützte Resource |
-| Umgebung | Öffentlicher Ingress nur bis Proxy |
-| Response | 401; keine Business-Logik, kein Tenant-Leak in Fehlermeldung |
-| Maß | Actuator/Health ggf. getrennt exponiert; API-Oberfläche closed by default |
+| Field | Content |
+|-------|---------|
+| Stimulus | Request without valid credentials on protected resource |
+| Environment | Public ingress only up to proxy |
+| Response | 401; no business logic, no tenant leak in error message |
+| Measure | Actuator/health possibly exposed separately; API surface closed by default |
 
-### Szenario Q-SEC-3: Bundle-Nachladen
+### Scenario Q-SEC-3: Bundle reload
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Ops installiert OSGi-Feature-Bundle in Produktion |
-| Umgebung | Equinox eingebettet, Console nur Admin-Netz |
-| Response | Nur signierte/freigegebene Bundles; Core bleibt härtbar |
-| Maß | Kein Remote-Install von untrusted URLs; Console nicht public |
+| Field | Content |
+|-------|---------|
+| Stimulus | Ops installs OSGi feature bundle in production |
+| Environment | Equinox embedded, console only admin network |
+| Response | Only signed/approved bundles; core remains hardenable |
+| Measure | No remote install from untrusted URLs; console not public |
 
-### Nicht-Ziele (explizit)
+### Non-goals (explicit)
 
-- Volumetric DDoS (Aufgabe von Proxy/Cloud)
-- Physischer DB-Host-Kompromiss
-- Self-Service-Endkunden-UI (out of scope)
+- Volumetric DDoS (task of proxy/cloud)
+- Physical DB host compromise
+- Self-service end-customer UI (out of scope)
 
 ---
 
-## 7.5 Zuverlässigkeit & Verfügbarkeit
+## 7.5 Reliability & Availability
 
 ### Motivation
 
-Institute erwarten planbare Verfügbarkeit der Back-Office-API und **Abschluss des COB** im Nachtfenster – auch wenn einzelne Worker sterben.
+Institutions expect predictable availability of the back-office API and **completion of COB** in the night window – even if individual workers die.
 
-### Architekturbeitrag
+### Architecture contribution
 
-| Mechanismus | Beitrag |
-|-------------|---------|
-| Health liveness/readiness | K8s/LB entfernen kranke Instanzen |
-| Batch Manager + Worker | COB-Arbeit verteilt und wiederanlaufbar |
+| Mechanism | Contribution |
+|-----------|--------------|
+| Health liveness/readiness | K8s/LB remove unhealthy instances |
+| Batch Manager + Worker | COB work distributed and restartable |
 | Stuck-Job-Retry | `fineract.job.stuck-retry-threshold` |
-| Partition/Chunk + retry-limit | Feingranulare Wiederholung |
-| Messaging (Kafka/JMS) | Entkopplung Manager/Worker |
-| Fail-Open KI (Default) | Externe KI bringt API nicht nieder |
-| Optional OSGi Services | Extension-Ausfall ≠ Totalausfall |
+| Partition/Chunk + retry-limit | Fine-grained repetition |
+| Messaging (Kafka/JMS) | Decoupling manager/worker |
+| Fail-Open AI (Default) | External AI does not take down the API |
+| Optional OSGi Services | Extension failure ≠ total failure |
 
-### Szenario Q-REL-1: Worker-Crash während COB
+### Scenario Q-REL-1: Worker crash during COB
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Batch-Worker stirbt mitten in einer Partition |
-| Umgebung | Manager + ≥2 Worker, Kafka |
-| Response | Partition wird redelivered/retry; andere Partitionen laufen weiter |
-| Maß | COB endet erfolgreich oder mit klarer Fehlerliste; keine doppelten Zinsbuchungen (Idempotenz der Steps) |
+| Field | Content |
+|-------|---------|
+| Stimulus | Batch worker dies mid-partition |
+| Environment | Manager + ≥2 workers, Kafka |
+| Response | Partition is redelivered/retried; other partitions continue |
+| Measure | COB ends successfully or with clear error list; no double interest bookings (idempotency of steps) |
 
-### Szenario Q-REL-2: KI-API down
+### Scenario Q-REL-2: AI API down
 
-| Feld | Inhalt |
-|------|--------|
+| Field | Content |
+|-------|---------|
 | Stimulus | xAI Grok API timeout/5xx |
-| Umgebung | Async Enrichment aktiv |
-| Response | Loan Create bleibt 2xx; Score fehlt/pending; Alarm/Metric |
-| Maß | Write-Erfolgsrate unverändert; KI-Error-Rate sichtbar |
+| Environment | Async enrichment active |
+| Response | Loan create remains 2xx; score missing/pending; alarm/metric |
+| Measure | Write success rate unchanged; AI error rate visible |
 
-### Szenario Q-REL-3: Node-Restart
+### Scenario Q-REL-3: Node restart
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Rolling Restart eines Write-Nodes |
-| Umgebung | ≥2 Write-Nodes hinter LB |
-| Response | Inflight-Requests failen kontrolliert oder werden wiederholt (Idempotency); Cluster nimmt Traffic an |
-| Maß | Verfügbarkeit API ≥ Ziel-SLO (z. B. 99.5 % monatlich – zu vereinbaren) |
+| Field | Content |
+|-------|---------|
+| Stimulus | Rolling restart of a write node |
+| Environment | ≥2 write nodes behind LB |
+| Response | In-flight requests fail controlled or are retried (idempotency); cluster accepts traffic |
+| Measure | API availability ≥ target SLO (e.g. 99.5% monthly – to be agreed) |
 
-### Richtwerte (Startpunkte)
+### Guideline values (starting points)
 
-| Indikator | Dev/Test | Ziel Prod (Vorschlag) |
+| Indicator | Dev/Test | Target Prod (proposal) |
 |-----------|----------|------------------------|
-| API Verfügbarkeit (Read+Write) | best effort | ≥ 99.5 % |
+| API availability (Read+Write) | best effort | ≥ 99.5 % |
 | RPO (DB) | n/a | ≤ 15 min (Backup/WAL) |
 | RTO (API) | n/a | ≤ 30 min |
-| COB Complete Success | manuell ok | ≥ 99 % Läufe ohne manuellen Eingriff |
+| COB Complete Success | manual ok | ≥ 99 % runs without manual intervention |
 
 ---
 
-## 7.6 Skalierbarkeit
+## 7.6 Scalability
 
 ### Motivation
 
-Mehr Institute (Tenants), mehr parallele Officer, wachsende Loan-Portfolios und COB-Volumen.
+More institutions (tenants), more parallel officers, growing loan portfolios and COB volume.
 
-### Skalierungsachsen
+### Scaling axes
 
-| Achse | Strategie | Limitierend |
-|-------|-----------|-------------|
-| **Read-Traffic** | Horizontale Read-Nodes (`read-enabled`) | DB Read Capacity / Replicas |
-| **Write-Traffic** | Begrenzt horizontal; Idempotenz + DB | DB Write IOPS, Locks |
-| **COB / Batch** | N Worker, Partition Size, Chunk Size | CPU Steps, DB, Queue Lag |
-| **Tenants** | Getrennte DBs, Pool-Config pro Tenant | Connections = Nodes × Pools × Tenants |
-| **Features** | OSGi Bundles pro Bedarf | Bundle-Kompatibilität cluster-weit |
-| **Integrationen** | External Events async | Broker Throughput |
+| Axis | Strategy | Limiting |
+|------|----------|----------|
+| **Read traffic** | Horizontal read nodes (`read-enabled`) | DB read capacity / replicas |
+| **Write traffic** | Limited horizontal; idempotency + DB | DB write IOPS, locks |
+| **COB / Batch** | N workers, partition size, chunk size | CPU steps, DB, queue lag |
+| **Tenants** | Separate DBs, pool config per tenant | Connections = Nodes × Pools × Tenants |
+| **Features** | OSGi bundles as needed | Bundle compatibility cluster-wide |
+| **Integrations** | External events async | Broker throughput |
 
 ```mermaid
 flowchart LR
-    Load[Lastwachstum] --> R[Scale Read Replicas/Nodes]
+    Load[Load growth] --> R[Scale Read Replicas/Nodes]
     Load --> W[Scale Workers]
     Load --> T[Shard Tenants / DB]
     Load --> F[Optional: split Write vs Batch]
@@ -252,30 +252,30 @@ flowchart LR
     T --> DB
 ```
 
-### Szenario Q-SCALE-1: COB-Volumen verdoppelt
+### Scenario Q-SCALE-1: COB volume doubles
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Anzahl aktiver Loans ×2 |
-| Umgebung | Manager + Worker-Pool |
-| Response | Worker-Replicas und/oder Partition-Parameter anpassen; COB bleibt im Fenster |
-| Maß | COB-Dauer ≤ vereinbartes Fenster (z. B. 4 h); Queue Lag → 0 vor Cutoff |
+| Field | Content |
+|-------|---------|
+| Stimulus | Number of active loans ×2 |
+| Environment | Manager + worker pool |
+| Response | Adjust worker replicas and/or partition parameters; COB stays in window |
+| Measure | COB duration ≤ agreed window (e.g. 4 h); queue lag → 0 before cutoff |
 
-### Szenario Q-SCALE-2: Report-Last
+### Scenario Q-SCALE-2: Report load
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Schwere Auswertungen parallel zum Tagesgeschäft |
-| Umgebung | Read-Nodes + optionale Read-only Tenant-DB |
-| Response | Reports treffen Write-Nodes nicht |
-| Maß | p95 Write-Latenz bleibt im SLO trotz Report-Peak |
+| Field | Content |
+|-------|---------|
+| Stimulus | Heavy reports parallel to day business |
+| Environment | Read nodes + optional read-only tenant DB |
+| Response | Reports do not hit write nodes |
+| Measure | p95 write latency stays in SLO despite report peak |
 
-### Konfigurationshebel (Code)
+### Configuration levers (code)
 
-- `FINERACT_MODE_*` – Rollen splitten  
-- `LOAN_COB_CHUNK_SIZE`, `LOAN_COB_PARTITION_SIZE`, Thread-Pool-Properties  
-- `FINERACT_HIKARI_MAXIMUM_POOL_SIZE`, Tenant pool min/max  
-- Kafka/JMS statt rein lokaler Spring Events  
+- `FINERACT_MODE_*` – split roles  
+- `LOAN_COB_CHUNK_SIZE`, `LOAN_COB_PARTITION_SIZE`, thread-pool properties  
+- `FINERACT_HIKARI_MAXIMUM_POOL_SIZE`, tenant pool min/max  
+- Kafka/JMS instead of purely local Spring Events  
 
 ---
 
@@ -283,220 +283,220 @@ flowchart LR
 
 ### Motivation
 
-Officer-UI/Integrationen brauchen snappy Writes; COB muss planbar durchlaufen. Hot-Path und Batch-Path haben **unterschiedliche** Optimierungsziele.
+Officer UI/integrations need snappy writes; COB must run predictably. Hot path and batch path have **different** optimization goals.
 
-### Architekturbeitrag
+### Architecture contribution
 
-| Maßnahme | Wirkung |
-|----------|---------|
-| Sync Command Default | Vorhersagbare Latenz, einfachere Korrektheit |
-| Optional Disruptor/Async Dispatcher | Höherer Durchsatz wo sicher migriert |
-| KI **async** (Default) | Write-Pfad ohne Inference-Latenz |
-| HikariCP + Prep-Stmt-Caches | Weniger Connection-Overhead |
-| COB Partitionierung | Parallelität statt monolithischer Job |
-| CQRS | Reads skalieren unabhängig |
-| Correlation + Metrics | Engpässe finden statt raten |
+| Measure | Effect |
+|---------|--------|
+| Sync command default | Predictable latency, simpler correctness |
+| Optional Disruptor/Async Dispatcher | Higher throughput where safely migrated |
+| AI **async** (default) | Write path without inference latency |
+| HikariCP + prep-stmt caches | Less connection overhead |
+| COB partitioning | Parallelism instead of monolithic job |
+| CQRS | Reads scale independently |
+| Correlation + Metrics | Find bottlenecks instead of guessing |
 
-### Szenario Q-PERF-1: Loan Create Latenz
+### Scenario Q-PERF-1: Loan create latency
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | `POST /loans` unter Normalast |
-| Umgebung | Write-Node, DB lokal im DC, KI async |
-| Response | Validierung + Persistenz + Audit in Transaktion |
-| Maß (Startpunkt) | p50 &lt; 300 ms, p95 &lt; 1 s, p99 &lt; 2 s (ohne externe KI sync) |
+| Field | Content |
+|-------|---------|
+| Stimulus | `POST /loans` under normal load |
+| Environment | Write node, DB local in DC, AI async |
+| Response | Validation + persistence + audit in transaction |
+| Measure (starting point) | p50 &lt; 300 ms, p95 &lt; 1 s, p99 &lt; 2 s (without external AI sync) |
 
-### Szenario Q-PERF-2: Sync-KI-Gate
+### Scenario Q-PERF-2: Sync AI gate
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Produkt erzwingt sync Score vor Approve |
-| Umgebung | KI-API p95 = 800 ms |
-| Response | Command-Latenz steigt um KI-Zeit + Budget; Timeout greift |
-| Maß | Timeout z. B. 2–3 s; bei Überschreitung Policy Fail-Open/Closed; Metric `ki.score.latency` |
+| Field | Content |
+|-------|---------|
+| Stimulus | Product forces sync score before approve |
+| Environment | AI API p95 = 800 ms |
+| Response | Command latency rises by AI time + budget; timeout applies |
+| Measure | Timeout e.g. 2–3 s; on exceed policy fail-open/closed; metric `ki.score.latency` |
 
-### Szenario Q-PERF-3: COB Throughput
+### Scenario Q-PERF-3: COB throughput
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | N Loans im COB |
-| Umgebung | M Worker |
-| Response | Steps parallel über Partitionen |
-| Maß | Loans/Minute ≥ Baseline; regress &lt; 10 % zwischen Releases |
+| Field | Content |
+|-------|---------|
+| Stimulus | N loans in COB |
+| Environment | M workers |
+| Response | Steps parallel across partitions |
+| Measure | Loans/minute ≥ baseline; regress &lt; 10 % between releases |
 
-### Anti-Patterns
+### Anti-patterns
 
-- Synchrone externe Calls im Default-Write-Pfad  
-- Zu große COB-Chunks (lange Transaktionen, Locks)  
-- Pool-Größen „auf Verdacht“ ohne Connection-Budget  
-- Logging mit riesigen Payloads auf INFO  
-
----
-
-## 7.8 Wartbarkeit (Maintainability)
-
-### Motivation
-
-Fineract ist groß und historisch gewachsen (JSON-Strings, Gson-Helfer). fineract-osgi zielt auf **klarere Modul- und Laufzeitgrenzen**.
-
-### Architekturbeitrag
-
-| Hebel | Nutzen |
-|-------|--------|
-| Gradle-Module (`fineract-loan`, `fineract-command`, …) | Build- und Team-Grenzen |
-| Neuer Command-Stack | Typsicherheit, weniger Magic Strings |
-| API-DTO Composition ([ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)) | Weniger fragile Vererbung; Shared-Felder explizit komponiert; JSON bleibt flach |
-| Hexagonale Architektur ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)) | Dependency Rule; Domain testbar ohne REST/DB; OSGi/KI als steckbare Adapter |
-| Clean Code ([ADR-018](decisions/ADR-018-clean-code.md)) | Namen, kleine Einheiten, Boy Scout, Tests; SOLID als Orientierung |
-| Domain-Driven Design ([ADR-019](decisions/ADR-019-domain-driven-design.md), [10](10_domain_context_map.md)) | Bounded Contexts, Aggregates, Ubiquitous Language; Read/Write-Modelle getrennt |
-| Event Sourcing Writes ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)) | Append-only Historie für Create/Update/Delete; Journal/Reads als Projektionen |
-| OSGi API vs. Impl Bundles | Stabile Extension-Verträge |
-| arc42 + Gherkin | Gemeinsames Verständnis |
-| Parallele Legacy/Neu-Migration | Risikoarm, reviewbar |
-| Tests (Unit, Integration, E2E) | Regressionsnetz; Composition-Smoke-Tests pro DTO-Familie |
-
-### Szenario Q-MAINT-1: Neues Pflichtfeld am Loan
-
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Fachliche Anforderung: neues validiertes Attribut |
-| Umgebung | Modul bereits auf `fineract-command` migriert |
-| Response | DTO + Validation + Handler + Test; OpenAPI aktualisiert |
-| Maß | Änderung lokal im Modul; keine String-Key-Jagd über 10 Packages; CI grün |
-
-### Szenario Q-MAINT-2: Legacy-Modul anfassen
-
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Bugfix in noch nicht migriertem Pfad |
-| Umgebung | `JsonCommand` / Legacy Handler |
-| Response | Minimal-Fix möglich; optional Ticket für Migration |
-| Maß | Kein Big-Bang-Refactor erzwungen; techn. Schulden sichtbar |
-
-### Metriken (Engineering)
-
-- Anteil Write-APIs auf neuem Command-Stack  
-- Zyklische Modul-Dependencies (Ziel: 0 neu)  
-- Mittlere Review-Größe / Lead Time für Bundle-only Features  
+- Synchronous external calls on the default write path  
+- Too large COB chunks (long transactions, locks)  
+- Pool sizes “by gut feel” without connection budget  
+- Logging huge payloads at INFO  
 
 ---
 
-## 7.9 Erweiterbarkeit (Extensibility)
+## 7.8 Maintainability
 
 ### Motivation
 
-Institute brauchen Differenzierung (Scoring, Produktregeln), ohne den Core zu forken.
+Fineract is large and historically grown (JSON strings, Gson helpers). fineract-osgi aims for **clearer module and runtime boundaries**.
 
-### Architekturbeitrag
+### Architecture contribution
 
-| Extension Point | Mechanismus |
-|-----------------|-------------|
-| Optionale Domain-Services | OSGi Service Registry |
-| Nachgelagerte Verarbeitung | Business/External Events, Hooks |
-| KI | Externes API-Bundle (Grok) |
-| Jobs | Konfigurierbare Business Steps |
-| Security | OIDC pro Tenant, 2FA |
+| Lever | Benefit |
+|-------|---------|
+| Gradle modules (`fineract-loan`, `fineract-command`, …) | Build and team boundaries |
+| New command stack | Type safety, fewer magic strings |
+| API DTO Composition ([ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)) | Less fragile inheritance; shared fields explicitly composed; JSON stays flat |
+| Hexagonal Architecture ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)) | Dependency rule; domain testable without REST/DB; OSGi/AI as pluggable adapters |
+| Clean Code ([ADR-018](decisions/ADR-018-clean-code.md)) | Names, small units, Boy Scout, tests; SOLID as orientation |
+| Domain-Driven Design ([ADR-019](decisions/ADR-019-domain-driven-design.md), [10](10_domain_context_map.md)) | Bounded contexts, aggregates, ubiquitous language; read/write models separated |
+| Event Sourcing Writes ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)) | Append-only history for Create/Update/Delete; journal/reads as projections |
+| OSGi API vs. Impl Bundles | Stable extension contracts |
+| arc42 + Gherkin | Shared understanding |
+| Parallel legacy/new migration | Low risk, reviewable |
+| Tests (Unit, Integration, E2E) | Regression net; composition smoke tests per DTO family |
 
-### Szenario Q-EXT-1: KI-Scoring aktivieren
+### Scenario Q-MAINT-1: New required field on loan
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Kunde will Credit Score nach Application Submit |
-| Umgebung | Cluster mit Equinox; Secret für API-Key vorhanden |
-| Response | Bundle deployen, Service binden, Event konsumieren; Core unverändert |
-| Maß | Time-to-Enable &lt; 1 Tag Ops+Config; Rollback = Bundle stop; Core-Regressionstests grün |
+| Field | Content |
+|-------|---------|
+| Stimulus | Domain requirement: new validated attribute |
+| Environment | Module already migrated to `fineract-command` |
+| Response | DTO + validation + handler + test; OpenAPI updated |
+| Measure | Change local in module; no string-key hunt across 10 packages; CI green |
 
-### Szenario Q-EXT-2: Feature ohne Bundle
+### Scenario Q-MAINT-2: Touch legacy module
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Bundle nicht installiert / gestoppt |
-| Umgebung | Produktivbetrieb |
-| Response | Default-Business-Pfad; keine Hard-Fail außer Fail-Closed-Policy |
-| Maß | Smoke-Tests All-in-One ohne KI-Bundle bestanden |
+| Field | Content |
+|-------|---------|
+| Stimulus | Bugfix in path not yet migrated |
+| Environment | `JsonCommand` / legacy handler |
+| Response | Minimal fix possible; optional ticket for migration |
+| Measure | No big-bang refactor forced; technical debt visible |
 
-### Regeln
+### Metrics (engineering)
 
-- Extension Points versionieren (SemVer der API-Packages).  
-- Keine stillen REST-Vertragsänderungen durch Bundles.  
-- Cluster-weite gleiche Bundle-Versionen ([Kap. 5.7](05_deployment_view.md)).  
+- Share of write APIs on new command stack  
+- Cyclic module dependencies (target: 0 new)  
+- Average review size / lead time for bundle-only features  
 
 ---
 
-## 7.10 Kompatibilität & Migration
+## 7.9 Extensibility
 
 ### Motivation
 
-Integratoren und bestehende Clients dürfen nicht brechen, während Command-Pipeline und OSGi eingeführt werden.
+Institutions need differentiation (scoring, product rules) without forking the core.
 
-### Architekturbeitrag
+### Architecture contribution
 
-- REST-API bleibt **rückwärtskompatibel** während Migration (`fineract-command` README-Ziele).  
-- Legacy und neuer Stack laufen **parallel**.  
-- OpenAPI / `fineract-client` für vertragliche Klarheit.  
-- Feature Flags und Mode-Flags für schrittweises Rollout.
+| Extension point | Mechanism |
+|-----------------|-----------|
+| Optional domain services | OSGi Service Registry |
+| Downstream processing | Business/External Events, Hooks |
+| AI | External API bundle (Grok) |
+| Jobs | Configurable business steps |
+| Security | OIDC per tenant, 2FA |
 
-### Szenario Q-COMPAT-1: Client ohne Änderung
+### Scenario Q-EXT-1: Enable AI scoring
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Bestehender Integrator gegen migriertes Modul |
-| Umgebung | Rolling Deploy neuer Version |
-| Response | Gleiche URLs, Statuscodes, Kern-JSON-Felder |
-| Maß | Contract-/E2E-Suite grün; keine Pflicht zu Client-Release |
+| Field | Content |
+|-------|---------|
+| Stimulus | Customer wants credit score after application submit |
+| Environment | Cluster with Equinox; secret for API key present |
+| Response | Deploy bundle, bind service, consume event; core unchanged |
+| Measure | Time-to-enable &lt; 1 day ops+config; rollback = bundle stop; core regression tests green |
 
-### Szenario Q-COMPAT-2: Rollback
+### Scenario Q-EXT-2: Feature without bundle
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Regression nach Toggle auf neuen Dispatcher |
-| Umgebung | Prod mit Config-Flag |
-| Response | Flag zurück auf sync/legacy; Daten konsistent |
-| Maß | Rollback &lt; 15 min ohne Restore |
+| Field | Content |
+|-------|---------|
+| Stimulus | Bundle not installed / stopped |
+| Environment | Production operation |
+| Response | Default business path; no hard fail except fail-closed policy |
+| Measure | Smoke tests all-in-one without AI bundle passed |
+
+### Rules
+
+- Version extension points (SemVer of API packages).  
+- No silent REST contract changes by bundles.  
+- Cluster-wide same bundle versions ([Ch. 5.7](05_deployment_view.md)).  
 
 ---
 
-## 7.11 Operability (Beobachtbarkeit & Betrieb)
+## 7.10 Compatibility & Migration
 
 ### Motivation
 
-Ohne Messbarkeit sind SLOs Makulatur.
+Integrators and existing clients must not break while command pipeline and OSGi are introduced.
 
-### Architekturbeitrag
+### Architecture contribution
 
-| Signal | Umsetzung |
-|--------|-----------|
+- REST API remains **backward compatible** during migration (`fineract-command` README goals).  
+- Legacy and new stack run **in parallel**.  
+- OpenAPI / `fineract-client` for contractual clarity.  
+- Feature flags and mode flags for stepwise rollout.
+
+### Scenario Q-COMPAT-1: Client without change
+
+| Field | Content |
+|-------|---------|
+| Stimulus | Existing integrator against migrated module |
+| Environment | Rolling deploy of new version |
+| Response | Same URLs, status codes, core JSON fields |
+| Measure | Contract/E2E suite green; no mandatory client release |
+
+### Scenario Q-COMPAT-2: Rollback
+
+| Field | Content |
+|-------|---------|
+| Stimulus | Regression after toggle to new dispatcher |
+| Environment | Prod with config flag |
+| Response | Flag back to sync/legacy; data consistent |
+| Measure | Rollback &lt; 15 min without restore |
+
+---
+
+## 7.11 Operability (Observability & Operations)
+
+### Motivation
+
+Without measurability, SLOs are worthless.
+
+### Architecture contribution
+
+| Signal | Implementation |
+|--------|----------------|
 | Health | Actuator liveness/readiness |
 | Metrics | Prometheus / optional CloudWatch |
 | Traces | OTLP/Tempo |
 | Logs | Logback, optional Correlation-ID (`X-Correlation-ID`) |
-| OSGi | `equinox.log`, Console (abgesichert) |
-| Jobs | Stuck detection, COB-Metadaten |
+| OSGi | `equinox.log`, console (secured) |
+| Jobs | Stuck detection, COB metadata |
 
-### Szenario Q-OPS-1: Latenz-Spike
+### Scenario Q-OPS-1: Latency spike
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | p95 Write-Latenz steigt stark |
-| Umgebung | Prod mit Metrics/Traces |
-| Response | Spike auf DB, Pool-Wait oder KI-sync eingrenzbar |
-| Maß | MTTD (Detect) &lt; 15 min; klare Dashboards pro Node-Rolle |
+| Field | Content |
+|-------|---------|
+| Stimulus | p95 write latency rises sharply |
+| Environment | Prod with metrics/traces |
+| Response | Spike isolatable to DB, pool wait, or AI sync |
+| Measure | MTTD (Detect) &lt; 15 min; clear dashboards per node role |
 
-### Szenario Q-OPS-2: Tenant-Incident
+### Scenario Q-OPS-2: Tenant incident
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Support-Ticket „Loan X falsch“ |
-| Umgebung | Correlation-ID + Audit vorhanden |
-| Response | Request → Command → Domain → Event nachziehbar |
-| Maß | MTTR-Unterstützung: Audit-Treffer in &lt; 10 min |
+| Field | Content |
+|-------|---------|
+| Stimulus | Support ticket “Loan X wrong” |
+| Environment | Correlation-ID + audit present |
+| Response | Request → Command → Domain → Event traceable |
+| Measure | MTTR support: audit hit in &lt; 10 min |
 
-### Mindest-Dashboards
+### Minimum dashboards
 
-1. Request Rate / Error Rate / Latency nach Mode-Node  
+1. Request rate / error rate / latency by mode node  
 2. Hikari active/pending, DB connections  
 3. COB progress, partition failures, queue lag  
-4. KI latency / error / circuit-open  
+4. AI latency / error / circuit-open  
 5. JVM heap/GC, pod restarts  
 
 ---
@@ -505,149 +505,149 @@ Ohne Messbarkeit sind SLOs Makulatur.
 
 ### Motivation
 
-Gleiches Artefakt für Laptop, Compose, Kubernetes, Cloud.
+Same artifact for laptop, Compose, Kubernetes, cloud.
 
-### Architekturbeitrag
+### Architecture contribution
 
-- 12-Factor-nahe Config über Env (`application.properties` Defaults)  
-- Docker-Images und Compose-Blaupausen  
-- K8s Manifeste + Startup-Skripte  
-- Node-Modes statt separater Codebasen  
-- OSGi-Bundles als zusätzliche Deployables  
+- 12-factor-near config via env (`application.properties` defaults)  
+- Docker images and Compose blueprints  
+- K8s manifests + startup scripts  
+- Node modes instead of separate codebases  
+- OSGi bundles as additional deployables  
 
-### Szenario Q-DEP-1: Promotion Dev → Staging
+### Scenario Q-DEP-1: Promotion Dev → Staging
 
-| Feld | Inhalt |
-|------|--------|
-| Stimulus | Release Candidate |
-| Umgebung | Image-Tag + Config/Secrets unterschiedlich |
-| Response | Gleiches Image; nur Config/Bundle-Satz ändert sich |
-| Maß | Keine Code-Änderung für Env-Switch; Smoke + Migration ok |
+| Field | Content |
+|-------|---------|
+| Stimulus | Release candidate |
+| Environment | Image tag + config/secrets different |
+| Response | Same image; only config/bundle set changes |
+| Measure | No code change for env switch; smoke + migration ok |
 
 ### Constraints
 
-- Compose-Beispiele sind **nicht** Prod-Härtung.  
-- Liquibase primär auf führendem Node; Worker ohne Migration.  
+- Compose examples are **not** prod hardening.  
+- Liquibase primarily on leading node; workers without migration.  
 
 ---
 
-## 7.13 Quality Scenarios – Gesamtmatrix
+## 7.13 Quality Scenarios – Overall Matrix
 
-| ID | Qualität | Stimulus (kurz) | Maß (kurz) |
-|----|----------|-----------------|------------|
-| Q-CORR-1 | Integrität | Doppel-Submit | keine Doppelbuchung |
-| Q-CORR-2 | Integrität | Exception im Write | Rollback + Audit ERROR |
-| Q-SEC-1 | Security | Cross-Tenant | Deny |
-| Q-SEC-2 | Security | unauth Request | 401 |
-| Q-SEC-3 | Security | Bundle Install | nur trusted |
-| Q-REL-1 | Reliability | Worker Crash | COB recoverable |
-| Q-REL-2 | Reliability | KI down | Write ok |
-| Q-REL-3 | Reliability | Node Restart | SLO availability |
-| Q-SCALE-1 | Scalability | 2× Loans COB | Fenster gehalten |
-| Q-SCALE-2 | Scalability | Report Peak | Write p95 stabil |
-| Q-PERF-1 | Performance | Loan Create | p95 &lt; 1 s (Richtwert) |
-| Q-PERF-2 | Performance | Sync KI | Timeout + Policy |
-| Q-PERF-3 | Performance | COB load | Loans/min Baseline |
-| Q-MAINT-1 | Maintainability | neues Feld | lokale Änderung |
-| Q-MAINT-2 | Maintainability | Legacy Bug | Minimal-Fix |
-| Q-EXT-1 | Extensibility | KI enable | Bundle-only |
+| ID | Quality | Stimulus (short) | Measure (short) |
+|----|---------|------------------|-----------------|
+| Q-CORR-1 | Integrity | Duplicate submit | no double booking |
+| Q-CORR-2 | Integrity | Exception in write | Rollback + Audit ERROR |
+| Q-SEC-1 | Security | Cross-tenant | Deny |
+| Q-SEC-2 | Security | unauth request | 401 |
+| Q-SEC-3 | Security | Bundle install | trusted only |
+| Q-REL-1 | Reliability | Worker crash | COB recoverable |
+| Q-REL-2 | Reliability | AI down | Write ok |
+| Q-REL-3 | Reliability | Node restart | SLO availability |
+| Q-SCALE-1 | Scalability | 2× Loans COB | window held |
+| Q-SCALE-2 | Scalability | Report peak | Write p95 stable |
+| Q-PERF-1 | Performance | Loan Create | p95 &lt; 1 s (guideline) |
+| Q-PERF-2 | Performance | Sync AI | Timeout + Policy |
+| Q-PERF-3 | Performance | COB load | Loans/min baseline |
+| Q-MAINT-1 | Maintainability | new field | local change |
+| Q-MAINT-2 | Maintainability | Legacy bug | Minimal fix |
+| Q-EXT-1 | Extensibility | AI enable | Bundle-only |
 | Q-EXT-2 | Extensibility | Bundle missing | degrade |
-| Q-COMPAT-1 | Compatibility | alter Client | Contract grün |
-| Q-COMPAT-2 | Compatibility | Toggle Rollback | &lt; 15 min |
-| Q-OPS-1 | Operability | Latenz-Spike | MTTD &lt; 15 min |
-| Q-OPS-2 | Operability | Support Case | Audit-Trace |
-| Q-DEP-1 | Deployability | Env Promotion | same image |
+| Q-COMPAT-1 | Compatibility | old client | Contract green |
+| Q-COMPAT-2 | Compatibility | Toggle rollback | &lt; 15 min |
+| Q-OPS-1 | Operability | Latency spike | MTTD &lt; 15 min |
+| Q-OPS-2 | Operability | Support case | Audit trace |
+| Q-DEP-1 | Deployability | Env promotion | same image |
 
 ---
 
 ## 7.14 Trade-offs
 
-| Entscheidung | Gewinn | Preis |
-|--------------|--------|-------|
-| CQRS + zentraler Command-Pfad | Audit, Idempotenz, Kontrolle | Mehr Indirection; Legacy-Komplexität |
-| Parallel Legacy + neuer Stack | Sichere Migration | Zwei Pfade pflegen temporär |
-| OSGi optional Services | Extensibility, Hot-Deploy | Lifecycle-/Versionsdisziplin |
-| Externe KI statt embedded ML | Weniger Core-Komplexität | Latenz, Datenschutz, Abhängigkeit Vendor |
-| KI async Default | Performance, Reliability | Score nicht sofort konsistent |
-| Horizontale Worker | COB-Skalierung | Genau-ein-Manager, Messaging-Ops |
-| Strenge Tenant-Isolation | Security | Mehr Connections/Pools, Ops-Aufwand |
-| Sync Commands Default | Korrektheit, Einfachheit | Weniger Roh-Durchsatz als Disruptor |
+| Decision | Gain | Cost |
+|----------|------|------|
+| CQRS + central command path | Audit, idempotency, control | More indirection; legacy complexity |
+| Parallel legacy + new stack | Safe migration | Maintain two paths temporarily |
+| OSGi optional services | Extensibility, hot deploy | Lifecycle/version discipline |
+| External AI instead of embedded ML | Less core complexity | Latency, data protection, vendor dependency |
+| AI async default | Performance, reliability | Score not immediately consistent |
+| Horizontal workers | COB scaling | Exactly-one manager, messaging ops |
+| Strict tenant isolation | Security | More connections/pools, ops effort |
+| Sync commands default | Correctness, simplicity | Less raw throughput than Disruptor |
 
 ```mermaid
 quadrantChart
-    title Priorität vs. Umsetzungsaufwand (schematisch)
-    x-axis Niedriger Aufwand --> Hoher Aufwand
-    y-axis Niedrige Prio --> Hohe Prio
-    quadrant-1 Strategisch investieren
-    quadrant-2 Schnell gewinnen
-    quadrant-3 Später / optional
-    quadrant-4 Überdenken
-    Korrektheit-Idempotenz: [0.35, 0.9]
+    title Priority vs. implementation effort (schematic)
+    x-axis Lower effort --> Higher effort
+    y-axis Lower priority --> Higher priority
+    quadrant-1 Invest strategically
+    quadrant-2 Quick wins
+    quadrant-3 Later / optional
+    quadrant-4 Reconsider
+    Correctness-Idempotency: [0.35, 0.9]
     Tenant-Security: [0.45, 0.88]
     COB-Partitioning: [0.55, 0.75]
     OSGi-Extensions: [0.7, 0.65]
-    Async-KI: [0.4, 0.6]
+    Async-AI: [0.4, 0.6]
     Disruptor-Commands: [0.8, 0.45]
     Redis-Idempotency: [0.75, 0.4]
 ```
 
 ---
 
-## 7.15 Verifikation & Nachweis
+## 7.15 Verification & Evidence
 
-| Qualität | Nachweis |
-|----------|----------|
-| Korrektheit | Unit-/Integrationstests, E2E (`fineract-e2e-tests-*`), Idempotency-Tests |
-| Security | AuthZ-Tests, OIDC/2FA-Module, Threat Model Review, Dependency Scanning |
-| Reliability | Chaos/Kill Worker in Compose-Kafka-Setup; Stuck-Job-Tests |
-| Performance | JMH (`fineract-command`), k6/JMeter auf Staging, COB-Dauer-Metriken |
-| Scalability | Worker-Replica-Tests, Pool-Exhaustion-Tests |
-| Maintainability | Modul-Grenzen in PRs, Migration-Checkliste Command-Stack |
-| Extensibility | Bundle install/stop Smoke; optional Service absent tests |
-| Operability | Dashboard-Reviews, Alert-Fire-Drills |
-| Compatibility | OpenAPI Diff, Contract Tests, Client SDK Builds |
+| Quality | Evidence |
+|---------|----------|
+| Correctness | Unit/integration tests, E2E (`fineract-e2e-tests-*`), idempotency tests |
+| Security | AuthZ tests, OIDC/2FA modules, threat model review, dependency scanning |
+| Reliability | Chaos/kill worker in Compose-Kafka setup; stuck-job tests |
+| Performance | JMH (`fineract-command`), k6/JMeter on staging, COB duration metrics |
+| Scalability | Worker replica tests, pool exhaustion tests |
+| Maintainability | Module boundaries in PRs, migration checklist command stack |
+| Extensibility | Bundle install/stop smoke; optional service absent tests |
+| Operability | Dashboard reviews, alert fire drills |
+| Compatibility | OpenAPI diff, contract tests, client SDK builds |
 
-### Definition of Done (architekturbezogen)
+### Definition of Done (architecture-related)
 
-Eine Änderung gilt qualitätsseitig als „fertig“, wenn:
+A change is quality-wise “done” when:
 
-1. Betroffene Quality Scenarios benannt sind,  
-2. Messpunkte (Metric/Log/Test) existieren oder begründet entfallen,  
-3. Trade-offs bei Zielkonflikten (z. B. sync KI vs. Latenz) dokumentiert sind,  
-4. Keine Regression auf Korrektheit/Security-Szenarien.
-
----
-
-## 7.16 Bezug zu anderen Kapiteln
-
-| Kapitel | Beitrag zu Qualität |
-|---------|---------------------|
-| [03 Building Blocks](03_building_block_view.md) | Modulgrenzen → Maintainability, Extensibility |
-| [04 Runtime](04_runtime_view.md) | Konkrete Abläufe für Scenarios (Loan, COB, KI, OSGi) |
-| [05 Deployment](05_deployment_view.md) | Skalierung, HA, Ports, Secrets, Modes |
-| [06 Crosscutting](06_crosscutting_concepts.md) | Mechanismen hinter den Qualitäten |
-| [08 Design Decisions](08_design_decisions.md) | Begründete Trade-offs (OSGi, KI, CQRS) |
-| [`SECURITY.md`](../../SECURITY.md) | Threat Model, In/Out-of-Scope |
+1. Affected quality scenarios are named,  
+2. Measurement points (metric/log/test) exist or are justifiably omitted,  
+3. Trade-offs at goal conflicts (e.g. sync AI vs. latency) are documented,  
+4. No regression on correctness/security scenarios.
 
 ---
 
-## 7.17 Offene Punkte / nächste Iterationen
+## 7.16 Relation to Other Chapters
 
-- Verbindliche **Prod-SLOs** pro Kundenklasse (MFI klein vs. groß) festziehen  
-- Baseline-Messung Loan-Create und COB auf Referenz-Hardware  
-- Weitere Quality-Szenarien mit Step-Defs an E2E-Runner anbinden  
-- Security-SLAs für Bundle-Signing und Secret-Rotation  
-- Kapazitätsmodell: Formel `max_connections` vs. Nodes × Hikari × Tenants  
-- Formale Bewertung Disruptor/Redis-Idempotency gegen Korrektheitsrisiken  
+| Chapter | Contribution to quality |
+|---------|-------------------------|
+| [03 Building Blocks](03_building_block_view.md) | Module boundaries → Maintainability, Extensibility |
+| [04 Runtime](04_runtime_view.md) | Concrete flows for scenarios (Loan, COB, AI, OSGi) |
+| [05 Deployment](05_deployment_view.md) | Scaling, HA, ports, secrets, modes |
+| [06 Crosscutting](06_crosscutting_concepts.md) | Mechanisms behind the qualities |
+| [08 Design Decisions](08_design_decisions.md) | Justified trade-offs (OSGi, AI, CQRS) |
+| [`SECURITY.md`](../../SECURITY.md) | Threat model, in/out of scope |
 
 ---
 
-## 7.18 Verwandte Gherkin-Features (Quality-Tags)
+## 7.17 Open Points / Next Iterations
 
-Quality-Szenarien sind in Gherkin über Tags `@quality-Q-…` referenzierbar.
+- Fix binding **prod SLOs** per customer class (MFI small vs. large)  
+- Baseline measurement loan create and COB on reference hardware  
+- Attach further quality scenarios with step defs to E2E runner  
+- Security SLAs for bundle signing and secret rotation  
+- Capacity model: formula `max_connections` vs. Nodes × Hikari × Tenants  
+- Formal assessment Disruptor/Redis idempotency against correctness risks  
 
-| Quality-ID | Feature (primär) |
-|------------|------------------|
+---
+
+## 7.18 Related Gherkin Features (Quality Tags)
+
+Quality scenarios are referenceable in Gherkin via tags `@quality-Q-…`.
+
+| Quality ID | Feature (primary) |
+|------------|-------------------|
 | Q-CORR-1 | [loan/loan_command_idempotency.feature](../gherkin/features/loan/loan_command_idempotency.feature) |
 | Q-CORR-2 | [crosscutting/command_processing.feature](../gherkin/features/crosscutting/command_processing.feature), [accounting/…](../gherkin/features/accounting/loan_disbursement_journal.feature) |
 | Q-SEC-1 | [crosscutting/multi_tenant_isolation.feature](../gherkin/features/crosscutting/multi_tenant_isolation.feature) |
@@ -658,8 +658,8 @@ Quality-Szenarien sind in Gherkin über Tags `@quality-Q-…` referenzierbar.
 | Q-EXT-1 / Q-EXT-2 | [osgi/ki_scoring_async.feature](../gherkin/features/osgi/ki_scoring_async.feature), [osgi/optional_bundle_degradation.feature](../gherkin/features/osgi/optional_bundle_degradation.feature) |
 | Q-PERF-1 | [loan/loan_creation.feature](../gherkin/features/loan/loan_creation.feature) (`@manual`) |
 
-Vollständige Matrix: [gherkin/README.md](../gherkin/README.md).
+Full matrix: [gherkin/README.md](../gherkin/README.md).
 
 ---
 
-*Weiter*: [08 Design Decisions](08_design_decisions.md) · *Zurück*: [06 Crosscutting Concepts](06_crosscutting_concepts.md)
+*Next*: [08 Design Decisions](08_design_decisions.md) · *Back*: [06 Crosscutting Concepts](06_crosscutting_concepts.md)

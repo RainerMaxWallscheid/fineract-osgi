@@ -1,31 +1,31 @@
 # 6. Crosscutting Concepts
 
-Crosscutting Concepts sind architekturweite Lösungsansätze, die **mehrere Bausteine und Runtime-Szenarien** durchziehen. Sie erklären das „Wie übergreifend?“, während [Kapitel 4](04_runtime_view.md) konkrete Abläufe und [Kapitel 5](05_deployment_view.md) den Betrieb beschreiben.
+Crosscutting concepts are architecture-wide solution approaches that span **multiple building blocks and runtime scenarios**. They explain the “how across the system?”, while [Chapter 4](04_runtime_view.md) describes concrete flows and [Chapter 5](05_deployment_view.md) describes operations.
 
-**Notation**: Konzept → Motivation → Mechanismus → Regeln/Constraints. Diagramme wo hilfreich.
+**Notation**: Concept → Motivation → Mechanism → Rules/Constraints. Diagrams where helpful.
 
 ---
 
-## 6.1 Überblick
+## 6.1 Overview
 
-| # | Konzept | Primäres Ziel | Hauptmodule / Artefakte |
-|---|---------|---------------|-------------------------|
-| 1 | Multi-Tenancy | Isolation pro Institut | Tenant-Filter, `ThreadLocalContext`, Tenant-DBs |
-| 2 | Security & Authorization | Authentifizierung, Rechte, 2FA/OIDC | `fineract-security`, Permissions |
-| 3 | CQRS, Commands & Audit | Schreibpfad, Nachvollziehbarkeit | Command Pipeline, `m_portfolio_command_source` |
-| 4 | Validation & Error Handling | Frühe, konsistente Fehler | Jakarta Validation, Platform Exceptions |
-| 5 | Domain & External Events | Entkopplung, Integration | Business Events, Hooks, Kafka/JMS |
-| 6 | OSGi Modularity | Dynamische Erweiterbarkeit | Equinox, Service Registry, Bundles |
-| 7 | KI-Integration | Externe Intelligenz ohne Monolith-ML | KI-Bundle, xAI Grok API, Policies |
-| 8 | Logging, Correlation & Observability | Betriebssicherheit | Logs, Metrics, Traces, Actuator |
-| 9 | Jobs, COB & Resilience | Batch-Zuverlässigkeit | Partitioned Jobs, Retry, Message Handler |
-| 10 | Configuration & Feature Modes | Umgebungsspezifisches Verhalten | Env, Modes, Config Domain Service |
-| 11 | Data Access & Caching | Performance, Pooling | HikariCP, optionale Caches |
-| 12 | API-Stil, DTO Composition & Compatibility | Stabile Integrationen | REST, Idempotency, OpenAPI, Gson SPI |
-| 13 | Hexagonale Architektur | Dependency Rule, austauschbare Ränder | Ports & Adapters, CQRS, OSGi, KI |
-| 14 | Clean Code | Lesbarkeit, Testbarkeit, sichere Evolution | Namen, kleine Einheiten, Boy Scout, SOLID, CI |
-| 15 | Domain-Driven Design | Fachliche Modelle und Context-Grenzen | Aggregates, UL, Events, Bounded Contexts |
-| 16 | Event Sourcing (Writes) | Append-only Write-Historie | Event Store, Projectors, Snapshots |
+| # | Concept | Primary goal | Main modules / artifacts |
+|---|---------|--------------|--------------------------|
+| 1 | Multi-Tenancy | Isolation per institution | Tenant filters, `ThreadLocalContext`, tenant DBs |
+| 2 | Security & Authorization | Authentication, permissions, 2FA/OIDC | `fineract-security`, Permissions |
+| 3 | CQRS, Commands & Audit | Write path, traceability | Command pipeline, `m_portfolio_command_source` |
+| 4 | Validation & Error Handling | Early, consistent errors | Jakarta Validation, Platform Exceptions |
+| 5 | Domain & External Events | Decoupling, integration | Business Events, Hooks, Kafka/JMS |
+| 6 | OSGi Modularity | Dynamic extensibility | Equinox, Service Registry, Bundles |
+| 7 | AI Integration | External intelligence without monolith ML | AI bundle, xAI Grok API, Policies |
+| 8 | Logging, Correlation & Observability | Operational safety | Logs, Metrics, Traces, Actuator |
+| 9 | Jobs, COB & Resilience | Batch reliability | Partitioned Jobs, Retry, Message Handler |
+| 10 | Configuration & Feature Modes | Environment-specific behavior | Env, Modes, Config Domain Service |
+| 11 | Data Access & Caching | Performance, pooling | HikariCP, optional caches |
+| 12 | API Style, DTO Composition & Compatibility | Stable integrations | REST, Idempotency, OpenAPI, Gson SPI |
+| 13 | Hexagonal Architecture | Dependency rule, swappable edges | Ports & Adapters, CQRS, OSGi, AI |
+| 14 | Clean Code | Readability, testability, safe evolution | Names, small units, Boy Scout, SOLID, CI |
+| 15 | Domain-Driven Design | Domain models and context boundaries | Aggregates, UL, Events, Bounded Contexts |
+| 16 | Event Sourcing (Writes) | Append-only write history | Event Store, Projectors, Snapshots |
 
 ```mermaid
 flowchart TB
@@ -37,7 +37,7 @@ flowchart TB
     C --> D[Domain Services]
     D --> E[Events]
     D --> DB[(Tenant DB)]
-    E --> KI[KI Bundle / Extern]
+    E --> KI[AI Bundle / External]
     E --> MQ[Kafka / JMS]
     C --> A[Audit]
     API --> L[Logging / Tracing / Metrics]
@@ -52,22 +52,22 @@ flowchart TB
 
 ### Motivation
 
-Ein Deployment bedient **viele Institute** (Tenants). Daten, Konfiguration, Business Date und oft auch Auth-IdP müssen strikt getrennt bleiben.
+One deployment serves **many institutions** (tenants). Data, configuration, business date, and often also the auth IdP must remain strictly separated.
 
-### Mechanismus
+### Mechanism
 
-1. **Tenant-Identifikation** am Request-Rand  
-   Header (z. B. Tenant-ID), Routing oder OIDC-Tenant-Kontext.
-2. **Tenant-Resolution**  
-   Metadaten aus `fineract_tenants` (JDBC-URL, Credentials, Timezone, …).
-3. **Context setzen**  
-   `ThreadLocalContextUtil` / Request-Context: Tenant, User, Business Date.
-4. **DataSource-Routing**  
-   Verbindungen gehen in die Tenant-DB (nicht in die Registry-DB für Fachdaten).
+1. **Tenant identification** at the request edge  
+   Header (e.g. Tenant ID), routing, or OIDC tenant context.
+2. **Tenant resolution**  
+   Metadata from `fineract_tenants` (JDBC URL, credentials, timezone, …).
+3. **Context set**  
+   `ThreadLocalContextUtil` / request context: tenant, user, business date.
+4. **DataSource routing**  
+   Connections go to the tenant DB (not to the registry DB for domain data).
 5. **Context clear**  
-   Nach Request/Job-Partition – Pflicht gegen Thread-Leaks (inkl. Virtual Threads).
+   After request/job partition – mandatory against thread leaks (incl. virtual threads).
 
-Relevante Filter (Auszug `fineract-security`):
+Relevant filters (excerpt from `fineract-security`):
 
 - `TenantAwareBasicAuthenticationFilter`
 - `TenantAwareAuthenticationFilter`
@@ -91,19 +91,19 @@ sequenceDiagram
     F-->>C: Response
 ```
 
-### Regeln
+### Rules
 
-| Regel | Begründung |
-|-------|------------|
-| Kein Fachzugriff ohne Tenant-Context | Verhindert Cross-Tenant-Leaks |
-| Batch-Partition = ein Tenant-Context | Parallelität ohne Vermischung |
-| Read-only Tenant-DB optional | `fineract.tenant.read-only-*` für Report-Nodes |
-| Pool-Grenzen pro Tenant beachten | `fineract.tenant.config.max-pool-size` vs. DB-Limits |
+| Rule | Rationale |
+|------|-----------|
+| No domain access without tenant context | Prevents cross-tenant leaks |
+| Batch partition = one tenant context | Parallelism without mixing |
+| Read-only tenant DB optional | `fineract.tenant.read-only-*` for report nodes |
+| Observe pool limits per tenant | `fineract.tenant.config.max-pool-size` vs. DB limits |
 
 ### Mapping Runtime / Deployment
 
-- Runtime: [Szenario 4 Multi-Tenant Request](04_runtime_view.md)
-- Deployment: [Persistenz & Multi-Tenancy](05_deployment_view.md)
+- Runtime: [Scenario 4 Multi-Tenant Request](04_runtime_view.md)
+- Deployment: [Persistence & Multi-Tenancy](05_deployment_view.md)
 
 ---
 
@@ -111,25 +111,25 @@ sequenceDiagram
 
 ### Motivation
 
-Core Banking verarbeitet sensible Finanz- und Personendaten. Jeder Write und die meisten Reads sind **berechtigungspflichtig**.
+Core banking processes sensitive financial and personal data. Every write and most reads are **subject to authorization**.
 
-### Authentifizierung (austauschbare Profile)
+### Authentication (swappable profiles)
 
-| Mechanismus | Modul / API | Einsatz |
-|-------------|-------------|---------|
-| **Basic Auth** | `TenantAwareBasicAuthenticationFilter`, `AuthenticationApiResource` | Dev, einfache Integrationen |
-| **OAuth2 / OIDC / JWT** | `OidcTenantAwareFilter`, JWT Converter, `TenantOidcConfig*` | Produktion, Federation |
-| **Two-Factor (2FA)** | `TwoFactorAuthenticationFilter`, `TwoFactorApiResource` | Zusätzliche Stufe für privilegierte Nutzer |
+| Mechanism | Module / API | Use |
+|-----------|--------------|-----|
+| **Basic Auth** | `TenantAwareBasicAuthenticationFilter`, `AuthenticationApiResource` | Dev, simple integrations |
+| **OAuth2 / OIDC / JWT** | `OidcTenantAwareFilter`, JWT Converter, `TenantOidcConfig*` | Production, federation |
+| **Two-Factor (2FA)** | `TwoFactorAuthenticationFilter`, `TwoFactorApiResource` | Additional step for privileged users |
 
-OIDC-Konfiguration kann **pro Tenant** hinterlegt sein (`TenantOidcConfigService`) – Multi-Tenancy greift hier in die Security hinein.
+OIDC configuration can be stored **per tenant** (`TenantOidcConfigService`) – multi-tenancy extends into security here.
 
-### Autorisierung
+### Authorization
 
-- **Permission-Modell** über Rollen/Rechte (AppUser, Roles, Permissions).
-- Prüfungen im **Platform Security Context** vor Command-Ausführung und in Resources.
-- Maker-Checker: zusätzliche organisatorische Freigabe für kritische Commands (siehe 6.4).
+- **Permission model** via roles/rights (AppUser, Roles, Permissions).
+- Checks in the **Platform Security Context** before command execution and in resources.
+- Maker-Checker: additional organizational approval for critical commands (see 6.4).
 
-### Security-Pipeline (vereinfacht)
+### Security pipeline (simplified)
 
 ```mermaid
 flowchart LR
@@ -141,15 +141,15 @@ flowchart LR
     P --> H[Resource / Command]
 ```
 
-### Regeln
+### Rules
 
-| Regel | Details |
-|-------|---------|
+| Rule | Details |
+|------|---------|
 | Defense in Depth | TLS ([Deployment](05_deployment_view.md)) + AuthN + AuthZ + Audit |
-| Least Privilege | Rollen nur nötige Permissions; Service-Accounts für Batch/Integration |
-| Secrets | DB-Passwörter, OIDC Client Secrets, KI-API-Keys nie im Image hardcoden |
-| Equinox Console | Admin-only, nicht öffentlich (Port 2501) |
-| Tenant spoofing | Tenant-Header nur in Kombination mit AuthZ/IdP-Claims vertrauen |
+| Least Privilege | Roles only necessary permissions; service accounts for batch/integration |
+| Secrets | DB passwords, OIDC client secrets, AI API keys never hardcoded in the image |
+| Equinox Console | Admin-only, not public (port 2501) |
+| Tenant spoofing | Trust tenant header only in combination with AuthZ/IdP claims |
 
 ---
 
@@ -157,9 +157,9 @@ flowchart LR
 
 ### Motivation
 
-Fineract trennt **Reads** (Queries) und **Writes** (Commands). Writes laufen über eine zentrale Pipeline – das ermöglicht Audit, Idempotenz, Maker-Checker und schrittweise Modernisierung.
+Fineract separates **reads** (queries) and **writes** (commands). Writes run through a central pipeline – enabling audit, idempotency, maker-checker, and stepwise modernization.
 
-### Legacy Write-Pfad
+### Legacy write path
 
 ```
 REST Resource
@@ -169,30 +169,30 @@ REST Resource
         → WritePlatformService
 ```
 
-- Payload oft als JSON-String / `JsonCommand`
-- Persistenz des Command-Zustands in **`m_portfolio_command_source`**
-- Status u. a. PENDING / PROCESSED / ERROR / Await Approval
+- Payload often as JSON string / `JsonCommand`
+- Persistence of command state in **`m_portfolio_command_source`**
+- Status e.g. PENDING / PROCESSED / ERROR / Await Approval
 
-### Neuer Command-Stack (`fineract-command`)
+### New command stack (`fineract-command`)
 
 ```
 REST (DTO) → CommandDispatcher → Hooks → CommandHandler<REQ,RES> → Domain
 ```
 
-- Typsichere Commands, Jakarta Validation
+- Type-safe commands, Jakarta Validation
 - Hooks: before / after / error (Username, Timestamp, Headers, …)
-- Dispatcher austauschbar: sync, async, Disruptor
+- Dispatcher swappable: sync, async, Disruptor
 
-Beide Stacks können **parallel** existieren; Migration modulweise ([Runtime 4.3](04_runtime_view.md)).
+Both stacks can exist **in parallel**; migration module by module ([Runtime 4.3](04_runtime_view.md)).
 
-### Audit & Idempotenz
+### Audit & idempotency
 
-| Konzept | Verhalten |
-|---------|-----------|
-| **Command Audit** | Wer / was / wann / Ergebnis – Grundlage für Compliance und Support |
-| **Idempotency Key** | Wiederholte Requests mit gleichem Key liefern gespeichertes Ergebnis |
-| **Maker-Checker** | Command wartet auf Checker-Freigabe, bevor Domain-Persistenz final wird |
-| **Retry** | Resilience4j-Konfiguration um Command-Ausführung (ohne Doppelbuchung dank Idempotenz) |
+| Concept | Behavior |
+|---------|----------|
+| **Command Audit** | Who / what / when / result – basis for compliance and support |
+| **Idempotency Key** | Repeated requests with the same key return the stored result |
+| **Maker-Checker** | Command waits for checker approval before domain persistence is finalized |
+| **Retry** | Resilience4j configuration around command execution (without double booking thanks to idempotency) |
 
 ```mermaid
 stateDiagram-v2
@@ -206,11 +206,11 @@ stateDiagram-v2
     Error --> [*]
 ```
 
-### Regeln
+### Rules
 
-- Jeder fachliche Write geht über Commands – keine „stillen“ DB-Updates aus Controllern.
-- Audit-Trail ist unverhandelbar; Performance-Optimierungen dürfen ihn nicht opfern.
-- Neue Features bevorzugen `fineract-command`; Legacy nicht unnötig erweitern.
+- Every domain write goes through commands – no “silent” DB updates from controllers.
+- The audit trail is non-negotiable; performance optimizations must not sacrifice it.
+- New features prefer `fineract-command`; do not unnecessarily extend legacy.
 
 ---
 
@@ -218,47 +218,47 @@ stateDiagram-v2
 
 ### Motivation
 
-Früh scheitern, klar kommunizieren, Domain-Invarianten schützen.
+Fail early, communicate clearly, protect domain invariants.
 
-### Schichten
+### Layers
 
-| Schicht | Mechanismus | Beispiel |
-|---------|-------------|---------|
-| **Transport** | HTTP-Status, JSON Error Body | 400/401/403/404/409 |
-| **Bean Validation** | Jakarta Annotations auf DTOs (neuer Stack) | `@NotNull`, Betragsgrenzen |
-| **API/JSON Validation** | Legacy-Parser, Data Validators | Pflichtfelder Loan Application |
-| **Domain Validation** | Business Rules in Services | Produktstatus, Disbursement-Voraussetzungen |
-| **OSGi Extensions** | optionale Validator-Services | instituts-spezifische Produktregeln |
+| Layer | Mechanism | Example |
+|-------|-----------|---------|
+| **Transport** | HTTP status, JSON error body | 400/401/403/404/409 |
+| **Bean Validation** | Jakarta annotations on DTOs (new stack) | `@NotNull`, amount bounds |
+| **API/JSON Validation** | Legacy parsers, data validators | Required fields loan application |
+| **Domain Validation** | Business rules in services | Product status, disbursement prerequisites |
+| **OSGi Extensions** | Optional validator services | Institution-specific product rules |
 
-### Fehlerprinzipien
+### Error principles
 
-- **Mappable Exceptions**: Domain-Fehler → stabile API-Fehlercodes/-messages (i18n-fähig).
-- **Keine internen Stacktraces** an externe Clients in Produktion.
-- **Command-Fehler** werden am Command-Record festgehalten (Audit), nicht nur geloggt.
-- **Validierung vor Side Effects**: erst prüfen, dann buchen.
+- **Mappable exceptions**: Domain errors → stable API error codes/messages (i18n-capable).
+- **No internal stack traces** to external clients in production.
+- **Command errors** are recorded on the command record (audit), not only logged.
+- **Validation before side effects**: check first, then book.
 
 ---
 
 ## 6.6 Domain Events, Hooks & External Events
 
-Vollständiges Inventar der Business-Event-TYPEs und ES-Mapping: **[12 Event Catalog](12_event_catalog.md)**.
+Full inventory of Business Event TYPEs and ES mapping: **[12 Event Catalog](12_event_catalog.md)**.
 
 ### Motivation
 
-Nachgelagerte Systeme (Reporting, CRM, KI, Messaging) sollen den Core nicht blockieren und lose koppeln.
+Downstream systems (reporting, CRM, AI, messaging) should not block the core and should stay loosely coupled.
 
-### Arten
+### Types
 
-| Art | Charakter | Transport |
-|-----|-----------|-----------|
-| **Interne Business Events** | In-Process, oft transaction-bound (nach Commit) | Spring Application Events |
-| **Hooks** | Konfigurierbare Webhooks/Integrationen | HTTP u. a. |
-| **External Events** | Für andere Bounded Contexts / Partner | Kafka oder JMS (konfigurierbar) |
+| Type | Character | Transport |
+|------|-----------|-----------|
+| **Internal Business Events** | In-process, often transaction-bound (after commit) | Spring Application Events |
+| **Hooks** | Configurable webhooks/integrations | HTTP and others |
+| **External Events** | For other bounded contexts / partners | Kafka or JMS (configurable) |
 
-Konfiguration (Auszug):
+Configuration (excerpt):
 
 - `fineract.remote-job-message-handler.spring-events|jms|kafka.*`
-- `FINERACT_EXTERNAL_EVENTS_*` in Docker-Env-Dateien
+- `FINERACT_EXTERNAL_EVENTS_*` in Docker env files
 
 ```mermaid
 flowchart LR
@@ -266,28 +266,28 @@ flowchart LR
     BE --> H[Hook Listeners]
     BE --> X[External Event Publisher]
     X --> K[Kafka / JMS]
-    H --> KI[KI Integration Bundle]
-    K --> EXT[Externe Konsumenten]
+    H --> KI[AI Integration Bundle]
+    K --> EXT[External Consumers]
 ```
 
-### Regeln
+### Rules
 
-- Default: **asynchron / nach Commit** – keine Event-Side-Effects in derselben DB-Transaktion außer Outbox-Patterns.
-- Event-Payloads versionieren; Consumer müssen tolerant sein.
-- KI und Dritt-systeme: best effort mit Retry/DLQ, Core-Erfolg nicht rückabwickeln (außer explizite synchrone Policy Gates).
+- Default: **asynchronous / after commit** – no event side effects in the same DB transaction except outbox patterns.
+- Version event payloads; consumers must be tolerant.
+- AI and third-party systems: best effort with retry/DLQ; do not roll back core success (except explicit synchronous policy gates).
 
-### Pflicht bei neuen Business Events (Boot)
+### Mandatory for new business events (boot)
 
-Jeder **konkrete** `*BusinessEvent`, der **nicht** `NoExternalEvent` implementiert, muss in der Tenant-Tabelle **`m_external_event_configuration`** stehen (`type` = Java-SimpleName).
+Every **concrete** `*BusinessEvent` that does **not** implement `NoExternalEvent` must be present in the tenant table **`m_external_event_configuration`** (`type` = Java simple name).
 
-| Mechanismus | Wirkung |
-|-------------|---------|
-| `ExternalEventConfigurationValidationService` | Classpath-Scan aller `BusinessEvent`-Implementierungen beim Start |
-| Fehlender DB-Eintrag | `ExternalEventConfigurationNotFoundException` → **ApplicationContext startet nicht** |
-| Integrationstests | `waitForFineract` läuft in Timeout, obwohl Cargo/Tomcat läuft |
+| Mechanism | Effect |
+|-----------|--------|
+| `ExternalEventConfigurationValidationService` | Classpath scan of all `BusinessEvent` implementations at startup |
+| Missing DB entry | `ExternalEventConfigurationNotFoundException` → **ApplicationContext does not start** |
+| Integration tests | `waitForFineract` times out even though Cargo/Tomcat is running |
 
-**Im selben PR:** Liquibase-Insert (typisch `enabled=false`) + Changelog-Include.  
-Details und Muster: **[12.9 Event Catalog – Pflicht External-Event-Konfiguration](12_event_catalog.md#129-pflicht-external-event-konfiguration-in-der-db)**.
+**In the same PR:** Liquibase insert (typically `enabled=false`) + changelog include.  
+Details and patterns: **[12.9 Event Catalog – Mandatory External Event Configuration](12_event_catalog.md#129-pflicht-external-event-konfiguration-in-der-db)**.
 
 ---
 
@@ -295,25 +295,25 @@ Details und Muster: **[12.9 Event Catalog – Pflicht External-Event-Konfigurati
 
 ### Motivation
 
-Apache Fineract ist historisch modularisiert über Gradle-Module, aber **Laufzeit-Erweiterungen** (Hot-Deploy, optionale Features pro Kunde) sind begrenzt. fineract-osgi ergänzt **OSGi (Equinox)**.
+Apache Fineract is historically modularized via Gradle modules, but **runtime extensions** (hot deploy, optional features per customer) are limited. fineract-osgi adds **OSGi (Equinox)**.
 
-### Mechanismus
+### Mechanism
 
-| Element | Rolle |
-|---------|--------|
-| **Equinox** | OSGi Framework im (oder neben dem) Application-Prozess |
-| **Bundles** | Feature-JARs unter `osgi/bundles` |
-| **Service Registry** | Publizieren/Finden von Interfaces (`CreditScoreProvider`, …) |
+| Element | Role |
+|---------|------|
+| **Equinox** | OSGi framework in (or beside) the application process |
+| **Bundles** | Feature JARs under `osgi/bundles` |
+| **Service Registry** | Publish/find interfaces (`CreditScoreProvider`, …) |
 | **Declarative Services / Activator** | Lifecycle start/stop/bind/unbind |
-| **Core Bridge** | Spring Beans nutzen OSGi Services optional |
+| **Core Bridge** | Spring beans optionally use OSGi services |
 
-### Entwurfsprinzipien
+### Design principles
 
-1. **Optional by default** – fehlt ein Bundle, bleibt Core funktionsfähig.
-2. **Interfaces im Core-API-Bundle**, Implementierungen in Feature-Bundles.
-3. **Keine zyklischen Bundle-Dependencies**; stabile Package-Exports.
-4. **Gleiche Bundle-Versionen** auf allen Nodes eines Clusters ([Deployment 5.7](05_deployment_view.md)).
-5. **Security**: signierte Bundles, kein unkontrolliertes Remote-Install in Prod.
+1. **Optional by default** – if a bundle is missing, the core remains functional.
+2. **Interfaces in the core API bundle**, implementations in feature bundles.
+3. **No cyclic bundle dependencies**; stable package exports.
+4. **Same bundle versions** on all nodes of a cluster ([Deployment 5.7](05_deployment_view.md)).
+5. **Security**: signed bundles, no uncontrolled remote install in prod.
 
 ```mermaid
 flowchart TB
@@ -331,53 +331,53 @@ flowchart TB
     Core --> Reg
 ```
 
-### Typische Extension Points
+### Typical extension points
 
-- Validatoren / Product Rules  
-- Credit Scoring / KI  
-- Notification Channels  
-- Import/Export Adapter  
-- Instituts-spezifische Reports (wenn isolierbar)
+- Validators / product rules  
+- Credit scoring / AI  
+- Notification channels  
+- Import/export adapters  
+- Institution-specific reports (when isolatable)
 
 ---
 
-## 6.8 KI-Integration (xAI Grok API)
+## 6.8 AI Integration (xAI Grok API)
 
 ### Motivation
 
-Kreditentscheidung, Fraud-Hints, Dokumentenzusammenfassung etc. sollen **extern** laufen – kein trainiertes ML-Modell im Banking-Monolithen ([Design Decision](08_design_decisions.md)).
+Credit decisions, fraud hints, document summarization, etc. should run **externally** – no trained ML model in the banking monolith ([Design Decision](08_design_decisions.md)).
 
-### Architektur-Pattern
+### Architecture patterns
 
-| Pattern | Beschreibung | Empfehlung |
-|---------|--------------|------------|
-| **Async Enrichment** | Event → KI-Bundle → API → Ergebnis speichern | Default |
-| **Sync Policy Gate** | Command wartet auf Score allow/deny | Nur wenn regulatorisch nötig |
-| **Human-in-the-Loop** | Score als Hinweis für Officer, keine Auto-Buchung | Häufig bei Kredit |
+| Pattern | Description | Recommendation |
+|---------|-------------|----------------|
+| **Async Enrichment** | Event → AI bundle → API → store result | Default |
+| **Sync Policy Gate** | Command waits for score allow/deny | Only when regulatorily required |
+| **Human-in-the-Loop** | Score as hint for officer, no auto-booking | Common for credit |
 
-### Bausteine
+### Building blocks
 
-- **OSGi KI-Bundle** implementiert z. B. `CreditScoreProvider`
-- **HTTP-Client** mit Timeout, Retry, Circuit Breaker
-- **Secret**: API-Key aus Vault/K8s Secret
-- **Datenminimierung**: nur nötige Features an die KI; PII-Policies beachten
-- **Persistenz**: Score/Explanation als Note, Custom Fields oder eigenes Aggregat – **nicht** als stiller Ersatz für Accounting
+- **OSGi AI bundle** implements e.g. `CreditScoreProvider`
+- **HTTP client** with timeout, retry, circuit breaker
+- **Secret**: API key from Vault/K8s Secret
+- **Data minimization**: only necessary features to the AI; observe PII policies
+- **Persistence**: score/explanation as note, custom fields, or own aggregate – **not** as a silent substitute for accounting
 
-### Policy-Matrix
+### Policy matrix
 
-| KI-Ergebnis / Fehler | Fail-Open | Fail-Closed |
-|----------------------|-----------|-------------|
-| Timeout / 5xx | Request läuft weiter | Command abbrechen |
-| Score unter Schwellwert | Warning speichern | Reject / Maker-Checker erzwingen |
-| Bundle nicht installiert | Default-Pfad | Feature deaktiviert melden |
+| AI result / error | Fail-Open | Fail-Closed |
+|-------------------|-----------|-------------|
+| Timeout / 5xx | Request continues | Abort command |
+| Score below threshold | Store warning | Reject / force maker-checker |
+| Bundle not installed | Default path | Report feature disabled |
 
-Default für Verfügbarkeit: **Fail-Open** auf dem Hot-Path; produkt-spezifisch konfigurierbar.
+Default for availability: **Fail-Open** on the hot path; product-specifically configurable.
 
 ```mermaid
 sequenceDiagram
     participant Cmd as Command Handler
     participant Reg as OSGi Registry
-    participant KI as KI Bundle
+    participant KI as AI Bundle
     participant API as xAI Grok API
     participant DB as Tenant DB
 
@@ -390,15 +390,15 @@ sequenceDiagram
         KI-->>Cmd: ScoreResult
     else not bound
         Reg-->>Cmd: empty
-        Cmd->>Cmd: continue without KI
+        Cmd->>Cmd: continue without AI
     end
 ```
 
-### Regeln
+### Rules
 
-- KI entscheidet nicht still über Buchungen ohne explizite Business-Rule.
-- Prompts/Responses auditierbar speichern (oder Hash + Metadaten), wo Compliance es verlangt.
-- Kosten/Latenz monitoren (siehe 6.9).
+- AI does not silently decide bookings without an explicit business rule.
+- Store prompts/responses in an auditable way (or hash + metadata) where compliance requires it.
+- Monitor cost/latency (see 6.9).
 
 ---
 
@@ -406,28 +406,28 @@ sequenceDiagram
 
 ### Motivation
 
-Ohne einheitliche Observability sind Multi-Tenant-, COB- und Pool-Probleme nicht beherrschbar.
+Without uniform observability, multi-tenant, COB, and pool problems are not manageable.
 
 ### Logging
 
-| Aspekt | Ansatz |
-|--------|--------|
-| Struktur | Logback (Override unter `config/docker/logback/`) |
-| Correlation | `fineract.correlation.enabled` + Header `X-Correlation-ID` (konfigurierbar) |
-| Tenant/User | im MDC/Context loggen (keine Secrets) |
-| OSGi | `osgi/logs/equinox.log` zusätzlich zum App-Log |
+| Aspect | Approach |
+|--------|----------|
+| Structure | Logback (override under `config/docker/logback/`) |
+| Correlation | `fineract.correlation.enabled` + header `X-Correlation-ID` (configurable) |
+| Tenant/User | log in MDC/context (no secrets) |
+| OSGi | `osgi/logs/equinox.log` in addition to app log |
 
 ### Metrics & Health
 
 - Spring Actuator: liveness/readiness ([Deployment](05_deployment_view.md))
 - Prometheus: `FINERACT_MANAGEMENT_PROMETHEUS_ENABLED`
 - CloudWatch optional
-- Fachliche Metriken (Ziel): Command-Latenz, COB-Dauer, KI-Timeout-Rate, Pool-Utilization
+- Domain metrics (target): command latency, COB duration, AI timeout rate, pool utilization
 
 ### Tracing
 
 - OTLP/Tempo: `FINERACT_MANAGEMENT_OLTP_*`
-- Sinnvolle Spans: HTTP → Command → DB → external KI call
+- Useful spans: HTTP → Command → DB → external AI call
 
 ```mermaid
 flowchart LR
@@ -439,11 +439,11 @@ flowchart LR
     L --> G
 ```
 
-### Regeln
+### Rules
 
-- PII und Credentials **nicht** in Logs/Traces im Klartext.
-- Correlation-ID vom Edge bis zum Worker-Job durchreichen (Messaging-Headers).
-- Alerting auf Error-Rate, COB SLA, DB-Connections, KI-Latenz.
+- **Do not** put PII and credentials in logs/traces in clear text.
+- Propagate Correlation-ID from the edge through to the worker job (messaging headers).
+- Alert on error rate, COB SLA, DB connections, AI latency.
 
 ---
 
@@ -451,30 +451,30 @@ flowchart LR
 
 ### Motivation
 
-Close-of-Business und andere Jobs müssen **partitionierbar, wiederholbar und ausfallsicher** sein.
+Close-of-Business and other jobs must be **partitionable, repeatable, and failure-tolerant**.
 
-### Building Blocks
+### Building blocks
 
-| Baustein | Funktion |
-|----------|----------|
-| Scheduler / Job Framework | Trigger, Stuck-Job-Retry (`fineract.job.stuck-retry-threshold`) |
-| Partitioned Jobs | z. B. `LOAN_COB` mit chunk/partition/thread-pool Properties |
-| Remote Job Message Handler | Spring Events (lokal) oder JMS/Kafka (verteilt) |
-| COB API Filter | schützen Online-Writes während COB auf betroffenen Loans |
-| Resilience | Retry an Commands und externen Calls; Timeouts zwingend |
+| Building block | Function |
+|----------------|----------|
+| Scheduler / Job Framework | Trigger, stuck-job retry (`fineract.job.stuck-retry-threshold`) |
+| Partitioned Jobs | e.g. `LOAN_COB` with chunk/partition/thread-pool properties |
+| Remote Job Message Handler | Spring Events (local) or JMS/Kafka (distributed) |
+| COB API Filter | protect online writes during COB on affected loans |
+| Resilience | Retry on commands and external calls; timeouts mandatory |
 
-### Konfigurationshebel (Beispiele)
+### Configuration levers (examples)
 
 - `LOAN_COB_CHUNK_SIZE`, `LOAN_COB_PARTITION_SIZE`, `LOAN_COB_POLL_INTERVAL`
 - `LOAN_COB_THREAD_POOL_*`, `LOAN_COB_RETRY_LIMIT`
 - `fineract.job.loan-cob-enabled`
 
-### Regeln
+### Rules
 
-- Job-Steps **idempotent** implementieren (Restart nach Crash).
-- Worker ohne Liquibase; Manager orchestriert.
-- Genau ein aktiver Batch-Manager pro Cluster.
-- OSGi-Logic in Business Steps: schnell, optional, fehlertolerant.
+- Implement job steps **idempotently** (restart after crash).
+- Workers without Liquibase; manager orchestrates.
+- Exactly one active batch manager per cluster.
+- OSGi logic in business steps: fast, optional, fault-tolerant.
 
 ---
 
@@ -482,92 +482,92 @@ Close-of-Business und andere Jobs müssen **partitionierbar, wiederholbar und au
 
 ### Motivation
 
-Ein Artefakt, viele Umgebungen: Dev-Compose, Multi-Node, K8s, Tenant-Policies.
+One artifact, many environments: Dev Compose, multi-node, K8s, tenant policies.
 
-### Schichten
+### Layers
 
-1. `application.properties` – Defaults  
-2. Environment Variables / ConfigMaps – Umgebung  
-3. Secrets – Credentials  
+1. `application.properties` – defaults  
+2. Environment variables / ConfigMaps – environment  
+3. Secrets – credentials  
 4. DB Configuration Domain Service – runtime business config  
-5. OSGi `config.ini` / Component Properties – Bundle-Level  
+5. OSGi `config.ini` / Component Properties – bundle level  
 
-### Mode-Flags
+### Mode flags
 
-| Mode | Wirkung |
-|------|---------|
-| `read-enabled` | Query-API |
-| `write-enabled` | Command-API |
-| `batch-manager-enabled` | Job-Orchestrierung |
-| `batch-worker-enabled` | Job-Ausführung |
+| Mode | Effect |
+|------|--------|
+| `read-enabled` | Query API |
+| `write-enabled` | Command API |
+| `batch-manager-enabled` | Job orchestration |
+| `batch-worker-enabled` | Job execution |
 
-Modes sind ein **crosscutting Deployment-Konzept** mit Auswirkung auf Security Surface, Liquibase und Messaging ([Kapitel 5.3](05_deployment_view.md)).
+Modes are a **crosscutting deployment concept** with impact on security surface, Liquibase, and messaging ([Chapter 5.3](05_deployment_view.md)).
 
-### Feature Toggles (fachlich)
+### Feature toggles (domain)
 
-Beispiele: Loan COB on/off, External Events, Correlation IDs, IP Tracking, Journal Entry Aggregation. Toggles gehören dokumentiert und default-sicher gesetzt.
+Examples: Loan COB on/off, external events, correlation IDs, IP tracking, journal entry aggregation. Toggles must be documented and set with safe defaults.
 
 ---
 
-## 6.12 Data Access, Transaktionen & Caching
+## 6.12 Data Access, Transactions & Caching
 
 ### Data Access
 
-- JDBC/JPA über Tenant-DataSource; HikariCP-Pooling (`FINERACT_HIKARI_*`).
-- Tenants-DB nur für Routing/Metadaten; Fachdaten in Tenant-DB.
-- Optional Read-only Replica-Parameter pro Tenant.
-- **JPA-Stack**: Spring Data JPA + **EclipseLink** (Hibernate excluded); Multi-Tenant über `RoutingDataSource`, eine EMF.
-- **CQRS-Persistenz** ([ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md), [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)): **Writes** im Zielbild → **Event Sourcing** (Create/Update/Delete); JPA/SQL für Snapshots, Read Models und Journal; schwere Reads/COB → JdbcTemplate/SQL. JPA-Hygiene **S1/S2** bleibt für Projectors/Legacy-Übergang.
+- JDBC/JPA via tenant DataSource; HikariCP pooling (`FINERACT_HIKARI_*`).
+- Tenants DB only for routing/metadata; domain data in tenant DB.
+- Optional read-only replica parameters per tenant.
+- **JPA stack**: Spring Data JPA + **EclipseLink** (Hibernate excluded); multi-tenant via `RoutingDataSource`, one EMF.
+- **CQRS persistence** ([ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md), [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)): **Writes** in the target model → **Event Sourcing** (Create/Update/Delete); JPA/SQL for snapshots, read models, and journal; heavy reads/COB → JdbcTemplate/SQL. JPA hygiene **S1/S2** remains for projectors/legacy transition.
 
-### Transaktionen
+### Transactions
 
-- Spring `@Transactional` an Write-Services / Command-Handlern.
-- Events idealerweise nach erfolgreichem Commit.
-- Batch: Chunk-Transaktionen statt einer Riesen-TX für den ganzen COB.
+- Spring `@Transactional` on write services / command handlers.
+- Events ideally after successful commit.
+- Batch: chunk transactions instead of one giant TX for the whole COB.
 
 ### Caching
 
-- Konfigurations- und Lookup-Daten können gecacht werden (plattformabhängig).
-- **Keine** aggressiven Caches auf hochgradig konsistenzkritischen Salden ohne Invalidierungsstrategie.
-- Command-Idempotency heute DB-gestützt; künftig optional schneller Store (Redis) – nur mit klarem Konsistenzmodell (`fineract-command` README).
+- Configuration and lookup data may be cached (platform-dependent).
+- **No** aggressive caches on highly consistency-critical balances without an invalidation strategy.
+- Command idempotency today DB-backed; later optional faster store (Redis) – only with a clear consistency model (`fineract-command` README).
 
 ---
 
-## 6.13 Hexagonale Architektur (Ports & Adapters)
+## 6.13 Hexagonal Architecture (Ports & Adapters)
 
 ### Motivation
 
-Domain und Use-Cases sollen **unabhängig** von Transport (REST, Batch) und Technik (JPA, JDBC, Kafka, KI) bleiben – testbar, OSGi-erweiterbar, modernisierbar ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)).
+Domain and use cases should remain **independent** of transport (REST, batch) and technology (JPA, JDBC, Kafka, AI) – testable, OSGi-extensible, modernizable ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)).
 
-### Leitbild
+### Guiding model
 
 ```mermaid
 flowchart LR
     DRV[Driving: REST Jobs OSGi] --> APP[Application: Commands Queries]
     APP --> DOM[Domain]
     APP --> PRT[Ports]
-    PRT --> DDN[Driven: JPA JDBC Events KI MQ]
+    PRT --> DDN[Driven: JPA JDBC Events AI MQ]
 ```
 
 | Ring | fineract-osgi |
 |------|----------------|
-| **Driving** | `*ApiResource`, COB/Batch, optionale Bundle-Eingänge |
-| **Application** | Command Handler, WritePlatformServices, Validation-Orchestrierung |
-| **Domain** | Aggregates, Domain Services, Invarianten |
-| **Driven** | Spring Data JPA / EclipseLink, JdbcTemplate-Reads, Hooks, Kafka/JMS, KI-Client |
+| **Driving** | `*ApiResource`, COB/Batch, optional bundle entry points |
+| **Application** | Command Handler, WritePlatformServices, validation orchestration |
+| **Domain** | Aggregates, domain services, invariants |
+| **Driven** | Spring Data JPA / EclipseLink, JdbcTemplate reads, Hooks, Kafka/JMS, AI client |
 
-CQRS: **Commands** und **Queries** sind Application-Use-Cases mit **unterschiedlichen** Driven-Adaptern (Write oft JPA, Read oft JDBC – [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md)).
+CQRS: **Commands** and **Queries** are application use cases with **different** driven adapters (write often JPA, read often JDBC – [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md)).
 
-### Regeln
+### Rules
 
-- Domain importiert keine JAX-RS-/Broker-/Servlet-Typen.
-- Resources bleiben dünne Driving-Adapter (HTTP ↔ Command/DTO).
-- Neue Ports nur bei echter Austauschbarkeit oder Testnaht (kein Interface-Theater).
-- OSGi-Bundles = steckbare Adapter hinter stabilen Ports ([ADR-002](decisions/ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md)).
+- Domain imports no JAX-RS / broker / servlet types.
+- Resources remain thin driving adapters (HTTP ↔ Command/DTO).
+- New ports only for real swappability or test seams (no interface theater).
+- OSGi bundles = pluggable adapters behind stable ports ([ADR-002](decisions/ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md)).
 
-### Bezug Building Blocks / Runtime
+### Relation to Building Blocks / Runtime
 
-- Statisch: [03.2](03_building_block_view.md) · Dynamisch: [04.3](04_runtime_view.md) Commands
+- Static: [03.2](03_building_block_view.md) · Dynamic: [04.3](04_runtime_view.md) Commands
 
 ---
 
@@ -575,29 +575,29 @@ CQRS: **Commands** und **Queries** sind Application-Use-Cases mit **unterschiedl
 
 ### Motivation
 
-Großer Legacy-Bestand und parallele Modernisierung erfordern ein gemeinsames **Code-Qualitätsleitbild** – nicht nur Architekturgrenzen ([ADR-018](decisions/ADR-018-clean-code.md)).
+A large legacy codebase and parallel modernization require a shared **code quality guiding model** – not only architecture boundaries ([ADR-018](decisions/ADR-018-clean-code.md)).
 
-### Leitprinzipien (Kurz)
+### Guiding principles (short)
 
-| Prinzip | Praxis |
-|---------|--------|
-| **Namen** | Fachsprache; Use-Case-klare Commands/Resources |
-| **Kleine Einheiten** | Dünne Resources/Handler; Logik in Domain |
-| **Composition** | Statt fragiler Vererbung ([ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)) |
-| **Explizite Fehler** | Validierung vor Side Effects; mappable Exceptions |
-| **Boy Scout** | Angefassten Code lokal verbessern, Scope im PR halten |
-| **Tests** | Domain unit; Adapter IT; API-Verträge absichern |
-| **Dependency Rule** | Domain ohne Transport/Vendor-APIs ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)) |
+| Principle | Practice |
+|-----------|----------|
+| **Names** | Domain language; use-case-clear commands/resources |
+| **Small units** | Thin resources/handlers; logic in domain |
+| **Composition** | Instead of fragile inheritance ([ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)) |
+| **Explicit errors** | Validation before side effects; mappable exceptions |
+| **Boy Scout** | Improve touched code locally, keep scope in the PR |
+| **Tests** | Domain unit; adapter IT; secure API contracts |
+| **Dependency Rule** | Domain without transport/vendor APIs ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)) |
 
-SOLID dient als **Orientierung** (S/O/L/I/D), nicht als dogmatische Klassenexplosion.
+SOLID serves as **orientation** (S/O/L/I/D), not as dogmatic class explosion.
 
-### Durchsetzung
+### Enforcement
 
-Spotless/Format, Checkstyle/SpotBugs (wo aktiv), CI-Tests, Code Review, arc42/Gherkin, `AGENTS.md`.
+Spotless/format, Checkstyle/SpotBugs (where active), CI tests, code review, arc42/Gherkin, `AGENTS.md`.
 
-### Non-Goals
+### Non-goals
 
-Kein Repo-weites Reformat in einem PR; kein Ersatz für fachliche Komplexität; kein Big-Bang-Clean-Rewrite.
+No repo-wide reformat in one PR; no substitute for domain complexity; no big-bang clean rewrite.
 
 ---
 
@@ -605,80 +605,80 @@ Kein Repo-weites Reformat in einem PR; kein Ersatz für fachliche Komplexität; 
 
 ### Motivation
 
-Core Banking braucht **klare Fachmodelle und Context-Grenzen** – nicht nur technische Schichten ([ADR-019](decisions/ADR-019-domain-driven-design.md)).
+Core banking needs **clear domain models and context boundaries** – not only technical layers ([ADR-019](decisions/ADR-019-domain-driven-design.md)).
 
-### Strategisch
+### Strategic
 
-| Konzept | Umsetzung |
-|---------|-----------|
-| **Bounded Context** | Domain-Gradle-Module (Loan, Savings, Accounting, Client, …); kanonische Liste → [10](10_domain_context_map.md) |
-| **Ubiquitous Language** | Code, Commands, Gherkin, arc42 dieselbe Fachsprache |
-| **Context Map** | [10 Domain Context Map](10_domain_context_map.md) – Integration über Commands, Events, IDs, GL-Mappings – nicht freies Entity-Sharing |
-| **Anti-Corruption Layer** | Interop/KI/Import/Legacy-JSON → typsichere Application-Modelle |
+| Concept | Implementation |
+|---------|----------------|
+| **Bounded Context** | Domain Gradle modules (Loan, Savings, Accounting, Client, …); canonical list → [10](10_domain_context_map.md) |
+| **Ubiquitous Language** | Code, commands, Gherkin, arc42 same domain language |
+| **Context Map** | [10 Domain Context Map](10_domain_context_map.md) – integration via commands, events, IDs, GL mappings – not free entity sharing |
+| **Anti-Corruption Layer** | Interop/AI/Import/Legacy JSON → type-safe application models |
 
-### Taktisch
+### Tactical
 
-| Baustein | Rolle |
-|----------|--------|
-| **Aggregate** | Konsistenzgrenze beim Write (z. B. Loan, SavingsAccount); Canvas → [11](11_aggregate_canvas.md) |
-| **Entity / Value Object** | Identität vs. Werte (Money, Enums/Converter) |
-| **Repository** | Persistenz-Port des Aggregates (Spring Data / Wrapper) |
-| **Domain Service** | Fachlogik über Entities hinweg (Zins, Accounting) |
-| **Application Service** | Use Case + Transaktion (Command Handler) |
-| **Domain Event** | Tatsache nach Commit (Hooks / External Events) |
+| Building block | Role |
+|----------------|------|
+| **Aggregate** | Consistency boundary on write (e.g. Loan, SavingsAccount); Canvas → [11](11_aggregate_canvas.md) |
+| **Entity / Value Object** | Identity vs. values (Money, enums/converters) |
+| **Repository** | Persistence port of the aggregate (Spring Data / wrapper) |
+| **Domain Service** | Domain logic across entities (interest, accounting) |
+| **Application Service** | Use case + transaction (Command Handler) |
+| **Domain Event** | Fact after commit (Hooks / External Events) |
 
-DDD sitzt im **Domain- und Application-Ring** des Hexagons ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)); CQRS trennt Write-Aggregate und Read-Modelle ([ADR-004](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md), [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md)).
+DDD sits in the **domain and application ring** of the hexagon ([ADR-017](decisions/ADR-017-hexagonale-architektur.md)); CQRS separates write aggregates and read models ([ADR-004](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md), [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md)).
 
-### Regeln (Kurz)
+### Rules (short)
 
-- Ein Write-Use-Case idealerweise ein Aggregat (Querschnitt bewusst orchestrieren).  
-- Queries blähen Write-Aggregate nicht auf.  
-- Neue Features: Aggregate + Command + Event benennen.  
-- Legacy anämisch: Boy Scout, kein Big-Bang-Remodel.
+- One write use case ideally one aggregate (orchestrate cross-cutting concerns deliberately).  
+- Queries do not bloat write aggregates.  
+- New features: name Aggregate + Command + Event.  
+- Legacy anemic: Boy Scout, no big-bang remodel.
 
 ---
 
-## 6.16 Event Sourcing (Write-Pflicht)
+## 6.16 Event Sourcing (Write Obligation)
 
 ### Motivation
 
-Create/Update/Delete an Domain-Aggregates sollen eine **vollständige, append-only Historie** haben – nicht nur den aktuellen Zustand ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)).
+Create/Update/Delete on domain aggregates should have a **complete, append-only history** – not only the current state ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)).
 
-### Pflicht
+### Obligation
 
-| Operation | Write-Modell |
-|-----------|--------------|
-| Create / Update / Delete / Transition | Domain Events in Event Store (Source of Truth) |
-| Command | Entscheidet Events; Optimistic Concurrency auf Stream-Version |
-| Read / Report / Journal | **Projektionen** (JDBC/JPA-Tabellen); Journal bleibt relational |
+| Operation | Write model |
+|-----------|-------------|
+| Create / Update / Delete / Transition | Domain events in event store (source of truth) |
+| Command | Decides events; optimistic concurrency on stream version |
+| Read / Report / Journal | **Projections** (JDBC/JPA tables); journal remains relational |
 
-### Abgrenzung
+### Demarcation
 
-- **Nicht** Event Store = alleiniges Accounting-Ledger.  
-- **Nicht** Replay pro GET.  
-- Migration **Strangler** (ES0–ES4): Greenfield zuerst, Kern-Aggregates schrittweise.
+- **Not** event store = sole accounting ledger.  
+- **Not** replay per GET.  
+- Migration **strangler** (ES0–ES4): greenfield first, core aggregates stepwise.
 
-### Bezug
+### References
 
-Commands [6.4](06_crosscutting_concepts.md) · DDD [6.15](06_crosscutting_concepts.md) · Persistenz [6.12](06_crosscutting_concepts.md) · Runtime [04.3](04_runtime_view.md)
+Commands [6.4](06_crosscutting_concepts.md) · DDD [6.15](06_crosscutting_concepts.md) · Persistence [6.12](06_crosscutting_concepts.md) · Runtime [04.3](04_runtime_view.md)
 
 ---
 
-## 6.17 API-Stil, DTO Composition, Idempotenz & Compatibility
+## 6.17 API Style, DTO Composition, Idempotency & Compatibility
 
-| Thema | Konzept |
+| Topic | Concept |
 |-------|---------|
-| **Stil** | REST unter `/fineract-provider/api/v1`, headless (keine UI im Scope) |
-| **CQRS nach außen** | Writes als Commands, Reads als Queries – auch wenn URL-Design historisch gemischt ist |
-| **Idempotenz** | Header/Key für Writes; Pflicht für Integrations-Retries |
-| **OpenAPI** | Client-Generierung (`fineract-client`); Dummy/DTO-Typen für Spec |
-| **DTO Composition** | Spezialisierte API-DTOs **komponieren** Shared-Felder statt tiefer Vererbung ([ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)) |
-| **Compatibility** | Neue Command-Pipeline und DTO-Refactors dürfen REST-JSON-Verträge nicht brechen (flach halten) |
-| **Correlation** | `X-Correlation-ID` für Support-Fälle |
+| **Style** | REST under `/fineract-provider/api/v1`, headless (no UI in scope) |
+| **CQRS outward** | Writes as commands, reads as queries – even if URL design is historically mixed |
+| **Idempotency** | Header/key for writes; mandatory for integration retries |
+| **OpenAPI** | Client generation (`fineract-client`); dummy/DTO types for spec |
+| **DTO Composition** | Specialized API DTOs **compose** shared fields instead of deep inheritance ([ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md)) |
+| **Compatibility** | New command pipeline and DTO refactors must not break REST JSON contracts (keep flat) |
+| **Correlation** | `X-Correlation-ID` for support cases |
 
-### API-DTO Composition (ADR-015)
+### API DTO Composition (ADR-015)
 
-Historisch erben viele Response-/Request-Objekte von Shared-Parents (`DepositProductData`, `CommandProcessingResult`, …). fineract-osgi stellt schrittweise auf **Composition** um:
+Historically many response/request objects inherit from shared parents (`DepositProductData`, `CommandProcessingResult`, …). fineract-osgi gradually moves to **composition**:
 
 ```mermaid
 flowchart LR
@@ -698,28 +698,28 @@ flowchart LR
     SMS --> API
 ```
 
-| Regel | Bedeutung |
-|-------|-----------|
-| **Wire-Form bleibt flach** | JSON enthält `id`, `state`, `depositAmount` auf Root-Ebene – keine Pflicht zu `product.id` |
-| **GET ≠ CommandResult** | Read-only Interop-DTOs erben nicht mehr von `CommandProcessingResult` |
-| **Write-Pipeline behält CPR** | Responses, die durch `logCommandSource` laufen, bleiben CPR-Subtypen; Shared-Interop-Felder werden flach kopiert |
-| **Gson SPI** | `FineractGsonTypeAdapterRegistrar` + `ServiceLoader` in `GoogleGsonSerializerHelper` – Module registrieren Flatten-Adapter ohne Core-Änderung |
-| **Jackson wo Jackson bindet** | Request-Bodies mit `@JsonUnwrapped`; Gson-Command-Re-Serialisierung ggf. über flache Map |
+| Rule | Meaning |
+|------|---------|
+| **Wire form stays flat** | JSON contains `id`, `state`, `depositAmount` at root level – no requirement for `product.id` |
+| **GET ≠ CommandResult** | Read-only Interop DTOs no longer inherit from `CommandProcessingResult` |
+| **Write pipeline keeps CPR** | Responses that run through `logCommandSource` remain CPR subtypes; shared Interop fields are copied flat |
+| **Gson SPI** | `FineractGsonTypeAdapterRegistrar` + `ServiceLoader` in `GoogleGsonSerializerHelper` – modules register flatten adapters without core change |
+| **Jackson where Jackson binds** | Request bodies with `@JsonUnwrapped`; Gson command re-serialization possibly via flat map |
 
-Shared-Typen (`DepositProductData`, `DepositAccountData`, `InteropRequestData`) bleiben für Lookup, Mapper-Basiszeilen und Composition-Quellen erhalten.
+Shared types (`DepositProductData`, `DepositAccountData`, `InteropRequestData`) remain for lookup, mapper base rows, and composition sources.
 
-### Integrationsregeln
+### Integration rules
 
-- Clients senden Tenant + Auth + Idempotency Key bei Writes.
-- Breaking Changes nur versioniert; OSGi-Extensions dürfen öffentliche API nicht still verändern.
-- DTO-Refactors müssen bestehende JSON-Feldnamen und Partial-Response-Parameter respektieren.
-- Externe KI ist **kein** Teil der stabilen Banking-API – eigene Facades/DTOs.
+- Clients send tenant + auth + idempotency key on writes.
+- Breaking changes only versioned; OSGi extensions must not silently change the public API.
+- DTO refactors must respect existing JSON field names and partial-response parameters.
+- External AI is **not** part of the stable banking API – own facades/DTOs.
 
 ---
 
-## 6.18 Zusammenspiel der Konzepte (Beispielfluss)
+## 6.18 Interaction of Concepts (Example Flow)
 
-Loan Creation mit optionaler KI – Crosscutting-Schichten:
+Loan creation with optional AI – crosscutting layers:
 
 ```mermaid
 sequenceDiagram
@@ -731,7 +731,7 @@ sequenceDiagram
     participant Val as Validation
     participant Dom as Domain
     participant Evt as Events
-    participant OSGi as OSGi KI Service
+    participant OSGi as OSGi AI Service
     participant Obs as Logs/Metrics/Traces
 
     Client->>Ten: POST /loans
@@ -742,58 +742,58 @@ sequenceDiagram
     Dom->>Cmd: result
     Cmd->>Evt: publish
     Evt->>OSGi: async score
-    Note over Ten,Obs: Correlation-ID, tenant, user im MDC/Trace
+    Note over Ten,Obs: Correlation-ID, tenant, user in MDC/Trace
 ```
 
 ---
 
-## 6.19 Qualitätsbezug
+## 6.19 Quality Mapping
 
-| Crosscutting Concept | Unterstützte Qualität ([Kap. 7](07_quality_attributes.md)) |
-|----------------------|--------------------------------------------------------------|
-| Multi-Tenancy | Security, Isolation, SaaS-Skalierung |
-| Security & Audit | Vertraulichkeit, Compliance, Nachvollziehbarkeit |
-| CQRS / Commands | Skalierbarkeit Writes/Reads, Maintainability |
-| API-DTO Composition | Maintainability, Compatibility (flache JSON-Verträge) |
-| Hexagonale Architektur | Maintainability, Extensibility, Testability |
-| Clean Code | Maintainability, Reliability, Testability |
-| Domain-Driven Design | Correctness, Maintainability, Extensibility |
-| Event Sourcing (Writes) | Correctness, Reliability, Auditierbarkeit |
-| OSGi | Extensibility, Maintainability, Deployment-Flexibilität |
-| KI-Integration | Extensibility, Innovation ohne Core-Komplexität |
-| Observability | Operability, Performance-Diagnose |
-| Jobs/Resilience | Reliability, COB-Performance |
-| Config/Modes | Portability, sichere Defaults |
-
----
-
-## 6.20 Offene Punkte / nächste Iterationen
-
-- Einheitliches **Outbox-Pattern** für External Events (exactly-once / at-least-once klar definieren)
-- Standard-Interfaces für OSGi Extension Points (API-Bundle versioniert)
-- KI: Datenklassifikation, Retention von Prompts, Modell-Changelog
-- Correlation-ID verpflichtend in Worker-Messaging
-- Policy-as-Code für Fail-Open/Fail-Closed pro Produkt
-- Cache-/Idempotency-Store-Entscheidung (DB only vs. Redis)
-- Weitere DTO-Hierarchien auf Composition migrieren (Loan/Savings-Product wo sinnvoll); ggf. generierte OpenAPI-Modelle angleichen
-- Hexagon E3 / ADR-021: Ports in `moduleapi`; Cross-Module nur über Module API ([14](14_module_api_boundaries.md)); ArchUnit Entity + Module-API-Regeln ([13](13_archunit_bounded_context_rules.md)) — Freeze-Store schrumpfen
-- DDD D3: Aggregatgrenzen weiter schärfen (Canvas [11](11_aggregate_canvas.md)); D4: ACL Interop/KI (Context Map [10](10_domain_context_map.md))
-- Event Sourcing ES0/ES1: Event-Store-Port, Metamodell, Greenfield-Pflicht; Pilot-Aggregat (ES2); Event-Inventar: [12](12_event_catalog.md)
+| Crosscutting concept | Supported quality ([Ch. 7](07_quality_attributes.md)) |
+|----------------------|--------------------------------------------------------|
+| Multi-Tenancy | Security, isolation, SaaS scalability |
+| Security & Audit | Confidentiality, compliance, traceability |
+| CQRS / Commands | Scalability of writes/reads, maintainability |
+| API DTO Composition | Maintainability, compatibility (flat JSON contracts) |
+| Hexagonal Architecture | Maintainability, extensibility, testability |
+| Clean Code | Maintainability, reliability, testability |
+| Domain-Driven Design | Correctness, maintainability, extensibility |
+| Event Sourcing (Writes) | Correctness, reliability, auditability |
+| OSGi | Extensibility, maintainability, deployment flexibility |
+| AI Integration | Extensibility, innovation without core complexity |
+| Observability | Operability, performance diagnosis |
+| Jobs/Resilience | Reliability, COB performance |
+| Config/Modes | Portability, safe defaults |
 
 ---
 
-## 6.21 Verwandte Gherkin-Features
+## 6.20 Open Points / Next Iterations
 
-| Konzept | Feature |
+- Uniform **outbox pattern** for external events (clearly define exactly-once / at-least-once)
+- Standard interfaces for OSGi extension points (API bundle versioned)
+- AI: data classification, prompt retention, model changelog
+- Correlation-ID mandatory in worker messaging
+- Policy-as-code for fail-open/fail-closed per product
+- Cache/idempotency store decision (DB only vs. Redis)
+- Migrate further DTO hierarchies to composition (Loan/Savings product where sensible); possibly align generated OpenAPI models
+- Hexagon E3 / ADR-021: Ports in `moduleapi`; cross-module only via Module API ([14](14_module_api_boundaries.md)); ArchUnit entity + Module API rules ([13](13_archunit_bounded_context_rules.md)) — shrink freeze store
+- DDD D3: further sharpen aggregate boundaries (Canvas [11](11_aggregate_canvas.md)); D4: ACL Interop/AI (Context Map [10](10_domain_context_map.md))
+- Event Sourcing ES0/ES1: Event-store port, metamodel, greenfield obligation; pilot aggregate (ES2); event inventory: [12](12_event_catalog.md)
+
+---
+
+## 6.21 Related Gherkin Features
+
+| Concept | Feature |
 |---------|---------|
 | Multi-Tenancy | [crosscutting/multi_tenant_isolation.feature](../gherkin/features/crosscutting/multi_tenant_isolation.feature) |
 | Security | [crosscutting/security_authentication.feature](../gherkin/features/crosscutting/security_authentication.feature) |
-| CQRS / Commands / Idempotenz | [crosscutting/command_processing.feature](../gherkin/features/crosscutting/command_processing.feature), [loan/loan_command_idempotency.feature](../gherkin/features/loan/loan_command_idempotency.feature) |
-| OSGi / KI | [osgi/](../gherkin/features/osgi/) |
+| CQRS / Commands / Idempotency | [crosscutting/command_processing.feature](../gherkin/features/crosscutting/command_processing.feature), [loan/loan_command_idempotency.feature](../gherkin/features/loan/loan_command_idempotency.feature) |
+| OSGi / AI | [osgi/](../gherkin/features/osgi/) |
 | Jobs / Modes | [cob/close_of_business.feature](../gherkin/features/cob/close_of_business.feature), [crosscutting/node_modes.feature](../gherkin/features/crosscutting/node_modes.feature) |
 
 Mapping: [gherkin/README.md](../gherkin/README.md).
 
 ---
 
-*Weiter*: [07 Quality Attributes](07_quality_attributes.md) · *Zurück*: [05 Deployment View](05_deployment_view.md)
+*Next*: [07 Quality Attributes](07_quality_attributes.md) · *Back*: [05 Deployment View](05_deployment_view.md)

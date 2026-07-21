@@ -1,79 +1,79 @@
-# ADR-015 – API-DTOs: Composition statt Vererbung
+# ADR-015 – API DTOs: Composition over Inheritance
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Maintainability, Compatibility, Extensibility |
+| **Qualities** | Maintainability, Compatibility, Extensibility |
 
-### Kontext
+### Context
 
-Viele API-Datenobjekte (Portfolio, Interop, Kampagnen) entstanden historisch als **Vererbungshierarchien**:
+Many API data objects (portfolio, interop, campaigns) evolved historically as **inheritance hierarchies**:
 
-- Spezialisierungen erben Dutzende `protected`-Felder vom Shared-Parent (z. B. `FixedDepositProductData extends DepositProductData`).
-- Interop-GET-Responses erben unnötig von `CommandProcessingResult`.
-- Request-DTOs (SmsCampaign, Interop Quote/Transfer) erben Shared-Felder, obwohl sie nur **komponieren** müssten.
+- Specializations inherit dozens of `protected` fields from a shared parent (e.g. `FixedDepositProductData extends DepositProductData`).
+- Interop GET responses unnecessarily inherit from `CommandProcessingResult`.
+- Request DTOs (SmsCampaign, Interop Quote/Transfer) inherit shared fields even though they should only **compose**.
 
-Das erschwert:
+This hinders:
 
-- **Wartung** (fragile base class, package-field-Zugriff, Riesen-Konstruktoren),
-- **Modularisierung** (Shared-Felder kleben am Parent-Typ),
-- **Korrekte Typisierung** (GET-Responses sind keine Command-Results).
+- **Maintainability** (fragile base class, package-field access, giant constructors),
+- **Modularization** (shared fields stuck on the parent type),
+- **Correct typing** (GET responses are not command results).
 
-Gleichzeitig darf die **öffentliche JSON-Form** nicht brechen: Clients erwarten flache Felder (`id`, `state`, `depositAmount`, …), nicht verschachtelte `product`/`request`-Objekte. Die Legacy-Serialisierung läuft über **Gson** (nicht Jackson `@JsonUnwrapped`).
+At the same time, the **public JSON shape** must not break: clients expect flat fields (`id`, `state`, `depositAmount`, …), not nested `product`/`request` objects. Legacy serialization uses **Gson** (not Jackson `@JsonUnwrapped`).
 
-### Entscheidung
+### Decision
 
-**Composition first** für API-DTOs, mit explizitem Flatten für die Wire-Form:
+**Composition first** for API DTOs, with explicit flattening for the wire form:
 
-| Muster | Wann | Wie |
-|--------|------|-----|
-| **Compose + flatten fields** | Read/Response-DTOs (Deposit FD/RD Product & Account, Interop specialized responses) | Shared-Typ bleibt; Spezialisierung hält flache Kopien der Shared-Felder + eigene Felder. Factories: `instance(shared, …)`, `asProductData()` / `asAccountData()`. |
-| **Compose nested component** | Request-DTOs (SmsCampaign create/update, Interop request variants) | Nested `InteropRequestData` / `SmsCampaignDto`; Jackson `@JsonUnwrapped` wo Jackson bindet; für Gson-Command-Pipeline ggf. `toCommandMap()`. |
-| **Drop false inheritance** | GET-only Interop DTOs | Kein `extends CommandProcessingResult`; Resource-IDs als eigene Felder. |
-| **Keep CPR inheritance** | Write-Pipeline-Responses | z. B. `InteropQuoteResponseData`, `InteropIdentifierAccountResponseData` bleiben `CommandProcessingResult`-Subtypen, **komponieren** aber `InteropResponseData` flach. |
+| Pattern | When | How |
+|---------|------|-----|
+| **Compose + flatten fields** | Read/response DTOs (Deposit FD/RD product & account, interop specialized responses) | Shared type remains; specialization holds flat copies of shared fields + own fields. Factories: `instance(shared, …)`, `asProductData()` / `asAccountData()`. |
+| **Compose nested component** | Request DTOs (SmsCampaign create/update, interop request variants) | Nested `InteropRequestData` / `SmsCampaignDto`; Jackson `@JsonUnwrapped` where Jackson binds; for the Gson command pipeline possibly `toCommandMap()`. |
+| **Drop false inheritance** | GET-only interop DTOs | No `extends CommandProcessingResult`; resource IDs as own fields. |
+| **Keep CPR inheritance** | Write-pipeline responses | e.g. `InteropQuoteResponseData`, `InteropIdentifierAccountResponseData` remain `CommandProcessingResult` subtypes, but **compose** `InteropResponseData` flat. |
 
-**Gson SPI** für modulspezifische TypeAdapter:
+**Gson SPI** for module-specific type adapters:
 
 - Interface `FineractGsonTypeAdapterRegistrar` in `fineract-core`
 - `ServiceLoader` in `GoogleGsonSerializerHelper.registerTypeAdapters`
-- Module können Flatten-Adapter registrieren, ohne den Core zu ändern
+- Modules can register flatten adapters without changing core
 
-**Polymorphe Service-Returns** wo Specialization kein Subtyp des Shared-DTO mehr ist: `Object` / `Collection<?>` / `Page<?>`; Callers casten auf konkrete FD/RD-Typen (API-Ressourcen nutzen ohnehin konkrete Serializer).
+**Polymorphic service returns** where specialization is no longer a subtype of the shared DTO: `Object` / `Collection<?>` / `Page<?>`; callers cast to concrete FD/RD types (API resources already use concrete serializers).
 
-### Alternativen
+### Alternatives
 
-| Option | Warum nicht (jetzt) |
-|--------|---------------------|
-| Vererbung beibehalten | Fragile Base, falsche Is-A-Beziehungen (GET ≠ CPR) |
-| Nested JSON ohne Flatten | Breaking Change für Clients und Partial-Response-Parameter |
-| Nur Jackson / OpenAPI-Modelle | Legacy-API und Command-Pipeline sind Gson-lastig |
-| Big-Bang alle Hierarchien | Risiko und Diff-Größe untragbar; schrittweise pro Bounded Context |
+| Option | Why not (now) |
+|--------|---------------|
+| Keep inheritance | Fragile base, wrong is-a relationships (GET ≠ CPR) |
+| Nested JSON without flatten | Breaking change for clients and partial-response parameters |
+| Jackson / OpenAPI models only | Legacy API and command pipeline are Gson-heavy |
+| Big-bang all hierarchies | Risk and diff size intolerable; stepwise per bounded context |
 
-### Umgesetzte Bereiche (Stand)
+### Implemented areas (as of now)
 
-| Bereich | Composition |
-|---------|-------------|
-| SmsCampaign create/update | Nested `SmsCampaignDto` + Unwrapped / `toCommandMap` |
+| Area | Composition |
+|------|-------------|
+| SmsCampaign create/update | Nested `SmsCampaignDto` + unwrapped / `toCommandMap` |
 | Interop requests | Compose `InteropRequestData` |
 | Interop specialized responses | Extend CPR + flatten `InteropResponseData` |
-| Interop GET DTOs | Kein CPR; flache IDs |
+| Interop GET DTOs | No CPR; flat IDs |
 | Fixed/Recurring Deposit Product | Compose/flatten `DepositProductData` |
 | Fixed/Recurring Deposit Account | Compose/flatten `DepositAccountData` |
 
-### Konsequenzen
+### Consequences
 
-- **+** Klarere Typgrenzen, weniger Super-Feld-Zugriff, testbare Composition-Smoke-Tests  
-- **+** API-JSON bleibt flach (Kompatibilität)  
-- **+** Module können Gson-Adapter via SPI liefern  
-- **−** Feld-Duplikation in spezialisierten DTOs (bewusst, für Flatten)  
-- **−** Service-Signaturen teils generischer (`Object`/`Collection<?>`); Callers brauchen Casts  
-- **−** Static-Init-Reihenfolge bei shared Mapper-Helpers beachten (z. B. `SHARED_COLUMNS` vor Mappern)
+- **+** Clearer type boundaries, less super-field access, testable composition smoke tests  
+- **+** API JSON stays flat (compatibility)  
+- **+** Modules can supply Gson adapters via SPI  
+- **−** Field duplication in specialized DTOs (intentional, for flatten)  
+- **−** Service signatures partly more generic (`Object`/`Collection<?>`); callers need casts  
+- **−** Watch static-init order for shared mapper helpers (e.g. `SHARED_COLUMNS` before mappers)
 
-### Bezug
+### Related
 
 - Crosscutting [6.13](../06_crosscutting_concepts.md) · Runtime [4.3](../04_runtime_view.md) · Quality [7.8 Maintainability](../07_quality_attributes.md)  
 - Code: `FineractGsonTypeAdapterRegistrar`, `*DtoCompositionTest`, Deposit/Interop data packages
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

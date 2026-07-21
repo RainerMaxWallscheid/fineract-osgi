@@ -1,9 +1,9 @@
 # Architecture Decision Records (ADRs)
 
-Einzelne Architekturentscheidungen für **fineract-osgi**. Übersicht und Format: [../08_design_decisions.md](../08_design_decisions.md).
+Individual architecture decisions for **fineract-osgi**. Overview and format: [../08_design_decisions.md](../08_design_decisions.md).
 
-| ADR | Datei |
-|-----|-------|
+| ADR | File |
+|-----|------|
 | ADR-001 | [ADR-001-fork-fineract-osgi-statt-pure-upstream.md](ADR-001-fork-fineract-osgi-statt-pure-upstream.md) |
 | ADR-002 | [ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md](ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md) |
 | ADR-003 | [ADR-003-spring-boot-gradle-module-als-kern-beibehalten.md](ADR-003-spring-boot-gradle-module-als-kern-beibehalten.md) |
@@ -26,9 +26,9 @@ Einzelne Architekturentscheidungen für **fineract-osgi**. Übersicht und Format
 | ADR-020 | [ADR-020-event-sourcing-writes-pflicht.md](ADR-020-event-sourcing-writes-pflicht.md) |
 | ADR-021 | [ADR-021-modul-kommunikation-nur-ueber-module-api.md](ADR-021-modul-kommunikation-nur-ueber-module-api.md) |
 
-## Neues ADR anlegen
+## Creating a new ADR
 
-1. Datei `ADR-NNN-kurzslug.md` in diesem Ordner (nächste freie Nummer).
-2. Format wie bestehende ADRs (Status, Kontext, Entscheidung, Alternativen, Konsequenzen, Bezug).
-3. Eintrag in [../08_design_decisions.md](../08_design_decisions.md) (Übersichtstabelle, Matrix, ggf. Mermaid).
-4. Querverweise aus Runtime/Crosscutting/Quality setzen.
+1. Create file `ADR-NNN-short-slug.md` in this folder (next free number).
+2. Use the same format as existing ADRs (Status, Context, Decision, Alternatives, Consequences, Related).
+3. Add an entry in [../08_design_decisions.md](../08_design_decisions.md) (overview table, matrix, Mermaid if applicable).
+4. Set cross-references from Runtime / Crosscutting / Quality sections.

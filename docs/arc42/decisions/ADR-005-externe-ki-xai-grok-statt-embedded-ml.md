@@ -1,39 +1,39 @@
-# ADR-005 – Externe KI (xAI Grok) statt embedded ML
+# ADR-005 – External AI (xAI Grok) instead of embedded ML
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Extensibility, Maintainability, Performance, Security |
+| **Qualities** | Extensibility, Maintainability, Performance, Security |
 
-### Kontext
+### Context
 
-Kredit-Scoring, Hinweise, Textanalyse sollen möglich sein. Ein trainiertes ML-Modell *im* Banking-Monolithen würde Release-, GPU-, Compliance- und Team-Kompetenz-Probleme schaffen.
+Credit scoring, guidance, and text analysis should be possible. A trained ML model *inside* the banking monolith would create release, GPU, compliance, and team-skill problems.
 
-### Entscheidung
+### Decision
 
-KI als **externe Inferenz** anbinden (Referenz: **xAI Grok API**), gekapselt in einem **OSGi-Feature-Bundle** (z. B. `CreditScoreProvider`).
+Connect AI as **external inference** (reference: **xAI Grok API**), encapsulated in an **OSGi feature bundle** (e.g. `CreditScoreProvider`).
 
-- Core Banking bleibt frei von Modellgewichten und Training-Pipelines.  
-- Austausch des Providers (anderer Vendor/Modell) über Bundle-Impl.  
-- Datenminimierung und Secret-Handling Pflicht ([Kap. 6.8](../06_crosscutting_concepts.md)).
+- Core banking stays free of model weights and training pipelines.  
+- Provider swap (other vendor/model) via bundle implementation.  
+- Data minimization and secret handling are mandatory ([Ch. 6.8](../06_crosscutting_concepts.md)).
 
-### Alternativen
+### Alternatives
 
-| Option | Warum nicht |
-|--------|-------------|
-| Embedded TensorFlow/ONNX im Core | Aufblähung, Ops, Haftungs-/Lizenzfragen |
-| Batch-only Offline-Scoring ohne API | Zu träge für Officer-Workflows; ergänzend ok |
-| KI direkt in Command-Handlern hardcoden | Kopplung, nicht multi-vendor, nicht OSGi-konform |
-| Anderer Cloud-LLM only | Möglich; Architektur bleibt vendor-neutral über Interface |
+| Option | Why not |
+|--------|---------|
+| Embedded TensorFlow/ONNX in the core | Bloat, ops, liability/license issues |
+| Batch-only offline scoring without API | Too slow for officer workflows; OK as a complement |
+| Hardcoding AI directly in command handlers | Coupling, not multi-vendor, not OSGi-conformant |
+| Another cloud LLM only | Possible; architecture stays vendor-neutral via interface |
 
-### Konsequenzen
+### Consequences
 
-- **+** Schlanker Core, schnelle Innovation am Rand  
-- **+** Passt zu OSGi-Extension-Modell  
-- **−** Abhängigkeit von Netz, Vendor, Kosten  
-- **−** Datenschutz/PII-Governance für Payloads nötig  
-- **−** Latenz- und Ausfallbehandlung explizit designen ([ADR-006](ADR-006-ki-default-asynchron-fail-open.md))
+- **+** Lean core, fast innovation at the edge  
+- **+** Fits the OSGi extension model  
+- **−** Dependency on network, vendor, cost  
+- **−** Privacy/PII governance for payloads required  
+- **−** Latency and failure handling must be designed explicitly ([ADR-006](ADR-006-ki-default-asynchron-fail-open.md))
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

@@ -1,42 +1,42 @@
-# ADR-007 – Node-Rollen Read / Write / Batch
+# ADR-007 – Node roles Read / Write / Batch
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Scalability, Reliability, Deployability |
+| **Qualities** | Scalability, Reliability, Deployability |
 
-### Kontext
+### Context
 
-Ein All-in-One-Prozess reicht für Dev und kleine Institute. Größere Last braucht Trennung von Online-API und COB-Arbeit, ohne separate Codebasen.
+An all-in-one process is enough for development and small institutions. Higher load needs separation of online API and COB work, without separate codebases.
 
-### Entscheidung
+### Decision
 
-Rollen über **Mode-Flags** steuern (bereits im Fineract-Kern):
+Control roles via **mode flags** (already in the Fineract core):
 
 - `fineract.mode.read-enabled`  
 - `fineract.mode.write-enabled`  
 - `fineract.mode.batch-manager-enabled`  
 - `fineract.mode.batch-worker-enabled`  
 
-Dazu `FINERACT_NODE_ID`; Worker typisch ohne Liquibase.
+Plus `FINERACT_NODE_ID`; workers typically without Liquibase.
 
-Topologien: All-in-One → API+Batch split → Manager + N Worker ([Kap. 5.3](../05_deployment_view.md)).
+Topologies: all-in-one → API+batch split → manager + N workers ([Ch. 5.3](../05_deployment_view.md)).
 
-### Alternativen
+### Alternatives
 
-| Option | Warum nicht |
-|--------|-------------|
-| Getrennte Artefakte pro Rolle | Build-/Release-Vervielfachung |
-| Immer nur All-in-One | COB und Reports ersticken Online-Traffic |
-| Kubernetes Jobs only ohne Modes | Unzureichend für langlebige Worker und API-Filter |
+| Option | Why not |
+|--------|---------|
+| Separate artifacts per role | Build/release multiplication |
+| Always all-in-one only | COB and reports choke online traffic |
+| Kubernetes Jobs only without modes | Insufficient for long-lived workers and API filters |
 
-### Konsequenzen
+### Consequences
 
-- **+** Horizontale Skalierung der richtigen Ebene  
-- **+** Ein Image, viele Rollen  
-- **−** Fehlkonfiguration (zweiter Manager) muss operativ verhindert werden  
-- **−** Mehr Deployment-Komplexität und Connection-Budget-Planung  
+- **+** Horizontal scaling of the right tier  
+- **+** One image, many roles  
+- **−** Misconfiguration (second manager) must be prevented operationally  
+- **−** More deployment complexity and connection-budget planning  
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

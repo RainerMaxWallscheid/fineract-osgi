@@ -1,37 +1,37 @@
-# ADR-006 – KI default asynchron & Fail-Open
+# ADR-006 – AI default asynchronous & fail-open
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Performance, Reliability; Trade-off vs. strikte Auto-Decision |
+| **Qualities** | Performance, Reliability; trade-off vs. strict auto-decision |
 
-### Kontext
+### Context
 
-Externe Inference kann 100 ms–mehrere Sekunden dauern und ausfallen. Sync im Default-Write-Pfad gefährdet p95 und Verfügbarkeit ([Q-PERF-1](../07_quality_attributes.md), [Q-REL-2](../07_quality_attributes.md)).
+External inference can take 100 ms to several seconds and can fail. Sync on the default write path endangers p95 and availability ([Q-PERF-1](../07_quality_attributes.md), [Q-REL-2](../07_quality_attributes.md)).
 
-### Entscheidung
+### Decision
 
-| Aspekt | Default | Ausnahme |
-|--------|---------|----------|
-| Aufrufzeitpunkt | **Async** nach Domain-Event / nach Commit | Sync nur als konfiguriertes **Policy Gate** |
-| Bei Timeout/5xx | **Fail-Open** (Write bleibt erfolgreich) | **Fail-Closed** nur produkt-/regulatorisch erzwungen |
-| Buchungen | KI ändert **nie still** Salden | Nur Enrichment oder explizite Business-Rule |
+| Aspect | Default | Exception |
+|--------|---------|-----------|
+| Invocation time | **Async** after domain event / after commit | Sync only as a configured **policy gate** |
+| On timeout/5xx | **Fail-open** (write remains successful) | **Fail-closed** only when product/regulatory rules force it |
+| Postings | AI **never silently** changes balances | Enrichment only, or explicit business rule |
 
-### Alternativen
+### Alternatives
 
-| Option | Bewertung |
-|--------|-----------|
-| Immer sync vor Persistenz | Hohe Korrektheit der „KI-Entscheidung“, schlechte Latenz/Verfügbarkeit |
-| Immer Fail-Closed | Sicher für Auto-Reject-Produkte, riskant für Ops |
-| Fire-and-forget ohne Persistenz des Scores | Zu wenig Auditierbarkeit |
+| Option | Assessment |
+|--------|------------|
+| Always sync before persistence | High correctness of the “AI decision”, poor latency/availability |
+| Always fail-closed | Safe for auto-reject products, risky for ops |
+| Fire-and-forget without persisting the score | Insufficient auditability |
 
-### Konsequenzen
+### Consequences
 
-- **+** Write-SLO und COB entkoppelt von Vendor-Latenz  
-- **+** Klare Policy-Matrix pro Produkt möglich  
-- **−** Score ggf. erst verzögert sichtbar (Eventual Enrichment)  
-- **−** Produkt-Teams müssen Fail-Closed bewusst einschalten  
+- **+** Write SLO and COB decoupled from vendor latency  
+- **+** Clear policy matrix per product possible  
+- **−** Score may only appear with delay (eventual enrichment)  
+- **−** Product teams must deliberately enable fail-closed  
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

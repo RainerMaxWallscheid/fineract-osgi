@@ -1,113 +1,113 @@
 # 10. Domain Context Map (DDD)
 
-Dieses Kapitel dokumentiert die **strategische Domain-Zerlegung** von fineract-osgi: Bounded Contexts, Subdomain-Klassifikation, Context Map (Upstream/Downstream) und Migrationsreihenfolge.
+This chapter documents the **strategic domain decomposition** of fineract-osgi: bounded contexts, subdomain classification, context map (upstream/downstream), and migration order.
 
-Es erfüllt Evolutionsstufe **D1** aus [ADR-019](decisions/ADR-019-domain-driven-design.md) (*Context-Map in Doku*) und ergänzt:
+It fulfills evolution stage **D1** from [ADR-019](decisions/ADR-019-domain-driven-design.md) (*context map in documentation*) and complements:
 
-- physische Module → [03 Building Block View](03_building_block_view.md)
-- Hexagon / Ports → [ADR-017](decisions/ADR-017-hexagonale-architektur.md)
-- Write-Events / ES → [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)
-- Fach-/Technikkontext → [02 Context and Scope](02_context_and_scope.md)
+- physical modules → [03 Building Block View](03_building_block_view.md)
+- hexagon / ports → [ADR-017](decisions/ADR-017-hexagonale-architektur.md)
+- write events / ES → [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)
+- business/technical context → [02 Context and Scope](02_context_and_scope.md)
 
-**Status:** living document – Context-Grenzen schärfen sich mit ES- und Modul-Migration (D3/D4).
+**Status:** living document – context boundaries sharpen with ES and module migration (D3/D4).
 
 ---
 
-## 10.1 Leitprinzipien
+## 10.1 Guiding principles
 
-| Prinzip | Bedeutung in fineract-osgi |
+| Principle | Meaning in fineract-osgi |
 |---------|----------------------------|
-| **Gradle-Modul ≠ Bounded Context** | Module sind physische Schnitte; BCs sind sprachliche und modellhafte Grenzen. Ein BC kann mehrere Module umfassen (z. B. Loan Servicing); ein Modul kann Teile mehrerer Legacy-Contexts hosten (`fineract-core`). |
-| **Integration ohne Entity-Sharing** | Über Context-Grenzen: **IDs**, **Published Language** (Commands, Avro/Business Events, Application-DTOs) – nicht JPA-Entities fremder Domains importieren. |
-| **Shared Kernel eng** | Nur echte Querschnittskonzepte (Money/Currency, Tenant/BusinessDate, ExternalId, Permission-Metamodell, Event-Envelope). Kein „alles in `fineract-core`“. |
-| **Accounting bleibt Ledger** | Journal/GL ist eigener Context und **Projektion** aus Domain Events – nicht durch Event Store ersetzt ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)). |
-| **Inkrementell** | Context Map steuert Strangler-Migration; kein Big-Bang-Microservice-Schnitt. |
+| **Gradle module ≠ bounded context** | Modules are physical cuts; BCs are linguistic and model boundaries. One BC can span multiple modules (e.g. Loan Servicing); one module can host parts of several legacy contexts (`fineract-core`). |
+| **Integration without entity sharing** | Across context boundaries: **IDs**, **published language** (commands, Avro/business events, application DTOs) – do not import JPA entities of foreign domains. |
+| **Shared kernel kept narrow** | Only true cross-cutting concepts (Money/Currency, Tenant/BusinessDate, ExternalId, permission metamodel, event envelope). Not “everything in `fineract-core`”. |
+| **Accounting remains the ledger** | Journal/GL is its own context and a **projection** from domain events – not replaced by the event store ([ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md)). |
+| **Incremental** | The context map steers strangler migration; no big-bang microservice cut. |
 
-### Integrationsstile (Legende)
+### Integration styles (legend)
 
-| Kürzel | Stil | Verwendung hier |
+| Abbrev. | Style | Use here |
 |--------|------|-----------------|
-| **U/D** | Upstream / Downstream | Daten- und Modellfluss: Downstream hängt von Upstream ab |
-| **OHS** | Open Host Service | Stabile API/Events des Upstream für mehrere Downstream-Konsumenten |
-| **PL** | Published Language | Gemeinsames Integrationsvokabular (Avro, Command-Typen, Event-Namen) |
-| **C/S** | Customer / Supplier | Explizite Lieferbeziehung (Downstream als Kunde) |
-| **CF** | Conformist | Downstream übernimmt Upstream-Modell weitgehend unverändert |
-| **ACL** | Anti-Corruption Layer | Übersetzung fremder/externer Modelle ins eigene Modell |
-| **SK** | Shared Kernel | Eng geteilte Typen/Packages – bewusst klein halten |
-| **PROC** | Process / Orchestration | Context orchestriert mehrere Aggregates ohne eigene Produkt-Wahrheit |
+| **U/D** | Upstream / Downstream | Data and model flow: downstream depends on upstream |
+| **OHS** | Open Host Service | Stable API/events of the upstream for multiple downstream consumers |
+| **PL** | Published Language | Shared integration vocabulary (Avro, command types, event names) |
+| **C/S** | Customer / Supplier | Explicit supply relationship (downstream as customer) |
+| **CF** | Conformist | Downstream largely adopts the upstream model unchanged |
+| **ACL** | Anti-Corruption Layer | Translation of foreign/external models into the own model |
+| **SK** | Shared Kernel | Narrowly shared types/packages – keep deliberately small |
+| **PROC** | Process / Orchestration | Context orchestrates multiple aggregates without own product truth |
 
 ---
 
-## 10.2 Bounded Contexts (Zielbild)
+## 10.2 Bounded contexts (target picture)
 
-### 10.2.1 Portfolio / Kernprodukte
+### 10.2.1 Portfolio / core products
 
-| Bounded Context | Verantwortung | Ubiquitous Language (Auszug) | Ist-Artefakte |
+| Bounded context | Responsibility | Ubiquitous language (excerpt) | As-is artifacts |
 |-----------------|---------------|------------------------------|---------------|
-| **Loan Servicing** | Lifecycle und Kontenführung aktiver Kredite | Disbursement, Schedule, Repayment, Write-off, Reschedule, Delinquency, Charge-off | `fineract-loan`, `fineract-progressive-loan`, `fineract-working-capital-loan`, `portfolio/loanaccount` |
-| **Loan Origination** | Antrag, Prüfung, Genehmigung, Übergabe an Servicing | Application, Underwriting, Approval, Scoring | `fineract-loan-origination` (+ Application-Submit-Teile im Loan-Legacy) |
-| **Savings & Deposits** | Spareinlagen, Fest- und Ratensparverträge | Deposit, Withdrawal, Interest Posting, Hold, Maturity, Pre-Closure, GSIM | `fineract-savings` |
-| **Share Accounts** | Genossenschafts-/Mitgliedsanteile | Share Product, Subscription, Dividend | `portfolio/shareaccounts`, `shareproducts` (provider/core) |
-| **Account Transfer** | Kontoübergreifende Bewegungen (Process Context) | Account Transfer, Standing Instruction, Loan from Savings | `portfolio/account` (provider) |
+| **Loan Servicing** | Lifecycle and account management of active loans | Disbursement, Schedule, Repayment, Write-off, Reschedule, Delinquency, Charge-off | `fineract-loan`, `fineract-progressive-loan`, `fineract-working-capital-loan`, `portfolio/loanaccount` |
+| **Loan Origination** | Application, assessment, approval, handoff to servicing | Application, Underwriting, Approval, Scoring | `fineract-loan-origination` (+ application-submit parts in loan legacy) |
+| **Savings & Deposits** | Savings deposits, fixed and recurring deposit contracts | Deposit, Withdrawal, Interest Posting, Hold, Maturity, Pre-Closure, GSIM | `fineract-savings` |
+| **Share Accounts** | Cooperative/membership shares | Share Product, Subscription, Dividend | `portfolio/shareaccounts`, `shareproducts` (provider/core) |
+| **Account Transfer** | Cross-account movements (process context) | Account Transfer, Standing Instruction, Loan from Savings | `portfolio/account` (provider) |
 
-**Loan Servicing – interne Module (kein eigener Deploy-Schnitt nötig):**
+**Loan Servicing – internal modules (no separate deploy cut required):**
 
-| Modul / Subdomain | Rolle |
+| Module / subdomain | Role |
 |-------------------|--------|
-| Standard Loan | Klassischer Kredit-Lifecycle |
-| Progressive Loan | Progressive Schedule / Recalculation |
-| Working Capital Loan | WC-Produkte, Breach / Near-Breach |
-| Delinquency | Ranges, Buckets, Pause – spricht Loan-Sprache |
+| Standard Loan | Classic loan lifecycle |
+| Progressive Loan | Progressive schedule / recalculation |
+| Working Capital Loan | WC products, breach / near-breach |
+| Delinquency | Ranges, buckets, pause – speaks loan language |
 
-### 10.2.2 Party & Organisation
+### 10.2.2 Party & organisation
 
-| Bounded Context | Verantwortung | Ubiquitous Language (Auszug) | Ist-Artefakte |
+| Bounded context | Responsibility | Ubiquitous language (excerpt) | As-is artifacts |
 |-----------------|---------------|------------------------------|---------------|
-| **Client & Group (Party)** | Kunden und Gruppen als Portfolio-Träger | Client, Non-Person, Activation, Closure, Transfer, Group/Center, Membership | `portfolio/client`, `portfolio/group` (core + provider) |
-| **Organisation** | Institutionsstruktur und Kalender | Office, Staff, Working Days, Holiday, Currency | `organisation/*` (core/provider) |
-| **Branch Cash / Teller** | Filialkasse und Teller-Settlement | Teller, Cashier, Cash Transaction | `fineract-branch` |
+| **Client & Group (Party)** | Clients and groups as portfolio carriers | Client, Non-Person, Activation, Closure, Transfer, Group/Center, Membership | `portfolio/client`, `portfolio/group` (core + provider) |
+| **Organisation** | Institutional structure and calendar | Office, Staff, Working Days, Holiday, Currency | `organisation/*` (core/provider) |
+| **Branch Cash / Teller** | Branch cash and teller settlement | Teller, Cashier, Cash Transaction | `fineract-branch` |
 
-### 10.2.3 Product & Pricing Configuration
+### 10.2.3 Product & pricing configuration
 
-| Bounded Context | Verantwortung | Ubiquitous Language (Auszug) | Ist-Artefakte |
+| Bounded context | Responsibility | Ubiquitous language (excerpt) | As-is artifacts |
 |-----------------|---------------|------------------------------|---------------|
-| **Product Catalog** | Produktdefinitionen (Config, nicht Runtime-Account) | LoanProduct, SavingsProduct, Fund, Interest Chart (Produkt) | Loan/Savings-Product-Packages, `fineract-rates` |
-| **Charge Catalog** | Gebühren-*Definitionen* | Charge Definition, Charge Time, Amount Rule | `fineract-charge` |
-| **Tax** | Steuerkomponenten und -gruppen | Tax Component, Tax Group | `fineract-tax` |
-| **Collateral** | Sicherheitenverwaltung | Collateral, Valuation, Client/Loan Collateral Link | `portfolio/collateral*` |
+| **Product Catalog** | Product definitions (config, not runtime account) | LoanProduct, SavingsProduct, Fund, Interest Chart (product) | Loan/Savings product packages, `fineract-rates` |
+| **Charge Catalog** | Fee *definitions* | Charge Definition, Charge Time, Amount Rule | `fineract-charge` |
+| **Tax** | Tax components and groups | Tax Component, Tax Group | `fineract-tax` |
+| **Collateral** | Collateral management | Collateral, Valuation, Client/Loan Collateral Link | `portfolio/collateral*` |
 
-> **Hinweis:** Eine instanziierte `LoanCharge` / `SavingsAccountCharge` gehört dem jeweiligen **Account-Context** (Entity unter Loan/Savings), nicht dem Charge Catalog.
+> **Note:** An instantiated `LoanCharge` / `SavingsAccountCharge` belongs to the respective **account context** (entity under Loan/Savings), not to the Charge Catalog.
 
-### 10.2.4 Finance & Nachgelagert
+### 10.2.4 Finance & downstream
 
-| Bounded Context | Verantwortung | Ubiquitous Language (Auszug) | Ist-Artefakte |
+| Bounded context | Responsibility | Ubiquitous language (excerpt) | As-is artifacts |
 |-----------------|---------------|------------------------------|---------------|
-| **Accounting (GL)** | Kontenplan, Journal, Abschlüsse, Product→GL-Mapping | GL Account, Journal Entry, Closure, Provisioning, Accounting Rule | `fineract-accounting` |
-| **Investor / Secondary Market** | Kreditverkauf / Ownership Transfer | External Asset Owner, Loan Ownership Transfer | `fineract-investor` |
-| **Reporting & Regulatory** | Auswertungen und regulatorische Formate (primär Read) | Report, MIX, Trial Balance Export | `fineract-report`, `fineract-mix`, `adhocquery` |
+| **Accounting (GL)** | Chart of accounts, journal, closings, product→GL mapping | GL Account, Journal Entry, Closure, Provisioning, Accounting Rule | `fineract-accounting` |
+| **Investor / Secondary Market** | Loan sale / ownership transfer | External Asset Owner, Loan Ownership Transfer | `fineract-investor` |
+| **Reporting & Regulatory** | Reports and regulatory formats (primarily read) | Report, MIX, Trial Balance Export | `fineract-report`, `fineract-mix`, `adhocquery` |
 
-### 10.2.5 Integration & Plattform
+### 10.2.5 Integration & platform
 
-| Bounded Context / System | Verantwortung | Ist-Artefakte |
+| Bounded context / system | Responsibility | As-is artifacts |
 |--------------------------|---------------|---------------|
-| **COB / Batch Operations** | Orchestrierung periodischer Domain-Schritte (Driver, keine Produkt-Wahrheit) | `fineract-cob` + Domain-COB-Steps |
-| **Interop (Payments)** | Externes Zahlungs-/Identifier-Protokoll → ACL vor Savings/Client | `interoperation` (provider/savings) |
-| **Document Management** | Anhänge und Metadaten an Entity-IDs | `fineract-document` |
-| **Identity & Access** | Users, Roles, Permissions, OIDC, 2FA | `fineract-security`, `useradministration` |
-| **Platform / Shared Kernel** | Tenant, Command-Pipeline, Validation, Event-Envelope, Codes | `fineract-core` (Ziel: abmagern), `fineract-command*`, `fineract-validation`, `fineract-avro-schemas` |
+| **COB / Batch Operations** | Orchestration of periodic domain steps (driver, no product truth) | `fineract-cob` + domain COB steps |
+| **Interop (Payments)** | External payment/identifier protocol → ACL in front of Savings/Client | `interoperation` (provider/savings) |
+| **Document Management** | Attachments and metadata on entity IDs | `fineract-document` |
+| **Identity & Access** | Users, roles, permissions, OIDC, 2FA | `fineract-security`, `useradministration` |
+| **Platform / Shared Kernel** | Tenant, command pipeline, validation, event envelope, codes | `fineract-core` (goal: slim down), `fineract-command*`, `fineract-validation`, `fineract-avro-schemas` |
 
 ---
 
-## 10.3 Core / Supporting / Generic Subdomains
+## 10.3 Core / supporting / generic subdomains
 
-Klassifikation steuert **Investitionsintensität** (Modellqualität, ES-Priorität, Team-Fokus) – nicht „ob gebraucht“.
+Classification steers **investment intensity** (model quality, ES priority, team focus) – not “whether needed”.
 
 ```text
-                    STRATEGISCHER WERT
+                    STRATEGIC VALUE
                          ↑
      CORE                │  Loan Servicing
                          │  Savings & Deposits
-                         │  Loan Origination (wenn Underwriting/KI differenzierend)
+                         │  Loan Origination (when underwriting/AI is differentiating)
                          │
      SUPPORTING          │  Client & Group
                          │  Accounting (GL)
@@ -119,31 +119,31 @@ Klassifikation steuert **Investitionsintensität** (Modellqualität, ES-Priorit�
                          │
      GENERIC             │  IAM / Security, Documents, Notifications
                          │  Multi-Tenancy, Command/Audit, Validation
-                         │  Interop-Protokoll-Adapter, Object Store
+                         │  Interop protocol adapters, Object Store
                          ↓
-              EIGENENTWICKLUNG / MODELLTIEFE →
+              IN-HOUSE DEVELOPMENT / MODEL DEPTH →
 ```
 
-| Typ | Contexts | Begründung |
+| Type | Contexts | Rationale |
 |-----|----------|------------|
-| **Core Domain** | Loan Servicing, Savings & Deposits, optional Loan Origination | Differenzierung (Schedule, Recalc, Progressive, WC, Deposit Interest); höchste Fehlerkosten; ES/CQRS-Nutzen maximal |
-| **Supporting Subdomain** | Client/Group, Accounting, Products/Charges/Tax, Organisation, Branch, Transfers, Investor, Collateral, Share, COB, Reporting | Unerlässlich für den Betrieb; Accounting ist *kritisch*, aber regulatorisch standardisierbar |
-| **Generic Subdomain** | Security/IAM, Documents, Platform/Tenant, Command-Infra, Validation, Notifications, Interop-ACL | Standardisieren, dünn halten, austauschbare Adapter |
+| **Core Domain** | Loan Servicing, Savings & Deposits, optional Loan Origination | Differentiation (schedule, recalc, progressive, WC, deposit interest); highest cost of failure; ES/CQRS benefit maximal |
+| **Supporting Subdomain** | Client/Group, Accounting, Products/Charges/Tax, Organisation, Branch, Transfers, Investor, Collateral, Share, COB, Reporting | Essential for operations; Accounting is *critical* but regulatorily standardisable |
+| **Generic Subdomain** | Security/IAM, Documents, Platform/Tenant, Command infra, Validation, Notifications, Interop ACL | Standardise, keep thin, swappable adapters |
 
-### Shared Kernel (eng)
+### Shared kernel (narrow)
 
-| Erlaubt im SK | Nicht im SK |
+| Allowed in SK | Not in SK |
 |---------------|-------------|
-| `Money` / `Currency` / Monetary primitives | `Client`, `Loan`, `SavingsAccount` Entities |
-| `ExternalId`, Tenant-/BusinessDate-Kontext | Portfolio-Write-Services |
-| Identity-VOs: `ClientId`, `OfficeId`, `StaffId`, `LoanId`, … | Volle JPA-Graphen fremder Domains |
-| Permission-/Command-Metamodell, Event Envelope (`MessageV1`) | Accounting-Journal-Logik |
+| `Money` / `Currency` / monetary primitives | `Client`, `Loan`, `SavingsAccount` entities |
+| `ExternalId`, tenant/business-date context | Portfolio write services |
+| Identity VOs: `ClientId`, `OfficeId`, `StaffId`, `LoanId`, … | Full JPA graphs of foreign domains |
+| Permission/command metamodel, event envelope (`MessageV1`) | Accounting journal logic |
 
 ---
 
-## 10.4 Context Map
+## 10.4 Context map
 
-### 10.4.1 Übersicht (Zielbild)
+### 10.4.1 Overview (target picture)
 
 ```mermaid
 flowchart TB
@@ -183,7 +183,7 @@ flowchart TB
   end
 
   subgraph Ext["External"]
-    KI[KI Scoring]
+    KI[AI Scoring]
     PAY[Interop Payments]
   end
 
@@ -205,8 +205,8 @@ flowchart TB
   INV -->|Events Journals| GL
   LOAN -->|OHS LoanOwnership| INV
 
-  XFER -->|PROC orchestriert| LOAN
-  XFER -->|PROC orchestriert| SAV
+  XFER -->|PROC orchestrates| LOAN
+  XFER -->|PROC orchestrates| SAV
 
   COB -->|Batch Driver| LOAN
   COB -->|Batch Driver| SAV
@@ -226,26 +226,26 @@ flowchart TB
   DOC -.->|by entity id| CLI & LOAN
 ```
 
-### 10.4.2 Upstream / Downstream-Beziehungen
+### 10.4.2 Upstream / downstream relationships
 
-| Upstream | Downstream | Stil | Mechanismus / Published Language |
+| Upstream | Downstream | Style | Mechanism / published language |
 |----------|------------|------|----------------------------------|
-| **Organisation** | Client, Loan, Branch, COB | OHS | `OfficeId`, `StaffId`; Working Days für Schedule/COB |
-| **Client & Group** | Loan, Savings, Origination, Investor | OHS / PL | `ClientId` / `GroupId`; Events `ClientActivated`, `ClientClosed`, `ClientTransferred` – **kein** Import der `Client`-Entity in die Loan-Domain |
-| **Product Catalog** | Loan / Savings | C/S | Produkt-**Snapshot** bei Account-Erstellung (Konditionen einfrieren) |
-| **Charge Catalog / Tax** | Loan / Savings | CF auf Definitions-Ebene | Katalog-IDs; Instanzen leben im Account-Aggregate |
-| **Loan Origination** | Loan Servicing | C/S | z. B. `LoanApplicationApproved` → Servicing erzeugt `Loan` |
-| **Loan Servicing** | Accounting | U/D, PL | Business/Domain Events → Journal-Projector |
-| **Savings & Deposits** | Accounting | U/D, PL | analog Loan |
-| **Loan Servicing** | Investor | OHS | Ownership-Transfer-Events |
-| **Investor** | Accounting | U/D | Investor-spezifische Journals |
-| **Account Transfer** | Loan + Savings | PROC | Orchestrierung; jede Seite behält eigenes Aggregate |
-| **COB / Batch** | Loan / Savings / Investor | Downstream driver | Ruft Application-Ports; kennt keine Entity-Internals |
-| **Reporting** | (alle fachlichen Contexts) | pure Downstream | Read Models / Event-Feeds |
-| **KI / Interop** | Origination, Loan, Savings, Client | **ACL** | Externe Modelle → interne Commands; Fail-Open für async KI ([ADR-006](decisions/ADR-006-ki-default-asynchron-fail-open.md)) |
-| **Identity & Access** | alle Write-Contexts | Generic OHS | Permissions vor Commands |
+| **Organisation** | Client, Loan, Branch, COB | OHS | `OfficeId`, `StaffId`; working days for schedule/COB |
+| **Client & Group** | Loan, Savings, Origination, Investor | OHS / PL | `ClientId` / `GroupId`; events `ClientActivated`, `ClientClosed`, `ClientTransferred` – **no** import of the `Client` entity into the loan domain |
+| **Product Catalog** | Loan / Savings | C/S | Product **snapshot** at account creation (freeze terms) |
+| **Charge Catalog / Tax** | Loan / Savings | CF at definition level | Catalog IDs; instances live in the account aggregate |
+| **Loan Origination** | Loan Servicing | C/S | e.g. `LoanApplicationApproved` → servicing creates `Loan` |
+| **Loan Servicing** | Accounting | U/D, PL | Business/domain events → journal projector |
+| **Savings & Deposits** | Accounting | U/D, PL | analogous to loan |
+| **Loan Servicing** | Investor | OHS | Ownership-transfer events |
+| **Investor** | Accounting | U/D | Investor-specific journals |
+| **Account Transfer** | Loan + Savings | PROC | Orchestration; each side keeps its own aggregate |
+| **COB / Batch** | Loan / Savings / Investor | Downstream driver | Calls application ports; knows no entity internals |
+| **Reporting** | (all business contexts) | pure downstream | Read models / event feeds |
+| **AI / Interop** | Origination, Loan, Savings, Client | **ACL** | External models → internal commands; fail-open for async AI ([ADR-006](decisions/ADR-006-ki-default-asynchron-fail-open.md)) |
+| **Identity & Access** | all write contexts | Generic OHS | Permissions before commands |
 
-### 10.4.3 Abhängigkeitsrichtung (Soll)
+### 10.4.3 Dependency direction (target)
 
 ```text
 Organisation ──► Client/Group ──► Loan / Savings ──► Accounting
@@ -254,183 +254,183 @@ Organisation ──► Client/Group ──► Loan / Savings ──► Accountin
                     Events / Product snapshots ───────────┘
 ```
 
-### 10.4.4 Bekannte Ist-Abweichungen (Technical Debt)
+### 10.4.4 Known as-is deviations (technical debt)
 
-| Abweichung | Problem | Ziel |
+| Deviation | Problem | Target |
 |------------|---------|------|
-| `Loan` hält JPA-`@ManyToOne` auf `Client` / `Group` / `LoanProduct` | Objektgraph-Kopplung über Context-Grenzen | Nur IDs + ProductSnapshot / Read-Projection |
-| `Client` / `Group` / Teile Organisation in `fineract-core` | Shared Kernel zu fett | Eigenes Party-/Organisation-Modul bzw. klare Packages mit Ports |
-| God-Aggregates (`Loan` ~2k LOC, `SavingsAccount` ~3k+ LOC) | Unklare Invarianten; ES-Streams unhandlich | Snapshot + Events; optionale Root-Splits (z. B. RescheduleRequest) |
-| Accounting-Mapping-Code unter Loan-Packages | Context-Leak | Mapping im Accounting-Context; Loan publiziert fachliche Events |
-| Account Transfer als implizite Service-Kopplung | Verteilte Transaktionen ohne klare Orchestrierung | Process Manager / Saga über Application-Ports |
+| `Loan` holds JPA `@ManyToOne` on `Client` / `Group` / `LoanProduct` | Object-graph coupling across context boundaries | IDs only + ProductSnapshot / read projection |
+| `Client` / `Group` / parts of Organisation in `fineract-core` | Shared kernel too fat | Own party/organisation module or clear packages with ports |
+| God aggregates (`Loan` ~2k LOC, `SavingsAccount` ~3k+ LOC) | Unclear invariants; ES streams unwieldy | Snapshot + events; optional root splits (e.g. RescheduleRequest) |
+| Accounting mapping code under loan packages | Context leak | Mapping in accounting context; loan publishes business events |
+| Account Transfer as implicit service coupling | Distributed transactions without clear orchestration | Process manager / saga via application ports |
 
 ---
 
-## 10.5 Aggregate Roots (Kerncontexts)
+## 10.5 Aggregate roots (core contexts)
 
-Ausführliche Canvases (Invarianten, Commands, Events, Konflikte): **[11 Aggregate Canvas](11_aggregate_canvas.md)** für `Loan`, `SavingsAccount`, `Client`.
+Detailed canvases (invariants, commands, events, conflicts): **[11 Aggregate Canvas](11_aggregate_canvas.md)** for `Loan`, `SavingsAccount`, `Client`.
 
-Hier die **empfohlenen Roots** für Reviews und ES-Streams.
+Here the **recommended roots** for reviews and ES streams.
 
 ### 10.5.1 Loan Servicing
 
-| Aggregate Root | Konsistenzgrenze (Auszug) | Stream-Idee |
+| Aggregate root | Consistency boundary (excerpt) | Stream idea |
 |----------------|---------------------------|-------------|
-| **`Loan`** | Status/Timeline, Term, Schedule Installments, Transactions (bzw. kritischer Zustand), Disbursements, Allocation Rules, Summary | `Loan-{id}` |
-| **`LoanProduct`** | Produktkonditionen, Recalc-/Delinquency-Config-Refs | `LoanProduct-{id}` |
-| **`LoanRescheduleRequest`** | Antrag bis Approval; Apply schreibt Events auf `Loan` | eigenes Root bis Approval |
-| **`GLIM`** | Group Loan Individual Monitoring Container | `GLIM-{id}` |
-| **`DelinquencyBucket` / `Range`** | Config | Config-Streams |
-| **WC Breach** (optional) | Working-Capital-Breach-Lifecycle | `WcLoanBreach-{id}` o. ä. |
+| **`Loan`** | Status/timeline, term, schedule installments, transactions (or critical state), disbursements, allocation rules, summary | `Loan-{id}` |
+| **`LoanProduct`** | Product terms, recalc/delinquency config refs | `LoanProduct-{id}` |
+| **`LoanRescheduleRequest`** | Request until approval; apply writes events on `Loan` | own root until approval |
+| **`GLIM`** | Group Loan Individual Monitoring container | `GLIM-{id}` |
+| **`DelinquencyBucket` / `Range`** | Config | Config streams |
+| **WC Breach** (optional) | Working-capital breach lifecycle | `WcLoanBreach-{id}` or similar |
 
-**Regeln:** `Client` und `LoanProduct` im Loan-Write-Modell nur als **ID** (+ eingefrorener Product-Snapshot). Transaktionshistorie primär als **Event-Stream** / Read Model, nicht als voll geladene JPA-Collection für jeden Use Case.
+**Rules:** `Client` and `LoanProduct` in the loan write model only as **ID** (+ frozen product snapshot). Transaction history primarily as **event stream** / read model, not as a fully loaded JPA collection for every use case.
 
 ### 10.5.2 Savings & Deposits
 
-| Aggregate Root | Konsistenzgrenze (Auszug) | Stream-Idee |
+| Aggregate root | Consistency boundary (excerpt) | Stream idea |
 |----------------|---------------------------|-------------|
-| **`SavingsAccount`** | Status, Balance/Summary, Transactions, Account Charges, Holds | `SavingsAccount-{id}` |
-| **`FixedDepositAccount`** | Term, Pre-Closure, Maturity, Chart am Account | eigener Stream-Typ oder Spezialisierung |
-| **`RecurringDepositAccount`** | Recurring Schedule vs. Actuals | analog FD |
-| **`SavingsProduct` / FD/RD Product** | Produktconfig | Product-Streams |
+| **`SavingsAccount`** | Status, balance/summary, transactions, account charges, holds | `SavingsAccount-{id}` |
+| **`FixedDepositAccount`** | Term, pre-closure, maturity, chart on the account | own stream type or specialisation |
+| **`RecurringDepositAccount`** | Recurring schedule vs. actuals | analogous to FD |
+| **`SavingsProduct` / FD/RD Product** | Product config | Product streams |
 | **`GSIM`** | Group Savings Monitoring | `GSIM-{id}` |
-| **`InterestRateChart`** | Slabs, Incentives | Config-Root |
+| **`InterestRateChart`** | Slabs, incentives | Config root |
 
 ### 10.5.3 Client & Group
 
-| Aggregate Root | Konsistenzgrenze (Auszug) | Stream-Idee |
+| Aggregate root | Consistency boundary (excerpt) | Stream idea |
 |----------------|---------------------------|-------------|
-| **`Client`** | Person/NonPerson, Status, Office, Identifiers, Family, Addresses | `Client-{id}` |
-| **`Group`** | Membership, Roles, Status, Hierarchy | `Group-{id}` |
-| **`ClientTransfer`** | Office-Transfer-Workflow | Process-Aggregate |
-| **`ClientCharge`** | optional Entity unter Client oder kleines Root | — |
+| **`Client`** | Person/NonPerson, status, office, identifiers, family, addresses | `Client-{id}` |
+| **`Group`** | Membership, roles, status, hierarchy | `Group-{id}` |
+| **`ClientTransfer`** | Office-transfer workflow | Process aggregate |
+| **`ClientCharge`** | optional entity under client or small root | — |
 
-**Nicht** im Client-Aggregate: Loan- und Savings-Konten (nur Read-Model „Account Summary“).
+**Not** in the client aggregate: loan and savings accounts (only read model “account summary”).
 
-### 10.5.4 Weitere Roots (Kurz)
+### 10.5.4 Further roots (brief)
 
-| Context | Roots (Auszug) |
+| Context | Roots (excerpt) |
 |---------|----------------|
-| Accounting | `GLAccount`, `JournalEntry` (Header+Lines atomar), `GLClosure`, `ProductToGLAccountMapping`, `AccountingRule` |
+| Accounting | `GLAccount`, `JournalEntry` (header+lines atomic), `GLClosure`, `ProductToGLAccountMapping`, `AccountingRule` |
 | Organisation | `Office`, `Staff`, `WorkingDays`, `Holiday` |
 | Branch | `Teller`, `Cashier` |
-| Investor | Ownership-Transfer / External Asset Owner |
-| Charge Catalog | `Charge` (Definition) |
+| Investor | Ownership transfer / External Asset Owner |
+| Charge Catalog | `Charge` (definition) |
 | Tax | `TaxComponent`, `TaxGroup` |
-| COB | `COBRun` / Partition Lock (prozessual-technisch) |
+| COB | `COBRun` / partition lock (processual-technical) |
 
 ---
 
-## 10.6 Mapping: Bounded Context ↔ Gradle-Modul (Ist)
+## 10.6 Mapping: bounded context ↔ Gradle module (as-is)
 
-| Bounded Context | Primäre Module / Packages | Reife Modulgrenze |
+| Bounded context | Primary modules / packages | Module-boundary maturity |
 |-----------------|---------------------------|-------------------|
-| Loan Servicing | `fineract-loan`, `fineract-progressive-loan`, `fineract-working-capital-loan` | hoch (Module existieren; Kopplungen bleiben) |
-| Loan Origination | `fineract-loan-origination` | mittel |
-| Savings & Deposits | `fineract-savings` | hoch |
-| Accounting | `fineract-accounting` | hoch |
-| Charge / Tax / Rates | `fineract-charge`, `fineract-tax`, `fineract-rates` | hoch |
-| Investor | `fineract-investor` | hoch |
-| Branch | `fineract-branch` | hoch |
-| Documents | `fineract-document` | hoch |
-| Reporting / MIX | `fineract-report`, `fineract-mix` | mittel |
-| COB | `fineract-cob` | hoch (Orchestrierung) |
-| Client & Group | core + provider `portfolio/client`, `portfolio/group` | **niedrig** – Extraktion priorisiert |
-| Organisation | core/provider `organisation/*` | niedrig–mittel |
-| Share Accounts | provider/core | niedrig |
-| Account Transfer | provider `portfolio/account` | niedrig |
-| Interop | provider `interoperation` | mittel (ACL-Kandidat) |
-| IAM | `fineract-security` | hoch |
-| Platform / SK | `fineract-core`, `fineract-command*` | überladen – abmagern |
+| Loan Servicing | `fineract-loan`, `fineract-progressive-loan`, `fineract-working-capital-loan` | high (modules exist; couplings remain) |
+| Loan Origination | `fineract-loan-origination` | medium |
+| Savings & Deposits | `fineract-savings` | high |
+| Accounting | `fineract-accounting` | high |
+| Charge / Tax / Rates | `fineract-charge`, `fineract-tax`, `fineract-rates` | high |
+| Investor | `fineract-investor` | high |
+| Branch | `fineract-branch` | high |
+| Documents | `fineract-document` | high |
+| Reporting / MIX | `fineract-report`, `fineract-mix` | medium |
+| COB | `fineract-cob` | high (orchestration) |
+| Client & Group | core + provider `portfolio/client`, `portfolio/group` | **low** – extraction prioritised |
+| Organisation | core/provider `organisation/*` | low–medium |
+| Share Accounts | provider/core | low |
+| Account Transfer | provider `portfolio/account` | low |
+| Interop | provider `interoperation` | medium (ACL candidate) |
+| IAM | `fineract-security` | high |
+| Platform / SK | `fineract-core`, `fineract-command*` | overloaded – slim down |
 
 ---
 
-## 10.7 Migrationsreihenfolge (Strangler)
+## 10.7 Migration order (strangler)
 
-Abgestimmt mit [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) (ES0→ES4) und ADR-019 (D1–D4).
+Aligned with [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) (ES0→ES4) and ADR-019 (D1–D4).
 
-### Phase 0 – Fundament (parallel)
+### Phase 0 – foundation (parallel)
 
-| Maßnahme | Bezug |
+| Measure | Reference |
 |----------|--------|
-| Event-Store-Port, Envelope, Tenant, Optimistic Concurrency | ES0 |
-| Dieses Kapitel + Glossar-Begriffe | D1 |
-| Dependency-Rule (Domain ohne REST/Broker-APIs) | ADR-017 |
-| Shared Kernel abmagern (Identity-VOs statt Entity-Sharing) | D3-Vorbereitung |
+| Event-store port, envelope, tenant, optimistic concurrency | ES0 |
+| This chapter + glossary terms | D1 |
+| Dependency rule (domain without REST/broker APIs) | ADR-017 |
+| Slim shared kernel (identity VOs instead of entity sharing) | D3 preparation |
 
-### Fachliche Reihenfolge
+### Business priority order
 
-| Prio | Context | Begründung |
+| Prio | Context | Rationale |
 |:----:|---------|------------|
-| 1 | **Charge Catalog + Tax + Rates** | Klein; idealer ES-/Hexagon-Pilot |
-| 2 | **Client & Group** | Upstream des Portfolios; heute falsch im SK; hoher struktureller Hebel |
-| 3 | **Organisation** | Upstream für Client/COB/Schedule |
-| 4 | **Accounting als Projection-Context** | Modul existiert; Event-Konsum vor Loan-ES-Cutover |
-| 5 | **Savings & Deposits** | Klarer als Loan; zweiter ES-Kern |
-| 6 | **Loan Origination** | Greenfield-freundlich; KI-ACL |
-| 7 | **Loan Servicing (Standard)** | Höchste Komplexität – erst wenn Client/Product/GL-Ports stehen |
-| 8 | **Progressive / Working Capital** | Hinter stabilen Loan-Ports |
-| 9 | **Account Transfer, Investor, Interop, Branch** | Orchestrierung/ACL auf stabilen Ports |
-| 10 | **COB** | Steps hinter Domain-Ports refactoren |
-| 11 | **Reporting / MIX / Documents** | Read-side von Published Language speisen |
+| 1 | **Charge Catalog + Tax + Rates** | Small; ideal ES/hexagon pilot |
+| 2 | **Client & Group** | Upstream of portfolio; wrongly in SK today; high structural leverage |
+| 3 | **Organisation** | Upstream for client/COB/schedule |
+| 4 | **Accounting as projection context** | Module exists; event consumption before loan ES cutover |
+| 5 | **Savings & Deposits** | Clearer than loan; second ES core |
+| 6 | **Loan Origination** | Greenfield-friendly; AI ACL |
+| 7 | **Loan Servicing (standard)** | Highest complexity – only once client/product/GL ports are in place |
+| 8 | **Progressive / Working Capital** | Behind stable loan ports |
+| 9 | **Account Transfer, Investor, Interop, Branch** | Orchestration/ACL on stable ports |
+| 10 | **COB** | Refactor steps behind domain ports |
+| 11 | **Reporting / MIX / Documents** | Feed read side from published language |
 
-### Strangler-Taktik pro Context
+### Strangler tactic per context
 
-1. Modul-/Package-Grenze und öffentliche Application-Ports ziehen.  
-2. ACL am Rand zu Legacy-`JsonCommand`.  
-3. Dual-Write oder Catch-up nur für **ein** Aggregat.  
-4. Cutover: Event-Stream = Write-SoT; Tabelle = Projection.  
-5. OSGi-Feature-Bundle erst bei stabilem Port.
+1. Draw module/package boundary and public application ports.  
+2. ACL at the edge to legacy `JsonCommand`.  
+3. Dual-write or catch-up only for **one** aggregate.  
+4. Cutover: event stream = write SoT; table = projection.  
+5. OSGi feature bundle only once the port is stable.
 
-### Warum nicht Loan zuerst?
+### Why not loan first?
 
-- Größter God-Aggregate und meiste Cross-Context-Joins.  
-- Ohne Client-Upstream und GL-Projector wird die Monolith-Kopplung in Events fortgeschrieben.  
-- ADR-020 empfiehlt Pilot auf schlankem Aggregat vor Portfolio-Kern.
-
----
-
-## 10.8 Review-Checkliste (Context-Grenzen)
-
-Bei neuem oder angefasstem Code:
-
-1. **Welcher Bounded Context?** (Name aus 10.2)  
-2. **Welches Aggregate Root?** Wird nur ein Root pro TX geändert?  
-3. **Upstream-Abhängigkeit:** ID / Snapshot / Event – oder unerlaubter Entity-Import?  
-4. **Published Language:** Command- und Event-Name in Ubiquitous Language?  
-5. **Accounting:** Journal nur als Folge/Projektion, nicht als versteckte Business-Rule im falschen Context?  
-6. **Read-Modell:** Query bläht Write-Aggregate nicht auf (CQRS)?  
-7. **ES-Plan:** Neues zustandsänderndes Feature hat Event-Pfad oder dokumentierte Ausnahme bis Cutover?
+- Largest god aggregate and most cross-context joins.  
+- Without client upstream and GL projector, monolith coupling is continued in events.  
+- ADR-020 recommends a pilot on a lean aggregate before the portfolio core.
 
 ---
 
-## 10.9 Offene Punkte (D3 / D4)
+## 10.8 Review checklist (context boundaries)
 
-| Thema | Nächster Schritt |
+For new or touched code:
+
+1. **Which bounded context?** (name from 10.2)  
+2. **Which aggregate root?** Is only one root changed per TX?  
+3. **Upstream dependency:** ID / snapshot / event – or illegal entity import?  
+4. **Published language:** command and event name in ubiquitous language?  
+5. **Accounting:** journal only as consequence/projection, not as a hidden business rule in the wrong context?  
+6. **Read model:** query does not inflate the write aggregate (CQRS)?  
+7. **ES plan:** new state-changing feature has an event path or a documented exception until cutover?
+
+---
+
+## 10.9 Open items (D3 / D4)
+
+| Topic | Next step |
 |-------|------------------|
-| Aggregate Canvas Loan / Savings / Client | → erledigt in [11](11_aggregate_canvas.md) |
-| Event-Katalog Ist → ES | → erledigt in [12](12_event_catalog.md) |
-| ArchUnit Cross-Context-Entity-Imports | → erledigt in [13](13_archunit_bounded_context_rules.md) / `:fineract-architecture` |
-| Import-Audit `portfolio.client.domain.Client` in Loan/Savings | ACL-Backlog und ArchUnit-Regeln |
-| Share Accounts & Account Transfer als eigene Module | Extraktion aus provider |
-| Interop/KI ACL-Standard | Ports + Fail-Open/Closed-Policy pro Use Case (D4) |
-| Product Snapshot-Schema | Versionierte VO-Struktur für Loan/Savings-Eröffnung |
+| Aggregate canvas Loan / Savings / Client | → done in [11](11_aggregate_canvas.md) |
+| Event catalog as-is → ES | → done in [12](12_event_catalog.md) |
+| ArchUnit cross-context entity imports | → done in [13](13_archunit_bounded_context_rules.md) / `:fineract-architecture` |
+| Import audit `portfolio.client.domain.Client` in Loan/Savings | ACL backlog and ArchUnit rules |
+| Share Accounts & Account Transfer as own modules | Extraction from provider |
+| Interop/AI ACL standard | Ports + fail-open/closed policy per use case (D4) |
+| Product snapshot schema | Versioned VO structure for Loan/Savings opening |
 
 ---
 
-## 10.10 Bezug
+## 10.10 References
 
-| Dokument | Rolle |
+| Document | Role |
 |----------|--------|
-| [ADR-019 Domain-Driven Design](decisions/ADR-019-domain-driven-design.md) | Strategisches/taktisches DDD-Leitbild |
-| [ADR-017 Hexagonale Architektur](decisions/ADR-017-hexagonale-architektur.md) | Ports & Adapters pro Context |
-| [ADR-020 Event Sourcing](decisions/ADR-020-event-sourcing-writes-pflicht.md) | Write-SoT pro Aggregate Stream |
-| [ADR-004 CQRS](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) | Commands vs. Queries |
-| [03 Building Blocks](03_building_block_view.md) | Physische Module |
-| [06.15 DDD](06_crosscutting_concepts.md) | Querschnitt Kurzfassung |
-| [09 Glossary](09_glossary.md) | Begriffe (BC, OHS, ACL, …) |
-| [11 Aggregate Canvas](11_aggregate_canvas.md) | Loan, Savings, Client taktisch |
-| [12 Event Catalog](12_event_catalog.md) | Business Events → ES |
+| [ADR-019 Domain-Driven Design](decisions/ADR-019-domain-driven-design.md) | Strategic/tactical DDD north star |
+| [ADR-017 Hexagonal Architecture](decisions/ADR-017-hexagonale-architektur.md) | Ports & adapters per context |
+| [ADR-020 Event Sourcing](decisions/ADR-020-event-sourcing-writes-pflicht.md) | Write SoT per aggregate stream |
+| [ADR-004 CQRS](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) | Commands vs. queries |
+| [03 Building Blocks](03_building_block_view.md) | Physical modules |
+| [06.15 DDD](06_crosscutting_concepts.md) | Cross-cutting summary |
+| [09 Glossary](09_glossary.md) | Terms (BC, OHS, ACL, …) |
+| [11 Aggregate Canvas](11_aggregate_canvas.md) | Loan, Savings, Client tactical |
+| [12 Event Catalog](12_event_catalog.md) | Business events → ES |
 
 ---
 

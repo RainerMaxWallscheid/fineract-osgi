@@ -1,121 +1,121 @@
-# ADR-016 – JPA-Ausbau und Read/Write-Persistenz
+# ADR-016 – JPA Expansion and Read/Write Persistence
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Maintainability, Performance, Reliability, Compatibility |
+| **Qualities** | Maintainability, Performance, Reliability, Compatibility |
 
-### Kontext
+### Context
 
-fineract-osgi nutzt bereits:
+fineract-osgi already uses:
 
-- **Spring Data JPA** als Repository-API (`JpaRepository`, Specs, Auditing),
-- **EclipseLink 4.x** als JPA-Provider (Hibernate ausgeschlossen, Static Weaving),
-- **RoutingDataSource** für Multi-Tenancy (eine EMF, Tenant über JDBC-Routing),
-- **JdbcTemplate + RowMapper** für einen großen Teil der **ReadPlatformServices** (Listen, Reports, Partial SQL).
+- **Spring Data JPA** as the repository API (`JpaRepository`, specs, auditing),
+- **EclipseLink 4.x** as the JPA provider (Hibernate excluded, static weaving),
+- **RoutingDataSource** for multi-tenancy (one EMF, tenant via JDBC routing),
+- **JdbcTemplate + RowMapper** for a large share of **ReadPlatformServices** (lists, reports, partial SQL).
 
-Das ist kein reines JPA-System, sondern ein **Hybrid**: Writes/Domain oft JPA, schwere Reads oft SQL. Ausbau ohne Leitplanken droht entweder „alles nach JPA“ (Risiko, COB/Reports) oder weiter wachsender JDBC-/Wrapper-Wildwuchs.
+This is not a pure JPA system but a **hybrid**: writes/domain often JPA, heavy reads often SQL. Expansion without guardrails risks either “everything to JPA” (risk for COB/reports) or further growing JDBC/wrapper sprawl.
 
-Bereits vorhanden und zu nutzen:
+Already present and to be used:
 
 - `JPAConfig` / `EclipseLinkJpaVendorAdapter`, `ExtendedJpaTransactionManager`
-- `EntityManagerFactoryCustomizer` (zusätzliche Packages, Vendor-Properties, Post-Processors)
-- Repository-Wrapper-Pattern, vereinzelt Criteria/Specs (z. B. Client-Search)
+- `EntityManagerFactoryCustomizer` (extra packages, vendor properties, post-processors)
+- Repository-wrapper pattern, occasional criteria/specs (e.g. client search)
 
-### Entscheidung
+### Decision
 
-#### Persistenz-Schnitt (CQRS-konform)
+#### Persistence cut (CQRS-aligned)
 
-| Pfad | Technologie | Verantwortung |
-|------|-------------|----------------|
-| **Write / Domain (Ziel)** | **Event Sourcing** ([ADR-020](ADR-020-event-sourcing-writes-pflicht.md)) | Append-only Event Store; Aggregates entscheiden Events |
-| **Write / Domain (Übergang)** | Spring Data JPA + EclipseLink | Legacy-State bis Aggregat-Cutover; kein neues State-only ohne Event-Plan |
-| **Snapshots / materialisierter Zustand** | JPA oder SQL-Tabellen | Abgeleitet aus Events; Performance |
-| **Einfache Reads** | JPA Projection / Specs / EntityGraph / Projector-Tabellen | Lookup, kleine Listen, Filter-APIs |
-| **Komplexe Reads / Reports / COB-SQL / Journal** | JdbcTemplate, SQL, ggf. DB-Views | Performance; Accounting-Double-Entry relational |
+| Path | Technology | Responsibility |
+|------|------------|----------------|
+| **Write / domain (target)** | **Event sourcing** ([ADR-020](ADR-020-event-sourcing-writes-pflicht.md)) | Append-only event store; aggregates decide events |
+| **Write / domain (transition)** | Spring Data JPA + EclipseLink | Legacy state until aggregate cutover; no new state-only without an event plan |
+| **Snapshots / materialized state** | JPA or SQL tables | Derived from events; performance |
+| **Simple reads** | JPA projection / specs / EntityGraph / projector tables | Lookup, small lists, filter APIs |
+| **Complex reads / reports / COB SQL / journal** | JdbcTemplate, SQL, possibly DB views | Performance; accounting double-entry relational |
 
-Der Hybrid **Read vs. Write** bleibt; die **Write-Source-of-Truth** wandert zu Events (Pflicht im Zielbild).
+The **read vs. write** hybrid remains; the **write source of truth** moves to events (mandatory in the target picture).
 
-#### Provider und Stack (fix)
+#### Provider and stack (fixed)
 
-- **Kein** Wechsel zu Hibernate.
-- Spring Data bleibt die **primäre** Programmierschnittstelle; direkter `EntityManager`-Einsatz nur in Custom-Fragments/Infrastruktur.
-- Multi-Tenancy bleibt **RoutingDataSource + eine EMF** (kein EMF-pro-Tenant in diesem ADR).
+- **No** switch to Hibernate.
+- Spring Data remains the **primary** programming interface; direct `EntityManager` use only in custom fragments/infrastructure.
+- Multi-tenancy remains **RoutingDataSource + one EMF** (no EMF-per-tenant in this ADR).
 
-#### Ausbaustufen (verbindlicher Scope dieses ADR)
+#### Evolution stages (binding scope of this ADR)
 
-| Stufe | Scope | In Scope | Beispiele |
-|-------|--------|----------|-----------|
-| **S1 – Hygiene** | Repository-API & Lesbarkeit | Specs, Projections, gezielte EntityGraphs/Fetch-Joins, Wrapper-Reduktion, Converter/Embeddables | Client/Loan-Lookupups, Filter-APIs |
-| **S2 – Performance** | EclipseLink-Tuning | JDBC batch-writing, Query-Hints (timeout, read-only, fetch-size), **selektiver** L2-Cache nur für Stammdaten | COB-Bulk, Codes/Currency/Permissions |
+| Stage | Scope | In scope | Examples |
+|-------|--------|----------|----------|
+| **S1 – Hygiene** | Repository API & readability | Specs, projections, targeted EntityGraphs/fetch joins, wrapper reduction, converters/embeddables | Client/loan lookups, filter APIs |
+| **S2 – Performance** | EclipseLink tuning | JDBC batch writing, query hints (timeout, read-only, fetch size), **selective** L2 cache only for master data | COB bulk, codes/currency/permissions |
 
-**S3+** (Modul-SPI-Vertiefung, breite JDBC→Projection-Migration, OSGi-dynamische PU) sind **Roadmap**, aber **nicht** Liefergegenstand dieses ADR — eigene Folgeschnitte nach Review von S1/S2.
+**S3+** (deeper module SPI, broad JDBC→projection migration, OSGi dynamic PU) are **roadmap**, but **not** deliverables of this ADR — separate follow-on cuts after review of S1/S2.
 
-#### Konkrete Leitplanken S1
+#### Concrete guardrails S1
 
-1. Neue Write-Pfade: Domain-Repositories in `**.domain` / `**.repository`; keine SQL in REST-Resources.  
-2. Dynamische Filter: `JpaSpecificationExecutor` / Criteria statt wachsender String-SQL-Varianten, wo fachlich möglich.  
-3. N+1: gezielt `@EntityGraph` / fetch joins an gemessenen Hotspots — kein globales Eager-Fetch.  
-4. `RepositoryWrapper`: gemeinsame „findByIdOrThrow“-Semantik; keine parallelen Exception-Muster pro Modul.  
-5. Value Objects/Enums: `AttributeConverter` und Embeddables ausbauen (Konsistenz mit bestehenden Converters).
+1. New write paths: domain repositories in `**.domain` / `**.repository`; no SQL in REST resources.  
+2. Dynamic filters: `JpaSpecificationExecutor` / criteria instead of growing string-SQL variants where domain-feasible.  
+3. N+1: targeted `@EntityGraph` / fetch joins at measured hotspots — no global eager fetch.  
+4. `RepositoryWrapper`: shared “findByIdOrThrow” semantics; no parallel exception patterns per module.  
+5. Value objects/enums: expand `AttributeConverter` and embeddables (consistency with existing converters).
 
-#### Konkrete Leitplanken S2
+#### Concrete guardrails S2
 
-1. Batch-Writing und Hints nur für **identifizierte** Bulk-/Job-Pfade, mit IT/Messung.  
-2. L2-Cache **nicht** global aktivieren; nur explizit freigegebene Referenz-Entities, Tenant-Safety prüfen.  
-3. Static Weaving beibehalten; Custom-Module über `EntityManagerFactoryCustomizer`.  
-4. EclipseLink-JPQL-Eigenheiten (CASE, Unary-Minus, …) dokumentieren und bestehende Workarounds nicht „wegoptimieren“ ohne Test.
+1. Batch writing and hints only for **identified** bulk/job paths, with IT/measurement.  
+2. L2 cache **not** enabled globally; only explicitly approved reference entities; check tenant safety.  
+3. Keep static weaving; custom modules via `EntityManagerFactoryCustomizer`.  
+4. Document EclipseLink JPQL peculiarities (CASE, unary minus, …) and do not “optimize away” existing workarounds without tests.
 
-#### Non-Goals (explizit)
+#### Non-Goals (explicit)
 
-| Non-Goal | Begründung |
-|----------|------------|
-| Migration **aller** ReadPlatformServices von JDBC nach JPA | Reports/COB/Partial-SQL sind oft bewusst SQL |
-| Provider-Wechsel zu Hibernate | Hohes Risiko, EclipseLink-spezifischer Code und Weaving |
-| **EMF pro Tenant** | Memory/Startup; RoutingDataSource reicht für Isolation der DB |
-| Globaler Second-Level-Cache | Stale Data + Multi-Tenant |
-| JPA als alleinige **dauerhafte** Write-Source-of-Truth | Widerspricht [ADR-020](ADR-020-event-sourcing-writes-pflicht.md); JPA bleibt für Snapshots/Reads/Übergang |
-| Ersetzen von Spring Batch / Job-SQL durch JPA-only COB | Andere Last- und Isolation-Profile |
+| Non-Goal | Rationale |
+|----------|-----------|
+| Migrating **all** ReadPlatformServices from JDBC to JPA | Reports/COB/partial SQL are often intentionally SQL |
+| Provider switch to Hibernate | High risk, EclipseLink-specific code and weaving |
+| **EMF per tenant** | Memory/startup; RoutingDataSource suffices for DB isolation |
+| Global second-level cache | Stale data + multi-tenant |
+| JPA as the sole **durable** write source of truth | Contradicts [ADR-020](ADR-020-event-sourcing-writes-pflicht.md); JPA remains for snapshots/reads/transition |
+| Replacing Spring Batch / job SQL with JPA-only COB | Different load and isolation profiles |
 
-### Alternativen
+### Alternatives
 
-| Option | Bewertung |
-|--------|-----------|
-| Alles JDBC (JPA abschaffen) | Verliert Domain-Modell, Auditing, Tx-Integration |
-| Alles JPA (JDBC abschaffen) | Bricht schwere Reads/COB; EclipseLink-Risiken |
-| Hibernate statt EclipseLink | Rewrite ohne klaren Gewinn; Non-Goal |
-| EMF pro Tenant | Starke Isolation, zu teuer als Default |
+| Option | Assessment |
+|--------|------------|
+| All JDBC (abolish JPA) | Loses domain model, auditing, tx integration |
+| All JPA (abolish JDBC) | Breaks heavy reads/COB; EclipseLink risks |
+| Hibernate instead of EclipseLink | Rewrite without clear gain; non-goal |
+| EMF per tenant | Strong isolation, too expensive as default |
 
-### Konsequenzen
+### Consequences
 
-- **+** Klarer Schreib-/Leseschnitt; Teams wissen, wann JPA vs. JDBC  
-- **+** S1/S2 sind reviewbar und messbar, ohne Architektur-Big-Bang  
-- **+** Nutzt vorhandene Spring-Data- und EMF-Customizer-SPI  
-- **−** Zwei Persistenzstile bleiben (Dokumentation und Code-Review-Disziplin nötig)  
-- **−** S2-Tuning ist EclipseLink-spezifisch (kein „portable Default“ ohne Tests)  
-- **−** Projection-Migration einzelner Reads braucht API-Paritäts-Tests (JSON flach, Partial Response)
+- **+** Clear write/read cut; teams know when JPA vs. JDBC  
+- **+** S1/S2 are reviewable and measurable, without architecture big-bang  
+- **+** Uses existing Spring Data and EMF customizer SPI  
+- **−** Two persistence styles remain (documentation and code-review discipline needed)  
+- **−** S2 tuning is EclipseLink-specific (no “portable default” without tests)  
+- **−** Projection migration of individual reads needs API parity tests (flat JSON, partial response)
 
-### Umsetzungshinweise
+### Implementation notes
 
-| Artefakt | Rolle |
-|----------|--------|
-| `JPAConfig` | EMF, Packages, EclipseLink-Adapter |
-| `EntityManagerFactoryCustomizer` | Modul-Erweiterungen |
-| `ExtendedJpaTransactionManager` | Tx, Read-Only-Mode, EclipseLink-Dialect |
-| `*Repository` / `*RepositoryWrapper` | Write- und Lookup-Zugriff |
-| `*ReadPlatformServiceImpl` + `JdbcTemplate` | Komplexe Reads (bleiben erlaubt) |
+| Artifact | Role |
+|----------|------|
+| `JPAConfig` | EMF, packages, EclipseLink adapter |
+| `EntityManagerFactoryCustomizer` | Module extensions |
+| `ExtendedJpaTransactionManager` | Tx, read-only mode, EclipseLink dialect |
+| `*Repository` / `*RepositoryWrapper` | Write and lookup access |
+| `*ReadPlatformServiceImpl` + `JdbcTemplate` | Complex reads (remain allowed) |
 
-Empfohlene Reihenfolge: **S1 in 1–2 Pilotmodulen** (z. B. Client + ein Loan-Lookup-Pfad) → Metriken/N+1 → **S2 nur an gemessenen Hotspots**.
+Recommended order: **S1 in 1–2 pilot modules** (e.g. Client + one loan lookup path) → metrics/N+1 → **S2 only at measured hotspots**.
 
-### Bezug
+### Related
 
-- [ADR-003](ADR-003-spring-boot-gradle-module-als-kern-beibehalten.md) Spring Boot + Module  
-- [ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) CQRS / Commands  
-- [ADR-008](ADR-008-multi-tenancy-mit-getrennten-tenant-datenbanken.md) Multi-Tenancy  
+- [ADR-003](ADR-003-spring-boot-gradle-module-als-kern-beibehalten.md) Spring Boot + modules  
+- [ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) CQRS / commands  
+- [ADR-008](ADR-008-multi-tenancy-mit-getrennten-tenant-datenbanken.md) Multi-tenancy  
 - [ADR-009](ADR-009-postgresql-als-primaere-datenbank-fuer-fineract-osgi.md) PostgreSQL  
-- [ADR-020](ADR-020-event-sourcing-writes-pflicht.md) Event Sourcing Writes (Pflicht)  
-- Crosscutting Data Access: [06.12](../06_crosscutting_concepts.md) · Quality Maintainability/Perf: [07](../07_quality_attributes.md)
+- [ADR-020](ADR-020-event-sourcing-writes-pflicht.md) Event sourcing writes (mandatory)  
+- Crosscutting data access: [06.12](../06_crosscutting_concepts.md) · Quality maintainability/perf: [07](../07_quality_attributes.md)
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

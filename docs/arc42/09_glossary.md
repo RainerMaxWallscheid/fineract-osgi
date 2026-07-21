@@ -1,249 +1,249 @@
 # 9. Glossary
 
-Begriffsverzeichnis für die arc42-Dokumentation von **fineract-osgi**. Einträge sind alphabetisch (deutsch/englisch gemischt, wie in den Kapiteln verwendet). Fachliche Fineract-Begriffe und Architekturkürzel stehen gleichberechtigt.
+Glossary for the arc42 documentation of **fineract-osgi**. Entries are alphabetical (mixed English terms as used in the chapters). Domain Fineract terms and architecture abbreviations are treated equally.
 
-**Legende**
+**Legend**
 
-| Kürzel | Bedeutung |
-|--------|-----------|
-| *A* | Architektur / arc42 |
-| *B* | Betrieb / Deployment |
-| *F* | Fachlichkeit Core Banking |
-| *T* | Technik / Framework |
+| Tag | Meaning |
+|-----|---------|
+| *A* | Architecture / arc42 |
+| *B* | Operations / Deployment |
+| *F* | Domain Core Banking |
+| *T* | Technology / Framework |
 
-Verweise auf Kapitel: [01](01_introduction.md)–[13](13_archunit_bounded_context_rules.md).
+Chapter references: [01](01_introduction.md)–[13](13_archunit_bounded_context_rules.md).
 
 ---
 
 ## 9.1 A–C
 
-| Begriff | Tag | Definition |
-|---------|:---:|------------|
-| **Actuator** | T | Spring-Boot-Endpunkte für Health, Metrics u. a. (`/fineract-provider/actuator/...`). Genutzt für K8s-Probes. → [05](05_deployment_view.md) |
-| **ADR** | A | *Architecture Decision Record* – dokumentierte Designentscheidung (Kapitel 8, ADR-light). → [08](08_design_decisions.md) |
-| **Aggregate** | A/T | DDD: Konsistenzgrenze und Write-Einheit (Root + zugehörige Entities). → [ADR-019](decisions/ADR-019-domain-driven-design.md), Canvas [11](11_aggregate_canvas.md) |
-| **Aggregate Canvas** | A | Kompakte Beschreibung eines Aggregates: Root, Members, Invarianten, Commands, Events, Konflikte. → [11](11_aggregate_canvas.md) |
-| **ArchUnit** | T | Library für Architektur-/Dependency-Tests (z. B. Bounded-Context-Grenzen). → [13](13_archunit_bounded_context_rules.md) |
-| **All-in-One** | B | Deployment-Topologie, in der Read, Write, Batch-Manager und Worker in **einem** Prozess aktiv sind. → [05](05_deployment_view.md) |
-| **AppUser** | F/T | Authentifizierter Back-Office-Benutzer in Fineract; Berechtigungen über Rollen/Permissions. |
-| **arc42** | A | Vorlage zur Architekturdokumentation (Kontext, Bausteine, Runtime, Deployment, Qualität, ADRs, …). |
-| **Audit / Command Audit** | F/T | Nachvollziehbare Aufzeichnung von Write-Operationen, typisch in `m_portfolio_command_source`. → [06](06_crosscutting_concepts.md) |
-| **AuthN / AuthZ** | T | *Authentication* (wer?) bzw. *Authorization* (darf?). → [06](06_crosscutting_concepts.md) |
-| **Batch Manager** | B | Node-Rolle, die Jobs (z. B. COB) plant und partitioniert (`batch-manager-enabled`). Genau ein aktiver Manager pro Cluster. → [05](05_deployment_view.md) |
-| **Batch Worker** | B | Node-Rolle, die Job-Partitionen ausführt (`batch-worker-enabled`). Horizontal skalierbar. → [05](05_deployment_view.md) |
-| **Bundle (OSGi)** | T | Installierbare OSGi-Einheit (JAR) mit Manifest, Lifecycle und optionalen Services. → [04](04_runtime_view.md), [05](05_deployment_view.md) |
-| **Business Date** | F | Fachliches Geschäftstag-Datum eines Tenants; steuert u. a. Buchungslogik und COB. Filter: `BusinessDateFilter`. |
-| **Bounded Context** | A | DDD: explizite Grenze eines Fachmodells (oft ein Domain-Modul). → [ADR-019](decisions/ADR-019-domain-driven-design.md), [10 Context Map](10_domain_context_map.md) |
-| **Anti-Corruption Layer (ACL)** | A | DDD: Übersetzungsschicht, die fremde/externe Modelle vom eigenen Bounded Context abschirmt (z. B. Interop, KI, Legacy-JSON). → [10](10_domain_context_map.md) |
-| **Boy Scout Rule** | A | Hinterlasse angefassten Code etwas sauberer als vorgefunden (im PR-Scope). → [ADR-018](decisions/ADR-018-clean-code.md) |
-| **Business Event** | T | Domänenereignis nach fachlicher Änderung (z. B. Loan created); intern oder als External Event. → [06](06_crosscutting_concepts.md), Inventar [12](12_event_catalog.md) |
-| **Business Step** | F/T | Einzelner Schritt in einer COB-/Job-Pipeline (z. B. Accrual, Penalty). |
-| **Circuit Breaker** | T | Resilience-Muster: unterbindet Calls zu einem fehlerhaften Downstream (z. B. KI-API) temporär. |
-| **COB** | F | *Close of Business* – periodischer Tagesabschluss (Zinsen, Penalties, Status etc.), oft partitioniert. → [04](04_runtime_view.md) |
-| **Command** | T | Schreibanweisung im CQRS-Modell; Legacy als `CommandWrapper`/`JsonCommand`, neu als typsicheres `Command<REQ>`. |
-| **Command Dispatcher** | T | Komponente im Modul `fineract-command`, die Commands an Handler routet (sync/async/Disruptor). → [04](04_runtime_view.md) |
-| **Command Handler** | T | Führt die fachliche Write-Logik für einen Command-Typ aus (`NewCommandSourceHandler` bzw. `CommandHandler<REQ,RES>`). |
-| **Command Hook** | T | Vor-/Nach-/Fehler-Callback um die Command-Ausführung (z. B. Username, Timestamp). |
-| **Compatibility** | A | Qualitätsziel: stabile REST-Verträge trotz interner Migration. → [07](07_quality_attributes.md) |
-| **Conformist (CF)** | A | DDD Context-Map: Downstream übernimmt das Upstream-Modell weitgehend unverändert. → [10](10_domain_context_map.md) |
-| **Context Map** | A | DDD: Karte der Bounded Contexts und ihrer Integrationsbeziehungen (U/D, OHS, ACL, …). → [10](10_domain_context_map.md) |
-| **Core Domain** | A | DDD: strategisch differenzierender Teil der Domäne (hier v. a. Loan Servicing, Savings). → [10](10_domain_context_map.md) |
-| **Correlation-ID** | B/T | Request-übergreifende Trace-ID (Header z. B. `X-Correlation-ID`) für Logs und Support. → [06](06_crosscutting_concepts.md) |
-| **Customer/Supplier (C/S)** | A | DDD Context-Map: Downstream ist Kunde des Upstream (explizite Lieferbeziehung). → [10](10_domain_context_map.md) |
-| **Clean Code** | A | Praktiken für lesbaren, testbaren, wartbaren Code (Namen, kleine Einheiten, Boy Scout, SOLID-Orientierung). → [ADR-018](decisions/ADR-018-clean-code.md) |
-| **CQRS** | A/T | *Command Query Responsibility Segregation* – Trennung von Schreib- und Lesepfaden. → [06](06_crosscutting_concepts.md), [08](08_design_decisions.md) |
+| Term | Tag | Definition |
+|------|:---:|------------|
+| **Actuator** | T | Spring Boot endpoints for health, metrics, etc. (`/fineract-provider/actuator/...`). Used for K8s probes. → [05](05_deployment_view.md) |
+| **ADR** | A | *Architecture Decision Record* – documented design decision (Chapter 8, ADR-light). → [08](08_design_decisions.md) |
+| **Aggregate** | A/T | DDD: consistency boundary and write unit (root + related entities). → [ADR-019](decisions/ADR-019-domain-driven-design.md), Canvas [11](11_aggregate_canvas.md) |
+| **Aggregate Canvas** | A | Compact description of an aggregate: root, members, invariants, commands, events, conflicts. → [11](11_aggregate_canvas.md) |
+| **ArchUnit** | T | Library for architecture/dependency tests (e.g. bounded-context boundaries). → [13](13_archunit_bounded_context_rules.md) |
+| **All-in-One** | B | Deployment topology in which read, write, batch manager, and worker are active in **one** process. → [05](05_deployment_view.md) |
+| **AppUser** | F/T | Authenticated back-office user in Fineract; permissions via roles/permissions. |
+| **arc42** | A | Template for architecture documentation (context, building blocks, runtime, deployment, quality, ADRs, …). |
+| **Audit / Command Audit** | F/T | Traceable record of write operations, typically in `m_portfolio_command_source`. → [06](06_crosscutting_concepts.md) |
+| **AuthN / AuthZ** | T | *Authentication* (who?) and *Authorization* (allowed?). → [06](06_crosscutting_concepts.md) |
+| **Batch Manager** | B | Node role that plans and partitions jobs (e.g. COB) (`batch-manager-enabled`). Exactly one active manager per cluster. → [05](05_deployment_view.md) |
+| **Batch Worker** | B | Node role that executes job partitions (`batch-worker-enabled`). Horizontally scalable. → [05](05_deployment_view.md) |
+| **Bundle (OSGi)** | T | Installable OSGi unit (JAR) with manifest, lifecycle, and optional services. → [04](04_runtime_view.md), [05](05_deployment_view.md) |
+| **Business Date** | F | Domain business-day date of a tenant; controls e.g. booking logic and COB. Filter: `BusinessDateFilter`. |
+| **Bounded Context** | A | DDD: explicit boundary of a domain model (often a domain module). → [ADR-019](decisions/ADR-019-domain-driven-design.md), [10 Context Map](10_domain_context_map.md) |
+| **Anti-Corruption Layer (ACL)** | A | DDD: translation layer that shields foreign/external models from the own bounded context (e.g. Interop, AI, legacy JSON). → [10](10_domain_context_map.md) |
+| **Boy Scout Rule** | A | Leave touched code a bit cleaner than found (within PR scope). → [ADR-018](decisions/ADR-018-clean-code.md) |
+| **Business Event** | T | Domain event after a domain change (e.g. Loan created); internal or as external event. → [06](06_crosscutting_concepts.md), inventory [12](12_event_catalog.md) |
+| **Business Step** | F/T | Single step in a COB/job pipeline (e.g. accrual, penalty). |
+| **Circuit Breaker** | T | Resilience pattern: temporarily stops calls to a failing downstream (e.g. AI API). |
+| **COB** | F | *Close of Business* – periodic day-end processing (interest, penalties, status, etc.), often partitioned. → [04](04_runtime_view.md) |
+| **Command** | T | Write instruction in the CQRS model; legacy as `CommandWrapper`/`JsonCommand`, new as type-safe `Command<REQ>`. |
+| **Command Dispatcher** | T | Component in module `fineract-command` that routes commands to handlers (sync/async/Disruptor). → [04](04_runtime_view.md) |
+| **Command Handler** | T | Executes the domain write logic for a command type (`NewCommandSourceHandler` or `CommandHandler<REQ,RES>`). |
+| **Command Hook** | T | Before/after/error callback around command execution (e.g. username, timestamp). |
+| **Compatibility** | A | Quality goal: stable REST contracts despite internal migration. → [07](07_quality_attributes.md) |
+| **Conformist (CF)** | A | DDD context map: downstream largely adopts the upstream model unchanged. → [10](10_domain_context_map.md) |
+| **Context Map** | A | DDD: map of bounded contexts and their integration relationships (U/D, OHS, ACL, …). → [10](10_domain_context_map.md) |
+| **Core Domain** | A | DDD: strategically differentiating part of the domain (here mainly loan servicing, savings). → [10](10_domain_context_map.md) |
+| **Correlation-ID** | B/T | Cross-request trace ID (header e.g. `X-Correlation-ID`) for logs and support. → [06](06_crosscutting_concepts.md) |
+| **Customer/Supplier (C/S)** | A | DDD context map: downstream is customer of the upstream (explicit supply relationship). → [10](10_domain_context_map.md) |
+| **Clean Code** | A | Practices for readable, testable, maintainable code (names, small units, Boy Scout, SOLID orientation). → [ADR-018](decisions/ADR-018-clean-code.md) |
+| **CQRS** | A/T | *Command Query Responsibility Segregation* – separation of write and read paths. → [06](06_crosscutting_concepts.md), [08](08_design_decisions.md) |
 
 ---
 
 ## 9.2 D–F
 
-| Begriff | Tag | Definition |
-|---------|:---:|------------|
-| **DataSource Routing** | T | Auswahl der JDBC-Connection anhand des aktuellen Tenant-Contexts. |
-| **Defense in Depth** | A | Mehrschichtige Sicherheit (TLS/Proxy, AuthN/Z, Tenant, Audit). → [08](08_design_decisions.md) |
-| **Degradation** | A | Kontrolliertes Weiterlaufen ohne optionales Feature (z. B. KI-Bundle fehlt). → [04](04_runtime_view.md) |
-| **Deployable** | B | Laufzeit-Artefakt (Container-Image, JAR, Bundle), das auf Infrastruktur ausgerollt wird. → [05](05_deployment_view.md) |
-| **Domain-Driven Design (DDD)** | A | Fachliche Modellierung mit Bounded Contexts, Aggregates, Ubiquitous Language und Domain Events. → [ADR-019](decisions/ADR-019-domain-driven-design.md) |
-| **Disruptor** | T | LMAX Disruptor – optionale hochperformante, non-blocking Command-Dispatcher-Variante. |
-| **Docker Compose** | B | Orchestrierung lokaler Multi-Container-Setups; Referenzdateien `docker-compose*.yml`. → [05](05_deployment_view.md) |
-| **DTO** | T | *Data Transfer Object* – typisierte Nutzlast zwischen API, Command und Domain (Ziel des neuen Command-Stacks). |
-| **DTO Composition** | A | Spezialisierte API-DTOs halten Shared-Felder als Komponente oder flache Kopie statt durch Vererbung; Wire-JSON bleibt flach. → [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md) |
-| **EclipseLink** | T | JPA-Provider in fineract-osgi (statt Hibernate); Static Weaving, Spring `EclipseLinkJpaVendorAdapter`. → [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md) |
-| **Equinox** | T | Eclipse OSGi-Framework, in fineract-osgi als OSGi-Runtime vorgesehen. → [05](05_deployment_view.md), [08](08_design_decisions.md) |
-| **Event Catalog** | A | Inventar der Business-Event-TYPEs und Mapping auf Domain/ES-Events. → [12](12_event_catalog.md) |
-| **Event Sourcing** | A | Persistenzmuster: Zustand als append-only Sequenz von Domain Events; Pflicht für Domain-Writes. → [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) |
-| **Event Store** | T | Append-only Speicher der Aggregat-Event-Streams (Write Source of Truth). → [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) |
-| **External Event** | T | Für Systeme außerhalb des Prozesses publiziertes Ereignis (Kafka/JMS). Katalog: [12](12_event_catalog.md). |
-| **External Event Configuration** | T | Tabelle `m_external_event_configuration`: jeder konkrete `BusinessEvent`-Typ (außer `NoExternalEvent`) muss beim Boot registriert sein, sonst startet die App nicht. → [12.9](12_event_catalog.md#129-pflicht-external-event-konfiguration-in-der-db), [06.6](06_crosscutting_concepts.md) |
-| **Fail-Closed** | A | Bei Fehler/Timeout des Downstream (z. B. KI) wird die Operation **abgelehnt**. → [06](06_crosscutting_concepts.md) |
-| **Fail-Open** | A | Bei Fehler/Timeout läuft die Kernoperation **weiter** (Default für async KI). → [08](08_design_decisions.md) |
-| **Flatten (API JSON)** | T | Serialisierung komponierter DTOs so, dass Shared- und Spezialfelder auf Root-Ebene erscheinen (Gson/Jackson), ohne Breaking Change. → [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md) |
-| **FineractGsonTypeAdapterRegistrar** | T | SPI-Interface in `fineract-core`; Module registrieren Gson-TypeAdapter via `ServiceLoader` in `GoogleGsonSerializerHelper`. → [06.13](06_crosscutting_concepts.md) |
-| **Feature Bundle** | T | OSGi-Bundle mit optionaler Fach-/Integrationsfunktion (KI, Produktregeln, …). |
-| **fineract-command** | T | Modul für den modernen, typsicheren Command-Stack parallel zur Legacy-Pipeline. |
-| **fineract-osgi** | A | Dieser Arbeitsstrang/Fork: Fineract-Kern + OSGi-Modularität + KI-Erweiterbarkeit. → [01](01_introduction.md) |
-| **fineract-provider** | T | Haupt-Application-Modul (Boot, REST, Verdrahtung der Domain-Module). |
-| **fineract_tenants** | T | Registry-Datenbank/-schema mit Tenant-Metadaten und Connection-Infos. → [05](05_deployment_view.md) |
+| Term | Tag | Definition |
+|------|:---:|------------|
+| **DataSource Routing** | T | Selection of the JDBC connection based on the current tenant context. |
+| **Defense in Depth** | A | Multi-layered security (TLS/proxy, AuthN/Z, tenant, audit). → [08](08_design_decisions.md) |
+| **Degradation** | A | Controlled continuation without optional feature (e.g. AI bundle missing). → [04](04_runtime_view.md) |
+| **Deployable** | B | Runtime artifact (container image, JAR, bundle) rolled out on infrastructure. → [05](05_deployment_view.md) |
+| **Domain-Driven Design (DDD)** | A | Domain modeling with bounded contexts, aggregates, ubiquitous language, and domain events. → [ADR-019](decisions/ADR-019-domain-driven-design.md) |
+| **Disruptor** | T | LMAX Disruptor – optional high-performance, non-blocking command-dispatcher variant. |
+| **Docker Compose** | B | Orchestration of local multi-container setups; reference files `docker-compose*.yml`. → [05](05_deployment_view.md) |
+| **DTO** | T | *Data Transfer Object* – typed payload between API, command, and domain (goal of the new command stack). |
+| **DTO Composition** | A | Specialized API DTOs hold shared fields as component or flat copy instead of inheritance; wire JSON stays flat. → [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md) |
+| **EclipseLink** | T | JPA provider in fineract-osgi (instead of Hibernate); static weaving, Spring `EclipseLinkJpaVendorAdapter`. → [ADR-016](decisions/ADR-016-jpa-ausbau-read-write-persistenz.md) |
+| **Equinox** | T | Eclipse OSGi framework, intended as OSGi runtime in fineract-osgi. → [05](05_deployment_view.md), [08](08_design_decisions.md) |
+| **Event Catalog** | A | Inventory of Business Event TYPEs and mapping to domain/ES events. → [12](12_event_catalog.md) |
+| **Event Sourcing** | A | Persistence pattern: state as append-only sequence of domain events; mandatory for domain writes. → [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) |
+| **Event Store** | T | Append-only store of aggregate event streams (write source of truth). → [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) |
+| **External Event** | T | Event published for systems outside the process (Kafka/JMS). Catalog: [12](12_event_catalog.md). |
+| **External Event Configuration** | T | Table `m_external_event_configuration`: every concrete `BusinessEvent` type (except `NoExternalEvent`) must be registered at boot, otherwise the app does not start. → [12.9](12_event_catalog.md#129-pflicht-external-event-konfiguration-in-der-db), [06.6](06_crosscutting_concepts.md) |
+| **Fail-Closed** | A | On error/timeout of the downstream (e.g. AI) the operation is **rejected**. → [06](06_crosscutting_concepts.md) |
+| **Fail-Open** | A | On error/timeout the core operation **continues** (default for async AI). → [08](08_design_decisions.md) |
+| **Flatten (API JSON)** | T | Serialization of composed DTOs so that shared and specialized fields appear at root level (Gson/Jackson), without breaking change. → [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md) |
+| **FineractGsonTypeAdapterRegistrar** | T | SPI interface in `fineract-core`; modules register Gson TypeAdapter via `ServiceLoader` in `GoogleGsonSerializerHelper`. → [06.13](06_crosscutting_concepts.md) |
+| **Feature Bundle** | T | OSGi bundle with optional domain/integration function (AI, product rules, …). |
+| **fineract-command** | T | Module for the modern, type-safe command stack parallel to the legacy pipeline. |
+| **fineract-osgi** | A | This workstream/fork: Fineract core + OSGi modularity + AI extensibility. → [01](01_introduction.md) |
+| **fineract-provider** | T | Main application module (boot, REST, wiring of domain modules). |
+| **fineract_tenants** | T | Registry database/schema with tenant metadata and connection info. → [05](05_deployment_view.md) |
 
 ---
 
 ## 9.3 G–L
 
-| Begriff | Tag | Definition |
-|---------|:---:|------------|
-| **Generic Subdomain** | A | DDD: austauschbare/standardisierbare Domäne (IAM, Documents, Validation, …). → [10](10_domain_context_map.md) |
-| **Gherkin** | A | BDD-Notation (Given/When/Then); Anforderungsartefakte unter [`docs/gherkin/`](../gherkin/README.md), getaggt mit `@arc42-*` / `@adr-*` / `@quality-Q-*`. → [08](08_design_decisions.md) |
-| **HikariCP** | T | JDBC-Connection-Pool von Fineract; Konfiguration über `FINERACT_HIKARI_*`. |
-| **Hook** | T | Konfigurierbare Integration/Webhook auf Business Events; auch Command Hooks im neuen Stack. |
-| **Hexagonale Architektur** | A | *Ports & Adapters* – Domain im Zentrum, Driving-/Driven-Adapter am Rand; Leitbild für fineract-osgi. → [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
-| **Hot-Deploy** | B | Nachladen/Aktualisieren von OSGi-Bundles ohne vollständigen App-Rebuild. |
-| **Hot-Path** | A | Latenzkritischer Request-Pfad (typisch synchrone Writes) – KI default **nicht** sync darauf. → [07](07_quality_attributes.md) |
-| **Idempotency Key** | T | Client-seitiger Schlüssel, der Wiederholungen desselben Writes entdoppelt. → [06](06_crosscutting_concepts.md) |
-| **IdP** | T | *Identity Provider* – externe Authentisierungsquelle (OIDC). |
-| **Jakarta Validation** | T | Bean-Validation-Annotationsmodell für DTO-Constraints im neuen Command-Stack. |
-| **Job Partition** | B/T | Teilmenge der COB-/Batch-Arbeit, die ein Worker übernimmt. |
-| **JsonCommand** | T | Legacy-Command-Nutzlast als geparstes JSON mit String-Keys. |
-| **JWT** | T | *JSON Web Token* – oft Träger der OIDC-/OAuth2-Identität. |
-| **Kubernetes (K8s)** | B | Container-Orchestrierung; Beispielmanifeste unter `kubernetes/`. → [05](05_deployment_view.md) |
-| **Legacy Command Pipeline** | T | Bisheriger Write-Pfad über `PortfolioCommandSourceWritePlatformService` / `SynchronousCommandProcessingService`. |
-| **Liquibase** | T | Schema-Migrations-Tool; typisch nur auf führendem/Manager-Node aktiv, Worker oft deaktiviert. |
-| **Loan Application** | F | Kreditantrag/-konto im Portfolio-Modul; zentrales Runtime-Beispiel. → [04](04_runtime_view.md) |
-| **Liveness / Readiness** | B | Health-Proben: Prozess lebt bzw. darf Traffic erhalten. |
+| Term | Tag | Definition |
+|------|:---:|------------|
+| **Generic Subdomain** | A | DDD: replaceable/standardizable domain (IAM, documents, validation, …). → [10](10_domain_context_map.md) |
+| **Gherkin** | A | BDD notation (Given/When/Then); requirement artifacts under [`docs/gherkin/`](../gherkin/README.md), tagged with `@arc42-*` / `@adr-*` / `@quality-Q-*`. → [08](08_design_decisions.md) |
+| **HikariCP** | T | JDBC connection pool of Fineract; configuration via `FINERACT_HIKARI_*`. |
+| **Hook** | T | Configurable integration/webhook on business events; also command hooks in the new stack. |
+| **Hexagonal Architecture** | A | *Ports & Adapters* – domain in the center, driving/driven adapters at the edge; guiding model for fineract-osgi. → [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
+| **Hot-Deploy** | B | Reload/update of OSGi bundles without full app rebuild. |
+| **Hot-Path** | A | Latency-critical request path (typically synchronous writes) – AI by default **not** sync on it. → [07](07_quality_attributes.md) |
+| **Idempotency Key** | T | Client-side key that deduplicates retries of the same write. → [06](06_crosscutting_concepts.md) |
+| **IdP** | T | *Identity Provider* – external authentication source (OIDC). |
+| **Jakarta Validation** | T | Bean Validation annotation model for DTO constraints in the new command stack. |
+| **Job Partition** | B/T | Subset of COB/batch work that a worker takes on. |
+| **JsonCommand** | T | Legacy command payload as parsed JSON with string keys. |
+| **JWT** | T | *JSON Web Token* – often carrier of the OIDC/OAuth2 identity. |
+| **Kubernetes (K8s)** | B | Container orchestration; sample manifests under `kubernetes/`. → [05](05_deployment_view.md) |
+| **Legacy Command Pipeline** | T | Previous write path via `PortfolioCommandSourceWritePlatformService` / `SynchronousCommandProcessingService`. |
+| **Liquibase** | T | Schema migration tool; typically active only on leading/manager node, workers often disabled. |
+| **Loan Application** | F | Loan application/account in the portfolio module; central runtime example. → [04](04_runtime_view.md) |
+| **Liveness / Readiness** | B | Health probes: process is alive or may receive traffic. |
 
 ---
 
 ## 9.4 M–O
 
-| Begriff | Tag | Definition |
-|---------|:---:|------------|
-| **Maker-Checker** | F | Vier-Augen-Prinzip: Command wartet auf Freigabe, bevor die Fachpersistenz final wird. → [06](06_crosscutting_concepts.md) |
-| **MDC** | T | *Mapped Diagnostic Context* – kontextuelle Log-Felder (Tenant, Correlation-ID, …). |
-| **Mode Flags** | B | Schalter `fineract.mode.read/write/batch-*-enabled` zur Rollensteuerung eines Nodes. → [05](05_deployment_view.md) |
-| **Module API** | A | Veröffentlichter Port-Schnitt eines Gradle-Domain-Moduls (`..moduleapi..`); einzige erlaubte fachliche Abhängigkeit für andere Module. ≠ REST-`..api..`. → [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [14](14_module_api_boundaries.md) |
-| **Multi-Tenancy** | A/F | Ein Deployment bedient viele Institute (Tenants) mit isolierten Daten/Kontexten. → [06](06_crosscutting_concepts.md) |
-| **Node ID** | B | `FINERACT_NODE_ID` – eindeutige Kennung einer Instanz im Cluster. |
-| **Observability** | B | Fähigkeit, Zustand über Logs, Metrics und Traces zu erkennen. → [06](06_crosscutting_concepts.md), [07](07_quality_attributes.md) |
-| **OIDC** | T | *OpenID Connect* – Authentisierungsprotokoll auf OAuth2; in Fineract tenant-fähig konfigurierbar. |
-| **Open Host Service (OHS)** | A | DDD Context-Map: Upstream bietet eine stabile API/Events für mehrere Downstream-Konsumenten. → [10](10_domain_context_map.md) |
-| **OpenAPI** | T | Spezifikation der REST-API; Basis für `fineract-client` und Vertragstests. |
-| **Operability** | A | Qualitätsziel: Betreibbarkeit, Diagnose, Deploy. → [07](07_quality_attributes.md) |
-| **OSGi** | T | *Open Services Gateway initiative* – Modularitäts- und Service-Framework-Standard. → [08](08_design_decisions.md) |
-| **OSGi Service Registry** | T | Laufzeitverzeichnis, in dem Bundles Services publizieren und konsumieren. |
-| **OTLP** | T | *OpenTelemetry Protocol* – Export von Traces/Metrics (z. B. nach Tempo). |
-| **Outbox Pattern** | T | Zuverlässiges Publizieren von Events über eine DB-Tabelle + Dispatcher (offener Punkt). → [06](06_crosscutting_concepts.md) |
+| Term | Tag | Definition |
+|------|:---:|------------|
+| **Maker-Checker** | F | Four-eyes principle: command waits for approval before domain persistence is finalized. → [06](06_crosscutting_concepts.md) |
+| **MDC** | T | *Mapped Diagnostic Context* – contextual log fields (tenant, Correlation-ID, …). |
+| **Mode Flags** | B | Switches `fineract.mode.read/write/batch-*-enabled` for role control of a node. → [05](05_deployment_view.md) |
+| **Module API** | A | Published port surface of a Gradle domain module (`..moduleapi..`); only allowed domain dependency for other modules. ≠ REST `..api..`. → [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [14](14_module_api_boundaries.md) |
+| **Multi-Tenancy** | A/F | One deployment serves many institutions (tenants) with isolated data/contexts. → [06](06_crosscutting_concepts.md) |
+| **Node ID** | B | `FINERACT_NODE_ID` – unique identifier of an instance in the cluster. |
+| **Observability** | B | Ability to recognize state via logs, metrics, and traces. → [06](06_crosscutting_concepts.md), [07](07_quality_attributes.md) |
+| **OIDC** | T | *OpenID Connect* – authentication protocol on OAuth2; in Fineract configurable per tenant. |
+| **Open Host Service (OHS)** | A | DDD context map: upstream offers a stable API/events for multiple downstream consumers. → [10](10_domain_context_map.md) |
+| **OpenAPI** | T | Specification of the REST API; basis for `fineract-client` and contract tests. |
+| **Operability** | A | Quality goal: operability, diagnosis, deploy. → [07](07_quality_attributes.md) |
+| **OSGi** | T | *Open Services Gateway initiative* – modularity and service framework standard. → [08](08_design_decisions.md) |
+| **OSGi Service Registry** | T | Runtime directory in which bundles publish and consume services. |
+| **OTLP** | T | *OpenTelemetry Protocol* – export of traces/metrics (e.g. to Tempo). |
+| **Outbox Pattern** | T | Reliable publishing of events via a DB table + dispatcher (open point). → [06](06_crosscutting_concepts.md) |
 
 ---
 
 ## 9.5 P–S
 
-| Begriff | Tag | Definition |
-|---------|:---:|------------|
-| **Permission** | F | Feingranulares Recht, das Rollen zugewiesen und vor Commands geprüft wird. |
-| **Platform Security Context** | T | Laufzeitkontext des aktuellen Benutzers und seiner Rechte. |
-| **Policy Gate** | A | Synchrone Entscheidungsstelle (z. B. KI-Score) vor Fortsetzung eines Commands. → [04](04_runtime_view.md) |
-| **Port (Hexagon)** | A | Fachliche Schnittstelle zwischen Application/Domain und Adapter (nicht TCP-Port). → [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
-| **PostgreSQL** | B | Primäre Zieldatenbank in der fineract-osgi-Referenzarchitektur. → [08](08_design_decisions.md) |
-| **Published Language (PL)** | A | DDD: gemeinsames Integrationsvokabular zwischen Contexts (Events, Commands, DTOs/Avro). → [10](10_domain_context_map.md) |
-| **Quality Scenario** | A | Messbares Qualitätsszenario (Stimulus, Umgebung, Response, Maß). → [07](07_quality_attributes.md) |
-| **Read Node** | B | Instanz mit `read-enabled` (und typisch ohne Write/Batch), für Queries/Reports. |
-| **Remote Job Message Handler** | T | Mechanismus zur Verteilung von Job-Arbeit (Spring Events, JMS oder Kafka). |
-| **Reverse Proxy / WAF** | B | Empfohlene Schicht vor der API (TLS-Terminierung, DDoS, Routing). → [`SECURITY.md`](../../SECURITY.md) |
-| **RPO / RTO** | B | *Recovery Point/Time Objective* – maximal tolerierter Datenverlust bzw. Wiederanlaufzeit. → [07](07_quality_attributes.md) |
-| **Runtime View** | A | arc42-Sicht auf dynamische Abläufe und Szenarien. → [04](04_runtime_view.md) |
-| **SACCO** | F | *Savings and Credit Cooperative* – typische Nutzergruppe im Microfinance-Kontext. → [02](02_context_and_scope.md) |
-| **Service Tracker** | T | OSGi-Hilfe zum Verfolgen von Service-Verfügbarkeit (bind/unbind). |
-| **SLO** | B | *Service Level Objective* – angestrebte Betriebszielgröße (Latenz, Verfügbarkeit). → [07](07_quality_attributes.md) |
-| **Shared Kernel (SK)** | A | DDD: eng begrenzte, gemeinsam genutzte Modellteile (Money, Tenant, IDs) – bewusst klein halten. → [10](10_domain_context_map.md), [ADR-019](decisions/ADR-019-domain-driven-design.md) |
-| **Spring Boot** | T | Application-Framework des Fineract-Kerns; bleibt laut ADR-003 erhalten. → [08](08_design_decisions.md) |
-| **Spring Events** | T | In-Process-Events; Default für lokale Job-Verteilung ohne Broker. |
-| **Supporting Subdomain** | A | DDD: nötig für den Betrieb, aber nicht der strategische Kern (Client, Accounting, Products, COB, …). → [10](10_domain_context_map.md) |
-| **SynchronousCommandProcessingService** | T | Zentrale Legacy-Komponente zur synchronen Command-Ausführung. |
+| Term | Tag | Definition |
+|------|:---:|------------|
+| **Permission** | F | Fine-grained right assigned to roles and checked before commands. |
+| **Platform Security Context** | T | Runtime context of the current user and their rights. |
+| **Policy Gate** | A | Synchronous decision point (e.g. AI score) before continuing a command. → [04](04_runtime_view.md) |
+| **Port (Hexagon)** | A | Domain interface between application/domain and adapter (not a TCP port). → [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
+| **PostgreSQL** | B | Primary target database in the fineract-osgi reference architecture. → [08](08_design_decisions.md) |
+| **Published Language (PL)** | A | DDD: shared integration vocabulary between contexts (events, commands, DTOs/Avro). → [10](10_domain_context_map.md) |
+| **Quality Scenario** | A | Measurable quality scenario (stimulus, environment, response, measure). → [07](07_quality_attributes.md) |
+| **Read Node** | B | Instance with `read-enabled` (and typically without write/batch), for queries/reports. |
+| **Remote Job Message Handler** | T | Mechanism for distributing job work (Spring Events, JMS, or Kafka). |
+| **Reverse Proxy / WAF** | B | Recommended layer in front of the API (TLS termination, DDoS, routing). → [`SECURITY.md`](../../SECURITY.md) |
+| **RPO / RTO** | B | *Recovery Point/Time Objective* – maximum tolerated data loss or recovery time. → [07](07_quality_attributes.md) |
+| **Runtime View** | A | arc42 view of dynamic flows and scenarios. → [04](04_runtime_view.md) |
+| **SACCO** | F | *Savings and Credit Cooperative* – typical user group in the microfinance context. → [02](02_context_and_scope.md) |
+| **Service Tracker** | T | OSGi helper for tracking service availability (bind/unbind). |
+| **SLO** | B | *Service Level Objective* – targeted operational metric (latency, availability). → [07](07_quality_attributes.md) |
+| **Shared Kernel (SK)** | A | DDD: tightly limited, jointly used model parts (Money, Tenant, IDs) – keep deliberately small. → [10](10_domain_context_map.md), [ADR-019](decisions/ADR-019-domain-driven-design.md) |
+| **Spring Boot** | T | Application framework of the Fineract core; retained per ADR-003. → [08](08_design_decisions.md) |
+| **Spring Events** | T | In-process events; default for local job distribution without broker. |
+| **Supporting Subdomain** | A | DDD: needed for operation, but not the strategic core (Client, Accounting, Products, COB, …). → [10](10_domain_context_map.md) |
+| **SynchronousCommandProcessingService** | T | Central legacy component for synchronous command execution. |
 
 ---
 
 ## 9.6 T–Z
 
-| Begriff | Tag | Definition |
-|---------|:---:|------------|
-| **Tenant** | F | Logisches Institut/Mandant mit eigener Fachdatenbank und Konfiguration. |
-| **Tenant Context** | T | Thread-/Request-gebundene Mandanteninformation (ID, DS, Timezone, User, Business Date). |
-| **ThreadLocalContext** | T | Halter des Tenant-/Request-Contexts; muss nach Request/Job geleert werden. → [06](06_crosscutting_concepts.md) |
-| **Trust Boundary** | A | Grenze zwischen vertrauenswürdig und nicht vertrauenswürdig (primär HTTPS-API). → [`SECURITY.md`](../../SECURITY.md) |
-| **Two-Factor (2FA)** | T | Zweite Authentisierungsstufe (OTP etc.) zusätzlich zu Passwort/OIDC. |
-| **Ubiquitous Language** | A | Gemeinsame Fachsprache in Code, API, Gherkin und Doku. → [ADR-019](decisions/ADR-019-domain-driven-design.md) |
-| **Upstream / Downstream (U/D)** | A | DDD Context-Map: Downstream hängt vom Modell/API des Upstream ab. → [10](10_domain_context_map.md) |
-| **Write Node** | B | Instanz mit `write-enabled` für CQRS-Commands. |
-| **xAI Grok API** | T | Externe KI-Inferenz-API; Referenz-Integration für Scoring/Analyse-Bundles. → [06](06_crosscutting_concepts.md), [08](08_design_decisions.md) |
+| Term | Tag | Definition |
+|------|:---:|------------|
+| **Tenant** | F | Logical institution/mandator with its own domain database and configuration. |
+| **Tenant Context** | T | Thread/request-bound tenant information (ID, DS, timezone, user, business date). |
+| **ThreadLocalContext** | T | Holder of the tenant/request context; must be cleared after request/job. → [06](06_crosscutting_concepts.md) |
+| **Trust Boundary** | A | Boundary between trusted and untrusted (primarily HTTPS API). → [`SECURITY.md`](../../SECURITY.md) |
+| **Two-Factor (2FA)** | T | Second authentication step (OTP etc.) in addition to password/OIDC. |
+| **Ubiquitous Language** | A | Shared domain language in code, API, Gherkin, and docs. → [ADR-019](decisions/ADR-019-domain-driven-design.md) |
+| **Upstream / Downstream (U/D)** | A | DDD context map: downstream depends on the model/API of the upstream. → [10](10_domain_context_map.md) |
+| **Write Node** | B | Instance with `write-enabled` for CQRS commands. |
+| **xAI Grok API** | T | External AI inference API; reference integration for scoring/analysis bundles. → [06](06_crosscutting_concepts.md), [08](08_design_decisions.md) |
 
 ---
 
-## 9.7 Module & Artefakte (Repo-Orientierung)
+## 9.7 Modules & Artifacts (Repo Orientation)
 
-| Name | Kurzbeschreibung |
-|------|------------------|
-| `fineract-provider` | Bootable Server, REST, Verdrahtung |
-| `fineract-core` | Infrastruktur, Legacy Commands, gemeinsame Kernteile |
-| `fineract-command` | Neuer Command-Stack |
-| `fineract-command-async` / `-disruptor` / `-jdbc` / `-audit` | Optionale Command-Implementierungsvarianten |
-| `fineract-loan` / `fineract-savings` / `fineract-accounting` / … | Domänenmodule |
-| `fineract-security` | AuthN/Z, Tenant-Filter, OIDC, 2FA |
-| `fineract-validation` | Validierungsunterstützung |
-| `fineract-cob` | COB-nahe Komponenten (wo ausgelagert) |
-| `fineract-client` / `fineract-client-feign` | Generierte/API-Clients |
-| `docs/arc42/` | Diese Architekturdokumentation |
-| `docs/gherkin/` | BDD-Features inkl. Mapping zu arc42 ([README](../gherkin/README.md)) |
-| `osgi/` | Equinox-Start, `config.ini`, Bundles, Logs |
-| `config/docker/` | Compose-Bausteine, Env-Dateien, Observability |
-| `kubernetes/` | Beispiel-Manifeste und Startskripte |
-| `SECURITY.md` | Threat Model (Upstream-Basis) |
+| Name | Short description |
+|------|-------------------|
+| `fineract-provider` | Bootable server, REST, wiring |
+| `fineract-core` | Infrastructure, legacy commands, shared core parts |
+| `fineract-command` | New command stack |
+| `fineract-command-async` / `-disruptor` / `-jdbc` / `-audit` | Optional command implementation variants |
+| `fineract-loan` / `fineract-savings` / `fineract-accounting` / … | Domain modules |
+| `fineract-security` | AuthN/Z, tenant filters, OIDC, 2FA |
+| `fineract-validation` | Validation support |
+| `fineract-cob` | COB-related components (where extracted) |
+| `fineract-client` / `fineract-client-feign` | Generated/API clients |
+| `docs/arc42/` | This architecture documentation |
+| `docs/gherkin/` | BDD features incl. mapping to arc42 ([README](../gherkin/README.md)) |
+| `osgi/` | Equinox start, `config.ini`, bundles, logs |
+| `config/docker/` | Compose building blocks, env files, observability |
+| `kubernetes/` | Sample manifests and start scripts |
+| `SECURITY.md` | Threat model (upstream basis) |
 
 ---
 
-## 9.8 Konfigurations- und Umgebungsvariablen (Auswahl)
+## 9.8 Configuration and Environment Variables (Selection)
 
-| Variable / Property | Bedeutung |
-|---------------------|-----------|
-| `FINERACT_NODE_ID` | Eindeutige Node-Kennung |
-| `FINERACT_MODE_READ_ENABLED` | Read-API aktiv |
-| `FINERACT_MODE_WRITE_ENABLED` | Write-/Command-API aktiv |
-| `FINERACT_MODE_BATCH_MANAGER_ENABLED` | Batch-Orchestrierung aktiv |
-| `FINERACT_MODE_BATCH_WORKER_ENABLED` | Batch-Ausführung aktiv |
-| `FINERACT_HIKARI_*` | JDBC-Pool und Datasource |
-| `FINERACT_DEFAULT_TENANTDB_*` | Default-Tenant-DB-Parameter |
-| `FINERACT_LIQUIBASE_ENABLED` | Schema-Migration an/aus (Worker oft `false`) |
-| `LOAN_COB_CHUNK_SIZE` / `PARTITION_SIZE` / `POLL_INTERVAL` | COB-Durchsatz-Tuning |
-| `FINERACT_REMOTE_JOB_MESSAGE_HANDLER_*` | Spring Events / JMS / Kafka für Jobs |
-| `FINERACT_EXTERNAL_EVENTS_*` | External-Event-Publisher |
+| Variable / Property | Meaning |
+|---------------------|---------|
+| `FINERACT_NODE_ID` | Unique node identifier |
+| `FINERACT_MODE_READ_ENABLED` | Read API active |
+| `FINERACT_MODE_WRITE_ENABLED` | Write/Command API active |
+| `FINERACT_MODE_BATCH_MANAGER_ENABLED` | Batch orchestration active |
+| `FINERACT_MODE_BATCH_WORKER_ENABLED` | Batch execution active |
+| `FINERACT_HIKARI_*` | JDBC pool and datasource |
+| `FINERACT_DEFAULT_TENANTDB_*` | Default tenant DB parameters |
+| `FINERACT_LIQUIBASE_ENABLED` | Schema migration on/off (workers often `false`) |
+| `LOAN_COB_CHUNK_SIZE` / `PARTITION_SIZE` / `POLL_INTERVAL` | COB throughput tuning |
+| `FINERACT_REMOTE_JOB_MESSAGE_HANDLER_*` | Spring Events / JMS / Kafka for jobs |
+| `FINERACT_EXTERNAL_EVENTS_*` | External event publisher |
 | `FINERACT_LOGGING_HTTP_CORRELATION_ID_*` / `fineract.correlation.*` | Correlation-ID |
-| `FINERACT_MANAGEMENT_PROMETHEUS_ENABLED` | Prometheus-Metrics |
-| `FINERACT_MANAGEMENT_OLTP_*` | OTLP-Export |
-| `FINERACT_SERVER_SSL_ENABLED` | HTTPS im Server |
+| `FINERACT_MANAGEMENT_PROMETHEUS_ENABLED` | Prometheus metrics |
+| `FINERACT_MANAGEMENT_OLTP_*` | OTLP export |
+| `FINERACT_SERVER_SSL_ENABLED` | HTTPS in the server |
 
-Vollständige Listen: `fineract-provider/.../application.properties`, `config/docker/env/`.
+Full lists: `fineract-provider/.../application.properties`, `config/docker/env/`.
 
 ---
 
-## 9.9 Ports (Referenz)
+## 9.9 Ports (Reference)
 
-| Port | Nutzung |
-|-----:|---------|
+| Port | Use |
+|-----:|-----|
 | **8443** | HTTPS REST + Actuator |
 | **5432** | PostgreSQL |
-| **3306** | MySQL/MariaDB (alternative/Beispiele) |
+| **3306** | MySQL/MariaDB (alternative/examples) |
 | **9092** | Kafka |
 | **61616** | ActiveMQ (JMS) |
-| **2501** | Equinox Console (nur Admin-Netz) |
-| **5000** | JDWP Debug (nur Dev) |
-| **4318** | OTLP HTTP (Tempo o. ä.) |
+| **2501** | Equinox Console (admin network only) |
+| **5000** | JDWP debug (dev only) |
+| **4318** | OTLP HTTP (Tempo or similar) |
 
 → Details: [05 Deployment View](05_deployment_view.md)
 
 ---
 
-## 9.10 Abkürzungsverzeichnis (Schnellreferenz)
+## 9.10 Abbreviations (Quick Reference)
 
-| Abk. | Langform |
-|------|----------|
+| Abbr. | Long form |
+|-------|-----------|
 | ADR | Architecture Decision Record |
 | API | Application Programming Interface |
 | BDD | Behavior-Driven Development |
@@ -255,7 +255,7 @@ Vollständige Listen: `fineract-provider/.../application.properties`, `config/do
 | JMS | Java Message Service |
 | JWT | JSON Web Token |
 | K8s | Kubernetes |
-| KI | Künstliche Intelligenz |
+| AI | Artificial Intelligence (German: KI) |
 | LB | Load Balancer |
 | MDC | Mapped Diagnostic Context |
 | ML | Machine Learning |
@@ -274,28 +274,28 @@ Vollständige Listen: `fineract-provider/.../application.properties`, `config/do
 
 ---
 
-## 9.11 Begriffliche Abgrenzungen
+## 9.11 Conceptual Distinctions
 
-| Nicht verwechseln | Unterschied |
-|-------------------|-------------|
-| **Command** vs. **Business Event** | Command = absichtliche Write-Anweisung; Event = Tatsache nach Änderung |
-| **Bundle** vs. **Gradle-Modul** | Modul = Build-Zeit; Bundle = OSGi-Laufzeitartefakt |
-| **Tenant-DB** vs. **fineract_tenants** | Fachdaten vs. Registry/Metadaten |
-| **Batch Manager** vs. **Worker** | Orchestrierung vs. Ausführung |
-| **Hook (Fineract)** vs. **Command Hook** | Externe/Business-Integration vs. Pipeline-Interceptor im neuen Stack |
-| **Fail-Open** vs. **Degradation** | Fehlerpolitik bei Downstream vs. fehlende optionale Komponente |
-| **Read Node** vs. **Read-only Tenant-DB** | App-Rolle vs. DB-Connection-Typ |
-| **Sync KI Policy Gate** vs. **Async Enrichment** | blockiert Command vs. reichert nachträglich an |
-
----
-
-## 9.12 Pflege des Glossars
-
-- Neue ADR- oder Runtime-Begriffe hier in der passenden Alphabetgruppe ergänzen.  
-- Abkürzungen in 9.10 und ausführliche Definition in 9.1–9.6 konsistent halten.  
-- Bei Umbenennungen im Code (Klassen/Env) beide Schreibweisen kurz erwähnen.  
-- Englische Upstream-Begriffe nicht unnötig übersetzen, wenn der Code englisch ist.
+| Do not confuse | Difference |
+|----------------|------------|
+| **Command** vs. **Business Event** | Command = intentional write instruction; Event = fact after change |
+| **Bundle** vs. **Gradle module** | Module = build time; Bundle = OSGi runtime artifact |
+| **Tenant DB** vs. **fineract_tenants** | Domain data vs. registry/metadata |
+| **Batch Manager** vs. **Worker** | Orchestration vs. execution |
+| **Hook (Fineract)** vs. **Command Hook** | External/business integration vs. pipeline interceptor in the new stack |
+| **Fail-Open** vs. **Degradation** | Error policy for downstream vs. missing optional component |
+| **Read Node** vs. **Read-only Tenant DB** | App role vs. DB connection type |
+| **Sync AI Policy Gate** vs. **Async Enrichment** | blocks command vs. enriches afterward |
 
 ---
 
-*Zurück*: [08 Design Decisions](08_design_decisions.md) · *Übersicht*: [README](README.md)
+## 9.12 Maintaining the Glossary
+
+- Add new ADR or runtime terms here in the matching alphabetical group.  
+- Keep abbreviations in 9.10 and full definitions in 9.1–9.6 consistent.  
+- On renames in code (classes/env), briefly mention both spellings.  
+- Do not unnecessarily translate English upstream terms when the code is English.
+
+---
+
+*Back*: [08 Design Decisions](08_design_decisions.md) · *Overview*: [README](README.md)

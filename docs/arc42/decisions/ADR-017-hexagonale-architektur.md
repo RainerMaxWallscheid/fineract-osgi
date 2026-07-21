@@ -1,34 +1,34 @@
-# ADR-017 – Hexagonale Architektur (Ports & Adapters)
+# ADR-017 – Hexagonal Architecture (Ports & Adapters)
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Maintainability, Extensibility, Testability, Compatibility |
+| **Qualities** | Maintainability, Extensibility, Testability, Compatibility |
 
-### Kontext
+### Context
 
-fineract-osgi ist ein **modularer Monolith** (Spring Boot + Gradle-Module, optional OSGi-Bundles) mit **CQRS** (Command-Pipeline, ReadPlatformServices) und klaren Integrationsrändern (REST, JDBC/JPA, Events, KI, Messaging).
+fineract-osgi is a **modular monolith** (Spring Boot + Gradle modules, optional OSGi bundles) with **CQRS** (command pipeline, ReadPlatformServices) and clear integration edges (REST, JDBC/JPA, events, AI, messaging).
 
-Historisch dominiert eine **Schichten-/Modulstruktur** (Resource → Command → WritePlatformService → Repository/JDBC), nicht ein reines Hexagon mit expliziten Port-Interfaces in jedem Package. Gleichzeitig wachsen Anforderungen an:
+Historically a **layered/module structure** dominates (Resource → Command → WritePlatformService → Repository/JDBC), not a pure hexagon with explicit port interfaces in every package. At the same time, requirements grow for:
 
-- austauschbare **Driven**-Technik (EclipseLink/JPA vs. JDBC, Kafka vs. Spring Events, externe KI),
-- **Driving**-Eingänge (REST, Batch/COB, künftig OSGi-Commands),
-- testbare Domain ohne Tomcat/DB,
-- OSGi-Feature-Bundles ohne Core-Fork ([ADR-002](ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md)).
+- swappable **driven** technology (EclipseLink/JPA vs. JDBC, Kafka vs. Spring Events, external AI),
+- **driving** entry points (REST, batch/COB, future OSGi commands),
+- testable domain without Tomcat/DB,
+- OSGi feature bundles without core fork ([ADR-002](ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md)).
 
-Ohne gemeinsames Vokabular drohen ad-hoc-Schichten und „alles darf alles importieren“.
+Without a shared vocabulary, ad-hoc layers and “everything may import everything” risk proliferating.
 
-### Entscheidung
+### Decision
 
-**Hexagonale Architektur (Ports & Adapters) als Leitbild und Evolutionsrichtung** für fineract-osgi – **pragmatisch auf den bestehenden Stack gemappt**, kein Big-Bang-Rewrite in Package-Struktur „hexagon/“.
+**Hexagonal architecture (ports & adapters) as the guiding model and evolution direction** for fineract-osgi – **pragmatically mapped onto the existing stack**, no big-bang rewrite into a package structure named `hexagon/`.
 
-#### Kernprinzipien
+#### Core principles
 
-1. **Domain im Zentrum** – Invarianten, Aggregates, fachliche Services; keine JAX-RS-, Servlet- oder Broker-APIs in der Domain.  
-2. **Application / Use-Case-Ring** – Orchestrierung eines Use Cases (Command Handler, Application Services); kennt Ports, nicht konkrete Adapter.  
-3. **Driving Adapters (inbound)** – stoßen Use Cases an: REST Resources, COB/Job-Steps, OSGi-Kommandos, (künftig) Message-Consumer.  
-4. **Driven Adapters (outbound)** – implementieren Technik: JPA/JDBC, Hooks, Kafka/JMS, Dateispeicher, KI-HTTP-Client.  
-5. **Ports** – fachlich benannte Schnittstellen (Java-Interfaces oder stabile Module-APIs); Adapter sind austauschbar.
+1. **Domain at the centre** – invariants, aggregates, domain services; no JAX-RS, servlet, or broker APIs in the domain.  
+2. **Application / use-case ring** – orchestration of a use case (command handler, application services); knows ports, not concrete adapters.  
+3. **Driving adapters (inbound)** – trigger use cases: REST resources, COB/job steps, OSGi commands, (future) message consumers.  
+4. **Driven adapters (outbound)** – implement technology: JPA/JDBC, hooks, Kafka/JMS, file storage, AI HTTP client.  
+5. **Ports** – domain-named interfaces (Java interfaces or stable module APIs); adapters are swappable.
 
 ```mermaid
 flowchart TB
@@ -45,14 +45,14 @@ flowchart TB
 
     subgraph Domain["Domain"]
       AGG[Aggregates / Domain Services]
-      INV[Invarianten]
+      INV[Invariants]
     end
 
     subgraph Driven["Driven Adapters"]
       JPA[Spring Data JPA / EclipseLink]
       JDBC[JdbcTemplate Reads / Bulk]
       EVT[Events / Hooks]
-      KI[KI HTTP Client]
+      KI[AI HTTP Client]
       MQ[Kafka / JMS]
     end
 
@@ -69,75 +69,75 @@ flowchart TB
     UC --> MQ
 ```
 
-#### Mapping auf fineract-osgi (Ist → Hexagon)
+#### Mapping onto fineract-osgi (as-is → hexagon)
 
-| Hexagon | fineract-osgi (heute / Ziel) |
-|---------|------------------------------|
-| **Driving: REST** | `*ApiResource`, Spring MVC/JAX-RS in `fineract-provider` und Domain-Modulen |
-| **Driving: Batch** | Spring Batch COB Manager/Worker, Job-Tasklets |
-| **Application** | `NewCommandSourceHandler` / `CommandHandler`, WritePlatformServices, Prefill/Validation |
-| **Domain** | Entities, Domain Services, Business Rules in `fineract-loan`, `fineract-savings`, … |
-| **Driven: Persistenz Write** | Spring Data JPA + EclipseLink ([ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md)) |
-| **Driven: Persistenz Read** | JdbcTemplate ReadPlatformServices; künftig Projection an Ports |
-| **Driven: Integration** | Hooks, External Events, Kafka/JMS, Document Store |
-| **Driven: KI** | OSGi-/Modul-Adapter auf xAI Grok ([ADR-005](ADR-005-externe-ki-xai-grok-statt-embedded-ml.md)/[006](ADR-006-ki-default-asynchron-fail-open.md)) |
-| **Port-Beispiele** | Repository-Interfaces, `CommandDispatcher`, `BusinessEventNotifier`, `FineractGsonTypeAdapterRegistrar`, `EntityManagerFactoryCustomizer`, Content-Store-APIs |
+| Hexagon | fineract-osgi (today / target) |
+|---------|--------------------------------|
+| **Driving: REST** | `*ApiResource`, Spring MVC/JAX-RS in `fineract-provider` and domain modules |
+| **Driving: Batch** | Spring Batch COB manager/worker, job tasklets |
+| **Application** | `NewCommandSourceHandler` / `CommandHandler`, WritePlatformServices, prefill/validation |
+| **Domain** | Entities, domain services, business rules in `fineract-loan`, `fineract-savings`, … |
+| **Driven: persistence write** | Spring Data JPA + EclipseLink ([ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md)) |
+| **Driven: persistence read** | JdbcTemplate ReadPlatformServices; future projection at ports |
+| **Driven: integration** | Hooks, external events, Kafka/JMS, document store |
+| **Driven: AI** | OSGi/module adapters on xAI Grok ([ADR-005](ADR-005-externe-ki-xai-grok-statt-embedded-ml.md)/[006](ADR-006-ki-default-asynchron-fail-open.md)) |
+| **Port examples** | Repository interfaces, `CommandDispatcher`, `BusinessEventNotifier`, `FineractGsonTypeAdapterRegistrar`, `EntityManagerFactoryCustomizer`, content-store APIs |
 
-CQRS ([ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md)) **sitzt im Application-Ring**: Commands = Write-Use-Cases; Queries = Read-Use-Cases mit eigenen Driven-Adaptern (oft JDBC).
+CQRS ([ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md)) **sits in the application ring**: commands = write use cases; queries = read use cases with their own driven adapters (often JDBC).
 
-#### Regeln für neue / migrierte Codepfade
+#### Rules for new / migrated code paths
 
-| Regel | Bedeutung |
-|-------|-----------|
-| **Dependency Rule** | Domain hängt nicht von REST, Jersey, Kafka, EclipseLink-API ab |
-| **Adapter dünn** | Resources mappen HTTP ↔ Command/DTO; keine Fachlogik in Resources |
-| **Ports an Modulgrenzen** | Öffentliche Interfaces in stabilen Packages; Impl in Adapter-/Infra-Paketen |
-| **OSGi = steckbare Adapter** | Feature-Bundles liefern Driven- oder optionale Driving-Adapter über Service Registry |
-| **Tests** | Domain/Application mit Fake-Ports; Adapter mit IT (DB, Broker) |
-| **Keine Pseudo-Ports** | Interfaces nur wo echte Austauschbarkeit/Testnaht nötig ist |
+| Rule | Meaning |
+|------|---------|
+| **Dependency rule** | Domain does not depend on REST, Jersey, Kafka, or EclipseLink API |
+| **Thin adapters** | Resources map HTTP ↔ command/DTO; no business logic in resources |
+| **Ports at module boundaries** | Public interfaces in stable packages; impl in adapter/infra packages |
+| **OSGi = pluggable adapters** | Feature bundles supply driven or optional driving adapters via the service registry |
+| **Tests** | Domain/application with fake ports; adapters with IT (DB, broker) |
+| **No pseudo-ports** | Interfaces only where real swappability/test seam is needed |
 
-#### Evolutionsstufen (kein Big-Bang)
+#### Evolution stages (no big-bang)
 
-| Stufe | Inhalt |
-|-------|--------|
-| **E1 – Vokabular & Doku** | Dieses ADR; Mapping in Building Block / Crosscutting |
-| **E2 – Neue Features** | Neue Module/Commands hexagon-konform (Resource → Handler → Domain → Port) |
-| **E3 – Gezielte Extraktion** | Ports für Persistenz/Events/KI an Hotspots; Legacy schrittweise entkoppeln |
-| **E4 – OSGi** | Bundles als Adapter-Deployables hinter denselben Ports |
+| Stage | Content |
+|-------|---------|
+| **E1 – Vocabulary & docs** | This ADR; mapping in building block / crosscutting |
+| **E2 – New features** | New modules/commands hexagon-conformant (resource → handler → domain → port) |
+| **E3 – Targeted extraction** | Ports for persistence/events/AI at hotspots; decouple legacy stepwise |
+| **E4 – OSGi** | Bundles as adapter deployables behind the same ports |
 
-### Alternativen
+### Alternatives
 
-| Option | Bewertung |
-|--------|-----------|
-| Reines Layered Model beibehalten (ohne Hexagon-Vokabular) | Unzureichend für OSGi/KI/Testnähte |
-| Clean Architecture streng (Use-Case-pro-Klasse, komplette Package-Umstellung) | Zu teuer; parallel zu Command-Migration |
-| Microservices pro Domain | Abgelehnt/deferred ([08](../08_design_decisions.md) Großoptionen); Hexagon skaliert im Monolith |
-| Nur Framework-„Hexagon“-Bibliothek erzwingen | Overhead; Fineract-Patterns reichen |
+| Option | Assessment |
+|--------|------------|
+| Keep pure layered model (no hexagon vocabulary) | Insufficient for OSGi/AI/test seams |
+| Strict clean architecture (use-case-per-class, full package move) | Too expensive; parallel to command migration |
+| Microservices per domain | Rejected/deferred ([08](../08_design_decisions.md) major options); hexagon scales in the monolith |
+| Force a framework “hexagon” library | Overhead; Fineract patterns suffice |
 
-### Konsequenzen
+### Consequences
 
-- **+** Gemeinsame Sprache für Reviews, OSGi und KI-Ränder  
-- **+** Passt zu CQRS, Command-Modernisierung und Persistenz-Hybrid (ADR-016)  
-- **+** Testbarkeit: Domain ohne HTTP/DB-Adapter  
-- **−** Bestandscode ist nicht überall hexagon-rein; Migration inkrementell  
-- **−** Risiko „Interface-Theater“ – Ports nur mit klarem Nutzen  
-- **−** Teams müssen Dependency-Richtung in Reviews durchsetzen  
+- **+** Shared language for reviews, OSGi, and AI edges  
+- **+** Fits CQRS, command modernization, and persistence hybrid (ADR-016)  
+- **+** Testability: domain without HTTP/DB adapters  
+- **−** Existing code is not hexagon-pure everywhere; migration incremental  
+- **−** Risk of “interface theatre” – ports only with clear benefit  
+- **−** Teams must enforce dependency direction in reviews  
 
 ### Non-Goals
 
-- Sofortiges Umbenennen aller Packages nach `domain` / `application` / `adapter`  
-- Ersetzen der Legacy-Command-Pipeline in einem Schritt  
-- Pflicht zu Hexagon-Frameworks oder DI-Containern jenseits Spring/OSGi  
+- Immediate rename of all packages to `domain` / `application` / `adapter`  
+- Replacing the legacy command pipeline in one step  
+- Mandate for hexagon frameworks or DI containers beyond Spring/OSGi  
 
-### Bezug
+### Related
 
 - [ADR-002](ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md) OSGi  
-- [ADR-003](ADR-003-spring-boot-gradle-module-als-kern-beibehalten.md) Spring Boot Kern  
+- [ADR-003](ADR-003-spring-boot-gradle-module-als-kern-beibehalten.md) Spring Boot core  
 - [ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) CQRS  
-- [ADR-005](ADR-005-externe-ki-xai-grok-statt-embedded-ml.md) / [ADR-006](ADR-006-ki-default-asynchron-fail-open.md) KI als Driven Adapter  
-- [ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md) Persistenz-Ports (JPA vs. JDBC)  
-- Building Blocks [03](../03_building_block_view.md) · Runtime [04](../04_runtime_view.md) · Crosscutting [06](../06_crosscutting_concepts.md)
+- [ADR-005](ADR-005-externe-ki-xai-grok-statt-embedded-ml.md) / [ADR-006](ADR-006-ki-default-asynchron-fail-open.md) AI as driven adapter  
+- [ADR-016](ADR-016-jpa-ausbau-read-write-persistenz.md) Persistence ports (JPA vs. JDBC)  
+- Building blocks [03](../03_building_block_view.md) · Runtime [04](../04_runtime_view.md) · Crosscutting [06](../06_crosscutting_concepts.md)
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)

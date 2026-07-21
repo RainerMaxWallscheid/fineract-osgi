@@ -1,42 +1,42 @@
-# ADR-013 – Sicherheit am API-Rand + Defense in Depth
+# ADR-013 – Security at the API Edge + Defense in Depth
 
 | | |
 |--|--|
 | **Status** | accepted |
-| **Qualitäten** | Security, Operability |
+| **Qualities** | Security, Operability |
 
-### Kontext
+### Context
 
-Threat Model: API ist primäre Trust Boundary; kein Direkt-Expose ohne Reverse Proxy/WAF empfohlen.
+Threat model: the API is the primary trust boundary; direct exposure without reverse proxy/WAF is not recommended.
 
-### Entscheidung
+### Decision
 
-1. **TLS** und idealerweise Reverse Proxy vor Fineract.  
-2. **AuthN** austauschbar: Basic (Dev), OIDC/JWT, optional 2FA.  
-3. **AuthZ** über Permissions im Security Context.  
-4. **Tenant-Context** vor Fachlogik.  
-5. **Audit** aller Writes.  
-6. Equinox Console und JDWP **nicht** öffentlich.  
-7. KI- und DB-Secrets außerhalb des Images.
+1. **TLS** and ideally a reverse proxy in front of Fineract.  
+2. **AuthN** swappable: Basic (dev), OIDC/JWT, optional 2FA.  
+3. **AuthZ** via permissions in the security context.  
+4. **Tenant context** before business logic.  
+5. **Audit** of all writes.  
+6. Equinox console and JDWP **not** public.  
+7. AI and DB secrets outside the image.
 
-### Alternativen
+### Alternatives
 
-| Option | Warum nicht |
-|--------|-------------|
-| Security nur im Service-Mesh | Mesh ergänzt, ersetzt App-AuthZ nicht |
-| API-Keys ohne User-Context für alles | Unzureichend für Maker-Checker und Audit |
-| „Security by obscurity“ interner Ports | Unzureichend |
+| Option | Why not |
+|--------|---------|
+| Security only in the service mesh | Mesh complements, does not replace app AuthZ |
+| API keys without user context for everything | Insufficient for maker-checker and audit |
+| “Security by obscurity” for internal ports | Insufficient |
 
-### Konsequenzen
+### Consequences
 
-- **+** Mehrschichtig, an Upstream-Modell angelehnt  
-- **−** Korrekte Proxy-, CORS- und Header-Konfiguration nötig  
-- **−** OIDC pro Tenant erhöht Config-Komplexität  
+- **+** Multi-layered, aligned with the upstream model  
+- **−** Correct proxy, CORS, and header configuration required  
+- **−** OIDC per tenant increases config complexity  
 
-### Bezug
+### Related
 
-- [`SECURITY.md`](../../../SECURITY.md), Crosscutting [6.3](../06_crosscutting_concepts.md)
+- [`SECURITY.md`](../../../SECURITY.md), crosscutting [6.3](../06_crosscutting_concepts.md)
 
 ---
 
-*Zurück zur Übersicht:* [08 Design Decisions](../08_design_decisions.md)
+*Back to overview:* [08 Design Decisions](../08_design_decisions.md)
