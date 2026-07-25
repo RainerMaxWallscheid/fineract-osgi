@@ -72,12 +72,8 @@ if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
     sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-command/impl/bin/main")
 }
 
-if (!(project.hasProperty('env') && project.getProperty('env') == 'dev')) {
-    sourceSets {
-        test {
-            java {
-                exclude '**/core/boot/tests/**'
-            }
-        }
-    }
+// Production-only module: white-box tests live in :fineract-command-test (Fragment-Host).
+tasks.named('test').configure {
+    // Keep the task so root aggregate test graphs stay valid, but there is no test source set content.
+    enabled = true
 }

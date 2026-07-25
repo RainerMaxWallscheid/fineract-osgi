@@ -9,11 +9,12 @@ See also `docs/arc42/` (Runtime / Deployment / OSGi concepts).
 
 | Artifact | Bundle-SymbolicName |
 |----------|---------------------|
-| `fineract-command-api` | `org.apache.fineract.command.api` |
-| `fineract-command-impl` | `org.apache.fineract.command.impl` |
-| `fineract-command-test` | `org.apache.fineract.command.test` (`Fragment-Host: org.apache.fineract.command.impl`) |
+| `fineract-command-api` (`fineract-command/api`) | `org.apache.fineract.command.api` |
+| `fineract-command-impl` (`fineract-command/impl`) | `org.apache.fineract.command.impl` |
+| `fineract-command-test` (`fineract-command/test`) | `org.apache.fineract.command.test` (`Fragment-Host: org.apache.fineract.command.impl`) |
 
 Build jars: `./gradlew :fineract-command-api:jar :fineract-command-impl:jar :fineract-command-test:jar`  
+White-box tests: `./gradlew :fineract-command-test:test`  
 Copy into `osgi/bundles/` for Equinox resolve experiments. Plan: [15_osgi_bundle_refactoring_fineract-command.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-command.md).
 
 ## Layout

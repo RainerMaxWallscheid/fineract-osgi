@@ -8,16 +8,17 @@ Step-by-step plan:
 
 ### Layout (implemented)
 
-| Gradle project | Bundle-SymbolicName | Role |
-|----------------|---------------------|------|
-| `fineract-command-api` | `org.apache.fineract.command.api` | Contracts (`core` + exceptions); **Export-Package** |
-| `fineract-command-impl` | `org.apache.fineract.command.impl` | Default sync dispatcher, hooks, Spring starter, OSGi service registrar |
-| `fineract-command-test` | `org.apache.fineract.command.test` | Test fixtures; **Fragment-Host** → `command.impl` |
-| `fineract-command` | *(facade JAR)* | Compatibility aggregator: `api` + `impl` for existing consumers |
+| Gradle project | Path | Bundle-SymbolicName | Role |
+|----------------|------|---------------------|------|
+| `fineract-command-api` | `fineract-command/api` | `org.apache.fineract.command.api` | Contracts (`core` + exceptions); **Export-Package** |
+| `fineract-command-impl` | `fineract-command/impl` | `org.apache.fineract.command.impl` | Default sync dispatcher, hooks, Spring starter, OSGi service registrar (**main only**) |
+| `fineract-command-test` | `fineract-command/test` | `org.apache.fineract.command.test` | Fixtures + white-box tests; **Fragment-Host** → `command.impl` |
+| `fineract-command` | `fineract-command/` | *(facade JAR)* | Compatibility aggregator: `api` + `impl` for existing consumers |
 
 Prefer new code depending on **`fineract-command-api`** only (plus runtime `fineract-command-impl` when defaults are required).  
 Inter-bundle access: **OSGi Service Registry** (`CommandOsgiServiceRegistrar` in impl). Not Karaf Features.  
-Spring remains inside **impl**.
+Spring remains inside **impl**.  
+Run command white-box tests: `./gradlew :fineract-command-test:test` (not on `:fineract-command-impl`).
 
 Background and Motivation
 -------------------------

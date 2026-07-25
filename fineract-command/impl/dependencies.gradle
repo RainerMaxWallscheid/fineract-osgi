@@ -37,20 +37,5 @@ dependencies {
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
     annotationProcessor 'org.mapstruct:mapstruct-processor'
 
-    testImplementation(project(path: ':fineract-command-test'))
-    testImplementation ('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'com.jayway.jsonpath', module: 'json-path'
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-        exclude group: 'jakarta.activation'
-        exclude group: 'javax.activation'
-        exclude group: 'org.skyscreamer'
-    }
-    testImplementation (
-            project(':fineract-validation'),
-            'org.mockito:mockito-inline',
-            'org.testcontainers:junit-jupiter',
-            'org.springframework.restdocs:spring-restdocs-mockmvc',
-            'org.springframework.restdocs:spring-restdocs-webtestclient',
-            'org.springframework.restdocs:spring-restdocs-restassured',
-            )
+    // Unit / white-box tests live in :fineract-command-test (Fragment-Host of this impl).
 }

@@ -37,7 +37,7 @@ fineract-command/
   build.gradle         # optional compatibility façade (re-exports api + impl)
   README.md
 
-fineract-command-test/ # Fragment-Host → command.impl
+fineract-command/test/ # Fragment-Host → command.impl (:fineract-command-test)
 fineract-command-jdbc/ # optional driven adapter
 fineract-command-async/
 fineract-command-disruptor/

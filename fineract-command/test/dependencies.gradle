@@ -18,7 +18,7 @@
  */
 
 dependencies {
-    // OSGi test fragment host is command-impl; compile only needs api contracts + Spring
+    // Fragment main sources (fixtures) compile against api contracts + Spring used by samples.
     implementation(
             project(path: ':fineract-command-api'),
             )
@@ -58,4 +58,23 @@ dependencies {
             'org.testcontainers:mysql',
             )
     annotationProcessor 'org.mapstruct:mapstruct-processor'
+
+    // White-box / Spring Boot tests of the impl host (Gradle classpath).
+    // In an OSGi container the same classes attach via Fragment-Host → command.impl.
+    testImplementation(project(path: ':fineract-command-impl'))
+    testImplementation(project(path: ':fineract-validation'))
+    testImplementation ('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'com.jayway.jsonpath', module: 'json-path'
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+        exclude group: 'jakarta.activation'
+        exclude group: 'javax.activation'
+        exclude group: 'org.skyscreamer'
+    }
+    testImplementation (
+            'org.mockito:mockito-inline',
+            'org.testcontainers:junit-jupiter',
+            'org.springframework.restdocs:spring-restdocs-mockmvc',
+            'org.springframework.restdocs:spring-restdocs-webtestclient',
+            'org.springframework.restdocs:spring-restdocs-restassured',
+            )
 }

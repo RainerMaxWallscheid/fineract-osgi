@@ -15,10 +15,10 @@ Step-by-step pilot for [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-se
 | 1 Project shells | **done** | Gradle projects + directory grouping under `fineract-command/` |
 | 2 Extract api | **done** | Contracts in `fineract-command/api`; no Spring in api |
 | 3 Move impl + façade | **done** | Impl in `fineract-command/impl`; `:fineract-command` re-exports api+impl |
-| 3b Directory layout | **done** | `fineract-command/{api,impl}` via `projectDir` in `settings.gradle` |
+| 3b Directory layout | **done** | `fineract-command/{api,impl,test}` via `projectDir` in `settings.gradle` |
 | 3c Naming (ADR-023) | **done** | Dropped `fineract-command-core*`; BSN `command.api` / `command.impl` |
 | 4 OSGi manifests | **done** | BSN + Export/Import/Fragment-Host on jars |
-| 5 Fragment-Host test | **done** | `:fineract-command-test` → Fragment-Host `org.apache.fineract.command.impl` |
+| 5 Fragment-Host test | **done** | `:fineract-command-test` under `fineract-command/test`; Fragment-Host `org.apache.fineract.command.impl`; white-box tests moved out of impl |
 | 6 Spring↔OSGi bridge | **done** | `CommandOsgiServiceRegistrar` (reflection; no hard OSGi runtime dep) |
 | 7 Satellites → api | **done** | jdbc/async/disruptor compile on api; audit on api+impl; tests may use impl |
 | 8 Consumer retarget | **partial** | core/provider/cob/document/mix still use façade (compatible) |
@@ -45,9 +45,9 @@ fineract-command/
   README.md
   build.gradle  # Gradle :fineract-command  (compatibility façade)
   api/          # Gradle :fineract-command-api
-  impl/         # Gradle :fineract-command-impl
+  impl/         # Gradle :fineract-command-impl  (main only)
+  test/         # Gradle :fineract-command-test  (OSGi fragment + white-box tests)
 
-fineract-command-test/         # Gradle :fineract-command-test  (OSGi fragment)
 fineract-command-jdbc/
 fineract-command-async/
 fineract-command-disruptor/
@@ -60,17 +60,18 @@ include ':fineract-command-api'
 project(':fineract-command-api').projectDir = file('fineract-command/api')
 include ':fineract-command-impl'
 project(':fineract-command-impl').projectDir = file('fineract-command/impl')
-include ':fineract-command'
 include ':fineract-command-test'
+project(':fineract-command-test').projectDir = file('fineract-command/test')
+include ':fineract-command'
 // … satellites …
 ```
 
 | Path | Gradle project | Role |
 |------|----------------|------|
 | `fineract-command/api` | `:fineract-command-api` | Contracts; **Export-Package**; no Spring |
-| `fineract-command/impl` | `:fineract-command-impl` | Sync dispatcher, hooks, starter, OSGi bridge; Spring inside |
+| `fineract-command/impl` | `:fineract-command-impl` | Sync dispatcher, hooks, starter, OSGi bridge; Spring inside; **no unit-test sources** |
+| `fineract-command/test` | `:fineract-command-test` | Fixtures (`src/main`) + white-box tests (`src/test`); **Fragment-Host** → `command.impl` |
 | `fineract-command/` (root build) | `:fineract-command` | Façade: `api` + `impl` for existing Boot consumers |
-| top-level | `:fineract-command-test` | Test fixtures; **Fragment-Host** → `command.impl` |
 | top-level | `:fineract-command-jdbc` / `-async` / `-disruptor` / `-audit` | Satellites (compile on api where possible) |
 
 ### 2.2 Bundle-SymbolicName
@@ -102,16 +103,16 @@ include ':fineract-command-test'
 | `:fineract-command` (façade) | `api` + `impl` (both `api` configuration) |
 | jdbc / async / disruptor | **compile:** `:fineract-command-api`; **test:** may add `-core-impl` + `-test` |
 | audit | **compile:** `:fineract-command-api` + `:fineract-command-impl` (`CommandProperties`) |
-| `:fineract-command-test` | **compile:** `:fineract-command-api` only |
+| `:fineract-command-test` | **main:** `:fineract-command-api` (+ Spring for samples); **test:** `:fineract-command-impl` + test stack |
 | core / provider / cob / document / mix | still `:fineract-command` façade (**Step 8 partial**) |
 
 ### 2.5 Tests (as implemented)
 
 | Location | Types |
 |----------|--------|
-| `fineract-command/impl/src/test` | `CommandDispatcherTest`, `DefaultCommandHandlerManagerTest`, `CommandSampleApiTest` |
-| `fineract-command-test` | Sample REST/handlers/services for those tests |
-| satellite modules | Own `TestConfiguration` + optional IT |
+| `fineract-command/test/src/main` | Sample REST/handlers/services (`org.apache.fineract.command.test.*`) |
+| `fineract-command/test/src/test` | `CommandDispatcherTest`, `DefaultCommandHandlerManagerTest`, `CommandSampleApiTest` |
+| satellite modules | Own `TestConfiguration` + optional IT; may `testImplementation` `:fineract-command-test` for fixtures |
 
 ### 2.6 Runtime wiring diagram
 
@@ -123,7 +124,7 @@ flowchart TB
   ASYNC[command-async]
   DISR[command-disruptor]
   AUD[command-audit]
-  TST[command-test<br/>Fragment-Host → core.impl]
+  TST[command-test<br/>Fragment-Host → command.impl]
   FAC[command façade<br/>api + impl]
   REG[(OSGi Service Registry)]
 
@@ -192,10 +193,12 @@ Handlers and individual hooks stay Spring-scanned inside the process for the pil
 
 Spring stays here: `@Component`, `@Configuration`, `@ConditionalOnMissingBean`, component scan.
 
-### 4.3 `:fineract-command-test` (fragment)
+### 4.3 `:fineract-command-test` (fragment under `fineract-command/test`)
 
-- **Fragment** of core-impl for white-box/unit tests and sample fixtures
+- **Fragment** of command-impl for white-box/unit tests and sample fixtures
 - Manifest: `Fragment-Host: org.apache.fineract.command.impl`
+- `src/main` — fixtures/samples; `src/test` — JUnit/Spring Boot tests of the host
+- Gradle: `./gradlew :fineract-command-test:test` (classpath includes impl). OSGi later: install fragment with host so tests share the host classloader without exporting impl packages
 - Pure contract tests (mock `CommandDispatcher` only) can stay as plain JUnit without fragment
 
 ---
@@ -238,7 +241,7 @@ Execute as **separate PRs** so each step stays reviewable and green. Checkboxes 
 2. [x] Move impl sources to `fineract-command/impl`
 3. [x] Map via `project(…).projectDir = file('fineract-command/…')`
 4. [x] Keep project names `:fineract-command-api` / `:fineract-command-impl` (stable for deps / CI)
-5. [x] Keep test project as top-level `:fineract-command-test` (not under `fineract-command/`)
+5. [x] Co-locate test fragment under `fineract-command/test` (`projectDir` mapping; Gradle name `:fineract-command-test`)
 
 ### Step 4 — Bundle metadata ✅
 
@@ -254,8 +257,9 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 ### Step 5 — Convert `fineract-command-test` to Fragment-Host ✅
 
 1. [x] Fragment-Host → `org.apache.fineract.command.impl`
-2. [x] White-box tests live under core-impl; fixtures in `fineract-command-test`
-3. [x] `:fineract-command-impl:test` uses `testImplementation project(':fineract-command-test')`
+2. [x] Fixtures in `fineract-command/test/src/main`; white-box tests in `fineract-command/test/src/test`
+3. [x] `:fineract-command-impl` is production **main only** (no unit-test source set content)
+4. [x] `:fineract-command-test:test` uses `testImplementation project(':fineract-command-impl')`
 
 ### Step 6 — Spring↔OSGi bridge ✅
 
@@ -298,7 +302,7 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 | 5 | No Karaf Feature descriptors | done |
 | 6 | Spring still wires impl under Boot | done |
 | 7 | Fragment-Host tests green | done |
-| 8 | Sources under `fineract-command/{api,impl}` | done |
+| 8 | Sources under `fineract-command/{api,impl,test}` | done |
 | 9 | Full consumer retarget off façade | **open** |
 
 ---
@@ -348,8 +352,8 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 ```bash
 # Core command stack
 ./gradlew :fineract-command-api:build \
-  :fineract-command-impl:test \
-  :fineract-command-test:jar \
+  :fineract-command-impl:jar \
+  :fineract-command-test:test \
   :fineract-command:jar \
   :fineract-command-jdbc:test \
   :fineract-command-async:test \
@@ -359,6 +363,7 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 # Install pilot jars for Equinox experiments
 # cp fineract-command/api/build/libs/*.jar osgi/bundles/
 # cp fineract-command/impl/build/libs/*.jar osgi/bundles/
+# cp fineract-command/test/build/libs/*.jar osgi/bundles/   # fragment host = command.impl
 ```
 
 ---

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-description = 'Fineract Command - Test'
+description = 'Fineract Command - Test fragment (host: command.impl)'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -45,7 +45,9 @@ configurations {
 
 apply from: 'dependencies.gradle'
 
-// OSGi fragment attached to command-impl (ADR-022 / pilot plan Step 5)
+// OSGi fragment attached to command-impl (ADR-022).
+// main = shared fixtures/samples for the host class space
+// test = JUnit/Spring Boot white-box tests of the host (Gradle); same fragment jar for Equinox install later
 jar {
     manifest {
         attributes(
@@ -72,7 +74,8 @@ modernizer {
 // If we are running Gradle within Eclipse to enhance classes with OpenJPA,
 // set the classes directory to point to Eclipse's default build directory
 if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
-    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-command-test/bin/main")
+    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-command/test/bin/main")
+    sourceSets.test.java.outputDir = new File(rootProject.projectDir, "fineract-command/test/bin/test")
 }
 
 if (!(project.hasProperty('env') && project.getProperty('env') == 'dev')) {
@@ -83,4 +86,8 @@ if (!(project.hasProperty('env') && project.getProperty('env') == 'dev')) {
             }
         }
     }
+}
+
+tasks.named('test').configure {
+    useJUnitPlatform()
 }
