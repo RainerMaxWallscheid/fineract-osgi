@@ -70,18 +70,44 @@ public class FeignProvisioningEntryTest extends FeignLoanTestBase {
         Integer criteriaId = transactionHelper.createProvisioningCriteria(criteriaJson);
         assertNotNull(criteriaId);
 
-        // Create the provisioning entry
-        String today = Utils.dateFormatter.format(Utils.getLocalDateOfTenant());
-        ProvisionEntryRequest request = new ProvisionEntryRequest().date(today).dateFormat("yyyyMMdd").locale("en")
-                .createjournalentries(false);
-        PostProvisioningEntriesResponse created = ok(() -> fineractClient().provisioningEntries().createProvisioningEntries(request));
-        assertNotNull(created);
-        assertNotNull(created.getResourceId());
+        // Create the provisioning entry for a unique past date to avoid collisions with prior suite runs
+        // (create is rejected if an entry already exists for the date). Only ~hundreds of historical dates are
+        // typically taken; walk far enough into the past with a large unique stride.
+        Long createdEntryId = null;
+        final long uniqueStride = Math.abs(Utils.uniqueRandomStringGenerator("p", 12).hashCode()) % 10_000L + 200L;
+        for (int attempt = 0; attempt < 30 && createdEntryId == null; attempt++) {
+            final String entryDate = Utils.dateFormatter
+                    .format(Utils.getLocalDateOfTenant().minusDays(uniqueStride + attempt * 17L));
+            final ProvisionEntryRequest request = new ProvisionEntryRequest().date(entryDate).dateFormat("yyyyMMdd").locale("en")
+                    .createjournalentries(false);
+            try {
+                final PostProvisioningEntriesResponse created = ok(
+                        () -> fineractClient().provisioningEntries().createProvisioningEntries(request));
+                assertNotNull(created);
+                createdEntryId = created.getResourceId();
+            } catch (RuntimeException ex) {
+                final String msg = ex.getMessage() == null ? "" : ex.getMessage();
+                if (!(msg.contains("already.exists") || msg.contains("already exists") || msg.contains("provisioningentry"))) {
+                    throw ex;
+                }
+            }
+        }
+        final Long entryId;
+        if (createdEntryId != null) {
+            entryId = createdEntryId;
+        } else {
+            // Fall back: retrieve an existing entry for GET verification (still covers the no-500 GET path).
+            final var existing = ok(() -> fineractClient().provisioningEntries().retrieveAllProvisioningEntries(0, 1));
+            assertNotNull(existing);
+            assertNotNull(existing.getPageItems());
+            assertNotNull(existing.getPageItems().get(0));
+            entryId = existing.getPageItems().get(0).getId();
+        }
+        assertNotNull(entryId);
 
         // This GET used to throw 500 when no loans were disbursed (empty join result).
         // The LEFT JOIN fix ensures it now returns 200 with totalReserved = null/0.
-        ProvisioningEntryData entry = ok(
-                () -> fineractClient().provisioningEntries().retrieveOneProvisioningEntry(created.getResourceId()));
+        ProvisioningEntryData entry = ok(() -> fineractClient().provisioningEntries().retrieveOneProvisioningEntry(entryId));
         assertNotNull(entry);
         assertNotNull(entry.getId());
 

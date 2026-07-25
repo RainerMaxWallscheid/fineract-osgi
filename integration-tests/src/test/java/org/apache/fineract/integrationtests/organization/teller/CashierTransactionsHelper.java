@@ -36,7 +36,6 @@ public class CashierTransactionsHelper {
     private final ResponseSpecification responseSpecification;
     private final RequestSpecification requestSpecification;
 
-    private static final String CREATE_CASHIER_URL = "/fineract-provider/api/v1/tellers/1/cashiers";
     private static final String CREATE_TELLER_URL = "/fineract-provider/api/v1/tellers";
     private static final Logger LOG = LoggerFactory.getLogger(CashierTransactionsHelper.class);
 
@@ -116,12 +115,22 @@ public class CashierTransactionsHelper {
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
     public static Integer createCashier(final RequestSpecification requestSpec, final ResponseSpecification responseSpec) {
-        return (Integer) createCashierWithJson(requestSpec, responseSpec, createCashierAsJSON()).get("resourceId");
+        return createCashier(requestSpec, responseSpec, 1, 1);
+    }
+
+    /**
+     * Allocate a cashier on the given teller/staff with a unique date range to avoid
+     * {@code CashierAlreadyAllocated} collisions across suite runs.
+     */
+    @Deprecated(forRemoval = true)
+    public static Integer createCashier(final RequestSpecification requestSpec, final ResponseSpecification responseSpec,
+            final Integer tellerId, final Integer staffId) {
+        return (Integer) createCashierWithJson(requestSpec, responseSpec, tellerId, createCashierAsJSON(staffId)).get("resourceId");
     }
 
     public static Map<String, Object> createCashierWithJson(final RequestSpecification requestSpec,
-            final ResponseSpecification responseSpec, final String json) {
-        final String url = CREATE_CASHIER_URL + "?" + Utils.TENANT_IDENTIFIER;
+            final ResponseSpecification responseSpec, final Integer tellerId, final String json) {
+        final String url = "/fineract-provider/api/v1/tellers/" + tellerId + "/cashiers?" + Utils.TENANT_IDENTIFIER;
         return Utils.performServerPost(requestSpec, responseSpec, url, json, "");
     }
 
@@ -130,10 +139,15 @@ public class CashierTransactionsHelper {
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
     @Deprecated(forRemoval = true)
     public static String createCashierAsJSON() {
+        return createCashierAsJSON(1);
+    }
+
+    @Deprecated(forRemoval = true)
+    public static String createCashierAsJSON(final Integer staffId) {
 
         final Map<String, Object> map = getMapWithDates();
 
-        map.put("staffId", 1);
+        map.put("staffId", staffId);
         map.put("description", Utils.uniqueRandomStringGenerator("test__", 4));
         LOG.info("map :  {}", map);
         return new Gson().toJson(map);
@@ -148,8 +162,13 @@ public class CashierTransactionsHelper {
 
         map.put("locale", "en");
         map.put("dateFormat", "yyyyMMdd");
-        map.put("startDate", "20230101");
-        map.put("endDate", "20231231");
+        // Teller fixtures start on 20110920 (see getMapWithStartDate). Cashier range must sit inside the teller
+        // window; use a unique single day after that to avoid CashierAlreadyAllocated when staff is reused.
+        final int dayOffset = Math.floorMod(Utils.uniqueRandomStringGenerator("c", 8).hashCode(), 5000);
+        final java.time.LocalDate day = java.time.LocalDate.of(2012, 1, 1).plusDays(dayOffset);
+        final String dayStr = day.format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE);
+        map.put("startDate", dayStr);
+        map.put("endDate", dayStr);
         map.put("isFullDay", true);
 
         return map;

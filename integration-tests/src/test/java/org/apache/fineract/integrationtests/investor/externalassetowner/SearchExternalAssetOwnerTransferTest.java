@@ -54,8 +54,10 @@ public class SearchExternalAssetOwnerTransferTest extends ExternalAssetOwnerTran
             PagedRequestExternalAssetOwnerSearchRequest searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest(externalId, "", null, null, null, null);
             PageExternalTransferData response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
             validateExternalAssetOwnerTransfer(response, ExpectedExternalTransferData.expected(PENDING, saleTransferResponse.getResourceExternalId(), baseDate, baseDate, "9999-12-31", false, new BigDecimal("15767.420000"), new BigDecimal("15000.000000"), new BigDecimal("757.420000"), new BigDecimal("10.000000"), new BigDecimal("0.000000"), new BigDecimal("0.000000")));
-            // LookUp by Effective Date
-            searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest("", "settlement", baseLocalDate, null, null, null);
+            // LookUp by settlement date. Use a closed [from,to] range (same day) so full-suite pollution of later
+            // settlement dates does not push this transfer off the first page (search sorts settlementDate DESC).
+            searchRequest = EXTERNAL_ASSET_OWNER_HELPER.buildExternalAssetOwnerSearchRequest("", "settlement", baseLocalDate, baseLocalDate,
+                    null, null);
             response = EXTERNAL_ASSET_OWNER_HELPER.searchExternalAssetOwnerTransfer(searchRequest);
             validateExternalAssetOwnerTransfer(response, ExpectedExternalTransferData.expected(PENDING, saleTransferResponse.getResourceExternalId(), baseDate, baseDate, "9999-12-31", false, new BigDecimal("15767.420000"), new BigDecimal("15000.000000"), new BigDecimal("757.420000"), new BigDecimal("10.000000"), new BigDecimal("0.000000"), new BigDecimal("0.000000")));
             // Cancel the External Asset Transfer

@@ -62,7 +62,7 @@ public class ClientSheetPopulator extends AbstractWorkbookPopulator {
     private void setClientNameToClientIdMap() {
         clientNameToClientId = new HashMap<>();
         for (ClientData clientData : allClients) {
-            clientNameToClientId.put(clientData.getDisplayName().trim() + "(" + clientData.getId() + ")", clientData.getId());
+            clientNameToClientId.put(clientLabel(clientData), clientData.getId());
         }
     }
 
@@ -81,17 +81,27 @@ public class ClientSheetPopulator extends AbstractWorkbookPopulator {
     private void setOfficeToClientsMap() {
         officeToClients = new HashMap<>();
         for (ClientData person : allClients) {
-            addToOfficeClientMap(person.getOfficeName().trim().replaceAll("[ )(]", "_"),
-                    person.getDisplayName().trim() + "(" + person.getId() + ")");
+            addToOfficeClientMap(safeName(person.getOfficeName()).replaceAll("[ )(]", "_"), clientLabel(person));
         }
     }
 
     private void setClientNameToSavingsAccountsIdsMap() {
         clientNameToSavingsAccountIds = new HashMap<>();
         for (ClientData client : allClients) {
-            clientNameToSavingsAccountIds.put(client.getDisplayName().trim() + "(" + client.getId() + ")", client.getSavingsAccountId());
+            clientNameToSavingsAccountIds.put(clientLabel(client), client.getSavingsAccountId());
         }
 
+    }
+
+    /**
+     * Display name can be null for incomplete/legacy client rows; workbook generation must not NPE.
+     */
+    private static String clientLabel(final ClientData client) {
+        return safeName(client.getDisplayName()) + "(" + client.getId() + ")";
+    }
+
+    private static String safeName(final String value) {
+        return value == null ? "" : value.trim();
     }
 
     // Guava Multi-map can reduce this.

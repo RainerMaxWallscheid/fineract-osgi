@@ -131,7 +131,8 @@ public abstract class AbstractWorkbookPopulator implements WorkbookPopulator {
                     if (row == null) {
                         row = sheet.createRow(rowIndex);
                     }
-                    writeString(nameCol, row, client.getDisplayName().replaceAll("[ )(] ", "_") + "(" + client.getId() + ")");
+                    final String displayName = client.getDisplayName() == null ? "" : client.getDisplayName();
+                    writeString(nameCol, row, displayName.replaceAll("[ )(] ", "_") + "(" + client.getId() + ")");
 
                     if (client.getActivationDate() != null) {
                         writeDate(activationDateCol, row, client.getActivationDate().format(formatter), dateCellStyle, dateFormat);
