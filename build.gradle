@@ -105,7 +105,7 @@ buildscript {
 
     configurations.classpath {
         resolutionStrategy {
-            // Cargo 1.9.x NPEs on File.list()/listFiles() == null (seen with Java 25 /
+            // Cargo 1.9.x NPEs on File.list()/listFiles() == null (seen with modern JDKs /
             // incomplete extract dirs). Force a current Cargo for the Ant tasks used by
             // the bmuschko cargo plugin.
             force 'org.codehaus.cargo:cargo-core-uberjar:1.10.28'
@@ -205,11 +205,11 @@ allprojects  {
                 // Substitution is to resolve CVE-2025-12183
                 substitute module('org.lz4:lz4-java') using module('at.yawk.lz4:lz4-java:1.11.0')
             }
-            // JDK 25 class files need ASM 9.8+
+            // JDK 21+ class files: pin ASM 9.8+
             eachDependency { details ->
                 if (details.requested.group == 'org.ow2.asm') {
                     details.useVersion '9.8'
-                    details.because 'ASM 9.8 required for Java 25 class file major version 69'
+                    details.because 'ASM 9.8 supports modern class file versions (incl. Java 21)'
                 }
             }
         }
@@ -428,7 +428,7 @@ configure(project.fineractJavaProjects) {
 
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(25)
+            languageVersion = JavaLanguageVersion.of(21)
         }
         withSourcesJar()
         withJavadocJar()
@@ -475,7 +475,7 @@ configure(project.fineractJavaProjects) {
         resolutionStrategy.eachDependency {
             if (it.requested.group == 'org.ow2.asm') {
                 it.useVersion '9.8'
-                it.because "Asm 9.8 is required for JDK 25 class file support"
+                it.because "Asm 9.8 for modern JDK class file support"
             }
         }
     }
@@ -805,7 +805,7 @@ configure(project.fineractJavaProjects) {
         failOnViolations = true
         violationLogLevel="error"
         // Toolchain-driven; pin for modernizer (Gradle 9 does not always expose project.targetCompatibility early)
-        javaVersion = '25'
+        javaVersion = '21'
         ignoreGeneratedClasses = true
         // Rules can be found here: https://github.com/gaul/modernizer-maven-plugin/blob/master/modernizer-maven-plugin/src/main/resources/modernizer.xml
         exclusions = [
