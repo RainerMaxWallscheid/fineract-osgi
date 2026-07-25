@@ -29,14 +29,14 @@ jar {
         attributes(
                 'Bundle-ManifestVersion': '2',
                 'Bundle-Name': 'Apache Fineract Command API',
-                'Bundle-SymbolicName': 'org.apache.fineract.command.api',
+                'Bundle-SymbolicName': 'org.apache.fineract.command.core.api',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Export-Package': 'org.apache.fineract.command.core,org.apache.fineract.command.core.exception',
-                'Automatic-Module-Name': 'org.apache.fineract.command.api'
+                'Automatic-Module-Name': 'org.apache.fineract.command.core.api'
                 )
     }
 }
 
 if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
-    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-command-api/bin/main")
+    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-command-core/api/bin/main")
 }

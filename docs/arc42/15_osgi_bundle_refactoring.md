@@ -35,8 +35,8 @@ fineract-charge-api/
 fineract-charge-impl/
 fineract-charge-test/
 
-fineract-command-api/
-fineract-command-impl/
+fineract-command-core/api/
+fineract-command-core/impl/
 fineract-command-test/
 ```
 

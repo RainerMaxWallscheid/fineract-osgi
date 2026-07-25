@@ -52,8 +52,10 @@ include ':fineract-architecture'
 include ':fineract-security'
 include ':fineract-cob'
 include ':fineract-validation'
-include ':fineract-command-api'
-include ':fineract-command-impl'
+include ':fineract-command-core-api'
+project(':fineract-command-core-api').projectDir = file('fineract-command-core/api')
+include ':fineract-command-core-impl'
+project(':fineract-command-core-impl').projectDir = file('fineract-command-core/impl')
 include ':fineract-command'
 include ':fineract-command-test'
 include ':fineract-command-jdbc'

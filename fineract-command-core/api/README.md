@@ -1,8 +1,10 @@
-# fineract-command-api
+# fineract-command-core/api
+
+Gradle project: `:fineract-command-core-api`
 
 OSGi **interface** bundle for the modern Fineract command stack.
 
-- **Bundle-SymbolicName:** `org.apache.fineract.command.api`
+- **Bundle-SymbolicName:** `org.apache.fineract.command.core.api`
 - **Export-Package:** `org.apache.fineract.command.core`, `org.apache.fineract.command.core.exception`
 - **No Spring** on this surface (ADR-022)
 

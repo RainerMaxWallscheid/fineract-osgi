@@ -19,7 +19,7 @@
 description = 'Fineract Command (compatibility facade: api + impl)'
 
 // Temporary aggregator for consumers still depending on :fineract-command.
-// Prefer :fineract-command-api (+ runtime :fineract-command-impl) going forward.
+// Prefer :fineract-command-core-api (+ runtime :fineract-command-core-impl) going forward.
 apply plugin: 'java-library'
 apply plugin: 'eclipse'
 
