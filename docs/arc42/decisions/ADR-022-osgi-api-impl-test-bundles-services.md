@@ -123,6 +123,7 @@ Full playbook: [15 OSGi Bundle Refactoring](../15_osgi_bundle_refactoring.md).
 ### Related
 
 - Playbook: [15 OSGi Bundle Refactoring](../15_osgi_bundle_refactoring.md)  
+- Command module naming (no `…-core`): [ADR-023](ADR-023-fineract-command-module-naming.md)  
 - Module API: [14](../14_module_api_boundaries.md), [ADR-021](ADR-021-modul-kommunikation-nur-ueber-module-api.md)  
 - Runtime OSGi: [04.4](../04_runtime_view.md)  
 - Crosscutting OSGi: [06.7](../06_crosscutting_concepts.md)  

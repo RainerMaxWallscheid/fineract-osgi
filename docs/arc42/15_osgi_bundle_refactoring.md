@@ -35,8 +35,8 @@ fineract-charge-api/
 fineract-charge-impl/
 fineract-charge-test/
 
-fineract-command-core/api/
-fineract-command-core/impl/
+fineract-command/api/
+fineract-command/impl/
 fineract-command-test/
 ```
 
@@ -178,7 +178,7 @@ sequenceDiagram
 
 ### Suggested pilot order
 
-1. **`fineract-command`** (clear interfaces / small surface) — **detailed plan (as-built under `fineract-command-core/{api,impl}`):** [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md)  
+1. **`fineract-command`** (clear interfaces / small surface) — **detailed plan (as-built under `fineract-command/{api,impl}`):** [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md)  
 2. rates, tax, validation / `fineract-charge`  
 3. branch, document  
 4. savings, accounting  

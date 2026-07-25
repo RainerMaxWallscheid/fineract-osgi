@@ -53,7 +53,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Command Test Fragment',
                 'Bundle-SymbolicName': 'org.apache.fineract.command.test',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Fragment-Host': 'org.apache.fineract.command.core.impl',
+                'Fragment-Host': 'org.apache.fineract.command.impl',
                 'Automatic-Module-Name': 'org.apache.fineract.command.test'
                 )
     }

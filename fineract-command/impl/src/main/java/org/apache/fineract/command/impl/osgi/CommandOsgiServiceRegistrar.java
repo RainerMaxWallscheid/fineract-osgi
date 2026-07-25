@@ -96,7 +96,7 @@ public class CommandOsgiServiceRegistrar implements InitializingBean, Disposable
             return;
         }
         final Dictionary<String, Object> props = new Hashtable<>();
-        props.put("provider", "fineract-command-core-impl");
+        props.put("provider", "fineract-command-impl");
         if (dispatcherKind != null) {
             props.put("dispatcher", dispatcherKind);
         }

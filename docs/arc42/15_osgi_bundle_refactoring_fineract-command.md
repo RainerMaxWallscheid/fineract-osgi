@@ -1,30 +1,30 @@
 # fineract-command – OSGi api / impl / test refactoring plan
 
-Step-by-step pilot for [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) and the general playbook [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md).
+Step-by-step pilot for [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-023](decisions/ADR-023-fineract-command-module-naming.md), and the general playbook [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md).
 
 **Inter-bundle access:** OSGi **Service Registry** only.  
 **Not used:** Apache Karaf Features (or similar feature install descriptors as a module contract).  
-**Spring:** remains **inside** implementation bundles; not removed before OSGi.
+**Spring:** remains **inside** implementation bundles; not removed before OSGi.  
+**Module name:** capability border is **`fineract-command`** (not `…-command-core`) — [ADR-023](decisions/ADR-023-fineract-command-module-naming.md).
 
 ### Implementation status
 
 | Step | Status | Notes |
 |------|--------|-------|
 | 0 Baseline | **done** | Command family tests green before split |
-| 1 Project shells | **done** | Gradle projects + later directory grouping under `fineract-command-core/` |
-| 2 Extract api | **done** | Contracts in `fineract-command-core/api`; no Spring in api |
-| 3 Move impl + façade | **done** | Impl in `fineract-command-core/impl`; `:fineract-command` re-exports api+impl |
-| 3b Directory layout | **done** | `fineract-command-core/{api,impl}` via `projectDir` in `settings.gradle` |
+| 1 Project shells | **done** | Gradle projects + directory grouping under `fineract-command/` |
+| 2 Extract api | **done** | Contracts in `fineract-command/api`; no Spring in api |
+| 3 Move impl + façade | **done** | Impl in `fineract-command/impl`; `:fineract-command` re-exports api+impl |
+| 3b Directory layout | **done** | `fineract-command/{api,impl}` via `projectDir` in `settings.gradle` |
+| 3c Naming (ADR-023) | **done** | Dropped `fineract-command-core*`; BSN `command.api` / `command.impl` |
 | 4 OSGi manifests | **done** | BSN + Export/Import/Fragment-Host on jars |
-| 5 Fragment-Host test | **done** | `:fineract-command-test` → Fragment-Host `org.apache.fineract.command.core.impl` |
+| 5 Fragment-Host test | **done** | `:fineract-command-test` → Fragment-Host `org.apache.fineract.command.impl` |
 | 6 Spring↔OSGi bridge | **done** | `CommandOsgiServiceRegistrar` (reflection; no hard OSGi runtime dep) |
 | 7 Satellites → api | **done** | jdbc/async/disruptor compile on api; audit on api+impl; tests may use impl |
 | 8 Consumer retarget | **partial** | core/provider/cob/document/mix still use façade (compatible) |
-| 9 Docs / acceptance | **done** | This plan + READMEs + `osgi/README.md` |
+| 9 Docs / acceptance | **done** | This plan + READMEs + ADR-023 + `osgi/README.md` |
 
 **Not in this pilot:** packaging/running full Fineract inside Equinox as the primary process.
-
-**Commits (develop):** OSGi split (`ce54fbac5` area), restructure under `fineract-command-core` (`95f04c1f2`).
 
 ---
 
@@ -38,15 +38,15 @@ The modern CQRS command stack ([ADR-004](decisions/ADR-004-cqrs-und-command-pipe
 
 ### 2.1 Filesystem vs Gradle projects
 
-Sources are grouped under `fineract-command-core/`; **Gradle project names** stay path-stable via `projectDir` mapping in `settings.gradle`:
+Sources are grouped under `fineract-command/`; **Gradle project names** stay path-stable via `projectDir` mapping in `settings.gradle`:
 
 ```text
-fineract-command-core/
+fineract-command/
   README.md
-  api/          # Gradle :fineract-command-core-api
-  impl/         # Gradle :fineract-command-core-impl
+  build.gradle  # Gradle :fineract-command  (compatibility façade)
+  api/          # Gradle :fineract-command-api
+  impl/         # Gradle :fineract-command-impl
 
-fineract-command/              # Gradle :fineract-command  (compatibility façade)
 fineract-command-test/         # Gradle :fineract-command-test  (OSGi fragment)
 fineract-command-jdbc/
 fineract-command-async/
@@ -56,10 +56,10 @@ fineract-command-audit/
 
 ```gradle
 // settings.gradle (excerpt)
-include ':fineract-command-core-api'
-project(':fineract-command-core-api').projectDir = file('fineract-command-core/api')
-include ':fineract-command-core-impl'
-project(':fineract-command-core-impl').projectDir = file('fineract-command-core/impl')
+include ':fineract-command-api'
+project(':fineract-command-api').projectDir = file('fineract-command/api')
+include ':fineract-command-impl'
+project(':fineract-command-impl').projectDir = file('fineract-command/impl')
 include ':fineract-command'
 include ':fineract-command-test'
 // … satellites …
@@ -67,32 +67,32 @@ include ':fineract-command-test'
 
 | Path | Gradle project | Role |
 |------|----------------|------|
-| `fineract-command-core/api` | `:fineract-command-core-api` | Contracts; **Export-Package**; no Spring |
-| `fineract-command-core/impl` | `:fineract-command-core-impl` | Sync dispatcher, hooks, starter, OSGi bridge; Spring inside |
-| top-level | `:fineract-command` | Façade: `api` + `impl` for existing Boot consumers |
-| top-level | `:fineract-command-test` | Test fixtures; **Fragment-Host** → core.impl |
+| `fineract-command/api` | `:fineract-command-api` | Contracts; **Export-Package**; no Spring |
+| `fineract-command/impl` | `:fineract-command-impl` | Sync dispatcher, hooks, starter, OSGi bridge; Spring inside |
+| `fineract-command/` (root build) | `:fineract-command` | Façade: `api` + `impl` for existing Boot consumers |
+| top-level | `:fineract-command-test` | Test fixtures; **Fragment-Host** → `command.impl` |
 | top-level | `:fineract-command-jdbc` / `-async` / `-disruptor` / `-audit` | Satellites (compile on api where possible) |
 
 ### 2.2 Bundle-SymbolicName
 
 | Project | Bundle-SymbolicName |
 |---------|---------------------|
-| `:fineract-command-core-api` | `org.apache.fineract.command.core.api` |
-| `:fineract-command-core-impl` | `org.apache.fineract.command.core.impl` |
-| `:fineract-command-test` | `org.apache.fineract.command.test` (`Fragment-Host: org.apache.fineract.command.core.impl`) |
+| `:fineract-command-api` | `org.apache.fineract.command.api` |
+| `:fineract-command-impl` | `org.apache.fineract.command.impl` |
+| `:fineract-command-test` | `org.apache.fineract.command.test` (`Fragment-Host: org.apache.fineract.command.impl`) |
 | satellites (later) | `org.apache.fineract.command.jdbc` / `.async` / `.disruptor` / `.audit` |
 
 ### 2.3 Package placement (as implemented)
 
 | Package | Location | Slice |
 |---------|----------|--------|
-| `org.apache.fineract.command.core` | `fineract-command-core/api` | **api** — ports, `Command`, constants, state, store |
-| `org.apache.fineract.command.core.exception` | `fineract-command-core/api` | **api** |
-| `org.apache.fineract.command.implementation` | `fineract-command-core/impl` | **impl** — default managers + sync dispatcher |
-| `org.apache.fineract.command.hook` | `fineract-command-core/impl` | **impl** |
-| `org.apache.fineract.command.starter` | `fineract-command-core/impl` | **impl** — Boot auto-config |
-| `org.apache.fineract.command.impl.config` | `fineract-command-core/impl` | **impl** — `CommandProperties` (Spring) |
-| `org.apache.fineract.command.impl.osgi` | `fineract-command-core/impl` | **impl** — `CommandOsgiServiceRegistrar` |
+| `org.apache.fineract.command.core` | `fineract-command/api` | **api** — ports, `Command`, constants, state, store |
+| `org.apache.fineract.command.core.exception` | `fineract-command/api` | **api** |
+| `org.apache.fineract.command.implementation` | `fineract-command/impl` | **impl** — default managers + sync dispatcher |
+| `org.apache.fineract.command.hook` | `fineract-command/impl` | **impl** |
+| `org.apache.fineract.command.starter` | `fineract-command/impl` | **impl** — Boot auto-config |
+| `org.apache.fineract.command.impl.config` | `fineract-command/impl` | **impl** — `CommandProperties` (Spring) |
+| `org.apache.fineract.command.impl.osgi` | `fineract-command/impl` | **impl** — `CommandOsgiServiceRegistrar` |
 | `org.apache.fineract.command.test.*` | `fineract-command-test` | **test** fragment fixtures |
 
 ### 2.4 Dependency rules (as implemented)
@@ -100,16 +100,16 @@ include ':fineract-command-test'
 | Consumer | Depends on |
 |----------|------------|
 | `:fineract-command` (façade) | `api` + `impl` (both `api` configuration) |
-| jdbc / async / disruptor | **compile:** `:fineract-command-core-api`; **test:** may add `-core-impl` + `-test` |
-| audit | **compile:** `:fineract-command-core-api` + `:fineract-command-core-impl` (`CommandProperties`) |
-| `:fineract-command-test` | **compile:** `:fineract-command-core-api` only |
+| jdbc / async / disruptor | **compile:** `:fineract-command-api`; **test:** may add `-core-impl` + `-test` |
+| audit | **compile:** `:fineract-command-api` + `:fineract-command-impl` (`CommandProperties`) |
+| `:fineract-command-test` | **compile:** `:fineract-command-api` only |
 | core / provider / cob / document / mix | still `:fineract-command` façade (**Step 8 partial**) |
 
 ### 2.5 Tests (as implemented)
 
 | Location | Types |
 |----------|--------|
-| `fineract-command-core/impl/src/test` | `CommandDispatcherTest`, `DefaultCommandHandlerManagerTest`, `CommandSampleApiTest` |
+| `fineract-command/impl/src/test` | `CommandDispatcherTest`, `DefaultCommandHandlerManagerTest`, `CommandSampleApiTest` |
 | `fineract-command-test` | Sample REST/handlers/services for those tests |
 | satellite modules | Own `TestConfiguration` + optional IT |
 
@@ -117,8 +117,8 @@ include ':fineract-command-test'
 
 ```mermaid
 flowchart TB
-  API[command-core-api<br/>Export-Package core + exception]
-  IMPL[command-core-impl<br/>sync dispatcher, hooks, Spring]
+  API[command-api<br/>Export-Package core + exception]
+  IMPL[command-impl<br/>sync dispatcher, hooks, Spring]
   JDBC[command-jdbc]
   ASYNC[command-async]
   DISR[command-disruptor]
@@ -152,7 +152,7 @@ Before the split, a single top-level `fineract-command` module held contracts, d
 
 ## 4. Contract vs implementation (what goes where)
 
-### 4.1 `:fineract-command-core-api` (`fineract-command-core/api`)
+### 4.1 `:fineract-command-api` (`fineract-command/api`)
 
 **Pure Java** contracts:
 
@@ -182,7 +182,7 @@ Before the split, a single top-level `fineract-command` module held contracts, d
 
 Handlers and individual hooks stay Spring-scanned inside the process for the pilot.
 
-### 4.2 `:fineract-command-core-impl` (`fineract-command-core/impl`)
+### 4.2 `:fineract-command-impl` (`fineract-command/impl`)
 
 - `implementation.*` (default managers + sync dispatcher)
 - `hook.*` (built-in hooks)
@@ -195,7 +195,7 @@ Spring stays here: `@Component`, `@Configuration`, `@ConditionalOnMissingBean`, 
 ### 4.3 `:fineract-command-test` (fragment)
 
 - **Fragment** of core-impl for white-box/unit tests and sample fixtures
-- Manifest: `Fragment-Host: org.apache.fineract.command.core.impl`
+- Manifest: `Fragment-Host: org.apache.fineract.command.impl`
 - Pure contract tests (mock `CommandDispatcher` only) can stay as plain JUnit without fragment
 
 ---
@@ -212,7 +212,7 @@ Execute as **separate PRs** so each step stays reviewable and green. Checkboxes 
 
 ### Step 1 — Introduce empty projects + settings ✅
 
-1. [x] Add projects `:fineract-command-core-api`, `:fineract-command-core-impl`
+1. [x] Add projects `:fineract-command-api`, `:fineract-command-impl`
 2. [x] Register in `settings.gradle`
 3. [x] api = `java-library`, no Spring Boot; impl = Spring deps + depends on api
 4. [x] Keep `:fineract-command` as compatibility façade
@@ -230,21 +230,21 @@ Execute as **separate PRs** so each step stays reviewable and green. Checkboxes 
 3. [x] Façade option A: thin module re-exporting api + impl
 4. [x] Root `build.gradle` project lists updated
 
-### Step 3b — Directory layout under `fineract-command-core/` ✅
+### Step 3b — Directory layout under `fineract-command/` ✅
 
 **Goal:** Physical grouping without renaming Gradle project coordinates.
 
-1. [x] Move api sources to `fineract-command-core/api`
-2. [x] Move impl sources to `fineract-command-core/impl`
-3. [x] Map via `project(…).projectDir = file('fineract-command-core/…')`
-4. [x] Keep project names `:fineract-command-core-api` / `:fineract-command-core-impl` (stable for deps / CI)
-5. [x] Keep test project as top-level `:fineract-command-test` (not under `fineract-command-core/`)
+1. [x] Move api sources to `fineract-command/api`
+2. [x] Move impl sources to `fineract-command/impl`
+3. [x] Map via `project(…).projectDir = file('fineract-command/…')`
+4. [x] Keep project names `:fineract-command-api` / `:fineract-command-impl` (stable for deps / CI)
+5. [x] Keep test project as top-level `:fineract-command-test` (not under `fineract-command/`)
 
 ### Step 4 — Bundle metadata ✅
 
 | Header | api | impl |
 |--------|-----|------|
-| `Bundle-SymbolicName` | `org.apache.fineract.command.core.api` | `org.apache.fineract.command.core.impl` |
+| `Bundle-SymbolicName` | `org.apache.fineract.command.api` | `org.apache.fineract.command.impl` |
 | `Bundle-Version` | project version | project version |
 | `Export-Package` | `core` + `core.exception` | limited (`impl.config`, `starter` for Boot/audit) |
 | `Import-Package` | minimal | api packages + Spring + … |
@@ -253,9 +253,9 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 
 ### Step 5 — Convert `fineract-command-test` to Fragment-Host ✅
 
-1. [x] Fragment-Host → `org.apache.fineract.command.core.impl`
+1. [x] Fragment-Host → `org.apache.fineract.command.impl`
 2. [x] White-box tests live under core-impl; fixtures in `fineract-command-test`
-3. [x] `:fineract-command-core-impl:test` uses `testImplementation project(':fineract-command-test')`
+3. [x] `:fineract-command-impl:test` uses `testImplementation project(':fineract-command-test')`
 
 ### Step 6 — Spring↔OSGi bridge ✅
 
@@ -278,12 +278,12 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 1. [ ] Retarget `fineract-mix` / provider / core / cob / document off façade to api + runtime impl
 2. [ ] Deprecate or remove façade `:fineract-command` when safe
 3. [x] Root project lists include core-api / core-impl
-4. [ ] ArchUnit/Gradle check: domain modules must not depend on `fineract-command-core-impl` (allow provider + tests)
+4. [ ] ArchUnit/Gradle check: domain modules must not depend on `fineract-command-impl` (allow provider + tests)
 
 ### Step 9 — Documentation & acceptance ✅ (ongoing)
 
 - [x] Plan updated with as-built layout (this document)
-- [x] `fineract-command` / `fineract-command-core` READMEs
+- [x] `fineract-command` / `fineract-command` READMEs
 - [x] `osgi/README.md` pilot table
 - [ ] Optional Gherkin `@adr-022` for command service present/absent
 
@@ -298,7 +298,7 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 | 5 | No Karaf Feature descriptors | done |
 | 6 | Spring still wires impl under Boot | done |
 | 7 | Fragment-Host tests green | done |
-| 8 | Sources under `fineract-command-core/{api,impl}` | done |
+| 8 | Sources under `fineract-command/{api,impl}` | done |
 | 9 | Full consumer retarget off façade | **open** |
 
 ---
@@ -310,7 +310,7 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 | PR-1 | command: core-api / core-impl shells | 1 | done |
 | PR-2 | command: extract core-api contracts | 2 | done |
 | PR-3 | command: move default stack to core-impl + façade | 3 | done |
-| PR-3b | command: group sources under fineract-command-core/{api,impl} | 3b | done |
+| PR-3b | command: group sources under fineract-command/{api,impl} | 3b | done |
 | PR-4 | command: OSGi bundle manifests | 4 | done |
 | PR-5 | command: Fragment-Host test bundle | 5 | done |
 | PR-6 | command: Spring↔OSGi service registrar | 6 | done |
@@ -326,7 +326,7 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 | Package split breaks Boot auto-config | `AutoConfiguration.imports` on impl; façade re-exports |
 | Multiple `CommandDispatcher` beans | `@ConditionalOnMissingBean` + OSGi service ranking |
 | `CommandProperties` on api by mistake | Lives in `impl.config` only |
-| Nested dirs break Gradle `it.name` lists | Keep project names `fineract-command-core-api` / `-impl` with `projectDir` |
+| Nested dirs break Gradle `it.name` lists | Keep project names `fineract-command-api` / `-impl` with `projectDir` |
 | Equinox not embedded in CI | Manifest + unit tests first; Equinox smoke optional |
 | `fineract-command-test` dual role | Fixtures + fragment; not a production dependency |
 
@@ -347,8 +347,8 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 
 ```bash
 # Core command stack
-./gradlew :fineract-command-core-api:build \
-  :fineract-command-core-impl:test \
+./gradlew :fineract-command-api:build \
+  :fineract-command-impl:test \
   :fineract-command-test:jar \
   :fineract-command:jar \
   :fineract-command-jdbc:test \
@@ -357,8 +357,8 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
   :fineract-command-audit:test
 
 # Install pilot jars for Equinox experiments
-# cp fineract-command-core/api/build/libs/*.jar osgi/bundles/
-# cp fineract-command-core/impl/build/libs/*.jar osgi/bundles/
+# cp fineract-command/api/build/libs/*.jar osgi/bundles/
+# cp fineract-command/impl/build/libs/*.jar osgi/bundles/
 ```
 
 ---
@@ -368,14 +368,14 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 | Doc | Use |
 |-----|-----|
 | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) | Decision: services, api/impl/test, Spring stays |
+| [ADR-023](decisions/ADR-023-fineract-command-module-naming.md) | Capability name `fineract-command`; drop `…-core` |
 | [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) | General stages B0–B6 |
 | [ADR-003](decisions/ADR-003-spring-boot-gradle-module-als-kern-beibehalten.md) | Spring Boot retained |
 | [ADR-004](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) | New command stack |
 | [ADR-002](decisions/ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md) | Equinox |
 | [`fineract-command/README.md`](../../fineract-command/README.md) | Stack motivation + layout table |
-| [`fineract-command-core/README.md`](../../fineract-command-core/README.md) | Directory grouping api/impl |
 | [`osgi/README.md`](../../osgi/README.md) | Equinox scaffold + pilot BSN table |
 
 ---
 
-*Navigation:* [15 general playbook](15_osgi_bundle_refactoring.md) · [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) · [arc42 README](README.md)
+*Navigation:* [15 general playbook](15_osgi_bundle_refactoring.md) · [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) · [ADR-023](decisions/ADR-023-fineract-command-module-naming.md) · [arc42 README](README.md)

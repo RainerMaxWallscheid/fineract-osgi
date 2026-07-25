@@ -13,7 +13,7 @@ This directory contains the arc42 documentation for **fineract-osgi** – Apache
 | 05 | [Deployment View](05_deployment_view.md) | Compose, K8s, modes, OSGi operations |
 | 06 | [Crosscutting Concepts](06_crosscutting_concepts.md) | Tenant, Security, CQRS, Events, Observability |
 | 07 | [Quality Attributes](07_quality_attributes.md) | NFRs, scenarios, trade-offs |
-| 08 | [Design Decisions](08_design_decisions.md) | ADRs 001–022 in [`decisions/`](decisions/) |
+| 08 | [Design Decisions](08_design_decisions.md) | ADRs 001–023 in [`decisions/`](decisions/) |
 | 09 | [Glossary](09_glossary.md) | Terms, abbreviations, ports, env |
 | 10 | [Domain Context Map](10_domain_context_map.md) | Bounded contexts, subdomains, U/D map, migration order (DDD D1) |
 | 11 | [Aggregate Canvas](11_aggregate_canvas.md) | Loan, SavingsAccount, Client: invariants, commands, events, conflicts (tactical DDD) |

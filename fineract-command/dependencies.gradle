@@ -19,6 +19,6 @@
 
 dependencies {
     // Compatibility façade: re-export api + impl so existing Boot wiring keeps working.
-    api project(path: ':fineract-command-core-api')
-    api project(path: ':fineract-command-core-impl')
+    api project(path: ':fineract-command-api')
+    api project(path: ':fineract-command-impl')
 }

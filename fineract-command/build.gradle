@@ -16,10 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-description = 'Fineract Command (compatibility facade: api + impl)'
+description = 'Fineract Command (compatibility façade: :fineract-command-api + :fineract-command-impl)'
 
 // Temporary aggregator for consumers still depending on :fineract-command.
-// Prefer :fineract-command-core-api (+ runtime :fineract-command-core-impl) going forward.
+// Prefer :fineract-command-api (+ runtime :fineract-command-impl) going forward.
 apply plugin: 'java-library'
 apply plugin: 'eclipse'
 

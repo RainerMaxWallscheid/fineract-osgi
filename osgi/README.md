@@ -3,17 +3,17 @@
 Minimal layout for running Eclipse Equinox alongside Fineract modularization work.
 See also `docs/arc42/` (Runtime / Deployment / OSGi concepts).
 
-**Architecture (target):** domain modules split into **api / impl / test** bundles; inter-bundle access only via the **OSGi Service Registry** (not Karaf Features). Spring may remain inside impl bundles. Full decision and stages: [ADR-022](../docs/arc42/decisions/ADR-022-osgi-api-impl-test-bundles-services.md), playbook [15 OSGi Bundle Refactoring](../docs/arc42/15_osgi_bundle_refactoring.md).
+**Architecture (target):** domain modules split into **api / impl / test** bundles; inter-bundle access only via the **OSGi Service Registry** (not Karaf Features). Spring may remain inside impl bundles. Decisions: [ADR-022](../docs/arc42/decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-023](../docs/arc42/decisions/ADR-023-fineract-command-module-naming.md) (command module naming). Playbook: [15 OSGi Bundle Refactoring](../docs/arc42/15_osgi_bundle_refactoring.md).
 
 ### Pilot: fineract-command bundles
 
 | Artifact | Bundle-SymbolicName |
 |----------|---------------------|
-| `fineract-command-core-api` | `org.apache.fineract.command.core.api` |
-| `fineract-command-core-impl` | `org.apache.fineract.command.core.impl` |
-| `fineract-command-test` | `org.apache.fineract.command.test` (`Fragment-Host: org.apache.fineract.command.core.impl`) |
+| `fineract-command-api` | `org.apache.fineract.command.api` |
+| `fineract-command-impl` | `org.apache.fineract.command.impl` |
+| `fineract-command-test` | `org.apache.fineract.command.test` (`Fragment-Host: org.apache.fineract.command.impl`) |
 
-Build jars: `./gradlew :fineract-command-core-api:jar :fineract-command-core-impl:jar :fineract-command-test:jar`  
+Build jars: `./gradlew :fineract-command-api:jar :fineract-command-impl:jar :fineract-command-test:jar`  
 Copy into `osgi/bundles/` for Equinox resolve experiments. Plan: [15_osgi_bundle_refactoring_fineract-command.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-command.md).
 
 ## Layout

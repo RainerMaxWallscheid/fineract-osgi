@@ -51,11 +51,11 @@ jar {
         attributes(
                 'Bundle-ManifestVersion': '2',
                 'Bundle-Name': 'Apache Fineract Command Implementation',
-                'Bundle-SymbolicName': 'org.apache.fineract.command.core.impl',
+                'Bundle-SymbolicName': 'org.apache.fineract.command.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Import-Package': 'org.apache.fineract.command.core,org.apache.fineract.command.core.exception,*',
-                'Export-Package': 'org.apache.fineract.command.core.impl.config,org.apache.fineract.command.starter',
-                'Automatic-Module-Name': 'org.apache.fineract.command.core.impl'
+                'Export-Package': 'org.apache.fineract.command.impl.config,org.apache.fineract.command.starter',
+                'Automatic-Module-Name': 'org.apache.fineract.command.impl'
                 )
     }
 }
@@ -69,7 +69,7 @@ modernizer {
 }
 
 if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
-    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-command-core/impl/bin/main")
+    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-command/impl/bin/main")
 }
 
 if (!(project.hasProperty('env') && project.getProperty('env') == 'dev')) {

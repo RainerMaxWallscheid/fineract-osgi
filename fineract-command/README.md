@@ -4,18 +4,18 @@ OSGi modularity (fineract-osgi)
 Step-by-step plan:
 
 - [docs/arc42/15_osgi_bundle_refactoring_fineract-command.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-command.md)
-- Decision: [ADR-022](../docs/arc42/decisions/ADR-022-osgi-api-impl-test-bundles-services.md)
+- Decisions: [ADR-022](../docs/arc42/decisions/ADR-022-osgi-api-impl-test-bundles-services.md) (bundles/services), [ADR-023](../docs/arc42/decisions/ADR-023-fineract-command-module-naming.md) (module name `fineract-command`, drop `…-core`)
 
 ### Layout (implemented)
 
 | Gradle project | Bundle-SymbolicName | Role |
 |----------------|---------------------|------|
-| `fineract-command-core-api` | `org.apache.fineract.command.core.api` | Contracts (`core` + exceptions); **Export-Package** |
-| `fineract-command-core-impl` | `org.apache.fineract.command.core.impl` | Default sync dispatcher, hooks, Spring starter, OSGi service registrar |
-| `fineract-command-test` | `org.apache.fineract.command.test` | Test fixtures; **Fragment-Host** → `command.core.impl` |
+| `fineract-command-api` | `org.apache.fineract.command.api` | Contracts (`core` + exceptions); **Export-Package** |
+| `fineract-command-impl` | `org.apache.fineract.command.impl` | Default sync dispatcher, hooks, Spring starter, OSGi service registrar |
+| `fineract-command-test` | `org.apache.fineract.command.test` | Test fixtures; **Fragment-Host** → `command.impl` |
 | `fineract-command` | *(facade JAR)* | Compatibility aggregator: `api` + `impl` for existing consumers |
 
-Prefer new code depending on **`fineract-command-core-api`** only (plus runtime `fineract-command-core-impl` when defaults are required).  
+Prefer new code depending on **`fineract-command-api`** only (plus runtime `fineract-command-impl` when defaults are required).  
 Inter-bundle access: **OSGi Service Registry** (`CommandOsgiServiceRegistrar` in impl). Not Karaf Features.  
 Spring remains inside **impl**.
 

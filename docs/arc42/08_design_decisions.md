@@ -45,6 +45,7 @@ Individual ADRs live under [`decisions/`](decisions/) – **one file per decisio
 | [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) | Event Sourcing Writes | accepted | Create/Update/Delete event-sourced; inventory → [12](12_event_catalog.md) |
 | [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md) | Module API only | accepted | Subprojects only via `moduleapi` / Events / Shared Kernel |
 | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) | OSGi api/impl/test + services | accepted | Bundle split; Service Registry only; no Karaf Features; Spring stays in impl |
+| [ADR-023](decisions/ADR-023-fineract-command-module-naming.md) | Command module naming | accepted | Capability name `fineract-command`; drop `…-core`; api/impl under that tree |
 
 ```mermaid
 flowchart TB
@@ -74,6 +75,10 @@ flowchart TB
     ADR003 --> ADR022
     ADR021 --> ADR022
     ADR017 --> ADR022
+    ADR022 --> ADR023[ADR-023 Command naming]
+    ADR004 --> ADR023
+    ADR017 --> ADR023
+    ADR019 --> ADR023
     ADR002 --> ADR005[ADR-005 External AI]
     ADR005 --> ADR006[ADR-006 Async AI]
     ADR003 --> ADR007[ADR-007 Node Modes]
@@ -133,6 +138,7 @@ flowchart TB
 | 020 Event Sourcing | ++ | + | + | ± | + | + | ± | ± | ± |
 | 021 Module API | + | | | | ++ | ++ | | | + |
 | 022 OSGi api/impl/test | | ± | + | | ++ | ++ | | ± | + |
+| 023 Command naming | | | | | ++ | + | | | + |
 
 *(++ strongly positive, + positive, ± mixed/trade-off)*
 
