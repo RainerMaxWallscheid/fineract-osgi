@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-description = 'Fineract Command Core (compatibility facade: api + impl)'
+description = 'Fineract Command (compatibility facade: api + impl)'
 
-// Temporary aggregator for consumers still depending on :fineract-command-core.
+// Temporary aggregator for consumers still depending on :fineract-command.
 // Prefer :fineract-command-api (+ runtime :fineract-command-impl) going forward.
 apply plugin: 'java-library'
 apply plugin: 'eclipse'
@@ -26,5 +26,5 @@ apply plugin: 'eclipse'
 apply from: 'dependencies.gradle'
 
 if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
-    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-command-core/bin/main")
+    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-command/bin/main")
 }

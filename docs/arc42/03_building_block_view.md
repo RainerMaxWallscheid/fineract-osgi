@@ -135,7 +135,7 @@ flowchart TB
 |--------|------|
 | **fineract-core** | Shared infrastructure: legacy commands, config, ThreadLocal/tenant helpers, various platform services |
 | **fineract-security** | AuthN/Z, tenant-aware filters, OIDC, 2FA, login/user-details APIs |
-| **fineract-command-*** | New type-safe command stack (`-api` / `-impl` / `-core` façade; dispatcher, handler API, hooks) |
+| **fineract-command** | New type-safe command stack (dispatcher, handler API, hooks) |
 | **fineract-command-async** | Asynchronous dispatcher variant |
 | **fineract-command-disruptor** | LMAX Disruptor variant |
 | **fineract-command-jdbc** / **-audit** | Persistence/audit aspects of the new stack |

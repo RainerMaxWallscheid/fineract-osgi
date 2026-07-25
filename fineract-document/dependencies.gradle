@@ -26,7 +26,7 @@ dependencies {
     //
     implementation(
             project(path: ':fineract-core'),
-            project(path: ':fineract-command-core'),
+            project(path: ':fineract-command'),
             )
 
     implementation(

@@ -13,13 +13,13 @@ Step-by-step pilot for [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-se
 | 0 Baseline | done | Command family tests green before split |
 | 1 Project shells | done | `fineract-command-api`, `fineract-command-impl` in `settings.gradle` |
 | 2 Extract api | done | `core` + `exception` contracts; no Spring in api |
-| 3 Move impl + façade | done | `fineract-command-core` re-exports api+impl; `CommandProperties` → `impl.config` |
+| 3 Move impl + façade | done | `fineract-command` re-exports api+impl; `CommandProperties` → `impl.config` |
 | 4 OSGi manifests | done | BSN + Export/Import/Fragment-Host on jars |
 | 5 Fragment-Host test | done | `fineract-command-test` Fragment-Host → `org.apache.fineract.command.impl` |
 | 6 Spring↔OSGi bridge | done | `CommandOsgiServiceRegistrar` (reflection; no hard OSGi runtime dep) |
 | 7 Satellites → api | done | jdbc/async/disruptor compile on api; audit on api+impl; tests may use impl |
 | 8 Consumer retarget | partial | core/provider/cob/document/mix still use façade (compatible) |
-| 9 Docs / acceptance | done | This table + `fineract-command-core/README.md` |
+| 9 Docs / acceptance | done | This table + `fineract-command/README.md` |
 
 **Not in this pilot:** packaging/running full Fineract inside Equinox as the primary process.
 
@@ -27,11 +27,11 @@ Step-by-step pilot for [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-se
 
 ## 1. Why this pilot
 
-`fineract-command-core` is the modern CQRS command stack ([ADR-004](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md)). It is already small, interface-heavy, and has satellite modules:
+`fineract-command` is the modern CQRS command stack ([ADR-004](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md)). It is already small, interface-heavy, and has satellite modules:
 
 | Gradle project | Role today |
 |----------------|------------|
-| `fineract-command-core` | Core contracts + default sync dispatcher + hooks + Spring starter |
+| `fineract-command` | Core contracts + default sync dispatcher + hooks + Spring starter |
 | `fineract-command-jdbc` | `CommandStore` JDBC adapter |
 | `fineract-command-async` | Async `CommandDispatcher` impl |
 | `fineract-command-disruptor` | Disruptor `CommandDispatcher` impl |
@@ -44,7 +44,7 @@ That makes it a good **B2 pilot**: clear ports (`CommandDispatcher`, `CommandSto
 
 ## 2. Current inventory (as-is)
 
-### 2.1 Packages in `fineract-command-core`
+### 2.1 Packages in `fineract-command`
 
 | Package | Contents | Target slice |
 |---------|----------|--------------|
@@ -55,7 +55,7 @@ That makes it a good **B2 pilot**: clear ports (`CommandDispatcher`, `CommandSto
 | `org.apache.fineract.command.starter` | `CommandConfiguration`, `CommandAutoConfiguration` | **impl** |
 | `CommandProperties` (in `core` today) | `@ConfigurationProperties` | **impl** (Spring-specific; keep out of pure api export if possible) |
 
-### 2.2 Downstream consumers of `project(':fineract-command-core')`
+### 2.2 Downstream consumers of `project(':fineract-command')`
 
 - `fineract-command-jdbc`, `-async`, `-disruptor`, `-audit`, `-test`
 - `fineract-mix` (and any provider wiring via Boot auto-config)
@@ -66,7 +66,7 @@ After the split, these must compile against **`fineract-command-api` only** (plu
 
 | Location | Types |
 |----------|--------|
-| `fineract-command-impl/src/test` (formerly under façade) | `CommandDispatcherTest`, `DefaultCommandHandlerManagerTest`, `CommandSampleApiTest` |
+| `fineract-command/src/test` | `CommandDispatcherTest`, `DefaultCommandHandlerManagerTest`, `CommandSampleApiTest` |
 | `fineract-command-test` | Sample REST/handlers/services used by those tests |
 | satellite modules | Own `TestConfiguration` + optional IT |
 
@@ -182,11 +182,11 @@ Execute as **separate PRs** so each step stays reviewable and green.
 
 **Goal:** Align team on scope; no code move yet.
 
-- [ ] Confirm pilot = `fineract-command-core` ([ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) B2)
+- [ ] Confirm pilot = `fineract-command` ([ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) B2)
 - [ ] Read this plan + [15](15_osgi_bundle_refactoring.md)
 - [ ] Baseline green:  
-  `./gradlew :fineract-command-core:test :fineract-command-jdbc:test :fineract-command-async:test :fineract-command-disruptor:test :fineract-command-audit:test`
-- [ ] List all `implementation project(':fineract-command-core')` edges (settings / dependencies)
+  `./gradlew :fineract-command:test :fineract-command-jdbc:test :fineract-command-async:test :fineract-command-disruptor:test :fineract-command-audit:test`
+- [ ] List all `implementation project(':fineract-command')` edges (settings / dependencies)
 
 **Exit:** Baseline green; owners agreed.
 
@@ -202,16 +202,16 @@ Execute as **separate PRs** so each step stays reviewable and green.
 2. Register in `settings.gradle`
 3. Copy/adapt `build.gradle` / `dependencies.gradle` stubs:
    - **api:** `java-library`, minimal deps (Guava if `CommandHandler` stays; **no** Spring Boot)
-   - **impl:** depends on `api` + current Spring deps from today`s `fineract-command-core`
-4. Keep existing `:fineract-command-core` as **facade** temporarily (see Step 3) **or** rename in place later — recommended temporary facade:
+   - **impl:** depends on `api` + current Spring deps from today`s `fineract-command`
+4. Keep existing `:fineract-command` as **facade** temporarily (see Step 3) **or** rename in place later — recommended temporary facade:
 
 ```text
-fineract-command-core  →  aggregator that re-exports api + impl for one release
+fineract-command  →  aggregator that re-exports api + impl for one release
 fineract-command-api
 fineract-command-impl
 ```
 
-**Exit:** Empty projects compile; existing modules still use `:fineract-command-core`.
+**Exit:** Empty projects compile; existing modules still use `:fineract-command`.
 
 ---
 
@@ -225,7 +225,7 @@ fineract-command-impl
    - `hook.*`
    - `starter.*`
    - `CommandProperties` if it carries Spring annotations → move to impl package
-3. Fix `fineract-command-core` (legacy project or impl) to `api project(':fineract-command-api')`
+3. Fix `fineract-command` (legacy project or impl) to `api project(':fineract-command-api')`
 4. Point satellites (`jdbc`, `async`, `disruptor`, `audit`, `test`) at **`fineract-command-api`** instead of full command module for compile scope; runtime still needs impl where required.
 
 **Package note:** Keeping `org.apache.fineract.command.core` package name in the api JAR is intentional (binary-friendly). OSGi Export-Package is that package, not a rename to `moduleapi` in this pilot. Optional later alias package `…command.moduleapi` is out of scope.
@@ -234,7 +234,7 @@ fineract-command-impl
 
 ```bash
 ./gradlew :fineract-command-api:compileJava \
-  :fineract-command-core:test \
+  :fineract-command:test \
   :fineract-command-jdbc:test \
   :fineract-command-async:test \
   :fineract-command-disruptor:test \
@@ -251,10 +251,10 @@ All green; api JAR contains **no** Spring types.
 
 1. Move `implementation`, `hook`, `starter`, `CommandProperties` → `fineract-command-impl`
 2. Move `META-INF/spring/….AutoConfiguration.imports` → impl
-3. Make `fineract-command-core` either:
-   - **A (recommended):** thin compatibility module depending on `api` + `impl` (for Boot apps that still use `project(':fineract-command-core')`), or  
+3. Make `fineract-command` either:
+   - **A (recommended):** thin compatibility module depending on `api` + `impl` (for Boot apps that still use `project(':fineract-command')`), or  
    - **B:** delete and retarget all consumers to `api` + `impl` in the same PR (larger blast radius)
-4. Update `build.gradle` root lists / spotless / jacoco includes if they name `fineract-command-core` only
+4. Update `build.gradle` root lists / spotless / jacoco includes if they name `fineract-command` only
 5. Eclipse `sourceSets` paths (env=eclipse) → update to new project dirs
 
 **Exit:** Runtime behaviour unchanged under Spring Boot auto-config; unit tests still pass via Spring test context.
@@ -292,7 +292,7 @@ Install pilot JARs under `osgi/bundles/` and smoke-start Equinox (`osgi/start-eq
 1. Add OSGi fragment manifest to `fineract-command-test`:
    - `Fragment-Host: org.apache.fineract.command.impl`
    - `Bundle-SymbolicName: org.apache.fineract.command.test`
-2. Move white-box tests from `fineract-command-impl/src/test` (formerly under façade) (or keep running as Gradle tests that put fragment + host on classpath)
+2. Move white-box tests from `fineract-command/src/test` (or keep running as Gradle tests that put fragment + host on classpath)
 3. Gradle test classpath for `:fineract-command-impl:test`:
    - `testImplementation project(':fineract-command-test')`  
    - plus test runtime of sample fixtures
@@ -351,7 +351,7 @@ Do **one satellite per PR** after core is stable.
 
 For each:
 
-1. Replace `implementation project(':fineract-command-core')` with `api project(':fineract-command-api')` (+ runtime `impl` only if tests need defaults)
+1. Replace `implementation project(':fineract-command')` with `api project(':fineract-command-api')` (+ runtime `impl` only if tests need defaults)
 2. Add bundle manifest
 3. Register OSGi service if the type is a public port
 4. Keep Spring auto-config for Boot path
@@ -364,8 +364,8 @@ For each:
 
 **Goal:** Remove temporary façade if used.
 
-1. Retarget `fineract-mix` / provider / any remaining `project(':fineract-command-core')` → `fineract-command-api` + runtime `fineract-command-impl` (and jdbc as needed)
-2. Deprecate or remove empty aggregator `fineract-command-core` project
+1. Retarget `fineract-mix` / provider / any remaining `project(':fineract-command')` → `fineract-command-api` + runtime `fineract-command-impl` (and jdbc as needed)
+2. Deprecate or remove empty aggregator `fineract-command` project
 3. Update root `build.gradle` project lists, docs, README links
 4. Add ArchUnit or Gradle check: domain modules must not depend on `fineract-command-impl` (allow provider + tests)
 
@@ -376,7 +376,7 @@ For each:
 ### Step 9 — Documentation & acceptance
 
 - [ ] Update [15](15_osgi_bundle_refactoring.md) pilot status (B2 done for command)
-- [ ] Update `fineract-command-core` README (or new api/impl READMEs): BSN, exports, services
+- [ ] Update `fineract-command` README (or new api/impl READMEs): BSN, exports, services
 - [ ] Note in [osgi/README.md](../../osgi/README.md) how to install command api+impl
 - [ ] Gherkin: optional scenario tag `@adr-022` for command service present/absent if useful
 - [ ] Checklist from [15.10](15_osgi_bundle_refactoring.md#1510-checklist-pr--module-review) all green
@@ -459,7 +459,7 @@ For each:
 | [ADR-003](decisions/ADR-003-spring-boot-gradle-module-als-kern-beibehalten.md) | Spring Boot retained |
 | [ADR-004](decisions/ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md) | New command stack |
 | [ADR-002](decisions/ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md) | Equinox |
-| [`fineract-command-core/README.md`](../../fineract-command-core/README.md) | Product motivation of new command stack |
+| [`fineract-command/README.md`](../../fineract-command/README.md) | Product motivation of new command stack |
 | [`osgi/README.md`](../../osgi/README.md) | Equinox scaffold |
 
 ---
