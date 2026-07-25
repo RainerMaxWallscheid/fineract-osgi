@@ -41,7 +41,7 @@ Chapter references: [01](01_introduction.md)–[13](13_archunit_bounded_context_
 | **Circuit Breaker** | T | Resilience pattern: temporarily stops calls to a failing downstream (e.g. AI API). |
 | **COB** | F | *Close of Business* – periodic day-end processing (interest, penalties, status, etc.), often partitioned. → [04](04_runtime_view.md) |
 | **Command** | T | Write instruction in the CQRS model; legacy as `CommandWrapper`/`JsonCommand`, new as type-safe `Command<REQ>`. |
-| **Command Dispatcher** | T | Component in module `fineract-command` that routes commands to handlers (sync/async/Disruptor). → [04](04_runtime_view.md) |
+| **Command Dispatcher** | T | Component in the `fineract-command-*` stack that routes commands to handlers (sync/async/Disruptor). → [04](04_runtime_view.md) |
 | **Command Handler** | T | Executes the domain write logic for a command type (`NewCommandSourceHandler` or `CommandHandler<REQ,RES>`). |
 | **Command Hook** | T | Before/after/error callback around command execution (e.g. username, timestamp). |
 | **Compatibility** | A | Quality goal: stable REST contracts despite internal migration. → [07](07_quality_attributes.md) |
@@ -81,7 +81,7 @@ Chapter references: [01](01_introduction.md)–[13](13_archunit_bounded_context_
 | **FineractGsonTypeAdapterRegistrar** | T | SPI interface in `fineract-core`; modules register Gson TypeAdapter via `ServiceLoader` in `GoogleGsonSerializerHelper`. → [06.13](06_crosscutting_concepts.md) |
 | **Feature Bundle** | T | OSGi **impl** bundle with optional domain/integration function (AI, product rules, …). Informal name only — integration is via the **Service Registry**, not Apache Karaf Features. → [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) |
 | **Fragment-Host** | T | OSGi manifest header: a fragment bundle attaches to a host (typically `*-impl`) and shares its classloader; used for test bundles. → [15](15_osgi_bundle_refactoring.md) |
-| **fineract-command** | T | Module for the modern, type-safe command stack parallel to the legacy pipeline. |
+| **fineract-command-*** | T | Command stack modules: `fineract-command-api` / `-impl` / `-core` (façade) / satellites; modern type-safe CQRS stack parallel to legacy. |
 | **fineract-osgi** | A | This workstream/fork: Fineract core + OSGi modularity + AI extensibility. → [01](01_introduction.md) |
 | **fineract-provider** | T | Main application module (boot, REST, wiring of domain modules). |
 | **fineract_tenants** | T | Registry database/schema with tenant metadata and connection info. → [05](05_deployment_view.md) |
@@ -185,7 +185,7 @@ Chapter references: [01](01_introduction.md)–[13](13_archunit_bounded_context_
 |------|-------------------|
 | `fineract-provider` | Bootable server, REST, wiring |
 | `fineract-core` | Infrastructure, legacy commands, shared core parts |
-| `fineract-command` | New command stack |
+| `fineract-command-*` | New command stack (api/impl/core façade + satellites) |
 | `fineract-command-async` / `-disruptor` / `-jdbc` / `-audit` | Optional command implementation variants |
 | `fineract-loan` / `fineract-savings` / `fineract-accounting` / … | Domain modules |
 | `fineract-security` | AuthN/Z, tenant filters, OIDC, 2FA |

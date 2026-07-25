@@ -13,7 +13,7 @@ Step-by-step plan:
 | `fineract-command-api` | `org.apache.fineract.command.api` | Contracts (`core` + exceptions); **Export-Package** |
 | `fineract-command-impl` | `org.apache.fineract.command.impl` | Default sync dispatcher, hooks, Spring starter, OSGi service registrar |
 | `fineract-command-test` | `org.apache.fineract.command.test` | Test fixtures; **Fragment-Host** → `command.impl` |
-| `fineract-command` | *(facade JAR)* | Compatibility aggregator: `api` + `impl` for existing consumers |
+| `fineract-command-core` | *(facade JAR)* | Compatibility aggregator: `api` + `impl` for existing consumers |
 
 Prefer new code depending on **`fineract-command-api`** only (plus runtime `fineract-command-impl` when defaults are required).  
 Inter-bundle access: **OSGi Service Registry** (`CommandOsgiServiceRegistrar` in impl). Not Karaf Features.  
@@ -136,8 +136,8 @@ You can try it out with the following instructions (it's still in a private repo
 git clone git@github.com:vidakovic/fineract.git
 cd fineract
 git switch feature/FINERACT-2169
-./gradlew :fineract-command:build
-./gradlew :fineract-command:jmh
+./gradlew :fineract-command-core:build
+./gradlew :fineract-command-core:jmh
 ```
 
 Diagrams

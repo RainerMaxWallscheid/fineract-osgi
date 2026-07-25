@@ -24,7 +24,7 @@ dependencies {
     // We also (normally should have) no need to ever use 'compileOnly'.
 
     implementation(project(path: ':fineract-avro-schemas'))
-    implementation(project(path: ':fineract-command'))
+    implementation(project(path: ':fineract-command-core'))
     implementation(project(path: ':fineract-validation'))
     implementation(project(path: ':fineract-core'))
 

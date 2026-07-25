@@ -139,7 +139,7 @@ Additionally in the repository:
 
 - [`docs/gherkin/`](../gherkin/README.md) – behavior-oriented requirements (BDD), tagged to chapters/ADRs/quality IDs  
 - `SECURITY.md` – threat model  
-- `fineract-command/README.md` – command modernization in detail  
+- `fineract-command-core/README.md` – command modernization in detail  
 - `osgi/` – Equinox scaffold  
 
 ### Related Gherkin Features
