@@ -45,19 +45,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.SimpleTransactionStatus;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 
 public class BusinessDateWritePlatformServiceTest {
 
-    @InjectMocks
     private BusinessDateWritePlatformServiceImpl underTest;
 
     @Mock
@@ -75,6 +78,24 @@ public class BusinessDateWritePlatformServiceTest {
     @BeforeEach
     public void init() {
         ThreadLocalContextUtil.setTenant(new FineractPlatformTenant(1L, "default", "Default", "Asia/Kolkata", null));
+        // No-op TX manager so TransactionTemplate runs callbacks without a real DB transaction.
+        PlatformTransactionManager noOpTxManager = new PlatformTransactionManager() {
+            @Override
+            public TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException {
+                return new SimpleTransactionStatus();
+            }
+
+            @Override
+            public void commit(TransactionStatus status) throws TransactionException {
+                // no-op
+            }
+
+            @Override
+            public void rollback(TransactionStatus status) throws TransactionException {
+                // no-op
+            }
+        };
+        underTest = new BusinessDateWritePlatformServiceImpl(businessDateRepository, configurationDomainService, noOpTxManager);
     }
 
     @AfterEach
@@ -105,7 +126,7 @@ public class BusinessDateWritePlatformServiceTest {
         verify(configurationDomainService, times(1)).isBusinessDateEnabled();
         verify(configurationDomainService, times(1)).isCOBDateAdjustmentEnabled();
         verify(businessDateRepository, times(1)).findByType(BUSINESS_DATE);
-        verify(businessDateRepository, times(1)).save(businessDateArgumentCaptor.capture());
+        verify(businessDateRepository, times(1)).saveAndFlush(businessDateArgumentCaptor.capture());
         assertEquals(LocalDate.of(2022, 6, 13), businessDateArgumentCaptor.getValue().getDate());
         assertEquals(BUSINESS_DATE, businessDateArgumentCaptor.getValue().getType());
     }
@@ -123,7 +144,7 @@ public class BusinessDateWritePlatformServiceTest {
         verify(configurationDomainService, times(1)).isBusinessDateEnabled();
         verify(configurationDomainService, times(1)).isCOBDateAdjustmentEnabled();
         verify(businessDateRepository, times(1)).findByType(COB_DATE);
-        verify(businessDateRepository, times(1)).save(businessDateArgumentCaptor.capture());
+        verify(businessDateRepository, times(1)).saveAndFlush(businessDateArgumentCaptor.capture());
         assertEquals(LocalDate.of(2022, 6, 14), businessDateArgumentCaptor.getValue().getDate());
         assertEquals(COB_DATE, businessDateArgumentCaptor.getValue().getType());
     }
@@ -141,7 +162,7 @@ public class BusinessDateWritePlatformServiceTest {
         verify(configurationDomainService, times(1)).isBusinessDateEnabled();
         verify(configurationDomainService, times(1)).isCOBDateAdjustmentEnabled();
         verify(businessDateRepository, times(1)).findByType(BUSINESS_DATE);
-        verify(businessDateRepository, times(1)).save(businessDateArgumentCaptor.capture());
+        verify(businessDateRepository, times(1)).saveAndFlush(businessDateArgumentCaptor.capture());
         assertEquals(LocalDate.of(2022, 6, 11), businessDateArgumentCaptor.getValue().getDate());
         assertEquals(BUSINESS_DATE, businessDateArgumentCaptor.getValue().getType());
     }
@@ -159,7 +180,7 @@ public class BusinessDateWritePlatformServiceTest {
         verify(configurationDomainService, times(1)).isBusinessDateEnabled();
         verify(configurationDomainService, times(1)).isCOBDateAdjustmentEnabled();
         verify(businessDateRepository, times(1)).findByType(BUSINESS_DATE);
-        verify(businessDateRepository, times(1)).save(businessDateArgumentCaptor.capture());
+        verify(businessDateRepository, times(1)).saveAndFlush(businessDateArgumentCaptor.capture());
         assertEquals(LocalDate.of(2022, 6, 13), businessDateArgumentCaptor.getValue().getDate());
         assertEquals(BUSINESS_DATE, businessDateArgumentCaptor.getValue().getType());
     }
@@ -177,7 +198,7 @@ public class BusinessDateWritePlatformServiceTest {
         verify(configurationDomainService, times(1)).isBusinessDateEnabled();
         verify(configurationDomainService, times(1)).isCOBDateAdjustmentEnabled();
         verify(businessDateRepository, times(1)).findByType(BUSINESS_DATE);
-        verify(businessDateRepository, times(0)).save(businessDateArgumentCaptor.capture());
+        verify(businessDateRepository, times(0)).saveAndFlush(businessDateArgumentCaptor.capture());
     }
 
     @Test
@@ -197,7 +218,7 @@ public class BusinessDateWritePlatformServiceTest {
         verify(configurationDomainService, times(1)).isCOBDateAdjustmentEnabled();
         verify(businessDateRepository, times(1)).findByType(BUSINESS_DATE);
         verify(businessDateRepository, times(1)).findByType(COB_DATE);
-        verify(businessDateRepository, times(2)).save(businessDateArgumentCaptor.capture());
+        verify(businessDateRepository, times(2)).saveAndFlush(businessDateArgumentCaptor.capture());
         assertEquals(LocalDate.of(2022, 6, 13), businessDateArgumentCaptor.getAllValues().get(0).getDate());
         assertEquals(BUSINESS_DATE, businessDateArgumentCaptor.getAllValues().get(0).getType());
         assertEquals(LocalDate.of(2022, 6, 12), businessDateArgumentCaptor.getAllValues().get(1).getDate());
@@ -220,7 +241,7 @@ public class BusinessDateWritePlatformServiceTest {
         verify(configurationDomainService, times(1)).isCOBDateAdjustmentEnabled();
         verify(businessDateRepository, times(1)).findByType(BUSINESS_DATE);
         verify(businessDateRepository, times(1)).findByType(COB_DATE);
-        verify(businessDateRepository, times(0)).save(Mockito.any());
+        verify(businessDateRepository, times(0)).saveAndFlush(Mockito.any());
     }
 
     @Test
@@ -240,7 +261,7 @@ public class BusinessDateWritePlatformServiceTest {
         underTest.increaseDateByTypeByOneDay(BUSINESS_DATE);
         verify(configurationDomainService, times(1)).isBusinessDateEnabled();
         verify(configurationDomainService, times(1)).isCOBDateAdjustmentEnabled();
-        verify(businessDateRepository, times(2)).save(businessDateArgumentCaptor.capture());
+        verify(businessDateRepository, times(2)).saveAndFlush(businessDateArgumentCaptor.capture());
         assertEquals(localDatePlus1, businessDateArgumentCaptor.getAllValues().get(0).getDate());
         assertEquals(BUSINESS_DATE, businessDateArgumentCaptor.getAllValues().get(0).getType());
         assertEquals(localDate, businessDateArgumentCaptor.getAllValues().get(1).getDate());
@@ -257,7 +278,7 @@ public class BusinessDateWritePlatformServiceTest {
         underTest.increaseDateByTypeByOneDay(COB_DATE);
         verify(configurationDomainService, times(1)).isBusinessDateEnabled();
         verify(configurationDomainService, times(1)).isCOBDateAdjustmentEnabled();
-        verify(businessDateRepository, times(1)).save(businessDateArgumentCaptor.capture());
+        verify(businessDateRepository, times(1)).saveAndFlush(businessDateArgumentCaptor.capture());
         assertEquals(localDate, businessDateArgumentCaptor.getValue().getDate());
     }
 }

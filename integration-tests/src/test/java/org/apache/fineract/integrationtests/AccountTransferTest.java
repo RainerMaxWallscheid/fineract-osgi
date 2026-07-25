@@ -112,20 +112,11 @@ public class AccountTransferTest {
         this.accountHelper = new AccountHelper(this.requestSpec, this.responseSpec);
         this.journalEntryHelper = new JournalEntryHelper(this.requestSpec, this.responseSpec);
         this.financialActivityAccountHelper = new FinancialActivityAccountHelper(this.requestSpec);
+        this.financialActivityAccountId = null;
+        this.liabilityTransferAccount = null;
 
         List<HashMap> financialActivities = this.financialActivityAccountHelper.getAllFinancialActivityAccounts(this.responseSpec);
-        if (financialActivities.isEmpty()) {
-            /* Setup liability transfer account **/
-            /* Create a Liability and an Asset Transfer Account **/
-            liabilityTransferAccount = accountHelper.createLiabilityAccount();
-            Assertions.assertNotNull(liabilityTransferAccount);
-
-            /* Create A Financial Activity to Account Mapping **/
-            financialActivityAccountId = (Integer) financialActivityAccountHelper.createFinancialActivityAccount(
-                    FinancialActivityAccountsTest.LIABILITY_TRANSFER_FINANCIAL_ACTIVITY_ID, liabilityTransferAccount.getAccountID(),
-                    responseSpec, CommonConstants.RESPONSE_RESOURCE_ID);
-            Assertions.assertNotNull(financialActivityAccountId);
-        } else {
+        if (financialActivities != null) {
             for (HashMap financialActivity : financialActivities) {
                 HashMap financialActivityData = (HashMap) financialActivity.get("financialActivityData");
                 if (financialActivityData.get("id").equals(FinancialActivityAccountsTest.LIABILITY_TRANSFER_FINANCIAL_ACTIVITY_ID)) {
@@ -136,17 +127,40 @@ public class AccountTransferTest {
                 }
             }
         }
+        if (financialActivityAccountId == null) {
+            /* Setup liability transfer account **/
+            liabilityTransferAccount = accountHelper.createLiabilityAccount();
+            Assertions.assertNotNull(liabilityTransferAccount);
+
+            /* Create A Financial Activity to Account Mapping **/
+            financialActivityAccountId = (Integer) financialActivityAccountHelper.createFinancialActivityAccount(
+                    FinancialActivityAccountsTest.LIABILITY_TRANSFER_FINANCIAL_ACTIVITY_ID, liabilityTransferAccount.getAccountID(),
+                    responseSpec, CommonConstants.RESPONSE_RESOURCE_ID);
+            Assertions.assertNotNull(financialActivityAccountId);
+        }
     }
 
     /**
-     * Delete the Liability transfer account
+     * Delete the Liability transfer account mapping created for the test (if present).
      */
     @AfterEach
     public void tearDown() {
-        Integer deletedFinancialActivityAccountId = financialActivityAccountHelper
-                .deleteFinancialActivityAccount(financialActivityAccountId, responseSpec, CommonConstants.RESPONSE_RESOURCE_ID);
-        Assertions.assertNotNull(deletedFinancialActivityAccountId);
-        Assertions.assertEquals(financialActivityAccountId, deletedFinancialActivityAccountId);
+        if (financialActivityAccountId == null) {
+            return;
+        }
+        final Integer mappingId = financialActivityAccountId;
+        this.financialActivityAccountId = null;
+        try {
+            Integer deletedFinancialActivityAccountId = financialActivityAccountHelper.deleteFinancialActivityAccount(mappingId,
+                    responseSpec, CommonConstants.RESPONSE_RESOURCE_ID);
+            Assertions.assertNotNull(deletedFinancialActivityAccountId);
+            Assertions.assertEquals(mappingId, deletedFinancialActivityAccountId);
+        } catch (AssertionError ex) {
+            // Mapping may already be gone (parallel suites / prior cleanup); do not fail the test on teardown noise.
+            if (ex.getMessage() == null || !ex.getMessage().contains("404")) {
+                throw ex;
+            }
+        }
     }
 
     @Test

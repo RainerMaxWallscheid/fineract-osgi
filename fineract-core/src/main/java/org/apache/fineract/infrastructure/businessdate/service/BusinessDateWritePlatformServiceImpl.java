@@ -18,6 +18,9 @@
  */
 package org.apache.fineract.infrastructure.businessdate.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,30 +36,65 @@ import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainR
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
 public class BusinessDateWritePlatformServiceImpl implements BusinessDateWritePlatformService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BusinessDateWritePlatformServiceImpl.class);
+
+    /**
+     * Serializes BUSINESS_DATE / COB_DATE writes in a single JVM. Scheduler jobs (increase business date / COB date)
+     * run in parallel and would otherwise race on {@code m_business_date} {@code @Version}.
+     */
+    private final Object businessDateWriteLock = new Object();
+
+    private static final int OPTIMISTIC_LOCK_MAX_ATTEMPTS = 5;
+
     private final BusinessDateRepository repository;
     private final ConfigurationDomainService configurationDomainService;
+    private final TransactionTemplate transactionTemplate;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public BusinessDateWritePlatformServiceImpl(final BusinessDateRepository repository,
+            final ConfigurationDomainService configurationDomainService, final PlatformTransactionManager transactionManager) {
+        this.repository = repository;
+        this.configurationDomainService = configurationDomainService;
+        this.transactionTemplate = new TransactionTemplate(transactionManager);
+        // Independent short TX so batch job TX is not marked rollback-only on lock retry,
+        // and so commit completes while still holding businessDateWriteLock.
+        this.transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
+    }
 
     @Override
     public BusinessDateDTO updateBusinessDate(BusinessDateDTO businessDateDto) {
-        adjustDate(businessDateDto);
-        return businessDateDto;
+        synchronized (businessDateWriteLock) {
+            return transactionTemplate.execute(status -> {
+                adjustDate(businessDateDto);
+                return businessDateDto;
+            });
+        }
     }
 
     @Override
     public void increaseDateByTypeByOneDay(BusinessDateType businessDateType) throws JobExecutionException {
-        Optional<BusinessDate> businessDateEntity = repository.findByType(businessDateType);
         List<Throwable> exceptions = new ArrayList<>();
-        LocalDate businessDate = businessDateEntity.map(BusinessDate::getDate).orElse(DateUtils.getLocalDateOfTenant());
-        businessDate = businessDate.plusDays(1);
         try {
-            BusinessDateDTO response = BusinessDateDTO.builder().type(businessDateType).description(businessDateType.getDescription()).date(businessDate).build();
-            adjustDate(response);
+            synchronized (businessDateWriteLock) {
+                transactionTemplate.executeWithoutResult(status -> {
+                    Optional<BusinessDate> businessDateEntity = repository.findByType(businessDateType);
+                    LocalDate businessDate = businessDateEntity.map(BusinessDate::getDate).orElse(DateUtils.getLocalDateOfTenant());
+                    businessDate = businessDate.plusDays(1);
+                    BusinessDateDTO response = BusinessDateDTO.builder().type(businessDateType)
+                            .description(businessDateType.getDescription()).date(businessDate).build();
+                    adjustDate(response);
+                });
+            }
         } catch (final PlatformApiDataValidationException e) {
             final List<ApiParameterError> errors = e.getErrors();
             for (final ApiParameterError error : errors) {
@@ -84,18 +122,35 @@ public class BusinessDateWritePlatformServiceImpl implements BusinessDateWritePl
         }
         updateOrCreateBusinessDate(businessDateDto);
         if (isCOBDateAdjustmentEnabled && BusinessDateType.BUSINESS_DATE.equals(businessDateDto.getType())) {
-            BusinessDateDTO res = BusinessDateDTO.builder().type(BusinessDateType.COB_DATE).description(BusinessDateType.COB_DATE.getDescription()).date(businessDateDto.getDate().minusDays(1)).build();
+            BusinessDateDTO res = BusinessDateDTO.builder().type(BusinessDateType.COB_DATE)
+                    .description(BusinessDateType.COB_DATE.getDescription()).date(businessDateDto.getDate().minusDays(1)).build();
             updateOrCreateBusinessDate(res);
             businessDateDto.addAllChanges(res.getChanges());
         }
     }
 
     private void updateOrCreateBusinessDate(BusinessDateDTO businessDateDto) {
+        for (int attempt = 1; attempt <= OPTIMISTIC_LOCK_MAX_ATTEMPTS; attempt++) {
+            try {
+                doUpdateOrCreateBusinessDate(businessDateDto);
+                return;
+            } catch (OptimisticLockingFailureException | OptimisticLockException ex) {
+                if (attempt == OPTIMISTIC_LOCK_MAX_ATTEMPTS) {
+                    throw ex;
+                }
+                log.warn("Optimistic lock updating BusinessDate type={} (attempt {}/{}): {}", businessDateDto.getType(), attempt,
+                        OPTIMISTIC_LOCK_MAX_ATTEMPTS, ex.toString());
+                clearPersistenceContext();
+            }
+        }
+    }
+
+    private void doUpdateOrCreateBusinessDate(BusinessDateDTO businessDateDto) {
         BusinessDateType businessDateType = businessDateDto.getType();
         Optional<BusinessDate> businessDate = repository.findByType(businessDateType);
         if (businessDate.isEmpty()) {
             BusinessDate newBusinessDate = BusinessDate.instance(businessDateType, businessDateDto.getDate());
-            repository.save(newBusinessDate);
+            repository.saveAndFlush(newBusinessDate);
             businessDateDto.addChange(businessDateType, newBusinessDate.getDate());
         } else {
             updateBusinessDate(businessDate.get(), businessDateDto);
@@ -107,13 +162,17 @@ public class BusinessDateWritePlatformServiceImpl implements BusinessDateWritePl
             return;
         }
         businessDate.setDate(businessDateDto.getDate());
-        repository.save(businessDate);
+        repository.saveAndFlush(businessDate);
         businessDateDto.addChange(businessDate.getType(), businessDateDto.getDate());
     }
 
-    @java.lang.SuppressWarnings("all")
-        public BusinessDateWritePlatformServiceImpl(final BusinessDateRepository repository, final ConfigurationDomainService configurationDomainService) {
-        this.repository = repository;
-        this.configurationDomainService = configurationDomainService;
+    private void clearPersistenceContext() {
+        if (entityManager != null) {
+            try {
+                entityManager.clear();
+            } catch (RuntimeException ex) {
+                log.debug("Could not clear EntityManager after optimistic lock: {}", ex.toString());
+            }
+        }
     }
 }
