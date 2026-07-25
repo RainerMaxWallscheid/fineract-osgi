@@ -341,7 +341,7 @@ On timeout: configurable fail-open / fail-closed policy (default: fail-open for 
 
 ## 4.10 Open Points / Next Iterations
 
-- Concrete bundle manifests and package exports for loan/AI extensions
+- Concrete bundle manifests and package exports for loan/AI extensions (layout: [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), stages: [15](15_osgi_bundle_refactoring.md); inter-bundle via **OSGi services**, not Karaf Features)
 - Final choice of event bridge (internal Spring events vs. Kafka/ActiveMQ outbox)
 - Metrics (SLOs) for command latency and COB duration per tenant size
 - Detailed maker-checker sequence as its own sub-scenario if compliance requires it

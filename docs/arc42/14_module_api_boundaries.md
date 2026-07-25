@@ -97,7 +97,8 @@ Legacy violations: **freeze store**. New internal imports → build red. Reduce 
 2. **Adapter** in the provider module implements the port with existing domain code.  
 3. **Consumer** (loan) switches to the port.  
 4. ArchUnit freeze shrinks.  
-5. Optional: move port interface into own module `moduleapi` when ownership is clear.
+5. Optional: move port interface into own module `moduleapi` when ownership is clear.  
+6. **OSGi physical split** (later): `-api` / `-impl` / `-test` bundles and Service Registry registration — see [15](15_osgi_bundle_refactoring.md) and [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md). Module API ports become Export-Package + OSGi service interfaces; **not** Karaf Features.
 
 ---
 
@@ -114,6 +115,8 @@ Legacy violations: **freeze store**. New internal imports → build red. Reduce 
 ## 14.8 References
 
 - [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md)  
+- [ADR-022 OSGi api/impl/test + services](decisions/ADR-022-osgi-api-impl-test-bundles-services.md)  
+- [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md)  
 - [ADR-017 Hexagon](decisions/ADR-017-hexagonale-architektur.md)  
 - [10 Context Map](10_domain_context_map.md)  
 - [13 ArchUnit Entity Rules](13_archunit_bounded_context_rules.md)  

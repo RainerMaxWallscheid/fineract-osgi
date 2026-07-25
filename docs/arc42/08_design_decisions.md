@@ -44,6 +44,7 @@ Individual ADRs live under [`decisions/`](decisions/) – **one file per decisio
 | [ADR-019](decisions/ADR-019-domain-driven-design.md) | Domain-Driven Design | accepted | Bounded Contexts, Aggregates, UL; Context Map → [10](10_domain_context_map.md) |
 | [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) | Event Sourcing Writes | accepted | Create/Update/Delete event-sourced; inventory → [12](12_event_catalog.md) |
 | [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md) | Module API only | accepted | Subprojects only via `moduleapi` / Events / Shared Kernel |
+| [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) | OSGi api/impl/test + services | accepted | Bundle split; Service Registry only; no Karaf Features; Spring stays in impl |
 
 ```mermaid
 flowchart TB
@@ -69,6 +70,10 @@ flowchart TB
     ADR017 --> ADR021[ADR-021 Module API]
     ADR019 --> ADR021
     ADR002 --> ADR021
+    ADR002 --> ADR022[ADR-022 OSGi api/impl/test]
+    ADR003 --> ADR022
+    ADR021 --> ADR022
+    ADR017 --> ADR022
     ADR002 --> ADR005[ADR-005 External AI]
     ADR005 --> ADR006[ADR-006 Async AI]
     ADR003 --> ADR007[ADR-007 Node Modes]
@@ -95,6 +100,8 @@ flowchart TB
 | Redis idempotency store | deferred | Evaluate only after stable new command stack |
 | Apache Camel as default dispatcher | deferred | Optional after several module migrations |
 | Karaf as mandatory runtime | deferred | Equinox first; Karaf possibly distribution later |
+| Karaf Features as inter-bundle contract | rejected | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md): OSGi **Service Registry** only |
+| Remove Spring before OSGi refactor | rejected | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) / [ADR-003](decisions/ADR-003-spring-boot-gradle-module-als-kern-beibehalten.md) |
 | UI in core | rejected | [ADR-010](decisions/ADR-010-headless-rest-api-keine-ui-im-scope.md) |
 | Blockchain/RTGS in core | rejected | Upstream out of scope |
 
@@ -124,6 +131,8 @@ flowchart TB
 | 018 Clean Code | + | | + | | ++ | | | + | + |
 | 019 DDD | ++ | | + | | ++ | + | | | + |
 | 020 Event Sourcing | ++ | + | + | ± | + | + | ± | ± | ± |
+| 021 Module API | + | | | | ++ | ++ | | | + |
+| 022 OSGi api/impl/test | | ± | + | | ++ | ++ | | ± | + |
 
 *(++ strongly positive, + positive, ± mixed/trade-off)*
 
@@ -149,6 +158,7 @@ Details: [`decisions/README.md`](decisions/README.md).
 |-------|---------------|--------|
 | Equinox embedded vs. sidecar | final process model | Prod image layout |
 | Bundle signing PKI | who signs, how verified | Prod hot deploy |
+| Pilot module for B2 split | charge vs command | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) / [15](15_osgi_bundle_refactoring.md) |
 | Outbox for external events | exactly vs. at-least-once UX | Enterprise integration |
 | Sync AI products | which products fail-closed default | Lending policy |
 | Helm chart | timing vs. raw manifests | Platform teams |
@@ -175,6 +185,7 @@ Details: [`decisions/README.md`](decisions/README.md).
 | [ADR-018](decisions/ADR-018-clean-code.md) Clean Code | Review checklist; Spotless/CI; Boy Scout in touched diffs |
 | [ADR-019](decisions/ADR-019-domain-driven-design.md) DDD | Context/Aggregate in reviews; Gherkin UL; domain events after commit; Context Map [10](10_domain_context_map.md) |
 | [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) Event Sourcing | Event-store port; pilot aggregate; projector/idempotency ITs |
+| [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) OSGi bundles | `@adr-002` / `@runtime-osgi-lifecycle` → [osgi/optional_bundle_degradation.feature](../gherkin/features/osgi/optional_bundle_degradation.feature); playbook [15](15_osgi_bundle_refactoring.md) |
 
 ---
 

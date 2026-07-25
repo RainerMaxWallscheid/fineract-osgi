@@ -69,7 +69,7 @@ At the same time, `..api..` packages are historically often **REST driving adapt
 | **M1** | This ADR + ArchUnit rules with freeze baseline |
 | **M2** | Per domain module `moduleapi` package + `package-info`; new cross-module features **only** via Module API |
 | **M3** | Extract hotspot ports (e.g. charge lookup, GL mapping, client guard) and shrink freeze store |
-| **M4** | Gradle `java-library` / separate `-api` artifacts or OSGi export packages = `moduleapi` only |
+| **M4** | Gradle `java-library` / separate `-api` artifacts or OSGi export packages = `moduleapi` only; physical **api/impl/test** bundles + Service Registry → [ADR-022](ADR-022-osgi-api-impl-test-bundles-services.md) / [15](../15_osgi_bundle_refactoring.md) |
 
 ### Alternatives
 
@@ -104,6 +104,7 @@ At the same time, `..api..` packages are historically often **REST driving adapt
 - [ADR-017 Hexagon](ADR-017-hexagonale-architektur.md) – ports at boundaries  
 - [ADR-019 DDD](ADR-019-domain-driven-design.md) – context map without entity sharing  
 - [ADR-002 OSGi](ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md) – exportable contracts  
+- [ADR-022 OSGi api/impl/test + services](ADR-022-osgi-api-impl-test-bundles-services.md) – physical bundle split; Service Registry (no Karaf Features)  
 - [10 Context Map](../10_domain_context_map.md)
 
 ---

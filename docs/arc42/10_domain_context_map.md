@@ -380,7 +380,7 @@ Aligned with [ADR-020](decisions/ADR-020-event-sourcing-writes-pflicht.md) (ES0â
 2. ACL at the edge to legacy `JsonCommand`.  
 3. Dual-write or catch-up only for **one** aggregate.  
 4. Cutover: event stream = write SoT; table = projection.  
-5. OSGi feature bundle only once the port is stable.
+5. OSGi `-impl` bundle + Service Registry registration only once the port is stable ([ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md)).
 
 ### Why not loan first?
 

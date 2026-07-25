@@ -18,7 +18,7 @@
  */
 package org.apache.fineract.command;
 
-import org.apache.fineract.command.core.CommandProperties;
+import org.apache.fineract.command.impl.config.CommandProperties;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

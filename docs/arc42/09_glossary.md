@@ -79,7 +79,8 @@ Chapter references: [01](01_introduction.md)–[13](13_archunit_bounded_context_
 | **Fail-Open** | A | On error/timeout the core operation **continues** (default for async AI). → [08](08_design_decisions.md) |
 | **Flatten (API JSON)** | T | Serialization of composed DTOs so that shared and specialized fields appear at root level (Gson/Jackson), without breaking change. → [ADR-015](decisions/ADR-015-api-dtos-composition-statt-vererbung.md) |
 | **FineractGsonTypeAdapterRegistrar** | T | SPI interface in `fineract-core`; modules register Gson TypeAdapter via `ServiceLoader` in `GoogleGsonSerializerHelper`. → [06.13](06_crosscutting_concepts.md) |
-| **Feature Bundle** | T | OSGi bundle with optional domain/integration function (AI, product rules, …). |
+| **Feature Bundle** | T | OSGi **impl** bundle with optional domain/integration function (AI, product rules, …). Informal name only — integration is via the **Service Registry**, not Apache Karaf Features. → [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) |
+| **Fragment-Host** | T | OSGi manifest header: a fragment bundle attaches to a host (typically `*-impl`) and shares its classloader; used for test bundles. → [15](15_osgi_bundle_refactoring.md) |
 | **fineract-command** | T | Module for the modern, type-safe command stack parallel to the legacy pipeline. |
 | **fineract-osgi** | A | This workstream/fork: Fineract core + OSGi modularity + AI extensibility. → [01](01_introduction.md) |
 | **fineract-provider** | T | Main application module (boot, REST, wiring of domain modules). |
@@ -127,8 +128,9 @@ Chapter references: [01](01_introduction.md)–[13](13_archunit_bounded_context_
 | **Open Host Service (OHS)** | A | DDD context map: upstream offers a stable API/events for multiple downstream consumers. → [10](10_domain_context_map.md) |
 | **OpenAPI** | T | Specification of the REST API; basis for `fineract-client` and contract tests. |
 | **Operability** | A | Quality goal: operability, diagnosis, deploy. → [07](07_quality_attributes.md) |
-| **OSGi** | T | *Open Services Gateway initiative* – modularity and service framework standard. → [08](08_design_decisions.md) |
-| **OSGi Service Registry** | T | Runtime directory in which bundles publish and consume services. |
+| **OSGi** | T | *Open Services Gateway initiative* – modularity and service framework standard. → [08](08_design_decisions.md), [ADR-002](decisions/ADR-002-osgi-equinox-fuer-laufzeitmodularitaet.md) |
+| **OSGi api / impl / test** | A | Bundle split: contract bundle, implementation bundle, test fragment. → [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [15](15_osgi_bundle_refactoring.md) |
+| **OSGi Service Registry** | T | Runtime directory in which bundles publish and consume services; **only** allowed inter-bundle access path for module ports (not Karaf Features). → [06.7](06_crosscutting_concepts.md), [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) |
 | **OTLP** | T | *OpenTelemetry Protocol* – export of traces/metrics (e.g. to Tempo). |
 | **Outbox Pattern** | T | Reliable publishing of events via a DB table + dispatcher (open point). → [06](06_crosscutting_concepts.md) |
 

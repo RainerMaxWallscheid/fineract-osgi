@@ -25,7 +25,7 @@ Principles:
 | Option | Assessment |
 |--------|------------|
 | **Apache Felix** | Valid; Equinox preferred for tooling/console/enterprise proximity |
-| **Apache Karaf** | More ops comfort, but heavier platform; later optional as a distribution |
+| **Apache Karaf** | More ops comfort, but heavier platform; later optional as a distribution only — **not** as inter-bundle Features API (see [ADR-022](ADR-022-osgi-api-impl-test-bundles-services.md)) |
 | **PF4J / Spring Plugin** | Lighter, but weaker isolation/versioning than OSGi |
 | **Microservices per feature** | Maximum isolation, but ops and transaction complexity too high for core banking |
 | **Gradle modules only** | Insufficient for hot-deploy and customer-specific binaries |
@@ -40,7 +40,8 @@ Principles:
 
 ### Related
 
-- Runtime [4.4](../04_runtime_view.md), Deployment [5.7](../05_deployment_view.md), Crosscutting [6.7](../06_crosscutting_concepts.md)
+- Runtime [4.4](../04_runtime_view.md), Deployment [5.7](../05_deployment_view.md), Crosscutting [6.7](../06_crosscutting_concepts.md)  
+- Bundle layout & Service Registry only: [ADR-022](ADR-022-osgi-api-impl-test-bundles-services.md), playbook [15](../15_osgi_bundle_refactoring.md)
 
 ---
 

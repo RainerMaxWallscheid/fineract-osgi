@@ -19,7 +19,8 @@
 
 dependencies {
     implementation(
-            project(path: ':fineract-command'),
+            project(path: ':fineract-command-api'),
+            project(path: ':fineract-command-impl'),
             )
 
     implementation(

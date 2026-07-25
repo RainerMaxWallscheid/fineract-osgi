@@ -19,7 +19,7 @@
 
 dependencies {
     implementation(
-            project(path: ':fineract-command'),
+            project(path: ':fineract-command-api'),
             )
 
     implementation(
@@ -36,6 +36,7 @@ dependencies {
     jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess'
 
     testImplementation(project(path: ':fineract-command-test'))
+    testImplementation(project(path: ':fineract-command-impl'))
     testImplementation ('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'com.jayway.jsonpath', module: 'json-path'
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'

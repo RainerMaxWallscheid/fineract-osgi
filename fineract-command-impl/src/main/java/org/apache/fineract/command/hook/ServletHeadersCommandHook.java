@@ -23,7 +23,7 @@ import static org.apache.fineract.command.core.CommandConstants.COMMAND_HTTP_HEA
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.command.core.Command;
 import org.apache.fineract.command.core.CommandHookBefore;
-import org.apache.fineract.command.core.CommandProperties;
+import org.apache.fineract.command.impl.config.CommandProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;

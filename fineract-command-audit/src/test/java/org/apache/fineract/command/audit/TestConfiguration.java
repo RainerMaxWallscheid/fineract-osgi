@@ -19,7 +19,7 @@
 package org.apache.fineract.command.audit;
 
 import static org.mockito.Mockito.mock;
-import org.apache.fineract.command.core.CommandProperties;
+import org.apache.fineract.command.impl.config.CommandProperties;
 import org.apache.fineract.command.core.CommandStore;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;

@@ -302,25 +302,28 @@ Apache Fineract is historically modularized via Gradle modules, but **runtime ex
 | Element | Role |
 |---------|------|
 | **Equinox** | OSGi framework in (or beside) the application process |
-| **Bundles** | Feature JARs under `osgi/bundles` |
-| **Service Registry** | Publish/find interfaces (`CreditScoreProvider`, …) |
-| **Declarative Services / Activator** | Lifecycle start/stop/bind/unbind |
-| **Core Bridge** | Spring beans optionally use OSGi services |
+| **Bundles** | JARs under `osgi/bundles` (api + impl); optional extensions |
+| **Service Registry** | **Only** inter-bundle access path for ports (`ChargeDefinitionPort`, `CreditScoreProvider`, …) |
+| **Declarative Services / Activator** | Lifecycle start/stop/bind/unbind + service registration |
+| **Core Bridge** | Spring beans optionally publish/consume OSGi services under **api** interfaces |
+| **api / impl / test** | Contract / implementation / Fragment-Host test bundles ([ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [15](15_osgi_bundle_refactoring.md)) |
 
 ### Design principles
 
 1. **Optional by default** – if a bundle is missing, the core remains functional.
-2. **Interfaces in the core API bundle**, implementations in feature bundles.
-3. **No cyclic bundle dependencies**; stable package exports.
-4. **Same bundle versions** on all nodes of a cluster ([Deployment 5.7](05_deployment_view.md)).
-5. **Security**: signed bundles, no uncontrolled remote install in prod.
+2. **Interfaces in the `-api` bundle**, implementations in `-impl` bundles; consumers depend on api only.
+3. **Inter-bundle = OSGi services** – not Spring `@Autowired` across modules, not **Karaf Features**.
+4. **No cyclic bundle dependencies**; stable package exports (api / shared kernel only).
+5. **Same bundle versions** on all nodes of a cluster ([Deployment 5.7](05_deployment_view.md)).
+6. **Security**: signed bundles, no uncontrolled remote install in prod.
+7. **Spring inside `-impl`** is allowed; Spring is **not** removed before the OSGi refactor ([ADR-003](decisions/ADR-003-spring-boot-gradle-module-als-kern-beibehalten.md)).
 
 ```mermaid
 flowchart TB
     Core[fineract-provider / Spring]
     API[API Bundle: Service Interfaces]
-    Impl1[Feature Bundle A]
-    Impl2[Feature Bundle B]
+    Impl1[Impl Bundle A]
+    Impl2[Impl Bundle B]
     Reg[(OSGi Service Registry)]
 
     Core --> API
@@ -331,6 +334,14 @@ flowchart TB
     Core --> Reg
 ```
 
+### Explicit non-goals (integration)
+
+| Approach | Status |
+|----------|--------|
+| **OSGi Service Registry** under api interfaces | **Required** inter-bundle contract |
+| **Apache Karaf Features** (feature XML install sets as module API) | **Rejected** for inter-bundle access ([ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md)) |
+| Karaf as optional distribution shell | Deferred only; not required |
+
 ### Typical extension points
 
 - Validators / product rules  
@@ -338,6 +349,10 @@ flowchart TB
 - Notification channels  
 - Import/export adapters  
 - Institution-specific reports (when isolatable)
+
+### Refactoring
+
+Stepwise api/impl/test split and stages B0–B6: **[15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md)**.
 
 ---
 

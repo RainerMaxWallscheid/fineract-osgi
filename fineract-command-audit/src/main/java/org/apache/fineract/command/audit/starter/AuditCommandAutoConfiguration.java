@@ -19,7 +19,7 @@
 package org.apache.fineract.command.audit.starter;
 
 import org.apache.fineract.command.audit.AuditCommandProperties;
-import org.apache.fineract.command.core.CommandProperties;
+import org.apache.fineract.command.impl.config.CommandProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

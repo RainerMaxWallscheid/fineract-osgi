@@ -30,6 +30,10 @@ A full rewrite (new language, new framework) would put domain logic (loans, savi
 - **−** Two worlds (Spring + OSGi) must be bridged  
 - **−** Technical debt of the monolith remains for now  
 
+### Related
+
+- Bundle split keeps Spring **inside** `-impl`; do not remove Spring before OSGi: [ADR-022](ADR-022-osgi-api-impl-test-bundles-services.md), [15](../15_osgi_bundle_refactoring.md)
+
 ---
 
 *Back to overview:* [08 Design Decisions](../08_design_decisions.md)

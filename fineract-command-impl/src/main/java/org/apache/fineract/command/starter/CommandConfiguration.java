@@ -18,14 +18,14 @@
  */
 package org.apache.fineract.command.starter;
 
-import org.apache.fineract.command.core.CommandProperties;
+import org.apache.fineract.command.impl.config.CommandProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties(CommandProperties.class)
-@ComponentScan("org.apache.fineract.command.core")
 @ComponentScan("org.apache.fineract.command.hook")
 @ComponentScan("org.apache.fineract.command.implementation")
+@ComponentScan("org.apache.fineract.command.impl")
 class CommandConfiguration {}

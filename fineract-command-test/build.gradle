@@ -45,6 +45,20 @@ configurations {
 
 apply from: 'dependencies.gradle'
 
+// OSGi fragment attached to command-impl (ADR-022 / pilot plan Step 5)
+jar {
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'Apache Fineract Command Test Fragment',
+                'Bundle-SymbolicName': 'org.apache.fineract.command.test',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Fragment-Host': 'org.apache.fineract.command.impl',
+                'Automatic-Module-Name': 'org.apache.fineract.command.test'
+                )
+    }
+}
+
 // Configuration for the modernizer plugin
 // https://github.com/andygoossens/gradle-modernizer-plugin
 modernizer {

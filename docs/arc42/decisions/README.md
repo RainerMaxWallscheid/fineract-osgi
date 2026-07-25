@@ -25,6 +25,7 @@ Individual architecture decisions for **fineract-osgi**. Overview and format: [.
 | ADR-019 | [ADR-019-domain-driven-design.md](ADR-019-domain-driven-design.md) |
 | ADR-020 | [ADR-020-event-sourcing-writes-pflicht.md](ADR-020-event-sourcing-writes-pflicht.md) |
 | ADR-021 | [ADR-021-modul-kommunikation-nur-ueber-module-api.md](ADR-021-modul-kommunikation-nur-ueber-module-api.md) |
+| ADR-022 | [ADR-022-osgi-api-impl-test-bundles-services.md](ADR-022-osgi-api-impl-test-bundles-services.md) |
 
 ## Creating a new ADR
 

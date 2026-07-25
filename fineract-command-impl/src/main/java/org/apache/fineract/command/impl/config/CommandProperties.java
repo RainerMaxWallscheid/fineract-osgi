@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.command.core;
+package org.apache.fineract.command.impl.config;
 
 import java.io.Serial;
 import java.io.Serializable;

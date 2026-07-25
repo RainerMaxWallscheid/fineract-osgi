@@ -18,8 +18,9 @@
  */
 
 dependencies {
+    // OSGi test fragment host is command-impl; compile only needs api contracts + Spring
     implementation(
-            project(path: ':fineract-command'),
+            project(path: ':fineract-command-api'),
             )
 
     implementation(

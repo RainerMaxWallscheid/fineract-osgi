@@ -16,57 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-description = 'Fineract Command'
+description = 'Fineract Command (compatibility facade: api + impl)'
 
-apply plugin: 'java'
+// Temporary aggregator for consumers still depending on :fineract-command.
+// Prefer :fineract-command-api (+ runtime :fineract-command-impl) going forward.
+apply plugin: 'java-library'
 apply plugin: 'eclipse'
-
-configurations {
-    asciidoctorExtensions
-    providedRuntime // needed for Spring Boot executable WAR
-    providedCompile
-    compile() {
-        exclude module: 'hibernate-entitymanager'
-        exclude module: 'hibernate-validator'
-        exclude module: 'activation'
-        exclude module: 'bcmail-jdk14'
-        exclude module: 'bcprov-jdk14'
-        exclude module: 'bctsp-jdk14'
-        exclude module: 'c3p0'
-        exclude module: 'stax-api'
-        exclude module: 'jaxb-api'
-        exclude module: 'jaxb-impl'
-        exclude module: 'jboss-logging'
-        exclude module: 'itext-rtf'
-        exclude module: 'classworlds'
-    }
-    runtime
-}
 
 apply from: 'dependencies.gradle'
 
-// Configuration for the modernizer plugin
-// https://github.com/andygoossens/gradle-modernizer-plugin
-modernizer {
-    ignoreClassNamePatterns = [
-        '.*AbstractPersistableCustom',
-        '.*EntityTables',
-        '.*domain.*'
-    ]
-}
-
-// If we are running Gradle within Eclipse to enhance classes with OpenJPA,
-// set the classes directory to point to Eclipse's default build directory
 if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
     sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-command/bin/main")
-}
-
-if (!(project.hasProperty('env') && project.getProperty('env') == 'dev')) {
-    sourceSets {
-        test {
-            java {
-                exclude '**/core/boot/tests/**'
-            }
-        }
-    }
 }

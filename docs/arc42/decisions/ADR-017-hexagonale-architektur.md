@@ -92,7 +92,7 @@ CQRS ([ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md))
 | **Dependency rule** | Domain does not depend on REST, Jersey, Kafka, or EclipseLink API |
 | **Thin adapters** | Resources map HTTP ↔ command/DTO; no business logic in resources |
 | **Ports at module boundaries** | Public interfaces in stable packages; impl in adapter/infra packages |
-| **OSGi = pluggable adapters** | Feature bundles supply driven or optional driving adapters via the service registry |
+| **OSGi = pluggable adapters** | Impl bundles supply driven or optional driving adapters via the **Service Registry** ([ADR-022](ADR-022-osgi-api-impl-test-bundles-services.md)) |
 | **Tests** | Domain/application with fake ports; adapters with IT (DB, broker) |
 | **No pseudo-ports** | Interfaces only where real swappability/test seam is needed |
 
@@ -103,7 +103,7 @@ CQRS ([ADR-004](ADR-004-cqrs-und-command-pipeline-beibehalten-modernisieren.md))
 | **E1 – Vocabulary & docs** | This ADR; mapping in building block / crosscutting |
 | **E2 – New features** | New modules/commands hexagon-conformant (resource → handler → domain → port) |
 | **E3 – Targeted extraction** | Ports for persistence/events/AI at hotspots; decouple legacy stepwise |
-| **E4 – OSGi** | Bundles as adapter deployables behind the same ports |
+| **E4 – OSGi** | Bundles as adapter deployables behind the same ports; api/impl/test + Service Registry ([ADR-022](ADR-022-osgi-api-impl-test-bundles-services.md), [15](../15_osgi_bundle_refactoring.md)) |
 
 ### Alternatives
 

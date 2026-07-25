@@ -13,13 +13,15 @@ This directory contains the arc42 documentation for **fineract-osgi** – Apache
 | 05 | [Deployment View](05_deployment_view.md) | Compose, K8s, modes, OSGi operations |
 | 06 | [Crosscutting Concepts](06_crosscutting_concepts.md) | Tenant, Security, CQRS, Events, Observability |
 | 07 | [Quality Attributes](07_quality_attributes.md) | NFRs, scenarios, trade-offs |
-| 08 | [Design Decisions](08_design_decisions.md) | ADRs 001–021 in [`decisions/`](decisions/) |
+| 08 | [Design Decisions](08_design_decisions.md) | ADRs 001–022 in [`decisions/`](decisions/) |
 | 09 | [Glossary](09_glossary.md) | Terms, abbreviations, ports, env |
 | 10 | [Domain Context Map](10_domain_context_map.md) | Bounded contexts, subdomains, U/D map, migration order (DDD D1) |
 | 11 | [Aggregate Canvas](11_aggregate_canvas.md) | Loan, SavingsAccount, Client: invariants, commands, events, conflicts (tactical DDD) |
 | 12 | [Event Catalog](12_event_catalog.md) | All business event TYPEs → ES target names, gaps, Avro, LoanEvent |
 | 13 | [ArchUnit BC Rules](13_archunit_bounded_context_rules.md) | ArchUnit rules against cross-context entity imports (freeze baseline) |
 | 14 | [Module API Boundaries](14_module_api_boundaries.md) | Subprojects only via `moduleapi` (ADR-021) |
+| 15 | [OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) | api/impl/test split, Service Registry, Fragment-Host, stages B0–B6 (ADR-022) |
+| 15a | [fineract-command pilot plan](15_osgi_bundle_refactoring_fineract-command.md) | Step-by-step OSGi split for the command stack (PRs 1–final) |
 
 ## Complementary Artifacts
 
@@ -51,6 +53,7 @@ Full mapping table: [`docs/gherkin/README.md`](../gherkin/README.md).
 - **Domain / DDD:** 10 → 11 → 12 → 13 → ADR-019 → ADR-020 → 03 (modules)  
 - **Ops:** 05 → 07 → 09 → `node_modes` / `close_of_business`  
 - **Architecture:** 07 → 08 → 10 → quality tags in Gherkin  
+- **OSGi modularity refactor:** ADR-002 → ADR-021 → [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) → [15](15_osgi_bundle_refactoring.md) → 06.7 → 04.4  
 
 ## Conventions
 
