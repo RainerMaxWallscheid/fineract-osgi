@@ -4,7 +4,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 
 | | |
 |--|--|
-| **Status** | draft — **Steps 0–4 done**; Step 5+ pending |
+| **Status** | draft — **Steps 0–5 done**; Step 6+ pending |
 | **Decisions** | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **Playbook** | [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) §15.6 Wave 1, §15.7 |
 | **Reference pilot** | [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md) (as-built) |
@@ -24,7 +24,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 | 2 Extract api | **done** (2026-07-26) | moduleapi + pure enums + catalog exceptions on charge-api; no Spring/JPA/REST |
 | 3 Move impl from provider | **done** (2026-07-26) | Read/write impls + `ChargeConfiguration` on charge-impl; provider only adapters + `ConvertChargeData*` |
 | 4 Bundle manifests | **done** (2026-07-26) | BSN + Export/Import/Fragment-Host on api/impl/test jars; starter export on impl |
-| 5 Fragment-Host test | **partial** | Tests already on charge-test; green |
+| 5 Fragment-Host test | **done** (2026-07-26) | White-box tests on charge-test only; impl main-only; 14 tests green |
 | 6 Spring↔OSGi bridge | **pending** | Register ports when `BundleContext` present |
 | 7 Consumer retarget (Gradle) | **pending** | Domain modules → compile on charge-api |
 | 8 Consumer retarget (semantic) | **pending** | loan/savings/… off `Charge` entity |
@@ -346,12 +346,19 @@ Execute as **separate PRs**. Checkboxes start open; update when done.
 
 **Known debt:** Java package `…charge.domain` (and `exception`) is split between api (enums / catalog exceptions) and impl (JPA entity / LoanCharge* exceptions). Flat Boot classpath is fine; strict Equinox may need package renames later.
 
-### Step 5 — Fragment-Host unit tests ⏳
+### Step 5 — Fragment-Host unit tests ✅
 
-1. [ ] Place white-box tests under `fineract-charge/test/src/test`  
-2. [ ] Impl remains production **main only**  
-3. [ ] `./gradlew :fineract-charge-test:test` green  
-4. [ ] Do **not** create integrationtest unless a second module needs shared charge fixtures  
+1. [x] White-box tests under `fineract-charge/test/src/test`  
+   - `ChargeDefinitionPortJpaAdapterTest` (Module API)  
+   - `ChargeDropdownReadPlatformServiceImplTest` (dropdown option sets)  
+   - `ChargeWritePlatformServiceJpaRepositoryImplTest` (delete guards / JDBC association)  
+2. [x] Impl remains production **main only** (no `*Test` under `charge/impl`)  
+3. [x] `./gradlew :fineract-charge-test:test` green — **14 tests**  
+4. [x] **No** `fineract-charge-integrationtest` (not needed yet; loan/savings keep own ITs)  
+5. [x] Fragment-Host manifest on test jar (Step 4); test deps include impl + core + tax (tax is implementation-only of impl)  
+6. [x] `fineract-charge/test/README.md` documents conventions  
+
+**Exit:** Catalog host types covered by fragment unit tests; production code not co-located with tests.  
 
 ### Step 6 — Spring↔OSGi service registrar ⏳
 
@@ -401,7 +408,7 @@ Hardest step — incremental PRs by consumer:
 | 4 | Ports registered in OSGi Service Registry (bridge present) | pending |
 | 5 | No Karaf Feature descriptors | pending |
 | 6 | Spring still wires impl under Boot | pending |
-| 7 | Fragment-Host tests green | pending |
+| 7 | Fragment-Host tests green | **done** (Step 5, 14 tests) |
 | 8 | Sources under `fineract-charge/{api,impl,test}` | pending |
 | 9 | No *new* foreign uses of `Charge` entity; freeze only shrinks | pending |
 | 10 | Provider no longer hosts charge catalog service impls | **done** (Step 3) |

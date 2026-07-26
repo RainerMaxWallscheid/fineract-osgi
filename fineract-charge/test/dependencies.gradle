@@ -18,9 +18,11 @@
  */
 
 dependencies {
-    // Host under test (java-library: only api of impl is exported — add core/JPA for entity types).
+    // Host under test (java-library: only api of impl is exported — add core/JPA/tax for host types).
     testImplementation(project(path: ':fineract-charge-impl'))
     testImplementation(project(path: ':fineract-core'))
+    // charge-impl uses tax as implementation — not transitive to this fragment.
+    testImplementation(project(path: ':fineract-tax'))
 
     testImplementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
         exclude group: 'org.hibernate'
