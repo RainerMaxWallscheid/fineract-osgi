@@ -4,7 +4,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 
 | | |
 |--|--|
-| **Status** | draft — **Step 0 in progress / largely complete** |
+| **Status** | draft — **Steps 0–3 done**; Step 4+ pending |
 | **Decisions** | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **Playbook** | [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) §15.6 Wave 1, §15.7 |
 | **Reference pilot** | [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md) (as-built) |
@@ -22,7 +22,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 | 0 Baseline & inventory | **done** (2026-07-26) | Baseline green; inventory §2; Module API expanded + JPA adapter + unit tests |
 | 1 Project shells | **done** (2026-07-26) | `fineract-charge/{api,impl,test}` + façade; production sources on impl |
 | 2 Extract api | **done** (2026-07-26) | moduleapi + pure enums + catalog exceptions on charge-api; no Spring/JPA/REST |
-| 3 Move impl from provider | **pending** | Read/write service impls still in `fineract-provider` |
+| 3 Move impl from provider | **done** (2026-07-26) | Read/write impls + `ChargeConfiguration` on charge-impl; provider only adapters + `ConvertChargeData*` |
 | 4 Bundle manifests | **partial** | BSN/Export on shells; refine after provider move |
 | 5 Fragment-Host test | **partial** | Tests already on charge-test; green |
 | 6 Spring↔OSGi bridge | **pending** | Register ports when `BundleContext` present |
@@ -69,14 +69,15 @@ fineract-charge/
 
 **Important split-brain (must be addressed in Steps 0–4):**
 
-| Concern | Where it lives today |
-|---------|----------------------|
-| `ChargeWritePlatformService` / `ChargeReadPlatformService` **interfaces** | `fineract-charge` |
-| **Implementations** (`*JpaRepositoryImpl`, `ChargeReadPlatformServiceImpl`) | **`fineract-provider`** |
+| Concern | Where it lives after Step 3 |
+|---------|------------------------------|
+| `ChargeWritePlatformService` / `ChargeReadPlatformService` **interfaces** | **charge-impl** |
+| **Implementations** (`*JpaRepositoryImpl`, `ChargeReadPlatformServiceImpl`) | **charge-impl** (+ composition adapters in provider) |
 | `ChargeData` DTO | **`fineract-core`** (`portfolio.charge.data`) |
 | `ChargeTimeType` (+ some converters/exceptions) | **`fineract-core`** *and* overlapping types under charge |
-| `Charge` JPA entity, most enums, repositories | `fineract-charge` |
-| REST resource | `fineract-charge` |
+| `Charge` JPA entity, most enums, repositories | **charge-impl** |
+| REST resource | **charge-impl** |
+| Provider leftover | `ConvertChargeDataToSpecificChargeData`; office/accounting **port adapters** |
 
 This plan treats **consolidation of ownership** as part of the split, not a side quest.
 
@@ -107,14 +108,16 @@ Import counts of `org.apache.fineract.portfolio.charge.*` from **outside** `fine
 | `fineract-core` / `fineract-accounting` | ~7 each |
 | `fineract-investor` | ~1 |
 
-#### Provider classes that implement / wire charge (move to charge-impl in Step 3)
+#### Provider classes that implement / wire charge (Step 3 outcome)
 
-| Class | Role |
-|-------|------|
-| `…provider…charge.service.ChargeReadPlatformServiceImpl` | Read impl |
-| `…provider…charge.service.ChargeWritePlatformServiceJpaRepositoryImpl` | Write impl |
-| `…provider…charge.starter.ChargeConfiguration` | `@Bean` wiring |
-| `…provider…charge.util.ConvertChargeDataToSpecificChargeData` | Utility (review ownership) |
+| Class | Role | Location after Step 3 |
+|-------|------|------------------------|
+| `ChargeReadPlatformServiceImpl` | Read impl | **charge-impl** |
+| `ChargeWritePlatformServiceJpaRepositoryImpl` | Write impl | **charge-impl** (loan product assoc via JDBC, not `LoanProductRepository`) |
+| `ChargeConfiguration` | `@Bean` wiring | **charge-impl** |
+| `ChargeOfficeAccessPort` + `ChargeOfficeAccessPortAdapter` | Office-scope SQL / mapping | Port in charge-impl; adapter in **provider** |
+| `ChargeAccountingDropdownPort` + `ChargeAccountingDropdownPortAdapter` | GL template options | Port in charge-impl; adapter in **provider** (avoids charge↔accounting cycle) |
+| `…provider…charge.util.ConvertChargeDataToSpecificChargeData` | Utility (savings/share deps) | **stays provider** |
 
 #### Charge types living in **fineract-core** (decision for Step 0)
 
@@ -308,13 +311,20 @@ Execute as **separate PRs**. Checkboxes start open; update when done.
 | Handlers, services, REST | **impl** |
 | `ChargeData`, `ChargeTimeType` | **core** (temporary kernel) |
 
-### Step 3 — Move remaining implementation from provider into charge-impl ⏳
+### Step 3 — Move remaining implementation from provider into charge-impl ✅
 
 1. [x] Catalog `domain`/handlers/service interfaces/REST already on `charge/impl` (Step 1)  
-2. [ ] **Move** `ChargeReadPlatformServiceImpl` / `ChargeWritePlatformServiceJpaRepositoryImpl` from **provider** into impl  
-3. [ ] Move/adjust `ChargeConfiguration` beans into charge-impl (or keep provider as composition-only wiring that imports impl config)  
+2. [x] **Moved** `ChargeReadPlatformServiceImpl` / `ChargeWritePlatformServiceJpaRepositoryImpl` from **provider** into charge-impl  
+3. [x] **Moved** `ChargeConfiguration` into charge-impl (`@ConditionalOnMissingBean` wiring)  
 4. [x] Façade re-exports api + impl for Boot  
-5. [x] Impl depends on api + tax/core; **not** on loan/savings  
+5. [x] Impl depends on api + tax/core; **not** on loan/savings/accounting  
+   - Delete/update association checks use **JDBC** (`m_product_loan_charge`, etc.) — no `LoanProductRepository`  
+   - Office restriction via `ChargeOfficeAccessPort` (provider adapter → `FineractEntityAccessUtil`)  
+   - Accounting template dropdowns via `ChargeAccountingDropdownPort` (provider adapter → accounting service)  
+   - Fee frequency options inlined from `CommonEnumerations` (no provider `DropdownReadPlatformService`)  
+   - `ConfigurationDomainService` interface (core) instead of provider JPA class  
+6. [x] Provider leftover: `ConvertChargeDataToSpecificChargeData` + two port adapters  
+7. [x] Compile green: `:fineract-charge-impl:compileJava`, `:fineract-provider:compileJava`; charge-test 4/4  
 
 **Exit:** Provider no longer owns charge catalog service implementations; application boots with façade.
 
@@ -387,7 +397,7 @@ Hardest step — incremental PRs by consumer:
 | 7 | Fragment-Host tests green | pending |
 | 8 | Sources under `fineract-charge/{api,impl,test}` | pending |
 | 9 | No *new* foreign uses of `Charge` entity; freeze only shrinks | pending |
-| 10 | Provider no longer hosts charge catalog service impls | pending |
+| 10 | Provider no longer hosts charge catalog service impls | **done** (Step 3) |
 
 ---
 

@@ -18,30 +18,30 @@
  */
 package org.apache.fineract.portfolio.charge.service;
 
+import static org.apache.fineract.portfolio.common.service.CommonEnumerations.termFrequencyType;
+
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.MonthDay;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.fineract.accounting.common.AccountingDropdownReadPlatformService;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
-import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainServiceJpa;
+import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityType;
-import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.service.CurrencyReadPlatformService;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.domain.ChargeAppliesTo;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
+import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.common.service.CommonEnumerations;
-import org.apache.fineract.portfolio.common.service.DropdownReadPlatformService;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 import org.apache.fineract.portfolio.tax.service.TaxReadPlatformService;
@@ -60,11 +60,10 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
     private final CurrencyReadPlatformService currencyReadPlatformService;
     private final ChargeDropdownReadPlatformService chargeDropdownReadPlatformService;
     private final JdbcTemplate jdbcTemplate;
-    private final DropdownReadPlatformService dropdownReadPlatformService;
-    private final FineractEntityAccessUtil fineractEntityAccessUtil;
-    private final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService;
+    private final ChargeOfficeAccessPort chargeOfficeAccessPort;
+    private final ChargeAccountingDropdownPort chargeAccountingDropdownPort;
     private final TaxReadPlatformService taxReadPlatformService;
-    private final ConfigurationDomainServiceJpa configurationDomainServiceJpa;
+    private final ConfigurationDomainService configurationDomainService;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
@@ -125,14 +124,20 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         final List<EnumOptionData> savingsChargeTimeTypeOptions = this.chargeDropdownReadPlatformService.retrieveSavingsCollectionTimeTypes();
         final List<EnumOptionData> clientChargeCalculationTypeOptions = this.chargeDropdownReadPlatformService.retrieveClientCalculationTypes();
         final List<EnumOptionData> clientChargeTimeTypeOptions = this.chargeDropdownReadPlatformService.retrieveClientCollectionTimeTypes();
-        final List<EnumOptionData> feeFrequencyOptions = this.dropdownReadPlatformService.retrievePeriodFrequencyTypeOptions();
-        final Map<String, List<GLAccountData>> incomeOrLiabilityAccountOptions = this.accountingDropdownReadPlatformService.retrieveAccountMappingOptionsForCharges();
+        // Period frequency options live in core CommonEnumerations — no provider DropdownReadPlatformService needed
+        final List<EnumOptionData> feeFrequencyOptions = Arrays.asList(
+                termFrequencyType(PeriodFrequencyType.DAYS, "frequency"),
+                termFrequencyType(PeriodFrequencyType.WEEKS, "frequency"),
+                termFrequencyType(PeriodFrequencyType.MONTHS, "frequency"),
+                termFrequencyType(PeriodFrequencyType.YEARS, "frequency"),
+                termFrequencyType(PeriodFrequencyType.WHOLE_TERM, "frequency"));
+        final Map<String, List<GLAccountData>> incomeOrLiabilityAccountOptions = this.chargeAccountingDropdownPort.retrieveAccountMappingOptionsForCharges();
         final List<EnumOptionData> shareChargeCalculationTypeOptions = this.chargeDropdownReadPlatformService.retrieveSharesCalculationTypes();
         final List<EnumOptionData> shareChargeTimeTypeOptions = this.chargeDropdownReadPlatformService.retrieveSharesCollectionTimeTypes();
         final Collection<TaxGroupData> taxGroupOptions = this.taxReadPlatformService.retrieveTaxGroupsForLookUp();
-        final String accountMappingForChargeConfig = this.configurationDomainServiceJpa.getAccountMappingForCharge();
-        final List<GLAccountData> expenseAccountOptions = this.accountingDropdownReadPlatformService.retrieveExpenseAccountOptions();
-        final List<GLAccountData> assetAccountOptions = this.accountingDropdownReadPlatformService.retrieveAssetAccountOptions();
+        final String accountMappingForChargeConfig = this.configurationDomainService.getAccountMappingForCharge();
+        final List<GLAccountData> expenseAccountOptions = this.chargeAccountingDropdownPort.retrieveExpenseAccountOptions();
+        final List<GLAccountData> assetAccountOptions = this.chargeAccountingDropdownPort.retrieveAssetAccountOptions();
         return ChargeData.builder().currencyOptions(currencyOptions).chargeCalculationTypeOptions(allowedChargeCalculationTypeOptions).chargeAppliesToOptions(allowedChargeAppliesToOptions).chargeTimeTypeOptions(allowedChargeTimeOptions).chargePaymetModeOptions(chargePaymentOptions).loanChargeCalculationTypeOptions(loansChargeCalculationTypeOptions).loanChargeTimeTypeOptions(loansChargeTimeTypeOptions).savingsChargeCalculationTypeOptions(savingsChargeCalculationTypeOptions).savingsChargeTimeTypeOptions(savingsChargeTimeTypeOptions).clientChargeCalculationTypeOptions(clientChargeCalculationTypeOptions).clientChargeTimeTypeOptions(clientChargeTimeTypeOptions).feeFrequencyOptions(feeFrequencyOptions).incomeOrLiabilityAccountOptions(incomeOrLiabilityAccountOptions).taxGroupOptions(taxGroupOptions).shareChargeCalculationTypeOptions(shareChargeCalculationTypeOptions).shareChargeTimeTypeOptions(shareChargeTimeTypeOptions).accountMappingForChargeConfig(accountMappingForChargeConfig).expenseAccountOptions(expenseAccountOptions).assetAccountOptions(assetAccountOptions).build();
     }
 
@@ -221,7 +226,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         String sql = "";
         // Check if branch specific products are enabled. If yes, fetch only
         // charges mapped to current user's office
-        String inClause = fineractEntityAccessUtil.getSQLWhereClauseForProductIDsForUserOffice_ifGlobalConfigEnabled(FineractEntityType.CHARGE);
+        String inClause = this.chargeOfficeAccessPort.chargeIdsInClauseForCurrentUserOfficeIfEnabled();
         if ((inClause != null) && !inClause.trim().isEmpty()) {
             sql += " and c.id in ( " + inClause + " ) ";
         }
@@ -386,16 +391,18 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         return this.jdbcTemplate.query(sql, rm, new Object[] {ChargeAppliesTo.SHARES.getValue()}); // NOSONAR
     }
 
-    @java.lang.SuppressWarnings("all")
-        public ChargeReadPlatformServiceImpl(final CurrencyReadPlatformService currencyReadPlatformService, final ChargeDropdownReadPlatformService chargeDropdownReadPlatformService, final JdbcTemplate jdbcTemplate, final DropdownReadPlatformService dropdownReadPlatformService, final FineractEntityAccessUtil fineractEntityAccessUtil, final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService, final TaxReadPlatformService taxReadPlatformService, final ConfigurationDomainServiceJpa configurationDomainServiceJpa, final NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public ChargeReadPlatformServiceImpl(final CurrencyReadPlatformService currencyReadPlatformService,
+            final ChargeDropdownReadPlatformService chargeDropdownReadPlatformService, final JdbcTemplate jdbcTemplate,
+            final ChargeOfficeAccessPort chargeOfficeAccessPort, final ChargeAccountingDropdownPort chargeAccountingDropdownPort,
+            final TaxReadPlatformService taxReadPlatformService, final ConfigurationDomainService configurationDomainService,
+            final NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.currencyReadPlatformService = currencyReadPlatformService;
         this.chargeDropdownReadPlatformService = chargeDropdownReadPlatformService;
         this.jdbcTemplate = jdbcTemplate;
-        this.dropdownReadPlatformService = dropdownReadPlatformService;
-        this.fineractEntityAccessUtil = fineractEntityAccessUtil;
-        this.accountingDropdownReadPlatformService = accountingDropdownReadPlatformService;
+        this.chargeOfficeAccessPort = chargeOfficeAccessPort;
+        this.chargeAccountingDropdownPort = chargeAccountingDropdownPort;
         this.taxReadPlatformService = taxReadPlatformService;
-        this.configurationDomainServiceJpa = configurationDomainServiceJpa;
+        this.configurationDomainService = configurationDomainService;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 }

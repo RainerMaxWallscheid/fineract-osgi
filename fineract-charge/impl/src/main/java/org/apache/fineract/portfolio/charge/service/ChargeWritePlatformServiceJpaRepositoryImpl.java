@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.charge.service;
 
 import jakarta.persistence.PersistenceException;
-import java.util.Collection;
 import java.util.Map;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
@@ -29,8 +28,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.infrastructure.core.exception.ErrorHandler;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
-import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityAccessType;
-import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.charge.api.ChargesApiConstants;
 import org.apache.fineract.portfolio.charge.domain.Charge;
@@ -39,8 +36,6 @@ import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeDeletedExcep
 import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeUpdatedException;
 import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
 import org.apache.fineract.portfolio.charge.serialization.ChargeDefinitionCommandFromApiJsonDeserializer;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
 import org.apache.fineract.portfolio.paymentdetail.PaymentDetailConstants;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
@@ -53,15 +48,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Charge catalog write path. Loan/savings product association checks use JDBC against
+ * mapping tables so this module does not depend on loan or savings BCs.
+ */
 public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWritePlatformService {
     @java.lang.SuppressWarnings("all")
-        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ChargeWritePlatformServiceJpaRepositoryImpl.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ChargeWritePlatformServiceJpaRepositoryImpl.class);
     private final PlatformSecurityContext context;
     private final ChargeDefinitionCommandFromApiJsonDeserializer fromApiJsonDeserializer;
     private final ChargeRepository chargeRepository;
-    private final LoanProductRepository loanProductRepository;
     private final JdbcTemplate jdbcTemplate;
-    private final FineractEntityAccessUtil fineractEntityAccessUtil;
+    private final ChargeOfficeAccessPort chargeOfficeAccessPort;
     private final GLAccountRepositoryWrapper glAccountRepository;
     private final TaxGroupRepositoryWrapper taxGroupRepository;
     private final PaymentTypeRepository paymentTypeRepository;
@@ -97,11 +95,8 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
             // check if the office specific products are enabled. If yes, then
             // save this savings product against a specific office
             // i.e. this savings product is specific for this office.
-            fineractEntityAccessUtil.checkConfigurationAndAddProductResrictionsForUserOffice(FineractEntityAccessType.OFFICE_ACCESS_TO_CHARGES, charge.getId());
-            return  //
-            //
-            //
-            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(charge.getId()).build();
+            this.chargeOfficeAccessPort.restrictNewChargeToCurrentUserOfficeIfEnabled(charge.getId());
+            return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(charge.getId()).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
@@ -170,11 +165,7 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
             if (!changes.isEmpty()) {
                 this.chargeRepository.save(chargeForUpdate);
             }
-            return  //
-            //
-            //
-            //
-            new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(chargeId).with(changes).build();
+            return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(chargeId).with(changes).build();
         } catch (final JpaSystemException | DataIntegrityViolationException dve) {
             handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
@@ -193,19 +184,18 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
         if (chargeForDelete.isDeleted()) {
             throw new ChargeNotFoundException(chargeId);
         }
-        final Collection<LoanProduct> loanProducts = this.loanProductRepository.retrieveLoanProductsByChargeId(chargeId);
+        // JDBC association checks — no LoanProductRepository (loan BC) dependency
+        final Boolean isChargeExistWithLoanProducts = isAnyLoanProductsAssociateWithThisCharge(chargeId);
         final Boolean isChargeExistWithLoans = isAnyLoansAssociateWithThisCharge(chargeId);
         final Boolean isChargeExistWithSavings = isAnySavingsAssociateWithThisCharge(chargeId);
         final Boolean isChargeExistWithWorkingCapitalLoan = chargeRepository.isAnyWorkingCapitalLoansAssociateWithThisCharge(chargeId).isPresent();
         // TODO: Change error messages around:
-        if (!loanProducts.isEmpty() || isChargeExistWithLoans || isChargeExistWithSavings || isChargeExistWithWorkingCapitalLoan) {
+        if (isChargeExistWithLoanProducts || isChargeExistWithLoans || isChargeExistWithSavings || isChargeExistWithWorkingCapitalLoan) {
             throw new ChargeCannotBeDeletedException("error.msg.charge.cannot.be.deleted.it.is.already.used.in.loan", "This charge cannot be deleted, it is already used in loan");
         }
         chargeForDelete.delete();
         this.chargeRepository.save(chargeForDelete);
-        return  //
-        //
-        new CommandProcessingResultBuilder().withEntityId(chargeForDelete.getId()).build();
+        return new CommandProcessingResultBuilder().withEntityId(chargeForDelete.getId()).build();
     }
 
     /*
@@ -248,14 +238,16 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
         return Boolean.valueOf(isSavingsUsingCharge);
     }
 
-    @java.lang.SuppressWarnings("all")
-        public ChargeWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final ChargeDefinitionCommandFromApiJsonDeserializer fromApiJsonDeserializer, final ChargeRepository chargeRepository, final LoanProductRepository loanProductRepository, final JdbcTemplate jdbcTemplate, final FineractEntityAccessUtil fineractEntityAccessUtil, final GLAccountRepositoryWrapper glAccountRepository, final TaxGroupRepositoryWrapper taxGroupRepository, final PaymentTypeRepository paymentTypeRepository) {
+    public ChargeWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
+            final ChargeDefinitionCommandFromApiJsonDeserializer fromApiJsonDeserializer, final ChargeRepository chargeRepository,
+            final JdbcTemplate jdbcTemplate, final ChargeOfficeAccessPort chargeOfficeAccessPort,
+            final GLAccountRepositoryWrapper glAccountRepository, final TaxGroupRepositoryWrapper taxGroupRepository,
+            final PaymentTypeRepository paymentTypeRepository) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.chargeRepository = chargeRepository;
-        this.loanProductRepository = loanProductRepository;
         this.jdbcTemplate = jdbcTemplate;
-        this.fineractEntityAccessUtil = fineractEntityAccessUtil;
+        this.chargeOfficeAccessPort = chargeOfficeAccessPort;
         this.glAccountRepository = glAccountRepository;
         this.taxGroupRepository = taxGroupRepository;
         this.paymentTypeRepository = paymentTypeRepository;

@@ -18,22 +18,20 @@
  */
 package org.apache.fineract.portfolio.charge.starter;
 
-import org.apache.fineract.accounting.common.AccountingDropdownReadPlatformService;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
-import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainServiceJpa;
-import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
+import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.service.CurrencyReadPlatformService;
 import org.apache.fineract.portfolio.charge.domain.ChargeRepository;
 import org.apache.fineract.portfolio.charge.serialization.ChargeDefinitionCommandFromApiJsonDeserializer;
+import org.apache.fineract.portfolio.charge.service.ChargeAccountingDropdownPort;
 import org.apache.fineract.portfolio.charge.service.ChargeDropdownReadPlatformService;
 import org.apache.fineract.portfolio.charge.service.ChargeDropdownReadPlatformServiceImpl;
+import org.apache.fineract.portfolio.charge.service.ChargeOfficeAccessPort;
 import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformServiceImpl;
 import org.apache.fineract.portfolio.charge.service.ChargeWritePlatformService;
 import org.apache.fineract.portfolio.charge.service.ChargeWritePlatformServiceJpaRepositoryImpl;
-import org.apache.fineract.portfolio.common.service.DropdownReadPlatformService;
-import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
 import org.apache.fineract.portfolio.tax.domain.TaxGroupRepositoryWrapper;
 import org.apache.fineract.portfolio.tax.service.TaxReadPlatformService;
@@ -56,22 +54,21 @@ public class ChargeConfiguration {
     @ConditionalOnMissingBean(ChargeReadPlatformService.class)
     public ChargeReadPlatformService chargeReadPlatformService(CurrencyReadPlatformService currencyReadPlatformService,
             ChargeDropdownReadPlatformService chargeDropdownReadPlatformService, JdbcTemplate jdbcTemplate,
-            DropdownReadPlatformService dropdownReadPlatformService, FineractEntityAccessUtil fineractEntityAccessUtil,
-            AccountingDropdownReadPlatformService accountingDropdownReadPlatformService, TaxReadPlatformService taxReadPlatformService,
-            ConfigurationDomainServiceJpa configurationDomainServiceJpa, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+            ChargeOfficeAccessPort chargeOfficeAccessPort, ChargeAccountingDropdownPort chargeAccountingDropdownPort,
+            TaxReadPlatformService taxReadPlatformService, ConfigurationDomainService configurationDomainService,
+            NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         return new ChargeReadPlatformServiceImpl(currencyReadPlatformService, chargeDropdownReadPlatformService, jdbcTemplate,
-                dropdownReadPlatformService, fineractEntityAccessUtil, accountingDropdownReadPlatformService, taxReadPlatformService,
-                configurationDomainServiceJpa, namedParameterJdbcTemplate);
+                chargeOfficeAccessPort, chargeAccountingDropdownPort, taxReadPlatformService, configurationDomainService,
+                namedParameterJdbcTemplate);
     }
 
     @Bean
     @ConditionalOnMissingBean(ChargeWritePlatformService.class)
     public ChargeWritePlatformService chargeWritePlatformService(PlatformSecurityContext context,
             ChargeDefinitionCommandFromApiJsonDeserializer fromApiJsonDeserializer, ChargeRepository chargeRepository,
-            LoanProductRepository loanProductRepository, JdbcTemplate jdbcTemplate, FineractEntityAccessUtil fineractEntityAccessUtil,
-            GLAccountRepositoryWrapper glAccountRepository, TaxGroupRepositoryWrapper taxGroupRepository,
-            PaymentTypeRepository paymentTypeRepository) {
-        return new ChargeWritePlatformServiceJpaRepositoryImpl(context, fromApiJsonDeserializer, chargeRepository, loanProductRepository,
-                jdbcTemplate, fineractEntityAccessUtil, glAccountRepository, taxGroupRepository, paymentTypeRepository);
+            JdbcTemplate jdbcTemplate, ChargeOfficeAccessPort chargeOfficeAccessPort, GLAccountRepositoryWrapper glAccountRepository,
+            TaxGroupRepositoryWrapper taxGroupRepository, PaymentTypeRepository paymentTypeRepository) {
+        return new ChargeWritePlatformServiceJpaRepositoryImpl(context, fromApiJsonDeserializer, chargeRepository, jdbcTemplate,
+                chargeOfficeAccessPort, glAccountRepository, taxGroupRepository, paymentTypeRepository);
     }
 }
