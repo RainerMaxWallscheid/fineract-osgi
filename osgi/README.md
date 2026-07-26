@@ -18,8 +18,20 @@ Build jars: `./gradlew :fineract-command-api:jar :fineract-command-impl:jar :fin
 White-box tests: `./gradlew :fineract-command-test:test`  
 Copy into `osgi/bundles/` for Equinox resolve experiments. Plan: [15_osgi_bundle_refactoring_fineract-command.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-command.md).
 
-**Next modules (after command):** ranked Wave 1–4 rollout in [15.6 Suggested rollout order](../docs/arc42/15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot) — prefer `fineract-charge` or `fineract-rates`, then tax, then document/branch.  
-Charge plan (draft): [15_osgi_bundle_refactoring_fineract-charge.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-charge.md).
+### Wave 1: fineract-charge bundles (Steps 0–4)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-charge-api` (`fineract-charge/api`) | `org.apache.fineract.charge.api` | Export: `moduleapi`, pure `domain` enums, catalog `exception` |
+| `fineract-charge-impl` (`fineract-charge/impl`) | `org.apache.fineract.charge.impl` | Export: `starter` only; Import api packages + `*` |
+| `fineract-charge-test` (`fineract-charge/test`) | `org.apache.fineract.charge.test` | `Fragment-Host: org.apache.fineract.charge.impl` |
+| `fineract-charge` | *(façade, not OSGi feature)* | Boot compatibility: re-exports api + impl |
+
+Build jars: `./gradlew :fineract-charge-api:jar :fineract-charge-impl:jar :fineract-charge-test:jar`  
+White-box tests: `./gradlew :fineract-charge-test:test`  
+Plan: [15_osgi_bundle_refactoring_fineract-charge.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-charge.md).
+
+**Next modules:** ranked Wave 1–4 in [15.6 Suggested rollout order](../docs/arc42/15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot) — rates, tax, document/branch, ….
 
 ## Layout
 

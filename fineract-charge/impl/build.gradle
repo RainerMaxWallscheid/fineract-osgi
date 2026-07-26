@@ -48,7 +48,9 @@ configurations {
 
 apply from: 'dependencies.gradle'
 
-// OSGi implementation bundle. After Step 2, prefer not exporting domain packages to foreign BCs.
+// OSGi implementation bundle (ADR-022 / charge plan Step 4).
+// Do not export domain / service packages — other BCs use charge-api + Service Registry.
+// Export starter only so Spring Boot / audit tooling can see ChargeConfiguration if needed.
 jar {
     manifest {
         attributes(
@@ -56,7 +58,12 @@ jar {
                 'Bundle-Name': 'Apache Fineract Charge Implementation',
                 'Bundle-SymbolicName': 'org.apache.fineract.charge.impl',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Import-Package': 'org.apache.fineract.portfolio.charge.moduleapi,*',
+                'Bundle-Description': 'Charge Catalog implementation (JPA, services, REST, Spring wiring)',
+                'Import-Package': 'org.apache.fineract.portfolio.charge.moduleapi,'
+                        + 'org.apache.fineract.portfolio.charge.domain,'
+                        + 'org.apache.fineract.portfolio.charge.exception,'
+                        + '*',
+                'Export-Package': 'org.apache.fineract.portfolio.charge.starter',
                 'Automatic-Module-Name': 'org.apache.fineract.charge.impl'
                 )
     }

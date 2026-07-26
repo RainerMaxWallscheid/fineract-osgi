@@ -4,7 +4,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 
 | | |
 |--|--|
-| **Status** | draft — **Steps 0–3 done**; Step 4+ pending |
+| **Status** | draft — **Steps 0–4 done**; Step 5+ pending |
 | **Decisions** | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **Playbook** | [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) §15.6 Wave 1, §15.7 |
 | **Reference pilot** | [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md) (as-built) |
@@ -23,7 +23,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 | 1 Project shells | **done** (2026-07-26) | `fineract-charge/{api,impl,test}` + façade; production sources on impl |
 | 2 Extract api | **done** (2026-07-26) | moduleapi + pure enums + catalog exceptions on charge-api; no Spring/JPA/REST |
 | 3 Move impl from provider | **done** (2026-07-26) | Read/write impls + `ChargeConfiguration` on charge-impl; provider only adapters + `ConvertChargeData*` |
-| 4 Bundle manifests | **partial** | BSN/Export on shells; refine after provider move |
+| 4 Bundle manifests | **done** (2026-07-26) | BSN + Export/Import/Fragment-Host on api/impl/test jars; starter export on impl |
 | 5 Fragment-Host test | **partial** | Tests already on charge-test; green |
 | 6 Spring↔OSGi bridge | **pending** | Register ports when `BundleContext` present |
 | 7 Consumer retarget (Gradle) | **pending** | Domain modules → compile on charge-api |
@@ -328,16 +328,23 @@ Execute as **separate PRs**. Checkboxes start open; update when done.
 
 **Exit:** Provider no longer owns charge catalog service implementations; application boots with façade.
 
-### Step 4 — Bundle metadata ⏳
+### Step 4 — Bundle metadata ✅
 
 | Header | api | impl | test |
 |--------|-----|------|------|
 | `Bundle-SymbolicName` | `org.apache.fineract.charge.api` | `org.apache.fineract.charge.impl` | `org.apache.fineract.charge.test` |
-| `Export-Package` | moduleapi + contract packages | none (or starter only if required) | n/a |
-| `Import-Package` | core/kernel as needed | api + Spring + JPA + … | host |
+| `Bundle-Version` | project version (`x.y.z.SNAPSHOT`) | same | same |
+| `Export-Package` | `moduleapi`, pure enums `domain`, catalog `exception` | `…charge.starter` only | — |
+| `Import-Package` | `*` (kernel bases) | api packages + `*` | inherits host |
 | `Fragment-Host` | — | — | `org.apache.fineract.charge.impl` |
 
-Bootstrap with `jar { manifest { attributes … } }` (bnd optional later), same as command.
+1. [x] Manifest attributes on `fineract-charge/{api,impl,test}/build.gradle` via `jar { manifest { attributes … } }` (bnd optional later; same bootstrap as command)  
+2. [x] Impl does **not** export domain/service packages (foreign BCs → charge-api + Service Registry)  
+3. [x] Test jar is a fragment of charge-impl  
+4. [x] Documented in module README + [osgi/README.md](../../osgi/README.md) pilot table  
+5. [x] Verified MANIFEST.MF on built jars  
+
+**Known debt:** Java package `…charge.domain` (and `exception`) is split between api (enums / catalog exceptions) and impl (JPA entity / LoanCharge* exceptions). Flat Boot classpath is fine; strict Equinox may need package renames later.
 
 ### Step 5 — Fragment-Host unit tests ⏳
 
@@ -388,7 +395,7 @@ Hardest step — incremental PRs by consumer:
 
 | # | Criterion | Status |
 |---|-----------|--------|
-| 1 | api, impl, test fragment artifacts build | pending |
+| 1 | api, impl, test fragment artifacts build | **done** (Step 4 jars) |
 | 2 | api has no Spring / JPA / REST | pending |
 | 3 | Domain modules compile on **charge-api** only (provider exception) | pending |
 | 4 | Ports registered in OSGi Service Registry (bridge present) | pending |

@@ -44,7 +44,8 @@ configurations {
 
 apply from: 'dependencies.gradle'
 
-// OSGi fragment attached to charge-impl (ADR-022).
+// OSGi fragment attached to charge-impl (ADR-022 / charge plan Step 4).
+// Fragment inherits host packages; no Export-Package of production types.
 jar {
     from sourceSets.test.output
     manifest {
@@ -53,6 +54,7 @@ jar {
                 'Bundle-Name': 'Apache Fineract Charge Test Fragment',
                 'Bundle-SymbolicName': 'org.apache.fineract.charge.test',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Bundle-Description': 'White-box unit tests for charge-impl (Fragment-Host)',
                 'Fragment-Host': 'org.apache.fineract.charge.impl',
                 'Automatic-Module-Name': 'org.apache.fineract.charge.test'
                 )
