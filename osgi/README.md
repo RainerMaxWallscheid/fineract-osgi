@@ -11,7 +11,7 @@ See also `docs/arc42/` (Runtime / Deployment / OSGi concepts).
 |----------|---------------------|
 | `fineract-command-api` (`fineract-command/api`) | `org.apache.fineract.command.api` |
 | `fineract-command-impl` (`fineract-command/impl`) | `org.apache.fineract.command.impl` |
-| `fineract-command-test` (`fineract-command/test`) | `org.apache.fineract.command.test` (`Fragment-Host: org.apache.fineract.command.impl`) |
+| `fineract-command-test` (top-level) | `org.apache.fineract.command.test` (`Fragment-Host: org.apache.fineract.command.impl`) |
 
 Build jars: `./gradlew :fineract-command-api:jar :fineract-command-impl:jar :fineract-command-test:jar`  
 White-box tests: `./gradlew :fineract-command-test:test`  

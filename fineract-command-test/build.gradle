@@ -47,8 +47,10 @@ apply from: 'dependencies.gradle'
 
 // OSGi fragment attached to command-impl (ADR-022).
 // main = shared fixtures/samples for the host class space
-// test = JUnit/Spring Boot white-box tests of the host (Gradle); same fragment jar for Equinox install later
+// test = JUnit/Spring Boot white-box tests of the host (Gradle)
+// jar also packages test classes so Equinox can install one fragment that sees host internals
 jar {
+    from sourceSets.test.output
     manifest {
         attributes(
                 'Bundle-ManifestVersion': '2',
@@ -74,8 +76,8 @@ modernizer {
 // If we are running Gradle within Eclipse to enhance classes with OpenJPA,
 // set the classes directory to point to Eclipse's default build directory
 if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
-    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-command/test/bin/main")
-    sourceSets.test.java.outputDir = new File(rootProject.projectDir, "fineract-command/test/bin/test")
+    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-command-test/bin/main")
+    sourceSets.test.java.outputDir = new File(rootProject.projectDir, "fineract-command-test/bin/test")
 }
 
 if (!(project.hasProperty('env') && project.getProperty('env') == 'dev')) {
@@ -90,4 +92,9 @@ if (!(project.hasProperty('env') && project.getProperty('env') == 'dev')) {
 
 tasks.named('test').configure {
     useJUnitPlatform()
+}
+
+// jar needs test classes compiled first when packaging them into the fragment
+tasks.named('jar').configure {
+    dependsOn tasks.named('testClasses')
 }

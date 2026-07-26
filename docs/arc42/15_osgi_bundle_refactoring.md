@@ -37,7 +37,7 @@ fineract-charge-test/
 
 fineract-command/api/
 fineract-command/impl/
-fineract-command/test/   # Fragment-Host → command.impl
+fineract-command-test/   # Fragment-Host → command.impl
 ```
 
 ```mermaid
