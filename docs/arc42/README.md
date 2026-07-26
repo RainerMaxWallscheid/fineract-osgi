@@ -20,8 +20,8 @@ This directory contains the arc42 documentation for **fineract-osgi** – Apache
 | 12 | [Event Catalog](12_event_catalog.md) | All business event TYPEs → ES target names, gaps, Avro, LoanEvent |
 | 13 | [ArchUnit BC Rules](13_archunit_bounded_context_rules.md) | ArchUnit rules against cross-context entity imports (freeze baseline) |
 | 14 | [Module API Boundaries](14_module_api_boundaries.md) | Subprojects only via `moduleapi` (ADR-021) |
-| 15 | [OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) | api/impl/test split, Service Registry, Fragment-Host, stages B0–B6 (ADR-022) |
-| 15a | [fineract-command pilot plan](15_osgi_bundle_refactoring_fineract-command.md) | Step-by-step OSGi split for the command stack (PRs 1–final) |
+| 15 | [OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) | api/impl/test split, Service Registry, Fragment-Host, stages B0–B6, **post-command rollout waves** (ADR-022) |
+| 15a | [fineract-command pilot plan](15_osgi_bundle_refactoring_fineract-command.md) | Step-by-step OSGi split for the command stack (as-built) |
 
 ## Complementary Artifacts
 

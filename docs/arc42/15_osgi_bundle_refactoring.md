@@ -177,15 +177,104 @@ sequenceDiagram
 | **B5** | Rollout | Further modules by coupling (small → large) | Freeze store shrinks; more services registered |
 | **B6** | Optional polish | DS-only for pure extensions; tighten exports | Core banking still Spring-in-impl |
 
-### Suggested pilot order
+### Suggested rollout order (post–command pilot)
 
-1. **`fineract-command`** (clear interfaces / small surface) — **detailed plan (as-built under `fineract-command/{api,impl}`):** [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md)  
-2. rates, tax, validation / `fineract-charge`  
-3. branch, document  
-4. savings, accounting  
-5. loan / progressive / working-capital (highest coupling)
+**B2 pilot status:** `fineract-command` is the completed pilot (api / impl / test fragment + integrationtest fixtures). As-built plan: [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md).
 
-Per module: complete **Module API ports first** ([14.6](14_module_api_boundaries.md)), then physical api/impl split.
+Further modules follow the same recipe, ordered by **port clarity**, **size**, **reverse dependency cost**, and **hexagonal value** (replaceable adapters as OSGi services). Metrics below are approximate main-source scale (order of magnitude); re-measure before a PR series.
+
+#### Selection criteria
+
+| Criterion | Why it matters |
+|-----------|----------------|
+| **Clear ports** | Interfaces / read-write services already exist → easy `-api` |
+| **Small surface** | Prefer ≲ ~100 main classes for the next 1–2 modules |
+| **Few JPA aggregates** | Less entity leakage into the contract |
+| **Bounded reverse deps** | Consumers can switch to `-api` without a monorepo-wide rewrite |
+| **Hexagonal fit** | Driven adapters already swappable (storage, messaging) |
+| **Value of OSGi service** | Optional / replaceable impl is a real benefit |
+| **Not composition root** | Leave `fineract-provider` and most of `fineract-core` last |
+
+Per module: complete **Module API ports first** ([14.6](14_module_api_boundaries.md)), then physical api/impl/test split.
+
+#### Wave 1 — next (command-sized, best ROI)
+
+| Rank | Module | ~main scale | Why next | Typical `-api` surface |
+|------|--------|-------------|----------|------------------------|
+| **1** | **`fineract-charge`** | ~40 | Co-named B2 candidate in [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md); already has `moduleapi.ChargeDefinitionPort`; classic BC “fee definition”; many dependents but port can stay narrow | `ChargeDefinitionPort` + read/write facades + stable DTOs/exceptions |
+| **2** | **`fineract-rates`** | ~20 | Smallest real domain slice; few entities; floating-rate ports are crisp | Floating rate read/write ports + data types |
+| **3** | **`fineract-tax`** | ~30 | Small; already has `moduleapi`; used by charge/loan/savings — good “api-only consumer” exercise after charge | Tax component/group ports + DTOs |
+
+- Prefer **charge first** for architectural impact (loan / savings / accounting / investor already depend on it).  
+- Prefer **rates first** for lowest mechanical risk (same steps as command, less consumer rewiring).
+
+Suggested directory layout (mirror command):
+
+```text
+fineract-charge/
+  api/   → :fineract-charge-api      BSN org.apache.fineract.charge.api
+  impl/  → :fineract-charge-impl     BSN org.apache.fineract.charge.impl  (Spring stays here)
+  test/  → :fineract-charge-test     Fragment-Host → charge.impl
+```
+
+Optional `fineract-<name>-integrationtest` only if several modules need shared fixtures (command needed it; charge may not).
+
+#### Wave 2 — strong hexagonal, medium size
+
+| Rank | Module | ~main scale | Why | Caveat |
+|------|--------|-------------|-----|--------|
+| **4** | **`fineract-document`** | ~85 | Real hexagonal story (`ContentStore` / FS vs S3); few consumers (mainly provider) | Port cleanup first; do not leak servlet/AWS types into `-api` |
+| **5** | **`fineract-branch`** | ~50 | Clear org aggregate (teller/cashier) | Less “optional extension” value than charge/document |
+| **6** | **`fineract-loan-origination`** | ~60 | Bounded slice vs full loan | Couples to loan types — extract ports carefully |
+| **7** | **`fineract-mix`** | ~35 | Small XBRL/reporting support | Niche; lower strategic value for OSGi services |
+
+#### Wave 3 — full domain BCs (after Module API hardening)
+
+| Rank | Module | ~main scale | Why wait |
+|------|--------|-------------|----------|
+| **8** | **`fineract-investor`** | ~100 | Clear investor BC + search; after charge/accounting ports stabilize |
+| **9** | **`fineract-accounting`** | ~150 | Central GL/journal; many dependents. Split only when ports are stable |
+| **10** | **`fineract-savings`** | ~180 | Full product BC; needs charge/tax/accounting APIs first |
+
+#### Wave 4 — last (high coupling / composition)
+
+| Module | ~main scale | Verdict |
+|--------|-------------|---------|
+| **`fineract-progressive-loan` / `fineract-working-capital-loan`** | 80–320 | Product variants of loan — after `fineract-loan` ports |
+| **`fineract-loan`** | ~680 | Heart of the platform; dedicated multi-PR plan only |
+| **`fineract-cob`** | ~65 | Orchestration around loan more than a pure BC |
+| **`fineract-security`** | ~65 | Cross-cutting; careful export policy |
+| **`fineract-core`** | ~800 | Shared kernel / platform — extract *slices*, do not “api/impl” the whole module |
+| **`fineract-provider`** | ~2500 | Composition root — hosts the Spring↔OSGi bridge; **never** the next pilot |
+
+#### Explicit non-candidates (for OSGi BC split)
+
+| Module | Reason |
+|--------|--------|
+| **`fineract-validation`** | Tiny utility / shared-kernel-ish — keep as library |
+| **`fineract-architecture`** | ArchUnit rules only |
+| **`fineract-report`** | Thin reporting glue |
+| **command satellites** (jdbc / async / disruptor / audit) | Already modular; finish command Step 8 (consumers off façade onto `command-api` + runtime impl) before more splits |
+
+#### Quick decision matrix
+
+```text
+Small + ports exist     → rates, tax, charge     ★★★ next
+Hexagonal adapters      → document               ★★☆ next-ish
+Many dependents         → charge, accounting     high value, more rewiring
+Huge / core banking     → loan, provider         later
+Shared kernel           → core, validation       don't force BC split
+```
+
+#### Parallel work while Wave 1 runs
+
+| Priority | Action |
+|----------|--------|
+| **Next PR series** | `fineract-charge` (or `fineract-rates` if smallest cut preferred) |
+| **Then** | `fineract-tax` → retarget charge/tax consumers onto `-api` |
+| **Then** | `fineract-document` (replaceable adapters as OSGi services) |
+| **Parallel** | Command **Step 8**: retarget core/provider/cob/document/mix off the command façade |
+| **Do not start** | loan / provider / full-core split |
 
 ---
 
@@ -244,4 +333,4 @@ Exact symbolic names may be refined in B1 tooling; keep them stable once publish
 
 ---
 
-*Navigation:* [README](README.md) · [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) · [14 Module API](14_module_api_boundaries.md)
+*Navigation:* [README](README.md) · [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) · [14 Module API](14_module_api_boundaries.md) · [command pilot](15_osgi_bundle_refactoring_fineract-command.md)

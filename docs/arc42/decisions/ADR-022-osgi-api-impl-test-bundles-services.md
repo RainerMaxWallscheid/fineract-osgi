@@ -86,7 +86,7 @@ Full playbook: [15 OSGi Bundle Refactoring](../15_osgi_bundle_refactoring.md).
 |-------|---------|
 | **B0** | Guardrails: ArchUnit Module API, `moduleapi` ports (already started) |
 | **B1** | Bundle tooling (bnd / manifests, symbolic names, export whitelist) |
-| **B2** | Pilot split of one small module (`fineract-charge` or `fineract-command`) into api/impl/test |
+| **B2** | Pilot split of one small module into api/impl/test — **done for `fineract-command`**; next candidates ranked in [15.6 rollout order](../15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot) (`fineract-charge` / rates / tax …) |
 | **B3** | Spring↔OSGi bridge in composition root |
 | **B4** | Consumers obtain ports only via OSGi services (or bridge façade), not foreign impl |
 | **B5** | Roll out further domain modules; shrink ArchUnit freeze store |
