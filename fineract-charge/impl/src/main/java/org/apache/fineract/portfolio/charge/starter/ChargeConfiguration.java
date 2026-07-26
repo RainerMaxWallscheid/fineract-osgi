@@ -37,11 +37,18 @@ import org.apache.fineract.portfolio.tax.domain.TaxGroupRepositoryWrapper;
 import org.apache.fineract.portfolio.tax.service.TaxReadPlatformService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+/**
+ * Spring wiring for charge catalog services. Also scans the OSGi registrar package so
+ * {@link org.apache.fineract.portfolio.charge.impl.osgi.ChargeOsgiServiceRegistrar} is active
+ * when this configuration is imported without a broad package scan.
+ */
 @Configuration
+@ComponentScan("org.apache.fineract.portfolio.charge.impl.osgi")
 public class ChargeConfiguration {
 
     @Bean

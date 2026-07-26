@@ -4,7 +4,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 
 | | |
 |--|--|
-| **Status** | draft — **Steps 0–5 done**; Step 6+ pending |
+| **Status** | draft — **Steps 0–6 done**; Step 7+ pending |
 | **Decisions** | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **Playbook** | [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) §15.6 Wave 1, §15.7 |
 | **Reference pilot** | [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md) (as-built) |
@@ -25,7 +25,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 | 3 Move impl from provider | **done** (2026-07-26) | Read/write impls + `ChargeConfiguration` on charge-impl; provider only adapters + `ConvertChargeData*` |
 | 4 Bundle manifests | **done** (2026-07-26) | BSN + Export/Import/Fragment-Host on api/impl/test jars; starter export on impl |
 | 5 Fragment-Host test | **done** (2026-07-26) | White-box tests on charge-test only; impl main-only; 14 tests green |
-| 6 Spring↔OSGi bridge | **pending** | Register ports when `BundleContext` present |
+| 6 Spring↔OSGi bridge | **done** (2026-07-26) | `ChargeOsgiServiceRegistrar` registers `ChargeDefinitionPort`; no-op without OSGi |
 | 7 Consumer retarget (Gradle) | **pending** | Domain modules → compile on charge-api |
 | 8 Consumer retarget (semantic) | **pending** | loan/savings/… off `Charge` entity |
 | 9 Docs / acceptance | **pending** | READMEs, osgi table, ArchUnit freeze shrink |
@@ -360,12 +360,18 @@ Execute as **separate PRs**. Checkboxes start open; update when done.
 
 **Exit:** Catalog host types covered by fragment unit tests; production code not co-located with tests.  
 
-### Step 6 — Spring↔OSGi service registrar ⏳
+### Step 6 — Spring↔OSGi service registrar ✅
 
-1. [ ] Add `…charge.impl.osgi.ChargeOsgiServiceRegistrar` (reflection / optional BundleContext — command pattern)  
-2. [ ] Register at least `ChargeDefinitionPort` + any new read ports  
-3. [ ] Boot path without OSGi remains unchanged  
-4. [ ] **No Karaf Features**
+1. [x] `org.apache.fineract.portfolio.charge.impl.osgi.ChargeOsgiServiceRegistrar`  
+   - Reflection on `FrameworkUtil` / `BundleContext` (same pattern as command)  
+   - `@Component` + `@ComponentScan` from `ChargeConfiguration`  
+2. [x] Registers **`ChargeDefinitionPort`** (property `provider=fineract-charge-impl`) when OSGi context present  
+   - Further list/filter Module API ports deferred until Step 8 retarget needs them  
+3. [x] Boot without OSGi: registrar no-ops (`ClassNotFoundException` / null bundle) — Spring wiring unchanged  
+4. [x] **No Karaf Features**  
+5. [x] Fragment tests: `ChargeOsgiServiceRegistrarTest` (no-op paths)  
+
+**Exit:** Catalog port publishable via Service Registry under Equinox; plain Boot unchanged.
 
 ### Step 7 — Consumers compile against api (mechanical) ⏳
 
@@ -405,9 +411,9 @@ Hardest step — incremental PRs by consumer:
 | 1 | api, impl, test fragment artifacts build | **done** (Step 4 jars) |
 | 2 | api has no Spring / JPA / REST | pending |
 | 3 | Domain modules compile on **charge-api** only (provider exception) | pending |
-| 4 | Ports registered in OSGi Service Registry (bridge present) | pending |
-| 5 | No Karaf Feature descriptors | pending |
-| 6 | Spring still wires impl under Boot | pending |
+| 4 | Ports registered in OSGi Service Registry (bridge present) | **done** (Step 6 registrar) |
+| 5 | No Karaf Feature descriptors | **done** (Service Registry only) |
+| 6 | Spring still wires impl under Boot | **done** (registrar no-ops off-OSGi) |
 | 7 | Fragment-Host tests green | **done** (Step 5, 14 tests) |
 | 8 | Sources under `fineract-charge/{api,impl,test}` | pending |
 | 9 | No *new* foreign uses of `Charge` entity; freeze only shrinks | pending |

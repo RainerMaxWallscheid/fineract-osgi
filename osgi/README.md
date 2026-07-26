@@ -23,7 +23,7 @@ Copy into `osgi/bundles/` for Equinox resolve experiments. Plan: [15_osgi_bundle
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-charge-api` (`fineract-charge/api`) | `org.apache.fineract.charge.api` | Export: `moduleapi`, pure `domain` enums, catalog `exception` |
-| `fineract-charge-impl` (`fineract-charge/impl`) | `org.apache.fineract.charge.impl` | Export: `starter` only; Import api packages + `*` |
+| `fineract-charge-impl` (`fineract-charge/impl`) | `org.apache.fineract.charge.impl` | Export: `starter` only; Import api packages + `*`; `ChargeOsgiServiceRegistrar` → `ChargeDefinitionPort` |
 | `fineract-charge-test` (`fineract-charge/test`) | `org.apache.fineract.charge.test` | `Fragment-Host: org.apache.fineract.charge.impl` |
 | `fineract-charge` | *(façade, not OSGi feature)* | Boot compatibility: re-exports api + impl |
 

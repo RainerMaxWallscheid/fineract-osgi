@@ -31,5 +31,6 @@ OSGi **unit / white-box test fragment** for the charge **impl** host ([ADR-022](
 | `ChargeDefinitionPortJpaAdapterTest` | Module API port mapping / active guards |
 | `ChargeDropdownReadPlatformServiceImplTest` | Catalog dropdown option sets |
 | `ChargeWritePlatformServiceJpaRepositoryImplTest` | Delete guards (JDBC association, soft-delete) |
+| `ChargeOsgiServiceRegistrarTest` | OSGi bridge no-op without FrameworkUtil |
 
 Plan: [15_osgi_bundle_refactoring_fineract-charge.md](../../docs/arc42/15_osgi_bundle_refactoring_fineract-charge.md).

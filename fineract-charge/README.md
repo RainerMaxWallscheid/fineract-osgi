@@ -9,7 +9,9 @@ Charge Catalog bounded context — OSGi modularization in progress ([ADR-022](..
 | `fineract-charge-test` | `test/` | `org.apache.fineract.charge.test` | White-box tests; **Fragment-Host** → `org.apache.fineract.charge.impl` |
 | `fineract-charge` | `.` | *(façade)* | Re-exports api + impl for existing Boot consumers (not a long-term OSGi feature) |
 
-Inter-bundle access: **OSGi Service Registry** (Step 6 registrar). Not Karaf Features. Spring stays inside **impl**.
+Inter-bundle access: **OSGi Service Registry** via `ChargeOsgiServiceRegistrar`
+(`ChargeDefinitionPort` when `BundleContext` is present). Not Karaf Features.
+Spring stays inside **impl**; Boot without OSGi is unchanged (registrar no-ops).
 
 ```bash
 ./gradlew :fineract-charge-api:jar :fineract-charge-impl:jar :fineract-charge-test:jar
