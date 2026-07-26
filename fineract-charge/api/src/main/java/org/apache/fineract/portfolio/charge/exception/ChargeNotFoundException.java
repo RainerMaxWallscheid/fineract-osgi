@@ -19,15 +19,22 @@
 package org.apache.fineract.portfolio.charge.exception;
 
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformResourceNotFoundException;
-import org.springframework.dao.EmptyResultDataAccessException;
 
+/**
+ * Catalog charge definition was not found (or is soft-deleted).
+ * Pure Module API contract type — no Spring JDBC types.
+ */
 public class ChargeNotFoundException extends AbstractPlatformResourceNotFoundException {
 
     public ChargeNotFoundException(final Long id) {
         super("error.msg.charge.id.invalid", "Charge with identifier " + id + " does not exist", id);
     }
 
-    public ChargeNotFoundException(Long id, EmptyResultDataAccessException e) {
-        super("error.msg.charge.id.invalid", "Charge with identifier " + id + " does not exist", id, e);
+    /**
+     * @param id catalog charge id
+     * @param cause underlying failure (e.g. empty query result); not a Spring-specific type
+     */
+    public ChargeNotFoundException(final Long id, final Throwable cause) {
+        super("error.msg.charge.id.invalid", "Charge with identifier " + id + " does not exist", id, cause);
     }
 }

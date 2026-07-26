@@ -24,7 +24,6 @@ apply plugin: 'eclipse'
 apply from: 'dependencies.gradle'
 
 // OSGi interface bundle: export contract packages only (ADR-022).
-// Step 1 shell — contracts move here in Step 2 (moduleapi still on impl until then).
 jar {
     manifest {
         attributes(
@@ -32,7 +31,9 @@ jar {
                 'Bundle-Name': 'Apache Fineract Charge API',
                 'Bundle-SymbolicName': 'org.apache.fineract.charge.api',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Export-Package': 'org.apache.fineract.portfolio.charge.moduleapi',
+                'Export-Package': 'org.apache.fineract.portfolio.charge.moduleapi,'
+                        + 'org.apache.fineract.portfolio.charge.domain,'
+                        + 'org.apache.fineract.portfolio.charge.exception',
                 'Automatic-Module-Name': 'org.apache.fineract.charge.api'
                 )
     }

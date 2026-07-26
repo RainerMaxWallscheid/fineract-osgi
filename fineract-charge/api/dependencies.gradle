@@ -18,6 +18,9 @@
  */
 
 dependencies {
-    // Pure contract surface: no Spring / JPA (Step 2 will populate sources).
+    // Shared kernel: platform exception bases only (no Spring/JPA on this surface).
+    // ChargeData / ChargeTimeType remain in fineract-core temporarily (Step 0 decision).
+    api project(path: ':fineract-core')
+
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
 }

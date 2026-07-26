@@ -20,14 +20,14 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 | Step | Status | Notes |
 |------|--------|-------|
 | 0 Baseline & inventory | **done** (2026-07-26) | Baseline green; inventory §2; Module API expanded + JPA adapter + unit tests |
-| 1 Project shells | **done** (2026-07-26) | `fineract-charge/{api,impl,test}` + façade; sources on impl; tests on test fragment |
-| 2 Grow Module API ports | **done** (with Step 0) | `ChargeDefinitionData` + expanded `ChargeDefinitionPort` + `ChargeDefinitionPortJpaAdapter` |
-| 3 Extract api | **pending** | Pure contracts; no Spring/JPA/REST |
-| 4 Move impl + façade | **pending** | Domain, services, handlers, OSGi registrar |
-| 5 Bundle manifests | **pending** | BSN + Export/Import/Fragment-Host |
-| 6 Fragment-Host test | **pending** | White-box tests on impl host |
-| 7 Spring↔OSGi bridge | **pending** | Register ports when `BundleContext` present |
-| 8 Consumer retarget | **pending** | loan/savings/accounting/… → api only |
+| 1 Project shells | **done** (2026-07-26) | `fineract-charge/{api,impl,test}` + façade; production sources on impl |
+| 2 Extract api | **done** (2026-07-26) | moduleapi + pure enums + catalog exceptions on charge-api; no Spring/JPA/REST |
+| 3 Move impl from provider | **pending** | Read/write service impls still in `fineract-provider` |
+| 4 Bundle manifests | **partial** | BSN/Export on shells; refine after provider move |
+| 5 Fragment-Host test | **partial** | Tests already on charge-test; green |
+| 6 Spring↔OSGi bridge | **pending** | Register ports when `BundleContext` present |
+| 7 Consumer retarget (Gradle) | **pending** | Domain modules → compile on charge-api |
+| 8 Consumer retarget (semantic) | **pending** | loan/savings/… off `Charge` entity |
 | 9 Docs / acceptance | **pending** | READMEs, osgi table, ArchUnit freeze shrink |
 
 **Not in this plan:** migrating *loan/savings account charges* (those are product BCs); full Equinox as primary process; removing Spring from charge.
@@ -285,23 +285,36 @@ Execute as **separate PRs**. Checkboxes start open; update when done.
 
 **Exit:** Modules build; consumers still use `:fineract-charge` façade; `:fineract-charge-test:test` green (4 tests); loan/savings compile OK.
 
-### Step 2 — Extract api contracts ⏳
+### Step 2 — Extract api contracts ✅
 
-1. [ ] Move `moduleapi` + expanded ports into `charge/api`  
-2. [ ] Move catalog enums / pure value types required by ports into api (or re-export from a single package)  
-3. [ ] Move or duplicate-then-delete catalog exceptions that are part of the contract  
-4. [ ] Plan `ChargeData`: either (a) move into charge-api, or (b) leave in core and depend on it from api with a ticket to reverse later  
-5. [ ] Ensure **no** Spring/JPA/REST in api sources  
-6. [ ] Export-Package whitelist on api jar manifest  
+1. [x] Move `moduleapi` + expanded ports into `charge/api`  
+2. [x] Move pure catalog enums into api (same packages for binary compatibility): `ChargeAppliesTo`, `ChargeCalculationType`, `ChargePaymentMode` — JPA converters stay on impl  
+3. [x] Move catalog exceptions to api: `ChargeNotFoundException`, `ChargeIsNotActiveException`, apply/update/delete/penalty catalog types — **not** LoanCharge*/ShareAccount* (remain on impl)  
+4. [x] `ChargeData` / `ChargeTimeType`: **(b)** leave in `fineract-core` for now (Step 0); inter-module catalog uses `ChargeDefinitionData`  
+5. [x] No Spring/JPA/REST in api sources (`ChargeNotFoundException` cause is `Throwable`, not Spring JDBC)  
+6. [x] Export-Package: `moduleapi`, `domain` (enums only), `exception` (catalog)  
 
-**Exit:** `:fineract-charge-api:jar` contains only pure contracts; consumers can depend on api (even if still also on façade).
+**Exit:** `:fineract-charge-api:jar` is pure contracts; façade still re-exports api+impl; loan/savings/provider compile; charge-test green.
 
-### Step 3 — Move implementation into charge-impl ⏳
+### 2.x As-built package placement (after Step 2)
 
-1. [ ] Move `domain`, handlers, service *impls*, serialization, REST into `charge/impl`  
-2. [ ] **Move** `ChargeReadPlatformServiceImpl` / `ChargeWritePlatformServiceJpaRepositoryImpl` from **provider** into impl (update Spring component scan / configuration in provider)  
-3. [ ] Façade re-exports api + impl for Boot  
-4. [ ] Impl depends on api + tax/core as needed; **not** on loan/savings  
+| Package / type | Location |
+|----------------|----------|
+| `…charge.moduleapi.*` | **api** |
+| `ChargeAppliesTo`, `ChargeCalculationType`, `ChargePaymentMode` | **api** (`…domain`) |
+| Catalog exceptions listed above | **api** (`…exception`) |
+| `Charge` entity, repositories, converters | **impl** |
+| LoanCharge* / ShareAccount* exceptions | **impl** (debt: move to loan/savings later) |
+| Handlers, services, REST | **impl** |
+| `ChargeData`, `ChargeTimeType` | **core** (temporary kernel) |
+
+### Step 3 — Move remaining implementation from provider into charge-impl ⏳
+
+1. [x] Catalog `domain`/handlers/service interfaces/REST already on `charge/impl` (Step 1)  
+2. [ ] **Move** `ChargeReadPlatformServiceImpl` / `ChargeWritePlatformServiceJpaRepositoryImpl` from **provider** into impl  
+3. [ ] Move/adjust `ChargeConfiguration` beans into charge-impl (or keep provider as composition-only wiring that imports impl config)  
+4. [x] Façade re-exports api + impl for Boot  
+5. [x] Impl depends on api + tax/core; **not** on loan/savings  
 
 **Exit:** Provider no longer owns charge catalog service implementations; application boots with façade.
 
