@@ -770,7 +770,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
             for (final LoanChargePaidBy chargePaidBy : loanTransaction.getLoanChargesPaid()) {
                 final LoanCharge lc = chargePaidBy.getLoanCharge();
                 final LoanChargePaidByDTO loanChargePaidData = new LoanChargePaidByDTO();
-                loanChargePaidData.setChargeId(lc.getCharge().getId());
+                loanChargePaidData.setChargeId(lc.getChargeId());
                 loanChargePaidData.setIsPenalty(lc.isPenaltyCharge());
                 loanChargePaidData.setLoanChargeId(lc.getId());
                 loanChargePaidData.setAmount(chargePaidBy.getAmount());

@@ -286,7 +286,7 @@ public final class LoanChargeApiJsonValidator {
                     } else {
                         LoanCharge loanCharge = this.loanChargeRepository.findById(loanChargeId).orElseThrow(() -> new LoanChargeNotFoundException(loanChargeId));
                         chargeName = loanCharge.name();
-                        chargeCurrencyCode = loanCharge.getCharge().getCurrencyCode();
+                        chargeCurrencyCode = loanCharge.currencyCode();
                         chargeTime = loanCharge.getChargeTimeType();
                         chargeCalculation = loanCharge.getChargeCalculation();
                         chargePaymentModeEnum = loanCharge.getChargePaymentMode();

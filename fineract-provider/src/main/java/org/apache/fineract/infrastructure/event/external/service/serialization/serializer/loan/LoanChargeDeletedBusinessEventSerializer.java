@@ -45,7 +45,7 @@ public class LoanChargeDeletedBusinessEventSerializer implements BusinessEventSe
         LoanDeleteChargeBusinessEvent event = (LoanDeleteChargeBusinessEvent) rawEvent;
         LoanCharge loanCharge = event.get();
         Long id = loanCharge.getId();
-        Long chargeId = loanCharge.getCharge().getId();
+        Long chargeId = loanCharge.getChargeId();
         return new LoanChargeDeletedV1(id, chargeId);
     }
 

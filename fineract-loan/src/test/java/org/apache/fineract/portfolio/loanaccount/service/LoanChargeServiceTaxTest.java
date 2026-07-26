@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.Map;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
@@ -42,6 +41,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanLifecycleStateMachin
 import org.apache.fineract.portfolio.loanaccount.serialization.LoanChargeValidator;
 import org.apache.fineract.portfolio.tax.domain.TaxComponent;
 import org.apache.fineract.portfolio.tax.domain.TaxGroup;
+import org.apache.fineract.portfolio.tax.domain.TaxGroupRepositoryWrapper;
 import org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -71,19 +71,22 @@ class LoanChargeServiceTaxTest {
         dateUtilsMock.close();
     }
 
-    private LoanChargeService buildService(ChargeTaxApplicationService taxService) {
+    private LoanChargeService buildService(ChargeTaxApplicationService taxService, TaxGroup taxGroup) {
+        TaxGroupRepositoryWrapper taxGroupRepositoryWrapper = mock(TaxGroupRepositoryWrapper.class);
+        if (taxGroup != null) {
+            when(taxGroupRepositoryWrapper.findOneWithNotFoundDetection(any(Long.class))).thenReturn(taxGroup);
+        }
         return new LoanChargeService(mock(LoanChargeValidator.class), mock(LoanTransactionProcessingService.class),
                 mock(LoanLifecycleStateMachine.class), mock(LoanBalanceService.class), mock(LoanScheduleGeneratorService.class),
-                taxService);
+                taxService, taxGroupRepositoryWrapper);
     }
 
     @Test
     void populateDerivedFields_doesNotApplyTax_whenChargeHasNoTaxGroup() {
         ChargeTaxApplicationService taxService = mock(ChargeTaxApplicationService.class);
-        LoanChargeService service = buildService(taxService);
+        LoanChargeService service = buildService(taxService, null);
 
-        Charge charge = flatCharge(null /* no tax group */);
-        LoanCharge loanCharge = loanCharge(charge, new BigDecimal("100.00"), null);
+        LoanCharge loanCharge = loanCharge(null, new BigDecimal("100.00"), null);
 
         service.populateDerivedFields(loanCharge, BigDecimal.ZERO, new BigDecimal("100.00"), null, BigDecimal.ZERO);
 
@@ -101,10 +104,8 @@ class LoanChargeServiceTaxTest {
         when(taxService.computeTax(any(TaxGroup.class), any(BigDecimal.class), any(LocalDate.class), anyInt()))
                 .thenReturn(Map.of(component, new BigDecimal("160.000000")));
 
-        LoanChargeService service = buildService(taxService);
-
-        Charge charge = flatCharge(taxGroup);
-        LoanCharge loanCharge = loanCharge(charge, new BigDecimal("1000.00"), null);
+        LoanChargeService service = buildService(taxService, taxGroup);
+        LoanCharge loanCharge = loanCharge(7L, new BigDecimal("1000.00"), null);
 
         service.populateDerivedFields(loanCharge, BigDecimal.ZERO, new BigDecimal("1000.00"), null, BigDecimal.ZERO);
 
@@ -122,9 +123,8 @@ class LoanChargeServiceTaxTest {
         when(taxService.computeTax(any(), any(), any(), anyInt()))
                 .thenReturn(Map.of(comp1, new BigDecimal("10.000000"), comp2, new BigDecimal("5.000000")));
 
-        LoanChargeService service = buildService(taxService);
-        Charge charge = flatCharge(taxGroup);
-        LoanCharge loanCharge = loanCharge(charge, new BigDecimal("100.00"), null);
+        LoanChargeService service = buildService(taxService, taxGroup);
+        LoanCharge loanCharge = loanCharge(7L, new BigDecimal("100.00"), null);
 
         service.populateDerivedFields(loanCharge, BigDecimal.ZERO, new BigDecimal("100.00"), null, BigDecimal.ZERO);
 
@@ -141,9 +141,8 @@ class LoanChargeServiceTaxTest {
         ChargeTaxApplicationService taxService = mock(ChargeTaxApplicationService.class);
         when(taxService.computeTax(any(), any(), any(), anyInt())).thenReturn(Map.of(component, new BigDecimal("75.000000")));
 
-        LoanChargeService service = buildService(taxService);
-        Charge charge = flatCharge(taxGroup);
-        LoanCharge loanCharge = loanCharge(charge, new BigDecimal("500.00"), null);
+        LoanChargeService service = buildService(taxService, taxGroup);
+        LoanCharge loanCharge = loanCharge(7L, new BigDecimal("500.00"), null);
 
         service.populateDerivedFields(loanCharge, BigDecimal.ZERO, new BigDecimal("500.00"), null, BigDecimal.ZERO);
 
@@ -157,9 +156,8 @@ class LoanChargeServiceTaxTest {
         ChargeTaxApplicationService taxService = mock(ChargeTaxApplicationService.class);
         when(taxService.computeTax(any(), any(), any(), anyInt())).thenReturn(Collections.emptyMap());
 
-        LoanChargeService service = buildService(taxService);
-        Charge charge = flatCharge(taxGroup);
-        LoanCharge loanCharge = loanCharge(charge, new BigDecimal("200.00"), null);
+        LoanChargeService service = buildService(taxService, taxGroup);
+        LoanCharge loanCharge = loanCharge(7L, new BigDecimal("200.00"), null);
 
         service.populateDerivedFields(loanCharge, BigDecimal.ZERO, new BigDecimal("200.00"), null, BigDecimal.ZERO);
 
@@ -176,9 +174,8 @@ class LoanChargeServiceTaxTest {
         ChargeTaxApplicationService taxService = mock(ChargeTaxApplicationService.class);
         when(taxService.computeTax(any(), any(), any(), anyInt())).thenReturn(Map.of(component, new BigDecimal("20.000000")));
 
-        LoanChargeService service = buildService(taxService);
-        Charge charge = flatCharge(taxGroup);
-        LoanCharge loanCharge = loanCharge(charge, new BigDecimal("200.00"), submittedOn);
+        LoanChargeService service = buildService(taxService, taxGroup);
+        LoanCharge loanCharge = loanCharge(7L, new BigDecimal("200.00"), submittedOn);
 
         service.populateDerivedFields(loanCharge, BigDecimal.ZERO, new BigDecimal("200.00"), null, BigDecimal.ZERO);
 
@@ -193,9 +190,8 @@ class LoanChargeServiceTaxTest {
         ChargeTaxApplicationService taxService = mock(ChargeTaxApplicationService.class);
         when(taxService.computeTax(any(), any(), any(), anyInt())).thenReturn(Map.of(component, new BigDecimal("10.000000")));
 
-        LoanChargeService service = buildService(taxService);
-        Charge charge = flatCharge(taxGroup);
-        LoanCharge loanCharge = loanCharge(charge, new BigDecimal("100.00"), null /* no submittedOnDate */);
+        LoanChargeService service = buildService(taxService, taxGroup);
+        LoanCharge loanCharge = loanCharge(7L, new BigDecimal("100.00"), null /* no submittedOnDate */);
 
         service.populateDerivedFields(loanCharge, BigDecimal.ZERO, new BigDecimal("100.00"), null, BigDecimal.ZERO);
 
@@ -212,9 +208,8 @@ class LoanChargeServiceTaxTest {
         when(taxService.computeTax(any(), any(), any(), anyInt())).thenReturn(
                 Map.of(comp1, new BigDecimal("10.000000"), comp2, new BigDecimal("5.000000")), Map.of(comp1, new BigDecimal("20.000000")));
 
-        LoanChargeService service = buildService(taxService);
-        Charge charge = flatCharge(taxGroup);
-        LoanCharge loanCharge = loanCharge(charge, new BigDecimal("100.00"), null);
+        LoanChargeService service = buildService(taxService, taxGroup);
+        LoanCharge loanCharge = loanCharge(7L, new BigDecimal("100.00"), null);
 
         service.populateDerivedFields(loanCharge, BigDecimal.ZERO, new BigDecimal("100.00"), null, BigDecimal.ZERO);
         assertThat(loanCharge.getTaxDetails()).hasSize(2);
@@ -227,15 +222,12 @@ class LoanChargeServiceTaxTest {
         assertThat(loanCharge.getTaxDetails().get(0).getTaxComponent()).isEqualTo(comp1);
     }
 
-    private Charge flatCharge(TaxGroup taxGroup) {
-        Charge charge = mock(Charge.class);
-        when(charge.getTaxGroup()).thenReturn(taxGroup);
-        return charge;
-    }
-
-    private LoanCharge loanCharge(Charge charge, BigDecimal amount, LocalDate submittedOnDate) {
+    private LoanCharge loanCharge(Long taxGroupId, BigDecimal amount, LocalDate submittedOnDate) {
         LoanCharge lc = new LoanCharge();
-        lc.setCharge(charge);
+        lc.setChargeId(1L);
+        lc.setChargeName("test-charge");
+        lc.setCurrencyCode("USD");
+        lc.setTaxGroupId(taxGroupId);
         lc.setAmount(amount);
         lc.setAmountOutstanding(amount);
         lc.setChargeCalculation(ChargeCalculationType.FLAT.getValue());

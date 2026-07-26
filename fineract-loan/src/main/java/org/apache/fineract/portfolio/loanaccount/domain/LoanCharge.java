@@ -42,10 +42,10 @@ import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
+import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.domain.ChargePaymentMode;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
@@ -59,9 +59,18 @@ public class LoanCharge extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     @ManyToOne(optional = false)
     @JoinColumn(name = "loan_id", referencedColumnName = "id", nullable = false)
     private Loan loan;
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "charge_id", referencedColumnName = "id", nullable = false)
-    private Charge charge;
+    /** Catalog charge definition id (no JPA association to charge-impl). */
+    @Column(name = "charge_id", nullable = false)
+    private Long chargeId;
+    /** Snapshot of catalog name at attach time (display / unpaid charge queries). */
+    @Column(name = "charge_name", length = 100)
+    private String chargeName;
+    /** Snapshot of catalog currency at attach time. */
+    @Column(name = "currency_code", length = 3)
+    private String currencyCode;
+    /** Snapshot of catalog tax group id at attach time (null if none). */
+    @Column(name = "tax_group_id")
+    private Long taxGroupId;
     @Column(name = "charge_time_enum", nullable = false)
     private Integer chargeTime;
     @Column(name = "submitted_on_date")
@@ -425,11 +434,19 @@ public class LoanCharge extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     }
 
     public String name() {
-        return this.charge.getName();
+        return this.chargeName;
+    }
+
+    public String getChargeName() {
+        return this.chargeName;
     }
 
     public String currencyCode() {
-        return this.charge.getCurrencyCode();
+        return this.currencyCode;
+    }
+
+    public String getCurrencyCode() {
+        return this.currencyCode;
     }
 
     /*
@@ -671,7 +688,8 @@ public class LoanCharge extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         EnumOptionData chargeCalculationTypeData = new EnumOptionData((long) getChargeCalculation().ordinal(), getChargeCalculation().getCode(), String.valueOf(getChargeCalculation().getValue()));
         EnumOptionData chargePaymentModeData = new EnumOptionData((long) getChargePaymentMode().ordinal(), getChargePaymentMode().getCode(), String.valueOf(getChargePaymentMode().getValue()));
         List<LoanInstallmentChargeData> loanInstallmentChargeDataList = installmentCharges().stream().map(LoanInstallmentCharge::toData).toList();
-        return LoanChargeData.builder().id(getId()).chargeId(getCharge().getId()).name(getCharge().getName()).currency(getCharge().toData().getCurrency()).amount(amount).amountPaid(amountPaid).amountWaived(amountWaived).amountWrittenOff(amountWrittenOff).amountOutstanding(amountOutstanding).chargeTimeType(chargeTimeTypeData).submittedOnDate(submittedOnDate).dueDate(dueDate).chargeCalculationType(chargeCalculationTypeData).percentage(percentage).amountPercentageAppliedTo(amountPercentageAppliedTo).amountOrPercentage(amountOrPercentage).penalty(penaltyCharge).chargePaymentMode(chargePaymentModeData).paid(paid).waived(waived).loanId(loan.getId()).minCap(minCap).maxCap(maxCap).installmentChargeData(loanInstallmentChargeDataList).externalId(externalId).build();
+        final CurrencyData currency = this.currencyCode != null ? new CurrencyData(this.currencyCode) : null;
+        return LoanChargeData.builder().id(getId()).chargeId(getChargeId()).name(name()).currency(currency).amount(amount).amountPaid(amountPaid).amountWaived(amountWaived).amountWrittenOff(amountWrittenOff).amountOutstanding(amountOutstanding).chargeTimeType(chargeTimeTypeData).submittedOnDate(submittedOnDate).dueDate(dueDate).chargeCalculationType(chargeCalculationTypeData).percentage(percentage).amountPercentageAppliedTo(amountPercentageAppliedTo).amountOrPercentage(amountOrPercentage).penalty(penaltyCharge).chargePaymentMode(chargePaymentModeData).paid(paid).waived(waived).loanId(loan.getId()).minCap(minCap).maxCap(maxCap).installmentChargeData(loanInstallmentChargeDataList).externalId(externalId).build();
     }
 
     public boolean hasInstallmentFor(final LoanRepaymentScheduleInstallment installment) {
@@ -684,8 +702,23 @@ public class LoanCharge extends AbstractAuditableWithUTCDateTimeCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setCharge(final Charge charge) {
-        this.charge = charge;
+        public void setChargeId(final Long chargeId) {
+        this.chargeId = chargeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setChargeName(final String chargeName) {
+        this.chargeName = chargeName;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setCurrencyCode(final String currencyCode) {
+        this.currencyCode = currencyCode;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public void setTaxGroupId(final Long taxGroupId) {
+        this.taxGroupId = taxGroupId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -808,16 +841,16 @@ public class LoanCharge extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         return this.loan;
     }
 
-    @java.lang.SuppressWarnings("all")
-        public Charge getCharge() {
-        return this.charge;
-    }
-
     /**
      * Catalog charge definition id without exposing the charge aggregate to foreign BCs.
      */
     public Long getChargeId() {
-        return this.charge != null ? this.charge.getId() : null;
+        return this.chargeId;
+    }
+
+    @java.lang.SuppressWarnings("all")
+        public Long getTaxGroupId() {
+        return this.taxGroupId;
     }
 
     @java.lang.SuppressWarnings("all")

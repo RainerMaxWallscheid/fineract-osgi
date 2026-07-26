@@ -135,7 +135,8 @@ public class LoanAccountDelinquencyRangeEventSerializerTest {
 
     private final LoanChargeService loanChargeService = new LoanChargeService(mock(LoanChargeValidator.class),
             mock(LoanTransactionProcessingService.class), mock(LoanLifecycleStateMachine.class), mock(LoanBalanceService.class),
-            mock(LoanScheduleGeneratorService.class), mock(ChargeTaxApplicationService.class));
+            mock(LoanScheduleGeneratorService.class), mock(ChargeTaxApplicationService.class),
+            mock(org.apache.fineract.portfolio.tax.domain.TaxGroupRepositoryWrapper.class));
 
     private MockedStatic<MoneyHelper> moneyHelper = Mockito.mockStatic(MoneyHelper.class);
 
@@ -433,7 +434,9 @@ public class LoanAccountDelinquencyRangeEventSerializerTest {
         when(installment.getFeeChargesOutstanding(any())).thenAnswer(a -> Money.of(currency, freeAmount));
         when(installment.getTotalOutstanding(any())).thenAnswer(a -> Money.of(currency, totalAmount));
         Charge charge = mock(Charge.class);
+        when(charge.getId()).thenReturn(1L);
         when(charge.getName()).thenReturn("charge");
+        when(charge.getCurrencyCode()).thenReturn(currency.getCode());
         when(charge.toData()).thenAnswer(a -> {
             ChargeData chargeData = mock(ChargeData.class);
             when(chargeData.getCurrency()).thenAnswer(b -> new CurrencyData(currency.getCode()));

@@ -214,8 +214,8 @@ public class LoanDisbursementService {
         final Integer installmentNumber = null;
         for (final LoanCharge charge : loan.getActiveCharges()) {
             LocalDate actualDisbursementDate = loan.getActualDisbursementDate(charge);
-            boolean isDisbursementCharge = charge.getCharge().getChargeTimeType().equals(ChargeTimeType.DISBURSEMENT.getValue()) && disbursedOn.equals(actualDisbursementDate) && !charge.isWaived() && !charge.isFullyPaid();
-            boolean isTrancheDisbursementCharge = charge.getCharge().getChargeTimeType().equals(ChargeTimeType.TRANCHE_DISBURSEMENT.getValue()) && disbursedOn.equals(actualDisbursementDate) && !charge.isWaived() && !charge.isFullyPaid();
+            boolean isDisbursementCharge = charge.getChargeTimeType().equals(ChargeTimeType.DISBURSEMENT) && disbursedOn.equals(actualDisbursementDate) && !charge.isWaived() && !charge.isFullyPaid();
+            boolean isTrancheDisbursementCharge = charge.getChargeTimeType().equals(ChargeTimeType.TRANCHE_DISBURSEMENT) && disbursedOn.equals(actualDisbursementDate) && !charge.isWaived() && !charge.isFullyPaid();
             /*
              * create a Charge applied transaction only when Up front Accrual accounting is enabled. No accrual
              * transactions should be created for None or Cash based accounting.

@@ -60,14 +60,14 @@ public interface LoanTransactionRepository extends JpaRepository<LoanTransaction
 
     @Query("""
                     SELECT new org.apache.fineract.portfolio.loanaccount.data.UnpaidChargeData(
-                        lc.charge.id,
-                        lc.charge.name,
+                        lc.chargeId,
+                        lc.chargeName,
                         SUM(lc.amountOutstanding)
                     ) FROM LoanCharge lc
                     WHERE lc.loan = :loan
                     AND lc.active = true
                     AND lc.amountOutstanding > 0
-                    GROUP BY lc.charge.id, lc.charge.name
+                    GROUP BY lc.chargeId, lc.chargeName
             """)
     List<UnpaidChargeData> fetchTotalUnpaidChargesForLoan(@Param("loan") Loan loan);
 

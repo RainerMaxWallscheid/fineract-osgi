@@ -30,7 +30,7 @@ public interface LoanChargePaidByMapper {
 
     @Mapping(target = "transactionId", source = "source.loanTransaction.id")
     @Mapping(target = "chargeId", source = "source.loanCharge.id")
-    @Mapping(target = "name", source = "source.loanCharge.charge.name")
+    @Mapping(target = "name", source = "source.loanCharge.chargeName")
     LoanChargePaidByData map(LoanChargePaidBy source);
 
     List<LoanChargePaidByData> map(List<LoanChargePaidBy> sources);

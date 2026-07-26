@@ -4,7 +4,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 
 | | |
 |--|--|
-| **Status** | **as-built** — Steps **0–7, 9 done**; Step **8 partial** (WC off Charge entity; loan/savings residual) |
+| **Status** | **as-built** — Steps **0–7, 9 done**; Step **8 partial** (WC + LoanCharge + tranche off Charge; LoanProduct/savings residual) |
 | **Decisions** | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **Playbook** | [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) §15.6 Wave 1, §15.7 |
 | **Reference pilot** | [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md) (as-built) |
@@ -418,19 +418,25 @@ Hardest step — **incremental**. First slice landed 2026-07-26:
 14. [x] **WC:** `WorkingCapitalLoanCharge` stores `Long chargeId` (no `@ManyToOne Charge`); read/write via port; **Gradle charge-api only**  
 15. [x] **Loan:** `LoanTrancheCharge` stores `chargeId`; `addTrancheLoanCharge(Long)`; assembler returns charge ids  
 
+#### Done (slice 4 — LoanCharge)
+
+16. [x] **Loan:** `LoanCharge` stores `Long chargeId` + catalog snapshots (`chargeName`, `currencyCode`, `taxGroupId`); no `@ManyToOne Charge`  
+17. [x] **Loan:** tax via `taxGroupId` + `TaxGroupRepositoryWrapper`; create still accepts `Charge` at assembly boundary (provider)  
+18. [x] Liquibase `1036_loan_charge_catalog_snapshots` backfills snapshots from `m_charge`  
+
 #### Residual (later slices)
 
 | Module | Still needs charge-impl for |
 |--------|-----------------------------|
-| **loan** | JPA `Charge` on `LoanCharge` / `LoanProduct`; tax/`getCharge()` paths; product charge lists |
+| **loan** | JPA `Charge` on `LoanProduct.charges` (many-to-many); create/assemblers still type `Charge` |
 | **savings** | JPA `Charge` on savings product/account charges; assemblers |
 | **provider / ITs** | façade composition root |
 
-16. [ ] Loan `LoanCharge` / `LoanProduct.charges` → chargeId / join entity without Charge type  
-17. [ ] Savings account/product charges same  
-18. [ ] ArchUnit freeze shrink; deprecate façade  
+19. [ ] Loan `LoanProduct.charges` → chargeId / ElementCollection without Charge type; create via `ChargeDefinitionData`  
+20. [ ] Savings account/product charges same  
+21. [ ] ArchUnit freeze shrink; deprecate façade  
 
-**Note:** Loan/savings product charge many-to-many still anchors charge-impl; freeze only shrinks.
+**Note:** Loan product charge many-to-many still anchors charge-impl; freeze only shrinks.
 
 ### Step 9 — Documentation & acceptance ✅
 

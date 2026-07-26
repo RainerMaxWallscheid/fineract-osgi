@@ -268,7 +268,9 @@ public class LoanTest {
         final LoanCharge loanCharge = new LoanCharge();
 
         loanCharge.setLoan(mock(Loan.class));
-        loanCharge.setCharge(mock(Charge.class));
+        loanCharge.setChargeId(1L);
+        loanCharge.setChargeName("test-charge");
+        loanCharge.setCurrencyCode("USD");
         loanCharge.setAmount(new BigDecimal(100));
         loanCharge.setAmountOutstanding(new BigDecimal(100));
         loanCharge.setChargeTime(ChargeTimeType.TRANCHE_DISBURSEMENT.getValue());

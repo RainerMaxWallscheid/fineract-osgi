@@ -72,7 +72,8 @@ public class SingleLoanChargeRepaymentScheduleProcessingWrapperTest {
 
     private final LoanChargeService loanChargeService = new LoanChargeService(mock(LoanChargeValidator.class),
             mock(LoanTransactionProcessingService.class), mock(LoanLifecycleStateMachine.class), mock(LoanBalanceService.class),
-            mock(LoanScheduleGeneratorService.class), mock(ChargeTaxApplicationService.class));
+            mock(LoanScheduleGeneratorService.class), mock(ChargeTaxApplicationService.class),
+            mock(org.apache.fineract.portfolio.tax.domain.TaxGroupRepositoryWrapper.class));
 
     @BeforeAll
     public static void init() {

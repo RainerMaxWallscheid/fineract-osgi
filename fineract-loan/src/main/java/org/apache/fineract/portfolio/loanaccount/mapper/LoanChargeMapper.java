@@ -31,7 +31,7 @@ import org.mapstruct.Mapping;
 public interface LoanChargeMapper {
 
     @Mapping(target = "id", source = "loanCharge.id")
-    @Mapping(target = "chargeId", source = "loanCharge.charge.id")
+    @Mapping(target = "chargeId", source = "loanCharge.chargeId")
     @Mapping(target = "amount", expression = "java(loanCharge.getAmount(currency).getAmount())")
     @Mapping(target = "chargeTimeType", source = "loanCharge.chargeTimeType.value")
     @Mapping(target = "chargeCalculationType", source = "loanCharge.chargeCalculation.value")

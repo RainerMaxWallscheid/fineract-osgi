@@ -59,6 +59,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.transactionprocessor.Tra
 import org.apache.fineract.portfolio.loanaccount.serialization.LoanChargeValidator;
 import org.apache.fineract.portfolio.tax.domain.TaxComponent;
 import org.apache.fineract.portfolio.tax.domain.TaxGroup;
+import org.apache.fineract.portfolio.tax.domain.TaxGroupRepositoryWrapper;
 import org.apache.fineract.portfolio.tax.service.ChargeTaxApplicationService;
 import org.apache.fineract.portfolio.tax.service.TaxUtils;
 
@@ -69,6 +70,7 @@ public class LoanChargeService {
     private final LoanBalanceService loanBalanceService;
     private final LoanScheduleGeneratorService loanScheduleGeneratorService;
     private final ChargeTaxApplicationService chargeTaxApplicationService;
+    private final TaxGroupRepositoryWrapper taxGroupRepositoryWrapper;
 
     public void recalculateAllCharges(final Loan loan) {
         Set<LoanCharge> charges = loan.getActiveCharges();
@@ -423,10 +425,11 @@ public class LoanChargeService {
     }
 
     private void applyTaxIfConfigured(final LoanCharge loanCharge) {
-        TaxGroup taxGroup = loanCharge.getCharge().getTaxGroup();
-        if (taxGroup == null || loanCharge.getAmount() == null) {
+        final Long taxGroupId = loanCharge.getTaxGroupId();
+        if (taxGroupId == null || loanCharge.getAmount() == null) {
             return;
         }
+        final TaxGroup taxGroup = this.taxGroupRepositoryWrapper.findOneWithNotFoundDetection(taxGroupId);
         LocalDate effectiveDate = loanCharge.getSubmittedOnDate() != null ? loanCharge.getSubmittedOnDate() : DateUtils.getBusinessLocalDate();
         Map<TaxComponent, BigDecimal> taxSplit = chargeTaxApplicationService.computeTax(taxGroup, loanCharge.getAmount(), effectiveDate, 6);
         BigDecimal totalTax = TaxUtils.totalTaxAmount(taxSplit);
@@ -476,7 +479,10 @@ public class LoanChargeService {
     public LoanCharge create(final Loan loan, final Charge chargeDefinition, final BigDecimal loanPrincipal, final BigDecimal amount, final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculation, final LocalDate dueDate, final ChargePaymentMode chargePaymentMode, final Integer numberOfRepayments, final BigDecimal loanChargeAmount, final ExternalId externalId) {
         final LoanCharge loanCharge = new LoanCharge();
         loanCharge.setLoan(loan);
-        loanCharge.setCharge(chargeDefinition);
+        loanCharge.setChargeId(chargeDefinition.getId());
+        loanCharge.setChargeName(chargeDefinition.getName());
+        loanCharge.setCurrencyCode(chargeDefinition.getCurrencyCode());
+        loanCharge.setTaxGroupId(chargeDefinition.getTaxGroupId());
         loanCharge.setSubmittedOnDate(DateUtils.getBusinessLocalDate());
         loanCharge.setPenaltyCharge(chargeDefinition.isPenalty());
         loanCharge.setMinCap(chargeDefinition.getMinCap());
@@ -839,7 +845,7 @@ public class LoanChargeService {
 
     private BigDecimal getDerivedAmountForCharge(final Loan loan, final LoanCharge loanCharge) {
         BigDecimal amount = BigDecimal.ZERO;
-        final ChargeTimeType chargeTimeType = ChargeTimeType.fromInt(loanCharge.getCharge().getChargeTimeType());
+        final ChargeTimeType chargeTimeType = loanCharge.getChargeTimeType();
         if (loan.isMultiDisburmentLoan() && chargeTimeType.isDisbursementOrTrancheDisbursementCharge()) {
             return sumMultiDisbursementAmounts(loan, chargeTimeType.isTrancheDisbursement()).getAmount();
         } else {
@@ -907,12 +913,13 @@ public class LoanChargeService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanChargeService(final LoanChargeValidator loanChargeValidator, final LoanTransactionProcessingService loanTransactionProcessingService, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanBalanceService loanBalanceService, final LoanScheduleGeneratorService loanScheduleGeneratorService, final ChargeTaxApplicationService chargeTaxApplicationService) {
+        public LoanChargeService(final LoanChargeValidator loanChargeValidator, final LoanTransactionProcessingService loanTransactionProcessingService, final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanBalanceService loanBalanceService, final LoanScheduleGeneratorService loanScheduleGeneratorService, final ChargeTaxApplicationService chargeTaxApplicationService, final TaxGroupRepositoryWrapper taxGroupRepositoryWrapper) {
         this.loanChargeValidator = loanChargeValidator;
         this.loanTransactionProcessingService = loanTransactionProcessingService;
         this.loanLifecycleStateMachine = loanLifecycleStateMachine;
         this.loanBalanceService = loanBalanceService;
         this.loanScheduleGeneratorService = loanScheduleGeneratorService;
         this.chargeTaxApplicationService = chargeTaxApplicationService;
+        this.taxGroupRepositoryWrapper = taxGroupRepositoryWrapper;
     }
 }
