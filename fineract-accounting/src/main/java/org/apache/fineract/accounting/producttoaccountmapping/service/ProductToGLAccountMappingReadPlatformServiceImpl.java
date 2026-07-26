@@ -44,6 +44,8 @@ import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.codes.mapper.CodeValueMapper;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +55,7 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProductToGLAccountMappingReadPlatformServiceImpl.class);
     private final ProductToGLAccountMappingRepository productToGLAccountMappingRepository;
     private final CodeValueMapper codeValueMapper;
+    private final ChargeDefinitionPort chargeDefinitionPort;
 
     @Override
     public Map<String, Object> fetchAccountMappingDetailsForLoanProduct(final Long loanProductId, final Integer accountingType) {
@@ -219,11 +222,19 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
     }
 
     private List<ChargeToGLAccountMapper> fetchChargeToIncomeAccountMappings(final PortfolioProductType portfolioProductType, final Long loanProductId, final boolean penalty) {
-        final List<ProductToGLAccountMapping> mappings = penalty ? productToGLAccountMappingRepository.findAllPenaltyMappings(loanProductId, portfolioProductType.getValue()) : productToGLAccountMappingRepository.findAllFeeMappings(loanProductId, portfolioProductType.getValue());
-        List<ChargeToGLAccountMapper> chargeToGLAccountMappers = mappings.isEmpty() ? null : new ArrayList<>();
+        final List<ProductToGLAccountMapping> mappings = productToGLAccountMappingRepository.findAllChargeIdMappings(loanProductId,
+                portfolioProductType.getValue());
+        List<ChargeToGLAccountMapper> chargeToGLAccountMappers = null;
         for (final ProductToGLAccountMapping mapping : mappings) {
+            final ChargeDefinitionData definition = this.chargeDefinitionPort.findCharge(mapping.getChargeId()).orElse(null);
+            if (definition == null || definition.isPenalty() != penalty) {
+                continue;
+            }
+            if (chargeToGLAccountMappers == null) {
+                chargeToGLAccountMappers = new ArrayList<>();
+            }
             final GLAccountData gLAccountData = new GLAccountData().setId(mapping.getGlAccount().getId()).setName(mapping.getGlAccount().getName()).setGlCode(mapping.getGlAccount().getGlCode());
-            final ChargeData chargeData = ChargeData.builder().id(mapping.getCharge().getId()).name(mapping.getCharge().getName()).penalty(mapping.getCharge().isPenalty()).build();
+            final ChargeData chargeData = ChargeData.builder().id(definition.getId()).name(definition.getName()).penalty(definition.isPenalty()).build();
             final ChargeToGLAccountMapper chargeToGLAccountMapper = new ChargeToGLAccountMapper().setCharge(chargeData).setIncomeAccount(gLAccountData);
             chargeToGLAccountMappers.add(chargeToGLAccountMapper);
         }
@@ -404,8 +415,9 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProductToGLAccountMappingReadPlatformServiceImpl(final ProductToGLAccountMappingRepository productToGLAccountMappingRepository, final CodeValueMapper codeValueMapper) {
+        public ProductToGLAccountMappingReadPlatformServiceImpl(final ProductToGLAccountMappingRepository productToGLAccountMappingRepository, final CodeValueMapper codeValueMapper, final ChargeDefinitionPort chargeDefinitionPort) {
         this.productToGLAccountMappingRepository = productToGLAccountMappingRepository;
         this.codeValueMapper = codeValueMapper;
+        this.chargeDefinitionPort = chargeDefinitionPort;
     }
 }

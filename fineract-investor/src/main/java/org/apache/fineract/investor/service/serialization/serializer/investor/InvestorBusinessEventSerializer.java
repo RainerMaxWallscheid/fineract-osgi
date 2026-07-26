@@ -110,8 +110,8 @@ public class InvestorBusinessEventSerializer extends AbstractBusinessEventWithCu
 
     private void addToMap(Map<Long, UnpaidChargeDataV1> map, LoanCharge loanCharge) {
         if (loanCharge.amountOutstanding().compareTo(BigDecimal.ZERO) > 0) {
-            UnpaidChargeDataV1 toAdd = new UnpaidChargeDataV1(loanCharge.getCharge().getId(), loanCharge.name(), loanCharge.amountOutstanding());
-            UnpaidChargeDataV1 unpaidChargeDataV1 = map.get(loanCharge.getCharge().getId());
+            UnpaidChargeDataV1 toAdd = new UnpaidChargeDataV1(loanCharge.getChargeId(), loanCharge.name(), loanCharge.amountOutstanding());
+            UnpaidChargeDataV1 unpaidChargeDataV1 = map.get(loanCharge.getChargeId());
             if (unpaidChargeDataV1 == null) {
                 map.put(toAdd.getChargeId(), toAdd);
             } else {

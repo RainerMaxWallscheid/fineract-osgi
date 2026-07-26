@@ -27,9 +27,7 @@ dependencies {
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-cob'))
     implementation(project(path: ':fineract-accounting'))
-    // Charge OSGi Step 7: prefer api; impl edge is temporary until Step 8 (Charge entity retarget).
-    implementation(project(path: ':fineract-charge-api'))
-    implementation(project(path: ':fineract-charge-impl'))
+    // Charge OSGi Step 8: no charge module dep (LoanCharge.getChargeId() only).
     implementation(project(path: ':fineract-loan'))
     implementation('org.apache.avro:avro')
     implementation(

@@ -30,6 +30,8 @@ import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.codes.mapper.CodeValueMapper;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.springframework.stereotype.Component;
 
@@ -37,6 +39,7 @@ import org.springframework.stereotype.Component;
 public class WorkingCapitalLoanProductAdvancedAccountingReadHelper {
     private final ProductToGLAccountMappingRepository productToGLAccountMappingRepository;
     private final CodeValueMapper codeValueMapper;
+    private final ChargeDefinitionPort chargeDefinitionPort;
 
     public List<PaymentTypeToGLAccountMapper> fetchPaymentTypeToFundSourceMappings(final Long wcLoanProductId) {
         final List<ProductToGLAccountMapping> mappings = productToGLAccountMappingRepository.findAllPaymentTypeMappings(wcLoanProductId, PortfolioProductType.WORKING_CAPITAL_LOAN.getValue());
@@ -66,11 +69,16 @@ public class WorkingCapitalLoanProductAdvancedAccountingReadHelper {
     }
 
     private List<ChargeToGLAccountMapper> fetchChargeToIncomeMappings(final Long wcLoanProductId, final boolean penalty) {
-        final List<ProductToGLAccountMapping> mappings = penalty ? productToGLAccountMappingRepository.findAllPenaltyMappings(wcLoanProductId, PortfolioProductType.WORKING_CAPITAL_LOAN.getValue()) : productToGLAccountMappingRepository.findAllFeeMappings(wcLoanProductId, PortfolioProductType.WORKING_CAPITAL_LOAN.getValue());
+        final List<ProductToGLAccountMapping> mappings = productToGLAccountMappingRepository.findAllChargeIdMappings(wcLoanProductId,
+                PortfolioProductType.WORKING_CAPITAL_LOAN.getValue());
         final List<ChargeToGLAccountMapper> result = new ArrayList<>();
         for (final ProductToGLAccountMapping mapping : mappings) {
+            final ChargeDefinitionData definition = this.chargeDefinitionPort.findCharge(mapping.getChargeId()).orElse(null);
+            if (definition == null || definition.isPenalty() != penalty) {
+                continue;
+            }
             final GLAccountData gLAccountData = new GLAccountData().setId(mapping.getGlAccount().getId()).setName(mapping.getGlAccount().getName()).setGlCode(mapping.getGlAccount().getGlCode());
-            final ChargeData chargeData = ChargeData.builder().id(mapping.getCharge().getId()).name(mapping.getCharge().getName()).penalty(mapping.getCharge().isPenalty()).build();
+            final ChargeData chargeData = ChargeData.builder().id(definition.getId()).name(definition.getName()).penalty(definition.isPenalty()).build();
             result.add(new ChargeToGLAccountMapper().setCharge(chargeData).setIncomeAccount(gLAccountData));
         }
         return result.isEmpty() ? null : result;
@@ -87,8 +95,9 @@ public class WorkingCapitalLoanProductAdvancedAccountingReadHelper {
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanProductAdvancedAccountingReadHelper(final ProductToGLAccountMappingRepository productToGLAccountMappingRepository, final CodeValueMapper codeValueMapper) {
+        public WorkingCapitalLoanProductAdvancedAccountingReadHelper(final ProductToGLAccountMappingRepository productToGLAccountMappingRepository, final CodeValueMapper codeValueMapper, final ChargeDefinitionPort chargeDefinitionPort) {
         this.productToGLAccountMappingRepository = productToGLAccountMappingRepository;
         this.codeValueMapper = codeValueMapper;
+        this.chargeDefinitionPort = chargeDefinitionPort;
     }
 }

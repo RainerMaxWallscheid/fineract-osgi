@@ -25,9 +25,8 @@ dependencies {
     // implementation dependencies are directly used (compiled against) in src/main (and src/test)
     //
     implementation(project(path: ':fineract-core'))
-    // Charge OSGi Step 7: prefer api; impl edge is temporary until Step 8 (Charge entity retarget).
+    // Charge OSGi Step 8: accounting uses ChargeDefinitionPort + charge_id FK only (no charge-impl).
     implementation(project(path: ':fineract-charge-api'))
-    implementation(project(path: ':fineract-charge-impl'))
     implementation('org.apache.avro:avro')
     implementation(
             project(path: ':fineract-avro-schemas')

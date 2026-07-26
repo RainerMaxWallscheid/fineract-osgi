@@ -62,7 +62,6 @@ import org.apache.fineract.investor.domain.InvestorBusinessEvent;
 import org.apache.fineract.investor.domain.LoanOwnershipTransferBusinessEvent;
 import org.apache.fineract.investor.service.ExternalAssetOwnersReadService;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
 import org.junit.jupiter.api.Test;
@@ -165,11 +164,8 @@ public class InvestorBusinessEventSerializerTest {
 
     private LoanCharge loanCharge(Long chargeId, String name, BigDecimal amountOutstanding) {
         LoanCharge loanCharge = mock(LoanCharge.class);
-        Charge charge = mock(Charge.class);
-        when(charge.getId()).thenReturn(chargeId);
-        when(charge.getName()).thenReturn(name);
         when(loanCharge.name()).thenReturn(name);
-        when(loanCharge.getCharge()).thenReturn(charge);
+        when(loanCharge.getChargeId()).thenReturn(chargeId);
         when(loanCharge.amountOutstanding()).thenReturn(amountOutstanding);
         return loanCharge;
     }

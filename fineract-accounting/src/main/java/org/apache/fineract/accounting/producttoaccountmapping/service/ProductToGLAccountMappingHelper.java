@@ -47,8 +47,7 @@ import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.PortfolioProductType;
-import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
 import org.apache.fineract.portfolio.paymenttype.exception.PaymentTypeNotFoundException;
@@ -61,7 +60,7 @@ public class ProductToGLAccountMappingHelper {
     protected final GLAccountRepository accountRepository;
     protected final ProductToGLAccountMappingRepository accountMappingRepository;
     protected final FromJsonHelper fromApiJsonHelper;
-    private final ChargeRepositoryWrapper chargeRepositoryWrapper;
+    private final ChargeDefinitionPort chargeDefinitionPort;
     protected final GLAccountRepositoryWrapper accountRepositoryWrapper;
     private final PaymentTypeRepository paymentTypeRepository;
     private final CodeValueRepository codeValueRepository;
@@ -284,7 +283,7 @@ public class ProductToGLAccountMappingHelper {
                 this.accountMappingRepository.deleteAll(existingChargeToIncomeAccountMappings);
             } else {
                 for (final ProductToGLAccountMapping chargeToIncomeAccountMapping : existingChargeToIncomeAccountMappings) {
-                    final Long currentCharge = chargeToIncomeAccountMapping.getCharge().getId();
+                    final Long currentCharge = chargeToIncomeAccountMapping.getChargeId();
                     existingCharges.add(currentCharge);
                     // update existing mappings (if required)
                     if (inputChargeToIncomeAccountMap.containsKey(currentCharge)) {
@@ -485,7 +484,8 @@ public class ProductToGLAccountMappingHelper {
      * @param productId
      */
     private void saveChargeToFundSourceMapping(final Long productId, final Long chargeId, final Long incomeAccountId, final PortfolioProductType portfolioProductType, final boolean isPenalty) {
-        final Charge charge = this.chargeRepositoryWrapper.findOneWithNotFoundDetection(chargeId);
+        // Catalog lookup via Module API (throws if missing / inactive / deleted)
+        this.chargeDefinitionPort.getActiveCharge(chargeId);
         // TODO Vishwas: Need to validate if given charge is fee or Penalty
         // based on input condition
         GLAccount glAccount;
@@ -501,7 +501,7 @@ public class ProductToGLAccountMappingHelper {
             glAccount = getAccountByIdAndType(LoanProductAccountingParams.INCOME_ACCOUNT_ID.getValue(), allowedAccountTypes, incomeAccountId);
             placeHolderAccountType = CashAccountsForLoan.INCOME_FROM_FEES;
         }
-        final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(placeHolderAccountType.getValue()).setCharge(charge);
+        final ProductToGLAccountMapping accountMapping = new ProductToGLAccountMapping().setGlAccount(glAccount).setProductId(productId).setProductType(portfolioProductType.getValue()).setFinancialAccountType(placeHolderAccountType.getValue()).setChargeId(chargeId);
         this.accountMappingRepository.saveAndFlush(accountMapping);
     }
 
@@ -665,11 +665,11 @@ public class ProductToGLAccountMappingHelper {
     }
 
     @java.lang.SuppressWarnings("all")
-        public ProductToGLAccountMappingHelper(final GLAccountRepository accountRepository, final ProductToGLAccountMappingRepository accountMappingRepository, final FromJsonHelper fromApiJsonHelper, final ChargeRepositoryWrapper chargeRepositoryWrapper, final GLAccountRepositoryWrapper accountRepositoryWrapper, final PaymentTypeRepository paymentTypeRepository, final CodeValueRepository codeValueRepository) {
+        public ProductToGLAccountMappingHelper(final GLAccountRepository accountRepository, final ProductToGLAccountMappingRepository accountMappingRepository, final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort, final GLAccountRepositoryWrapper accountRepositoryWrapper, final PaymentTypeRepository paymentTypeRepository, final CodeValueRepository codeValueRepository) {
         this.accountRepository = accountRepository;
         this.accountMappingRepository = accountMappingRepository;
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.chargeRepositoryWrapper = chargeRepositoryWrapper;
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.accountRepositoryWrapper = accountRepositoryWrapper;
         this.paymentTypeRepository = paymentTypeRepository;
         this.codeValueRepository = codeValueRepository;

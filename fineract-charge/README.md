@@ -18,12 +18,14 @@ Spring stays inside **impl**; Boot without OSGi is unchanged (registrar no-ops).
 ./gradlew :fineract-charge-test:test
 ```
 
-### Consumer Gradle edges (Step 7)
+### Consumer Gradle edges (Steps 7–8)
 
 | Module | Depend on |
 |--------|-----------|
 | progressive-loan | `:fineract-charge-api` only |
-| loan / savings / accounting / investor / working-capital | `:fineract-charge-api` + `:fineract-charge-impl` *(temp until Step 8)* |
+| **accounting** | `:fineract-charge-api` only (Step 8: `chargeId` + port) |
+| **investor** | *(none)* — `LoanCharge.getChargeId()` |
+| loan / savings / working-capital | `:fineract-charge-api` + `:fineract-charge-impl` *(Step 8 residual)* |
 | provider / integration-tests | `:fineract-charge` façade |
 
 Plan: [docs/arc42/15_osgi_bundle_refactoring_fineract-charge.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-charge.md).

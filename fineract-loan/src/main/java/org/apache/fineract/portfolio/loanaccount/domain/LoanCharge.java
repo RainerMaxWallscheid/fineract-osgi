@@ -813,6 +813,13 @@ public class LoanCharge extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         return this.charge;
     }
 
+    /**
+     * Catalog charge definition id without exposing the charge aggregate to foreign BCs.
+     */
+    public Long getChargeId() {
+        return this.charge != null ? this.charge.getId() : null;
+    }
+
     @java.lang.SuppressWarnings("all")
         public Integer getChargeTime() {
         return this.chargeTime;

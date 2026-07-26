@@ -27,7 +27,6 @@ import jakarta.persistence.UniqueConstraint;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 
 @Entity
@@ -41,9 +40,11 @@ public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
     @ManyToOne
     @JoinColumn(name = "payment_type", nullable = true)
     private PaymentType paymentType;
-    @ManyToOne
-    @JoinColumn(name = "charge_id", nullable = true)
-    private Charge charge;
+    /**
+     * Catalog charge definition id (no JPA association to charge-impl entity — ADR-021 / charge Step 8).
+     */
+    @Column(name = "charge_id", nullable = true)
+    private Long chargeId;
     @Column(name = "product_type", nullable = true)
     private int productType;
     @Column(name = "financial_account_type", nullable = true)
@@ -81,8 +82,8 @@ public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public Charge getCharge() {
-        return this.charge;
+        public Long getChargeId() {
+        return this.chargeId;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -146,8 +147,8 @@ public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
      * @return {@code this}.
      */
     @java.lang.SuppressWarnings("all")
-        public ProductToGLAccountMapping setCharge(final Charge charge) {
-        this.charge = charge;
+        public ProductToGLAccountMapping setChargeId(final Long chargeId) {
+        this.chargeId = chargeId;
         return this;
     }
 
