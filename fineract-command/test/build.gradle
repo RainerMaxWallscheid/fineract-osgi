@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-description = 'Fineract Command Implementation (OSGi impl bundle)'
+description = 'Fineract Command - Unit/white-box test fragment (host: command.impl)'
 
-apply plugin: 'java-library'
+apply plugin: 'java'
 apply plugin: 'eclipse'
 
 configurations {
@@ -45,17 +45,18 @@ configurations {
 
 apply from: 'dependencies.gradle'
 
-// OSGi implementation bundle: do not export internals to foreign domain modules
+// OSGi fragment attached to command-impl (ADR-022) for white-box unit tests of the host.
+// Production main is empty; tests live in src/test. Fragment jar packages test classes for Equinox.
 jar {
+    from sourceSets.test.output
     manifest {
         attributes(
                 'Bundle-ManifestVersion': '2',
-                'Bundle-Name': 'Apache Fineract Command Implementation',
-                'Bundle-SymbolicName': 'org.apache.fineract.command.impl',
+                'Bundle-Name': 'Apache Fineract Command Test Fragment',
+                'Bundle-SymbolicName': 'org.apache.fineract.command.test',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Import-Package': 'org.apache.fineract.command.core,org.apache.fineract.command.core.exception,*',
-                'Export-Package': 'org.apache.fineract.command.impl.config,org.apache.fineract.command.starter',
-                'Automatic-Module-Name': 'org.apache.fineract.command.impl'
+                'Fragment-Host': 'org.apache.fineract.command.impl',
+                'Automatic-Module-Name': 'org.apache.fineract.command.test'
                 )
     }
 }
@@ -69,8 +70,23 @@ modernizer {
 }
 
 if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
-    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-command/impl/bin/main")
+    sourceSets.test.java.outputDir = new File(rootProject.projectDir, "fineract-command/test/bin/test")
 }
 
-// Production-only module: white-box tests live in :fineract-command-test (Fragment-Host).
-// Shared IT fixtures: :fineract-command-integrationtest.
+if (!(project.hasProperty('env') && project.getProperty('env') == 'dev')) {
+    sourceSets {
+        test {
+            java {
+                exclude '**/core/boot/tests/**'
+            }
+        }
+    }
+}
+
+tasks.named('test').configure {
+    useJUnitPlatform()
+}
+
+tasks.named('jar').configure {
+    dependsOn tasks.named('testClasses')
+}

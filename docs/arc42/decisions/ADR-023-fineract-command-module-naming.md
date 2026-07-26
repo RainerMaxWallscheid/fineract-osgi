@@ -37,7 +37,8 @@ fineract-command/
   build.gradle         # optional compatibility façade (re-exports api + impl)
   README.md
 
-fineract-command-test/ # Fragment-Host → command.impl
+fineract-command/test/              # Fragment-Host → command.impl (unit tests)
+fineract-command-integrationtest/  # shared IT fixtures for all command modules
 fineract-command-jdbc/ # optional driven adapter
 fineract-command-async/
 fineract-command-disruptor/
@@ -51,7 +52,8 @@ fineract-command-audit/
 | Ports | `:fineract-command-api` | `fineract-command/api` |
 | Default impl | `:fineract-command-impl` | `fineract-command/impl` |
 | Façade (temporary) | `:fineract-command` | `fineract-command/` (aggregator only) |
-| Test fragment | `:fineract-command-test` | top-level |
+| Unit test fragment | `:fineract-command-test` | `fineract-command/test` |
+| Shared IT fixtures | `:fineract-command-integrationtest` | `fineract-command-integrationtest/` |
 
 5. **OSGi Bundle-SymbolicName**
 
@@ -59,7 +61,8 @@ fineract-command-audit/
 |--------|-----|
 | api | `org.apache.fineract.command.api` |
 | impl | `org.apache.fineract.command.impl` |
-| test fragment | `org.apache.fineract.command.test` (`Fragment-Host: org.apache.fineract.command.impl`) |
+| unit test fragment | `org.apache.fineract.command.test` (`Fragment-Host: org.apache.fineract.command.impl`) |
+| IT support | `org.apache.fineract.command.integrationtest` (no Fragment-Host) |
 | satellites | `org.apache.fineract.command.jdbc` / `.async` / … (unchanged policy) |
 
 6. **Java packages**  

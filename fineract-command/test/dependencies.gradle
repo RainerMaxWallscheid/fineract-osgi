@@ -18,30 +18,11 @@
  */
 
 dependencies {
-    implementation(
-            project(path: ':fineract-command-api'),
-            )
-
-    implementation(
-            'org.springframework.boot:spring-boot-starter',
-            'org.springframework.boot:spring-boot-starter-data-jdbc',
-            'io.github.resilience4j:resilience4j-spring-boot3',
-
-            'com.fasterxml.jackson.core:jackson-databind',
-
-            'org.liquibase:liquibase-core',
-
-            'org.postgresql:postgresql',
-
-            'org.apache.commons:commons-lang3',
-
-            'org.mapstruct:mapstruct',
-            )
-    compileOnly 'com.github.spotbugs:spotbugs-annotations'
-    annotationProcessor 'org.mapstruct:mapstruct-processor'
-
-    testImplementation(project(path: ':fineract-command-integrationtest'))
+    // White-box tests of command-impl; sample fixtures from the shared IT support module.
     testImplementation(project(path: ':fineract-command-impl'))
+    testImplementation(project(path: ':fineract-command-integrationtest'))
+    testImplementation(project(path: ':fineract-validation'))
+
     testImplementation ('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'com.jayway.jsonpath', module: 'json-path'
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
@@ -49,15 +30,11 @@ dependencies {
         exclude group: 'javax.activation'
         exclude group: 'org.skyscreamer'
     }
-    testRuntimeOnly(
-            'org.mariadb.jdbc:mariadb-java-client',
-            'com.mysql:mysql-connector-j',
-            )
     testImplementation (
             'org.mockito:mockito-inline',
             'org.testcontainers:junit-jupiter',
-            'org.testcontainers:postgresql',
-            'org.testcontainers:mariadb',
-            'org.testcontainers:mysql',
+            'org.springframework.restdocs:spring-restdocs-mockmvc',
+            'org.springframework.restdocs:spring-restdocs-webtestclient',
+            'org.springframework.restdocs:spring-restdocs-restassured',
             )
 }

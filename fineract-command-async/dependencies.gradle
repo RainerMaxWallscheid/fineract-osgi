@@ -35,7 +35,7 @@ dependencies {
     jmh 'org.openjdk.jmh:jmh-generator-annprocess'
     jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess'
 
-    testImplementation(project(path: ':fineract-command-test'))
+    testImplementation(project(path: ':fineract-command-integrationtest'))
     testImplementation(project(path: ':fineract-command-impl'))
     testImplementation ('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'com.jayway.jsonpath', module: 'json-path'

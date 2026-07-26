@@ -12,13 +12,18 @@ Step-by-step plan:
 |----------------|------|---------------------|------|
 | `fineract-command-api` | `fineract-command/api` | `org.apache.fineract.command.api` | Contracts (`core` + exceptions); **Export-Package** |
 | `fineract-command-impl` | `fineract-command/impl` | `org.apache.fineract.command.impl` | Default sync dispatcher, hooks, Spring starter, OSGi service registrar (**main only**) |
-| `fineract-command-test` | `fineract-command-test/` | `org.apache.fineract.command.test` | Fixtures + white-box tests; **Fragment-Host** → `command.impl` |
+| `fineract-command-test` | `fineract-command/test` | `org.apache.fineract.command.test` | White-box unit tests of **impl**; **Fragment-Host** → `command.impl` |
+| `fineract-command-integrationtest` | `fineract-command-integrationtest/` | `org.apache.fineract.command.integrationtest` | Shared IT fixtures/samples for **all** command modules |
 | `fineract-command` | `fineract-command/` | *(facade JAR)* | Compatibility aggregator: `api` + `impl` for existing consumers |
 
 Prefer new code depending on **`fineract-command-api`** only (plus runtime `fineract-command-impl` when defaults are required).  
 Inter-bundle access: **OSGi Service Registry** (`CommandOsgiServiceRegistrar` in impl). Not Karaf Features.  
 Spring remains inside **impl**.  
-Run command white-box tests: `./gradlew :fineract-command-test:test` (not on `:fineract-command-impl`).
+
+```bash
+./gradlew :fineract-command-test:test              # impl white-box
+./gradlew :fineract-command-jdbc:test              # satellite ITs use integrationtest fixtures
+```
 
 Background and Motivation
 -------------------------

@@ -37,7 +37,8 @@ fineract-charge-test/
 
 fineract-command/api/
 fineract-command/impl/
-fineract-command-test/   # Fragment-Host → command.impl
+fineract-command/test/              # Fragment-Host → command.impl (unit)
+fineract-command-integrationtest/  # shared IT fixtures
 ```
 
 ```mermaid

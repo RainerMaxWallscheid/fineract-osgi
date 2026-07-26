@@ -34,6 +34,7 @@ buildscript {
                 'fineract-command-impl',
                 'fineract-command',
                 'fineract-command-test',
+                'fineract-command-integrationtest',
                 'fineract-command-jdbc',
                 'fineract-command-audit',
                 'fineract-command-async',

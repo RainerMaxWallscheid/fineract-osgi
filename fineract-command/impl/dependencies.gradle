@@ -37,5 +37,6 @@ dependencies {
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
     annotationProcessor 'org.mapstruct:mapstruct-processor'
 
-    // Unit / white-box tests live in :fineract-command-test (Fragment-Host of this impl).
+    // Unit / white-box tests live in :fineract-command-test (fineract-command/test, Fragment-Host).
+    // Shared IT fixtures: :fineract-command-integrationtest.
 }

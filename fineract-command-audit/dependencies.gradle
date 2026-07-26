@@ -34,7 +34,7 @@ dependencies {
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
     annotationProcessor 'org.mapstruct:mapstruct-processor'
 
-    testImplementation(project(path: ':fineract-command-test'))
+    testImplementation(project(path: ':fineract-command-integrationtest'))
     testImplementation ('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'com.jayway.jsonpath', module: 'json-path'
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'

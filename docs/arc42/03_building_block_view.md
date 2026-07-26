@@ -139,7 +139,8 @@ flowchart TB
 | **fineract-command-async** | Asynchronous dispatcher variant |
 | **fineract-command-disruptor** | LMAX Disruptor variant |
 | **fineract-command-jdbc** / **-audit** | Persistence/audit aspects of the new stack |
-| **fineract-command-test** | Test support |
+| **fineract-command-test** | Unit/white-box test fragment (host: command.impl) |
+| **fineract-command-integrationtest** | Shared IT fixtures for command modules |
 | **fineract-validation** | Validation building blocks |
 | **fineract-cob** | COB components and business-step integration |
 | **fineract-avro-schemas** | Schema definitions for events/messaging |

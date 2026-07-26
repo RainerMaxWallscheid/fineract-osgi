@@ -18,7 +18,7 @@ Step-by-step pilot for [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-se
 | 3b Directory layout | **done** | `fineract-command/{api,impl}` via `projectDir`; test fragment top-level |
 | 3c Naming (ADR-023) | **done** | Dropped `fineract-command-core*`; BSN `command.api` / `command.impl` |
 | 4 OSGi manifests | **done** | BSN + Export/Import/Fragment-Host on jars |
-| 5 Fragment-Host test | **done** | top-level `:fineract-command-test`; Fragment-Host `org.apache.fineract.command.impl`; white-box tests moved out of impl into `src/test` |
+| 5 Fragment-Host test | **done** | `:fineract-command-test` under `fineract-command/test` (Fragment-Host); shared fixtures in `:fineract-command-integrationtest` |
 | 6 Spring↔OSGi bridge | **done** | `CommandOsgiServiceRegistrar` (reflection; no hard OSGi runtime dep) |
 | 7 Satellites → api | **done** | jdbc/async/disruptor compile on api; audit on api+impl; tests may use impl |
 | 8 Consumer retarget | **partial** | core/provider/cob/document/mix still use façade (compatible) |
@@ -46,8 +46,9 @@ fineract-command/
   build.gradle  # Gradle :fineract-command  (compatibility façade)
   api/          # Gradle :fineract-command-api
   impl/         # Gradle :fineract-command-impl  (main only)
+  test/         # Gradle :fineract-command-test  (Fragment-Host unit tests of impl)
 
-fineract-command-test/         # Gradle :fineract-command-test  (OSGi fragment + white-box tests)
+fineract-command-integrationtest/  # shared IT fixtures for all command modules
 fineract-command-jdbc/
 fineract-command-async/
 fineract-command-disruptor/
@@ -60,8 +61,10 @@ include ':fineract-command-api'
 project(':fineract-command-api').projectDir = file('fineract-command/api')
 include ':fineract-command-impl'
 project(':fineract-command-impl').projectDir = file('fineract-command/impl')
-include ':fineract-command'
 include ':fineract-command-test'
+project(':fineract-command-test').projectDir = file('fineract-command/test')
+include ':fineract-command'
+include ':fineract-command-integrationtest'
 // … satellites …
 ```
 
@@ -69,7 +72,8 @@ include ':fineract-command-test'
 |------|----------------|------|
 | `fineract-command/api` | `:fineract-command-api` | Contracts; **Export-Package**; no Spring |
 | `fineract-command/impl` | `:fineract-command-impl` | Sync dispatcher, hooks, starter, OSGi bridge; Spring inside; **no unit-test sources** |
-| `fineract-command-test/` | `:fineract-command-test` | Fixtures (`src/main`) + white-box tests (`src/test`); **Fragment-Host** → `command.impl` |
+| `fineract-command/test` | `:fineract-command-test` | White-box unit tests of **impl**; **Fragment-Host** → `command.impl` |
+| `fineract-command-integrationtest/` | `:fineract-command-integrationtest` | Shared IT fixtures/samples (`CommandBaseTest`, dummy sample) for **all** command modules |
 | `fineract-command/` (root build) | `:fineract-command` | Façade: `api` + `impl` for existing Boot consumers |
 | top-level | `:fineract-command-jdbc` / `-async` / `-disruptor` / `-audit` | Satellites (compile on api where possible) |
 
@@ -80,6 +84,7 @@ include ':fineract-command-test'
 | `:fineract-command-api` | `org.apache.fineract.command.api` |
 | `:fineract-command-impl` | `org.apache.fineract.command.impl` |
 | `:fineract-command-test` | `org.apache.fineract.command.test` (`Fragment-Host: org.apache.fineract.command.impl`) |
+| `:fineract-command-integrationtest` | `org.apache.fineract.command.integrationtest` (no Fragment-Host) |
 | satellites (later) | `org.apache.fineract.command.jdbc` / `.async` / `.disruptor` / `.audit` |
 
 ### 2.3 Package placement (as implemented)
@@ -93,7 +98,7 @@ include ':fineract-command-test'
 | `org.apache.fineract.command.starter` | `fineract-command/impl` | **impl** — Boot auto-config |
 | `org.apache.fineract.command.impl.config` | `fineract-command/impl` | **impl** — `CommandProperties` (Spring) |
 | `org.apache.fineract.command.impl.osgi` | `fineract-command/impl` | **impl** — `CommandOsgiServiceRegistrar` |
-| `org.apache.fineract.command.test.*` | `fineract-command-test` | **test** fragment fixtures |
+| `org.apache.fineract.command.test.*` | `fineract-command-integrationtest` | **shared IT fixtures** (package name historical) |
 
 ### 2.4 Dependency rules (as implemented)
 
@@ -102,16 +107,17 @@ include ':fineract-command-test'
 | `:fineract-command` (façade) | `api` + `impl` (both `api` configuration) |
 | jdbc / async / disruptor | **compile:** `:fineract-command-api`; **test:** may add `-core-impl` + `-test` |
 | audit | **compile:** `:fineract-command-api` + `:fineract-command-impl` (`CommandProperties`) |
-| `:fineract-command-test` | **main:** `:fineract-command-api` (+ Spring for samples); **test:** `:fineract-command-impl` + test stack |
+| `:fineract-command-test` | **test:** `:fineract-command-impl` + `:fineract-command-integrationtest` + test stack |
+| `:fineract-command-integrationtest` | **main:** `:fineract-command-api` (+ Spring/testcontainers for samples/base) |
 | core / provider / cob / document / mix | still `:fineract-command` façade (**Step 8 partial**) |
 
 ### 2.5 Tests (as implemented)
 
 | Location | Types |
 |----------|--------|
-| `fineract-command-test/src/main` | Sample REST/handlers/services (`org.apache.fineract.command.test.*`) |
-| `fineract-command-test/src/test` | `CommandDispatcherTest`, `DefaultCommandHandlerManagerTest`, `CommandSampleApiTest` |
-| satellite modules | Own `TestConfiguration` + optional IT; may `testImplementation` `:fineract-command-test` for fixtures |
+| `fineract-command-integrationtest/src/main` | `CommandBaseTest` + sample REST/handlers/services (`org.apache.fineract.command.test.*`) |
+| `fineract-command/test/src/test` | `CommandDispatcherTest`, `DefaultCommandHandlerManagerTest`, `CommandSampleApiTest` (impl white-box) |
+| satellite modules | Own `TestConfiguration` + IT; `testImplementation` `:fineract-command-integrationtest` for fixtures |
 
 ### 2.6 Runtime wiring diagram
 
@@ -124,6 +130,7 @@ flowchart TB
   DISR[command-disruptor]
   AUD[command-audit]
   TST[command-test<br/>Fragment-Host → command.impl]
+  IT[command-integrationtest<br/>shared fixtures]
   FAC[command façade<br/>api + impl]
   REG[(OSGi Service Registry)]
 
@@ -192,13 +199,20 @@ Handlers and individual hooks stay Spring-scanned inside the process for the pil
 
 Spring stays here: `@Component`, `@Configuration`, `@ConditionalOnMissingBean`, component scan.
 
-### 4.3 `:fineract-command-test` (top-level fragment)
+### 4.3 `:fineract-command-test` (`fineract-command/test` fragment)
 
-- **Fragment** of command-impl for white-box/unit tests and sample fixtures
+- **Fragment** of command-impl for white-box/unit tests of the host only
 - Manifest: `Fragment-Host: org.apache.fineract.command.impl`
-- `src/main` — fixtures/samples; `src/test` — JUnit/Spring Boot tests of the host (also packaged into the fragment JAR for Equinox)
-- Gradle: `./gradlew :fineract-command-test:test` (classpath includes impl). OSGi later: install fragment with host so tests share the host classloader without exporting impl packages
-- Pure contract tests (mock `CommandDispatcher` only) can stay as plain JUnit without fragment
+- `src/test` — JUnit/Spring Boot tests of the host (packaged into the fragment JAR for Equinox)
+- Depends on `:fineract-command-integrationtest` for sample fixtures
+- Gradle: `./gradlew :fineract-command-test:test`
+
+### 4.4 `:fineract-command-integrationtest` (shared IT support)
+
+- Test-support library for **all** command modules (jdbc/async/disruptor/audit + command-test)
+- `src/main` — `CommandBaseTest`, dummy sample domain (`org.apache.fineract.command.test.*`)
+- **Not** Fragment-Host of impl; not a production dependency
+- Satellites: `testImplementation project(':fineract-command-integrationtest')`
 
 ---
 
@@ -240,7 +254,7 @@ Execute as **separate PRs** so each step stays reviewable and green. Checkboxes 
 2. [x] Move impl sources to `fineract-command/impl`
 3. [x] Map via `project(…).projectDir = file('fineract-command/…')`
 4. [x] Keep project names `:fineract-command-api` / `:fineract-command-impl` (stable for deps / CI)
-5. [x] Keep test fragment as top-level `:fineract-command-test` (fixtures + white-box tests; impl main only)
+5. [x] Split unit fragment (`fineract-command/test`) from shared IT fixtures (`fineract-command-integrationtest`)
 
 ### Step 4 — Bundle metadata ✅
 
@@ -256,9 +270,9 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 ### Step 5 — Convert `fineract-command-test` to Fragment-Host ✅
 
 1. [x] Fragment-Host → `org.apache.fineract.command.impl`
-2. [x] Fixtures in `fineract-command-test/src/main`; white-box tests in `fineract-command-test/src/test`
+2. [x] White-box tests in `fineract-command/test/src/test`; shared fixtures in `fineract-command-integrationtest/src/main`
 3. [x] `:fineract-command-impl` is production **main only** (no unit-test source set content)
-4. [x] `:fineract-command-test:test` uses `testImplementation project(':fineract-command-impl')`
+4. [x] `:fineract-command-test:test` uses `testImplementation` of impl + integrationtest
 
 ### Step 6 — Spring↔OSGi bridge ✅
 
@@ -301,7 +315,7 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 | 5 | No Karaf Feature descriptors | done |
 | 6 | Spring still wires impl under Boot | done |
 | 7 | Fragment-Host tests green | done |
-| 8 | Sources under `fineract-command/{api,impl}` + top-level test fragment | done |
+| 8 | Sources under `fineract-command/{api,impl,test}` + integrationtest fixtures | done |
 | 9 | Full consumer retarget off façade | **open** |
 
 ---
@@ -331,7 +345,7 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 | `CommandProperties` on api by mistake | Lives in `impl.config` only |
 | Nested dirs break Gradle `it.name` lists | Keep project names `fineract-command-api` / `-impl` with `projectDir` |
 | Equinox not embedded in CI | Manifest + unit tests first; Equinox smoke optional |
-| `fineract-command-test` dual role | Fixtures + fragment; not a production dependency |
+| Dual role of former command-test | Split: unit fragment vs shared integrationtest fixtures |
 
 ---
 
@@ -352,6 +366,7 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 # Core command stack
 ./gradlew :fineract-command-api:build \
   :fineract-command-impl:jar \
+  :fineract-command-integrationtest:jar \
   :fineract-command-test:test \
   :fineract-command:jar \
   :fineract-command-jdbc:test \
@@ -362,7 +377,7 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 # Install pilot jars for Equinox experiments
 # cp fineract-command/api/build/libs/*.jar osgi/bundles/
 # cp fineract-command/impl/build/libs/*.jar osgi/bundles/
-# cp fineract-command-test/build/libs/*.jar osgi/bundles/   # fragment host = command.impl
+# cp fineract-command/test/build/libs/*.jar osgi/bundles/   # fragment host = command.impl
 ```
 
 ---

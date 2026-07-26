@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-description = 'Fineract Command - Test fragment (host: command.impl)'
+description = 'Fineract Command - Shared integration-test fixtures (all command modules)'
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'eclipse'
 
 configurations {
     asciidoctorExtensions
-    providedRuntime // needed for Spring Boot executable WAR
+    providedRuntime
     providedCompile
     compile() {
         exclude module: 'hibernate-entitymanager'
@@ -45,26 +45,22 @@ configurations {
 
 apply from: 'dependencies.gradle'
 
-// OSGi fragment attached to command-impl (ADR-022).
-// main = shared fixtures/samples for the host class space
-// test = JUnit/Spring Boot white-box tests of the host (Gradle)
-// jar also packages test classes so Equinox can install one fragment that sees host internals
+// Test-support library (not a production bundle). Install only on test classpaths.
+// Not a Fragment-Host of command.impl — shared by all command-family modules.
 jar {
-    from sourceSets.test.output
     manifest {
         attributes(
                 'Bundle-ManifestVersion': '2',
-                'Bundle-Name': 'Apache Fineract Command Test Fragment',
-                'Bundle-SymbolicName': 'org.apache.fineract.command.test',
+                'Bundle-Name': 'Apache Fineract Command Integration Test Support',
+                'Bundle-SymbolicName': 'org.apache.fineract.command.integrationtest',
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
-                'Fragment-Host': 'org.apache.fineract.command.impl',
-                'Automatic-Module-Name': 'org.apache.fineract.command.test'
+                'Export-Package': 'org.apache.fineract.command.test,org.apache.fineract.command.test.sample,org.apache.fineract.command.test.sample.api,org.apache.fineract.command.test.sample.command,org.apache.fineract.command.test.sample.data,org.apache.fineract.command.test.sample.exception,org.apache.fineract.command.test.sample.handler,org.apache.fineract.command.test.sample.service',
+                'Import-Package': 'org.apache.fineract.command.core,org.apache.fineract.command.core.exception,*',
+                'Automatic-Module-Name': 'org.apache.fineract.command.integrationtest'
                 )
     }
 }
 
-// Configuration for the modernizer plugin
-// https://github.com/andygoossens/gradle-modernizer-plugin
 modernizer {
     ignoreClassNamePatterns = [
         '.*AbstractPersistableCustom',
@@ -73,28 +69,11 @@ modernizer {
     ]
 }
 
-// If we are running Gradle within Eclipse to enhance classes with OpenJPA,
-// set the classes directory to point to Eclipse's default build directory
 if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
-    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-command-test/bin/main")
-    sourceSets.test.java.outputDir = new File(rootProject.projectDir, "fineract-command-test/bin/test")
+    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-command-integrationtest/bin/main")
 }
 
-if (!(project.hasProperty('env') && project.getProperty('env') == 'dev')) {
-    sourceSets {
-        test {
-            java {
-                exclude '**/core/boot/tests/**'
-            }
-        }
-    }
-}
-
+// No unit tests in this module — it only publishes fixtures for other modules' tests.
 tasks.named('test').configure {
-    useJUnitPlatform()
-}
-
-// jar needs test classes compiled first when packaging them into the fragment
-tasks.named('jar').configure {
-    dependsOn tasks.named('testClasses')
+    enabled = false
 }

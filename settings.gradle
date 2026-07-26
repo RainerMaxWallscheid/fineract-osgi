@@ -56,8 +56,10 @@ include ':fineract-command-api'
 project(':fineract-command-api').projectDir = file('fineract-command/api')
 include ':fineract-command-impl'
 project(':fineract-command-impl').projectDir = file('fineract-command/impl')
-include ':fineract-command'
 include ':fineract-command-test'
+project(':fineract-command-test').projectDir = file('fineract-command/test')
+include ':fineract-command'
+include ':fineract-command-integrationtest'
 include ':fineract-command-jdbc'
 include ':fineract-command-audit'
 include ':fineract-command-async'
