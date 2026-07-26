@@ -4,7 +4,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 
 | | |
 |--|--|
-| **Status** | draft — **Steps 0–6 done**; Step 7+ pending |
+| **Status** | draft — **Steps 0–7 done** (Step 7 residual impl edges → Step 8); Step 8+ pending |
 | **Decisions** | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **Playbook** | [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) §15.6 Wave 1, §15.7 |
 | **Reference pilot** | [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md) (as-built) |
@@ -26,7 +26,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 | 4 Bundle manifests | **done** (2026-07-26) | BSN + Export/Import/Fragment-Host on api/impl/test jars; starter export on impl |
 | 5 Fragment-Host test | **done** (2026-07-26) | White-box tests on charge-test only; impl main-only; 14 tests green |
 | 6 Spring↔OSGi bridge | **done** (2026-07-26) | `ChargeOsgiServiceRegistrar` registers `ChargeDefinitionPort`; no-op without OSGi |
-| 7 Consumer retarget (Gradle) | **pending** | Domain modules → compile on charge-api |
+| 7 Consumer retarget (Gradle) | **done** (2026-07-26) | Off façade: progressive → api only; loan/savings/… → api+impl temp; provider/IT keep façade |
 | 8 Consumer retarget (semantic) | **pending** | loan/savings/… off `Charge` entity |
 | 9 Docs / acceptance | **pending** | READMEs, osgi table, ArchUnit freeze shrink |
 
@@ -373,15 +373,22 @@ Execute as **separate PRs**. Checkboxes start open; update when done.
 
 **Exit:** Catalog port publishable via Service Registry under Equinox; plain Boot unchanged.
 
-### Step 7 — Consumers compile against api (mechanical) ⏳
+### Step 7 — Consumers compile against api (mechanical) ✅
 
-| Consumer | Target compile dep | Runtime |
-|----------|-------------------|---------|
-| loan, savings, accounting, investor, progressive, working-capital | `:fineract-charge-api` | provider brings impl |
-| provider | façade or api+impl | composition root |
-| integration-tests | runtimeElements of façade/impl as today | unchanged initially |
+| Consumer | Gradle edge after Step 7 | Notes |
+|----------|--------------------------|-------|
+| **progressive-loan** | `:fineract-charge-api` only | Pure enums via loan-charge call sites |
+| loan, savings, accounting, investor, working-capital | `:fineract-charge-api` + **`:fineract-charge-impl` (temp)** | Still need `Charge` / `ChargeRepositoryWrapper` / LoanCharge* exceptions |
+| architecture (test) | api + impl | ArchUnit classpath |
+| **provider** | `:fineract-charge` **façade** | Composition root |
+| **integration-tests** | façade `runtimeElements` | Unchanged |
 
-Gradle: replace `implementation project(':fineract-charge')` with **api** for domain modules; keep façade for provider until Step 8 done.
+1. [x] Dropped façade for domain modules listed above  
+2. [x] Explicit **api** edge on every domain consumer  
+3. [x] **Residual:** impl compile dependency remains until Step 8 semantic retarget (entity → port)  
+4. [x] Compile green: loan, savings, accounting, investor, progressive, WC, provider, architecture  
+
+**Exit:** No domain module depends on the façade project name; progressive proves pure-api; full api-only compile is Step 8.
 
 ### Step 8 — Consumer retarget (semantic) ⏳
 
@@ -410,7 +417,7 @@ Hardest step — incremental PRs by consumer:
 |---|-----------|--------|
 | 1 | api, impl, test fragment artifacts build | **done** (Step 4 jars) |
 | 2 | api has no Spring / JPA / REST | pending |
-| 3 | Domain modules compile on **charge-api** only (provider exception) | pending |
+| 3 | Domain modules compile on **charge-api** only (provider exception) | **partial** (Step 7: progressive api-only; others still need impl until Step 8) |
 | 4 | Ports registered in OSGi Service Registry (bridge present) | **done** (Step 6 registrar) |
 | 5 | No Karaf Feature descriptors | **done** (Service Registry only) |
 | 6 | Spring still wires impl under Boot | **done** (registrar no-ops off-OSGi) |
