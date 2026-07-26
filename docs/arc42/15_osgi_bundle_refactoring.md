@@ -181,6 +181,8 @@ sequenceDiagram
 
 **B2 pilot status:** `fineract-command` is the completed pilot (api / impl / test fragment + integrationtest fixtures). As-built plan: [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md).
 
+**Wave 1 charge status (2026-07-26):** `fineract-charge` split is **as-built for Steps 0–7 and 9**; **Step 8 partial** (accounting + investor off `Charge` entity; loan / savings / working-capital residual). Plan: [15_osgi_bundle_refactoring_fineract-charge.md](15_osgi_bundle_refactoring_fineract-charge.md).
+
 Further modules follow the same recipe, ordered by **port clarity**, **size**, **reverse dependency cost**, and **hexagonal value** (replaceable adapters as OSGi services). Metrics below are approximate main-source scale (order of magnitude); re-measure before a PR series.
 
 #### Selection criteria
@@ -201,7 +203,7 @@ Per module: complete **Module API ports first** ([14.6](14_module_api_boundaries
 
 | Rank | Module | ~main scale | Why next | Typical `-api` surface |
 |------|--------|-------------|----------|------------------------|
-| **1** | **`fineract-charge`** | ~40 | Co-named B2 candidate in [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md); already has `moduleapi.ChargeDefinitionPort`; classic BC “fee definition”; many dependents but port can stay narrow. **Detailed plan:** [15_osgi_bundle_refactoring_fineract-charge.md](15_osgi_bundle_refactoring_fineract-charge.md) | `ChargeDefinitionPort` + read/write facades + stable DTOs/exceptions |
+| **1** | **`fineract-charge`** | ~40 | **In progress / largely done** — api/impl/test + registrar + Gradle retarget shipped; semantic Step 8 residual on loan/savings/WC. **Detailed plan:** [15_osgi_bundle_refactoring_fineract-charge.md](15_osgi_bundle_refactoring_fineract-charge.md) | `ChargeDefinitionPort` + catalog enums/exceptions; façade still for provider |
 | **2** | **`fineract-rates`** | ~20 | Smallest real domain slice; few entities; floating-rate ports are crisp | Floating rate read/write ports + data types |
 | **3** | **`fineract-tax`** | ~30 | Small; already has `moduleapi`; used by charge/loan/savings — good “api-only consumer” exercise after charge | Tax component/group ports + DTOs |
 
@@ -270,7 +272,7 @@ Shared kernel           → core, validation       don't force BC split
 
 | Priority | Action |
 |----------|--------|
-| **Next PR series** | `fineract-charge` (or `fineract-rates` if smallest cut preferred) — charge plan: [15b](15_osgi_bundle_refactoring_fineract-charge.md) |
+| **Next PR series** | Finish **charge Step 8 residual** (loan/savings/WC off `Charge`) *or* start **`fineract-rates`** / **`fineract-tax`** — charge plan: [15b](15_osgi_bundle_refactoring_fineract-charge.md) |
 | **Then** | `fineract-tax` → retarget charge/tax consumers onto `-api` |
 | **Then** | `fineract-document` (replaceable adapters as OSGi services) |
 | **Parallel** | Command **Step 8**: retarget core/provider/cob/document/mix off the command façade |

@@ -34,7 +34,9 @@ dependencies {
             project(path: ':fineract-savings', configuration: 'runtimeElements'),
             project(path: ':fineract-provider', configuration: 'runtimeElements'),
             project(path: ':fineract-avro-schemas', configuration: 'runtimeElements'),
-            project(path: ':fineract-progressive-loan', configuration: 'runtimeElements')
+            project(path: ':fineract-progressive-loan', configuration: 'runtimeElements'),
+            // Working-capital-loan: needed on test JVM for WC product builders / enums (not only cargo WAR).
+            project(path: ':fineract-working-capital-loan', configuration: 'runtimeElements')
             )
 
     // Retrofit client for existing tests

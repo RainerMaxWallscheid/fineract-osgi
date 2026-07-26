@@ -19,9 +19,8 @@
 
 dependencies {
     implementation(project(path: ':fineract-core'))
-    // Charge OSGi Step 7: prefer api; impl edge is temporary until Step 8 (Charge entity retarget).
+    // Charge OSGi Step 8 residual: charge-api only (chargeId + ChargeDefinitionPort / ChargeReadPlatformService).
     implementation(project(path: ':fineract-charge-api'))
-    implementation(project(path: ':fineract-charge-impl'))
     implementation(project(path: ':fineract-loan'))
     implementation(project(path: ':fineract-accounting'))
     implementation(project(path: ':fineract-cob'))

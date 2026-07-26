@@ -499,9 +499,10 @@ public class LoanAccountConfiguration {
     public LoanDisbursementService loanDisbursementService(LoanChargeValidator loanChargeValidator,
             LoanDisbursementValidator loanDisbursementValidator, LoanChargeService loanChargeService, LoanBalanceService loanBalanceService,
             LoanJournalEntryPoster journalEntryPoster, LoanTransactionRepository loanTransactionRepository,
-            ConfigurationDomainService configurationDomainService) {
+            ConfigurationDomainService configurationDomainService,
+            org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper chargeRepository) {
         return new LoanDisbursementService(loanChargeValidator, loanDisbursementValidator, loanChargeService, loanBalanceService,
-                journalEntryPoster, loanTransactionRepository, configurationDomainService);
+                journalEntryPoster, loanTransactionRepository, configurationDomainService, chargeRepository);
     }
 
     @Bean

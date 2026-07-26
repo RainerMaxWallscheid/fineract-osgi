@@ -4,7 +4,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 
 | | |
 |--|--|
-| **Status** | draft — **Steps 0–7 done**; **Step 8 partial** (accounting + investor); loan/savings/WC residual |
+| **Status** | **as-built** — Steps **0–7, 9 done**; Step **8 partial** (WC off Charge entity; loan/savings residual) |
 | **Decisions** | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **Playbook** | [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) §15.6 Wave 1, §15.7 |
 | **Reference pilot** | [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md) (as-built) |
@@ -24,11 +24,11 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 | 2 Extract api | **done** (2026-07-26) | moduleapi + pure enums + catalog exceptions on charge-api; no Spring/JPA/REST |
 | 3 Move impl from provider | **done** (2026-07-26) | Read/write impls + `ChargeConfiguration` on charge-impl; provider only adapters + `ConvertChargeData*` |
 | 4 Bundle manifests | **done** (2026-07-26) | BSN + Export/Import/Fragment-Host on api/impl/test jars; starter export on impl |
-| 5 Fragment-Host test | **done** (2026-07-26) | White-box tests on charge-test only; impl main-only; 14 tests green |
+| 5 Fragment-Host test | **done** (2026-07-26) | White-box tests on charge-test only; impl main-only; 16 tests green |
 | 6 Spring↔OSGi bridge | **done** (2026-07-26) | `ChargeOsgiServiceRegistrar` registers `ChargeDefinitionPort`; no-op without OSGi |
 | 7 Consumer retarget (Gradle) | **done** (2026-07-26) | Off façade: progressive → api only; loan/savings/… → api+impl temp; provider/IT keep façade |
-| 8 Consumer retarget (semantic) | **partial** (2026-07-26) | Accounting + investor off Charge entity; loan/savings/WC still need charge-impl |
-| 9 Docs / acceptance | **pending** | READMEs, osgi table, ArchUnit freeze shrink |
+| 8 Consumer retarget (semantic) | **partial** (2026-07-26) | Accounting, investor, **WC** off Charge; loan tranche chargeId; loan/savings entity residual |
+| 9 Docs / acceptance | **done** (2026-07-26) | READMEs, osgi table, 15.6 rollout, optional Gherkin; freeze shrink deferred with Step 8 residual |
 
 **Not in this plan:** migrating *loan/savings account charges* (those are product BCs); full Equinox as primary process; removing Spring from charge.
 
@@ -353,7 +353,7 @@ Execute as **separate PRs**. Checkboxes start open; update when done.
    - `ChargeDropdownReadPlatformServiceImplTest` (dropdown option sets)  
    - `ChargeWritePlatformServiceJpaRepositoryImplTest` (delete guards / JDBC association)  
 2. [x] Impl remains production **main only** (no `*Test` under `charge/impl`)  
-3. [x] `./gradlew :fineract-charge-test:test` green — **14 tests**  
+3. [x] `./gradlew :fineract-charge-test:test` green — **16 tests** (after Step 6 registrar tests)  
 4. [x] **No** `fineract-charge-integrationtest` (not needed yet; loan/savings keep own ITs)  
 5. [x] Fragment-Host manifest on test jar (Step 4); test deps include impl + core + tax (tax is implementation-only of impl)  
 6. [x] `fineract-charge/test/README.md` documents conventions  
@@ -404,45 +404,58 @@ Hardest step — **incremental**. First slice landed 2026-07-26:
 6. [x] **Investor:** uses `LoanCharge.getChargeId()`; **no** charge module dependency  
 7. [x] **Loan:** added `LoanCharge.getChargeId()` for foreign BCs  
 
+#### Done (slice 2 — residual progress)
+
+8. [x] **LoanCharge* exceptions** moved `charge-impl` → `loanaccount.exception` (provider/loan/WC imports updated)  
+9. [x] **ChargeEnumerations** moved to **charge-api** (`…charge.service`)  
+10. [x] **ChargeReadPlatformService** interface moved to **charge-api** (impl stays charge-impl)  
+11. [x] **ChargeCalculationTypeConverter / ChargePaymentModeConverter** on charge-api (JPA attribute converters for pure enums)  
+12. [x] **LoanChargeApiJsonValidator** uses `ChargeDefinitionPort` for new catalog charge attach (not `ChargeRepositoryWrapper`)  
+13. [x] **WC** uses `WorkingCapitalLoanChargeNotFoundException` instead of loan exception  
+
+#### Done (slice 3 — residual next)
+
+14. [x] **WC:** `WorkingCapitalLoanCharge` stores `Long chargeId` (no `@ManyToOne Charge`); read/write via port; **Gradle charge-api only**  
+15. [x] **Loan:** `LoanTrancheCharge` stores `chargeId`; `addTrancheLoanCharge(Long)`; assembler returns charge ids  
+
 #### Residual (later slices)
 
 | Module | Still needs charge-impl for |
 |--------|-----------------------------|
-| **loan** | `Charge` on `LoanCharge` / product charges; `ChargeRepositoryWrapper` in validators; LoanCharge* exceptions in charge-impl |
-| **savings** | `Charge` on `SavingsAccountCharge`; wrappers; savings charge exceptions |
-| **working-capital-loan** | `WorkingCapitalLoanCharge` → `Charge`; `ChargeReadPlatformService`; converters; LoanChargeNotFoundException |
+| **loan** | JPA `Charge` on `LoanCharge` / `LoanProduct`; tax/`getCharge()` paths; product charge lists |
+| **savings** | JPA `Charge` on savings product/account charges; assemblers |
 | **provider / ITs** | façade composition root |
 
-8. [ ] Loan product / loan charge setup: resolve catalog via port, map to loan-local types  
-9. [ ] Savings account charge aggregates: same  
-10. [ ] Move LoanCharge* exceptions to loan (or shared kernel)  
-11. [ ] ArchUnit: shrink freeze for loan/savings → charge.domain as imports drop  
-12. [ ] Deprecate façade `:fineract-charge` when domain modules no longer need impl  
+16. [ ] Loan `LoanCharge` / `LoanProduct.charges` → chargeId / join entity without Charge type  
+17. [ ] Savings account/product charges same  
+18. [ ] ArchUnit freeze shrink; deprecate façade  
 
-**Note:** Full elimination of `Charge` from loan/savings spans more PRs; freeze only shrinks.
+**Note:** Loan/savings product charge many-to-many still anchors charge-impl; freeze only shrinks.
 
-### Step 9 — Documentation & acceptance ⏳
+### Step 9 — Documentation & acceptance ✅
 
-1. [ ] Update this plan status table to **done** per step  
-2. [ ] Module READMEs under `fineract-charge/{api,impl,test}`  
-3. [ ] [osgi/README.md](../../osgi/README.md) pilot table row for charge  
-4. [ ] [15.6 rollout](15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot) — mark charge as in progress/done  
-5. [ ] Optional Gherkin `@adr-022` charge service present/absent  
+1. [x] Plan status table + acceptance criteria updated (this document)  
+2. [x] Module READMEs: `fineract-charge/README.md`, `api/`, `impl/`, `test/`  
+3. [x] [osgi/README.md](../../osgi/README.md) Wave 1 charge table (as-built + consumer residual)  
+4. [x] [15.6 rollout](15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot) — charge marked **in progress / largely done**  
+5. [x] Optional Gherkin: [charge_catalog_service.feature](../gherkin/features/osgi/charge_catalog_service.feature) (`@adr-022`)  
 
 **Acceptance criteria**
 
 | # | Criterion | Status |
 |---|-----------|--------|
 | 1 | api, impl, test fragment artifacts build | **done** (Step 4 jars) |
-| 2 | api has no Spring / JPA / REST | pending |
+| 2 | api has no Spring / JPA / REST | **done** (verified Step 9) |
 | 3 | Domain modules compile on **charge-api** only (provider exception) | **partial** (progressive + accounting api-only; investor none; loan/savings/WC still impl) |
 | 4 | Ports registered in OSGi Service Registry (bridge present) | **done** (Step 6 registrar) |
 | 5 | No Karaf Feature descriptors | **done** (Service Registry only) |
 | 6 | Spring still wires impl under Boot | **done** (registrar no-ops off-OSGi) |
-| 7 | Fragment-Host tests green | **done** (Step 5, 14 tests) |
-| 8 | Sources under `fineract-charge/{api,impl,test}` | pending |
-| 9 | No *new* foreign uses of `Charge` entity; freeze only shrinks | **in progress** (accounting/investor cleaned; freeze residual for loan/savings) |
+| 7 | Fragment-Host tests green | **done** (Step 5, 16 tests) |
+| 8 | Sources under `fineract-charge/{api,impl,test}` | **done** |
+| 9 | No *new* foreign uses of `Charge` entity; freeze only shrinks | **partial** (accounting/investor cleaned; freeze residual for loan/savings) |
 | 10 | Provider no longer hosts charge catalog service impls | **done** (Step 3) |
+
+**Exit (Step 9):** Documentation matches as-built layout; open work is **Step 8 residual** only (not docs).
 
 ---
 

@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.charge.exception;
+package org.apache.fineract.portfolio.loanaccount.exception;
 
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 
-public class LoanChargeCannotBeDeletedException extends AbstractPlatformDomainRuleException {
+public class LoanChargeCannotBeUpdatedException extends AbstractPlatformDomainRuleException {
 
-    /*** enum of reasons of why Loan Charge cannot be deleted **/
-    public enum LoanChargeCannotBeDeletedReason {
+    /*** enum of reasons of why Loan Charge cannot be updated **/
+    public enum LoanChargeCannotBeUpdatedReason {
 
         ALREADY_PAID, //
         ALREADY_WAIVED, //
@@ -35,7 +35,7 @@ public class LoanChargeCannotBeDeletedException extends AbstractPlatformDomainRu
             } else if (name().equalsIgnoreCase("ALREADY_WAIVED")) {
                 return "This loan charge has already been waived";
             } else if (name().equalsIgnoreCase("LOAN_NOT_IN_SUBMITTED_AND_PENDING_APPROVAL_STAGE")) {
-                return "This charge cannot be deleted as the loan it is associated with is not in submitted and pending approval stage";
+                return "This charge cannot be updated as the loan it is associated with is not in submitted and pending approval stage";
             }
             return name();
         }
@@ -52,7 +52,7 @@ public class LoanChargeCannotBeDeletedException extends AbstractPlatformDomainRu
         }
     }
 
-    public LoanChargeCannotBeDeletedException(final LoanChargeCannotBeDeletedReason reason, final Long loanChargeId) {
+    public LoanChargeCannotBeUpdatedException(final LoanChargeCannotBeUpdatedReason reason, final Long loanChargeId) {
         super(reason.errorCode(), reason.errorMessage(), loanChargeId);
     }
 }

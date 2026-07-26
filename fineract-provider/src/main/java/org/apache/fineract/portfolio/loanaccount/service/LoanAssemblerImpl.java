@@ -406,9 +406,9 @@ public class LoanAssemblerImpl implements LoanAssembler {
          * Boolean determines if any charge has been modified *
          */
         boolean isChargeModified = false;
-        Set<Charge> newTrancheCharges = this.loanChargeAssembler.getNewLoanTrancheCharges(command.parsedJson());
-        for (Charge charge : newTrancheCharges) {
-            loan.addTrancheLoanCharge(charge);
+        Set<Long> newTrancheChargeIds = this.loanChargeAssembler.getNewLoanTrancheChargeIds(command.parsedJson());
+        for (Long chargeId : newTrancheChargeIds) {
+            loan.addTrancheLoanCharge(chargeId);
         }
         /**
          * If there are any charges already present, which are now not passed in as a part of the request, deem the

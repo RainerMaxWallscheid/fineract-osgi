@@ -43,6 +43,7 @@ import org.apache.fineract.infrastructure.core.serialization.JsonParserHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.charge.domain.Charge;
+import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -68,6 +69,7 @@ public class LoanDisbursementService {
     private final LoanJournalEntryPoster loanJournalEntryPoster;
     private final LoanTransactionRepository loanTransactionRepository;
     private final ConfigurationDomainService configurationDomainService;
+    private final ChargeRepositoryWrapper chargeRepository;
 
     public void updateDisbursementDetails(final Loan loan, final JsonCommand jsonCommand, final Map<String, Object> actualChanges) {
         final List<Long> disbursementList = loan.fetchDisbursementIds();
@@ -264,7 +266,7 @@ public class LoanDisbursementService {
         } else {
             final var disbursementDetails = loan.addLoanDisbursementDetails(expectedDisbursementDate, principal);
             for (LoanTrancheCharge trancheCharge : loan.getTrancheCharges()) {
-                Charge chargeDefinition = trancheCharge.getCharge();
+                Charge chargeDefinition = chargeRepository.findOneWithNotFoundDetection(trancheCharge.getChargeId());
                 ExternalId externalId = ExternalId.empty();
                 if (TemporaryConfigurationServiceContainer.isExternalIdAutoGenerationEnabled()) {
                     externalId = ExternalId.generate();
@@ -416,7 +418,7 @@ public class LoanDisbursementService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanDisbursementService(final LoanChargeValidator loanChargeValidator, final LoanDisbursementValidator loanDisbursementValidator, final LoanChargeService loanChargeService, final LoanBalanceService loanBalanceService, final LoanJournalEntryPoster loanJournalEntryPoster, final LoanTransactionRepository loanTransactionRepository, final ConfigurationDomainService configurationDomainService) {
+        public LoanDisbursementService(final LoanChargeValidator loanChargeValidator, final LoanDisbursementValidator loanDisbursementValidator, final LoanChargeService loanChargeService, final LoanBalanceService loanBalanceService, final LoanJournalEntryPoster loanJournalEntryPoster, final LoanTransactionRepository loanTransactionRepository, final ConfigurationDomainService configurationDomainService, final ChargeRepositoryWrapper chargeRepository) {
         this.loanChargeValidator = loanChargeValidator;
         this.loanDisbursementValidator = loanDisbursementValidator;
         this.loanChargeService = loanChargeService;
@@ -424,5 +426,6 @@ public class LoanDisbursementService {
         this.loanJournalEntryPoster = loanJournalEntryPoster;
         this.loanTransactionRepository = loanTransactionRepository;
         this.configurationDomainService = configurationDomainService;
+        this.chargeRepository = chargeRepository;
     }
 }

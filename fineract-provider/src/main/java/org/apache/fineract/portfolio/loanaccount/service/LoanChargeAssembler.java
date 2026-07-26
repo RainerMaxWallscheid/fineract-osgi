@@ -40,8 +40,8 @@ import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.domain.ChargePaymentMode;
 import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
-import org.apache.fineract.portfolio.charge.exception.LoanChargeNotFoundException;
-import org.apache.fineract.portfolio.charge.exception.LoanChargeWithoutMandatoryFieldException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeNotFoundException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeWithoutMandatoryFieldException;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
@@ -188,8 +188,8 @@ public class LoanChargeAssembler {
         return loanCharges;
     }
 
-    public Set<Charge> getNewLoanTrancheCharges(final JsonElement element) {
-        final Set<Charge> associatedChargesForLoan = new HashSet<>();
+    public Set<Long> getNewLoanTrancheChargeIds(final JsonElement element) {
+        final Set<Long> associatedChargeIds = new HashSet<>();
         if (element.isJsonObject()) {
             final JsonObject topLevelJsonElement = element.getAsJsonObject();
             if (topLevelJsonElement.has("charges") && topLevelJsonElement.get("charges").isJsonArray()) {
@@ -198,16 +198,16 @@ public class LoanChargeAssembler {
                     final JsonObject loanChargeElement = array.get(i).getAsJsonObject();
                     final Long id = this.fromApiJsonHelper.extractLongNamed("id", loanChargeElement);
                     final Long chargeId = this.fromApiJsonHelper.extractLongNamed("chargeId", loanChargeElement);
-                    if (id == null) {
+                    if (id == null && chargeId != null) {
                         final Charge chargeDefinition = this.chargeRepository.findOneWithNotFoundDetection(chargeId);
                         if (chargeDefinition.getChargeTimeType().equals(ChargeTimeType.TRANCHE_DISBURSEMENT.getValue())) {
-                            associatedChargesForLoan.add(chargeDefinition);
+                            associatedChargeIds.add(chargeId);
                         }
                     }
                 }
             }
         }
-        return associatedChargesForLoan;
+        return associatedChargeIds;
     }
 
     public LoanCharge createNewFromJson(final Loan loan, final Charge chargeDefinition, final JsonCommand command) {

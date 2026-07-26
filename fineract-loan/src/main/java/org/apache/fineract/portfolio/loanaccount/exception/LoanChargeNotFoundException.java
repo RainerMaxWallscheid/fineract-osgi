@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.charge.exception;
+package org.apache.fineract.portfolio.loanaccount.exception;
 
 import java.util.Objects;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;

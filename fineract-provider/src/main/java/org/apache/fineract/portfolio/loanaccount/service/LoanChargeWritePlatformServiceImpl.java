@@ -74,13 +74,13 @@ import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeAppliedToException;
 import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeUpdatedException;
-import org.apache.fineract.portfolio.charge.exception.LoanChargeCannotBeAddedException;
-import org.apache.fineract.portfolio.charge.exception.LoanChargeCannotBeDeletedException;
-import org.apache.fineract.portfolio.charge.exception.LoanChargeCannotBePayedException;
-import org.apache.fineract.portfolio.charge.exception.LoanChargeCannotBeUpdatedException;
-import org.apache.fineract.portfolio.charge.exception.LoanChargeCannotBeWaivedException;
-import org.apache.fineract.portfolio.charge.exception.LoanChargeNotFoundException;
-import org.apache.fineract.portfolio.charge.exception.LoanChargeWaiveCannotBeReversedException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeCannotBeAddedException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeCannotBeDeletedException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeCannotBePayedException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeCannotBeUpdatedException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeCannotBeWaivedException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeNotFoundException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeWaiveCannotBeReversedException;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
@@ -227,7 +227,7 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
                 final String errorMessage = "Charge with identifier " + chargeDefinition.getId() + " cannot be applied: No valid loan disbursement available";
                 throw new ChargeCannotBeAppliedToException("loan", errorMessage, chargeDefinition.getId());
             }
-            loan.addTrancheLoanCharge(chargeDefinition);
+            loan.addTrancheLoanCharge(chargeDefinition.getId());
         } else {
             loanCharge = loanChargeAssembler.createNewFromJson(loan, chargeDefinition, command);
             businessEventNotifierService.notifyPreBusinessEvent(new LoanAddChargeBusinessEvent(loanCharge));

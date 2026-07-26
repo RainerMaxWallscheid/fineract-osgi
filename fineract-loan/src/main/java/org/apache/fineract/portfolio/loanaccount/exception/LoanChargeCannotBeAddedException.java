@@ -16,18 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.charge.exception;
+package org.apache.fineract.portfolio.loanaccount.exception;
 
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 
 /**
- * {@link AbstractPlatformDomainRuleException} thrown when currency mismatch occurs
+ * {@link AbstractPlatformDomainRuleException} thrown when loan charge is not allowed to be added to the loan.
  */
-public class LoanChargeWithoutMandatoryFieldException extends AbstractPlatformDomainRuleException {
+public class LoanChargeCannotBeAddedException extends AbstractPlatformDomainRuleException {
 
-    public LoanChargeWithoutMandatoryFieldException(final String entity, final String postFix, final String defaultUserMessage,
+    public LoanChargeCannotBeAddedException(final String entity, final String postFix, final String defaultUserMessage,
             final Object... defaultUserMessageArgs) {
-        super("error.msg." + entity + "." + postFix + ".cannot.be.blank", defaultUserMessage, defaultUserMessageArgs);
+        super("error.msg." + entity + ".cannot.be.added.as." + postFix, defaultUserMessage, defaultUserMessageArgs);
     }
 
 }

@@ -18,9 +18,11 @@
  */
 
 dependencies {
-    // Shared kernel: platform exception bases only (no Spring/JPA on this surface).
-    // ChargeData / ChargeTimeType remain in fineract-core temporarily (Step 0 decision).
+    // Shared kernel: platform exception bases + ChargeData / ChargeTimeType (core temporarily).
     api project(path: ':fineract-core')
+
+    // AttributeConverters for pure catalog enums only (Step 8 residual); no Spring services on api.
+    compileOnly 'jakarta.persistence:jakarta.persistence-api'
 
     compileOnly 'com.github.spotbugs:spotbugs-annotations'
 }

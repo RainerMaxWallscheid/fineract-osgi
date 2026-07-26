@@ -34,9 +34,9 @@ import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.event.business.domain.workingcapitalloan.transaction.WorkingCapitalLoanChargeAdjustmentPostBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.domain.workingcapitalloan.transaction.WorkingCapitalLoanChargeAdjustmentPreBusinessEvent;
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
-import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRelationTypeEnum;
@@ -70,7 +70,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkingCapitalLoanChargeWritePlatformServiceImpl implements WorkingCapitalLoanChargeWritePlatformService {
     private final WorkingCapitalLoanChargeDataValidator loanChargeDataValidator;
     private final WorkingCapitalLoanRepository workingCapitalLoanRepository;
-    private final ChargeRepositoryWrapper chargeRepository;
+    private final ChargeDefinitionPort chargeDefinitionPort;
     private final WorkingCapitalLoanChargeRepository loanChargeRepository;
     private final ExternalIdFactory externalIdFactory;
     private final WorkingCapitalLoanBalanceRepository balanceRepository;
@@ -190,7 +190,7 @@ public class WorkingCapitalLoanChargeWritePlatformServiceImpl implements Working
         final LocalDate dueDate = command.dateValueOfParameterNamed("dueDate");
         final Long chargeId = command.longValueOfParameterNamed("chargeId");
         final ExternalId externalId = externalIdFactory.createFromCommand(command, WorkingCapitalLoanConstants.externalIdParameterName);
-        final Charge chargeDefinition = chargeRepository.findOneWithNotFoundDetection(chargeId);
+        final ChargeDefinitionData chargeDefinition = chargeDefinitionPort.getActiveCharge(chargeId);
         if (ChargeTimeType.SPECIFIED_DUE_DATE.getValue().equals(chargeDefinition.getChargeTimeType())) {
             if (dueDate == null) {
                 throw new PlatformApiDataValidationException("field.is.mandatory", "Field is mandatory", WorkingCapitalLoanChargeConstants.dueDateParamName);
@@ -215,10 +215,10 @@ public class WorkingCapitalLoanChargeWritePlatformServiceImpl implements Working
     }
 
     @java.lang.SuppressWarnings("all")
-        public WorkingCapitalLoanChargeWritePlatformServiceImpl(final WorkingCapitalLoanChargeDataValidator loanChargeDataValidator, final WorkingCapitalLoanRepository workingCapitalLoanRepository, final ChargeRepositoryWrapper chargeRepository, final WorkingCapitalLoanChargeRepository loanChargeRepository, final ExternalIdFactory externalIdFactory, final WorkingCapitalLoanBalanceRepository balanceRepository, final WorkingCapitalLoanTransactionRepository transactionRepository, final WorkingCapitalLoanTransactionRelationRepository relationRepository, final PaymentDetailWritePlatformService paymentDetailService, final WorkingCapitalLoanNoteRepository noteRepository, final BusinessEventNotifierService businessEventNotifierService, final WorkingCapitalLoanAccountingProcessor accountingProcessor, final WorkingCapitalLoanTransactionProcessor transactionProcessor) {
+        public WorkingCapitalLoanChargeWritePlatformServiceImpl(final WorkingCapitalLoanChargeDataValidator loanChargeDataValidator, final WorkingCapitalLoanRepository workingCapitalLoanRepository, final ChargeDefinitionPort chargeDefinitionPort, final WorkingCapitalLoanChargeRepository loanChargeRepository, final ExternalIdFactory externalIdFactory, final WorkingCapitalLoanBalanceRepository balanceRepository, final WorkingCapitalLoanTransactionRepository transactionRepository, final WorkingCapitalLoanTransactionRelationRepository relationRepository, final PaymentDetailWritePlatformService paymentDetailService, final WorkingCapitalLoanNoteRepository noteRepository, final BusinessEventNotifierService businessEventNotifierService, final WorkingCapitalLoanAccountingProcessor accountingProcessor, final WorkingCapitalLoanTransactionProcessor transactionProcessor) {
         this.loanChargeDataValidator = loanChargeDataValidator;
         this.workingCapitalLoanRepository = workingCapitalLoanRepository;
-        this.chargeRepository = chargeRepository;
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.loanChargeRepository = loanChargeRepository;
         this.externalIdFactory = externalIdFactory;
         this.balanceRepository = balanceRepository;

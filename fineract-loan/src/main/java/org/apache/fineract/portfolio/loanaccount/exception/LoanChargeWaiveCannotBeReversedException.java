@@ -16,32 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.charge.exception;
+package org.apache.fineract.portfolio.loanaccount.exception;
 
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 
-public class LoanChargeCannotBePayedException extends AbstractPlatformDomainRuleException {
+public class LoanChargeWaiveCannotBeReversedException extends AbstractPlatformDomainRuleException {
 
-    /*** enum of reasons of why Loan Charge cannot be paid **/
-    public enum LoanChargeCannotBePayedReason {
+    /*** enum of reasons of why Loan Charge waive cannot undo **/
+    public enum LoanChargeWaiveCannotUndoReason {
 
         ALREADY_PAID, //
         ALREADY_WAIVED, //
         LOAN_INACTIVE, //
-        CHARGE_NOT_ACCOUNT_TRANSFER, //
-        CHARGE_NOT_PAYABLE; //
+        WAIVE_NOT_ALLOWED_FOR_CHARGE, //
+        NOT_WAIVED, //
+        ALREADY_REVERSED; //
 
         public String errorMessage() {
+
             if (name().equalsIgnoreCase("ALREADY_PAID")) {
-                return "This loan charge has been completely paid";
+                return "This loan charge waive cannot be reversed as the charge has already been paid";
             } else if (name().equalsIgnoreCase("ALREADY_WAIVED")) {
                 return "This loan charge has already been waived";
             } else if (name().equalsIgnoreCase("LOAN_INACTIVE")) {
-                return "This loan charge cannot be paid as the loan associated with it is currently inactive";
-            } else if (name().equalsIgnoreCase("CHARGE_NOT_ACCOUNT_TRANSFER")) {
-                return "This loan charge cannot be paid as the charge payment mode is not account transfer";
-            } else if (name().equalsIgnoreCase("CHARGE_NOT_PAYABLE")) {
-                return "This loan charge is not payable through account transfer";
+                return "This loan charge waive cannot be reversed as the loan associated with it is currently inactive";
+            } else if (name().equalsIgnoreCase("WAIVE_NOT_ALLOWED_FOR_CHARGE")) {
+                return "This loan charge waive cannot be reversed";
+            } else if (name().equalsIgnoreCase("NOT_WAIVED")) {
+                return "This loan charge waive cannot be reversed as this charge is not waived";
+            } else if (name().equalsIgnoreCase("ALREADY_REVERSED")) {
+                return "This loan charge waive cannot be reversed as this transaction is already reversed";
             }
 
             return name();
@@ -54,16 +58,19 @@ public class LoanChargeCannotBePayedException extends AbstractPlatformDomainRule
                 return "error.msg.loan.charge.already.waived";
             } else if (name().equalsIgnoreCase("LOAN_INACTIVE")) {
                 return "error.msg.loan.charge.associated.loan.inactive";
-            } else if (name().equalsIgnoreCase("CHARGE_NOT_ACCOUNT_TRANSFER")) {
-                return "error.msg.loan.charge.payment.mode.not.account.transfer";
-            } else if (name().equalsIgnoreCase("CHARGE_NOT_PAYABLE")) {
-                return "error.msg.loan.charge.payment.not.allowed.account.transfer";
+            } else if (name().equalsIgnoreCase("WAIVE_NOT_ALLOWED_FOR_CHARGE")) {
+                return "error.msg.loan.charge.waive.not.allowed";
+            } else if (name().equalsIgnoreCase("NOT_WAIVED")) {
+                return "error.msg.loan.charge.waive.cannot.undo";
+            } else if (name().equalsIgnoreCase("ALREADY_REVERSED")) {
+                return "error.msg.transaction.cannot.reverse";
             }
             return name();
         }
     }
 
-    public LoanChargeCannotBePayedException(final LoanChargeCannotBePayedReason reason, final Long loanChargeId) {
-        super(reason.errorCode(), reason.errorMessage(), loanChargeId);
+    public LoanChargeWaiveCannotBeReversedException(final LoanChargeWaiveCannotUndoReason reason, final Long id) {
+        super(reason.errorCode(), reason.errorMessage(), id);
     }
+
 }

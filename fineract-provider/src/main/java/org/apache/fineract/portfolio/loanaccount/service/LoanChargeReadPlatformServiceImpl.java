@@ -32,7 +32,7 @@ import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.charge.exception.LoanChargeNotFoundException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeNotFoundException;
 import org.apache.fineract.portfolio.charge.service.ChargeDropdownReadPlatformService;
 import org.apache.fineract.portfolio.charge.service.ChargeEnumerations;
 import org.apache.fineract.portfolio.common.service.DropdownReadPlatformService;

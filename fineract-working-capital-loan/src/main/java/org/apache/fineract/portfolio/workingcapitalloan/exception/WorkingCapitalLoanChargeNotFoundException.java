@@ -25,4 +25,14 @@ public class WorkingCapitalLoanChargeNotFoundException extends AbstractPlatformR
     public WorkingCapitalLoanChargeNotFoundException(final Long id) {
         super("error.msg.wc.loan.charge.id.invalid", "Working Capital Loan Charge with identifier " + id + " does not exist", id);
     }
+
+    public WorkingCapitalLoanChargeNotFoundException(final Long id, final Long loanId) {
+        super("error.msg.wc.loan.charge.id.invalid.for.given.loan",
+                "Working Capital Loan Charge with identifier " + id + " does not exist for loan " + loanId, id, loanId);
+    }
+
+    public WorkingCapitalLoanChargeNotFoundException(final Long id, final Long loanId, final Throwable cause) {
+        super("error.msg.wc.loan.charge.id.invalid.for.given.loan",
+                "Working Capital Loan Charge with identifier " + id + " does not exist for loan " + loanId, id, loanId, cause);
+    }
 }

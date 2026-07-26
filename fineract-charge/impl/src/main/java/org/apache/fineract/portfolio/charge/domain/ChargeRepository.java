@@ -26,6 +26,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface ChargeRepository extends JpaRepository<Charge, Long>, JpaSpecificationExecutor<Charge> {
 
-    @Query("select lc.id from WorkingCapitalLoanCharge lc where lc.charge.id = :chargeId and lc.active = true")
+    @Query("select lc.id from WorkingCapitalLoanCharge lc where lc.chargeId = :chargeId and lc.active = true")
     Optional<Long> isAnyWorkingCapitalLoansAssociateWithThisCharge(@Param("chargeId") Long chargeId);
 }

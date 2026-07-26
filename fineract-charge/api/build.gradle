@@ -37,7 +37,8 @@ jar {
                 'Bundle-Description': 'Charge Catalog contracts (Module API ports, pure enums, catalog exceptions)',
                 'Export-Package': 'org.apache.fineract.portfolio.charge.moduleapi,'
                         + 'org.apache.fineract.portfolio.charge.domain,'
-                        + 'org.apache.fineract.portfolio.charge.exception',
+                        + 'org.apache.fineract.portfolio.charge.exception,'
+                        + 'org.apache.fineract.portfolio.charge.service',
                 // Kernel exception bases only; wildcard leaves transitive resolution to the framework.
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.charge.api'

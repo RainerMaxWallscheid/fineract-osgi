@@ -40,13 +40,13 @@ import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidati
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.exception.InvalidCurrencyException;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.domain.ChargePaymentMode;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
-import org.apache.fineract.portfolio.charge.exception.LoanChargeCannotBeAddedException;
-import org.apache.fineract.portfolio.charge.exception.LoanChargeNotFoundException;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeCannotBeAddedException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanChargeRepository;
@@ -58,7 +58,7 @@ import org.springframework.stereotype.Component;
 @Component
 public final class LoanChargeApiJsonValidator {
     private final FromJsonHelper fromApiJsonHelper;
-    private final ChargeRepositoryWrapper chargeRepository;
+    private final ChargeDefinitionPort chargeDefinitionPort;
     private final LoanChargeRepository loanChargeRepository;
 
     private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
@@ -247,10 +247,10 @@ public final class LoanChargeApiJsonValidator {
                     final String arrayObjectJson = this.fromApiJsonHelper.toJson(loanChargeElement);
                     this.fromApiJsonHelper.checkForUnsupportedParameters(arrayObjectParameterTypeOfMap, arrayObjectJson, supportedParameters);
                     String chargeCurrencyCode;
-                    Charge chargeDefinition;
                     ChargeTimeType chargeTime;
                     ChargeCalculationType chargeCalculation;
                     ChargePaymentMode chargePaymentModeEnum;
+                    String chargeName;
                     final Integer chargeTimeType = this.fromApiJsonHelper.extractIntegerNamed("chargeTimeType", loanChargeElement, locale);
                     final Integer chargeCalculationType = this.fromApiJsonHelper.extractIntegerNamed("chargeCalculationType", loanChargeElement, locale);
                     final Integer chargePaymentMode = this.fromApiJsonHelper.extractIntegerNamed("chargePaymentMode", loanChargeElement, locale);
@@ -265,7 +265,8 @@ public final class LoanChargeApiJsonValidator {
                         return;
                     }
                     if (chargeId != null) {
-                        chargeDefinition = this.chargeRepository.findOneWithNotFoundDetection(chargeId);
+                        final ChargeDefinitionData chargeDefinition = this.chargeDefinitionPort.getActiveCharge(chargeId);
+                        chargeName = chargeDefinition.getName();
                         chargeCurrencyCode = chargeDefinition.getCurrencyCode();
                         if (chargeTimeType != null) {
                             chargeTime = ChargeTimeType.fromInt(chargeTimeType);
@@ -275,7 +276,7 @@ public final class LoanChargeApiJsonValidator {
                         if (chargeCalculationType != null) {
                             chargeCalculation = ChargeCalculationType.fromInt(chargeCalculationType);
                         } else {
-                            chargeCalculation = ChargeCalculationType.fromInt(chargeDefinition.getChargeCalculation());
+                            chargeCalculation = ChargeCalculationType.fromInt(chargeDefinition.getChargeCalculationType());
                         }
                         if (chargePaymentMode != null) {
                             chargePaymentModeEnum = ChargePaymentMode.fromInt(chargePaymentMode);
@@ -284,8 +285,8 @@ public final class LoanChargeApiJsonValidator {
                         }
                     } else {
                         LoanCharge loanCharge = this.loanChargeRepository.findById(loanChargeId).orElseThrow(() -> new LoanChargeNotFoundException(loanChargeId));
-                        chargeDefinition = loanCharge.getCharge();
-                        chargeCurrencyCode = chargeDefinition.getCurrencyCode();
+                        chargeName = loanCharge.name();
+                        chargeCurrencyCode = loanCharge.getCharge().getCurrencyCode();
                         chargeTime = loanCharge.getChargeTimeType();
                         chargeCalculation = loanCharge.getChargeCalculation();
                         chargePaymentModeEnum = loanCharge.getChargePaymentMode();
@@ -295,9 +296,9 @@ public final class LoanChargeApiJsonValidator {
                         // TODO: GeneralPlatformDomainRuleException vs PlatformApiDataValidationException
                         throw new InvalidCurrencyException("loanCharge", "attach.to.loan", errorMessage);
                     }
-                    if (chargeDefinition.isOverdueInstallment()) {
+                    if (chargeTime.isOverdueInstallment()) {
                         final String defaultUserMessage = "Installment charge cannot be added to the loan.";
-                        throw new LoanChargeCannotBeAddedException("loanCharge", "overdue.charge", defaultUserMessage, null, chargeDefinition.getName());
+                        throw new LoanChargeCannotBeAddedException("loanCharge", "overdue.charge", defaultUserMessage, null, chargeName);
                     }
                     final BigDecimal amount = this.fromApiJsonHelper.extractBigDecimalNamed(LoanApiConstants.amountParameterName, loanChargeElement, locale);
                     baseDataValidator.reset().parameter(LoanApiConstants.chargesParameterName).parameterAtIndexArray(LoanApiConstants.amountParameterName, i).value(amount).notNull().positiveAmount();
@@ -306,7 +307,7 @@ public final class LoanChargeApiJsonValidator {
                         LocalDate expectedDisbursementDate = this.fromApiJsonHelper.extractLocalDateNamed(LoanApiConstants.expectedDisbursementDateParameterName, element);
                         if (DateUtils.isBefore(dueDate, expectedDisbursementDate)) {
                             final String defaultUserMessage = "This charge with specified due date cannot be added as the it is not in schedule range.";
-                            throw new LoanChargeCannotBeAddedException("loanCharge", "specified.due.date.outside.range", defaultUserMessage, expectedDisbursementDate, chargeDefinition.getName());
+                            throw new LoanChargeCannotBeAddedException("loanCharge", "specified.due.date.outside.range", defaultUserMessage, expectedDisbursementDate, chargeName);
                         }
                     }
                     if (chargePaymentMode != null) {
@@ -357,9 +358,9 @@ public final class LoanChargeApiJsonValidator {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanChargeApiJsonValidator(final FromJsonHelper fromApiJsonHelper, final ChargeRepositoryWrapper chargeRepository, final LoanChargeRepository loanChargeRepository) {
+        public LoanChargeApiJsonValidator(final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort, final LoanChargeRepository loanChargeRepository) {
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.chargeRepository = chargeRepository;
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.loanChargeRepository = loanChargeRepository;
     }
 }

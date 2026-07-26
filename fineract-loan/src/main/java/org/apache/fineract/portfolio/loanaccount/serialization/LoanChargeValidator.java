@@ -20,7 +20,7 @@ package org.apache.fineract.portfolio.loanaccount.serialization;
 
 import java.time.LocalDate;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.portfolio.charge.exception.LoanChargeCannotBeAddedException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeCannotBeAddedException;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;

@@ -18,20 +18,22 @@ Build jars: `./gradlew :fineract-command-api:jar :fineract-command-impl:jar :fin
 White-box tests: `./gradlew :fineract-command-test:test`  
 Copy into `osgi/bundles/` for Equinox resolve experiments. Plan: [15_osgi_bundle_refactoring_fineract-command.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-command.md).
 
-### Wave 1: fineract-charge bundles (Steps 0–4)
+### Wave 1: fineract-charge bundles (as-built Steps 0–7, 9; Step 8 partial)
 
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
 | `fineract-charge-api` (`fineract-charge/api`) | `org.apache.fineract.charge.api` | Export: `moduleapi`, pure `domain` enums, catalog `exception` |
-| `fineract-charge-impl` (`fineract-charge/impl`) | `org.apache.fineract.charge.impl` | Export: `starter` only; Import api packages + `*`; `ChargeOsgiServiceRegistrar` → `ChargeDefinitionPort` |
-| `fineract-charge-test` (`fineract-charge/test`) | `org.apache.fineract.charge.test` | `Fragment-Host: org.apache.fineract.charge.impl` |
-| `fineract-charge` | *(façade, not OSGi feature)* | Boot compatibility: re-exports api + impl |
+| `fineract-charge-impl` (`fineract-charge/impl`) | `org.apache.fineract.charge.impl` | Export: `starter` only; `ChargeOsgiServiceRegistrar` → `ChargeDefinitionPort` |
+| `fineract-charge-test` (`fineract-charge/test`) | `org.apache.fineract.charge.test` | `Fragment-Host: org.apache.fineract.charge.impl` (16 unit tests) |
+| `fineract-charge` | *(façade, not OSGi feature)* | Boot composition root only |
+
+**Consumers:** accounting / progressive → `-api` only; investor → no charge dep; loan / savings / WC still `-impl` (Step 8 residual).
 
 Build jars: `./gradlew :fineract-charge-api:jar :fineract-charge-impl:jar :fineract-charge-test:jar`  
 White-box tests: `./gradlew :fineract-charge-test:test`  
 Plan: [15_osgi_bundle_refactoring_fineract-charge.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-charge.md).
 
-**Next modules:** ranked Wave 1–4 in [15.6 Suggested rollout order](../docs/arc42/15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot) — rates, tax, document/branch, ….
+**Next Wave 1 modules:** rates, tax, document/branch — see [15.6 Suggested rollout order](../docs/arc42/15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot).
 
 ## Layout
 

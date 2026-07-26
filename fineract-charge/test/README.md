@@ -24,7 +24,7 @@ OSGi **unit / white-box test fragment** for the charge **impl** host ([ADR-022](
 ./gradlew :fineract-charge-test:jar   # fragment JAR with Fragment-Host manifest
 ```
 
-## Current coverage (Step 5)
+## Coverage (as-built)
 
 | Test class | Focus |
 |------------|--------|
@@ -32,5 +32,9 @@ OSGi **unit / white-box test fragment** for the charge **impl** host ([ADR-022](
 | `ChargeDropdownReadPlatformServiceImplTest` | Catalog dropdown option sets |
 | `ChargeWritePlatformServiceJpaRepositoryImplTest` | Delete guards (JDBC association, soft-delete) |
 | `ChargeOsgiServiceRegistrarTest` | OSGi bridge no-op without FrameworkUtil |
+
+```bash
+./gradlew :fineract-charge-test:test   # 16 tests
+```
 
 Plan: [15_osgi_bundle_refactoring_fineract-charge.md](../../docs/arc42/15_osgi_bundle_refactoring_fineract-charge.md).

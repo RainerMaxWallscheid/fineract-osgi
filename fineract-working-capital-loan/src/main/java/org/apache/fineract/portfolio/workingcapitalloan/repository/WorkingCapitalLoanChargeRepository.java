@@ -20,13 +20,11 @@
 package org.apache.fineract.portfolio.workingcapitalloan.repository;
 
 import java.util.List;
+import java.util.Optional;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
-import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanChargeData;
 import org.apache.fineract.portfolio.workingcapitalloan.domain.WorkingCapitalLoanCharge;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -37,14 +35,5 @@ public interface WorkingCapitalLoanChargeRepository
 
     List<WorkingCapitalLoanCharge> findByLoanIdAndActiveTrueOrderByDueDateAscIdAsc(Long loanId);
 
-    @Query("select new org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanChargeData("
-            + "lc.id, c.id, c.name, lc.chargeTimeType, lc.submittedOnDate, lc.dueDate, lc.chargeCalculationType, oc.code, oc.name, oc.decimalPlaces, oc.inMultiplesOf, oc.displaySymbol,"
-            + " oc.nameCode, lc.amount, lc.amountPaid, lc.penaltyCharge, lc.chargePaymentMode, lc.paid, l.id, lc.externalId, l.externalId) from WorkingCapitalLoanCharge lc join fetch lc.charge c join OrganisationCurrency oc on c.currencyCode = oc.code join fetch lc.loan l where l.id = :loanId and lc.id = :id")
-    WorkingCapitalLoanChargeData retrieveLoanChargeDetails(@Param("id") Long id, @Param("loanId") Long loanId);
-
-    @Query("select new org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanChargeData("
-            + "lc.id, c.id, c.name, lc.chargeTimeType, lc.submittedOnDate, lc.dueDate, lc.chargeCalculationType, oc.code, oc.name, oc.decimalPlaces, oc.inMultiplesOf, oc.displaySymbol,"
-            + " oc.nameCode, lc.amount, lc.amountPaid, lc.penaltyCharge, lc.chargePaymentMode, lc.paid, l.id, lc.externalId, l.externalId) from WorkingCapitalLoanCharge lc join fetch lc.charge c join OrganisationCurrency oc on c.currencyCode = oc.code join fetch lc.loan l where l.id = :loanId and lc.active = true order by lc.chargeTimeType asc, lc.dueDate asc, lc.penaltyCharge asc")
-    List<WorkingCapitalLoanChargeData> retrieveLoanCharges(@Param("loanId") Long loanId);
-
+    Optional<WorkingCapitalLoanCharge> findByIdAndLoan_Id(Long id, Long loanId);
 }

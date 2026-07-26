@@ -19,12 +19,12 @@
 package org.apache.fineract.portfolio.loanaccount.domain;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 
 @Entity
 @Table(name = "m_loan_tranche_charges")
@@ -34,32 +34,29 @@ public class LoanTrancheCharge extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "charge_id", nullable = false)
-    private Charge charge;
+    @Column(name = "charge_id", nullable = false)
+    private Long chargeId;
 
-    LoanTrancheCharge() {
+    LoanTrancheCharge() {}
 
+    LoanTrancheCharge(final Long chargeId) {
+        this.chargeId = chargeId;
     }
 
-    LoanTrancheCharge(Charge chargeDefinition) {
-        this.charge = chargeDefinition;
-    }
-
-    public LoanTrancheCharge(Charge charge, Loan loan) {
-        this.charge = charge;
+    public LoanTrancheCharge(final Long chargeId, final Loan loan) {
+        this.chargeId = chargeId;
         this.loan = loan;
     }
 
-    public static LoanTrancheCharge createLoanTrancheCharge(Charge chargeDefinition) {
-        return new LoanTrancheCharge(chargeDefinition);
+    public static LoanTrancheCharge createLoanTrancheCharge(final Long chargeId) {
+        return new LoanTrancheCharge(chargeId);
     }
 
-    public static LoanTrancheCharge createLoanTrancheChargeWithLoan(Charge chargeDefinition, Loan loan) {
-        return new LoanTrancheCharge(chargeDefinition, loan);
+    public static LoanTrancheCharge createLoanTrancheChargeWithLoan(final Long chargeId, final Loan loan) {
+        return new LoanTrancheCharge(chargeId, loan);
     }
 
-    public Charge getCharge() {
-        return charge;
+    public Long getChargeId() {
+        return chargeId;
     }
 }

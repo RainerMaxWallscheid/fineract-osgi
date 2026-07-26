@@ -425,7 +425,7 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         for (final LoanCharge loanCharge : loanCharges) {
             loanCharge.update(this);
             if (loanCharge.getTrancheDisbursementCharge() != null) {
-                addTrancheLoanCharge(loanCharge.getCharge());
+                addTrancheLoanCharge(loanCharge.getChargeId());
             }
         }
         return loanCharges;
@@ -1289,14 +1289,13 @@ public class Loan extends AbstractAuditableWithUTCDateTimeCustom<Long> {
         return actualDisbursementDate;
     }
 
-    public void addTrancheLoanCharge(final Charge charge) {
-        final List<Charge> appliedCharges = new ArrayList<>();
+    public void addTrancheLoanCharge(final Long chargeId) {
         for (final LoanTrancheCharge loanTrancheCharge : this.trancheCharges) {
-            appliedCharges.add(loanTrancheCharge.getCharge());
+            if (chargeId != null && chargeId.equals(loanTrancheCharge.getChargeId())) {
+                return;
+            }
         }
-        if (!appliedCharges.contains(charge)) {
-            this.trancheCharges.add(new LoanTrancheCharge(charge, this));
-        }
+        this.trancheCharges.add(new LoanTrancheCharge(chargeId, this));
     }
 
     private int adjustNumberOfRepayments() {

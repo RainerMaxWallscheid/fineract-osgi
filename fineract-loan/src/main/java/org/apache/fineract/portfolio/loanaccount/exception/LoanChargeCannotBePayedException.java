@@ -16,19 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.charge.exception;
+package org.apache.fineract.portfolio.loanaccount.exception;
 
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 
-public class LoanChargeCannotBeWaivedException extends AbstractPlatformDomainRuleException {
+public class LoanChargeCannotBePayedException extends AbstractPlatformDomainRuleException {
 
-    /*** enum of reasons of why Loan Charge cannot be waived **/
-    public enum LoanChargeCannotBeWaivedReason {
+    /*** enum of reasons of why Loan Charge cannot be paid **/
+    public enum LoanChargeCannotBePayedReason {
 
         ALREADY_PAID, //
         ALREADY_WAIVED, //
         LOAN_INACTIVE, //
-        WAIVE_NOT_ALLOWED_FOR_CHARGE; //
+        CHARGE_NOT_ACCOUNT_TRANSFER, //
+        CHARGE_NOT_PAYABLE; //
 
         public String errorMessage() {
             if (name().equalsIgnoreCase("ALREADY_PAID")) {
@@ -36,9 +37,11 @@ public class LoanChargeCannotBeWaivedException extends AbstractPlatformDomainRul
             } else if (name().equalsIgnoreCase("ALREADY_WAIVED")) {
                 return "This loan charge has already been waived";
             } else if (name().equalsIgnoreCase("LOAN_INACTIVE")) {
-                return "This loan charge cannot be waived as the loan associated with it is currently inactive";
-            } else if (name().equalsIgnoreCase("WAIVE_NOT_ALLOWED_FOR_CHARGE")) {
-                return "This loan charge cannot be waived";
+                return "This loan charge cannot be paid as the loan associated with it is currently inactive";
+            } else if (name().equalsIgnoreCase("CHARGE_NOT_ACCOUNT_TRANSFER")) {
+                return "This loan charge cannot be paid as the charge payment mode is not account transfer";
+            } else if (name().equalsIgnoreCase("CHARGE_NOT_PAYABLE")) {
+                return "This loan charge is not payable through account transfer";
             }
 
             return name();
@@ -51,14 +54,16 @@ public class LoanChargeCannotBeWaivedException extends AbstractPlatformDomainRul
                 return "error.msg.loan.charge.already.waived";
             } else if (name().equalsIgnoreCase("LOAN_INACTIVE")) {
                 return "error.msg.loan.charge.associated.loan.inactive";
-            } else if (name().equalsIgnoreCase("WAIVE_NOT_ALLOWED_FOR_CHARGE")) {
-                return "error.msg.loan.charge.waive.not.allowed";
+            } else if (name().equalsIgnoreCase("CHARGE_NOT_ACCOUNT_TRANSFER")) {
+                return "error.msg.loan.charge.payment.mode.not.account.transfer";
+            } else if (name().equalsIgnoreCase("CHARGE_NOT_PAYABLE")) {
+                return "error.msg.loan.charge.payment.not.allowed.account.transfer";
             }
             return name();
         }
     }
 
-    public LoanChargeCannotBeWaivedException(final LoanChargeCannotBeWaivedReason reason, final Long loanChargeId) {
+    public LoanChargeCannotBePayedException(final LoanChargeCannotBePayedReason reason, final Long loanChargeId) {
         super(reason.errorCode(), reason.errorMessage(), loanChargeId);
     }
 }
