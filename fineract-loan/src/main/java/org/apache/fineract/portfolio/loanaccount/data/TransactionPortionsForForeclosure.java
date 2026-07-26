@@ -21,14 +21,41 @@ package org.apache.fineract.portfolio.loanaccount.data;
 import java.math.BigDecimal;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 
-public interface TransactionPortionsForForeclosure {
+/**
+ * Projection of loan-transaction portion amounts used when calculating foreclosure income.
+ * <p>
+ * Concrete type (not a Spring Data interface projection) so the repository can use a JPQL
+ * {@code SELECT new ...} constructor expression. EclipseLink rejects multi-select {@code AS}
+ * aliases used for interface-based projections.
+ */
+public class TransactionPortionsForForeclosure {
 
-    LoanTransactionType getTransactionType();
+    private final LoanTransactionType transactionType;
+    private final BigDecimal interestPortion;
+    private final BigDecimal feeChargesPortion;
+    private final BigDecimal penaltyChargesPortion;
 
-    BigDecimal getInterestPortion();
+    public TransactionPortionsForForeclosure(final LoanTransactionType transactionType, final BigDecimal interestPortion,
+            final BigDecimal feeChargesPortion, final BigDecimal penaltyChargesPortion) {
+        this.transactionType = transactionType;
+        this.interestPortion = interestPortion;
+        this.feeChargesPortion = feeChargesPortion;
+        this.penaltyChargesPortion = penaltyChargesPortion;
+    }
 
-    BigDecimal getFeeChargesPortion();
+    public LoanTransactionType getTransactionType() {
+        return this.transactionType;
+    }
 
-    BigDecimal getPenaltyChargesPortion();
+    public BigDecimal getInterestPortion() {
+        return this.interestPortion;
+    }
 
+    public BigDecimal getFeeChargesPortion() {
+        return this.feeChargesPortion;
+    }
+
+    public BigDecimal getPenaltyChargesPortion() {
+        return this.penaltyChargesPortion;
+    }
 }

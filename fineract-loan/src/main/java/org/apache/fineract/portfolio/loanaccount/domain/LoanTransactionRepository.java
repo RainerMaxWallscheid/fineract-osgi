@@ -150,12 +150,15 @@ public interface LoanTransactionRepository extends JpaRepository<LoanTransaction
             """)
     List<Long> findReversedTransactionIdsByLoan(@Param("loan") Loan loan);
 
+    // Constructor expression (not interface AS-aliases): EclipseLink rejects multi-select
+    // "lt.x AS x" projections used by Spring Data interface projections.
     @Query("""
-            SELECT
-                lt.typeOf AS transactionType,
-                lt.interestPortion AS interestPortion,
-                lt.feeChargesPortion AS feeChargesPortion,
-                lt.penaltyChargesPortion AS penaltyChargesPortion
+            SELECT new org.apache.fineract.portfolio.loanaccount.data.TransactionPortionsForForeclosure(
+                lt.typeOf,
+                lt.interestPortion,
+                lt.feeChargesPortion,
+                lt.penaltyChargesPortion
+            )
             FROM LoanTransaction lt
             WHERE lt.loan = :loan
                 AND lt.reversed = false
