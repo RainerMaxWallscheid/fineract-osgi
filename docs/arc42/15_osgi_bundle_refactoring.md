@@ -201,7 +201,7 @@ Per module: complete **Module API ports first** ([14.6](14_module_api_boundaries
 
 | Rank | Module | ~main scale | Why next | Typical `-api` surface |
 |------|--------|-------------|----------|------------------------|
-| **1** | **`fineract-charge`** | ~40 | Co-named B2 candidate in [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md); already has `moduleapi.ChargeDefinitionPort`; classic BC “fee definition”; many dependents but port can stay narrow | `ChargeDefinitionPort` + read/write facades + stable DTOs/exceptions |
+| **1** | **`fineract-charge`** | ~40 | Co-named B2 candidate in [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md); already has `moduleapi.ChargeDefinitionPort`; classic BC “fee definition”; many dependents but port can stay narrow. **Detailed plan:** [15_osgi_bundle_refactoring_fineract-charge.md](15_osgi_bundle_refactoring_fineract-charge.md) | `ChargeDefinitionPort` + read/write facades + stable DTOs/exceptions |
 | **2** | **`fineract-rates`** | ~20 | Smallest real domain slice; few entities; floating-rate ports are crisp | Floating rate read/write ports + data types |
 | **3** | **`fineract-tax`** | ~30 | Small; already has `moduleapi`; used by charge/loan/savings — good “api-only consumer” exercise after charge | Tax component/group ports + DTOs |
 
@@ -270,7 +270,7 @@ Shared kernel           → core, validation       don't force BC split
 
 | Priority | Action |
 |----------|--------|
-| **Next PR series** | `fineract-charge` (or `fineract-rates` if smallest cut preferred) |
+| **Next PR series** | `fineract-charge` (or `fineract-rates` if smallest cut preferred) — charge plan: [15b](15_osgi_bundle_refactoring_fineract-charge.md) |
 | **Then** | `fineract-tax` → retarget charge/tax consumers onto `-api` |
 | **Then** | `fineract-document` (replaceable adapters as OSGi services) |
 | **Parallel** | Command **Step 8**: retarget core/provider/cob/document/mix off the command façade |
@@ -333,4 +333,4 @@ Exact symbolic names may be refined in B1 tooling; keep them stable once publish
 
 ---
 
-*Navigation:* [README](README.md) · [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) · [14 Module API](14_module_api_boundaries.md) · [command pilot](15_osgi_bundle_refactoring_fineract-command.md)
+*Navigation:* [README](README.md) · [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) · [14 Module API](14_module_api_boundaries.md) · [command pilot](15_osgi_bundle_refactoring_fineract-command.md) · [charge plan](15_osgi_bundle_refactoring_fineract-charge.md)

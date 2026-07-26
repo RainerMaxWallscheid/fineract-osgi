@@ -18,7 +18,8 @@ Build jars: `./gradlew :fineract-command-api:jar :fineract-command-impl:jar :fin
 White-box tests: `./gradlew :fineract-command-test:test`  
 Copy into `osgi/bundles/` for Equinox resolve experiments. Plan: [15_osgi_bundle_refactoring_fineract-command.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-command.md).
 
-**Next modules (after command):** ranked Wave 1–4 rollout in [15.6 Suggested rollout order](../docs/arc42/15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot) — prefer `fineract-charge` or `fineract-rates`, then tax, then document/branch.
+**Next modules (after command):** ranked Wave 1–4 rollout in [15.6 Suggested rollout order](../docs/arc42/15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot) — prefer `fineract-charge` or `fineract-rates`, then tax, then document/branch.  
+Charge plan (draft): [15_osgi_bundle_refactoring_fineract-charge.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-charge.md).
 
 ## Layout
 

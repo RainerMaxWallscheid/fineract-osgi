@@ -22,6 +22,7 @@ This directory contains the arc42 documentation for **fineract-osgi** – Apache
 | 14 | [Module API Boundaries](14_module_api_boundaries.md) | Subprojects only via `moduleapi` (ADR-021) |
 | 15 | [OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) | api/impl/test split, Service Registry, Fragment-Host, stages B0–B6, **post-command rollout waves** (ADR-022) |
 | 15a | [fineract-command pilot plan](15_osgi_bundle_refactoring_fineract-command.md) | Step-by-step OSGi split for the command stack (as-built) |
+| 15b | [fineract-charge split plan](15_osgi_bundle_refactoring_fineract-charge.md) | Wave‑1 charge catalog api/impl/test plan (draft) |
 
 ## Complementary Artifacts
 
