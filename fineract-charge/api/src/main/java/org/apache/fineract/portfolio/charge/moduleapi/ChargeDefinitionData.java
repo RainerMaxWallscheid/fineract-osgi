@@ -37,7 +37,7 @@ import java.util.Objects;
  */
 public final class ChargeDefinitionData implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     private final Long id;
     private final String name;
@@ -55,11 +55,34 @@ public final class ChargeDefinitionData implements Serializable {
     private final Integer feeFrequency;
     private final Long incomeOrLiabilityAccountId;
     private final Long taxGroupId;
+    /** Day-of-month for annual/monthly fee schedules (nullable). */
+    private final Integer feeOnDay;
+    /** Month for annual fee schedules (nullable). */
+    private final Integer feeOnMonth;
+    private final boolean enableFreeWithdrawal;
+    private final boolean enablePaymentType;
+    private final Integer freeWithdrawalFrequency;
+    private final Integer restartFrequency;
+    private final Integer restartFrequencyEnum;
+    private final Long paymentTypeId;
+    private final String paymentTypeName;
 
     public ChargeDefinitionData(final Long id, final String name, final BigDecimal amount, final String currencyCode,
             final Integer chargeAppliesTo, final Integer chargeTimeType, final Integer chargeCalculationType,
             final Integer chargePaymentMode, final boolean penalty, final boolean active, final BigDecimal minCap, final BigDecimal maxCap,
             final Integer feeInterval, final Integer feeFrequency, final Long incomeOrLiabilityAccountId, final Long taxGroupId) {
+        this(id, name, amount, currencyCode, chargeAppliesTo, chargeTimeType, chargeCalculationType, chargePaymentMode, penalty, active,
+                minCap, maxCap, feeInterval, feeFrequency, incomeOrLiabilityAccountId, taxGroupId, null, null, false, false, null, null,
+                null, null, null);
+    }
+
+    public ChargeDefinitionData(final Long id, final String name, final BigDecimal amount, final String currencyCode,
+            final Integer chargeAppliesTo, final Integer chargeTimeType, final Integer chargeCalculationType,
+            final Integer chargePaymentMode, final boolean penalty, final boolean active, final BigDecimal minCap, final BigDecimal maxCap,
+            final Integer feeInterval, final Integer feeFrequency, final Long incomeOrLiabilityAccountId, final Long taxGroupId,
+            final Integer feeOnDay, final Integer feeOnMonth, final boolean enableFreeWithdrawal, final boolean enablePaymentType,
+            final Integer freeWithdrawalFrequency, final Integer restartFrequency, final Integer restartFrequencyEnum,
+            final Long paymentTypeId, final String paymentTypeName) {
         this.id = id;
         this.name = name;
         this.amount = amount;
@@ -76,6 +99,15 @@ public final class ChargeDefinitionData implements Serializable {
         this.feeFrequency = feeFrequency;
         this.incomeOrLiabilityAccountId = incomeOrLiabilityAccountId;
         this.taxGroupId = taxGroupId;
+        this.feeOnDay = feeOnDay;
+        this.feeOnMonth = feeOnMonth;
+        this.enableFreeWithdrawal = enableFreeWithdrawal;
+        this.enablePaymentType = enablePaymentType;
+        this.freeWithdrawalFrequency = freeWithdrawalFrequency;
+        this.restartFrequency = restartFrequency;
+        this.restartFrequencyEnum = restartFrequencyEnum;
+        this.paymentTypeId = paymentTypeId;
+        this.paymentTypeName = paymentTypeName;
     }
 
     public Long getId() {
@@ -140,6 +172,52 @@ public final class ChargeDefinitionData implements Serializable {
 
     public Long getTaxGroupId() {
         return this.taxGroupId;
+    }
+
+    public Integer getFeeOnDay() {
+        return this.feeOnDay;
+    }
+
+    public Integer getFeeOnMonth() {
+        return this.feeOnMonth;
+    }
+
+    public boolean isEnableFreeWithdrawal() {
+        return this.enableFreeWithdrawal;
+    }
+
+    public boolean isEnablePaymentType() {
+        return this.enablePaymentType;
+    }
+
+    public Integer getFreeWithdrawalFrequency() {
+        return this.freeWithdrawalFrequency;
+    }
+
+    public Integer getRestartFrequency() {
+        return this.restartFrequency;
+    }
+
+    public Integer getRestartFrequencyEnum() {
+        return this.restartFrequencyEnum;
+    }
+
+    public Long getPaymentTypeId() {
+        return this.paymentTypeId;
+    }
+
+    public String getPaymentTypeName() {
+        return this.paymentTypeName;
+    }
+
+    /**
+     * Reconstructs fee schedule day when both month and day are present.
+     */
+    public java.time.MonthDay getFeeOnMonthDay() {
+        if (this.feeOnDay == null || this.feeOnMonth == null) {
+            return null;
+        }
+        return java.time.MonthDay.of(this.feeOnMonth, this.feeOnDay);
     }
 
     @Override

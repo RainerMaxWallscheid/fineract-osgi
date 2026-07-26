@@ -991,7 +991,8 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         if ((chargeTimeType.equals(ChargeTimeType.WITHDRAWAL_FEE.getValue()) || chargeTimeType.equals(ChargeTimeType.SAVINGS_NOACTIVITY_FEE.getValue())) && dueAsOfDateParam != null) {
             baseDataValidator.reset().parameter(dueAsOfDateParamName).value(dueAsOfDateParam.format(fmt)).failWithCodeNoParameterAddedToErrorCode("charge.due.date.is.invalid.for." + ChargeTimeType.fromInt(chargeTimeType).getCode());
         }
-        final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewFromJson(savingsAccount, chargeDefinition, command);
+        final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewFromJson(savingsAccount,
+                chargeDefinition.toDefinitionData(), command);
         validateChargeAmountNotZero(savingsAccountCharge, dataValidationErrors);
         if (chargeDefinition.isEnableFreeWithdrawal()) {
             savingsAccountCharge.setFreeWithdrawalCount(0);
@@ -1656,7 +1657,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     }
 
     private void validateChargeAmountNotZero(final SavingsAccountCharge savingsAccountCharge, final List<ApiParameterError> dataValidationErrors) {
-        if (!ChargeCalculationType.fromInt(savingsAccountCharge.getCharge().getChargeCalculation()).isFlat()) {
+        if (!ChargeCalculationType.fromInt(savingsAccountCharge.getChargeCalculation()).isFlat()) {
             return;
         }
         if (savingsAccountCharge.getAmount(savingsAccountCharge.savingsAccount().getCurrency()).isZero()) {

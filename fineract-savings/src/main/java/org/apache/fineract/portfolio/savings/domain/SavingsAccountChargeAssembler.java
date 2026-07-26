@@ -119,7 +119,8 @@ public class SavingsAccountChargeAssembler {
 
                         final boolean status = true;
                         final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewWithoutSavingsAccount(
-                                chargeDefinition, amount, chargeTime, chargeCalculation, dueDate, status, feeOnMonthDay, feeInterval);
+                                chargeDefinition.toDefinitionData(), amount, chargeTime, chargeCalculation, dueDate, status, feeOnMonthDay,
+                                feeInterval);
                         savingsAccountCharges.add(savingsAccountCharge);
                     } else {
                         final Long savingsAccountChargeId = id;
@@ -161,8 +162,9 @@ public class SavingsAccountChargeAssembler {
                 chargeCalculation = ChargeCalculationType.fromInt(charge.getChargeCalculation());
             }
             final boolean status = true;
-            final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewWithoutSavingsAccount(charge,
-                    charge.getAmount(), chargeTime, chargeCalculation, null, status, charge.getFeeOnMonthDay(), charge.feeInterval());
+            final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewWithoutSavingsAccount(
+                    charge.toDefinitionData(), charge.getAmount(), chargeTime, chargeCalculation, null, status, charge.getFeeOnMonthDay(),
+                    charge.feeInterval());
             savingsAccountCharges.add(savingsAccountCharge);
         }
         return savingsAccountCharges;
@@ -176,7 +178,7 @@ public class SavingsAccountChargeAssembler {
         boolean isOneAnnualPresent = false;
         for (SavingsAccountCharge charge : charges) {
             if (!charge.hasCurrencyCodeOf(productCurrencyCode)) {
-                baseDataValidator.reset().parameter("currency").value(charge.getCharge().getId())
+                baseDataValidator.reset().parameter("currency").value(charge.getChargeId())
                         .failWithCodeNoParameterAddedToErrorCode("currency.and.charge.currency.not.same");
             }
 

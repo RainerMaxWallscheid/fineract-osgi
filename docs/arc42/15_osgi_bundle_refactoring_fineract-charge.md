@@ -4,7 +4,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 
 | | |
 |--|--|
-| **Status** | **as-built** — Steps **0–7, 9 done**; Step **8 partial** (loan domain api-only; savings product off Charge; savings account residual) |
+| **Status** | **as-built** — Steps **0–7, 9 done**; Step **8 partial** (loan api-only; savings product + account charge off entity; assemblers/client residual) |
 | **Decisions** | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **Playbook** | [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) §15.6 Wave 1, §15.7 |
 | **Reference pilot** | [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md) (as-built) |
@@ -435,17 +435,24 @@ Hardest step — **incremental**. First slice landed 2026-07-26:
 22. [x] **Charge:** `Charge.toDefinitionData()` for provider assembly boundary  
 23. [x] **Savings:** `SavingsProduct` / FD / RD store `Set<Long> chargeIds` (`m_savings_product_charge`); assemblers validate via repository  
 
+#### Done (slice 7 — SavingsAccountCharge)
+
+24. [x] **Savings:** `SavingsAccountCharge` stores `chargeId` + catalog snapshots (name/currency/free-withdrawal/payment-type)  
+25. [x] **ChargeDefinitionData** extended for feeOnMonth/day + free-withdrawal/payment-type fields  
+26. [x] Liquibase `2006_savings_account_charge_catalog_snapshots` backfill  
+
 #### Residual (later slices)
 
 | Module | Still needs charge-impl for |
 |--------|-----------------------------|
-| **savings** | JPA `Charge` on `SavingsAccountCharge` (+ free-withdrawal / feeOnMonthDay paths) |
+| **savings** | Assemblers still load `Charge` entity to validate/build definition data |
 | **provider / ITs** | façade; client/share charges |
 
-24. [ ] Savings account charges → chargeId + snapshots (expand port if feeOnMonthDay needed)  
-25. [ ] ArchUnit freeze shrink; deprecate façade  
+27. [ ] Savings assemblers via `ChargeDefinitionPort` only; drop charge-impl from savings Gradle  
+28. [ ] Client/share account charges off Charge entity  
+29. [ ] ArchUnit freeze shrink; deprecate façade  
 
-**Note:** Savings account charge association still anchors charge-impl; freeze only shrinks.
+**Note:** Savings still depends on charge-impl for `ChargeRepositoryWrapper` at product/account assembly; freeze only shrinks.
 
 ### Step 9 — Documentation & acceptance ✅
 

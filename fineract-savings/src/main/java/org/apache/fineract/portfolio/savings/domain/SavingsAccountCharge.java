@@ -47,10 +47,10 @@ import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.exception.SavingsAccountChargeWithoutMandatoryFieldException;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +68,33 @@ public class SavingsAccountCharge extends AbstractAuditableWithUTCDateTimeCustom
     @JoinColumn(name = "savings_account_id", referencedColumnName = "id", nullable = false)
     private SavingsAccount savingsAccount;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "charge_id", referencedColumnName = "id", nullable = false)
-    private Charge charge;
+    /** Catalog charge definition id (no JPA association to charge-impl). */
+    @Column(name = "charge_id", nullable = false)
+    private Long chargeId;
+
+    @Column(name = "charge_name", length = 100)
+    private String chargeName;
+
+    @Column(name = "currency_code", length = 3)
+    private String currencyCode;
+
+    @Column(name = "is_free_withdrawal", nullable = false)
+    private boolean enableFreeWithdrawal = false;
+
+    @Column(name = "is_payment_type", nullable = false)
+    private boolean enablePaymentType = false;
+
+    @Column(name = "free_withdrawal_charge_frequency")
+    private Integer freeWithdrawalChargeFrequency;
+
+    @Column(name = "restart_frequency")
+    private Integer restartFrequency;
+
+    @Column(name = "restart_frequency_enum")
+    private Integer restartFrequencyEnum;
+
+    @Column(name = "payment_type_name", length = 100)
+    private String paymentTypeName;
 
     @Column(name = "charge_time_enum", nullable = false)
     private Integer chargeTime;
@@ -133,7 +157,7 @@ public class SavingsAccountCharge extends AbstractAuditableWithUTCDateTimeCustom
     @Column(name = "inactivated_on_date")
     private LocalDate inactivationDate;
 
-    public static SavingsAccountCharge createNewFromJson(final SavingsAccount savingsAccount, final Charge chargeDefinition,
+    public static SavingsAccountCharge createNewFromJson(final SavingsAccount savingsAccount, final ChargeDefinitionData chargeDefinition,
             final JsonCommand command) {
 
         BigDecimal amount = command.bigDecimalValueOfParameterNamed(amountParamName);
@@ -154,9 +178,9 @@ public class SavingsAccountCharge extends AbstractAuditableWithUTCDateTimeCustom
                 feeOnMonthDay, feeInterval);
     }
 
-    public static SavingsAccountCharge createNewWithoutSavingsAccount(final Charge chargeDefinition, final BigDecimal amountPayable,
-            final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculation, final LocalDate dueDate, final boolean status,
-            final MonthDay feeOnMonthDay, final Integer feeInterval) {
+    public static SavingsAccountCharge createNewWithoutSavingsAccount(final ChargeDefinitionData chargeDefinition,
+            final BigDecimal amountPayable, final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculation,
+            final LocalDate dueDate, final boolean status, final MonthDay feeOnMonthDay, final Integer feeInterval) {
         return new SavingsAccountCharge(null, chargeDefinition, amountPayable, chargeTime, chargeCalculation, dueDate, status,
                 feeOnMonthDay, feeInterval);
     }
@@ -165,12 +189,20 @@ public class SavingsAccountCharge extends AbstractAuditableWithUTCDateTimeCustom
         //
     }
 
-    private SavingsAccountCharge(final SavingsAccount savingsAccount, final Charge chargeDefinition, final BigDecimal amount,
+    private SavingsAccountCharge(final SavingsAccount savingsAccount, final ChargeDefinitionData chargeDefinition, final BigDecimal amount,
             final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculation, final LocalDate dueDate, final boolean status,
             MonthDay feeOnMonthDay, final Integer feeInterval) {
 
         this.savingsAccount = savingsAccount;
-        this.charge = chargeDefinition;
+        this.chargeId = chargeDefinition.getId();
+        this.chargeName = chargeDefinition.getName();
+        this.currencyCode = chargeDefinition.getCurrencyCode();
+        this.enableFreeWithdrawal = chargeDefinition.isEnableFreeWithdrawal();
+        this.enablePaymentType = chargeDefinition.isEnablePaymentType();
+        this.freeWithdrawalChargeFrequency = chargeDefinition.getFreeWithdrawalFrequency();
+        this.restartFrequency = chargeDefinition.getRestartFrequency();
+        this.restartFrequencyEnum = chargeDefinition.getRestartFrequencyEnum();
+        this.paymentTypeName = chargeDefinition.getPaymentTypeName();
         this.penaltyCharge = chargeDefinition.isPenalty();
         this.chargeTime = (chargeTime == null) ? chargeDefinition.getChargeTimeType() : chargeTime.getValue();
 
@@ -211,12 +243,12 @@ public class SavingsAccountCharge extends AbstractAuditableWithUTCDateTimeCustom
         }
 
         if (isMonthlyFee() || isWeeklyFee()) {
-            this.feeInterval = (feeInterval == null) ? chargeDefinition.feeInterval() : feeInterval;
+            this.feeInterval = (feeInterval == null) ? chargeDefinition.getFeeInterval() : feeInterval;
         }
 
         this.dueDate = dueDate;
 
-        this.chargeCalculation = chargeDefinition.getChargeCalculation();
+        this.chargeCalculation = chargeDefinition.getChargeCalculationType();
         if (chargeCalculation != null) {
             this.chargeCalculation = chargeCalculation.getValue();
         }
@@ -652,35 +684,39 @@ public class SavingsAccountCharge extends AbstractAuditableWithUTCDateTimeCustom
     }
 
     public String name() {
-        return this.charge.getName();
+        return this.chargeName;
     }
 
     public String currencyCode() {
-        return this.charge.getCurrencyCode();
+        return this.currencyCode;
     }
 
-    public Charge getCharge() {
-        return this.charge;
+    public Long getChargeId() {
+        return this.chargeId;
+    }
+
+    public String getPaymentTypeName() {
+        return this.paymentTypeName;
     }
 
     public boolean isEnableFreeWithdrawal() {
-        return charge.isEnableFreeWithdrawal();
+        return this.enableFreeWithdrawal;
     }
 
     public boolean isEnablePaymentType() {
-        return charge.isEnablePaymentType();
+        return this.enablePaymentType;
     }
 
     public Integer getFrequencyFreeWithdrawalCharge() { // number of times free withdrawal allowed
-        return charge.getFrequencyFreeWithdrawalCharge();
+        return this.freeWithdrawalChargeFrequency;
     }
 
     public Integer getRestartFrequency() { // numeric value of which numeric-period, count should restart
-        return charge.getRestartFrequency();
+        return this.restartFrequency;
     }
 
     public Integer getRestartFrequencyEnum() { // enum day/week/month for restarting the count.
-        return charge.getRestartFrequencyEnum();
+        return this.restartFrequencyEnum;
     }
 
     public Integer getFreeWithdrawalCount() {
@@ -756,7 +792,7 @@ public class SavingsAccountCharge extends AbstractAuditableWithUTCDateTimeCustom
         }
         SavingsAccountCharge that = (SavingsAccountCharge) o;
         return (penaltyCharge == that.penaltyCharge) && (paid == that.paid) && (waived == that.waived) && (status == that.status)
-                && Objects.equals(savingsAccount, that.savingsAccount) && Objects.equals(charge, that.charge)
+                && Objects.equals(savingsAccount, that.savingsAccount) && Objects.equals(chargeId, that.chargeId)
                 && Objects.equals(chargeTime, that.chargeTime) && DateUtils.isEqual(dueDate, that.dueDate)
                 && Objects.equals(feeOnMonth, that.feeOnMonth) && Objects.equals(feeOnDay, that.feeOnDay)
                 && Objects.equals(feeInterval, that.feeInterval) && Objects.equals(chargeCalculation, that.chargeCalculation)
@@ -768,9 +804,13 @@ public class SavingsAccountCharge extends AbstractAuditableWithUTCDateTimeCustom
 
     @Override
     public int hashCode() {
-        return Objects.hash(savingsAccount, charge, chargeTime, dueDate, feeOnMonth, feeOnDay, feeInterval, chargeCalculation, percentage,
+        return Objects.hash(savingsAccount, chargeId, chargeTime, dueDate, feeOnMonth, feeOnDay, feeInterval, chargeCalculation, percentage,
                 amountPercentageAppliedTo, amount, amountPaid, amountWaived, amountWrittenOff, amountOutstanding, penaltyCharge, paid,
                 waived, status, inactivationDate);
+    }
+
+    public Integer getChargeCalculation() {
+        return this.chargeCalculation;
     }
 
     public BigDecimal calculateWithdralFeeAmount(@NotNull BigDecimal transactionAmount) {

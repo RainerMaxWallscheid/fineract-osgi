@@ -640,8 +640,8 @@ public final class SavingsAccountTransaction extends AbstractAuditableWithUTCDat
             final List<Map<String, Object>> savingsChargesPaidData = new ArrayList<>();
             for (final SavingsAccountChargePaidBy chargePaidBy : this.savingsAccountChargesPaid) {
                 final Map<String, Object> savingChargePaidData = new LinkedHashMap<>();
-                savingChargePaidData.put("chargeId", chargePaidBy.getSavingsAccountCharge().getCharge().getId());
-                savingChargePaidData.put("isPenalty", chargePaidBy.getSavingsAccountCharge().getCharge().isPenalty());
+                savingChargePaidData.put("chargeId", chargePaidBy.getSavingsAccountCharge().getChargeId());
+                savingChargePaidData.put("isPenalty", chargePaidBy.getSavingsAccountCharge().isPenaltyCharge());
                 savingChargePaidData.put("savingsChargeId", chargePaidBy.getSavingsAccountCharge().getId());
                 savingChargePaidData.put("amount", chargePaidBy.getAmount());
 

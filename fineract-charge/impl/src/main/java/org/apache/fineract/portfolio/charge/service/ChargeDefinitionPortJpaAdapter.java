@@ -73,22 +73,6 @@ public class ChargeDefinitionPortJpaAdapter implements ChargeDefinitionPort {
     }
 
     static ChargeDefinitionData toData(final Charge charge) {
-        return new ChargeDefinitionData(//
-                charge.getId(), //
-                charge.getName(), //
-                charge.getAmount(), //
-                charge.getCurrencyCode(), //
-                charge.getChargeAppliesTo(), //
-                charge.getChargeTimeType(), //
-                charge.getChargeCalculation(), //
-                charge.getChargePaymentMode(), //
-                charge.isPenalty(), //
-                charge.isActive(), //
-                charge.getMinCap(), //
-                charge.getMaxCap(), //
-                charge.getFeeInterval(), //
-                charge.feeFrequency(), //
-                charge.getIncomeAccountId(), //
-                charge.getTaxGroupId());
+        return charge.toDefinitionData();
     }
 }

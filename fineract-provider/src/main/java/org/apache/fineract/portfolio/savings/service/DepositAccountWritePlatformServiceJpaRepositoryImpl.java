@@ -913,7 +913,8 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
         final DateTimeFormatter fmt = StringUtils.isNotBlank(format) ? DateTimeFormatter.ofPattern(format).withLocale(locale) : DateTimeFormatter.ofPattern("dd MM yyyy");
         final Long chargeDefinitionId = command.longValueOfParameterNamed(chargeIdParamName);
         final Charge chargeDefinition = this.chargeRepository.findOneWithNotFoundDetection(chargeDefinitionId);
-        final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewFromJson(savingsAccount, chargeDefinition, command);
+        final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewFromJson(savingsAccount,
+                chargeDefinition.toDefinitionData(), command);
         if (savingsAccountCharge.getDueDate() != null) {
             // transaction date should not be on a holiday or non working day
             if (!this.configurationDomainService.allowTransactionsOnHolidayEnabled() && this.holidayRepository.isHoliday(savingsAccount.officeId(), savingsAccountCharge.getDueDate())) {

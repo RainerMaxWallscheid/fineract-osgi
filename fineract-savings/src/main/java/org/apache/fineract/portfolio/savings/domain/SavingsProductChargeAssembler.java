@@ -100,7 +100,8 @@ public class SavingsProductChargeAssembler {
                             ChargeCalculationType.fromInt(chargeCalculationType);
                         }
                         final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewWithoutSavingsAccount(
-                                chargeDefinition, amount, chargeTime, chargeCalculation, dueDate, true, feeOnMonthDay, feeInterval);
+                                chargeDefinition.toDefinitionData(), amount, chargeTime, chargeCalculation, dueDate, true, feeOnMonthDay,
+                                feeInterval);
                         savingsAccountCharges.add(savingsAccountCharge);
                     } else {
                         final Long savingsAccountChargeId = id;

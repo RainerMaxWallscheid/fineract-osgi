@@ -584,6 +584,8 @@ public class Charge extends AbstractPersistableCustom<Long> {
      * Stable catalog projection for foreign BCs (loan create, etc.) without exporting this entity.
      */
     public org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData toDefinitionData() {
+        final Long paymentTypeId = this.paymentType != null ? this.paymentType.getId() : null;
+        final String paymentTypeName = this.paymentType != null ? this.paymentType.getName() : null;
         return new org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData(//
                 getId(), //
                 getName(), //
@@ -600,7 +602,16 @@ public class Charge extends AbstractPersistableCustom<Long> {
                 getFeeInterval(), //
                 feeFrequency(), //
                 getIncomeAccountId(), //
-                getTaxGroupId());
+                getTaxGroupId(), //
+                this.feeOnDay, //
+                this.feeOnMonth, //
+                isEnableFreeWithdrawal(), //
+                isEnablePaymentType(), //
+                getFrequencyFreeWithdrawalCharge(), //
+                getRestartFrequency(), //
+                getRestartFrequencyEnum(), //
+                paymentTypeId, //
+                paymentTypeName);
     }
 
     public boolean isDisbursementCharge() {
