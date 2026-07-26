@@ -142,8 +142,12 @@ public class SavingsAccountChargeAssembler {
     public Set<SavingsAccountCharge> fromSavingsProduct(final SavingsProduct savingsProduct) {
 
         final Set<SavingsAccountCharge> savingsAccountCharges = new HashSet<>();
-        Set<Charge> productCharges = savingsProduct.charges();
-        for (Charge charge : productCharges) {
+        final Set<Long> productChargeIds = savingsProduct.chargeIds();
+        if (productChargeIds == null) {
+            return savingsAccountCharges;
+        }
+        for (final Long chargeId : productChargeIds) {
+            final Charge charge = this.chargeRepository.findOneWithNotFoundDetection(chargeId);
             ChargeTimeType chargeTime = null;
             if (charge.getChargeTimeType() != null) {
                 chargeTime = ChargeTimeType.fromInt(charge.getChargeTimeType());

@@ -31,7 +31,7 @@ import org.springframework.lang.NonNull;
 
 public interface LoanProductRepository extends JpaRepository<LoanProduct, Long>, JpaSpecificationExecutor<LoanProduct> {
 
-    @Query("select loanProduct from LoanProduct loanProduct, IN(loanProduct.charges) charge where charge.id = :chargeId")
+    @Query("select loanProduct from LoanProduct loanProduct where :chargeId member of loanProduct.chargeIds")
     List<LoanProduct> retrieveLoanProductsByChargeId(@Param("chargeId") Long chargeId);
 
     Long countByDelinquencyBucket(DelinquencyBucket delinquencyBucket);

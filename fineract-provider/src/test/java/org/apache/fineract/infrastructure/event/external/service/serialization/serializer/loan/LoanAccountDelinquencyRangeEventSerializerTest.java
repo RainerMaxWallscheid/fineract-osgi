@@ -63,8 +63,6 @@ import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
-import org.apache.fineract.portfolio.charge.data.ChargeData;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.domain.ChargePaymentMode;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
@@ -433,30 +431,27 @@ public class LoanAccountDelinquencyRangeEventSerializerTest {
         when(installment.getPenaltyChargesOutstanding(any())).thenAnswer(a -> Money.of(currency, penaltyAmount));
         when(installment.getFeeChargesOutstanding(any())).thenAnswer(a -> Money.of(currency, freeAmount));
         when(installment.getTotalOutstanding(any())).thenAnswer(a -> Money.of(currency, totalAmount));
-        Charge charge = mock(Charge.class);
-        when(charge.getId()).thenReturn(1L);
-        when(charge.getName()).thenReturn("charge");
-        when(charge.getCurrencyCode()).thenReturn(currency.getCode());
-        when(charge.toData()).thenAnswer(a -> {
-            ChargeData chargeData = mock(ChargeData.class);
-            when(chargeData.getCurrency()).thenAnswer(b -> new CurrencyData(currency.getCode()));
-            return chargeData;
-        });
+        final org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData charge = new org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData(
+                1L, "charge", BigDecimal.TEN, currency.getCode(), null, ChargeTimeType.SPECIFIED_DUE_DATE.getValue(),
+                ChargeCalculationType.FLAT.getValue(), ChargePaymentMode.REGULAR.getValue(), false, true, null, null, null, null, null,
+                null);
 
         Set<LoanInstallmentCharge> installmentCharges = Arrays.stream(charges)
-                .map(amount -> buildLoanInstallmentCharge(amount, charge, loan)).collect(Collectors.toSet());
+                .map(chargeAmount -> buildLoanInstallmentCharge(chargeAmount, charge, loan)).collect(Collectors.toSet());
         when(installment.getInstallmentCharges()).thenReturn(installmentCharges);
         return installment;
     }
 
-    private LoanInstallmentCharge buildLoanInstallmentCharge(BigDecimal amount, Charge charge, Loan loan) {
+    private LoanInstallmentCharge buildLoanInstallmentCharge(BigDecimal amount,
+            org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData charge, Loan loan) {
         LoanInstallmentCharge installmentCharge = new LoanInstallmentCharge();
         ReflectionTestUtils.setField(installmentCharge, "amount", amount);
         ReflectionTestUtils.setField(installmentCharge, "loancharge", buildLoanCharge(loan, amount, charge));
         return installmentCharge;
     }
 
-    private LoanCharge buildLoanCharge(Loan loan, BigDecimal amount, Charge charge) {
+    private LoanCharge buildLoanCharge(Loan loan, BigDecimal amount,
+            org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData charge) {
         LoanCharge loanCharge = loanChargeService.create(loan, charge, amount, amount, ChargeTimeType.SPECIFIED_DUE_DATE,
                 ChargeCalculationType.FLAT, LocalDate.of(2022, 6, 27), ChargePaymentMode.REGULAR, 1, new BigDecimal(100),
                 ExternalId.generate());

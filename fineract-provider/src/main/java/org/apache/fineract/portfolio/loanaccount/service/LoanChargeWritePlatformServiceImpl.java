@@ -687,7 +687,7 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
             log.warn("Adding charge to Loan: {} is not allowed. Loan Account is Charged-off", loanId);
             return;
         }
-        Optional<Charge> optPenaltyCharge = loan.getLoanProduct().getCharges().stream().filter(e -> ChargeTimeType.OVERDUE_INSTALLMENT.getValue().equals(e.getChargeTimeType()) && e.isLoanCharge()).findFirst();
+        final Optional<Charge> optPenaltyCharge = resolveOverdueInstallmentPenaltyCharge(loan);
         if (optPenaltyCharge.isEmpty()) {
             return;
         }
@@ -1237,6 +1237,20 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
         }
         loanLifecycleStateMachine.determineAndTransition(loan, waiveLoanChargeTransaction.getTransactionDate());
         return waiveLoanChargeTransaction;
+    }
+
+    private Optional<Charge> resolveOverdueInstallmentPenaltyCharge(final Loan loan) {
+        final List<Long> chargeIds = loan.getLoanProduct().getChargeIds();
+        if (chargeIds == null || chargeIds.isEmpty()) {
+            return Optional.empty();
+        }
+        for (final Long chargeId : chargeIds) {
+            final Charge charge = this.chargeRepository.findOneWithNotFoundDetection(chargeId);
+            if (ChargeTimeType.OVERDUE_INSTALLMENT.getValue().equals(charge.getChargeTimeType()) && charge.isLoanCharge()) {
+                return Optional.of(charge);
+            }
+        }
+        return Optional.empty();
     }
 
     @java.lang.SuppressWarnings("all")

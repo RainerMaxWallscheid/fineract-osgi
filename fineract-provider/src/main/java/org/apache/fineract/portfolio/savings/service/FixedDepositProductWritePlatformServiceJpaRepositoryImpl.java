@@ -90,7 +90,7 @@ public class FixedDepositProductWritePlatformServiceJpaRepositoryImpl implements
             final FixedDepositProduct product = this.fixedDepositProductRepository.findById(productId).orElseThrow(() -> new FixedDepositProductNotFoundException(productId));
             final Map<String, Object> changes = product.update(command);
             if (changes.containsKey(chargesParamName)) {
-                final Set<Charge> savingsProductCharges = this.depositProductAssembler.assembleListOfSavingsProductCharges(command, product.currency().getCode());
+                final Set<Long> savingsProductCharges = this.depositProductAssembler.assembleListOfSavingsProductCharges(command, product.currency().getCode());
                 final boolean updated = product.update(savingsProductCharges);
                 if (!updated) {
                     changes.remove(chargesParamName);

@@ -90,7 +90,7 @@ public class RecurringDepositProductWritePlatformServiceJpaRepositoryImpl implem
             final RecurringDepositProduct product = this.recurringDepositProductRepository.findById(productId).orElseThrow(() -> new RecurringDepositProductNotFoundException(productId));
             final Map<String, Object> changes = product.update(command);
             if (changes.containsKey(chargesParamName)) {
-                final Set<Charge> savingsProductCharges = this.depositProductAssembler.assembleListOfSavingsProductCharges(command, product.currency().getCode());
+                final Set<Long> savingsProductCharges = this.depositProductAssembler.assembleListOfSavingsProductCharges(command, product.currency().getCode());
                 final boolean updated = product.update(savingsProductCharges);
                 if (!updated) {
                     changes.remove(chargesParamName);

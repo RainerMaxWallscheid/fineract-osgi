@@ -580,6 +580,29 @@ public class Charge extends AbstractPersistableCustom<Long> {
         return taxGroupId;
     }
 
+    /**
+     * Stable catalog projection for foreign BCs (loan create, etc.) without exporting this entity.
+     */
+    public org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData toDefinitionData() {
+        return new org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData(//
+                getId(), //
+                getName(), //
+                getAmount(), //
+                getCurrencyCode(), //
+                getChargeAppliesTo(), //
+                getChargeTimeType(), //
+                getChargeCalculation(), //
+                getChargePaymentMode(), //
+                isPenalty(), //
+                isActive(), //
+                getMinCap(), //
+                getMaxCap(), //
+                getFeeInterval(), //
+                feeFrequency(), //
+                getIncomeAccountId(), //
+                getTaxGroupId());
+    }
+
     public boolean isDisbursementCharge() {
         return ChargeTimeType.fromInt(this.chargeTimeType).equals(ChargeTimeType.DISBURSEMENT) || ChargeTimeType.fromInt(this.chargeTimeType).equals(ChargeTimeType.TRANCHE_DISBURSEMENT);
     }

@@ -141,7 +141,7 @@ public class SavingsProductAssembler {
         final AccountingRuleType accountingRuleType = AccountingRuleType.fromInt(command.integerValueOfParameterNamed("accountingRule"));
 
         // Savings product charges
-        final Set<Charge> charges = assembleListOfSavingsProductCharges(command, currencyCode);
+        final Set<Long> charges = assembleListOfSavingsProductCharges(command, currencyCode);
 
         boolean allowOverdraft = false;
         if (command.parameterExists(allowOverdraftParamName)) {
@@ -201,9 +201,9 @@ public class SavingsProductAssembler {
                 taxGroup, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat);
     }
 
-    public Set<Charge> assembleListOfSavingsProductCharges(final JsonCommand command, final String savingsProductCurrencyCode) {
+    public Set<Long> assembleListOfSavingsProductCharges(final JsonCommand command, final String savingsProductCurrencyCode) {
 
-        final Set<Charge> charges = new HashSet<>();
+        final Set<Long> chargeIds = new HashSet<>();
 
         if (command.parameterExists(chargesParamName)) {
             final JsonArray chargesArray = command.arrayOfParameterNamed(chargesParamName);
@@ -226,13 +226,13 @@ public class SavingsProductAssembler {
                             final String errorMessage = "Charge and Savings Product must have the same currency.";
                             throw new InvalidCurrencyException("charge", "attach.to.savings.product", errorMessage);
                         }
-                        charges.add(charge);
+                        chargeIds.add(id);
                     }
                 }
             }
         }
 
-        return charges;
+        return chargeIds;
     }
 
     public TaxGroup assembleTaxGroup(final JsonCommand command) {

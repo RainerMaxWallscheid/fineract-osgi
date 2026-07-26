@@ -107,7 +107,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
             final Fund fund = findFundByIdIfProvided(command.longValueOfParameterNamed("fundId"));
             final String loanTransactionProcessingStrategyCode = command.stringValueOfParameterNamed("transactionProcessingStrategyCode");
             final String currencyCode = command.stringValueOfParameterNamed("currencyCode");
-            final List<Charge> charges = assembleListOfProductCharges(command, currencyCode);
+            final List<Long> charges = assembleListOfProductChargeIds(command, currencyCode);
             final List<Rate> rates = assembleListOfProductRates(command);
             final List<LoanProductPaymentAllocationRule> loanProductPaymentAllocationRules = advancedPaymentJsonParser.assembleLoanProductPaymentAllocationRules(command, loanTransactionProcessingStrategyCode);
             final List<LoanProductCreditAllocationRule> loanProductCreditAllocationRules = creditAllocationsJsonParser.assembleLoanProductCreditAllocationRules(command, loanTransactionProcessingStrategyCode);
@@ -190,7 +190,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
                 product.setTransactionProcessingStrategyName(transactionProcessingStrategyName);
             }
             if (changes.containsKey("charges")) {
-                final List<Charge> productCharges = assembleListOfProductCharges(command, product.getCurrency().getCode());
+                final List<Long> productCharges = assembleListOfProductChargeIds(command, product.getCurrency().getCode());
                 final boolean updated = product.update(productCharges);
                 if (!updated) {
                     changes.remove("charges");
@@ -268,8 +268,8 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
         return isChangeFromFloatingToFlatOrViceVersa || isChangeInCriticalFloatingRateParams;
     }
 
-    private List<Charge> assembleListOfProductCharges(final JsonCommand command, final String currencyCode) {
-        final List<Charge> charges = new ArrayList<>();
+    private List<Long> assembleListOfProductChargeIds(final JsonCommand command, final String currencyCode) {
+        final List<Long> chargeIds = new ArrayList<>();
         String loanProductCurrencyCode = command.stringValueOfParameterNamed("currencyCode");
         if (loanProductCurrencyCode == null) {
             loanProductCurrencyCode = currencyCode;
@@ -286,12 +286,12 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
                             final String errorMessage = "Charge and Loan Product must have the same currency.";
                             throw new InvalidCurrencyException("charge", "attach.to.loan.product", errorMessage);
                         }
-                        charges.add(charge);
+                        chargeIds.add(id);
                     }
                 }
             }
         }
-        return charges;
+        return chargeIds;
     }
 
     private List<Rate> assembleListOfProductRates(final JsonCommand command) {

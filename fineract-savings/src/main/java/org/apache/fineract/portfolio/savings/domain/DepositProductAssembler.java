@@ -157,7 +157,7 @@ public class DepositProductAssembler {
                 depositTermDetail, depositProductAmountDetails, null);
 
         // Savings product charges
-        final Set<Charge> charges = assembleListOfSavingsProductCharges(command, currencyCode);
+        final Set<Long> charges = assembleListOfSavingsProductCharges(command, currencyCode);
         // Interest rate charts
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
@@ -253,7 +253,7 @@ public class DepositProductAssembler {
         final DepositProductRecurringDetail productRecurringDetail = DepositProductRecurringDetail.createNew(recurringDetail, null);
 
         // Savings product charges
-        final Set<Charge> charges = assembleListOfSavingsProductCharges(command, currencyCode);
+        final Set<Long> charges = assembleListOfSavingsProductCharges(command, currencyCode);
         // Interest rate charts
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
@@ -431,9 +431,9 @@ public class DepositProductAssembler {
         return DepositRecurringDetail.createFrom(isMandatoryDeposit, allowWithdrawal, adjustAdvanceTowardsFuturePayments);
     }
 
-    public Set<Charge> assembleListOfSavingsProductCharges(final JsonCommand command, final String savingsProductCurrencyCode) {
+    public Set<Long> assembleListOfSavingsProductCharges(final JsonCommand command, final String savingsProductCurrencyCode) {
 
-        final Set<Charge> charges = new HashSet<>();
+        final Set<Long> chargeIds = new HashSet<>();
 
         if (command.parameterExists(chargesParamName)) {
             final JsonArray chargesArray = command.arrayOfParameterNamed(chargesParamName);
@@ -456,13 +456,13 @@ public class DepositProductAssembler {
                             final String errorMessage = "Charge and Savings Product must have the same currency.";
                             throw new InvalidCurrencyException("charge", "attach.to.savings.product", errorMessage);
                         }
-                        charges.add(charge);
+                        chargeIds.add(id);
                     }
                 }
             }
         }
 
-        return charges;
+        return chargeIds;
     }
 
     private Set<InterestRateChart> assembleListOfCharts(JsonCommand command, String currencyCode, DataValidatorBuilder baseDataValidator) {

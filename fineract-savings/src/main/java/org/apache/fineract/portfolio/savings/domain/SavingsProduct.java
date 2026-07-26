@@ -54,16 +54,17 @@ import static org.apache.fineract.portfolio.savings.SavingsApiConstants.withHold
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.withdrawalFeeForTransfersParamName;
 
 import com.google.gson.JsonArray;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -83,7 +84,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
-import org.apache.fineract.portfolio.charge.domain.Charge;
+
 import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChart;
 import org.apache.fineract.portfolio.savings.SavingsCompoundingInterestPeriodType;
 import org.apache.fineract.portfolio.savings.SavingsInterestCalculationDaysInYearType;
@@ -159,9 +160,11 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
     @Column(name = "withdrawal_fee_for_transfer")
     protected boolean withdrawalFeeApplicableForTransfer;
 
-    @ManyToMany
-    @JoinTable(name = "m_savings_product_charge", joinColumns = @JoinColumn(name = "savings_product_id"), inverseJoinColumns = @JoinColumn(name = "charge_id"))
-    protected Set<Charge> charges;
+    /** Catalog charge definition ids (no JPA association to charge-impl). */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "m_savings_product_charge", joinColumns = @JoinColumn(name = "savings_product_id"))
+    @Column(name = "charge_id")
+    protected Set<Long> chargeIds;
 
     @Column(name = "allow_overdraft")
     private boolean allowOverdraft;
@@ -215,7 +218,7 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
             final SavingsPostingInterestPeriodType interestPostingPeriodType, final SavingsInterestCalculationType interestCalculationType,
             final SavingsInterestCalculationDaysInYearType interestCalculationDaysInYearType, final BigDecimal minRequiredOpeningBalance,
             final Integer lockinPeriodFrequency, final SavingsPeriodFrequencyType lockinPeriodFrequencyType,
-            final boolean withdrawalFeeApplicableForTransfer, final AccountingRuleType accountingRuleType, final Set<Charge> charges,
+            final boolean withdrawalFeeApplicableForTransfer, final AccountingRuleType accountingRuleType, final Set<Long> chargeIds,
             final boolean allowOverdraft, final BigDecimal overdraftLimit, final boolean enforceMinRequiredBalance,
             final BigDecimal minRequiredBalance, final boolean lienAllowed, final BigDecimal maxAllowedLienLimit,
             final BigDecimal minBalanceForInterestCalculation, final BigDecimal nominalAnnualInterestRateOverdraft,
@@ -224,7 +227,7 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
 
         return new SavingsProduct(name, shortName, description, currency, interestRate, interestCompoundingPeriodType,
                 interestPostingPeriodType, interestCalculationType, interestCalculationDaysInYearType, minRequiredOpeningBalance,
-                lockinPeriodFrequency, lockinPeriodFrequencyType, withdrawalFeeApplicableForTransfer, accountingRuleType, charges,
+                lockinPeriodFrequency, lockinPeriodFrequencyType, withdrawalFeeApplicableForTransfer, accountingRuleType, chargeIds,
                 allowOverdraft, overdraftLimit, enforceMinRequiredBalance, minRequiredBalance, lienAllowed, maxAllowedLienLimit,
                 minBalanceForInterestCalculation, nominalAnnualInterestRateOverdraft, minOverdraftForInterestCalculation, withHoldTax,
                 taxGroup, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat);
@@ -240,12 +243,12 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
             final SavingsPostingInterestPeriodType interestPostingPeriodType, final SavingsInterestCalculationType interestCalculationType,
             final SavingsInterestCalculationDaysInYearType interestCalculationDaysInYearType, final BigDecimal minRequiredOpeningBalance,
             final Integer lockinPeriodFrequency, final SavingsPeriodFrequencyType lockinPeriodFrequencyType,
-            final boolean withdrawalFeeApplicableForTransfer, final AccountingRuleType accountingRuleType, final Set<Charge> charges,
+            final boolean withdrawalFeeApplicableForTransfer, final AccountingRuleType accountingRuleType, final Set<Long> chargeIds,
             final boolean allowOverdraft, final BigDecimal overdraftLimit, BigDecimal minBalanceForInterestCalculation, boolean withHoldTax,
             TaxGroup taxGroup) {
         this(name, shortName, description, currency, interestRate, interestCompoundingPeriodType, interestPostingPeriodType,
                 interestCalculationType, interestCalculationDaysInYearType, minRequiredOpeningBalance, lockinPeriodFrequency,
-                lockinPeriodFrequencyType, withdrawalFeeApplicableForTransfer, accountingRuleType, charges, allowOverdraft, overdraftLimit,
+                lockinPeriodFrequencyType, withdrawalFeeApplicableForTransfer, accountingRuleType, chargeIds, allowOverdraft, overdraftLimit,
                 false, null, false, null, minBalanceForInterestCalculation, null, null, withHoldTax, taxGroup, null, null, null, null);
     }
 
@@ -254,7 +257,7 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
             final SavingsPostingInterestPeriodType interestPostingPeriodType, final SavingsInterestCalculationType interestCalculationType,
             final SavingsInterestCalculationDaysInYearType interestCalculationDaysInYearType, final BigDecimal minRequiredOpeningBalance,
             final Integer lockinPeriodFrequency, final SavingsPeriodFrequencyType lockinPeriodFrequencyType,
-            final boolean withdrawalFeeApplicableForTransfer, final AccountingRuleType accountingRuleType, final Set<Charge> charges,
+            final boolean withdrawalFeeApplicableForTransfer, final AccountingRuleType accountingRuleType, final Set<Long> chargeIds,
             final boolean allowOverdraft, final BigDecimal overdraftLimit, final boolean enforceMinRequiredBalance,
             final BigDecimal minRequiredBalance, final boolean lienAllowed, final BigDecimal maxAllowedLienLimit,
             BigDecimal minBalanceForInterestCalculation, final BigDecimal nominalAnnualInterestRateOverdraft,
@@ -287,8 +290,8 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
             this.accountingRule = accountingRuleType.getValue();
         }
 
-        if (charges != null) {
-            this.charges = charges;
+        if (chargeIds != null) {
+            this.chargeIds = chargeIds;
         }
 
         validateLockinDetails();
@@ -670,23 +673,23 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
         return this.accountingRule;
     }
 
-    public boolean update(final Set<Charge> newSavingsProductCharges) {
-        if (newSavingsProductCharges == null) {
+    public boolean update(final Set<Long> newSavingsProductChargeIds) {
+        if (newSavingsProductChargeIds == null) {
             return false;
         }
 
         boolean updated = false;
-        if (this.charges != null) {
-            final Set<Charge> currentSetOfCharges = new HashSet<>(this.charges);
-            final Set<Charge> newSetOfCharges = new HashSet<>(newSavingsProductCharges);
+        if (this.chargeIds != null) {
+            final Set<Long> currentSetOfCharges = new HashSet<>(this.chargeIds);
+            final Set<Long> newSetOfCharges = new HashSet<>(newSavingsProductChargeIds);
 
             if (!currentSetOfCharges.equals(newSetOfCharges)) {
                 updated = true;
-                this.charges = newSavingsProductCharges;
+                this.chargeIds = newSavingsProductChargeIds;
             }
         } else {
             updated = true;
-            this.charges = newSavingsProductCharges;
+            this.chargeIds = newSavingsProductChargeIds;
         }
         return updated;
     }
@@ -719,8 +722,8 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
         return this.lienAllowed;
     }
 
-    public Set<Charge> charges() {
-        return this.charges;
+    public Set<Long> chargeIds() {
+        return this.chargeIds;
     }
 
     public InterestRateChart applicableChart(@SuppressWarnings("unused") final LocalDate target) {

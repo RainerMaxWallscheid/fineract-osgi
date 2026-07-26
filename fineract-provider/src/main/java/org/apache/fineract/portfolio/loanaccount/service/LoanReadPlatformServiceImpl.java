@@ -73,7 +73,6 @@ import org.apache.fineract.portfolio.calendar.data.CalendarData;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformService;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.client.data.ClientData;
@@ -1148,11 +1147,13 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
         if (!loan.isOpen()) {
             return list;
         }
-        Optional<Charge> optPenaltyCharge = loan.getLoanProduct().getCharges().stream().filter(e -> ChargeTimeType.OVERDUE_INSTALLMENT.getValue().equals(e.getChargeTimeType()) && e.isLoanCharge()).findFirst();
+        final Optional<org.apache.fineract.portfolio.charge.data.ChargeData> optPenaltyCharge = this.chargeReadPlatformService
+                .retrieveLoanProductCharges(loan.getLoanProduct().getId()).stream()
+                .filter(org.apache.fineract.portfolio.charge.data.ChargeData::isOverdueInstallmentCharge).findFirst();
         if (optPenaltyCharge.isEmpty()) {
             return list;
         }
-        final Charge penaltyCharge = optPenaltyCharge.get();
+        final org.apache.fineract.portfolio.charge.data.ChargeData penaltyCharge = optPenaltyCharge.get();
         final Long penaltyWaitPeriod = configurationDomainService.retrievePenaltyWaitPeriod();
         final boolean backdatePenalties = configurationDomainService.isBackdatePenaltiesEnabled();
         for (LoanRepaymentScheduleInstallment installment : loan.getRepaymentScheduleInstallments()) {

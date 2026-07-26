@@ -124,7 +124,7 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
             this.fromApiJsonDataValidator.validateForUpdate(command.json(), product);
             final Map<String, Object> changes = product.update(command);
             if (changes.containsKey(chargesParamName)) {
-                final Set<Charge> savingsProductCharges = this.savingsProductAssembler.assembleListOfSavingsProductCharges(command, product.currency().getCode());
+                final Set<Long> savingsProductCharges = this.savingsProductAssembler.assembleListOfSavingsProductCharges(command, product.currency().getCode());
                 final boolean updated = product.update(savingsProductCharges);
                 if (!updated) {
                     changes.remove(chargesParamName);

@@ -39,7 +39,6 @@ import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.domain.ChargePaymentMode;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
@@ -145,11 +144,10 @@ public class SingleLoanChargeRepaymentScheduleProcessingWrapperTest {
 
     @NonNull
     private LoanCharge createCharge(boolean penalty) {
-        Charge charge = mock(Charge.class);
-        when(charge.getId()).thenReturn(1L);
-        when(charge.getName()).thenReturn("charge a");
-        when(charge.getCurrencyCode()).thenReturn("UDS");
-        when(charge.isPenalty()).thenReturn(penalty);
+        final org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData charge = new org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData(
+                1L, "charge a", new BigDecimal("10"), "UDS", null, ChargeTimeType.SPECIFIED_DUE_DATE.getValue(),
+                ChargeCalculationType.FLAT.getValue(), ChargePaymentMode.REGULAR.getValue(), penalty, true, null, null, null, null, null,
+                null);
         Loan loan = mock(Loan.class);
         when(loan.isInterestBearing()).thenReturn(false);
 

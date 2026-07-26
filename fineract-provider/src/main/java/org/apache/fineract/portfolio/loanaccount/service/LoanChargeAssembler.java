@@ -272,14 +272,14 @@ public class LoanChargeAssembler {
             }
         }
         ExternalId externalId = externalIdFactory.createFromCommand(command, "externalId");
-        return loanChargeService.create(loan, chargeDefinition, amountPercentageAppliedTo, amount, chargeTime, chargeCalculation, dueDate, chargePaymentMode, null, loanCharge, externalId);
+        return loanChargeService.create(loan, chargeDefinition.toDefinitionData(), amountPercentageAppliedTo, amount, chargeTime, chargeCalculation, dueDate, chargePaymentMode, null, loanCharge, externalId);
     }
 
     /*
      * loanPrincipal is required for charges that are percentage based
      */
     public LoanCharge createNewWithoutLoan(final Charge chargeDefinition, final BigDecimal loanPrincipal, final BigDecimal amount, final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculation, final LocalDate dueDate, final ChargePaymentMode chargePaymentMode, final Integer numberOfRepayments, final ExternalId externalId) {
-        return loanChargeService.create(null, chargeDefinition, loanPrincipal, amount, chargeTime, chargeCalculation, dueDate, chargePaymentMode, numberOfRepayments, BigDecimal.ZERO, externalId);
+        return loanChargeService.create(null, chargeDefinition.toDefinitionData(), loanPrincipal, amount, chargeTime, chargeCalculation, dueDate, chargePaymentMode, numberOfRepayments, BigDecimal.ZERO, externalId);
     }
 
     @java.lang.SuppressWarnings("all")

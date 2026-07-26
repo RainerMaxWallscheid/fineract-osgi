@@ -34,10 +34,10 @@ import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.domain.ChargePaymentMode;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeCannotBeAddedException;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeWithoutMandatoryFieldException;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -476,7 +476,7 @@ public class LoanChargeService {
         update(loanCharge, amount, dueDate, amountPercentageAppliedTo, numberOfRepayments, BigDecimal.ZERO);
     }
 
-    public LoanCharge create(final Loan loan, final Charge chargeDefinition, final BigDecimal loanPrincipal, final BigDecimal amount, final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculation, final LocalDate dueDate, final ChargePaymentMode chargePaymentMode, final Integer numberOfRepayments, final BigDecimal loanChargeAmount, final ExternalId externalId) {
+    public LoanCharge create(final Loan loan, final ChargeDefinitionData chargeDefinition, final BigDecimal loanPrincipal, final BigDecimal amount, final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculation, final LocalDate dueDate, final ChargePaymentMode chargePaymentMode, final Integer numberOfRepayments, final BigDecimal loanChargeAmount, final ExternalId externalId) {
         final LoanCharge loanCharge = new LoanCharge();
         loanCharge.setLoan(loan);
         loanCharge.setChargeId(chargeDefinition.getId());
@@ -497,7 +497,7 @@ public class LoanChargeService {
         } else {
             loanCharge.setDueDate(null);
         }
-        loanCharge.setChargeCalculation(chargeCalculation == null ? chargeDefinition.getChargeCalculation() : chargeCalculation.getValue());
+        loanCharge.setChargeCalculation(chargeCalculation == null ? chargeDefinition.getChargeCalculationType() : chargeCalculation.getValue());
         BigDecimal chargeAmount = chargeDefinition.getAmount();
         if (amount != null) {
             chargeAmount = amount;

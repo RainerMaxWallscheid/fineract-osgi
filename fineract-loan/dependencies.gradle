@@ -27,9 +27,8 @@ dependencies {
     implementation(project(path: ':fineract-core'))
     implementation(project(path: ':fineract-cob'))
     implementation(project(path: ':fineract-accounting'))
-    // Charge OSGi Step 7: prefer api; impl edge is temporary until Step 8 (Charge entity retarget).
+    // Charge OSGi Step 8 residual: loan domain uses charge-api only (create via ChargeDefinitionData).
     implementation(project(path: ':fineract-charge-api'))
-    implementation(project(path: ':fineract-charge-impl'))
     implementation(project(path: ':fineract-rates'))
     implementation(project(path: ':fineract-tax'))
 

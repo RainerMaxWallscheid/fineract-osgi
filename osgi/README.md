@@ -27,7 +27,7 @@ Copy into `osgi/bundles/` for Equinox resolve experiments. Plan: [15_osgi_bundle
 | `fineract-charge-test` (`fineract-charge/test`) | `org.apache.fineract.charge.test` | `Fragment-Host: org.apache.fineract.charge.impl` (16 unit tests) |
 | `fineract-charge` | *(façade, not OSGi feature)* | Boot composition root only |
 
-**Consumers:** accounting / progressive → `-api` only; investor → no charge dep; WC → `-api` only; loan still `-impl` (`LoanProduct.charges`); savings still `-impl` (Step 8 residual).
+**Consumers:** accounting / progressive / loan / WC → `-api` only; investor → no charge dep; savings still `-impl` (`SavingsAccountCharge` residual).
 
 Build jars: `./gradlew :fineract-charge-api:jar :fineract-charge-impl:jar :fineract-charge-test:jar`  
 White-box tests: `./gradlew :fineract-charge-test:test`  

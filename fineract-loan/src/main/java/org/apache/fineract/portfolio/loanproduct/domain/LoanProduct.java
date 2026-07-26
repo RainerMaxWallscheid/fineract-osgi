@@ -19,7 +19,9 @@
 package org.apache.fineract.portfolio.loanproduct.domain;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -47,7 +49,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
-import org.apache.fineract.portfolio.charge.domain.Charge;
+
 import org.apache.fineract.portfolio.common.domain.DaysInMonthType;
 import org.apache.fineract.portfolio.common.domain.DaysInYearCustomStrategyType;
 import org.apache.fineract.portfolio.common.domain.DaysInYearType;
@@ -102,9 +104,11 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
     private String shortName;
     @Column(name = "description")
     private String description;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "m_product_loan_charge", joinColumns = @JoinColumn(name = "product_loan_id"), inverseJoinColumns = @JoinColumn(name = "charge_id"))
-    private List<Charge> charges;
+    /** Catalog charge definition ids (no JPA association to charge-impl). */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "m_product_loan_charge", joinColumns = @JoinColumn(name = "product_loan_id"))
+    @Column(name = "charge_id")
+    private List<Long> chargeIds;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "m_product_loan_rate", joinColumns = @JoinColumn(name = "product_loan_id"), inverseJoinColumns = @JoinColumn(name = "rate_id"))
     private List<Rate> rates;
@@ -194,7 +198,7 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
         this.loanProductMinMaxConstraints = null;
     }
 
-    public LoanProduct(final Fund fund, final String transactionProcessingStrategyCode, final List<LoanProductPaymentAllocationRule> paymentAllocationRules, final List<LoanProductCreditAllocationRule> creditAllocationRules, final String name, final String shortName, final String description, final MonetaryCurrency currency, final BigDecimal defaultPrincipal, final BigDecimal defaultMinPrincipal, final BigDecimal defaultMaxPrincipal, final BigDecimal defaultNominalInterestRatePerPeriod, final BigDecimal defaultMinNominalInterestRatePerPeriod, final BigDecimal defaultMaxNominalInterestRatePerPeriod, final PeriodFrequencyType interestPeriodFrequencyType, final BigDecimal defaultAnnualNominalInterestRate, final InterestMethod interestMethod, final InterestCalculationPeriodMethod interestCalculationPeriodMethod, final boolean considerPartialPeriodInterest, final Integer repayEvery, final PeriodFrequencyType repaymentFrequencyType, final Integer defaultNumberOfInstallments, final Integer defaultMinNumberOfInstallments, final Integer defaultMaxNumberOfInstallments, final Integer graceOnPrincipalPayment, final Integer recurringMoratoriumOnPrincipalPeriods, final Integer graceOnInterestPayment, final Integer graceOnInterestCharged, final AmortizationMethod amortizationMethod, final BigDecimal inArrearsTolerance, final List<Charge> charges, final AccountingRuleType accountingRuleType, final boolean includeInBorrowerCycle, final LocalDate startDate, final LocalDate closeDate, final ExternalId externalId, final boolean useBorrowerCycle, final Set<LoanProductBorrowerCycleVariations> loanProductBorrowerCycleVariations, final boolean multiDisburseLoan, final Integer maxTrancheCount, final BigDecimal outstandingLoanBalance, final Integer graceOnArrearsAgeing, final Integer overdueDaysForNPA, final DaysInMonthType daysInMonthType, final DaysInYearType daysInYearType, final boolean isInterestRecalculationEnabled, final LoanProductInterestRecalculationDetails productInterestRecalculationDetails, final Integer minimumDaysBetweenDisbursalAndFirstRepayment, final boolean holdGuarantorFunds, final LoanProductGuaranteeDetails loanProductGuaranteeDetails, final BigDecimal principalThresholdForLastInstallment, final boolean accountMovesOutOfNPAOnlyOnArrearsCompletion, final boolean canDefineEmiAmount, final Integer installmentAmountInMultiplesOf, final LoanProductConfigurableAttributes loanProductConfigurableAttributes, Boolean isLinkedToFloatingInterestRates, FloatingRate floatingRate, BigDecimal interestRateDifferential, BigDecimal minDifferentialLendingRate, BigDecimal maxDifferentialLendingRate, BigDecimal defaultDifferentialLendingRate, Boolean isFloatingInterestRateCalculationAllowed, final Boolean isVariableInstallmentsAllowed, final Integer minimumGapBetweenInstallments, final Integer maximumGapBetweenInstallments, final boolean syncExpectedWithDisbursementDate, final boolean canUseForTopup, final boolean isEqualAmortization, final List<Rate> rates, final BigDecimal fixedPrincipalPercentagePerInstallment, final boolean disallowExpectedDisbursements, final boolean allowApprovedDisbursedAmountsOverApplied, final String overAppliedCalculationType, final Integer overAppliedNumber, final Integer dueDaysForRepaymentEvent, final Integer overDueDaysForRepaymentEvent, final boolean enableDownPayment, final BigDecimal disbursedAmountPercentageForDownPayment, final boolean enableAutoRepaymentForDownPayment, final RepaymentStartDateType repaymentStartDateType, final boolean enableInstallmentLevelDelinquency, final LoanScheduleType loanScheduleType, final LoanScheduleProcessingType loanScheduleProcessingType, final Integer fixedLength, final boolean enableAccrualActivityPosting, final List<LoanSupportedInterestRefundTypes> supportedInterestRefundTypes, final LoanChargeOffBehaviour chargeOffBehaviour, final boolean isInterestRecognitionOnDisbursementDate, final DaysInYearCustomStrategyType daysInYearCustomStrategy, final boolean enableIncomeCapitalization, final LoanCapitalizedIncomeCalculationType capitalizedIncomeCalculationType, final LoanCapitalizedIncomeStrategy capitalizedIncomeStrategy, final LoanCapitalizedIncomeType capitalizedIncomeType, final boolean enableBuyDownFee, final LoanBuyDownFeeCalculationType buyDownFeeCalculationType, final LoanBuyDownFeeStrategy buyDownFeeStrategy, final LoanBuyDownFeeIncomeType buyDownFeeIncomeType, final boolean merchantBuyDownFee, final boolean allowFullTermForTranche) {
+    public LoanProduct(final Fund fund, final String transactionProcessingStrategyCode, final List<LoanProductPaymentAllocationRule> paymentAllocationRules, final List<LoanProductCreditAllocationRule> creditAllocationRules, final String name, final String shortName, final String description, final MonetaryCurrency currency, final BigDecimal defaultPrincipal, final BigDecimal defaultMinPrincipal, final BigDecimal defaultMaxPrincipal, final BigDecimal defaultNominalInterestRatePerPeriod, final BigDecimal defaultMinNominalInterestRatePerPeriod, final BigDecimal defaultMaxNominalInterestRatePerPeriod, final PeriodFrequencyType interestPeriodFrequencyType, final BigDecimal defaultAnnualNominalInterestRate, final InterestMethod interestMethod, final InterestCalculationPeriodMethod interestCalculationPeriodMethod, final boolean considerPartialPeriodInterest, final Integer repayEvery, final PeriodFrequencyType repaymentFrequencyType, final Integer defaultNumberOfInstallments, final Integer defaultMinNumberOfInstallments, final Integer defaultMaxNumberOfInstallments, final Integer graceOnPrincipalPayment, final Integer recurringMoratoriumOnPrincipalPeriods, final Integer graceOnInterestPayment, final Integer graceOnInterestCharged, final AmortizationMethod amortizationMethod, final BigDecimal inArrearsTolerance, final List<Long> chargeIds, final AccountingRuleType accountingRuleType, final boolean includeInBorrowerCycle, final LocalDate startDate, final LocalDate closeDate, final ExternalId externalId, final boolean useBorrowerCycle, final Set<LoanProductBorrowerCycleVariations> loanProductBorrowerCycleVariations, final boolean multiDisburseLoan, final Integer maxTrancheCount, final BigDecimal outstandingLoanBalance, final Integer graceOnArrearsAgeing, final Integer overdueDaysForNPA, final DaysInMonthType daysInMonthType, final DaysInYearType daysInYearType, final boolean isInterestRecalculationEnabled, final LoanProductInterestRecalculationDetails productInterestRecalculationDetails, final Integer minimumDaysBetweenDisbursalAndFirstRepayment, final boolean holdGuarantorFunds, final LoanProductGuaranteeDetails loanProductGuaranteeDetails, final BigDecimal principalThresholdForLastInstallment, final boolean accountMovesOutOfNPAOnlyOnArrearsCompletion, final boolean canDefineEmiAmount, final Integer installmentAmountInMultiplesOf, final LoanProductConfigurableAttributes loanProductConfigurableAttributes, Boolean isLinkedToFloatingInterestRates, FloatingRate floatingRate, BigDecimal interestRateDifferential, BigDecimal minDifferentialLendingRate, BigDecimal maxDifferentialLendingRate, BigDecimal defaultDifferentialLendingRate, Boolean isFloatingInterestRateCalculationAllowed, final Boolean isVariableInstallmentsAllowed, final Integer minimumGapBetweenInstallments, final Integer maximumGapBetweenInstallments, final boolean syncExpectedWithDisbursementDate, final boolean canUseForTopup, final boolean isEqualAmortization, final List<Rate> rates, final BigDecimal fixedPrincipalPercentagePerInstallment, final boolean disallowExpectedDisbursements, final boolean allowApprovedDisbursedAmountsOverApplied, final String overAppliedCalculationType, final Integer overAppliedNumber, final Integer dueDaysForRepaymentEvent, final Integer overDueDaysForRepaymentEvent, final boolean enableDownPayment, final BigDecimal disbursedAmountPercentageForDownPayment, final boolean enableAutoRepaymentForDownPayment, final RepaymentStartDateType repaymentStartDateType, final boolean enableInstallmentLevelDelinquency, final LoanScheduleType loanScheduleType, final LoanScheduleProcessingType loanScheduleProcessingType, final Integer fixedLength, final boolean enableAccrualActivityPosting, final List<LoanSupportedInterestRefundTypes> supportedInterestRefundTypes, final LoanChargeOffBehaviour chargeOffBehaviour, final boolean isInterestRecognitionOnDisbursementDate, final DaysInYearCustomStrategyType daysInYearCustomStrategy, final boolean enableIncomeCapitalization, final LoanCapitalizedIncomeCalculationType capitalizedIncomeCalculationType, final LoanCapitalizedIncomeStrategy capitalizedIncomeStrategy, final LoanCapitalizedIncomeType capitalizedIncomeType, final boolean enableBuyDownFee, final LoanBuyDownFeeCalculationType buyDownFeeCalculationType, final LoanBuyDownFeeStrategy buyDownFeeStrategy, final LoanBuyDownFeeIncomeType buyDownFeeIncomeType, final boolean merchantBuyDownFee, final boolean allowFullTermForTranche) {
         this.fund = fund;
         this.transactionProcessingStrategyCode = transactionProcessingStrategyCode;
         this.paymentAllocationRules = paymentAllocationRules;
@@ -216,8 +220,8 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
         } else {
             this.description = null;
         }
-        if (charges != null) {
-            this.charges = charges;
+        if (chargeIds != null) {
+            this.chargeIds = chargeIds;
         }
         this.isLinkedToFloatingInterestRate = isLinkedToFloatingInterestRates != null && isLinkedToFloatingInterestRates;
         if (isLinkedToFloatingInterestRate) {
@@ -322,21 +326,21 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
         return this.loanProductRelatedDetail.hasCurrencyCodeOf(currencyCode);
     }
 
-    public boolean update(final List<Charge> newProductCharges) {
-        if (newProductCharges == null) {
+    public boolean update(final List<Long> newProductChargeIds) {
+        if (newProductChargeIds == null) {
             return false;
         }
         boolean updated = false;
-        if (this.charges != null) {
-            final Set<Charge> currentSetOfCharges = new HashSet<>(this.charges);
-            final Set<Charge> newSetOfCharges = new HashSet<>(newProductCharges);
+        if (this.chargeIds != null) {
+            final Set<Long> currentSetOfCharges = new HashSet<>(this.chargeIds);
+            final Set<Long> newSetOfCharges = new HashSet<>(newProductChargeIds);
             if (!currentSetOfCharges.equals(newSetOfCharges)) {
                 updated = true;
-                this.charges = newProductCharges;
+                this.chargeIds = newProductChargeIds;
             }
         } else {
             updated = true;
-            this.charges = newProductCharges;
+            this.chargeIds = newProductChargeIds;
         }
         return updated;
     }
@@ -625,8 +629,8 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public List<Charge> getCharges() {
-        return this.charges;
+        public List<Long> getChargeIds() {
+        return this.chargeIds;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -840,8 +844,8 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
     }
 
     @java.lang.SuppressWarnings("all")
-        public void setCharges(final List<Charge> charges) {
-        this.charges = charges;
+        public void setChargeIds(final List<Long> chargeIds) {
+        this.chargeIds = chargeIds;
     }
 
     @java.lang.SuppressWarnings("all")
