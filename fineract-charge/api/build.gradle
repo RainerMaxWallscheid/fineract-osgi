@@ -16,15 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-description = 'Fineract Charge (compatibility façade: :fineract-charge-api + :fineract-charge-impl)'
+description = 'Fineract Charge API (OSGi interface bundle)'
 
-// Temporary aggregator for consumers still depending on :fineract-charge.
-// Prefer :fineract-charge-api (+ runtime :fineract-charge-impl) going forward.
 apply plugin: 'java-library'
 apply plugin: 'eclipse'
 
 apply from: 'dependencies.gradle'
 
+// OSGi interface bundle: export contract packages only (ADR-022).
+// Step 1 shell — contracts move here in Step 2 (moduleapi still on impl until then).
+jar {
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'Apache Fineract Charge API',
+                'Bundle-SymbolicName': 'org.apache.fineract.charge.api',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Export-Package': 'org.apache.fineract.portfolio.charge.moduleapi',
+                'Automatic-Module-Name': 'org.apache.fineract.charge.api'
+                )
+    }
+}
+
 if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
-    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-charge/bin/main")
+    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-charge/api/bin/main")
 }

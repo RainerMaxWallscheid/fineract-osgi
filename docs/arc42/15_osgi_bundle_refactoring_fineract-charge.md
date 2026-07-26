@@ -20,7 +20,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 | Step | Status | Notes |
 |------|--------|-------|
 | 0 Baseline & inventory | **done** (2026-07-26) | Baseline green; inventory §2; Module API expanded + JPA adapter + unit tests |
-| 1 Project shells | **pending** | `fineract-charge/{api,impl,test}` + `projectDir` |
+| 1 Project shells | **done** (2026-07-26) | `fineract-charge/{api,impl,test}` + façade; sources on impl; tests on test fragment |
 | 2 Grow Module API ports | **done** (with Step 0) | `ChargeDefinitionData` + expanded `ChargeDefinitionPort` + `ChargeDefinitionPortJpaAdapter` |
 | 3 Extract api | **pending** | Pure contracts; no Spring/JPA/REST |
 | 4 Move impl + façade | **pending** | Domain, services, handlers, OSGi registrar |
@@ -51,21 +51,20 @@ Command proved the *mechanics*. Charge proves the pattern on a **real product BC
 
 ## 2. Current structure (baseline inventory)
 
-### 2.1 Gradle & layout (today)
+### 2.1 Gradle & layout (after Step 1)
 
 ```text
-fineract-charge/                    # single project :fineract-charge
-  build.gradle
-  dependencies.gradle               # → fineract-core, fineract-tax, Spring, JPA/EclipseLink
-  src/main/java/org/apache/fineract/portfolio/charge/
-    moduleapi/                      # ChargeDefinitionPort (thin)
-    domain/                         # Charge entity, enums, repository, converters
-    service/                        # *interfaces* + some *Impl* (dropdown)
-    handler/                        # CQRS command handlers
-    api/                            # Jersey/Spring REST (ChargesApiResource)
-    exception/
-    serialization/
-    request/
+fineract-charge/
+  README.md
+  build.gradle                      # :fineract-charge  façade → api + impl
+  dependencies.gradle
+  api/                              # :fineract-charge-api  (empty contracts shell until Step 2)
+  impl/                             # :fineract-charge-impl — all production sources today
+    src/main/java/.../portfolio/charge/
+      moduleapi/                    # still on impl until Step 2
+      domain/ service/ handler/ api/ exception/ …
+  test/                             # :fineract-charge-test  Fragment-Host → charge.impl
+    src/test/java/.../ChargeDefinitionPortJpaAdapterTest
 ```
 
 **Important split-brain (must be addressed in Steps 0–4):**
@@ -275,15 +274,16 @@ Execute as **separate PRs**. Checkboxes start open; update when done.
 **Exit:** Ports exist for single-id catalog lookup; inventory agreed; baseline green.  
 **Follow-ups for later steps:** provider impl relocation; consumer switch from `Charge` / `ChargeRepositoryWrapper` to port; optional list query ports.
 
-### Step 1 — Introduce empty projects + settings ⏳
+### Step 1 — Introduce projects + settings ✅
 
-1. [ ] Create `fineract-charge/api`, `impl`, `test` shells (or rename after extract)  
-2. [ ] `settings.gradle`: `:fineract-charge-api` / `-impl` / `-test` with `projectDir`  
-3. [ ] api = `java-library`, no Spring Boot / JPA; impl = Spring + JPA + depends on api  
-4. [ ] Keep `:fineract-charge` as façade depending on api+impl  
-5. [ ] Register projects in root `build.gradle` lists (`fineractJavaProjects`, etc.)
+1. [x] Create `fineract-charge/api`, `impl`, `test`  
+2. [x] `settings.gradle`: `:fineract-charge-api` / `-impl` / `-test` with `projectDir`  
+3. [x] api = `java-library`, no Spring Boot / JPA (empty sources until Step 2); impl = Spring + JPA + depends on api; **all production sources moved to impl**  
+4. [x] `:fineract-charge` is compatibility **façade** (`api` re-export of api+impl)  
+5. [x] Root `build.gradle` lists include charge-api / charge-impl / charge-test  
+6. [x] Unit tests live under `fineract-charge/test` (Fragment-Host manifest on test jar)
 
-**Exit:** Empty modules build; façade still points at current sources or empty impl.
+**Exit:** Modules build; consumers still use `:fineract-charge` façade; `:fineract-charge-test:test` green (4 tests); loan/savings compile OK.
 
 ### Step 2 — Extract api contracts ⏳
 

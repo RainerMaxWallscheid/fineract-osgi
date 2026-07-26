@@ -1,0 +1,80 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+description = 'Fineract Charge - Unit/white-box test fragment (host: charge.impl)'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+configurations {
+    providedRuntime
+    providedCompile
+    compile() {
+        exclude module: 'hibernate-entitymanager'
+        exclude module: 'hibernate-validator'
+        exclude module: 'activation'
+        exclude module: 'bcmail-jdk14'
+        exclude module: 'bcprov-jdk14'
+        exclude module: 'bctsp-jdk14'
+        exclude module: 'c3p0'
+        exclude module: 'stax-api'
+        exclude module: 'jaxb-api'
+        exclude module: 'jaxb-impl'
+        exclude module: 'jboss-logging'
+        exclude module: 'itext-rtf'
+        exclude module: 'classworlds'
+    }
+    runtime
+}
+
+apply from: 'dependencies.gradle'
+
+// OSGi fragment attached to charge-impl (ADR-022).
+jar {
+    from sourceSets.test.output
+    manifest {
+        attributes(
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'Apache Fineract Charge Test Fragment',
+                'Bundle-SymbolicName': 'org.apache.fineract.charge.test',
+                'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
+                'Fragment-Host': 'org.apache.fineract.charge.impl',
+                'Automatic-Module-Name': 'org.apache.fineract.charge.test'
+                )
+    }
+}
+
+modernizer {
+    ignoreClassNamePatterns = [
+        '.*AbstractPersistableCustom',
+        '.*EntityTables',
+        '.*domain.*'
+    ]
+}
+
+if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
+    sourceSets.test.java.outputDir = new File(rootProject.projectDir, "fineract-charge/test/bin/test")
+}
+
+tasks.named('test').configure {
+    useJUnitPlatform()
+}
+
+tasks.named('jar').configure {
+    dependsOn tasks.named('testClasses')
+}

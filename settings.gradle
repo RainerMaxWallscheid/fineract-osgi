@@ -70,6 +70,12 @@ include ':fineract-branch'
 include ':fineract-document'
 include ':fineract-investor'
 include ':fineract-rates'
+include ':fineract-charge-api'
+project(':fineract-charge-api').projectDir = file('fineract-charge/api')
+include ':fineract-charge-impl'
+project(':fineract-charge-impl').projectDir = file('fineract-charge/impl')
+include ':fineract-charge-test'
+project(':fineract-charge-test').projectDir = file('fineract-charge/test')
 include ':fineract-charge'
 include ':fineract-tax'
 include ':fineract-loan-origination'
