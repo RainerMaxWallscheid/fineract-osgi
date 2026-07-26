@@ -4,7 +4,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 
 | | |
 |--|--|
-| **Status** | draft (not started) |
+| **Status** | draft — **Step 0 in progress / largely complete** |
 | **Decisions** | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **Playbook** | [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) §15.6 Wave 1, §15.7 |
 | **Reference pilot** | [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md) (as-built) |
@@ -19,9 +19,9 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 
 | Step | Status | Notes |
 |------|--------|-------|
-| 0 Baseline & inventory | **pending** | Ports, foreign imports, provider/core drift |
+| 0 Baseline & inventory | **done** (2026-07-26) | Baseline green; inventory §2; Module API expanded + JPA adapter + unit tests |
 | 1 Project shells | **pending** | `fineract-charge/{api,impl,test}` + `projectDir` |
-| 2 Grow Module API ports | **pending** | Expand beyond `ChargeDefinitionPort` |
+| 2 Grow Module API ports | **done** (with Step 0) | `ChargeDefinitionData` + expanded `ChargeDefinitionPort` + `ChargeDefinitionPortJpaAdapter` |
 | 3 Extract api | **pending** | Pure contracts; no Spring/JPA/REST |
 | 4 Move impl + façade | **pending** | Domain, services, handlers, OSGi registrar |
 | 5 Bundle manifests | **pending** | BSN + Export/Import/Fragment-Host |
@@ -81,20 +81,59 @@ fineract-charge/                    # single project :fineract-charge
 
 This plan treats **consolidation of ownership** as part of the split, not a side quest.
 
-### 2.2 Foreign usage (compile surface)
+### 2.2 Foreign usage (compile surface) — inventory 2026-07-26
 
-Approximate import pressure from **outside** `fineract-charge` (order of magnitude):
+Import counts of `org.apache.fineract.portfolio.charge.*` from **outside** `fineract-charge` (production + tests, approximate):
 
 | Type / package | ~import sites | Risk for api split |
 |----------------|---------------|--------------------|
-| `charge.data.ChargeData` | high | Already in core — migrate or re-export carefully |
-| `charge.domain.Charge` | high | **Must not** leave as cross-module entity; replace with ports/DTOs |
-| `ChargeTimeType`, `ChargeCalculationType`, `ChargePaymentMode` | high | Value objects / enums → candidates for **api** (or shared kernel) |
-| `ChargeRepositoryWrapper` | medium | Impl detail; consumers must use ports |
-| `ChargeReadPlatformService` | medium | Interface → **api**; impl → **impl** |
-| LoanCharge* / SavingsCharge* exceptions | low–medium | Misplaced in charge catalog; eventual move to loan/savings BCs |
+| `charge.data.ChargeData` | ~50 | Lives in **core** — temporary shared kernel; later charge-api |
+| `charge.domain.Charge` | ~46 | **Must not** stay as cross-module entity; replace with `ChargeDefinitionPort` / DTOs |
+| `ChargeTimeType` | ~38 | Lives in **core** (also converters); keep kernel for now, or move to charge-api |
+| `ChargeRepositoryWrapper` | ~26 | Impl detail; consumers → ports |
+| `ChargeCalculationType` | ~25 | In charge.domain — candidate for **api** enums |
+| `ChargeReadPlatformService` | ~25 | Interface → **api** (or replace with port); impl in **provider** today |
+| `ChargePaymentMode` | ~19 | In charge.domain — candidate for **api** enums |
+| LoanCharge* / SavingsCharge* exceptions | scattered | Misplaced catalog module; eventual loan/savings BC |
 
-`ChargeDefinitionPort` is **defined** but barely consumed yet — Step 2 grows real ports and Step 8 retires direct `Charge` usage.
+**By consumer module (import line counts):**
+
+| Module | ~imports |
+|--------|----------|
+| `fineract-provider` | ~163 |
+| `fineract-loan` | ~37 |
+| `fineract-savings` | ~34 |
+| `integration-tests` | ~21 |
+| `fineract-working-capital-loan` | ~20 |
+| `fineract-core` / `fineract-accounting` | ~7 each |
+| `fineract-investor` | ~1 |
+
+#### Provider classes that implement / wire charge (move to charge-impl in Step 3)
+
+| Class | Role |
+|-------|------|
+| `…provider…charge.service.ChargeReadPlatformServiceImpl` | Read impl |
+| `…provider…charge.service.ChargeWritePlatformServiceJpaRepositoryImpl` | Write impl |
+| `…provider…charge.starter.ChargeConfiguration` | `@Bean` wiring |
+| `…provider…charge.util.ConvertChargeDataToSpecificChargeData` | Utility (review ownership) |
+
+#### Charge types living in **fineract-core** (decision for Step 0)
+
+| Type | Decision (Step 0) |
+|------|-------------------|
+| `portfolio.charge.data.ChargeData` | **Keep in core temporarily** (wide template DTO + accounting/tax deps). Inter-module catalog use → new slim `ChargeDefinitionData` in moduleapi. Later PR: move/slim ChargeData into charge-api when accounting types are ports. |
+| `portfolio.charge.domain.ChargeTimeType` (+ converter) | **Keep in core temporarily** (heavily used by loan/savings). Long-term: charge-api enum package. |
+| `portfolio.charge.exception.ChargeParameterUpdateNotSupportedException` | Keep with Charge entity updates (impl); not a foreign port type. |
+
+#### Module API after Step 0
+
+| Type | Location | Role |
+|------|----------|------|
+| `ChargeDefinitionPort` | `…charge.moduleapi` | existsActive / findActive / find / getActive |
+| `ChargeDefinitionData` | `…charge.moduleapi` | Pure catalog projection (integer enum codes) |
+| `ChargeDefinitionPortJpaAdapter` | `…charge.service` | Spring `@Service` adapter (stays in impl after split) |
+
+Unit tests: `ChargeDefinitionPortJpaAdapterTest` (4 cases).
 
 ### 2.3 Target structure (to-be)
 
@@ -220,19 +259,21 @@ During migration, keep top-level/façade project that re-exports **api + impl** 
 
 Execute as **separate PRs**. Checkboxes start open; update when done.
 
-### Step 0 — Baseline, inventory, Module API growth ⏳
+### Step 0 — Baseline, inventory, Module API growth ✅
 
-1. [ ] Freeze baseline: `./gradlew :fineract-charge:test :fineract-loan:compileJava :fineract-savings:compileJava` (+ subset of charge-related ITs if needed)  
-2. [ ] Document foreign imports of `Charge`, enums, services (refresh §2.2)  
-3. [ ] List provider classes that implement charge interfaces — plan move into impl  
-4. [ ] List charge types living in **core** — decide: move to charge-api, or keep as temporary shared kernel  
-5. [ ] Expand **Module API** before physical split ([14.6](14_module_api_boundaries.md)):
-   - Grow `ChargeDefinitionPort` (e.g. find by id → DTO, exists active, applies-to filters)  
-   - Add read/query ports used by loan/savings product setup  
-   - Prefer DTOs over `Charge` entity in new methods  
-6. [ ] Optionally start **ArchUnit** rules: no new `import …charge.domain.Charge` from foreign modules (freeze store may allow existing)
+1. [x] Freeze baseline: `./gradlew :fineract-charge:test :fineract-loan:compileJava :fineract-savings:compileJava` — **BUILD SUCCESSFUL** (charge had no tests before; loan/savings compile OK)  
+2. [x] Document foreign imports of `Charge`, enums, services — refreshed **§2.2**  
+3. [x] List provider classes that implement charge interfaces — **§2.2 Provider table** (Step 3 move target)  
+4. [x] List charge types living in **core** — **§2.2 Core decision table** (ChargeData / ChargeTimeType stay kernel for now)  
+5. [x] Expand **Module API** before physical split ([14.6](14_module_api_boundaries.md)):
+   - [x] `ChargeDefinitionData` (slim pure DTO)  
+   - [x] `ChargeDefinitionPort`: `existsActiveCharge`, `findActiveCharge`, `findCharge`, `getActiveCharge`  
+   - [x] `ChargeDefinitionPortJpaAdapter` + unit tests (4)  
+   - [ ] *Deferred to Step 8:* list/filter ports for loan product applicable charges (today still `ChargeReadPlatformService`)  
+6. [x] ArchUnit: freeze rules for loan/savings → charge internals **already exist** in `ModuleApiBoundaryRulesTest` (`loan_must_not_depend_on_charge_internals`, `savings_must_not_depend_on_charge_internals`); no change required in Step 0 — shrink freeze via consumer retarget in Step 8  
 
-**Exit:** Ports exist for the top foreign use-cases; inventory agreed.
+**Exit:** Ports exist for single-id catalog lookup; inventory agreed; baseline green.  
+**Follow-ups for later steps:** provider impl relocation; consumer switch from `Charge` / `ChargeRepositoryWrapper` to port; optional list query ports.
 
 ### Step 1 — Introduce empty projects + settings ⏳
 

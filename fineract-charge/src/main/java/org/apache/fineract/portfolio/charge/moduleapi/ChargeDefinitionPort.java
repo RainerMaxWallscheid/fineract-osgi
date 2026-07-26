@@ -18,20 +18,50 @@
  */
 package org.apache.fineract.portfolio.charge.moduleapi;
 
+import java.util.Optional;
+
 /**
- * Module API port for charge definitions (catalog).
+ * Module API port for the Charge Catalog (fee <em>definitions</em>).
  *
  * <p>
- * Other modules (Loan, Savings) must depend on this port instead of
- * {@code org.apache.fineract.portfolio.charge.domain.Charge}.
- * Implementation lives inside {@code fineract-charge} and is wired by Spring/OSGi.
+ * Other modules (Loan, Savings, Accounting, Investor, …) must depend on this port instead of
+ * {@code org.apache.fineract.portfolio.charge.domain.Charge} or charge repositories.
+ * Implementation lives in {@code fineract-charge} (and later {@code charge-impl}) and is wired by Spring /
+ * OSGi Service Registry ([ADR-021](docs/arc42/decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md),
+ * [charge plan](docs/arc42/15_osgi_bundle_refactoring_fineract-charge.md)).
  * </p>
  */
 public interface ChargeDefinitionPort {
 
     /**
      * @param chargeId catalog charge id
-     * @return true if a charge definition with this id exists and is active
+     * @return true if a non-deleted, active charge definition with this id exists
      */
     boolean existsActiveCharge(Long chargeId);
+
+    /**
+     * Active catalog charge, if present and not deleted.
+     *
+     * @param chargeId catalog charge id
+     * @return definition data, or empty when missing, deleted, or inactive
+     */
+    Optional<ChargeDefinitionData> findActiveCharge(Long chargeId);
+
+    /**
+     * Catalog charge that is not soft-deleted (may be inactive).
+     *
+     * @param chargeId catalog charge id
+     * @return definition data, or empty when missing or deleted
+     */
+    Optional<ChargeDefinitionData> findCharge(Long chargeId);
+
+    /**
+     * Same as {@link #findActiveCharge(Long)} but throws when not found / inactive / deleted.
+     *
+     * @param chargeId catalog charge id
+     * @return active definition
+     * @throws org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException when missing or deleted
+     * @throws org.apache.fineract.portfolio.charge.exception.ChargeIsNotActiveException when inactive
+     */
+    ChargeDefinitionData getActiveCharge(Long chargeId);
 }

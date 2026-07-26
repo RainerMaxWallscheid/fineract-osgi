@@ -572,7 +572,7 @@ public class Charge extends AbstractPersistableCustom<Long> {
         return incomeAccountId;
     }
 
-    private Long getTaxGroupId() {
+    public Long getTaxGroupId() {
         Long taxGroupId = null;
         if (this.taxGroup != null) {
             taxGroupId = this.taxGroup.getId();
@@ -614,6 +614,14 @@ public class Charge extends AbstractPersistableCustom<Long> {
     @java.lang.SuppressWarnings("all")
         public String getCurrencyCode() {
         return this.currencyCode;
+    }
+
+    /**
+     * Catalog applies-to enum value ({@link ChargeAppliesTo#getValue()}).
+     * Exposed for Module API mapping without leaking the JPA entity to other BCs.
+     */
+    public Integer getChargeAppliesTo() {
+        return this.chargeAppliesTo;
     }
 
     @java.lang.SuppressWarnings("all")

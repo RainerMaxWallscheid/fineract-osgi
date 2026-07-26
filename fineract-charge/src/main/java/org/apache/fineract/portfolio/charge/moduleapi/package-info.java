@@ -19,11 +19,15 @@
 
 /**
  * Module API (ADR-021) — the only package other Gradle modules should depend on
- * from this bounded context.
+ * from this bounded context (Charge Catalog).
  *
  * <p>Put port interfaces, stable DTOs/IDs and public contract types here.
  * Do not place JPA entities, Spring Data repositories or REST resources in this package.
  *
+ * <p>Key types: {@link org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort},
+ * {@link org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData}.
+ *
  * @see docs/arc42/14_module_api_boundaries.md
+ * @see docs/arc42/15_osgi_bundle_refactoring_fineract-charge.md
  */
 package org.apache.fineract.portfolio.charge.moduleapi;
