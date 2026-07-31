@@ -4,7 +4,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 
 | | |
 |--|--|
-| **Status** | **as-built** — Steps **0–7, 9 done**; Step **8 partial** (loan + savings **charge-api only**; client/share account charges chargeId; freeze residual) |
+| **Status** | **as-built** — Steps **0–7, 9 done**; Step **8 partial** (loan + savings **charge-api only**; product/account charges chargeId; freeze rebaselined — entity residual gone) |
 | **Decisions** | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **Playbook** | [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) §15.6 Wave 1, §15.7 |
 | **Reference pilot** | [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md) (as-built) |
@@ -453,16 +453,33 @@ Hardest step — **incremental**. First slice landed 2026-07-26:
 31. [x] **ShareAccountCharge** stores `chargeId` + name/currency; create via `ChargeDefinitionData`  
 32. [x] Liquibase `0243_client_share_charge_catalog_snapshots`  
 
+#### Done (slice 10 — ShareProduct charges)
+
+33. [x] **ShareProduct** stores `Set<Long> chargeIds` (`@ElementCollection` on `m_share_product_charge`); no `@ManyToMany Charge`  
+34. [x] **Provider:** `ShareProductDataSerializer` validates via `ChargeDefinitionPort` (currency check); create/update use `setChargeIds`  
+
+#### Done (slice 11 — provider port cleanup + freeze rebaseline)
+
+35. [x] **Provider:** `LoanProductWritePlatformService` validates product charges via `ChargeDefinitionPort` (not `ChargeRepositoryWrapper`)  
+36. [x] **Provider:** `FineractEntityDataValidator` charge existence via port  
+37. [x] **ArchUnit:** rebaselined freeze store after chargeId retargets — **0** loan/savings residual on `Charge` entity; residual is pure enums / `ChargeReadPlatformService` / `ChargeEnumerations` still under `charge.domain` / `charge.service` packages  
+
+#### Done (slice 12 — loan charge assembly port-only)
+
+38. [x] **Provider:** `LoanChargeAssembler` uses `ChargeDefinitionPort` / `ChargeDefinitionData` (no `Charge` / `ChargeRepositoryWrapper`)  
+39. [x] **Provider:** `LoanChargeWritePlatformServiceImpl` add/overdue/penalty resolution via port  
+40. [x] **Provider:** `LoanDisbursementService` tranche charges via port  
+
 #### Residual (later slices)
 
 | Module | Still needs charge-impl for |
 |--------|-----------------------------|
-| **provider / ITs** | façade composition root; share **product** may still load Charge for validation |
+| **provider / ITs** | façade composition root; catalog write/read services still on charge-impl; accounting helper may still load `Charge` for GL account |
 
-33. [ ] Share/client product charge lists if any still use Charge entity  
-34. [ ] ArchUnit freeze shrink; deprecate façade  
+41. [ ] Deprecate façade; optional package move of pure enums out of `CHARGE_INTERNAL` packages  
+42. [ ] Optional: `AccountingProcessorHelper` income GL via `incomeOrLiabilityAccountId` + GL repo  
 
-**Note:** Domain modules loan + savings + WC + accounting are charge-api-only; account-level client/share charges are chargeId.
+**Note:** Domain modules loan + savings + WC + accounting are charge-api-only; all product charge join tables (loan/savings/share) and account-level client/share charges use chargeId. Loan charge create path is port-only in provider. Freeze residual is package-level enum/read-service coupling, not JPA `Charge` associations.
 
 ### Step 9 — Documentation & acceptance ✅
 

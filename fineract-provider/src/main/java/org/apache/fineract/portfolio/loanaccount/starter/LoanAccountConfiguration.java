@@ -51,7 +51,7 @@ import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPl
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
 import org.apache.fineract.portfolio.calendar.domain.CalendarRepository;
 import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformService;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.charge.service.ChargeDropdownReadPlatformService;
 import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
@@ -292,10 +292,10 @@ public class LoanAccountConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(LoanChargeAssembler.class)
-    public LoanChargeAssembler loanChargeAssembler(final FromJsonHelper fromApiJsonHelper, final ChargeRepositoryWrapper chargeRepository,
+    public LoanChargeAssembler loanChargeAssembler(final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort,
             final LoanChargeRepository loanChargeRepository, final LoanProductRepository loanProductRepository,
             final ExternalIdFactory externalIdFactory, final LoanChargeService loanChargeService) {
-        return new LoanChargeAssembler(fromApiJsonHelper, chargeRepository, loanChargeRepository, loanProductRepository, externalIdFactory,
+        return new LoanChargeAssembler(fromApiJsonHelper, chargeDefinitionPort, loanChargeRepository, loanProductRepository, externalIdFactory,
                 loanChargeService);
     }
 
@@ -311,7 +311,7 @@ public class LoanAccountConfiguration {
     @Bean
     @ConditionalOnMissingBean(LoanChargeWritePlatformService.class)
     public LoanChargeWritePlatformService loanChargeWritePlatformService(LoanChargeApiJsonValidator loanChargeApiJsonValidator,
-            LoanAssembler loanAssembler, ChargeRepositoryWrapper chargeRepository,
+            LoanAssembler loanAssembler, ChargeDefinitionPort chargeDefinitionPort,
             BusinessEventNotifierService businessEventNotifierService, LoanTransactionRepository loanTransactionRepository,
             AccountTransfersWritePlatformService accountTransfersWritePlatformService, LoanRepositoryWrapper loanRepositoryWrapper,
             LoanAccountDomainService loanAccountDomainService, LoanChargeRepository loanChargeRepository,
@@ -326,7 +326,7 @@ public class LoanAccountConfiguration {
             LoanScheduleService loanScheduleService, ReprocessLoanTransactionsService reprocessLoanTransactionsService,
             LoanAccountService loanAccountService, LoanAdjustmentService loanAdjustmentService, LoanChargeService loanChargeService,
             LoanJournalEntryPoster loanJournalEntryPoster) {
-        return new LoanChargeWritePlatformServiceImpl(loanChargeApiJsonValidator, loanAssembler, chargeRepository,
+        return new LoanChargeWritePlatformServiceImpl(loanChargeApiJsonValidator, loanAssembler, chargeDefinitionPort,
                 businessEventNotifierService, loanTransactionRepository, accountTransfersWritePlatformService, loanRepositoryWrapper,
                 loanAccountDomainService, loanChargeRepository, loanWritePlatformService, loanUtilService, loanChargeReadPlatformService,
                 loanLifecycleStateMachine, accountAssociationsReadPlatformService, fromApiJsonHelper, configurationDomainService,
@@ -500,9 +500,9 @@ public class LoanAccountConfiguration {
             LoanDisbursementValidator loanDisbursementValidator, LoanChargeService loanChargeService, LoanBalanceService loanBalanceService,
             LoanJournalEntryPoster journalEntryPoster, LoanTransactionRepository loanTransactionRepository,
             ConfigurationDomainService configurationDomainService,
-            org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper chargeRepository) {
+            ChargeDefinitionPort chargeDefinitionPort) {
         return new LoanDisbursementService(loanChargeValidator, loanDisbursementValidator, loanChargeService, loanBalanceService,
-                journalEntryPoster, loanTransactionRepository, configurationDomainService, chargeRepository);
+                journalEntryPoster, loanTransactionRepository, configurationDomainService, chargeDefinitionPort);
     }
 
     @Bean

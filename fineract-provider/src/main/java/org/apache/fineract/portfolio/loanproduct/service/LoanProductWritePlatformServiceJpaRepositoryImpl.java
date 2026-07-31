@@ -39,8 +39,9 @@ import org.apache.fineract.infrastructure.event.business.domain.loan.product.Loa
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.exception.InvalidCurrencyException;
-import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucket;
 import org.apache.fineract.portfolio.delinquency.domain.DelinquencyBucketRepository;
 import org.apache.fineract.portfolio.delinquency.exception.DelinquencyBucketNotFoundException;
@@ -81,7 +82,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     private final LoanProductRepository loanProductRepository;
     private final AprCalculator aprCalculator;
     private final FundRepository fundRepository;
-    private final ChargeRepositoryWrapper chargeRepository;
+    private final ChargeDefinitionPort chargeDefinitionPort;
     private final RateRepositoryWrapper rateRepository;
     private final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService;
     private final FineractEntityAccessUtil fineractEntityAccessUtil;
@@ -281,7 +282,8 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
                     final JsonObject jsonObject = chargesArray.get(i).getAsJsonObject();
                     if (jsonObject.has("id")) {
                         final Long id = jsonObject.get("id").getAsLong();
-                        final Charge charge = this.chargeRepository.findOneWithNotFoundDetection(id);
+                        final ChargeDefinitionData charge = this.chargeDefinitionPort.findCharge(id)
+                                .orElseThrow(() -> new ChargeNotFoundException(id));
                         if (!loanProductCurrencyCode.equals(charge.getCurrencyCode())) {
                             final String errorMessage = "Charge and Loan Product must have the same currency.";
                             throw new InvalidCurrencyException("charge", "attach.to.loan.product", errorMessage);
@@ -353,13 +355,13 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanProductWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanProductDataValidator fromApiJsonDeserializer, final LoanProductRepository loanProductRepository, final AprCalculator aprCalculator, final FundRepository fundRepository, final ChargeRepositoryWrapper chargeRepository, final RateRepositoryWrapper rateRepository, final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService, final FineractEntityAccessUtil fineractEntityAccessUtil, final FloatingRateRepositoryWrapper floatingRateRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final BusinessEventNotifierService businessEventNotifierService, final DelinquencyBucketRepository delinquencyBucketRepository, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsJsonParser advancedPaymentJsonParser, final CreditAllocationsJsonParser creditAllocationsJsonParser, final LoanProductAssembler loanProductAssembler, final LoanProductUpdateUtil loanProductUpdateUtil) {
+        public LoanProductWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final LoanProductDataValidator fromApiJsonDeserializer, final LoanProductRepository loanProductRepository, final AprCalculator aprCalculator, final FundRepository fundRepository, final ChargeDefinitionPort chargeDefinitionPort, final RateRepositoryWrapper rateRepository, final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService, final FineractEntityAccessUtil fineractEntityAccessUtil, final FloatingRateRepositoryWrapper floatingRateRepository, final LoanRepositoryWrapper loanRepositoryWrapper, final BusinessEventNotifierService businessEventNotifierService, final DelinquencyBucketRepository delinquencyBucketRepository, final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory, final AdvancedPaymentAllocationsJsonParser advancedPaymentJsonParser, final CreditAllocationsJsonParser creditAllocationsJsonParser, final LoanProductAssembler loanProductAssembler, final LoanProductUpdateUtil loanProductUpdateUtil) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.loanProductRepository = loanProductRepository;
         this.aprCalculator = aprCalculator;
         this.fundRepository = fundRepository;
-        this.chargeRepository = chargeRepository;
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.rateRepository = rateRepository;
         this.accountMappingWritePlatformService = accountMappingWritePlatformService;
         this.fineractEntityAccessUtil = fineractEntityAccessUtil;

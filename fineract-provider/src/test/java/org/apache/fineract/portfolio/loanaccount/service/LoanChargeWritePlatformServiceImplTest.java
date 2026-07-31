@@ -41,10 +41,10 @@ import org.apache.fineract.infrastructure.event.business.domain.loan.transaction
 import org.apache.fineract.infrastructure.event.business.service.BusinessEventNotifierService;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.domain.ChargePaymentMode;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.loanaccount.data.AccountingBridgeDataDTO;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanAccountDomainService;
@@ -100,10 +100,10 @@ class LoanChargeWritePlatformServiceImplTest {
     private Loan loan;
 
     @Mock
-    private ChargeRepositoryWrapper chargeRepository;
+    private ChargeDefinitionPort chargeDefinitionPort;
 
     @Mock
-    private Charge chargeDefinition;
+    private ChargeDefinitionData chargeDefinition;
 
     @Mock
     private LoanChargeAssembler loanChargeAssembler;
@@ -171,8 +171,9 @@ class LoanChargeWritePlatformServiceImplTest {
     @BeforeEach
     void setUp() {
         when(loanAssembler.assembleFrom(LOAN_ID)).thenReturn(loan);
-        when(chargeRepository.findOneWithNotFoundDetection(anyLong())).thenReturn(chargeDefinition);
+        when(chargeDefinitionPort.getActiveCharge(anyLong())).thenReturn(chargeDefinition);
         when(chargeDefinition.getChargeTimeType()).thenReturn(SPECIFIED_DUE_DATE);
+        when(chargeDefinition.getChargeCalculationType()).thenReturn(1); // FLAT
         when(chargeDefinition.getCurrencyCode()).thenReturn(CURRENCY_CODE);
         when(loanChargeAssembler.createNewFromJson(loan, chargeDefinition, jsonCommand)).thenReturn(loanCharge);
         when(loan.getLoanProductRelatedDetail()).thenReturn(loanRepaymentScheduleDetail);

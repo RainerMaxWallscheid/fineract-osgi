@@ -35,26 +35,26 @@ import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.domain.ChargePaymentMode;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
-import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeNotFoundException;
-import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeWithoutMandatoryFieldException;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanChargeRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanDisbursementDetails;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTrancheDisbursementCharge;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeNotFoundException;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeWithoutMandatoryFieldException;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 
 public class LoanChargeAssembler {
     private final FromJsonHelper fromApiJsonHelper;
-    private final ChargeRepositoryWrapper chargeRepository;
+    private final ChargeDefinitionPort chargeDefinitionPort;
     private final LoanChargeRepository loanChargeRepository;
     private final LoanProductRepository loanProductRepository;
     private final ExternalIdFactory externalIdFactory;
@@ -106,7 +106,7 @@ public class LoanChargeAssembler {
                     final String externalIdStr = this.fromApiJsonHelper.extractStringNamed("externalId", loanChargeElement);
                     final ExternalId externalId = externalIdFactory.create(externalIdStr);
                     if (loanChargeId == null) {
-                        final Charge chargeDefinition = this.chargeRepository.findOneWithNotFoundDetection(chargeId);
+                        final ChargeDefinitionData chargeDefinition = this.chargeDefinitionPort.getActiveCharge(chargeId);
                         ChargeTimeType chargeTime = null;
                         if (chargeTimeType != null) {
                             chargeTime = ChargeTimeType.fromInt(chargeTimeType);
@@ -141,7 +141,8 @@ public class LoanChargeAssembler {
                                     // tranche
                                     for (LoanDisbursementDetails disbursementDetail : disbursementDetails) {
                                         LoanTrancheDisbursementCharge loanTrancheDisbursementCharge = null;
-                                        if (chargeDefinition.isPercentageOfApprovedAmount() && disbursementDetail.expectedDisbursementDateAsLocalDate().equals(expectedDisbursementDate)) {
+                                        if (isPercentageOfApprovedAmount(chargeDefinition)
+                                                && disbursementDetail.expectedDisbursementDateAsLocalDate().equals(expectedDisbursementDate)) {
                                             final LoanCharge loanCharge = createNewWithoutLoan(chargeDefinition, principal, amount, chargeTime, chargeCalculation, dueDate, chargePaymentModeEnum, numberOfRepayments, externalId);
                                             loanCharges.add(loanCharge);
                                             if (loanCharge.isTrancheDisbursementCharge()) {
@@ -199,8 +200,8 @@ public class LoanChargeAssembler {
                     final Long id = this.fromApiJsonHelper.extractLongNamed("id", loanChargeElement);
                     final Long chargeId = this.fromApiJsonHelper.extractLongNamed("chargeId", loanChargeElement);
                     if (id == null && chargeId != null) {
-                        final Charge chargeDefinition = this.chargeRepository.findOneWithNotFoundDetection(chargeId);
-                        if (chargeDefinition.getChargeTimeType().equals(ChargeTimeType.TRANCHE_DISBURSEMENT.getValue())) {
+                        final ChargeDefinitionData chargeDefinition = this.chargeDefinitionPort.getActiveCharge(chargeId);
+                        if (ChargeTimeType.TRANCHE_DISBURSEMENT.getValue().equals(chargeDefinition.getChargeTimeType())) {
                             associatedChargeIds.add(chargeId);
                         }
                     }
@@ -210,45 +211,45 @@ public class LoanChargeAssembler {
         return associatedChargeIds;
     }
 
-    public LoanCharge createNewFromJson(final Loan loan, final Charge chargeDefinition, final JsonCommand command) {
+    public LoanCharge createNewFromJson(final Loan loan, final ChargeDefinitionData chargeDefinition, final JsonCommand command) {
         final LocalDate dueDate = command.localDateValueOfParameterNamed("dueDate");
-        if (chargeDefinition.getChargeTimeType().equals(ChargeTimeType.SPECIFIED_DUE_DATE.getValue()) && dueDate == null) {
+        if (ChargeTimeType.SPECIFIED_DUE_DATE.getValue().equals(chargeDefinition.getChargeTimeType()) && dueDate == null) {
             final String defaultUserMessage = "Loan charge is missing due date.";
             throw new LoanChargeWithoutMandatoryFieldException("loanCharge", "dueDate", defaultUserMessage, chargeDefinition.getId(), chargeDefinition.getName());
         }
         return createNewFromJson(loan, chargeDefinition, command, dueDate);
     }
 
-    public LoanCharge createNewFromJson(final Loan loan, final Charge chargeDefinition, final JsonCommand command, final LocalDate dueDate) {
+    public LoanCharge createNewFromJson(final Loan loan, final ChargeDefinitionData chargeDefinition, final JsonCommand command, final LocalDate dueDate) {
         final Locale locale = command.extractLocale();
         final BigDecimal amount = command.bigDecimalValueOfParameterNamed("amount", locale);
         final ChargeTimeType chargeTime = null;
         final ChargeCalculationType chargeCalculation = null;
         final ChargePaymentMode chargePaymentMode = null;
         BigDecimal amountPercentageAppliedTo = BigDecimal.ZERO;
-        switch (ChargeCalculationType.fromInt(chargeDefinition.getChargeCalculation())) {
-        case PERCENT_OF_AMOUNT: 
+        switch (ChargeCalculationType.fromInt(chargeDefinition.getChargeCalculationType())) {
+        case PERCENT_OF_AMOUNT:
             if (command.hasParameter("principal")) {
                 amountPercentageAppliedTo = command.bigDecimalValueOfParameterNamed("principal");
             } else {
                 amountPercentageAppliedTo = loan.getPrincipal().getAmount();
             }
             break;
-        case PERCENT_OF_AMOUNT_AND_INTEREST: 
+        case PERCENT_OF_AMOUNT_AND_INTEREST:
             if (command.hasParameter("principal") && command.hasParameter("interest")) {
                 amountPercentageAppliedTo = command.bigDecimalValueOfParameterNamed("principal").add(command.bigDecimalValueOfParameterNamed("interest"));
             } else {
                 amountPercentageAppliedTo = loan.getPrincipal().getAmount().add(loan.getTotalInterest());
             }
             break;
-        case PERCENT_OF_INTEREST: 
+        case PERCENT_OF_INTEREST:
             if (command.hasParameter("interest")) {
                 amountPercentageAppliedTo = command.bigDecimalValueOfParameterNamed("interest");
             } else {
                 amountPercentageAppliedTo = loan.getTotalInterest();
             }
             break;
-        default: 
+        default:
             break;
         }
         BigDecimal loanCharge = BigDecimal.ZERO;
@@ -257,13 +258,13 @@ public class LoanChargeAssembler {
             if (percentage == null) {
                 percentage = chargeDefinition.getAmount();
             }
-            loanCharge = loanChargeService.calculatePerInstallmentChargeAmount(loan, ChargeCalculationType.fromInt(chargeDefinition.getChargeCalculation()), percentage);
+            loanCharge = loanChargeService.calculatePerInstallmentChargeAmount(loan, ChargeCalculationType.fromInt(chargeDefinition.getChargeCalculationType()), percentage);
         }
         // If charge type is specified due date and loan is multi disburment
         // loan.
         // Then we need to get as of this loan charge due date how much amount
         // disbursed.
-        if (chargeDefinition.getChargeTimeType().equals(ChargeTimeType.SPECIFIED_DUE_DATE.getValue()) && loan.isMultiDisburmentLoan()) {
+        if (ChargeTimeType.SPECIFIED_DUE_DATE.getValue().equals(chargeDefinition.getChargeTimeType()) && loan.isMultiDisburmentLoan()) {
             amountPercentageAppliedTo = BigDecimal.ZERO;
             for (final LoanDisbursementDetails loanDisbursementDetails : loan.getDisbursementDetails()) {
                 if (!DateUtils.isAfter(loanDisbursementDetails.expectedDisbursementDate(), dueDate)) {
@@ -272,20 +273,24 @@ public class LoanChargeAssembler {
             }
         }
         ExternalId externalId = externalIdFactory.createFromCommand(command, "externalId");
-        return loanChargeService.create(loan, chargeDefinition.toDefinitionData(), amountPercentageAppliedTo, amount, chargeTime, chargeCalculation, dueDate, chargePaymentMode, null, loanCharge, externalId);
+        return loanChargeService.create(loan, chargeDefinition, amountPercentageAppliedTo, amount, chargeTime, chargeCalculation, dueDate, chargePaymentMode, null, loanCharge, externalId);
     }
 
     /*
      * loanPrincipal is required for charges that are percentage based
      */
-    public LoanCharge createNewWithoutLoan(final Charge chargeDefinition, final BigDecimal loanPrincipal, final BigDecimal amount, final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculation, final LocalDate dueDate, final ChargePaymentMode chargePaymentMode, final Integer numberOfRepayments, final ExternalId externalId) {
-        return loanChargeService.create(null, chargeDefinition.toDefinitionData(), loanPrincipal, amount, chargeTime, chargeCalculation, dueDate, chargePaymentMode, numberOfRepayments, BigDecimal.ZERO, externalId);
+    public LoanCharge createNewWithoutLoan(final ChargeDefinitionData chargeDefinition, final BigDecimal loanPrincipal, final BigDecimal amount, final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculation, final LocalDate dueDate, final ChargePaymentMode chargePaymentMode, final Integer numberOfRepayments, final ExternalId externalId) {
+        return loanChargeService.create(null, chargeDefinition, loanPrincipal, amount, chargeTime, chargeCalculation, dueDate, chargePaymentMode, numberOfRepayments, BigDecimal.ZERO, externalId);
+    }
+
+    private static boolean isPercentageOfApprovedAmount(final ChargeDefinitionData chargeDefinition) {
+        return ChargeCalculationType.fromInt(chargeDefinition.getChargeCalculationType()).isPercentageOfAmount();
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanChargeAssembler(final FromJsonHelper fromApiJsonHelper, final ChargeRepositoryWrapper chargeRepository, final LoanChargeRepository loanChargeRepository, final LoanProductRepository loanProductRepository, final ExternalIdFactory externalIdFactory, final LoanChargeService loanChargeService) {
+    public LoanChargeAssembler(final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort, final LoanChargeRepository loanChargeRepository, final LoanProductRepository loanProductRepository, final ExternalIdFactory externalIdFactory, final LoanChargeService loanChargeService) {
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.chargeRepository = chargeRepository;
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.loanChargeRepository = loanChargeRepository;
         this.loanProductRepository = loanProductRepository;
         this.externalIdFactory = externalIdFactory;

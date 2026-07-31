@@ -69,11 +69,13 @@ import org.apache.fineract.portfolio.account.domain.AccountTransferType;
 import org.apache.fineract.portfolio.account.exception.AccountTransferNotFoundException;
 import org.apache.fineract.portfolio.account.service.AccountAssociationsReadPlatformService;
 import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
-import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.charge.domain.ChargeAppliesTo;
+import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeAppliedToException;
 import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeUpdatedException;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeCannotBeAddedException;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeCannotBeDeletedException;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanChargeCannotBePayedException;
@@ -141,7 +143,7 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
     private static final String AMOUNT = "amount";
     private final LoanChargeApiJsonValidator loanChargeApiJsonValidator;
     private final LoanAssembler loanAssembler;
-    private final ChargeRepositoryWrapper chargeRepository;
+    private final ChargeDefinitionPort chargeDefinitionPort;
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanTransactionRepository loanTransactionRepository;
     private final AccountTransfersWritePlatformService accountTransfersWritePlatformService;
@@ -185,8 +187,8 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
         }
         List<LoanDisbursementDetails> loanDisburseDetails = loan.getDisbursementDetails();
         final Long chargeDefinitionId = command.longValueOfParameterNamed("chargeId");
-        final Charge chargeDefinition = this.chargeRepository.findOneWithNotFoundDetection(chargeDefinitionId);
-        if (loan.isDisbursed() && chargeDefinition.isDisbursementCharge()) {
+        final ChargeDefinitionData chargeDefinition = this.chargeDefinitionPort.getActiveCharge(chargeDefinitionId);
+        if (loan.isDisbursed() && isDisbursementCharge(chargeDefinition)) {
             // validates whether any pending disbursements are available to
             // apply this charge
             validateAddingNewChargeAllowed(loanDisburseDetails);
@@ -195,7 +197,7 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
         LoanCharge loanCharge = null;
         LocalDate recalculateFrom = loan.fetchInterestRecalculateFromDate();
         LocalDate transactionDate = null;
-        if (chargeDefinition.isPercentageOfDisbursementAmount()) {
+        if (isPercentageOfDisbursementAmount(chargeDefinition)) {
             LoanTrancheDisbursementCharge loanTrancheDisbursementCharge;
             ExternalId externalId = externalIdFactory.createFromCommand(command, "externalId");
             boolean isFirst = true;
@@ -687,8 +689,7 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
             log.warn("Adding charge to Loan: {} is not allowed. Loan Account is Charged-off", loanId);
             return;
         }
-        final Optional<Charge> optPenaltyCharge = resolveOverdueInstallmentPenaltyCharge(loan);
-        if (optPenaltyCharge.isEmpty()) {
+        if (resolveOverdueInstallmentPenaltyCharge(loan).isEmpty()) {
             return;
         }
         boolean runInterestRecalculation = false;
@@ -863,8 +864,8 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
         }
     }
 
-    private void validateAddLoanCharge(final Loan loan, final Charge chargeDefinition, final LoanCharge loanCharge) {
-        if (chargeDefinition.isOverdueInstallment()) {
+    private void validateAddLoanCharge(final Loan loan, final ChargeDefinitionData chargeDefinition, final LoanCharge loanCharge) {
+        if (ChargeTimeType.fromInt(chargeDefinition.getChargeTimeType()).isOverdueInstallment()) {
             final String defaultUserMessage = "Installment charge cannot be added to the loan.";
             throw new LoanChargeCannotBeAddedException("loanCharge", "overdue.charge", defaultUserMessage, null, chargeDefinition.getName());
         } else if (loanCharge.getDueLocalDate() != null) {
@@ -886,7 +887,7 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
         }
     }
 
-    private boolean addCharge(final Loan loan, final Charge chargeDefinition, LoanCharge loanCharge) {
+    private boolean addCharge(final Loan loan, final ChargeDefinitionData chargeDefinition, LoanCharge loanCharge) {
         if (!loan.hasCurrencyCodeOf(chargeDefinition.getCurrencyCode())) {
             final String errorMessage = "Charge and Loan must have the same currency.";
             throw new InvalidCurrencyException("loanCharge", "attach.to.loan", errorMessage);
@@ -924,9 +925,9 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
 
     private LoanOverdueDTO applyChargeToOverdueLoanInstallment(final Loan loan, final Long loanChargeId, final Integer periodNumber, final JsonCommand command) {
         boolean runInterestRecalculation = false;
-        final Charge chargeDefinition = this.chargeRepository.findOneWithNotFoundDetection(loanChargeId);
+        final ChargeDefinitionData chargeDefinition = this.chargeDefinitionPort.getActiveCharge(loanChargeId);
         Collection<Integer> frequencyNumbers = loanChargeReadPlatformService.retrieveOverdueInstallmentChargeFrequencyNumber(loan, chargeDefinition.getId(), periodNumber);
-        Integer feeFrequency = chargeDefinition.feeFrequency();
+        Integer feeFrequency = chargeDefinition.getFeeFrequency();
         final ScheduledDateGenerator scheduledDateGenerator = new DefaultScheduledDateGenerator();
         Map<Integer, LocalDate> scheduleDates = new HashMap<>();
         final Long penaltyWaitPeriodValue = this.configurationDomainService.retrievePenaltyWaitPeriod();
@@ -943,7 +944,7 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
         } else {
             while (!DateUtils.isDateInTheFuture(startDate)) {
                 scheduleDates.put(frequencyNumber++, startDate.minusDays(diff));
-                startDate = scheduledDateGenerator.getRepaymentPeriodDate(PeriodFrequencyType.fromInt(feeFrequency), chargeDefinition.feeInterval(), startDate);
+                startDate = scheduledDateGenerator.getRepaymentPeriodDate(PeriodFrequencyType.fromInt(feeFrequency), chargeDefinition.getFeeInterval(), startDate);
             }
         }
         for (Integer frequency : frequencyNumbers) {
@@ -1239,25 +1240,35 @@ public class LoanChargeWritePlatformServiceImpl implements LoanChargeWritePlatfo
         return waiveLoanChargeTransaction;
     }
 
-    private Optional<Charge> resolveOverdueInstallmentPenaltyCharge(final Loan loan) {
+    private Optional<ChargeDefinitionData> resolveOverdueInstallmentPenaltyCharge(final Loan loan) {
         final List<Long> chargeIds = loan.getLoanProduct().getChargeIds();
         if (chargeIds == null || chargeIds.isEmpty()) {
             return Optional.empty();
         }
         for (final Long chargeId : chargeIds) {
-            final Charge charge = this.chargeRepository.findOneWithNotFoundDetection(chargeId);
-            if (ChargeTimeType.OVERDUE_INSTALLMENT.getValue().equals(charge.getChargeTimeType()) && charge.isLoanCharge()) {
+            final ChargeDefinitionData charge = this.chargeDefinitionPort.getActiveCharge(chargeId);
+            if (ChargeTimeType.OVERDUE_INSTALLMENT.getValue().equals(charge.getChargeTimeType())
+                    && ChargeAppliesTo.fromInt(charge.getChargeAppliesTo()).isLoanCharge()) {
                 return Optional.of(charge);
             }
         }
         return Optional.empty();
     }
 
+    private static boolean isDisbursementCharge(final ChargeDefinitionData chargeDefinition) {
+        final ChargeTimeType time = ChargeTimeType.fromInt(chargeDefinition.getChargeTimeType());
+        return time.isTimeOfDisbursement() || time.isTrancheDisbursement();
+    }
+
+    private static boolean isPercentageOfDisbursementAmount(final ChargeDefinitionData chargeDefinition) {
+        return ChargeCalculationType.fromInt(chargeDefinition.getChargeCalculationType()).isPercentageOfDisbursementAmount();
+    }
+
     @java.lang.SuppressWarnings("all")
-        public LoanChargeWritePlatformServiceImpl(final LoanChargeApiJsonValidator loanChargeApiJsonValidator, final LoanAssembler loanAssembler, final ChargeRepositoryWrapper chargeRepository, final BusinessEventNotifierService businessEventNotifierService, final LoanTransactionRepository loanTransactionRepository, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanAccountDomainService loanAccountDomainService, final LoanChargeRepository loanChargeRepository, final LoanWritePlatformService loanWritePlatformService, final LoanUtilService loanUtilService, final LoanChargeReadPlatformService loanChargeReadPlatformService, final LoanLifecycleStateMachine loanLifecycleStateMachine, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final FromJsonHelper fromApiJsonHelper, final ConfigurationDomainService configurationDomainService, final ExternalIdFactory externalIdFactory, final AccountTransferDetailRepository accountTransferDetailRepository, final LoanChargeAssembler loanChargeAssembler, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final NoteRepository noteRepository, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanChargeValidator loanChargeValidator, final LoanScheduleService loanScheduleService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanAccountService loanAccountService, final LoanAdjustmentService loanAdjustmentService, final LoanChargeService loanChargeService, final LoanJournalEntryPoster loanJournalEntryPoster) {
+        public LoanChargeWritePlatformServiceImpl(final LoanChargeApiJsonValidator loanChargeApiJsonValidator, final LoanAssembler loanAssembler, final ChargeDefinitionPort chargeDefinitionPort, final BusinessEventNotifierService businessEventNotifierService, final LoanTransactionRepository loanTransactionRepository, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final LoanRepositoryWrapper loanRepositoryWrapper, final LoanAccountDomainService loanAccountDomainService, final LoanChargeRepository loanChargeRepository, final LoanWritePlatformService loanWritePlatformService, final LoanUtilService loanUtilService, final LoanChargeReadPlatformService loanChargeReadPlatformService, final LoanLifecycleStateMachine loanLifecycleStateMachine, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final FromJsonHelper fromApiJsonHelper, final ConfigurationDomainService configurationDomainService, final ExternalIdFactory externalIdFactory, final AccountTransferDetailRepository accountTransferDetailRepository, final LoanChargeAssembler loanChargeAssembler, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final NoteRepository noteRepository, final LoanAccrualsProcessingService loanAccrualsProcessingService, final LoanDownPaymentTransactionValidator loanDownPaymentTransactionValidator, final LoanChargeValidator loanChargeValidator, final LoanScheduleService loanScheduleService, final ReprocessLoanTransactionsService reprocessLoanTransactionsService, final LoanAccountService loanAccountService, final LoanAdjustmentService loanAdjustmentService, final LoanChargeService loanChargeService, final LoanJournalEntryPoster loanJournalEntryPoster) {
         this.loanChargeApiJsonValidator = loanChargeApiJsonValidator;
         this.loanAssembler = loanAssembler;
-        this.chargeRepository = chargeRepository;
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.businessEventNotifierService = businessEventNotifierService;
         this.loanTransactionRepository = loanTransactionRepository;
         this.accountTransfersWritePlatformService = accountTransfersWritePlatformService;

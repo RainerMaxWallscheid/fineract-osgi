@@ -45,8 +45,9 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.exception.InvalidCurrencyException;
-import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.shareproducts.constants.ShareProductApiConstants;
 import org.apache.fineract.portfolio.shareproducts.data.ShareProductMarketPriceData;
@@ -79,14 +80,14 @@ public class ShareProductDataSerializer {
             ShareProductApiConstants.dateFormatParamName, ShareProductApiConstants.dividendPeriodStartDateParamName,
             ShareProductApiConstants.dividendPeriodEndDateParamName, ShareProductApiConstants.dividendAmountParamName));
     private final FromJsonHelper fromApiJsonHelper;
-    private final ChargeRepositoryWrapper chargeRepository;
+    private final ChargeDefinitionPort chargeDefinitionPort;
     private final PlatformSecurityContext platformSecurityContext;
 
     @Autowired
-    public ShareProductDataSerializer(final FromJsonHelper fromApiJsonHelper, final ChargeRepositoryWrapper chargeRepository,
+    public ShareProductDataSerializer(final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort,
             final PlatformSecurityContext platformSecurityContext) {
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.chargeRepository = chargeRepository;
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.platformSecurityContext = platformSecurityContext;
     }
 
@@ -165,7 +166,7 @@ public class ShareProductDataSerializer {
         }
 
         Set<ShareProductMarketPrice> marketPriceSet = asembleShareMarketPrice(element);
-        Set<Charge> charges = assembleListOfProductCharges(element, currencyCode);
+        Set<Long> charges = assembleListOfProductChargeIds(element, currencyCode);
         Boolean allowdividendsForInactiveClients = this.fromApiJsonHelper
                 .extractBooleanNamed(ShareProductApiConstants.allowdividendcalculationforinactiveclients_paramname, element);
 
@@ -236,8 +237,8 @@ public class ShareProductDataSerializer {
         return set;
     }
 
-    private Set<Charge> assembleListOfProductCharges(final JsonElement element, final String currencyCode) {
-        final Set<Charge> charges = new HashSet<>();
+    private Set<Long> assembleListOfProductChargeIds(final JsonElement element, final String currencyCode) {
+        final Set<Long> chargeIds = new HashSet<>();
         if (this.fromApiJsonHelper.parameterExists(ShareProductApiConstants.charges_paramname, element)) {
             JsonArray chargesArray = this.fromApiJsonHelper.extractJsonArrayNamed(ShareProductApiConstants.charges_paramname, element);
             if (chargesArray != null) {
@@ -245,17 +246,18 @@ public class ShareProductDataSerializer {
                     final JsonObject jsonObject = chargesArray.get(i).getAsJsonObject();
                     if (jsonObject.has("id")) {
                         final Long id = jsonObject.get("id").getAsLong();
-                        final Charge charge = this.chargeRepository.findOneWithNotFoundDetection(id);
+                        final ChargeDefinitionData charge = this.chargeDefinitionPort.findCharge(id)
+                                .orElseThrow(() -> new ChargeNotFoundException(id));
                         if (!currencyCode.equals(charge.getCurrencyCode())) {
                             final String errorMessage = "Charge and Share Product must have the same currency.";
                             throw new InvalidCurrencyException("charge", "attach.to.share.product", errorMessage);
                         }
-                        charges.add(charge);
+                        chargeIds.add(id);
                     }
                 }
             }
         }
-        return charges;
+        return chargeIds;
     }
 
     public Map<String, Object> validateAndUpdate(JsonCommand jsonCommand, ShareProduct product) {
@@ -396,8 +398,8 @@ public class ShareProductDataSerializer {
 
         if (this.fromApiJsonHelper.parameterExists(ShareProductApiConstants.charges_paramname, element)) {
             final String currencyCode = this.fromApiJsonHelper.extractStringNamed(ShareProductApiConstants.currency_paramname, element);
-            Set<Charge> charges = assembleListOfProductCharges(element, currencyCode);
-            if (product.setCharges(charges)) {
+            Set<Long> charges = assembleListOfProductChargeIds(element, currencyCode);
+            if (product.setChargeIds(charges)) {
                 actualChanges.put(ShareProductApiConstants.charges_paramname, charges);
             }
         }

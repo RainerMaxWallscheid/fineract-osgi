@@ -42,9 +42,9 @@ import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.serialization.JsonParserHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.domain.Money;
-import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
@@ -69,7 +69,7 @@ public class LoanDisbursementService {
     private final LoanJournalEntryPoster loanJournalEntryPoster;
     private final LoanTransactionRepository loanTransactionRepository;
     private final ConfigurationDomainService configurationDomainService;
-    private final ChargeRepositoryWrapper chargeRepository;
+    private final ChargeDefinitionPort chargeDefinitionPort;
 
     public void updateDisbursementDetails(final Loan loan, final JsonCommand jsonCommand, final Map<String, Object> actualChanges) {
         final List<Long> disbursementList = loan.fetchDisbursementIds();
@@ -266,12 +266,12 @@ public class LoanDisbursementService {
         } else {
             final var disbursementDetails = loan.addLoanDisbursementDetails(expectedDisbursementDate, principal);
             for (LoanTrancheCharge trancheCharge : loan.getTrancheCharges()) {
-                Charge chargeDefinition = chargeRepository.findOneWithNotFoundDetection(trancheCharge.getChargeId());
+                ChargeDefinitionData chargeDefinition = chargeDefinitionPort.getActiveCharge(trancheCharge.getChargeId());
                 ExternalId externalId = ExternalId.empty();
                 if (TemporaryConfigurationServiceContainer.isExternalIdAutoGenerationEnabled()) {
                     externalId = ExternalId.generate();
                 }
-                final LoanCharge loanCharge = loanChargeService.create(loan, chargeDefinition.toDefinitionData(), principal, null, null, null, expectedDisbursementDate, null, null, BigDecimal.ZERO, externalId);
+                final LoanCharge loanCharge = loanChargeService.create(loan, chargeDefinition, principal, null, null, null, expectedDisbursementDate, null, null, BigDecimal.ZERO, externalId);
                 LoanTrancheDisbursementCharge loanTrancheDisbursementCharge = new LoanTrancheDisbursementCharge(loanCharge, disbursementDetails);
                 loanCharge.updateLoanTrancheDisbursementCharge(loanTrancheDisbursementCharge);
                 loanChargeValidator.validateChargeAdditionForDisbursedLoan(loan, loanCharge);
@@ -418,7 +418,7 @@ public class LoanDisbursementService {
     }
 
     @java.lang.SuppressWarnings("all")
-        public LoanDisbursementService(final LoanChargeValidator loanChargeValidator, final LoanDisbursementValidator loanDisbursementValidator, final LoanChargeService loanChargeService, final LoanBalanceService loanBalanceService, final LoanJournalEntryPoster loanJournalEntryPoster, final LoanTransactionRepository loanTransactionRepository, final ConfigurationDomainService configurationDomainService, final ChargeRepositoryWrapper chargeRepository) {
+        public LoanDisbursementService(final LoanChargeValidator loanChargeValidator, final LoanDisbursementValidator loanDisbursementValidator, final LoanChargeService loanChargeService, final LoanBalanceService loanBalanceService, final LoanJournalEntryPoster loanJournalEntryPoster, final LoanTransactionRepository loanTransactionRepository, final ConfigurationDomainService configurationDomainService, final ChargeDefinitionPort chargeDefinitionPort) {
         this.loanChargeValidator = loanChargeValidator;
         this.loanDisbursementValidator = loanDisbursementValidator;
         this.loanChargeService = loanChargeService;
@@ -426,6 +426,6 @@ public class LoanDisbursementService {
         this.loanJournalEntryPoster = loanJournalEntryPoster;
         this.loanTransactionRepository = loanTransactionRepository;
         this.configurationDomainService = configurationDomainService;
-        this.chargeRepository = chargeRepository;
+        this.chargeDefinitionPort = chargeDefinitionPort;
     }
 }

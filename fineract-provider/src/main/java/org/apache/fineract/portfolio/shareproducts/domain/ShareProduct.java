@@ -19,15 +19,15 @@
 package org.apache.fineract.portfolio.shareproducts.domain;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
@@ -39,7 +39,6 @@ import org.apache.fineract.accounting.common.AccountingRuleType;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.shareproducts.data.ShareProductMarketPriceData;
 
@@ -97,9 +96,11 @@ public class ShareProduct extends AbstractAuditableCustom {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "product", orphanRemoval = true, fetch = FetchType.EAGER)
     Set<ShareProductMarketPrice> marketPrice;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "m_share_product_charge", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "charge_id"))
-    private Set<Charge> charges;
+    /** Catalog charge definition ids (no JPA association to charge-impl). */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "m_share_product_charge", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "charge_id")
+    private Set<Long> chargeIds = new HashSet<>();
 
     @Column(name = "allow_dividends_inactive_clients")
     private Boolean allowDividendCalculationForInactiveClients;
@@ -128,7 +129,7 @@ public class ShareProduct extends AbstractAuditableCustom {
     public ShareProduct(final String name, final String shortName, final String description, final String externalId,
             final MonetaryCurrency currency, final Long totalShares, final Long totalSharesIssued, final BigDecimal unitPrice,
             final BigDecimal shareCapital, final Long minimumShares, final Long nominalShares, final Long maximumShares,
-            Set<ShareProductMarketPrice> marketPrice, Set<Charge> charges, final Boolean allowDividendCalculationForInactiveClients,
+            Set<ShareProductMarketPrice> marketPrice, Set<Long> chargeIds, final Boolean allowDividendCalculationForInactiveClients,
             final Integer lockinPeriod, final PeriodFrequencyType lockPeriodType, final Integer minimumActivePeriod,
             final PeriodFrequencyType minimumActivePeriodForDividendsType, final AccountingRuleType accountingRuleType) {
 
@@ -145,7 +146,9 @@ public class ShareProduct extends AbstractAuditableCustom {
         this.nominalShares = nominalShares;
         this.maximumShares = maximumShares;
         this.marketPrice = marketPrice;
-        this.charges = charges;
+        if (chargeIds != null) {
+            this.chargeIds = chargeIds;
+        }
         this.allowDividendCalculationForInactiveClients = allowDividendCalculationForInactiveClients;
         this.lockinPeriod = lockinPeriod;
         this.lockPeriodType = lockPeriodType;
@@ -295,10 +298,19 @@ public class ShareProduct extends AbstractAuditableCustom {
         return update;
     }
 
-    public boolean setCharges(Set<Charge> charges) {
-        this.charges.clear();
-        this.charges.addAll(charges);
+    public boolean setChargeIds(Set<Long> chargeIds) {
+        if (this.chargeIds == null) {
+            this.chargeIds = new HashSet<>();
+        }
+        this.chargeIds.clear();
+        if (chargeIds != null) {
+            this.chargeIds.addAll(chargeIds);
+        }
         return true;
+    }
+
+    public Set<Long> getChargeIds() {
+        return this.chargeIds;
     }
 
     public boolean setAllowDividendCalculationForInactiveClients(Boolean allowDividendCalculationForInactiveClients) {
