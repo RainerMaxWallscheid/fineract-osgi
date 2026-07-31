@@ -4,7 +4,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 
 | | |
 |--|--|
-| **Status** | **as-built** — Steps **0–7, 9 done**; Step **8 partial** (loan + savings **charge-api only**; product/account charges chargeId; freeze rebaselined — entity residual gone) |
+| **Status** | **as-built** — Steps **0–9 done** for charge catalog split; Step 8 semantic retargets + façade **removed**; ArchUnit charge freeze **green** (public catalog surface allowlisted) |
 | **Decisions** | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **Playbook** | [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) §15.6 Wave 1, §15.7 |
 | **Reference pilot** | [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md) (as-built) |
@@ -251,9 +251,9 @@ Prefer **new moduleapi ports** that return DTOs/IDs over exporting legacy `*Plat
 - `testImplementation` of impl (+ core/test stack)  
 - No production code in main  
 
-### 3.4 Compatibility façade `:fineract-charge`
+### 3.4 Compatibility façade `:fineract-charge` — **REMOVED**
 
-During migration, keep top-level/façade project that re-exports **api + impl** so existing `implementation project(':fineract-charge')` keeps compiling. Retire after Step 8.
+Façade project deleted. Depend on `:fineract-charge-api` and (composition roots only) `:fineract-charge-impl` explicitly.
 
 ---
 
@@ -470,16 +470,40 @@ Hardest step — **incremental**. First slice landed 2026-07-26:
 39. [x] **Provider:** `LoanChargeWritePlatformServiceImpl` add/overdue/penalty resolution via port  
 40. [x] **Provider:** `LoanDisbursementService` tranche charges via port  
 
+#### Done (slice 13 — remaining provider account attach + accounting GL)
+
+41. [x] **Provider:** `ClientChargeWritePlatformServiceImpl` via `ChargeDefinitionPort`  
+42. [x] **Provider:** `ShareAccountDataSerializer` assemble account charges via port  
+43. [x] **Provider:** `SavingsAccountWritePlatformService` / `DepositAccountWritePlatformService` add charge via port  
+44. [x] **Provider:** `AccountingProcessorHelper` savings charge income GL via `incomeOrLiabilityAccountId` + `GLAccountRepository`  
+
+#### Done (slice 14 — façade deprecation)
+
+45. [x] **Gradle:** provider / war / integration-tests depend on `:fineract-charge-api` + `:fineract-charge-impl` (not façade)  
+46. [x] **Docs:** façade marked **DEPRECATED** (README, osgi table, plan §3.4); leftover unused `Charge` imports removed  
+
+#### Done (slice 15 — façade removed + ArchUnit public catalog surface)
+
+47. [x] **Gradle:** `:fineract-charge` façade project **removed** from `settings.gradle` (no re-export aggregator)  
+48. [x] **ArchUnit:** `IS_CHARGE_INTERNAL` allowlists pure catalog enums, converters, `ChargeReadPlatformService`, `ChargeEnumerations`; forbids entity/repos/write/impl  
+49. [x] **Freeze:** loan/savings → charge internal rules **0 violations** (empty freeze store files)  
+
+#### Done (slice 16 — public types under moduleapi)
+
+50. [x] **Package move:** pure enums, converters, `ChargeReadPlatformService`, `ChargeEnumerations` → `…portfolio.charge.moduleapi` (charge-api)  
+51. [x] **Core:** `ChargeTimeType` + converter → `…portfolio.charge.moduleapi` (shared kernel, same package name)  
+52. [x] **OSGi Export-Package:** charge-api exports `moduleapi` + `exception` only (no domain/service split packages)  
+53. [x] **ArchUnit:** `IS_CHARGE_INTERNAL` = domain/service/handler/serialization only; public surface is moduleapi  
+
 #### Residual (later slices)
 
 | Module | Still needs charge-impl for |
 |--------|-----------------------------|
-| **provider / ITs** | façade composition root; catalog write/read services still on charge-impl; accounting helper may still load `Charge` for GL account |
+| **provider / ITs** | catalog write/read services + REST live on charge-impl (correct for composition root) |
 
-41. [ ] Deprecate façade; optional package move of pure enums out of `CHARGE_INTERNAL` packages  
-42. [ ] Optional: `AccountingProcessorHelper` income GL via `incomeOrLiabilityAccountId` + GL repo  
+54. [ ] Wave 1 next modules (rates / tax / …)  
 
-**Note:** Domain modules loan + savings + WC + accounting are charge-api-only; all product charge join tables (loan/savings/share) and account-level client/share charges use chargeId. Loan charge create path is port-only in provider. Freeze residual is package-level enum/read-service coupling, not JPA `Charge` associations.
+**Note:** Domain modules loan + savings + WC + accounting are charge-api-only; product/account charge create paths in provider use `ChargeDefinitionPort`. Loan/savings ArchUnit charge-internal freeze is green.
 
 ### Step 9 — Documentation & acceptance ✅
 

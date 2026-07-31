@@ -33,8 +33,9 @@ dependencies {
     implementation(project(path: ':fineract-accounting'))
     implementation(project(path: ':fineract-investor'))
     implementation(project(path: ':fineract-rates'))
-    // Charge OSGi Step 7: composition root keeps façade (api + impl) until Step 8 façade deprecation.
-    implementation(project(path: ':fineract-charge'))
+    // Charge catalog: explicit api + impl (façade :fineract-charge is deprecated for new edges).
+    implementation(project(path: ':fineract-charge-api'))
+    implementation(project(path: ':fineract-charge-impl'))
     implementation(project(path: ':fineract-loan'))
     implementation(project(path: ':fineract-savings'))
     implementation(project(path: ':fineract-branch'))

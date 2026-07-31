@@ -60,7 +60,7 @@ import org.apache.fineract.accounting.common.AccountingRuleType;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.exception.InvalidCurrencyException;
-import org.apache.fineract.portfolio.charge.domain.ChargeAppliesTo;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeAppliesTo;
 import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeAppliedToException;
 import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;

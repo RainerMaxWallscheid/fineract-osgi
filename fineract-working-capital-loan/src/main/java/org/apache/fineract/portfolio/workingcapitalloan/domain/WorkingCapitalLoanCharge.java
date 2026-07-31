@@ -32,12 +32,12 @@ import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDa
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
-import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
-import org.apache.fineract.portfolio.charge.domain.ChargeCalculationTypeConverter;
-import org.apache.fineract.portfolio.charge.domain.ChargePaymentMode;
-import org.apache.fineract.portfolio.charge.domain.ChargePaymentModeConverter;
-import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
-import org.apache.fineract.portfolio.charge.domain.ChargeTimeTypeConverter;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeCalculationType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeCalculationTypeConverter;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargePaymentMode;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargePaymentModeConverter;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeTypeConverter;
 import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 import org.apache.fineract.portfolio.workingcapitalloan.data.WorkingCapitalLoanChargeData;
 

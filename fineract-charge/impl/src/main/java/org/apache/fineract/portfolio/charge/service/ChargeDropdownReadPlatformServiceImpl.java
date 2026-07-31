@@ -18,18 +18,19 @@
  */
 package org.apache.fineract.portfolio.charge.service;
 
-import static org.apache.fineract.portfolio.charge.service.ChargeEnumerations.chargeCalculationType;
-import static org.apache.fineract.portfolio.charge.service.ChargeEnumerations.chargePaymentMode;
-import static org.apache.fineract.portfolio.charge.service.ChargeEnumerations.chargeTimeType;
+import static org.apache.fineract.portfolio.charge.moduleapi.ChargeEnumerations.chargeCalculationType;
+import static org.apache.fineract.portfolio.charge.moduleapi.ChargeEnumerations.chargePaymentMode;
+import static org.apache.fineract.portfolio.charge.moduleapi.ChargeEnumerations.chargeTimeType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
-import org.apache.fineract.portfolio.charge.domain.ChargeAppliesTo;
-import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
-import org.apache.fineract.portfolio.charge.domain.ChargePaymentMode;
-import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeAppliesTo;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeCalculationType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeEnumerations;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargePaymentMode;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
 
 public class ChargeDropdownReadPlatformServiceImpl implements ChargeDropdownReadPlatformService {
 

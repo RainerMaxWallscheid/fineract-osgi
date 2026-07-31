@@ -16,15 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-description = 'Fineract Charge (compatibility façade: :fineract-charge-api + :fineract-charge-impl)'
 
-// Temporary aggregator for consumers still depending on :fineract-charge.
-// Prefer :fineract-charge-api (+ runtime :fineract-charge-impl) going forward.
-apply plugin: 'java-library'
-apply plugin: 'eclipse'
+package org.apache.fineract.portfolio.charge.moduleapi;
 
-apply from: 'dependencies.gradle'
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
-if (project.hasProperty('env') && project.getProperty('env') == 'eclipse') {
-    sourceSets.main.java.outputDir = new File(rootProject.projectDir, "fineract-charge/bin/main")
+@Converter
+public class ChargePaymentModeConverter implements AttributeConverter<ChargePaymentMode, Integer> {
+
+    @Override
+    public Integer convertToDatabaseColumn(ChargePaymentMode attribute) {
+        return attribute == null ? null : attribute.getValue();
+    }
+
+    @Override
+    public ChargePaymentMode convertToEntityAttribute(Integer dbData) {
+        return dbData == null ? null : ChargePaymentMode.fromInt(dbData);
+    }
 }

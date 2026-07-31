@@ -26,8 +26,9 @@ dependencies {
             project(path: ':fineract-core', configuration: 'runtimeElements'),
             project(path: ':fineract-accounting', configuration: 'runtimeElements'),
             project(path: ':fineract-investor', configuration: 'runtimeElements'),
-            // Charge façade runtime until Step 8 (ITs need catalog services + entity on classpath).
-            project(path: ':fineract-charge', configuration: 'runtimeElements'),
+            // Charge catalog runtime (explicit api + impl; façade deprecated).
+            project(path: ':fineract-charge-api', configuration: 'runtimeElements'),
+            project(path: ':fineract-charge-impl', configuration: 'runtimeElements'),
             project(path: ':fineract-rates', configuration: 'runtimeElements'),
             project(path: ':fineract-tax', configuration: 'runtimeElements'),
             project(path: ':fineract-loan', configuration: 'runtimeElements'),

@@ -26,10 +26,10 @@ import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.service.MathUtil;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
-import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
-import org.apache.fineract.portfolio.charge.domain.ChargePaymentMode;
-import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
-import org.apache.fineract.portfolio.charge.service.ChargeEnumerations;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeCalculationType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargePaymentMode;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeEnumerations;
 
 public final class WorkingCapitalLoanChargeData {
     private final Long id;

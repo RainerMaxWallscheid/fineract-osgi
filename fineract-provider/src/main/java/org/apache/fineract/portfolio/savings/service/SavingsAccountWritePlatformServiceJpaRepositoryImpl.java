@@ -83,10 +83,10 @@ import org.apache.fineract.portfolio.account.domain.StandingInstructionRepositor
 import org.apache.fineract.portfolio.account.domain.StandingInstructionStatus;
 import org.apache.fineract.portfolio.account.service.AccountAssociationsReadPlatformService;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
-import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
-import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeCalculationType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.group.domain.Group;
@@ -150,7 +150,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     private final NoteRepository noteRepository;
     private final AccountTransfersReadPlatformService accountTransfersReadPlatformService;
     private final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService;
-    private final ChargeRepositoryWrapper chargeRepository;
+    private final ChargeDefinitionPort chargeDefinitionPort;
     private final SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository;
     private final HolidayRepositoryWrapper holidayRepository;
     private final WorkingDaysRepositoryWrapper workingDaysRepository;
@@ -985,14 +985,13 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         final String format = command.dateFormat();
         final DateTimeFormatter fmt = StringUtils.isNotBlank(format) ? DateTimeFormatter.ofPattern(format).withLocale(locale) : DateTimeFormatter.ofPattern("dd MM yyyy");
         final Long chargeDefinitionId = command.longValueOfParameterNamed(chargeIdParamName);
-        final Charge chargeDefinition = this.chargeRepository.findOneWithNotFoundDetection(chargeDefinitionId);
+        final ChargeDefinitionData chargeDefinition = this.chargeDefinitionPort.getActiveCharge(chargeDefinitionId);
         Integer chargeTimeType = chargeDefinition.getChargeTimeType();
         LocalDate dueAsOfDateParam = command.localDateValueOfParameterNamed(dueAsOfDateParamName);
         if ((chargeTimeType.equals(ChargeTimeType.WITHDRAWAL_FEE.getValue()) || chargeTimeType.equals(ChargeTimeType.SAVINGS_NOACTIVITY_FEE.getValue())) && dueAsOfDateParam != null) {
             baseDataValidator.reset().parameter(dueAsOfDateParamName).value(dueAsOfDateParam.format(fmt)).failWithCodeNoParameterAddedToErrorCode("charge.due.date.is.invalid.for." + ChargeTimeType.fromInt(chargeTimeType).getCode());
         }
-        final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewFromJson(savingsAccount,
-                chargeDefinition.toDefinitionData(), command);
+        final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewFromJson(savingsAccount, chargeDefinition, command);
         validateChargeAmountNotZero(savingsAccountCharge, dataValidationErrors);
         if (chargeDefinition.isEnableFreeWithdrawal()) {
             savingsAccountCharge.setFreeWithdrawalCount(0);
@@ -1009,7 +1008,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
-        savingsAccount.addCharge(fmt, savingsAccountCharge, chargeDefinition.toDefinitionData());
+        savingsAccount.addCharge(fmt, savingsAccountCharge, chargeDefinition);
         this.savingsAccountChargeRepository.save(savingsAccountCharge);
         this.savingAccountRepositoryWrapper.saveAndFlush(savingsAccount);
         return  //
@@ -1667,7 +1666,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     }
 
     @java.lang.SuppressWarnings("all")
-        public SavingsAccountWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountDataValidator fromApiJsonDeserializer, final SavingsAccountRepositoryWrapper savingAccountRepositoryWrapper, final StaffRepositoryWrapper staffRepository, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final SavingsAccountAssembler savingAccountAssembler, final SavingsAccountTransactionDataValidator savingsAccountTransactionDataValidator, final SavingsAccountChargeDataValidator savingsAccountChargeDataValidator, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final JournalEntryWritePlatformService journalEntryWritePlatformService, final SavingsAccountDomainService savingsAccountDomainService, final NoteRepository noteRepository, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final ChargeRepositoryWrapper chargeRepository, final SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final ConfigurationDomainService configurationDomainService, final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final AppUserRepositoryWrapper appuserRepository, final StandingInstructionRepository standingInstructionRepository, final BusinessEventNotifierService businessEventNotifierService, final GSIMRepositoy gsimRepository, final SavingsAccountInterestPostingService savingsAccountInterestPostingService, final SavingsAccountPostInterestService savingsAccountPostInterestService, final SavingsAccountActivationService savingsAccountActivationService, final ExternalIdFactory externalIdFactory, final ErrorHandler errorHandler) {
+        public SavingsAccountWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountDataValidator fromApiJsonDeserializer, final SavingsAccountRepositoryWrapper savingAccountRepositoryWrapper, final StaffRepositoryWrapper staffRepository, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final SavingsAccountAssembler savingAccountAssembler, final SavingsAccountTransactionDataValidator savingsAccountTransactionDataValidator, final SavingsAccountChargeDataValidator savingsAccountChargeDataValidator, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final JournalEntryWritePlatformService journalEntryWritePlatformService, final SavingsAccountDomainService savingsAccountDomainService, final NoteRepository noteRepository, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final ChargeDefinitionPort chargeDefinitionPort, final SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final ConfigurationDomainService configurationDomainService, final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository, final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService, final AppUserRepositoryWrapper appuserRepository, final StandingInstructionRepository standingInstructionRepository, final BusinessEventNotifierService businessEventNotifierService, final GSIMRepositoy gsimRepository, final SavingsAccountInterestPostingService savingsAccountInterestPostingService, final SavingsAccountPostInterestService savingsAccountPostInterestService, final SavingsAccountActivationService savingsAccountActivationService, final ExternalIdFactory externalIdFactory, final ErrorHandler errorHandler) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.savingAccountRepositoryWrapper = savingAccountRepositoryWrapper;
@@ -1682,7 +1681,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         this.noteRepository = noteRepository;
         this.accountTransfersReadPlatformService = accountTransfersReadPlatformService;
         this.accountAssociationsReadPlatformService = accountAssociationsReadPlatformService;
-        this.chargeRepository = chargeRepository;
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.savingsAccountChargeRepository = savingsAccountChargeRepository;
         this.holidayRepository = holidayRepository;
         this.workingDaysRepository = workingDaysRepository;

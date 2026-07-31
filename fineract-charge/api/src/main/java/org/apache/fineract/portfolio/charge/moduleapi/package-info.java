@@ -19,13 +19,22 @@
 
 /**
  * Module API (ADR-021) — the only package other Gradle modules should depend on
- * from this bounded context (Charge Catalog).
+ * from this bounded context (Charge Catalog), aside from catalog {@code exception}.
  *
- * <p>Put port interfaces, stable DTOs/IDs and public contract types here.
- * Do not place JPA entities, Spring Data repositories or REST resources in this package.
+ * <p>Contents:
+ * <ul>
+ * <li>Ports / DTOs: {@link org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort},
+ * {@link org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData}</li>
+ * <li>Pure catalog enums and JPA converters: {@code ChargeAppliesTo}, {@code ChargeCalculationType},
+ * {@code ChargePaymentMode}, …</li>
+ * <li>Published read contract: {@link org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService},
+ * {@link org.apache.fineract.portfolio.charge.moduleapi.ChargeEnumerations}</li>
+ * </ul>
  *
- * <p>Key types: {@link org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort},
- * {@link org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData}.
+ * <p>{@code ChargeTimeType} lives in the same Java package name on {@code fineract-core}
+ * (shared-kernel placement until rates/tax-style catalog consolidation).
+ *
+ * <p>Do not place JPA entities, Spring Data repositories or REST resources here.
  *
  * @see docs/arc42/14_module_api_boundaries.md
  * @see docs/arc42/15_osgi_bundle_refactoring_fineract-charge.md

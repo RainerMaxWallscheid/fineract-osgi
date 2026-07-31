@@ -18,16 +18,15 @@ Build jars: `./gradlew :fineract-command-api:jar :fineract-command-impl:jar :fin
 White-box tests: `./gradlew :fineract-command-test:test`  
 Copy into `osgi/bundles/` for Equinox resolve experiments. Plan: [15_osgi_bundle_refactoring_fineract-command.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-command.md).
 
-### Wave 1: fineract-charge bundles (as-built Steps 0–7, 9; Step 8 partial)
+### Wave 1: fineract-charge bundles (as-built Steps 0–8; no façade)
 
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
-| `fineract-charge-api` (`fineract-charge/api`) | `org.apache.fineract.charge.api` | Export: `moduleapi`, pure `domain` enums, catalog `exception` |
+| `fineract-charge-api` (`fineract-charge/api`) | `org.apache.fineract.charge.api` | Export: `moduleapi` (ports, pure enums, read service), catalog `exception` |
 | `fineract-charge-impl` (`fineract-charge/impl`) | `org.apache.fineract.charge.impl` | Export: `starter` only; `ChargeOsgiServiceRegistrar` → `ChargeDefinitionPort` |
 | `fineract-charge-test` (`fineract-charge/test`) | `org.apache.fineract.charge.test` | `Fragment-Host: org.apache.fineract.charge.impl` (16 unit tests) |
-| `fineract-charge` | *(façade, not OSGi feature)* | Boot composition root only |
 
-**Consumers:** accounting / progressive / loan / savings / WC → `-api` only; investor → no charge dep; loan/savings/share **product** + client/share **account** charges use chargeId (provider composition root still uses charge façade/impl).
+**Consumers:** accounting / progressive / loan / savings / WC → `-api` only; investor → no charge dep; product/account charges use chargeId; **provider / war / ITs** → `-api` + `-impl`. ArchUnit allows pure catalog enums / `ChargeReadPlatformService`; forbids `Charge` entity / write internals.
 
 Build jars: `./gradlew :fineract-charge-api:jar :fineract-charge-impl:jar :fineract-charge-test:jar`  
 White-box tests: `./gradlew :fineract-charge-test:test`  

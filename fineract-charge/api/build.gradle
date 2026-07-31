@@ -23,10 +23,9 @@ apply plugin: 'eclipse'
 
 apply from: 'dependencies.gradle'
 
-// OSGi interface bundle: export contract packages only (ADR-022 / charge plan Step 4).
-// Note: Export-Package includes pure enums under …charge.domain and catalog exceptions.
-// The JPA Charge aggregate stays in charge-impl under the same Java package name (split-package
-// debt for strict Equinox; Boot flat classpath is fine). Prefer moduleapi for foreign BCs.
+// OSGi interface bundle: export Module API + catalog exceptions only (ADR-022 / charge plan).
+// Pure enums, converters, ChargeReadPlatformService, and ChargeEnumerations live under moduleapi.
+// The JPA Charge aggregate stays in charge-impl under portfolio.charge.domain (impl-only).
 jar {
     manifest {
         attributes(
@@ -36,9 +35,7 @@ jar {
                 'Bundle-Version': "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'),
                 'Bundle-Description': 'Charge Catalog contracts (Module API ports, pure enums, catalog exceptions)',
                 'Export-Package': 'org.apache.fineract.portfolio.charge.moduleapi,'
-                        + 'org.apache.fineract.portfolio.charge.domain,'
-                        + 'org.apache.fineract.portfolio.charge.exception,'
-                        + 'org.apache.fineract.portfolio.charge.service',
+                        + 'org.apache.fineract.portfolio.charge.exception',
                 // Kernel exception bases only; wildcard leaves transitive resolution to the framework.
                 'Import-Package': '*',
                 'Automatic-Module-Name': 'org.apache.fineract.charge.api'

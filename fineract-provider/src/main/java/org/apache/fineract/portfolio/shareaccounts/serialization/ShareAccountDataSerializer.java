@@ -49,10 +49,10 @@ import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.exception.InvalidCurrencyException;
 import org.apache.fineract.portfolio.accounts.constants.ShareAccountApiConstants;
-import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
-import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeCalculationType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
@@ -83,7 +83,7 @@ public class ShareAccountDataSerializer {
 
     private final FromJsonHelper fromApiJsonHelper;
 
-    private final ChargeRepositoryWrapper chargeRepository;
+    private final ChargeDefinitionPort chargeDefinitionPort;
 
     private final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper;
 
@@ -110,12 +110,12 @@ public class ShareAccountDataSerializer {
 
     @Autowired
     public ShareAccountDataSerializer(final PlatformSecurityContext platformSecurityContext, final FromJsonHelper fromApiJsonHelper,
-            final ChargeRepositoryWrapper chargeRepository, final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper,
+            final ChargeDefinitionPort chargeDefinitionPort, final SavingsAccountRepositoryWrapper savingsAccountRepositoryWrapper,
             final ClientRepositoryWrapper clientRepositoryWrapper, final ShareProductRepositoryWrapper shareProductRepository,
             final SavingsAccountReadPlatformService savingsAccountReadPlatformService) {
         this.platformSecurityContext = platformSecurityContext;
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.chargeRepository = chargeRepository;
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.savingsAccountRepositoryWrapper = savingsAccountRepositoryWrapper;
         this.clientRepositoryWrapper = clientRepositoryWrapper;
         this.shareProductRepository = shareProductRepository;
@@ -659,7 +659,7 @@ public class ShareAccountDataSerializer {
                     if (jsonObject.has("chargeId")) {
                         final Long id = jsonObject.get("chargeId").getAsLong();
                         BigDecimal amount = jsonObject.get("amount").getAsBigDecimal();
-                        final Charge charge = this.chargeRepository.findOneWithNotFoundDetection(id);
+                        final ChargeDefinitionData charge = this.chargeDefinitionPort.getActiveCharge(id);
                         if (!currencyCode.equals(charge.getCurrencyCode())) {
                             final String errorMessage = "Charge and Share Account must have the same currency.";
                             throw new InvalidCurrencyException("charge", "attach.to.share.account", errorMessage);
@@ -668,7 +668,7 @@ public class ShareAccountDataSerializer {
                         ChargeTimeType chargeTime = null;
                         ChargeCalculationType chargeCalculation = null;
                         Boolean status = Boolean.TRUE;
-                        ShareAccountCharge accountCharge = ShareAccountCharge.createNewWithoutShareAccount(charge.toDefinitionData(),
+                        ShareAccountCharge accountCharge = ShareAccountCharge.createNewWithoutShareAccount(charge,
                                 amount, chargeTime, chargeCalculation, status);
                         charges.add(accountCharge);
                     }

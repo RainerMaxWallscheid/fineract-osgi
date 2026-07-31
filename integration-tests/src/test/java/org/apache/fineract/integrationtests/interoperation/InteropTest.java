@@ -46,7 +46,7 @@ import org.apache.fineract.integrationtests.common.savings.SavingsStatusChecker;
 import org.apache.fineract.interoperation.domain.InteropIdentifierType;
 import org.apache.fineract.interoperation.domain.InteropTransactionRole;
 import org.apache.fineract.interoperation.util.InteropUtil;
-import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
 import org.apache.fineract.portfolio.savings.SavingsApiConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

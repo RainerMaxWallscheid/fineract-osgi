@@ -23,8 +23,8 @@ import static com.tngtech.archunit.library.freeze.FreezingArchRule.freeze;
 import static org.apache.fineract.architecture.ArchitecturePackages.ACCOUNTING_INTERNAL;
 import static org.apache.fineract.architecture.ArchitecturePackages.ACCOUNTING_OWNED;
 import static org.apache.fineract.architecture.ArchitecturePackages.BASE;
-import static org.apache.fineract.architecture.ArchitecturePackages.CHARGE_INTERNAL;
 import static org.apache.fineract.architecture.ArchitecturePackages.CLIENT_INTERNAL;
+import static org.apache.fineract.architecture.ArchitecturePackages.IS_CHARGE_INTERNAL;
 import static org.apache.fineract.architecture.ArchitecturePackages.INVESTOR_OWNED;
 import static org.apache.fineract.architecture.ArchitecturePackages.LOAN_INTERNAL;
 import static org.apache.fineract.architecture.ArchitecturePackages.LOAN_OWNED;
@@ -57,8 +57,8 @@ class ModuleApiBoundaryRulesTest {
 
     @ArchTest
     static final ArchRule loan_must_not_depend_on_charge_internals = freeze(noClasses().that().resideInAnyPackage(LOAN_OWNED).should()
-            .dependOnClassesThat().resideInAnyPackage(CHARGE_INTERNAL)
-            .because("Loan may only use Charge Module API / events (ADR-021), not charge.domain or charge.service"));
+            .dependOnClassesThat(IS_CHARGE_INTERNAL)
+            .because("Loan may only use charge.moduleapi (ports, pure enums, ChargeReadPlatformService) (ADR-021), not Charge entity or charge write/impl services"));
 
     @ArchTest
     static final ArchRule loan_must_not_depend_on_savings_internals = freeze(noClasses().that().resideInAnyPackage(LOAN_OWNED).should()
@@ -91,8 +91,8 @@ class ModuleApiBoundaryRulesTest {
 
     @ArchTest
     static final ArchRule savings_must_not_depend_on_charge_internals = freeze(noClasses().that().resideInAnyPackage(SAVINGS_OWNED).should()
-            .dependOnClassesThat().resideInAnyPackage(CHARGE_INTERNAL)
-            .because("Savings may only use Charge Module API (ADR-021)"));
+            .dependOnClassesThat(IS_CHARGE_INTERNAL)
+            .because("Savings may only use charge.moduleapi (ports, pure enums) (ADR-021), not Charge entity or charge write/impl services"));
 
     @ArchTest
     static final ArchRule savings_must_not_depend_on_accounting_internals = freeze(noClasses().that().resideInAnyPackage(SAVINGS_OWNED)

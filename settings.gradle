@@ -76,7 +76,7 @@ include ':fineract-charge-impl'
 project(':fineract-charge-impl').projectDir = file('fineract-charge/impl')
 include ':fineract-charge-test'
 project(':fineract-charge-test').projectDir = file('fineract-charge/test')
-include ':fineract-charge'
+// No :fineract-charge façade — depend on -api / -impl explicitly.
 include ':fineract-tax'
 include ':fineract-loan-origination'
 include ':fineract-loan'

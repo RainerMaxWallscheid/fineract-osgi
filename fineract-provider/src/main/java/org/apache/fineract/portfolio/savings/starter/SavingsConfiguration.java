@@ -52,9 +52,9 @@ import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatfor
 import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
 import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformService;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.charge.service.ChargeDropdownReadPlatformService;
-import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.common.service.DropdownReadPlatformService;
@@ -233,7 +233,7 @@ public class SavingsConfiguration {
             ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper,
             JournalEntryWritePlatformService journalEntryWritePlatformService, DepositAccountDomainService depositAccountDomainService,
             NoteRepository noteRepository, AccountTransfersReadPlatformService accountTransfersReadPlatformService,
-            ChargeRepositoryWrapper chargeRepository, SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository,
+            ChargeDefinitionPort chargeDefinitionPort, SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository,
             AccountAssociationsReadPlatformService accountAssociationsReadPlatformService,
             AccountTransfersWritePlatformService accountTransfersWritePlatformService,
             DepositAccountReadPlatformService depositAccountReadPlatformService, CalendarInstanceRepository calendarInstanceRepository,
@@ -246,7 +246,7 @@ public class SavingsConfiguration {
                 savingsAccountTransactionRepository, depositAccountAssembler, savingsAccountPostInterestService,
                 depositAccountTransactionDataValidator, savingsAccountChargeDataValidator, paymentDetailWritePlatformService,
                 applicationCurrencyRepositoryWrapper, journalEntryWritePlatformService, depositAccountDomainService, noteRepository,
-                accountTransfersReadPlatformService, chargeRepository, savingsAccountChargeRepository,
+                accountTransfersReadPlatformService, chargeDefinitionPort, savingsAccountChargeRepository,
                 accountAssociationsReadPlatformService, accountTransfersWritePlatformService, depositAccountReadPlatformService,
                 calendarInstanceRepository, configurationDomainService, holidayRepository, workingDaysRepository,
                 depositAccountOnHoldTransactionRepository);
@@ -389,7 +389,7 @@ public class SavingsConfiguration {
             PaymentDetailWritePlatformService paymentDetailWritePlatformService,
             JournalEntryWritePlatformService journalEntryWritePlatformService, SavingsAccountDomainService savingsAccountDomainService,
             NoteRepository noteRepository, AccountTransfersReadPlatformService accountTransfersReadPlatformService,
-            AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, ChargeRepositoryWrapper chargeRepository,
+            AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, ChargeDefinitionPort chargeDefinitionPort,
             SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository, HolidayRepositoryWrapper holidayRepository,
             WorkingDaysRepositoryWrapper workingDaysRepository, ConfigurationDomainService configurationDomainService,
             DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository,
@@ -403,7 +403,7 @@ public class SavingsConfiguration {
                 staffRepository, savingsAccountTransactionRepository, savingAccountAssembler, savingsAccountTransactionDataValidator,
                 savingsAccountChargeDataValidator, paymentDetailWritePlatformService, journalEntryWritePlatformService,
                 savingsAccountDomainService, noteRepository, accountTransfersReadPlatformService, accountAssociationsReadPlatformService,
-                chargeRepository, savingsAccountChargeRepository, holidayRepository, workingDaysRepository, configurationDomainService,
+                chargeDefinitionPort, savingsAccountChargeRepository, holidayRepository, workingDaysRepository, configurationDomainService,
                 depositAccountOnHoldTransactionRepository, entityDatatableChecksWritePlatformService, appuserRepository,
                 standingInstructionRepository, businessEventNotifierService, gsimRepository, savingsAccountInterestPostingService,
                 savingsAccountPostInterestService, savingsAccountActivationService, externalIdFactory, errorHandler);

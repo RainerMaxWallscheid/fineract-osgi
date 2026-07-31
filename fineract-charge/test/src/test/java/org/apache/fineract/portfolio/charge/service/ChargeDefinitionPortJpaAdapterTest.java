@@ -117,6 +117,9 @@ class ChargeDefinitionPortJpaAdapterTest {
         when(charge.feeFrequency()).thenReturn(null);
         when(charge.getIncomeAccountId()).thenReturn(null);
         when(charge.getTaxGroupId()).thenReturn(null);
+        // Adapter maps via Charge#toDefinitionData() (not individual getters).
+        when(charge.toDefinitionData()).thenReturn(new ChargeDefinitionData(id, name, new BigDecimal("10.00"), "USD", 1, 1, 1, 0, false,
+                active, null, null, null, null, null, null));
         return charge;
     }
 }

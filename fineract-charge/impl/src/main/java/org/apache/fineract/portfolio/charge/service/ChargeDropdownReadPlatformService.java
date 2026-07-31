@@ -20,8 +20,8 @@ package org.apache.fineract.portfolio.charge.service;
 
 import java.util.List;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
-import org.apache.fineract.portfolio.charge.domain.ChargeAppliesTo;
-import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeAppliesTo;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeTimeType;
 
 public interface ChargeDropdownReadPlatformService {
 

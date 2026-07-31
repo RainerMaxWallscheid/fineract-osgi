@@ -70,8 +70,8 @@ import org.apache.fineract.portfolio.calendar.domain.CalendarInstance;
 import org.apache.fineract.portfolio.calendar.domain.CalendarInstanceRepository;
 import org.apache.fineract.portfolio.calendar.domain.CalendarType;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
-import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
@@ -124,7 +124,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
     private final DepositAccountDomainService depositAccountDomainService;
     private final NoteRepository noteRepository;
     private final AccountTransfersReadPlatformService accountTransfersReadPlatformService;
-    private final ChargeRepositoryWrapper chargeRepository;
+    private final ChargeDefinitionPort chargeDefinitionPort;
     private final SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository;
     private final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService;
     private final AccountTransfersWritePlatformService accountTransfersWritePlatformService;
@@ -912,9 +912,9 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
         final String format = command.dateFormat();
         final DateTimeFormatter fmt = StringUtils.isNotBlank(format) ? DateTimeFormatter.ofPattern(format).withLocale(locale) : DateTimeFormatter.ofPattern("dd MM yyyy");
         final Long chargeDefinitionId = command.longValueOfParameterNamed(chargeIdParamName);
-        final Charge chargeDefinition = this.chargeRepository.findOneWithNotFoundDetection(chargeDefinitionId);
+        final ChargeDefinitionData chargeDefinition = this.chargeDefinitionPort.getActiveCharge(chargeDefinitionId);
         final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewFromJson(savingsAccount,
-                chargeDefinition.toDefinitionData(), command);
+                chargeDefinition, command);
         if (savingsAccountCharge.getDueDate() != null) {
             // transaction date should not be on a holiday or non working day
             if (!this.configurationDomainService.allowTransactionsOnHolidayEnabled() && this.holidayRepository.isHoliday(savingsAccount.officeId(), savingsAccountCharge.getDueDate())) {
@@ -930,7 +930,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
                 }
             }
         }
-        savingsAccount.addCharge(fmt, savingsAccountCharge, chargeDefinition.toDefinitionData());
+        savingsAccount.addCharge(fmt, savingsAccountCharge, chargeDefinition);
         this.savingAccountRepositoryWrapper.saveAndFlush(savingsAccount);
         return  //
         //
@@ -1192,7 +1192,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
     }
 
     @java.lang.SuppressWarnings("all")
-        public DepositAccountWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepositoryWrapper, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final DepositAccountAssembler depositAccountAssembler, final SavingsAccountPostInterestService savingsAccountPostInterestService, final DepositAccountTransactionDataValidator depositAccountTransactionDataValidator, final SavingsAccountChargeDataValidator savingsAccountChargeDataValidator, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper, final JournalEntryWritePlatformService journalEntryWritePlatformService, final DepositAccountDomainService depositAccountDomainService, final NoteRepository noteRepository, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final ChargeRepositoryWrapper chargeRepository, final SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final DepositAccountReadPlatformService depositAccountReadPlatformService, final CalendarInstanceRepository calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository) {
+        public DepositAccountWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final SavingsAccountRepositoryWrapper savingAccountRepositoryWrapper, final SavingsAccountTransactionRepository savingsAccountTransactionRepository, final DepositAccountAssembler depositAccountAssembler, final SavingsAccountPostInterestService savingsAccountPostInterestService, final DepositAccountTransactionDataValidator depositAccountTransactionDataValidator, final SavingsAccountChargeDataValidator savingsAccountChargeDataValidator, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper, final JournalEntryWritePlatformService journalEntryWritePlatformService, final DepositAccountDomainService depositAccountDomainService, final NoteRepository noteRepository, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final ChargeDefinitionPort chargeDefinitionPort, final SavingsAccountChargeRepositoryWrapper savingsAccountChargeRepository, final AccountAssociationsReadPlatformService accountAssociationsReadPlatformService, final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final DepositAccountReadPlatformService depositAccountReadPlatformService, final CalendarInstanceRepository calendarInstanceRepository, final ConfigurationDomainService configurationDomainService, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository) {
         this.context = context;
         this.savingAccountRepositoryWrapper = savingAccountRepositoryWrapper;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
@@ -1206,7 +1206,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
         this.depositAccountDomainService = depositAccountDomainService;
         this.noteRepository = noteRepository;
         this.accountTransfersReadPlatformService = accountTransfersReadPlatformService;
-        this.chargeRepository = chargeRepository;
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.savingsAccountChargeRepository = savingsAccountChargeRepository;
         this.accountAssociationsReadPlatformService = accountAssociationsReadPlatformService;
         this.accountTransfersWritePlatformService = accountTransfersWritePlatformService;

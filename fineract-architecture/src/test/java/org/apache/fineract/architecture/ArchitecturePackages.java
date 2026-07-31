@@ -18,6 +18,11 @@
  */
 package org.apache.fineract.architecture;
 
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage;
+
+import com.tngtech.archunit.base.DescribedPredicate;
+import com.tngtech.archunit.core.domain.JavaClass;
+
 /**
  * Package constants for ArchUnit rules aligned with the Domain Context Map
  * ({@code docs/arc42/10_domain_context_map.md}).
@@ -114,12 +119,30 @@ public final class ArchitecturePackages {
             "..accounting..serialization..", //
     };
 
-    public static final String[] CHARGE_INTERNAL = { //
-            "..portfolio.charge.domain..", //
-            "..portfolio.charge.service..", //
+    /**
+     * Charge packages that are internal to the catalog BC. Public catalog types live under
+     * {@code ..portfolio.charge.moduleapi..} (charge-api / core shared-kernel) and are <em>not</em>
+     * listed here.
+     */
+    public static final String[] CHARGE_INTERNAL_PACKAGES = { //
+            "..portfolio.charge.domain..", // JPA Charge entity + repositories (impl)
+            "..portfolio.charge.service..", // write/impl services (impl); not ChargeReadPlatformService
             "..portfolio.charge.handler..", //
             "..portfolio.charge.serialization..", //
     };
+
+    /**
+     * @deprecated use {@link #CHARGE_INTERNAL_PACKAGES} or {@link #IS_CHARGE_INTERNAL}
+     */
+    @Deprecated
+    public static final String[] CHARGE_INTERNAL = CHARGE_INTERNAL_PACKAGES;
+
+    /**
+     * True charge internals for ADR-021: JPA entity, repositories, write/impl services, handlers,
+     * serialization. Pure catalog enums / read contract are under {@code moduleapi}.
+     */
+    public static final DescribedPredicate<JavaClass> IS_CHARGE_INTERNAL = resideInAnyPackage(CHARGE_INTERNAL_PACKAGES)
+            .as("charge internals (entity/repos/write services/handlers under domain/service/handler/serialization)");
 
     public static final String[] CLIENT_INTERNAL = { //
             "..portfolio.client.domain..", //

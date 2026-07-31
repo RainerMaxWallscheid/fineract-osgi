@@ -45,9 +45,10 @@ import org.apache.fineract.organisation.monetary.domain.ApplicationCurrency;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepositoryWrapper;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.workingdays.domain.WorkingDaysRepositoryWrapper;
-import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeAppliesTo;
 import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeAppliedToException;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
 import org.apache.fineract.portfolio.client.data.ClientChargeDataValidator;
 import org.apache.fineract.portfolio.client.domain.Client;
@@ -68,7 +69,7 @@ import org.springframework.stereotype.Service;
 public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePlatformService {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ClientChargeWritePlatformServiceImpl.class);
-    private final ChargeRepositoryWrapper chargeRepository;
+    private final ChargeDefinitionPort chargeDefinitionPort;
     private final ClientRepositoryWrapper clientRepository;
     private final ClientChargeDataValidator clientChargeDataValidator;
     private final ConfigurationDomainService configurationDomainService;
@@ -86,16 +87,16 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
             this.clientChargeDataValidator.validateAdd(command.json());
             final Client client = clientRepository.getActiveClientInUserScope(clientId);
             final Long chargeDefinitionId = command.longValueOfParameterNamed(ClientApiConstants.chargeIdParamName);
-            final Charge charge = this.chargeRepository.findOneWithNotFoundDetection(chargeDefinitionId);
+            final ChargeDefinitionData charge = this.chargeDefinitionPort.getActiveCharge(chargeDefinitionId);
             // validate for client charge
-            if (!charge.isClientCharge()) {
+            if (!ChargeAppliesTo.fromInt(charge.getChargeAppliesTo()).isClientCharge()) {
                 final String errorMessage = "Charge with identifier " + charge.getId() + " cannot be applied to a Client";
                 throw new ChargeCannotBeAppliedToException("client", errorMessage, charge.getId());
             }
             Money roundedAmount = calculateRoundedChargeAmount(charge, command);
             validateChargeAmountNotZero(roundedAmount);
             final LocalDate date = command.localDateValueOfParameterNamed(ClientApiConstants.dueAsOfDateParamName);
-            final ClientCharge clientCharge = ClientCharge.createNew(client, charge.toDefinitionData(), roundedAmount.getAmount(), date);
+            final ClientCharge clientCharge = ClientCharge.createNew(client, charge, roundedAmount.getAmount(), date);
             final DateTimeFormatter fmt = DateTimeFormatter.ofPattern(command.dateFormat());
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
             final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
@@ -369,7 +370,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
         throw ErrorHandler.getMappable(dve, "error.msg.client.charges.unknown.data.integrity.issue", "Unknown data integrity issue with resource: " + realCause.getMessage());
     }
 
-    private Money calculateRoundedChargeAmount(final Charge charge, final JsonCommand command) {
+    private Money calculateRoundedChargeAmount(final ChargeDefinitionData charge, final JsonCommand command) {
         BigDecimal amount = command.bigDecimalValueOfParameterNamed(ClientApiConstants.amountParamName);
         amount = (amount == null) ? charge.getAmount() : amount;
         ApplicationCurrency currency = this.applicationCurrencyRepositoryWrapper.findOneWithNotFoundDetection(charge.getCurrencyCode());
@@ -386,8 +387,8 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
     }
 
     @java.lang.SuppressWarnings("all")
-        public ClientChargeWritePlatformServiceImpl(final ChargeRepositoryWrapper chargeRepository, final ClientRepositoryWrapper clientRepository, final ClientChargeDataValidator clientChargeDataValidator, final ConfigurationDomainService configurationDomainService, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final ClientChargeRepositoryWrapper clientChargeRepository, final ClientTransactionRepository clientTransactionRepository, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final JournalEntryWritePlatformService journalEntryWritePlatformService, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper) {
-        this.chargeRepository = chargeRepository;
+        public ClientChargeWritePlatformServiceImpl(final ChargeDefinitionPort chargeDefinitionPort, final ClientRepositoryWrapper clientRepository, final ClientChargeDataValidator clientChargeDataValidator, final ConfigurationDomainService configurationDomainService, final HolidayRepositoryWrapper holidayRepository, final WorkingDaysRepositoryWrapper workingDaysRepository, final ClientChargeRepositoryWrapper clientChargeRepository, final ClientTransactionRepository clientTransactionRepository, final PaymentDetailWritePlatformService paymentDetailWritePlatformService, final JournalEntryWritePlatformService journalEntryWritePlatformService, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepositoryWrapper) {
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.clientRepository = clientRepository;
         this.clientChargeDataValidator = clientChargeDataValidator;
         this.configurationDomainService = configurationDomainService;

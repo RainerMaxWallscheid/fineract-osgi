@@ -69,7 +69,7 @@ import org.apache.fineract.organisation.office.domain.OfficeRepository;
 import org.apache.fineract.portfolio.PortfolioProductType;
 import org.apache.fineract.portfolio.account.PortfolioAccountType;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.loanaccount.data.AccountingBridgeLoanTransactionDTO;
 import org.apache.fineract.portfolio.loanaccount.data.ChargeTaxDetailDTO;
 import org.apache.fineract.portfolio.loanaccount.data.LoanChargeData;
@@ -94,7 +94,7 @@ public class AccountingProcessorHelper {
     private final GLAccountRepository glAccountRepository;
     private final OfficeRepository officeRepository;
     private final AccountTransfersReadPlatformService accountTransfersReadPlatformService;
-    private final ChargeRepositoryWrapper chargeRepositoryWrapper;
+    private final ChargeDefinitionPort chargeDefinitionPort;
     private final BusinessEventNotifierService businessEventNotifierService;
 
     public LoanDTO populateLoanDtoFromDTO(final org.apache.fineract.portfolio.loanaccount.data.AccountingBridgeDataDTO accountingBridgeData) {
@@ -970,9 +970,9 @@ public class AccountingProcessorHelper {
              * cash and accrual based accounts
              * ***
              */
-            GLAccount glAccount = chargeRepositoryWrapper.findOneWithNotFoundDetection(chargeId).getAccount();
-            if (glAccount != null) {
-                return glAccount;
+            final Long incomeAccountId = this.chargeDefinitionPort.getActiveCharge(chargeId).getIncomeOrLiabilityAccountId();
+            if (incomeAccountId != null) {
+                return this.glAccountRepository.findById(incomeAccountId).orElse(null);
             }
             final ProductToGLAccountMapping chargeSpecificIncomeAccountMapping = this.accountMappingRepository.findProductIdAndProductTypeAndFinancialAccountTypeAndChargeId(savingsProductId, PortfolioProductType.SAVING.getValue(), accountMappingTypeId, chargeId);
             if (chargeSpecificIncomeAccountMapping != null) {
@@ -1139,7 +1139,7 @@ public class AccountingProcessorHelper {
     }
 
     @java.lang.SuppressWarnings("all")
-        public AccountingProcessorHelper(final JournalEntryRepository glJournalEntryRepository, final ProductToGLAccountMappingRepository accountMappingRepository, final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository, final GLClosureRepository closureRepository, final GLAccountRepository glAccountRepository, final OfficeRepository officeRepository, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final ChargeRepositoryWrapper chargeRepositoryWrapper, final BusinessEventNotifierService businessEventNotifierService) {
+        public AccountingProcessorHelper(final JournalEntryRepository glJournalEntryRepository, final ProductToGLAccountMappingRepository accountMappingRepository, final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository, final GLClosureRepository closureRepository, final GLAccountRepository glAccountRepository, final OfficeRepository officeRepository, final AccountTransfersReadPlatformService accountTransfersReadPlatformService, final ChargeDefinitionPort chargeDefinitionPort, final BusinessEventNotifierService businessEventNotifierService) {
         this.glJournalEntryRepository = glJournalEntryRepository;
         this.accountMappingRepository = accountMappingRepository;
         this.financialActivityAccountRepository = financialActivityAccountRepository;
@@ -1147,7 +1147,7 @@ public class AccountingProcessorHelper {
         this.glAccountRepository = glAccountRepository;
         this.officeRepository = officeRepository;
         this.accountTransfersReadPlatformService = accountTransfersReadPlatformService;
-        this.chargeRepositoryWrapper = chargeRepositoryWrapper;
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.businessEventNotifierService = businessEventNotifierService;
     }
 }

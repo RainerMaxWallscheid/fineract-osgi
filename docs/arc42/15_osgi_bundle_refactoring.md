@@ -203,7 +203,7 @@ Per module: complete **Module API ports first** ([14.6](14_module_api_boundaries
 
 | Rank | Module | ~main scale | Why next | Typical `-api` surface |
 |------|--------|-------------|----------|------------------------|
-| **1** | **`fineract-charge`** | ~40 | **In progress / largely done** — loan + savings **charge-api only**; client/share **account** charges chargeId; residual freeze/façade. **Detailed plan:** [15_osgi_bundle_refactoring_fineract-charge.md](15_osgi_bundle_refactoring_fineract-charge.md) | `ChargeDefinitionPort` + catalog enums/exceptions; façade still for provider |
+| **1** | **`fineract-charge`** | ~40 | **Largely done** — api/impl/test; chargeId/port retargets; façade **removed**; ArchUnit charge freeze green. **Detailed plan:** [15_osgi_bundle_refactoring_fineract-charge.md](15_osgi_bundle_refactoring_fineract-charge.md) | `ChargeDefinitionPort`; composition roots use api+impl |
 | **2** | **`fineract-rates`** | ~20 | Smallest real domain slice; few entities; floating-rate ports are crisp | Floating rate read/write ports + data types |
 | **3** | **`fineract-tax`** | ~30 | Small; already has `moduleapi`; used by charge/loan/savings — good “api-only consumer” exercise after charge | Tax component/group ports + DTOs |
 

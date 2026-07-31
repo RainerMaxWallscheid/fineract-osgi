@@ -26,7 +26,7 @@ import org.apache.fineract.organisation.monetary.service.CurrencyWritePlatformSe
 import org.apache.fineract.organisation.monetary.service.CurrencyWritePlatformServiceJpaRepositoryImpl;
 import org.apache.fineract.organisation.monetary.service.OrganisationCurrencyReadPlatformService;
 import org.apache.fineract.organisation.monetary.service.OrganisationCurrencyReadPlatformServiceImpl;
-import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

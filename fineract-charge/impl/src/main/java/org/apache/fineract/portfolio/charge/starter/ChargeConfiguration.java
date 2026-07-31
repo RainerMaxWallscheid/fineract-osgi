@@ -28,7 +28,7 @@ import org.apache.fineract.portfolio.charge.service.ChargeAccountingDropdownPort
 import org.apache.fineract.portfolio.charge.service.ChargeDropdownReadPlatformService;
 import org.apache.fineract.portfolio.charge.service.ChargeDropdownReadPlatformServiceImpl;
 import org.apache.fineract.portfolio.charge.service.ChargeOfficeAccessPort;
-import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformServiceImpl;
 import org.apache.fineract.portfolio.charge.service.ChargeWritePlatformService;
 import org.apache.fineract.portfolio.charge.service.ChargeWritePlatformServiceJpaRepositoryImpl;

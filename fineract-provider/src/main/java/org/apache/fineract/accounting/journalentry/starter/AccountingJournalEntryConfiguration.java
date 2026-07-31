@@ -48,7 +48,7 @@ import org.apache.fineract.organisation.office.domain.OfficeRepository;
 import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanAmortizationAllocationMappingRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
@@ -66,10 +66,10 @@ public class AccountingJournalEntryConfiguration {
             ProductToGLAccountMappingRepository accountMappingRepository,
             FinancialActivityAccountRepositoryWrapper financialActivityAccountRepository, GLClosureRepository closureRepository,
             GLAccountRepository glAccountRepository, OfficeRepository officeRepository,
-            AccountTransfersReadPlatformService accountTransfersReadPlatformService, ChargeRepositoryWrapper chargeRepositoryWrapper,
+            AccountTransfersReadPlatformService accountTransfersReadPlatformService, ChargeDefinitionPort chargeDefinitionPort,
             BusinessEventNotifierService businessEventNotifierService) {
         return new AccountingProcessorHelper(glJournalEntryRepository, accountMappingRepository, financialActivityAccountRepository,
-                closureRepository, glAccountRepository, officeRepository, accountTransfersReadPlatformService, chargeRepositoryWrapper,
+                closureRepository, glAccountRepository, officeRepository, accountTransfersReadPlatformService, chargeDefinitionPort,
                 businessEventNotifierService);
     }
 

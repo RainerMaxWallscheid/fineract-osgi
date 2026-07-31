@@ -17,21 +17,21 @@
  * under the License.
  */
 
-package org.apache.fineract.portfolio.charge.domain;
+package org.apache.fineract.portfolio.charge.moduleapi;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter
-public class ChargeCalculationTypeConverter implements AttributeConverter<ChargeCalculationType, Integer> {
+public class ChargeTimeTypeConverter implements AttributeConverter<ChargeTimeType, Integer> {
 
     @Override
-    public Integer convertToDatabaseColumn(ChargeCalculationType attribute) {
+    public Integer convertToDatabaseColumn(ChargeTimeType attribute) {
         return attribute == null ? null : attribute.getValue();
     }
 
     @Override
-    public ChargeCalculationType convertToEntityAttribute(Integer dbData) {
-        return dbData == null ? null : ChargeCalculationType.fromInt(dbData);
+    public ChargeTimeType convertToEntityAttribute(Integer dbData) {
+        return dbData == null ? null : ChargeTimeType.fromInt(dbData);
     }
 }
