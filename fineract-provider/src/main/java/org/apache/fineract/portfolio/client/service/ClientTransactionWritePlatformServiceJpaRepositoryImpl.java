@@ -56,7 +56,7 @@ public class ClientTransactionWritePlatformServiceJpaRepositoryImpl implements C
             final Set<ClientChargePaidBy> chargesPaidBy = clientTransaction.getClientChargePaidByCollection();
             for (final ClientChargePaidBy clientChargePaidBy : chargesPaidBy) {
                 final ClientCharge clientCharge = clientChargePaidBy.getClientCharge();
-                clientCharge.setCurrency(organisationCurrencyRepository.findOneWithNotFoundDetection(clientCharge.getCharge().getCurrencyCode()));
+                clientCharge.setCurrency(organisationCurrencyRepository.findOneWithNotFoundDetection(clientCharge.getCurrencyCode()));
                 if (clientTransaction.isPayChargeTransaction()) {
                     clientCharge.undoPayment(clientTransaction.getAmount());
                 } else if (clientTransaction.isWaiveChargeTransaction()) {

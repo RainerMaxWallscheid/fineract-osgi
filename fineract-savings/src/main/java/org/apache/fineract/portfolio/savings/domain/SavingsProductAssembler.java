@@ -60,9 +60,11 @@ import org.apache.fineract.accounting.common.AccountingRuleType;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.exception.InvalidCurrencyException;
-import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.charge.domain.ChargeAppliesTo;
 import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeAppliedToException;
+import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.savings.SavingsCompoundingInterestPeriodType;
 import org.apache.fineract.portfolio.savings.SavingsInterestCalculationDaysInYearType;
 import org.apache.fineract.portfolio.savings.SavingsInterestCalculationType;
@@ -76,12 +78,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class SavingsProductAssembler {
 
-    private final ChargeRepositoryWrapper chargeRepository;
+    private final ChargeDefinitionPort chargeDefinitionPort;
     private final TaxGroupRepositoryWrapper taxGroupRepository;
 
     @Autowired
-    public SavingsProductAssembler(final ChargeRepositoryWrapper chargeRepository, final TaxGroupRepositoryWrapper taxGroupRepository) {
-        this.chargeRepository = chargeRepository;
+    public SavingsProductAssembler(final ChargeDefinitionPort chargeDefinitionPort, final TaxGroupRepositoryWrapper taxGroupRepository) {
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.taxGroupRepository = taxGroupRepository;
     }
 
@@ -214,9 +216,10 @@ public class SavingsProductAssembler {
                     if (jsonObject.has(idParamName)) {
                         final Long id = jsonObject.get(idParamName).getAsLong();
 
-                        final Charge charge = this.chargeRepository.findOneWithNotFoundDetection(id);
+                        final ChargeDefinitionData charge = this.chargeDefinitionPort.findCharge(id)
+                                .orElseThrow(() -> new ChargeNotFoundException(id));
 
-                        if (!charge.isSavingsCharge()) {
+                        if (!ChargeAppliesTo.fromInt(charge.getChargeAppliesTo()).isSavingsCharge()) {
                             final String errorMessage = "Charge with identifier " + charge.getId()
                                     + " cannot be applied to Savings product.";
                             throw new ChargeCannotBeAppliedToException("savings.product", errorMessage, charge.getId());

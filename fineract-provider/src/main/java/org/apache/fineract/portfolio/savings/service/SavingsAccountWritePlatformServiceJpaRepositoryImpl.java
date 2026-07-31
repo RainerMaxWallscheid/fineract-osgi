@@ -1009,7 +1009,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
-        savingsAccount.addCharge(fmt, savingsAccountCharge, chargeDefinition);
+        savingsAccount.addCharge(fmt, savingsAccountCharge, chargeDefinition.toDefinitionData());
         this.savingsAccountChargeRepository.save(savingsAccountCharge);
         this.savingAccountRepositoryWrapper.saveAndFlush(savingsAccount);
         return  //

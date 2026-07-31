@@ -95,7 +95,7 @@ public class ClientChargeWritePlatformServiceImpl implements ClientChargeWritePl
             Money roundedAmount = calculateRoundedChargeAmount(charge, command);
             validateChargeAmountNotZero(roundedAmount);
             final LocalDate date = command.localDateValueOfParameterNamed(ClientApiConstants.dueAsOfDateParamName);
-            final ClientCharge clientCharge = ClientCharge.createNew(client, charge, roundedAmount.getAmount(), date);
+            final ClientCharge clientCharge = ClientCharge.createNew(client, charge.toDefinitionData(), roundedAmount.getAmount(), date);
             final DateTimeFormatter fmt = DateTimeFormatter.ofPattern(command.dateFormat());
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
             final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);

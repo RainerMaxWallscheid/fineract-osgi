@@ -38,11 +38,12 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
+import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
 import org.apache.fineract.portfolio.charge.exception.SavingsAccountChargeNotFoundException;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,14 +51,14 @@ import org.springframework.stereotype.Service;
 public class SavingsProductChargeAssembler {
 
     private final FromJsonHelper fromApiJsonHelper;
-    private final ChargeRepositoryWrapper chargeRepository;
+    private final ChargeDefinitionPort chargeDefinitionPort;
     private final SavingsAccountChargeRepository savingsAccountChargeRepository;
 
     @Autowired
-    public SavingsProductChargeAssembler(final FromJsonHelper fromApiJsonHelper, final ChargeRepositoryWrapper chargeRepository,
+    public SavingsProductChargeAssembler(final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort,
             final SavingsAccountChargeRepository savingsAccountChargeRepository) {
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.chargeRepository = chargeRepository;
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.savingsAccountChargeRepository = savingsAccountChargeRepository;
     }
 
@@ -90,7 +91,8 @@ public class SavingsProductChargeAssembler {
                             locale);
 
                     if (id == null) {
-                        final Charge chargeDefinition = this.chargeRepository.findOneWithNotFoundDetection(chargeId);
+                        final ChargeDefinitionData chargeDefinition = this.chargeDefinitionPort.findCharge(chargeId)
+                                .orElseThrow(() -> new ChargeNotFoundException(chargeId));
                         final ChargeTimeType chargeTime = null;
                         if (chargeTimeType != null) {
                             ChargeTimeType.fromInt(chargeTimeType);
@@ -100,8 +102,7 @@ public class SavingsProductChargeAssembler {
                             ChargeCalculationType.fromInt(chargeCalculationType);
                         }
                         final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewWithoutSavingsAccount(
-                                chargeDefinition.toDefinitionData(), amount, chargeTime, chargeCalculation, dueDate, true, feeOnMonthDay,
-                                feeInterval);
+                                chargeDefinition, amount, chargeTime, chargeCalculation, dueDate, true, feeOnMonthDay, feeInterval);
                         savingsAccountCharges.add(savingsAccountCharge);
                     } else {
                         final Long savingsAccountChargeId = id;

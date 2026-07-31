@@ -44,12 +44,14 @@ import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
-import org.apache.fineract.portfolio.charge.domain.Charge;
+import org.apache.fineract.portfolio.charge.domain.ChargeAppliesTo;
 import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeAppliedToException;
+import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
 import org.apache.fineract.portfolio.charge.exception.SavingsAccountChargeNotFoundException;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,14 +59,14 @@ import org.springframework.stereotype.Service;
 public class SavingsAccountChargeAssembler {
 
     private final FromJsonHelper fromApiJsonHelper;
-    private final ChargeRepositoryWrapper chargeRepository;
+    private final ChargeDefinitionPort chargeDefinitionPort;
     private final SavingsAccountChargeRepository savingsAccountChargeRepository;
 
     @Autowired
-    public SavingsAccountChargeAssembler(final FromJsonHelper fromApiJsonHelper, final ChargeRepositoryWrapper chargeRepository,
+    public SavingsAccountChargeAssembler(final FromJsonHelper fromApiJsonHelper, final ChargeDefinitionPort chargeDefinitionPort,
             final SavingsAccountChargeRepository savingsAccountChargeRepository) {
         this.fromApiJsonHelper = fromApiJsonHelper;
-        this.chargeRepository = chargeRepository;
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.savingsAccountChargeRepository = savingsAccountChargeRepository;
     }
 
@@ -99,9 +101,10 @@ public class SavingsAccountChargeAssembler {
                             locale);
 
                     if (id == null) {
-                        final Charge chargeDefinition = this.chargeRepository.findOneWithNotFoundDetection(chargeId);
+                        final ChargeDefinitionData chargeDefinition = this.chargeDefinitionPort.findCharge(chargeId)
+                                .orElseThrow(() -> new ChargeNotFoundException(chargeId));
 
-                        if (!chargeDefinition.isSavingsCharge()) {
+                        if (!ChargeAppliesTo.fromInt(chargeDefinition.getChargeAppliesTo()).isSavingsCharge()) {
                             final String errorMessage = "Charge with identifier " + chargeDefinition.getId()
                                     + " cannot be applied to Savings product.";
                             throw new ChargeCannotBeAppliedToException("savings.product", errorMessage, chargeDefinition.getId());
@@ -119,8 +122,7 @@ public class SavingsAccountChargeAssembler {
 
                         final boolean status = true;
                         final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewWithoutSavingsAccount(
-                                chargeDefinition.toDefinitionData(), amount, chargeTime, chargeCalculation, dueDate, status, feeOnMonthDay,
-                                feeInterval);
+                                chargeDefinition, amount, chargeTime, chargeCalculation, dueDate, status, feeOnMonthDay, feeInterval);
                         savingsAccountCharges.add(savingsAccountCharge);
                     } else {
                         final Long savingsAccountChargeId = id;
@@ -148,7 +150,8 @@ public class SavingsAccountChargeAssembler {
             return savingsAccountCharges;
         }
         for (final Long chargeId : productChargeIds) {
-            final Charge charge = this.chargeRepository.findOneWithNotFoundDetection(chargeId);
+            final ChargeDefinitionData charge = this.chargeDefinitionPort.findCharge(chargeId)
+                    .orElseThrow(() -> new ChargeNotFoundException(chargeId));
             ChargeTimeType chargeTime = null;
             if (charge.getChargeTimeType() != null) {
                 chargeTime = ChargeTimeType.fromInt(charge.getChargeTimeType());
@@ -158,13 +161,12 @@ public class SavingsAccountChargeAssembler {
             }
 
             ChargeCalculationType chargeCalculation = null;
-            if (charge.getChargeCalculation() != null) {
-                chargeCalculation = ChargeCalculationType.fromInt(charge.getChargeCalculation());
+            if (charge.getChargeCalculationType() != null) {
+                chargeCalculation = ChargeCalculationType.fromInt(charge.getChargeCalculationType());
             }
             final boolean status = true;
-            final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewWithoutSavingsAccount(
-                    charge.toDefinitionData(), charge.getAmount(), chargeTime, chargeCalculation, null, status, charge.getFeeOnMonthDay(),
-                    charge.feeInterval());
+            final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewWithoutSavingsAccount(charge,
+                    charge.getAmount(), chargeTime, chargeCalculation, null, status, charge.getFeeOnMonthDay(), charge.getFeeInterval());
             savingsAccountCharges.add(savingsAccountCharge);
         }
         return savingsAccountCharges;

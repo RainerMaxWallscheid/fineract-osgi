@@ -36,7 +36,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableWithUTCDateTimeCustom;
 import org.apache.fineract.infrastructure.core.domain.ExternalId;
@@ -162,14 +161,14 @@ public class ClientTransaction extends AbstractAuditableWithUTCDateTimeCustom<Lo
             final List<Map<String, Object>> clientChargesPaidData = new ArrayList<>();
             for (final ClientChargePaidBy clientChargePaidBy : this.clientChargePaidByCollection) {
                 final Map<String, Object> clientChargePaidData = new LinkedHashMap<>();
-                clientChargePaidData.put("chargeId", clientChargePaidBy.getClientCharge().getCharge().getId());
-                clientChargePaidData.put("isPenalty", clientChargePaidBy.getClientCharge().getCharge().isPenalty());
+                clientChargePaidData.put("chargeId", clientChargePaidBy.getClientCharge().getChargeId());
+                clientChargePaidData.put("isPenalty", clientChargePaidBy.getClientCharge().isPenaltyCharge());
                 clientChargePaidData.put("clientChargeId", clientChargePaidBy.getClientCharge().getId());
                 clientChargePaidData.put("amount", clientChargePaidBy.getAmount());
-                GLAccount glAccount = clientChargePaidBy.getClientCharge().getCharge().getAccount();
-                if (glAccount != null) {
+                final Long incomeAccountId = clientChargePaidBy.getClientCharge().getIncomeOrLiabilityAccountId();
+                if (incomeAccountId != null) {
                     accountingEnabledForAtleastOneCharge = true;
-                    clientChargePaidData.put("incomeAccountId", glAccount.getId());
+                    clientChargePaidData.put("incomeAccountId", incomeAccountId);
                 }
                 clientChargesPaidData.add(clientChargePaidData);
             }

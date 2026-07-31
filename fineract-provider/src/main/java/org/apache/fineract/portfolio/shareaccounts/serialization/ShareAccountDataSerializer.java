@@ -349,7 +349,7 @@ public class ShareAccountDataSerializer {
                     ChargeTimeType chargeTime = null;
                     ChargeCalculationType chargeCalculation = null;
                     Boolean status = Boolean.TRUE;
-                    ShareAccountCharge accountCharge = ShareAccountCharge.createNewWithoutShareAccount(charge.getCharge(),
+                    ShareAccountCharge accountCharge = ShareAccountCharge.createNewWithoutShareAccount(charge.toDefinitionData(),
                             charge.percentageOrAmount(), chargeTime, chargeCalculation, status);
                     chargesList.add(accountCharge);
                 }
@@ -668,8 +668,8 @@ public class ShareAccountDataSerializer {
                         ChargeTimeType chargeTime = null;
                         ChargeCalculationType chargeCalculation = null;
                         Boolean status = Boolean.TRUE;
-                        ShareAccountCharge accountCharge = ShareAccountCharge.createNewWithoutShareAccount(charge, amount, chargeTime,
-                                chargeCalculation, status);
+                        ShareAccountCharge accountCharge = ShareAccountCharge.createNewWithoutShareAccount(charge.toDefinitionData(),
+                                amount, chargeTime, chargeCalculation, status);
                         charges.add(accountCharge);
                     }
                 }

@@ -260,4 +260,5 @@
     <include file="parts/0239_add_retained_earning_job.xml" relativeToChangelogFile="true"/>
     <include file="parts/0240_add_retained_earning_global_configuration.xml" relativeToChangelogFile="true"/>
     <include file="parts/0242_add_client_lifecycle_external_event_configuration.xml" relativeToChangelogFile="true"/>
+    <include file="parts/0243_client_share_charge_catalog_snapshots.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

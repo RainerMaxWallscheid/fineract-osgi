@@ -4,7 +4,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 
 | | |
 |--|--|
-| **Status** | **as-built** — Steps **0–7, 9 done**; Step **8 partial** (loan api-only; savings product + account charge off entity; assemblers/client residual) |
+| **Status** | **as-built** — Steps **0–7, 9 done**; Step **8 partial** (loan + savings **charge-api only**; client/share account charges chargeId; freeze residual) |
 | **Decisions** | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **Playbook** | [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) §15.6 Wave 1, §15.7 |
 | **Reference pilot** | [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md) (as-built) |
@@ -441,18 +441,28 @@ Hardest step — **incremental**. First slice landed 2026-07-26:
 25. [x] **ChargeDefinitionData** extended for feeOnMonth/day + free-withdrawal/payment-type fields  
 26. [x] Liquibase `2006_savings_account_charge_catalog_snapshots` backfill  
 
+#### Done (slice 8 — savings charge-api only)
+
+27. [x] **Savings:** product/account/deposit charge assemblers use `ChargeDefinitionPort` + `ChargeAppliesTo` (no `ChargeRepositoryWrapper`)  
+28. [x] **Gradle:** `:fineract-savings` depends on **charge-api only** (dropped charge-impl)  
+29. [x] **SavingsAccount.addCharge** takes `ChargeDefinitionData`  
+
+#### Done (slice 9 — client / share account charges)
+
+30. [x] **ClientCharge** stores `chargeId` + name/currency/incomeAccount snapshots; create via `ChargeDefinitionData`  
+31. [x] **ShareAccountCharge** stores `chargeId` + name/currency; create via `ChargeDefinitionData`  
+32. [x] Liquibase `0243_client_share_charge_catalog_snapshots`  
+
 #### Residual (later slices)
 
 | Module | Still needs charge-impl for |
 |--------|-----------------------------|
-| **savings** | Assemblers still load `Charge` entity to validate/build definition data |
-| **provider / ITs** | façade; client/share charges |
+| **provider / ITs** | façade composition root; share **product** may still load Charge for validation |
 
-27. [ ] Savings assemblers via `ChargeDefinitionPort` only; drop charge-impl from savings Gradle  
-28. [ ] Client/share account charges off Charge entity  
-29. [ ] ArchUnit freeze shrink; deprecate façade  
+33. [ ] Share/client product charge lists if any still use Charge entity  
+34. [ ] ArchUnit freeze shrink; deprecate façade  
 
-**Note:** Savings still depends on charge-impl for `ChargeRepositoryWrapper` at product/account assembly; freeze only shrinks.
+**Note:** Domain modules loan + savings + WC + accounting are charge-api-only; account-level client/share charges are chargeId.
 
 ### Step 9 — Documentation & acceptance ✅
 

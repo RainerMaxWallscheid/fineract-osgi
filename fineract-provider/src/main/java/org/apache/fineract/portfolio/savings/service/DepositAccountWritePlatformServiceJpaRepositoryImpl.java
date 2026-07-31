@@ -930,7 +930,7 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
                 }
             }
         }
-        savingsAccount.addCharge(fmt, savingsAccountCharge, chargeDefinition);
+        savingsAccount.addCharge(fmt, savingsAccountCharge, chargeDefinition.toDefinitionData());
         this.savingAccountRepositoryWrapper.saveAndFlush(savingsAccount);
         return  //
         //

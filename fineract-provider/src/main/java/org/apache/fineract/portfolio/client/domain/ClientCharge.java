@@ -30,9 +30,9 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.OrganisationCurrency;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 
 @Entity
 @Table(name = "m_client_charge")
@@ -42,9 +42,18 @@ public class ClientCharge extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "client_id", referencedColumnName = "id", nullable = false)
     private Client client;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "charge_id", referencedColumnName = "id", nullable = false)
-    private Charge charge;
+    /** Catalog charge definition id (no JPA association to charge-impl). */
+    @Column(name = "charge_id", nullable = false)
+    private Long chargeId;
+
+    @Column(name = "charge_name", length = 100)
+    private String chargeName;
+
+    @Column(name = "currency_code", length = 3)
+    private String currencyCode;
+
+    @Column(name = "income_or_liability_account_id")
+    private Long incomeOrLiabilityAccountId;
 
     @Column(name = "charge_time_enum", nullable = false)
     private Integer chargeTime;
@@ -92,19 +101,24 @@ public class ClientCharge extends AbstractPersistableCustom<Long> {
         //
     }
 
-    public static ClientCharge createNew(final Client client, final Charge charge, final BigDecimal amount, final LocalDate dueDate) {
+    public static ClientCharge createNew(final Client client, final ChargeDefinitionData charge, final BigDecimal amount,
+            final LocalDate dueDate) {
         final boolean status = true;
         return new ClientCharge(client, charge, amount, dueDate, status);
     }
 
-    private ClientCharge(final Client client, final Charge charge, final BigDecimal amount, final LocalDate dueDate, final boolean status) {
+    private ClientCharge(final Client client, final ChargeDefinitionData charge, final BigDecimal amount, final LocalDate dueDate,
+            final boolean status) {
 
         this.client = client;
-        this.charge = charge;
+        this.chargeId = charge.getId();
+        this.chargeName = charge.getName();
+        this.currencyCode = charge.getCurrencyCode();
+        this.incomeOrLiabilityAccountId = charge.getIncomeOrLiabilityAccountId();
         this.penaltyCharge = charge.isPenalty();
         this.chargeTime = charge.getChargeTimeType();
         this.dueDate = dueDate;
-        this.chargeCalculation = charge.getChargeCalculation();
+        this.chargeCalculation = charge.getChargeCalculationType();
 
         BigDecimal chargeAmount = charge.getAmount();
         if (amount != null) {
@@ -214,8 +228,20 @@ public class ClientCharge extends AbstractPersistableCustom<Long> {
         return this.client;
     }
 
-    public Charge getCharge() {
-        return this.charge;
+    public Long getChargeId() {
+        return this.chargeId;
+    }
+
+    public String getChargeName() {
+        return this.chargeName;
+    }
+
+    public String getCurrencyCode() {
+        return this.currencyCode;
+    }
+
+    public Long getIncomeOrLiabilityAccountId() {
+        return this.incomeOrLiabilityAccountId;
     }
 
     public Integer getChargeTime() {

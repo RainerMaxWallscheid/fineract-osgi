@@ -69,9 +69,11 @@ import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.exception.InvalidCurrencyException;
-import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.charge.domain.ChargeAppliesTo;
 import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeAppliedToException;
+import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionPort;
 import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChart;
 import org.apache.fineract.portfolio.interestratechart.service.InterestRateChartAssembler;
 import org.apache.fineract.portfolio.savings.PreClosurePenalInterestOnType;
@@ -88,14 +90,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class DepositProductAssembler {
 
-    private final ChargeRepositoryWrapper chargeRepository;
+    private final ChargeDefinitionPort chargeDefinitionPort;
     private final InterestRateChartAssembler chartAssembler;
     private final TaxGroupRepositoryWrapper taxGroupRepository;
 
     @Autowired
-    public DepositProductAssembler(final ChargeRepositoryWrapper chargeRepository, final InterestRateChartAssembler chartAssembler,
+    public DepositProductAssembler(final ChargeDefinitionPort chargeDefinitionPort, final InterestRateChartAssembler chartAssembler,
             final TaxGroupRepositoryWrapper taxGroupRepository) {
-        this.chargeRepository = chargeRepository;
+        this.chargeDefinitionPort = chargeDefinitionPort;
         this.chartAssembler = chartAssembler;
         this.taxGroupRepository = taxGroupRepository;
     }
@@ -444,9 +446,10 @@ public class DepositProductAssembler {
                     if (jsonObject.has(idParamName)) {
                         final Long id = jsonObject.get(idParamName).getAsLong();
 
-                        final Charge charge = this.chargeRepository.findOneWithNotFoundDetection(id);
+                        final ChargeDefinitionData charge = this.chargeDefinitionPort.findCharge(id)
+                                .orElseThrow(() -> new ChargeNotFoundException(id));
 
-                        if (!charge.isSavingsCharge()) {
+                        if (!ChargeAppliesTo.fromInt(charge.getChargeAppliesTo()).isSavingsCharge()) {
                             final String errorMessage = "Charge with identifier " + charge.getId()
                                     + " cannot be applied to Savings product.";
                             throw new ChargeCannotBeAppliedToException("savings.product", errorMessage, charge.getId());

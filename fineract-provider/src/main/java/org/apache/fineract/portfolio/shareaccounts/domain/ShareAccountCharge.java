@@ -29,9 +29,9 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
-import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
+import org.apache.fineract.portfolio.charge.moduleapi.ChargeDefinitionData;
 
 @Entity
 @Table(name = "m_share_account_charge")
@@ -41,9 +41,15 @@ public class ShareAccountCharge extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false)
     private ShareAccount shareAccount;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "charge_id", referencedColumnName = "id", nullable = false)
-    private Charge charge;
+    /** Catalog charge definition id (no JPA association to charge-impl). */
+    @Column(name = "charge_id", nullable = false)
+    private Long chargeId;
+
+    @Column(name = "charge_name", length = 100)
+    private String chargeName;
+
+    @Column(name = "currency_code", length = 3)
+    private String currencyCode;
 
     @Column(name = "charge_time_enum", nullable = false)
     private Integer chargeTime;
@@ -84,8 +90,9 @@ public class ShareAccountCharge extends AbstractPersistableCustom<Long> {
     @Column(name = "charge_amount_or_percentage")
     private BigDecimal amountOrPercentage;
 
-    public static ShareAccountCharge createNewWithoutShareAccount(final Charge chargeDefinition, final BigDecimal amountPayable,
-            final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculation, final boolean status) {
+    public static ShareAccountCharge createNewWithoutShareAccount(final ChargeDefinitionData chargeDefinition,
+            final BigDecimal amountPayable, final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculation,
+            final boolean status) {
         return new ShareAccountCharge(null, chargeDefinition, amountPayable, chargeTime, chargeCalculation, status);
     }
 
@@ -93,14 +100,16 @@ public class ShareAccountCharge extends AbstractPersistableCustom<Long> {
         //
     }
 
-    private ShareAccountCharge(final ShareAccount shareAccount, final Charge chargeDefinition, final BigDecimal amount,
+    private ShareAccountCharge(final ShareAccount shareAccount, final ChargeDefinitionData chargeDefinition, final BigDecimal amount,
             final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculation, final boolean status) {
 
         this.shareAccount = shareAccount;
-        this.charge = chargeDefinition;
+        this.chargeId = chargeDefinition.getId();
+        this.chargeName = chargeDefinition.getName();
+        this.currencyCode = chargeDefinition.getCurrencyCode();
         this.chargeTime = chargeTime == null ? chargeDefinition.getChargeTimeType() : chargeTime.getValue();
 
-        this.chargeCalculation = chargeDefinition.getChargeCalculation();
+        this.chargeCalculation = chargeDefinition.getChargeCalculationType();
         if (chargeCalculation != null) {
             this.chargeCalculation = chargeCalculation.getValue();
         }
@@ -308,15 +317,11 @@ public class ShareAccountCharge extends AbstractPersistableCustom<Long> {
     }
 
     public String name() {
-        return this.charge.getName();
+        return this.chargeName;
     }
 
     public String currencyCode() {
-        return this.charge.getCurrencyCode();
-    }
-
-    public Charge getCharge() {
-        return this.charge;
+        return this.currencyCode;
     }
 
     public ShareAccount shareAccount() {
@@ -358,7 +363,30 @@ public class ShareAccountCharge extends AbstractPersistableCustom<Long> {
     }
 
     public Long getChargeId() {
-        return this.charge.getId();
+        return this.chargeId;
+    }
+
+    /**
+     * Catalog projection from denormalized snapshots (for re-attach without loading Charge).
+     */
+    public ChargeDefinitionData toDefinitionData() {
+        return new ChargeDefinitionData(//
+                this.chargeId, //
+                this.chargeName, //
+                this.amountOrPercentage != null ? this.amountOrPercentage : this.amount, //
+                this.currencyCode, //
+                null, //
+                this.chargeTime, //
+                this.chargeCalculation, //
+                null, //
+                false, //
+                this.active, //
+                null, //
+                null, //
+                null, //
+                null, //
+                null, //
+                null);
     }
 
     public boolean isSharesPurchaseCharge() {
