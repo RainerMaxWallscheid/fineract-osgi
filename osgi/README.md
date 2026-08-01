@@ -18,7 +18,7 @@ Build jars: `./gradlew :fineract-command-api:jar :fineract-command-impl:jar :fin
 White-box tests: `./gradlew :fineract-command-test:test`  
 Copy into `osgi/bundles/` for Equinox resolve experiments. Plan: [15_osgi_bundle_refactoring_fineract-command.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-command.md).
 
-### Wave 1: fineract-charge bundles (as-built Steps 0–8; no façade)
+### Wave 1: fineract-charge bundles (complete)
 
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
@@ -51,6 +51,16 @@ Loan uses **rates-api only** (`floatingRateId` + port).
 | `fineract-tax-test` | `org.apache.fineract.tax.test` | Fragment-Host → tax.impl |
 
 Charge/loan/savings use **tax-api only** (`taxGroupId` / `taxComponentId` + ports). Plan: [15_osgi_bundle_refactoring_fineract-tax.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-tax.md).
+
+### Wave 2: fineract-document bundles (in progress)
+
+| Artifact | Bundle-SymbolicName | Notes |
+|----------|---------------------|-------|
+| `fineract-document-api` | `org.apache.fineract.document.api` | `ContentStoreService`, document/image ports, DTOs |
+| `fineract-document-impl` | `org.apache.fineract.document.impl` | FS/S3 + REST + `DocumentOsgiServiceRegistrar` |
+| `fineract-document-test` | `org.apache.fineract.document.test` | Fragment-Host → document.impl |
+
+Provider/war take **api + impl** (`ContentPipe` residual). Plan: [15_osgi_bundle_refactoring_fineract-document.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-document.md).
 
 ## Layout
 

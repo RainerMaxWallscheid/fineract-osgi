@@ -1,6 +1,6 @@
 # fineract-charge
 
-Charge Catalog bounded context — OSGi modularization **as-built** (Steps 0–8)
+Charge Catalog bounded context — OSGi modularization **complete** (Steps 0–9)
 ([ADR-022](../docs/arc42/decisions/ADR-022-osgi-api-impl-test-bundles-services.md)).
 
 | Gradle project | Path | Bundle-SymbolicName | Role |

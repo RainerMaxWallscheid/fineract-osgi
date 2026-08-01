@@ -164,7 +164,7 @@ Details: [`decisions/README.md`](decisions/README.md).
 |-------|---------------|--------|
 | Equinox embedded vs. sidecar | final process model | Prod image layout |
 | Bundle signing PKI | who signs, how verified | Prod hot deploy |
-| B2 pilot follow-up | command pilot done; next Wave 1 = charge (or rates) then tax — see [15.6 rollout order](15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot) | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) / [15](15_osgi_bundle_refactoring.md) |
+| Wave 2 follow-up | Wave 1 **complete**; **document** api/impl/test **in progress** — see [document plan](15_osgi_bundle_refactoring_fineract-document.md) / [15.6](15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot) | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md) / [15](15_osgi_bundle_refactoring.md) |
 | Outbox for external events | exactly vs. at-least-once UX | Enterprise integration |
 | Sync AI products | which products fail-closed default | Lending policy |
 | Helm chart | timing vs. raw manifests | Platform teams |

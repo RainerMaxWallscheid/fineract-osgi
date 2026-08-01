@@ -4,7 +4,7 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 
 | | |
 |--|--|
-| **Status** | **as-built** — Steps **0–9 done** for charge catalog split; Step 8 semantic retargets + façade **removed**; ArchUnit charge freeze **green** (public catalog surface allowlisted) |
+| **Status** | **complete** — Steps **0–9** (api/impl/test; façade **removed**; chargeId/port retargets; domain consumers **charge-api only**; ArchUnit charge freeze **green**) |
 | **Decisions** | [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-services.md), [ADR-021](decisions/ADR-021-modul-kommunikation-nur-ueber-module-api.md), [ADR-017](decisions/ADR-017-hexagonale-architektur.md) |
 | **Playbook** | [15 OSGi Bundle Refactoring](15_osgi_bundle_refactoring.md) §15.6 Wave 1, §15.7 |
 | **Reference pilot** | [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md) (as-built) |
@@ -27,8 +27,8 @@ Step-by-step plan to split **Charge Catalog** (fee *definitions*) into OSGi **ap
 | 5 Fragment-Host test | **done** (2026-07-26) | White-box tests on charge-test only; impl main-only; 16 tests green |
 | 6 Spring↔OSGi bridge | **done** (2026-07-26) | `ChargeOsgiServiceRegistrar` registers `ChargeDefinitionPort`; no-op without OSGi |
 | 7 Consumer retarget (Gradle) | **done** (2026-07-26) | Off façade: progressive → api only; loan/savings/… → api+impl temp; provider/IT keep façade |
-| 8 Consumer retarget (semantic) | **partial** (2026-07-26) | Accounting, investor, **WC** off Charge; loan tranche chargeId; loan/savings entity residual |
-| 9 Docs / acceptance | **done** (2026-07-26) | READMEs, osgi table, 15.6 rollout, optional Gherkin; freeze shrink deferred with Step 8 residual |
+| 8 Consumer retarget (semantic) | **done** | Product/account charges use chargeId; loan/savings/accounting/WC/progressive → charge-api only; provider/war/ITs → api+impl |
+| 9 Docs / acceptance | **done** | READMEs, osgi table, 15.6 rollout (Wave 1 **complete**), optional Gherkin; ArchUnit charge freeze green |
 
 **Not in this plan:** migrating *loan/savings account charges* (those are product BCs); full Equinox as primary process; removing Spring from charge.
 
@@ -501,7 +501,7 @@ Hardest step — **incremental**. First slice landed 2026-07-26:
 |--------|-----------------------------|
 | **provider / ITs** | catalog write/read services + REST live on charge-impl (correct for composition root) |
 
-54. [x] Wave 1 next: **rates** api/impl/test started — [rates plan](15_osgi_bundle_refactoring_fineract-rates.md); tax planned — [tax plan](15_osgi_bundle_refactoring_fineract-tax.md)
+54. [x] Wave 1 **complete**: rates + tax also landed — [rates plan](15_osgi_bundle_refactoring_fineract-rates.md); [tax plan](15_osgi_bundle_refactoring_fineract-tax.md)
 
 **Note:** Domain modules loan + savings + WC + accounting are charge-api-only; product/account charge create paths in provider use `ChargeDefinitionPort`. Loan/savings ArchUnit charge-internal freeze is green.
 
@@ -510,7 +510,7 @@ Hardest step — **incremental**. First slice landed 2026-07-26:
 1. [x] Plan status table + acceptance criteria updated (this document)  
 2. [x] Module READMEs: `fineract-charge/README.md`, `api/`, `impl/`, `test/`  
 3. [x] [osgi/README.md](../../osgi/README.md) Wave 1 charge table (as-built + consumer residual)  
-4. [x] [15.6 rollout](15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot) — charge marked **in progress / largely done**  
+4. [x] [15.6 rollout](15_osgi_bundle_refactoring.md#suggested-rollout-order-postcommand-pilot) — Wave 1 charge/rates/tax marked **complete**  
 5. [x] Optional Gherkin: [charge_catalog_service.feature](../gherkin/features/osgi/charge_catalog_service.feature) (`@adr-022`)  
 
 **Acceptance criteria**
@@ -519,16 +519,16 @@ Hardest step — **incremental**. First slice landed 2026-07-26:
 |---|-----------|--------|
 | 1 | api, impl, test fragment artifacts build | **done** (Step 4 jars) |
 | 2 | api has no Spring / JPA / REST | **done** (verified Step 9) |
-| 3 | Domain modules compile on **charge-api** only (provider exception) | **partial** (progressive + accounting api-only; investor none; loan/savings/WC still impl) |
+| 3 | Domain modules compile on **charge-api** only (provider exception) | **done** (loan/savings/accounting/WC/progressive api-only; investor none; provider/war/ITs api+impl) |
 | 4 | Ports registered in OSGi Service Registry (bridge present) | **done** (Step 6 registrar) |
 | 5 | No Karaf Feature descriptors | **done** (Service Registry only) |
 | 6 | Spring still wires impl under Boot | **done** (registrar no-ops off-OSGi) |
 | 7 | Fragment-Host tests green | **done** (Step 5, 16 tests) |
 | 8 | Sources under `fineract-charge/{api,impl,test}` | **done** |
-| 9 | No *new* foreign uses of `Charge` entity; freeze only shrinks | **partial** (accounting/investor cleaned; freeze residual for loan/savings) |
+| 9 | No *new* foreign uses of `Charge` entity; freeze only shrinks | **done** (domain consumers on charge-api; freeze allowlists public catalog surface) |
 | 10 | Provider no longer hosts charge catalog service impls | **done** (Step 3) |
 
-**Exit (Step 9):** Documentation matches as-built layout; open work is **Step 8 residual** only (not docs).
+**Exit (Step 9):** Documentation matches as-built layout; charge Wave 1 catalog split is **complete**.
 
 ---
 
@@ -558,7 +558,7 @@ Hardest step — **incremental**. First slice landed 2026-07-26:
 | Service impls still in **provider** | Step 3 move is mandatory; scan provider for leftover charge components |
 | Enum duplication (core vs charge) | Single source of truth in api; delete duplicates |
 | `JsonCommand` on write API | Keep write application service in impl; expose only high-level ports to other BCs |
-| Tax dependency | charge-impl depends on tax-api + tax-impl (TaxGroup entity residual until tax Step 8) |
+| Tax dependency | charge-impl depends on **tax-api only** (`taxGroupId` + `TaxCatalogPort`; tax Step 8 closed) |
 | LoanCharge* exceptions in charge module | Do not put on charge-api export; migrate to loan in a follow-up |
 | Nested `projectDir` breaks CI name lists | Keep Gradle names `fineract-charge-api` etc. stable |
 | Equinox not in CI | Manifest + unit tests first; optional Equinox smoke |
@@ -572,7 +572,7 @@ Hardest step — **incremental**. First slice landed 2026-07-26:
 - Karaf Features packaging  
 - Removing Spring from charge-impl  
 - Running full Fineract inside Equinox as the primary process  
-- Splitting tax in the same PR series (coordinate only: charge-impl may keep depending on tax monolith until tax Wave 1)
+- Tax / rates Wave 1 splits (done separately; charge now tax-api only)
 
 ---
 
@@ -582,8 +582,7 @@ Hardest step — **incremental**. First slice landed 2026-07-26:
 # After shells exist
 ./gradlew :fineract-charge-api:jar \
   :fineract-charge-impl:jar \
-  :fineract-charge-test:test \
-  :fineract-charge:jar
+  :fineract-charge-test:test
 
 # Consumer compile check (examples)
 ./gradlew :fineract-loan:compileJava \

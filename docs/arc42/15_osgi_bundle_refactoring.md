@@ -181,8 +181,8 @@ sequenceDiagram
 
 **B2 pilot status:** `fineract-command` is the completed pilot (api / impl / test fragment + integrationtest fixtures). As-built plan: [15_osgi_bundle_refactoring_fineract-command.md](15_osgi_bundle_refactoring_fineract-command.md).
 
-**Wave 1 status:**
-- **charge** — largely done (api/impl/test; façade removed; chargeId/port retargets). Plan: [15_osgi_bundle_refactoring_fineract-charge.md](15_osgi_bundle_refactoring_fineract-charge.md).
+**Wave 1 status:** **complete** (charge, rates, tax).
+- **charge** — **complete** (api/impl/test; façade removed; chargeId/port retargets; domain consumers **charge-api only**). Plan: [15_osgi_bundle_refactoring_fineract-charge.md](15_osgi_bundle_refactoring_fineract-charge.md).
 - **rates** — **complete** (api/impl/test + `FloatingRatePort`; loan **rates-api only** via `floatingRateId`). Plan: [15_osgi_bundle_refactoring_fineract-rates.md](15_osgi_bundle_refactoring_fineract-rates.md).
 - **tax** — **complete** (api/impl/test + ports; charge/loan/savings **tax-api only** via catalog ids). Plan: [15_osgi_bundle_refactoring_fineract-tax.md](15_osgi_bundle_refactoring_fineract-tax.md).
 
@@ -202,16 +202,13 @@ Further modules follow the same recipe, ordered by **port clarity**, **size**, *
 
 Per module: complete **Module API ports first** ([14.6](14_module_api_boundaries.md)), then physical api/impl/test split.
 
-#### Wave 1 — next (command-sized, best ROI)
+#### Wave 1 — complete (command-sized)
 
-| Rank | Module | ~main scale | Why next | Typical `-api` surface |
-|------|--------|-------------|----------|------------------------|
-| **1** | **`fineract-charge`** | ~40 | **Largely done** — api/impl/test; chargeId/port retargets; façade **removed**; ArchUnit charge freeze green. **Detailed plan:** [15_osgi_bundle_refactoring_fineract-charge.md](15_osgi_bundle_refactoring_fineract-charge.md) | `ChargeDefinitionPort`; composition roots use api+impl |
+| Rank | Module | ~main scale | Status | Typical `-api` surface |
+|------|--------|-------------|--------|------------------------|
+| **1** | **`fineract-charge`** | ~40 | **Complete** — api/impl/test; chargeId/port retargets; façade **removed**; ArchUnit charge freeze green. [charge plan](15_osgi_bundle_refactoring_fineract-charge.md) | `ChargeDefinitionPort`; composition roots use api+impl |
 | **2** | **`fineract-rates`** | ~20 | **Complete** — api/impl/test + `FloatingRatePort`; loan rates-api only. [rates plan](15_osgi_bundle_refactoring_fineract-rates.md) | `FloatingRatePort` + DTOs / service interfaces |
 | **3** | **`fineract-tax`** | ~30 | **Complete** — api/impl/test + ports; charge/loan/savings tax-api only. [tax plan](15_osgi_bundle_refactoring_fineract-tax.md) | `TaxCatalogPort` + `ChargeTaxApplicationService` |
-
-- Prefer **charge first** for architectural impact (loan / savings / accounting / investor already depend on it).  
-- Prefer **rates first** for lowest mechanical risk (same steps as command, less consumer rewiring).
 
 Suggested directory layout (mirror command):
 
@@ -228,7 +225,7 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 
 | Rank | Module | ~main scale | Why | Caveat |
 |------|--------|-------------|-----|--------|
-| **4** | **`fineract-document`** | ~85 | Real hexagonal story (`ContentStore` / FS vs S3); few consumers (mainly provider) | Port cleanup first; do not leak servlet/AWS types into `-api` |
+| **4** | **`fineract-document`** | ~85 | **In progress** — api/impl/test + `ContentStoreService` port; provider still impl for `ContentPipe`. [document plan](15_osgi_bundle_refactoring_fineract-document.md) | Port cleanup first; do not leak servlet/AWS types into `-api` |
 | **5** | **`fineract-branch`** | ~50 | Clear org aggregate (teller/cashier) | Less “optional extension” value than charge/document |
 | **6** | **`fineract-loan-origination`** | ~60 | Bounded slice vs full loan | Couples to loan types — extract ports carefully |
 | **7** | **`fineract-mix`** | ~35 | Small XBRL/reporting support | Niche; lower strategic value for OSGi services |
@@ -264,19 +261,18 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 #### Quick decision matrix
 
 ```text
-Small + ports exist     → rates, tax, charge     ★★★ next
-Hexagonal adapters      → document               ★★☆ next-ish
-Many dependents         → charge, accounting     high value, more rewiring
+Wave 1 done             → charge, rates, tax     ★★★ complete
+Hexagonal adapters      → document               ★★★ next
+Many dependents         → accounting             high value, more rewiring
 Huge / core banking     → loan, provider         later
 Shared kernel           → core, validation       don't force BC split
 ```
 
-#### Parallel work while Wave 1 runs
+#### Parallel work after Wave 1
 
 | Priority | Action |
 |----------|--------|
-| **Next PR series** | Wave 1 complete for charge/rates/tax; pick next module by [selection criteria](#selection-criteria) |
-| **Then** | `fineract-document` (replaceable adapters as OSGi services) |
+| **Next PR series** | Finish **document Step 8** (`ContentPipe` residual) — [document plan](15_osgi_bundle_refactoring_fineract-document.md) |
 | **Parallel** | Command **Step 8**: retarget core/provider/cob/document/mix off the command façade |
 | **Do not start** | loan / provider / full-core split |
 
