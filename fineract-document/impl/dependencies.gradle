@@ -22,7 +22,7 @@ dependencies {
 
     implementation(project(path: ':fineract-core'))
     // Handlers use command stack; prefer command-api when Step 8 closes command façade residual.
-    implementation(project(path: ':fineract-command'))
+    implementation(project(path: ':fineract-command-api'))
 
     implementation(
             'org.springframework.boot:spring-boot-starter-web',

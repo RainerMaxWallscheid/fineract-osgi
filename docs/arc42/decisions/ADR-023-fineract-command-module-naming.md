@@ -51,9 +51,9 @@ fineract-command-audit/
 |------|---------|--------------|
 | Ports | `:fineract-command-api` | `fineract-command/api` |
 | Default impl | `:fineract-command-impl` | `fineract-command/impl` |
-| Façade (temporary) | `:fineract-command` | `fineract-command/` (aggregator only) |
 | Unit test fragment | `:fineract-command-test` | `fineract-command/test` |
 | Shared IT fixtures | `:fineract-command-integrationtest` | `fineract-command-integrationtest/` |
+| ~~Façade~~ | removed (Step 8) | — |
 
 5. **OSGi Bundle-SymbolicName**
 
@@ -97,7 +97,7 @@ Context map: **platform application infrastructure**, not a loan/savings bounded
 - **+** api/impl under one directory tree reflect hexagon slices of **one** module  
 - **+** BSNs shorter and aligned with OSGi practice  
 - **−** One-time rename of Gradle paths, deps, docs, Fragment-Host  
-- **−** Façade still named `:fineract-command` until consumer retarget removes it  
+- **+** Compatibility façade `:fineract-command` removed after Step 8 consumer retarget  
 - **−** Java package `…command.core` remains until a separate package migration  
 
 ### Non-Goals

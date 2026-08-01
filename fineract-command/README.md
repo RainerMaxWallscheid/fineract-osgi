@@ -14,9 +14,8 @@ Step-by-step plan:
 | `fineract-command-impl` | `fineract-command/impl` | `org.apache.fineract.command.impl` | Default sync dispatcher, hooks, Spring starter, OSGi service registrar (**main only**) |
 | `fineract-command-test` | `fineract-command/test` | `org.apache.fineract.command.test` | White-box unit tests of **impl**; **Fragment-Host** → `command.impl` |
 | `fineract-command-integrationtest` | `fineract-command-integrationtest/` | `org.apache.fineract.command.integrationtest` | Shared IT fixtures/samples for **all** command modules |
-| `fineract-command` | `fineract-command/` | *(facade JAR)* | Compatibility aggregator: `api` + `impl` for existing consumers |
 
-Prefer new code depending on **`fineract-command-api`** only (plus runtime `fineract-command-impl` when defaults are required).  
+No `:fineract-command` façade (Step 8 closed). Depend on **`fineract-command-api`** (plus **`fineract-command-impl`** at composition roots that need Spring auto-config).
 Inter-bundle access: **OSGi Service Registry** (`CommandOsgiServiceRegistrar` in impl). Not Karaf Features.  
 Spring remains inside **impl**.  
 

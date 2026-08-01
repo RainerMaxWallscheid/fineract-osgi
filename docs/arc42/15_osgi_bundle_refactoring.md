@@ -256,7 +256,7 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 | **`fineract-validation`** | Tiny utility / shared-kernel-ish — keep as library |
 | **`fineract-architecture`** | ArchUnit rules only |
 | **`fineract-report`** | Thin reporting glue |
-| **command satellites** (jdbc / async / disruptor / audit) | Already modular; finish command Step 8 (consumers off façade onto `command-api` + runtime impl) before more splits |
+| **command satellites** (jdbc / async / disruptor / audit) | Already modular; command Step 8 **closed** (no façade; consumers on api / api+impl) |
 
 #### Quick decision matrix
 
@@ -274,7 +274,7 @@ Shared kernel           → core, validation       don't force BC split
 | Priority | Action |
 |----------|--------|
 | **Next PR series** | **`fineract-loan-origination`** api/impl/test — [15.6 Wave 2](#wave-2--strong-hexagonal-medium-size) |
-| **Parallel** | Command **Step 8**: retarget core/provider/cob/mix off the command façade |
+| **Parallel** | Command Step 8 **closed** (façade removed); optional ArchUnit freeze for command-impl edges |
 | **Do not start** | loan / provider / full-core split |
 
 ---

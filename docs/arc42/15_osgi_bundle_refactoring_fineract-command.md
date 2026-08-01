@@ -14,14 +14,14 @@ Step-by-step pilot for [ADR-022](decisions/ADR-022-osgi-api-impl-test-bundles-se
 | 0 Baseline | **done** | Command family tests green before split |
 | 1 Project shells | **done** | Gradle projects + directory grouping under `fineract-command/` |
 | 2 Extract api | **done** | Contracts in `fineract-command/api`; no Spring in api |
-| 3 Move impl + façade | **done** | Impl in `fineract-command/impl`; `:fineract-command` re-exports api+impl |
+| 3 Move impl + façade | **done** | Impl in `fineract-command/impl`; façade was transitional only |
 | 3b Directory layout | **done** | `fineract-command/{api,impl}` via `projectDir`; test fragment top-level |
 | 3c Naming (ADR-023) | **done** | Dropped `fineract-command-core*`; BSN `command.api` / `command.impl` |
 | 4 OSGi manifests | **done** | BSN + Export/Import/Fragment-Host on jars |
 | 5 Fragment-Host test | **done** | `:fineract-command-test` under `fineract-command/test` (Fragment-Host); shared fixtures in `:fineract-command-integrationtest` |
 | 6 Spring↔OSGi bridge | **done** | `CommandOsgiServiceRegistrar` (reflection; no hard OSGi runtime dep) |
 | 7 Satellites → api | **done** | jdbc/async/disruptor compile on api; audit on api+impl; tests may use impl |
-| 8 Consumer retarget | **partial** | core/provider/cob/document/mix still use façade (compatible) |
+| 8 Consumer retarget | **done** | Façade removed; core/mix/document-api only; provider api+impl; cob no dep |
 | 9 Docs / acceptance | **done** | This plan + READMEs + ADR-023 + `osgi/README.md` |
 
 **Not in this pilot:** packaging/running full Fineract inside Equinox as the primary process.
@@ -43,7 +43,6 @@ Sources are grouped under `fineract-command/`; **Gradle project names** stay pat
 ```text
 fineract-command/
   README.md
-  build.gradle  # Gradle :fineract-command  (compatibility façade)
   api/          # Gradle :fineract-command-api
   impl/         # Gradle :fineract-command-impl  (main only)
   test/         # Gradle :fineract-command-test  (Fragment-Host unit tests of impl)
@@ -63,7 +62,7 @@ include ':fineract-command-impl'
 project(':fineract-command-impl').projectDir = file('fineract-command/impl')
 include ':fineract-command-test'
 project(':fineract-command-test').projectDir = file('fineract-command/test')
-include ':fineract-command'
+// No :fineract-command façade
 include ':fineract-command-integrationtest'
 // … satellites …
 ```
@@ -74,7 +73,6 @@ include ':fineract-command-integrationtest'
 | `fineract-command/impl` | `:fineract-command-impl` | Sync dispatcher, hooks, starter, OSGi bridge; Spring inside; **no unit-test sources** |
 | `fineract-command/test` | `:fineract-command-test` | White-box unit tests of **impl**; **Fragment-Host** → `command.impl` |
 | `fineract-command-integrationtest/` | `:fineract-command-integrationtest` | Shared IT fixtures/samples (`CommandBaseTest`, dummy sample) for **all** command modules |
-| `fineract-command/` (root build) | `:fineract-command` | Façade: `api` + `impl` for existing Boot consumers |
 | top-level | `:fineract-command-jdbc` / `-async` / `-disruptor` / `-audit` | Satellites (compile on api where possible) |
 
 ### 2.2 Bundle-SymbolicName
@@ -104,12 +102,13 @@ include ':fineract-command-integrationtest'
 
 | Consumer | Depends on |
 |----------|------------|
-| `:fineract-command` (façade) | `api` + `impl` (both `api` configuration) |
-| jdbc / async / disruptor | **compile:** `:fineract-command-api`; **test:** may add `-core-impl` + `-test` |
+| jdbc / async / disruptor | **compile:** `:fineract-command-api`; **test:** may add impl + integrationtest |
 | audit | **compile:** `:fineract-command-api` + `:fineract-command-impl` (`CommandProperties`) |
 | `:fineract-command-test` | **test:** `:fineract-command-impl` + `:fineract-command-integrationtest` + test stack |
 | `:fineract-command-integrationtest` | **main:** `:fineract-command-api` (+ Spring/testcontainers for samples/base) |
-| core / provider / cob / document / mix | still `:fineract-command` façade (**Step 8 partial**) |
+| core / mix / document-impl | **command-api only** |
+| cob | none (legacy `commands.*`) |
+| provider | **command-api + command-impl** (+ jdbc / audit satellites) |
 
 ### 2.5 Tests (as implemented)
 
@@ -290,17 +289,22 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 | `fineract-command-disruptor` | api | later (optional dispatcher) |
 | `fineract-command-audit` | api + impl | hooks still Spring-only for now |
 
-### Step 8 — Consumer retarget & compatibility cleanup ⏳ partial
+### Step 8 — Consumer retarget & compatibility cleanup ✅
 
-1. [ ] Retarget `fineract-mix` / provider / core / cob / document off façade to api + runtime impl
-2. [ ] Deprecate or remove façade `:fineract-command` when safe
-3. [x] Root project lists include core-api / core-impl
-4. [ ] ArchUnit/Gradle check: domain modules must not depend on `fineract-command-impl` (allow provider + tests)
+1. [x] Retarget consumers off façade:
+   | Consumer | Edge |
+   |----------|------|
+   | core, mix, document-impl | **command-api only** |
+   | cob | **no** command dep (legacy `commands.*` only) |
+   | provider | **command-api + command-impl** (+ jdbc/audit satellites) |
+2. [x] Removed façade project `:fineract-command` (no aggregator JAR)
+3. [x] Root project lists: api / impl / test / satellites only
+4. [x] Domain modules do not depend on `fineract-command-impl` (provider composition root does)
 
-### Step 9 — Documentation & acceptance ✅ (ongoing)
+### Step 9 — Documentation & acceptance ✅
 
 - [x] Plan updated with as-built layout (this document)
-- [x] `fineract-command` / `fineract-command` READMEs
+- [x] `fineract-command` README (no façade)
 - [x] `osgi/README.md` pilot table
 - [ ] Optional Gherkin `@adr-022` for command service present/absent
 
@@ -316,7 +320,7 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 | 6 | Spring still wires impl under Boot | done |
 | 7 | Fragment-Host tests green | done |
 | 8 | Sources under `fineract-command/{api,impl,test}` + integrationtest fixtures | done |
-| 9 | Full consumer retarget off façade | **open** |
+| 9 | Full consumer retarget off façade | **done** |
 
 ---
 
@@ -332,7 +336,7 @@ Implemented with `jar { manifest { attributes … } }` bootstrap (bnd optional l
 | PR-5 | command: Fragment-Host test bundle | 5 | done |
 | PR-6 | command: Spring↔OSGi service registrar | 6 | done |
 | PR-7 | command satellites depend on api | 7 | done |
-| PR-final | command: drop façade; consumer retarget | 8–9 | open |
+| PR-final | command: drop façade; consumer retarget | 8–9 | **done** |
 
 ---
 
