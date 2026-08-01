@@ -25,7 +25,7 @@ import java.io.InputStream;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import org.apache.fineract.infrastructure.contentstore.exception.ContentProcessorException;
-import org.apache.fineract.infrastructure.contentstore.util.ContentPipe;
+import org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 
@@ -37,7 +37,7 @@ public class ImageResizeContentProcessor implements ContentProcessor {
     public static final String IMAGE_RESIZE_PARAM_MAX_WIDTH = IMAGE_RESIZE_PREFIX + "max-width";
     public static final String IMAGE_RESIZE_PARAM_MAX_HEIGHT = IMAGE_RESIZE_PREFIX + "max-height";
     public static final String IMAGE_RESIZE_PARAM_FORMAT = IMAGE_RESIZE_PREFIX + "format";
-    private final ContentPipe pipe;
+    private final ContentStreamPort pipe;
     private static final Pattern VALID_IMAGE_FORMATS = Pattern.compile("^(gif|jpg|jpeg|png)$", Pattern.CASE_INSENSITIVE);
 
     @Override
@@ -88,7 +88,7 @@ public class ImageResizeContentProcessor implements ContentProcessor {
     }
 
     @java.lang.SuppressWarnings("all")
-        public ImageResizeContentProcessor(final ContentPipe pipe) {
+        public ImageResizeContentProcessor(final ContentStreamPort pipe) {
         this.pipe = pipe;
     }
 }

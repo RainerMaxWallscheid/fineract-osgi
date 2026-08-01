@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.documentmanagement.service.DocumentReadPlatformService;
 import org.apache.fineract.infrastructure.documentmanagement.service.DocumentWritePlatformService;
@@ -44,14 +45,17 @@ public class DocumentOsgiServiceRegistrar implements InitializingBean, Disposabl
     private static final Logger LOG = LoggerFactory.getLogger(DocumentOsgiServiceRegistrar.class);
 
     private final ObjectProvider<ContentStoreService> contentStoreService;
+    private final ObjectProvider<ContentStreamPort> contentStreamPort;
     private final ObjectProvider<DocumentReadPlatformService> documentReadPlatformService;
     private final ObjectProvider<DocumentWritePlatformService> documentWritePlatformService;
     private final List<Object> registrations = new ArrayList<>();
 
     public DocumentOsgiServiceRegistrar(final ObjectProvider<ContentStoreService> contentStoreService,
+            final ObjectProvider<ContentStreamPort> contentStreamPort,
             final ObjectProvider<DocumentReadPlatformService> documentReadPlatformService,
             final ObjectProvider<DocumentWritePlatformService> documentWritePlatformService) {
         this.contentStoreService = contentStoreService;
+        this.contentStreamPort = contentStreamPort;
         this.documentReadPlatformService = documentReadPlatformService;
         this.documentWritePlatformService = documentWritePlatformService;
     }
@@ -74,6 +78,7 @@ public class DocumentOsgiServiceRegistrar implements InitializingBean, Disposabl
             }
 
             register(context, ContentStoreService.class, contentStoreService.getIfAvailable());
+            register(context, ContentStreamPort.class, contentStreamPort.getIfAvailable());
             register(context, DocumentReadPlatformService.class, documentReadPlatformService.getIfAvailable());
             register(context, DocumentWritePlatformService.class, documentWritePlatformService.getIfAvailable());
             LOG.info("Registered {} document OSGi service(s)", registrations.size());

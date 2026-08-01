@@ -29,13 +29,17 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import org.apache.fineract.infrastructure.contentstore.exception.ContentProcessorException;
-import org.apache.fineract.infrastructure.contentstore.processor.ContentProcessor;
+import org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+/**
+ * Stream pipe implementing {@link ContentStreamPort}. Foreign BCs inject the port; in-module
+ * processors may inject this concrete type or the port.
+ */
 @Component
-public final class ContentPipe {
+public final class ContentPipe implements ContentStreamPort {
     @java.lang.SuppressWarnings("all")
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ContentPipe.class);
     private final ExecutorService executor;
@@ -46,12 +50,13 @@ public final class ContentPipe {
         this.properties = properties;
     }
 
-    public InputStream pipe(ContentProcessor.OutputStreamConsumer consumer) {
+    @Override
+    public InputStream pipe(final ContentStreamPort.OutputStreamWriter writer) {
         var pis = new PipedInputStream(requireNonNullElse(properties.getContent().getDefaultBufferSize(), 8192));
         var pos = newPipedOutputStream(pis);
         var future = executor.submit(() -> {
             try (var os = pos) {
-                consumer.accept(os);
+                writer.writeTo(os);
             } catch (Throwable e) {
                 // if an error occurs, the pipe will close
                 throw new ContentProcessorException(new IOException(e));
@@ -60,7 +65,8 @@ public final class ContentPipe {
         return new FutureInputStream(pis, future);
     }
 
-    public InputStream pipe(InputStream inputStream, ContentProcessor.InputOutputStreamConsumer consumer) {
+    @Override
+    public InputStream pipe(final InputStream inputStream, final ContentStreamPort.InputOutputStreamTransformer transformer) {
         // Java default buffer is 1024 bytes
         var pis = new PipedInputStream(requireNonNullElse(properties.getContent().getDefaultBufferSize(), 8192));
         var pos = newPipedOutputStream(pis);
@@ -70,7 +76,7 @@ public final class ContentPipe {
                 var os = pos;
                 var is = inputStream) {
                 // run the user logic (e.g., zipping, resizing)
-                consumer.accept(is, os);
+                transformer.transform(is, os);
             } catch (
             // flushing is handled by try-with-resources close()
             Throwable e) {
@@ -82,6 +88,7 @@ public final class ContentPipe {
         return new FutureInputStream(pis, future);
     }
 
+    @Override
     public void write(InputStream is, OutputStream os, byte[] buffer) throws IOException {
         int bytesRead;
         while ((bytesRead = is.read(buffer)) != -1) {

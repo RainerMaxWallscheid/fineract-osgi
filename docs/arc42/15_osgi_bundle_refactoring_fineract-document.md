@@ -6,7 +6,7 @@ Wave‑2 module after Wave 1 (charge / rates / tax)
 
 | Field | Value |
 |-------|--------|
-| **Status** | **in progress** — Steps **0–7, 9** (api/impl/test + OSGi registrar); Step **8** residual open (`ContentPipe` / processors still used by provider bulk-import) |
+| **Status** | **complete** — Steps **0–9** (api/impl/test + `ContentStoreService` / `ContentStreamPort`; provider bulk-import on ports; composition root still api+impl) |
 | **Module** | Document management + content store (FS / S3) |
 | **No façade** | Compose with `:fineract-document-api` + `:fineract-document-impl` explicitly |
 
@@ -87,12 +87,13 @@ Existing contentstore/document tests + registrar smoke test under document-test.
 ### Step 7 — Mechanical consumer Gradle ✅
 | Consumer | Edge |
 |----------|------|
-| provider / war | api + **impl** (composition root + `ContentPipe` residual) |
+| provider / war | api + **impl** (composition root loads Spring beans) |
 
-### Step 8 — Semantic residual ⏳ open
-- [ ] Provider bulk-import off direct `ContentPipe` / processor types if possible
-- [ ] Prefer document-api only for pure DTO/port consumers
-- [ ] Do not export AWS / servlet types from api
+### Step 8 — Semantic residual ✅
+- [x] Provider bulk-import uses `ContentStreamPort` (not `ContentPipe`)
+- [x] `ContentPipe` implements `ContentStreamPort`; registered in OSGi
+- [x] Impl no longer exports util/processor packages (AWS/FS stay internal)
+- [x] Pure DTO/port types on document-api; composition root keeps api+impl
 
 ### Step 9 — Docs ✅
 This plan + module README + osgi / parent 15 updates.

@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort;
 import org.apache.fineract.infrastructure.contentstore.service.ContentStoreService;
 import org.apache.fineract.infrastructure.documentmanagement.service.DocumentReadPlatformService;
 import org.apache.fineract.infrastructure.documentmanagement.service.DocumentWritePlatformService;
@@ -38,14 +39,17 @@ class DocumentOsgiServiceRegistrarTest {
         @SuppressWarnings("unchecked")
         final ObjectProvider<ContentStoreService> contentStore = mock(ObjectProvider.class);
         @SuppressWarnings("unchecked")
+        final ObjectProvider<ContentStreamPort> contentStream = mock(ObjectProvider.class);
+        @SuppressWarnings("unchecked")
         final ObjectProvider<DocumentReadPlatformService> read = mock(ObjectProvider.class);
         @SuppressWarnings("unchecked")
         final ObjectProvider<DocumentWritePlatformService> write = mock(ObjectProvider.class);
         when(contentStore.getIfAvailable()).thenReturn(mock(ContentStoreService.class));
+        when(contentStream.getIfAvailable()).thenReturn(mock(ContentStreamPort.class));
         when(read.getIfAvailable()).thenReturn(mock(DocumentReadPlatformService.class));
         when(write.getIfAvailable()).thenReturn(mock(DocumentWritePlatformService.class));
 
-        final DocumentOsgiServiceRegistrar registrar = new DocumentOsgiServiceRegistrar(contentStore, read, write);
+        final DocumentOsgiServiceRegistrar registrar = new DocumentOsgiServiceRegistrar(contentStore, contentStream, read, write);
         assertDoesNotThrow(registrar::afterPropertiesSet);
         assertDoesNotThrow(registrar::destroy);
     }

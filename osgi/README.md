@@ -52,15 +52,15 @@ Loan uses **rates-api only** (`floatingRateId` + port).
 
 Charge/loan/savings use **tax-api only** (`taxGroupId` / `taxComponentId` + ports). Plan: [15_osgi_bundle_refactoring_fineract-tax.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-tax.md).
 
-### Wave 2: fineract-document bundles (in progress)
+### Wave 2: fineract-document bundles (complete)
 
 | Artifact | Bundle-SymbolicName | Notes |
 |----------|---------------------|-------|
-| `fineract-document-api` | `org.apache.fineract.document.api` | `ContentStoreService`, document/image ports, DTOs |
+| `fineract-document-api` | `org.apache.fineract.document.api` | `ContentStoreService`, `ContentStreamPort`, document/image ports |
 | `fineract-document-impl` | `org.apache.fineract.document.impl` | FS/S3 + REST + `DocumentOsgiServiceRegistrar` |
 | `fineract-document-test` | `org.apache.fineract.document.test` | Fragment-Host → document.impl |
 
-Provider/war take **api + impl** (`ContentPipe` residual). Plan: [15_osgi_bundle_refactoring_fineract-document.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-document.md).
+Provider bulk-import uses **`ContentStreamPort`**; composition root still api+impl. Plan: [15_osgi_bundle_refactoring_fineract-document.md](../docs/arc42/15_osgi_bundle_refactoring_fineract-document.md).
 
 ## Layout
 

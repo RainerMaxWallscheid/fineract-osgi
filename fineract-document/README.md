@@ -13,18 +13,18 @@ No `:fineract-document` façade.
 
 ### Module API
 
-- **Port:** `ContentStoreService` (download / upload / delete / store type)
+- **Ports:** `ContentStoreService` (FS/S3), `ContentStreamPort` (async stream pipe)
 - Document & image read/write service interfaces
 - Pure request/response DTOs and command types
 - Content-store exceptions
 
-Adapters: `FileContentStoreService`, `S3ContentStoreService` (impl only — do not leak AWS types into api).
+Adapters: `FileContentStoreService`, `S3ContentStoreService`, `ContentPipe` (impl only — do not leak AWS types into api).
 
 ### Consumers
 
 | Module | Depend on |
 |--------|-----------|
-| provider / war | `-api` + `-impl` (`ContentPipe` residual + composition root) |
+| provider / war | `-api` + `-impl` (composition root; bulk-import uses `ContentStreamPort`) |
 
 ```bash
 ./gradlew :fineract-document-api:jar :fineract-document-impl:jar :fineract-document-test:test

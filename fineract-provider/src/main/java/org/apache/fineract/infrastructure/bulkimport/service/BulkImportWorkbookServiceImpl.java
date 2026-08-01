@@ -34,7 +34,7 @@ import org.apache.fineract.infrastructure.bulkimport.domain.ImportDocument;
 import org.apache.fineract.infrastructure.bulkimport.domain.ImportDocumentRepository;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
 import org.apache.fineract.infrastructure.bulkimport.mapping.ImportDocumentMapper;
-import org.apache.fineract.infrastructure.contentstore.util.ContentPipe;
+import org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.exception.GeneralPlatformDomainRuleException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
@@ -62,7 +62,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     private final ImportDocumentRepository importDocumentRepository;
     private final DocumentWritePlatformService writePlatformService;
     private final JdbcTemplate jdbcTemplate;
-    private final ContentPipe pipe;
+    private final ContentStreamPort contentStreamPort;
     private final ImportDocumentMapper mapper;
 
     @Override
@@ -157,7 +157,7 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     }
 
     private DocumentCreateResponse createDocument(final Workbook workbook, final FormDataContentDisposition fileDetail, final String fileType) {
-        final var pipedInputStream = pipe.pipe(output -> {
+        final var pipedInputStream = contentStreamPort.pipe(output -> {
             workbook.write(output);
         });
         // TODO: does it really make sense to use the current user's ID?
@@ -218,13 +218,13 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     }
 
     @java.lang.SuppressWarnings("all")
-        public BulkImportWorkbookServiceImpl(final TransactionBoundApplicationEventPublisher eventPublisher, final PlatformSecurityContext securityContext, final ImportDocumentRepository importDocumentRepository, final DocumentWritePlatformService writePlatformService, final JdbcTemplate jdbcTemplate, final ContentPipe pipe, final ImportDocumentMapper mapper) {
+        public BulkImportWorkbookServiceImpl(final TransactionBoundApplicationEventPublisher eventPublisher, final PlatformSecurityContext securityContext, final ImportDocumentRepository importDocumentRepository, final DocumentWritePlatformService writePlatformService, final JdbcTemplate jdbcTemplate, final ContentStreamPort contentStreamPort, final ImportDocumentMapper mapper) {
         this.eventPublisher = eventPublisher;
         this.securityContext = securityContext;
         this.importDocumentRepository = importDocumentRepository;
         this.writePlatformService = writePlatformService;
         this.jdbcTemplate = jdbcTemplate;
-        this.pipe = pipe;
+        this.contentStreamPort = contentStreamPort;
         this.mapper = mapper;
     }
 }

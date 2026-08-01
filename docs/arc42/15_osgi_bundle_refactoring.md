@@ -225,7 +225,7 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 
 | Rank | Module | ~main scale | Why | Caveat |
 |------|--------|-------------|-----|--------|
-| **4** | **`fineract-document`** | ~85 | **In progress** — api/impl/test + `ContentStoreService` port; provider still impl for `ContentPipe`. [document plan](15_osgi_bundle_refactoring_fineract-document.md) | Port cleanup first; do not leak servlet/AWS types into `-api` |
+| **4** | **`fineract-document`** | ~85 | **Complete** — api/impl/test + `ContentStoreService` / `ContentStreamPort`; provider on ports. [document plan](15_osgi_bundle_refactoring_fineract-document.md) | Do not leak servlet/AWS types into `-api` |
 | **5** | **`fineract-branch`** | ~50 | Clear org aggregate (teller/cashier) | Less “optional extension” value than charge/document |
 | **6** | **`fineract-loan-origination`** | ~60 | Bounded slice vs full loan | Couples to loan types — extract ports carefully |
 | **7** | **`fineract-mix`** | ~35 | Small XBRL/reporting support | Niche; lower strategic value for OSGi services |
@@ -262,18 +262,19 @@ Optional `fineract-<name>-integrationtest` only if several modules need shared f
 
 ```text
 Wave 1 done             → charge, rates, tax     ★★★ complete
-Hexagonal adapters      → document               ★★★ next
+Wave 2 started          → document               ★★★ complete
+Next Wave 2             → branch                 ★★☆ next
 Many dependents         → accounting             high value, more rewiring
 Huge / core banking     → loan, provider         later
 Shared kernel           → core, validation       don't force BC split
 ```
 
-#### Parallel work after Wave 1
+#### Parallel work after Wave 1 / document
 
 | Priority | Action |
 |----------|--------|
-| **Next PR series** | Finish **document Step 8** (`ContentPipe` residual) — [document plan](15_osgi_bundle_refactoring_fineract-document.md) |
-| **Parallel** | Command **Step 8**: retarget core/provider/cob/document/mix off the command façade |
+| **Next PR series** | **`fineract-branch`** api/impl/test — [15.6 Wave 2](#wave-2--strong-hexagonal-medium-size) |
+| **Parallel** | Command **Step 8**: retarget core/provider/cob/mix off the command façade |
 | **Do not start** | loan / provider / full-core split |
 
 ---

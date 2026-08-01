@@ -20,8 +20,12 @@
 /**
  * Module API (ADR-021 / ADR-022) for content storage.
  *
- * <p>The primary OSGi port is {@link org.apache.fineract.infrastructure.contentstore.service.ContentStoreService}
- * (FS vs S3 adapters live in document-impl). Prefer that interface over adapter-specific types.
+ * <p>Primary OSGi ports:
+ * <ul>
+ *   <li>{@link org.apache.fineract.infrastructure.contentstore.service.ContentStoreService} — FS vs S3</li>
+ *   <li>{@link ContentStreamPort} — async stream piping for bulk import / processors</li>
+ * </ul>
+ * Prefer these over adapter-specific or Spring utility types in document-impl.
  *
  * @see docs/arc42/15_osgi_bundle_refactoring_fineract-document.md
  */

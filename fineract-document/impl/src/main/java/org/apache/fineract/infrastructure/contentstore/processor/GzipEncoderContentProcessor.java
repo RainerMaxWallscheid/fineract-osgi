@@ -20,7 +20,7 @@ package org.apache.fineract.infrastructure.contentstore.processor;
 
 import static java.util.Objects.requireNonNullElse;
 import java.util.zip.GZIPOutputStream;
-import org.apache.fineract.infrastructure.contentstore.util.ContentPipe;
+import org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +30,7 @@ public class GzipEncoderContentProcessor implements ContentProcessor {
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GzipEncoderContentProcessor.class);
     private static final String GZIP_ENCODE_PREFIX = "gzip.encode.";
     public static final String GZIP_ENCODE_PARAM_BUFFER_SIZE = GZIP_ENCODE_PREFIX + "buffer-size";
-    private final ContentPipe pipe;
+    private final ContentStreamPort pipe;
     private final FineractProperties properties;
 
     @Override
@@ -43,7 +43,7 @@ public class GzipEncoderContentProcessor implements ContentProcessor {
     }
 
     @java.lang.SuppressWarnings("all")
-        public GzipEncoderContentProcessor(final ContentPipe pipe, final FineractProperties properties) {
+        public GzipEncoderContentProcessor(final ContentStreamPort pipe, final FineractProperties properties) {
         this.pipe = pipe;
         this.properties = properties;
     }

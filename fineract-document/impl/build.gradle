@@ -65,10 +65,8 @@ jar {
                         + 'org.apache.fineract.infrastructure.documentmanagement.data,'
                         + 'org.apache.fineract.infrastructure.documentmanagement.exception,'
                         + '*',
-                // Residual: ContentPipe / processors used by provider bulk-import until retargeted.
-                'Export-Package': 'org.apache.fineract.infrastructure.contentstore.util,'
-                        + 'org.apache.fineract.infrastructure.contentstore.config,'
-                        + 'org.apache.fineract.infrastructure.contentstore.processor',
+                // Spring config package only for Boot wiring; no ContentPipe/processor export (use ContentStreamPort).
+                'Export-Package': 'org.apache.fineract.infrastructure.contentstore.config',
                 'Automatic-Module-Name': 'org.apache.fineract.document.impl'
                 )
     }

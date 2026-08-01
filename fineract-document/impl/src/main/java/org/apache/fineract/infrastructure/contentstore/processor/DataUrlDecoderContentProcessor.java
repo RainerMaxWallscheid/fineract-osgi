@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.fineract.infrastructure.contentstore.util.ContentPipe;
+import org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +37,7 @@ public class DataUrlDecoderContentProcessor implements ContentProcessor {
     public static final String DATA_URL_DECODE_RESULT_CONTENT_TYPE = DATA_URL_PREFIX + "result.content-type";
     public static final String DATA_URL_DECODE_RESULT_ENCODING = DATA_URL_PREFIX + "result.encoding";
     public static final String DATA_URL_DECODE_PARAM_BUFFER_SIZE = DATA_URL_PREFIX + "param.buffer-size";
-    private final ContentPipe pipe;
+    private final ContentStreamPort pipe;
     private final FineractProperties properties;
 
     @Override
@@ -129,7 +129,7 @@ public class DataUrlDecoderContentProcessor implements ContentProcessor {
     }
 
     @java.lang.SuppressWarnings("all")
-        public DataUrlDecoderContentProcessor(final ContentPipe pipe, final FineractProperties properties) {
+        public DataUrlDecoderContentProcessor(final ContentStreamPort pipe, final FineractProperties properties) {
         this.pipe = pipe;
         this.properties = properties;
     }

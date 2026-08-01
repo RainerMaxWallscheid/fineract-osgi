@@ -24,7 +24,7 @@ import org.apache.fineract.infrastructure.bulkimport.data.BulkImportEvent;
 import org.apache.fineract.infrastructure.bulkimport.data.GlobalEntityType;
 import org.apache.fineract.infrastructure.bulkimport.domain.ImportDocumentRepository;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandler;
-import org.apache.fineract.infrastructure.contentstore.util.ContentPipe;
+import org.apache.fineract.infrastructure.contentstore.moduleapi.ContentStreamPort;
 import org.apache.fineract.infrastructure.core.exception.GeneralPlatformDomainRuleException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
@@ -41,7 +41,7 @@ public class BulkImportEventListener implements ApplicationListener<BulkImportEv
         private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BulkImportEventListener.class);
     private final ApplicationContext applicationContext;
     private final ImportDocumentRepository importRepository;
-    private final ContentPipe pipe;
+    private final ContentStreamPort contentStreamPort;
     private final CommandDispatcher dispatcher;
 
     @Override
@@ -73,7 +73,7 @@ public class BulkImportEventListener implements ApplicationListener<BulkImportEv
             };
             final var count = importHandler.process(event.getWorkbook(), event.getLocale(), event.getDateFormat());
             event.getImportDocument().update(DateUtils.getLocalDateTimeOfTenant(), count.getSuccessCount(), count.getErrorCount());
-            final var pipedInputStream = pipe.pipe(output -> {
+            final var pipedInputStream = contentStreamPort.pipe(output -> {
                 event.getWorkbook().write(output);
             });
             final var command = new DocumentUpdateCommand();
@@ -89,10 +89,10 @@ public class BulkImportEventListener implements ApplicationListener<BulkImportEv
     }
 
     @java.lang.SuppressWarnings("all")
-        public BulkImportEventListener(final ApplicationContext applicationContext, final ImportDocumentRepository importRepository, final ContentPipe pipe, final CommandDispatcher dispatcher) {
+        public BulkImportEventListener(final ApplicationContext applicationContext, final ImportDocumentRepository importRepository, final ContentStreamPort contentStreamPort, final CommandDispatcher dispatcher) {
         this.applicationContext = applicationContext;
         this.importRepository = importRepository;
-        this.pipe = pipe;
+        this.contentStreamPort = contentStreamPort;
         this.dispatcher = dispatcher;
     }
 }
